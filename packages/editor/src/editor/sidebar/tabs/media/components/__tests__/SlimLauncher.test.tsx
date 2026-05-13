@@ -25,19 +25,18 @@ const baseItem: Omit<LibraryItem, "key" | "name" | "type" | "src" | "thumb"> = {
   mimeType: "image/jpeg",
 };
 
-const makeItem = (overrides: Partial<LibraryItem>): LibraryItem =>
-  ({
-    ...baseItem,
-    key: "a",
-    name: "a.jpg",
-    type: "img",
-    src: "",
-    thumb: "",
-    ...overrides,
-  }) as LibraryItem;
+const makeItem = (overrides: Partial<LibraryItem>): LibraryItem => ({
+  ...baseItem,
+  key: "a",
+  name: "a.jpg",
+  type: "img" as const,
+  src: "",
+  thumb: "",
+  ...overrides,
+});
 
 const baseProps = () => ({
-  composer: mockComposer() as never,
+  composer: mockComposer(),
   libraryItems: [] as LibraryItem[],
   activeType: "all" as const,
   counts: { all: 0, img: 0, vid: 0, ico: 0, fnt: 0 },
@@ -102,12 +101,16 @@ describe("SlimLauncher — §10 default 320px experience", () => {
   });
 
   it("filters grid by type pill click", async () => {
-    const onTypeChange = vi.fn();
     const user = userEvent.setup();
+    const items = [
+      makeItem({ key: "a", name: "a.jpg", type: "img", src: "x", thumb: "x" }),
+      makeItem({ key: "b", name: "b.mp4", type: "vid", src: "y", thumb: "y" }),
+    ];
     // @ts-expect-error — props mismatch until Task 11 rewrite
-    render(<SlimLauncher {...baseProps()} onTypeChange={onTypeChange} />);
+    const { container } = render(<SlimLauncher {...baseProps()} libraryItems={items} />);
     await user.click(screen.getByRole("tab", { name: /^Video/i }));
-    expect(onTypeChange).toHaveBeenCalledWith("vid");
+    const cells = container.querySelectorAll(".med-asset-cell");
+    expect(cells.length).toBe(1);
   });
 
   it("opens stock modal when '+ Stock' clicked", async () => {
