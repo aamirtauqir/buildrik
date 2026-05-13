@@ -96,4 +96,12 @@ describe("AssetCell", () => {
     );
     expect(container.querySelector(".med-asset-cell--locked")).toBeInTheDocument();
   });
+
+  it("locked cell does NOT fire onClick", async () => {
+    const onClick = vi.fn();
+    const user = userEvent.setup();
+    render(<AssetCell item={imgItem} onClick={onClick} isLocked />);
+    await user.click(screen.getByRole("button"));
+    expect(onClick).not.toHaveBeenCalled();
+  });
 });

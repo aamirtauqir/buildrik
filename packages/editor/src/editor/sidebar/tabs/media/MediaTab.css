@@ -1602,8 +1602,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.med-asset-cell__lock-overlay::after {
-  content: "🔒";
-  font-size: 18px;
+  color: var(--bd-fg-muted, #64748B);
 }

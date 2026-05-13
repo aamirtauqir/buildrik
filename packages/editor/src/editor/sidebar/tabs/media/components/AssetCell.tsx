@@ -9,7 +9,7 @@
  * primitive whose visual is the thumb itself — vibcoder Button chrome
  * (padding, hover bg) would conflict with the edge-to-edge thumb fill.
  */
-import { Play, FileType } from "lucide-react";
+import { Play, FileType, Lock } from "lucide-react";
 import type { MouseEvent } from "react";
 import type { LibraryItem } from "../data/mediaTypes";
 import { UsagePips } from "./UsagePips";
@@ -49,6 +49,7 @@ export function AssetCell({
     <button
       type="button"
       className={className}
+      disabled={isLocked}
       onClick={() => onClick(item.key)}
       onDoubleClick={onDoubleClick ? () => onDoubleClick(item.key) : undefined}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, item.key) : undefined}
@@ -82,7 +83,9 @@ export function AssetCell({
         <span className="med-asset-cell__applied-badge">APPLIED</span>
       ) : null}
       {isLocked ? (
-        <div className="med-asset-cell__lock-overlay" aria-hidden="true" />
+        <div className="med-asset-cell__lock-overlay" aria-hidden="true">
+          <Lock size={18} />
+        </div>
       ) : null}
     </button>
   );
