@@ -268,17 +268,36 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             <h2 className="tpl-header-title tpl-header-title--sm">Choose a template for your new page</h2>
             <div className="tpl-newpage-chip">New Page</div>
           </div>
+        ) : detailTemplate ? (
+          <div className="tpl-header-breadcrumb">
+            <Button
+              className="tpl-header-back"
+              onClick={() => sel.setDetailId(null)}
+              aria-label="Back to templates"
+            >
+              ‹ Back
+            </Button>
+            <span className="tpl-header-path">
+              <span className="tpl-header-path-cat">
+                {(detailTemplate.category || "Templates").replace(/-/g, " ")}
+              </span>
+              <span className="tpl-header-path-sep">›</span>
+              <span className="tpl-header-path-current">{detailTemplate.name}</span>
+            </span>
+          </div>
         ) : (
           <h2 className="tpl-header-title">Templates</h2>
         )}
         <div className="tpl-header-actions">
-          <Button
-            className="tpl-header-btn"
-            onClick={() => setShowSearch(!showSearch)}
-            aria-label={showSearch ? "Close search" : "Search templates"}
-          >
-            <Search size={16} />
-          </Button>
+          {!detailTemplate && (
+            <Button
+              className="tpl-header-btn"
+              onClick={() => setShowSearch(!showSearch)}
+              aria-label={showSearch ? "Close search" : "Search templates"}
+            >
+              <Search size={16} />
+            </Button>
+          )}
           {onClose && (
             <Button className="tpl-header-btn" onClick={onClose} aria-label="Close templates">
               <X size={16} />
@@ -400,7 +419,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                   onApplyToCurrent={handleApplyToCurrent}
                   onAddAsNewPage={handleAddAsNewPage}
                   onPreview={(id) => sel.setPreviewId(id)}
-                  onCancel={() => sel.setDetailId(null)}
                   usageCount={detailUsage.length}
                   onShowUsage={() => setUsageDrawerOpen(true)}
                   currentPageName={activePageInfo?.name}

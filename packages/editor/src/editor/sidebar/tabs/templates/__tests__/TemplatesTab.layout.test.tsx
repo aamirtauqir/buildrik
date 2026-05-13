@@ -3,7 +3,7 @@
  * TemplatesTab layout tests — prototype-v3 §2 inline detail panel.
  * Verifies grid stays visible beside detail (no display:none regression),
  * detail-layout wrapper carries --split modifier when detail open,
- * and header breadcrumb is removed (in-panel breadcrumb is canonical).
+ * and header swaps "Templates" title for breadcrumb path in detail mode.
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -51,15 +51,18 @@ describe("TemplatesTab — inline detail layout (prototype-v3 §2)", () => {
     expect(grid?.children.length).toBeGreaterThan(0);
   });
 
-  it("does not render the header breadcrumb (.tpl-breadcrumb) when detail is open", async () => {
+  it("swaps the 'Templates' title for a breadcrumb path when detail is open", async () => {
     const user = userEvent.setup();
     const { container } = render(<TemplatesTab composer={null} />);
 
     const cards = container.querySelectorAll(".tpl-card");
     await user.click(cards[0]);
 
-    const headerBreadcrumb = container.querySelector(".tpl-header .tpl-breadcrumb");
-    expect(headerBreadcrumb).toBeNull();
-    expect(screen.getByRole("heading", { name: "Templates" })).toBeInTheDocument();
+    // Title is replaced by breadcrumb
+    expect(screen.queryByRole("heading", { name: "Templates" })).toBeNull();
+    const headerBreadcrumb = container.querySelector(".tpl-header .tpl-header-breadcrumb");
+    expect(headerBreadcrumb).not.toBeNull();
+    expect(container.querySelector(".tpl-header-back")).not.toBeNull();
+    expect(container.querySelector(".tpl-header-path-current")).not.toBeNull();
   });
 });

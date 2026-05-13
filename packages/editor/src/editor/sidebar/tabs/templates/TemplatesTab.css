@@ -377,17 +377,17 @@
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
 }
 
-/* ── Detail panel: breadcrumb row (prototype-v3 §2) ── */
-.tpl-detail-breadcrumb {
+/* ── Panel header: breadcrumb row in detail mode (prototype-v3 §2) ── */
+.tpl-header-breadcrumb {
   display: flex;
   align-items: center;
-  gap: var(--bd-space-2);
-  padding-bottom: var(--bd-space-2);
-  border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
-.tpl-detail-breadcrumb-back {
+.tpl-header-back {
   height: 24px;
-  padding: 0 6px;
+  padding: 2px 6px;
   background: transparent;
   border: none;
   color: var(--bd-fg-muted, #64748B);
@@ -398,53 +398,35 @@
   font-family: inherit;
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
 }
-.tpl-detail-breadcrumb-back:hover {
+.tpl-header-back:hover {
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   color: var(--bd-fg, var(--bd-fg-primary));
 }
-.tpl-detail-breadcrumb-path {
+.tpl-header-path {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
+  font-size: 11px;
   flex: 1;
   min-width: 0;
 }
-.tpl-detail-breadcrumb-cat {
+.tpl-header-path-cat {
   color: var(--bd-fg-muted, #64748B);
   text-transform: capitalize;
   flex-shrink: 0;
 }
-.tpl-detail-breadcrumb-sep {
+.tpl-header-path-sep {
   color: var(--bd-fg-muted, #94A3B8);
   flex-shrink: 0;
 }
-.tpl-detail-breadcrumb-current {
+.tpl-header-path-current {
   color: var(--bd-fg, var(--bd-fg-primary));
-  font-weight: 500;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.tpl-detail-breadcrumb-close {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: var(--bd-fg-muted, #64748B);
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.tpl-detail-breadcrumb-close:hover {
-  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
-  color: var(--bd-fg, var(--bd-fg-primary));
 }
 
 /* ── Detail panel: APPLIED HERE badge on preview ── */

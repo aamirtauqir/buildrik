@@ -22,7 +22,6 @@ interface TemplateDetailProps {
   onApplyToCurrent: (id: string) => void;
   onAddAsNewPage: (id: string) => void;
   onPreview: (id: string) => void;
-  onCancel: () => void;
   previewState?: "loading" | "error" | "ready";
   onPreviewRetry?: () => void;
   /** S9: count of pages this template is applied to (drives "Used in" link). */
@@ -43,7 +42,6 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
   onApplyToCurrent,
   onAddAsNewPage,
   onPreview,
-  onCancel,
   previewState = "ready",
   onPreviewRetry,
   usageCount,
@@ -54,35 +52,10 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
   const isPremium = template.status === "premium";
   const typeLabel = (template.type || template.category || "TEMPLATE").toUpperCase();
   const statusLabel = isPremium ? "PRO" : "FREE";
-  const breadcrumbCat = (template.category || "Templates").replace(/-/g, " ");
   const pageName = currentPageName || "current page";
 
   return (
     <div className="tpl-detail">
-      {/* Breadcrumb row */}
-      <div className="tpl-detail-breadcrumb">
-        <Button
-          className="tpl-detail-breadcrumb-back"
-          onClick={onCancel}
-          aria-label="Back to templates"
-        >
-          ‹ Back
-        </Button>
-        <span className="tpl-detail-breadcrumb-path">
-          <span className="tpl-detail-breadcrumb-cat">{breadcrumbCat}</span>
-          <span className="tpl-detail-breadcrumb-sep">›</span>
-          <span className="tpl-detail-breadcrumb-current">{template.name}</span>
-        </span>
-        <Button
-          className="tpl-detail-breadcrumb-close"
-          onClick={onCancel}
-          aria-label="Close detail"
-          title="Close"
-        >
-          ✕
-        </Button>
-      </div>
-
       {/* Preview block */}
       <div
         className="tpl-detail-preview"
