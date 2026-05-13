@@ -1479,3 +1479,25 @@
   height: auto;
   min-height: 0;
 }
+
+/* Usage pips (cobalt dots = N pages used) — prototype-v3 §10/§12/§15 */
+.med-usage-pips {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  display: flex;
+  gap: 2px;
+}
+.med-usage-pip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--bd-accent);
+}
+.med-usage-pip--overflow {
+  width: 7px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--bd-accent);
+  opacity: 0.6;
+}
