@@ -252,11 +252,31 @@
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px var(--bd-accent-tint);
 }
+.tpl-card--applied {
+  border-color: var(--bd-accent);
+  border-width: 2px;
+}
 
 .tpl-card-thumb {
+  position: relative;
   aspect-ratio: 4 / 3;
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   flex-shrink: 0;
+}
+
+/* APPLIED badge — top-right of thumb (prototype-v3 §1) */
+.tpl-card-applied-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 2px 6px;
+  background: var(--bd-accent);
+  color: var(--bd-bg-card, #fff);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 3px;
+  line-height: 1.2;
 }
 
 .tpl-card-info {
@@ -285,8 +305,20 @@
   padding: 0 var(--bd-space-3) 6px;
 }
 .tpl-card-category {
-  font-size: 11px;
-  color: var(--bd-fg-secondary, var(--bd-fg-muted));
+  font-size: 10px;
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
+  margin-top: 1px;
+}
+.tpl-card-meta-sep {
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
+  opacity: 0.6;
+}
+.tpl-card-status {
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
+}
+.tpl-card-status--pro {
+  color: var(--bd-warn, #B45309);
+  font-weight: 600;
 }
 
 /* ── Detail panel — full width when active (sidebar is 280px) ── */

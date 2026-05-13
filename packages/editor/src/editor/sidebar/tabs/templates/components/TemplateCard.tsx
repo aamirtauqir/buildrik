@@ -15,6 +15,9 @@ export interface TemplateCardProps {
   template: TemplateItem;
   onClick: (id: string) => void;
   isSelected?: boolean;
+  /** True when this template is the most-recently applied one for current page.
+   *  Drives the cobalt APPLIED badge (prototype-v3 §1). */
+  isApplied?: boolean;
   /** Active search query — wraps matching substring in <mark> for highlight. */
   highlightQuery?: string;
 }
@@ -46,6 +49,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
   template,
   onClick,
   isSelected = false,
+  isApplied = false,
   highlightQuery,
 }) => {
   const handleActivate = React.useCallback(() => {
@@ -62,8 +66,14 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
     [handleActivate]
   );
 
-  const className = `tpl-card${isSelected ? " tpl-card--selected" : ""}`;
+  const className = [
+    "tpl-card",
+    isSelected && "tpl-card--selected",
+    isApplied && "tpl-card--applied",
+  ].filter(Boolean).join(" ");
   const categoryLabel = formatCategory(template.category);
+  const isPremium = template.status === "premium";
+  const statusLabel = isPremium ? "Pro" : "Free";
 
   return (
     <div
@@ -81,13 +91,22 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
         aria-hidden="true"
       >
         <span className="tpl-card-thumb-icon">{template.icon}</span>
-        {template.status === "premium" && (
+        {isApplied && (
+          <span className="tpl-card-applied-badge" aria-label="Applied to current page">APPLIED</span>
+        )}
+        {!isApplied && isPremium && (
           <span className="tpl-card-badge">Pro</span>
         )}
       </div>
       <div className="tpl-card-info">
         <div className="tpl-card-name">{highlightQuery ? renderHighlighted(template.name, highlightQuery) : template.name}</div>
-        {categoryLabel && <div className="tpl-card-category">{categoryLabel}</div>}
+        {categoryLabel && (
+          <div className="tpl-card-category">
+            {categoryLabel}
+            <span className="tpl-card-meta-sep"> · </span>
+            <span className={`tpl-card-status${isPremium ? " tpl-card-status--pro" : ""}`}>{statusLabel}</span>
+          </div>
+        )}
       </div>
     </div>
   );

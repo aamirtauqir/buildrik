@@ -407,6 +407,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                       key={tpl.id}
                       template={tpl}
                       isSelected={sel.detailId === tpl.id}
+                      isApplied={appliedId === tpl.id}
                       onClick={(id) => sel.setDetailId(sel.detailId === id ? null : id)}
                       highlightQuery={sel.searchQ.trim() || undefined}
                     />
