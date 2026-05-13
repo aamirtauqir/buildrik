@@ -1501,3 +1501,35 @@
   background: var(--bd-accent);
   opacity: 0.6;
 }
+
+/* Storage quota bar — prototype-v3 §10 / §22 */
+.med-quota-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.med-quota-text {
+  font-size: 10px;
+  color: var(--bd-fg-muted, #64748B);
+}
+.med-quota-track {
+  height: 3px;
+  background: var(--bd-bg-subtle, #f1f5f9);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.med-quota-fill {
+  height: 100%;
+  background: var(--bd-accent);
+  transition: width 180ms ease;
+}
+.med-quota-bar--near-limit .med-quota-fill {
+  background: var(--bd-warn, #d97706);
+}
+.med-quota-bar--exhausted .med-quota-fill {
+  background: var(--bd-danger, #dc2626);
+}
+.med-quota-bar--near-limit .med-quota-text,
+.med-quota-bar--exhausted .med-quota-text {
+  color: var(--bd-warn, #b45309);
+}
