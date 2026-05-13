@@ -547,6 +547,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .med-tab .med-type-pill:hover,
 .exp-panel .med-type-pill:hover {

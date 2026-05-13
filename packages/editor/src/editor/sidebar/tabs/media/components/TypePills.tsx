@@ -41,6 +41,8 @@ export function TypePills({
             key={p.key}
             type="button"
             role="tab"
+            size="sm"
+            variant="ghost"
             aria-selected={isActive}
             className={`med-type-pill${isActive ? " med-type-pill--active" : ""}`}
             onClick={() => onTypeChange(p.key)}

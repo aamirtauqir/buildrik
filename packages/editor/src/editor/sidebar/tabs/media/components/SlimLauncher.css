@@ -44,9 +44,21 @@
 .sl-controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   padding: 10px 12px 0;
+}
+/* TypePills row scrolls horizontally inside the controls so the
+ * "+ Stock" button always stays visible on the right at 320px panel
+ * width. Matches prototype-v3 §10 layout (pills left, Stock right). */
+.sl-controls .med-type-pills {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sl-controls .med-type-pills::-webkit-scrollbar {
+  display: none;
 }
 .sl-stock-btn.bd-btn {
   flex-shrink: 0;
