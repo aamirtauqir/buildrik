@@ -18,6 +18,19 @@ User feedback 2026-05-13: "media tab ki protypes is example sae bilkul bhee matc
 
 Solo workflow (commit-to-main) per `feedback_solo_workflow`.
 
+## Definitions
+
+| Term | Meaning |
+|------|---------|
+| **Functional parity** | Every feature shown in prototype works in live editor — same trigger, same UI affordance, same end-state. Pixel-exact spacing/sizing not required. |
+| **DS-token alignment** | All colors via `var(--bd-*)` aliases; spacing via `var(--bd-space-*)` aliases OR literal px values that fall on 4-base grid (4, 8, 12, 16, 20, 24, 32, 48); motion via `var(--bd-motion-*)` aliases OR literal 120ms / 180ms. No inline hex, no Arial fallback, no spring physics. |
+| **Per-section TDD** | Failing test commit must precede any implementation commit for that section. Test file naming: `__tests__/Section<N>.test.tsx`. |
+| **Audit first, fix-forward** | For each section: read current code, identify gap, fix only gap. No throwaway rewrites of working features. |
+| **SSOT contract** | Concept has exactly one canonical home. New consumers import; never re-create. |
+| **Pre-implementation audit** | Free-form code reading at the START of a section phase, BEFORE writing failing test. Outputs: gap list + commit count estimate refresh. Not a commit. |
+| **Phase 0** | Structural extraction of shared SSOT components. Zero feature change. Tests gate every commit. |
+| **§N phase** | Numbered sequential phase 1-13. Each maps to one prototype section (§10-§22). |
+
 ## Constraints (user-locked)
 
 | Constraint | Value | Locked at |
@@ -119,13 +132,13 @@ Fullpage mode (no `onOpenLibrary` callback) is OUT OF SCOPE — prototype only d
 
 **Current state:** Implemented inline in `MediaTab.tsx:211-242` with hardcoded styles. Functional, but violates SSOT (inline styles, no component extraction).
 
-**Gap signal:** Extract `SelectionContextBar` component, replace inline; verify visual matches prototype tokens. Estimated 3-4 commits.
+**Gap signal:** Component extraction happens in Phase 0 (refactor only). §11 phase verifies the extracted component matches prototype visual (pulsing white dot, cobalt bg, copy wording). Estimated 3-4 commits.
 
 ### §12 — Expanded 560px on upload
 
 **Prototype intent:** On upload, panel expands 320→560px. Inner layout splits: folder tree (180px) + library area (380px). Sort / format / grid-size controls available. "Compact" button collapses back to 320.
 
-**Current state:** `ExpandedMediaPanel.tsx` exists, triggered by `state.panelExpanded`. Internal layout split TBD.
+**Current state:** `ExpandedMediaPanel.tsx` exists, triggered by `state.panelExpanded`. Pre-implementation audit reads file to confirm whether folder tree (180px) + library area (380px) split exists or needs to be built.
 
 **Gap signal:** Audit 180/380 inner split, controls bar parity, Compact button position. Estimated 4-6 commits.
 
@@ -149,7 +162,7 @@ Fullpage mode (no `onOpenLibrary` callback) is OUT OF SCOPE — prototype only d
 
 **Prototype intent:** Click asset → drawer slides in (480px). Five tabs: Preview (full-size + metadata), Where used (pages with this asset), Versions (image edit history), Edit (rename + tags + alt-text), Optimize (compress shortcut). Replace + Delete actions in footer.
 
-**Current state:** `AssetDetailOverlay.tsx` exists. Tab structure TBD.
+**Current state:** `AssetDetailOverlay.tsx` exists. Pre-implementation audit reads file to enumerate current tab structure; missing tabs added to match prototype 5-tab set (Preview / Where used / Versions / Edit / Optimize).
 
 **Gap signal:** Audit 5-tab parity, footer actions, drawer width. Estimated 6-9 commits.
 
@@ -165,7 +178,7 @@ Fullpage mode (no `onOpenLibrary` callback) is OUT OF SCOPE — prototype only d
 
 **Prototype intent:** Full-screen modal. Left: tool rail (crop / rotate / brightness / contrast / saturation / filter). Center: live canvas. Right: parameters + reset + before/after toggle. Save creates v_n+1 in Versions tab — original never overwritten.
 
-**Current state:** `onOpenImageEditor` handler wired through MediaTab; modal component location TBD.
+**Current state:** `onOpenImageEditor` handler wired through MediaTab; pre-implementation audit greps for `ImageEditorModal` / similar; if found, audit tool rail; if not found, build per prototype spec.
 
 **Gap signal:** Locate / create modal; audit tool rail + parameters. Estimated 6-10 commits.
 
@@ -205,7 +218,7 @@ Fullpage mode (no `onOpenLibrary` callback) is OUT OF SCOPE — prototype only d
 
 **Prototype intent:** UploadZone has 6 visual states. States: idle / drag-over / uploading / quota-warning (80%) / exhausted / error. Quota near limit shows warning at 80%; exhausted disables zone with upgrade CTA. Error state per-file keeps queue visible with retry.
 
-**Current state:** `UploadZone.tsx` exists; 6 state variations TBD.
+**Current state:** `UploadZone.tsx` exists; pre-implementation audit enumerates which of 6 state variants (idle / drag-over / uploading / quota-warning / exhausted / error) are already wired vs missing.
 
 **Gap signal:** Audit each of 6 states + transitions. Estimated 4-6 commits.
 
