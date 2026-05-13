@@ -83,3 +83,40 @@
   border-radius: 4px;
   background: var(--bd-bg-card, #fff);
 }
+.sl-grid-wrap {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+.med-asset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  padding: 10px 12px;
+  align-content: start;
+}
+.sl-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 12px;
+  text-align: center;
+  gap: 8px;
+}
+.sl-empty__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bd-fg, var(--bd-fg-primary));
+}
+.sl-empty__body {
+  margin: 0;
+  font-size: 11px;
+  color: var(--bd-fg-muted, #64748B);
+  line-height: 1.5;
+  max-width: 220px;
+}
+.sl-empty__cta.bd-btn {
+  margin-top: 4px;
+}

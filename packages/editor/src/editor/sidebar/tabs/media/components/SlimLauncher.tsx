@@ -16,6 +16,7 @@ import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts } from "../data/mediaTypes";
 import { TypePills } from "./TypePills";
 import { SelectionContextBar } from "./SelectionContextBar";
+import { AssetCell } from "./AssetCell";
 import "./SlimLauncher.css";
 
 interface SlimLauncherProps {
@@ -51,6 +52,17 @@ export function SlimLauncher(props: SlimLauncherProps) {
     selectionContext,
     onCancelSelection,
   } = props;
+
+  // Filter items by activeType + search query
+  const filtered = React.useMemo(() => {
+    let result = props.libraryItems;
+    if (activeType !== "all") result = result.filter((i) => i.type === activeType);
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter((i) => i.name.toLowerCase().includes(q));
+    }
+    return result;
+  }, [props.libraryItems, activeType, searchQuery]);
 
   return (
     <div className="sl-launcher">
@@ -100,7 +112,42 @@ export function SlimLauncher(props: SlimLauncherProps) {
           aria-label="Search library"
         />
       </div>
-      {/* Grid + UploadZone in Tasks 12-13 */}
+      <div className="sl-grid-wrap">
+        {filtered.length === 0 ? (
+          props.libraryItems.length === 0 ? (
+            <div className="sl-empty">
+              <p className="sl-empty__title">Your library is empty</p>
+              <p className="sl-empty__body">
+                Upload your brand assets or browse free stock.
+              </p>
+              <Button
+                type="button"
+                className="sl-empty__cta"
+                onClick={onOpenStock}
+              >
+                Browse stock
+              </Button>
+            </div>
+          ) : (
+            <div className="sl-empty">
+              <p className="sl-empty__body">No assets matching this filter.</p>
+            </div>
+          )
+        ) : (
+          <div className="med-asset-grid" role="listbox" aria-label="Asset library">
+            {filtered.map((item) => (
+              <AssetCell
+                key={item.key}
+                item={item}
+                usageCount={props.usageMap.get(item.key) ?? 0}
+                isApplied={props.appliedAssetKey === item.key}
+                onClick={props.onInsert}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      {/* UploadZone in Task 13 */}
     </div>
   );
 }

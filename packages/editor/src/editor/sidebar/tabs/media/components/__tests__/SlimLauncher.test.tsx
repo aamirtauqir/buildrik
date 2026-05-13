@@ -9,12 +9,13 @@
  * @license BSD-3-Clause
  */
 
+import * as React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SlimLauncher } from "../SlimLauncher";
 import { mockComposer } from "../../__tests__/test-utils/mockComposer";
-import type { LibraryItem } from "../data/mediaTypes";
+import type { LibraryItem, MediaTypeFilter } from "../data/mediaTypes";
 
 const baseItem: Omit<LibraryItem, "key" | "name" | "type" | "src" | "thumb"> = {
   size: 1024,
@@ -91,12 +92,23 @@ describe("SlimLauncher — §10 default 320px experience", () => {
   });
 
   it("filters grid by type pill click", async () => {
+    function Harness() {
+      const [type, setType] = React.useState<MediaTypeFilter>("all");
+      const items = [
+        makeItem({ key: "a", name: "a.jpg", type: "img", src: "x", thumb: "x" }),
+        makeItem({ key: "b", name: "b.mp4", type: "vid", src: "y", thumb: "y" }),
+      ];
+      return (
+        <SlimLauncher
+          {...baseProps()}
+          libraryItems={items}
+          activeType={type}
+          onTypeChange={setType}
+        />
+      );
+    }
     const user = userEvent.setup();
-    const items = [
-      makeItem({ key: "a", name: "a.jpg", type: "img", src: "x", thumb: "x" }),
-      makeItem({ key: "b", name: "b.mp4", type: "vid", src: "y", thumb: "y" }),
-    ];
-    const { container } = render(<SlimLauncher {...baseProps()} libraryItems={items} />);
+    const { container } = render(<Harness />);
     await user.click(screen.getByRole("tab", { name: /^Video/i }));
     const cells = container.querySelectorAll(".med-asset-cell");
     expect(cells.length).toBe(1);
