@@ -50,8 +50,9 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
   appliedToCurrentPage,
 }) => {
   const isPremium = template.status === "premium";
-  const typeLabel = (template.type || template.category || "TEMPLATE").toUpperCase();
-  const statusLabel = isPremium ? "PRO" : "FREE";
+  const rawType = template.type || template.category || "Template";
+  const typeLabel = rawType.charAt(0).toUpperCase() + rawType.slice(1).replace(/-/g, " ");
+  const statusLabel = isPremium ? "Pro" : "Free";
   const pageName = currentPageName || "current page";
 
   return (
@@ -119,7 +120,7 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
             onClick={onShowUsage}
             type="button"
           >
-            USED IN {usageCount} {usageCount === 1 ? "PAGE" : "PAGES"} →
+            Used in {usageCount} {usageCount === 1 ? "page" : "pages"} →
           </Button>
         )}
       </div>

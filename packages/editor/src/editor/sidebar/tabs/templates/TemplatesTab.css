@@ -302,8 +302,9 @@
 }
 
 .tpl-detail-preview {
-  height: 240px;
+  height: 180px;
   border-radius: 6px;
+  border: 1px solid var(--bd-border-light, var(--bd-border));
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   flex-shrink: 0;
   position: relative;
@@ -362,11 +363,12 @@
 }
 .tpl-detail-btn--outline {
   background: var(--bd-bg-card, var(--bd-bg-card));
-  color: var(--bd-accent);
-  border: 1px solid var(--bd-accent);
+  color: var(--bd-fg, var(--bd-fg-primary));
+  border: 1px solid var(--bd-border-light, var(--bd-border));
 }
 .tpl-detail-btn--outline:hover {
-  background: var(--bd-accent-tint);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
+  border-color: var(--bd-border, var(--bd-border-light));
 }
 .tpl-detail-btn--ghost {
   background: var(--bd-bg-card, var(--bd-bg-card));
@@ -458,16 +460,15 @@
   display: inline-flex;
   align-items: center;
   padding: 3px 8px;
-  font-family: var(--bd-font-mono, ui-monospace, "Geist Mono", monospace);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
   border-radius: 999px;
   line-height: 1.2;
   border: none;
   cursor: default;
-  font-family: inherit;
 }
 .tpl-detail-meta-pill--type {
   background: var(--bd-bg-subtle, #F1F5F9);
@@ -493,12 +494,15 @@
 
 /* ── Detail panel: "Apply to" section label ── */
 .tpl-detail-section-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--bd-fg-muted, #64748B);
-  margin-top: var(--bd-space-2);
+  margin-top: 16px;
+  padding-top: 16px;
+  margin-bottom: 8px;
+  border-top: 1px solid var(--bd-border-light, var(--bd-border));
 }
 
 /* ── Detail panel: info note ── */
