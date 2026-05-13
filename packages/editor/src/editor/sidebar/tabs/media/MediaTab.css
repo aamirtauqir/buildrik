@@ -533,7 +533,8 @@
 
 /* TypePills — individual pill */
 .med-tab .med-type-pill,
-.exp-panel .med-type-pill {
+.exp-panel .med-type-pill,
+.sl-launcher .med-type-pill {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -551,14 +552,17 @@
   white-space: nowrap;
 }
 .med-tab .med-type-pill:hover,
-.exp-panel .med-type-pill:hover {
+.exp-panel .med-type-pill:hover,
+.sl-launcher .med-type-pill:hover {
   background: var(--bd-bg, #FFFFFF);
   color: var(--bd-fg, #0F172A);
 }
 .med-tab .med-type-pill--active,
 .exp-panel .med-type-pill--active,
+.sl-launcher .med-type-pill--active,
 .med-tab .med-type-pill[aria-selected="true"],
-.exp-panel .med-type-pill[aria-selected="true"] {
+.exp-panel .med-type-pill[aria-selected="true"],
+.sl-launcher .med-type-pill[aria-selected="true"] {
   background: var(--bd-bg, #FFFFFF);
   color: var(--bd-cobalt, #2D6DFF);
   font-weight: 600;
