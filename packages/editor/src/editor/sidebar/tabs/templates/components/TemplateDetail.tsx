@@ -168,13 +168,14 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
           </svg>
           <span>
             Replacing current {pageName} page content.{" "}
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               className="tpl-detail-info-note-link"
               onClick={() => onAddAsNewPage(template.id)}
             >
               Add as new page instead?
-            </button>
+            </Button>
           </span>
         </div>
       )}

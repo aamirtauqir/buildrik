@@ -522,18 +522,28 @@
   margin-top: 1px;
   color: var(--bd-fg-muted, #94A3B8);
 }
-.tpl-detail-info-note-link {
+/* High specificity to override .bd-btn from vibcoder Button (Gate 24 compliant) */
+.tpl-detail-info-note .tpl-detail-info-note-link.bd-btn,
+.tpl-detail-info-note-link.bd-btn {
   display: inline;
+  height: auto;
+  min-height: 0;
   padding: 0;
+  margin: 0;
   background: none;
   border: none;
   color: var(--bd-accent, #2D6DFF);
   font-family: inherit;
   font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
   text-decoration: underline;
   cursor: pointer;
+  vertical-align: baseline;
 }
-.tpl-detail-info-note-link:hover {
+.tpl-detail-info-note .tpl-detail-info-note-link.bd-btn:hover,
+.tpl-detail-info-note-link.bd-btn:hover {
+  background: none;
   text-decoration: none;
 }
 
