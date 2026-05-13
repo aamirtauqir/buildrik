@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { Composer } from "../../../../../../engine/Composer";
+import type { Composer } from "@/engine/Composer";
 
 interface MockComposerOpts {
   libraryItems?: unknown[];
@@ -17,11 +17,15 @@ export function mockComposer(opts: MockComposerOpts = {}): Composer {
     off: vi.fn((event: string, cb: (payload: unknown) => void) => {
       listeners.get(event)?.delete(cb);
     }),
-    emit: vi.fn(),
-    emitEvent: vi.fn(),
+    emit: vi.fn((event: string, payload?: unknown) => {
+      listeners.get(event)?.forEach((cb) => cb(payload));
+    }),
+    emitEvent: vi.fn((event: string, payload?: unknown) => {
+      listeners.get(event)?.forEach((cb) => cb(payload));
+    }),
     getLibraryItems: vi.fn(() => opts.libraryItems ?? []),
     getFolders: vi.fn(() => opts.folders ?? []),
-    getStorage: vi.fn(() => opts.storage ?? { used: 0, total: 5e9 }),
+    getStorage: vi.fn(() => opts.storage ?? { used: 0, total: 5_000_000_000 }),
   };
   return {
     media,
