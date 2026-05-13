@@ -13,10 +13,11 @@ import { X, Search } from "lucide-react";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import type { Composer } from "@/engine/Composer";
-import type { LibraryItem, MediaTypeFilter, TypeCounts } from "../data/mediaTypes";
+import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { TypePills } from "./TypePills";
 import { SelectionContextBar } from "./SelectionContextBar";
 import { AssetCell } from "./AssetCell";
+import { UploadZone } from "./UploadZone";
 import "./SlimLauncher.css";
 
 interface SlimLauncherProps {
@@ -26,7 +27,7 @@ interface SlimLauncherProps {
   counts: TypeCounts;
   searchQuery: string;
   storage: { used: number; total: number };
-  uploadQueue: unknown[];
+  uploadQueue: UploadProgress[];
   usageMap: Map<string, number>;
   appliedAssetKey?: string;
   onInsert(key: string): void;
@@ -147,7 +148,14 @@ export function SlimLauncher(props: SlimLauncherProps) {
           </div>
         )}
       </div>
-      {/* UploadZone in Task 13 */}
+      <div className="sl-upload-footer">
+        <UploadZone
+          storage={props.storage}
+          onUpload={props.onUpload}
+          uploadQueue={props.uploadQueue}
+          disabled={props.storage.used >= props.storage.total}
+        />
+      </div>
     </div>
   );
 }
