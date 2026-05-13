@@ -1533,3 +1533,77 @@
 .med-quota-bar--exhausted .med-quota-text {
   color: var(--bd-warn, #b45309);
 }
+
+/* Asset cell — prototype-v3 §10/§12/§15 */
+.med-asset-cell {
+  position: relative;
+  aspect-ratio: 1;
+  border: 1px solid var(--bd-border-light, var(--bd-border));
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: var(--bd-bg-subtle, #f1f5f9);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.med-asset-cell:hover {
+  border-color: var(--bd-accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+.med-asset-cell--selected,
+.med-asset-cell--applied {
+  border: 2px solid var(--bd-accent);
+}
+.med-asset-cell--locked {
+  cursor: not-allowed;
+}
+.med-asset-cell--locked:hover {
+  border-color: var(--bd-border-light, var(--bd-border));
+  box-shadow: none;
+}
+.med-asset-cell__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.med-asset-cell__vid-preview,
+.med-asset-cell__ico-preview,
+.med-asset-cell__fnt-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--bd-fg-muted, #64748B);
+  background: var(--bd-bg-card, #fff);
+}
+.med-asset-cell__fnt-preview {
+  font-size: 24px;
+  font-weight: 500;
+}
+.med-asset-cell__applied-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 1px 4px;
+  background: var(--bd-accent);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+  line-height: 1.2;
+}
+.med-asset-cell__lock-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.med-asset-cell__lock-overlay::after {
+  content: "🔒";
+  font-size: 18px;
+}
