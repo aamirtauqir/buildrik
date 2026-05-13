@@ -95,6 +95,7 @@ export interface LibraryStateResult {
   rawAssets: MediaAsset[];
   libraryItems: LibraryItem[];
   folders: MediaFolder[];
+  allFolders: MediaFolder[];
   currentFolderId: string | null;
   setCurrentFolderId(id: string | null): void;
   createFolder(name: string): Promise<void>;
@@ -179,6 +180,7 @@ export interface MediaStateResult {
   // Library
   libraryItems: LibraryItem[];
   folders: MediaFolder[];
+  allFolders: MediaFolder[];
   createFolder(name: string): Promise<void>;
   deleteFolder(id: string): Promise<void>;
   moveAsset(assetId: string, folderId: string | null): Promise<void>;

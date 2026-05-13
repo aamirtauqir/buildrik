@@ -17,6 +17,7 @@ function buildMockState() {
     gridN: 3,
     fmtFilter: null as string | null,
     folders: [] as unknown[],
+    allFolders: [] as unknown[],
     usageMap: new Map<string, number>(),
     upload: (_files: File[]) => {},
     setSelectionContext: (_ctx: unknown) => {},

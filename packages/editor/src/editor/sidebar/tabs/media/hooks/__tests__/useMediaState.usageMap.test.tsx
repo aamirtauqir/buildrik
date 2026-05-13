@@ -18,6 +18,7 @@ vi.mock("../useLibraryState", () => ({
   useLibraryState: () => ({
     libraryItems: stableMocks.libraryItems,
     folders: [],
+    allFolders: [],
     counts: { all: 1, img: 1, vid: 0, ico: 0, fnt: 0 },
     activeType: "all",
     currentFolderId: null,

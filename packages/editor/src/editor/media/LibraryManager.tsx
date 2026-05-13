@@ -259,7 +259,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
 
         <div className="mgr-middle">
           <FolderBreadcrumb
-            folders={state.folders}
+            folders={state.allFolders}
             currentFolderId={state.currentFolderId}
             onNavigate={state.setCurrentFolderId}
           />

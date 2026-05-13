@@ -95,6 +95,7 @@ describe("§13 — breadcrumb in expanded panel", () => {
     const { container } = renderPanel({
       currentFolderId: null,
       folders: [],
+      allFolders: [],
     });
     const crumb = container.querySelector("[data-testid='folder-breadcrumb']");
     expect(crumb).toBeInTheDocument();
@@ -102,12 +103,14 @@ describe("§13 — breadcrumb in expanded panel", () => {
   });
 
   it("renders nested path when folder selected", () => {
+    const nested = [
+      { id: "f1", name: "Brand Assets", parentId: null },
+      { id: "f2", name: "Logos", parentId: "f1" },
+    ];
     const { container } = renderPanel({
       currentFolderId: "f2",
-      folders: [
-        { id: "f1", name: "Brand Assets", parentId: null },
-        { id: "f2", name: "Logos", parentId: "f1" },
-      ],
+      folders: nested,
+      allFolders: nested,
     });
     const crumb = container.querySelector("[data-testid='folder-breadcrumb']");
     expect(crumb).toBeInTheDocument();
@@ -116,12 +119,14 @@ describe("§13 — breadcrumb in expanded panel", () => {
 
   it("clicking segment calls setCurrentFolderId with that id", () => {
     const setCurrentFolderId = vi.fn();
+    const nested = [
+      { id: "f1", name: "Brand Assets", parentId: null },
+      { id: "f2", name: "Logos", parentId: "f1" },
+    ];
     const { container } = renderPanel({
       currentFolderId: "f2",
-      folders: [
-        { id: "f1", name: "Brand Assets", parentId: null },
-        { id: "f2", name: "Logos", parentId: "f1" },
-      ],
+      folders: nested,
+      allFolders: nested,
       setCurrentFolderId,
     });
     const buttons = container.querySelectorAll(
@@ -131,5 +136,24 @@ describe("§13 — breadcrumb in expanded panel", () => {
     expect(buttons.length).toBe(3);
     fireEvent.click(buttons[1]);
     expect(setCurrentFolderId).toHaveBeenCalledWith("f1");
+  });
+
+  it("renders nested path even when state.folders contains only roots (production case)", () => {
+    // Production: composer.media.getFolders() returns roots only.
+    // composer.media.getAllFolders() returns the flat tree.
+    // Breadcrumb must read from allFolders, not folders, to render nested paths.
+    const { container } = renderPanel({
+      currentFolderId: "f2",
+      folders: [
+        { id: "f1", name: "Brand Assets", parentId: null },
+        // f2 NOT in folders (it's nested — getFolders(null) would not return it)
+      ],
+      allFolders: [
+        { id: "f1", name: "Brand Assets", parentId: null },
+        { id: "f2", name: "Logos", parentId: "f1" },
+      ],
+    });
+    const crumb = container.querySelector("[data-testid='folder-breadcrumb']");
+    expect(crumb?.textContent).toMatch(/All Media.*Brand Assets.*Logos/);
   });
 });

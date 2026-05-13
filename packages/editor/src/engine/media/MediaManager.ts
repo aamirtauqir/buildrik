@@ -1214,6 +1214,16 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   /**
+   * Return ALL folders flat (root + nested), regardless of parent.
+   * Use for breadcrumb path resolution, folder-id lookups, etc.
+   * `getFolders(parentId)` returns children of a specific parent;
+   * `getAllFolders()` returns the full tree as a flat list.
+   */
+  getAllFolders(): MediaFolder[] {
+    return [...this.state.folders];
+  }
+
+  /**
    * Automatically ensure a folder exists for the current project.
    * Creates it at the root level if not found.
    */

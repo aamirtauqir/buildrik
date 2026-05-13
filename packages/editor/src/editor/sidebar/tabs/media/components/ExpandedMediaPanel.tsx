@@ -243,7 +243,7 @@ export function ExpandedMediaPanel({
         {/* Library area */}
         <div className="exp-panel__library">
           <FolderBreadcrumb
-            folders={state.folders}
+            folders={state.allFolders}
             currentFolderId={currentFolderId}
             onNavigate={setCurrentFolderId}
           />

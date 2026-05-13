@@ -315,6 +315,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     // Library
     libraryItems: library.libraryItems,
     folders: library.folders,
+    allFolders: library.allFolders,
     createFolder: library.createFolder,
     deleteFolder: library.deleteFolder,
     moveAsset: library.moveAsset,

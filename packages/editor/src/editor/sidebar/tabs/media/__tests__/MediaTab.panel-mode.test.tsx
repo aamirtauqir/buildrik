@@ -20,6 +20,7 @@ function makeFakeComposer() {
     media: {
       getAssets: () => [],
       getFolders: () => [],
+      getAllFolders: () => [],
       getIcons: () => [],
       getFonts: () => [],
       getStock: () => [],

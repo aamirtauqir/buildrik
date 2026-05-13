@@ -21,6 +21,7 @@ import {
 export function useLibraryState(composer: Composer): LibraryStateResult {
   const [rawAssets, setRawAssets] = useState(() => composer.media.getAssets());
   const [folders, setFolders] = useState(() => composer.media.getFolders());
+  const [allFolders, setAllFolders] = useState(() => composer.media.getAllFolders());
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [sort, setSort_] = useState<MediaSortBy>(
     () => (localStorage.getItem(STORAGE_KEYS.MEDIA_SORT) as MediaSortBy | null) ?? "date"
@@ -41,7 +42,10 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
   // Subscribe to engine events
   useEffect(() => {
     const reload = () => setRawAssets([...composer.media.getAssets()]);
-    const reloadFolders = () => setFolders([...composer.media.getFolders()]);
+    const reloadFolders = () => {
+      setFolders([...composer.media.getFolders()]);
+      setAllFolders([...composer.media.getAllFolders()]);
+    };
 
     reload();
     reloadFolders();
@@ -216,6 +220,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     rawAssets,
     libraryItems,
     folders,
+    allFolders,
     currentFolderId,
     setCurrentFolderId,
     createFolder,
