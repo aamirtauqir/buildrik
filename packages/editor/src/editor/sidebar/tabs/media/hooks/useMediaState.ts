@@ -65,6 +65,10 @@ export function useMediaState(composer: Composer): MediaStateResult {
     };
   }, [composer, selectionContext, setPanelExpanded]);
 
+  // §10/§15 — per-asset usage counts (distinct pages where each asset is referenced).
+  // Built from composer.elements page tree; resilient to missing engine APIs (mocks/tests).
+  const [usageMap, setUsageMap] = useState<Map<string, number>>(new Map());
+
   // Sub-hooks
   const library = useLibraryState(composer);
   // Phase C: server-side quota replaces hardcoded 1GB IndexedDB cap when reachable.
@@ -73,6 +77,41 @@ export function useMediaState(composer: Composer): MediaStateResult {
   const upload = useUploadState(composer, showToast, serverQuota.quota);
   const selection = useSelectionState(composer, library.libraryItems, showToast);
   const discovery = useDiscoveryState(composer, showToast);
+
+  // Recompute usageMap when library or page graph changes.
+  // Equality-check guards against infinite re-renders from new Map identity.
+  useEffect(() => {
+    const map = new Map<string, number>();
+    const elementsApi = (composer as unknown as {
+      elements?: { getAllPages?: () => unknown[] };
+    }).elements;
+    const pages = elementsApi?.getAllPages?.() ?? [];
+    for (const page of pages) {
+      const pageTyped = page as { root?: { getDescendants?: () => unknown[] } };
+      const elements = pageTyped?.root?.getDescendants?.() ?? [];
+      const usedInThisPage = new Set<string>();
+      for (const el of elements) {
+        const elTyped = el as {
+          styles?: { backgroundImage?: string };
+          attrs?: { src?: string };
+        };
+        const assetSrc = elTyped.styles?.backgroundImage ?? elTyped.attrs?.src ?? "";
+        if (!assetSrc) continue;
+        const item = library.libraryItems.find((i) => i.src && assetSrc.includes(i.src));
+        if (item) usedInThisPage.add(item.key);
+      }
+      for (const key of usedInThisPage) {
+        map.set(key, (map.get(key) ?? 0) + 1);
+      }
+    }
+    setUsageMap((prev) => {
+      if (prev.size !== map.size) return map;
+      for (const [k, v] of map) {
+        if (prev.get(k) !== v) return map;
+      }
+      return prev;
+    });
+  }, [composer, library.libraryItems]);
 
   // Listen for selection mode requests from other parts of the UI
   useEffect(() => {
@@ -355,5 +394,8 @@ export function useMediaState(composer: Composer): MediaStateResult {
     // §21 replace-across pair
     replaceAcrossPair,
     setReplaceAcrossPair,
+
+    // §10/§15 usage tracking
+    usageMap,
   };
 }

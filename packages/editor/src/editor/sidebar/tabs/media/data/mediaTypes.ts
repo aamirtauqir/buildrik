@@ -261,6 +261,10 @@ export interface MediaStateResult {
   setReplaceAcrossPair(
     pair: { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null
   ): void;
+
+  // §10/§15 usage tracking — Map<assetKey, distinct-page-count> driving UsagePips
+  // on AssetCell + 'Where used' tab on detail drawer.
+  usageMap: Map<string, number>;
 }
 
 // --- Prop slices ---
