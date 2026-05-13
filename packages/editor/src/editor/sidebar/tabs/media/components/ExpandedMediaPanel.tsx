@@ -21,6 +21,7 @@ import type { IconConfig, MediaFolder } from "@shared/types/media";
 import { useToast } from "@/editor/shared/vibcoder";
 import { TypePills } from "./TypePills";
 import { LibraryView } from "./LibraryView";
+import { FolderBreadcrumb } from "./FolderBreadcrumb";
 import { AssetDetailOverlay } from "./AssetDetailOverlay";
 import { MediaContextMenu } from "./MediaContextMenu";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
@@ -241,6 +242,11 @@ export function ExpandedMediaPanel({
 
         {/* Library area */}
         <div className="exp-panel__library">
+          <FolderBreadcrumb
+            folders={state.folders}
+            currentFolderId={currentFolderId}
+            onNavigate={setCurrentFolderId}
+          />
           <TypePills
             activeType={state.activeType}
             counts={state.counts}

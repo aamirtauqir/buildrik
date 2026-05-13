@@ -28,6 +28,7 @@ import type { IconConfig } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
+import { FolderBreadcrumb } from "../sidebar/tabs/media/components/FolderBreadcrumb";
 import { fmtBytes } from "./utils/fmtBytes";
 import { generateAltTextRemote } from "../../services/AltTextService";
 import "./LibraryManager.css";
@@ -257,19 +258,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
 
         <div className="mgr-middle">
-          <div className="mgr-breadcrumb">
-            {breadcrumbPath.map((crumb, i) => (
-              <React.Fragment key={crumb.id ?? "root"}>
-                {i > 0 && <span className="mgr-sep">/</span>}
-                <span
-                  className={i === breadcrumbPath.length - 1 ? "mgr-crumb-current" : "mgr-crumb"}
-                  onClick={() => state.setCurrentFolderId(crumb.id)}
-                >
-                  {crumb.name}
-                </span>
-              </React.Fragment>
-            ))}
-          </div>
+          <FolderBreadcrumb
+            folders={state.folders}
+            currentFolderId={state.currentFolderId}
+            onNavigate={state.setCurrentFolderId}
+          />
           <div className="mgr-search">
             <Search size={14} />
             <Input

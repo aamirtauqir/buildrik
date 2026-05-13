@@ -1610,3 +1610,40 @@
   justify-content: center;
   color: var(--bd-fg-muted, #64748B);
 }
+
+/* ─── §13 FolderBreadcrumb ─────────────────────────────────────────────── */
+.med-folder-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--bd-font-size-xs);
+  color: var(--bd-fg-muted);
+  white-space: nowrap;
+  min-width: 0;
+  flex-shrink: 0;
+}
+.med-folder-breadcrumb__seg {
+  background: transparent;
+  border: 0;
+  padding: 4px 6px;
+  border-radius: var(--bd-radius-sm);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.2;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.med-folder-breadcrumb__seg:hover {
+  background: var(--bd-hover-bg);
+  color: var(--bd-fg);
+}
+.med-folder-breadcrumb__seg--current {
+  color: var(--bd-fg);
+  font-weight: 600;
+}
+.med-folder-breadcrumb__sep {
+  color: var(--bd-fg-muted);
+  flex-shrink: 0;
+}
