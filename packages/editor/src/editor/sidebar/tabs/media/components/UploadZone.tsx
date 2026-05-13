@@ -11,6 +11,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 import * as React from "react";
 import { Upload, AlertTriangle, XCircle } from "lucide-react";
 import type { UploadZoneProps } from "../data/mediaTypes";
+import { StorageQuotaBar } from "./StorageQuotaBar";
 
 const ACCEPT_TYPES = "image/*,video/*,.ttf,.otf,.woff,.woff2,.svg";
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB hard ceiling at the UI layer
@@ -89,33 +90,31 @@ export function UploadZone({ storage, onUpload, disabled = false }: UploadZonePr
         : "Drag files or click to browse";
 
   return (
-    <div
-      className={`med-upload-zone${stateClass ? ` ${stateClass}` : ""}`}
-      onClick={() => !isFull && !disabled && !rejectedReason && inputRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
-      onDragLeave={() => setIsDragOver(false)}
-      onDrop={handleDrop}
-      role="button"
-      tabIndex={0}
-      aria-label={label}
-      aria-live={rejectedReason ? "assertive" : "polite"}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
-    >
-      <Icon size={20} className="med-upload-zone-icon" />
-      <span className="med-upload-zone__label">{label}</span>
-      {isNearLimit && !rejectedReason && (
-        <span style={{ fontSize: 10, color: "var(--bd-warn, #D97706)", marginTop: 2 }}>
-          {Math.round((storage.total - storage.used) / 1024 / 1024)}MB left
-        </span>
-      )}
-      <Input
-        ref={inputRef}
-        type="file"
-        multiple
-        accept={ACCEPT_TYPES}
-        style={{ display: "none" }}
-        onChange={(e) => handleFiles(e.target.files)}
-      />
+    <div className="med-upload-zone-wrap">
+      <div
+        className={`med-upload-zone${stateClass ? ` ${stateClass}` : ""}`}
+        onClick={() => !isFull && !disabled && !rejectedReason && inputRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+        onDragLeave={() => setIsDragOver(false)}
+        onDrop={handleDrop}
+        role="button"
+        tabIndex={0}
+        aria-label={label}
+        aria-live={rejectedReason ? "assertive" : "polite"}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
+      >
+        <Icon size={20} className="med-upload-zone-icon" />
+        <span className="med-upload-zone__label">{label}</span>
+        <Input
+          ref={inputRef}
+          type="file"
+          multiple
+          accept={ACCEPT_TYPES}
+          style={{ display: "none" }}
+          onChange={(e) => handleFiles(e.target.files)}
+        />
+      </div>
+      <StorageQuotaBar used={storage.used} total={storage.total} />
     </div>
   );
 }
