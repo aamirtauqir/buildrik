@@ -12,9 +12,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-// @ts-expect-error — Task 11 rewrite will update SlimLauncher prop signature
-// to match these new §10 props (activeType, counts, searchQuery, onOpenStock,
-// onTypeChange, onSearchChange, usageMap, storage, uploadQueue).
 import { SlimLauncher } from "../SlimLauncher";
 import { mockComposer } from "../../__tests__/test-utils/mockComposer";
 import type { LibraryItem } from "../data/mediaTypes";
@@ -53,25 +50,21 @@ const baseProps = () => ({
 
 describe("SlimLauncher — §10 default 320px experience", () => {
   it("renders panel header with 'Media' title", () => {
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     render(<SlimLauncher {...baseProps()} />);
     expect(screen.getByRole("heading", { name: /^Media$/ })).toBeInTheDocument();
   });
 
   it("renders TypePills row", () => {
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     const { container } = render(<SlimLauncher {...baseProps()} />);
     expect(container.querySelector(".med-type-pills")).toBeInTheDocument();
   });
 
   it("renders '+ Stock' primary button", () => {
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     render(<SlimLauncher {...baseProps()} />);
     expect(screen.getByRole("button", { name: /\+ Stock/i })).toBeInTheDocument();
   });
 
   it("renders real search input (not ghost button)", () => {
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     render(<SlimLauncher {...baseProps()} />);
     expect(screen.getByPlaceholderText(/Search library/i)).toBeInTheDocument();
   });
@@ -81,7 +74,6 @@ describe("SlimLauncher — §10 default 320px experience", () => {
       makeItem({ key: "a", name: "a.jpg", type: "img", src: "x", thumb: "x" }),
       makeItem({ key: "b", name: "b.jpg", type: "img", src: "y", thumb: "y" }),
     ];
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     const { container } = render(<SlimLauncher {...baseProps()} libraryItems={items} />);
     const grid = container.querySelector(".med-asset-grid");
     expect(grid).toBeInTheDocument();
@@ -89,13 +81,11 @@ describe("SlimLauncher — §10 default 320px experience", () => {
   });
 
   it("renders UploadZone at bottom", () => {
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     const { container } = render(<SlimLauncher {...baseProps()} />);
     expect(container.querySelector(".med-upload-zone")).toBeInTheDocument();
   });
 
   it("renders empty state when no assets", () => {
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     render(<SlimLauncher {...baseProps()} />);
     expect(screen.getByText(/Your library is empty/i)).toBeInTheDocument();
   });
@@ -106,7 +96,6 @@ describe("SlimLauncher — §10 default 320px experience", () => {
       makeItem({ key: "a", name: "a.jpg", type: "img", src: "x", thumb: "x" }),
       makeItem({ key: "b", name: "b.mp4", type: "vid", src: "y", thumb: "y" }),
     ];
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     const { container } = render(<SlimLauncher {...baseProps()} libraryItems={items} />);
     await user.click(screen.getByRole("tab", { name: /^Video/i }));
     const cells = container.querySelectorAll(".med-asset-cell");
@@ -116,7 +105,6 @@ describe("SlimLauncher — §10 default 320px experience", () => {
   it("opens stock modal when '+ Stock' clicked", async () => {
     const onOpenStock = vi.fn();
     const user = userEvent.setup();
-    // @ts-expect-error — props mismatch until Task 11 rewrite
     render(<SlimLauncher {...baseProps()} onOpenStock={onOpenStock} />);
     await user.click(screen.getByRole("button", { name: /\+ Stock/i }));
     expect(onOpenStock).toHaveBeenCalledOnce();

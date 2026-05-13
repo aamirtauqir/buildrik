@@ -176,9 +176,19 @@ function MediaTabWithComposer({
       <SlimLauncher
         composer={composer}
         libraryItems={state.libraryItems}
+        activeType={state.activeType}
+        counts={state.counts}
+        searchQuery={state.librarySearch}
+        storage={state.storage}
+        uploadQueue={state.uploadQueue}
+        usageMap={state.usageMap}
+        appliedAssetKey={undefined}
         onInsert={state.insertToCanvas}
-        onOpenLibrary={onOpenLibrary}
+        onTypeChange={state.setType}
+        onSearchChange={(q) => state.setLibrarySearch(q)}
         onUpload={state.upload}
+        onOpenStock={() => setStockModalOpen(true)}
+        onOpenLibrary={onOpenLibrary}
         onClose={onClose}
         selectionContext={state.selectionContext}
         onCancelSelection={() => state.setSelectionContext(null)}
