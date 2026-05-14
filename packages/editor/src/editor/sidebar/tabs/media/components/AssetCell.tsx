@@ -10,7 +10,7 @@
  * (padding, hover bg) would conflict with the edge-to-edge thumb fill.
  */
 import { Play, FileType, Lock } from "lucide-react";
-import type { MouseEvent } from "react";
+import type { DragEvent, MouseEvent } from "react";
 import type { LibraryItem } from "../data/mediaTypes";
 import { UsagePips } from "./UsagePips";
 
@@ -45,11 +45,23 @@ export function AssetCell({
     .filter(Boolean)
     .join(" ");
 
+  // §13 — drag-to-folder. Native HTML5 DnD on the cell. Payload carries
+  // the asset key under our internal MIME plus a text/plain fallback for
+  // browsers/tests that read the generic slot. Folder rail drop handlers
+  // in ExpandedMediaPanel pick this up and fire state.moveAsset.
+  const handleDragStart = (e: DragEvent<HTMLButtonElement>) => {
+    e.dataTransfer.setData("application/x-buildrik-media-asset-key", item.key);
+    e.dataTransfer.setData("text/plain", item.key);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
   return (
     <button
       type="button"
       className={className}
       disabled={isLocked}
+      draggable={!isLocked}
+      onDragStart={isLocked ? undefined : handleDragStart}
       onClick={() => onClick(item.key)}
       onDoubleClick={onDoubleClick ? () => onDoubleClick(item.key) : undefined}
       onContextMenu={onContextMenu ? (e) => onContextMenu(e, item.key) : undefined}

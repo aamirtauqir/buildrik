@@ -142,6 +142,15 @@
   font-weight: 500;
 }
 
+/* §13 — drag-to-folder snap feedback. Outline + soft fill while an asset
+   is being dragged over this folder; clears on dragleave / drop. */
+.exp-folder-item.is-drop-target {
+  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.12));
+  outline: 2px solid var(--bd-cobalt, #2D6DFF);
+  outline-offset: -2px;
+  color: var(--bd-cobalt, #2D6DFF);
+}
+
 .exp-folder-item__name {
   overflow: hidden;
   text-overflow: ellipsis;

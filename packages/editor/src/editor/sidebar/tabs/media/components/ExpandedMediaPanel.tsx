@@ -135,6 +135,54 @@ export function ExpandedMediaPanel({
   const currentFolderId = state.currentFolderId;
   const setCurrentFolderId = state.setCurrentFolderId;
 
+  // §13 — drag-to-folder snap target. Tracks which folder the user is
+  // currently hovering during a drag so we can apply the snap outline.
+  // Sentinel "__root__" represents the "All assets" target.
+  const [dropTargetId, setDropTargetId] = React.useState<string | null>(null);
+
+  const readDraggedAssetKey = (e: React.DragEvent<HTMLElement>): string => {
+    return (
+      e.dataTransfer.getData("application/x-buildrik-media-asset-key") ||
+      e.dataTransfer.getData("text/plain") ||
+      ""
+    );
+  };
+
+  const handleFolderDragOver = (
+    e: React.DragEvent<HTMLElement>,
+    id: string | null,
+  ) => {
+    // preventDefault is required for the drop event to fire at all.
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "move";
+    const marker = id ?? "__root__";
+    if (dropTargetId !== marker) setDropTargetId(marker);
+  };
+
+  const handleFolderDragLeave = (id: string | null) => {
+    const marker = id ?? "__root__";
+    setDropTargetId((prev) => (prev === marker ? null : prev));
+  };
+
+  const handleFolderDrop = (
+    e: React.DragEvent<HTMLElement>,
+    folderId: string | null,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const assetKey = readDraggedAssetKey(e);
+    setDropTargetId(null);
+    if (!assetKey) return;
+    // Multi-select drag: if the dragged asset is part of the active
+    // selection set, move the whole set; otherwise single-asset move.
+    if (state.selMode && state.selectedKeys.has(assetKey) && state.selectedKeys.size > 1) {
+      state.bulkMoveAssets(Array.from(state.selectedKeys), folderId);
+    } else {
+      state.moveAsset(assetKey, folderId);
+    }
+  };
+
   React.useEffect(() => {
     const refresh = () => {
       try {
@@ -221,8 +269,12 @@ export function ExpandedMediaPanel({
           <div className="exp-panel__folder-list">
             <Button
               type="button"
-              className={`exp-folder-item${currentFolderId === null ? " is-active" : ""}`}
+              data-folder-id="__root__"
+              className={`exp-folder-item${currentFolderId === null ? " is-active" : ""}${dropTargetId === "__root__" ? " is-drop-target" : ""}`}
               onClick={() => setCurrentFolderId(null)}
+              onDragOver={(e) => handleFolderDragOver(e, null)}
+              onDragLeave={() => handleFolderDragLeave(null)}
+              onDrop={(e) => handleFolderDrop(e, null)}
             >
               <span className="exp-folder-item__name">All assets</span>
               <span className="exp-folder-item__count">{totalCount}</span>
@@ -231,8 +283,12 @@ export function ExpandedMediaPanel({
               <Button
                 key={f.id}
                 type="button"
-                className={`exp-folder-item${currentFolderId === f.id ? " is-active" : ""}`}
+                data-folder-id={f.id}
+                className={`exp-folder-item${currentFolderId === f.id ? " is-active" : ""}${dropTargetId === f.id ? " is-drop-target" : ""}`}
                 onClick={() => setCurrentFolderId(f.id)}
+                onDragOver={(e) => handleFolderDragOver(e, f.id)}
+                onDragLeave={() => handleFolderDragLeave(f.id)}
+                onDrop={(e) => handleFolderDrop(e, f.id)}
               >
                 <span className="exp-folder-item__name">{f.name}</span>
               </Button>
