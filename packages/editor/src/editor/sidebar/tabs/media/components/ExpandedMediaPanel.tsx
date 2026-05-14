@@ -523,6 +523,7 @@ export function ExpandedMediaPanel({
           libraryItems={state.libraryItems}
           onOpenItem={state.openDetail}
           onOptimized={optimizedHandler}
+          onReplaceAcross={onReplaceAcross}
         />
       )}
       <StockSourceModal

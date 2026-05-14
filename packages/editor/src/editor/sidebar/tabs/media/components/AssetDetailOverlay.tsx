@@ -42,6 +42,8 @@ interface AssetDetailOverlayProps {
   onOpenItem?: (item: LibraryItem) => void;
   /** §18 — uploads optimized output as a new version (mirrors handleEditImage upload pattern). */
   onOptimized?: (optimizedSrc: string) => void | Promise<void>;
+  /** §15 footer Replace — opens file picker, then triggers replace-across flow on the parent. */
+  onReplaceAcross?(item: LibraryItem): void;
 }
 
 function baseName(name: string): string {
@@ -63,6 +65,7 @@ export function AssetDetailOverlay({
   libraryItems,
   onOpenItem,
   onOptimized,
+  onReplaceAcross,
 }: AssetDetailOverlayProps) {
   const [tab, setTab] = useState<Tab>("preview");
   const [name, setName] = useState(item.name);
@@ -370,6 +373,15 @@ export function AssetDetailOverlay({
           >
             {inserted ? "Added ✓" : "Add to page"}
           </Button>
+          {onReplaceAcross && (item.type === "img" || item.type === "vid") ? (
+            <Button
+              className="med-detail-action-btn"
+              onClick={() => onReplaceAcross(item)}
+              aria-label="Replace asset"
+            >
+              Replace
+            </Button>
+          ) : null}
           <Button
             className="med-detail-action-btn med-detail-action-btn--danger"
             onClick={() => onDelete(item.key)}

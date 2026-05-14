@@ -348,6 +348,7 @@ function MediaTabWithComposer({
           libraryItems={state.libraryItems}
           onOpenItem={state.openDetail}
           onOptimized={handleOptimized}
+          onReplaceAcross={handleReplaceAcross}
         />
       )}
       {/* Stock Source Modal — replaces old Discovery tab */}
