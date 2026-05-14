@@ -292,6 +292,8 @@ export interface LibraryViewProps {
   selMode: boolean;
   selectedKeys: Set<string>;
   searchQuery: string;
+  /** All folders flat — for §14 Move-to-folder picker. */
+  allFolders: MediaFolder[];
   onSort(by: MediaSortBy, dir: SortDirection): void;
   onGridN(n: 2 | 3 | 4): void;
   onFmt(f: string): void;
@@ -303,6 +305,8 @@ export interface LibraryViewProps {
   onInsert(key: string): void;
   onCtxMenu(e: React.MouseEvent, item: LibraryItem): void;
   onDetail(item: LibraryItem): void;
+  /** §14 — bulk move selected assets into a folder. null = root. */
+  onMoveSelected(folderId: string | null): void;
 }
 
 export type DiscOrientation = "all" | "landscape" | "portrait" | "squarish";

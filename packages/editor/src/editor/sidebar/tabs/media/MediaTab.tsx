@@ -263,6 +263,7 @@ function MediaTabWithComposer({
           selMode={state.selMode}
           selectedKeys={state.selectedKeys}
           searchQuery={state.librarySearch}
+          allFolders={state.allFolders}
           onSort={state.setSort}
           onGridN={state.setGridN}
           onFmt={state.setFmtFilter}
@@ -274,6 +275,10 @@ function MediaTabWithComposer({
           onInsert={state.insertToCanvas}
           onCtxMenu={state.openCtxMenu}
           onDetail={state.openDetail}
+          onMoveSelected={(folderId) => {
+            state.bulkMoveAssets(Array.from(state.selectedKeys), folderId);
+            state.toggleSelMode();
+          }}
         />
       </div>
       {/* 5. Upload Zone (Library only) */}

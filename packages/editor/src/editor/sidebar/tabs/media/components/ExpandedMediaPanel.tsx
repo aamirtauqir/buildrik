@@ -443,6 +443,7 @@ export function ExpandedMediaPanel({
               selMode={state.selMode}
               selectedKeys={state.selectedKeys}
               searchQuery={state.librarySearch}
+              allFolders={state.allFolders}
               onSort={state.setSort}
               onGridN={state.setGridN}
               onFmt={state.setFmtFilter}
@@ -454,6 +455,10 @@ export function ExpandedMediaPanel({
               onInsert={state.insertToCanvas}
               onCtxMenu={state.openCtxMenu}
               onDetail={state.openDetail}
+              onMoveSelected={(folderId) => {
+                state.bulkMoveAssets(Array.from(state.selectedKeys), folderId);
+                state.toggleSelMode();
+              }}
             />
           )}
         </div>

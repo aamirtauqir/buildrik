@@ -819,21 +819,75 @@
   color: var(--bd-fg-muted);
 }
 
-/* Bulk action bar */
-.med-bulk-bar {
+/* §14 Multi-select banner */
+.med-multi-select-wrap {
+  position: relative;
+  margin: 8px 0;
+}
+.med-multi-select-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.08));
+  border: 1px solid var(--bd-cobalt-soft, rgba(45, 109, 255, 0.2));
+  border-radius: 6px;
+  font-size: 12px;
+}
+.med-multi-select-banner__count {
+  font-weight: 600;
+  color: var(--bd-cobalt, #2D6DFF);
+}
+.med-multi-select-banner__actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.med-multi-select-banner__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.med-multi-select-banner__btn.is-danger {
+  color: var(--bd-danger, #DC2626);
+}
+
+.med-move-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 100;
+  min-width: 200px;
+  background: var(--bd-surface);
+  border: 1px solid var(--bd-border);
+  border-radius: var(--bd-radius-md);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.med-move-popover__title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bd-fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 8px 4px;
+}
+.med-move-popover__item {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
-  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.08));
-  border: 1px solid var(--bd-cobalt-soft);
-  border-radius: 6px;
-  margin: 8px 0;
+  justify-content: flex-start;
+  width: 100%;
 }
-.med-bulk-count {
+.med-move-popover__empty {
+  padding: 8px;
   font-size: 12px;
-  font-weight: 500;
-  color: var(--bd-cobalt);
+  color: var(--bd-fg-muted);
+  text-align: center;
 }
 
 /* Upload ghost cards */

@@ -1,4 +1,6 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { MultiSelectBanner } from "./MultiSelectBanner";
+import { MoveToFolderPopover } from "./MoveToFolderPopover";
 /**
  * Media Tab — My Library View
  * Renders all 4 type sections inline (img/vid/ico/fnt).
@@ -397,6 +399,7 @@ export function LibraryView({
   selMode,
   selectedKeys,
   searchQuery,
+  allFolders,
   onSort,
   onGridN,
   onFmt,
@@ -408,7 +411,9 @@ export function LibraryView({
   onInsert,
   onCtxMenu,
   onDetail,
+  onMoveSelected,
 }: LibraryViewProps) {
+  const [moveOpen, setMoveOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -530,22 +535,28 @@ export function LibraryView({
           ☑
         </Button>
       </div>
-      {/* Bulk select bar */}
+      {/* §14 Multi-select banner */}
       {selMode && selectedKeys.size > 0 && (
-        <div className="med-bulk-bar">
-          <span className="med-bulk-count">{selectedKeys.size} selected</span>
-          <Button className="med-bulk-btn" onClick={onSelectAll}>
-            All
-          </Button>
-          <Button
-            className="med-bulk-btn danger"
-            onClick={() => {
+        <div className="med-multi-select-wrap">
+          <MultiSelectBanner
+            count={selectedKeys.size}
+            onMove={() => setMoveOpen(true)}
+            onDelete={() => {
               const selectedItems = items.filter((i) => selectedKeys.has(i.key));
               onRequestBulkDelete(selectedItems);
             }}
-          >
-            Delete
-          </Button>
+            onCancel={onSelToggle}
+          />
+          {moveOpen && (
+            <MoveToFolderPopover
+              folders={allFolders}
+              onPick={(folderId) => {
+                onMoveSelected(folderId);
+                setMoveOpen(false);
+              }}
+              onClose={() => setMoveOpen(false)}
+            />
+          )}
         </div>
       )}
       {/* Upload ghost cards */}
