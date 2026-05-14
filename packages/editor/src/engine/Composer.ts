@@ -148,7 +148,7 @@ export class Composer extends EventEmitter {
   readonly designSystem!: {
     readonly tokenUsage: TokenUsageTracker;
     readonly lintState: LintState;
-    readonly styleBindings: StyleBindingResolver;
+    readonly tokenBindingResolver: StyleBindingResolver;
   };
 
   constructor(config: ComposerConfig) {
@@ -210,8 +210,8 @@ export class Composer extends EventEmitter {
 
     const tokenUsage = new TokenUsageTracker();
     const lintState = new LintState();
-    const styleBindings = new StyleBindingResolver();
-    this.designSystem = { tokenUsage, lintState, styleBindings };
+    const tokenBindingResolver = new StyleBindingResolver();
+    this.designSystem = { tokenUsage, lintState, tokenBindingResolver };
     // Recompute token usage whenever element trees or styles change. These
     // four events cover create/delete/update/style-set — markDirty's broader
     // PROJECT_CHANGED also fires for non-element work (settings, metadata)

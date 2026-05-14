@@ -159,12 +159,12 @@ describe("StyleBindingResolver via Composer", () => {
     HTMLCanvasElement.prototype.getContext = originalGetContext;
   });
 
-  it("is accessible on composer.designSystem.styleBindings", () => {
+  it("is accessible on composer.designSystem.tokenBindingResolver", () => {
     const composer = new Composer({} as never);
-    expect(composer.designSystem.styleBindings).toBeDefined();
-    expect(typeof composer.designSystem.styleBindings.resolveForElements).toBe(
-      "function",
-    );
+    expect(composer.designSystem.tokenBindingResolver).toBeDefined();
+    expect(
+      typeof composer.designSystem.tokenBindingResolver.resolveForElements,
+    ).toBe("function");
   });
 
   it("resolves bindings on real ElementManager elements", async () => {
@@ -185,7 +185,7 @@ describe("StyleBindingResolver via Composer", () => {
     });
     composer.elements.addElement(el, rootId);
 
-    const result = composer.designSystem.styleBindings.resolveForElements(
+    const result = composer.designSystem.tokenBindingResolver.resolveForElements(
       [el.getId()],
       composer.elements.getAllElements(),
     );
