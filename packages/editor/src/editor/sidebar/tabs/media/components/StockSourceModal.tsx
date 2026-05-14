@@ -251,6 +251,29 @@ export function StockSourceModal({
                     <Download size={16} color="white" />
                     <span style={{ color: "white", fontSize: 11 }}>Save to Library</span>
                   </div>
+                  {(p.author || p.source) && (
+                    <div
+                      className="med-img-attribution"
+                      data-testid="stock-tile-attribution"
+                    >
+                      {p.author ? (
+                        p.authorUrl ? (
+                          <a
+                            href={p.authorUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {p.author}
+                          </a>
+                        ) : (
+                          <span>{p.author}</span>
+                        )
+                      ) : null}
+                      {p.author && p.source ? " · " : null}
+                      {p.source ? <span className="med-img-attribution__src">{p.source}</span> : null}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -271,6 +294,16 @@ export function StockSourceModal({
                   <div className="med-vid-play">
                     <svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" fill="white" /></svg>
                   </div>
+                  {(v.author || v.source) && (
+                    <div
+                      className="med-img-attribution"
+                      data-testid="stock-tile-attribution"
+                    >
+                      {v.author ? <span>{v.author}</span> : null}
+                      {v.author && v.source ? " · " : null}
+                      {v.source ? <span className="med-img-attribution__src">{v.source}</span> : null}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

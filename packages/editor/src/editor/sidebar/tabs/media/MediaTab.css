@@ -113,6 +113,37 @@
   opacity: 1;
 }
 
+/* §19 — stock tile attribution (photographer + source) */
+.med-img-attribution {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 8px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.55));
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+.med-img-card:hover .med-img-attribution,
+.med-vid-card:hover .med-img-attribution {
+  opacity: 1;
+  pointer-events: auto;
+}
+.med-img-attribution a {
+  color: inherit;
+  text-decoration: underline;
+}
+.med-img-attribution__src {
+  text-transform: capitalize;
+  opacity: 0.75;
+}
+
 .med-img-hover-bar button {
   background: none;
   border: none;
