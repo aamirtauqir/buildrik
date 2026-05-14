@@ -165,6 +165,8 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
     optimizedSrc: null,
     isProcessing: false,
   });
+  // §18 — Max-dimension override (longest-side clamp). Empty / 0 / NaN → no clamp.
+  const [maxDim, setMaxDim] = React.useState<string>("");
 
   // Check format support
   const [formatSupport, setFormatSupport] = React.useState({ webp: true, avif: false });
@@ -189,10 +191,16 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
     const optimize = async () => {
       setState((s) => ({ ...s, isProcessing: true }));
       try {
+        const maxDimPx = Number(maxDim);
+        const clamp =
+          Number.isFinite(maxDimPx) && maxDimPx > 0
+            ? { maxWidth: maxDimPx, maxHeight: maxDimPx }
+            : {};
         const result = await optimizer.optimize(imageSrc, {
           format: state.format,
           quality: state.quality / 100,
           preserveTransparency: state.format !== "jpeg",
+          ...clamp,
         });
 
         if (result.success && result.dataUrl) {
@@ -212,7 +220,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
 
     const timer = setTimeout(optimize, 300);
     return () => clearTimeout(timer);
-  }, [imageSrc, state.format, state.quality, optimizer]);
+  }, [imageSrc, state.format, state.quality, maxDim, optimizer]);
 
   const handleFormatChange = (format: ImageExportFormat) => {
     setState((s) => ({ ...s, format }));
@@ -278,6 +286,21 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
           />
           <span style={styles.qualityValue}>{state.quality}%</span>
         </div>
+      </div>
+      {/* §18 — Max dimension override */}
+      <div style={styles.section}>
+        <label style={styles.label} htmlFor="opt-max-dim">Max dimension (px)</label>
+        <Input
+          id="opt-max-dim"
+          type="number"
+          min={1}
+          step={1}
+          inputMode="numeric"
+          placeholder="No limit"
+          aria-label="Max dimension in pixels"
+          value={maxDim}
+          onChange={(e) => setMaxDim(e.target.value)}
+        />
       </div>
       {/* Stats */}
       <div style={styles.statsRow}>
