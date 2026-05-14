@@ -443,7 +443,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const changedSectionLabels = isDirty ? ["Tokens"] : [];
 
   return (
-    <div style={{ ...containerStyles, position: "relative" }}>
+    <div className="ds-panel-root" style={{ ...containerStyles, position: "relative" }}>
       <PanelHeader
         title={headerTitle}
         isPinned={isPinned}

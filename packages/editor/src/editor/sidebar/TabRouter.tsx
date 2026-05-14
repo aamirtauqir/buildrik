@@ -1,8 +1,8 @@
 /**
  * TabRouter — Panel-mode tab routing for LeftSidebar
  * Maps GroupedTabId to lazy-loaded panel tab components.
- * Only handles panel-mode tabs (Add, Media, Layers, Pages, Components, History).
- * Fullpage tabs (Templates, Settings, Design) are handled by FullPageRouter.
+ * Handles panel-mode tabs (Add, Media, Layers, Pages, Components, Design, History).
+ * Fullpage tabs (Templates, Settings) are handled by FullPageRouter.
  *
  * Tab lifecycle note: this router mounts one panel tab at a time via a
  * `switch` and unmounts the previous tab on every nav click. An earlier
@@ -47,6 +47,7 @@ const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 const AITab = React.lazy(() =>
   import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
 );
+const DesignSystemTab = React.lazy(() => import("@/editor/design-system/ui/DesignSystemTab"));
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;
@@ -193,6 +194,9 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           {...commonTabProps}
         />
       );
+
+    case "design":
+      return <DesignSystemTab composer={composer} {...commonTabProps} />;
 
     default:
       return null;

@@ -145,7 +145,8 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     section: "bottom",
     pattern: "standalone",
     shortcut: "D",
-    mode: "fullpage",
+    mode: "panel",
+    panelWidth: 320,
   },
   {
     id: "settings",

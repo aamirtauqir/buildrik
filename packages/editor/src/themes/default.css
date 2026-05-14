@@ -102,3 +102,6 @@
 @import "./components/organisms/topbar.css" layer(components);
 
 @import "./legacy-components.css";
+
+/* Design-system tab panel-mode layout (320px chrome) */
+@import "../editor/design-system/styles/ds-panel.css";
