@@ -1213,6 +1213,21 @@ export class MediaManager extends MediaEventEmitter {
     return this.state.folders.filter((f) => f.parentId === parentId);
   }
 
+  async renameFolder(id: string, name: string): Promise<void> {
+    const idx = this.state.folders.findIndex((f) => f.id === id);
+    if (idx < 0) throw new Error(`Folder ${id} not found`);
+    const trimmed = name.trim();
+    if (!trimmed) throw new Error("Folder name cannot be empty");
+    const updated: MediaFolder = {
+      ...this.state.folders[idx],
+      name: trimmed,
+      updatedAt: new Date().toISOString(),
+    };
+    this.state.folders[idx] = updated;
+    await this.storage.saveFolder(updated);
+    this.emit(MEDIA_EVENTS.FOLDER_UPDATED, updated);
+  }
+
   /**
    * Return ALL folders flat (root + nested), regardless of parent.
    * Use for breadcrumb path resolution, folder-id lookups, etc.
