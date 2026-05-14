@@ -52,6 +52,7 @@ import { MigrationManager } from "./migration/MigrationManager";
 import { AliasResolver } from "./aliasResolver";
 import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
+import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
 import { CSSBundler } from "../editor/design-system/bundler";
 import { DSLinter } from "../editor/design-system/linter";
 import { AIAssistService } from "../editor/design-system/services";
@@ -142,6 +143,9 @@ export class Composer extends EventEmitter {
     readonly drag: DragManager;
     readonly interactions: InteractionManager;
   };
+  readonly designSystem!: {
+    readonly tokenUsage: TokenUsageTracker;
+  };
 
   constructor(config: ComposerConfig) {
     super();
@@ -199,6 +203,18 @@ export class Composer extends EventEmitter {
       drag: new DragManager(this),
       interactions: new InteractionManager(this),
     };
+
+    const tokenUsage = new TokenUsageTracker();
+    this.designSystem = { tokenUsage };
+    // Recompute token usage whenever element trees or styles change. These
+    // four events cover create/delete/update/style-set — markDirty's broader
+    // PROJECT_CHANGED also fires for non-element work (settings, metadata)
+    // that can't affect token bindings, so we stay surgical.
+    const recomputeTokenUsage = () => tokenUsage.recompute(this.elements.getAllElements());
+    this.on(EVENTS.ELEMENT_CREATED, recomputeTokenUsage);
+    this.on(EVENTS.ELEMENT_DELETED, recomputeTokenUsage);
+    this.on(EVENTS.ELEMENT_UPDATED, recomputeTokenUsage);
+    this.on(EVENTS.ELEMENT_STYLE_UPDATED, recomputeTokenUsage);
 
     const operationApplyHandler = (patch: Patch) => {
       this.history.applyRemoteOperation(patch);
