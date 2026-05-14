@@ -15,7 +15,7 @@ import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {
   X, RotateCcw, RotateCw, FlipHorizontal, FlipVertical,
-  Crop, SlidersHorizontal, Maximize, Download, AlertTriangle,
+  Crop, SlidersHorizontal, Maximize, Download, AlertTriangle, Eye,
 } from "lucide-react";
 import "./ImageEditorModal.css";
 
@@ -178,6 +178,9 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 }) => {
   const [tab, setTab] = React.useState<EditorTab>("crop");
   const [saving, setSaving] = React.useState(false);
+  // §17 — Before/After hold-to-compare. While true, canvas previews the
+  // un-edited original (no filter, no rotation/flip transform).
+  const [comparing, setComparing] = React.useState(false);
   const [imageError, setImageError] = React.useState(false);
 
   // Crop state
@@ -291,6 +294,31 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
         <div className="ie-header">
           <h3 className="ie-title">Edit Image</h3>
           <div className="ie-header-actions">
+            <Button
+              className="ie-btn-ghost ie-compare-btn"
+              onPointerDown={() => setComparing(true)}
+              onPointerUp={() => setComparing(false)}
+              onPointerLeave={() => setComparing(false)}
+              onPointerCancel={() => setComparing(false)}
+              onKeyDown={(e) => {
+                if (e.key === " " || e.key === "Enter") {
+                  e.preventDefault();
+                  setComparing(true);
+                }
+              }}
+              onKeyUp={(e) => {
+                if (e.key === " " || e.key === "Enter") {
+                  setComparing(false);
+                }
+              }}
+              onBlur={() => setComparing(false)}
+              aria-label="Hold to compare with original"
+              aria-pressed={comparing}
+              data-comparing={comparing}
+            >
+              <Eye size={14} />
+              {comparing ? "Original" : "Compare"}
+            </Button>
             <Button className="ie-btn-ghost" onClick={handleReset}>Reset</Button>
             <Button className="ie-btn-primary" onClick={handleSave} disabled={saving}>
               <Download size={14} />
@@ -310,7 +338,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   image={imageSrc}
                   crop={crop}
                   zoom={zoom}
-                  rotation={rotation}
+                  rotation={comparing ? 0 : rotation}
                   aspect={aspect}
                   onCropChange={setCrop}
                   onZoomChange={setZoom}
@@ -319,8 +347,10 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   onMediaLoaded={() => setImageError(false)}
                   style={{
                     mediaStyle: {
-                      filter: filterStyle,
-                      transform: `scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`,
+                      filter: comparing ? "none" : filterStyle,
+                      transform: comparing
+                        ? "none"
+                        : `scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`,
                       transformOrigin: "center center",
                     },
                   }}
