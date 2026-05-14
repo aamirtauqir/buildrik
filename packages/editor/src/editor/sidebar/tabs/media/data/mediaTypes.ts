@@ -127,7 +127,7 @@ export interface UploadStateResult {
   /** Phase C: total quota bytes. From server when available, else local IndexedDB cap. */
   storageTotal: number;
   panelDragOver: boolean;
-  upload(files: File[]): void;
+  upload(files: File[], opts?: { folderId?: string | null }): void;
   dismissFailedUploads(): void;
   handlePanelDragEnter(e: React.DragEvent): void;
   handlePanelDragLeave(e: React.DragEvent): void;
@@ -200,7 +200,7 @@ export interface MediaStateResult {
   toggleSelMode(): void;
   toggleSelect(key: string): void;
   selectAll(): void;
-  upload(files: File[]): void;
+  upload(files: File[], opts?: { folderId?: string | null }): void;
   failedUploads: FailedUpload[];
   dismissFailedUploads(): void;
   requestDelete(key: string): void;

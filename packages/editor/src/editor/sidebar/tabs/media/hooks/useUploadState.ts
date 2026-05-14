@@ -114,20 +114,22 @@ export function useUploadState(
       : STORAGE_QUOTA_BYTES;
 
   const upload = useCallback(
-    (files: File[]) => {
+    (files: File[], opts: { folderId?: string | null } = {}) => {
       const totalNew = files.reduce((acc, f) => acc + f.size, 0);
       // Skip cap check on unlimited tier (BUSINESS).
       if (!isUnlimited && storageUsed + totalNew > storageTotal) {
         showToast("Not enough storage — delete some files to free space", "error");
         return;
       }
+      const uploadOpts =
+        opts.folderId != null ? { folderId: opts.folderId } : undefined;
       files.forEach((file) => {
         // Duplicate filename info toast
         const existing = composer.media.getAssets().find((a) => a.name === file.name);
         if (existing) {
           showToast(`"${file.name}" already exists — uploading as duplicate`, "info");
         }
-        composer.media.uploadFile(file);
+        composer.media.uploadFile(file, uploadOpts);
       });
     },
     [composer, storageUsed, storageTotal, isUnlimited, showToast]

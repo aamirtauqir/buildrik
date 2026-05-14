@@ -157,6 +157,48 @@
   white-space: nowrap;
 }
 
+.med-empty-folder-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 24px;
+  border: 2px dashed var(--bd-border);
+  border-radius: var(--bd-radius-md);
+  margin: 16px;
+  background: transparent;
+  color: var(--bd-fg-muted);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.med-empty-folder-zone:hover,
+.med-empty-folder-zone:focus-visible {
+  border-color: var(--bd-cobalt, #2D6DFF);
+  background: color-mix(in srgb, var(--bd-cobalt, #2D6DFF) 6%, transparent);
+  outline: none;
+}
+
+.med-empty-folder-zone.is-drag-over {
+  border-color: var(--bd-cobalt, #2D6DFF);
+  background: color-mix(in srgb, var(--bd-cobalt, #2D6DFF) 14%, transparent);
+  color: var(--bd-fg);
+}
+
+.med-empty-folder-zone__title {
+  font-size: var(--bd-font-size-sm);
+  font-weight: 600;
+  color: var(--bd-fg);
+}
+
+.med-empty-folder-zone__sub {
+  font-size: var(--bd-font-size-xs);
+  color: var(--bd-fg-muted);
+}
+
 .exp-folder-item__rename-input {
   flex: 1;
   min-width: 0;

@@ -26,6 +26,7 @@ import { AssetDetailOverlay } from "./AssetDetailOverlay";
 import { MediaContextMenu } from "./MediaContextMenu";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { EmptyFolderDropZone } from "./EmptyFolderDropZone";
 import { FolderContextMenu } from "./FolderContextMenu";
 import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
@@ -420,30 +421,41 @@ export function ExpandedMediaPanel({
             discMode={false}
             onTypeChange={state.setType}
           />
-          <LibraryView
-            items={state.libraryItems}
-            uploadQueue={state.uploadQueue}
-            activeType={state.activeType}
-            counts={state.counts}
-            sort={state.sort}
-            sortDir={state.sortDir}
-            gridN={state.gridN}
-            fmtFilter={state.fmtFilter}
-            selMode={state.selMode}
-            selectedKeys={state.selectedKeys}
-            searchQuery={state.librarySearch}
-            onSort={state.setSort}
-            onGridN={state.setGridN}
-            onFmt={state.setFmtFilter}
-            onSelToggle={state.toggleSelMode}
-            onSelect={state.toggleSelect}
-            onSelectAll={state.selectAll}
-            onRequestBulkDelete={state.requestBulkDelete}
-            onRequestDelete={state.requestDelete}
-            onInsert={state.insertToCanvas}
-            onCtxMenu={state.openCtxMenu}
-            onDetail={state.openDetail}
-          />
+          {currentFolderId !== null &&
+          state.libraryItems.length === 0 &&
+          !state.librarySearch ? (
+            <EmptyFolderDropZone
+              folderName={
+                folders.find((f) => f.id === currentFolderId)?.name ?? "this folder"
+              }
+              onFiles={(files) => state.upload(files, { folderId: currentFolderId })}
+            />
+          ) : (
+            <LibraryView
+              items={state.libraryItems}
+              uploadQueue={state.uploadQueue}
+              activeType={state.activeType}
+              counts={state.counts}
+              sort={state.sort}
+              sortDir={state.sortDir}
+              gridN={state.gridN}
+              fmtFilter={state.fmtFilter}
+              selMode={state.selMode}
+              selectedKeys={state.selectedKeys}
+              searchQuery={state.librarySearch}
+              onSort={state.setSort}
+              onGridN={state.setGridN}
+              onFmt={state.setFmtFilter}
+              onSelToggle={state.toggleSelMode}
+              onSelect={state.toggleSelect}
+              onSelectAll={state.selectAll}
+              onRequestBulkDelete={state.requestBulkDelete}
+              onRequestDelete={state.requestDelete}
+              onInsert={state.insertToCanvas}
+              onCtxMenu={state.openCtxMenu}
+              onDetail={state.openDetail}
+            />
+          )}
         </div>
       </div>
 
