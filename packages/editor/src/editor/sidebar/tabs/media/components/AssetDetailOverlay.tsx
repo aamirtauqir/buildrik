@@ -53,6 +53,7 @@ export function AssetDetailOverlay({
   item,
   onInsert,
   onRename,
+  onUpdate,
   onDelete,
   onClose,
   onPrev,
@@ -65,6 +66,7 @@ export function AssetDetailOverlay({
 }: AssetDetailOverlayProps) {
   const [tab, setTab] = useState<Tab>("preview");
   const [name, setName] = useState(item.name);
+  const [altDraft, setAltDraft] = useState(item.altText ?? "");
   const [inserted, setInserted] = useState(false);
   const [metaError, setMetaError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -121,10 +123,18 @@ export function AssetDetailOverlay({
 
   useEffect(() => {
     setName(item.name);
+    setAltDraft(item.altText ?? "");
     setTab("preview");
     setInserted(false);
     setMetaError(false);
-  }, [item.key, item.name]);
+  }, [item.key, item.name, item.altText]);
+
+  const commitAltText = useCallback(() => {
+    if (!onUpdate) return;
+    const next = altDraft.trim();
+    if (next === (item.altText ?? "")) return;
+    void onUpdate(item.key, { altText: next });
+  }, [onUpdate, altDraft, item.altText, item.key]);
 
   const commitRename = useCallback(() => {
     const trimmed = name.trim();
@@ -304,6 +314,28 @@ export function AssetDetailOverlay({
           </div>
         ) : tab === "edit" ? (
           <div className="med-detail-edit-pane">
+            <label className="med-detail-edit-field">
+              <span className="med-detail-edit-label">Alt text</span>
+              <Input
+                className="med-detail-alt-input"
+                value={altDraft}
+                onChange={(e) => setAltDraft(e.target.value)}
+                onBlur={commitAltText}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitAltText();
+                    (e.currentTarget as HTMLInputElement).blur();
+                  }
+                }}
+                placeholder="Describe this image for screen readers"
+                aria-label="Alt text"
+              />
+              <span className="med-detail-edit-help">
+                Used by screen readers + image-SEO. Keep under 125 characters.
+              </span>
+            </label>
+            <div className="med-detail-edit-divider" role="separator" />
             <p className="med-detail-edit-blurb">
               Crop, rotate, or adjust this image. Edits create a new versioned copy — original is preserved.
             </p>
