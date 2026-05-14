@@ -53,6 +53,7 @@ import { AliasResolver } from "./aliasResolver";
 import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
 import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
+import { LintState } from "./designSystem/LintState";
 import { CSSBundler } from "../editor/design-system/bundler";
 import { DSLinter } from "../editor/design-system/linter";
 import { AIAssistService } from "../editor/design-system/services";
@@ -145,6 +146,7 @@ export class Composer extends EventEmitter {
   };
   readonly designSystem!: {
     readonly tokenUsage: TokenUsageTracker;
+    readonly lintState: LintState;
   };
 
   constructor(config: ComposerConfig) {
@@ -205,7 +207,8 @@ export class Composer extends EventEmitter {
     };
 
     const tokenUsage = new TokenUsageTracker();
-    this.designSystem = { tokenUsage };
+    const lintState = new LintState();
+    this.designSystem = { tokenUsage, lintState };
     // Recompute token usage whenever element trees or styles change. These
     // four events cover create/delete/update/style-set — markDirty's broader
     // PROJECT_CHANGED also fires for non-element work (settings, metadata)
