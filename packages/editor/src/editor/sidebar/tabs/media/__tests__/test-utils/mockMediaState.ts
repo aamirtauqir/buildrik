@@ -24,6 +24,9 @@ function buildMockState() {
     setType: (_t: unknown) => {},
     setPanelExpanded: (_expanded: boolean) => {},
     insertToCanvas: (_key: string) => {},
+    renameFolder: async (_id: string, _name: string) => {},
+    deleteFolder: async (_id: string, _opts?: { force?: boolean }) => {},
+    inspectFolder: (_id: string) => ({ assetCount: 0, subFolderCount: 0 }),
   };
 }
 

@@ -345,6 +345,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     confirmDelete: selection.confirmDelete,
     insertToCanvas,
     renameItem: library.renameItem,
+    renameFolder: library.renameFolder,
     updateItem: library.updateItem,
 
     // Discovery

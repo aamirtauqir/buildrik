@@ -206,6 +206,13 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     [composer]
   );
 
+  const renameFolder = useCallback(
+    async (id: string, name: string) => {
+      await composer.media.renameFolder(id, name);
+    },
+    [composer]
+  );
+
   const updateItem = useCallback(
     async (key: string, updates: Partial<LibraryItem>) => {
       const assetUpdates: any = {};
@@ -241,6 +248,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     setFmtFilter,
     setActiveType,
     renameItem,
+    renameFolder,
     updateItem,
   };
 }

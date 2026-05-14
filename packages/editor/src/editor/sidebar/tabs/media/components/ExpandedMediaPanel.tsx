@@ -25,6 +25,8 @@ import { FolderBreadcrumb } from "./FolderBreadcrumb";
 import { AssetDetailOverlay } from "./AssetDetailOverlay";
 import { MediaContextMenu } from "./MediaContextMenu";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { FolderContextMenu } from "./FolderContextMenu";
 import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
 import "../MediaTab.css";
@@ -139,6 +141,91 @@ export function ExpandedMediaPanel({
   // currently hovering during a drag so we can apply the snap outline.
   // Sentinel "__root__" represents the "All assets" target.
   const [dropTargetId, setDropTargetId] = React.useState<string | null>(null);
+
+  // §13 — folder context menu (right-click). { folderId, folderName, x, y }
+  const [folderMenu, setFolderMenu] = React.useState<
+    { folderId: string; folderName: string; x: number; y: number } | null
+  >(null);
+
+  // §13 — folder inline-rename. id of the folder currently being renamed.
+  const [renamingFolderId, setRenamingFolderId] = React.useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = React.useState("");
+
+  // §13 — folder delete confirm. Inspect result includes asset/subfolder count.
+  const [deleteFolderTarget, setDeleteFolderTarget] = React.useState<
+    { folderId: string; folderName: string; assetCount: number; subFolderCount: number } | null
+  >(null);
+
+  const handleFolderContextMenu = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    folder: MediaFolder,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFolderMenu({
+      folderId: folder.id,
+      folderName: folder.name,
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const handleStartRename = (folderId: string) => {
+    const folder = folders.find((f) => f.id === folderId);
+    if (!folder) return;
+    setRenamingFolderId(folderId);
+    setRenameDraft(folder.name);
+  };
+
+  const handleCommitRename = async () => {
+    const id = renamingFolderId;
+    const next = renameDraft.trim();
+    setRenamingFolderId(null);
+    setRenameDraft("");
+    if (!id || !next) return;
+    const folder = folders.find((f) => f.id === id);
+    if (folder && folder.name === next) return;
+    try {
+      await state.renameFolder(id, next);
+    } catch (err) {
+      showToast(
+        `Rename failed: ${err instanceof Error ? err.message : "unknown error"}`,
+        "error",
+      );
+    }
+  };
+
+  const handleCancelRename = () => {
+    setRenamingFolderId(null);
+    setRenameDraft("");
+  };
+
+  const handleStartDelete = (folderId: string) => {
+    const folder = folders.find((f) => f.id === folderId);
+    if (!folder) return;
+    const { assetCount, subFolderCount } = state.inspectFolder(folderId);
+    setDeleteFolderTarget({
+      folderId,
+      folderName: folder.name,
+      assetCount,
+      subFolderCount,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    const target = deleteFolderTarget;
+    setDeleteFolderTarget(null);
+    if (!target) return;
+    try {
+      await state.deleteFolder(target.folderId, { force: true });
+      showToast(`Folder '${target.folderName}' deleted.`, "success");
+    } catch (err) {
+      showToast(
+        `Delete failed: ${err instanceof Error ? err.message : "unknown error"}`,
+        "error",
+      );
+    }
+  };
 
   const readDraggedAssetKey = (e: React.DragEvent<HTMLElement>): string => {
     return (
@@ -285,12 +372,36 @@ export function ExpandedMediaPanel({
                 type="button"
                 data-folder-id={f.id}
                 className={`exp-folder-item${currentFolderId === f.id ? " is-active" : ""}${dropTargetId === f.id ? " is-drop-target" : ""}`}
-                onClick={() => setCurrentFolderId(f.id)}
+                onClick={() => {
+                  if (renamingFolderId !== f.id) setCurrentFolderId(f.id);
+                }}
+                onContextMenu={(e) => handleFolderContextMenu(e, f)}
                 onDragOver={(e) => handleFolderDragOver(e, f.id)}
                 onDragLeave={() => handleFolderDragLeave(f.id)}
                 onDrop={(e) => handleFolderDrop(e, f.id)}
               >
-                <span className="exp-folder-item__name">{f.name}</span>
+                {renamingFolderId === f.id ? (
+                  <input
+                    type="text"
+                    className="exp-folder-item__rename-input"
+                    value={renameDraft}
+                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => setRenameDraft(e.target.value)}
+                    onBlur={handleCommitRename}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleCommitRename();
+                      } else if (e.key === "Escape") {
+                        e.preventDefault();
+                        handleCancelRename();
+                      }
+                    }}
+                  />
+                ) : (
+                  <span className="exp-folder-item__name">{f.name}</span>
+                )}
               </Button>
             ))}
           </div>
@@ -414,6 +525,34 @@ export function ExpandedMediaPanel({
         onSave={(type, item) => { state.saveToLibrary(type, item); }}
         onInsert={state.insertToCanvas}
         onOpenIconPicker={onOpenIconPicker ? triggerIconPicker : undefined}
+      />
+      {folderMenu && (
+        <FolderContextMenu
+          folderId={folderMenu.folderId}
+          folderName={folderMenu.folderName}
+          x={folderMenu.x}
+          y={folderMenu.y}
+          onClose={() => setFolderMenu(null)}
+          onRename={handleStartRename}
+          onDelete={handleStartDelete}
+        />
+      )}
+      <ConfirmDialog
+        isOpen={!!deleteFolderTarget}
+        onClose={() => setDeleteFolderTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title={
+          deleteFolderTarget
+            ? `Delete "${deleteFolderTarget.folderName}"?`
+            : "Delete folder?"
+        }
+        message={
+          deleteFolderTarget && (deleteFolderTarget.assetCount > 0 || deleteFolderTarget.subFolderCount > 0)
+            ? `This folder contains ${deleteFolderTarget.assetCount} item${deleteFolderTarget.assetCount === 1 ? "" : "s"}${deleteFolderTarget.subFolderCount > 0 ? ` and ${deleteFolderTarget.subFolderCount} subfolder${deleteFolderTarget.subFolderCount === 1 ? "" : "s"}` : ""}. Items will move to the parent folder.`
+            : "Are you sure you want to delete this folder?"
+        }
+        confirmText="Delete Folder"
+        variant="danger"
       />
     </div>
   );

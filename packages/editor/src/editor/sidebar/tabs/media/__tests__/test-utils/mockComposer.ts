@@ -27,6 +27,8 @@ export function mockComposer(opts: MockComposerOpts = {}): Composer {
     getFolders: vi.fn(() => opts.folders ?? []),
     getAllFolders: vi.fn(() => opts.folders ?? []),
     getStorage: vi.fn(() => opts.storage ?? { used: 0, total: 5_000_000_000 }),
+    renameFolder: vi.fn(async () => {}),
+    deleteFolder: vi.fn(async () => {}),
   };
   return {
     media,

@@ -116,6 +116,7 @@ export interface LibraryStateResult {
   setFmtFilter(f: string): void;
   setActiveType(t: MediaTypeFilter): void;
   renameItem(key: string, name: string): Promise<void>;
+  renameFolder(id: string, name: string): Promise<void>;
   updateItem(key: string, updates: Partial<LibraryItem>): Promise<void>;
 }
 
@@ -209,6 +210,7 @@ export interface MediaStateResult {
   confirmDelete: ConfirmDeletePayload | null;
   insertToCanvas(key: string): void;
   renameItem(key: string, name: string): Promise<void>;
+  renameFolder(id: string, name: string): Promise<void>;
   updateItem(key: string, updates: Partial<LibraryItem>): Promise<void>;
 
   // Discovery

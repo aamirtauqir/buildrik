@@ -157,6 +157,18 @@
   white-space: nowrap;
 }
 
+.exp-folder-item__rename-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bd-surface);
+  border: 1px solid var(--bd-cobalt, #2D6DFF);
+  border-radius: var(--bd-radius-sm);
+  padding: 2px 6px;
+  font: inherit;
+  color: inherit;
+  outline: none;
+}
+
 .exp-folder-item__count {
   font-size: 10px;
   color: var(--bd-fg-muted);
