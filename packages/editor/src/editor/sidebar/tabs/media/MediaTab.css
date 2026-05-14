@@ -113,6 +113,47 @@
   opacity: 1;
 }
 
+/* §21 — Replace-across per-page selector */
+.med-rx-pages {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--bd-border-light, var(--bd-border));
+  border-radius: var(--bd-radius-md, 6px);
+}
+.med-rx-page-row {
+  border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
+}
+.med-rx-page-row:last-child {
+  border-bottom: none;
+}
+.med-rx-page-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.med-rx-page-label:hover {
+  background: var(--bd-hover-bg, rgba(45, 109, 255, 0.04));
+}
+.med-rx-page-name {
+  flex: 1;
+  color: var(--bd-fg);
+}
+.med-rx-page-count {
+  color: var(--bd-fg-muted);
+  font-size: 11px;
+}
+.med-rx-body--empty {
+  text-align: center;
+  color: var(--bd-fg-muted);
+  padding: 12px;
+}
+
 /* §19 — stock tile attribution (photographer + source) */
 .med-img-attribution {
   position: absolute;

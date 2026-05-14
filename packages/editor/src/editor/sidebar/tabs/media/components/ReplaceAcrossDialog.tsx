@@ -31,10 +31,31 @@ interface ReplaceAcrossDialogProps {
   onComplete?(result: ReplaceAcrossResult): void;
 }
 
+interface PageRow {
+  id: string;
+  name: string;
+  useCount: number;
+}
+
 type DialogState =
-  | { phase: "preview"; usageCount: number }
+  | { phase: "preview"; pages: PageRow[]; selected: Set<string> }
   | { phase: "committing" }
   | { phase: "result"; result: ReplaceAcrossResult };
+
+function buildPageRows(composer: Composer, oldSrc: string): PageRow[] {
+  const byPage = composer.mediaOps.getUsagesByPage(oldSrc);
+  const allPages = composer.elements.getAllPages?.() ?? [];
+  const nameById = new Map(allPages.map((p) => [p.id, p.name ?? p.id]));
+  const rows: PageRow[] = [];
+  for (const [pageId, elements] of byPage) {
+    rows.push({
+      id: pageId,
+      name: nameById.get(pageId) ?? pageId,
+      useCount: elements.length,
+    });
+  }
+  return rows;
+}
 
 export function ReplaceAcrossDialog({
   composer,
@@ -45,26 +66,59 @@ export function ReplaceAcrossDialog({
   onClose,
   onComplete,
 }: ReplaceAcrossDialogProps) {
-  const [state, setState] = React.useState<DialogState>(() => ({
-    phase: "preview",
-    usageCount: composer.mediaOps.getUsages(oldSrc).count,
-  }));
+  const [state, setState] = React.useState<DialogState>(() => {
+    const pages = buildPageRows(composer, oldSrc);
+    return {
+      phase: "preview",
+      pages,
+      selected: new Set(pages.map((p) => p.id)),
+    };
+  });
+
+  const handleTogglePage = React.useCallback((pageId: string) => {
+    setState((prev) => {
+      if (prev.phase !== "preview") return prev;
+      const next = new Set(prev.selected);
+      if (next.has(pageId)) next.delete(pageId);
+      else next.add(pageId);
+      return { ...prev, selected: next };
+    });
+  }, []);
+
+  const selectedTotals = React.useMemo(() => {
+    if (state.phase !== "preview") return { uses: 0, pages: 0 };
+    let uses = 0;
+    let pages = 0;
+    for (const p of state.pages) {
+      if (state.selected.has(p.id)) {
+        uses += p.useCount;
+        pages += 1;
+      }
+    }
+    return { uses, pages };
+  }, [state]);
 
   const handleCommit = React.useCallback(() => {
+    if (state.phase !== "preview") return;
+    const pageIds = state.pages
+      .filter((p) => state.selected.has(p.id))
+      .map((p) => p.id);
     setState({ phase: "committing" });
-    // Run on next tick so the UI repaints to the committing state.
     Promise.resolve().then(() => {
-      const result = composer.mediaOps.replaceAcross(oldSrc, newSrc);
+      const result = composer.mediaOps.replaceAcrossSelective(
+        oldSrc,
+        newSrc,
+        pageIds,
+      );
       setState({ phase: "result", result });
       onComplete?.(result);
     });
-  }, [composer, oldSrc, newSrc, onComplete]);
+  }, [composer, oldSrc, newSrc, onComplete, state]);
 
   const handleRetryFailed = React.useCallback(() => {
     if (state.phase !== "result") return;
-    // Retry only the failed ids. Engine doesn't expose a targeted retry,
-    // so we re-run replaceAcross — any elements that succeeded on round 1
-    // already have newSrc and will be filtered out by findByMediaSrc(oldSrc).
+    // Retry: re-run against ALL pages with the asset (elements that succeeded
+    // on round 1 already have newSrc and are filtered out by findByMediaSrc).
     setState({ phase: "committing" });
     Promise.resolve().then(() => {
       const result = composer.mediaOps.replaceAcross(oldSrc, newSrc);
@@ -89,9 +143,9 @@ export function ReplaceAcrossDialog({
         {state.phase === "preview" ? (
           <>
             <p className="med-rx-body">
-              This will replace every use of this asset on your canvas with{" "}
-              {newLabel ? <strong>{newLabel}</strong> : "the new asset"}. The
-              change is one undo step.
+              Replace this asset with{" "}
+              {newLabel ? <strong>{newLabel}</strong> : "the new asset"} on the
+              selected pages. The change is one undo step.
             </p>
             <div className="med-rx-preview">
               <div className="med-rx-preview__before">
@@ -106,6 +160,36 @@ export function ReplaceAcrossDialog({
                 <span>After</span>
               </div>
             </div>
+            {state.pages.length === 0 ? (
+              <p className="med-rx-body med-rx-body--empty">
+                This asset is not used on any page.
+              </p>
+            ) : (
+              <ul
+                className="med-rx-pages"
+                role="list"
+                aria-label="Pages to replace on"
+                data-testid="rx-pages-list"
+              >
+                {state.pages.map((p) => (
+                  <li key={p.id} className="med-rx-page-row">
+                    <label className="med-rx-page-label">
+                      <input
+                        type="checkbox"
+                        checked={state.selected.has(p.id)}
+                        onChange={() => handleTogglePage(p.id)}
+                        data-testid={`rx-page-${p.id}`}
+                        aria-label={`Replace on ${p.name}`}
+                      />
+                      <span className="med-rx-page-name">{p.name}</span>
+                      <span className="med-rx-page-count">
+                        {p.useCount} use{p.useCount === 1 ? "" : "s"}
+                      </span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            )}
             <footer className="med-rx-footer">
               <Button type="button" className="med-rx-btn" onClick={onClose}>
                 Cancel
@@ -114,9 +198,11 @@ export function ReplaceAcrossDialog({
                 type="button"
                 className="med-rx-btn med-rx-btn--primary"
                 onClick={handleCommit}
-                disabled={state.usageCount === 0}
+                disabled={selectedTotals.uses === 0}
               >
-                Replace {state.usageCount} use{state.usageCount === 1 ? "" : "s"}
+                Replace {selectedTotals.uses} use
+                {selectedTotals.uses === 1 ? "" : "s"} on {selectedTotals.pages}{" "}
+                page{selectedTotals.pages === 1 ? "" : "s"}
               </Button>
             </footer>
           </>
