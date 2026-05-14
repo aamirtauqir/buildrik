@@ -1,5 +1,5 @@
 /**
- * FullPageRouter — Routes fullpage-mode tabs (Templates, Settings)
+ * FullPageRouter — Routes fullpage-mode tabs (Templates, Assets)
  * Renders inside LayoutShell.FullPage slot when a fullpage tab is active.
  *
  * @license BSD-3-Clause
@@ -12,7 +12,6 @@ import type { IconConfig } from "../../shared/types/media";
 
 // Lazy-loaded fullpage tab components
 const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
-const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 const LibraryManager = React.lazy(() =>
   import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))
 );

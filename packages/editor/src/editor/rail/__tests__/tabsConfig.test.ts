@@ -13,8 +13,8 @@ describe("tabsConfig helpers", () => {
       expect(getTabMode("add")).toBe("panel");
     });
 
-    it("returns 'fullpage' for Templates tab", () => {
-      expect(getTabMode("templates")).toBe("fullpage");
+    it("returns 'panel' for Templates tab", () => {
+      expect(getTabMode("templates")).toBe("panel");
     });
 
     it("returns 'panel' for Settings tab", () => {

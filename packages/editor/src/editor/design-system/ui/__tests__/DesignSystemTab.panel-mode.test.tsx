@@ -2,8 +2,9 @@
  * DesignSystemTab — panel-mode layout test
  *
  * Verifies the tab renders within the 320px LeftSidebar panel chrome without
- * horizontal overflow. Asserts the `.ds-panel-root` wrapper exists so CSS in
- * `ds-panel.css` can target sub-section grids defensively.
+ * horizontal overflow. Width is enforced by `.ls-panel` parent + the tab's
+ * own inline flex-column container; this suite asserts the tab mounts and
+ * does not force an intrinsic wider width.
  *
  * @license BSD-3-Clause
  */
@@ -63,7 +64,7 @@ beforeEach(() => {
 });
 
 describe("DesignSystemTab — panel mode", () => {
-  it("mounts the .ds-panel-root wrapper inside a 320px container", () => {
+  it("mounts inside a 320px container", () => {
     const composer = makeFakeComposer();
     const { container } = render(
       wrap(
@@ -72,8 +73,8 @@ describe("DesignSystemTab — panel mode", () => {
         </div>,
       ),
     );
-    // The outer wrapper is the 320px div; .ds-panel-root sits one level deeper.
-    const root = container.querySelector(".ds-panel-root") as HTMLElement | null;
+    // The 320px wrapper is the outer div; DesignSystemTab's root sits inside.
+    const root = container.firstElementChild?.firstElementChild as HTMLElement | null;
     expect(root).toBeTruthy();
   });
 
@@ -86,11 +87,11 @@ describe("DesignSystemTab — panel mode", () => {
         </div>,
       ),
     );
-    const root = container.querySelector(".ds-panel-root") as HTMLElement | null;
+    const root = container.firstElementChild?.firstElementChild as HTMLElement | null;
     expect(root).toBeTruthy();
     // jsdom doesn't apply CSS layout, so scrollWidth ≈ clientWidth. Assert the
-    // wrapper exists and that no inline style forces a wider intrinsic width.
-    // The real width clamp is enforced by .ls-panel + ds-panel.css in browser.
+    // tab's root exists and that no inline style forces a wider intrinsic width.
+    // The real width clamp is enforced by .ls-panel in the browser.
     if (root) {
       const inlineWidth = root.style.width;
       expect(inlineWidth === "" || inlineWidth === "100%").toBe(true);
