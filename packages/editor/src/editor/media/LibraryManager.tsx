@@ -436,6 +436,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           y={state.ctxMenu.y}
           item={state.ctxMenu.item}
           folders={state.folders}
+          allFolders={state.allFolders}
+          onInsert={(item) => state.insertToCanvas(item.key)}
           onSelect={(item) => state.enterSelectModeWith(item.key)}
           onRename={state.openDetail}
           onMove={(item, fid) => state.moveAsset(item.key, fid)}
