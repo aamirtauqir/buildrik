@@ -9,7 +9,8 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
-import { Upload, AlertTriangle, XCircle } from "lucide-react";
+import { Upload, AlertTriangle, XCircle, RotateCcw } from "lucide-react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import type { UploadZoneProps } from "../data/mediaTypes";
 import { StorageQuotaBar } from "./StorageQuotaBar";
 
@@ -24,7 +25,13 @@ function isAccepted(file: File): boolean {
   return false;
 }
 
-export function UploadZone({ storage, onUpload, disabled = false }: UploadZoneProps) {
+export function UploadZone({
+  storage,
+  onUpload,
+  disabled = false,
+  uploadQueue,
+  onRetryUpload,
+}: UploadZoneProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = React.useState(false);
   const [rejectedReason, setRejectedReason] = React.useState<string | null>(null);
@@ -68,16 +75,29 @@ export function UploadZone({ storage, onUpload, disabled = false }: UploadZonePr
     if (!isFull) handleFiles(e.dataTransfer.files);
   };
 
-  // Visual state takes priority: rejected > full > near-limit > drag > idle.
+  // §22 — active upload state (any queue item still in-flight)
+  const hasActiveUploads = (uploadQueue ?? []).some(
+    (q) =>
+      q.status === "uploading" ||
+      q.status === "optimizing" ||
+      q.status === "processing" ||
+      q.status === "pending",
+  );
+
+  const failedItems = (uploadQueue ?? []).filter((q) => q.status === "error");
+
+  // Visual state priority: rejected > full > uploading > near-limit > drag > idle.
   const stateClass = rejectedReason
     ? "med-upload-zone--rejected"
     : isFull
       ? "med-upload-zone--disabled"
-      : isNearLimit
-        ? "med-upload-zone--near-limit"
-        : isDragOver
-          ? "med-upload-zone--drag-active"
-          : "";
+      : hasActiveUploads
+        ? "med-upload-zone--uploading"
+        : isNearLimit
+          ? "med-upload-zone--near-limit"
+          : isDragOver
+            ? "med-upload-zone--drag-active"
+            : "";
 
   const Icon = rejectedReason ? XCircle : isNearLimit ? AlertTriangle : Upload;
 
@@ -115,6 +135,40 @@ export function UploadZone({ storage, onUpload, disabled = false }: UploadZonePr
         />
       </div>
       <StorageQuotaBar used={storage.used} total={storage.total} />
+      {failedItems.length > 0 && (
+        <ul
+          className="med-upload-queue-errors"
+          role="list"
+          aria-label="Failed uploads"
+          data-testid="upload-queue-errors"
+        >
+          {failedItems.map((item) => (
+            <li
+              key={item.fileName}
+              className="med-upload-queue-item med-upload-queue-item--error"
+            >
+              <XCircle size={14} aria-hidden />
+              <span className="med-upload-queue-item__name">{item.fileName}</span>
+              <span className="med-upload-queue-item__reason">
+                {item.error ?? "Upload failed"}
+              </span>
+              {onRetryUpload ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="med-upload-queue-item__retry"
+                  onClick={() => onRetryUpload(item.fileName)}
+                  aria-label={`Retry ${item.fileName}`}
+                >
+                  <RotateCcw size={12} aria-hidden />
+                  Retry
+                </Button>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

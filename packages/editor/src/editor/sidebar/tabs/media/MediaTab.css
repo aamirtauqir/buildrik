@@ -113,6 +113,51 @@
   opacity: 1;
 }
 
+/* §22 — Upload zone uploading state + queue errors */
+.med-upload-zone--uploading {
+  border-color: var(--bd-cobalt, #2D6DFF);
+  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.06));
+}
+.med-upload-queue-errors {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.med-upload-queue-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  border-radius: var(--bd-radius-sm, 4px);
+  border-left: 2px solid transparent;
+}
+.med-upload-queue-item--error {
+  background: var(--bd-danger-soft, #fee2e2);
+  color: var(--bd-danger, #DC2626);
+  border-left-color: var(--bd-danger, #DC2626);
+}
+.med-upload-queue-item__name {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40%;
+}
+.med-upload-queue-item__reason {
+  flex: 1;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.med-upload-queue-item__retry {
+  flex-shrink: 0;
+}
+
 /* §21 — Replace-across per-page selector */
 .med-rx-pages {
   list-style: none;

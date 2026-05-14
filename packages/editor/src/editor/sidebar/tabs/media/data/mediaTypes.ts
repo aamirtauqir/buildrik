@@ -360,6 +360,9 @@ export interface UploadZoneProps {
   storage: { used: number; total: number };
   onUpload(files: File[]): void;
   disabled?: boolean;
-  /** Currently-uploading files; reserved for future queue UI. Accepted but unused today. */
+  /** Currently-uploading files. When any item has status "uploading"/"optimizing"/"processing",
+   *  the zone applies med-upload-zone--uploading. Failed items render below the zone. */
   uploadQueue?: UploadProgress[];
+  /** §22 — fired when user clicks Retry on a failed queue item. */
+  onRetryUpload?(fileName: string): void;
 }
