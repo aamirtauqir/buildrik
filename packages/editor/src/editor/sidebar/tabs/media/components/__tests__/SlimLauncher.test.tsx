@@ -15,7 +15,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SlimLauncher } from "../SlimLauncher";
 import { mockComposer } from "../../__tests__/test-utils/mockComposer";
-import type { LibraryItem, MediaTypeFilter } from "../data/mediaTypes";
+import type { LibraryItem, MediaTypeFilter } from "../../data/mediaTypes";
 
 const baseItem: Omit<LibraryItem, "key" | "name" | "type" | "src" | "thumb"> = {
   size: 1024,

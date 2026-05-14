@@ -187,7 +187,8 @@ export interface MediaStateResult {
   folders: MediaFolder[];
   allFolders: MediaFolder[];
   createFolder(name: string): Promise<void>;
-  deleteFolder(id: string): Promise<void>;
+  inspectFolder(id: string): { assetCount: number; subFolderCount: number };
+  deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;
   moveAsset(assetId: string, folderId: string | null): Promise<void>;
   bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<void>;
   uploadQueue: UploadProgress[];

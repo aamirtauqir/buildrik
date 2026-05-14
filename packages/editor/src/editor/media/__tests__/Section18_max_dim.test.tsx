@@ -53,7 +53,8 @@ describe("§18 — OptimizationPanel max-dim override", () => {
   it("default empty value omits maxWidth/maxHeight from optimize call", async () => {
     renderPanel();
     await waitFor(() => expect(optimizeMock).toHaveBeenCalled());
-    const opts = optimizeMock.mock.calls.at(-1)?.[1] as Record<string, unknown>;
+    const calls = optimizeMock.mock.calls as unknown as Array<[unknown, Record<string, unknown>]>;
+    const opts = calls.at(-1)?.[1] ?? {};
     expect(opts).not.toHaveProperty("maxWidth");
     expect(opts).not.toHaveProperty("maxHeight");
   });
@@ -65,7 +66,8 @@ describe("§18 — OptimizationPanel max-dim override", () => {
     ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "800" } });
     await waitFor(() => {
-      const opts = optimizeMock.mock.calls.at(-1)?.[1] as Record<string, unknown>;
+      const calls = optimizeMock.mock.calls as unknown as Array<[unknown, Record<string, unknown>]>;
+    const opts = calls.at(-1)?.[1] ?? {};
       expect(opts?.maxWidth).toBe(800);
       expect(opts?.maxHeight).toBe(800);
     });
@@ -78,7 +80,8 @@ describe("§18 — OptimizationPanel max-dim override", () => {
     ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "0" } });
     await waitFor(() => {
-      const opts = optimizeMock.mock.calls.at(-1)?.[1] as Record<string, unknown>;
+      const calls = optimizeMock.mock.calls as unknown as Array<[unknown, Record<string, unknown>]>;
+    const opts = calls.at(-1)?.[1] ?? {};
       expect(opts).not.toHaveProperty("maxWidth");
     });
   });
