@@ -335,6 +335,8 @@ export function useMediaState(composer: Composer): MediaStateResult {
     toggleSelMode: selection.toggleSelMode,
     toggleSelect: selection.toggleSelect,
     selectAll: selection.selectAll,
+    shiftSelect: selection.shiftSelect,
+    enterSelectModeWith: selection.enterSelectModeWith,
     failedUploads: upload.failedUploads,
     dismissFailedUploads: upload.dismissFailedUploads,
     upload: upload.upload,

@@ -20,6 +20,8 @@ interface MediaContextMenuProps {
   onDelete(item: LibraryItem): void;
   onCopyUrl(item: LibraryItem): void;
   onEditImage(item: LibraryItem): void;
+  /** §14 — enter multi-select mode with this item pre-selected. */
+  onSelect(item: LibraryItem): void;
   /** §21 — opens file picker; on upload-complete, mounts ReplaceAcrossDialog.
    *  Optional: callers without the wire (e.g., LibraryManager) omit it; the menu
    *  item is then hidden. */
@@ -40,6 +42,7 @@ export function MediaContextMenu({
   onDelete,
   onCopyUrl,
   onEditImage,
+  onSelect,
   onReplaceAcross,
   onClose,
 }: MediaContextMenuProps) {
@@ -67,6 +70,9 @@ export function MediaContextMenu({
         aria-label="Asset actions"
         style={{ position: "fixed", left, top, width: MENU_WIDTH, zIndex: 200 }}
       >
+        <Button role="menuitem" className="med-ctx-item" onClick={act(() => onSelect(item))}>
+          Select
+        </Button>
         <Button role="menuitem" className="med-ctx-item" onClick={act(() => onRename(item))}>
           Rename
         </Button>

@@ -269,6 +269,7 @@ function MediaTabWithComposer({
           onFmt={state.setFmtFilter}
           onSelToggle={state.toggleSelMode}
           onSelect={state.toggleSelect}
+          onShiftSelect={state.shiftSelect}
           onSelectAll={state.selectAll}
           onRequestBulkDelete={state.requestBulkDelete}
           onRequestDelete={state.requestDelete}
@@ -304,6 +305,7 @@ function MediaTabWithComposer({
           y={state.ctxMenu.y}
           item={state.ctxMenu.item}
           folders={state.folders}
+          onSelect={(item) => state.enterSelectModeWith(item.key)}
           onRename={state.openDetail}
           onMove={(item, fid) => state.moveAsset(item.key, fid)}
           onDelete={(item) => state.requestDelete(item.key)}

@@ -18,6 +18,8 @@ export function useSelectionState(
   const [selMode, setSelMode] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [confirmDelete, setConfirmDelete] = useState<ConfirmDeletePayload | null>(null);
+  // §14 — last single-click anchor for shift-range select.
+  const [anchorKey, setAnchorKey] = useState<string | null>(null);
 
   const checkInUse = useCallback(
     (keys: string[]): number => {
@@ -49,11 +51,50 @@ export function useSelectionState(
       else next.add(key);
       return next;
     });
+    setAnchorKey(key);
   }, []);
 
   const selectAll = useCallback(() => {
     setSelectedKeys(new Set(libraryItems.map((i) => i.key)));
   }, [libraryItems]);
+
+  /**
+   * §14 — Enter select mode + pre-select a single item. Used by
+   * the right-click "Select" menu entry on an asset cell.
+   */
+  const enterSelectModeWith = useCallback((key: string) => {
+    setSelMode(true);
+    setSelectedKeys(new Set([key]));
+    setAnchorKey(key);
+  }, []);
+
+  /**
+   * §14 — Shift-click range select. If there's an existing anchor in
+   * libraryItems, select every item between anchor and `key` inclusive
+   * (display order). Otherwise treat as a single-item select + set anchor.
+   * Turns on select mode if it wasn't on.
+   */
+  const shiftSelect = useCallback(
+    (key: string) => {
+      setSelMode(true);
+      if (!anchorKey || anchorKey === key) {
+        setSelectedKeys(new Set([key]));
+        setAnchorKey(key);
+        return;
+      }
+      const order = libraryItems.map((i) => i.key);
+      const a = order.indexOf(anchorKey);
+      const b = order.indexOf(key);
+      if (a === -1 || b === -1) {
+        setSelectedKeys(new Set([key]));
+        setAnchorKey(key);
+        return;
+      }
+      const [lo, hi] = a < b ? [a, b] : [b, a];
+      setSelectedKeys(new Set(order.slice(lo, hi + 1)));
+    },
+    [anchorKey, libraryItems],
+  );
 
   const requestDelete = useCallback(
     (key: string) => {
@@ -104,5 +145,7 @@ export function useSelectionState(
     requestBulkDelete,
     executeDelete,
     cancelDelete,
+    shiftSelect,
+    enterSelectModeWith,
   };
 }

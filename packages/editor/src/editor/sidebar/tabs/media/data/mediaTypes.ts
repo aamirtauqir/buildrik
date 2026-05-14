@@ -146,6 +146,10 @@ export interface SelectionStateResult {
   requestBulkDelete(items: LibraryItem[]): void;
   executeDelete(): Promise<void>;
   cancelDelete(): void;
+  /** §14 — shift-click range select. Anchored on last toggleSelect. */
+  shiftSelect(key: string): void;
+  /** §14 — right-click "Select" entry: enter mode + pre-select one item. */
+  enterSelectModeWith(key: string): void;
 }
 
 export type DiscSource = "unsplash" | "pexels" | "pixabay";
@@ -200,6 +204,8 @@ export interface MediaStateResult {
   toggleSelMode(): void;
   toggleSelect(key: string): void;
   selectAll(): void;
+  shiftSelect(key: string): void;
+  enterSelectModeWith(key: string): void;
   upload(files: File[], opts?: { folderId?: string | null }): void;
   failedUploads: FailedUpload[];
   dismissFailedUploads(): void;
@@ -299,6 +305,8 @@ export interface LibraryViewProps {
   onFmt(f: string): void;
   onSelToggle(): void;
   onSelect(key: string): void;
+  /** §14 — shift-click range select. Anchored on previous toggleSelect. */
+  onShiftSelect(key: string): void;
   onSelectAll(): void;
   onRequestBulkDelete(items: LibraryItem[]): void;
   onRequestDelete(key: string): void;

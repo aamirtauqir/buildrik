@@ -42,6 +42,7 @@ function ImageSection({
   selMode,
   selectedKeys,
   onSelect,
+  onShiftSelect,
   onRequestDelete,
   onInsert,
   onCtxMenu,
@@ -52,6 +53,7 @@ function ImageSection({
   selMode: boolean;
   selectedKeys: Set<string>;
   onSelect(key: string): void;
+  onShiftSelect(key: string): void;
   onRequestDelete(key: string): void;
   onInsert(key: string): void;
   onCtxMenu(e: React.MouseEvent, item: LibraryItem): void;
@@ -66,7 +68,7 @@ function ImageSection({
             key={item.key}
             className={`med-img-card${sel ? " selected" : ""}`}
             onContextMenu={(e) => onCtxMenu(e, item)}
-            onClick={() => (selMode ? onSelect(item.key) : onDetail(item))}
+            onClick={(e) => (e.shiftKey ? onShiftSelect(item.key) : selMode ? onSelect(item.key) : onDetail(item))}
             role="button"
             tabIndex={0}
             aria-label={item.name}
@@ -150,6 +152,7 @@ function VideoSection({
   selMode,
   selectedKeys,
   onSelect,
+  onShiftSelect,
   onInsert,
   onRequestDelete,
   onCtxMenu,
@@ -160,6 +163,7 @@ function VideoSection({
   selMode: boolean;
   selectedKeys: Set<string>;
   onSelect(key: string): void;
+  onShiftSelect(key: string): void;
   onInsert(key: string): void;
   onRequestDelete(key: string): void;
   onCtxMenu(e: React.MouseEvent, item: LibraryItem): void;
@@ -174,7 +178,7 @@ function VideoSection({
             key={item.key}
             className={`med-vid-card${sel ? " selected" : ""}`}
             onContextMenu={(e) => onCtxMenu(e, item)}
-            onClick={() => (selMode ? onSelect(item.key) : onDetail(item))}
+            onClick={(e) => (e.shiftKey ? onShiftSelect(item.key) : selMode ? onSelect(item.key) : onDetail(item))}
             role="button"
             tabIndex={0}
             aria-label={item.name}
@@ -237,6 +241,7 @@ function IconSection({
   selMode,
   selectedKeys,
   onSelect,
+  onShiftSelect,
   onInsert,
   onRequestDelete,
   onCtxMenu,
@@ -245,6 +250,7 @@ function IconSection({
   selMode: boolean;
   selectedKeys: Set<string>;
   onSelect(key: string): void;
+  onShiftSelect(key: string): void;
   onInsert(key: string): void;
   onRequestDelete(key: string): void;
   onCtxMenu(e: React.MouseEvent, item: LibraryItem): void;
@@ -258,7 +264,7 @@ function IconSection({
             key={item.key}
             className={`med-ico-card${sel ? " selected" : ""}`}
             onContextMenu={(e) => onCtxMenu(e, item)}
-            onClick={() => (selMode ? onSelect(item.key) : onInsert(item.key))}
+            onClick={(e) => (e.shiftKey ? onShiftSelect(item.key) : selMode ? onSelect(item.key) : onInsert(item.key))}
             role="button"
             tabIndex={0}
             aria-label={item.name}
@@ -299,6 +305,7 @@ function FontSection({
   selMode,
   selectedKeys,
   onSelect,
+  onShiftSelect,
   onInsert,
   onCtxMenu,
 }: {
@@ -306,6 +313,7 @@ function FontSection({
   selMode: boolean;
   selectedKeys: Set<string>;
   onSelect(key: string): void;
+  onShiftSelect(key: string): void;
   onInsert(key: string): void;
   onCtxMenu(e: React.MouseEvent, item: LibraryItem): void;
 }) {
@@ -322,7 +330,7 @@ function FontSection({
             tabIndex={0}
             aria-label={item.name}
             aria-selected={selMode ? sel : undefined}
-            onClick={() => (selMode ? onSelect(item.key) : onInsert(item.key))}
+            onClick={(e) => (e.shiftKey ? onShiftSelect(item.key) : selMode ? onSelect(item.key) : onInsert(item.key))}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -405,6 +413,7 @@ export function LibraryView({
   onFmt,
   onSelToggle,
   onSelect,
+  onShiftSelect,
   onSelectAll,
   onRequestBulkDelete,
   onRequestDelete,
@@ -587,6 +596,7 @@ export function LibraryView({
               selMode={selMode}
               selectedKeys={selectedKeys}
               onSelect={onSelect}
+              onShiftSelect={onShiftSelect}
               onRequestDelete={onRequestDelete}
               onInsert={onInsert}
               onCtxMenu={onCtxMenu}
@@ -613,6 +623,7 @@ export function LibraryView({
               selMode={selMode}
               selectedKeys={selectedKeys}
               onSelect={onSelect}
+              onShiftSelect={onShiftSelect}
               onInsert={onInsert}
               onRequestDelete={onRequestDelete}
               onCtxMenu={onCtxMenu}
@@ -638,6 +649,7 @@ export function LibraryView({
               selMode={selMode}
               selectedKeys={selectedKeys}
               onSelect={onSelect}
+              onShiftSelect={onShiftSelect}
               onInsert={onInsert}
               onRequestDelete={onRequestDelete}
               onCtxMenu={onCtxMenu}
@@ -662,6 +674,7 @@ export function LibraryView({
               selMode={selMode}
               selectedKeys={selectedKeys}
               onSelect={onSelect}
+              onShiftSelect={onShiftSelect}
               onInsert={onInsert}
               onCtxMenu={onCtxMenu}
             />
