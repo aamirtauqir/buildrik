@@ -27,6 +27,7 @@ import {
   Layers,
   File,
   Diamond,
+  Palette,
   Settings,
   Timer,
 } from "lucide-react";
@@ -43,6 +44,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Layers,
   File,
   Diamond,
+  Palette,
   Settings,
   Timer,
 };

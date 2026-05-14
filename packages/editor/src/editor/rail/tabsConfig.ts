@@ -147,6 +147,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     shortcut: "D",
     mode: "panel",
     panelWidth: 320,
+    zone: "config",
   },
   {
     id: "settings",
