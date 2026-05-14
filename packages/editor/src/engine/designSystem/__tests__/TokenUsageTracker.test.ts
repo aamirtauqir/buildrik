@@ -181,17 +181,58 @@ describe("TokenUsageTracker via Composer", () => {
       styles: { color: "{{token.color.brand.primary}}" },
     });
     composer.elements.addElement(el, rootId);
+    await Promise.resolve(); // flush coalesced recompute
 
     expect(composer.designSystem.tokenUsage.getUsage("color.brand.primary")).toBe(1);
 
     // Remove the binding via setStyle — ELEMENT_UPDATED fires, tracker recomputes.
     el.setStyle("color", "#3B82F6");
+    await Promise.resolve();
     expect(composer.designSystem.tokenUsage.getUsage("color.brand.primary")).toBe(0);
 
     // Delete the element — ELEMENT_DELETED fires, tracker recomputes.
     el.setStyle("color", "{{token.color.brand.primary}}");
+    await Promise.resolve();
     expect(composer.designSystem.tokenUsage.getUsage("color.brand.primary")).toBe(1);
     composer.elements.removeElement(el.getId());
+    await Promise.resolve();
     expect(composer.designSystem.tokenUsage.getUsage("color.brand.primary")).toBe(0);
+  });
+
+  it("coalesces multiple element events into one recompute", async () => {
+    const composer = new Composer({} as never);
+    await composer.whenReady();
+
+    composer.elements.createPage("Home");
+    const activePage = composer.elements.getActivePage();
+    if (!activePage) throw new Error("No active page after createPage");
+    const rootId = activePage.root.id;
+
+    const el = composer.elements.createElement("text", {
+      content: "Hello",
+      styles: { color: "{{token.color.brand.primary}}" },
+    });
+    composer.elements.addElement(el, rootId);
+    await Promise.resolve(); // flush addElement's scheduled recompute
+
+    // Spy on the tracker — count calls from this point forward.
+    const tracker = composer.designSystem.tokenUsage;
+    let calls = 0;
+    const origRecompute = tracker.recompute.bind(tracker);
+    tracker.recompute = (els) => {
+      calls++;
+      origRecompute(els);
+    };
+
+    // Five rapid style updates within the same tick.
+    el.setStyle("color", "{{token.color.brand.primary}}");
+    el.setStyle("color", "{{token.color.brand.secondary}}");
+    el.setStyle("color", "{{token.color.brand.tertiary}}");
+    el.setStyle("color", "{{token.color.brand.quaternary}}");
+    el.setStyle("color", "{{token.color.brand.primary}}");
+
+    expect(calls).toBe(0); // all five coalesced, none flushed yet
+    await Promise.resolve();
+    expect(calls).toBe(1); // single recompute for the burst
   });
 });

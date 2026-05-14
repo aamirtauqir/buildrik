@@ -210,11 +210,24 @@ export class Composer extends EventEmitter {
     // four events cover create/delete/update/style-set — markDirty's broader
     // PROJECT_CHANGED also fires for non-element work (settings, metadata)
     // that can't affect token bindings, so we stay surgical.
-    const recomputeTokenUsage = () => tokenUsage.recompute(this.elements.getAllElements());
-    this.on(EVENTS.ELEMENT_CREATED, recomputeTokenUsage);
-    this.on(EVENTS.ELEMENT_DELETED, recomputeTokenUsage);
-    this.on(EVENTS.ELEMENT_UPDATED, recomputeTokenUsage);
-    this.on(EVENTS.ELEMENT_STYLE_UPDATED, recomputeTokenUsage);
+    //
+    // Coalesce via microtask: ELEMENT_UPDATED fires on every keystroke
+    // (Element.setContent) and on every setStyle call, so a typing burst on
+    // a 200-element project would otherwise trigger 200 recomputes/sec. One
+    // recompute per microtask collapses bursts to a single O(N·S·L) walk.
+    let recomputeScheduled = false;
+    const scheduleRecomputeTokenUsage = () => {
+      if (recomputeScheduled) return;
+      recomputeScheduled = true;
+      queueMicrotask(() => {
+        recomputeScheduled = false;
+        tokenUsage.recompute(this.elements.getAllElements());
+      });
+    };
+    this.on(EVENTS.ELEMENT_CREATED, scheduleRecomputeTokenUsage);
+    this.on(EVENTS.ELEMENT_DELETED, scheduleRecomputeTokenUsage);
+    this.on(EVENTS.ELEMENT_UPDATED, scheduleRecomputeTokenUsage);
+    this.on(EVENTS.ELEMENT_STYLE_UPDATED, scheduleRecomputeTokenUsage);
 
     const operationApplyHandler = (patch: Patch) => {
       this.history.applyRemoteOperation(patch);
