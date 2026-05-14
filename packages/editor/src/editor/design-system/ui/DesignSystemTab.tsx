@@ -52,6 +52,7 @@ import { DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
 import { DSLintMount } from "./DSLintMount";
 import { DSModeToggle } from "./DSModeToggle";
+import { ColorModeToggle } from "./ColorModeToggle";
 import { ExportDropdown } from "./ExportDropdown";
 import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
@@ -455,6 +456,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           <DraftChip state={isDirty ? "dirty" : "saved"} count={totalDirty} />
         </div>
         <DSModeToggle />
+        {composer && composer.colorMode ? <ColorModeToggle composer={composer} /> : null}
         <ExportDropdown
           onExport={handleExport}
           isDirty={isDirty}

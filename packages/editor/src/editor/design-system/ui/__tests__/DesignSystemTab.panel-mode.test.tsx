@@ -37,6 +37,11 @@ function makeFakeComposer() {
     },
     elements: { getAll: () => [], getAllElements: () => [] },
     dsLinter: { lint: () => [] },
+    colorMode: {
+      get: () => "light" as const,
+      set: () => {},
+      resolved: () => "light" as const,
+    },
     settings,
   } as unknown as NonNullable<Parameters<typeof DesignSystemTab>[0]["composer"]>;
 }
@@ -98,10 +103,7 @@ describe("DesignSystemTab — panel mode", () => {
     }
   });
 
-  // TODO(Task 6): once ColorModeToggle is mounted into the PanelHeader,
-  // assert both DSModeToggle (`group: /mode/i`) and ColorModeToggle
-  // (`group: /color/i`) are present. Skipped now to keep the suite green.
-  it.skip("renders header with both DSModeToggle and ColorModeToggle (Task 6)", () => {
+  it("renders header with both DSModeToggle and ColorModeToggle (Task 6)", () => {
     const composer = makeFakeComposer();
     const { getByRole } = render(
       wrap(
@@ -110,7 +112,10 @@ describe("DesignSystemTab — panel mode", () => {
         </div>,
       ),
     );
-    expect(getByRole("group", { name: /mode/i })).toBeTruthy();
-    expect(getByRole("group", { name: /color/i })).toBeTruthy();
+    // DSModeToggle renders a role="radiogroup" with aria-label "Design system
+    // display mode" — matches getByRole("radiogroup", { name: /mode/i }).
+    expect(getByRole("radiogroup", { name: /mode/i })).toBeTruthy();
+    // ColorModeToggle renders an IconButton with aria-label starting "Color mode:".
+    expect(getByRole("button", { name: /color mode/i })).toBeTruthy();
   });
 });
