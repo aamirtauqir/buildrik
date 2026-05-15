@@ -38,6 +38,8 @@ export interface ColorTokenListProps {
   getLintIssues?: (tokenId: string) => readonly LintIssue[];
   /** T8: row click → drill-in detail. */
   onRowClick?: (tokenId: string) => void;
+  /** T5: Pro mode exposes token IDs (mono) + alias arrow chip per s02/s10. */
+  isPro?: boolean;
 }
 
 interface ColorGroup {
@@ -174,6 +176,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   usageByTokenId,
   getLintIssues,
   onRowClick,
+  isPro,
 }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterMode, setFilterMode] = React.useState<FilterMode>("all");
@@ -397,6 +400,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                       key={token.id}
                       token={token}
                       previewSlot={<ColorSwatch value={currentValue} isDirty={isDirty} />}
+                      isPro={isPro}
+                      aliasTarget={token.aliasOf ?? null}
                       usageCount={usageByTokenId?.get(token.id) ?? 0}
                       lintIssues={getLintIssues?.(token.id)}
                       onClick={() => onRowClick?.(token.id)}

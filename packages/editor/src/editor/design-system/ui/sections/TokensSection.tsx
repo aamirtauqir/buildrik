@@ -64,6 +64,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
 }) => {
   const dsMode = useDSModeOptional();
   const isBeginner = dsMode?.mode !== "pro";
+  const isPro = dsMode?.mode === "pro";
 
   // T7: subscribe to TokenUsageTracker's own "tokenUsage:changed" event.
   //
@@ -237,6 +238,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 onAddToken={() => onAddTokenClick?.()}
                 usageByTokenId={usageMap}
                 getLintIssues={getIssues}
+                isPro={isPro}
               />
             </TokenKindCard>
           );
