@@ -1,10 +1,10 @@
 /**
- * StylesRouter (Arc B1 T1) — two-pane router for the Styles sub-tab.
+ * StylesRouter — drill-in stack for Styles sub-tab.
  *
- * Owns `{ category, variant }` selection state. Left column: 11 category
- * rows from PRESET_CATEGORIES; right pane: PresetDetailPane for the active
- * category. Click category → resets variant to first; deleted variant →
- * effect falls back.
+ * 320px panel width can't host a two-pane split (s03 prototype was 1280+).
+ * Pattern follows T8 TokensRouter + saved feedback_drill_in_drawer_preference:
+ * list view shows 11 category rows; click → push detail view with variant
+ * tabs + binding rows; back arrow returns to list.
  *
  * @license BSD-3-Clause
  */
@@ -28,10 +28,9 @@ import {
 import { StyleCategoryRow } from "./StyleCategoryRow";
 import { PresetDetailPane } from "./PresetDetailPane";
 
-interface View {
-  category: PresetCategory;
-  variant: string;
-}
+type View =
+  | { kind: "list" }
+  | { kind: "detail"; category: PresetCategory; variant: string };
 
 export const StylesRouter: React.FC = () => {
   const button = useButtonPresets();
@@ -76,86 +75,97 @@ export const StylesRouter: React.FC = () => {
       ],
     );
 
-  const [view, setView] = React.useState<View>(() => {
-    const initialCategory =
-      PRESET_CATEGORIES.find((c) => presetsByCategory[c].length > 0) ??
-      "button";
-    const initialVariant =
-      presetsByCategory[initialCategory][0]?.variant ?? "";
-    return { category: initialCategory, variant: initialVariant };
-  });
+  const [view, setView] = React.useState<View>({ kind: "list" });
 
-  // If the active category's presets disappear (delete) or the active variant
-  // is gone, recover to the first available.
+  // If active variant disappears from registry, fall back to first variant
+  // OR back to list if category is empty.
   React.useEffect(() => {
+    if (view.kind !== "detail") return;
     const variants = presetsByCategory[view.category];
     if (variants.length === 0) {
-      const fallback =
-        PRESET_CATEGORIES.find((c) => presetsByCategory[c].length > 0) ??
-        "button";
-      const fallbackVariant =
-        presetsByCategory[fallback][0]?.variant ?? "";
-      if (fallback !== view.category || fallbackVariant !== view.variant) {
-        setView({ category: fallback, variant: fallbackVariant });
-      }
+      setView({ kind: "list" });
       return;
     }
     if (!variants.some((p) => p.variant === view.variant)) {
-      setView((v) => ({ ...v, variant: variants[0].variant }));
+      setView((v) =>
+        v.kind === "detail"
+          ? { ...v, variant: variants[0].variant }
+          : v,
+      );
     }
-  }, [presetsByCategory, view.category, view.variant]);
+  }, [presetsByCategory, view]);
 
-  return (
-    <div
-      data-styles-router
-      style={{
-        display: "flex",
-        gap: 12,
-        height: "100%",
-        minHeight: 0,
-      }}
-    >
-      {/* Left: category list */}
+  if (view.kind === "detail") {
+    return (
       <div
-        data-category-list
-        style={{
-          width: 220,
-          flexShrink: 0,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          overflowY: "auto",
-        }}
+        data-styles-router
+        data-detail-view
+        style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
       >
-        {PRESET_CATEGORIES.map((cat) => (
-          <StyleCategoryRow
-            key={cat}
-            category={cat}
-            variantCount={presetsByCategory[cat].length}
-            isActive={view.category === cat}
-            onClick={() => {
-              const firstVariant =
-                presetsByCategory[cat][0]?.variant ?? "";
-              setView({ category: cat, variant: firstVariant });
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Right: detail pane */}
-      <div
-        data-detail-pane-host
-        style={{ flex: 1, minWidth: 0, overflowY: "auto" }}
-      >
+        <button
+          type="button"
+          onClick={() => setView({ kind: "list" })}
+          style={{
+            padding: "6px 12px",
+            background: "transparent",
+            border: "none",
+            color: "var(--bd-fg-muted)",
+            cursor: "pointer",
+            fontSize: 12,
+            textAlign: "left" as const,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          ← Back to styles
+        </button>
         <PresetDetailPane
           category={view.category}
           variant={view.variant}
           presets={presetsByCategory[view.category]}
           onVariantChange={(variant) =>
-            setView((v) => ({ ...v, variant }))
+            setView((v) =>
+              v.kind === "detail" ? { ...v, variant } : v,
+            )
           }
         />
       </div>
+    );
+  }
+
+  return (
+    <div
+      data-styles-router
+      data-list-view
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        padding: "8px 0",
+        minHeight: 0,
+        overflowY: "auto",
+      }}
+    >
+      {PRESET_CATEGORIES.map((cat) => (
+        <StyleCategoryRow
+          key={cat}
+          category={cat}
+          variantCount={presetsByCategory[cat].length}
+          isActive={false}
+          onClick={() => {
+            const firstVariant =
+              presetsByCategory[cat][0]?.variant ?? "";
+            if (firstVariant) {
+              setView({
+                kind: "detail",
+                category: cat,
+                variant: firstVariant,
+              });
+            }
+          }}
+        />
+      ))}
     </div>
   );
 };

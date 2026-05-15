@@ -53,8 +53,8 @@ beforeEach(() => {
   }
 });
 
-describe("DesignSystemTab → StylesSection (Arc B1 two-pane integration)", () => {
-  it("clicking Styles section reveals the two-pane router (11 category rows + detail pane)", async () => {
+describe("DesignSystemTab → StylesSection (Arc B1 drill-in integration)", () => {
+  it("clicking Styles section reveals list view with 11 category rows", async () => {
     const composer = makeFakeComposer();
     const { getAllByRole, container } = render(
       wrap(<DesignSystemTab composer={composer} />),
@@ -66,12 +66,13 @@ describe("DesignSystemTab → StylesSection (Arc B1 two-pane integration)", () =
 
     await waitFor(() => {
       expect(container.querySelector("[data-styles-router]")).toBeTruthy();
+      expect(container.querySelector("[data-list-view]")).toBeTruthy();
       expect(container.querySelectorAll("[data-category-row]").length).toBe(11);
-      expect(container.querySelector("[data-preset-detail-pane]")).toBeTruthy();
+      expect(container.querySelector("[data-preset-detail-pane]")).toBeNull();
     });
   });
 
-  it("clicking the Card category row swaps the detail pane to card variants", async () => {
+  it("clicking the Card category row drills into Card detail view", async () => {
     const composer = makeFakeComposer();
     const { getAllByRole, container } = render(
       wrap(<DesignSystemTab composer={composer} />),
@@ -87,6 +88,7 @@ describe("DesignSystemTab → StylesSection (Arc B1 two-pane integration)", () =
     fireEvent.click(cardRow);
 
     await waitFor(() => {
+      expect(container.querySelector("[data-detail-view]")).toBeTruthy();
       const pane = container.querySelector(
         "[data-preset-detail-pane]",
       ) as HTMLElement;

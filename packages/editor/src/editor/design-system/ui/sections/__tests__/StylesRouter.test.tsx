@@ -17,22 +17,17 @@ beforeEach(() => {
 });
 
 describe("StylesRouter", () => {
-  it("initial render selects Button category and its first variant (primary)", () => {
+  it("initial render shows list view (no detail pane)", () => {
     const { container } = render(wrap(<StylesRouter />));
 
-    const buttonRow = container.querySelector(
-      '[data-category-row="button"]',
-    ) as HTMLButtonElement;
-    expect(buttonRow.getAttribute("data-active")).toBe("true");
-
-    const detailPane = container.querySelector(
-      "[data-preset-detail-pane]",
-    ) as HTMLElement;
-    expect(detailPane.getAttribute("data-category")).toBe("button");
-    expect(detailPane.getAttribute("data-variant")).toBe("primary");
+    expect(container.querySelector("[data-list-view]")).toBeTruthy();
+    expect(container.querySelector("[data-detail-view]")).toBeNull();
+    expect(container.querySelector("[data-preset-detail-pane]")).toBeNull();
+    // 11 category rows visible.
+    expect(container.querySelectorAll("[data-category-row]").length).toBe(11);
   });
 
-  it("clicking Card category swaps detail pane to card + first card variant", () => {
+  it("clicking a category row pushes detail view with first variant", () => {
     const { container } = render(wrap(<StylesRouter />));
 
     const cardRow = container.querySelector(
@@ -40,17 +35,36 @@ describe("StylesRouter", () => {
     ) as HTMLButtonElement;
     fireEvent.click(cardRow);
 
-    expect(cardRow.getAttribute("data-active")).toBe("true");
+    expect(container.querySelector("[data-list-view]")).toBeNull();
+    expect(container.querySelector("[data-detail-view]")).toBeTruthy();
     const detailPane = container.querySelector(
       "[data-preset-detail-pane]",
     ) as HTMLElement;
     expect(detailPane.getAttribute("data-category")).toBe("card");
-    // DEFAULT_PRESETS: card variants are "elevated" then "flat".
     expect(detailPane.getAttribute("data-variant")).toBe("elevated");
+  });
+
+  it("back arrow returns to list view", () => {
+    const { container, getByText } = render(wrap(<StylesRouter />));
+    const buttonRow = container.querySelector(
+      '[data-category-row="button"]',
+    ) as HTMLButtonElement;
+    fireEvent.click(buttonRow);
+
+    expect(container.querySelector("[data-detail-view]")).toBeTruthy();
+    fireEvent.click(getByText(/Back to styles/));
+    expect(container.querySelector("[data-list-view]")).toBeTruthy();
+    expect(container.querySelector("[data-detail-view]")).toBeNull();
   });
 
   it("clicking a variant tab inside the detail pane updates the variant", () => {
     const { container } = render(wrap(<StylesRouter />));
+
+    // Drill in first.
+    const buttonRow = container.querySelector(
+      '[data-category-row="button"]',
+    ) as HTMLButtonElement;
+    fireEvent.click(buttonRow);
 
     const ghostTab = container.querySelector(
       '[data-variant-tab="ghost"]',
