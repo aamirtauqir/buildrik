@@ -2,7 +2,7 @@
 
 - **Date**: 2026-05-15
 - **Author**: Claude Opus 4.7
-- **Status**: APPROVED — executing immediately
+- **Status**: SHIPPED 2026-05-15 (commits `d0197988`..`fe266f1c`) — drill-in pattern adopted over two-pane after live verify caught 320px panel cramp
 - **Reference prototype**: `file:///Users/shahg/.gstack/projects/aamirtauqir-buildrik/designs/ds-components-prototype-20260507/index.html#s03`
 - **Predecessor**: DS full rewrite arc (T1-T10 + T34 + T6 fix) — covered Tokens sub-tab only
 
