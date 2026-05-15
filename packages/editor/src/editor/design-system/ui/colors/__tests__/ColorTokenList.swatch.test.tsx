@@ -1,6 +1,8 @@
 /**
- * Visual-sync arc V1 — ColorTokenList swatch grid view tests.
- * Reference: docs/reference/left-panel/tab-design.html (Brand colour section).
+ * T4 — ColorTokenList row-stack view tests. Migrated from 6-col swatch grid
+ * shape (now via TokenRow primitive). Original swatch+picker drawer tests
+ * dropped (drill-in moves to T8). Surviving tests assert on row-shape
+ * (data-token-row), search, group headers, dirty indicator, and Add token.
  */
 import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -33,47 +35,33 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe("ColorTokenList — swatch grid (Visual-sync V1)", () => {
-  it("renders one swatch per token as a button", () => {
+describe("ColorTokenList — row stack (T4)", () => {
+  it("renders one TokenRow per token", () => {
     const tokens = [
       makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
       makeToken("color-text", "Text", "#0F172A", "brand"),
       makeToken("color-muted", "Muted", "#64748B", "brand"),
     ];
-    const { getAllByRole } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
-    const swatches = getAllByRole("listitem");
-    expect(swatches.length).toBe(3);
+    const { container } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
+    const rows = container.querySelectorAll("[data-token-row]");
+    expect(rows.length).toBe(3);
   });
 
-  it("each swatch has accessible name with token name + value", () => {
+  it("each row carries the token id via data-token-row marker", () => {
     const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
-    const { getByLabelText } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
-    expect(getByLabelText(/Edit color Primary \(#2D6DFF\)/)).toBeTruthy();
+    const { container } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
+    expect(container.querySelector('[data-token-row="color-primary"]')).toBeTruthy();
   });
 
-  it("clicking a swatch toggles aria-pressed and reveals the picker drawer", () => {
+  it("clicking a row dispatches onRowClick with the token id", () => {
     const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
-    const { getByLabelText, queryByText, container } = render(
-      <ColorTokenList tokens={tokens} {...baseProps} />,
+    const onRowClick = vi.fn();
+    const { container } = render(
+      <ColorTokenList tokens={tokens} {...baseProps} onRowClick={onRowClick} />,
     );
-    const swatch = getByLabelText(/Edit color Primary/);
-    expect(swatch.getAttribute("aria-pressed")).toBe("false");
-    expect(queryByText("Primary")).toBeNull(); // drawer not rendered yet
-
-    fireEvent.click(swatch);
-    expect(swatch.getAttribute("aria-pressed")).toBe("true");
-    // Drawer renders the token name + value in mono header.
-    expect(container.textContent).toContain("Primary");
-    expect(container.textContent).toContain("#2D6DFF");
-  });
-
-  it("clicking the active swatch a second time collapses the picker drawer", () => {
-    const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
-    const { getByLabelText } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
-    const swatch = getByLabelText(/Edit color Primary/);
-    fireEvent.click(swatch);
-    fireEvent.click(swatch);
-    expect(swatch.getAttribute("aria-pressed")).toBe("false");
+    const row = container.querySelector('[data-token-row="color-primary"]') as HTMLElement;
+    fireEvent.click(row);
+    expect(onRowClick).toHaveBeenCalledWith("color-primary");
   });
 
   it("groups tokens by their `group` field — brand renders as 'Brand colour' header", () => {
@@ -86,7 +74,7 @@ describe("ColorTokenList — swatch grid (Visual-sync V1)", () => {
     expect(getByText("Surface")).toBeTruthy();
   });
 
-  it("shows a dirty marker on swatches whose token has a pending diff", () => {
+  it("shows a dirty marker on the swatch when token has a pending diff", () => {
     const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
     const pendingDiff: Record<string, TokenDiff> = {
       "color-primary": { tokenId: "color-primary", previousValue: "#2D6DFF", currentValue: "#FF0000" },
@@ -100,22 +88,21 @@ describe("ColorTokenList — swatch grid (Visual-sync V1)", () => {
   it("brand group surfaces the first token's value as mono mini-metadata in the header", () => {
     const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
     const { container } = render(<ColorTokenList tokens={tokens} {...baseProps} />);
-    // The header pattern is: <h3>Brand colour</h3> ... <span>#2D6DFF</span>
     expect(container.textContent).toContain("#2D6DFF");
   });
 
-  it("preserves the search filter — typing narrows visible swatches", () => {
+  it("preserves the search filter — typing narrows visible rows", () => {
     const tokens = [
       makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
       makeToken("color-text", "Text", "#0F172A", "brand"),
       makeToken("color-muted", "Muted", "#64748B", "brand"),
     ];
-    const { getAllByRole, getByPlaceholderText } = render(
+    const { container, getByPlaceholderText } = render(
       <ColorTokenList tokens={tokens} {...baseProps} />,
     );
-    expect(getAllByRole("listitem").length).toBe(3);
+    expect(container.querySelectorAll("[data-token-row]").length).toBe(3);
     fireEvent.change(getByPlaceholderText("Search colors…"), { target: { value: "primary" } });
-    expect(getAllByRole("listitem").length).toBe(1);
+    expect(container.querySelectorAll("[data-token-row]").length).toBe(1);
   });
 
   it("preserves the Add token affordance", () => {
@@ -128,62 +115,21 @@ describe("ColorTokenList — swatch grid (Visual-sync V1)", () => {
     expect(onAddToken).toHaveBeenCalledTimes(1);
   });
 
-  it("renders inline lint row IMMEDIATELY AFTER the affected swatch cell, not at group bottom", () => {
-    // Spec gap fix — earlier the lint rows clustered as flat siblings AFTER
-    // the SwatchGrid, so all amber rows ended up at the group bottom. Spec
-    // calls for per-token inline placement: amber row directly below the
-    // offending swatch, spanning all 6 grid columns.
+  it("rows with lint issues get warn state via TokenRow (data-lint-warn)", () => {
     const tokens = [
       makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
       makeToken("color-text", "Text", "#0F172A", "brand"),
-      makeToken("color-muted", "Muted", "#64748B", "brand"),
     ];
-    // Only the MIDDLE token has a lint issue — if placement is inline,
-    // the lint row must appear between swatch-1 (Text) and swatch-2 (Muted)
-    // in DOM order. If placement is cluster-bottom, it appears AFTER all
-    // three swatches.
     const getLintIssues = (id: string) =>
       id === "color-text"
         ? [{ type: "contrast" as const, severity: "warn" as const, message: "low contrast", autoFixHint: "darken-22" }]
         : [];
     const { container } = render(
-      <ColorTokenList
-        tokens={tokens}
-        {...baseProps}
-        getLintIssues={getLintIssues}
-        onLintAutoFix={() => {}}
-        onLintIgnore={() => {}}
-      />,
+      <ColorTokenList tokens={tokens} {...baseProps} getLintIssues={getLintIssues} />,
     );
-    // Collect grid children in DOM order. Swatch cells contain a button
-    // role="listitem"; the lint row has data-token-lint-row.
-    const grid = container.querySelector('[role="list"]') as HTMLElement;
-    expect(grid).toBeTruthy();
-    const orderedKinds: string[] = [];
-    for (const child of Array.from(grid.children)) {
-      if (child.querySelector('[role="listitem"]')) orderedKinds.push("swatch");
-      else if (child.getAttribute("data-token-lint-row")) orderedKinds.push("lint");
-    }
-    // Expected: [swatch (Primary), swatch (Text), lint (Text), swatch (Muted)].
-    expect(orderedKinds).toEqual(["swatch", "swatch", "lint", "swatch"]);
-  });
-
-  it("inline lint row spans the full grid width via gridColumn: 1 / -1", () => {
-    const tokens = [makeToken("color-text", "Text", "#0F172A", "brand")];
-    const getLintIssues = () => [
-      { type: "contrast" as const, severity: "warn" as const, message: "low contrast", autoFixHint: "darken-22" },
-    ];
-    const { container } = render(
-      <ColorTokenList
-        tokens={tokens}
-        {...baseProps}
-        getLintIssues={getLintIssues}
-        onLintAutoFix={() => {}}
-        onLintIgnore={() => {}}
-      />,
-    );
-    const row = container.querySelector("[data-token-lint-row]") as HTMLElement;
-    expect(row).toBeTruthy();
-    expect(row.style.gridColumn).toBe("1 / -1");
+    const warnRow = container.querySelector('[data-token-row="color-text"]') as HTMLElement;
+    expect(warnRow.getAttribute("data-lint-warn")).toBe("true");
+    const cleanRow = container.querySelector('[data-token-row="color-primary"]') as HTMLElement;
+    expect(cleanRow.getAttribute("data-lint-warn")).toBeNull();
   });
 });

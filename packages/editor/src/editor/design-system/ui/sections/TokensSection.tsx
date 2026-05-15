@@ -236,16 +236,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 canRedo={color.canRedo}
                 onAddToken={() => onAddTokenClick?.()}
                 usageByTokenId={usageMap}
-                composer={composer}
                 getLintIssues={getIssues}
-                onLintIgnore={onIgnoreLint}
-                onLintAutoFix={(id, hint) => {
-                  const t = color.tokens.find((x) => x.id === id);
-                  if (!t) return;
-                  color.updateToken(id, computeAutoFix(t.value, hint));
-                  // Auto-suppress after a successful fix so the row clears.
-                  lintState?.suppress(id);
-                }}
               />
             </TokenKindCard>
           );

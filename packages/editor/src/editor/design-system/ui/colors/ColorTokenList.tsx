@@ -1,17 +1,17 @@
 /**
- * ColorTokenList v11 — prototype-faithful swatch grid view.
+ * ColorTokenList — T4 of DS prototype-full-rewrite arc.
  *
- * Visual reference: docs/reference/left-panel/tab-design.html (Brand colour
- * section). Per-group 6-column square swatch grid with token-name labels
- * under each swatch. Active (expanded) swatch gets cobalt outline. Click
- * a swatch to open the ColorPicker inline below the grid.
+ * Rewritten from 6-col swatch grid to vertical row stack using the TokenRow
+ * SSOT primitive (commit 323f782b). One render shape across Color/Type/Spacing
+ * lists. SwatchGrid + compactLabel + PickerDrawer + expandedId state removed.
  *
- * Replaces the v10 row-stack rendering — visual treatment was generic
- * settings-panel, didn't match the prototype's dense designer surface.
+ * Per-row dark-missing chip + composer colorMode subscription dropped — T6
+ * will add an aggregate header chip in the slot reserved below SearchAndFilter.
  *
- * Search / WCAG-issues filter / fix-all banner / add-token affordances
- * are preserved from v10 — those serve advanced editing flows that the
- * grid alone can't surface.
+ * TokenLintRow inline render dropped — TokenRow handles inline lint state.
+ *
+ * Preserved: search, all/issues filter, WCAG issues banner, Fix-all button,
+ * group structure (brand/surface/state), GroupHeader, Add-token button.
  *
  * @license BSD-3-Clause
  */
@@ -20,10 +20,7 @@ import * as React from "react";
 import type { DesignToken, TokenDiff } from "../../types";
 import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
-import { ColorPicker } from "./ColorPicker";
-import { TokenUsageChip } from "../sections/TokenUsageChip";
-import { TokenLintRow } from "../sections/TokenLintRow";
-import type { Composer } from "../../../../engine/Composer";
+import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 
 export interface ColorTokenListProps {
@@ -35,20 +32,12 @@ export interface ColorTokenListProps {
   canUndo: (id: string) => boolean;
   canRedo: (id: string) => boolean;
   onAddToken: () => void;
-  /** T7 coverage: per-token usage counts (from composer.designSystem.tokenUsage). */
+  /** Per-token usage counts (from composer.designSystem.tokenUsage). */
   usageByTokenId?: ReadonlyMap<string, number>;
-  /**
-   * T9: composer drives the dark-missing chip. When colorMode resolves to "dark"
-   * AND a color token has no darkValue, the row gets an amber "no dark · falls back"
-   * chip. Subscribes to `colorMode:changed` to re-render on mode flips.
-   */
-  composer?: Composer | null;
-  /** T10: visible lint issues for a token (from composer.designSystem.lintState). */
+  /** Visible lint issues for a token (from composer.designSystem.lintState). */
   getLintIssues?: (tokenId: string) => readonly LintIssue[];
-  /** T10: Auto-fix click — host applies the hint + suppresses the row. */
-  onLintAutoFix?: (tokenId: string, hint: string | undefined) => void;
-  /** T10: Ignore click — host calls lintState.suppress(tokenId). */
-  onLintIgnore?: (tokenId: string) => void;
+  /** T8: row click → drill-in detail. */
+  onRowClick?: (tokenId: string) => void;
 }
 
 interface ColorGroup {
@@ -69,6 +58,7 @@ const GROUP_META: Record<string, { label: string; subtext: string }> = {
   state: { label: "States", subtext: "Feedback colors — success, error, warning, info." },
 };
 
+// Background used for WCAG contrast checks. Editor canvas dark surface.
 const BG = "#0A0A0A";
 
 // ─── Group header (mono-uppercase per prototype) ──────────────────────────────
@@ -120,182 +110,43 @@ const GroupHeader: React.FC<{ label: string; mini?: string; subtext?: string }> 
   </div>
 );
 
-// ─── Swatch grid (6-col, square aspect, label under) ──────────────────────────
+// ─── Color swatch (16px square preview slot) ──────────────────────────────────
 
-interface SwatchGridProps {
-  tokens: DesignToken[];
-  expandedId: string | null;
-  pendingDiff: Record<string, TokenDiff>;
-  onSwatchClick: (id: string) => void;
-  usageByTokenId?: ReadonlyMap<string, number>;
-  /** T9: when true, color tokens without a darkValue render the amber chip. */
-  isDarkMode: boolean;
-  /** T9: handler invoked when the dark-missing chip is clicked. */
-  onDarkMissingClick: (tokenId: string) => void;
-  /**
-   * T10 spec gap fix: lint rows render INLINE inside the grid, immediately
-   * after the affected swatch's cell, spanning the full 6-col width via
-   * `gridColumn: "1 / -1"`. Earlier the rows clustered at the bottom of the
-   * group (flat siblings after the grid) — spec calls for per-token inline
-   * placement.
-   */
-  getLintIssues?: (tokenId: string) => readonly LintIssue[];
-  onLintAutoFix?: (tokenId: string, hint: string | undefined) => void;
-  onLintIgnore?: (tokenId: string) => void;
-}
-
-const SwatchGrid: React.FC<SwatchGridProps> = ({
-  tokens, expandedId, pendingDiff, onSwatchClick, usageByTokenId,
-  isDarkMode, onDarkMissingClick,
-  getLintIssues, onLintAutoFix, onLintIgnore,
-}) => (
-  <div
-    role="list"
-    style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(6, 1fr)",
-      // 4px swatch gap; rows get extra space below for label + usage chip stack.
-      columnGap: 4,
-      rowGap: 24,
-    }}
-  >
-    {tokens.map((t) => {
-      const isActive = expandedId === t.id;
-      const isDirty = pendingDiff[t.id] !== undefined;
-      // Light values get a visible 1px border so they don't disappear on the
-      // panel background. Dark values use the swatch fill itself as visual.
-      const isLight = isLikelyLightValue(t.value);
-      const usage = usageByTokenId?.get(t.id) ?? 0;
-      // T9: dark-missing chip — only color tokens, only when dark mode active,
-      // only when darkValue is undefined or null. Empty string is explicit-empty
-      // (not missing) per types.ts:110 contract.
-      const isDarkMissing =
-        isDarkMode && (t.darkValue === undefined || t.darkValue === null);
-      // T10 spec gap fix: inline lint row directly under this swatch's cell.
-      // Rendered as a sibling grid item with `gridColumn: "1 / -1"` so it
-      // breaks the 6-col grid into a full-width sub-row at this position.
-      const tokenIssues = getLintIssues?.(t.id) ?? [];
-      return (
-        <React.Fragment key={t.id}>
-        <div
+const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, isDirty }) => {
+  // Light values get a visible 1px border so they don't disappear on subtle bg.
+  const isLight = isLikelyLightValue(value);
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        position: "relative",
+        display: "inline-block",
+        width: 16,
+        height: 16,
+        borderRadius: 4,
+        background: value,
+        border: isLight
+          ? "1px solid var(--bd-border-medium, #cbd5e1)"
+          : "1px solid var(--bd-border)",
+      }}
+    >
+      {isDirty && (
+        <span
+          aria-label="unsaved changes"
           style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "stretch",
-            gap: 3,
+            position: "absolute",
+            top: -2,
+            right: -2,
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            background: "var(--bd-warning, #f59e0b)",
           }}
-        >
-          <button
-            role="listitem"
-            type="button"
-            aria-label={`Edit color ${t.name} (${t.value})`}
-            aria-pressed={isActive}
-            onClick={() => onSwatchClick(t.id)}
-            style={{
-              position: "relative",
-              aspectRatio: "1 / 1",
-              margin: 0,
-              padding: 0,
-              borderRadius: 6,
-              background: t.value,
-              border: isLight
-                ? "1px solid var(--bd-border-medium, #cbd5e1)"
-                : "1px solid var(--bd-border)",
-              cursor: "pointer",
-              outline: isActive ? "2px solid var(--bd-accent, #2D6DFF)" : "none",
-              outlineOffset: 2,
-              transition: "outline-color 120ms",
-            }}
-            title={`${t.name} · ${t.value}`}
-          >
-            {isDirty && (
-              <span
-                aria-label="unsaved changes"
-                style={{
-                  position: "absolute",
-                  top: 2,
-                  right: 2,
-                  width: 5,
-                  height: 5,
-                  borderRadius: "50%",
-                  background: "var(--bd-warning, #f59e0b)",
-                }}
-              />
-            )}
-          </button>
-          <span
-            aria-hidden="true"
-            style={{
-              fontSize: 9,
-              fontWeight: 500,
-              fontFamily:
-                "var(--buildrick-font-family-mono, ui-monospace, monospace)",
-              color: "var(--bd-fg-muted)",
-              textAlign: "center",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {compactLabel(t)}
-          </span>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <TokenUsageChip count={usage} />
-          </div>
-          {isDarkMissing && (
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDarkMissingClick(t.id);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onDarkMissingClick(t.id);
-                  }
-                }}
-                aria-label={`Missing dark variant for ${t.name}. Click to add.`}
-                title="No dark variant defined — token falls back to its light value in dark mode."
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  padding: "1px 6px",
-                  borderRadius: 4,
-                  fontSize: 9,
-                  fontWeight: 500,
-                  fontFamily:
-                    "var(--buildrick-font-family-mono, ui-monospace, monospace)",
-                  background: "var(--buildrick-warning-soft, #FEF3C7)",
-                  color: "var(--buildrick-warning-strong, #854D0E)",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  maxWidth: "100%",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                no dark · falls back
-              </span>
-            </div>
-          )}
-        </div>
-        {tokenIssues.length > 0 && (
-          <TokenLintRow
-            tokenId={t.id}
-            issues={tokenIssues}
-            onAutoFix={(id, hint) => onLintAutoFix?.(id, hint)}
-            onIgnore={(id) => onLintIgnore?.(id)}
-            style={{ gridColumn: "1 / -1" }}
-          />
-        )}
-        </React.Fragment>
-      );
-    })}
-  </div>
-);
+        />
+      )}
+    </span>
+  );
+};
 
 // Heuristic — if RGB sum > ~600, treat as "light" for border decoration.
 function isLikelyLightValue(hex: string): boolean {
@@ -309,83 +160,6 @@ function isLikelyLightValue(hex: string): boolean {
   return r + g + b > 600;
 }
 
-// Prefer the short alias suffix (color-primary → "primary") for label brevity.
-function compactLabel(t: DesignToken): string {
-  const id = t.id ?? t.name;
-  const cut = id.replace(/^color-/, "");
-  return cut || id;
-}
-
-// ─── Picker drawer (under grid when active) ───────────────────────────────────
-
-interface PickerDrawerProps {
-  token: DesignToken;
-  onColorChange: (id: string, hex: string) => void;
-  onCancel: () => void;
-  onSave: (hex: string) => void;
-}
-
-const PickerDrawer: React.FC<PickerDrawerProps> = ({
-  token, onColorChange, onCancel, onSave,
-}) => (
-  <div
-    style={{
-      marginTop: 6,
-      padding: 10,
-      background: "var(--bd-bg-subtle)",
-      border: "1px solid var(--bd-border)",
-      borderRadius: 8,
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 8,
-      }}
-    >
-      <span
-        style={{
-          width: 16,
-          height: 16,
-          borderRadius: 4,
-          background: token.value,
-          border: "1px solid var(--bd-border)",
-          flexShrink: 0,
-        }}
-        aria-hidden="true"
-      />
-      <span
-        style={{
-          fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
-          fontSize: 11,
-          color: "var(--bd-fg-primary)",
-        }}
-      >
-        {token.name}
-      </span>
-      <span
-        style={{
-          marginLeft: "auto",
-          fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
-          fontSize: 10.5,
-          color: "var(--bd-fg-muted)",
-        }}
-      >
-        {token.value}
-      </span>
-    </div>
-    <ColorPicker
-      initialHex={token.value}
-      background={BG}
-      onChange={(hex) => onColorChange(token.id, hex)}
-      onCancel={onCancel}
-      onSave={onSave}
-    />
-  </div>
-);
-
 // ─── ColorTokenList ───────────────────────────────────────────────────────────
 
 export const ColorTokenList: React.FC<ColorTokenListProps> = ({
@@ -398,44 +172,11 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   canRedo: _canRedo,
   onAddToken,
   usageByTokenId,
-  composer,
   getLintIssues,
-  onLintAutoFix,
-  onLintIgnore,
+  onRowClick,
 }) => {
-  const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterMode, setFilterMode] = React.useState<FilterMode>("all");
-
-  // T9: subscribe to colorMode:changed so the dark-missing chip toggles when
-  // the user flips light↔dark via ColorModeToggle. Lazy init reads current
-  // resolved mode (handles "system" → "light"/"dark"). Pattern mirrors
-  // ColorModeToggle.tsx:78-87. Without composer, defaults to "light" and
-  // never shows the chip (graceful fallback when used outside Studio).
-  const [resolvedMode, setResolvedMode] = React.useState<"light" | "dark">(
-    () => composer?.colorMode?.resolved?.() ?? "light",
-  );
-  React.useEffect(() => {
-    if (!composer?.colorMode) return;
-    const sync = () => setResolvedMode(composer.colorMode.resolved());
-    composer.on("colorMode:changed", sync);
-    return () => {
-      composer.off("colorMode:changed", sync);
-    };
-  }, [composer]);
-
-  // T9: click handler stub — opens token editor on the dark-value field.
-  // No openTokenEditor engine API exists yet; ship with DEV-only console.warn
-  // so the chip is visually live but click is a no-op pending S2.x scope.
-  const handleDarkMissingClick = React.useCallback((tokenId: string) => {
-    if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        "[T9] openTokenEditor not implemented; cannot focus darkValue for",
-        tokenId,
-      );
-    }
-  }, []);
 
   const visibleTokens = React.useMemo(() => {
     let result = tokens;
@@ -493,25 +234,12 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
     Object.entries(contrastFixes).forEach(([id, hex]) => onColorChange(id, hex));
   };
 
-  const handleSwatchClick = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id));
-  };
-
-  const handlePickerSave = (id: string, hex: string) => {
-    onColorChange(id, hex);
-    setExpandedId(null);
-  };
-
-  const expandedToken = expandedId
-    ? visibleTokens.find((t) => t.id === expandedId)
-    : null;
-
   const isEmpty = visibleTokens.length === 0;
   const isIssuesEmpty =
     filterMode === "issues" && issuesCount === 0 && searchQuery === "";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+    <div data-color-token-list style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       {/* Controls row — search + filter pills */}
       <div
         style={{
@@ -577,6 +305,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           Issues{issuesCount > 0 ? ` (${issuesCount})` : ""}
         </button>
       </div>
+
+      {/* T6 slot: aggregate dark-missing chip will mount here. */}
 
       {/* WCAG filter banner */}
       {filterMode === "issues" && issuesCount > 0 && (
@@ -647,40 +377,33 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         </div>
       )}
 
-      {/* Token groups → swatch grid + (when active) picker drawer */}
+      {/* Token groups → vertical row stack of TokenRow */}
       {!isEmpty &&
         groups.map((group) => {
-          const expandedHere = expandedToken && group.tokens.some((t) => t.id === expandedToken.id);
-          // Show "Brand colour #2D6DFF" mini metadata for the brand group: pick
-          // the first token's value — matches prototype's "current accent" feel.
           const mini = group.key === "brand" ? group.tokens[0]?.value : undefined;
           return (
-            <div key={group.key} style={{ maxWidth: 320 }}>
+            <div key={group.key} data-group={group.key}>
               <GroupHeader
                 label={group.key === "brand" ? "Brand colour" : group.label}
                 mini={mini}
                 subtext={group.subtext}
               />
-              <SwatchGrid
-                tokens={group.tokens}
-                expandedId={expandedId}
-                pendingDiff={pendingDiff}
-                onSwatchClick={handleSwatchClick}
-                usageByTokenId={usageByTokenId}
-                isDarkMode={resolvedMode === "dark"}
-                onDarkMissingClick={handleDarkMissingClick}
-                getLintIssues={getLintIssues}
-                onLintAutoFix={onLintAutoFix}
-                onLintIgnore={onLintIgnore}
-              />
-              {expandedHere && expandedToken && (
-                <PickerDrawer
-                  token={expandedToken}
-                  onColorChange={onColorChange}
-                  onCancel={() => setExpandedId(null)}
-                  onSave={(hex) => handlePickerSave(expandedToken.id, hex)}
-                />
-              )}
+              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {group.tokens.map((token) => {
+                  const currentValue = pendingDiff[token.id]?.currentValue ?? token.value;
+                  const isDirty = pendingDiff[token.id] !== undefined;
+                  return (
+                    <TokenRow
+                      key={token.id}
+                      token={token}
+                      previewSlot={<ColorSwatch value={currentValue} isDirty={isDirty} />}
+                      usageCount={usageByTokenId?.get(token.id) ?? 0}
+                      lintIssues={getLintIssues?.(token.id)}
+                      onClick={() => onRowClick?.(token.id)}
+                    />
+                  );
+                })}
+              </div>
               {filterMode === "issues" &&
                 group.tokens.map((t) => {
                   const fix = contrastFixes[t.id];
