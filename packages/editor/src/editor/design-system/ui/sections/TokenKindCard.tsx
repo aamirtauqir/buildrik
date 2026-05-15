@@ -11,42 +11,39 @@ interface TokenKindCardProps {
 
 const STORAGE_PREFIX = "buildrik:design-tab:card-open:";
 
+// T3: section card shell. Border-top divider lives on the header so consecutive
+// cards present as a continuous accordion stack matching prototype s02.
 const cardStyle: React.CSSProperties = {
-  border: "1px solid var(--bd-border)",
-  borderRadius: 8,
   background: "var(--bd-bg-elevated)",
-  marginBottom: 8,
   overflow: "hidden",
 };
 
+// T3: prototype `COLOR · 12 TOKENS [-]` shape — mono uppercase, count inline,
+// `[+]`/`[-]` text glyph replaces lucide ChevronDown.
 const headerStyle: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
+  gap: 8,
   width: "100%",
   padding: "10px 12px",
   background: "transparent",
   border: "none",
+  borderTop: "1px solid var(--bd-border)",
   cursor: "pointer",
-  fontSize: 13,
-  fontWeight: 500,
-  color: "var(--bd-fg-primary)",
+  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+  fontSize: 10.5,
+  fontWeight: 600,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "var(--bd-fg-muted)",
   textAlign: "left",
 };
 
 const bodyStyle: React.CSSProperties = {
   padding: "8px 12px 12px",
-  borderTop: "1px solid var(--bd-border)",
-};
-
-const countStyle: React.CSSProperties = {
-  marginLeft: 8,
-  fontSize: 12,
-  color: "var(--bd-fg-muted)",
-  fontWeight: 400,
 };
 
 const dirtyDotStyle: React.CSSProperties = {
-  marginLeft: 8,
   width: 6,
   height: 6,
   borderRadius: "50%",
@@ -54,12 +51,9 @@ const dirtyDotStyle: React.CSSProperties = {
   flexShrink: 0,
 };
 
-const chevronStyle = (open: boolean): React.CSSProperties => ({
-  marginLeft: "auto",
-  transition: "transform 0.15s",
-  transform: open ? "rotate(90deg)" : "rotate(0deg)",
-  color: "var(--bd-fg-muted)",
-});
+const spacerStyle: React.CSSProperties = {
+  flex: 1,
+};
 
 export const TokenKindCard: React.FC<TokenKindCardProps> = ({
   kindId,
@@ -93,10 +87,10 @@ export const TokenKindCard: React.FC<TokenKindCardProps> = ({
   return (
     <div style={cardStyle} data-token-kind-card={kindId}>
       <button type="button" onClick={toggle} style={headerStyle} aria-expanded={open}>
-        <span>{title}</span>
-        <span style={countStyle}>{count} tokens</span>
+        <span>{title} · {count} TOKENS</span>
         {isDirty && <span aria-label="unsaved changes in this kind" style={dirtyDotStyle} />}
-        <span style={chevronStyle(open)} aria-hidden>›</span>
+        <span style={spacerStyle} />
+        <span aria-hidden="true">[{open ? "−" : "+"}]</span>
       </button>
       {open && <div style={bodyStyle}>{children}</div>}
     </div>

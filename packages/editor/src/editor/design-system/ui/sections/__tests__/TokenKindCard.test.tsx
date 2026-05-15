@@ -8,15 +8,19 @@ describe("TokenKindCard", () => {
     localStorage.clear();
   });
 
-  it("renders title, count and child body when open", () => {
-    const { getByText } = render(
+  it("renders title, count and child body when open (T3 mono format)", () => {
+    const { getByText, getByRole } = render(
       <TokenKindCard kindId="color" title="Color" count={12} defaultOpen>
         <div>color body</div>
       </TokenKindCard>
     );
-    expect(getByText("Color")).toBeTruthy();
-    expect(getByText("12 tokens")).toBeTruthy();
+    // T3: header text is `{Title} · {count} TOKENS` inline.
+    expect(getByText("Color · 12 TOKENS")).toBeTruthy();
     expect(getByText("color body")).toBeTruthy();
+    // Open state → minus-sign glyph.
+    const button = getByRole("button");
+    expect(button.textContent).toContain("[−]");
+    expect(button.getAttribute("aria-expanded")).toBe("true");
   });
 
   it("hides body when collapsed and re-shows on header click", () => {
@@ -44,6 +48,32 @@ describe("TokenKindCard", () => {
       </TokenKindCard>
     );
     expect(queryByText("shadow body")).toBeTruthy();
+  });
+
+  it("T3: collapsed header shows [+], expanded shows [−], aria-expanded reflects state", () => {
+    const { getByRole } = render(
+      <TokenKindCard kindId="motion" title="Motion" count={6} defaultOpen={false}>
+        <div>motion body</div>
+      </TokenKindCard>
+    );
+    const button = getByRole("button");
+    expect(button.textContent).toContain("[+]");
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(button);
+    expect(button.textContent).toContain("[−]");
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("T3: header uses monospace font + uppercase via inline style", () => {
+    const { getByRole } = render(
+      <TokenKindCard kindId="border" title="Border" count={0} defaultOpen={false}>
+        <div>border body</div>
+      </TokenKindCard>
+    );
+    const button = getByRole("button") as HTMLButtonElement;
+    expect(button.style.fontFamily).toContain("var(--buildrick-font-family-mono");
+    expect(button.style.textTransform).toBe("uppercase");
+    expect(button.style.letterSpacing).toBe("0.08em");
   });
 
   it("renders dirty dot when isDirty is true", () => {
