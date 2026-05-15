@@ -22,12 +22,15 @@ import {
 } from "../../state/TokenRegistryContext";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import type { TokenKind } from "../../types";
+import type { Composer } from "../../../../engine/Composer";
 
 interface TokensSectionProps {
   /** C2 fix: clicking "+" inside ColorTokenList must open the parent's AddTokenModal. */
   onAddTokenClick?: () => void;
   /** C3 fix: SpacingTokenList's "Reset to defaults" must call stageDefaults at parent scope. */
   onResetSpacingToDefaults?: () => void;
+  /** T7: composer drives per-token usage counts via TokenUsageTracker. */
+  composer?: Composer | null;
 }
 
 interface KindEntry {
@@ -56,9 +59,42 @@ const KIND_ORDER: KindEntry[] = [
 export const TokensSection: React.FC<TokensSectionProps> = ({
   onAddTokenClick,
   onResetSpacingToDefaults,
+  composer,
 }) => {
   const dsMode = useDSModeOptional();
   const isBeginner = dsMode?.mode !== "pro";
+
+  // T7: subscribe to TokenUsageTracker. Recomputes are microtask-coalesced
+  // in Composer (4 element events → one recompute), so each handler call
+  // already reflects the up-to-date map. We re-snapshot into a new Map on
+  // every event so React sees a new reference and re-renders consumers.
+  //
+  // Per feedback_setter_closure_stale_state.md: do not capture the initial
+  // map only — subscribe via useEffect and update state on every event.
+  const [usageMap, setUsageMap] = React.useState<ReadonlyMap<string, number>>(
+    () =>
+      composer?.designSystem?.tokenUsage
+        ? new Map(composer.designSystem.tokenUsage.getAllUsage())
+        : new Map()
+  );
+
+  React.useEffect(() => {
+    const tracker = composer?.designSystem?.tokenUsage;
+    if (!composer || !tracker) return;
+    // Seed once on mount in case events fired before this subscription.
+    setUsageMap(new Map(tracker.getAllUsage()));
+    const handler = () => setUsageMap(new Map(tracker.getAllUsage()));
+    composer.on("element:created", handler);
+    composer.on("element:deleted", handler);
+    composer.on("element:updated", handler);
+    composer.on("element:style-updated", handler);
+    return () => {
+      composer.off("element:created", handler);
+      composer.off("element:deleted", handler);
+      composer.off("element:updated", handler);
+      composer.off("element:style-updated", handler);
+    };
+  }, [composer]);
 
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
@@ -213,6 +249,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               onTokenChange={r.updateToken}
               onUndo={r.undoToken}
               canUndo={r.canUndo}
+              usageByTokenId={usageMap}
             />
           </TokenKindCard>
         );

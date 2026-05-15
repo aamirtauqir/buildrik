@@ -582,6 +582,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             <TokensSection
               onAddTokenClick={() => setShowAddToken(true)}
               onResetSpacingToDefaults={handleResetSpacingToDefaults}
+              composer={composer}
             />
           )}
           {activeSection === "styles"     && <StylesSection />}

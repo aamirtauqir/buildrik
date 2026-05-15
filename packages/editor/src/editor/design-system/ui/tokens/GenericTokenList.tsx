@@ -1,6 +1,7 @@
 import * as React from "react";
 import type { DesignToken } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
+import { TokenUsageChip } from "../sections/TokenUsageChip";
 
 interface GenericTokenListProps {
   tokens: DesignToken[];
@@ -8,6 +9,8 @@ interface GenericTokenListProps {
   onTokenChange: (id: string, value: string) => void;
   onUndo: (id: string) => void;
   canUndo: (id: string) => boolean;
+  /** Per-token usage counts (from composer.designSystem.tokenUsage). */
+  usageByTokenId?: ReadonlyMap<string, number>;
 }
 
 const listStyle: React.CSSProperties = {
@@ -17,9 +20,11 @@ const listStyle: React.CSSProperties = {
 };
 
 const rowStyle: React.CSSProperties = {
+  // 4 cols: label · input · Restore · usage chip. minmax(0,1fr) prevents the
+  // label column from forcing horizontal overflow when the panel is narrow.
   display: "grid",
-  gridTemplateColumns: "1fr 140px auto",
-  gap: 8,
+  gridTemplateColumns: "minmax(0, 1fr) 96px auto auto",
+  gap: 6,
   alignItems: "center",
 };
 
@@ -70,6 +75,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
   onTokenChange,
   onUndo,
   canUndo,
+  usageByTokenId,
 }) => {
   const dsMode = useDSModeOptional();
   const isPro = dsMode?.mode === "pro";
@@ -84,6 +90,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
         const friendly = t.friendlyName ?? t.name;
         const isDirty = pendingDiff[t.id] !== undefined;
         const undoable = canUndo(t.id);
+        const usage = usageByTokenId?.get(t.id) ?? 0;
         return (
           <div key={t.id} style={rowStyle}>
             <div>
@@ -117,6 +124,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
             >
               Restore
             </button>
+            <TokenUsageChip count={usage} />
           </div>
         );
       })}

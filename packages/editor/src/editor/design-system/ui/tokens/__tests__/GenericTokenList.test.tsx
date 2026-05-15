@@ -132,4 +132,40 @@ describe("GenericTokenList", () => {
     );
     expect(getByText(/No tokens yet/i)).toBeTruthy();
   });
+
+  it("renders 'unused' chip on every row when no usage map is supplied", () => {
+    const { getAllByText } = render(
+      wrap(
+        <GenericTokenList
+          tokens={sampleTokens}
+          pendingDiff={{}}
+          onTokenChange={() => {}}
+          onUndo={() => {}}
+          canUndo={() => false}
+        />
+      )
+    );
+    expect(getAllByText("unused")).toHaveLength(2);
+  });
+
+  it("renders 'used Nx' chip when usage map has counts", () => {
+    const usage = new Map<string, number>([
+      ["radius-sm", 3],
+      ["radius-md", 0],
+    ]);
+    const { getByText } = render(
+      wrap(
+        <GenericTokenList
+          tokens={sampleTokens}
+          pendingDiff={{}}
+          onTokenChange={() => {}}
+          onUndo={() => {}}
+          canUndo={() => false}
+          usageByTokenId={usage}
+        />
+      )
+    );
+    expect(getByText("used 3×")).toBeTruthy();
+    expect(getByText("unused")).toBeTruthy();
+  });
 });
