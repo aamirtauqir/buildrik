@@ -53,23 +53,10 @@ beforeEach(() => {
   }
 });
 
-describe("DesignSystemTab → StylesSection (S2 integration)", () => {
-  it("clicking Styles section reveals 11 PresetCategoryCards", async () => {
+describe("DesignSystemTab → StylesSection (Arc B1 two-pane integration)", () => {
+  it("clicking Styles section reveals the two-pane router (11 category rows + detail pane)", async () => {
     const composer = makeFakeComposer();
-    const { getAllByRole, container } = render(wrap(<DesignSystemTab composer={composer} />));
-
-    const stylesBtn = getAllByRole("tab").find((b) => b.textContent === "Styles");
-    if (!stylesBtn) throw new Error("Styles section button missing");
-    fireEvent.click(stylesBtn);
-
-    await waitFor(() => {
-      expect(container.querySelectorAll("[data-preset-category-card]").length).toBe(11);
-    });
-  });
-
-  it("editing a preset friendly-name lights the Styles section-tab dirty marker", async () => {
-    const composer = makeFakeComposer();
-    const { getAllByRole, container, getAllByLabelText } = render(
+    const { getAllByRole, container } = render(
       wrap(<DesignSystemTab composer={composer} />),
     );
 
@@ -77,18 +64,33 @@ describe("DesignSystemTab → StylesSection (S2 integration)", () => {
     if (!stylesBtn) throw new Error("Styles section button missing");
     fireEvent.click(stylesBtn);
 
-    // Buttons card defaults open (DEFAULT_PRESETS includes 3 button entries
-    // and isCommon=true). Find the friendly-name input for button-primary.
-    const inputs = await waitFor(() =>
-      getAllByLabelText(/button preset button-primary friendly name/i),
+    await waitFor(() => {
+      expect(container.querySelector("[data-styles-router]")).toBeTruthy();
+      expect(container.querySelectorAll("[data-category-row]").length).toBe(11);
+      expect(container.querySelector("[data-preset-detail-pane]")).toBeTruthy();
+    });
+  });
+
+  it("clicking the Card category row swaps the detail pane to card variants", async () => {
+    const composer = makeFakeComposer();
+    const { getAllByRole, container } = render(
+      wrap(<DesignSystemTab composer={composer} />),
     );
-    fireEvent.change(inputs[0], { target: { value: "Renamed primary" } });
+
+    const stylesBtn = getAllByRole("tab").find((b) => b.textContent === "Styles");
+    if (!stylesBtn) throw new Error("Styles section button missing");
+    fireEvent.click(stylesBtn);
+
+    const cardRow = (await waitFor(() =>
+      container.querySelector('[data-category-row="card"]'),
+    )) as HTMLButtonElement;
+    fireEvent.click(cardRow);
 
     await waitFor(() => {
-      // dirty marker is rendered with aria-label "unsaved changes" inside
-      // the Styles section-tab button (and only the Styles tab — Tokens has
-      // no edits in this scenario).
-      expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+      const pane = container.querySelector(
+        "[data-preset-detail-pane]",
+      ) as HTMLElement;
+      expect(pane.getAttribute("data-category")).toBe("card");
     });
   });
 });
