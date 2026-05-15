@@ -76,11 +76,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const [showCreateModal, setShowCreateModal] = React.useState(false);
 
   const handleCreateComponent = React.useCallback(
-    (name: string) => {
+    (payload: { name: string; group: string | null; prefillBindings: boolean }) => {
       const selectedIds = composer?.selection?.getSelectedIds?.() ?? [];
       const elementId = selectedIds[0];
       if (elementId) {
-        void composer?.components?.createComponent?.(name, elementId);
+        void composer?.components?.createComponent?.(payload.name, elementId, {
+          category: payload.group ?? undefined,
+          prefillFromDs: payload.prefillBindings,
+        });
       }
     },
     [composer]
