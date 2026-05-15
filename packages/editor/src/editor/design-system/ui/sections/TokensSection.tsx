@@ -136,6 +136,20 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     }
   };
 
+  // Inline style for the beginner-mode educative hint chip (T8).
+  // Inline-styles pattern matches TokenUsageChip post-T7 review — avoids
+  // orphan className → vibcoder cobalt fallback per
+  // feedback_orphan_classes_pattern.md.
+  const hintStyle: React.CSSProperties = {
+    marginTop: 12,
+    padding: "8px 12px",
+    background: "var(--buildrick-info-soft, #EFF4FF)",
+    color: "var(--buildrick-info-strong, #1F4FBF)",
+    borderRadius: 6,
+    fontSize: 11,
+    lineHeight: 1.5,
+  };
+
   // Beginner mode: foundation kinds with zero tokens move to the bottom.
   const ordered = React.useMemo(() => {
     if (!isBeginner) return KIND_ORDER;
@@ -255,6 +269,11 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
           </TokenKindCard>
         );
       })}
+      {isBeginner && (
+        <div style={hintStyle} role="note">
+          Beginner mode hides token IDs and alias graph. Toggle Pro to expose.
+        </div>
+      )}
     </div>
   );
 };

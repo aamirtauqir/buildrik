@@ -52,6 +52,8 @@
   --buildrick-warning-bg: rgba(180, 83, 9, 0.05);
   --buildrick-info: #2D6DFF;
   --buildrick-info-light: rgba(45, 109, 255, 0.08);
+  --buildrick-info-soft: #EFF4FF;             /* light fill for info chips/badges (used by beginner-mode hint) */
+  --buildrick-info-strong: #1F4FBF;           /* WCAG AA text on info-soft */
 
   /* AMBER / EMERALD FAMILIES */
   --buildrick-amber-light: rgba(217, 119, 6, 0.10);
