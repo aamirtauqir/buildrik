@@ -52,7 +52,7 @@ describe("CreateComponentModal", () => {
     const { getByLabelText, getByText } = render(
       <CreateComponentModal onClose={() => {}} onSubmit={onSubmit} selectionContext={ctx} />
     );
-    fireEvent.change(getByLabelText(/name/i), { target: { value: "Pricing card" } });
+    fireEvent.change(getByLabelText("Name"), { target: { value: "Pricing card" } });
     fireEvent.click(getByText(/save component/i));
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -67,12 +67,27 @@ describe("CreateComponentModal", () => {
     const { getByLabelText, getByText } = render(
       <CreateComponentModal onClose={() => {}} onSubmit={onSubmit} />
     );
-    fireEvent.change(getByLabelText(/name/i), { target: { value: "Custom block" } });
+    fireEvent.change(getByLabelText("Name"), { target: { value: "Custom block" } });
     fireEvent.click(getByText(/save component/i));
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         name: "Custom block",
         prefillBindings: false,
+      })
+    );
+  });
+
+  it("includes group in submitted payload (null by default)", () => {
+    const onSubmit = vi.fn();
+    const { getByLabelText, getByText } = render(
+      <CreateComponentModal onClose={() => {}} onSubmit={onSubmit} />
+    );
+    fireEvent.change(getByLabelText("Name"), { target: { value: "Hero block" } });
+    fireEvent.click(getByText(/save component/i));
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Hero block",
+        group: null,
       })
     );
   });

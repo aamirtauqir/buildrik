@@ -8,6 +8,11 @@
  * @license BSD-3-Clause
  */
 
+// TODO(T12): The shell/modals/CreateComponentModal at editor/shell/modals/
+// CreateComponentModal.tsx is the canvas-right-click consumer today.
+// T12 should reroute canvas flow here so this modal's selectionContext
+// branch actually fires, or merge the two files.
+
 import * as React from "react";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
@@ -41,7 +46,6 @@ export interface CreateComponentModalProps {
   onClose: () => void;
   onSubmit: (payload: CreateComponentSubmitPayload) => void;
   selectionContext?: SelectionContext;
-  availableGroups?: readonly string[];
 }
 
 const labelStyle: React.CSSProperties = {
@@ -77,7 +81,6 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   onClose,
   onSubmit,
   selectionContext,
-  availableGroups,
 }) => {
   const [name, setName] = React.useState("");
   const [group, setGroup] = React.useState<string>("");
@@ -138,11 +141,6 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   style={dialogInputStyles}
                 >
                   <option value="">Your symbols</option>
-                  {availableGroups?.map((g) => (
-                    <option key={g} value={g}>
-                      {g}
-                    </option>
-                  ))}
                 </select>
               </Stack>
 
@@ -166,7 +164,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
               )}
             </Stack>
           </div>
-          <div className="bd-modal__foot" style={{ display: "flex", gap: 8, justifyContent: "flex-end", padding: "12px 16px" }}>
+          <div className="bd-modal__foot">
             <Button onClick={onClose} style={dialogCancelBtnStyles}>
               Cancel
             </Button>

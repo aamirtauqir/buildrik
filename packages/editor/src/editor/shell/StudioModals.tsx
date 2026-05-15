@@ -346,6 +346,11 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
       )}
 
       {/* Create Component Modal */}
+      {/* TODO(T12): Canvas right-click "Save as component" should route through */}
+      {/* editor/sidebar/tabs/component-library/CreateComponentModal — that modal */}
+      {/* already supports selectionContext (T11 commit 76aca3a3). Either redirect */}
+      {/* here or consolidate the two CreateComponentModal files. Unify before */}
+      {/* duplicating binding-aware UI in shell/modals/CreateComponentModal.tsx. */}
       <CreateComponentModal
         isOpen={showCreateComponent}
         onClose={onCloseCreateComponent}
