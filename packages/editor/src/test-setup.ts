@@ -40,3 +40,19 @@ if (typeof window !== "undefined" && typeof window.matchMedia === "undefined") {
     }),
   });
 }
+
+// jsdom doesn't ship document.fonts. FontManager / TypeTokenList /
+// FontFamilyRow probe it for availability + fallback warnings. Resolve to
+// an empty array (= "font available, no fallback") to keep tests quiet.
+if (
+  typeof document !== "undefined" &&
+  !(document as Document & { fonts?: unknown }).fonts
+) {
+  Object.defineProperty(document, "fonts", {
+    configurable: true,
+    value: {
+      load: () => Promise.resolve([]),
+      ready: Promise.resolve(),
+    },
+  });
+}

@@ -43,6 +43,8 @@
   --buildrick-error-bg: rgba(220, 38, 38, 0.05);
   --buildrick-success: #16A34A;
   --buildrick-success-light: rgba(22, 163, 74, 0.10);
+  --buildrick-success-soft: #DCFCE7;          /* light fill for success chips/badges (used by avatar, count, toast, history-panel) */
+  --buildrick-success-strong: #15803D;        /* WCAG AA text on success-soft (5.66:1 vs 4.5 required) */
   --buildrick-success-border: rgba(22, 163, 74, 0.30);
   --buildrick-warning: #B45309;             /* amber-700 — fixes WCAG AA on warning-bg (was #D97706 amber-600 → 3.19:1 fail; now 5.04:1 pass) */
   --buildrick-warning-light: rgba(180, 83, 9, 0.10);

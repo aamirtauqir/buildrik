@@ -14,15 +14,8 @@ describe("TokenUsageChip", () => {
     expect(getByText("unused")).toBeTruthy();
   });
 
-  it("applies used variant class for count > 0", () => {
-    const { container } = render(<TokenUsageChip count={5} />);
-    const chip = container.firstElementChild as HTMLElement;
-    expect(chip.className).toContain("ds-token-usage-chip--used");
-  });
-
-  it("applies unused variant class for count 0", () => {
-    const { container } = render(<TokenUsageChip count={0} />);
-    const chip = container.firstElementChild as HTMLElement;
-    expect(chip.className).toContain("ds-token-usage-chip--unused");
+  it("renders 'used 1×' for count 1 (no pluralization edge case)", () => {
+    const { getByText } = render(<TokenUsageChip count={1} />);
+    expect(getByText("used 1×")).toBeTruthy();
   });
 });

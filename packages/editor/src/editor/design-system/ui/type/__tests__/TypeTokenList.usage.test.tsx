@@ -2,22 +2,12 @@
  * T7 coverage — TypeTokenList renders TokenUsageChip per row.
  */
 import { render } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { TypeTokenList } from "../TypeTokenList";
 import type { DesignToken } from "../../../types";
 
-// jsdom doesn't ship document.fonts — FontFamilyRow probes it for fallback warnings.
-beforeAll(() => {
-  if (!(document as unknown as { fonts?: unknown }).fonts) {
-    Object.defineProperty(document, "fonts", {
-      configurable: true,
-      value: {
-        load: () => Promise.resolve([{} as FontFace]),
-      },
-    });
-  }
-});
+// document.fonts polyfill lives in test-setup.ts (jsdom-wide).
 
 function makeFont(id: string, value: string): DesignToken {
   return {

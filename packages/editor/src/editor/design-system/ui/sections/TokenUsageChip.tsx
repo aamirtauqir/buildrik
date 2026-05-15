@@ -8,9 +8,8 @@
  *   count > 0  → green "used Nx" chip
  *   count == 0 → muted "unused" chip
  *
- * Inline styles + className: className gives tests a deterministic hook;
- * inline styles avoid the orphan-class trap (className with no matching
- * CSS rule = invisible in production).
+ * Inline styles only — no className. Tests assert on the rendered text
+ * ("used 5×" / "unused") rather than orphan className hooks.
  *
  * @license BSD-3-Clause
  */
@@ -33,7 +32,7 @@ const baseStyle: React.CSSProperties = {
 
 const usedStyle: React.CSSProperties = {
   background: "var(--buildrick-success-soft, #dcfce7)",
-  color: "var(--buildrick-success-strong, #16a34a)",
+  color: "var(--buildrick-success-strong, #15803d)",
 };
 
 const unusedStyle: React.CSSProperties = {
@@ -43,17 +42,10 @@ const unusedStyle: React.CSSProperties = {
 
 export const TokenUsageChip: React.FC<TokenUsageChipProps> = ({ count }) => {
   const isUsed = count > 0;
-  const variantClass = isUsed
-    ? "ds-token-usage-chip--used"
-    : "ds-token-usage-chip--unused";
   const label = isUsed ? `used ${count}×` : "unused";
   const style: React.CSSProperties = {
     ...baseStyle,
     ...(isUsed ? usedStyle : unusedStyle),
   };
-  return (
-    <span className={`ds-token-usage-chip ${variantClass}`} style={style}>
-      {label}
-    </span>
-  );
+  return <span style={style}>{label}</span>;
 };

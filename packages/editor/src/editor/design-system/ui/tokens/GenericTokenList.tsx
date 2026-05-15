@@ -22,8 +22,10 @@ const listStyle: React.CSSProperties = {
 const rowStyle: React.CSSProperties = {
   // 4 cols: label · input · Restore · usage chip. minmax(0,1fr) prevents the
   // label column from forcing horizontal overflow when the panel is narrow.
+  // Input column kept at 140px — shadow/motion/border values commonly run
+  // >20 chars and would clip visibly at a tighter width.
   display: "grid",
-  gridTemplateColumns: "minmax(0, 1fr) 96px auto auto",
+  gridTemplateColumns: "minmax(0, 1fr) 140px auto auto",
   gap: 6,
   alignItems: "center",
 };

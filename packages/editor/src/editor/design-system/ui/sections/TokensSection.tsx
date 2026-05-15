@@ -64,10 +64,14 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   const dsMode = useDSModeOptional();
   const isBeginner = dsMode?.mode !== "pro";
 
-  // T7: subscribe to TokenUsageTracker. Recomputes are microtask-coalesced
-  // in Composer (4 element events → one recompute), so each handler call
-  // already reflects the up-to-date map. We re-snapshot into a new Map on
-  // every event so React sees a new reference and re-renders consumers.
+  // T7: subscribe to TokenUsageTracker's own "tokenUsage:changed" event.
+  //
+  // Why not the 4 element:* events directly? Composer microtask-coalesces
+  // recompute (Composer.ts:225-236). A handler on `element:updated` would
+  // fire SYNCHRONOUSLY in the same tick and snapshot the pre-recompute
+  // (stale) map; the queued microtask flushes the new counts AFTER the
+  // snapshot is taken. The tracker emits "tokenUsage:changed" at the END
+  // of recompute, so by the time we re-snapshot the map is fresh.
   //
   // Per feedback_setter_closure_stale_state.md: do not capture the initial
   // map only — subscribe via useEffect and update state on every event.
@@ -80,19 +84,13 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
 
   React.useEffect(() => {
     const tracker = composer?.designSystem?.tokenUsage;
-    if (!composer || !tracker) return;
-    // Seed once on mount in case events fired before this subscription.
+    if (!tracker) return;
+    // Seed once on mount in case recompute already ran before subscription.
     setUsageMap(new Map(tracker.getAllUsage()));
     const handler = () => setUsageMap(new Map(tracker.getAllUsage()));
-    composer.on("element:created", handler);
-    composer.on("element:deleted", handler);
-    composer.on("element:updated", handler);
-    composer.on("element:style-updated", handler);
+    tracker.on("tokenUsage:changed", handler);
     return () => {
-      composer.off("element:created", handler);
-      composer.off("element:deleted", handler);
-      composer.off("element:updated", handler);
-      composer.off("element:style-updated", handler);
+      tracker.off("tokenUsage:changed", handler);
     };
   }, [composer]);
 

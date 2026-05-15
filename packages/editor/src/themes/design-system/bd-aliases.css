@@ -26,6 +26,7 @@
   --bd-bg-input: var(--buildrick-bg-input);
   --bd-bg-elevated: var(--buildrick-bg-elevated);
   --bd-bg-subtle: var(--buildrick-bg-subtle);
+  --bd-bg-muted: var(--buildrick-bg-subtle);
   --bd-bg-hover: var(--buildrick-bg-hover);
   --bd-bg-pressed: var(--buildrick-bg-pressed);
   --bd-canvas-wrapper: var(--buildrick-canvas-wrapper);

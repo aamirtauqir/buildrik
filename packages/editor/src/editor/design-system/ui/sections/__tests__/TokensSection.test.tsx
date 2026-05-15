@@ -6,15 +6,7 @@ import { TokenRegistryProvider } from "../../../state/TokenRegistryContext";
 import { DSModeProvider } from "../../../state/DSModeContext";
 import { ToastProvider } from "@/editor/shared/vibcoder";
 
-// jsdom lacks document.fonts; TypeTokenList probes it on mount.
-beforeEach(() => {
-  if (!(document as Document & { fonts?: unknown }).fonts) {
-    Object.defineProperty(document, "fonts", {
-      configurable: true,
-      value: { load: () => Promise.resolve([]) },
-    });
-  }
-});
+// document.fonts polyfill lives in test-setup.ts (jsdom-wide).
 
 const wrap = (children: React.ReactNode, mode: "beginner" | "pro" = "beginner") => (
   <ToastProvider>

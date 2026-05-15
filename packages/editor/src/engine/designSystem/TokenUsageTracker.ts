@@ -16,15 +16,24 @@
  */
 
 import type { Element } from "../elements/Element";
+import { EventEmitter } from "../EventEmitter";
 
 const TOKEN_REF_RE = /\{\{token\.([a-zA-Z0-9._-]+)\}\}/g;
 
-export class TokenUsageTracker {
+/**
+ * Emits `"tokenUsage:changed"` after every `recompute()` completes so
+ * consumers (e.g. TokensSection) can re-snapshot AFTER the new counts are
+ * written. Subscribing directly to Composer's `element:*` events would race
+ * the microtask-coalesced recompute (Composer.ts:225-236) and read stale
+ * counts in the same tick the mutation fired.
+ */
+export class TokenUsageTracker extends EventEmitter {
   private counts = new Map<string, number>();
 
   /**
    * Replace the usage map by walking `elements` and counting every
-   * `{{token.X.Y}}` ref found in style values.
+   * `{{token.X.Y}}` ref found in style values. Emits `"tokenUsage:changed"`
+   * on completion.
    */
   recompute(elements: readonly Element[]): void {
     this.counts.clear();
@@ -39,6 +48,7 @@ export class TokenUsageTracker {
         }
       }
     }
+    this.emit("tokenUsage:changed");
   }
 
   /** Returns the count for `tokenId` (0 if unused). */
