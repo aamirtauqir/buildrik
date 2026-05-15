@@ -13,6 +13,7 @@ import type { ComponentDefinition, VariantProperty } from "../../../../shared/ty
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useToast } from "@/editor/shared/vibcoder";
 import { DrillInHeader } from "../../shared/DrillInHeader";
+import { DetachConfirmModal } from "./DetachConfirmModal";
 
 // ============================================
 // Types
@@ -62,6 +63,14 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
   // Delete confirmation dialog state
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+
+  // Detach confirmation modal state — populated with derived label/master/count
+  // computed from the currently-selected canvas instance at click time.
+  const [pendingDetach, setPendingDetach] = React.useState<{
+    instanceLabel: string;
+    masterName: string;
+    masterInstanceCount: number;
+  } | null>(null);
 
   // State for variant selection (for preview)
   const [selectedVariantValues, setSelectedVariantValues] = React.useState<Record<string, string>>(
@@ -140,8 +149,32 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   // Instance count for delete message
   const instanceCount = composer?.components?.getInstancesOfComponent?.(component.id)?.length ?? 0;
 
-  // Handle detach instance
+  // Handle detach instance — open confirmation modal first with derived
+  // label/master/count. The actual detach is fired in confirmDetach below.
   const handleDetach = () => {
+    if (!composer) {
+      onDetachInstance?.();
+      return;
+    }
+    const selectedIds = composer.selection?.getSelectedIds() || [];
+    const currentSelectedId = selectedIds[0];
+    if (!currentSelectedId) {
+      onDetachInstance?.();
+      return;
+    }
+    const allInstances =
+      composer.components?.getInstancesOfComponent?.(component.id) ?? [];
+    const index = allInstances.findIndex((i) => i.elementId === currentSelectedId);
+    const instanceLabel = index >= 0 ? `#${index + 1}` : "selected";
+    setPendingDetach({
+      instanceLabel,
+      masterName: component.name,
+      masterInstanceCount: allInstances.length || 1,
+    });
+  };
+
+  const confirmDetach = () => {
+    setPendingDetach(null);
     onDetachInstance?.();
   };
 
@@ -271,6 +304,16 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         confirmText="Delete"
         variant="danger"
       />
+      {/* Detach confirmation modal (Task 13) */}
+      {pendingDetach && (
+        <DetachConfirmModal
+          instanceLabel={pendingDetach.instanceLabel}
+          masterName={pendingDetach.masterName}
+          masterInstanceCount={pendingDetach.masterInstanceCount}
+          onCancel={() => setPendingDetach(null)}
+          onConfirm={confirmDetach}
+        />
+      )}
     </div>
   );
 };
