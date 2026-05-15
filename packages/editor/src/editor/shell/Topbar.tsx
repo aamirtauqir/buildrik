@@ -34,7 +34,7 @@ import { CommandPalette } from "./modals/CommandPalette";
 import { InviteModal } from "./InviteModal";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
-import { ColorModeToggle } from "@/editor/design-system/ui/ColorModeToggle";
+import { ColorModeIconCycle } from "@/editor/design-system/ui/ColorModeIconCycle";
 
 import "./chrome.css";
 
@@ -505,7 +505,7 @@ export const Topbar: React.FC<TopbarProps> = ({
           {composer && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <ColorModeToggle
+                <ColorModeIconCycle
                   composer={composer}
                   renderTrigger={({ onClick, ariaLabel, children }) => (
                     <IconButton onClick={onClick} aria-label={ariaLabel}>
