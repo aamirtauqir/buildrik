@@ -26,6 +26,7 @@ import { ConflictModal } from "../sync/ConflictModal";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CommandPalette } from "./modals/CommandPalette";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
+import { CreateComponentModal as SaveAsComponentModal } from "../sidebar/tabs/component-library/CreateComponentModal";
 import { ProjectSettingsModal } from "./modals/ProjectSettingsModal";
 
 // ============================================================================
@@ -102,6 +103,14 @@ export interface StudioModalsProps {
   createComponentContext: {
     elementId: string;
   } | null;
+
+  // Save as Component (T12 — canvas right-click, binding-aware)
+  showSaveAsComponent: boolean;
+  onCloseSaveAsComponent: () => void;
+  saveAsComponentContext: {
+    selectionIds: readonly string[];
+    extractedBindings: Map<string, string>;
+  } | null;
   // Project Settings
   showProjectSettings: boolean;
   onCloseProjectSettings: () => void;
@@ -155,6 +164,9 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   showCreateComponent,
   onCloseCreateComponent,
   createComponentContext,
+  showSaveAsComponent,
+  onCloseSaveAsComponent,
+  saveAsComponentContext,
   showProjectSettings,
   onCloseProjectSettings,
   showCMSCollectionSetup,
@@ -345,18 +357,39 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         />
       )}
 
-      {/* Create Component Modal */}
-      {/* TODO(T12): Canvas right-click "Save as component" should route through */}
-      {/* editor/sidebar/tabs/component-library/CreateComponentModal — that modal */}
-      {/* already supports selectionContext (T11 commit 76aca3a3). Either redirect */}
-      {/* here or consolidate the two CreateComponentModal files. Unify before */}
-      {/* duplicating binding-aware UI in shell/modals/CreateComponentModal.tsx. */}
+      {/* Create Component Modal — sidebar header + LeftSidebar "+" flow.
+          Carries variants/description/tags UX. Single-elementId payload. */}
       <CreateComponentModal
         isOpen={showCreateComponent}
         onClose={onCloseCreateComponent}
         composer={composer}
         elementId={createComponentContext?.elementId || null}
       />
+
+      {/* Save as Component Modal (T12) — canvas right-click flow.
+          Uses the T11-extended component-library modal that renders the
+          "Pre-fill bindings from DS" hint based on selectionContext. */}
+      {showSaveAsComponent && saveAsComponentContext && composer && (
+        <SaveAsComponentModal
+          onClose={onCloseSaveAsComponent}
+          onSubmit={(payload) => {
+            // Component schema is keyed by a single masterTree → pass the
+            // first selected id as the source element. Multi-select grouping
+            // is a separate feature surface; for now the first id is the
+            // canonical "master" the binding-aware modal extracted from.
+            const elementId = saveAsComponentContext.selectionIds[0];
+            if (!elementId) return;
+            void composer.components.createComponent(payload.name, elementId, {
+              category: payload.group ?? undefined,
+              prefillFromDs: payload.prefillBindings,
+            });
+          }}
+          selectionContext={{
+            selectionIds: saveAsComponentContext.selectionIds,
+            extractedBindings: saveAsComponentContext.extractedBindings,
+          }}
+        />
+      )}
 
       {/* Project Settings Modal */}
       <ProjectSettingsModal

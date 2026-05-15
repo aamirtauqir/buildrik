@@ -40,7 +40,7 @@ export interface EditorEventListenerStateSetters {
 
 export interface UseEditorEventListenersOptions {
   composer: Composer | null;
-  modals: Pick<UseStudioModalsReturn, "openCreateComponent">;
+  modals: Pick<UseStudioModalsReturn, "openCreateComponent" | "openSaveAsComponent">;
   state: EditorEventListenerStateSetters;
   /** Hide the first-run wizard once the project has any content. */
   setShowWizard: (v: boolean) => void;
@@ -71,7 +71,7 @@ export function useEditorEventListeners({
   }, [composer, setShowWizard]);
 
   // 2) COMPONENT_CREATE_REQUESTED → open the create-component modal.
-  const { openCreateComponent } = modals;
+  const { openCreateComponent, openSaveAsComponent } = modals;
   React.useEffect(() => {
     if (!composer) return;
     const handle = (event: { elementId: string }) => {
@@ -82,6 +82,24 @@ export function useEditorEventListeners({
       composer.off(EVENTS.COMPONENT_CREATE_REQUESTED, handle);
     };
   }, [composer, openCreateComponent]);
+
+  // 2b) COMPONENT_SAVE_AS_REQUESTED (T12) → open the binding-aware save-as modal.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = (event: {
+      selectionIds: readonly string[];
+      extractedBindings: Map<string, string>;
+    }) => {
+      openSaveAsComponent({
+        selectionIds: event.selectionIds,
+        extractedBindings: event.extractedBindings,
+      });
+    };
+    composer.on(EVENTS.COMPONENT_SAVE_AS_REQUESTED, handle);
+    return () => {
+      composer.off(EVENTS.COMPONENT_SAVE_AS_REQUESTED, handle);
+    };
+  }, [composer, openSaveAsComponent]);
 
   // 3) SHOW_IN_LAYERS → switch tab + open drawer + scroll-to-selection.
   const { setLeftPanelTab, setIsLeftPanelOpen } = state;

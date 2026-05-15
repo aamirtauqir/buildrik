@@ -72,6 +72,20 @@ export interface CreateComponentContext {
   elementId: string;
 }
 
+/**
+ * T12 — canvas right-click "Save as component" context.
+ *
+ * `selectionIds` is the list of elements the user right-clicked + the
+ * surrounding multi-selection (if any). `extractedBindings` is the result of
+ * `composer.designSystem.tokenBindingResolver.resolveForElements(...)` so the
+ * binding-aware modal can render the "Pre-fill bindings from DS" hint with an
+ * accurate count without re-walking the element tree.
+ */
+export interface SaveAsComponentContext {
+  selectionIds: readonly string[];
+  extractedBindings: Map<string, string>;
+}
+
 // ============================================
 // Hook Return Type
 // ============================================
@@ -145,6 +159,12 @@ export interface UseStudioModalsReturn {
   createComponentContext: CreateComponentContext | null;
   openCreateComponent: (elementId: string) => void;
   closeCreateComponent: () => void;
+
+  // Save as Component modal (T12 — canvas right-click)
+  showSaveAsComponent: boolean;
+  saveAsComponentContext: SaveAsComponentContext | null;
+  openSaveAsComponent: (context: SaveAsComponentContext) => void;
+  closeSaveAsComponent: () => void;
 
   // Project Settings modal
   showProjectSettings: boolean;

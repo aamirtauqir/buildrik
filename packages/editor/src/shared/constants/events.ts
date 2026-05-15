@@ -133,6 +133,8 @@ export const EVENTS = {
   // Component Events (AQUI-027)
   // ============================================
   COMPONENT_CREATE_REQUESTED: "component:create-requested",
+  /** T12: canvas right-click "Save as component" — carries selectionIds + extractedBindings */
+  COMPONENT_SAVE_AS_REQUESTED: "component:save-as-requested",
   COMPONENT_CREATED: "component:created",
   COMPONENT_UPDATED: "component:updated",
   COMPONENT_DELETED: "component:deleted",

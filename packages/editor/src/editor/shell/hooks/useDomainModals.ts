@@ -18,6 +18,7 @@ import * as React from "react";
 import type {
   CollectionSetupContext,
   CreateComponentContext,
+  SaveAsComponentContext,
 } from "./useStudioModals";
 
 export interface UseDomainModalsReturn {
@@ -34,6 +35,12 @@ export interface UseDomainModalsReturn {
   createComponentContext: CreateComponentContext | null;
   openCreateComponent: (elementId: string) => void;
   closeCreateComponent: () => void;
+
+  // Save as Component (T12 — canvas right-click; carries selectionIds + extractedBindings)
+  showSaveAsComponent: boolean;
+  saveAsComponentContext: SaveAsComponentContext | null;
+  openSaveAsComponent: (context: SaveAsComponentContext) => void;
+  closeSaveAsComponent: () => void;
 
   // CMS Collection Setup (WS-14a)
   showCMSCollectionSetup: boolean;
@@ -52,6 +59,10 @@ export function useDomainModals(): UseDomainModalsReturn {
   const [showCreateComponent, setShowCreateComponent] = React.useState(false);
   const [createComponentContext, setCreateComponentContext] =
     React.useState<CreateComponentContext | null>(null);
+
+  const [showSaveAsComponent, setShowSaveAsComponent] = React.useState(false);
+  const [saveAsComponentContext, setSaveAsComponentContext] =
+    React.useState<SaveAsComponentContext | null>(null);
 
   const [showCMSCollectionSetup, setShowCMSCollectionSetup] = React.useState(false);
 
@@ -76,6 +87,15 @@ export function useDomainModals(): UseDomainModalsReturn {
     setCreateComponentContext(null);
   }, []);
 
+  const openSaveAsComponent = React.useCallback((context: SaveAsComponentContext) => {
+    setSaveAsComponentContext(context);
+    setShowSaveAsComponent(true);
+  }, []);
+  const closeSaveAsComponent = React.useCallback(() => {
+    setShowSaveAsComponent(false);
+    setSaveAsComponentContext(null);
+  }, []);
+
   const openCMSCollectionSetup = React.useCallback(() => setShowCMSCollectionSetup(true), []);
   const closeCMSCollectionSetup = React.useCallback(() => setShowCMSCollectionSetup(false), []);
 
@@ -84,6 +104,8 @@ export function useDomainModals(): UseDomainModalsReturn {
     setCollectionSetupContext(null);
     setShowCreateComponent(false);
     setCreateComponentContext(null);
+    setShowSaveAsComponent(false);
+    setSaveAsComponentContext(null);
     setShowCMSCollectionSetup(false);
   }, []);
 
@@ -96,6 +118,10 @@ export function useDomainModals(): UseDomainModalsReturn {
     createComponentContext,
     openCreateComponent,
     closeCreateComponent,
+    showSaveAsComponent,
+    saveAsComponentContext,
+    openSaveAsComponent,
+    closeSaveAsComponent,
     showCMSCollectionSetup,
     openCMSCollectionSetup,
     closeCMSCollectionSetup,

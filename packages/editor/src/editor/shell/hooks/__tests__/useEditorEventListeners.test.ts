@@ -64,7 +64,10 @@ function makeComposer(elements: { id: string }[] = []): MockComposer {
 
 interface MockOpts {
   composer: MockComposer;
-  modals: { openCreateComponent: ReturnType<typeof vi.fn> };
+  modals: {
+    openCreateComponent: ReturnType<typeof vi.fn>;
+    openSaveAsComponent: ReturnType<typeof vi.fn>;
+  };
   state: {
     setLeftPanelTab: ReturnType<typeof vi.fn>;
     setIsLeftPanelOpen: ReturnType<typeof vi.fn>;
@@ -80,7 +83,11 @@ interface MockOpts {
 function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
   return {
     composer: overrides.composer ?? makeComposer(),
-    modals: overrides.modals ?? { openCreateComponent: vi.fn() },
+    modals:
+      overrides.modals ?? {
+        openCreateComponent: vi.fn(),
+        openSaveAsComponent: vi.fn(),
+      },
     state: overrides.state ?? {
       setLeftPanelTab: vi.fn(),
       setIsLeftPanelOpen: vi.fn(),

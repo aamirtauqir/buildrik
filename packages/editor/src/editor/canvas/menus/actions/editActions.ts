@@ -4,7 +4,6 @@
  * @license BSD-3-Clause
  */
 
-import { EVENTS } from "../../../../shared/constants/events";
 import { runTransaction } from "../../../../shared/utils/helpers";
 import { getElementNameFromType } from "../../utils/elementInfo";
 import type { ContextAction } from "../contextMenuRegistry";
@@ -101,18 +100,6 @@ export const editSubmenu: ContextAction[] = [
     handler: ({ composer, element }) => {
       runTransaction(composer, "context-duplicate", () => {
         composer.elements.duplicateElement(element.getId());
-      });
-    },
-  },
-  {
-    id: "create-component",
-    label: "Create Component",
-    icon: "package",
-    group: "Edit",
-    isVisible: ({ isRoot }) => !isRoot,
-    handler: ({ composer, element }) => {
-      composer.emit(EVENTS.COMPONENT_CREATE_REQUESTED, {
-        elementId: element.getId(),
       });
     },
   },

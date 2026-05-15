@@ -4,10 +4,34 @@
  * @license BSD-3-Clause
  */
 
+import { EVENTS } from "../../../../shared/constants/events";
 import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
 
 export const standaloneActions: ContextAction[] = [
+  {
+    id: "save-as-component",
+    label: "Save as component",
+    icon: "package",
+    group: "standalone",
+    isVisible: ({ isRoot }) => !isRoot,
+    handler: ({ composer, element }) => {
+      // Selection-aware: include all multi-selected ids when present, fall
+      // back to the right-clicked element. Bindings are extracted up-front
+      // so the modal can render the "Pre-fill bindings from DS" hint with
+      // an accurate count without re-walking the element tree.
+      const selectedIds = composer.selection?.getSelectedIds?.() ?? [];
+      const selectionIds = selectedIds.length > 0 ? selectedIds : [element.getId()];
+      const extractedBindings = composer.designSystem.tokenBindingResolver.resolveForElements(
+        selectionIds,
+        composer.elements.getAllElements(),
+      );
+      composer.emit(EVENTS.COMPONENT_SAVE_AS_REQUESTED, {
+        selectionIds,
+        extractedBindings,
+      });
+    },
+  },
   {
     id: "reveal-in-layers",
     label: "Reveal in Layers",
