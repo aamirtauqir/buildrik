@@ -149,4 +149,29 @@ describe("ColorModeToggle (2-pill seg)", () => {
     fireEvent.click(span);
     expect(composer.colorMode.set).toHaveBeenLastCalledWith("dark");
   });
+
+  it("renderTrigger cycle never enters system mode (spec D1)", () => {
+    const composer = makeFakeComposer("light");
+    const { container } = render(
+      <ColorModeToggle
+        composer={composer as any}
+        renderTrigger={({ onClick, ariaLabel, children }) => (
+          <span role="button" data-testid="custom" onClick={onClick} aria-label={ariaLabel}>
+            {children}
+          </span>
+        )}
+      />
+    );
+    const span = container.querySelector('[data-testid="custom"]')!;
+    // Click 4 times to verify the cycle never lands on system.
+    fireEvent.click(span);
+    fireEvent.click(span);
+    fireEvent.click(span);
+    fireEvent.click(span);
+    const calls = (composer.colorMode.set as ReturnType<typeof vi.fn>).mock.calls;
+    expect(calls.length).toBeGreaterThanOrEqual(4);
+    for (const call of calls) {
+      expect(["light", "dark"]).toContain(call[0]);
+    }
+  });
 });

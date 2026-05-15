@@ -26,7 +26,9 @@ import type { ThemeMode } from "../types";
 
 const NEXT_MODE: Record<ThemeMode, ThemeMode> = {
   light: "dark",
-  dark: "system",
+  dark: "light",
+  // user-click cycle never enters System per spec D1; System remains valid
+  // composer state for auto-detect on first load.
   system: "light",
 };
 
