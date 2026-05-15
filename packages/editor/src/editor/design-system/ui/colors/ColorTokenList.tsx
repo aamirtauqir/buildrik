@@ -389,14 +389,16 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   }, [composer]);
 
   // T9: click handler stub — opens token editor on the dark-value field.
-  // No openTokenEditor engine API exists yet; ship with console.warn so
-  // the chip is visually live but click is a no-op pending S2.x scope.
+  // No openTokenEditor engine API exists yet; ship with DEV-only console.warn
+  // so the chip is visually live but click is a no-op pending S2.x scope.
   const handleDarkMissingClick = React.useCallback((tokenId: string) => {
-    // eslint-disable-next-line no-console
-    console.warn(
-      "[T9] Dark-value editor not implemented yet; cannot focus darkValue for",
-      tokenId,
-    );
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "[T9] openTokenEditor not implemented; cannot focus darkValue for",
+        tokenId,
+      );
+    }
   }, []);
 
   const visibleTokens = React.useMemo(() => {
