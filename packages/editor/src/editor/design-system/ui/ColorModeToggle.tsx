@@ -1,22 +1,26 @@
 /**
- * Phase F.1 / Tier-1 wireframe S15-right: Color Mode Toggle.
+ * Color Mode Toggle — 2-pill seg `[Light][Dark]` per spec D1 (DS prototype
+ * full rewrite arc).
  *
- * Cycles `composer.colorMode` through light → dark → system → light on click.
- * Subscribes to colorMode:changed so external changes (e.g., system preference
- * shift while in "system" mode) keep the icon in sync.
+ * Default render: 2-pill seg used inside the DS panel.
+ *   - `role="tablist"` container with `aria-label="Color mode"`.
+ *   - Each pill: `role="tab"` + `aria-selected`.
+ *   - Active pill uses `var(--bd-accent)` bg + white fg; inactive is transparent.
+ *   - System mode dropped from UI; composer state preserves auto-detect for
+ *     first load. When composer resolves to "dark", Dark pill is active.
  *
- * Visible affordance: icon button with sun/moon/monitor glyph based on current
- * mode. Tooltip shows "Color mode: <current>" + a "missing dark variants"
- * count when DSLinter flags any.
+ * Legacy render: `renderTrigger` slot kept for the Topbar IconButton wrapper
+ * (icon cycle Sun→Moon→Monitor). Removing it would break Topbar's tooltip
+ * `asChild` ref-forwarding pattern; new DS panel mount supplies no slot and
+ * gets the seg.
  *
  * Wires to:
  *   - composer.colorMode (B.0) — get/set/resolved
- *   - composer.dsLinter (H.0) — count missing-dark warnings to surface in tooltip
+ *   - composer.on("colorMode:changed") — external sync
  *
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 import type { Composer } from "../../../engine";
 import type { ThemeMode } from "../types";
 
@@ -67,16 +71,15 @@ const ICON: Record<ThemeMode, React.ComponentType> = {
 export interface ColorModeToggleProps {
   composer: Composer;
   /**
-   * Render slot — caller supplies an IconButton-like element. Pattern matches
-   * existing Topbar IconButton wrapper. Defaults to a plain <button> with the
-   * `bd-icon-btn` class so the toggle works standalone outside Topbar context.
+   * Legacy icon-cycle render slot (Topbar). When supplied, behaves like the
+   * pre-arc icon button: click cycles light → dark → system → light. New DS
+   * panel mount omits this and gets the 2-pill seg instead.
    */
   renderTrigger?: (args: { onClick: () => void; ariaLabel: string; children: React.ReactNode }) => React.ReactNode;
 }
 
 export const ColorModeToggle: React.FC<ColorModeToggleProps> = ({ composer, renderTrigger }) => {
   const [mode, setMode] = React.useState<ThemeMode>(() => composer.colorMode.get());
-  const [missingDarkCount, setMissingDarkCount] = React.useState<number>(0);
 
   React.useEffect(() => {
     const sync = () => setMode(composer.colorMode.get());
@@ -86,43 +89,68 @@ export const ColorModeToggle: React.FC<ColorModeToggleProps> = ({ composer, rend
     };
   }, [composer]);
 
-  // Refresh missing-dark count when colorMode changes (proxy for "user
-  // toggled into a context where dark fidelity matters"). Cheap O(N) lint
-  // run; fine on every mode toggle.
-  React.useEffect(() => {
-    // The Composer doesn't expose tokens directly; consumers wire their
-    // current token list when they have one (e.g., from TokenRegistryContext).
-    // For Topbar mount where we have no token slice, count stays at 0.
-    // Phase F.2 will pass tokens via prop when Inspector chip ships.
-    setMissingDarkCount(0);
-    // Reference composer.dsLinter via no-op assignment so the effect's
-    // dep array is honest about the wiring without actually invoking lint
-    // (we have no tokens to lint at this mount point).
-    const _linter = composer.dsLinter;
-    void _linter;
-  }, [composer, mode]);
-
-  const handleClick = React.useCallback(() => {
-    composer.colorMode.set(NEXT_MODE[mode]);
-  }, [composer, mode]);
-
-  const Icon = ICON[mode];
-  const ariaLabel = `Color mode: ${MODE_LABEL[mode]} — click to switch to ${MODE_LABEL[NEXT_MODE[mode]]}`;
-
+  // Legacy icon-cycle render path (Topbar IconButton wrapper).
   if (renderTrigger) {
+    const Icon = ICON[mode];
+    const ariaLabel = `Color mode: ${MODE_LABEL[mode]} — click to switch to ${MODE_LABEL[NEXT_MODE[mode]]}`;
+    const handleClick = () => composer.colorMode.set(NEXT_MODE[mode]);
     return <>{renderTrigger({ onClick: handleClick, ariaLabel, children: <Icon /> })}</>;
   }
 
+  // Default render: 2-pill seg [Light][Dark] for DS panel header.
+  const resolved =
+    typeof composer.colorMode.resolved === "function"
+      ? composer.colorMode.resolved()
+      : mode === "system"
+        ? "light"
+        : mode;
+  const active: "light" | "dark" = resolved === "dark" ? "dark" : "light";
+
   return (
-    <IconButton
-      variant="ghost"
-      size="sm"
-      type="button"
-      onClick={handleClick}
-      aria-label={ariaLabel}
-      title={ariaLabel + (missingDarkCount > 0 ? ` (${missingDarkCount} tokens missing dark variant)` : "")}
+    <div
+      role="tablist"
+      aria-label="Color mode"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 2,
+        padding: 2,
+        borderRadius: 9999,
+        border: "1px solid var(--bd-border)",
+        background: "var(--bd-bg-subtle)",
+      }}
     >
-      <Icon />
-    </IconButton>
+      <Pill value="light" label="Light" active={active === "light"} composer={composer} />
+      <Pill value="dark" label="Dark" active={active === "dark"} composer={composer} />
+    </div>
   );
 };
+
+interface PillProps {
+  value: "light" | "dark";
+  label: string;
+  active: boolean;
+  composer: Composer;
+}
+
+const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
+  <button
+    type="button"
+    role="tab"
+    aria-selected={active}
+    onClick={() => composer.colorMode.set(value)}
+    style={{
+      padding: "3px 12px",
+      fontSize: 11,
+      fontWeight: 600,
+      border: "none",
+      borderRadius: 9999,
+      cursor: "pointer",
+      background: active ? "var(--bd-accent)" : "transparent",
+      color: active ? "#fff" : "var(--bd-fg-muted)",
+      transition: "background 80ms",
+    }}
+  >
+    {label}
+  </button>
+);

@@ -115,7 +115,8 @@ describe("DesignSystemTab — panel mode", () => {
     // DSModeToggle renders a role="radiogroup" with aria-label "Design system
     // display mode" — matches getByRole("radiogroup", { name: /mode/i }).
     expect(getByRole("radiogroup", { name: /mode/i })).toBeTruthy();
-    // ColorModeToggle renders an IconButton with aria-label starting "Color mode:".
-    expect(getByRole("button", { name: /color mode/i })).toBeTruthy();
+    // ColorModeToggle renders a role="tablist" with aria-label "Color mode"
+    // (2-pill [Light][Dark] seg per spec D1).
+    expect(getByRole("tablist", { name: /color mode/i })).toBeTruthy();
   });
 });

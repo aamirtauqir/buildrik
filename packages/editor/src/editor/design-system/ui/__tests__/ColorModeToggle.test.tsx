@@ -34,7 +34,7 @@ function makeFakeComposer(initialMode: ThemeMode = "system") {
   };
 }
 
-describe("ColorModeToggle", () => {
+describe("ColorModeToggle (2-pill seg)", () => {
   beforeEach(() => {
     Object.defineProperty(window, "matchMedia", {
       writable: true,
@@ -47,43 +47,78 @@ describe("ColorModeToggle", () => {
     });
   });
 
-  it("renders with current mode (system) and aria-label includes next mode", () => {
-    const composer = makeFakeComposer("system");
-    const { container } = render(<ColorModeToggle composer={composer as any} />);
-    const btn = container.querySelector("button")!;
-    expect(btn.getAttribute("aria-label")).toContain("System");
-    expect(btn.getAttribute("aria-label")).toContain("Light"); // next in cycle
+  it("renders a role=tablist container with aria-label 'Color mode'", () => {
+    const composer = makeFakeComposer("light");
+    const { getByRole } = render(<ColorModeToggle composer={composer as any} />);
+    const tablist = getByRole("tablist");
+    expect(tablist.getAttribute("aria-label")).toBe("Color mode");
   });
 
-  it("cycles light → dark → system → light on repeated clicks", () => {
+  it("renders exactly 2 tabs with role=tab", () => {
     const composer = makeFakeComposer("light");
-    const { container } = render(<ColorModeToggle composer={composer as any} />);
-    const btn = container.querySelector("button")!;
+    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
+    const tabs = getAllByRole("tab");
+    expect(tabs).toHaveLength(2);
+    expect(tabs[0].textContent).toBe("Light");
+    expect(tabs[1].textContent).toBe("Dark");
+  });
 
-    fireEvent.click(btn);
-    expect(composer.colorMode.set).toHaveBeenLastCalledWith("dark");
+  it("when resolved=light, Light tab has aria-selected=true and Dark is false", () => {
+    const composer = makeFakeComposer("light");
+    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
+    const [lightTab, darkTab] = getAllByRole("tab");
+    expect(lightTab.getAttribute("aria-selected")).toBe("true");
+    expect(darkTab.getAttribute("aria-selected")).toBe("false");
+  });
 
-    fireEvent.click(btn);
-    expect(composer.colorMode.set).toHaveBeenLastCalledWith("system");
+  it("when resolved=dark, Dark tab has aria-selected=true and Light is false", () => {
+    const composer = makeFakeComposer("dark");
+    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
+    const [lightTab, darkTab] = getAllByRole("tab");
+    expect(lightTab.getAttribute("aria-selected")).toBe("false");
+    expect(darkTab.getAttribute("aria-selected")).toBe("true");
+  });
 
-    fireEvent.click(btn);
+  it("when stored mode=system, resolved() decides which pill is active", () => {
+    const composer = makeFakeComposer("system");
+    // resolved() defaults to "light" when system since matchMedia is mocked false
+    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
+    const [lightTab, darkTab] = getAllByRole("tab");
+    expect(lightTab.getAttribute("aria-selected")).toBe("true");
+    expect(darkTab.getAttribute("aria-selected")).toBe("false");
+  });
+
+  it("click [Light] calls composer.colorMode.set('light')", () => {
+    const composer = makeFakeComposer("dark");
+    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
+    const [lightTab] = getAllByRole("tab");
+    fireEvent.click(lightTab);
     expect(composer.colorMode.set).toHaveBeenLastCalledWith("light");
   });
 
-  it("subscribes to colorMode:changed and re-renders icon when mode flips externally", () => {
+  it("click [Dark] calls composer.colorMode.set('dark')", () => {
     const composer = makeFakeComposer("light");
-    const { container } = render(<ColorModeToggle composer={composer as any} />);
-    const btn = container.querySelector("button")!;
-    const initialLabel = btn.getAttribute("aria-label");
+    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
+    const [, darkTab] = getAllByRole("tab");
+    fireEvent.click(darkTab);
+    expect(composer.colorMode.set).toHaveBeenLastCalledWith("dark");
+  });
+
+  it("after colorMode:changed external emit, active pill swaps to new resolved mode", () => {
+    const composer = makeFakeComposer("light");
+    const { getAllByRole } = render(<ColorModeToggle composer={composer as any} />);
+    let [lightTab, darkTab] = getAllByRole("tab");
+    expect(lightTab.getAttribute("aria-selected")).toBe("true");
+    expect(darkTab.getAttribute("aria-selected")).toBe("false");
 
     // Simulate external set + emit (e.g., another component flipping mode).
     act(() => {
       composer.colorMode.set("dark");
     });
 
-    const updated = container.querySelector("button")!.getAttribute("aria-label");
-    expect(updated).not.toBe(initialLabel);
-    expect(updated).toContain("Dark");
+    [lightTab, darkTab] = getAllByRole("tab");
+    expect(lightTab.getAttribute("aria-selected")).toBe("false");
+    expect(darkTab.getAttribute("aria-selected")).toBe("true");
   });
 
   it("unsubscribes on unmount", () => {
@@ -93,7 +128,7 @@ describe("ColorModeToggle", () => {
     expect(composer.off).toHaveBeenCalledWith("colorMode:changed", expect.any(Function));
   });
 
-  it("renderTrigger prop overrides default button", () => {
+  it("renderTrigger prop (legacy Topbar slot) bypasses seg and renders icon-cycle button", () => {
     const composer = makeFakeComposer("light");
     const { container } = render(
       <ColorModeToggle
@@ -108,5 +143,10 @@ describe("ColorModeToggle", () => {
     const span = container.querySelector('[data-testid="custom"]')!;
     expect(span).toBeTruthy();
     expect(span.getAttribute("aria-label")).toContain("Light");
+    // No tablist should render when renderTrigger is provided.
+    expect(container.querySelector('[role="tablist"]')).toBeNull();
+    // Click cycles light → dark (legacy behavior).
+    fireEvent.click(span);
+    expect(composer.colorMode.set).toHaveBeenLastCalledWith("dark");
   });
 });
