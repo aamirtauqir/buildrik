@@ -127,4 +127,63 @@ describe("ColorTokenList — swatch grid (Visual-sync V1)", () => {
     fireEvent.click(getByText("+ Add token"));
     expect(onAddToken).toHaveBeenCalledTimes(1);
   });
+
+  it("renders inline lint row IMMEDIATELY AFTER the affected swatch cell, not at group bottom", () => {
+    // Spec gap fix — earlier the lint rows clustered as flat siblings AFTER
+    // the SwatchGrid, so all amber rows ended up at the group bottom. Spec
+    // calls for per-token inline placement: amber row directly below the
+    // offending swatch, spanning all 6 grid columns.
+    const tokens = [
+      makeToken("color-primary", "Primary", "#2D6DFF", "brand"),
+      makeToken("color-text", "Text", "#0F172A", "brand"),
+      makeToken("color-muted", "Muted", "#64748B", "brand"),
+    ];
+    // Only the MIDDLE token has a lint issue — if placement is inline,
+    // the lint row must appear between swatch-1 (Text) and swatch-2 (Muted)
+    // in DOM order. If placement is cluster-bottom, it appears AFTER all
+    // three swatches.
+    const getLintIssues = (id: string) =>
+      id === "color-text"
+        ? [{ type: "contrast" as const, severity: "warn" as const, message: "low contrast", autoFixHint: "darken-22" }]
+        : [];
+    const { container } = render(
+      <ColorTokenList
+        tokens={tokens}
+        {...baseProps}
+        getLintIssues={getLintIssues}
+        onLintAutoFix={() => {}}
+        onLintIgnore={() => {}}
+      />,
+    );
+    // Collect grid children in DOM order. Swatch cells contain a button
+    // role="listitem"; the lint row has data-token-lint-row.
+    const grid = container.querySelector('[role="list"]') as HTMLElement;
+    expect(grid).toBeTruthy();
+    const orderedKinds: string[] = [];
+    for (const child of Array.from(grid.children)) {
+      if (child.querySelector('[role="listitem"]')) orderedKinds.push("swatch");
+      else if (child.getAttribute("data-token-lint-row")) orderedKinds.push("lint");
+    }
+    // Expected: [swatch (Primary), swatch (Text), lint (Text), swatch (Muted)].
+    expect(orderedKinds).toEqual(["swatch", "swatch", "lint", "swatch"]);
+  });
+
+  it("inline lint row spans the full grid width via gridColumn: 1 / -1", () => {
+    const tokens = [makeToken("color-text", "Text", "#0F172A", "brand")];
+    const getLintIssues = () => [
+      { type: "contrast" as const, severity: "warn" as const, message: "low contrast", autoFixHint: "darken-22" },
+    ];
+    const { container } = render(
+      <ColorTokenList
+        tokens={tokens}
+        {...baseProps}
+        getLintIssues={getLintIssues}
+        onLintAutoFix={() => {}}
+        onLintIgnore={() => {}}
+      />,
+    );
+    const row = container.querySelector("[data-token-lint-row]") as HTMLElement;
+    expect(row).toBeTruthy();
+    expect(row.style.gridColumn).toBe("1 / -1");
+  });
 });

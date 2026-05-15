@@ -132,11 +132,22 @@ interface SwatchGridProps {
   isDarkMode: boolean;
   /** T9: handler invoked when the dark-missing chip is clicked. */
   onDarkMissingClick: (tokenId: string) => void;
+  /**
+   * T10 spec gap fix: lint rows render INLINE inside the grid, immediately
+   * after the affected swatch's cell, spanning the full 6-col width via
+   * `gridColumn: "1 / -1"`. Earlier the rows clustered at the bottom of the
+   * group (flat siblings after the grid) — spec calls for per-token inline
+   * placement.
+   */
+  getLintIssues?: (tokenId: string) => readonly LintIssue[];
+  onLintAutoFix?: (tokenId: string, hint: string | undefined) => void;
+  onLintIgnore?: (tokenId: string) => void;
 }
 
 const SwatchGrid: React.FC<SwatchGridProps> = ({
   tokens, expandedId, pendingDiff, onSwatchClick, usageByTokenId,
   isDarkMode, onDarkMissingClick,
+  getLintIssues, onLintAutoFix, onLintIgnore,
 }) => (
   <div
     role="list"
@@ -160,9 +171,13 @@ const SwatchGrid: React.FC<SwatchGridProps> = ({
       // (not missing) per types.ts:110 contract.
       const isDarkMissing =
         isDarkMode && (t.darkValue === undefined || t.darkValue === null);
+      // T10 spec gap fix: inline lint row directly under this swatch's cell.
+      // Rendered as a sibling grid item with `gridColumn: "1 / -1"` so it
+      // breaks the 6-col grid into a full-width sub-row at this position.
+      const tokenIssues = getLintIssues?.(t.id) ?? [];
       return (
+        <React.Fragment key={t.id}>
         <div
-          key={t.id}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -267,6 +282,16 @@ const SwatchGrid: React.FC<SwatchGridProps> = ({
             </div>
           )}
         </div>
+        {tokenIssues.length > 0 && (
+          <TokenLintRow
+            tokenId={t.id}
+            issues={tokenIssues}
+            onAutoFix={(id, hint) => onLintAutoFix?.(id, hint)}
+            onIgnore={(id) => onLintIgnore?.(id)}
+            style={{ gridColumn: "1 / -1" }}
+          />
+        )}
+        </React.Fragment>
       );
     })}
   </div>
@@ -644,6 +669,9 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                 usageByTokenId={usageByTokenId}
                 isDarkMode={resolvedMode === "dark"}
                 onDarkMissingClick={handleDarkMissingClick}
+                getLintIssues={getLintIssues}
+                onLintAutoFix={onLintAutoFix}
+                onLintIgnore={onLintIgnore}
               />
               {expandedHere && expandedToken && (
                 <PickerDrawer
@@ -653,21 +681,6 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                   onSave={(hex) => handlePickerSave(expandedToken.id, hex)}
                 />
               )}
-              {/* T10: lint rows for tokens in this group (s09 surface A) */}
-              {getLintIssues &&
-                group.tokens.map((t) => {
-                  const issues = getLintIssues(t.id);
-                  if (issues.length === 0) return null;
-                  return (
-                    <TokenLintRow
-                      key={`${t.id}-lint`}
-                      tokenId={t.id}
-                      issues={issues}
-                      onAutoFix={(id, hint) => onLintAutoFix?.(id, hint)}
-                      onIgnore={(id) => onLintIgnore?.(id)}
-                    />
-                  );
-                })}
               {filterMode === "issues" &&
                 group.tokens.map((t) => {
                   const fix = contrastFixes[t.id];

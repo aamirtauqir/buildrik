@@ -93,4 +93,25 @@ describe("TokenLintRow", () => {
     );
     expect(container.firstChild).toBeNull();
   });
+
+  it("merges style override (gridColumn: 1 / -1) over the base amber row style", () => {
+    // Spec gap fix — ColorTokenList mounts this inline inside a CSS grid
+    // and needs the row to span all 6 columns. Style prop must merge,
+    // not replace, so amber colors / padding stay.
+    const { container } = render(
+      <TokenLintRow
+        tokenId="color.accent.yellow"
+        issues={[issue]}
+        onAutoFix={() => {}}
+        onIgnore={() => {}}
+        style={{ gridColumn: "1 / -1" }}
+      />,
+    );
+    const row = container.querySelector("[data-token-lint-row]") as HTMLElement;
+    expect(row).toBeTruthy();
+    // gridColumn override is wired through.
+    expect(row.style.gridColumn).toBe("1 / -1");
+    // Base amber padding is still applied (jsdom reports as "8px 12px").
+    expect(row.style.padding).toContain("8px");
+  });
 });

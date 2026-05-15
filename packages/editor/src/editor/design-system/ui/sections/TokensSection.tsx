@@ -113,9 +113,11 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
 
   // List-agnostic helpers passed to every token list. `getIssues` returns
   // the visible (non-suppressed) issues for a token; `onIgnore` suppresses
-  // them. `applyAutoFix` resolves a LintIssue.autoFixHint into a fixed
-  // hex; the list applies the result via its own update path
-  // (onColorChange / onTokenChange / etc.).
+  // them. `computeAutoFix` resolves a LintIssue.autoFixHint into a fixed
+  // hex (pure compute, engine-side); the list applies the result via its
+  // own update path (onColorChange / onTokenChange / etc.) and then
+  // suppresses the row. See Composer.ts:designSystem.computeAutoFix for
+  // why this isn't a full engine transaction.
   const lintState = composer?.designSystem?.lintState;
   const getIssues = React.useCallback(
     (tokenId: string): readonly LintIssue[] =>
@@ -129,9 +131,9 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     },
     [lintState],
   );
-  const applyAutoFix = React.useCallback(
+  const computeAutoFix = React.useCallback(
     (value: string, hint: string | undefined): string =>
-      composer?.designSystem?.applyAutoFix(value, hint) ?? value,
+      composer?.designSystem?.computeAutoFix(value, hint) ?? value,
     [composer],
   );
 
@@ -240,7 +242,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 onLintAutoFix={(id, hint) => {
                   const t = color.tokens.find((x) => x.id === id);
                   if (!t) return;
-                  color.updateToken(id, applyAutoFix(t.value, hint));
+                  color.updateToken(id, computeAutoFix(t.value, hint));
                   // Auto-suppress after a successful fix so the row clears.
                   lintState?.suppress(id);
                 }}
@@ -321,7 +323,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               onLintAutoFix={(id, hint) => {
                 const t = r.tokens.find((x) => x.id === id);
                 if (!t) return;
-                r.updateToken(id, applyAutoFix(t.value, hint));
+                r.updateToken(id, computeAutoFix(t.value, hint));
                 lintState?.suppress(id);
               }}
             />

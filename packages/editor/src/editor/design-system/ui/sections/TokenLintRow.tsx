@@ -28,6 +28,13 @@ export interface TokenLintRowProps {
   issues: readonly LintIssue[];
   onAutoFix: (tokenId: string, hint: string | undefined) => void;
   onIgnore: (tokenId: string) => void;
+  /**
+   * Optional style override — used when the row mounts inline inside a CSS
+   * grid (e.g. ColorTokenList's 6-col swatch grid) and needs to span the
+   * full grid width with `gridColumn: "1 / -1"`. Merges over the base
+   * amber-row style; callers should not override colors / padding.
+   */
+  style?: React.CSSProperties;
 }
 
 const rowStyle: React.CSSProperties = {
@@ -90,11 +97,12 @@ export const TokenLintRow: React.FC<TokenLintRowProps> = ({
   issues,
   onAutoFix,
   onIgnore,
+  style,
 }) => {
   if (issues.length === 0) return null;
   const first = issues[0];
   return (
-    <div style={rowStyle} role="note" data-token-lint-row={tokenId}>
+    <div style={{ ...rowStyle, ...style }} role="note" data-token-lint-row={tokenId}>
       <div style={headerRowStyle}>
         <span aria-hidden="true">⚠</span>
         <span>{first.message}</span>

@@ -152,11 +152,27 @@ export class Composer extends EventEmitter {
     readonly tokenBindingResolver: StyleBindingResolver;
     /**
      * Resolves a LintIssue `autoFixHint` into a suggested next hex value.
-     * Pure — does not mutate the token registry (which lives React-side
-     * in TokenRegistryContext). Callers chain this with `onColorChange` /
-     * `updateToken` to actually apply the fix.
+     *
+     * Pure compute helper — does NOT mutate the token registry (the
+     * registries live React-side in `TokenRegistryContext`, not in the
+     * engine). Callers chain this with `onColorChange` / `updateToken` to
+     * actually apply the fix, then call `lintState.suppress(id)` to clear
+     * the row.
+     *
+     * Naming intent: `compute*` signals "pure, no side effects" — the
+     * original `applyAutoFix(tokenId, hint): void` spec called for engine
+     * ownership of fetch + update + history, but token storage lives
+     * React-side, so a full transaction wrapper would cross the
+     * engine→React boundary the wrong way. Renamed from `applyAutoFix`
+     * 2026-05-15.
+     *
+     * TODO(history): no Cmd+Z entry is pushed today. If history-aware
+     * auto-fix becomes a requirement, expose the React-side token update
+     * to the engine (e.g. via a registered callback on Composer) and add
+     * a transaction wrapper here. See feedback_orphan_classes_pattern for
+     * the boundary discipline.
      */
-    readonly applyAutoFix: (currentValue: string, hint: string | undefined) => string;
+    readonly computeAutoFix: (currentValue: string, hint: string | undefined) => string;
   };
 
   constructor(config: ComposerConfig) {
@@ -223,7 +239,7 @@ export class Composer extends EventEmitter {
       tokenUsage,
       lintState,
       tokenBindingResolver,
-      applyAutoFix: (currentValue, hint) => {
+      computeAutoFix: (currentValue, hint) => {
         if (!hint) return currentValue;
         return applyContrastFix(currentValue, hint);
       },
