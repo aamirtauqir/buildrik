@@ -18,6 +18,7 @@
  */
 
 @import "./design-system/index.css";
+@import "./design-system/ds-panel-dark.css";
 
 /* ─── Vibcoder vendored bundle — full wiring (76 files) ───
  * Loads atom + layout + molecule + organism CSS into @layer components

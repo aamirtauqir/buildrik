@@ -140,6 +140,22 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const [error, setError] = React.useState<string | null>(null);
   const [isFirstLoad, setIsFirstLoad] = React.useState(false);
 
+  // T10 / spec D8: outermost wrapper gets data-ds-preview={resolvedMode} so
+  // ds-panel-dark.css can scope overrides to the DS panel only. Editor chrome
+  // (Inspector, canvas, topbar) keeps the canonical light theme.
+  const [resolvedMode, setResolvedMode] = React.useState<"light" | "dark">(
+    () => composer?.colorMode?.resolved?.() ?? "light",
+  );
+  React.useEffect(() => {
+    if (!composer?.colorMode) return;
+    const sync = () => setResolvedMode(composer.colorMode.resolved?.() ?? "light");
+    sync();
+    composer.on("colorMode:changed", sync);
+    return () => {
+      composer.off("colorMode:changed", sync);
+    };
+  }, [composer]);
+
   const hasLoadedRef = React.useRef(false);
 
   const [usageVersion, setUsageVersion] = React.useState(0);
@@ -444,7 +460,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const changedSectionLabels = isDirty ? ["Tokens"] : [];
 
   return (
-    <div style={{ ...containerStyles, position: "relative" }}>
+    <div data-ds-preview={resolvedMode} style={{ ...containerStyles, position: "relative" }}>
       <PanelHeader
         title={headerTitle}
         isPinned={isPinned}

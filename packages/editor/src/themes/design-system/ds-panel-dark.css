@@ -1,0 +1,22 @@
+/* themes/design-system/ds-panel-dark.css
+   Scoped dark-mode preview chrome for DS panel ONLY.
+   Editor chrome (Inspector, canvas, topbar) stays light per spec D8 / T10.
+
+   Cascade: @layer overrides wins over component layer; vibcoder primitives
+   in the DS panel respect these var overrides automatically. */
+@layer overrides {
+  [data-ds-preview="dark"] {
+    --bd-bg-panel: #0F172A;
+    --bd-bg-subtle: #1E293B;
+    --bd-fg-primary: #F8FAFC;
+    --bd-fg-muted: #94A3B8;
+    --bd-fg-secondary: #CBD5E1;
+    --bd-border: #1E293B;
+  }
+  [data-ds-preview="dark"] [data-token-row]:hover {
+    background: #1E293B !important;
+  }
+  [data-ds-preview="dark"] [data-token-row][data-lint-warn="true"] {
+    background: rgba(245, 158, 11, 0.15) !important;
+  }
+}
