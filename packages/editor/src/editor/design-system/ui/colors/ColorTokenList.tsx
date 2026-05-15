@@ -22,6 +22,7 @@ import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { ColorPicker } from "./ColorPicker";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
+import type { Composer } from "../../../../engine/Composer";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -34,6 +35,12 @@ export interface ColorTokenListProps {
   onAddToken: () => void;
   /** T7 coverage: per-token usage counts (from composer.designSystem.tokenUsage). */
   usageByTokenId?: ReadonlyMap<string, number>;
+  /**
+   * T9: composer drives the dark-missing chip. When colorMode resolves to "dark"
+   * AND a color token has no darkValue, the row gets an amber "no dark · falls back"
+   * chip. Subscribes to `colorMode:changed` to re-render on mode flips.
+   */
+  composer?: Composer | null;
 }
 
 interface ColorGroup {
@@ -113,10 +120,15 @@ interface SwatchGridProps {
   pendingDiff: Record<string, TokenDiff>;
   onSwatchClick: (id: string) => void;
   usageByTokenId?: ReadonlyMap<string, number>;
+  /** T9: when true, color tokens without a darkValue render the amber chip. */
+  isDarkMode: boolean;
+  /** T9: handler invoked when the dark-missing chip is clicked. */
+  onDarkMissingClick: (tokenId: string) => void;
 }
 
 const SwatchGrid: React.FC<SwatchGridProps> = ({
   tokens, expandedId, pendingDiff, onSwatchClick, usageByTokenId,
+  isDarkMode, onDarkMissingClick,
 }) => (
   <div
     role="list"
@@ -135,6 +147,11 @@ const SwatchGrid: React.FC<SwatchGridProps> = ({
       // panel background. Dark values use the swatch fill itself as visual.
       const isLight = isLikelyLightValue(t.value);
       const usage = usageByTokenId?.get(t.id) ?? 0;
+      // T9: dark-missing chip — only color tokens, only when dark mode active,
+      // only when darkValue is undefined or null. Empty string is explicit-empty
+      // (not missing) per types.ts:110 contract.
+      const isDarkMissing =
+        isDarkMode && (t.darkValue === undefined || t.darkValue === null);
       return (
         <div
           key={t.id}
@@ -202,6 +219,45 @@ const SwatchGrid: React.FC<SwatchGridProps> = ({
           <div style={{ display: "flex", justifyContent: "center" }}>
             <TokenUsageChip count={usage} />
           </div>
+          {isDarkMissing && (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDarkMissingClick(t.id);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onDarkMissingClick(t.id);
+                  }
+                }}
+                aria-label={`Missing dark variant for ${t.name}. Click to add.`}
+                title="No dark variant defined — token falls back to its light value in dark mode."
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "1px 6px",
+                  borderRadius: 4,
+                  fontSize: 9,
+                  fontWeight: 500,
+                  fontFamily:
+                    "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+                  background: "var(--buildrick-warning-soft, #FEF3C7)",
+                  color: "var(--buildrick-warning-strong, #854D0E)",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  maxWidth: "100%",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                no dark · falls back
+              </span>
+            </div>
+          )}
         </div>
       );
     })}
@@ -309,10 +365,39 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   canRedo: _canRedo,
   onAddToken,
   usageByTokenId,
+  composer,
 }) => {
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterMode, setFilterMode] = React.useState<FilterMode>("all");
+
+  // T9: subscribe to colorMode:changed so the dark-missing chip toggles when
+  // the user flips light↔dark via ColorModeToggle. Lazy init reads current
+  // resolved mode (handles "system" → "light"/"dark"). Pattern mirrors
+  // ColorModeToggle.tsx:78-87. Without composer, defaults to "light" and
+  // never shows the chip (graceful fallback when used outside Studio).
+  const [resolvedMode, setResolvedMode] = React.useState<"light" | "dark">(
+    () => composer?.colorMode?.resolved?.() ?? "light",
+  );
+  React.useEffect(() => {
+    if (!composer?.colorMode) return;
+    const sync = () => setResolvedMode(composer.colorMode.resolved());
+    composer.on("colorMode:changed", sync);
+    return () => {
+      composer.off("colorMode:changed", sync);
+    };
+  }, [composer]);
+
+  // T9: click handler stub — opens token editor on the dark-value field.
+  // No openTokenEditor engine API exists yet; ship with console.warn so
+  // the chip is visually live but click is a no-op pending S2.x scope.
+  const handleDarkMissingClick = React.useCallback((tokenId: string) => {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[T9] Dark-value editor not implemented yet; cannot focus darkValue for",
+      tokenId,
+    );
+  }, []);
 
   const visibleTokens = React.useMemo(() => {
     let result = tokens;
@@ -544,6 +629,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                 pendingDiff={pendingDiff}
                 onSwatchClick={handleSwatchClick}
                 usageByTokenId={usageByTokenId}
+                isDarkMode={resolvedMode === "dark"}
+                onDarkMissingClick={handleDarkMissingClick}
               />
               {expandedHere && expandedToken && (
                 <PickerDrawer

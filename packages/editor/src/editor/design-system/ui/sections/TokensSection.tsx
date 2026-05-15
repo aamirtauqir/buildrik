@@ -193,6 +193,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 canRedo={color.canRedo}
                 onAddToken={() => onAddTokenClick?.()}
                 usageByTokenId={usageMap}
+                composer={composer}
               />
             </TokenKindCard>
           );

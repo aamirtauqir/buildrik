@@ -48,6 +48,8 @@
   --buildrick-success-border: rgba(22, 163, 74, 0.30);
   --buildrick-warning: #B45309;             /* amber-700 — fixes WCAG AA on warning-bg (was #D97706 amber-600 → 3.19:1 fail; now 5.04:1 pass) */
   --buildrick-warning-light: rgba(180, 83, 9, 0.10);
+  --buildrick-warning-soft: #FEF3C7;          /* T9: amber-100 fill for warning chips (dark-missing chip, etc.) — matches info/success pattern */
+  --buildrick-warning-strong: #854D0E;        /* T9: amber-900 — WCAG AA text on warning-soft (5.61:1 vs 4.5 required) */
   --buildrick-warning-border: rgba(180, 83, 9, 0.30);
   --buildrick-warning-bg: rgba(180, 83, 9, 0.05);
   --buildrick-info: #2D6DFF;
