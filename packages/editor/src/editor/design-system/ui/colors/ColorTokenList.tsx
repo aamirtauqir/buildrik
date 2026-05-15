@@ -21,6 +21,7 @@ import type { DesignToken, TokenDiff } from "../../types";
 import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { ColorPicker } from "./ColorPicker";
+import { TokenUsageChip } from "../sections/TokenUsageChip";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -31,6 +32,8 @@ export interface ColorTokenListProps {
   canUndo: (id: string) => boolean;
   canRedo: (id: string) => boolean;
   onAddToken: () => void;
+  /** T7 coverage: per-token usage counts (from composer.designSystem.tokenUsage). */
+  usageByTokenId?: ReadonlyMap<string, number>;
 }
 
 interface ColorGroup {
@@ -109,18 +112,20 @@ interface SwatchGridProps {
   expandedId: string | null;
   pendingDiff: Record<string, TokenDiff>;
   onSwatchClick: (id: string) => void;
+  usageByTokenId?: ReadonlyMap<string, number>;
 }
 
 const SwatchGrid: React.FC<SwatchGridProps> = ({
-  tokens, expandedId, pendingDiff, onSwatchClick,
+  tokens, expandedId, pendingDiff, onSwatchClick, usageByTokenId,
 }) => (
   <div
     role="list"
     style={{
       display: "grid",
       gridTemplateColumns: "repeat(6, 1fr)",
-      gap: 4,
-      paddingBottom: 18, // headroom for bottom labels
+      // 4px swatch gap; rows get extra space below for label + usage chip stack.
+      columnGap: 4,
+      rowGap: 24,
     }}
   >
     {tokens.map((t) => {
@@ -129,52 +134,58 @@ const SwatchGrid: React.FC<SwatchGridProps> = ({
       // Light values get a visible 1px border so they don't disappear on the
       // panel background. Dark values use the swatch fill itself as visual.
       const isLight = isLikelyLightValue(t.value);
+      const usage = usageByTokenId?.get(t.id) ?? 0;
       return (
-        <button
+        <div
           key={t.id}
-          role="listitem"
-          type="button"
-          aria-label={`Edit color ${t.name} (${t.value})`}
-          aria-pressed={isActive}
-          onClick={() => onSwatchClick(t.id)}
           style={{
-            position: "relative",
-            aspectRatio: "1 / 1",
-            margin: 0,
-            padding: 0,
-            borderRadius: 6,
-            background: t.value,
-            border: isLight
-              ? "1px solid var(--bd-border-medium, #cbd5e1)"
-              : "1px solid var(--bd-border)",
-            cursor: "pointer",
-            outline: isActive ? "2px solid var(--bd-accent, #2D6DFF)" : "none",
-            outlineOffset: 2,
-            transition: "outline-color 120ms",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "stretch",
+            gap: 3,
           }}
-          title={`${t.name} · ${t.value}`}
         >
-          {isDirty && (
-            <span
-              aria-label="unsaved changes"
-              style={{
-                position: "absolute",
-                top: 2,
-                right: 2,
-                width: 5,
-                height: 5,
-                borderRadius: "50%",
-                background: "var(--bd-warning, #f59e0b)",
-              }}
-            />
-          )}
+          <button
+            role="listitem"
+            type="button"
+            aria-label={`Edit color ${t.name} (${t.value})`}
+            aria-pressed={isActive}
+            onClick={() => onSwatchClick(t.id)}
+            style={{
+              position: "relative",
+              aspectRatio: "1 / 1",
+              margin: 0,
+              padding: 0,
+              borderRadius: 6,
+              background: t.value,
+              border: isLight
+                ? "1px solid var(--bd-border-medium, #cbd5e1)"
+                : "1px solid var(--bd-border)",
+              cursor: "pointer",
+              outline: isActive ? "2px solid var(--bd-accent, #2D6DFF)" : "none",
+              outlineOffset: 2,
+              transition: "outline-color 120ms",
+            }}
+            title={`${t.name} · ${t.value}`}
+          >
+            {isDirty && (
+              <span
+                aria-label="unsaved changes"
+                style={{
+                  position: "absolute",
+                  top: 2,
+                  right: 2,
+                  width: 5,
+                  height: 5,
+                  borderRadius: "50%",
+                  background: "var(--bd-warning, #f59e0b)",
+                }}
+              />
+            )}
+          </button>
           <span
             aria-hidden="true"
             style={{
-              position: "absolute",
-              bottom: -16,
-              left: 0,
-              right: 0,
               fontSize: 9,
               fontWeight: 500,
               fontFamily:
@@ -188,7 +199,10 @@ const SwatchGrid: React.FC<SwatchGridProps> = ({
           >
             {compactLabel(t)}
           </span>
-        </button>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <TokenUsageChip count={usage} />
+          </div>
+        </div>
       );
     })}
   </div>
@@ -294,6 +308,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   canUndo: _canUndo,
   canRedo: _canRedo,
   onAddToken,
+  usageByTokenId,
 }) => {
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -528,6 +543,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                 expandedId={expandedId}
                 pendingDiff={pendingDiff}
                 onSwatchClick={handleSwatchClick}
+                usageByTokenId={usageByTokenId}
               />
               {expandedHere && expandedToken && (
                 <PickerDrawer

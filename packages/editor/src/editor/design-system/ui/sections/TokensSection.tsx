@@ -180,6 +180,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 canUndo={color.canUndo}
                 canRedo={color.canRedo}
                 onAddToken={() => onAddTokenClick?.()}
+                usageByTokenId={usageMap}
               />
             </TokenKindCard>
           );
@@ -202,6 +203,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 canUndo={type.canUndo}
                 onRedo={type.redoToken}
                 canRedo={type.canRedo}
+                usageByTokenId={usageMap}
               />
             </TokenKindCard>
           );
@@ -227,6 +229,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 canUndo={spacing.canUndo}
                 onRedo={spacing.redoToken}
                 canRedo={spacing.canRedo}
+                usageByTokenId={usageMap}
               />
             </TokenKindCard>
           );

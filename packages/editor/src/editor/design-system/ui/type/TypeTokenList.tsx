@@ -7,6 +7,7 @@
 import * as React from "react";
 import type { ResponsiveMode } from "../../state/useTypeTokens";
 import type { DesignToken } from "../../types";
+import { TokenUsageChip } from "../sections/TokenUsageChip";
 
 export interface TypeTokenListProps {
   tokens: DesignToken[];
@@ -17,6 +18,8 @@ export interface TypeTokenListProps {
   canUndo: (id: string) => boolean;
   onRedo: (id: string) => void;
   canRedo: (id: string) => boolean;
+  /** T7 coverage: per-token usage counts (from composer.designSystem.tokenUsage). */
+  usageByTokenId?: ReadonlyMap<string, number>;
 }
 
 // ─── Icon buttons ─────────────────────────────────────────────────────────────
@@ -102,6 +105,7 @@ interface TypeScaleRowProps {
   canUndo: boolean;
   onRedo: (id: string) => void;
   canRedo: boolean;
+  usageCount: number;
 }
 
 const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
@@ -111,6 +115,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
   canUndo,
   onRedo,
   canRedo,
+  usageCount,
 }) => {
   const [bold, setBold] = React.useState(false);
   const [italic, setItalic] = React.useState(false);
@@ -245,6 +250,11 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           ↪
         </button>
       )}
+
+      {/* Usage chip */}
+      <div style={{ flexShrink: 0 }}>
+        <TokenUsageChip count={usageCount} />
+      </div>
     </div>
   );
 };
@@ -265,9 +275,10 @@ const FONT_OPTIONS = [
 interface FontRowProps {
   token: DesignToken;
   onChange: (id: string, value: string) => void;
+  usageCount: number;
 }
 
-const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange }) => {
+const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount }) => {
   const [fontLoadFailed, setFontLoadFailed] = React.useState(false);
 
   React.useEffect(() => {
@@ -330,6 +341,9 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange }) => {
         ))}
         {!FONT_OPTIONS.includes(token.value) && <option value={token.value}>{token.value}</option>}
       </select>
+      <div style={{ flexShrink: 0 }}>
+        <TokenUsageChip count={usageCount} />
+      </div>
     </div>
   );
 };
@@ -438,6 +452,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
   canUndo,
   onRedo,
   canRedo,
+  usageByTokenId,
 }) => {
   const fontTokens = tokens.filter((t) => t.type === "font-family");
   const sizeTokens = tokens.filter((t) => t.type === "font-size");
@@ -510,7 +525,12 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
         <>
           <div style={SECTION_HEADER}>Fonts</div>
           {fontTokens.map((token) => (
-            <FontFamilyRow key={token.id} token={token} onChange={onTokenChange} />
+            <FontFamilyRow
+              key={token.id}
+              token={token}
+              onChange={onTokenChange}
+              usageCount={usageByTokenId?.get(token.id) ?? 0}
+            />
           ))}
         </>
       )}
@@ -528,6 +548,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
               canUndo={canUndo(token.id)}
               onRedo={onRedo}
               canRedo={canRedo(token.id)}
+              usageCount={usageByTokenId?.get(token.id) ?? 0}
             />
           ))}
         </>

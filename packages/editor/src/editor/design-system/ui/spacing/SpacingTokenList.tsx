@@ -16,6 +16,7 @@
 import * as React from "react";
 import type { SpacingPreset } from "../../state/useSpacingTokens";
 import type { DesignToken } from "../../types";
+import { TokenUsageChip } from "../sections/TokenUsageChip";
 
 export interface SpacingTokenListProps {
   tokens: DesignToken[];
@@ -29,6 +30,8 @@ export interface SpacingTokenListProps {
   canUndo: (id: string) => boolean;
   onRedo: (id: string) => void;
   canRedo: (id: string) => boolean;
+  /** T7 coverage: per-token usage counts (from composer.designSystem.tokenUsage). */
+  usageByTokenId?: ReadonlyMap<string, number>;
 }
 
 const PRESET_LABELS: Record<SpacingPreset, string> = {
@@ -251,6 +254,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
   canUndo,
   onRedo,
   canRedo,
+  usageByTokenId,
 }) => {
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const activeToken = activeId ? tokens.find((t) => t.id === activeId) ?? null : null;
@@ -348,16 +352,26 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
       <div
         role="list"
         aria-label="Spacing tokens"
-        style={{ display: "flex", flexWrap: "wrap", gap: 4 }}
+        style={{ display: "flex", flexWrap: "wrap", gap: 8 }}
       >
         {tokens.map((t) => (
-          <ValueChip
+          <div
             key={t.id}
-            token={t}
-            isActive={activeId === t.id}
-            isDirty={false}
-            onClick={() => setActiveId((prev) => (prev === t.id ? null : t.id))}
-          />
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 3,
+            }}
+          >
+            <ValueChip
+              token={t}
+              isActive={activeId === t.id}
+              isDirty={false}
+              onClick={() => setActiveId((prev) => (prev === t.id ? null : t.id))}
+            />
+            <TokenUsageChip count={usageByTokenId?.get(t.id) ?? 0} />
+          </div>
         ))}
       </div>
 
