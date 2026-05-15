@@ -4,7 +4,7 @@
 **Author:** Saqib + Claude (brainstorming session)
 **Prototype source:** `file:///Users/shahg/.gstack/projects/aamirtauqir-buildrik/designs/ds-components-prototype-20260507/index.html`
 **Audit screenshots:** `/tmp/proto-s01.png`, `/tmp/proto-s11.png`, `/tmp/editor-palette.png`, `/tmp/editor-components-2.png`
-**Status:** Approved (brainstorm complete) — pending writing-plans
+**Status:** **SHIPPED** 2026-05-15 — 21 commits from `07233be9` (plan) to `05ce0d85` (final fix). All 9 spec gaps closed. Live visual verify passed. Memory log: `project_ds_prototype_parity_arc_shipped_20260515.md`. Deferred follow-ups: history-push for auto-fix, openTokenEditor API, two CreateComponentModal coexistence, multi-select first-id grouping, group dropdown taxonomy, lint-row coverage for Type/Spacing.
 
 ## 1. Background
 
