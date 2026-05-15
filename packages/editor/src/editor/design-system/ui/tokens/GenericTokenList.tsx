@@ -2,7 +2,6 @@ import * as React from "react";
 import type { DesignToken } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
-import { TokenLintRow } from "../sections/TokenLintRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 
 interface GenericTokenListProps {
@@ -13,12 +12,10 @@ interface GenericTokenListProps {
   canUndo: (id: string) => boolean;
   /** Per-token usage counts (from composer.designSystem.tokenUsage). */
   usageByTokenId?: ReadonlyMap<string, number>;
-  /** T10: visible lint issues for a token (from composer.designSystem.lintState). */
+  /** T7: visible lint issues for a token (from composer.designSystem.lintState).
+   *  Drives inline row warn state (amber bg + borderLeft + italic description +
+   *  [lint] tag). Auto-fix / Ignore actions live in T8 detail view per D7. */
   getLintIssues?: (tokenId: string) => readonly LintIssue[];
-  /** T10: Auto-fix click — host applies the hint + suppresses the row. */
-  onLintAutoFix?: (tokenId: string, hint: string | undefined) => void;
-  /** T10: Ignore click — host calls lintState.suppress(tokenId). */
-  onLintIgnore?: (tokenId: string) => void;
 }
 
 const listStyle: React.CSSProperties = {
@@ -79,6 +76,40 @@ const emptyStyle: React.CSSProperties = {
   textAlign: "center",
 };
 
+// T7 inline lint state — matches TokenRow primitive's render shape.
+// Row gets amber bg + 3px left border (paddingLeft compensates), italic
+// description line after the editable group, and a [lint] tag after the
+// usage chip. Auto-fix + Ignore buttons move to T8 detail view per D7.
+const lintRowContainerStyle: React.CSSProperties = {
+  background: "rgba(245, 158, 11, 0.08)",
+  borderLeft: "3px solid var(--buildrick-warning-strong)",
+  borderRadius: 4,
+  // Inner row already has its own grid padding — outer wrapper pads by 3px
+  // less on the left so total visual padding stays constant.
+  paddingLeft: 9,
+  paddingTop: 4,
+  paddingRight: 12,
+  paddingBottom: 6,
+  // Compensate for the 12px-on-left padding of the inner grid (rowStyle has
+  // no padding — gap-only). Just match the outer wrapper sizing.
+};
+
+const lintDescStyle: React.CSSProperties = {
+  fontSize: 11,
+  fontStyle: "italic",
+  color: "var(--buildrick-warning-strong)",
+  marginTop: 4,
+};
+
+const lintTagStyle: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 500,
+  padding: "1px 6px",
+  borderRadius: 4,
+  background: "rgba(245, 158, 11, 0.18)",
+  color: "var(--buildrick-warning-strong)",
+};
+
 export const GenericTokenList: React.FC<GenericTokenListProps> = ({
   tokens,
   pendingDiff,
@@ -87,8 +118,6 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
   canUndo,
   usageByTokenId,
   getLintIssues,
-  onLintAutoFix,
-  onLintIgnore,
 }) => {
   const dsMode = useDSModeOptional();
   const isPro = dsMode?.mode === "pro";
@@ -105,8 +134,14 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
         const undoable = canUndo(t.id);
         const usage = usageByTokenId?.get(t.id) ?? 0;
         const lintIssues = getLintIssues?.(t.id) ?? [];
+        const hasLint = lintIssues.length > 0;
         return (
-          <div key={t.id}>
+          <div
+            key={t.id}
+            data-token-row={t.id}
+            data-lint-warn={hasLint ? "true" : undefined}
+            style={hasLint ? lintRowContainerStyle : undefined}
+          >
             <div style={rowStyle}>
               <div>
                 <div style={labelStyle}>{friendly}</div>
@@ -139,15 +174,13 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
               >
                 Restore
               </button>
-              <TokenUsageChip count={usage} />
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <TokenUsageChip count={usage} />
+                {hasLint && <span style={lintTagStyle}>[lint]</span>}
+              </div>
             </div>
-            {lintIssues.length > 0 && (
-              <TokenLintRow
-                tokenId={t.id}
-                issues={lintIssues}
-                onAutoFix={(id, hint) => onLintAutoFix?.(id, hint)}
-                onIgnore={(id) => onLintIgnore?.(id)}
-              />
+            {hasLint && (
+              <div style={lintDescStyle}>△ {lintIssues[0].message}</div>
             )}
           </div>
         );

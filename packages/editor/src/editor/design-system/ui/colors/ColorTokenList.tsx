@@ -11,7 +11,7 @@
  * resolvedMode==="dark" AND at least one color token has no darkValue. Click
  * → onRowClick(firstMissingTokenId) per D5 (drill-in).
  *
- * TokenLintRow inline render dropped — TokenRow handles inline lint state.
+ * Inline lint handled by TokenRow primitive.
  *
  * Preserved: search, all/issues filter, WCAG issues banner, Fix-all button,
  * group structure (brand/surface/state), GroupHeader, Add-token button.

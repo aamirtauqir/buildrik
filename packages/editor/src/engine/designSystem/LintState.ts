@@ -5,8 +5,9 @@
  * persist to localStorage so an "Ignore" decision sticks across reloads.
  *
  * Issues are populated externally (by DSLinter, downstream of this arc). For
- * now this is a passive store. `TokenKindCard` reads via `getVisibleIssues`
- * to render inline `TokenLintRow` with Auto-fix and Ignore buttons.
+ * now this is a passive store. Token list rows read via `getVisibleIssues`
+ * to render inline row lint state (amber bg + borderLeft + description +
+ * [lint] tag). Auto-fix + Ignore actions live in the T8 detail view.
  *
  * @module engine/designSystem/LintState
  * @license BSD-3-Clause

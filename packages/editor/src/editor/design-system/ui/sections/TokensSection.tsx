@@ -112,30 +112,15 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     };
   }, [composer]);
 
-  // List-agnostic helpers passed to every token list. `getIssues` returns
-  // the visible (non-suppressed) issues for a token; `onIgnore` suppresses
-  // them. `computeAutoFix` resolves a LintIssue.autoFixHint into a fixed
-  // hex (pure compute, engine-side); the list applies the result via its
-  // own update path (onColorChange / onTokenChange / etc.) and then
-  // suppresses the row. See Composer.ts:designSystem.computeAutoFix for
-  // why this isn't a full engine transaction.
+  // T7: `getIssues` returns the visible (non-suppressed) issues for a token
+  // and drives inline row warn state in each list. Auto-fix + Ignore actions
+  // live in T8 detail view per D7 — TokensSection only needs the getter.
   const lintState = composer?.designSystem?.lintState;
   const getIssues = React.useCallback(
     (tokenId: string): readonly LintIssue[] =>
       lintState?.getVisibleIssues(tokenId) ?? [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [lintState, lintVersion],
-  );
-  const onIgnoreLint = React.useCallback(
-    (tokenId: string) => {
-      lintState?.suppress(tokenId);
-    },
-    [lintState],
-  );
-  const computeAutoFix = React.useCallback(
-    (value: string, hint: string | undefined): string =>
-      composer?.designSystem?.computeAutoFix(value, hint) ?? value,
-    [composer],
   );
 
   const color      = useColorRegistry();
@@ -313,13 +298,6 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               canUndo={r.canUndo}
               usageByTokenId={usageMap}
               getLintIssues={getIssues}
-              onLintIgnore={onIgnoreLint}
-              onLintAutoFix={(id, hint) => {
-                const t = r.tokens.find((x) => x.id === id);
-                if (!t) return;
-                r.updateToken(id, computeAutoFix(t.value, hint));
-                lintState?.suppress(id);
-              }}
             />
           </TokenKindCard>
         );
