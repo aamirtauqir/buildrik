@@ -204,17 +204,19 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
     };
   }, [composer]);
 
-  // T6: count color tokens missing darkValue (per spec §T6 line 129).
+  // T6: count tokens missing darkValue. `tokens` prop is already filtered
+  // to color-only upstream by TokensSection (useColorTokens hook), so the
+  // explicit `t.kind === "color"` check from the spec was redundant AND
+  // failed because the upstream filter strips the kind field. See
+  // live-verify probe finding 2026-05-15.
   const missingDarkCount = React.useMemo(
-    () => tokens.filter((t) => t.kind === "color" && !t.darkValue).length,
+    () => tokens.filter((t) => !t.darkValue).length,
     [tokens],
   );
 
   // T6 + D5: click chip → drill into first missing token's detail.
   const handleDarkMissingClick = React.useCallback(() => {
-    const firstMissing = tokens.find(
-      (t) => t.kind === "color" && !t.darkValue,
-    );
+    const firstMissing = tokens.find((t) => !t.darkValue);
     if (firstMissing) onRowClick?.(firstMissing.id);
   }, [tokens, onRowClick]);
 
