@@ -54,7 +54,7 @@ import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
 import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
 import { LintState } from "./designSystem/LintState";
-import { StyleBindingResolver } from "./designSystem/StyleBindingResolver";
+import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import { applyContrastFix } from "./designSystem/contrastFix";
 import { CSSBundler } from "../editor/design-system/bundler";
 import { DSLinter } from "../editor/design-system/linter";
@@ -149,7 +149,7 @@ export class Composer extends EventEmitter {
   readonly designSystem!: {
     readonly tokenUsage: TokenUsageTracker;
     readonly lintState: LintState;
-    readonly tokenBindingResolver: StyleBindingResolver;
+    readonly tokenBindingResolver: TokenBindingResolver;
     /**
      * Resolves a LintIssue `autoFixHint` into a suggested next hex value.
      *
@@ -234,7 +234,7 @@ export class Composer extends EventEmitter {
 
     const tokenUsage = new TokenUsageTracker();
     const lintState = new LintState();
-    const tokenBindingResolver = new StyleBindingResolver();
+    const tokenBindingResolver = new TokenBindingResolver();
     this.designSystem = {
       tokenUsage,
       lintState,

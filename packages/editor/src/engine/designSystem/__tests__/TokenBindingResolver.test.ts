@@ -1,10 +1,10 @@
 /**
- * StyleBindingResolver tests — covers extract semantics + Composer integration.
+ * TokenBindingResolver tests — covers extract semantics + Composer integration.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { StyleBindingResolver } from "../StyleBindingResolver";
+import { TokenBindingResolver } from "../TokenBindingResolver";
 import { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 
@@ -21,8 +21,8 @@ function makeStub(id: string, styles: Record<string, string>): Element {
   } as unknown as Element;
 }
 
-describe("StyleBindingResolver", () => {
-  const resolver = new StyleBindingResolver();
+describe("TokenBindingResolver", () => {
+  const resolver = new TokenBindingResolver();
 
   it("returns empty map when no elements", () => {
     expect(resolver.resolveForElements([], [])).toEqual(new Map());
@@ -70,7 +70,7 @@ describe("StyleBindingResolver", () => {
   });
 });
 
-describe("StyleBindingResolver via Composer", () => {
+describe("TokenBindingResolver via Composer", () => {
   let originalGetContext: typeof HTMLCanvasElement.prototype.getContext;
 
   beforeAll(() => {

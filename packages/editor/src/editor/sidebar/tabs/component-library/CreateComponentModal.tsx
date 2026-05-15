@@ -8,10 +8,13 @@
  * @license BSD-3-Clause
  */
 
-// TODO(T12): The shell/modals/CreateComponentModal at editor/shell/modals/
-// CreateComponentModal.tsx is the canvas-right-click consumer today.
-// T12 should reroute canvas flow here so this modal's selectionContext
-// branch actually fires, or merge the two files.
+// Canvas right-click "Save as component" flow routes here via the
+// SaveAsComponentModal alias in editor/shell/StudioModals.tsx (T12 shipped
+// via the SaveAsComponentModal re-import — see StudioModals.tsx:29). The
+// shell/modals/CreateComponentModal.tsx serves the LeftSidebar "+" button
+// flow (simple name + group). Two distinct UX surfaces, intentionally
+// separate: this file is the binding-aware variant used by canvas
+// right-click, the shell one is the lightweight sidebar header variant.
 
 import * as React from "react";
 import { Input } from "@/editor/shared/vibcoder/Input";

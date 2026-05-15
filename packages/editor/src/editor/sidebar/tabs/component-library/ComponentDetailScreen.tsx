@@ -12,6 +12,7 @@ import type { Composer } from "../../../../engine";
 import type { ComponentDefinition, VariantProperty } from "../../../../shared/types/components";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useToast } from "@/editor/shared/vibcoder";
+import { useDSModeOptional } from "@/editor/design-system/state/DSModeContext";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { DetachConfirmModal } from "./DetachConfirmModal";
 
@@ -60,6 +61,13 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 }) => {
   // DrillInHeader handles focus-on-mount automatically
   const { addToast } = useToast();
+
+  // Spec H: "Detach (Pro mode only)" — Detach UI hidden in beginner mode.
+  // Hook is optional (null-safe) because ComponentDetailScreen may render
+  // outside a DSModeProvider in some screens (e.g. component-library
+  // standalone). Default-to-beginner when provider is absent.
+  const dsMode = useDSModeOptional();
+  const isPro = dsMode?.mode === "pro";
 
   // Delete confirmation dialog state
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
@@ -252,20 +260,24 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
           </Button>
         </div>
 
-        {/* Instance Actions (shown when instance is selected on canvas) */}
+        {/* Instance Actions (shown when instance is selected on canvas).
+            Spec H: Detach button is Pro-mode-only; Swap remains visible
+            in both modes. */}
         {isInstanceSelected && (
           <div>
             <h4>Instance Actions</h4>
+            {isPro && (
+              <Button
+
+                onClick={handleDetach}
+                title="Detach this instance from the component"
+              >
+                <Unlink size={14} />
+                <span>Detach instance</span>
+              </Button>
+            )}
             <Button
-             
-              onClick={handleDetach}
-              title="Detach this instance from the component"
-            >
-              <Unlink size={14} />
-              <span>Detach instance</span>
-            </Button>
-            <Button
-             
+
               onClick={handleSwap}
               title="Swap with another component"
             >

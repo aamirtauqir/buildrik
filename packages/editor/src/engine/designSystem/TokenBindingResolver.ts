@@ -1,5 +1,5 @@
 /**
- * StyleBindingResolver
+ * TokenBindingResolver
  *
  * Extracts style-to-token bindings from a set of elements. Given a list of
  * element ids and the full element tree, returns a `Map<"elementId:styleProp", "tokenId">`
@@ -14,7 +14,7 @@
  * `linear-gradient({{token.color.brand.primary}}, #000)` is intentionally
  * skipped — partial-token bindings aren't a thing in the component schema.
  *
- * @module engine/designSystem/StyleBindingResolver
+ * @module engine/designSystem/TokenBindingResolver
  * @license BSD-3-Clause
  */
 
@@ -22,7 +22,7 @@ import type { Element } from "../elements/Element";
 
 const TOKEN_REF_RE = /^\{\{token\.([a-zA-Z0-9._-]+)\}\}$/;
 
-export class StyleBindingResolver {
+export class TokenBindingResolver {
   /**
    * Walks `elements` and returns a map of `"elementId:styleProp" → tokenId`
    * for every style value on every requested element whose value is a
