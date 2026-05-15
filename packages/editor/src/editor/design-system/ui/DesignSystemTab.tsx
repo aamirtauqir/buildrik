@@ -602,7 +602,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             />
           )}
           {activeSection === "styles"     && <StylesSection />}
-          {activeSection === "components" && <ComponentsSection />}
+          {activeSection === "components" && <ComponentsSection composer={composer} />}
           {activeSection === "export"     && <ExportSection />}
         </div>
       )}
