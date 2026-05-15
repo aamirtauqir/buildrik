@@ -2,6 +2,8 @@ import * as React from "react";
 import type { DesignToken } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
+import { TokenLintRow } from "../sections/TokenLintRow";
+import type { LintIssue } from "../../../../engine/designSystem/LintState";
 
 interface GenericTokenListProps {
   tokens: DesignToken[];
@@ -11,6 +13,12 @@ interface GenericTokenListProps {
   canUndo: (id: string) => boolean;
   /** Per-token usage counts (from composer.designSystem.tokenUsage). */
   usageByTokenId?: ReadonlyMap<string, number>;
+  /** T10: visible lint issues for a token (from composer.designSystem.lintState). */
+  getLintIssues?: (tokenId: string) => readonly LintIssue[];
+  /** T10: Auto-fix click — host applies the hint + suppresses the row. */
+  onLintAutoFix?: (tokenId: string, hint: string | undefined) => void;
+  /** T10: Ignore click — host calls lintState.suppress(tokenId). */
+  onLintIgnore?: (tokenId: string) => void;
 }
 
 const listStyle: React.CSSProperties = {
@@ -78,6 +86,9 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
   onUndo,
   canUndo,
   usageByTokenId,
+  getLintIssues,
+  onLintAutoFix,
+  onLintIgnore,
 }) => {
   const dsMode = useDSModeOptional();
   const isPro = dsMode?.mode === "pro";
@@ -93,40 +104,51 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
         const isDirty = pendingDiff[t.id] !== undefined;
         const undoable = canUndo(t.id);
         const usage = usageByTokenId?.get(t.id) ?? 0;
+        const lintIssues = getLintIssues?.(t.id) ?? [];
         return (
-          <div key={t.id} style={rowStyle}>
-            <div>
-              <div style={labelStyle}>{friendly}</div>
-              {isPro && (
-                <div style={metaStyle}>
-                  {t.id} · {t.cssVar}
-                </div>
-              )}
+          <div key={t.id}>
+            <div style={rowStyle}>
+              <div>
+                <div style={labelStyle}>{friendly}</div>
+                {isPro && (
+                  <div style={metaStyle}>
+                    {t.id} · {t.cssVar}
+                  </div>
+                )}
+              </div>
+              <input
+                type="text"
+                value={t.value}
+                onChange={(e) => onTokenChange(t.id, e.target.value)}
+                style={{
+                  ...inputStyle,
+                  borderColor: isDirty ? "var(--bd-warning)" : "var(--bd-border)",
+                }}
+                aria-label={`${friendly} value`}
+              />
+              <button
+                type="button"
+                disabled={!undoable}
+                onClick={() => onUndo(t.id)}
+                style={{
+                  ...restoreButtonStyle,
+                  opacity: undoable ? 1 : 0.4,
+                  cursor: undoable ? "pointer" : "not-allowed",
+                }}
+                aria-label={`Restore ${friendly}`}
+              >
+                Restore
+              </button>
+              <TokenUsageChip count={usage} />
             </div>
-            <input
-              type="text"
-              value={t.value}
-              onChange={(e) => onTokenChange(t.id, e.target.value)}
-              style={{
-                ...inputStyle,
-                borderColor: isDirty ? "var(--bd-warning)" : "var(--bd-border)",
-              }}
-              aria-label={`${friendly} value`}
-            />
-            <button
-              type="button"
-              disabled={!undoable}
-              onClick={() => onUndo(t.id)}
-              style={{
-                ...restoreButtonStyle,
-                opacity: undoable ? 1 : 0.4,
-                cursor: undoable ? "pointer" : "not-allowed",
-              }}
-              aria-label={`Restore ${friendly}`}
-            >
-              Restore
-            </button>
-            <TokenUsageChip count={usage} />
+            {lintIssues.length > 0 && (
+              <TokenLintRow
+                tokenId={t.id}
+                issues={lintIssues}
+                onAutoFix={(id, hint) => onLintAutoFix?.(id, hint)}
+                onIgnore={(id) => onLintIgnore?.(id)}
+              />
+            )}
           </div>
         );
       })}

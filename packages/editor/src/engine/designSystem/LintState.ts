@@ -12,6 +12,8 @@
  * @license BSD-3-Clause
  */
 
+import { EventEmitter } from "../EventEmitter";
+
 export interface LintIssue {
   type: "contrast" | "spacing-collision" | "unused" | "alias-cycle";
   severity: "warn" | "error";
@@ -21,17 +23,25 @@ export interface LintIssue {
 
 const STORAGE_KEY = "buildrik:ds:lintSuppressions";
 
-export class LintState {
+/**
+ * Emits `"lint:changed"` after every mutation (setIssues / suppress /
+ * unsuppress) so the React layer can re-render. Mirrors the T1
+ * TokenUsageTracker emit pattern — UI subscribes once at TokensSection,
+ * snapshots fresh issue maps in the handler.
+ */
+export class LintState extends EventEmitter {
   private issues = new Map<string, LintIssue[]>();
   private suppressed = new Set<string>();
 
   constructor() {
+    super();
     this.loadSuppressions();
   }
 
   setIssues(tokenId: string, issues: readonly LintIssue[]): void {
     if (issues.length === 0) this.issues.delete(tokenId);
     else this.issues.set(tokenId, [...issues]);
+    this.emit("lint:changed");
   }
 
   getIssues(tokenId: string): readonly LintIssue[] {
@@ -46,11 +56,13 @@ export class LintState {
   suppress(tokenId: string): void {
     this.suppressed.add(tokenId);
     this.persist();
+    this.emit("lint:changed");
   }
 
   unsuppress(tokenId: string): void {
     this.suppressed.delete(tokenId);
     this.persist();
+    this.emit("lint:changed");
   }
 
   isSuppressed(tokenId: string): boolean {

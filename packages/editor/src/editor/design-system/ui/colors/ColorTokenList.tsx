@@ -22,7 +22,9 @@ import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { ColorPicker } from "./ColorPicker";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
+import { TokenLintRow } from "../sections/TokenLintRow";
 import type { Composer } from "../../../../engine/Composer";
+import type { LintIssue } from "../../../../engine/designSystem/LintState";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -41,6 +43,12 @@ export interface ColorTokenListProps {
    * chip. Subscribes to `colorMode:changed` to re-render on mode flips.
    */
   composer?: Composer | null;
+  /** T10: visible lint issues for a token (from composer.designSystem.lintState). */
+  getLintIssues?: (tokenId: string) => readonly LintIssue[];
+  /** T10: Auto-fix click — host applies the hint + suppresses the row. */
+  onLintAutoFix?: (tokenId: string, hint: string | undefined) => void;
+  /** T10: Ignore click — host calls lintState.suppress(tokenId). */
+  onLintIgnore?: (tokenId: string) => void;
 }
 
 interface ColorGroup {
@@ -366,6 +374,9 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   onAddToken,
   usageByTokenId,
   composer,
+  getLintIssues,
+  onLintAutoFix,
+  onLintIgnore,
 }) => {
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -642,6 +653,21 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                   onSave={(hex) => handlePickerSave(expandedToken.id, hex)}
                 />
               )}
+              {/* T10: lint rows for tokens in this group (s09 surface A) */}
+              {getLintIssues &&
+                group.tokens.map((t) => {
+                  const issues = getLintIssues(t.id);
+                  if (issues.length === 0) return null;
+                  return (
+                    <TokenLintRow
+                      key={`${t.id}-lint`}
+                      tokenId={t.id}
+                      issues={issues}
+                      onAutoFix={(id, hint) => onLintAutoFix?.(id, hint)}
+                      onIgnore={(id) => onLintIgnore?.(id)}
+                    />
+                  );
+                })}
               {filterMode === "issues" &&
                 group.tokens.map((t) => {
                   const fix = contrastFixes[t.id];

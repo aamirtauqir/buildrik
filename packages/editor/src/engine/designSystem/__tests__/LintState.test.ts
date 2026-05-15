@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { LintState, type LintIssue } from "../LintState";
 
 describe("LintState", () => {
@@ -41,5 +41,15 @@ describe("LintState", () => {
     expect(state.getVisibleIssues("color.accent.yellow")).toHaveLength(1);
     state.suppress("color.accent.yellow");
     expect(state.getVisibleIssues("color.accent.yellow")).toHaveLength(0);
+  });
+
+  it("emits 'lint:changed' on setIssues / suppress / unsuppress", () => {
+    const handler = vi.fn();
+    state.on("lint:changed", handler);
+    const issue: LintIssue = { type: "contrast", severity: "warn", message: "x" };
+    state.setIssues("color.a", [issue]);
+    state.suppress("color.a");
+    state.unsuppress("color.a");
+    expect(handler).toHaveBeenCalledTimes(3);
   });
 });

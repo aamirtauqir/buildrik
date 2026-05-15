@@ -23,6 +23,7 @@ import {
 import { useDSModeOptional } from "../../state/DSModeContext";
 import type { TokenKind } from "../../types";
 import type { Composer } from "../../../../engine/Composer";
+import type { LintIssue } from "../../../../engine/designSystem/LintState";
 
 interface TokensSectionProps {
   /** C2 fix: clicking "+" inside ColorTokenList must open the parent's AddTokenModal. */
@@ -93,6 +94,46 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       tracker.off("tokenUsage:changed", handler);
     };
   }, [composer]);
+
+  // T10: subscribe to LintState "lint:changed" event. Bumps a version
+  // counter that's referenced in lintGetter's dep array — re-creates the
+  // getter, which forces children to re-resolve issues on every change
+  // (suppress / unsuppress / setIssues). Matches T7 emit pattern; emit
+  // added in T10 (see LintState.ts).
+  const [lintVersion, setLintVersion] = React.useState(0);
+  React.useEffect(() => {
+    const lint = composer?.designSystem?.lintState;
+    if (!lint) return;
+    const handler = () => setLintVersion((v) => v + 1);
+    lint.on("lint:changed", handler);
+    return () => {
+      lint.off("lint:changed", handler);
+    };
+  }, [composer]);
+
+  // List-agnostic helpers passed to every token list. `getIssues` returns
+  // the visible (non-suppressed) issues for a token; `onIgnore` suppresses
+  // them. `applyAutoFix` resolves a LintIssue.autoFixHint into a fixed
+  // hex; the list applies the result via its own update path
+  // (onColorChange / onTokenChange / etc.).
+  const lintState = composer?.designSystem?.lintState;
+  const getIssues = React.useCallback(
+    (tokenId: string): readonly LintIssue[] =>
+      lintState?.getVisibleIssues(tokenId) ?? [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lintState, lintVersion],
+  );
+  const onIgnoreLint = React.useCallback(
+    (tokenId: string) => {
+      lintState?.suppress(tokenId);
+    },
+    [lintState],
+  );
+  const applyAutoFix = React.useCallback(
+    (value: string, hint: string | undefined): string =>
+      composer?.designSystem?.applyAutoFix(value, hint) ?? value,
+    [composer],
+  );
 
   const color      = useColorRegistry();
   const type       = useTypeRegistry();
@@ -194,6 +235,15 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 onAddToken={() => onAddTokenClick?.()}
                 usageByTokenId={usageMap}
                 composer={composer}
+                getLintIssues={getIssues}
+                onLintIgnore={onIgnoreLint}
+                onLintAutoFix={(id, hint) => {
+                  const t = color.tokens.find((x) => x.id === id);
+                  if (!t) return;
+                  color.updateToken(id, applyAutoFix(t.value, hint));
+                  // Auto-suppress after a successful fix so the row clears.
+                  lintState?.suppress(id);
+                }}
               />
             </TokenKindCard>
           );
@@ -266,6 +316,14 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               onUndo={r.undoToken}
               canUndo={r.canUndo}
               usageByTokenId={usageMap}
+              getLintIssues={getIssues}
+              onLintIgnore={onIgnoreLint}
+              onLintAutoFix={(id, hint) => {
+                const t = r.tokens.find((x) => x.id === id);
+                if (!t) return;
+                r.updateToken(id, applyAutoFix(t.value, hint));
+                lintState?.suppress(id);
+              }}
             />
           </TokenKindCard>
         );

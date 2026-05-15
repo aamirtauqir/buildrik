@@ -55,6 +55,7 @@ import { ColorMode } from "./colorMode";
 import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
 import { LintState } from "./designSystem/LintState";
 import { StyleBindingResolver } from "./designSystem/StyleBindingResolver";
+import { applyContrastFix } from "./designSystem/contrastFix";
 import { CSSBundler } from "../editor/design-system/bundler";
 import { DSLinter } from "../editor/design-system/linter";
 import { AIAssistService } from "../editor/design-system/services";
@@ -149,6 +150,13 @@ export class Composer extends EventEmitter {
     readonly tokenUsage: TokenUsageTracker;
     readonly lintState: LintState;
     readonly tokenBindingResolver: StyleBindingResolver;
+    /**
+     * Resolves a LintIssue `autoFixHint` into a suggested next hex value.
+     * Pure — does not mutate the token registry (which lives React-side
+     * in TokenRegistryContext). Callers chain this with `onColorChange` /
+     * `updateToken` to actually apply the fix.
+     */
+    readonly applyAutoFix: (currentValue: string, hint: string | undefined) => string;
   };
 
   constructor(config: ComposerConfig) {
@@ -211,7 +219,15 @@ export class Composer extends EventEmitter {
     const tokenUsage = new TokenUsageTracker();
     const lintState = new LintState();
     const tokenBindingResolver = new StyleBindingResolver();
-    this.designSystem = { tokenUsage, lintState, tokenBindingResolver };
+    this.designSystem = {
+      tokenUsage,
+      lintState,
+      tokenBindingResolver,
+      applyAutoFix: (currentValue, hint) => {
+        if (!hint) return currentValue;
+        return applyContrastFix(currentValue, hint);
+      },
+    };
     // Recompute token usage whenever element trees or styles change. These
     // four events cover create/delete/update/style-set — markDirty's broader
     // PROJECT_CHANGED also fires for non-element work (settings, metadata)
