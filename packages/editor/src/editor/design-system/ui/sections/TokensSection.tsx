@@ -1,5 +1,6 @@
 import * as React from "react";
 import { TokenKindCard } from "./TokenKindCard";
+import { TokensRouter } from "./TokensRouter";
 import { GenericTokenList } from "../tokens/GenericTokenList";
 import { ColorTokenList } from "../colors/ColorTokenList";
 import { TypeTokenList } from "../type/TypeTokenList";
@@ -179,6 +180,53 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
     lineHeight: 1.5,
   };
 
+  // T8: flat token map for TokensRouter — lets the router look up a token by
+  // id without knowing about per-kind registries. Lookup also drives the
+  // detail view's bail-out path when a token disappears.
+  const allTokens = React.useMemo(
+    () => [
+      ...color.tokens, ...type.tokens, ...spacing.tokens,
+      ...radius.tokens, ...shadow.tokens, ...motion.tokens, ...border.tokens,
+      ...opacity.tokens, ...zindex.tokens, ...breakpoint.tokens, ...grid.tokens,
+      ...sizing.tokens, ...icon.tokens, ...imagery.tokens,
+    ],
+    [color.tokens, type.tokens, spacing.tokens, radius.tokens, shadow.tokens,
+     motion.tokens, border.tokens, opacity.tokens, zindex.tokens,
+     breakpoint.tokens, grid.tokens, sizing.tokens, icon.tokens, imagery.tokens],
+  );
+
+  // T8: dispatch a token-value update to whichever registry owns the id.
+  // Detail view (and any future cross-kind editor) calls onTokenChange with
+  // just (id, value) — we resolve the owning registry by token kind.
+  const handleTokenChange = React.useCallback((id: string, value: string) => {
+    const tok = allTokens.find((t) => t.id === id);
+    if (!tok) return;
+    const k = tok.kind ?? (tok.category === "colors" ? "color"
+      : tok.category === "typography" ? "type"
+      : tok.category === "spacing" ? "spacing"
+      : undefined);
+    if (k === "color")        { color.updateToken(id, value); return; }
+    if (k === "type")         { type.updateToken(id, value); return; }
+    if (k === "spacing")      { spacing.updateToken(id, value); return; }
+    const r = newKindRegistry(k as TokenKind);
+    r?.updateToken?.(id, value);
+  }, [allTokens, color, type, spacing, radius, shadow, motion, border,
+      opacity, zindex, breakpoint, grid, sizing, icon, imagery]);
+
+  // T8: dispatch delete. Only color + generic kinds expose deleteToken;
+  // type + spacing intentionally omit it (no DS UX entry for delete on
+  // typography or spacing scales). Detail view's Delete button no-ops for
+  // those token kinds (button still renders, just nothing to call).
+  const handleTokenDelete = React.useCallback((id: string) => {
+    const tok = allTokens.find((t) => t.id === id);
+    if (!tok) return;
+    const k = tok.kind ?? (tok.category === "colors" ? "color" : undefined);
+    if (k === "color") { color.deleteToken(id); return; }
+    const r = newKindRegistry(k as TokenKind);
+    r?.deleteToken?.(id);
+  }, [allTokens, color, radius, shadow, motion, border, opacity, zindex,
+      breakpoint, grid, sizing, icon, imagery]);
+
   // Beginner mode: foundation kinds with zero tokens move to the bottom.
   const ordered = React.useMemo(() => {
     if (!isBeginner) return KIND_ORDER;
@@ -201,112 +249,126 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       sizing.tokens.length, icon.tokens.length, imagery.tokens.length]);
 
   return (
-    <div>
-      {ordered.map((entry) => {
-        if (entry.kindId === "color") {
-          return (
-            <TokenKindCard
-              key={entry.kindId}
-              kindId={entry.kindId}
-              title={entry.title}
-              count={color.tokens.length}
-              isDirty={colorDirty}
-            >
-              <ColorTokenList
-                tokens={color.tokens}
-                pendingDiff={color.pendingDiff}
-                onColorChange={color.updateToken}
-                onUndo={color.undoToken}
-                onRedo={color.redoToken}
-                canUndo={color.canUndo}
-                canRedo={color.canRedo}
-                onAddToken={() => onAddTokenClick?.()}
-                usageByTokenId={usageMap}
-                getLintIssues={getIssues}
-                isPro={isPro}
-                composer={composer}
-              />
-            </TokenKindCard>
-          );
-        }
-        if (entry.kindId === "type") {
-          return (
-            <TokenKindCard
-              key={entry.kindId}
-              kindId={entry.kindId}
-              title={entry.title}
-              count={type.tokens.length}
-              isDirty={typeDirty}
-            >
-              <TypeTokenList
-                tokens={type.tokens}
-                responsiveMode={type.responsiveMode}
-                onTokenChange={type.updateToken}
-                onResponsiveModeChange={type.setResponsiveMode}
-                onUndo={type.undoToken}
-                canUndo={type.canUndo}
-                onRedo={type.redoToken}
-                canRedo={type.canRedo}
-                usageByTokenId={usageMap}
-              />
-            </TokenKindCard>
-          );
-        }
-        if (entry.kindId === "spacing") {
-          return (
-            <TokenKindCard
-              key={entry.kindId}
-              kindId={entry.kindId}
-              title={entry.title}
-              count={spacing.tokens.length}
-              isDirty={spacingDirty}
-            >
-              <SpacingTokenList
-                tokens={spacing.tokens}
-                activePreset={spacing.activePreset}
-                savedPreset={spacing.savedPreset}
-                isDirty={spacing.isDirty}
-                onTokenChange={spacing.updateToken}
-                onPresetApply={spacing.applyPreset}
-                onResetToDefaults={() => onResetSpacingToDefaults?.()}
-                onUndo={spacing.undoToken}
-                canUndo={spacing.canUndo}
-                onRedo={spacing.redoToken}
-                canRedo={spacing.canRedo}
-                usageByTokenId={usageMap}
-              />
-            </TokenKindCard>
-          );
-        }
-        const r = newKindRegistry(entry.kindId);
-        if (!r) return null;
-        const dirty = Object.keys(r.pendingDiff).length > 0;
-        return (
-          <TokenKindCard
-            key={entry.kindId}
-            kindId={entry.kindId}
-            title={entry.title}
-            count={r.tokens.length}
-            isDirty={dirty}
-            defaultOpen={r.tokens.length > 0}
-          >
-            <GenericTokenList
-              tokens={r.tokens}
-              pendingDiff={r.pendingDiff}
-              onTokenChange={r.updateToken}
-              onUndo={r.undoToken}
-              canUndo={r.canUndo}
-              usageByTokenId={usageMap}
-              getLintIssues={getIssues}
-            />
-          </TokenKindCard>
-        );
-      })}
-      {isBeginner && (
-        <div style={hintStyle} role="note">
-          Beginner mode hides token IDs and alias graph. Toggle Pro to expose.
+    <TokensRouter
+      composer={composer}
+      tokens={allTokens}
+      onTokenChange={handleTokenChange}
+      onTokenDelete={handleTokenDelete}
+      onTokenRename={undefined /* TODO(T8 follow-up): registry rename API */}
+    >
+      {({ onRowClick }) => (
+        <div>
+          {ordered.map((entry) => {
+            if (entry.kindId === "color") {
+              return (
+                <TokenKindCard
+                  key={entry.kindId}
+                  kindId={entry.kindId}
+                  title={entry.title}
+                  count={color.tokens.length}
+                  isDirty={colorDirty}
+                >
+                  <ColorTokenList
+                    tokens={color.tokens}
+                    pendingDiff={color.pendingDiff}
+                    onColorChange={color.updateToken}
+                    onUndo={color.undoToken}
+                    onRedo={color.redoToken}
+                    canUndo={color.canUndo}
+                    canRedo={color.canRedo}
+                    onAddToken={() => onAddTokenClick?.()}
+                    usageByTokenId={usageMap}
+                    getLintIssues={getIssues}
+                    isPro={isPro}
+                    composer={composer}
+                    onRowClick={onRowClick}
+                  />
+                </TokenKindCard>
+              );
+            }
+            if (entry.kindId === "type") {
+              return (
+                <TokenKindCard
+                  key={entry.kindId}
+                  kindId={entry.kindId}
+                  title={entry.title}
+                  count={type.tokens.length}
+                  isDirty={typeDirty}
+                >
+                  <TypeTokenList
+                    tokens={type.tokens}
+                    responsiveMode={type.responsiveMode}
+                    onTokenChange={type.updateToken}
+                    onResponsiveModeChange={type.setResponsiveMode}
+                    onUndo={type.undoToken}
+                    canUndo={type.canUndo}
+                    onRedo={type.redoToken}
+                    canRedo={type.canRedo}
+                    usageByTokenId={usageMap}
+                    onRowClick={onRowClick}
+                  />
+                </TokenKindCard>
+              );
+            }
+            if (entry.kindId === "spacing") {
+              return (
+                <TokenKindCard
+                  key={entry.kindId}
+                  kindId={entry.kindId}
+                  title={entry.title}
+                  count={spacing.tokens.length}
+                  isDirty={spacingDirty}
+                >
+                  <SpacingTokenList
+                    tokens={spacing.tokens}
+                    activePreset={spacing.activePreset}
+                    savedPreset={spacing.savedPreset}
+                    isDirty={spacing.isDirty}
+                    onTokenChange={spacing.updateToken}
+                    onPresetApply={spacing.applyPreset}
+                    onResetToDefaults={() => onResetSpacingToDefaults?.()}
+                    onUndo={spacing.undoToken}
+                    canUndo={spacing.canUndo}
+                    onRedo={spacing.redoToken}
+                    canRedo={spacing.canRedo}
+                    usageByTokenId={usageMap}
+                    onRowClick={onRowClick}
+                  />
+                </TokenKindCard>
+              );
+            }
+            const r = newKindRegistry(entry.kindId);
+            if (!r) return null;
+            const dirty = Object.keys(r.pendingDiff).length > 0;
+            return (
+              <TokenKindCard
+                key={entry.kindId}
+                kindId={entry.kindId}
+                title={entry.title}
+                count={r.tokens.length}
+                isDirty={dirty}
+                defaultOpen={r.tokens.length > 0}
+              >
+                <GenericTokenList
+                  tokens={r.tokens}
+                  pendingDiff={r.pendingDiff}
+                  onTokenChange={r.updateToken}
+                  onUndo={r.undoToken}
+                  canUndo={r.canUndo}
+                  usageByTokenId={usageMap}
+                  getLintIssues={getIssues}
+                  onRowClick={onRowClick}
+                />
+              </TokenKindCard>
+            );
+          })}
+          {isBeginner && (
+            <div style={hintStyle} role="note">
+              Beginner mode hides token IDs and alias graph. Toggle Pro to expose.
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </TokensRouter>
   );
 };

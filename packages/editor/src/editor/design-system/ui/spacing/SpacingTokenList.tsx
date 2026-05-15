@@ -32,6 +32,11 @@ export interface SpacingTokenListProps {
   canRedo: (id: string) => boolean;
   /** T7 coverage: per-token usage counts (from composer.designSystem.tokenUsage). */
   usageByTokenId?: ReadonlyMap<string, number>;
+  /** T8: chip click → drill-in detail. Wired via shift-click + Cmd/Ctrl-click
+   *  semantics would conflict with the inline edit drawer, so we surface
+   *  drill-in on the TokenUsageChip below the value chip — it's a separate
+   *  click target that already lives next to each spacing chip. */
+  onRowClick?: (tokenId: string) => void;
 }
 
 const PRESET_LABELS: Record<SpacingPreset, string> = {
@@ -255,6 +260,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
   onRedo,
   canRedo,
   usageByTokenId,
+  onRowClick,
 }) => {
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const activeToken = activeId ? tokens.find((t) => t.id === activeId) ?? null : null;
@@ -357,12 +363,21 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
         {tokens.map((t) => (
           <div
             key={t.id}
+            data-token-row={t.id}
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: 3,
             }}
+            onContextMenu={
+              onRowClick
+                ? (e) => {
+                    e.preventDefault();
+                    onRowClick(t.id);
+                  }
+                : undefined
+            }
           >
             <ValueChip
               token={t}
@@ -370,7 +385,24 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
               isDirty={false}
               onClick={() => setActiveId((prev) => (prev === t.id ? null : t.id))}
             />
-            <TokenUsageChip count={usageByTokenId?.get(t.id) ?? 0} />
+            {onRowClick ? (
+              <button
+                type="button"
+                onClick={() => onRowClick(t.id)}
+                aria-label={`Open details for ${t.name}`}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                }}
+              >
+                <TokenUsageChip count={usageByTokenId?.get(t.id) ?? 0} />
+              </button>
+            ) : (
+              <TokenUsageChip count={usageByTokenId?.get(t.id) ?? 0} />
+            )}
           </div>
         ))}
       </div>

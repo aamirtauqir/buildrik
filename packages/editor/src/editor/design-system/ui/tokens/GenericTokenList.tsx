@@ -16,6 +16,9 @@ interface GenericTokenListProps {
    *  Drives inline row warn state (amber bg + borderLeft + italic description +
    *  [lint] tag). Auto-fix / Ignore actions live in T8 detail view per D7. */
   getLintIssues?: (tokenId: string) => readonly LintIssue[];
+  /** T8: row click → drill-in detail. Wired to the row's outer container so
+   *  it doesn't compete with the inline input/restore controls. */
+  onRowClick?: (tokenId: string) => void;
 }
 
 const listStyle: React.CSSProperties = {
@@ -118,6 +121,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
   canUndo,
   usageByTokenId,
   getLintIssues,
+  onRowClick,
 }) => {
   const dsMode = useDSModeOptional();
   const isPro = dsMode?.mode === "pro";
@@ -143,7 +147,22 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
             style={hasLint ? lintRowContainerStyle : undefined}
           >
             <div style={rowStyle}>
-              <div>
+              <div
+                role={onRowClick ? "button" : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                onClick={onRowClick ? () => onRowClick(t.id) : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onRowClick(t.id);
+                        }
+                      }
+                    : undefined
+                }
+                style={onRowClick ? { cursor: "pointer" } : undefined}
+              >
                 <div style={labelStyle}>{friendly}</div>
                 {isPro && (
                   <div style={metaStyle}>

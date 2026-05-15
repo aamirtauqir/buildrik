@@ -20,6 +20,9 @@ export interface TypeTokenListProps {
   canRedo: (id: string) => boolean;
   /** T7 coverage: per-token usage counts (from composer.designSystem.tokenUsage). */
   usageByTokenId?: ReadonlyMap<string, number>;
+  /** T8: row click → drill-in detail. Wired to each row's name/label area
+   *  so it doesn't fight with the inline size input + B/I toggles. */
+  onRowClick?: (tokenId: string) => void;
 }
 
 // ─── Icon buttons ─────────────────────────────────────────────────────────────
@@ -106,6 +109,7 @@ interface TypeScaleRowProps {
   onRedo: (id: string) => void;
   canRedo: boolean;
   usageCount: number;
+  onRowClick?: (tokenId: string) => void;
 }
 
 const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
@@ -116,6 +120,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
   onRedo,
   canRedo,
   usageCount,
+  onRowClick,
 }) => {
   const [bold, setBold] = React.useState(false);
   const [italic, setItalic] = React.useState(false);
@@ -141,7 +146,22 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       }}
     >
       {/* Semantic label */}
-      <div style={{ width: 64, flexShrink: 0 }}>
+      <div
+        role={onRowClick ? "button" : undefined}
+        tabIndex={onRowClick ? 0 : undefined}
+        onClick={onRowClick ? () => onRowClick(token.id) : undefined}
+        onKeyDown={
+          onRowClick
+            ? (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onRowClick(token.id);
+                }
+              }
+            : undefined
+        }
+        style={{ width: 64, flexShrink: 0, cursor: onRowClick ? "pointer" : undefined }}
+      >
         <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bd-fg-primary)" }}>
           {info?.semantic ?? token.name}
         </div>
@@ -276,9 +296,10 @@ interface FontRowProps {
   token: DesignToken;
   onChange: (id: string, value: string) => void;
   usageCount: number;
+  onRowClick?: (tokenId: string) => void;
 }
 
-const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount }) => {
+const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, onRowClick }) => {
   const [fontLoadFailed, setFontLoadFailed] = React.useState(false);
 
   React.useEffect(() => {
@@ -301,7 +322,22 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount }) 
         borderBottom: "1px solid rgba(255,255,255,0.04)",
       }}
     >
-      <div style={{ flex: 1 }}>
+      <div
+        role={onRowClick ? "button" : undefined}
+        tabIndex={onRowClick ? 0 : undefined}
+        onClick={onRowClick ? () => onRowClick(token.id) : undefined}
+        onKeyDown={
+          onRowClick
+            ? (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onRowClick(token.id);
+                }
+              }
+            : undefined
+        }
+        style={{ flex: 1, cursor: onRowClick ? "pointer" : undefined }}
+      >
         <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bd-fg-primary)" }}>
           {token.name}
         </div>
@@ -453,6 +489,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
   onRedo,
   canRedo,
   usageByTokenId,
+  onRowClick,
 }) => {
   const fontTokens = tokens.filter((t) => t.type === "font-family");
   const sizeTokens = tokens.filter((t) => t.type === "font-size");
@@ -530,6 +567,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
               token={token}
               onChange={onTokenChange}
               usageCount={usageByTokenId?.get(token.id) ?? 0}
+              onRowClick={onRowClick}
             />
           ))}
         </>
@@ -549,6 +587,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
               onRedo={onRedo}
               canRedo={canRedo(token.id)}
               usageCount={usageByTokenId?.get(token.id) ?? 0}
+              onRowClick={onRowClick}
             />
           ))}
         </>
