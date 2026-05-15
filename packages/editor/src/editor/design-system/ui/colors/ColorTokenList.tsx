@@ -1,12 +1,15 @@
 /**
- * ColorTokenList — T4 of DS prototype-full-rewrite arc.
+ * ColorTokenList — T4 + T6 of DS prototype-full-rewrite arc.
  *
- * Rewritten from 6-col swatch grid to vertical row stack using the TokenRow
- * SSOT primitive (commit 323f782b). One render shape across Color/Type/Spacing
- * lists. SwatchGrid + compactLabel + PickerDrawer + expandedId state removed.
+ * T4 (commit fb832744): Rewritten from 6-col swatch grid to vertical row stack
+ * using the TokenRow SSOT primitive. SwatchGrid + compactLabel + PickerDrawer
+ * + expandedId state + per-row dark-missing chip removed.
  *
- * Per-row dark-missing chip + composer colorMode subscription dropped — T6
- * will add an aggregate header chip in the slot reserved below SearchAndFilter.
+ * T6 (this commit): Aggregate dark-missing header chip mounted at top of the
+ * color section. Re-introduces composer prop + colorMode:changed subscription
+ * at LIST level (T4 dropped them at per-row level). Chip visible only when
+ * resolvedMode==="dark" AND at least one color token has no darkValue. Click
+ * → onRowClick(firstMissingTokenId) per D5 (drill-in).
  *
  * TokenLintRow inline render dropped — TokenRow handles inline lint state.
  *
@@ -22,6 +25,7 @@ import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
+import type { Composer } from "../../../../engine/Composer";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -40,6 +44,8 @@ export interface ColorTokenListProps {
   onRowClick?: (tokenId: string) => void;
   /** T5: Pro mode exposes token IDs (mono) + alias arrow chip per s02/s10. */
   isPro?: boolean;
+  /** T6: composer drives resolvedMode for aggregate dark-missing chip. */
+  composer?: Composer | null;
 }
 
 interface ColorGroup {
@@ -177,9 +183,40 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
   getLintIssues,
   onRowClick,
   isPro,
+  composer,
 }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterMode, setFilterMode] = React.useState<FilterMode>("all");
+
+  // T6: subscribe to composer.colorMode for aggregate dark-missing chip.
+  // resolvedMode reflects the EFFECTIVE mode after system-pref resolution.
+  const [resolvedMode, setResolvedMode] = React.useState<"light" | "dark">(
+    () => composer?.colorMode?.resolved?.() ?? "light",
+  );
+  React.useEffect(() => {
+    if (!composer?.colorMode) return;
+    const sync = () =>
+      setResolvedMode(composer.colorMode.resolved?.() ?? "light");
+    sync();
+    composer.on("colorMode:changed", sync);
+    return () => {
+      composer.off("colorMode:changed", sync);
+    };
+  }, [composer]);
+
+  // T6: count color tokens missing darkValue (per spec §T6 line 129).
+  const missingDarkCount = React.useMemo(
+    () => tokens.filter((t) => t.kind === "color" && !t.darkValue).length,
+    [tokens],
+  );
+
+  // T6 + D5: click chip → drill into first missing token's detail.
+  const handleDarkMissingClick = React.useCallback(() => {
+    const firstMissing = tokens.find(
+      (t) => t.kind === "color" && !t.darkValue,
+    );
+    if (firstMissing) onRowClick?.(firstMissing.id);
+  }, [tokens, onRowClick]);
 
   const visibleTokens = React.useMemo(() => {
     let result = tokens;
@@ -309,7 +346,34 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         </button>
       </div>
 
-      {/* T6 slot: aggregate dark-missing chip will mount here. */}
+      {/* T6: aggregate dark-missing chip — only when dark mode active AND ≥1 missing. */}
+      {resolvedMode === "dark" && missingDarkCount > 0 && (
+        <button
+          type="button"
+          onClick={handleDarkMissingClick}
+          data-dark-missing-chip
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "6px 10px",
+            marginBottom: 12,
+            borderRadius: 6,
+            border: "1px solid var(--buildrick-warning-strong)",
+            background: "var(--buildrick-warning-soft)",
+            color: "var(--buildrick-warning-strong)",
+            fontSize: 11.5,
+            fontWeight: 500,
+            cursor: "pointer",
+            alignSelf: "flex-start",
+          }}
+        >
+          <span aria-hidden="true">⚠</span>
+          <span>
+            {missingDarkCount} {missingDarkCount === 1 ? "token" : "tokens"} missing dark variant
+          </span>
+        </button>
+      )}
 
       {/* WCAG filter banner */}
       {filterMode === "issues" && issuesCount > 0 && (

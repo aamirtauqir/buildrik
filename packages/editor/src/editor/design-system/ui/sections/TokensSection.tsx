@@ -239,6 +239,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
                 usageByTokenId={usageMap}
                 getLintIssues={getIssues}
                 isPro={isPro}
+                composer={composer}
               />
             </TokenKindCard>
           );
