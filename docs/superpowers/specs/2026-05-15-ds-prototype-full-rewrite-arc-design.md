@@ -2,7 +2,7 @@
 
 - **Date**: 2026-05-15
 - **Author**: Claude Opus 4.7
-- **Status**: APPROVED — execution starting
+- **Status**: SHIPPED 2026-05-15 (commits `f5f13f6e`..`d3fde9f0`) — see `~/.claude/projects/.../memory/project_ds_full_rewrite_arc_shipped_20260515.md`
 - **Reference prototype**: `file:///Users/shahg/.gstack/projects/aamirtauqir-buildrik/designs/ds-components-prototype-20260507/index.html`
 - **Predecessor**: `2026-05-15-ds-prototype-parity-arc-design.md` (T1-T13 SHIPPED) — that arc closed structural gaps; this arc fixes the visual paradigm mismatch the parity arc missed.
 
