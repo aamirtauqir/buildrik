@@ -626,7 +626,12 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             />
           )}
           {activeSection === "styles"     && <StylesSection />}
-          {activeSection === "components" && <ComponentsSection composer={composer} />}
+          {activeSection === "components" && (
+            <ComponentsSection
+              composer={composer}
+              onOpenAIAssist={() => setAiOpen(true)}
+            />
+          )}
           {activeSection === "export"     && <ExportSection />}
         </div>
       )}

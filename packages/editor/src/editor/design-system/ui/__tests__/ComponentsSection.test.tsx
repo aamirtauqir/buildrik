@@ -1,82 +1,94 @@
 /**
- * ComponentsSection (Arc B2) — functional catalog tests.
+ * ComponentsSection (Arc D2) — read-only summary tests per prototype s04.
  *
- * Replaces prior info-card tests. Verifies the catalog body: data-components-catalog
- * root, DSStatusChip "Bound to DS" text, 3 filter pills with All active initially,
- * filter gating of catalog vs user-saved sections, search typeability, and at least
- * one atom row rendered from the live CATALOG.
+ * Replaces Arc B2 functional-catalog tests. Asserts the summary shape:
+ * catalog header line, catalog card grid with variant/instance text,
+ * AI-assist CTA + button, saved-components subheader, and "Read-only by
+ * design" footer. Also verifies the Open Components panel jump CTA
+ * emits the `buildrik:openRailTab` window event and the Open AI-assist
+ * button invokes the parent callback.
  *
  * @license BSD-3-Clause
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { ComponentsSection } from "../sections/ComponentsSection";
-import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
-import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
-import { ToastProvider } from "@/editor/shared/vibcoder";
-
-const wrap = (ui: React.ReactNode) => (
-  <ToastProvider>
-    <TokenRegistryProvider projectId="cs-arc-b2-test">
-      <StylePresetRegistryProvider projectId="cs-arc-b2-test">
-        {ui}
-      </StylePresetRegistryProvider>
-    </TokenRegistryProvider>
-  </ToastProvider>
-);
+import { CATALOG } from "../../../components-catalog/catalog";
 
 beforeEach(() => {
   localStorage.clear();
 });
 
-describe("ComponentsSection (Arc B2) — functional catalog", () => {
-  it("renders the data-components-catalog root", () => {
-    const { container } = render(wrap(<ComponentsSection composer={null} />));
-    expect(container.querySelector("[data-components-catalog]")).toBeTruthy();
+describe("ComponentsSection (Arc D2) — read-only summary", () => {
+  it("renders the catalog header with shipped component count", () => {
+    const { getByText } = render(<ComponentsSection composer={null} />);
+    expect(
+      getByText(`Catalog · ${CATALOG.length} polished components shipped`)
+    ).toBeTruthy();
   });
 
-  it("renders the DSStatusChip with 'Bound to DS' text", () => {
-    const { container } = render(wrap(<ComponentsSection composer={null} />));
-    const chip = container.querySelector("[data-ds-status-chip]");
-    expect(chip).toBeTruthy();
-    expect(chip?.textContent).toMatch(/Bound to DS/);
+  it("renders a catalog card per CATALOG entry with variant + instance text", () => {
+    const { container } = render(<ComponentsSection composer={null} />);
+    const cards = container.querySelectorAll("[data-catalog-card]");
+    expect(cards.length).toBe(CATALOG.length);
+    // First card should expose name + "N variants · M instances" text.
+    const first = cards[0];
+    expect(first.textContent).toMatch(CATALOG[0].name);
+    expect(first.textContent).toMatch(/\d+ variants? · \d+ instances?/);
   });
 
-  it("renders 3 filter pills with All active initially", () => {
-    const { getByText, container } = render(wrap(<ComponentsSection composer={null} />));
-    expect(getByText("All")).toBeTruthy();
-    expect(getByText("DS")).toBeTruthy();
-    expect(getByText("Yours")).toBeTruthy();
-    const allPill = container.querySelector('[data-filter-pill="all"]');
-    expect(allPill?.getAttribute("aria-checked")).toBe("true");
+  it("renders the + Add via AI-assist CTA and Open AI-assist button", () => {
+    const { container } = render(<ComponentsSection composer={null} />);
+    expect(container.querySelector("[data-ai-assist-cta]")?.textContent).toMatch(
+      /\+ Add via AI-assist/
+    );
+    expect(container.querySelector("[data-open-ai-assist]")).toBeTruthy();
   });
 
-  it("clicking DS hides UserSavedSection (catalog only)", () => {
-    const { getByText, container } = render(wrap(<ComponentsSection composer={null} />));
-    fireEvent.click(getByText("DS"));
-    expect(container.querySelector("[data-catalog-section]")).toBeTruthy();
-    expect(container.querySelector("[data-user-saved-section]")).toBeNull();
+  it("Open AI-assist click invokes onOpenAIAssist callback", () => {
+    const onOpen = vi.fn();
+    const { container } = render(
+      <ComponentsSection composer={null} onOpenAIAssist={onOpen} />
+    );
+    const btn = container.querySelector("[data-open-ai-assist]") as HTMLButtonElement;
+    fireEvent.click(btn);
+    expect(onOpen).toHaveBeenCalledTimes(1);
   });
 
-  it("clicking Yours hides CatalogSection (user-saved only)", () => {
-    const { getByText, container } = render(wrap(<ComponentsSection composer={null} />));
-    fireEvent.click(getByText("Yours"));
-    expect(container.querySelector("[data-catalog-section]")).toBeNull();
-    expect(container.querySelector("[data-user-saved-section]")).toBeTruthy();
+  it("renders the 'Your saved components · N' subheader", () => {
+    const { container } = render(<ComponentsSection composer={null} />);
+    const header = container.querySelector("[data-saved-header]");
+    expect(header).toBeTruthy();
+    expect(header?.textContent).toMatch(/Your saved components · 0/);
   });
 
-  it("search input is typeable and updates value", () => {
-    const { getByLabelText } = render(wrap(<ComponentsSection composer={null} />));
-    const input = getByLabelText("Search components") as HTMLInputElement;
-    fireEvent.change(input, { target: { value: "button" } });
-    expect(input.value).toBe("button");
+  it("renders the empty-state when there are no saved components", () => {
+    const { container } = render(<ComponentsSection composer={null} />);
+    const empty = container.querySelector("[data-saved-empty]");
+    expect(empty).toBeTruthy();
+    expect(empty?.textContent).toMatch(/No saved components yet/);
   });
 
-  it("renders at least one catalog row in the All view", () => {
-    const { container } = render(wrap(<ComponentsSection composer={null} />));
-    const rows = container.querySelectorAll("[data-catalog-row]");
-    expect(rows.length).toBeGreaterThan(0);
+  it("renders the 'Read-only by design' footer callout", () => {
+    const { container } = render(<ComponentsSection composer={null} />);
+    const footer = container.querySelector("[data-readonly-footer]");
+    expect(footer).toBeTruthy();
+    expect(footer?.textContent).toMatch(/Read-only by design/);
+  });
+
+  it("Open Components panel button dispatches buildrik:openRailTab event", () => {
+    const listener = vi.fn();
+    window.addEventListener("buildrik:openRailTab", listener);
+    const { container } = render(<ComponentsSection composer={null} />);
+    const btn = container.querySelector(
+      "[data-open-components-panel]"
+    ) as HTMLButtonElement;
+    fireEvent.click(btn);
+    expect(listener).toHaveBeenCalledTimes(1);
+    const evt = listener.mock.calls[0][0] as CustomEvent;
+    expect(evt.detail).toEqual({ tab: "components" });
+    window.removeEventListener("buildrik:openRailTab", listener);
   });
 });
