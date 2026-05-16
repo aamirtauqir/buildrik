@@ -20,6 +20,7 @@ import {
   useSizingRegistry,
   useIconRegistry,
   useImageryRegistry,
+  useResetAllKinds,
 } from "../../state/TokenRegistryContext";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import type { TokenKind } from "../../types";
@@ -194,6 +195,31 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
      motion.tokens, border.tokens, opacity.tokens, zindex.tokens,
      breakpoint.tokens, grid.tokens, sizing.tokens, icon.tokens, imagery.tokens],
   );
+
+  // D6.c: re-hydrate every kind registry whenever the underlying project
+  // settings shift out from under the React state. Three triggers:
+  //  - project:changed  → applyAutoFix's labeled transaction lands here
+  //  - history:undo     → Composer.importProject runs WITHOUT emitting
+  //                       project:changed (would create a record loop), so
+  //                       we listen explicitly to get Cmd+Z back into the UI
+  //  - history:redo     → same reasoning, Cmd+Shift+Z roundtrip
+  // handleApply also fires project:changed → harmless no-op re-hydrate.
+  const resetAll = useResetAllKinds();
+  React.useEffect(() => {
+    if (!composer) return;
+    const onSettingsShift = () => {
+      const next = (composer.getProjectSettings()?.designTokens ?? []) as Parameters<typeof resetAll>[0];
+      if (next.length > 0) resetAll(next);
+    };
+    composer.on("project:changed", onSettingsShift);
+    composer.on("history:undo", onSettingsShift);
+    composer.on("history:redo", onSettingsShift);
+    return () => {
+      composer.off("project:changed", onSettingsShift);
+      composer.off("history:undo", onSettingsShift);
+      composer.off("history:redo", onSettingsShift);
+    };
+  }, [composer, resetAll]);
 
   // T8: dispatch a token-value update to whichever registry owns the id.
   // Detail view (and any future cross-kind editor) calls onTokenChange with

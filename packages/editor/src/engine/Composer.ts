@@ -159,20 +159,25 @@ export class Composer extends EventEmitter {
      * actually apply the fix, then call `lintState.suppress(id)` to clear
      * the row.
      *
-     * Naming intent: `compute*` signals "pure, no side effects" — the
-     * original `applyAutoFix(tokenId, hint): void` spec called for engine
-     * ownership of fetch + update + history, but token storage lives
-     * React-side, so a full transaction wrapper would cross the
-     * engine→React boundary the wrong way. Renamed from `applyAutoFix`
-     * 2026-05-15.
-     *
-     * TODO(history): no Cmd+Z entry is pushed today. If history-aware
-     * auto-fix becomes a requirement, expose the React-side token update
-     * to the engine (e.g. via a registered callback on Composer) and add
-     * a transaction wrapper here. See feedback_orphan_classes_pattern for
-     * the boundary discipline.
+     * Naming intent: `compute*` signals "pure, no side effects". Use
+     * `applyAutoFix` below for the history-aware path that mutates
+     * projectSettings inside a transaction.
      */
     readonly computeAutoFix: (currentValue: string, hint: string | undefined) => string;
+    /**
+     * History-aware Auto-fix entry (Arc D6.c, 2026-05-16). Computes the
+     * fixed value, then writes it to `projectSettings.designTokens` inside
+     * a labeled transaction so HistoryManager captures ONE undoable entry.
+     *
+     * Returns the fixed value when the token was found and the value
+     * actually changed, otherwise `null` (caller may decide whether to
+     * still suppress the lint row).
+     *
+     * React-side registries follow this update via the existing
+     * `project:changed` event — TokensSection re-hydrates all 14 kind
+     * registries on every emission, so Cmd+Z roundtrips back into the UI.
+     */
+    readonly applyAutoFix: (tokenId: string, hint: string | undefined) => string | null;
   };
 
   constructor(config: ComposerConfig) {
@@ -242,6 +247,20 @@ export class Composer extends EventEmitter {
       computeAutoFix: (currentValue, hint) => {
         if (!hint) return currentValue;
         return applyContrastFix(currentValue, hint);
+      },
+      applyAutoFix: (tokenId, hint) => {
+        if (!hint) return null;
+        const settings = this.getProjectSettings();
+        const tokens = (settings.designTokens ?? []) as Array<{ id: string; value: string } & Record<string, unknown>>;
+        const target = tokens.find((t) => t.id === tokenId);
+        if (!target) return null;
+        const fixed = applyContrastFix(target.value, hint);
+        if (fixed === target.value) return null;
+        this.beginTransaction("Auto-fix contrast");
+        const updated = tokens.map((t) => (t.id === tokenId ? { ...t, value: fixed } : t));
+        this.setProjectSettings({ ...settings, designTokens: updated });
+        this.endTransaction();
+        return fixed;
       },
     };
     // Recompute token usage whenever element trees or styles change. These

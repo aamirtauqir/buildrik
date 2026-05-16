@@ -375,9 +375,23 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     const issue = lintIssues[0];
     if (!issue || !composer) return;
     const hint = issue.autoFixHint;
-    const fixed = composer.designSystem.computeAutoFix(token.value, hint);
-    if (fixed && fixed !== token.value) {
-      onValueChange?.(token.id, fixed);
+    // D6.c: prefer the history-aware engine path. It writes through
+    // projectSettings inside a labeled transaction, so Cmd+Z roundtrips
+    // into a single undoable entry. The React registries re-hydrate via
+    // TokensSection's project:changed subscription.
+    const engineApply = composer.designSystem.applyAutoFix;
+    if (typeof engineApply === "function") {
+      const fixed = engineApply(token.id, hint);
+      if (fixed === null) {
+        // Engine refused (token not found or value unchanged) — fall through
+        // to the old onValueChange path so callers without engine support
+        // still see the suppress side effect.
+        const computed = composer.designSystem.computeAutoFix(token.value, hint);
+        if (computed && computed !== token.value) onValueChange?.(token.id, computed);
+      }
+    } else {
+      const fixed = composer.designSystem.computeAutoFix(token.value, hint);
+      if (fixed && fixed !== token.value) onValueChange?.(token.id, fixed);
     }
     lintState?.suppress(token.id);
   };
