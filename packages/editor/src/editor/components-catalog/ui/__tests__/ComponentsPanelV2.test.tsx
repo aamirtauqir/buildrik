@@ -5,6 +5,7 @@ import { ComponentsPanelV2 } from "../ComponentsPanelV2";
 import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
 import { StylePresetRegistryProvider } from "@/editor/design-system/state/StylePresetRegistryContext";
 import { ToastProvider } from "@/editor/shared/vibcoder";
+import { EVENTS } from "@/shared/constants/events";
 
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
@@ -93,8 +94,9 @@ describe("ComponentsPanelV2", () => {
 
 describe("ComponentsPanelV2 → Save current selection (Gap A — sidebar save)", () => {
   const clickSaveButton = (container: HTMLElement) => {
-    const buttons = Array.from(container.querySelectorAll("button"));
-    const saveBtn = buttons.find((b) => b.textContent?.includes("Save current selection"));
+    const saveBtn = container.querySelector(
+      "[data-save-current-selection]",
+    ) as HTMLButtonElement | null;
     if (!saveBtn) throw new Error("Save current selection button not found");
     fireEvent.click(saveBtn);
   };
@@ -118,11 +120,8 @@ describe("ComponentsPanelV2 → Save current selection (Gap A — sidebar save)"
 
     expect(resolveForElements).toHaveBeenCalledWith(["el-1"], allElements);
     expect(emit).toHaveBeenCalledWith(
-      "component:save-as-requested",
-      expect.objectContaining({
-        selectionIds: ["el-1"],
-        extractedBindings: expect.any(Map),
-      }),
+      EVENTS.COMPONENT_SAVE_AS_REQUESTED,
+      { selectionIds: ["el-1"], extractedBindings: sentinelBindings },
     );
   });
 
@@ -175,7 +174,7 @@ describe("ComponentsPanelV2 → Save current selection (Gap A — sidebar save)"
     clickSaveButton(container);
 
     expect(emit).toHaveBeenCalledWith(
-      "component:save-as-requested",
+      EVENTS.COMPONENT_SAVE_AS_REQUESTED,
       expect.objectContaining({
         selectionIds: ["el-1"],
         extractedBindings: new Map(),
