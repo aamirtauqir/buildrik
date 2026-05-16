@@ -29,6 +29,7 @@ import { CatalogSection } from "./CatalogSection";
 import { UserSavedSection } from "./UserSavedSection";
 import { DSStatusChip } from "./DSStatusChip";
 import { AIPromptModal } from "@/editor/design-system/ui/AIPromptModal";
+import { EVENTS } from "@/shared/constants/events";
 
 type FilterMode = "all" | "ds" | "yours";
 
@@ -157,24 +158,19 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
     setAiOpen(true);
   }, [aiService]);
 
-  const handleSaveSelection = React.useCallback(async () => {
-    if (!composer) {
-      // eslint-disable-next-line no-console
-      console.log("TODO: save current selection — composer not mounted");
-      return;
-    }
-    const selectedIds = composer.selection.getSelectedIds();
-    if (selectedIds.length !== 1) {
-      // eslint-disable-next-line no-console
-      console.log(
-        "TODO: save current selection — need exactly one selected element, got",
-        selectedIds.length,
-      );
-      return;
-    }
-    const name = window.prompt("Name this component", "Untitled component");
-    if (!name) return;
-    await composer.components.createComponent(name, selectedIds[0]);
+  const handleSaveSelection = React.useCallback(() => {
+    if (!composer) return;
+    const selectionIds = composer.selection.getSelectedIds();
+    if (selectionIds.length !== 1) return;
+    const allElements = composer.elements?.getAllElements?.() ?? [];
+    const resolver = composer.designSystem?.tokenBindingResolver;
+    const extractedBindings = resolver
+      ? resolver.resolveForElements(selectionIds, allElements)
+      : new Map<string, string>();
+    composer.emit(EVENTS.COMPONENT_SAVE_AS_REQUESTED, {
+      selectionIds,
+      extractedBindings,
+    });
   }, [composer]);
 
   return (
