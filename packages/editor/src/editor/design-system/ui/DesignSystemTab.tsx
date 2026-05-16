@@ -279,8 +279,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
     composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
     composer.on(EVENTS.SETTINGS_CHANGE, handleSettingsChange);
-    composer.on("undo:applied", handleUndoRedo);
-    composer.on("redo:applied", handleUndoRedo);
+    // Engine emits history:undo / history:redo (EVENTS.HISTORY_UNDO/REDO).
+    // The original "undo:applied" / "redo:applied" names matched zero
+    // emitters anywhere in the codebase — handler never fired in production.
+    composer.on("history:undo", handleUndoRedo);
+    composer.on("history:redo", handleUndoRedo);
     composer.on(EVENTS.ELEMENT_CREATED, bumpUsage);
     composer.on(EVENTS.ELEMENT_UPDATED, bumpUsage);
     composer.on(EVENTS.ELEMENT_DELETED, bumpUsage);
@@ -289,8 +292,8 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     return () => {
       composer.off(EVENTS.PROJECT_LOADED, handleProjectLoaded);
       composer.off(EVENTS.SETTINGS_CHANGE, handleSettingsChange);
-      composer.off("undo:applied", handleUndoRedo);
-      composer.off("redo:applied", handleUndoRedo);
+      composer.off("history:undo", handleUndoRedo);
+      composer.off("history:redo", handleUndoRedo);
       composer.off(EVENTS.ELEMENT_CREATED, bumpUsage);
       composer.off(EVENTS.ELEMENT_UPDATED, bumpUsage);
       composer.off(EVENTS.ELEMENT_DELETED, bumpUsage);

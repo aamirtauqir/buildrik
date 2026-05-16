@@ -272,12 +272,16 @@ function getInstanceCount(composer: Composer | null, componentId: string): numbe
 }
 
 // ─── Open-rail-tab event helper ──────────────────────────────────────────────
+//
+// Uses the existing `ui:switch-tab` composer event that StudioPanels already
+// subscribes to (see StudioPanels.tsx ~L246). The original v1 dispatched a
+// `buildrik:openRailTab` window CustomEvent — no shell listener existed, so
+// the button was a silent no-op in production. Reusing the composer channel
+// avoids adding a parallel listener path.
 
-function dispatchOpenComponentsPanel(): void {
-  if (typeof window === "undefined") return;
-  window.dispatchEvent(
-    new CustomEvent("buildrik:openRailTab", { detail: { tab: "components" } })
-  );
+function dispatchOpenComponentsPanel(composer: ComponentsSectionProps["composer"]): void {
+  if (!composer || typeof composer.emit !== "function") return;
+  composer.emit("ui:switch-tab", { tab: "components" });
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -296,7 +300,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         </div>
         <button
           type="button"
-          onClick={dispatchOpenComponentsPanel}
+          onClick={() => dispatchOpenComponentsPanel(composer)}
           data-open-components-panel
           style={openPanelButtonStyle}
         >

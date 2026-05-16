@@ -78,17 +78,24 @@ describe("ComponentsSection (Arc D2) — read-only summary", () => {
     expect(footer?.textContent).toMatch(/Read-only by design/);
   });
 
-  it("Open Components panel button dispatches buildrik:openRailTab event", () => {
-    const listener = vi.fn();
-    window.addEventListener("buildrik:openRailTab", listener);
-    const { container } = render(<ComponentsSection composer={null} />);
+  it("Open Components panel button emits ui:switch-tab on composer", () => {
+    const emit = vi.fn();
+    const composer = { emit } as unknown as Parameters<typeof ComponentsSection>[0]["composer"];
+    const { container } = render(<ComponentsSection composer={composer} />);
     const btn = container.querySelector(
       "[data-open-components-panel]"
     ) as HTMLButtonElement;
     fireEvent.click(btn);
-    expect(listener).toHaveBeenCalledTimes(1);
-    const evt = listener.mock.calls[0][0] as CustomEvent;
-    expect(evt.detail).toEqual({ tab: "components" });
-    window.removeEventListener("buildrik:openRailTab", listener);
+    expect(emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "components" });
+  });
+
+  it("Open Components panel button is a safe no-op when composer is null", () => {
+    const { container } = render(<ComponentsSection composer={null} />);
+    const btn = container.querySelector(
+      "[data-open-components-panel]"
+    ) as HTMLButtonElement;
+    // Smoke — must not throw.
+    fireEvent.click(btn);
+    expect(btn).toBeTruthy();
   });
 });
