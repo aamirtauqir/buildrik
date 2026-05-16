@@ -54,6 +54,7 @@ import { DSLintMount } from "./DSLintMount";
 import { DSModeToggle } from "./DSModeToggle";
 import { ColorModeToggle } from "./ColorModeToggle";
 import { ExportDropdown } from "./ExportDropdown";
+import { AIPromptModal } from "./AIPromptModal";
 import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
 import { TabGuardModal } from "./modals/TabGuardModal";
@@ -137,6 +138,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const [showSectionGuard, setShowSectionGuard] = React.useState(false);
   const [showReview, setShowReview] = React.useState(false);
   const [showAddToken, setShowAddToken] = React.useState(false);
+  const [aiOpen, setAiOpen] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isFirstLoad, setIsFirstLoad] = React.useState(false);
 
@@ -473,6 +475,28 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         </div>
         <DSModeToggle />
         {composer && composer.colorMode ? <ColorModeToggle composer={composer} /> : null}
+        <button
+          type="button"
+          data-ai-entry
+          onClick={() => setAiOpen(true)}
+          aria-label="Open AI assist"
+          title="AI assist · component schema generate"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 28,
+            height: 24,
+            background: "transparent",
+            border: "1px solid var(--bd-border)",
+            borderRadius: 6,
+            cursor: "pointer",
+            color: "var(--bd-fg-muted)",
+            fontSize: 14,
+          }}
+        >
+          {"✨"}
+        </button>
         <ExportDropdown
           onExport={handleExport}
           isDirty={isDirty}
@@ -641,6 +665,15 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           onClose={() => setShowAddToken(false)}
         />
       )}
+      <AIPromptModal
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        service={composer?.aiAssistService ?? null}
+        onAccept={() => {
+          // Acceptance routes the generated schema into the component catalog
+          // in a follow-up arc; modal closes itself via onOpenChange(false).
+        }}
+      />
     </div>
   );
 };
