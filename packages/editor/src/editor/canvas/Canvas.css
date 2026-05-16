@@ -459,6 +459,22 @@
   to { opacity: 0; transform: translateX(20px); }
 }
 
+/* ------------------------------------------------------------------
+ * Gap C Frame 3 — insert animation for newly dropped components.
+ * The drop handler sets [data-just-added="true"] on the new node for
+ * ~200ms; this keyframe fades the element in over 180ms with a tiny
+ * vertical slide. Keyframe name namespaced `bd-canvas-drop-*` to
+ * satisfy gate:ds-ssot uniqueness.
+ * ------------------------------------------------------------------ */
+@keyframes bd-canvas-drop-fade-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.buildrick-canvas [data-just-added="true"] {
+  animation: bd-canvas-drop-fade-in 180ms ease-out;
+}
+
 .bd-canvas--component-view [data-buildrick-type] {
   position: relative;
   outline: 1px dashed var(--buildrick-accent);

@@ -829,6 +829,77 @@ describe("handleComponentDrop", () => {
     );
     expect(composer.endTransaction).toHaveBeenCalled();
   });
+
+  // ---------------------------------------------------------------------------
+  // Gap C — Frame 3 (insert animation) + Frame 4 (auto-select after drop)
+  // ---------------------------------------------------------------------------
+
+  describe("Gap C Frame 3 — insert animation", () => {
+    it("sets data-just-added attribute on the new element node after component drop", async () => {
+      const sentinelId = "new-comp-instance-1";
+      const composer = makeStubComposer({
+        activePage: { id: "p1", root: { id: "r1" } },
+        hasComponents: true,
+      });
+      composer.components!.instantiateComponent = vi
+        .fn()
+        .mockResolvedValue(sentinelId);
+      // Register the new element so selection lookup resolves.
+      const newEl = makeStubElement({ id: sentinelId });
+      composer.elements.getElement = vi.fn(
+        (id: string) => (id === sentinelId ? newEl : null) as any,
+      );
+
+      // Mount the DOM node the drop animation must locate.
+      const node = document.createElement("div");
+      node.setAttribute("data-buildrick-id", sentinelId);
+      document.body.appendChild(node);
+
+      try {
+        const ctx = makeDropContext(composer);
+        const e = makeDragEvent({
+          "application/x-aquibra-component": "comp-id",
+        });
+
+        await handleComponentDrop(e, ctx);
+
+        // queueMicrotask resolves after the awaited promise settles. The
+        // `await` above already flushed the await; we wait one more
+        // microtask tick to make sure the post-drop queueMicrotask fires.
+        await Promise.resolve();
+
+        expect(node.getAttribute("data-just-added")).toBe("true");
+      } finally {
+        document.body.removeChild(node);
+      }
+    });
+  });
+
+  describe("Gap C Frame 4 — auto-select after drop", () => {
+    it("calls composer.selection.select with the new element after instantiateComponent resolves", async () => {
+      const sentinelId = "new-comp-instance-2";
+      const newEl = makeStubElement({ id: sentinelId });
+      const composer = makeStubComposer({
+        activePage: { id: "p1", root: { id: "r1" } },
+        hasComponents: true,
+      });
+      composer.components!.instantiateComponent = vi
+        .fn()
+        .mockResolvedValue(sentinelId);
+      composer.elements.getElement = vi.fn(
+        (id: string) => (id === sentinelId ? newEl : null) as any,
+      );
+
+      const ctx = makeDropContext(composer);
+      const e = makeDragEvent({
+        "application/x-aquibra-component": "comp-id",
+      });
+
+      await handleComponentDrop(e, ctx);
+
+      expect(composer.selection.select).toHaveBeenCalledWith(newEl);
+    });
+  });
 });
 
 // =============================================================================

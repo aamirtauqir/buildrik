@@ -246,15 +246,39 @@ export async function handleComponentDrop(e: React.DragEvent, ctx: DropContext):
   if (!composer.components) return false;
 
   composer.beginTransaction("instantiate-component-drop");
+  let newElementId: string | null = null;
   try {
     const targetId = freshTargetId || composer.elements.getActivePage()?.root?.id;
     if (targetId) {
-      await composer.components.instantiateComponent(componentId, targetId);
+      newElementId = await composer.components.instantiateComponent(componentId, targetId);
     }
     composer.endTransaction();
   } catch {
     composer.rollbackTransaction();
     onDropError?.({ type: "INSERT_FAILED", message: "Failed to instantiate component" });
+    return true;
+  }
+
+  // Gap C Frame 4 — auto-select after drop. Inspector mounts immediately.
+  if (newElementId) {
+    const newElement = composer.elements.getElement(newElementId);
+    if (newElement) {
+      composer.selection.select(newElement);
+    }
+
+    // Gap C Frame 3 — insert animation. queueMicrotask defers the DOM
+    // query until after the engine flushes the new element into the
+    // canvas innerHTML. The attribute triggers the bd-canvas-drop-fade-in
+    // keyframe (Canvas.css) and is cleaned up after 200ms.
+    queueMicrotask(() => {
+      const node = document.querySelector(
+        `[data-buildrick-id="${newElementId}"]`,
+      );
+      if (node) {
+        node.setAttribute("data-just-added", "true");
+        setTimeout(() => node.removeAttribute("data-just-added"), 200);
+      }
+    });
   }
 
   return true;
