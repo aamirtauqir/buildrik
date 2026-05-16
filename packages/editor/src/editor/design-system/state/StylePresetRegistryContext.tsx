@@ -193,19 +193,32 @@ export function useResetAllPresets(): (allPresets: StylePreset[]) => void {
   const table    = useTablePresets();
   const layout   = useLayoutPresets();
 
+  // Mirror of useResetAllKinds — see that hook for the full rationale.
+  // Each useXPresets() returns a fresh object every render, so listing
+  // them in useCallback deps would rotate this callable's identity per
+  // render and destabilise any downstream useCallback/useEffect that
+  // captures it. Pin via ref + empty-deps useCallback.
+  const latest = React.useRef({
+    button, card, form, link, badge, alert, tooltip, modal, nav, table, layout,
+  });
+  latest.current = {
+    button, card, form, link, badge, alert, tooltip, modal, nav, table, layout,
+  };
+
   return React.useCallback((all: StylePreset[]) => {
-    button.hydrateFromExternal(all);
-    card.hydrateFromExternal(all);
-    form.hydrateFromExternal(all);
-    link.hydrateFromExternal(all);
-    badge.hydrateFromExternal(all);
-    alert.hydrateFromExternal(all);
-    tooltip.hydrateFromExternal(all);
-    modal.hydrateFromExternal(all);
-    nav.hydrateFromExternal(all);
-    table.hydrateFromExternal(all);
-    layout.hydrateFromExternal(all);
-  }, [button, card, form, link, badge, alert, tooltip, modal, nav, table, layout]);
+    const r = latest.current;
+    r.button.hydrateFromExternal(all);
+    r.card.hydrateFromExternal(all);
+    r.form.hydrateFromExternal(all);
+    r.link.hydrateFromExternal(all);
+    r.badge.hydrateFromExternal(all);
+    r.alert.hydrateFromExternal(all);
+    r.tooltip.hydrateFromExternal(all);
+    r.modal.hydrateFromExternal(all);
+    r.nav.hydrateFromExternal(all);
+    r.table.hydrateFromExternal(all);
+    r.layout.hydrateFromExternal(all);
+  }, []);
 }
 
 export { PRESET_CATEGORIES };

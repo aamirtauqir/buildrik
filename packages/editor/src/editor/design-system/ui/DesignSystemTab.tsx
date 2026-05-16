@@ -159,6 +159,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   }, [composer]);
 
   const hasLoadedRef = React.useRef(false);
+  // Identity of the composer that has already been loaded into the React
+  // registries. Used by the load effect below to ensure each composer
+  // instance gets a single initial loadFromComposer() call, even if
+  // surrounding identity (resetAllKinds, loadFromComposer, addToast) ever
+  // re-rotates. Cleared implicitly by the comparison when composer prop
+  // changes (e.g. project switch).
+  const loadedComposerRef = React.useRef<typeof composer | null>(null);
 
   const [usageVersion, setUsageVersion] = React.useState(0);
   const usageMap = useTokenUsageMap(composer, usageVersion);
@@ -261,7 +268,17 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
   React.useEffect(() => {
     if (!composer) return;
-    loadFromComposer();
+    // Defense-in-depth alongside the useRef stabilisation of useResetAllKinds:
+    // gate the initial load to once per composer instance, so that even if a
+    // future change re-introduces identity churn for loadFromComposer, the
+    // effect's self-invocation cannot drive an unbounded render loop. A
+    // genuine project switch (new composer prop) still re-triggers because
+    // the ref comparison fails. Cross-window settings change still flows
+    // through handleSettingsChange below.
+    if (loadedComposerRef.current !== composer) {
+      loadedComposerRef.current = composer;
+      loadFromComposer();
+    }
 
     const handleProjectLoaded = () => { if (!hasLoadedRef.current) loadFromComposer(); };
     const handleSettingsChange = () => {

@@ -429,20 +429,43 @@ export function useResetAllKinds(): (allTokens: DesignToken[]) => void {
   const icon       = useIconRegistry();
   const imagery    = useImageryRegistry();
 
+  // Each useXTokens hook returns a fresh object on every render (no
+  // useMemo around the return). Listing those 14 registries in the
+  // useCallback deps below would make this callable rotate identity on
+  // every render, which destabilises any downstream useCallback/useEffect
+  // that lists it as a dep — DesignSystemTab.loadFromComposer + the
+  // effect that calls it synchronously produced an unbounded render loop
+  // when `composer.getProjectSettings().designTokens.length > 0`.
+  //
+  // We only need to invoke registry mutator methods — we never need to
+  // *react* to registry identity changes — so pinning the latest values
+  // in a ref and returning an empty-deps useCallback is the correct
+  // shape here. The ref is reassigned on every render so each invocation
+  // hits the current registries.
+  const latest = React.useRef({
+    color, type, spacing, radius, shadow, motion, border,
+    opacity, zindex, breakpoint, grid, sizing, icon, imagery,
+  });
+  latest.current = {
+    color, type, spacing, radius, shadow, motion, border,
+    opacity, zindex, breakpoint, grid, sizing, icon, imagery,
+  };
+
   return React.useCallback((allTokens: DesignToken[]) => {
-    color.resetFromSaved(allTokens);
-    type.resetFromSaved(allTokens);
-    spacing.resetFromSaved(allTokens);
-    radius.hydrateFromExternal(allTokens);
-    shadow.hydrateFromExternal(allTokens);
-    motion.hydrateFromExternal(allTokens);
-    border.hydrateFromExternal(allTokens);
-    opacity.hydrateFromExternal(allTokens);
-    zindex.hydrateFromExternal(allTokens);
-    breakpoint.hydrateFromExternal(allTokens);
-    grid.hydrateFromExternal(allTokens);
-    sizing.hydrateFromExternal(allTokens);
-    icon.hydrateFromExternal(allTokens);
-    imagery.hydrateFromExternal(allTokens);
-  }, [color, type, spacing, radius, shadow, motion, border, opacity, zindex, breakpoint, grid, sizing, icon, imagery]);
+    const r = latest.current;
+    r.color.resetFromSaved(allTokens);
+    r.type.resetFromSaved(allTokens);
+    r.spacing.resetFromSaved(allTokens);
+    r.radius.hydrateFromExternal(allTokens);
+    r.shadow.hydrateFromExternal(allTokens);
+    r.motion.hydrateFromExternal(allTokens);
+    r.border.hydrateFromExternal(allTokens);
+    r.opacity.hydrateFromExternal(allTokens);
+    r.zindex.hydrateFromExternal(allTokens);
+    r.breakpoint.hydrateFromExternal(allTokens);
+    r.grid.hydrateFromExternal(allTokens);
+    r.sizing.hydrateFromExternal(allTokens);
+    r.icon.hydrateFromExternal(allTokens);
+    r.imagery.hydrateFromExternal(allTokens);
+  }, []);
 }
