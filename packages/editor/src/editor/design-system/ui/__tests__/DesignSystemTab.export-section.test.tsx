@@ -84,21 +84,17 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
 
   it("import flow stages a new color token + propagates dirty marker to Tokens section tab", async () => {
     const composer = makeFakeComposer();
-    const { getAllByRole, getByLabelText, getByText, getByRole, container, findByText } =
+    const { getAllByRole, getByLabelText, getByText, container, findByText } =
       render(wrap(<DesignSystemTab composer={composer} />));
 
-    // Two buttons read "Export" (header dropdown trigger + section switcher
-    // tab). Section tab has no aria-haspopup; dropdown does.
     const sectionExport = getAllByRole("tab").find((t) => t.textContent === "Export");
     if (!sectionExport) throw new Error("Export section tab missing");
     fireEvent.click(sectionExport);
 
-    // MODIFY existing color-primary instead of adding a new id. The
-    // DesignSystemTab section-tab dirty marker (dirtyCount() at line 97)
-    // intentionally only counts modifications (saved !== undefined && value
-    // changed) — not pure additions. AddTokenModal has the same blind spot
-    // and is treated as a separate concern. S5 import wiring is exercised
-    // through the modify path here.
+    // D4 rewrite: drop-zone primary, paste textarea collapsed. Expand
+    // paste fallback → Parse → "Apply N valid only" (not "Preview" / "Apply
+    // Import" anymore). Modify path triggers ID collision → default
+    // "replace" strategy → applyCount=1 still.
     const payload = JSON.stringify([
       {
         id: "color-primary",
@@ -111,12 +107,12 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
       },
     ]);
 
-    fireEvent.change(getByLabelText("Paste JSON"), { target: { value: payload } });
-    fireEvent.click(getByRole("button", { name: "Preview" }));
-    await findByText(/1 modified/i);
-    fireEvent.click(getByText(/Apply Import/i));
+    fireEvent.click(getByText(/or paste JSON/i));
+    fireEvent.change(getByLabelText(/Paste JSON/i), { target: { value: payload } });
+    fireEvent.click(getByText(/^Parse$/i));
+    await findByText(/Apply 1 valid only/i);
+    fireEvent.click(getByText(/Apply 1 valid only/i));
 
-    // Dirty marker on Tokens tab — same span the aggregation test asserts.
     await waitFor(() => {
       expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
     });
@@ -124,7 +120,7 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
 
   it("ADD via import lights the dirty marker (was silent before dirtyCount fix)", async () => {
     const composer = makeFakeComposer();
-    const { getAllByRole, getByLabelText, getByText, getByRole, container, findByText } =
+    const { getAllByRole, getByLabelText, getByText, container, findByText } =
       render(wrap(<DesignSystemTab composer={composer} />));
 
     const sectionExport = getAllByRole("tab").find((t) => t.textContent === "Export");
@@ -143,10 +139,11 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
       },
     ]);
 
-    fireEvent.change(getByLabelText("Paste JSON"), { target: { value: payload } });
-    fireEvent.click(getByRole("button", { name: "Preview" }));
-    await findByText(/1 added/i);
-    fireEvent.click(getByText(/Apply Import/i));
+    fireEvent.click(getByText(/or paste JSON/i));
+    fireEvent.change(getByLabelText(/Paste JSON/i), { target: { value: payload } });
+    fireEvent.click(getByText(/^Parse$/i));
+    await findByText(/Apply 1 valid only/i);
+    fireEvent.click(getByText(/Apply 1 valid only/i));
 
     // Dirty marker MUST appear for adds, not just modifications. Pre-fix,
     // dirtyCount() at DesignSystemTab.tsx:97 only counted saved !== undefined
