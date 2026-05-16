@@ -149,3 +149,33 @@ describe("AIPromptModal", () => {
     expect(abortFn?.aborted).toBe(true);
   });
 });
+
+describe("AIPromptModal → Accept (Gap B — onAccept receives schema)", () => {
+  it("calls onAccept with the generated schema when user fills prompt, generates, then Accepts", async () => {
+    const sentinelSchema: ComponentSchema = {
+      componentTypeId: "GapBSentinelCard",
+      variants: [{ name: "default", bindings: { primary: "color-primary" } }],
+      bindings: { primary: "color-primary" },
+    };
+    const service = makeService({
+      generate: vi.fn(async () => JSON.stringify(sentinelSchema)),
+    });
+    const onAccept = vi.fn();
+
+    const { getByLabelText, getByText, findByTestId } = render(
+      <AIPromptModal open service={service} onOpenChange={() => {}} onAccept={onAccept} />,
+    );
+
+    fireEvent.change(getByLabelText("Component description"), {
+      target: { value: "a sentinel card" },
+    });
+    fireEvent.click(getByText("Generate"));
+
+    const preview = await findByTestId("ai-prompt-schema-preview");
+    expect(preview.textContent).toContain("GapBSentinelCard");
+
+    fireEvent.click(getByText("Accept"));
+    expect(onAccept).toHaveBeenCalledTimes(1);
+    expect(onAccept).toHaveBeenCalledWith(sentinelSchema);
+  });
+});

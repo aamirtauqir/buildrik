@@ -23,6 +23,7 @@
 
 import * as React from "react";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { useToast } from "@/editor/shared/vibcoder";
 import { PanelHeader } from "@/shared/extensions/PanelHeader";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";
@@ -142,6 +143,7 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
   const [filter, setFilter] = React.useState<FilterMode>("all");
   const [search, setSearch] = React.useState("");
   const [aiOpen, setAiOpen] = React.useState(false);
+  const { addToast } = useToast();
 
   const showCatalog   = filter === "all" || filter === "ds";
   const showUserSaved = filter === "all" || filter === "yours";
@@ -250,12 +252,48 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
         open={aiOpen}
         onOpenChange={setAiOpen}
         service={aiService}
-        onAccept={() => {
-          // Accept handler wiring (catalog ingestion of generated schema)
-          // ships in a follow-up arc. For now, closing the modal is enough
-          // to surface the entry point — schema generation already works
-          // end-to-end via AIAssistService.
-          setAiOpen(false);
+        onAccept={(schema) => {
+          // Gap B (Arc D-final) — schema-storage-only descope. Full canvas
+          // insert (schema tree → createElement walk → createComponent)
+          // requires composer.components.createComponentFromSchema, which
+          // doesn't exist yet. Until that engine API lands, we persist the
+          // schema to localStorage so the user's work isn't lost and the
+          // AI entry point is honest about its current behavior.
+          //
+          // Modal-close semantics: AIPromptModal.handleAccept calls
+          // onOpenChange(false) AFTER this callback returns. On the happy
+          // path we want the modal to close (let the modal's own call do
+          // that). On the error path we re-open via a microtask so the
+          // user can retry — the microtask runs after the modal's
+          // synchronous close-flip lands.
+          if (!composer) return;
+          try {
+            const projectId =
+              (composer as unknown as { projectId?: string }).projectId ?? "default";
+            const key = `buildrik-ai-pending-schemas-${projectId}`;
+            const existing = (() => {
+              try {
+                const raw = localStorage.getItem(key);
+                return raw ? JSON.parse(raw) : [];
+              } catch {
+                return [];
+              }
+            })();
+            const next = Array.isArray(existing) ? [...existing, schema] : [schema];
+            localStorage.setItem(key, JSON.stringify(next));
+            addToast({
+              tone: "success",
+              description: "Schema saved · canvas insert ships in a follow-up arc",
+            });
+            // Modal closes via its own onOpenChange(false) call — no-op here.
+          } catch (e) {
+            addToast({
+              tone: "error",
+              description: e instanceof Error ? e.message : "Could not save schema",
+            });
+            // Re-open after the modal's synchronous onOpenChange(false) fires.
+            Promise.resolve().then(() => setAiOpen(true));
+          }
         }}
       />
     </div>
