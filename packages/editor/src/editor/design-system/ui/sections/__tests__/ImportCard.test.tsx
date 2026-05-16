@@ -1,8 +1,18 @@
+/**
+ * ImportCard tests — covers drop-zone → detail block → conflict resolution → apply.
+ *
+ * @license BSD-3-Clause
+ */
+
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, fireEvent, waitFor, act } from "@testing-library/react";
 import * as React from "react";
 import { ImportCard } from "../ImportCard";
-import { TokenRegistryProvider, useColorRegistry } from "../../../state/TokenRegistryContext";
+import {
+  TokenRegistryProvider,
+  useColorRegistry,
+} from "../../../state/TokenRegistryContext";
+// useColorRegistry is used in the Apply test via Probe.
 import { ToastProvider } from "@/editor/shared/vibcoder";
 
 const wrap = (ui: React.ReactNode) => (
@@ -15,29 +25,125 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-describe("ImportCard", () => {
-  it("shows error when JSON is malformed", async () => {
-    const { getByLabelText, getByText, findByText } = render(wrap(<ImportCard />));
-    fireEvent.change(getByLabelText(/Paste JSON/i), { target: { value: "{not json" } });
-    fireEvent.click(getByText(/Preview/i));
-    expect(await findByText(/parse error/i)).toBeTruthy();
+function makeJsonFile(payload: unknown, name = "tokens.json"): File {
+  return new File([JSON.stringify(payload)], name, { type: "application/json" });
+}
+
+describe("ImportCard — drop-zone initial state", () => {
+  it("renders the drop zone visible initially (no detail block)", () => {
+    const { getByTestId, queryByTestId } = render(wrap(<ImportCard />));
+    expect(getByTestId("import-drop-zone")).toBeTruthy();
+    expect(queryByTestId("import-detail-block")).toBeNull();
   });
 
-  it("shows diff summary after parsing valid JSON", async () => {
-    const { getByLabelText, getByText, findByText } = render(wrap(<ImportCard />));
-    const payload = JSON.stringify([
+  it("exposes a hidden file input that opens on drop-zone click", () => {
+    const { getByLabelText, getByTestId } = render(wrap(<ImportCard />));
+    const zone = getByTestId("import-drop-zone");
+    const input = getByLabelText(/Upload JSON file/i) as HTMLInputElement;
+    expect(input.type).toBe("file");
+    // Click on the zone should not throw — actual file picker is browser-driven.
+    fireEvent.click(zone);
+  });
+
+  it("shows paste textarea when 'or paste JSON' is toggled", () => {
+    const { getByText, getByLabelText, queryByLabelText } = render(wrap(<ImportCard />));
+    expect(queryByLabelText(/Paste JSON/i)).toBeNull();
+    fireEvent.click(getByText(/or paste JSON/i));
+    expect(getByLabelText(/Paste JSON/i)).toBeTruthy();
+  });
+});
+
+describe("ImportCard — file ingestion", () => {
+  it("drops a JSON file → detail block surfaces with Detected/Valid", async () => {
+    const { getByTestId, findByText, findByTestId } = render(wrap(<ImportCard />));
+    const zone = getByTestId("import-drop-zone");
+    const file = makeJsonFile([
       {
         id: "color-imported", name: "Imported", value: "#0055FF",
         category: "colors", cssVar: "--buildrick-design-color-imported", type: "color",
         kind: "color",
       },
     ]);
-    fireEvent.change(getByLabelText(/Paste JSON/i), { target: { value: payload } });
-    fireEvent.click(getByText(/Preview/i));
-    expect(await findByText(/1 added/i)).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.drop(zone, { dataTransfer: { files: [file] } });
+    });
+
+    expect(await findByTestId("import-detail-block")).toBeTruthy();
+    expect(await findByText(/Detected/i)).toBeTruthy();
+    expect(await findByText(/Design tokens JSON/i)).toBeTruthy();
   });
 
-  it("Apply button stages tokens through registries (modifies dirty state)", async () => {
+  it("zero errors + zero conflicts → Apply + Cancel only, no Resolve box", async () => {
+    const { getByTestId, findByText, queryByTestId } = render(wrap(<ImportCard />));
+    const zone = getByTestId("import-drop-zone");
+    const file = makeJsonFile([
+      {
+        id: "color-fresh-add", name: "Fresh", value: "#abcdef",
+        category: "colors", cssVar: "--buildrick-design-color-fresh-add", type: "color",
+        kind: "color",
+      },
+    ]);
+
+    await act(async () => {
+      fireEvent.drop(zone, { dataTransfer: { files: [file] } });
+    });
+
+    await findByText(/Apply 1 valid only/i);
+    expect(queryByTestId("import-resolve-box")).toBeNull();
+    expect(await findByText(/Cancel/i)).toBeTruthy();
+  });
+});
+
+describe("ImportCard — conflict resolution", () => {
+  it("conflicts > 0 → Resolve box + 3 strategy buttons visible", async () => {
+    // color-primary lives in DEFAULT_TOKENS — drop a payload with the same id
+    // but a different value to force a single conflict against the seeded set.
+    const { getByTestId, findByText, findByTestId } = render(wrap(<ImportCard />));
+
+    const file = makeJsonFile([
+      {
+        id: "color-primary", name: "Brand Override", value: "#222222",
+        category: "colors", cssVar: "--buildrick-design-color-primary", type: "color",
+        kind: "color",
+      },
+    ]);
+
+    await act(async () => {
+      fireEvent.drop(getByTestId("import-drop-zone"), { dataTransfer: { files: [file] } });
+    });
+
+    expect(await findByTestId("import-resolve-box")).toBeTruthy();
+    expect(await findByText(/^Replace$/i)).toBeTruthy();
+    expect(await findByText(/Merge · keep mine/i)).toBeTruthy();
+    expect(await findByText(/Merge · keep theirs/i)).toBeTruthy();
+    expect(await findByText(/1 ID collisions/i)).toBeTruthy();
+  });
+});
+
+describe("ImportCard — cancel + apply", () => {
+  it("Cancel returns to drop-zone state (detail block gone)", async () => {
+    const { getByTestId, getByText, queryByTestId, findByTestId } = render(wrap(<ImportCard />));
+    const file = makeJsonFile([
+      {
+        id: "color-cancel-test", name: "Test", value: "#aaaaaa",
+        category: "colors", cssVar: "--buildrick-design-color-cancel-test", type: "color",
+        kind: "color",
+      },
+    ]);
+
+    await act(async () => {
+      fireEvent.drop(getByTestId("import-drop-zone"), { dataTransfer: { files: [file] } });
+    });
+    await findByTestId("import-detail-block");
+
+    fireEvent.click(getByText(/Cancel/i));
+
+    expect(queryByTestId("import-detail-block")).toBeNull();
+    expect(getByTestId("import-drop-zone")).toBeTruthy();
+  });
+
+  it("Apply stages tokens through registries (modifies dirty state)", async () => {
     const Probe: React.FC<{ onColors: (count: number, dirty: boolean) => void }> = ({ onColors }) => {
       const c = useColorRegistry();
       React.useEffect(() => { onColors(c.tokens.length, c.isDirty); }, [c.tokens, c.isDirty, onColors]);
@@ -48,7 +154,7 @@ describe("ImportCard", () => {
     let lastDirty = false;
     const onColors = (n: number, d: boolean) => { lastCount = n; lastDirty = d; };
 
-    const { getByLabelText, getByText, findByText } = render(
+    const { getByTestId, getByText, findByText } = render(
       wrap(
         <>
           <Probe onColors={onColors} />
@@ -58,21 +164,49 @@ describe("ImportCard", () => {
     );
     const initialCount = lastCount;
 
-    const payload = JSON.stringify([
+    const file = makeJsonFile([
       {
         id: "color-stage-add", name: "Stage Add", value: "#FF00AA",
         category: "colors", cssVar: "--buildrick-design-color-stage-add", type: "color",
         kind: "color",
       },
     ]);
-    fireEvent.change(getByLabelText(/Paste JSON/i), { target: { value: payload } });
-    fireEvent.click(getByText(/Preview/i));
-    await findByText(/1 added/i);
-    fireEvent.click(getByText(/Apply Import/i));
+
+    await act(async () => {
+      fireEvent.drop(getByTestId("import-drop-zone"), { dataTransfer: { files: [file] } });
+    });
+    await findByText(/Apply 1 valid only/i);
+    fireEvent.click(getByText(/Apply 1 valid only/i));
 
     await waitFor(() => {
       expect(lastCount).toBe(initialCount + 1);
       expect(lastDirty).toBe(true);
     });
+  });
+});
+
+describe("ImportCard — paste fallback", () => {
+  it("paste + Parse populates the detail block", async () => {
+    const { getByText, getByLabelText, findByTestId } = render(wrap(<ImportCard />));
+    fireEvent.click(getByText(/or paste JSON/i));
+    fireEvent.change(getByLabelText(/Paste JSON/i), {
+      target: { value: JSON.stringify([
+        {
+          id: "color-paste", name: "Paste", value: "#bbbbbb",
+          category: "colors", cssVar: "--buildrick-design-color-paste", type: "color",
+          kind: "color",
+        },
+      ]) },
+    });
+    fireEvent.click(getByText(/^Parse$/i));
+    expect(await findByTestId("import-detail-block")).toBeTruthy();
+  });
+
+  it("malformed JSON surfaces parse error message", async () => {
+    const { getByText, getByLabelText, findByText } = render(wrap(<ImportCard />));
+    fireEvent.click(getByText(/or paste JSON/i));
+    fireEvent.change(getByLabelText(/Paste JSON/i), { target: { value: "{not json" } });
+    fireEvent.click(getByText(/^Parse$/i));
+    expect(await findByText(/parse error/i)).toBeTruthy();
   });
 });
