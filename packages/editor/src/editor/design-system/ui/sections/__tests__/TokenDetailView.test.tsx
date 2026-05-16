@@ -135,8 +135,8 @@ describe("TokenDetailView", () => {
     );
     expect(getByText(colorToken.name)).toBeTruthy();
     expect(getByText(colorToken.id)).toBeTruthy();
-    // CSS var derives from kind+id
-    expect(getByText("--ds-color-color-brand-primary")).toBeTruthy();
+    // CSS var comes from engine SSOT `token.cssVar` (no client derive).
+    expect(getByText(colorToken.cssVar)).toBeTruthy();
   });
 
   it("Beginner mode: hides token id and css var", () => {
@@ -153,7 +153,7 @@ describe("TokenDetailView", () => {
     );
     expect(getByText(colorToken.name)).toBeTruthy();
     expect(queryByText(colorToken.id)).toBeNull();
-    expect(queryByText("--ds-color-color-brand-primary")).toBeNull();
+    expect(queryByText(colorToken.cssVar)).toBeNull();
   });
 
   it("Used by row reflects mock usage count", () => {

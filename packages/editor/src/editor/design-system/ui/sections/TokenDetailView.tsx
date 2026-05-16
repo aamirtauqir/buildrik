@@ -333,11 +333,15 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     setDarkInput(token.darkValue ?? "");
   }, [token.darkValue]);
 
-  // ─ CSS var name (Pro mode only). Derives from kind+id.
+  // ─ CSS var name (Pro mode only). Prefer engine SSOT `token.cssVar`
+  // field; fallback only if absent. Engine field already canonical so
+  // we don't double-prefix (e.g. id="color-primary" + kind="colors"
+  // was producing "--ds-colors-color-primary" before this fix).
   const cssVarName = React.useMemo(() => {
+    if (token.cssVar) return token.cssVar;
     const kind = token.kind ?? token.category ?? "token";
     return `--ds-${kind}-${token.id.replace(/\./g, "-")}`;
-  }, [token.kind, token.category, token.id]);
+  }, [token.cssVar, token.kind, token.category, token.id]);
 
   // ─ Lint actions.
   const handleAutoFix = () => {
