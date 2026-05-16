@@ -64,4 +64,29 @@ describe("ComponentsPanelV2", () => {
     fireEvent.click(chip);
     expect(onJump).toHaveBeenCalled();
   });
+
+  it("renders a 2-col card grid for each tier (Arc D5)", () => {
+    const { container } = render(wrap(<ComponentsPanelV2 composer={null} />));
+    const grids = container.querySelectorAll("[data-catalog-grid]");
+    // One grid per tier (atom / molecule / organism).
+    expect(grids.length).toBe(3);
+    const firstGridStyle = (grids[0] as HTMLElement).style.gridTemplateColumns;
+    // jsdom may serialize "minmax(0, 1fr)" with normalized whitespace; just
+    // verify the column count token is present.
+    expect(firstGridStyle.includes("repeat(2,")).toBe(true);
+  });
+
+  it("renders header `+ AI` entry button (Arc D5)", () => {
+    const { container } = render(wrap(<ComponentsPanelV2 composer={null} />));
+    const aiBtn = container.querySelector("[data-components-ai-entry]");
+    expect(aiBtn).toBeTruthy();
+    expect(aiBtn!.textContent).toContain("AI");
+  });
+
+  it("renders footer `+ Save current selection` button (Arc D5)", () => {
+    const { container } = render(wrap(<ComponentsPanelV2 composer={null} />));
+    const saveBtn = container.querySelector("[data-save-current-selection]");
+    expect(saveBtn).toBeTruthy();
+    expect(saveBtn!.textContent).toContain("Save current selection");
+  });
 });

@@ -1,8 +1,9 @@
 /**
- * CatalogSection (S6 CU2) — three tier groups (Atoms / Molecules / Organisms)
- * each with its catalog rows. Filtered by the parent search query.
+ * CatalogSection (S6 CU2 / Arc D5) — three tier groups (Atoms / Molecules /
+ * Organisms), each rendered as a 2-column card grid per prototype s06.
+ * Filtered by the parent search query.
  *
- * Drag → place wiring is stubbed at CatalogRow (sets dataTransfer payload);
+ * Drag → place wiring is stubbed at CatalogCard (sets dataTransfer payload);
  * Canvas-side drop handler ships in a separate arc.
  *
  * @license BSD-3-Clause
@@ -10,7 +11,7 @@
 
 import * as React from "react";
 import { useCatalog } from "../useCatalog";
-import { CatalogRow } from "./CatalogRow";
+import { CatalogCard } from "./CatalogCard";
 import type { ComponentTier, ComponentType } from "../types";
 
 interface CatalogSectionProps {
@@ -33,9 +34,10 @@ const sectionHeaderStyle: React.CSSProperties = {
   letterSpacing: "0.04em",
 };
 
-const tierBodyStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
+const tierGridStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: 8,
 };
 
 const emptyTierStyle: React.CSSProperties = {
@@ -71,17 +73,17 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
             <div style={{ ...sectionHeaderStyle, marginTop: 8 }}>
               {label} ({tierMatches.length})
             </div>
-            <div style={tierBodyStyle}>
-              {tierMatches.length === 0 ? (
-                <div style={emptyTierStyle}>
-                  {searchQuery ? "No matches in this tier" : "No components yet"}
-                </div>
-              ) : (
-                tierMatches.map((c) => (
-                  <CatalogRow key={c.id} component={c} onSelect={onComponentSelect} />
-                ))
-              )}
-            </div>
+            {tierMatches.length === 0 ? (
+              <div style={emptyTierStyle}>
+                {searchQuery ? "No matches in this tier" : "No components yet"}
+              </div>
+            ) : (
+              <div style={tierGridStyle} data-catalog-grid>
+                {tierMatches.map((c) => (
+                  <CatalogCard key={c.id} component={c} onSelect={onComponentSelect} />
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
