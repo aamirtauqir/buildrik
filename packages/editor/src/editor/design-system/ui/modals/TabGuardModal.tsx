@@ -74,7 +74,6 @@ export const TabGuardModal: React.FC<{
             variant="primary"
             size="sm"
             onClick={onSaveAndSwitch}
-            style={{ background: "linear-gradient(135deg, #7c3aed, #6d28d9)", border: "none" }}
           >
             Save and switch
           </Button>

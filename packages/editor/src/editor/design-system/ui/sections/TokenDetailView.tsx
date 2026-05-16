@@ -705,8 +705,14 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <button
           type="button"
           onClick={handleRenameId}
-          style={actionBtnStyle}
+          style={{
+            ...actionBtnStyle,
+            ...(onRename ? {} : { opacity: 0.5, cursor: "not-allowed" }),
+          }}
           aria-label="Rename ID"
+          aria-disabled={!onRename || undefined}
+          disabled={!onRename}
+          title={onRename ? "Rename token id" : "Rename API coming soon — edit value inline above"}
         >
           Rename ID
         </button>
