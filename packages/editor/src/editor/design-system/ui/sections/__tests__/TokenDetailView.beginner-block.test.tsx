@@ -32,9 +32,21 @@ function makeMockComposer(): any {
   const off = (e: string, h: () => void) => {
     handlers[e] = (handlers[e] ?? []).filter((x) => x !== h);
   };
+  // D6.b: detail view derives count from getBreakdown().length, so mock both
+  // to keep the "3 elements bind" assertion stable.
+  const refs = [
+    { elementId: "el-1", styleProp: "color" },
+    { elementId: "el-2", styleProp: "background" },
+    { elementId: "el-3", styleProp: "borderColor" },
+  ];
   return {
     designSystem: {
-      tokenUsage: { getUsage: () => 3, on, off },
+      tokenUsage: {
+        getUsage: () => 3,
+        getBreakdown: () => refs,
+        on,
+        off,
+      },
       lintState: {
         getIssues: () => [],
         getVisibleIssues: () => [],

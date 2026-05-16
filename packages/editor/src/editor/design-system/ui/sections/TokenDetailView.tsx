@@ -30,6 +30,8 @@ import * as React from "react";
 import type { Composer } from "../../../../engine/Composer";
 import type { DesignToken } from "../../types";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
+import type { UsageRef } from "../../../../engine/designSystem/TokenUsageTracker";
+import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
 
@@ -188,6 +190,56 @@ const dangerBtnStyle: React.CSSProperties = {
   borderColor: "var(--bd-danger, #ef4444)",
 };
 
+// ─ Used-by expand styles (D6.b drill-in list) ─────────────────────────────
+const usageToggleStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  padding: "0",
+  background: "transparent",
+  border: "none",
+  color: "var(--bd-fg-primary)",
+  fontSize: 12,
+  cursor: "pointer",
+  textAlign: "left",
+};
+
+const usageCaretStyle: React.CSSProperties = {
+  display: "inline-block",
+  width: 10,
+  fontSize: 10,
+  color: "var(--bd-fg-muted)",
+};
+
+const usageListStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 2,
+  marginTop: 6,
+  paddingLeft: 14,
+};
+
+const usageEntryBtnStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  padding: "4px 6px",
+  background: "transparent",
+  border: "none",
+  borderRadius: 4,
+  color: "var(--bd-fg-primary)",
+  fontSize: 11.5,
+  cursor: "pointer",
+  textAlign: "left",
+  width: "100%",
+};
+
+const usagePropStyle: React.CSSProperties = {
+  color: "var(--bd-fg-muted)",
+  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+  fontSize: 11,
+};
+
 const beginnerNoticeStyle: React.CSSProperties = {
   marginTop: 12,
   padding: "10px 12px",
@@ -300,20 +352,28 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   const isPro = dsMode?.mode === "pro";
   const isColor = token.kind === "color" || token.category === "colors";
 
-  // ─ Used by: subscribe to tokenUsage:changed for live count updates.
+  // ─ Used by: subscribe to tokenUsage:changed for live count + breakdown updates.
+  // D6.b: breakdown drives the drill-in element list (click row → expand).
   const tracker = composer?.designSystem?.tokenUsage;
-  const [usageCount, setUsageCount] = React.useState<number>(
-    () => tracker?.getUsage?.(token.id) ?? 0,
+  const readBreakdown = React.useCallback(
+    (): readonly UsageRef[] =>
+      tracker?.getBreakdown?.(token.id) ?? [],
+    [tracker, token.id],
+  );
+  const [usageRefs, setUsageRefs] = React.useState<readonly UsageRef[]>(
+    () => readBreakdown(),
   );
   React.useEffect(() => {
     if (!tracker) return;
-    setUsageCount(tracker.getUsage(token.id));
-    const handler = () => setUsageCount(tracker.getUsage(token.id));
+    setUsageRefs(readBreakdown());
+    const handler = () => setUsageRefs(readBreakdown());
     tracker.on("tokenUsage:changed", handler);
     return () => {
       tracker.off("tokenUsage:changed", handler);
     };
-  }, [tracker, token.id]);
+  }, [tracker, readBreakdown]);
+  const usageCount = usageRefs.length;
+  const [usageExpanded, setUsageExpanded] = React.useState(false);
 
   // ─ Lint: subscribe to lint:changed; snapshot visible (non-suppressed) issues.
   const lintState = composer?.designSystem?.lintState;
@@ -557,13 +617,59 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         </div>
       )}
 
-      {/* Used by */}
+      {/* Used by — click-to-expand element list (D6.b) */}
       <div style={fieldRowStyle}>
         <div style={fieldLabelStyle}>Used by</div>
         <div style={fieldValueStyle}>
-          <span data-used-count={usageCount}>
-            {usageCount} {usageCount === 1 ? "element" : "elements"}
-          </span>
+          <button
+            type="button"
+            onClick={() => {
+              if (usageCount > 0) setUsageExpanded((v) => !v);
+            }}
+            style={usageToggleStyle}
+            aria-expanded={usageExpanded}
+            aria-disabled={usageCount === 0 || undefined}
+            disabled={usageCount === 0}
+            data-used-by-toggle
+          >
+            <span aria-hidden="true" style={usageCaretStyle}>
+              {usageCount === 0 ? "" : usageExpanded ? "▾" : "▸"}
+            </span>
+            <span data-used-count={usageCount}>
+              {usageCount} {usageCount === 1 ? "element" : "elements"}
+            </span>
+          </button>
+          {usageExpanded && usageCount > 0 && (
+            <ul style={usageListStyle} data-used-by-list role="list">
+              {usageRefs.map((ref, idx) => {
+                const el = composer?.elements?.getElement?.(ref.elementId);
+                const type = el?.getType?.();
+                const name = type
+                  ? (ELEMENT_TYPE_LABELS[type] ??
+                    type.charAt(0).toUpperCase() + type.slice(1))
+                  : ref.elementId;
+                return (
+                  <li key={`${ref.elementId}-${ref.styleProp}-${idx}`}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = composer?.elements?.getElement?.(
+                          ref.elementId,
+                        );
+                        if (target) composer?.selection?.select(target);
+                      }}
+                      style={usageEntryBtnStyle}
+                      aria-label={`Select ${name} · ${ref.styleProp}`}
+                      data-used-by-entry={ref.elementId}
+                    >
+                      <span>{name}</span>
+                      <span style={usagePropStyle}>· {ref.styleProp}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
       </div>
 

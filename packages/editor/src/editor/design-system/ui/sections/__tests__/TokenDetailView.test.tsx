@@ -14,6 +14,7 @@ import { TokenDetailView } from "../TokenDetailView";
 import { DSModeProvider } from "../../../state/DSModeContext";
 import type { DesignToken } from "../../../types";
 import type { LintIssue } from "../../../../../engine/designSystem/LintState";
+import type { UsageRef } from "../../../../../engine/designSystem/TokenUsageTracker";
 
 const colorToken: DesignToken = {
   id: "color.brand.primary",
@@ -37,12 +38,23 @@ const radiusToken: DesignToken = {
 
 interface MockTrackerOpts {
   getUsage?: (id: string) => number;
+  /** D6.b: ref breakdown per token id. When absent, getBreakdown returns []. */
+  getBreakdown?: (id: string) => readonly UsageRef[];
+}
+
+interface MockElementsEntry {
+  id: string;
+  type: string;
 }
 
 function makeMockComposer(opts: {
   usage?: MockTrackerOpts;
   issues?: Map<string, readonly LintIssue[]>;
   computeAutoFix?: (value: string, hint: string | undefined) => string;
+  /** Map of elementId → {type} so detail view can render element names. */
+  elements?: ReadonlyArray<MockElementsEntry>;
+  /** Selection capture for click-on-entry assertions. */
+  onSelect?: (el: { getId: () => string }) => void;
 }): any {
   type Handler = (payload?: unknown) => void;
   const handlers: Record<string, Handler[]> = {};
@@ -59,6 +71,10 @@ function makeMockComposer(opts: {
 
   const issues = opts.issues ?? new Map();
   const suppressed = new Set<string>();
+  const elementMap = new Map<string, { getId: () => string; getType: () => string }>();
+  (opts.elements ?? []).forEach((e) => {
+    elementMap.set(e.id, { getId: () => e.id, getType: () => e.type });
+  });
 
   return {
     // Composer-level EventEmitter surface — TokenDetailView's alias subscription
@@ -66,6 +82,12 @@ function makeMockComposer(opts: {
     on,
     off,
     _emit: emit,
+    elements: {
+      getElement: (id: string) => elementMap.get(id),
+    },
+    selection: {
+      select: (el: { getId: () => string }) => opts.onSelect?.(el),
+    },
     aliasResolver: {
       findAliasesOf: (targetId: string, tokens: readonly DesignToken[]) =>
         tokens.filter((t) => t.aliasOf === targetId),
@@ -73,6 +95,7 @@ function makeMockComposer(opts: {
     designSystem: {
       tokenUsage: {
         getUsage: (id: string) => opts.usage?.getUsage?.(id) ?? 0,
+        getBreakdown: (id: string) => opts.usage?.getBreakdown?.(id) ?? [],
         on,
         off,
         _emit: () => emit("tokenUsage:changed"),
@@ -166,8 +189,15 @@ describe("TokenDetailView", () => {
   });
 
   it("Used by row reflects mock usage count", () => {
+    const refs: UsageRef[] = Array.from({ length: 7 }, (_, i) => ({
+      elementId: `el-${i}`,
+      styleProp: "color",
+    }));
     const composer = makeMockComposer({
-      usage: { getUsage: (id) => (id === colorToken.id ? 7 : 0) },
+      usage: {
+        getUsage: (id) => (id === colorToken.id ? 7 : 0),
+        getBreakdown: (id) => (id === colorToken.id ? refs : []),
+      },
     });
     const { getByText } = render(
       wrap(
@@ -442,5 +472,188 @@ describe("TokenDetailView", () => {
     ) as HTMLElement | null;
     expect(countEl).toBeTruthy();
     expect(countEl!.getAttribute("data-aliased-by-count")).toBe("1");
+  });
+
+  // ── Used by drill-in (Arc D6.b) ───────────────────────────────────────────
+
+  it("Used by row collapsed by default — no entry list", () => {
+    const refs: UsageRef[] = [
+      { elementId: "el-1", styleProp: "color" },
+      { elementId: "el-2", styleProp: "background" },
+    ];
+    const composer = makeMockComposer({
+      usage: { getBreakdown: () => refs },
+      elements: [
+        { id: "el-1", type: "text" },
+        { id: "el-2", type: "section" },
+      ],
+    });
+    const { container } = render(
+      wrap(
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          onBack={() => {}}
+        />,
+      ),
+    );
+    expect(container.querySelector("[data-used-by-list]")).toBeNull();
+    const toggle = container.querySelector(
+      "[data-used-by-toggle]",
+    ) as HTMLButtonElement | null;
+    expect(toggle).toBeTruthy();
+    expect(toggle!.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("Click Used by row → list expands with N entries from getBreakdown", () => {
+    const refs: UsageRef[] = [
+      { elementId: "el-1", styleProp: "color" },
+      { elementId: "el-2", styleProp: "background" },
+      { elementId: "el-3", styleProp: "borderColor" },
+    ];
+    const composer = makeMockComposer({
+      usage: { getBreakdown: () => refs },
+      elements: [
+        { id: "el-1", type: "text" },
+        { id: "el-2", type: "section" },
+        { id: "el-3", type: "button" },
+      ],
+    });
+    const { container } = render(
+      wrap(
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          onBack={() => {}}
+        />,
+      ),
+    );
+    const toggle = container.querySelector(
+      "[data-used-by-toggle]",
+    ) as HTMLButtonElement;
+    fireEvent.click(toggle);
+    const list = container.querySelector("[data-used-by-list]");
+    expect(list).toBeTruthy();
+    const entries = container.querySelectorAll("[data-used-by-entry]");
+    expect(entries).toHaveLength(3);
+    // Style prop is rendered alongside element name.
+    expect(list!.textContent).toMatch(/color/);
+    expect(list!.textContent).toMatch(/background/);
+    expect(list!.textContent).toMatch(/borderColor/);
+  });
+
+  it("Click element entry → selection API called with correct element", () => {
+    const refs: UsageRef[] = [
+      { elementId: "el-target", styleProp: "color" },
+    ];
+    const onSelect = vi.fn();
+    const composer = makeMockComposer({
+      usage: { getBreakdown: () => refs },
+      elements: [{ id: "el-target", type: "text" }],
+      onSelect,
+    });
+    const { container } = render(
+      wrap(
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          onBack={() => {}}
+        />,
+      ),
+    );
+    fireEvent.click(
+      container.querySelector("[data-used-by-toggle]") as HTMLButtonElement,
+    );
+    const entry = container.querySelector(
+      '[data-used-by-entry="el-target"]',
+    ) as HTMLButtonElement;
+    expect(entry).toBeTruthy();
+    fireEvent.click(entry);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect.mock.calls[0][0].getId()).toBe("el-target");
+  });
+
+  it("Click Used by row twice → collapses", () => {
+    const refs: UsageRef[] = [
+      { elementId: "el-1", styleProp: "color" },
+    ];
+    const composer = makeMockComposer({
+      usage: { getBreakdown: () => refs },
+      elements: [{ id: "el-1", type: "text" }],
+    });
+    const { container } = render(
+      wrap(
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          onBack={() => {}}
+        />,
+      ),
+    );
+    const toggle = container.querySelector(
+      "[data-used-by-toggle]",
+    ) as HTMLButtonElement;
+    fireEvent.click(toggle);
+    expect(container.querySelector("[data-used-by-list]")).toBeTruthy();
+    fireEvent.click(toggle);
+    expect(container.querySelector("[data-used-by-list]")).toBeNull();
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("Used by row with 0 refs → toggle disabled, no expand on click", () => {
+    const composer = makeMockComposer({
+      usage: { getBreakdown: () => [] },
+    });
+    const { container } = render(
+      wrap(
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          onBack={() => {}}
+        />,
+      ),
+    );
+    const toggle = container.querySelector(
+      "[data-used-by-toggle]",
+    ) as HTMLButtonElement;
+    expect(toggle.disabled).toBe(true);
+    fireEvent.click(toggle);
+    expect(container.querySelector("[data-used-by-list]")).toBeNull();
+  });
+
+  it("tokenUsage:changed event → breakdown refreshes (count + list)", () => {
+    let current: UsageRef[] = [
+      { elementId: "el-1", styleProp: "color" },
+    ];
+    const composer = makeMockComposer({
+      usage: { getBreakdown: () => current },
+      elements: [
+        { id: "el-1", type: "text" },
+        { id: "el-2", type: "section" },
+      ],
+    });
+    const { container, getByText } = render(
+      wrap(
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          onBack={() => {}}
+        />,
+      ),
+    );
+    expect(getByText("1 element")).toBeTruthy();
+
+    // Swap underlying breakdown then fire the event.
+    current = [
+      { elementId: "el-1", styleProp: "color" },
+      { elementId: "el-2", styleProp: "background" },
+    ];
+    act(() => {
+      composer.designSystem.tokenUsage._emit();
+    });
+    const countEl = container.querySelector(
+      "[data-used-count]",
+    ) as HTMLElement;
+    expect(countEl.getAttribute("data-used-count")).toBe("2");
   });
 });

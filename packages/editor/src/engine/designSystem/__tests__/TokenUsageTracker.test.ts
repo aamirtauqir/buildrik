@@ -9,12 +9,18 @@ import { Composer } from "@/engine/Composer";
 import type { Element } from "@/engine/elements/Element";
 
 /**
- * Test stand-in for Element. The tracker only reads `getStyles()`, so a
- * minimal duck-typed object is sufficient — avoids the cost of constructing
+ * Test stand-in for Element. The tracker reads `getId()` + `getStyles()`, so
+ * a minimal duck-typed object is sufficient — avoids the cost of constructing
  * real Element instances with a Composer.
  */
-function makeStub(styles: Record<string, string>): Element {
-  return { getStyles: () => styles } as unknown as Element;
+function makeStub(
+  styles: Record<string, string>,
+  id: string = "stub-element",
+): Element {
+  return {
+    getId: () => id,
+    getStyles: () => styles,
+  } as unknown as Element;
 }
 
 describe("TokenUsageTracker", () => {
@@ -78,6 +84,116 @@ describe("TokenUsageTracker", () => {
     expect(tracker.getUsage("color.brand.primary")).toBe(1);
     tracker.recompute([]);
     expect(tracker.getUsage("color.brand.primary")).toBe(0);
+  });
+
+  // ─── D6.b — breakdown refs (elementId + styleProp) ───────────────────────
+
+  it("getBreakdown: empty for unused token returns []", () => {
+    tracker.recompute([]);
+    expect(tracker.getBreakdown("nonexistent")).toEqual([]);
+  });
+
+  it("getBreakdown: single ref records elementId + styleProp", () => {
+    tracker.recompute([
+      makeStub({ color: "{{token.color.brand.primary}}" }, "el-1"),
+    ]);
+    const refs = tracker.getBreakdown("color.brand.primary");
+    expect(refs).toHaveLength(1);
+    expect(refs[0]).toEqual({ elementId: "el-1", styleProp: "color" });
+  });
+
+  it("getBreakdown: multi-prop same element → distinct refs per prop", () => {
+    tracker.recompute([
+      makeStub(
+        {
+          color: "{{token.color.brand.primary}}",
+          background: "{{token.color.brand.primary}}",
+        },
+        "el-multi",
+      ),
+    ]);
+    const refs = tracker.getBreakdown("color.brand.primary");
+    expect(refs).toHaveLength(2);
+    const props = refs.map((r) => r.styleProp).sort();
+    expect(props).toEqual(["background", "color"]);
+    refs.forEach((r) => expect(r.elementId).toBe("el-multi"));
+  });
+
+  it("getBreakdown: multi-element same token → refs from different elementIds", () => {
+    tracker.recompute([
+      makeStub({ color: "{{token.color.brand.primary}}" }, "el-a"),
+      makeStub({ color: "{{token.color.brand.primary}}" }, "el-b"),
+      makeStub({ color: "{{token.color.brand.primary}}" }, "el-c"),
+    ]);
+    const refs = tracker.getBreakdown("color.brand.primary");
+    expect(refs).toHaveLength(3);
+    const ids = refs.map((r) => r.elementId).sort();
+    expect(ids).toEqual(["el-a", "el-b", "el-c"]);
+  });
+
+  it("getBreakdown: gradient w/ 2 refs in one value → 2 separate refs", () => {
+    tracker.recompute([
+      makeStub(
+        {
+          background:
+            "linear-gradient({{token.color.brand.primary}}, {{token.color.brand.primary}})",
+        },
+        "el-grad",
+      ),
+    ]);
+    const refs = tracker.getBreakdown("color.brand.primary");
+    expect(refs).toHaveLength(2);
+    refs.forEach((r) => {
+      expect(r.elementId).toBe("el-grad");
+      expect(r.styleProp).toBe("background");
+    });
+  });
+
+  it("getUsage stays back-compat (scalar count) after refs refactor", () => {
+    tracker.recompute([
+      makeStub({ color: "{{token.color.brand.primary}}" }, "el-a"),
+      makeStub({ background: "{{token.color.brand.primary}}" }, "el-b"),
+    ]);
+    expect(tracker.getUsage("color.brand.primary")).toBe(2);
+    expect(tracker.getUsage("color.brand.primary")).toBe(
+      tracker.getBreakdown("color.brand.primary").length,
+    );
+  });
+
+  it("getAllUsage back-compat: ReadonlyMap<string, number> w/ scalar counts", () => {
+    tracker.recompute([
+      makeStub(
+        {
+          color: "{{token.color.brand.primary}}",
+          padding: "{{token.space.md}}",
+        },
+        "el-x",
+      ),
+      makeStub({ background: "{{token.color.brand.primary}}" }, "el-y"),
+    ]);
+    const all = tracker.getAllUsage();
+    expect(all.get("color.brand.primary")).toBe(2);
+    expect(all.get("space.md")).toBe(1);
+    // Spreading entries into a new Map (TokensSection:84 pattern) must work.
+    const cloned = new Map(all);
+    expect(cloned.get("color.brand.primary")).toBe(2);
+  });
+
+  it("recompute clears prior refs (second run replaces, not merges)", () => {
+    tracker.recompute([
+      makeStub({ color: "{{token.color.brand.primary}}" }, "el-1"),
+    ]);
+    expect(tracker.getBreakdown("color.brand.primary")).toHaveLength(1);
+
+    tracker.recompute([
+      makeStub({ background: "{{token.color.brand.secondary}}" }, "el-2"),
+    ]);
+    expect(tracker.getBreakdown("color.brand.primary")).toEqual([]);
+    expect(tracker.getBreakdown("color.brand.secondary")).toHaveLength(1);
+    expect(tracker.getBreakdown("color.brand.secondary")[0]).toEqual({
+      elementId: "el-2",
+      styleProp: "background",
+    });
   });
 });
 
