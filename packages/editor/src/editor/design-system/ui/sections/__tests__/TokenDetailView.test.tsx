@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, act } from "@testing-library/react";
 import * as React from "react";
 import { TokenDetailView } from "../TokenDetailView";
 import { DSModeProvider } from "../../../state/DSModeContext";
@@ -44,10 +44,10 @@ function makeMockComposer(opts: {
   issues?: Map<string, readonly LintIssue[]>;
   computeAutoFix?: (value: string, hint: string | undefined) => string;
 }): any {
-  type Handler = () => void;
+  type Handler = (payload?: unknown) => void;
   const handlers: Record<string, Handler[]> = {};
-  const emit = (evt: string) => {
-    (handlers[evt] ?? []).forEach((h) => h());
+  const emit = (evt: string, payload?: unknown) => {
+    (handlers[evt] ?? []).forEach((h) => h(payload));
   };
   const on = (evt: string, h: Handler) => {
     handlers[evt] = handlers[evt] ?? [];
@@ -61,6 +61,15 @@ function makeMockComposer(opts: {
   const suppressed = new Set<string>();
 
   return {
+    // Composer-level EventEmitter surface — TokenDetailView's alias subscription
+    // (D6.a) listens to `tokens:alias-changed` at this level.
+    on,
+    off,
+    _emit: emit,
+    aliasResolver: {
+      findAliasesOf: (targetId: string, tokens: readonly DesignToken[]) =>
+        tokens.filter((t) => t.aliasOf === targetId),
+    },
     designSystem: {
       tokenUsage: {
         getUsage: (id: string) => opts.usage?.getUsage?.(id) ?? 0,
@@ -323,5 +332,115 @@ describe("TokenDetailView", () => {
     ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "12px" } });
     expect(onValueChange).toHaveBeenCalledWith(radiusToken.id, "12px");
+  });
+
+  // ── Aliased by row (Arc D6.a) ─────────────────────────────────────────────
+  it("Aliased by row hidden when 0 aliases reference this token", () => {
+    const composer = makeMockComposer({});
+    const allTokens: DesignToken[] = [colorToken];
+    const { container, queryByText } = render(
+      wrap(
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          allTokens={allTokens}
+          onBack={() => {}}
+        />,
+      ),
+    );
+    expect(queryByText("Aliased by")).toBeNull();
+    expect(container.querySelector("[data-aliased-by-count]")).toBeNull();
+  });
+
+  it("Aliased by row visible with count + names when N > 0", () => {
+    const composer = makeMockComposer({});
+    const aliasA: DesignToken = {
+      id: "color.alias.a",
+      name: "Alias A",
+      value: "",
+      category: "colors",
+      cssVar: "--buildrick-design-color-alias-a",
+      type: "color",
+      kind: "color",
+      aliasOf: colorToken.id,
+    };
+    const aliasB: DesignToken = {
+      id: "color.alias.b",
+      name: "Alias B",
+      value: "",
+      category: "colors",
+      cssVar: "--buildrick-design-color-alias-b",
+      type: "color",
+      kind: "color",
+      aliasOf: colorToken.id,
+    };
+    const allTokens: DesignToken[] = [colorToken, aliasA, aliasB];
+    const { container, getByText } = render(
+      wrap(
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          allTokens={allTokens}
+          onBack={() => {}}
+        />,
+      ),
+    );
+    expect(getByText("Aliased by")).toBeTruthy();
+    const countEl = container.querySelector(
+      "[data-aliased-by-count]",
+    ) as HTMLElement | null;
+    expect(countEl).toBeTruthy();
+    expect(countEl!.getAttribute("data-aliased-by-count")).toBe("2");
+    expect(countEl!.textContent).toMatch(/Alias A/);
+    expect(countEl!.textContent).toMatch(/Alias B/);
+  });
+
+  it("Aliased by row updates when tokens:alias-changed fires", () => {
+    const composer = makeMockComposer({});
+    const aliasA: DesignToken = {
+      id: "color.alias.a",
+      name: "Alias A",
+      value: "",
+      category: "colors",
+      cssVar: "--buildrick-design-color-alias-a",
+      type: "color",
+      kind: "color",
+      aliasOf: colorToken.id,
+    };
+    // Mutable allTokens reference — we swap its contents and fire the event.
+    // The component re-reads via findAliasesOf on each event.
+    let allTokens: DesignToken[] = [colorToken];
+    const Wrapper: React.FC = () => {
+      const [, force] = React.useState(0);
+      // Subscribe to alias-changed at the wrapper level so re-render triggers
+      // a fresh `allTokens` prop pass-through alongside the event.
+      React.useEffect(() => {
+        const handler = () => force((n) => n + 1);
+        composer.on("tokens:alias-changed", handler);
+        return () => composer.off("tokens:alias-changed", handler);
+      }, []);
+      return (
+        <TokenDetailView
+          token={colorToken}
+          composer={composer}
+          allTokens={allTokens}
+          onBack={() => {}}
+        />
+      );
+    };
+    const { container, queryByText } = render(wrap(<Wrapper />));
+    expect(queryByText("Aliased by")).toBeNull();
+
+    // Swap underlying array, then emit alias-changed.
+    allTokens = [colorToken, aliasA];
+    act(() => {
+      composer._emit("tokens:alias-changed", { count: 1 });
+    });
+
+    const countEl = container.querySelector(
+      "[data-aliased-by-count]",
+    ) as HTMLElement | null;
+    expect(countEl).toBeTruthy();
+    expect(countEl!.getAttribute("data-aliased-by-count")).toBe("1");
   });
 });

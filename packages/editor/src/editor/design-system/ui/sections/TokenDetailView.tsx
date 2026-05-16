@@ -19,8 +19,9 @@
  *   - `composer.designSystem.computeAutoFix(value, hint)` — pure helper for
  *     Auto-fix button.
  *
- * Aliased-by field OMITTED — AliasResolver has no `findReverseRefs` today
- * (spec § 4 audit + D2 note). Documented as follow-up below.
+ * Aliased-by field — Arc D6.a (2026-05-16). When the project has any tokens
+ * whose `aliasOf` equals this token's id, the row renders count + names.
+ * Empty array → row is hidden. Re-renders on `tokens:alias-changed`.
  *
  * @license BSD-3-Clause
  */
@@ -32,12 +33,16 @@ import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
 
-// TODO(T8 follow-up): when `AliasResolver.findReverseRefs(tokenId)` ships,
-// add the "Aliased by" field below "Used by". Skipped per spec D2.
-
 export interface TokenDetailViewProps {
   token: DesignToken;
   composer: Composer | null | undefined;
+  /**
+   * Full token list — used by the "Aliased by" row to compute reverse-lookup
+   * via `composer.aliasResolver.findAliasesOf(token.id, allTokens)`. Optional
+   * for back-compat with consumers that haven't been re-wired yet — when
+   * absent or empty, the row simply renders nothing.
+   */
+  allTokens?: ReadonlyArray<DesignToken>;
   onBack: () => void;
   onValueChange?: (id: string, value: string) => void;
   onDelete?: (id: string) => void;
@@ -285,6 +290,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
 export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   token,
   composer,
+  allTokens,
   onBack,
   onValueChange,
   onDelete,
@@ -323,6 +329,27 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       lintState.off("lint:changed", handler);
     };
   }, [lintState, token.id]);
+
+  // ─ Aliased by: reverse-lookup via composer.aliasResolver. Re-subscribes to
+  // `tokens:alias-changed` so the row updates when any alias-edit fires. D6.a.
+  const aliasResolver = composer?.aliasResolver;
+  const computeAliases = React.useCallback((): readonly DesignToken[] => {
+    if (!aliasResolver || !allTokens || allTokens.length === 0) return [];
+    return aliasResolver.findAliasesOf(token.id, allTokens);
+  }, [aliasResolver, allTokens, token.id]);
+
+  const [aliases, setAliases] = React.useState<readonly DesignToken[]>(() =>
+    computeAliases(),
+  );
+  React.useEffect(() => {
+    setAliases(computeAliases());
+    if (!composer || typeof composer.on !== "function") return;
+    const handler = () => setAliases(computeAliases());
+    composer.on("tokens:alias-changed", handler);
+    return () => {
+      composer.off?.("tokens:alias-changed", handler);
+    };
+  }, [composer, computeAliases]);
 
   // ─ ColorPicker open state for color tokens (D3 — inline below value row).
   const [pickerOpen, setPickerOpen] = React.useState(false);
@@ -525,6 +552,19 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           </span>
         </div>
       </div>
+
+      {/* Aliased by — hidden when empty (D6.a) */}
+      {aliases.length > 0 && (
+        <div style={fieldRowStyle}>
+          <div style={fieldLabelStyle}>Aliased by</div>
+          <div style={fieldValueStyle}>
+            <span data-aliased-by-count={aliases.length}>
+              {aliases.length} ·{" "}
+              {aliases.map((a) => a.friendlyName ?? a.name).join(", ")}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Lint */}
       <div style={fieldRowStyle}>

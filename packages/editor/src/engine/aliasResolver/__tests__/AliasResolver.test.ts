@@ -136,6 +136,65 @@ describe("AliasResolver.getChain", () => {
   });
 });
 
+describe("AliasResolver.findAliasesOf", () => {
+  let resolver: AliasResolver;
+
+  beforeEach(() => {
+    resolver = new AliasResolver(makeEvents());
+  });
+
+  it("returns [] when token list is empty", () => {
+    expect(resolver.findAliasesOf("nonexistent", [])).toEqual([]);
+  });
+
+  it("returns [] when target has no aliases pointing at it", () => {
+    const tokens: DesignToken[] = [
+      { id: "primary", name: "Primary", value: "#000", category: "colors", cssVar: "--bd-primary", type: "color" },
+    ];
+    expect(resolver.findAliasesOf("primary", tokens)).toEqual([]);
+  });
+
+  it("returns the single alias pointing at target", () => {
+    const tokens: DesignToken[] = [
+      { id: "primary", name: "Primary", value: "#000", category: "colors", cssVar: "--bd-primary", type: "color" },
+      { id: "a", name: "A", value: "", category: "colors", cssVar: "--bd-a", type: "color", aliasOf: "primary" },
+    ];
+    const result = resolver.findAliasesOf("primary", tokens);
+    expect(result.map((t) => t.id)).toEqual(["a"]);
+  });
+
+  it("returns all aliases pointing at target (multi)", () => {
+    const tokens: DesignToken[] = [
+      { id: "primary", name: "Primary", value: "#000", category: "colors", cssVar: "--bd-primary", type: "color" },
+      { id: "a", name: "A", value: "", category: "colors", cssVar: "--bd-a", type: "color", aliasOf: "primary" },
+      { id: "b", name: "B", value: "", category: "colors", cssVar: "--bd-b", type: "color", aliasOf: "primary" },
+    ];
+    const result = resolver.findAliasesOf("primary", tokens);
+    expect(result.map((t) => t.id)).toEqual(["a", "b"]);
+  });
+
+  it("does not include tokens that alias OTHER targets", () => {
+    const tokens: DesignToken[] = [
+      { id: "primary", name: "Primary", value: "#000", category: "colors", cssVar: "--bd-primary", type: "color" },
+      { id: "secondary", name: "Secondary", value: "#fff", category: "colors", cssVar: "--bd-secondary", type: "color" },
+      { id: "a", name: "A", value: "", category: "colors", cssVar: "--bd-a", type: "color", aliasOf: "primary" },
+      { id: "b", name: "B", value: "", category: "colors", cssVar: "--bd-b", type: "color", aliasOf: "secondary" },
+    ];
+    expect(resolver.findAliasesOf("primary", tokens).map((t) => t.id)).toEqual(["a"]);
+    expect(resolver.findAliasesOf("secondary", tokens).map((t) => t.id)).toEqual(["b"]);
+  });
+
+  it("returns aliases even when graph contains a cycle (read path, not validate)", () => {
+    // Cycle: a → b → a. Both are aliases of each other. findAliasesOf("a") must
+    // surface "b" without throwing — UI shows aliases even on a broken graph.
+    const tokens = cycle2Fixture.tokens as DesignToken[];
+    const aliasesOfA = resolver.findAliasesOf("a", tokens);
+    const aliasesOfB = resolver.findAliasesOf("b", tokens);
+    expect(aliasesOfA.map((t) => t.id)).toContain("b");
+    expect(aliasesOfB.map((t) => t.id)).toContain("a");
+  });
+});
+
 describe("AliasResolver.validateAndEmit", () => {
   it("emits tokens:alias-changed on success", () => {
     const emit = vi.fn();

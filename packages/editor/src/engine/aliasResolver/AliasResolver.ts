@@ -111,4 +111,17 @@ export class AliasResolver {
     }
     return chain;
   }
+
+  /**
+   * Reverse lookup — return every token in `tokens` whose `aliasOf` equals
+   * `targetId`. Read path, not validate: returns refs even when the graph
+   * contains cycles (UI shows aliases even on a broken graph). Used by
+   * TokenDetailView's "Aliased by" row.
+   *
+   * D6.a (Arc 2026-05-16). Pure filter, no allocation beyond the filtered
+   * array; tests cover empty / single / multiple / cycle cases.
+   */
+  findAliasesOf(targetId: string, tokens: readonly DesignToken[]): readonly DesignToken[] {
+    return tokens.filter((t) => t.aliasOf === targetId);
+  }
 }

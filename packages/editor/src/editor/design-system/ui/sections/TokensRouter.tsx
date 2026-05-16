@@ -64,6 +64,7 @@ export const TokensRouter: React.FC<TokensRouterProps> = ({
       <TokenDetailView
         token={token}
         composer={composer}
+        allTokens={tokens}
         onBack={onBack}
         onValueChange={onTokenChange}
         onDelete={onTokenDelete}
