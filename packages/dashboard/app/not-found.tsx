@@ -1,7 +1,13 @@
 import Link from "next/link";
+import { auth } from "@server/auth";
 import { GoBackButton } from "@/components/go-back-button";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const session = await auth();
+  const isAuthed = Boolean(session?.user);
+  const ctaHref = isAuthed ? "/dashboard" : "/auth";
+  const ctaLabel = isAuthed ? "Go to Dashboard" : "Sign in";
+
   return (
     <div
       className="min-h-screen flex items-center justify-center"
@@ -22,11 +28,11 @@ export default function NotFound() {
         </p>
         <div className="mt-8 flex gap-3 justify-center">
           <Link
-            href="/dashboard"
+            href={ctaHref}
             className="px-4 py-2 rounded-lg text-sm font-medium text-white"
             style={{ backgroundColor: "#E42313" }}
           >
-            Go to Dashboard
+            {ctaLabel}
           </Link>
           <GoBackButton />
         </div>

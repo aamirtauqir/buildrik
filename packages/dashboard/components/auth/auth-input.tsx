@@ -25,6 +25,7 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
           <input
             ref={ref}
             type={inputType}
+            suppressHydrationWarning
             className={cn(
               "w-full h-auth-input px-3 rounded-auth-input text-auth-input text-auth-text-body",
               "placeholder:text-auth-text-placeholder",

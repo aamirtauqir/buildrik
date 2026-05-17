@@ -2,18 +2,26 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { AuthLogo } from "@/components/auth/auth-logo";
 import { Loader2 } from "lucide-react";
 
 export default function SuccessPage() {
   const router = useRouter();
+  const { status } = useSession();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push("/auth/redirect");
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [router]);
+    if (status === "unauthenticated") {
+      router.replace("/auth?reason=session-required");
+      return;
+    }
+    if (status === "authenticated") {
+      const timer = setTimeout(() => {
+        router.push("/auth/redirect");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, router]);
 
   return (
     <div className="flex flex-col items-center gap-6">

@@ -114,18 +114,21 @@ export function CookieConsent() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[9998] flex h-16 items-center border-t bg-white px-6 shadow-lg"
-      style={{ borderColor: "#E8E8E8" }}
+      className="fixed bottom-0 left-0 right-0 z-[9998] border-t bg-white px-4 py-3 shadow-lg sm:px-6"
+      style={{
+        borderColor: "#E8E8E8",
+        paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))",
+      }}
     >
-      <div className="mx-auto flex w-full max-w-[1220px] items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="mx-auto flex w-full max-w-[1220px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3 sm:items-center">
           <Shield className="h-5 w-5 shrink-0" style={{ color: "#7A7A7A" }} />
           <p className="text-sm" style={{ color: "#0D0D0D" }}>
             We use cookies to improve your experience. You can manage your
             preferences at any time.
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:flex-nowrap">
           <button
             onClick={() => saveConsent("accept_all")}
             className="rounded-lg px-4 py-2 text-sm font-medium text-white"

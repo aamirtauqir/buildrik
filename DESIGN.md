@@ -6,6 +6,26 @@
 - **Space / industry:** Designer-grade web builders. Peers: Webflow, Framer, Webstudio. Not peers: Wix, Squarespace, Durable (different wedge).
 - **Project type:** Desktop web app with separate marketing site. Editor chrome is the primary surface.
 
+## Surface Scope (which brand applies where)
+
+Buildrik runs three visual surfaces with **two brand accents**. This is intentional, not drift.
+
+| Surface | Lives in | Accent | Display font | Body font | Audience |
+|---|---|---|---|---|---|
+| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **Cobalt `#2D6DFF`** | General Sans | Inter Tight | Power user mid-flow. Quiet. |
+| **Dashboard chrome** (auth, settings, billing, team, sites list) | `packages/dashboard/app/auth/`, `app/dashboard/`, `app/onboarding/`, `app/maintenance/`, 404, share | **Red `#E42313`** (Tailwind red-600-ish; CSS token `--color-auth-cta: #EF4444` for hover scale) | Inter Tight | Inter Tight | New visitor / signed-out / admin tasks. Warmer, marketing-adjacent. |
+| **Marketing site** (separate repo / public landing pages) | n/a in this repo | Red `#E42313` (matches dashboard) | General Sans | Inter Tight | Cold traffic. |
+
+**Why two accents:** the dashboard sits between marketing and editor in the user journey. It needs to feel inviting and brand-warm, not industrial. The editor sits where the user is producing work — color recedes so the canvas dominates.
+
+Rules:
+- **Decorative icons inside dashboard pages** (forgot-password key, 2FA shield, OTP phone, etc.) **may use cobalt `#2D6DFF`** as a secondary accent. The primary CTA and the Buildrik logo stay red. Mixing both on one dashboard page is allowed.
+- **Editor chrome never uses red** as a CTA, surface, or accent. Red there means destructive only (delete confirm, errors).
+- **Dashboard never uses cobalt for CTAs or surfaces.** Cobalt in dashboard is only for those secondary-accent decorative icons.
+- The **NO BLACK RULE** below applies to **editor chrome only**. Dashboard may use `#0D0D0D` for primary text (matches its warmer marketing tone).
+
+If a new surface is unsure: ask which side of the auth boundary it lives on. Past `/auth` and into `/dashboard` or `/edit` = editor brand rules apply to its chrome.
+
 ## Aesthetic Direction
 - **Direction:** Industrial / Utilitarian, **light chrome**. Premium tool, not premium marketing. "Webflow meets Linear, daylight edition."
 - **Decoration level:** Minimal. Surfaces communicate depth through layered warm neutrals and hairline borders. No gradients, no blobs, no grain, no decorative texture, no shadows beyond subtle elevation on modals.

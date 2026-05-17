@@ -26,6 +26,13 @@ function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const prefillEmail = searchParams.get("email") ?? "";
+  const reason = searchParams.get("reason");
+  const reasonBanner =
+    reason === "session-required"
+      ? { title: "Please sign in again", subtitle: "Your session has expired." }
+      : reason === "session-expired"
+        ? { title: "Session expired", subtitle: "Sign in to continue." }
+        : null;
   const [step, setStep] = useState<AuthStep>({ type: "email_entry" });
   const [email, setEmail] = useState(prefillEmail);
   const [rememberMe, setRememberMe] = useState(false);
@@ -187,6 +194,13 @@ function AuthPageContent() {
                 </>
               )}
 
+              {!error && reasonBanner && (
+                <>
+                  <FormBanner variant="error" title={reasonBanner.title} subtitle={reasonBanner.subtitle} />
+                  <div className="h-4" />
+                </>
+              )}
+
               <AuthInput
                 label="Email"
                 type="email"
@@ -204,6 +218,7 @@ function AuthPageContent() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
+                  suppressHydrationWarning
                   className="rounded border-auth-input-border"
                 />
                 <span className="text-auth-label text-auth-text-secondary">Remember me</span>
@@ -440,6 +455,7 @@ function AuthPageContent() {
                   type="checkbox"
                   checked={termsAccepted}
                   onChange={(e) => setTermsAccepted(e.target.checked)}
+                  suppressHydrationWarning
                   className="mt-0.5 rounded border-auth-input-border"
                 />
                 <span className="text-auth-label text-auth-text-secondary">
