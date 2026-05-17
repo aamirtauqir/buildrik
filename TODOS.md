@@ -1,5 +1,22 @@
 # TODOS
 
+## 2026-05-18 — Gate 24 outside-DS-UI sweep CLOSED (floor hit)
+
+- ✅ 3 additional commits closed remaining inline-element violations across non-DS surfaces
+- ✅ Net: 24 → **3** (carry-forward floor)
+- ✅ 15 files codemoded across media, comp-library, templates, DS UI top-level + sections
+- ✅ Pattern note: Checkbox-with-label-slot — drop outer `<label>`, pass `<>{children}</>` as Checkbox `label` prop to avoid nested-label invalid HTML
+- ⚠ Floor (3 violations): `ExportSection.tsx:326,375` (radio inputs — needs Radio primitive) + `AssetCell.tsx:59` (doc-justified native button, edge-to-edge thumb visual)
+- Total arc: **99 → 3** (~97% drained, 15 commits across 2 legs)
+
+Shipped at `61ebdcd6..447e95fb`. See `memory/project_gate24_codemod_arc_20260518.md` for refreshed ledger.
+
+### Open carry-forwards
+
+- **Build vibcoder Radio + RadioGroup primitive** — closes 2 ExportSection violations + unblocks future radio surfaces
+- **Add `bareButton` variant OR new BareButton primitive** — for cases like AssetCell where consumer className IS the visual; `bd-btn` chrome conflicts
+- **Gate 24 CI enforcement audit** — verify the gate actually fails PRs at scale (99 violations slipped past "zero tolerance" once)
+
 ## 2026-05-18 — Gate 24 DS UI sweep CLOSED
 
 - ✅ 12 commits drained inline-element violations from `editor/design-system/ui/` tree
