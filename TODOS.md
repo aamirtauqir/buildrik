@@ -46,12 +46,8 @@ DS Arc Phase A (Token foundation + aliasing) is now unblocked. Phase 0 commit ch
 
 ## Deferred from Left Bar Redesign (2026-04-07)
 
-### Mobile/Responsive Rail Behavior
-**What:** Collapse 60px rail to hamburger or bottom tab bar on mobile viewports.
-**Why:** The rail takes 16% of a 375px screen. Users on phones can't use the editor.
-**Effort:** M (human: ~1 week / CC: ~1 hour)
-**Priority:** P2
-**Depends on:** Left bar redesign shipped and stable.
+### ~~Mobile/Responsive Rail Behavior~~ — DROPPED 2026-05-18
+DESIGN.md flipped editor to desktop-only direction on 2026-04-18 (theme unification). Mobile rail is out of scope by product design, not a backlog item.
 
 ### Per-conflict Merge Resolution for Branch Merges
 **What:** When merging branches with conflicting element changes, surface per-element conflict UI.
@@ -81,31 +77,18 @@ DS Arc Phase A (Token foundation + aliasing) is now unblocked. Phase 0 commit ch
 **Priority:** P3
 **Depends on:** Left bar redesign shipped, useTemplateApply tests passing.
 
-### Create DESIGN.md
-**What:** Document the design system: color tokens, spacing scale, typography, component patterns.
-**Why:** Design decisions are scattered across 3 CSS files (ls-*, aqb-*, default.css). No single reference.
-**Effort:** M (human: ~1 day / CC: ~30 min)
-**Priority:** P2
-**Depends on:** Run /design-consultation for structured output.
+### ~~Create DESIGN.md~~ — RESOLVED (file exists)
+DESIGN.md exists at `/DESIGN.md` (356 lines). Original TODO entry was stale, also flagged in `Phase 0 Foundation Prereqs` closeout 2026-05-08. Removing from open list.
 
 ---
 
 ## Settings Tab Fixes (2026-04-17)
 
-### DomainsScreen: wire "Connect Domain" button
-**What:** `handleConnect` in `screens/DomainsScreen.tsx:36` is an empty function. Button is rendered but does nothing.
-**Why:** Custom domain connection requires a backend API (domain verification, SSL provisioning) that isn't wired yet.
-**Context:** `FEATURE_FLAGS.domains` gates the entire screen behind "Coming Soon" lock — not user-visible yet. When the flag is enabled, the dead button will be apparent.
-**Fix:** Wire to domain connection API once backend endpoint exists. Until then, log a "not yet implemented" message so it's not silently dead.
-**Depends on:** Backend domain connection API
-**Priority:** P2
+### ~~DomainsScreen: wire "Connect Domain" button~~ — DROPPED 2026-05-18
+Honesty audit 2026-05-18: file `packages/editor/src/editor/sidebar/tabs/settings/screens/DomainsScreen.tsx` does not exist anywhere in `packages/editor/src/`. The TODO references either a renamed file or one that was removed in an earlier cleanup. Settings tab grep shows zero empty `onClick` handlers across all screens — no dead buttons to wire. Closing as stale.
 
-### jsdom test environment broken
-**What:** All `render()` and `renderHook()` calls fail with `ReferenceError: document is not defined`. Affects entire editor test suite.
-**Why:** jsdom environment not properly initialized in Vitest config.
-**Priority:** P2 — blocks writing new tests
-
-- ~~jsdom test environment broken (render/renderHook fail)~~ — RESOLVED 2026-05-07. Verified suite-wide: SemanticBadge.test.tsx 12/12 pass, useCallout.test.ts 10/10 pass (renderHook works), full suite 2069/2069 pass across 250 files. Polyfills in `packages/editor/src/test-setup.ts` cover ResizeObserver, matchMedia, scrollIntoView. No further action needed.
+### ~~jsdom test environment broken~~ — RESOLVED 2026-05-07
+Verified suite-wide: SemanticBadge.test.tsx 12/12 pass, useCallout.test.ts 10/10 pass (renderHook works), full suite 2069/2069 pass across 250 files. Polyfills in `packages/editor/src/test-setup.ts` cover ResizeObserver, matchMedia, scrollIntoView.
 
 ---
 
