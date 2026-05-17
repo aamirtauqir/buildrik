@@ -45,6 +45,7 @@
 @import "./components/atoms/label.css" layer(components);
 @import "./components/atoms/link.css" layer(components);
 @import "./components/atoms/progress.css" layer(components);
+@import "./components/atoms/radio.css" layer(components);
 @import "./components/atoms/select.css" layer(components);
 @import "./components/atoms/skeleton.css" layer(components);
 @import "./components/atoms/slider.css" layer(components);

@@ -561,13 +561,16 @@ else
     | jq -s 'add | length' 2>/dev/null || echo "0")
 fi
 
-# Baseline 3 (was 0) per 2026-05-18 Gate 24 codemod arc closeout:
-#   - 2x <input type=radio> in ExportSection.tsx — no Radio primitive in vibcoder
+# Baseline 1 (was 3 → 0 originally) per 2026-05-18 Radio primitive ship:
 #   - 1x <button> in AssetCell.tsx — doc-justified native button for edge-to-edge
-#     thumb visual where bd-btn padding/hover would conflict
-# Ratchet back to 0 after Radio primitive + BareButton variant ship.
-# See memory/project_gate24_codemod_arc_20260518.md for the full arc.
-check_gate 24 "$GATE24_HITS" "3" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — locked floor: 3 carry-forward (Radio primitive gap + AssetCell)" || exit 1
+#     thumb visual where bd-btn padding/hover would conflict.
+# Previous baseline 3 included 2x <input type=radio> in ExportSection.tsx;
+# those closed when the vibcoder Radio + RadioGroup primitives shipped.
+# Ratchet back to 0 after a `bareButton` variant or BareButton primitive ships
+# that AssetCell can adopt without losing edge-to-edge fill.
+# See memory/project_gate24_codemod_arc_20260518.md and
+#     memory/project_radio_primitive_20260518.md for the arc.
+check_gate 24 "$GATE24_HITS" "1" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — locked floor: 1 (AssetCell edge-to-edge thumb)" || exit 1
 
 # Gate 25: Orphan codemod fixtures.
 # Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —

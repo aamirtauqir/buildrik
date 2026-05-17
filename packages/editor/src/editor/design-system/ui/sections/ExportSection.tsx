@@ -28,6 +28,7 @@ import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Radio } from "@/editor/shared/vibcoder/Radio";
 
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
@@ -318,36 +319,35 @@ export const ExportSection: React.FC = () => {
             const droppedCount = id === "tailwind" ? tailwindDropped : 0;
             const chip = chipForFormat(id, droppedCount);
             return (
-              <label
+              <Radio
                 key={id}
                 style={selected ? formatRowSelectedStyle : formatRowStyle}
                 data-testid={`format-row-${id}`}
-              >
-                <input
-                  type="radio"
-                  name="export-format"
-                  value={id}
-                  checked={selected}
-                  onChange={() => setFormat(id)}
-                  aria-label={label}
-                  style={{ margin: 0 }}
-                />
-                <span>
-                  {label}
-                  <span style={{ marginLeft: 4, color: "var(--bd-fg-muted)" }}>· {desc}</span>
-                </span>
-                <span
-                  data-testid={`format-chip-${id}`}
-                  style={{
-                    ...chipBaseStyle,
-                    background: chip.bg,
-                    color: chip.fg,
-                    borderColor: chip.border,
-                  }}
-                >
-                  {chip.label}
-                </span>
-              </label>
+                name="export-format"
+                value={id}
+                checked={selected}
+                onChange={() => setFormat(id)}
+                aria-label={label}
+                label={
+                  <>
+                    <span>
+                      {label}
+                      <span style={{ marginLeft: 4, color: "var(--bd-fg-muted)" }}>· {desc}</span>
+                    </span>
+                    <span
+                      data-testid={`format-chip-${id}`}
+                      style={{
+                        ...chipBaseStyle,
+                        background: chip.bg,
+                        color: chip.fg,
+                        borderColor: chip.border,
+                      }}
+                    >
+                      {chip.label}
+                    </span>
+                  </>
+                }
+              />
             );
           })}
         </div>
@@ -371,17 +371,16 @@ export const ExportSection: React.FC = () => {
             </div>
             <div style={radioRowStyle} role="radiogroup" aria-label="Dark mode strategy">
               {DARK_OPTIONS.map(({ id, label }) => (
-                <label key={id} style={radioLabelStyle}>
-                  <input
-                    type="radio"
-                    name="dark-strategy"
-                    value={id}
-                    checked={darkStrategy === id}
-                    onChange={() => setDarkStrategy(id)}
-                    aria-label={label}
-                  />
-                  <span>{label}</span>
-                </label>
+                <Radio
+                  key={id}
+                  style={radioLabelStyle}
+                  name="dark-strategy"
+                  value={id}
+                  checked={darkStrategy === id}
+                  onChange={() => setDarkStrategy(id)}
+                  aria-label={label}
+                  label={label}
+                />
               ))}
             </div>
           </div>

@@ -1,0 +1,117 @@
+/**
+ * bd-radio — single radio control atom.
+ * Wrap a native <input type="radio"> + <span> label inside a <label>.
+ * Native input is restyled via appearance: none; selection dot drawn with ::after.
+ *
+ * Sibling primitive to bd-checkbox. Visual diff: circular border + circular
+ * fill dot instead of square + checkmark glyph. Sizes/error/disabled states
+ * mirror checkbox 1:1 so consumers can swap class prefixes without surprises.
+ *
+ * For mutually-exclusive groups, render multiple <Radio> wrappers inside a
+ * <RadioGroup name="x"> container — wrappers carry a shared `name` attribute
+ * which the browser uses to enforce exclusion at the form-control level.
+ */
+
+.bd-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* The visually-styled native input */
+.bd-radio__input {
+  position: relative;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--buildrick-bg-input);
+  border: 1.5px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-full);
+  cursor: pointer;
+  transition:
+    background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+    border-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+
+/* Hover (only when interactive + not already filled) */
+.bd-radio__input:hover:not(:checked):not(:disabled) {
+  border-color: var(--buildrick-border-hover);
+}
+
+/* Checked — accent border + accent dot inside */
+.bd-radio__input:checked {
+  border-color: var(--buildrick-accent);
+}
+.bd-radio__input:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--buildrick-accent);
+  border-radius: var(--buildrick-radius-full);
+  transform: translate(-50%, -50%);
+}
+
+/* Focus — DS glow ring */
+.bd-radio__input:focus-visible {
+  outline: none;
+  box-shadow: var(--buildrick-glow-primary);
+}
+
+/* Disabled */
+.bd-radio__input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.bd-radio:has(.bd-radio__input:disabled),
+.bd-radio.bd-radio--disabled {
+  cursor: not-allowed;
+}
+
+/* Label text */
+.bd-radio__label {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm);
+  color: var(--buildrick-text-primary);
+  line-height: var(--buildrick-line-normal);
+}
+
+/* ─── SIZES ─── */
+
+.bd-radio--sm .bd-radio__input { width: 14px; height: 14px; }
+.bd-radio--sm .bd-radio__input:checked::after { width: 6px; height: 6px; }
+.bd-radio--sm .bd-radio__label { font-size: var(--buildrick-text-xs); }
+
+.bd-radio--lg .bd-radio__input { width: 20px; height: 20px; }
+.bd-radio--lg .bd-radio__input:checked::after { width: 10px; height: 10px; }
+.bd-radio--lg .bd-radio__label { font-size: var(--buildrick-text-md); }
+
+/* ─── ERROR ─── */
+
+.bd-radio--error .bd-radio__input,
+.bd-radio--error .bd-radio__input:hover:not(:checked):not(:disabled) {
+  border-color: var(--buildrick-error);
+}
+.bd-radio--error .bd-radio__input:focus-visible {
+  box-shadow: 0 0 0 3px var(--buildrick-error-light);
+}
+
+/* ─── GROUP ─── */
+/* Vertical layout default; consumers add `bd-radio-group--horizontal` for inline. */
+.bd-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--buildrick-space-2);
+}
+.bd-radio-group--horizontal {
+  flex-direction: row;
+  gap: var(--buildrick-space-4);
+  flex-wrap: wrap;
+}

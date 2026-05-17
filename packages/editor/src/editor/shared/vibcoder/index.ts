@@ -18,6 +18,8 @@ export { Textarea } from "./Textarea";
 export type { TextareaSize, TextareaProps } from "./Textarea";
 export { Checkbox } from "./Checkbox";
 export type { CheckboxSize, CheckboxProps } from "./Checkbox";
+export { Radio, RadioGroup } from "./Radio";
+export type { RadioSize, RadioProps, RadioGroupProps } from "./Radio";
 export { Switch } from "./Switch";
 export type { SwitchProps } from "./Switch";
 export { Icon } from "./Icon";
