@@ -49,7 +49,7 @@ describe("useColorTokens — addToken", () => {
 });
 
 describe("useColorTokens — deleteToken", () => {
-  it("removes a token by id", () => {
+  it("removes a token by id (hard delete — back-compat)", () => {
     const { result } = renderHook(() => useColorTokens(INITIAL));
     act(() => result.current.deleteToken("color-primary"));
     expect(result.current.tokens).toHaveLength(0);
@@ -58,6 +58,27 @@ describe("useColorTokens — deleteToken", () => {
   it("marks isDirty after deleteToken", () => {
     const { result } = renderHook(() => useColorTokens(INITIAL));
     act(() => result.current.deleteToken("color-primary"));
+    expect(result.current.isDirty).toBe(true);
+  });
+
+  // B4 lock (2026-05-16): soft-delete via replaceWith uses B1 replacedBy bridge.
+  // Token stays in registry but resolver redirects to replacement.
+
+  it("soft-deletes with { replaceWith } — keeps token + sets replacedBy", () => {
+    const REPL: DesignToken = { ...MOCK_TOKEN, id: "color-replacement", name: "Replacement" };
+    const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, REPL]));
+    act(() => result.current.deleteToken("color-primary", { replaceWith: "color-replacement" }));
+    // Token NOT removed from array (soft-delete)
+    expect(result.current.tokens).toHaveLength(2);
+    const soft = result.current.tokens.find((t) => t.id === "color-primary");
+    expect(soft).toBeDefined();
+    expect(soft?.replacedBy).toBe("color-replacement");
+  });
+
+  it("soft-delete marks isDirty (registry changed)", () => {
+    const REPL: DesignToken = { ...MOCK_TOKEN, id: "color-replacement" };
+    const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, REPL]));
+    act(() => result.current.deleteToken("color-primary", { replaceWith: "color-replacement" }));
     expect(result.current.isDirty).toBe(true);
   });
 });

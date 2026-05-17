@@ -33,7 +33,8 @@ interface TokensForKindActions {
   hydrateFromExternal: (allTokens: DesignToken[]) => void;
   filterTokens: (q: string) => DesignToken[];
   addToken: (token: DesignToken) => void;
-  deleteToken: (id: string) => void;
+  /** Delete a token. Pass `{ replaceWith }` for soft-delete via replacedBy bridge (B4 lock 2026-05-16). */
+  deleteToken: (id: string, options?: { replaceWith?: string }) => void;
 }
 
 export type TokensForKindRegistry = TokensForKindState & TokensForKindActions;
@@ -56,7 +57,9 @@ export function useTokensForKind(
     const diff: Record<string, string> = {};
     for (const t of tokens) {
       const saved = savedTokens.find((s) => s.id === t.id);
-      if (!saved || saved.value !== t.value) {
+      // B4 (2026-05-16): replacedBy soft-delete also counts as a change so
+      // isDirty fires for soft-deletes that don't touch token.value.
+      if (!saved || saved.value !== t.value || saved.replacedBy !== t.replacedBy) {
         diff[t.id] = t.value;
       }
     }
@@ -169,7 +172,15 @@ export function useTokensForKind(
     setTokens((prev) => [...prev, token]);
   }, []);
 
-  const deleteToken = React.useCallback((id: string) => {
+  const deleteToken = React.useCallback((id: string, options?: { replaceWith?: string }) => {
+    // B4 (2026-05-16): soft-delete via replacedBy bridge — token stays,
+    // resolver redirects to replaceWith. Hard delete only when no replacement.
+    if (options?.replaceWith !== undefined) {
+      setTokens((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, replacedBy: options.replaceWith } : t))
+      );
+      return;
+    }
     setTokens((prev) => prev.filter((t) => t.id !== id));
     undoStackRef.current.delete(id);
     redoStackRef.current.delete(id);

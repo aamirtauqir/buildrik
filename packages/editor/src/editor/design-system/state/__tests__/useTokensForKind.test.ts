@@ -96,9 +96,29 @@ describe("useTokensForKind", () => {
     expect(result.current.tokens).toHaveLength(2);
   });
 
-  it("deleteToken removes by id", () => {
+  it("deleteToken removes by id (hard delete — back-compat)", () => {
     const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
     act(() => result.current.deleteToken("radius-md"));
     expect(result.current.tokens).toHaveLength(0);
+  });
+
+  // B4 lock (2026-05-16): soft-delete via replaceWith uses B1 replacedBy bridge.
+  // Token stays in registry; resolver redirects consumers to replacement.
+
+  it("soft-deletes with { replaceWith } — keeps token + sets replacedBy", () => {
+    const repl: DesignToken = { ...radiusToken, id: "radius-lg", name: "Large radius" };
+    const { result } = renderHook(() => useTokensForKind("radius", [radiusToken, repl]));
+    act(() => result.current.deleteToken("radius-md", { replaceWith: "radius-lg" }));
+    expect(result.current.tokens).toHaveLength(2);
+    const soft = result.current.tokens.find((t) => t.id === "radius-md");
+    expect(soft).toBeDefined();
+    expect(soft?.replacedBy).toBe("radius-lg");
+  });
+
+  it("soft-delete marks isDirty (registry changed)", () => {
+    const repl: DesignToken = { ...radiusToken, id: "radius-lg" };
+    const { result } = renderHook(() => useTokensForKind("radius", [radiusToken, repl]));
+    act(() => result.current.deleteToken("radius-md", { replaceWith: "radius-lg" }));
+    expect(result.current.isDirty).toBe(true);
   });
 });

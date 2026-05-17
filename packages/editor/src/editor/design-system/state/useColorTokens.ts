@@ -40,8 +40,19 @@ export interface ColorTokensActions {
   filterTokens: (query: string) => DesignToken[];
   /** Add a new token to the list */
   addToken: (token: DesignToken) => void;
-  /** Delete a token by id */
-  deleteToken: (id: string) => void;
+  /**
+   * Delete a token by id.
+   *
+   * Modes:
+   *   - **Hard delete** `deleteToken(id)` — removes token from registry.
+   *     Caller must ensure no consumers, else bindings break silently.
+   *   - **Soft delete** `deleteToken(id, { replaceWith })` — token stays in
+   *     registry with `replacedBy: replaceWith` set. Resolver follows the
+   *     bridge so all consumer bindings transparently redirect to the
+   *     replacement. B4 lock 2026-05-16. Sweep at v5 hard-removes the
+   *     bridged token after 2-version retention window.
+   */
+  deleteToken: (id: string, options?: { replaceWith?: string }) => void;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -62,11 +73,12 @@ export function useColorTokens(
   // redoStack[id] = stack of undone values
   const [redoStack, setRedoStack] = useState<Record<string, UndoEntry[]>>({});
 
-  // Derive pendingDiff from tokens vs savedTokens
+  // Derive pendingDiff from tokens vs savedTokens.
+  // B4 (2026-05-16): replacedBy soft-delete also counts as a change.
   const pendingDiff: Record<string, TokenDiff> = {};
   tokens.forEach((token, i) => {
     const saved = savedTokens[i];
-    if (saved && token.value !== saved.value) {
+    if (saved && (token.value !== saved.value || token.replacedBy !== saved.replacedBy)) {
       pendingDiff[token.id] = {
         tokenId: token.id,
         previousValue: saved.value,
@@ -201,7 +213,16 @@ export function useColorTokens(
     setRedoStack((s) => ({ ...s, [token.id]: [] }));
   }, []);
 
-  const deleteToken = useCallback((id: string) => {
+  const deleteToken = useCallback((id: string, options?: { replaceWith?: string }) => {
+    // B4 (2026-05-16): soft-delete via B1 replacedBy bridge when replaceWith
+    // provided. Token stays in registry; resolver redirects consumers.
+    if (options?.replaceWith !== undefined) {
+      setTokens((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, replacedBy: options.replaceWith } : t))
+      );
+      return;
+    }
+    // Hard delete (caller asserts no consumers).
     setTokens((prev) => prev.filter((t) => t.id !== id));
     setUndoStack((s) => {
       const n = { ...s };
