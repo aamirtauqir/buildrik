@@ -9,6 +9,7 @@ export default defineConfig({
       "__tests__/**/*.test.{ts,tsx}",
       "packages/editor/src/**/*.test.{ts,tsx}",
       "packages/shared/**/*.test.{ts,tsx}",
+      "server/**/*.test.{ts,tsx}",
     ],
     exclude: ["**/node_modules/**", ".worktrees/**"],
   },

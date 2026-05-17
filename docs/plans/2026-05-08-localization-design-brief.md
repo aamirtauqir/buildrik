@@ -1,8 +1,9 @@
 # Localization design brief — A1 day-3 deferred decision
 
-**Status:** decision brief, no code yet. The localization screen stub
-(`ComingSoonScreen` for the `localization` nav slot) stays until you pick
-URL strategy + DB model.
+**Status:** DECISION LOCKED 2026-05-18 → `LOC: A,A` (subdirectory URLs + JSON
+translations column). Implementation arc unblocked. The `ComingSoonScreen` stub
+for the `localization` nav slot stays until backend + middleware + locale
+switcher ship.
 
 **Why deferred:** localization is the biggest day-3 item by surface area
 (URL routing, page persistence, fallback resolver, runtime middleware).

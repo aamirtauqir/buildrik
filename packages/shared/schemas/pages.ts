@@ -26,5 +26,30 @@ export const deletePageSchema = z.object({
   siteId: z.string(),
 });
 
+// Locale string shape mirrors packages/shared/schemas/site-detail.ts (defaultLocale/enabledLocales).
+// BCP-47 friendly: "en", "fr-FR", "zh-Hant".
+const localeString = z.string().min(2).max(10);
+
+export const getTranslationSchema = z.object({
+  pageId: z.string(),
+  locale: localeString,
+});
+
+export const setTranslationSchema = z.object({
+  pageId: z.string(),
+  siteId: z.string(),
+  locale: localeString,
+  blocks: z.unknown(),
+});
+
+export const removeTranslationSchema = z.object({
+  pageId: z.string(),
+  siteId: z.string(),
+  locale: localeString,
+});
+
 export type CreatePageInput = z.infer<typeof createPageSchema>;
 export type UpdatePageInput = z.infer<typeof updatePageSchema>;
+export type GetTranslationInput = z.infer<typeof getTranslationSchema>;
+export type SetTranslationInput = z.infer<typeof setTranslationSchema>;
+export type RemoveTranslationInput = z.infer<typeof removeTranslationSchema>;
