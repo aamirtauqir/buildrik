@@ -79,9 +79,11 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
           }}
         >
           {(["preview", "used", "versions"] as const).map((t) => (
-            <button
+            <Button
               key={t}
               type="button"
+              variant="ghost"
+              size="sm"
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
@@ -98,7 +100,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
               }}
             >
               {t === "preview" ? "Preview" : t === "used" ? "Used in" : "Versions"}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -184,8 +186,10 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
               >
                 {usage.map((entry) => (
                   <li key={entry.pageId}>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onJumpToPage?.(entry.pageId)}
                       disabled={!onJumpToPage}
                       style={{
@@ -218,7 +222,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                       <span style={{ fontSize: 11, color: "var(--bd-fg-muted, #64748b)" }}>
                         {formatRelative(entry.appliedAt)}
                       </span>
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>

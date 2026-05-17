@@ -19,6 +19,8 @@
 import * as React from "react";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Select } from "@/editor/shared/vibcoder/Select";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import {
   Modal,
   ModalContent,
@@ -137,27 +139,25 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                 <label htmlFor="create-component-group" style={labelStyle}>
                   Group
                 </label>
-                <select
+                <Select
                   id="create-component-group"
                   value={group}
                   onChange={(e) => setGroup(e.target.value)}
                   style={dialogInputStyles}
                 >
                   <option value="">Your symbols</option>
-                </select>
+                </Select>
               </Stack>
 
               {selectionContext && (
                 <div style={bindingsCardStyle}>
-                  <label style={bindingsCheckboxStyle}>
-                    <input
-                      type="checkbox"
-                      checked={prefillBindings}
-                      onChange={(e) => setPrefillBindings(e.target.checked)}
-                      aria-label="Pre-fill bindings from DS"
-                    />
-                    Pre-fill bindings from DS
-                  </label>
+                  <Checkbox
+                    style={bindingsCheckboxStyle}
+                    checked={prefillBindings}
+                    onChange={(e) => setPrefillBindings(e.target.checked)}
+                    aria-label="Pre-fill bindings from DS"
+                    label="Pre-fill bindings from DS"
+                  />
                   <p style={bindingsHintStyle}>
                     {bindingCount === 1
                       ? "1 style will bind to your DS tokens. Editing tokens later updates this component too."
