@@ -24,6 +24,9 @@
 
 import * as React from "react";
 import { useToast } from "@/editor/shared/vibcoder";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
 import { useImportTokens } from "../../state/useImportTokens";
 import {
@@ -380,7 +383,7 @@ export const ImportCard: React.FC = () => {
             <div style={{ color: "var(--bd-fg-muted)" }}>
               or click to browse
             </div>
-            <input
+            <Input
               ref={fileInputRef}
               type="file"
               accept="application/json,.json,.ts,.js"
@@ -394,8 +397,10 @@ export const ImportCard: React.FC = () => {
             />
           </div>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => setShowPaste((v) => !v)}
             style={{
               marginTop: 8,
@@ -410,7 +415,7 @@ export const ImportCard: React.FC = () => {
             aria-expanded={showPaste}
           >
             or paste JSON
-          </button>
+          </Button>
 
           {showPaste && (
             <div>
@@ -418,7 +423,7 @@ export const ImportCard: React.FC = () => {
                 <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)" }}>
                   Paste JSON
                 </span>
-                <textarea
+                <Textarea
                   aria-label="Paste JSON"
                   value={pasteBuffer}
                   onChange={(e) => setPasteBuffer(e.target.value)}
@@ -426,14 +431,15 @@ export const ImportCard: React.FC = () => {
                   style={pasteAreaStyle}
                 />
               </label>
-              <button
+              <Button
                 type="button"
+                variant="primary"
                 onClick={() => ingestRaw(pasteBuffer, null)}
                 style={pasteSubmitStyle}
                 disabled={!pasteBuffer.trim()}
               >
                 Parse
-              </button>
+              </Button>
             </div>
           )}
 
@@ -492,50 +498,58 @@ export const ImportCard: React.FC = () => {
                 {conflictCount} tokens already exist with the same ID. Choose how to handle them:
               </div>
               <div style={conflictBtnRowStyle}>
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setStrategy("replace")}
                   style={strategyBtnStyle(strategy === "replace")}
                   aria-pressed={strategy === "replace"}
                 >
                   Replace
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setStrategy("keep-mine")}
                   style={strategyBtnStyle(strategy === "keep-mine")}
                   aria-pressed={strategy === "keep-mine"}
                 >
                   Merge · keep mine
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setStrategy("keep-theirs")}
                   style={strategyBtnStyle(strategy === "keep-theirs")}
                   aria-pressed={strategy === "keep-theirs"}
                 >
                   Merge · keep theirs
-                </button>
+                </Button>
               </div>
             </div>
           )}
 
           <div style={actionRowStyle}>
-            <button
+            <Button
               type="button"
+              variant="primary"
               onClick={handleApply}
               style={applyBtnStyle}
               disabled={applyCount === 0}
             >
               Apply {applyCount} valid only
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="secondary"
               onClick={handleCancel}
               style={cancelBtnStyle}
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </>
       )}
