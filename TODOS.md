@@ -1,5 +1,23 @@
 # TODOS
 
+## 2026-05-18 — Gate 24 arc CLOSED — 99 → 0 (100%)
+
+- ✅ `Button variant="bare"` shipped (commit `1cfafe28`). Strips bd-btn chrome; keeps button semantics.
+- ✅ AssetCell.tsx wired to `<Button variant="bare">`. 18/18 AssetCell unit tests pass.
+- ✅ 8/8 Button unit tests pass (added bare-variant assertion).
+- ✅ Gate 24 baseline 1 → **0**. Full ZERO TOLERANCE restored.
+- Arc total: **99 → 0 across 18 commits in one day** (12 leg-1 + 4 leg-2 + Radio + bare variant).
+
+Memory: `project_bare_button_variant_20260518.md`.
+
+### Open carry-forwards (unrelated to Gate 24)
+
+- Gate 17 ghost aliases (34 remaining) — unblocks Gates 18-25 visibility in CI script
+- Animation cleanup cluster (Trigger pill removal + dead engine delete)
+- Drain accepted ratchets (hex 284, shadow 10, radius 133, layout 47)
+- Localization middleware decision
+- AccountModal real wiring
+
 ## 2026-05-18 — Radio primitive CLOSED (Gate 24 floor 3 → 1)
 
 - ✅ Vibcoder Radio + RadioGroup primitives shipped (commit `d7a7ea78`)
