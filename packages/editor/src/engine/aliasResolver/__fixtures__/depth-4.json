@@ -1,0 +1,58 @@
+{
+  "tokens": [
+    {
+      "id": "a",
+      "name": "A",
+      "value": "",
+      "category": "colors",
+      "cssVar": "--bd-a",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "A",
+      "aliasOf": "b"
+    },
+    {
+      "id": "b",
+      "name": "B",
+      "value": "",
+      "category": "colors",
+      "cssVar": "--bd-b",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "B",
+      "aliasOf": "c"
+    },
+    {
+      "id": "c",
+      "name": "C",
+      "value": "",
+      "category": "colors",
+      "cssVar": "--bd-c",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "C",
+      "aliasOf": "d"
+    },
+    {
+      "id": "d",
+      "name": "D",
+      "value": "",
+      "category": "colors",
+      "cssVar": "--bd-d",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "D",
+      "aliasOf": "e"
+    },
+    {
+      "id": "e",
+      "name": "E",
+      "value": "#2D6DFF",
+      "category": "colors",
+      "cssVar": "--bd-e",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "E"
+    }
+  ]
+}

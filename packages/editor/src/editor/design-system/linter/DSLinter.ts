@@ -14,7 +14,14 @@ export type LintRuleId =
   | "pure-black"
   | "empty-value"
   | "missing-dark"
-  | "unresolved-binding";
+  | "unresolved-binding"
+  | "alias-depth-exceeded"
+  | "semantic-needs-alias";
+
+/** Max alias chain depth per B2 lock (2026-05-16). Mirror of MAX_ALIAS_DEPTH in
+ *  engine/aliasResolver/errors.ts — kept inline to avoid editor → engine import
+ *  here since DSLinter ships before AliasResolver in the dep graph for some tests. */
+const MAX_ALIAS_DEPTH = 3;
 
 /**
  * Phase H.0: DSLinter — pure-function checker for design-token violations.
@@ -38,9 +45,49 @@ export class DSLinter {
   lint(tokens: readonly DesignToken[]): LintIssue[] {
     const issues: LintIssue[] = [];
     const projectHasAnyDark = tokens.some((t) => t.darkValue !== undefined);
+    const byId = new Map<string, DesignToken>();
+    for (const t of tokens) byId.set(t.id, t);
 
     for (const t of tokens) {
       const isColor = t.category === "colors" || t.kind === "color";
+
+      // semantic-needs-alias (B5 lock 2026-05-16): a token with semanticKind
+      // set MUST also have aliasOf set. Semantics are role-named pointers to
+      // a primitive (or another semantic); without aliasOf they resolve to
+      // nothing. Lint as error to prevent silent rendering failure.
+      if (t.semanticKind !== undefined && !t.aliasOf) {
+        issues.push({
+          rule: "semantic-needs-alias",
+          severity: "error",
+          tokenId: t.id,
+          message: `Semantic token "${t.id}" (semanticKind="${t.semanticKind}") is missing aliasOf. Every semantic token must point to a primitive or another semantic via aliasOf.`,
+        });
+      }
+
+      // alias-depth-exceeded (B2 lock 2026-05-16): walk the chain from this
+      // token; if length exceeds MAX_ALIAS_DEPTH + 1, emit issue on the entry
+      // token only. AliasResolver.validate throws on save, this rule surfaces
+      // the same condition non-fatally for lint UI (banner/chip).
+      if (t.aliasOf) {
+        const visited = new Set<string>([t.id]);
+        const chain: string[] = [t.id];
+        let cursor: DesignToken | undefined = byId.get(t.aliasOf);
+        while (cursor) {
+          chain.push(cursor.id);
+          if (visited.has(cursor.id)) break; // cycle — separate concern
+          visited.add(cursor.id);
+          if (!cursor.aliasOf) break;
+          cursor = byId.get(cursor.aliasOf);
+        }
+        if (chain.length > MAX_ALIAS_DEPTH + 1) {
+          issues.push({
+            rule: "alias-depth-exceeded",
+            severity: "error",
+            tokenId: t.id,
+            message: `Token "${t.id}" alias chain exceeds max depth 3 — ${chain.join(" → ")}`,
+          });
+        }
+      }
 
       // empty-value (warning — color tokens can be intentionally empty)
       if (!t.value || t.value.trim() === "") {

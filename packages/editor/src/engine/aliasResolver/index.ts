@@ -1,2 +1,2 @@
 export { AliasResolver } from "./AliasResolver";
-export { AliasCycleError, AliasDepthError } from "./errors";
+export { AliasCycleError, AliasDepthError, MAX_ALIAS_DEPTH } from "./errors";

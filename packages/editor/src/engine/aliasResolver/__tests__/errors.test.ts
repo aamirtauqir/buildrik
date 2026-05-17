@@ -22,18 +22,21 @@ describe("AliasCycleError", () => {
 });
 
 describe("AliasDepthError", () => {
-  it("extends Error with sourceId + targetId", () => {
-    const err = new AliasDepthError("color-primary", "color-brand");
+  // B2 upgrade (2026-05-16): constructor takes the full chain, not (source, target).
+  // sourceId + targetId derived from chain[0] and chain[last] for back-compat.
+
+  it("extends Error with sourceId + targetId + chain fields", () => {
+    const err = new AliasDepthError(["a", "b", "c", "d", "e"]);
     expect(err).toBeInstanceOf(Error);
     expect(err.name).toBe("AliasDepthError");
-    expect(err.sourceId).toBe("color-primary");
-    expect(err.targetId).toBe("color-brand");
+    expect(err.sourceId).toBe("a");
+    expect(err.targetId).toBe("e");
+    expect(err.chain).toEqual(["a", "b", "c", "d", "e"]);
   });
 
-  it("message indicates depth-1 violation with both ids", () => {
-    const err = new AliasDepthError("a", "b");
-    expect(err.message).toContain("depth-1");
-    expect(err.message).toContain("a");
-    expect(err.message).toContain("b");
+  it("message indicates depth violation with full chain joined by arrows", () => {
+    const err = new AliasDepthError(["a", "b", "c", "d", "e"]);
+    expect(err.message).toContain("max depth 3");
+    expect(err.message).toContain("a → b → c → d → e");
   });
 });

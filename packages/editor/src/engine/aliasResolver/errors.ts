@@ -17,19 +17,28 @@ export class AliasCycleError extends Error {
 }
 
 /**
- * Thrown when an alias chain exceeds depth 1 — i.e. token T1.aliasOf points
- * to T2 and T2.aliasOf is also set. Phase 1 only allows depth-1 aliases.
+ * Thrown when an alias chain exceeds the configured max depth.
+ *
+ * B2 upgrade (2026-05-16): max depth raised from 1 to 3. Chains up to length
+ * 4 (entry + 3 hops, e.g. `button.bg → action.default → brand.primary → blue.500`)
+ * accepted. Length 5+ rejected. See token-design-decisions.md §B2.
+ *
+ * `chain` carries the full violating path. `sourceId`/`targetId` kept for
+ * back-compat with depth-1 era callers.
  */
 export class AliasDepthError extends Error {
   readonly sourceId: string;
   readonly targetId: string;
+  readonly chain: readonly string[];
 
-  constructor(sourceId: string, targetId: string) {
-    super(
-      `[alias-resolver] depth-1 violation: token "${sourceId}" aliases "${targetId}", but "${targetId}" itself has aliasOf set`
-    );
+  constructor(chain: readonly string[]) {
+    super(`[alias-resolver] depth violation: chain length ${chain.length - 1} exceeds max depth 3 — ${chain.join(" → ")}`);
     this.name = "AliasDepthError";
-    this.sourceId = sourceId;
-    this.targetId = targetId;
+    this.chain = chain;
+    this.sourceId = chain[0];
+    this.targetId = chain[chain.length - 1];
   }
 }
+
+/** Max alias chain depth allowed per B2 lock (2026-05-16). */
+export const MAX_ALIAS_DEPTH = 3;

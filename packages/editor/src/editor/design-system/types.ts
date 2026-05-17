@@ -57,6 +57,18 @@ export type TokenKind =
   | "icon" | "imagery";
 
 /**
+ * Semantic-kind axis (B5 lock 2026-05-16). Orthogonal to TokenKind (which
+ * declares value shape). A token with semanticKind set is a "semantic token"
+ * and MUST have aliasOf set. A token without semanticKind is a "primitive"
+ * and MUST NOT have semanticKind set. Lint rules enforce both directions
+ * (DSLinter rules `semantic-needs-alias` + `primitive-rejects-semantic-kind`).
+ *
+ * Beginner mode hides primitives; Pro mode shows both. See utils/semanticKind.ts
+ * for the mode filter.
+ */
+export type SemanticKind = "action" | "surface" | "text" | "feedback";
+
+/**
  * Per-kind value shape. Discriminated by `kind`. Validators in
  * packages/shared/schemas/designToken.ts enforce the per-kind shape.
  */
@@ -103,6 +115,9 @@ export interface DesignToken {
   friendlyName?: string;         // spec §5.3 — beginner-mode label.
                                  // RESOLUTION RULE: render sites should use `friendlyName ?? name`.
   aliasOf?: string;              // Phase A.2 — populated then; declared here so type compiles
+  semanticKind?: SemanticKind;   // B5 lock 2026-05-16 — semantic token role axis.
+                                 // When set, aliasOf MUST also be set (lint enforced).
+                                 // When unset, token is treated as a primitive.
   darkValue?: string;            // Phase B.0 — color-only dark variant.
                                  // Resolution: mode==="dark" && darkValue → use darkValue;
                                  // missing darkValue under mode==="dark" → fall back to `value`

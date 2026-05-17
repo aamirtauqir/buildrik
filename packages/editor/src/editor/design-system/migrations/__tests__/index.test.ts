@@ -3,8 +3,8 @@ import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../index";
 import type { DesignToken } from "../../types";
 
 describe("migrateDesignTokens", () => {
-  it("CURRENT_SCHEMA_VERSION is 1 for DS V1", () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(1);
+  it("CURRENT_SCHEMA_VERSION is 2 after B5 lock (semanticKind field added 2026-05-16)", () => {
+    expect(CURRENT_SCHEMA_VERSION).toBe(2);
   });
 
   it("is no-op for same-version (V1 → V1)", () => {

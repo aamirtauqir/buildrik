@@ -23,6 +23,84 @@ function makePreset(
   };
 }
 
+describe("DSLinter.lint — semantic-needs-alias (B5 lock 2026-05-16)", () => {
+  it("does NOT flag a primitive token (no semanticKind, no aliasOf)", () => {
+    const tokens: DesignToken[] = [makeColor("color-brand-primary", "#2D6DFF")];
+    const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "semantic-needs-alias");
+    expect(issues).toEqual([]);
+  });
+
+  it("does NOT flag a primitive token that happens to have aliasOf (back-compat)", () => {
+    // Pre-B5 aliased tokens existed without semanticKind. Keep them valid —
+    // only enforce semantic-needs-alias on tokens that DECLARE semanticKind.
+    const tokens: DesignToken[] = [
+      makeColor("color-brand-primary", "#2D6DFF"),
+      { ...makeColor("color-brand-hover", ""), aliasOf: "color-brand-primary" /* semanticKind undefined */ },
+    ];
+    const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "semantic-needs-alias");
+    expect(issues).toEqual([]);
+  });
+
+  it("does NOT flag a semantic token that has aliasOf (well-formed)", () => {
+    const tokens: DesignToken[] = [
+      makeColor("color-brand-primary", "#2D6DFF"),
+      { ...makeColor("action-default", ""), semanticKind: "action", aliasOf: "color-brand-primary" },
+    ];
+    const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "semantic-needs-alias");
+    expect(issues).toEqual([]);
+  });
+
+  it("flags semantic-needs-alias when semanticKind set but aliasOf missing", () => {
+    const tokens: DesignToken[] = [
+      { ...makeColor("action-orphan", ""), semanticKind: "action" /* aliasOf missing */ },
+    ];
+    const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "semantic-needs-alias");
+    expect(issues).toHaveLength(1);
+    expect(issues[0].tokenId).toBe("action-orphan");
+    expect(issues[0].severity).toBe("error");
+    expect(issues[0].message).toContain("semantic");
+    expect(issues[0].message).toContain("aliasOf");
+  });
+});
+
+describe("DSLinter.lint — alias-depth-exceeded (B2 lock 2026-05-16)", () => {
+  it("does NOT flag a depth-2 alias chain (a → b → c)", () => {
+    const tokens: DesignToken[] = [
+      { ...makeColor("c", "#2D6DFF"), aliasOf: undefined },
+      { ...makeColor("b", ""), aliasOf: "c" },
+      { ...makeColor("a", ""), aliasOf: "b" },
+    ];
+    const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "alias-depth-exceeded");
+    expect(issues).toEqual([]);
+  });
+
+  it("does NOT flag a depth-3 alias chain (a → b → c → d)", () => {
+    const tokens: DesignToken[] = [
+      { ...makeColor("d", "#2D6DFF"), aliasOf: undefined },
+      { ...makeColor("c", ""), aliasOf: "d" },
+      { ...makeColor("b", ""), aliasOf: "c" },
+      { ...makeColor("a", ""), aliasOf: "b" },
+    ];
+    const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "alias-depth-exceeded");
+    expect(issues).toEqual([]);
+  });
+
+  it("flags a depth-4 alias chain (a → b → c → d → e) on the entry token only", () => {
+    const tokens: DesignToken[] = [
+      { ...makeColor("e", "#2D6DFF"), aliasOf: undefined },
+      { ...makeColor("d", ""), aliasOf: "e" },
+      { ...makeColor("c", ""), aliasOf: "d" },
+      { ...makeColor("b", ""), aliasOf: "c" },
+      { ...makeColor("a", ""), aliasOf: "b" },
+    ];
+    const issues = new DSLinter().lint(tokens).filter((i) => i.rule === "alias-depth-exceeded");
+    expect(issues).toHaveLength(1);
+    expect(issues[0].tokenId).toBe("a");
+    expect(issues[0].severity).toBe("error");
+    expect(issues[0].message).toContain("max depth 3");
+  });
+});
+
 describe("DSLinter.lint", () => {
   it("returns empty array for compliant tokens", () => {
     const tokens: DesignToken[] = [

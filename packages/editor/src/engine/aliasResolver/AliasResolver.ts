@@ -1,14 +1,14 @@
 import type { DesignToken } from "../../editor/design-system";
 import type { EventEmitter } from "../EventEmitter";
-import { AliasCycleError, AliasDepthError } from "./errors";
+import { AliasCycleError, AliasDepthError, MAX_ALIAS_DEPTH } from "./errors";
 
 /**
  * Composer-owned alias resolver. Validates the alias graph and resolves
  * `aliasOf` pointers to a canonical (non-alias) token.
  *
- * Phase A.2 enforces depth-1 only: a token T1 may have aliasOf=T2, but T2
- * itself MUST NOT have aliasOf set. Multi-hop chains are deferred to a
- * future phase per spec §16.3 D4.
+ * B2 upgrade (2026-05-16): max depth raised from 1 to MAX_ALIAS_DEPTH (3).
+ * Chains up to length 4 (entry + 3 hops) accepted, longer rejected. See
+ * token-design-decisions.md §B2 and errors.ts MAX_ALIAS_DEPTH.
  *
  * Validation entry points:
  *   - validate(tokens): throws AliasCycleError or AliasDepthError on violation.
@@ -25,7 +25,7 @@ export class AliasResolver {
   /**
    * Validate the alias graph. Throws on first violation found.
    *   - AliasCycleError(chain)   on any cycle (depth >= 2 cycles included)
-   *   - AliasDepthError(src, tgt) when an alias points to another alias
+   *   - AliasDepthError(chain)   when chain length exceeds MAX_ALIAS_DEPTH + 1
    */
   validate(tokens: readonly DesignToken[]): void {
     const byId = new Map<string, DesignToken>();
@@ -48,8 +48,10 @@ export class AliasResolver {
         cursor = byId.get(cursor.aliasOf);
       }
 
-      if (chain.length > 2) {
-        throw new AliasDepthError(chain[0], chain[1]);
+      // chain.length === depth + 1 (entry token + N alias hops).
+      // MAX_ALIAS_DEPTH=3 → chain.length up to 4 allowed, 5+ rejected.
+      if (chain.length > MAX_ALIAS_DEPTH + 1) {
+        throw new AliasDepthError(chain);
       }
     }
   }

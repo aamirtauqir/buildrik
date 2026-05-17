@@ -12,12 +12,16 @@ import type { DesignToken } from "../types";
 /**
  * Current schema version. Bump when renaming/splitting/removing tokens
  * in DEFAULT_TOKENS. Each bump requires a matching MIGRATIONS entry.
+ *
+ * v2 (2026-05-16) — B5 lock. Adds optional `semanticKind` field to DesignToken.
+ *                   No-op migration: existing tokens stay as primitives
+ *                   (semanticKind undefined). Future tokens may set semanticKind
+ *                   to declare a semantic role.
  */
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 /**
  * Per-version migration functions. Key = TARGET version.
- * V1 is baseline. Future entries: MIGRATIONS[2] = migrateV1toV2, etc.
  *
  * When adding a migration:
  *   1. Bump CURRENT_SCHEMA_VERSION
@@ -25,7 +29,9 @@ export const CURRENT_SCHEMA_VERSION = 1;
  *   3. Add alias to generateCompatibilityShim in exportUtils.ts (2-version retention)
  */
 const MIGRATIONS: Record<number, (tokens: DesignToken[]) => DesignToken[]> = {
-  // V1 is baseline. No migrations yet.
+  // v1 → v2: additive only. semanticKind field defaults to undefined,
+  // preserving all existing tokens as primitives. Identity transform.
+  2: (tokens) => tokens,
 };
 
 /**

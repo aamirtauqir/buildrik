@@ -7,6 +7,8 @@ import validFixture from "../__fixtures__/valid-alias.json";
 import cycle2Fixture from "../__fixtures__/cycle-2-node.json";
 import cycle3Fixture from "../__fixtures__/cycle-3-node.json";
 import depth2Fixture from "../__fixtures__/depth-2.json";
+import depth3Fixture from "../__fixtures__/depth-3.json";
+import depth4Fixture from "../__fixtures__/depth-4.json";
 
 function makeEvents(): EventEmitter {
   return { emit: () => {}, on: () => {}, off: () => {} } as unknown as EventEmitter;
@@ -51,12 +53,24 @@ describe("AliasResolver.validate", () => {
     expect(chain.length).toBeGreaterThanOrEqual(3);
   });
 
-  it("throws AliasDepthError on a depth-2 chain (a → b → c)", () => {
+  // B2 upgrade (2026-05-16): depth-1 → depth-3. Chains up to depth-3 accepted,
+  // depth-4+ rejected. Old "depth-2 throws" test flipped because semantics changed.
+
+  it("accepts a depth-2 chain (a → b → c) per B2 upgrade", () => {
+    expect(() => resolver.validate(depth2Fixture.tokens as DesignToken[])).not.toThrow();
+  });
+
+  it("accepts a depth-3 chain (a → b → c → d) per B2 upgrade", () => {
+    expect(() => resolver.validate(depth3Fixture.tokens as DesignToken[])).not.toThrow();
+  });
+
+  it("throws AliasDepthError on a depth-4 chain (a → b → c → d → e)", () => {
     let thrown: unknown;
-    try { resolver.validate(depth2Fixture.tokens as DesignToken[]); } catch (e) { thrown = e; }
+    try { resolver.validate(depth4Fixture.tokens as DesignToken[]); } catch (e) { thrown = e; }
     expect(thrown).toBeInstanceOf(AliasDepthError);
+    expect((thrown as AliasDepthError).chain).toEqual(["a", "b", "c", "d", "e"]);
     expect((thrown as AliasDepthError).sourceId).toBe("a");
-    expect((thrown as AliasDepthError).targetId).toBe("b");
+    expect((thrown as AliasDepthError).targetId).toBe("e");
   });
 
   it("does NOT throw when alias points to a non-existent id (treated as leaf, validated by registry separately)", () => {
