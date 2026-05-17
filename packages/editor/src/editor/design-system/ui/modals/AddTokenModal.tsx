@@ -5,6 +5,8 @@
 
 import * as React from "react";
 import { generateColorTokenId } from "../../utils/exportUtils";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Input } from "@/editor/shared/vibcoder/Input";
 
 export interface AddTokenModalProps {
   existingIds: string[];
@@ -84,11 +86,12 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
         >
           Token name
         </label>
-        <input
+        <Input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Purple"
+          error={!!nameError}
           style={{
             width: "100%",
             padding: "8px 10px",
@@ -127,11 +130,12 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               flexShrink: 0,
             }}
           />
-          <input
+          <Input
             type="text"
             value={hex}
             onChange={(e) => setHex(e.target.value)}
             placeholder="#3B82F6"
+            error={!!hexError}
             style={{
               flex: 1,
               padding: "8px 10px",
@@ -149,7 +153,8 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
         )}
 
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
-          <button
+          <Button
+            variant="secondary"
             onClick={onClose}
             style={{
               padding: "7px 14px",
@@ -162,8 +167,9 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
             onClick={handleAdd}
             style={{
               padding: "7px 14px",
@@ -177,7 +183,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             }}
           >
             Add token
-          </button>
+          </Button>
         </div>
       </div>
     </div>
