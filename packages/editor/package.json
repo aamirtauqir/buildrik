@@ -17,6 +17,7 @@
     "check:no-legacy-settings-path": "grep -r 'components/Panels/LeftSidebar/tabs/settings' src/ --include='*.ts' --include='*.tsx' && echo 'FAIL: legacy settings path found' && exit 1 || echo 'PASS: no legacy settings path'",
     "lint:ds": "bash scripts/ds-grep-gates.sh",
     "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh",
+    "hooks:install": "bash scripts/install-git-hooks.sh",
     "lint:ds-hex": "node scripts/find-inline-hex-v2.mjs",
     "gate:buildrick": "node scripts/check-buildrick-baseline.mjs",
     "gate:ds-ssot": "node scripts/check-ds-ssot.mjs",

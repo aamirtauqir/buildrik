@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Buildrik editor — pre-push WARN-only DS gate hook.
+#
+# Runs `pnpm run verify:ds` on every `git push` and prints the result.
+# Currently WARN-only — does NOT block the push, regardless of exit code.
+#
+# Rationale: CI was last green 2026-04-16 with months of accumulated drift
+# (Gate 17 ghost aliases + unverified Gates 18–25). A blocking hook today
+# would prevent every push until that backlog is drained. Hook ships in
+# observability mode now so:
+#   1. Each push surfaces gate state immediately, not 5 min later in CI.
+#   2. New regressions are visible at push-time, not buried in 69 historical
+#      reds.
+#   3. Drift can be drained incrementally without breaking developer flow.
+#
+# Upgrade path: when the gate runs fully green, flip BLOCK_ON_FAIL=true
+# below to make this a blocking hook. Solo-direct-to-main workflow then
+# has effective enforcement (the only path that survives `commit --no-verify`
+# is intentional bypass).
+#
+# Install: bash packages/editor/scripts/install-git-hooks.sh
+#
+# @license BSD-3-Clause
+
+set -u
+
+BLOCK_ON_FAIL=false  # flip to true after CI baseline goes green
+
+# Resolve repo root so the hook works regardless of where push is invoked.
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT/packages/editor"
+
+echo ""
+echo "──────────────────────────────────────────────"
+echo " Buildrik DS gates (pre-push, WARN mode)"
+echo "──────────────────────────────────────────────"
+
+# Run the gate but capture exit code instead of letting it kill the hook.
+if pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1; then
+  echo " ✓ all gates passing"
+  echo "──────────────────────────────────────────────"
+  exit 0
+fi
+
+# Gate failed. Show what broke and either warn-or-block.
+echo " ✗ one or more gates failing"
+echo ""
+tail -20 /tmp/buildrik-pre-push-gate.log | sed 's/^/   /'
+echo ""
+echo " full log: /tmp/buildrik-pre-push-gate.log"
+echo "──────────────────────────────────────────────"
+
+if [ "$BLOCK_ON_FAIL" = "true" ]; then
+  echo " BLOCK: push refused. Fix gate failures and retry."
+  echo " Bypass: git push --no-verify  (only with intent)"
+  exit 1
+fi
+
+echo " WARN: push allowed (BLOCK_ON_FAIL=false). Drain the backlog to flip."
+echo "──────────────────────────────────────────────"
+exit 0

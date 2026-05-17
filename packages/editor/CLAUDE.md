@@ -427,6 +427,20 @@ npx vitest           # Run tests
 npx tsc --noEmit     # Type check
 ```
 
+### Pre-push gate hook (WARN mode)
+
+Once per clone:
+
+```bash
+pnpm run hooks:install
+```
+
+Installs `.git/hooks/pre-push` which runs `pnpm run verify:ds` and prints
+gate state before every push. **Currently WARN-only** — does not block.
+After CI backlog drained (Gate 17 ghost aliases + Gates 18-25 verification),
+flip `BLOCK_ON_FAIL=true` in `packages/editor/scripts/hooks/pre-push` to make
+it enforce.
+
 ---
 
 ## ENV VARIABLES (Vite — `import.meta.env.*`)
