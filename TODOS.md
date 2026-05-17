@@ -1,5 +1,26 @@
 # TODOS
 
+## 2026-05-18 — Hex drain (Gate 10/11/16 ratcheted)
+
+- ✅ 232 inline hex literals replaced with vibcoder --bd-* aliases (commit `d03d4b7c`)
+- ✅ 6 chrome files codemoded: MediaTab.css (111), TemplatesTab.css (32), inspector.css (28), TemplateUsageDrawer.tsx (28), ReplaceAcrossModal.tsx (23 → 6 residual), MigrationProgressModal.tsx (17)
+- ✅ TSX fallback strip: `var(--bd-X, #YYYYYY)` → `var(--bd-X)`. Safe because Gate 17 ghosts drained + hook BLOCKING.
+- ✅ 634/634 tests passing across affected packages
+- ✅ Baselines ratcheted:
+  - Gate 10 (global hex): 1055 → **823** (−232)
+  - Gate 16 (editor-scoped hex): 583 → 575 (−8)
+  - Gate 11 (chrome gradients): 76 → 71 (side effect of gradient-stop cleanup)
+
+Memory pointer: `project_hex_drain_20260518.md`
+
+### Open ratchet debt (deferred — each is multi-hour arc)
+
+- **Gate 12 box-shadow (185 baseline)** — replace raw `box-shadow: 0 4px ...` with `var(--bd-shadow-X)`
+- **Gate 13 radius>4 (504 baseline)** — replace `border-radius: 6px+` with `var(--bd-radius-X)` or kill
+- **Gate 14 layout literals (369 baseline)** — replace magic px (`width: 280px`) with shell-width tokens
+- **Gate 10/16 path-filter audit** — Gate 10 conflates chrome hex with user-content hex (templates, starters, wizard). Gate 16 already excludes designer-facing dirs; same logic should apply to Gate 10. Remaining 823 floor is ~70% user content.
+- **6 decorative gradient stops in ReplaceAcrossModal** — peach/cobalt thumb placeholder fills. No semantic chrome token. Either add canonical decorative-gradient tokens or accept floor.
+
 ## 2026-05-18 — Full CI green + pre-push hook BLOCKING
 
 - ✅ verify:ds exits 0 end-to-end (first since 2026-04-16, **70 days**)
