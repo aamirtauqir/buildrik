@@ -9,6 +9,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import type { PresetCategory } from "../../types";
 
 export interface StyleCategoryRowProps {
@@ -40,8 +41,10 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
 }) => {
   const enabled = variantCount > 0;
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="sm"
       data-category-row={category}
       data-active={isActive ? "true" : undefined}
       onClick={onClick}
@@ -73,6 +76,6 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
         {CATEGORY_LABELS[category]} · {variantCount}{" "}
         {variantCount === 1 ? "variant" : "variants"}
       </span>
-    </button>
+    </Button>
   );
 };

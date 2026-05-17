@@ -123,8 +123,9 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
   const text = starter.tokens.find((t) => t.id === "color-text")?.value ?? "#0f172a";
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       role="radio"
       aria-checked={selected}
       onClick={onSelect}
@@ -172,6 +173,6 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
           {starter.description}
         </div>
       </div>
-    </button>
+    </Button>
   );
 }

@@ -10,6 +10,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import type { PresetCategory, StylePreset } from "../../types";
 import {
   useButtonPresets,
@@ -102,8 +103,10 @@ export const StylesRouter: React.FC = () => {
         data-detail-view
         style={{ display: "flex", flexDirection: "column", minHeight: 0 }}
       >
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => setView({ kind: "list" })}
           style={{
             padding: "6px 12px",
@@ -119,7 +122,7 @@ export const StylesRouter: React.FC = () => {
           }}
         >
           ← Back to styles
-        </button>
+        </Button>
         <PresetDetailPane
           category={view.category}
           variant={view.variant}

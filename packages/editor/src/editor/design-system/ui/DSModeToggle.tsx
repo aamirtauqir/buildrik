@@ -13,6 +13,7 @@
  */
 import * as React from "react";
 import { useDSMode, type DSMode } from "../state/DSModeContext";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 const SEGMENTS: ReadonlyArray<{ value: DSMode; label: string; hint: string }> = [
   { value: "beginner", label: "Beginner", hint: "Friendly · hides token IDs and empty foundations" },
@@ -44,9 +45,11 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
       {SEGMENTS.map((seg) => {
         const active = mode === seg.value;
         return (
-          <button
+          <Button
             key={seg.value}
             type="button"
+            variant="ghost"
+            size="sm"
             role="radio"
             aria-checked={active}
             title={seg.hint}
@@ -65,7 +68,7 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
             }}
           >
             {seg.label}
-          </button>
+          </Button>
         );
       })}
     </div>

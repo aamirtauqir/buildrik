@@ -11,6 +11,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import type { PresetCategory, StylePreset } from "../../types";
 import { PresetBindingRow } from "./PresetBindingRow";
 
@@ -152,9 +153,11 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
         {presets.map((p) => {
           const isActive = p.variant === activeVariant;
           return (
-            <button
+            <Button
               key={p.variant}
               type="button"
+              variant="ghost"
+              size="sm"
               role="tab"
               aria-selected={isActive}
               data-variant-tab={p.variant}
@@ -175,7 +178,7 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
               }}
             >
               {p.variant}
-            </button>
+            </Button>
           );
         })}
       </div>

@@ -92,8 +92,10 @@ export const ExportDropdown: React.FC<{
             </div>
           )}
           {EXPORT_OPTIONS.map(({ fmt, label, desc }) => (
-            <button
+            <Button
               key={fmt}
+              variant="ghost"
+              size="sm"
               role="menuitem"
               onClick={() => {
                 onExport(fmt as ExportFormat);
@@ -113,7 +115,7 @@ export const ExportDropdown: React.FC<{
               <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 1 }}>
                 {desc}
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       )}

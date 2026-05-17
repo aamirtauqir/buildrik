@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import { Button } from "@/editor/shared/vibcoder";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import type { ColorHSB } from "../../types";
 import {
   hexToHsb,
@@ -286,7 +287,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           className={`buildrick-design-picker__hex-input-wrap${hexError ? " buildrick-design-picker__hex-input-wrap--error" : ""}`}
         >
           <span className="buildrick-design-picker__hash">#</span>
-          <input
+          <Input
             type="text"
             value={hexInput.replace("#", "")}
             onChange={handleHexInput}

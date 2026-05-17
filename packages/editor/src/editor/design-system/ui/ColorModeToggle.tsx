@@ -18,6 +18,7 @@
  */
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { useColorMode } from "../state/useColorMode";
 
 export interface ColorModeToggleProps {
@@ -63,8 +64,10 @@ interface PillProps {
 }
 
 const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
-  <button
+  <Button
     type="button"
+    variant="ghost"
+    size="sm"
     role="tab"
     aria-selected={active}
     onClick={() => composer.colorMode.set(value)}
@@ -81,5 +84,5 @@ const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
     }}
   >
     {label}
-  </button>
+  </Button>
 );
