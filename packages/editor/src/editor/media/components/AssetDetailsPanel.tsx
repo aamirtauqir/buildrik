@@ -18,6 +18,7 @@
  */
 
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Download, FolderOpen, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
@@ -467,7 +468,7 @@ function AltTextSection({
       >
         Alt text
       </label>
-      <textarea
+      <Textarea
         id={`alt-text-${item.key}`}
         value={item.altText ?? ""}
         maxLength={ALT_TEXT_MAX}

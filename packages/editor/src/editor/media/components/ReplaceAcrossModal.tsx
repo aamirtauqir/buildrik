@@ -13,6 +13,8 @@
  */
 import * as React from "react";
 import { Modal, ModalContent, ModalDescription, ModalTitle } from "@/editor/shared/vibcoder";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 
 export interface ReplaceAcrossPageEntry {
   pageId: string;
@@ -177,21 +179,21 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
             {totalPlaces === 1 ? "element change" : "element changes"}
           </span>
           <div style={{ display: "flex", gap: 8 }}>
-            <button
+            <Button
               type="button"
-              className="bd-btn bd-btn--ghost"
+              variant="ghost"
               onClick={() => onOpenChange(false)}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
-              className="bd-btn bd-btn--primary"
+              variant="primary"
               onClick={handleConfirm}
               disabled={selectedCount === 0}
             >
               Replace on {selectedCount} {selectedCount === 1 ? "page" : "pages"}
-            </button>
+            </Button>
           </div>
         </div>
       </ModalContent>
@@ -266,8 +268,7 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
         opacity: checked ? 1 : 0.7,
       }}
     >
-      <input
-        type="checkbox"
+      <Checkbox
         checked={checked}
         onChange={onToggle}
         aria-label={`Replace on ${page.pageName}`}
