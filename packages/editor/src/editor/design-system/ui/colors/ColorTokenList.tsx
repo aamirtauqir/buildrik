@@ -26,6 +26,8 @@ import { suggestContrastFix } from "../../utils/contrastFix";
 import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { Composer } from "../../../../engine/Composer";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Input } from "@/editor/shared/vibcoder/Input";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -304,7 +306,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         }}
       >
         <div style={{ flex: 1, position: "relative", minWidth: 100 }}>
-          <input
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -322,8 +324,10 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             }}
           />
         </div>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={() => setFilterMode("all")}
           style={{
             padding: "4px 10px",
@@ -338,9 +342,11 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           }}
         >
           All
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={() => setFilterMode("issues")}
           style={{
             padding: "4px 10px",
@@ -356,13 +362,15 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           title={`${issuesCount} token${issuesCount !== 1 ? "s" : ""} fail WCAG AA`}
         >
           Issues{issuesCount > 0 ? ` (${issuesCount})` : ""}
-        </button>
+        </Button>
       </div>
 
       {/* T6: aggregate dark-missing chip — only when dark mode active AND ≥1 missing. */}
       {resolvedMode === "dark" && missingDarkCount > 0 && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={handleDarkMissingClick}
           data-dark-missing-chip
           style={{
@@ -385,7 +393,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           <span>
             {missingDarkCount} {missingDarkCount === 1 ? "token" : "tokens"} missing dark variant
           </span>
-        </button>
+        </Button>
       )}
 
       {/* WCAG filter banner */}
@@ -411,8 +419,10 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               {issuesCount} token{issuesCount !== 1 ? "s" : ""} with low contrast — fails WCAG AA.
             </span>
             {Object.keys(contrastFixes).length > 0 && (
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="sm"
                 onClick={applyAllFixes}
                 style={{
                   padding: "3px 10px",
@@ -429,7 +439,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                 aria-label={`Fix all ${Object.keys(contrastFixes).length} contrast issues`}
               >
                 Fix all ({Object.keys(contrastFixes).length})
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -524,8 +534,10 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                         aria-hidden="true"
                       />
                       <code style={{ fontSize: 11 }}>{fix}</code>
-                      <button
+                      <Button
                         type="button"
+                        variant="secondary"
+                        size="sm"
                         onClick={() => onColorChange(t.id, fix)}
                         style={{
                           marginLeft: "auto",
@@ -541,7 +553,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                         aria-label={`Fix contrast for ${t.name}`}
                       >
                         Fix
-                      </button>
+                      </Button>
                     </div>
                   );
                 })}
@@ -550,8 +562,9 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         })}
 
       {/* Add token */}
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={onAddToken}
         style={{
           marginTop: 16,
@@ -566,7 +579,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         }}
       >
         + Add token
-      </button>
+      </Button>
     </div>
   );
 };
