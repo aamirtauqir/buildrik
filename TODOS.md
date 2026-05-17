@@ -1,5 +1,29 @@
 # TODOS
 
+## 2026-05-18 — E-005 partial codemod CLOSED
+
+- ✅ 24 string-literal `emit()` callsites across 7 engine production files codemod'd to use `EVENTS` constants
+- ✅ 8 new EVENTS constants added (additive — no rename, no breakage):
+  ELEMENT_WRAPPED, ELEMENT_UNWRAPPED, ELEMENT_REPLACED, ELEMENT_BINDING_SET,
+  ELEMENT_BINDING_REMOVED, ELEMENT_NUDGED, ELEMENT_REORDERED, UI_TOGGLE_COMPONENT_VIEW
+- ✅ All emit values preserved — subscribers using `composer.on("element:updated", ...)` continue to match because `EVENTS.ELEMENT_UPDATED === "element:updated"`. Pure literal-to-constant substitution
+- ✅ Files touched: ElementStyles.ts, ElementOperations.ts, ElementChildren.ts, ElementCRUD.ts, ComponentVariantResolver.ts, defaultCommands.ts, commandOperations.ts
+- ✅ 269/269 production engine tests pass post-codemod
+- ⏸ DS arc events (colorMode/migration/tokens/lint) intentionally left as string literals per memory `project_editor_audit_progress_20260509` — authoring-phase rule. Fold in once DS arc fully closes.
+- ⏸ ESLint ban-rule for string-literal `emit()` — follow-up sweep with the DS events.
+
+Shipped at `4f5474f3`.
+
+## 2026-05-18 — Editor honesty audit CLOSED
+
+- ✅ Findings memo at `memory/project_editor_honesty_audit_20260518.md`
+- ✅ TODOS.md drained of 3 stale entries:
+  - Mobile rail (out-of-scope per DESIGN.md desktop-only direction)
+  - DomainsScreen Connect button (file doesn't exist in tree)
+  - Create DESIGN.md (file exists at /DESIGN.md)
+- ✅ Confirmed in code: Settings tab has zero empty `onClick` handlers; AccountModal + InviteModal are SCAFFOLD only, gated behind `VITE_FEATURE_ACCOUNT`/`VITE_FEATURE_INVITE` (never user-visible until flipped)
+- ✅ Cross-checked tRPC procs: `account.profile.get` + `account.profile.update` + 20+ procs in `account.ts` exist server-side. The SCAFFOLD comment "when Profile backend ships (Phase 2)" in AccountModal is **stale** — backend already shipped, only UI wiring remains.
+
 ## 2026-05-18 — Localization · LOC:A,A Backend Phase 1 CLOSED
 
 - ✅ Decision locked: subdirectory URLs + JSON translations column (brief: `docs/plans/2026-05-08-localization-design-brief.md`)
