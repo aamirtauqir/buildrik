@@ -23,6 +23,7 @@ import type { Composer } from "../../../../engine/Composer";
 import { CATALOG } from "../../../components-catalog/catalog";
 import type { ComponentType } from "../../../components-catalog/types";
 import type { ComponentDefinition } from "../../../../shared/types/components";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 const CATALOG_LAST_UPDATED = "2026-04-12";
 
@@ -298,14 +299,16 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         <div style={headerTitleStyle}>
           Catalog · {CATALOG.length} polished components shipped
         </div>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={() => dispatchOpenComponentsPanel(composer)}
           data-open-components-panel
           style={openPanelButtonStyle}
         >
           Open Components
-        </button>
+        </Button>
       </div>
       <div style={headerSubtitleStyle}>
         Buildrik catalog v3 · last updated {CATALOG_LAST_UPDATED}
@@ -334,8 +337,10 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         <div style={aiCtaTextStyle} data-ai-assist-cta>
           + Add via AI-assist
         </div>
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={onOpenAIAssist}
           disabled={!onOpenAIAssist}
           data-open-ai-assist
@@ -346,7 +351,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
           }}
         >
           Open AI-assist
-        </button>
+        </Button>
       </div>
       <div style={aiDescStyle}>
         Describe a component — Claude drafts a schema. Preview before adopt.

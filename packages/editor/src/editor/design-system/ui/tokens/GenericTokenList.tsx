@@ -3,6 +3,8 @@ import type { DesignToken } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Input } from "@/editor/shared/vibcoder/Input";
 
 interface GenericTokenListProps {
   tokens: DesignToken[];
@@ -170,7 +172,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                   </div>
                 )}
               </div>
-              <input
+              <Input
                 type="text"
                 value={t.value}
                 onChange={(e) => onTokenChange(t.id, e.target.value)}
@@ -180,8 +182,10 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                 }}
                 aria-label={`${friendly} value`}
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 disabled={!undoable}
                 onClick={() => onUndo(t.id)}
                 style={{
@@ -192,7 +196,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                 aria-label={`Restore ${friendly}`}
               >
                 Restore
-              </button>
+              </Button>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <TokenUsageChip count={usage} />
                 {hasLint && <span style={lintTagStyle}>[lint]</span>}

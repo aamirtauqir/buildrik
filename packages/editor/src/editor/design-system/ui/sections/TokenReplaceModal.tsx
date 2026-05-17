@@ -22,6 +22,7 @@ import {
   ModalDescription,
   ModalFooter,
 } from "../../../shared/vibcoder";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import type { DesignToken } from "../../types";
 
 export interface TokenReplaceModalProps {
@@ -163,22 +164,24 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
         </div>
         <ModalFooter>
           <div style={btnRowStyle}>
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={() => onOpenChange(false)}
               style={cancelBtnStyle}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="danger"
               data-token-replace-confirm
               disabled={!selectedId}
               onClick={handleConfirm}
               style={confirmBtnStyle(!!selectedId)}
             >
               Delete and replace
-            </button>
+            </Button>
           </div>
         </ModalFooter>
       </ModalContent>
