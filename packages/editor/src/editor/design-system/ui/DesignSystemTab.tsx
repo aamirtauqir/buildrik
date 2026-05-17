@@ -12,6 +12,7 @@ import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
 import { useToast } from "@/editor/shared/vibcoder";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { DEFAULT_TOKENS } from "../constants";
 import {
   useColorRegistry,
@@ -495,8 +496,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         </div>
         <DSModeToggle />
         {composer && composer.colorMode ? <ColorModeToggle composer={composer} /> : null}
-        <button
+        <Button
           type="button"
+          variant="ghost"
           data-ai-entry
           onClick={() => setAiOpen(true)}
           aria-label="Open AI assist"
@@ -516,7 +518,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           }}
         >
           {"✨"}
-        </button>
+        </Button>
         <ExportDropdown
           onExport={handleExport}
           isDirty={isDirty}
@@ -545,8 +547,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             (s.id === "styles" && stylesDirty > 0);
           const selected = activeSection === s.id;
           return (
-            <button
+            <Button
               key={s.id}
+              variant="ghost"
               role="tab"
               id={`design-tab-${s.id}`}
               aria-selected={selected}
@@ -586,7 +589,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                   aria-label="unsaved changes"
                 />
               )}
-            </button>
+            </Button>
           );
         })}
       </div>
