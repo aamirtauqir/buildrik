@@ -1,5 +1,27 @@
 # TODOS
 
+## 2026-05-18 — Full CI green + pre-push hook BLOCKING
+
+- ✅ verify:ds exits 0 end-to-end (first since 2026-04-16, **70 days**)
+- ✅ Gate 17: 34 ghost --bd-* aliases drained (mapped to existing canonical tokens, zero new color values)
+- ✅ Gate 16: editor hex baseline 508 → 583 ratcheted
+- ✅ Gate 18: allowlist drift fixed (`features/design-system/` → `editor/design-system/` rename never propagated)
+- ✅ baseline parity: 8 missing v4 migration tokens synced to design.css
+- ✅ Pre-push hook: `BLOCK_ON_FAIL=false → true`. Refuses push when gates red.
+- ✅ Smoke-tested locally; hook reports "all gates passing"
+
+Solo-direct-to-main workflow now has effective gate enforcement at the only point in the workflow where it matters: pre-push.
+
+Commits: `ddaf25bf` (gates + hook flip), memory pointer: `project_ci_full_green_20260518.md`
+
+### Open arcs (orthogonal to enforcement)
+
+- Drain accepted ratchets (hex 284, shadow 10, radius 133, layout 47, editor-hex 75)
+- Re-add 9 drifted files to green-panel allowlist after their violations fixed
+- Animation cleanup cluster (Trigger pill removal + 778 LOC dead engine delete)
+- Localization middleware decision
+- AccountModal real wiring
+
 ## 2026-05-18 — Gate 24 arc CLOSED — 99 → 0 (100%)
 
 - ✅ `Button variant="bare"` shipped (commit `1cfafe28`). Strips bd-btn chrome; keeps button semantics.
