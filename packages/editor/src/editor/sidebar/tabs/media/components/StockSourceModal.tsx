@@ -167,9 +167,11 @@ export function StockSourceModal({
               {SOURCES.map((s) => {
                 const active = source === s.id;
                 return (
-                  <button
+                  <Button
                     key={s.id}
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     role="radio"
                     aria-checked={active}
                     onClick={() => onSetSource(s.id)}
@@ -185,7 +187,7 @@ export function StockSourceModal({
                     }}
                   >
                     {s.label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

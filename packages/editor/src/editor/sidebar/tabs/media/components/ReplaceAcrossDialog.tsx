@@ -1,4 +1,5 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 /**
  * ReplaceAcrossDialog — confirms and surfaces results of replace-across-canvas.
  *
@@ -173,19 +174,21 @@ export function ReplaceAcrossDialog({
               >
                 {state.pages.map((p) => (
                   <li key={p.id} className="med-rx-page-row">
-                    <label className="med-rx-page-label">
-                      <input
-                        type="checkbox"
-                        checked={state.selected.has(p.id)}
-                        onChange={() => handleTogglePage(p.id)}
-                        data-testid={`rx-page-${p.id}`}
-                        aria-label={`Replace on ${p.name}`}
-                      />
-                      <span className="med-rx-page-name">{p.name}</span>
-                      <span className="med-rx-page-count">
-                        {p.useCount} use{p.useCount === 1 ? "" : "s"}
-                      </span>
-                    </label>
+                    <Checkbox
+                      className="med-rx-page-label"
+                      checked={state.selected.has(p.id)}
+                      onChange={() => handleTogglePage(p.id)}
+                      data-testid={`rx-page-${p.id}`}
+                      aria-label={`Replace on ${p.name}`}
+                      label={
+                        <>
+                          <span className="med-rx-page-name">{p.name}</span>
+                          <span className="med-rx-page-count">
+                            {p.useCount} use{p.useCount === 1 ? "" : "s"}
+                          </span>
+                        </>
+                      }
+                    />
                   </li>
                 ))}
               </ul>

@@ -182,9 +182,11 @@ export function AssetDetailOverlay({
       {/* Tabs */}
       <div className="med-detail-tabs" role="tablist" aria-label="Asset detail sections">
         {tabs.map((t) => (
-          <button
+          <Button
             key={t.id}
             type="button"
+            variant="ghost"
+            size="sm"
             role="tab"
             aria-selected={tab === t.id}
             className={`med-detail-tab${tab === t.id ? " is-active" : ""}`}
@@ -194,7 +196,7 @@ export function AssetDetailOverlay({
             {t.count != null && t.count > 0 ? (
               <span className="med-detail-tab-count">{t.count}</span>
             ) : null}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -298,8 +300,10 @@ export function AssetDetailOverlay({
               <ul className="med-detail-versions-list">
                 {versions.map((v) => (
                   <li key={v.key}>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       className={`med-detail-version-row${v.key === item.key ? " is-current" : ""}`}
                       onClick={() => v.key !== item.key && onOpenItem?.(v)}
                       disabled={v.key === item.key || !onOpenItem}
@@ -309,7 +313,7 @@ export function AssetDetailOverlay({
                         {fmtSize(v.size)} · {new Date(v.createdAt).toLocaleDateString()}
                       </span>
                       {v.key === item.key && <span className="med-detail-version-badge">current</span>}
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>

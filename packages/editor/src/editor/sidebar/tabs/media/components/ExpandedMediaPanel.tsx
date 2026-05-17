@@ -15,6 +15,7 @@
 import * as React from "react";
 import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";
 import type { IconConfig, MediaFolder } from "@shared/types/media";
@@ -382,7 +383,7 @@ export function ExpandedMediaPanel({
                 onDrop={(e) => handleFolderDrop(e, f.id)}
               >
                 {renamingFolderId === f.id ? (
-                  <input
+                  <Input
                     type="text"
                     className="exp-folder-item__rename-input"
                     value={renameDraft}

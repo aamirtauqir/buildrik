@@ -15,6 +15,7 @@
 import * as React from "react";
 import { ChevronRight } from "lucide-react";
 import type { MediaFolder } from "@shared/types/media";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 export interface FolderBreadcrumbProps {
   folders: MediaFolder[];
@@ -37,8 +38,10 @@ export function FolderBreadcrumb({
       className="med-folder-breadcrumb"
       aria-label="Folder breadcrumb"
     >
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         className={
           "med-folder-breadcrumb__seg" +
           (currentFolderId === null ? " med-folder-breadcrumb__seg--current" : "")
@@ -46,7 +49,7 @@ export function FolderBreadcrumb({
         onClick={() => onNavigate(null)}
       >
         All Media
-      </button>
+      </Button>
       {path.map((folder, idx) => {
         const isCurrent = idx === path.length - 1;
         return (
@@ -56,8 +59,10 @@ export function FolderBreadcrumb({
               className="med-folder-breadcrumb__sep"
               aria-hidden
             />
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               className={
                 "med-folder-breadcrumb__seg" +
                 (isCurrent ? " med-folder-breadcrumb__seg--current" : "")
@@ -65,7 +70,7 @@ export function FolderBreadcrumb({
               onClick={() => onNavigate(folder.id)}
             >
               {folder.name}
-            </button>
+            </Button>
           </React.Fragment>
         );
       })}
