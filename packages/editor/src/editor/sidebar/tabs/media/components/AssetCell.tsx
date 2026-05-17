@@ -5,14 +5,16 @@
  * Consumed by §10 library grid, §12 expanded library area, §15 detail drawer
  * preview.
  *
- * Native `<button>` is used (not vibcoder Button) because this is a leaf
- * primitive whose visual is the thumb itself — vibcoder Button chrome
- * (padding, hover bg) would conflict with the edge-to-edge thumb fill.
+ * Uses vibcoder Button with `variant="bare"` — strips bd-btn padding /
+ * hover bg / radius / transition so the consumer's `.med-asset-cell`
+ * className is the sole source of visual styling. Keeps button semantics
+ * (keyboard focus, click activation, :disabled, type="button" defaulting).
  */
 import { Play, FileType, Lock } from "lucide-react";
 import type { DragEvent, MouseEvent } from "react";
 import type { LibraryItem } from "../data/mediaTypes";
 import { UsagePips } from "./UsagePips";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 interface AssetCellProps {
   item: LibraryItem;
@@ -56,8 +58,9 @@ export function AssetCell({
   };
 
   return (
-    <button
+    <Button
       type="button"
+      variant="bare"
       className={className}
       disabled={isLocked}
       draggable={!isLocked}
@@ -99,6 +102,6 @@ export function AssetCell({
           <Lock size={18} />
         </div>
       ) : null}
-    </button>
+    </Button>
   );
 }

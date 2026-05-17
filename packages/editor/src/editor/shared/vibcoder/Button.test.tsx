@@ -18,11 +18,19 @@ describe("vibcoder Button wrapper", () => {
     expect(lg.className).toContain("bd-btn--lg");
   });
 
-  it("supports all 5 variants", () => {
-    for (const v of ["primary", "secondary", "ghost", "danger", "publish"] as const) {
+  it("supports all 6 variants", () => {
+    for (const v of ["primary", "secondary", "ghost", "danger", "publish", "bare"] as const) {
       const { container } = render(<Button variant={v}>x</Button>);
       expect(container.querySelector("button")!.className).toContain(`bd-btn--${v}`);
     }
+  });
+
+  it("bare variant: emits bd-btn base + bd-btn--bare modifier (no implicit reset to other variant)", () => {
+    const { container } = render(<Button variant="bare">x</Button>);
+    const btn = container.querySelector("button")!;
+    expect(btn.className).toContain("bd-btn");
+    expect(btn.className).toContain("bd-btn--bare");
+    expect(btn.className).not.toContain("bd-btn--primary");
   });
 
   it("emits busy state class + aria-busy when busy", () => {

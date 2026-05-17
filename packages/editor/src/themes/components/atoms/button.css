@@ -140,3 +140,34 @@
   background: var(--buildrick-accent-pressed);
   filter: brightness(0.9);
 }
+
+/* ---- Bare variant ----
+ * Strips every visual the base .bd-btn applies (padding, border, radius,
+ * font, transition, focus glow) so the consumer's className/style is the
+ * SOLE source of visual styling. Keeps semantic <button> behavior:
+ * keyboard focus, click activation, :disabled aria mapping, type="button"
+ * defaulting. Use when the button's "chrome" IS the content (image tile,
+ * full-bleed thumbnail card, custom-styled cell) and bd-btn padding +
+ * hover bg would conflict with the consumer's own selected/applied states.
+ *
+ * Consumer is responsible for adequate focus-visible affordance. Default
+ * focus ring is dropped here intentionally — re-add via the consumer's
+ * className if needed, e.g. `.med-asset-cell:focus-visible { outline: ... }`.
+ *
+ * Active consumer: editor/sidebar/tabs/media/components/AssetCell.tsx
+ * (edge-to-edge thumb where bd-btn chrome would obscure the image fill).
+ */
+.bd-btn--bare {
+  /* Display NOT reset — consumer's className controls layout. */
+  gap: 0;
+  padding: 0;
+  font: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  transition: none;
+}
+.bd-btn--bare:focus-visible { box-shadow: none; }
+/* :disabled inherits cursor + opacity + pointer-events from .bd-btn base. */

@@ -561,16 +561,15 @@ else
     | jq -s 'add | length' 2>/dev/null || echo "0")
 fi
 
-# Baseline 1 (was 3 → 0 originally) per 2026-05-18 Radio primitive ship:
-#   - 1x <button> in AssetCell.tsx — doc-justified native button for edge-to-edge
-#     thumb visual where bd-btn padding/hover would conflict.
-# Previous baseline 3 included 2x <input type=radio> in ExportSection.tsx;
-# those closed when the vibcoder Radio + RadioGroup primitives shipped.
-# Ratchet back to 0 after a `bareButton` variant or BareButton primitive ships
-# that AssetCell can adopt without losing edge-to-edge fill.
-# See memory/project_gate24_codemod_arc_20260518.md and
-#     memory/project_radio_primitive_20260518.md for the arc.
-check_gate 24 "$GATE24_HITS" "1" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — locked floor: 1 (AssetCell edge-to-edge thumb)" || exit 1
+# Baseline 0 (was 99 → 36 → 3 → 1 → 0 across the 2026-05-18 arc).
+# Final close: AssetCell.tsx adopted Button variant="bare" once the bare
+# variant landed (strips bd-btn padding / hover / radius / transition so the
+# consumer's className is sole source of visual styling, while keeping
+# semantic button behavior). All editor chrome JSX uses vibcoder primitives.
+# See memory/project_gate24_codemod_arc_20260518.md,
+#     memory/project_radio_primitive_20260518.md, and
+#     memory/project_bare_button_variant_20260518.md.
+check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — ZERO TOLERANCE" || exit 1
 
 # Gate 25: Orphan codemod fixtures.
 # Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —
