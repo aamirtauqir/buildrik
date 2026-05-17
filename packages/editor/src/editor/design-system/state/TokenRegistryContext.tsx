@@ -280,6 +280,7 @@ const FALLBACK_COLOR: ColorRegistry = {
     colorDefaults.filter((t) => t.name.toLowerCase().includes(q.toLowerCase())),
   addToken: noop,
   deleteToken: noop,
+  renameToken: noop,
 };
 
 const FALLBACK_SPACING: SpacingRegistry = {

@@ -254,6 +254,50 @@ describe("AliasResolver.findAliasesOf", () => {
   });
 });
 
+// B1 follow-up (2026-05-17): map-index for replacedBy bridge.
+// findReplacedBy mirrors findAliasesOf — given a canonical target id, return
+// the (zero or one) token whose replacedBy points at it. Bridge writes are
+// 1:1 by construction (one rename source per target); resolver must surface
+// the source even when the graph contains cycles.
+describe("AliasResolver.findReplacedBy", () => {
+  let resolver: AliasResolver;
+
+  beforeEach(() => {
+    resolver = new AliasResolver(makeEvents());
+  });
+
+  it("returns undefined when token list is empty", () => {
+    expect(resolver.findReplacedBy("nonexistent", [])).toBeUndefined();
+  });
+
+  it("returns undefined when no token has replacedBy pointing at target", () => {
+    const tokens: DesignToken[] = [
+      { id: "new-id", name: "New", value: "#000", category: "colors", cssVar: "--bd-new", type: "color" },
+    ];
+    expect(resolver.findReplacedBy("new-id", tokens)).toBeUndefined();
+  });
+
+  it("returns the source token whose replacedBy points at target", () => {
+    const tokens: DesignToken[] = [
+      { id: "new-id", name: "New", value: "#000", category: "colors", cssVar: "--bd-new", type: "color" },
+      { id: "old-id", name: "Old", value: "#000", category: "colors", cssVar: "--bd-old", type: "color", replacedBy: "new-id" },
+    ];
+    const result = resolver.findReplacedBy("new-id", tokens);
+    expect(result?.id).toBe("old-id");
+  });
+
+  it("does not return tokens whose replacedBy points at OTHER targets", () => {
+    const tokens: DesignToken[] = [
+      { id: "new-a", name: "NewA", value: "#000", category: "colors", cssVar: "--bd-new-a", type: "color" },
+      { id: "new-b", name: "NewB", value: "#000", category: "colors", cssVar: "--bd-new-b", type: "color" },
+      { id: "old-a", name: "OldA", value: "#000", category: "colors", cssVar: "--bd-old-a", type: "color", replacedBy: "new-a" },
+      { id: "old-b", name: "OldB", value: "#000", category: "colors", cssVar: "--bd-old-b", type: "color", replacedBy: "new-b" },
+    ];
+    expect(resolver.findReplacedBy("new-a", tokens)?.id).toBe("old-a");
+    expect(resolver.findReplacedBy("new-b", tokens)?.id).toBe("old-b");
+  });
+});
+
 describe("AliasResolver.validateAndEmit", () => {
   it("emits tokens:alias-changed on success", () => {
     const emit = vi.fn();

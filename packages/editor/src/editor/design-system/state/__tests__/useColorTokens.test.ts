@@ -82,3 +82,51 @@ describe("useColorTokens — deleteToken", () => {
     expect(result.current.isDirty).toBe(true);
   });
 });
+
+// B1 follow-up (2026-05-17): renameToken creates a new canonical token with
+// the requested id and leaves the old token in place with replacedBy set so
+// the resolver can bridge consumers from the old id to the new one.
+describe("useColorTokens — renameToken", () => {
+  it("appends a new token with the requested id, copies fields, derives cssVar", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.renameToken("color-primary", "color-action-new"));
+    expect(result.current.tokens).toHaveLength(2);
+    const fresh = result.current.tokens.find((t) => t.id === "color-action-new");
+    expect(fresh).toBeDefined();
+    expect(fresh?.value).toBe(MOCK_TOKEN.value);
+    expect(fresh?.category).toBe("colors");
+    expect(fresh?.cssVar).toBe("--buildrick-design-color-action-new");
+    expect(fresh?.replacedBy).toBeUndefined();
+  });
+
+  it("marks the old token with replacedBy pointing at the new id", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.renameToken("color-primary", "color-action-new"));
+    const old = result.current.tokens.find((t) => t.id === "color-primary");
+    expect(old).toBeDefined();
+    expect(old?.replacedBy).toBe("color-action-new");
+  });
+
+  it("marks isDirty after rename", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.renameToken("color-primary", "color-action-new"));
+    expect(result.current.isDirty).toBe(true);
+  });
+
+  it("is a no-op when oldId does not exist", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.renameToken("color-nonexistent", "color-other"));
+    expect(result.current.tokens).toHaveLength(1);
+    expect(result.current.tokens[0].id).toBe("color-primary");
+  });
+
+  it("is a no-op when newId already exists (avoid collision)", () => {
+    const REPL: DesignToken = { ...MOCK_TOKEN, id: "color-existing" };
+    const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, REPL]));
+    act(() => result.current.renameToken("color-primary", "color-existing"));
+    // Old token untouched (no replacedBy written), no third token created.
+    expect(result.current.tokens).toHaveLength(2);
+    const old = result.current.tokens.find((t) => t.id === "color-primary");
+    expect(old?.replacedBy).toBeUndefined();
+  });
+});

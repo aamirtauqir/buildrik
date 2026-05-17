@@ -264,6 +264,21 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   }, [allTokens, color, radius, shadow, motion, border, opacity, zindex,
       breakpoint, grid, sizing, icon, imagery]);
 
+  // B1 follow-up (2026-05-17): dispatch rename to the owning registry. Same
+  // routing rules as handleTokenDelete — color flows to useColorTokens, every
+  // other kind to its useTokensForKind registry. Type + spacing currently
+  // have no rename API (no DS UX entry for those) so renames there silently
+  // no-op via optional chaining.
+  const handleTokenRename = React.useCallback((id: string, newId: string) => {
+    const tok = allTokens.find((t) => t.id === id);
+    if (!tok) return;
+    const k = tok.kind ?? (tok.category === "colors" ? "color" : undefined);
+    if (k === "color") { color.renameToken(id, newId); return; }
+    const r = newKindRegistry(k as TokenKind);
+    r?.renameToken?.(id, newId);
+  }, [allTokens, color, radius, shadow, motion, border, opacity, zindex,
+      breakpoint, grid, sizing, icon, imagery]);
+
   // Beginner mode: foundation kinds with zero visible tokens move to the
   // bottom. B5-wire (2026-05-17): "visible" honors the semantic filter, so
   // a foundation kind with primitives-only (no semantics yet) still mutes
@@ -294,7 +309,7 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       tokens={allTokens}
       onTokenChange={handleTokenChange}
       onTokenDelete={handleTokenDelete}
-      onTokenRename={undefined /* TODO(T8 follow-up): registry rename API */}
+      onTokenRename={handleTokenRename}
     >
       {({ onRowClick }) => (
         <div>

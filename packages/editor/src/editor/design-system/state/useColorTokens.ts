@@ -53,6 +53,17 @@ export interface ColorTokensActions {
    *     bridged token after 2-version retention window.
    */
   deleteToken: (id: string, options?: { replaceWith?: string }) => void;
+  /**
+   * Rename a token id while preserving consumer references via the B1
+   * `replacedBy` bridge. Appends a new token carrying `newId` (cssVar
+   * derived from `--buildrick-design-${newId}`) and writes `replacedBy:
+   * newId` on the old token. Both stay in the registry; resolver redirects
+   * old → new for all consumers.
+   *
+   * No-op when `oldId` is missing or `newId` already exists (collision).
+   * B1 follow-up 2026-05-17.
+   */
+  renameToken: (oldId: string, newId: string) => void;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -236,6 +247,21 @@ export function useColorTokens(
     });
   }, []);
 
+  const renameToken = useCallback((oldId: string, newId: string) => {
+    setTokens((prev) => {
+      const src = prev.find((t) => t.id === oldId);
+      if (!src) return prev;
+      if (prev.some((t) => t.id === newId)) return prev;
+      const fresh: DesignToken = {
+        ...src,
+        id: newId,
+        cssVar: `--buildrick-design-${newId}`,
+        replacedBy: undefined,
+      };
+      return prev.map((t) => (t.id === oldId ? { ...t, replacedBy: newId } : t)).concat(fresh);
+    });
+  }, []);
+
   const filterTokens = useCallback(
     (query: string): DesignToken[] => {
       if (!query.trim()) return tokens;
@@ -266,5 +292,6 @@ export function useColorTokens(
     filterTokens,
     addToken,
     deleteToken,
+    renameToken,
   };
 }

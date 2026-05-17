@@ -121,4 +121,36 @@ describe("useTokensForKind", () => {
     act(() => result.current.deleteToken("radius-md", { replaceWith: "radius-lg" }));
     expect(result.current.isDirty).toBe(true);
   });
+
+  // B1 follow-up (2026-05-17): renameToken contract — same shape as
+  // useColorTokens.renameToken. Creates new token, bridges old via replacedBy.
+
+  it("renameToken appends new token + sets replacedBy on the old one", () => {
+    const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
+    act(() => result.current.renameToken("radius-md", "radius-medium"));
+    expect(result.current.tokens).toHaveLength(2);
+    const fresh = result.current.tokens.find((t) => t.id === "radius-medium");
+    expect(fresh).toBeDefined();
+    expect(fresh?.value).toBe("8px");
+    expect(fresh?.kind).toBe("radius");
+    expect(fresh?.replacedBy).toBeUndefined();
+    const old = result.current.tokens.find((t) => t.id === "radius-md");
+    expect(old?.replacedBy).toBe("radius-medium");
+  });
+
+  it("renameToken is a no-op when oldId does not exist", () => {
+    const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
+    act(() => result.current.renameToken("radius-missing", "radius-other"));
+    expect(result.current.tokens).toHaveLength(1);
+    expect(result.current.tokens[0].id).toBe("radius-md");
+  });
+
+  it("renameToken is a no-op when newId already exists", () => {
+    const lg: DesignToken = { ...radiusToken, id: "radius-lg" };
+    const { result } = renderHook(() => useTokensForKind("radius", [radiusToken, lg]));
+    act(() => result.current.renameToken("radius-md", "radius-lg"));
+    expect(result.current.tokens).toHaveLength(2);
+    const old = result.current.tokens.find((t) => t.id === "radius-md");
+    expect(old?.replacedBy).toBeUndefined();
+  });
 });

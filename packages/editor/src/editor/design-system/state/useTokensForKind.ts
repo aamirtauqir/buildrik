@@ -35,6 +35,9 @@ interface TokensForKindActions {
   addToken: (token: DesignToken) => void;
   /** Delete a token. Pass `{ replaceWith }` for soft-delete via replacedBy bridge (B4 lock 2026-05-16). */
   deleteToken: (id: string, options?: { replaceWith?: string }) => void;
+  /** Rename a token via B1 replacedBy bridge. Appends a new token with `newId` and
+   *  writes replacedBy on the old. No-op on missing oldId or duplicate newId. */
+  renameToken: (oldId: string, newId: string) => void;
 }
 
 export type TokensForKindRegistry = TokensForKindState & TokensForKindActions;
@@ -172,6 +175,21 @@ export function useTokensForKind(
     setTokens((prev) => [...prev, token]);
   }, []);
 
+  const renameToken = React.useCallback((oldId: string, newId: string) => {
+    setTokens((prev) => {
+      const src = prev.find((t) => t.id === oldId);
+      if (!src) return prev;
+      if (prev.some((t) => t.id === newId)) return prev;
+      const fresh: DesignToken = {
+        ...src,
+        id: newId,
+        cssVar: `--buildrick-design-${newId}`,
+        replacedBy: undefined,
+      };
+      return prev.map((t) => (t.id === oldId ? { ...t, replacedBy: newId } : t)).concat(fresh);
+    });
+  }, []);
+
   const deleteToken = React.useCallback((id: string, options?: { replaceWith?: string }) => {
     // B4 (2026-05-16): soft-delete via replacedBy bridge — token stays,
     // resolver redirects to replaceWith. Hard delete only when no replacement.
@@ -203,5 +221,6 @@ export function useTokensForKind(
     filterTokens,
     addToken,
     deleteToken,
+    renameToken,
   };
 }

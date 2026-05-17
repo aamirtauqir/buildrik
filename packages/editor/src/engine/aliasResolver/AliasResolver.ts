@@ -22,14 +22,60 @@ import { AliasCycleError, AliasDepthError, MAX_ALIAS_DEPTH } from "./errors";
 export class AliasResolver {
   constructor(private readonly events: EventEmitter) {}
 
+  // B1 follow-up (2026-05-17): per-tokens-array forward + reverse caches.
+  // Keyed by the tokens array identity (WeakMap) so a stable registry
+  // snapshot resolves O(1) per lookup after the first call. When the
+  // registry mutates the array identity changes and the cache invalidates
+  // implicitly. Three caches:
+  //   - forwardIndex: id → token (validate/resolve/getChain hot paths)
+  //   - replacedByIndex: targetId → source token (findReplacedBy O(1))
+  //   - aliasOfIndex: targetId → source tokens[] (findAliasesOf O(1))
+  private readonly forwardIndex = new WeakMap<readonly DesignToken[], Map<string, DesignToken>>();
+  private readonly replacedByIndex = new WeakMap<readonly DesignToken[], Map<string, DesignToken>>();
+  private readonly aliasOfIndex = new WeakMap<readonly DesignToken[], Map<string, DesignToken[]>>();
+
+  private getForwardIndex(tokens: readonly DesignToken[]): Map<string, DesignToken> {
+    let m = this.forwardIndex.get(tokens);
+    if (!m) {
+      m = new Map<string, DesignToken>();
+      for (const t of tokens) m.set(t.id, t);
+      this.forwardIndex.set(tokens, m);
+    }
+    return m;
+  }
+
+  private getReplacedByIndex(tokens: readonly DesignToken[]): Map<string, DesignToken> {
+    let m = this.replacedByIndex.get(tokens);
+    if (!m) {
+      m = new Map<string, DesignToken>();
+      for (const t of tokens) if (t.replacedBy) m.set(t.replacedBy, t);
+      this.replacedByIndex.set(tokens, m);
+    }
+    return m;
+  }
+
+  private getAliasOfIndex(tokens: readonly DesignToken[]): Map<string, DesignToken[]> {
+    let m = this.aliasOfIndex.get(tokens);
+    if (!m) {
+      m = new Map<string, DesignToken[]>();
+      for (const t of tokens) {
+        if (!t.aliasOf) continue;
+        const list = m.get(t.aliasOf);
+        if (list) list.push(t);
+        else m.set(t.aliasOf, [t]);
+      }
+      this.aliasOfIndex.set(tokens, m);
+    }
+    return m;
+  }
+
   /**
    * Validate the alias graph. Throws on first violation found.
    *   - AliasCycleError(chain)   on any cycle (depth >= 2 cycles included)
    *   - AliasDepthError(chain)   when chain length exceeds MAX_ALIAS_DEPTH + 1
    */
   validate(tokens: readonly DesignToken[]): void {
-    const byId = new Map<string, DesignToken>();
-    for (const t of tokens) byId.set(t.id, t);
+    const byId = this.getForwardIndex(tokens);
 
     for (const start of tokens) {
       if (!start.aliasOf) continue;
@@ -66,8 +112,7 @@ export class AliasResolver {
    * adds to the visited set so cycles short-circuit to undefined.
    */
   resolve(tokenId: string, tokens: readonly DesignToken[]): DesignToken | undefined {
-    const byId = new Map<string, DesignToken>();
-    for (const t of tokens) byId.set(t.id, t);
+    const byId = this.getForwardIndex(tokens);
 
     const visited = new Set<string>();
     let cursor = byId.get(tokenId);
@@ -102,8 +147,7 @@ export class AliasResolver {
   }
 
   getChain(tokenId: string, tokens: readonly DesignToken[]): readonly string[] {
-    const byId = new Map<string, DesignToken>();
-    for (const t of tokens) byId.set(t.id, t);
+    const byId = this.getForwardIndex(tokens);
 
     const start = byId.get(tokenId);
     if (!start) return [];
@@ -134,6 +178,22 @@ export class AliasResolver {
    * array; tests cover empty / single / multiple / cycle cases.
    */
   findAliasesOf(targetId: string, tokens: readonly DesignToken[]): readonly DesignToken[] {
-    return tokens.filter((t) => t.aliasOf === targetId);
+    return this.getAliasOfIndex(tokens).get(targetId) ?? [];
+  }
+
+  /**
+   * Reverse lookup for B1 rename bridge — return the (unique) source token
+   * whose `replacedBy` equals `targetId`, or undefined when none exists.
+   * O(1) per call after first lookup against a given tokens array thanks to
+   * the per-array WeakMap index built in getReplacedByIndex.
+   *
+   * Bridge writes are 1:1 by construction (rename writes replacedBy on the
+   * single old id pointing at the canonical new id), so the return type is
+   * a single token rather than an array. If multiple sources accidentally
+   * point at the same target the last-built entry wins — that case is a
+   * data bug, not a resolver bug.
+   */
+  findReplacedBy(targetId: string, tokens: readonly DesignToken[]): DesignToken | undefined {
+    return this.getReplacedByIndex(tokens).get(targetId);
   }
 }
