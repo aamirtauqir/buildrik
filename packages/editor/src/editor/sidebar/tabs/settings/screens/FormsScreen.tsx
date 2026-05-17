@@ -223,16 +223,18 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
         </Field>
         <div style={filterRowStyles} role="tablist" aria-label="Submission filter">
           {(["inbox", "unread", "spam", "archived"] as const).map((f) => (
-            <button
+            <Button
               key={f}
               type="button"
+              variant="ghost"
+              size="sm"
               role="tab"
               aria-selected={filter === f}
               onClick={() => setFilter(f)}
               style={filter === f ? filterChipActiveStyles : filterChipStyles}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
+            </Button>
           ))}
         </div>
       </Section>
@@ -251,8 +253,9 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
               const isExpanded = expandedId === s.id;
               return (
                 <li key={s.id} style={s.isRead ? rowStyles : rowUnreadStyles}>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => {
                       setExpandedId(isExpanded ? null : s.id);
                       if (!s.isRead) void handleUpdate(s.id, { isRead: true });
@@ -267,7 +270,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                       <span style={timestampStyles}>{formatTime(s.createdAt)}</span>
                     </div>
                     {s.sourceUrl && <div style={sourceStyles}>{s.sourceUrl}</div>}
-                  </button>
+                  </Button>
                   {isExpanded && (
                     <div style={detailStyles}>
                       <dl style={dlStyles}>

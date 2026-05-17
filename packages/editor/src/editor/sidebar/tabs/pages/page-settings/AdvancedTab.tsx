@@ -30,9 +30,11 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
         </div>
         <div style={{ display: "inline-flex", padding: 2, background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)", borderRadius: 4 }} role="radiogroup" aria-label="Page visibility">
           {(["live", "hidden", "password"] as const).map((v) => (
-            <button
+            <Button
               key={v}
               type="button"
+              variant="ghost"
+              size="sm"
               role="radio"
               aria-checked={s.visibility === v}
               style={{
@@ -50,7 +52,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
               onClick={() => s.setVisibility(v)}
             >
               {v.charAt(0).toUpperCase() + v.slice(1)}
-            </button>
+            </Button>
           ))}
         </div>
         <HelperText>

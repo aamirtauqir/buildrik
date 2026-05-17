@@ -188,9 +188,9 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
           {submitError && (
             <div role="alert" style={errorStyles}>{submitError}</div>
           )}
-          <button type="submit" disabled={submitting} style={addButtonStyles}>
+          <Button type="submit" variant="primary" disabled={submitting} style={addButtonStyles}>
             {submitting ? "Adding…" : "Add redirect"}
-          </button>
+          </Button>
         </form>
       </Section>
 
