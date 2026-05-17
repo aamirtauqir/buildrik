@@ -1,5 +1,28 @@
 # TODOS
 
+## 2026-05-18 — Animation feature audit CLOSED (report-only, no code changes)
+
+- ✅ Animation is inspector SECTION (`editor/inspector/sections/AnimationSection.tsx`), not a sidebar tab.
+- ✅ Two parallel animation systems found:
+  - **AnimationSection** — CSS-only, fires on mount. `setAnimation()` writes inline `style.animation: bd-anim-X ...`. All 25 type buttons have matching `bd-anim-*` keyframes.
+  - **InteractionsSection** — GSAP runtime via InteractionRuntime + InteractionManager. Honors load/scroll/hover/click triggers properly.
+- 🔴 User-facing footgun: AnimationSection Trigger pills (load/scroll/hover/click) + scrollOffset slider are DEAD. Stored in element data but never consumed at runtime. User picks "hover" → animation still fires on mount.
+- 🔴 778 LOC of dead engine code:
+  - `engine/animations/ScrollTriggerEngine.ts` (362 LOC) — only self-imports
+  - `engine/animations/TimelineManager.ts` (416 LOC) — only self-imports
+  - `engine/animations/GSAPEngine.ts` (342 LOC) — partially live via InteractionRuntime, Timeline/ScrollTrigger features ride in unused
+- 🔴 Dead button: InteractionsSection "Open Timeline" → `console.warn("not yet implemented")` in `registry/effects.tsx:121`
+
+Full ledger: `memory/project_animation_audit_20260518.md`
+
+### Open arcs (deferred)
+
+- **Fix trigger footgun** — remove dead Trigger row from AnimationSection (cheap, ~10 min, honest) OR wire to runtime listener (~1-2 days, real feature). Recommended: remove for now, direct users to InteractionsSection for triggered animations.
+- **Delete ScrollTriggerEngine + TimelineManager** — 778 LOC drain. Verify, `rm`, run tests. ~15 min.
+- **Wire or kill onOpenTimeline** — current `console.warn` handler is dead button in Interactions UI.
+- **Slim GSAPEngine** — keep only what InteractionRuntime consumes.
+- **Consolidate Animation + Interactions** — multi-day UX refactor. Merge into one section with clear fire-on-mount vs fire-on-trigger model.
+
 ## 2026-05-18 — CI gate audit CLOSED (partial recovery + WARN-only hook)
 
 - ✅ Discovered CI red for 1 month (69 consecutive fails since 2026-04-16). Last green: `2026-04-16T17:18:47Z`.
