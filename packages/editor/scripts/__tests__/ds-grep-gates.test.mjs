@@ -31,12 +31,11 @@ test("Gate 7 fires when non-vendored CSS ships @media (prefers-reduced-motion)",
     __dirname,
     "../../src/themes/design-system/test-gate7-fixture.css",
   );
-  // Belt-and-braces: refuse to overwrite an unrelated file with the same path.
-  if (existsSync(planted)) {
-    throw new Error(
-      `Refusing to overwrite existing file at ${planted} — rename or remove it first.`,
-    );
-  }
+  // Belt-and-braces: clean up any stale fixture leaked by a crashed prior run.
+  // Filename is unique to this test (`test-gate7-fixture.css`) — overwriting
+  // an unrelated file at this path would require someone to have manually
+  // created one with that exact name, which is their problem.
+  if (existsSync(planted)) unlinkSync(planted);
   writeFileSync(
     planted,
     "@media (prefers-reduced-motion: reduce) { .x { transition: none; } }\n",

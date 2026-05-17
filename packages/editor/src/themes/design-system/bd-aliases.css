@@ -73,6 +73,10 @@
   --bd-warning-tint: var(--buildrick-warning-light);
   --bd-warning-light: var(--buildrick-warning-light);
   --bd-warning-border: var(--buildrick-warning-border);
+  /* Short-form synonyms used by template/DS chrome (consumers carry inline fallbacks). */
+  --bd-warn-soft: var(--buildrick-warning-light);
+  --bd-warn-border: var(--buildrick-warning-border);
+  --bd-warn-strong: var(--buildrick-warning);
   --bd-info: var(--buildrick-info);
 
   /* ─── CANVAS BOX-MODEL OVERLAYS ──────────────────────────────────────── */

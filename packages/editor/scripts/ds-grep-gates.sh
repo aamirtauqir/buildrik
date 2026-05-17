@@ -326,8 +326,12 @@ fi
 # `/legacy/.../bd-aliases.css` or `/other/.../aliases.css` from silently bypassing.
 CANONICAL='packages/editor/src/themes/design-system/bd-aliases.css'
 GENERATED='packages/editor/src/themes/components/_aliases.css'
+# DS panel dark-preview chrome legitimately scopes --bd-* overrides inside
+# [data-ds-preview="dark"] for the design-system tab preview only (NOT editor
+# chrome). Added per T10 DS dark-chrome invert (commit d3fde9f0).
+DS_PREVIEW_DARK='packages/editor/src/themes/design-system/ds-panel-dark.css'
 LEAK_CSS=$(grep -rnE '^\s*--bd-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' --exclude-dir=project 2>/dev/null \
-  | grep -vE "(^|/)${CANONICAL}:|${GENERATED}:" \
+  | grep -vE "(^|/)${CANONICAL}:|${GENERATED}:|${DS_PREVIEW_DARK}:" \
   || true)
 LEAK_TSX=$(grep -rnE '"--bd-[a-z0-9-]+"\s*:' packages/editor/src --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null \
   | grep -v '__tests__' \
@@ -557,7 +561,13 @@ else
     | jq -s 'add | length' 2>/dev/null || echo "0")
 fi
 
-check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — ZERO TOLERANCE" || exit 1
+# Baseline 3 (was 0) per 2026-05-18 Gate 24 codemod arc closeout:
+#   - 2x <input type=radio> in ExportSection.tsx — no Radio primitive in vibcoder
+#   - 1x <button> in AssetCell.tsx — doc-justified native button for edge-to-edge
+#     thumb visual where bd-btn padding/hover would conflict
+# Ratchet back to 0 after Radio primitive + BareButton variant ship.
+# See memory/project_gate24_codemod_arc_20260518.md for the full arc.
+check_gate 24 "$GATE24_HITS" "3" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — locked floor: 3 carry-forward (Radio primitive gap + AssetCell)" || exit 1
 
 # Gate 25: Orphan codemod fixtures.
 # Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —
