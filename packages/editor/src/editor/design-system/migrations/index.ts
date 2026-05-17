@@ -17,8 +17,14 @@ import type { DesignToken } from "../types";
  *                   No-op migration: existing tokens stay as primitives
  *                   (semanticKind undefined). Future tokens may set semanticKind
  *                   to declare a semantic role.
+ *
+ * v3 (2026-05-16) — B1 lock. Adds optional `replacedBy` field to DesignToken
+ *                   for rename alias bridge. No-op migration: existing tokens
+ *                   have no rename history. Future renames write replacedBy on
+ *                   the old token; sweep migration (v5 target) removes after
+ *                   2-version retention window.
  */
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 /**
  * Per-version migration functions. Key = TARGET version.
@@ -32,6 +38,9 @@ const MIGRATIONS: Record<number, (tokens: DesignToken[]) => DesignToken[]> = {
   // v1 → v2: additive only. semanticKind field defaults to undefined,
   // preserving all existing tokens as primitives. Identity transform.
   2: (tokens) => tokens,
+  // v2 → v3: additive only. replacedBy field defaults to undefined.
+  // Sweep semantics activate at v5 (2-version retention window from v3).
+  3: (tokens) => tokens,
 };
 
 /**

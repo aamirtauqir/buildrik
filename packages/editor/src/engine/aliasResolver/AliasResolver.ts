@@ -57,8 +57,13 @@ export class AliasResolver {
   }
 
   /**
-   * Resolve a token id to its canonical (non-alias) token by walking aliasOf.
-   * Returns undefined if the id is unknown OR the chain leads to an unknown id.
+   * Resolve a token id to its canonical (non-alias) token by walking
+   * `replacedBy` (rename bridges) then `aliasOf` chains. Returns undefined
+   * if the id is unknown OR a chain leads to an unknown id OR a cycle exists.
+   *
+   * Resolution order per hop: check `replacedBy` first (renamed → follow to
+   * new id), then `aliasOf` (semantic → follow to primitive). Either hop
+   * adds to the visited set so cycles short-circuit to undefined.
    */
   resolve(tokenId: string, tokens: readonly DesignToken[]): DesignToken | undefined {
     const byId = new Map<string, DesignToken>();
@@ -69,6 +74,11 @@ export class AliasResolver {
     while (cursor) {
       if (visited.has(cursor.id)) return undefined;
       visited.add(cursor.id);
+      // B1 (2026-05-16): rename bridge takes priority — follow to canonical id.
+      if (cursor.replacedBy) {
+        cursor = byId.get(cursor.replacedBy);
+        continue;
+      }
       if (!cursor.aliasOf) return cursor;
       cursor = byId.get(cursor.aliasOf);
     }

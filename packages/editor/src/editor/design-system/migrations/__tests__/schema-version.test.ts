@@ -51,23 +51,24 @@ describe("schema version — load path branches", () => {
   // B5 lock (2026-05-16): v2 migration adds optional semanticKind field.
   // Additive only — existing tokens stay as primitives (semanticKind undefined).
 
-  it("CURRENT_SCHEMA_VERSION is 2 (B5 bump for semanticKind field)", () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(2);
+  it("CURRENT_SCHEMA_VERSION is 3 (B1 bump for replacedBy field, on top of B5 v2)", () => {
+    expect(CURRENT_SCHEMA_VERSION).toBe(3);
   });
 
-  it("v1 → v2 migration preserves all existing token fields", () => {
+  it("v1 → v3 migration preserves all existing token fields", () => {
     const tokens = [stubToken];
-    const migrated = migrateDesignTokens(tokens, 1, 2);
+    const migrated = migrateDesignTokens(tokens, 1, 3);
     expect(migrated).toHaveLength(1);
     expect(migrated[0].id).toBe(stubToken.id);
     expect(migrated[0].value).toBe(stubToken.value);
     expect(migrated[0].category).toBe(stubToken.category);
   });
 
-  it("v1 → v2 migration leaves semanticKind undefined on existing tokens (primitives)", () => {
+  it("v1 → v3 migration leaves semanticKind + replacedBy undefined on existing tokens", () => {
     const tokens = [stubToken];
-    const migrated = migrateDesignTokens(tokens, 1, 2);
+    const migrated = migrateDesignTokens(tokens, 1, 3);
     expect(migrated[0].semanticKind).toBeUndefined();
+    expect(migrated[0].replacedBy).toBeUndefined();
   });
 
   it("project at future version is loaded as-is with a warn", () => {

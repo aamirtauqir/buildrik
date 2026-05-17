@@ -118,6 +118,11 @@ export interface DesignToken {
   semanticKind?: SemanticKind;   // B5 lock 2026-05-16 — semantic token role axis.
                                  // When set, aliasOf MUST also be set (lint enforced).
                                  // When unset, token is treated as a primitive.
+  replacedBy?: string;           // B1 lock 2026-05-16 — rename alias bridge.
+                                 // When set, the token is soft-deleted: resolver
+                                 // returns the canonical at `replacedBy` instead.
+                                 // Cleared by sweep migration after 2-version window.
+                                 // See token-design-decisions.md §B1.
   darkValue?: string;            // Phase B.0 — color-only dark variant.
                                  // Resolution: mode==="dark" && darkValue → use darkValue;
                                  // missing darkValue under mode==="dark" → fall back to `value`
