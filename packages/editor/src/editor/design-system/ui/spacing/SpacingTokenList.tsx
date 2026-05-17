@@ -17,6 +17,8 @@ import * as React from "react";
 import type { SpacingPreset } from "../../state/useSpacingTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Input } from "@/editor/shared/vibcoder/Input";
 
 export interface SpacingTokenListProps {
   tokens: DesignToken[];
@@ -52,8 +54,10 @@ const PresetChip: React.FC<{
   isActive: boolean;
   onApply: () => void;
 }> = ({ preset, isActive, onApply }) => (
-  <button
+  <Button
     type="button"
+    variant="ghost"
+    size="sm"
     onClick={onApply}
     style={{
       padding: "4px 10px",
@@ -68,7 +72,7 @@ const PresetChip: React.FC<{
     }}
   >
     {PRESET_LABELS[preset]}
-  </button>
+  </Button>
 );
 
 // ─── Value chip (the prototype-faithful primary surface) ──────────────────────
@@ -84,8 +88,10 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
   const num = parseFloat(token.value);
   const display = Number.isFinite(num) ? String(num) : token.value;
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="sm"
       role="listitem"
       aria-label={`Edit spacing ${token.name} (${token.value})`}
       aria-pressed={isActive}
@@ -117,7 +123,7 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
           }}
         />
       )}
-    </button>
+    </Button>
   );
 };
 
@@ -163,7 +169,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       >
         {token.name}
       </span>
-      <input
+      <Input
         type="number"
         aria-label={`Value for ${token.name}`}
         value={Number.isFinite(num) ? num : 0}
@@ -194,29 +200,35 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
         </span>
       )}
       {canUndo && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => onUndo(token.id)}
           title="Undo"
           aria-label={`Undo change to ${token.name}`}
           style={iconBtnStyle("var(--bd-warning)")}
         >
           ↩
-        </button>
+        </Button>
       )}
       {canRedo && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => onRedo(token.id)}
           title="Redo"
           aria-label={`Redo change to ${token.name}`}
           style={iconBtnStyle("var(--bd-accent)")}
         >
           ↪
-        </button>
+        </Button>
       )}
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         onClick={onClose}
         aria-label="Close edit drawer"
         style={{
@@ -229,7 +241,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
         }}
       >
         ×
-      </button>
+      </Button>
     </div>
   );
 };
@@ -282,8 +294,10 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
             onApply={() => onPresetApply(p)}
           />
         ))}
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={onResetToDefaults}
           title="Reset all spacing to factory defaults"
           style={{
@@ -298,7 +312,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           }}
         >
           Reset defaults
-        </button>
+        </Button>
       </div>
 
       {/* Preset change warning banner */}
@@ -386,8 +400,10 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
               onClick={() => setActiveId((prev) => (prev === t.id ? null : t.id))}
             />
             {onRowClick ? (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => onRowClick(t.id)}
                 aria-label={`Open details for ${t.name}`}
                 style={{
@@ -399,7 +415,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
                 }}
               >
                 <TokenUsageChip count={usageByTokenId?.get(t.id) ?? 0} />
-              </button>
+              </Button>
             ) : (
               <TokenUsageChip count={usageByTokenId?.get(t.id) ?? 0} />
             )}
