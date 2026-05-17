@@ -119,6 +119,51 @@ describe("AliasResolver.resolve", () => {
   });
 });
 
+describe("AliasResolver.resolve — replacedBy rename bridge (B1 lock 2026-05-16)", () => {
+  let resolver: AliasResolver;
+  beforeEach(() => { resolver = new AliasResolver(makeEvents()); });
+
+  it("follows replacedBy single hop (renamed: a → b, returns b)", () => {
+    const tokens: DesignToken[] = [
+      { id: "a", name: "A (old)", value: "", category: "colors", cssVar: "--bd-a", type: "color", replacedBy: "b" },
+      { id: "b", name: "B", value: "#2D6DFF", category: "colors", cssVar: "--bd-b", type: "color" },
+    ];
+    expect(resolver.resolve("a", tokens)?.id).toBe("b");
+    expect(resolver.resolve("a", tokens)?.value).toBe("#2D6DFF");
+  });
+
+  it("follows replacedBy then aliasOf chain (a.replacedBy=b, b.aliasOf=c, returns c)", () => {
+    const tokens: DesignToken[] = [
+      { id: "a", name: "A", value: "", category: "colors", cssVar: "--bd-a", type: "color", replacedBy: "b" },
+      { id: "b", name: "B", value: "", category: "colors", cssVar: "--bd-b", type: "color", aliasOf: "c" },
+      { id: "c", name: "C", value: "#2D6DFF", category: "colors", cssVar: "--bd-c", type: "color" },
+    ];
+    expect(resolver.resolve("a", tokens)?.id).toBe("c");
+  });
+
+  it("returns undefined on replacedBy cycle (a.replacedBy=b, b.replacedBy=a)", () => {
+    const tokens: DesignToken[] = [
+      { id: "a", name: "A", value: "", category: "colors", cssVar: "--bd-a", type: "color", replacedBy: "b" },
+      { id: "b", name: "B", value: "", category: "colors", cssVar: "--bd-b", type: "color", replacedBy: "a" },
+    ];
+    expect(resolver.resolve("a", tokens)).toBeUndefined();
+  });
+
+  it("returns undefined when replacedBy target is unknown", () => {
+    const tokens: DesignToken[] = [
+      { id: "a", name: "A", value: "", category: "colors", cssVar: "--bd-a", type: "color", replacedBy: "ghost" },
+    ];
+    expect(resolver.resolve("a", tokens)).toBeUndefined();
+  });
+
+  it("does not follow replacedBy when token has no replacedBy field (back-compat)", () => {
+    const tokens: DesignToken[] = [
+      { id: "a", name: "A", value: "#2D6DFF", category: "colors", cssVar: "--bd-a", type: "color" },
+    ];
+    expect(resolver.resolve("a", tokens)?.id).toBe("a");
+  });
+});
+
 describe("AliasResolver.getChain", () => {
   let resolver: AliasResolver;
 
