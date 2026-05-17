@@ -34,6 +34,7 @@ import type { UsageRef } from "../../../../engine/designSystem/TokenUsageTracker
 import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLabels";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
+import { TokenReplaceModal } from "./TokenReplaceModal";
 
 export interface TokenDetailViewProps {
   token: DesignToken;
@@ -47,7 +48,13 @@ export interface TokenDetailViewProps {
   allTokens?: ReadonlyArray<DesignToken>;
   onBack: () => void;
   onValueChange?: (id: string, value: string) => void;
-  onDelete?: (id: string) => void;
+  /**
+   * Delete callback. Accepts an optional `{ replaceWith }` second arg routed
+   * through the B1 `replacedBy` bridge (B4 follow-up). Without the second
+   * arg the call is a hard delete; with it consumer bindings transparently
+   * redirect to `replaceWith` via the resolver.
+   */
+  onDelete?: (id: string, opts?: { replaceWith?: string }) => void;
   onRename?: (id: string, newId: string) => void;
 }
 
@@ -479,9 +486,41 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
     }
   };
 
+  // B4 follow-up (2026-05-17): per-token consumer count drives the delete
+  // path. Zero consumers → hard delete bypasses the modal. > 0 consumers →
+  // open the picker modal; user picks a replacement which routes through
+  // useColorTokens / useTokensForKind deleteToken(id, { replaceWith }).
+  const consumerCount = composer?.designSystem?.tokenUsage?.getUsage(token.id) ?? 0;
+
+  // Candidates = same-kind tokens, excluding self + already-soft-deleted (so
+  // selecting one never produces a bridge chain). Fallback kind derivation
+  // mirrors TokensSection.handleTokenDelete dispatch rules.
+  const tokenKind = token.kind ?? (token.category === "colors" ? "color" : undefined);
+  const replaceCandidates = React.useMemo(
+    () =>
+      (allTokens ?? []).filter((t) => {
+        if (t.id === token.id) return false;
+        if (t.replacedBy) return false;
+        const k = t.kind ?? (t.category === "colors" ? "color" : undefined);
+        return k === tokenKind;
+      }),
+    [allTokens, token.id, tokenKind],
+  );
+
+  const [replaceOpen, setReplaceOpen] = React.useState(false);
+
   const handleDelete = () => {
     if (!isPro) return; // Beginner-blocked.
-    onDelete?.(token.id);
+    if (consumerCount === 0) {
+      onDelete?.(token.id);
+      onBack();
+      return;
+    }
+    setReplaceOpen(true);
+  };
+
+  const handleReplaceConfirm = (replaceWithId: string) => {
+    onDelete?.(token.id, { replaceWith: replaceWithId });
     onBack();
   };
 
@@ -740,6 +779,14 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           </span>
         </div>
       )}
+      <TokenReplaceModal
+        open={replaceOpen}
+        onOpenChange={setReplaceOpen}
+        token={token}
+        candidates={replaceCandidates}
+        usage={consumerCount}
+        onConfirm={handleReplaceConfirm}
+      />
     </div>
   );
 };

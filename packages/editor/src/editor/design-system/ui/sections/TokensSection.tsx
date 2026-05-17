@@ -254,13 +254,13 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   // type + spacing intentionally omit it (no DS UX entry for delete on
   // typography or spacing scales). Detail view's Delete button no-ops for
   // those token kinds (button still renders, just nothing to call).
-  const handleTokenDelete = React.useCallback((id: string) => {
+  const handleTokenDelete = React.useCallback((id: string, opts?: { replaceWith?: string }) => {
     const tok = allTokens.find((t) => t.id === id);
     if (!tok) return;
     const k = tok.kind ?? (tok.category === "colors" ? "color" : undefined);
-    if (k === "color") { color.deleteToken(id); return; }
+    if (k === "color") { color.deleteToken(id, opts); return; }
     const r = newKindRegistry(k as TokenKind);
-    r?.deleteToken?.(id);
+    r?.deleteToken?.(id, opts);
   }, [allTokens, color, radius, shadow, motion, border, opacity, zindex,
       breakpoint, grid, sizing, icon, imagery]);
 

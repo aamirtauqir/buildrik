@@ -134,7 +134,10 @@ describe("TokenDetailView beginner-block", () => {
     expect(container.querySelector("[data-beginner-notice]")).toBeNull();
   });
 
-  it("Pro: clicking Delete calls onDelete(id) and onBack()", () => {
+  // B4 follow-up (2026-05-17): with usage>0, Pro mode now opens the picker
+  // modal instead of hard-deleting. Hard-delete-on-click is only for usage=0.
+  // The original assertion is preserved via the modal Confirm path below.
+  it("Pro + usage>0: clicking Delete opens picker (no hard delete yet)", () => {
     const onDelete = vi.fn();
     const onBack = vi.fn();
     const { getByText } = render(
@@ -149,7 +152,9 @@ describe("TokenDetailView beginner-block", () => {
       ),
     );
     fireEvent.click(getByText("Delete"));
-    expect(onDelete).toHaveBeenCalledWith(colorToken.id);
-    expect(onBack).toHaveBeenCalledTimes(1);
+    // Modal opens; nothing deleted yet, no back navigation.
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(onBack).not.toHaveBeenCalled();
+    expect(document.querySelector('[data-token-replace-modal]')).toBeTruthy();
   });
 });

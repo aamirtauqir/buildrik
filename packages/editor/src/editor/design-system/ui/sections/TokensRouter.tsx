@@ -29,7 +29,7 @@ export interface TokensRouterProps {
   composer: Composer | null | undefined;
   tokens: ReadonlyArray<DesignToken>;
   onTokenChange?: (id: string, value: string) => void;
-  onTokenDelete?: (id: string) => void;
+  onTokenDelete?: (id: string, opts?: { replaceWith?: string }) => void;
   onTokenRename?: (id: string, newId: string) => void;
   children: (handlers: { onRowClick: (tokenId: string) => void }) => React.ReactNode;
 }
