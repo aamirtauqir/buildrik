@@ -23,8 +23,104 @@ import type { DesignToken } from "../types";
  *                   have no rename history. Future renames write replacedBy on
  *                   the old token; sweep migration (v5 target) removes after
  *                   2-version retention window.
+ *
+ * v4 (2026-05-17) — B5-wire seed. Injects 4 primitive color tokens
+ *                   (color-blue-500 / color-slate-50 / color-slate-700 /
+ *                   color-red-500) and 4 semantic color tokens
+ *                   (color-action / color-surface / color-text-primary /
+ *                   color-feedback-error). Semantics use B1 aliasOf to point
+ *                   at the corresponding primitive. Id-gated so user-edited
+ *                   entries are never clobbered. Unblocks Beginner-mode
+ *                   filtering (B5 lock) — without this seed, fresh installs
+ *                   see an empty Tokens tab.
  */
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
+
+const V4_SEEDS: DesignToken[] = [
+  // Primitives (Pro-only).
+  {
+    id: "color-blue-500",
+    name: "Blue 500",
+    value: "#2D6DFF",
+    category: "colors",
+    cssVar: "--buildrick-design-color-blue-500",
+    type: "color",
+    group: "primitive",
+  },
+  {
+    id: "color-slate-50",
+    name: "Slate 50",
+    value: "#F8FAFC",
+    category: "colors",
+    cssVar: "--buildrick-design-color-slate-50",
+    type: "color",
+    group: "primitive",
+  },
+  {
+    id: "color-slate-700",
+    name: "Slate 700",
+    value: "#334155",
+    category: "colors",
+    cssVar: "--buildrick-design-color-slate-700",
+    type: "color",
+    group: "primitive",
+  },
+  {
+    id: "color-red-500",
+    name: "Red 500",
+    value: "#EF4444",
+    category: "colors",
+    cssVar: "--buildrick-design-color-red-500",
+    type: "color",
+    group: "primitive",
+  },
+  // Semantics (Beginner-visible). aliasOf points at the primitives above so
+  // value resolution flows primitive→semantic via the resolver.
+  {
+    id: "color-action",
+    name: "Action",
+    value: "#2D6DFF",
+    category: "colors",
+    cssVar: "--buildrick-design-color-action",
+    type: "color",
+    group: "semantic",
+    semanticKind: "action",
+    aliasOf: "color-blue-500",
+  },
+  {
+    id: "color-surface",
+    name: "Surface",
+    value: "#F8FAFC",
+    category: "colors",
+    cssVar: "--buildrick-design-color-surface",
+    type: "color",
+    group: "semantic",
+    semanticKind: "surface",
+    aliasOf: "color-slate-50",
+  },
+  {
+    id: "color-text-primary",
+    name: "Text Primary",
+    value: "#334155",
+    category: "colors",
+    cssVar: "--buildrick-design-color-text-primary",
+    type: "color",
+    group: "semantic",
+    semanticKind: "text",
+    aliasOf: "color-slate-700",
+  },
+  {
+    id: "color-feedback-error",
+    name: "Feedback Error",
+    value: "#EF4444",
+    category: "colors",
+    cssVar: "--buildrick-design-color-feedback-error",
+    type: "color",
+    group: "semantic",
+    semanticKind: "feedback",
+    aliasOf: "color-red-500",
+  },
+];
 
 /**
  * Per-version migration functions. Key = TARGET version.
@@ -41,6 +137,14 @@ const MIGRATIONS: Record<number, (tokens: DesignToken[]) => DesignToken[]> = {
   // v2 → v3: additive only. replacedBy field defaults to undefined.
   // Sweep semantics activate at v5 (2-version retention window from v3).
   3: (tokens) => tokens,
+  // v3 → v4: id-gated append of B5-wire seed tokens. Existing entries are
+  // preserved verbatim — only missing ids are added. Lets users who edited
+  // a seed (e.g. recolored color-action) keep their edit through the bump.
+  4: (tokens) => {
+    const existingIds = new Set(tokens.map((t) => t.id));
+    const additions = V4_SEEDS.filter((t) => !existingIds.has(t.id));
+    return additions.length === 0 ? tokens : [...tokens, ...additions];
+  },
 };
 
 /**

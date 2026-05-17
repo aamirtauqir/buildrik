@@ -51,8 +51,8 @@ describe("schema version — load path branches", () => {
   // B5 lock (2026-05-16): v2 migration adds optional semanticKind field.
   // Additive only — existing tokens stay as primitives (semanticKind undefined).
 
-  it("CURRENT_SCHEMA_VERSION is 3 (B1 bump for replacedBy field, on top of B5 v2)", () => {
-    expect(CURRENT_SCHEMA_VERSION).toBe(3);
+  it("CURRENT_SCHEMA_VERSION is 4 (B5-wire seed bump 2026-05-17, on top of B1 v3)", () => {
+    expect(CURRENT_SCHEMA_VERSION).toBe(4);
   });
 
   it("v1 → v3 migration preserves all existing token fields", () => {
