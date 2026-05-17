@@ -8,6 +8,8 @@ import * as React from "react";
 import type { ResponsiveMode } from "../../state/useTypeTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Input } from "@/editor/shared/vibcoder/Input";
 
 export interface TypeTokenListProps {
   tokens: DesignToken[];
@@ -63,7 +65,9 @@ const StyleToggle: React.FC<{
   onToggle: () => void;
   fontStyle?: React.CSSProperties;
 }> = ({ label, active, onToggle, fontStyle }) => (
-  <button
+  <Button
+    variant="ghost"
+    size="sm"
     onClick={onToggle}
     aria-pressed={active}
     style={{
@@ -85,7 +89,7 @@ const StyleToggle: React.FC<{
     title={`Toggle ${label}`}
   >
     {label}
-  </button>
+  </Button>
 );
 
 // ─── Type scale row ───────────────────────────────────────────────────────────
@@ -169,7 +173,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       </div>
 
       {/* Size input */}
-      <input
+      <Input
         type="number"
         value={size}
         min={1}
@@ -235,7 +239,9 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
 
       {/* Undo button */}
       {canUndo && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onUndo(token.id)}
           title="Undo"
           style={{
@@ -249,12 +255,14 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           }}
         >
           ↩
-        </button>
+        </Button>
       )}
 
       {/* Redo button */}
       {canRedo && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onRedo(token.id)}
           title="Redo"
           style={{
@@ -268,7 +276,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           }}
         >
           ↪
-        </button>
+        </Button>
       )}
 
       {/* Usage chip */}
@@ -508,7 +516,9 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
         style={{ display: "flex", gap: 4, marginBottom: 8 }}
         title="Preview only — font sizes scale automatically for mobile. You cannot set separate mobile values here."
       >
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onResponsiveModeChange("desktop")}
           title="Desktop preview"
           style={{
@@ -527,8 +537,10 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
         >
           <DesktopIcon />
           Desktop preview
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onResponsiveModeChange("mobile")}
           title="Mobile preview"
           style={{
@@ -547,7 +559,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
         >
           <MobileIcon />
           Mobile preview (85%)
-        </button>
+        </Button>
       </div>
 
       {/* Full preview band */}
