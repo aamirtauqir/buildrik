@@ -35,6 +35,8 @@ import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLab
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
 import { TokenReplaceModal } from "./TokenReplaceModal";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Input } from "@/editor/shared/vibcoder/Input";
 
 export interface TokenDetailViewProps {
   token: DesignToken;
@@ -544,23 +546,27 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         </span>
         <div style={lintActionRowStyle}>
           {issue.autoFixHint && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={handleAutoFix}
               style={smallBtnStyle}
               aria-label="Auto-fix lint issue"
             >
               Auto-fix
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={handleIgnore}
             style={smallBtnStyle}
             aria-label="Ignore lint issue"
           >
             Ignore
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -569,15 +575,16 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
   return (
     <div style={containerStyle} data-token-detail-view={token.id}>
       {/* Back arrow */}
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={onBack}
         style={backBtnStyle}
         aria-label="Back to tokens"
       >
         <span aria-hidden="true">←</span>
         <span>Back to tokens</span>
-      </button>
+      </Button>
 
       {/* Header — preview + name + id + cssVar(Pro) */}
       <div style={headerStyle}>
@@ -596,7 +603,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           {isColor ? (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <input
+                <Input
                   type="text"
                   value={token.value}
                   onChange={(e) => onValueChange?.(token.id, e.target.value)}
@@ -621,7 +628,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
               )}
             </>
           ) : (
-            <input
+            <Input
               type="text"
               value={token.value}
               onChange={(e) => onValueChange?.(token.id, e.target.value)}
@@ -637,7 +644,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <div style={fieldRowStyle}>
           <div style={fieldLabelStyle}>Dark value</div>
           <div style={fieldValueStyle}>
-            <input
+            <Input
               type="text"
               value={darkInput}
               placeholder={token.darkValue ? "" : "+ add (currently falls back)"}
@@ -660,8 +667,9 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       <div style={fieldRowStyle}>
         <div style={fieldLabelStyle}>Used by</div>
         <div style={fieldValueStyle}>
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => {
               if (usageCount > 0) setUsageExpanded((v) => !v);
             }}
@@ -677,7 +685,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
             <span data-used-count={usageCount}>
               {usageCount} {usageCount === 1 ? "element" : "elements"}
             </span>
-          </button>
+          </Button>
           {usageExpanded && usageCount > 0 && (
             <ul style={usageListStyle} data-used-by-list role="list">
               {usageRefs.map((ref, idx) => {
@@ -689,8 +697,9 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                   : ref.elementId;
                 return (
                   <li key={`${ref.elementId}-${ref.styleProp}-${idx}`}>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
                       onClick={() => {
                         const target = composer?.elements?.getElement?.(
                           ref.elementId,
@@ -703,7 +712,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                     >
                       <span>{name}</span>
                       <span style={usagePropStyle}>· {ref.styleProp}</span>
-                    </button>
+                    </Button>
                   </li>
                 );
               })}
@@ -733,16 +742,18 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
 
       {/* Action row */}
       <div style={actionRowStyle}>
-        <button
+        <Button
           type="button"
+          variant="primary"
           onClick={handleReplaceValue}
           style={actionBtnStyle}
           aria-label="Replace value"
         >
           Replace value
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
           onClick={handleRenameId}
           style={{
             ...actionBtnStyle,
@@ -754,9 +765,10 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           title={onRename ? "Rename token id" : "Rename API coming soon — edit value inline above"}
         >
           Rename ID
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="danger"
           onClick={handleDelete}
           style={dangerBtnStyle}
           aria-label="Delete token"
@@ -764,7 +776,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           disabled={!isPro}
         >
           Delete
-        </button>
+        </Button>
       </div>
 
       {/* Beginner notice */}
