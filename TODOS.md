@@ -1,5 +1,24 @@
 # TODOS
 
+## 2026-05-18 — Gate 24 DS UI sweep CLOSED
+
+- ✅ 12 commits drained inline-element violations from `editor/design-system/ui/` tree
+- ✅ Net: 99 → 36 (-63, 64% of total baseline)
+- ✅ 13 DS UI files codemoded — BindingEditor, DesignSystemTab, ExportSection, ColorTokenRow, AddTokenModal, TokenDetailView, ImportCard, SpacingTokenList, ColorTokenList, TypeTokenList, BindingRow, ComponentsSection, TokenReplaceModal, GenericTokenList
+- ✅ All inline `<button>`/`<input type=text|number|file>`/`<textarea>`/`<select>` replaced with vibcoder Button/Input/Textarea/Select primitives
+- ✅ All `style={}`, ARIA, `disabled`, `data-*` attrs preserved — no behavior change
+- ✅ AST scanner verified `[]` for each file post-codemod
+- ⚠ 2 `<input type="radio">` remain in ExportSection — no Radio primitive in vibcoder; deferred
+- ⚠ 36 violations remain across ~27 files outside DS UI (components-catalog, media, sidebar tabs, inspector) — separate sweep arc
+
+Shipped at `c3b32a46..2aa77052`. See `memory/project_gate24_codemod_arc_20260518.md` for full file ledger + pattern doc.
+
+### Deferred — separate arcs
+
+- **Gate 24 outside DS UI** — 36 violations, ~6-10 commits estimated. Same codemod pattern. Files: ComponentsPanelV2 (3), ReplaceAcrossModal (3), CreateComponentModal (2), AssetDetailOverlay (2), FolderBreadcrumb (2), FormsScreen (2), AdvancedTab (1), AssetDetailsPanel (1 textarea), Section.tsx inspector (1), and more.
+- **Vibcoder Radio primitive** — gap in design system. 4+ radio inputs accumulate violations because no primitive exists. Build before next DS arc.
+- **Gate 24 CI enforcement audit** — 99 violations slipped past a "zero tolerance" gate. Verify the gate actually fails PRs at scale. Without enforcement integrity, drained violations rebuild within months.
+
 ## 2026-05-18 — E-005 partial codemod CLOSED
 
 - ✅ 24 string-literal `emit()` callsites across 7 engine production files codemod'd to use `EVENTS` constants
