@@ -94,7 +94,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
         <div
           style={{
             padding: "16px 20px",
-            borderBottom: "1px solid var(--bd-border, #e2e8f0)",
+            borderBottom: "1px solid var(--bd-border)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -105,7 +105,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
               Replace {oldName} across pages
             </ModalTitle>
             <ModalDescription
-              style={{ fontSize: 11, color: "var(--bd-fg-muted, #64748b)", marginTop: 2 }}
+              style={{ fontSize: 11, color: "var(--bd-fg-muted)", marginTop: 2 }}
             >
               Used in {pages.length} {pages.length === 1 ? "page" : "pages"} · review before applying
             </ModalDescription>
@@ -118,7 +118,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
             padding: "12px 20px",
             display: "flex",
             gap: 16,
-            borderBottom: "1px solid var(--bd-border, #e2e8f0)",
+            borderBottom: "1px solid var(--bd-border)",
           }}
         >
           <ThumbBlock label="Replacing" name={oldName} kind="old" size={SQUARE} />
@@ -137,7 +137,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
               alignItems: "center",
               padding: "4px 0 8px",
               fontSize: 11,
-              color: "var(--bd-fg-muted, #64748b)",
+              color: "var(--bd-fg-muted)",
             }}
           >
             <span>Choose pages</span>
@@ -166,15 +166,15 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
         <div
           style={{
             padding: "12px 20px",
-            background: "var(--bd-bg-subtle, #f8fafc)",
-            borderTop: "1px solid var(--bd-border, #e2e8f0)",
+            background: "var(--bd-bg-subtle)",
+            borderTop: "1px solid var(--bd-border)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             gap: 8,
           }}
         >
-          <span style={{ fontSize: 12, color: "var(--bd-fg-muted, #64748b)" }}>
+          <span style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>
             {selectedCount} of {pages.length} pages selected · ~{totalPlaces}{" "}
             {totalPlaces === 1 ? "element change" : "element changes"}
           </span>
@@ -211,10 +211,10 @@ interface ThumbBlockProps {
 }
 
 function ThumbBlock({ label, name, kind, size }: ThumbBlockProps) {
-  const accent = kind === "new" ? "var(--bd-accent, #2D6DFF)" : "var(--bd-fg-muted, #64748b)";
+  const accent = kind === "new" ? "var(--bd-accent)" : "var(--bd-fg-muted)";
   const bg =
     kind === "new"
-      ? "linear-gradient(135deg, var(--bd-cobalt-soft, #f4f8ff), #e9f0fc)"
+      ? "linear-gradient(135deg, var(--bd-cobalt-soft), #e9f0fc)"
       : "linear-gradient(135deg, #fff4e8, #fde9d2)";
   return (
     <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 10 }}>
@@ -224,7 +224,7 @@ function ThumbBlock({ label, name, kind, size }: ThumbBlockProps) {
           height: size,
           background: bg,
           borderRadius: 4,
-          border: kind === "new" ? `2px solid ${accent}` : "1px solid var(--bd-border, #e2e8f0)",
+          border: kind === "new" ? `2px solid ${accent}` : "1px solid var(--bd-border)",
         }}
       />
       <div>
@@ -261,8 +261,8 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
         alignItems: "center",
         gap: 12,
         padding: 10,
-        border: checked ? "1px solid var(--bd-accent, #2D6DFF)" : "1px solid var(--bd-border, #e2e8f0)",
-        background: checked ? "var(--bd-cobalt-tint, #eaf1ff)" : "transparent",
+        border: checked ? "1px solid var(--bd-accent)" : "1px solid var(--bd-border)",
+        background: checked ? "var(--bd-cobalt-tint)" : "transparent",
         borderRadius: 6,
         cursor: "pointer",
         opacity: checked ? 1 : 0.7,
@@ -291,12 +291,12 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
             width: thumbW,
             height: thumbH,
             background: checked
-              ? "linear-gradient(135deg, var(--bd-cobalt-soft, #f4f8ff), #e9f0fc)"
-              : "var(--bd-bg-subtle, #f8fafc)",
+              ? "linear-gradient(135deg, var(--bd-cobalt-soft), #e9f0fc)"
+              : "var(--bd-bg-subtle)",
             borderRadius: 3,
             border: checked
-              ? "1px solid var(--bd-accent, #2D6DFF)"
-              : "1px dashed var(--bd-border, #e2e8f0)",
+              ? "1px solid var(--bd-accent)"
+              : "1px dashed var(--bd-border)",
           }}
         />
       </div>
@@ -304,12 +304,12 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
         <div style={{ fontSize: 13, fontWeight: 500 }}>
           {page.pageName}
           {!checked && (
-            <span style={{ fontSize: 10, color: "var(--bd-fg-muted, #64748b)", fontWeight: 400, marginLeft: 6 }}>
+            <span style={{ fontSize: 10, color: "var(--bd-fg-muted)", fontWeight: 400, marginLeft: 6 }}>
               (skipped)
             </span>
           )}
         </div>
-        <div style={{ fontSize: 11, color: "var(--bd-fg-muted, #64748b)" }}>
+        <div style={{ fontSize: 11, color: "var(--bd-fg-muted)" }}>
           {page.placeCount} {page.placeCount === 1 ? "place" : "places"}
           {!checked ? " · won't change" : ""}
         </div>
@@ -320,7 +320,7 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
 
 function ArrowRight({ small }: { small?: boolean } = {}) {
   const size = small ? 12 : 20;
-  const stroke = small ? "var(--bd-fg-muted, #64748b)" : "var(--bd-accent, #2D6DFF)";
+  const stroke = small ? "var(--bd-fg-muted)" : "var(--bd-accent)";
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="2" aria-hidden>
       <path d="M5 12h14M12 5l7 7-7 7" />

@@ -109,7 +109,7 @@
   border-radius: 4px;
   border: 1px solid var(--bd-border-light, var(--bd-border));
   background: var(--bd-bg-card, var(--bd-bg-card));
-  color: var(--bd-fg-muted, #475569);
+  color: var(--bd-fg-muted, var(--bd-fg-primary));
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -123,9 +123,9 @@
   color: var(--bd-accent);
 }
 .tpl-pill--active {
-  background: var(--bd-bg-card, #FFFFFF);
-  border-color: var(--bd-fg, #0F172A);
-  color: var(--bd-fg, #0F172A);
+  background: var(--bd-bg-card, var(--bd-bg-card));
+  border-color: var(--bd-fg, var(--bd-fg-heading));
+  color: var(--bd-fg, var(--bd-fg-heading));
 }
 
 /* ── Sub-category tags ── */
@@ -145,7 +145,7 @@
   border-radius: 14px;
   border: none;
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
-  color: var(--bd-fg-muted, #475569);
+  color: var(--bd-fg-muted, var(--bd-fg-primary));
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -271,7 +271,7 @@
   right: 6px;
   padding: 2px 6px;
   background: var(--bd-accent);
-  color: var(--bd-bg-card, #fff);
+  color: var(--bd-bg-card, var(--bd-bg-card));
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -317,7 +317,7 @@
   color: var(--bd-fg-muted, var(--bd-fg-secondary));
 }
 .tpl-card-status--pro {
-  color: var(--bd-warn, #B45309);
+  color: var(--bd-warn, var(--bd-warning));
   font-weight: 600;
 }
 
@@ -404,7 +404,7 @@
 }
 .tpl-detail-btn--ghost {
   background: var(--bd-bg-card, var(--bd-bg-card));
-  color: var(--bd-fg-muted, #475569);
+  color: var(--bd-fg-muted, var(--bd-fg-primary));
   border: 1px solid var(--bd-border-light, var(--bd-border));
 }
 .tpl-detail-btn--ghost:hover {
@@ -424,7 +424,7 @@
   padding: 2px 6px;
   background: transparent;
   border: none;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -447,12 +447,12 @@
   min-width: 0;
 }
 .tpl-header-path-cat {
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
   text-transform: capitalize;
   flex-shrink: 0;
 }
 .tpl-header-path-sep {
-  color: var(--bd-fg-muted, #94A3B8);
+  color: var(--bd-fg-muted, var(--bd-fg-muted));
   flex-shrink: 0;
 }
 .tpl-header-path-current {
@@ -469,8 +469,8 @@
   top: 8px;
   right: 8px;
   padding: 3px 6px;
-  background: var(--bd-accent, #2D6DFF);
-  color: var(--bd-bg-card, #FFFFFF);
+  background: var(--bd-accent, var(--bd-accent));
+  color: var(--bd-bg-card, var(--bd-bg-card));
   font-family: var(--bd-font-mono, ui-monospace, "Geist Mono", monospace);
   font-size: 10px;
   font-weight: 600;
@@ -503,20 +503,20 @@
   cursor: default;
 }
 .tpl-detail-meta-pill--type {
-  background: var(--bd-bg-subtle, #F1F5F9);
-  color: var(--bd-fg-muted, #475569);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
+  color: var(--bd-fg-muted, var(--bd-fg-primary));
 }
 .tpl-detail-meta-pill--free {
-  background: var(--bd-success-bg, #DCFCE7);
-  color: var(--bd-success, #166534);
+  background: var(--bd-success-bg, var(--bd-success-soft));
+  color: var(--bd-success, var(--bd-success));
 }
 .tpl-detail-meta-pill--pro {
-  background: var(--bd-warn-soft, #FEF3C7);
-  color: var(--bd-warn, #B45309);
+  background: var(--bd-warn-soft, var(--bd-warn-soft));
+  color: var(--bd-warn, var(--bd-warning));
 }
 .tpl-detail-meta-pill--usage {
   background: var(--bd-accent-tint, rgba(45, 109, 255, 0.1));
-  color: var(--bd-accent, #2D6DFF);
+  color: var(--bd-accent, var(--bd-accent));
   cursor: pointer;
   transition: background 0.12s;
 }
@@ -530,7 +530,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
   margin-top: 16px;
   padding-top: 16px;
   margin-bottom: 8px;
@@ -543,16 +543,16 @@
   align-items: flex-start;
   gap: 8px;
   padding: 10px 12px;
-  background: var(--bd-bg-subtle, #F8FAFC);
+  background: var(--bd-bg-subtle, var(--bd-bg-panel));
   border-radius: 4px;
   font-size: 11px;
   line-height: 1.5;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
 }
 .tpl-detail-info-note svg {
   flex-shrink: 0;
   margin-top: 1px;
-  color: var(--bd-fg-muted, #94A3B8);
+  color: var(--bd-fg-muted, var(--bd-fg-muted));
 }
 /* High specificity to override .bd-btn from vibcoder Button (Gate 24 compliant) */
 .tpl-detail-info-note .tpl-detail-info-note-link.bd-btn,
@@ -564,7 +564,7 @@
   margin: 0;
   background: none;
   border: none;
-  color: var(--bd-accent, #2D6DFF);
+  color: var(--bd-accent, var(--bd-accent));
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
@@ -601,7 +601,7 @@
   border-radius: 4px;
   border: 1px solid var(--bd-border-light, var(--bd-border));
   background: var(--bd-bg-card, var(--bd-bg-card));
-  color: var(--bd-fg-muted, #475569);
+  color: var(--bd-fg-muted, var(--bd-fg-primary));
   font-size: 12px;
   font-family: inherit;
   cursor: pointer;
@@ -619,7 +619,7 @@
 .tpl-pagination-page--active:hover {
   background: var(--bd-accent);
   border-color: var(--bd-accent);
-  color: var(--bd-bg-card, #fff);
+  color: var(--bd-bg-card, var(--bd-bg-card));
   font-weight: 600;
 }
 .tpl-pagination-gap {
@@ -627,7 +627,7 @@
   align-items: center;
   padding: 0 4px;
   font-size: 11px;
-  color: var(--bd-fg-muted, #94A3B8);
+  color: var(--bd-fg-muted, var(--bd-fg-muted));
   user-select: none;
 }
 
@@ -647,7 +647,7 @@
 }
 .tpl-empty-text {
   font-size: 14px;
-  color: var(--bd-fg-muted, #475569);
+  color: var(--bd-fg-muted, var(--bd-fg-primary));
   margin: 0;
 }
 .tpl-empty-btn {
@@ -786,7 +786,7 @@
 .tpl-modal-btn--ghost {
   background: transparent;
   border: 1px solid var(--bd-border, var(--bd-border-medium));
-  color: var(--bd-fg-muted, #475569);
+  color: var(--bd-fg-muted, var(--bd-fg-primary));
 }
 .tpl-modal-btn--ghost:hover {
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
@@ -889,7 +889,7 @@
   flex-direction: column;
   gap: var(--bd-space-4);
   box-shadow: var(--bd-shadow-modal, 0 4px 24px rgba(0, 0, 0, 0.2));
-  border-color: var(--bd-border-medium, #D8E0EA);
+  border-color: var(--bd-border-medium, var(--bd-border));
 }
 .tpl-modal-row {
   display: flex;
@@ -905,7 +905,7 @@
   justify-content: center;
 }
 .tpl-modal-icon--success svg {
-  stroke: var(--bd-success, #166534);
+  stroke: var(--bd-success, var(--bd-success));
 }
 .tpl-modal-title--lg {
   font-size: 18px;

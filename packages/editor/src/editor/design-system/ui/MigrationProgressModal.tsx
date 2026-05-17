@@ -84,7 +84,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
           </ModalTitle>
           {rangeLabel && (
             <ModalDescription
-              style={{ fontSize: 11, color: "var(--bd-text-muted, #64748b)", marginTop: 4 }}
+              style={{ fontSize: 11, color: "var(--bd-text-muted)", marginTop: 4 }}
             >
               {rangeLabel}
             </ModalDescription>
@@ -94,14 +94,14 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
             <div
               role="alert"
               style={{
-                background: "var(--bd-error-tint, #fee2e2)",
-                borderLeft: "3px solid var(--bd-error, #dc2626)",
+                background: "var(--bd-error-tint)",
+                borderLeft: "3px solid var(--bd-error)",
                 padding: "10px 12px",
                 borderRadius: "0 6px 6px 0",
                 margin: "16px 0",
               }}
             >
-              <div style={{ fontWeight: 600, fontSize: 13, color: "var(--bd-error, #dc2626)" }}>
+              <div style={{ fontWeight: 600, fontSize: 13, color: "var(--bd-error)" }}>
                 Migration v{stuckAt ?? "?"} failed
               </div>
               <div
@@ -109,7 +109,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                   fontSize: 11,
                   marginTop: 4,
                   fontFamily: "ui-monospace, monospace",
-                  color: "var(--bd-text, #0f172a)",
+                  color: "var(--bd-text)",
                 }}
               >
                 {failureMessage}
@@ -126,11 +126,11 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                   alignItems: "center",
                   gap: 8,
                   padding: "8px 0",
-                  borderBottom: "1px solid var(--bd-border, #e2e8f0)",
+                  borderBottom: "1px solid var(--bd-border)",
                   fontSize: 13,
                 }}
               >
-                <span style={{ flex: 1, color: "var(--bd-text, #0f172a)" }}>
+                <span style={{ flex: 1, color: "var(--bd-text)" }}>
                   v{step.version} · {step.label}
                 </span>
                 <span style={{ fontSize: 11 }}>{statusLabel(step.status)}</span>
@@ -149,7 +149,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                 style={{
                   marginTop: 12,
                   height: 4,
-                  background: "var(--bd-surface-2, #f1f5f9)",
+                  background: "var(--bd-surface-2)",
                   borderRadius: 2,
                   overflow: "hidden",
                 }}
@@ -158,7 +158,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                   style={{
                     width: `${progress}%`,
                     height: "100%",
-                    background: "var(--bd-accent, #2D6DFF)",
+                    background: "var(--bd-accent)",
                     transition: "width 200ms ease-out",
                   }}
                 />
@@ -166,7 +166,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
               <div
                 style={{
                   fontSize: 10,
-                  color: "var(--bd-text-muted, #64748b)",
+                  color: "var(--bd-text-muted)",
                   marginTop: 4,
                   textAlign: "center",
                 }}
@@ -180,7 +180,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
             <>
               <div style={{ marginTop: 16, display: "grid", gap: 4 }}>
                 {snapshotLabel && (
-                  <Row label="Snapshot saved" value={snapshotLabel} valueColor="var(--bd-success, #16a34a)" />
+                  <Row label="Snapshot saved" value={snapshotLabel} valueColor="var(--bd-success)" />
                 )}
                 <Row
                   label="Migrations applied"
@@ -232,8 +232,8 @@ function Row({
         padding: "4px 0",
       }}
     >
-      <span style={{ color: "var(--bd-text-muted, #64748b)" }}>{label}</span>
-      <span style={{ color: valueColor ?? "var(--bd-text, #0f172a)" }}>{value}</span>
+      <span style={{ color: "var(--bd-text-muted)" }}>{label}</span>
+      <span style={{ color: valueColor ?? "var(--bd-text)" }}>{value}</span>
     </div>
   );
 }
@@ -241,13 +241,13 @@ function Row({
 function statusLabel(status: MigrationStep["status"]): React.ReactNode {
   switch (status) {
     case "done":
-      return <span style={{ color: "var(--bd-success, #16a34a)" }}>✓</span>;
+      return <span style={{ color: "var(--bd-success)" }}>✓</span>;
     case "running":
-      return <span style={{ color: "var(--bd-accent, #2D6DFF)" }}>running…</span>;
+      return <span style={{ color: "var(--bd-accent)" }}>running…</span>;
     case "failed":
-      return <span style={{ color: "var(--bd-error, #dc2626)" }}>failed</span>;
+      return <span style={{ color: "var(--bd-error)" }}>failed</span>;
     case "queued":
     default:
-      return <span style={{ color: "var(--bd-text-subtle, #94a3b8)" }}>queued</span>;
+      return <span style={{ color: "var(--bd-text-subtle)" }}>queued</span>;
   }
 }

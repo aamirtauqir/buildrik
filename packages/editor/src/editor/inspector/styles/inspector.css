@@ -4,7 +4,7 @@
  *
  * Color policy:
  *   - Prefer `--bd-*` tokens for every value that has a defined token.
- *   - `#fff` is wrapped in `var(--bd-bg-card, #fff)` so a future token swap
+ *   - `var(--bd-bg-card)` is wrapped in `var(--bd-bg-card, var(--bd-bg-card))` so a future token swap
  *     is one-line.
  *   - Alpha-blended literals (rgba(...) shadows, focus glows, mixed-value
  *     badge tints) stay as raw values until the design system defines
@@ -16,7 +16,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   font: 500 11px var(--bd-font);
   color: var(--bd-fg-primary);
   overflow: hidden;
@@ -37,7 +37,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px var(--bd-space-2) 6px 10px;
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-bottom: 1px solid var(--bd-border);
   position: sticky;
   top: 0;
@@ -95,7 +95,7 @@
   align-items: center;
   gap: var(--bd-space-2);
   padding: 10px var(--bd-space-3);
-  background: linear-gradient(180deg, var(--bd-bg-card, #fff) 0%, var(--bd-bg-panel) 100%);
+  background: linear-gradient(180deg, var(--bd-bg-card, var(--bd-bg-card)) 0%, var(--bd-bg-panel) 100%);
   border-bottom: 1px solid var(--bd-border);
 }
 .bdi-ehdr .bdi-eic {
@@ -142,7 +142,7 @@
   display: flex;
   padding: 0 var(--bd-space-2);
   border-bottom: 1px solid var(--bd-border);
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
 }
 .bdi-tab {
   flex: 1;
@@ -184,7 +184,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: #FAFBFC;
+  background: var(--bd-bg-panel);
   border-bottom: 1px solid var(--bd-border);
   font: 500 10px var(--bd-font);
   color: var(--bd-fg-muted);
@@ -392,11 +392,11 @@
   position: relative;
 }
 .bdi-fld:hover {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-border);
 }
 .bdi-fld:focus-within {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -499,11 +499,11 @@
   width: 100%;
 }
 .bdi-ddn:hover {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-border);
 }
 .bdi-ddn:focus-within {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -557,7 +557,7 @@
   font: 500 9.5px var(--bd-font);
 }
 .bdi-qa:hover {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-border);
   color: var(--bd-fg-primary);
 }
@@ -604,7 +604,7 @@
   transform: translateY(-50%);
   font: 600 8px var(--bd-font);
   letter-spacing: 0.08em;
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   padding: 0 var(--bd-space-1);
   color: var(--bd-warning);
   text-transform: uppercase;
@@ -629,11 +629,11 @@
   outline: none;
 }
 .bdi-ax:hover {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-border);
 }
 .bdi-ax:focus {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -669,7 +669,7 @@
   transform: translateY(-50%);
 }
 .bdi-center-rect {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border: 1px solid var(--bd-border-medium);
   border-radius: 3px;
   padding: 5px 14px;
@@ -763,7 +763,7 @@
   color: var(--bd-fg-primary);
 }
 .bdi-seg button.on {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   color: var(--bd-fg-heading);
   font-weight: 600;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
@@ -785,7 +785,7 @@
   width: 100%;
 }
 .bdi-fill:hover {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-border);
 }
 .bdi-fill .bdi-sw {
@@ -876,7 +876,7 @@
   left: 12px;
   width: 8px;
   height: 8px;
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-radius: 50%;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
   transition: left 120ms;
@@ -902,7 +902,7 @@
 .bdi-chip {
   font: 500 10px var(--bd-mono);
   color: var(--bd-fg-primary);
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border: 1px solid var(--bd-border);
   padding: 1px var(--bd-space-1) 1px 6px;
   border-radius: 3px;
@@ -960,7 +960,7 @@
   top: calc(100% + 4px);
   left: 0;
   z-index: 20;
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border: 1px solid var(--bd-border);
   border-radius: 4px;
   padding: 2px;
@@ -1056,7 +1056,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--bd-fg-secondary);
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   padding: 1px 5px;
   border-radius: 3px;
   flex-shrink: 0;
@@ -1094,11 +1094,11 @@
   transition: background 120ms, border-color 120ms;
 }
 .bdi-text:hover {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-border);
 }
 .bdi-text:focus {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -1164,11 +1164,11 @@ textarea.bdi-text {
   position: relative;
 }
 .bdi-num:hover {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-border);
 }
 .bdi-num:focus-within {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -1239,7 +1239,7 @@ textarea.bdi-text {
   cursor: pointer;
 }
 .bdi-color:hover {
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card, var(--bd-bg-card));
   border-color: var(--bd-border);
 }
 .bdi-color .bdi-sw,
@@ -1305,7 +1305,7 @@ textarea.bdi-text {
  * the chip's pill geometry. */
 .bd-ds-binding-chip:focus-visible,
 .bd-ds-binding-chip__bind-hint:focus-visible {
-  outline: 2px solid var(--bd-accent, #2D6DFF);
+  outline: 2px solid var(--bd-accent, var(--bd-accent));
   outline-offset: 1px;
   border-radius: 10px;
 }
