@@ -58,12 +58,23 @@ interface ColorGroup {
 type FilterMode = "all" | "issues";
 
 const GROUP_META: Record<string, { label: string; subtext: string }> = {
+  // B5-wire (2026-05-17): semantic group surfaces first in Beginner mode
+  // because it is the only group with role-named tokens (action/surface/
+  // text/feedback). Primitives sit at the bottom — Pro-only visibility.
+  semantic: {
+    label: "Semantic",
+    subtext: "Role-named tokens — Buildrik's recommended palette.",
+  },
   brand: {
     label: "Brand",
     subtext: "Primary palette — used for CTAs, links, and key UI elements.",
   },
   surface: { label: "Surface", subtext: "Background layers and card fills." },
   state: { label: "States", subtext: "Feedback colors — success, error, warning, info." },
+  primitive: {
+    label: "Primitives",
+    subtext: "Raw color scale — semantic tokens alias these. Pro mode only.",
+  },
 };
 
 // Background used for WCAG contrast checks. Editor canvas dark surface.
@@ -245,7 +256,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       if (existing) existing.push(t);
       else groupMap.set(key, [t]);
     });
-    const order = ["brand", "surface", "state", "other"];
+    const order = ["semantic", "brand", "surface", "state", "primitive", "other"];
     return order
       .filter((k) => groupMap.has(k))
       .map((k) => ({

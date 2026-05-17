@@ -114,4 +114,61 @@ describe("TokensSection", () => {
       });
     });
   });
+
+  // B5-wire (2026-05-17): Beginner mode shows ONLY tokens with semanticKind
+  // set. Pro mode shows all tokens (primitives + semantics). The seed
+  // committed in v4 migration provides 4 semantic color tokens; Pro mode
+  // exposes those plus the 4 primitives + the legacy 9 colors.
+  describe("B5-wire — mode-driven token filter", () => {
+    function colorRowIds(container: HTMLElement): string[] {
+      const colorCard = container.querySelector('[data-token-kind-card="color"]') as HTMLElement;
+      // Inline color tokens use data-token-id; generic kinds use data-token-row.
+      const rows = colorCard.querySelectorAll("[data-token-id],[data-token-row]");
+      const ids: string[] = [];
+      rows.forEach((row) => {
+        const id = row.getAttribute("data-token-id") ?? row.getAttribute("data-token-row");
+        if (id) ids.push(id);
+      });
+      return ids;
+    }
+
+    it("Beginner mode shows only color tokens carrying semanticKind", () => {
+      const { container } = render(wrap(<TokensSection />, "beginner"));
+      const ids = colorRowIds(container);
+      // 4 semantic seeds — present.
+      expect(ids).toContain("color-action");
+      expect(ids).toContain("color-surface");
+      expect(ids).toContain("color-text-primary");
+      expect(ids).toContain("color-feedback-error");
+      // Primitive seeds + legacy primitives — absent.
+      expect(ids).not.toContain("color-blue-500");
+      expect(ids).not.toContain("color-primary");
+      expect(ids).not.toContain("color-error");
+    });
+
+    it("Pro mode shows both primitives and semantics", () => {
+      const { container } = render(wrap(<TokensSection />, "pro"));
+      const ids = colorRowIds(container);
+      // Semantics + primitives both present.
+      expect(ids).toContain("color-action");
+      expect(ids).toContain("color-blue-500");
+      expect(ids).toContain("color-primary");
+    });
+
+    it("Beginner card count reflects filtered (semantic-only) count, not total", () => {
+      const { container } = render(wrap(<TokensSection />, "beginner"));
+      const colorCard = container.querySelector('[data-token-kind-card="color"]') as HTMLElement;
+      const header = colorCard.querySelector(":scope > button") as HTMLButtonElement;
+      // 4 semantic colors seeded — count must show 4 in Beginner.
+      expect(header.textContent).toMatch(/Color · 4 TOKENS/);
+    });
+
+    it("Pro card count reflects total (semantic + primitive + legacy) count", () => {
+      const { container } = render(wrap(<TokensSection />, "pro"));
+      const colorCard = container.querySelector('[data-token-kind-card="color"]') as HTMLElement;
+      const header = colorCard.querySelector(":scope > button") as HTMLButtonElement;
+      // 9 legacy + 4 v4 primitives + 4 v4 semantics = 17 in Pro.
+      expect(header.textContent).toMatch(/Color · 17 TOKENS/);
+    });
+  });
 });

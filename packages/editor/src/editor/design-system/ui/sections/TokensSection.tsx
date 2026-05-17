@@ -23,7 +23,8 @@ import {
   useResetAllKinds,
 } from "../../state/TokenRegistryContext";
 import { useDSModeOptional } from "../../state/DSModeContext";
-import type { TokenKind } from "../../types";
+import { filterTokensByMode } from "../../utils/semanticKind";
+import type { TokenKind, DesignToken } from "../../types";
 import type { Composer } from "../../../../engine/Composer";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 
@@ -123,6 +124,16 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
       lintState?.getVisibleIssues(tokenId) ?? [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [lintState, lintVersion],
+  );
+
+  // B5-wire (2026-05-17): Beginner mode filters lists to semantic-only tokens
+  // (those with semanticKind set). Pro mode passes all tokens through. Mode
+  // is read once here; lists + card counts use the same filtered view so
+  // the count never disagrees with what the list actually renders.
+  const mode = dsMode?.mode ?? "beginner";
+  const visible = React.useCallback(
+    (tokens: readonly DesignToken[]): DesignToken[] => filterTokensByMode(tokens, mode),
+    [mode],
   );
 
   const color      = useColorRegistry();
@@ -253,26 +264,29 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   }, [allTokens, color, radius, shadow, motion, border, opacity, zindex,
       breakpoint, grid, sizing, icon, imagery]);
 
-  // Beginner mode: foundation kinds with zero tokens move to the bottom.
+  // Beginner mode: foundation kinds with zero visible tokens move to the
+  // bottom. B5-wire (2026-05-17): "visible" honors the semantic filter, so
+  // a foundation kind with primitives-only (no semantics yet) still mutes
+  // in Beginner — matches the empty card body the user will see.
   const ordered = React.useMemo(() => {
     if (!isBeginner) return KIND_ORDER;
     const populated: KindEntry[] = [];
     const muted: KindEntry[] = [];
     for (const k of KIND_ORDER) {
       let count = 0;
-      if (k.kindId === "color")        count = color.tokens.length;
-      else if (k.kindId === "type")    count = type.tokens.length;
-      else if (k.kindId === "spacing") count = spacing.tokens.length;
-      else                             count = newKindRegistry(k.kindId)?.tokens.length ?? 0;
+      if (k.kindId === "color")        count = visible(color.tokens).length;
+      else if (k.kindId === "type")    count = visible(type.tokens).length;
+      else if (k.kindId === "spacing") count = visible(spacing.tokens).length;
+      else                             count = visible(newKindRegistry(k.kindId)?.tokens ?? []).length;
       if (k.isFoundation && count === 0) muted.push(k);
       else                               populated.push(k);
     }
     return [...populated, ...muted];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBeginner, color.tokens.length, type.tokens.length, spacing.tokens.length,
-      radius.tokens.length, shadow.tokens.length, motion.tokens.length, border.tokens.length,
-      opacity.tokens.length, zindex.tokens.length, breakpoint.tokens.length, grid.tokens.length,
-      sizing.tokens.length, icon.tokens.length, imagery.tokens.length]);
+  }, [isBeginner, visible, color.tokens, type.tokens, spacing.tokens,
+      radius.tokens, shadow.tokens, motion.tokens, border.tokens,
+      opacity.tokens, zindex.tokens, breakpoint.tokens, grid.tokens,
+      sizing.tokens, icon.tokens, imagery.tokens]);
 
   return (
     <TokensRouter
@@ -286,16 +300,17 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
         <div>
           {ordered.map((entry) => {
             if (entry.kindId === "color") {
+              const visibleColor = visible(color.tokens);
               return (
                 <TokenKindCard
                   key={entry.kindId}
                   kindId={entry.kindId}
                   title={entry.title}
-                  count={color.tokens.length}
+                  count={visibleColor.length}
                   isDirty={colorDirty}
                 >
                   <ColorTokenList
-                    tokens={color.tokens}
+                    tokens={visibleColor}
                     pendingDiff={color.pendingDiff}
                     onColorChange={color.updateToken}
                     onUndo={color.undoToken}
@@ -313,16 +328,17 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               );
             }
             if (entry.kindId === "type") {
+              const visibleType = visible(type.tokens);
               return (
                 <TokenKindCard
                   key={entry.kindId}
                   kindId={entry.kindId}
                   title={entry.title}
-                  count={type.tokens.length}
+                  count={visibleType.length}
                   isDirty={typeDirty}
                 >
                   <TypeTokenList
-                    tokens={type.tokens}
+                    tokens={visibleType}
                     responsiveMode={type.responsiveMode}
                     onTokenChange={type.updateToken}
                     onResponsiveModeChange={type.setResponsiveMode}
@@ -337,16 +353,17 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
               );
             }
             if (entry.kindId === "spacing") {
+              const visibleSpacing = visible(spacing.tokens);
               return (
                 <TokenKindCard
                   key={entry.kindId}
                   kindId={entry.kindId}
                   title={entry.title}
-                  count={spacing.tokens.length}
+                  count={visibleSpacing.length}
                   isDirty={spacingDirty}
                 >
                   <SpacingTokenList
-                    tokens={spacing.tokens}
+                    tokens={visibleSpacing}
                     activePreset={spacing.activePreset}
                     savedPreset={spacing.savedPreset}
                     isDirty={spacing.isDirty}
@@ -366,17 +383,18 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
             const r = newKindRegistry(entry.kindId);
             if (!r) return null;
             const dirty = Object.keys(r.pendingDiff).length > 0;
+            const visibleR = visible(r.tokens);
             return (
               <TokenKindCard
                 key={entry.kindId}
                 kindId={entry.kindId}
                 title={entry.title}
-                count={r.tokens.length}
+                count={visibleR.length}
                 isDirty={dirty}
-                defaultOpen={r.tokens.length > 0}
+                defaultOpen={visibleR.length > 0}
               >
                 <GenericTokenList
-                  tokens={r.tokens}
+                  tokens={visibleR}
                   pendingDiff={r.pendingDiff}
                   onTokenChange={r.updateToken}
                   onUndo={r.undoToken}
