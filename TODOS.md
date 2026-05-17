@@ -1,5 +1,23 @@
 # TODOS
 
+## 2026-05-18 — Localization · LOC:A,A Backend Phase 1 CLOSED
+
+- ✅ Decision locked: subdirectory URLs + JSON translations column (brief: `docs/plans/2026-05-08-localization-design-brief.md`)
+- ✅ Inventory finding: migration + Site columns + invariant guard already shipped on 2026-05-08 (`20260508050000_add_localization`); only Page-side CRUD + resolver were missing
+- ✅ Zod schemas (`getTranslation`/`setTranslation`/`removeTranslation`) — `packages/shared/schemas/pages.ts`
+- ✅ Service layer — `resolveTranslation` / `setTranslation` / `removeTranslation` + `buildFallbackChain` helper in `server/services/page.service.ts`. Default-locale content stays on `Page.blocks` (single source of truth); non-default locales live in `translations` JSON. `setTranslation` enforces locale ∈ `Site.enabledLocales`.
+- ✅ tRPC procedures wired into `pages` router with full TRPCError mapping
+- ✅ 18-case test (`server/services/__tests__/translation.test.ts`) — fallback chain shapes, resolver paths, guard rails, idempotency, Prisma.JsonNull null-collapse on last-entry remove
+- ✅ vitest.config.ts: `include` extended to `server/**/*.test.{ts,tsx}` so the new test runs (and revives the pre-existing `userCanEditSite.test.ts` that was previously skipped by the include glob)
+
+Shipped at `c3b32a46`.
+
+### Deferred from this arc
+
+- ⏸ **Middleware locale routing** — architectural ambiguity (dashboard middleware vs static-export rewrite vs Vercel edge fn). Static published sites bypass the dashboard middleware; published-site locale routing likely lives in the export step (`lib/vercel.ts` template) or as a `vercel.json` rewrite. Needs its own brief before code.
+- ⏸ **Editor topbar locale switcher** (Phase B per brief — ~2-3 days alone).
+- ⏸ **Per-locale slug variants** (e.g. `/fr/a-propos` vs `/en/about`). LOC:A,A model stores translations keyed by locale; current slug column is locale-agnostic. Either: extend translations entry shape to `{ blocks, slug? }`, OR add a separate per-locale slug table. Decide at routing-brief time.
+
 ## 2026-05-08 — DS Arc · Phase A.0 Token Foundation CLOSED
 
 - ✅ TokenKind union (14 kinds) + TokenValue discriminated union — types.ts
