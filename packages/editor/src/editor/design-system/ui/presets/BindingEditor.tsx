@@ -18,6 +18,8 @@ import type { PresetBinding } from "../../types";
 import { BindingRow } from "./BindingRow";
 import { cssPropertyKinds, COMMON_CSS_PROPERTIES } from "../../utils/cssPropertyKinds";
 import { useTokensByKinds } from "../../state/useTokensByKinds";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Select } from "@/editor/shared/vibcoder/Select";
 
 interface BindingEditorProps {
   bindings: Record<string, PresetBinding>;
@@ -141,7 +143,7 @@ export const BindingEditor: React.FC<BindingEditorProps> = ({ bindings, onChange
       ))}
 
       <div style={addRowStyle}>
-        <select
+        <Select
           aria-label="Select CSS property to bind"
           value={draftProperty}
           onChange={(e) => setDraftProperty(e.target.value)}
@@ -151,15 +153,17 @@ export const BindingEditor: React.FC<BindingEditorProps> = ({ bindings, onChange
           {availableProps.map((p) => (
             <option key={p} value={p}>{p}</option>
           ))}
-        </select>
-        <button
+        </Select>
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           disabled={!draftProperty}
           onClick={() => setResolveTarget(draftProperty)}
           style={addBtnStyle}
         >
           Add
-        </button>
+        </Button>
       </div>
 
       {resolveTarget && (
