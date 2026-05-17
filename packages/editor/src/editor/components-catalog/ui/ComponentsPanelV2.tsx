@@ -23,6 +23,7 @@
 
 import * as React from "react";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { useToast } from "@/editor/shared/vibcoder";
 import { PanelHeader } from "@/shared/extensions/PanelHeader";
 import type { Composer } from "@/engine";
@@ -184,15 +185,17 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       >
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={handleOpenAI}
           data-components-ai-entry
           aria-label="Add component via AI"
           style={headerAiButtonStyle}
         >
           + AI
-        </button>
+        </Button>
       </PanelHeader>
 
       <div style={subHeaderStyle}>
@@ -201,16 +204,18 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
 
       <div style={filterRowStyle} role="radiogroup" aria-label="Filter components">
         {FILTERS.map((f) => (
-          <button
+          <Button
             key={f.id}
             type="button"
+            variant="ghost"
+            size="sm"
             role="radio"
             aria-checked={filter === f.id}
             onClick={() => setFilter(f.id)}
             style={pillStyle(filter === f.id)}
           >
             {f.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -239,14 +244,15 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
         )}
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={handleSaveSelection}
         data-save-current-selection
         style={footerSaveStyle}
       >
         + Save current selection
-      </button>
+      </Button>
 
       <AIPromptModal
         open={aiOpen}
