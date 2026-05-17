@@ -20,6 +20,18 @@
   --buildrick-design-color-success: #22C55E;
   --buildrick-design-color-error: #EF4444;
 
+  /* COLORS — v4 migration (4 primitives + 4 semantic aliases, added via
+   * projectMigrations/0002. Synced to CSS 2026-05-18 to satisfy baseline
+   * parity check against DEFAULT_TOKENS in constants.ts). */
+  --buildrick-design-color-blue-500: #2D6DFF;
+  --buildrick-design-color-slate-50: #F8FAFC;
+  --buildrick-design-color-slate-700: #334155;
+  --buildrick-design-color-red-500: #EF4444;
+  --buildrick-design-color-action: #2D6DFF;
+  --buildrick-design-color-surface: #F8FAFC;
+  --buildrick-design-color-text-primary: #334155;
+  --buildrick-design-color-feedback-error: #EF4444;
+
   /* TYPOGRAPHY (11 — user-editable) */
   --buildrick-design-font-heading: "Inter Tight";
   --buildrick-design-font-body: "Inter Tight";

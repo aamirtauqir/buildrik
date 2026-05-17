@@ -175,4 +175,59 @@
   --bd-transition-normal: var(--buildrick-transition-normal);
   --bd-transition-colors: var(--buildrick-transition-colors);
   --bd-transition-transform: var(--buildrick-transition-transform);
+
+  /* ─── SHORT-FORM CHROME SYNONYMS (drained 2026-05-18 from Gate 17 ghosts)
+   * Consumers across editor chrome reach for shorter names than the formal
+   * --buildrick-*/--bd-fg-primary style. Aliased here so Gate 17 sees them
+   * defined (was: 34 ghost references with inline rgba fallbacks). All map
+   * to existing canonical tokens — no new color values introduced.
+   */
+  /* Surfaces / backgrounds */
+  --bd-bg: var(--buildrick-bg-panel);
+  --bd-bg-default: var(--buildrick-bg-panel);
+  --bd-bg-canvas: var(--buildrick-canvas-wrapper);
+  --bd-bg-soft: var(--buildrick-bg-subtle);
+  --bd-bg-sub: var(--buildrick-bg-subtle);
+  --bd-hover-bg: var(--buildrick-bg-hover);
+  --bd-surface: var(--buildrick-bg-card);
+  --bd-surface-1: var(--buildrick-bg-card);
+  --bd-surface-2: var(--buildrick-bg-elevated);
+
+  /* Borders */
+  --bd-border-default: var(--buildrick-border);
+
+  /* Text / foreground */
+  --bd-fg: var(--buildrick-text-primary);
+  --bd-fg-strong: var(--buildrick-text-heading);
+  --bd-fg-subtle: var(--buildrick-text-muted);
+  --bd-fg-danger: var(--buildrick-error);
+  --bd-fg-success: var(--buildrick-success);
+  --bd-fg-warn: var(--buildrick-warning);
+  --bd-text: var(--buildrick-text-primary);
+  --bd-text-muted: var(--buildrick-text-muted);
+  --bd-text-subtle: var(--buildrick-text-muted);
+
+  /* Semantic-status synonyms */
+  --bd-danger: var(--buildrick-error);
+  --bd-danger-soft: var(--buildrick-error-light);
+  --bd-warn: var(--buildrick-warning);
+  --bd-info-bg: var(--buildrick-info-light);
+  --bd-info-border: var(--buildrick-accent-tint);
+  --bd-info-soft: var(--buildrick-info-soft);
+  --bd-info-strong: var(--buildrick-info-strong);
+  --bd-success-soft: var(--buildrick-success-soft);
+  --bd-success-strong: var(--buildrick-success-strong);
+
+  /* Cobalt-themed accent variants (cobalt = the single-accent system) */
+  --bd-cobalt: var(--buildrick-accent);
+  --bd-cobalt-dark: var(--buildrick-accent-pressed);
+  --bd-cobalt-soft: var(--buildrick-accent-subtle);
+  --bd-cobalt-tint: var(--buildrick-accent-tint);
+  --bd-accent-soft: var(--buildrick-accent-subtle);
+  --bd-accent-tint-hover: var(--buildrick-accent-tint);
+
+  /* Typography size synonyms (CSS font shorthand consumers) */
+  --bd-ui: var(--buildrick-font-family);
+  --bd-font-size-sm: var(--buildrick-text-sm);
+  --bd-font-size-xs: var(--buildrick-text-xs);
 }

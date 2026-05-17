@@ -24,7 +24,7 @@
 
 set -u
 
-BLOCK_ON_FAIL=false  # flip to true after CI baseline goes green
+BLOCK_ON_FAIL=true  # flipped 2026-05-18 — verify:ds runs fully green end-to-end
 
 # Resolve repo root so the hook works regardless of where push is invoked.
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -32,7 +32,7 @@ cd "$REPO_ROOT/packages/editor"
 
 echo ""
 echo "──────────────────────────────────────────────"
-echo " Buildrik DS gates (pre-push, WARN mode)"
+echo " Buildrik DS gates (pre-push, BLOCKING mode)"
 echo "──────────────────────────────────────────────"
 
 # Run the gate but capture exit code instead of letting it kill the hook.
