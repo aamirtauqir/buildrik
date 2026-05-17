@@ -27,6 +27,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
@@ -394,9 +395,9 @@ export const ExportSection: React.FC = () => {
         <pre data-testid="export-preview" style={previewStyle}>
           {preview}
         </pre>
-        <button onClick={handleDownload} style={downloadButtonStyle}>
+        <Button variant="primary" onClick={handleDownload} style={downloadButtonStyle}>
           {downloadLabelFor(format)}
-        </button>
+        </Button>
       </div>
 
       <ImportCard />
