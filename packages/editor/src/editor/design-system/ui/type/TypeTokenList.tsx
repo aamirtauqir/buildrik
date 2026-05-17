@@ -10,6 +10,7 @@ import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Select } from "@/editor/shared/vibcoder/Select";
 
 export interface TypeTokenListProps {
   tokens: DesignToken[];
@@ -365,7 +366,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
           </div>
         )}
       </div>
-      <select
+      <Select
         value={token.value}
         onChange={(e) => onChange(token.id, e.target.value)}
         style={{
@@ -384,7 +385,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
           </option>
         ))}
         {!FONT_OPTIONS.includes(token.value) && <option value={token.value}>{token.value}</option>}
-      </select>
+      </Select>
       <div style={{ flexShrink: 0 }}>
         <TokenUsageChip count={usageCount} />
       </div>
