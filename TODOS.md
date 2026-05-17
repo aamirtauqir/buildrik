@@ -1,5 +1,23 @@
 # TODOS
 
+## 2026-05-18 — Radio primitive CLOSED (Gate 24 floor 3 → 1)
+
+- ✅ Vibcoder Radio + RadioGroup primitives shipped (commit `d7a7ea78`)
+- ✅ `themes/components/atoms/radio.css` — sibling to checkbox.css, sm/md/lg + error variant
+- ✅ `editor/shared/vibcoder/Radio.tsx` — Radio (single) + RadioGroup with name-threading via React.cloneElement
+- ✅ 12 unit tests pass
+- ✅ ExportSection's 2 radio surfaces (Format picker + Dark-mode strategy) wired to Radio
+- ✅ 26/26 existing ExportSection tests pass post-swap
+- ✅ Gate 24 baseline ratcheted 3 → 1 (AssetCell only — doc-justified edge-to-edge thumb visual)
+- Arc total: **99 → 1** (~99% drained, 16 commits)
+
+Closes carry-forward "Build vibcoder Radio + RadioGroup primitive" from the 2026-05-18 Gate 24 codemod arc.
+
+### Open carry-forwards
+
+- **BareButton variant / primitive** — closes the final Gate 24 floor (AssetCell). Either add a `bareButton` variant to Button that strips `bd-btn` chrome OR new BareButton primitive. ~20 min.
+- All other open arcs (Gate 17 ghosts, CI ratchet drains, animation footgun fix, dead-engine delete) unchanged.
+
 ## 2026-05-18 — Animation feature audit CLOSED (report-only, no code changes)
 
 - ✅ Animation is inspector SECTION (`editor/inspector/sections/AnimationSection.tsx`), not a sidebar tab.
