@@ -7,6 +7,7 @@
  */
 
 import type { ElementData, TraitData, TraitValue } from "../../shared/types";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 
 /**
@@ -44,7 +45,7 @@ export class ElementStyles {
       value
     );
 
-    this.getComposer().emit("element:updated", this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
     this.getComposer().markDirty();
   }
 
@@ -52,7 +53,7 @@ export class ElementStyles {
     const data = this.getData();
     if (data.attributes) {
       delete data.attributes[name];
-      this.getComposer().emit("element:updated", this);
+      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
       this.getComposer().markDirty();
     }
   }
@@ -83,7 +84,7 @@ export class ElementStyles {
     }
     if (!data.classes.includes(className)) {
       data.classes.push(className);
-      this.getComposer().emit("element:updated", this);
+      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
       this.getComposer().markDirty();
     }
   }
@@ -94,7 +95,7 @@ export class ElementStyles {
       const index = data.classes.indexOf(className);
       if (index !== -1) {
         data.classes.splice(index, 1);
-        this.getComposer().emit("element:updated", this);
+        this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
         this.getComposer().markDirty();
       }
     }
@@ -110,7 +111,7 @@ export class ElementStyles {
 
   setClasses(classes: string[]): void {
     this.getData().classes = [...classes];
-    this.getComposer().emit("element:updated", this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
     this.getComposer().markDirty();
   }
 
@@ -137,7 +138,7 @@ export class ElementStyles {
       value
     );
 
-    this.getComposer().emit("element:updated", this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
     this.getComposer().markDirty();
   }
 
@@ -145,7 +146,7 @@ export class ElementStyles {
     const data = this.getData();
     if (data.styles) {
       delete data.styles[property];
-      this.getComposer().emit("element:updated", this);
+      this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
       this.getComposer().markDirty();
     }
   }
@@ -162,7 +163,7 @@ export class ElementStyles {
 
   setStyles(styles: Record<string, string>): void {
     this.getData().styles = { ...styles };
-    this.getComposer().emit("element:updated", this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
     this.getComposer().markDirty();
   }
 
@@ -187,7 +188,7 @@ export class ElementStyles {
       data.traits.push({ name, type: "text", value });
     }
 
-    this.getComposer().emit("element:updated", this);
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this);
     this.getComposer().markDirty();
   }
 

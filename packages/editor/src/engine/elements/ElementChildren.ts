@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import type { Element } from "./Element";
 
@@ -84,7 +85,7 @@ export class ElementChildren {
     parent.addChild(this.getSelf(), index);
 
     // NOTE: We do NOT maintain data.children - toJSON() reconstructs it.
-    this.getComposer().emit("element:moved", {
+    this.getComposer().emit(EVENTS.ELEMENT_MOVED, {
       element: this.getSelf(),
       parent,
     });

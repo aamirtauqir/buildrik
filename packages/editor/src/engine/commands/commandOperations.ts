@@ -7,6 +7,7 @@
  */
 
 import { snapToGrid } from "../../shared/utils/dragDrop";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 
 /** Direction for z-index reordering */
@@ -54,7 +55,7 @@ export function nudgeSelected(composer: Composer, deltaX: number, deltaY: number
   selected.setStyle("top", `${newTop}px`);
 
   composer.endTransaction();
-  composer.emit("element:nudged", { elementId, deltaX, deltaY });
+  composer.emit(EVENTS.ELEMENT_NUDGED, { elementId, deltaX, deltaY });
 }
 
 /**
@@ -109,7 +110,7 @@ export function reorderElement(composer: Composer, direction: ReorderDirection):
   }
 
   composer.endTransaction();
-  composer.emit("element:reordered", {
+  composer.emit(EVENTS.ELEMENT_REORDERED, {
     elementId: selected.getId(),
     direction,
   });

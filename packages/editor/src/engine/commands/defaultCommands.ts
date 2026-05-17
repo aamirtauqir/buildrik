@@ -114,7 +114,7 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
         c.beginTransaction("paste");
         c.elements.pasteElement(c.clipboard, target);
         c.endTransaction();
-        c.emit("clipboard:paste", { targetId });
+        c.emit(EVENTS.CLIPBOARD_PASTE, { targetId });
       },
     },
 
@@ -270,25 +270,25 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       id: "ui-open-templates",
       label: "Open Templates",
       shortcut: "ctrl+shift+t",
-      run: () => composer.emit("ui:toggle:templates"),
+      run: () => composer.emit(EVENTS.UI_TOGGLE_TEMPLATES),
     },
     {
       id: "ui-open-exporter",
       label: "Open Exporter",
       shortcut: "ctrl+shift+e",
-      run: () => composer.emit("ui:toggle:exporter"),
+      run: () => composer.emit(EVENTS.UI_TOGGLE_EXPORTER),
     },
     {
       id: "ui-open-ai",
       label: "Open AI Assistant",
       shortcut: "ctrl+shift+a",
-      run: () => composer.emit("ui:toggle:ai"),
+      run: () => composer.emit(EVENTS.UI_TOGGLE_AI),
     },
     {
       id: "ui-toggle-component-view",
       label: "Toggle Component View",
       shortcut: "ctrl+shift+c",
-      run: () => composer.emit("ui:toggle:component-view"),
+      run: () => composer.emit(EVENTS.UI_TOGGLE_COMPONENT_VIEW),
     },
 
     // ============================================

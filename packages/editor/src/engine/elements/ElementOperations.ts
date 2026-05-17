@@ -9,6 +9,7 @@
 import type { ElementData } from "../../shared/types";
 import type { AnimationConfig } from "../../shared/types/animations";
 import type { DataBinding } from "../../shared/types/data";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import type { Element } from "./Element";
 
@@ -86,7 +87,7 @@ export class ElementOperations {
       oldParent.addChild(wrapper, oldIndex);
     }
 
-    this.getComposer().emit("element:wrapped", { element: self, wrapper });
+    this.getComposer().emit(EVENTS.ELEMENT_WRAPPED, { element: self, wrapper });
     this.getComposer().markDirty();
 
     return wrapper;
@@ -118,7 +119,7 @@ export class ElementOperations {
       parent.addChild(child, index);
     }
 
-    this.getComposer().emit("element:unwrapped", { element: self, children });
+    this.getComposer().emit(EVENTS.ELEMENT_UNWRAPPED, { element: self, children });
     this.getComposer().markDirty();
 
     return children;
@@ -141,7 +142,7 @@ export class ElementOperations {
     // NOTE: We do NOT maintain data.children here.
     // The toJSON() method reconstructs children from live this.children array.
 
-    this.getComposer().emit("element:replaced", {
+    this.getComposer().emit(EVENTS.ELEMENT_REPLACED, {
       old: self,
       new: element,
     });
@@ -195,7 +196,7 @@ export class ElementOperations {
     const cssValue = this.generateAnimationCSS(config);
     this.setStyleFn("animation", cssValue);
 
-    this.getComposer().emit("element:updated", this.getSelf());
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 
@@ -208,7 +209,7 @@ export class ElementOperations {
       delete data.data.animation;
     }
     this.removeStyleFn("animation");
-    this.getComposer().emit("element:updated", this.getSelf());
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 
@@ -240,7 +241,7 @@ export class ElementOperations {
       data.data = {};
     }
     data.data.interactions = interactions;
-    this.getComposer().emit("element:updated", this.getSelf());
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 
@@ -255,7 +256,7 @@ export class ElementOperations {
     if (data.data?.interactions) {
       delete data.data.interactions;
     }
-    this.getComposer().emit("element:updated", this.getSelf());
+    this.getComposer().emit(EVENTS.ELEMENT_UPDATED, this.getSelf());
     this.getComposer().markDirty();
   }
 
@@ -268,7 +269,7 @@ export class ElementOperations {
    */
   setDataBinding(property: string, binding: DataBinding): void {
     this.dataBindings.set(property, binding);
-    this.getComposer().emit("element:binding:set", {
+    this.getComposer().emit(EVENTS.ELEMENT_BINDING_SET, {
       element: this.getSelf(),
       property,
       binding,
@@ -300,7 +301,7 @@ export class ElementOperations {
   removeDataBinding(property: string): void {
     if (this.dataBindings.has(property)) {
       this.dataBindings.delete(property);
-      this.getComposer().emit("element:binding:removed", {
+      this.getComposer().emit(EVENTS.ELEMENT_BINDING_REMOVED, {
         element: this.getSelf(),
         property,
       });

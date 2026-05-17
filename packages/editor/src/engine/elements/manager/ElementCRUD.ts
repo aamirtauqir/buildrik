@@ -89,7 +89,7 @@ export class ElementCRUD {
     const activePage = this.ctx.composer.elements.getActivePage();
     if (activePage?.root?.id === id) {
       devWarn("Composer", "Cannot delete page root element");
-      this.ctx.composer.emit("error", {
+      this.ctx.composer.emit(EVENTS.ERROR, {
         type: "invalid_operation",
         message: "Cannot delete page root element",
       });

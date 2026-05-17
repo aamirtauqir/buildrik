@@ -54,6 +54,20 @@ export const EVENTS = {
   ELEMENT_EDIT_ALT: "element:edit-alt",
   /** Preview layer changed for element (T8 — AI tab live-preview channel) */
   ELEMENT_PREVIEW_CHANGED: "element:preview:changed",
+  /** Element wrapped in a container by ElementOperations.wrap */
+  ELEMENT_WRAPPED: "element:wrapped",
+  /** Element's container removed by ElementOperations.unwrap (children promoted) */
+  ELEMENT_UNWRAPPED: "element:unwrapped",
+  /** Element replaced with a different element by ElementOperations.replace */
+  ELEMENT_REPLACED: "element:replaced",
+  /** Data binding established on element field */
+  ELEMENT_BINDING_SET: "element:binding:set",
+  /** Data binding removed from element field */
+  ELEMENT_BINDING_REMOVED: "element:binding:removed",
+  /** Element position nudged by arrow keys */
+  ELEMENT_NUDGED: "element:nudged",
+  /** Element reordered within its parent's children list */
+  ELEMENT_REORDERED: "element:reordered",
 
   // ============================================
   // Layer Panel Events
@@ -298,6 +312,7 @@ export const EVENTS = {
   UI_TOGGLE_CODE: "ui:toggle:code",
   UI_TOGGLE_PREVIEW: "ui:toggle:preview",
   UI_TOGGLE_AI: "ui:toggle:ai",
+  UI_TOGGLE_COMPONENT_VIEW: "ui:toggle:component-view",
   UI_PANEL_RESIZE: "ui:panel:resize",
 
   // ============================================

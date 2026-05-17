@@ -7,6 +7,7 @@
  */
 
 import type { ComponentDefinition, ComponentInstance } from "../../shared/types/components";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 
 // ============================================
@@ -99,7 +100,7 @@ export function markInstanceElementsDirty(composer: Composer, instance: Componen
 
   const emitUpdatedRecursive = (el: ReturnType<typeof composer.elements.getElement>) => {
     if (!el) return;
-    composer.emit("element:updated", el);
+    composer.emit(EVENTS.ELEMENT_UPDATED, el);
     for (const child of el.getChildren()) {
       emitUpdatedRecursive(child);
     }
