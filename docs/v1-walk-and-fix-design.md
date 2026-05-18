@@ -113,7 +113,7 @@ zero data loss, zero console errors.
 Same script every iteration. Reproducibility beats coverage. Coverage expands post-v1.
 
 ```
-1. dashboard signup with seeded test account `qa+v1@buildrik.test` (deterministic — reset DB row per iteration)
+1. dashboard login with seeded account `qa@buildrik.local` / `qa-test-1234` (from `prisma/seed.ts`)
 2. dashboard → create site "test-site-N" (N = iteration number)
 3. click "Open in editor"
 4. editor: add Section → add Heading → add Image (from media tab) → add Button → save
