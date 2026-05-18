@@ -114,6 +114,34 @@ export class HistoryManager {
 
     this.composer.on(EVENTS.PROJECT_CHANGED, this.projectChangedHandler);
 
+    // After a project loads (sync from dashboard, file import, etc.), push an
+    // initial checkpoint so undo always has a baseline. Without this, the
+    // first user action goes onto an empty stack — undoing it triggers
+    // reconstructState(-1) which wipes the canvas. PROJECT_LOADED fires 4×
+    // during a typical load (wrapper + data, wrapper + data); only act on
+    // the wrapped-data emits which carry the actual ProjectData shape.
+    this.composer.on(EVENTS.PROJECT_LOADED, (data: unknown) => {
+      if (this.isDestroyed) return;
+      const isProjectData =
+        data != null &&
+        typeof data === "object" &&
+        "pages" in (data as Record<string, unknown>) &&
+        !("loading" in (data as Record<string, unknown>)) &&
+        !("importing" in (data as Record<string, unknown>));
+      if (!isProjectData) return;
+      // Project load just completed. The import phase emitted PROJECT_CHANGED
+      // for every intermediate operation (clear, importPage × N) which got
+      // recorded as undo patches — those represent empty-canvas transitional
+      // states, NOT user-undoable steps. Reset the stack and capture the
+      // loaded state as the single baseline checkpoint so user's first undo
+      // returns to the loaded state, not to mid-import garbage.
+      this.undoStack = [];
+      this.redoStack = [];
+      this.patchesSinceCheckpoint = 0;
+      this.currentStateCache = null;
+      this.recordCheckpoint("loaded");
+    });
+
     this.composer.on(EVENTS.TRANSACTION_BEGIN, (data: { label?: string }) => {
       if (data?.label) {
         this.currentTransactionLabel = data.label;

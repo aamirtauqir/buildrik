@@ -329,3 +329,37 @@ Just this iteration log update. No source change — the walk was a coverage ext
 **V1 ship still holds.** Extended walk validates A bar wasn't a 2-element fluke. All 4 walk-script element types + multi-page workflow work end-to-end.
 
 Tech-debt freeze remains active per spec Section 5. Still waiting on real-user (manual, in-real-Chrome-not-test-browser) walk before unfreeze.
+
+## Iteration 7 — undo/redo/delete coverage — 2026-05-19
+
+**Goal:** Test core editor primitives (Ctrl+Z, Ctrl+Shift+Z, Delete) — untested by Iters 1-6.
+
+### P0 found + FIXED
+
+**P0-6: Ctrl+Z catastrophically wipes canvas.**
+
+- Repro: Load existing site with 6 elements. Add 1 Heading (total 7). Ctrl+Z. **Canvas drops to 1 element (root DIV only) — lost 7 elements**.
+- Real-user impact: any accidental Ctrl+Z mid-edit destroys entire work.
+- Root cause: `HistoryManager.constructor` registered no PROJECT_LOADED listener. During `importProject()`, each intermediate step (clear, importPage × N) fired PROJECT_CHANGED → HistoryManager.record() pushed import-step patches onto undoStack. After load, undoStack already contained N patches representing transitional empty-canvas states (not user-meaningful steps). User's first add pushed an N+1 patch. Ctrl+Z → undo() popped patch → `reconstructState(N-1)` walked back through import-noise patches → empty canvas.
+- Fix: `packages/editor/src/engine/HistoryManager.ts:115+` — added PROJECT_LOADED handler. When fully-loaded data arrives (filter: has `pages` key, no `loading`/`importing` flag), reset undoStack + redoStack + currentStateCache + push single `recordCheckpoint("loaded")`. User's first add now pushes onto [checkpoint, ...] stack. Undo pops to checkpoint = load state restored.
+- Re-walk verified: Load=10 → Add Heading=11 → Ctrl+Z=10 (correct).
+
+### P1 found, NOT fixed
+
+**P1-1: Redo broken (Ctrl+Shift+Z and Ctrl+Y both no-op).**
+
+- Repro: After successful undo, press Ctrl+Shift+Z OR Ctrl+Y. Canvas state doesn't change (stays at post-undo count).
+- Suspected: either keybind not registered for editor canvas focus context, OR `redo()` method has bug when restoring from my new initial-checkpoint baseline.
+- Deferred to separate iter — undo is the high-stakes path (data loss), redo is "lost productivity" but not destructive.
+
+### Delete works
+
+- Select element (click) + press Delete key → element removed. Canvas count drops by 1. Persistence: not verified in this iter but engine state correct.
+
+### Commit
+
+`HistoryManager.ts` PROJECT_LOADED handler (single-edit fix).
+
+### Memory cross-ref
+
+This is exactly the kind of P0 that automation walk catches and human walk would NOT have caught: undo silently wipes everything but produces no error, no toast, no console.error. Real user hits Ctrl+Z out of muscle memory, loses everything, has no idea why. The walk-and-fix loop earns its keep on these kinds of silent-data-loss surfaces. See [[feedback-v1-walk-and-fix-loop]].
