@@ -494,8 +494,26 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         <div aria-live="polite" aria-atomic="true" style={{ marginRight: 4 }}>
           <DraftChip state={isDirty ? "dirty" : "saved"} count={totalDirty} />
         </div>
+      </PanelHeader>
+
+      {/* Toolbar row — modes + AI + Export. Moved out of PanelHeader actions
+          so the 320px DS panel doesn't overflow (title was wrapping under
+          the action cluster). */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "6px 12px",
+          borderBottom: "1px solid var(--bd-border)",
+          background: "var(--bd-bg-subtle)",
+          flexShrink: 0,
+          flexWrap: "wrap",
+        }}
+      >
         <DSModeToggle />
         {composer && composer.colorMode ? <ColorModeToggle composer={composer} /> : null}
+        <span style={{ flex: 1 }} />
         <Button
           type="button"
           variant="ghost"
@@ -524,7 +542,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           isDirty={isDirty}
           onSaveFirst={() => setShowReview(true)}
         />
-      </PanelHeader>
+      </div>
 
       <DSLintMount composer={composer} />
 

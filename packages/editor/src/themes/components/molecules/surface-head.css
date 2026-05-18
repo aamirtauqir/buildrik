@@ -56,6 +56,9 @@
   color: var(--buildrick-text-heading);
   letter-spacing: -0.01em;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bd-surface-head__meta {
