@@ -81,6 +81,8 @@ export interface StudioHeaderProps {
   onOpenPlugins?: () => void;
   onOpenHistory?: () => void;
   onOpenIssues?: () => void;
+  /** Open Keyboard Shortcuts panel (wired to topbar Help button) */
+  onOpenShortcuts?: () => void;
 
   // Core actions
   onSave: () => void;
@@ -142,6 +144,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenPlugins,
   onOpenHistory,
   onOpenIssues,
+  onOpenShortcuts,
   onSave,
   onExportHTML,
   onVercelPublish,
@@ -263,6 +266,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       onOpenHistory={onOpenHistory}
       onOpenAI={onShowAI}
       onOpenIssues={onOpenIssues}
+      onHelp={onOpenShortcuts}
       collaborationSlot={
         hasTransport ? (
           <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
