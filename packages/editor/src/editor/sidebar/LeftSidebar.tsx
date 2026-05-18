@@ -213,7 +213,10 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       if (tabId !== activeTab) {
         safeTabChange(tabId);
         if (!drawerOpen) onDrawerToggle();
-      } else if (!drawerOpen) {
+      } else {
+        // Clicking the already-active rail icon toggles the drawer
+        // (open if closed, close if open). Replaces the redundant
+        // outer `ls-panel-close` × icon for tabs without PanelHeader.
         onDrawerToggle();
       }
     },
@@ -368,20 +371,9 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         role="tabpanel"
         aria-hidden={!drawerOpen}
       >
-        {drawerOpen && (
-          <Button
-            type="button"
-            className="ls-panel-close"
-            onClick={onDrawerToggle}
-            aria-label="Close panel"
-            title="Close panel"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
-          </Button>
-        )}
+        {/* ls-panel-close removed: PanelHeader inside each tab owns the close X.
+            Tabs without a PanelHeader (Layers, Add) can be closed by re-clicking
+            the active rail icon, which now toggles drawerOpen. */}
         <div ref={panelContentRef} className="ls-panel-content ls-panel-content--no-padding" tabIndex={-1}>
           <InspectorErrorBoundary
             key={errorKey}
