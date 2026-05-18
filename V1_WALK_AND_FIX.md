@@ -579,3 +579,26 @@ The chevron next to element label shows parent navigation only. Real users right
 ### Iter 13 commits
 
 `cf52fd87` — redo/undo bail guard + 1 test added (6 cases total).
+
+## Iteration 14 — Forms category element walk — 2026-05-19
+
+**Goal:** Untested element family — drag an Input from the Forms category, verify render + save + reload. Forms = first non-Basic/Layout element family touched in walk-and-fix.
+
+### Results — all PASS
+
+| Test | Result | Evidence |
+|---|---|---|
+| Forms accordion expand (16 elements) | ✅ | Input, Textarea, Select, Checkbox, Radio, Switch, Slider, Upload, Submit, Email, Password, Number visible |
+| Drag Input → canvas | ✅ | `<input type="text" placeholder="Enter text...">` mounts; inspector shows "Input" + Stroke `1px solid var(--buildrick-design-input-border)` |
+| Save | ✅ | "Saved · just now" green |
+| Reload persistence | ✅ | inputCount=1, type=text, placeholder="Enter text..." after full nav reload |
+
+### Side-observation — starter DS wizard appears mid-walk
+
+Mid-scroll, the "Pick a starter design system" modal (Cobalt Default / Stripe Blue / Notion Warm / Apple Minimal / Linear Dark / Vercel Mono) overlayed the canvas. This is the DS-prototype-parity Arc shipped 2026-05-15 — the wizard surfaces when no DS is configured for a site. The QA test site was created without picking a DS, so the wizard pops up every session. "Skip" dismisses it cleanly.
+
+**Not a bug, but a UX consideration:** real users on existing sites will see this wizard on every editor open until they pick or skip permanently. Should "Skip" persist (don't re-show) instead of just dismissing for the session.
+
+### Iter 14 commits
+
+Walk log only. Input path shipped correctly.
