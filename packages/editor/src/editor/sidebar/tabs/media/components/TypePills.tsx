@@ -17,12 +17,16 @@ interface TypePillsProps {
   onTypeChange(type: MediaTypeFilter): void;
 }
 
-const PILLS: Array<{ key: MediaTypeFilter; label: string }> = [
-  { key: "all", label: "All" },
-  { key: "img", label: "Images" },
-  { key: "vid", label: "Video" },
-  { key: "ico", label: "Icons" },
-  { key: "fnt", label: "Fonts" },
+// Labels match the file's intent doc above (All / Img / Vid / Ico / Fnt).
+// Short labels let all 5 pills fit beside the "+ Stock" button at the
+// 320px panel width without horizontal-scroll clipping the last pill.
+// `title` exposes the full word for hover + screen readers.
+const PILLS: Array<{ key: MediaTypeFilter; label: string; title: string }> = [
+  { key: "all", label: "All",   title: "All" },
+  { key: "img", label: "Img",   title: "Images" },
+  { key: "vid", label: "Video", title: "Video" },
+  { key: "ico", label: "Icons", title: "Icons" },
+  { key: "fnt", label: "Fonts", title: "Fonts" },
 ];
 
 export function TypePills({
@@ -44,6 +48,8 @@ export function TypePills({
             size="sm"
             variant="ghost"
             aria-selected={isActive}
+            aria-label={p.title}
+            title={p.title}
             className={`med-type-pill${isActive ? " med-type-pill--active" : ""}`}
             onClick={() => onTypeChange(p.key)}
           >
