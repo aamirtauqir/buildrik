@@ -97,7 +97,14 @@ export async function updateSiteSettings(
     enabledLocales?: string[];
   }
 ) {
-  if (data.headCode !== undefined || data.bodyCode !== undefined || data.slug) {
+  // Gate Pro-only fields on actual content, not field presence. Editor
+  // auto-save sends headCode="" / bodyCode="" on every tick because the
+  // editor's customCode settings default to empty strings; gating on
+  // !== undefined blocked all Free-tier saves (P0-8, iter 10).
+  const wantsCustomCode =
+    (data.headCode != null && data.headCode !== "") ||
+    (data.bodyCode != null && data.bodyCode !== "");
+  if (wantsCustomCode || data.slug) {
     const current = await prisma.site.findUnique({
       where: { id: siteId },
       select: {
@@ -106,7 +113,7 @@ export async function updateSiteSettings(
       },
     });
 
-    if (data.headCode !== undefined || data.bodyCode !== undefined) {
+    if (wantsCustomCode) {
       const plan = current?.workspace?.plan ?? "FREE";
       if (plan === "FREE") throw new Error("CUSTOM_CODE_NOT_AVAILABLE");
     }
