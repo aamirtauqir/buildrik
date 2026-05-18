@@ -19,8 +19,8 @@ interface TypePillsProps {
 
 // Labels match the file's intent doc above (All / Img / Vid / Ico / Fnt).
 // Short labels let all 5 pills fit beside the "+ Stock" button at the
-// 320px panel width without horizontal-scroll clipping the last pill.
-// `title` exposes the full word for hover + screen readers.
+// narrow Media-panel width without horizontal-scroll clipping the last
+// pill. `title` exposes the full word for hover + screen readers.
 const PILLS: Array<{ key: MediaTypeFilter; label: string; title: string }> = [
   { key: "all", label: "All",   title: "All" },
   { key: "img", label: "Img",   title: "Images" },
