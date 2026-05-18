@@ -1,5 +1,43 @@
 # TODOS
 
+## 2026-05-18 — Autonomous loop pause point
+
+29 commits shipped today across 11 distinct arcs. Loop paused at a natural blocker: remaining gate-ratchet debt requires per-component design-taste decisions, not codemod sweeps.
+
+### Today's totals (full session)
+
+| Arc | Commits | Delta |
+|---|---:|---|
+| Localization Phase 1 backend | 1 | tRPC + Prisma + 18 tests |
+| E-005 partial codemod | 1 | 24 emit callsites to EVENTS constants |
+| TODOS drain / honesty audit | 2 | 5 stale entries closed |
+| Sidebar QA + Gate 24 discovery | — | 99 violations surfaced |
+| Gate 24 codemod (leg 1: DS UI) | 12 | 99 → 36 |
+| Gate 24 codemod (leg 2: outside DS) | 4 | 36 → 3 |
+| Animation feature audit (report) | 1 | 778 LOC dead + 2 footguns flagged |
+| CI gate audit | 2 | 1-month-red diagnosis, WARN hook |
+| Radio + RadioGroup primitives | 2 | Gate 24 3 → 1 |
+| Button `bare` variant | 2 | **Gate 24 1 → 0** |
+| Full CI green + hook → BLOCKING | 3 | Gate 17 34→0, Gate 16/18 fixed |
+| Hex drain | 2 | Gate 10 1055→823 (CSS+TSX) |
+| Gate 10 path-filter | 1 | 823→416 honest |
+| Animation cleanup ship | 1 | Delete 778 LOC + Trigger pills + Timeline |
+| Radius drain | 1 | Gate 13 504→303 |
+
+### Blocker reached
+
+Gate 12 (box-shadow, 185), Gate 13 residual (303 non-canonical), Gate 14 (layout literals, 369) all require per-component design-taste calls (snap-to-nearest visually risks designer intent; bespoke composite shadows would need new canonical tokens; same-px-different-semantics for layout literals). Not autonomous-safe per the scope feedback I wrote earlier today.
+
+### Open arcs (next session, with user input)
+
+- **Per-component radius residual review** (303): which 10px → 8 vs 12? which 5px → 4? Designer call.
+- **Box-shadow tokenization** (185): which composite shadows deserve new canonical tokens? Token-sprawl tradeoff.
+- **Layout-literal tokenization** (369): per-usage semantic mapping (is this 48px a rail width or a button height?).
+- **Re-add 9 drifted files to green-panel allowlist** after their 18 violations are fixed.
+- **Push to remote** (29 commits ahead of main, would verify BLOCKING hook end-to-end). Per CLAUDE.md needs user confirmation.
+- **Localization middleware decision** (A/B/C still pending user input).
+- **AccountModal real wiring** (multi-day, needs UI verify).
+
 ## 2026-05-18 — Hex drain (Gate 10/11/16 ratcheted)
 
 - ✅ 232 inline hex literals replaced with vibcoder --bd-* aliases (commit `d03d4b7c`)
