@@ -435,3 +435,7 @@ External loadProject + file-import paths still pass through the handler (flag fa
 ### Pattern caught
 
 The Iter 7 fix solved one symptom and surfaced another. **Lesson for codex pre-check:** when adding a handler that mutates shared state, grep ALL emit sites for the event before shipping — `Composer.ts:394` (loadProject) AND `Composer.ts:453` (importProject) both emit bare-data PROJECT_LOADED. Iter 7 only audited `loadProject`. Iter 9 closes the gap.
+
+### Iter 9b — sibling fix
+
+Same defect class found by post-fix sweep: `HistoryManager.applyRemoteOperation()` also calls `composer.importProject(newState)` (line 274). Without the new guard, an incoming collab teammate operation would silently wipe the local user's undo + redo stacks (silent-data-loss class P0 in collab sessions). Two-line fix: set `isRestoringFromHistory = true` inside its try/finally too. Both `importProject` callers inside HistoryManager now self-guarded. Shipped in `c764a170`.
