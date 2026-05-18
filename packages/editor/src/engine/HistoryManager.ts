@@ -342,11 +342,35 @@ export class HistoryManager {
     const previousState = this.reconstructState(this.undoStack.length - 1);
     this.restoreSnapshot(previousState);
     this.updatePatchCounter();
+    this.validateSelectionAfterRestore();
 
     this.composer.emit(EVENTS.HISTORY_UNDO, {
       entry: { timestamp: Date.now(), snapshot: previousState, label: current.label },
     });
     return true;
+  }
+
+  // Undo/redo replaces the entire element tree via importProject. The
+  // selection manager still references the previously-selected element ID,
+  // which may no longer exist in the restored tree — leaving inspector,
+  // breadcrumb, and footer status stuck on a deleted element. Validate
+  // post-restore: if the selected ID isn't in the new tree, clear selection.
+  private validateSelectionAfterRestore(): void {
+    try {
+      const selected = this.composer.selection?.getSelected?.();
+      if (!selected) return;
+      const id = selected.getId();
+      if (!id) {
+        this.composer.selection.clear();
+        return;
+      }
+      const stillExists = this.composer.elements?.getElement?.(id);
+      if (!stillExists) {
+        this.composer.selection.clear();
+      }
+    } catch {
+      // Defensive: never let selection validation break undo/redo.
+    }
   }
 
   redo(): boolean {
@@ -365,6 +389,7 @@ export class HistoryManager {
     this.undoStack.push(entry);
     this.restoreSnapshot(newState);
     this.updatePatchCounter();
+    this.validateSelectionAfterRestore();
 
     this.composer.emit(EVENTS.HISTORY_REDO, {
       entry: { timestamp: Date.now(), snapshot: newState, label: entry.label },
