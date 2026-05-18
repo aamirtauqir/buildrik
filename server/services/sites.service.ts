@@ -219,16 +219,31 @@ export async function createSite(
     return site;
   }
 
-  return prisma.site.create({
-    data: {
-      name: input.name,
-      slug,
-      status: "DRAFT",
-      workspaceId,
-      createdBy: userId,
-      pages: 0,
-      lastEditedAt: new Date(),
-    },
+  return prisma.$transaction(async (tx) => {
+    const created = await tx.site.create({
+      data: {
+        name: input.name,
+        slug,
+        status: "DRAFT",
+        workspaceId,
+        createdBy: userId,
+        pages: 1,
+        lastEditedAt: new Date(),
+      },
+    });
+
+    await tx.page.create({
+      data: {
+        siteId: created.id,
+        name: "Home",
+        slug: "home",
+        position: 0,
+        blocks: [],
+        isHomePage: true,
+      },
+    });
+
+    return created;
   });
 }
 
