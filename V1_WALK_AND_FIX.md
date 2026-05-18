@@ -383,3 +383,55 @@ Just iteration log update. No source change — these primitives already worked 
 ### Why this matters
 
 Page CRUD is the "scaffold-the-site" loop. Real users iterate page structure constantly during build — rename for clarity, delete for re-plan. Both must be fast + irreversible-feeling-safe (no data corruption, no orphaned children). Both verified.
+
+## Iteration 9 — Redo P1 source-only fix — 2026-05-19
+
+**Goal:** Close P1-1 from Iter 7. Browser extension disconnected mid-loop → pivoted to source-only investigation + fix (codex pre-check pattern: grep + read + test, defer live re-walk).
+
+### Bug — self-fired PROJECT_LOADED wiped redoStack
+
+Iter 7's PROJECT_LOADED handler added a stack reset on bare-ProjectData emits. That fix solved "first-add → Ctrl+Z wipes canvas," but introduced a sibling regression: `HistoryManager.restoreSnapshot()` calls `composer.importProject()`, which re-emits PROJECT_LOADED with bare data shape (`Composer.ts:453`). Handler couldn't tell the difference between an external load (which SHOULD reset) and the history's own restore (which must NOT). After every undo, redo, or applyRemoteOperation, both stacks got reset to a fresh "loaded" checkpoint. canRedo() = false → Ctrl+Shift+Z no-op.
+
+### Fix — `isRestoringFromHistory` self-guard
+
+Two-line behavior change in `HistoryManager.ts`:
+
+```ts
+// 1. new private flag
+private isRestoringFromHistory: boolean = false;
+
+// 2. PROJECT_LOADED handler early-returns when flag true
+if (this.isRestoringFromHistory) return;
+
+// 3. restoreSnapshot wraps in try/finally
+private restoreSnapshot(snapshot: ProjectData): void {
+  this.isRecording = false;
+  this.isRestoringFromHistory = true;
+  try {
+    this.composer.importProject(snapshot);
+    this.currentStateCache = snapshot;
+  } finally {
+    this.isRestoringFromHistory = false;
+    this.isRecording = true;
+  }
+}
+```
+
+External loadProject + file-import paths still pass through the handler (flag false in those entries) → history correctly resets when the user actually loads a new project. The flag only suppresses the self-fire from within restoreSnapshot.
+
+### Test added
+
+`HistoryManager.test.ts` — `PROJECT_LOADED self-guard`. Seeds undoStack with [checkpoint, patch] + redoStack with one entry, calls `redo()`, asserts undoStack stays > 1 (would be 1 without fix because handler resets to single "loaded" checkpoint) and redoStack drains to 0. Locks the invariant: the handler must not fire during HistoryManager's own restores.
+
+### Verification status
+
+- ✅ Unit test: ratchets pre/post-fix behavior.
+- ⏸ Live browser re-walk: deferred — extension was down for this iter. Add to next browser-up iter checklist.
+
+### Iter 9 commits
+
+`HistoryManager.ts` + `HistoryManager.test.ts` (commit `00c81729`; commit message uses "iter 10" — minor numbering drift, this entry is the canonical record).
+
+### Pattern caught
+
+The Iter 7 fix solved one symptom and surfaced another. **Lesson for codex pre-check:** when adding a handler that mutates shared state, grep ALL emit sites for the event before shipping — `Composer.ts:394` (loadProject) AND `Composer.ts:453` (importProject) both emit bare-data PROJECT_LOADED. Iter 7 only audited `loadProject`. Iter 9 closes the gap.
