@@ -60,13 +60,16 @@ function renderSidebar(overrides: {
 }
 
 describe("LeftSidebar rail click semantics", () => {
-  it("active tab click while drawer OPEN is a no-op", () => {
+  // Post ISSUE-005: the active rail icon doubles as the drawer's close affordance.
+  // The legacy outer `.ls-panel-close` × icon was removed; the inline PanelHeader
+  // close X inside each tab is the only other way to dismiss the drawer.
+  it("active tab click while drawer OPEN closes the drawer", () => {
     const { onTabChange, onDrawerToggle } = renderSidebar({
       activeTab: "layers",
       drawerOpen: true,
     });
     fireEvent.click(screen.getByRole("tab", { selected: true }));
-    expect(onDrawerToggle).not.toHaveBeenCalled();
+    expect(onDrawerToggle).toHaveBeenCalledTimes(1);
     expect(onTabChange).not.toHaveBeenCalled();
   });
 
@@ -108,16 +111,9 @@ describe("LeftSidebar rail click semantics", () => {
     expect(btn.classList.contains("ls-btn--last")).toBe(true);
   });
 
-  it("explicit close button invokes onDrawerToggle", () => {
-    const { onDrawerToggle } = renderSidebar({ drawerOpen: true });
-    const closeBtn = document.querySelector(".ls-panel-close") as HTMLElement;
-    expect(closeBtn).not.toBeNull();
-    fireEvent.click(closeBtn);
-    expect(onDrawerToggle).toHaveBeenCalledTimes(1);
-  });
-
-  it("close button is not rendered when drawer is already closed", () => {
-    renderSidebar({ drawerOpen: false });
+  it("legacy outer .ls-panel-close button is never rendered", () => {
+    // Removed in ISSUE-005 — the active rail icon owns the drawer toggle now.
+    renderSidebar({ drawerOpen: true });
     expect(document.querySelector(".ls-panel-close")).toBeNull();
   });
 });

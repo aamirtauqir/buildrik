@@ -207,7 +207,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   }, [activeTab, onTabChange]);
 
   // Rail button click: open drawer if closed, switch tab if different.
-  // Clicking an already-active tab is a no-op — closing uses the explicit X.
+  // Clicking the already-active tab TOGGLES the drawer (closes when open,
+  // reopens when closed) — replaces the removed `.ls-panel-close` × icon.
   const handleBtnClick = React.useCallback(
     (tabId: GroupedTabId) => {
       if (tabId !== activeTab) {
