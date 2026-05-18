@@ -30,7 +30,6 @@ import {
 } from "@/editor/shared/vibcoder";
 import type { Issue } from "./hooks/useStudioState";
 import { CommandPalette } from "./modals/CommandPalette";
-import { InviteModal } from "./InviteModal";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { ColorModeIconCycle } from "@/editor/design-system/ui/ColorModeIconCycle";
@@ -171,7 +170,6 @@ export interface TopbarProps {
   onOpenIssues?: () => void;
   onCommandPalette?: () => void;
   onHelp?: () => void;
-  onInvite?: () => void;
 
   // Legacy / StudioHeader wiring
   device?: string;
@@ -246,9 +244,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   onDeviceChange,
 }) => {
   const publishEnabled = isFeatureEnabled("publish");
-  const inviteEnabled = isFeatureEnabled("invite");
   const [cmdOpen, setCmdOpen] = React.useState(false);
-  const [inviteOpen, setInviteOpen] = React.useState(false);
 
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -420,23 +416,27 @@ export const Topbar: React.FC<TopbarProps> = ({
               Offline
             </span>
           )}
-          {inviteEnabled && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setInviteOpen(true)}
-                  aria-label="Invite team"
-                >
-                  + Invite
-                </Button>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>Invite team</TooltipContent>
-              </TooltipPortal>
-            </Tooltip>
-          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  window.open(
+                    `${dashboardUrl}/dashboard/team`,
+                    "_blank",
+                    "noopener,noreferrer"
+                  )
+                }
+                aria-label="Invite team"
+              >
+                + Invite
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Manage team</TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
         </TopbarGroup>
 
         {/* Cell 8 — Right actions: Cmd / Preview / Publish / Help / Account */}
@@ -552,7 +552,6 @@ export const Topbar: React.FC<TopbarProps> = ({
         </TopbarGroup>
       </VibcoderTopbar>
       {cmdOpen && <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} />}
-      {inviteOpen && inviteEnabled && <InviteModal onClose={() => setInviteOpen(false)} />}
     </>
   );
 };

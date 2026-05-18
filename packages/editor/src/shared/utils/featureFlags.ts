@@ -13,8 +13,6 @@ const env = import.meta.env;
 export const FEATURES = {
   /** Publish-to-host workflow. Backend: Vercel API integration. Phase 1. */
   publish: env.VITE_FEATURE_PUBLISH === "true",
-  /** Invite modal (team invitations via Resend). Phase 4. */
-  invite: env.VITE_FEATURE_INVITE === "true",
   /** Cloud sync (CloudSyncService + SyncManager). SCAFFOLD — never wired. */
   sync: env.VITE_FEATURE_SYNC === "true",
   /** S6 dual-section Components panel (Catalog + UserSaved + DSStatusChip). */
