@@ -517,3 +517,25 @@ Look for this pattern at other gates: any server endpoint that bases authorizati
 ### Iter 11 commits
 
 Walk log only — no source change needed. All three style paths shipped correctly; Iter 10's Pro-gate fix unblocked all saves.
+
+## Iteration 12 — drag-and-drop walk — 2026-05-19
+
+**Goal:** Test the two core drag primitives of any visual builder — drag-from-sidebar (add element) and drag-to-reorder (move existing element). Both critical to "user can compose without learning a keyboard mapping."
+
+### Results — all PASS
+
+| Test | Result | Evidence |
+|---|---|---|
+| Drag Heading from sidebar → canvas drop zone | ✅ | h2 count 5 → 6; inspector mounts on new element; breadcrumb shows Section > Container nesting (expected wrapping) |
+| Drag existing Heading from position-N → between position 1+2 | ✅ | Sequence reordered; element ID preserved in new position |
+| Save after each drag | ✅ | Topbar "Saved · just now" green both times |
+| Full reload persistence | ✅ | 10 elements, 0 dupes, 6 h2 in expected order; visible canvas matches DOM dump |
+
+### Observations
+
+- Drag-from-sidebar wraps the new element in `Section > Container` automatically when dropped into an empty drop zone. For users adding a top-level Heading this is correct (section wrapping per design system) but worth a UX check for builders who expect flat insertion at body level.
+- Engine state stayed clean across drag operations — no transient duplication artifact like the (false-alarm) one in Iter 10. Native HTML5 drag API + the engine's controlled mutation path don't race the way contentEditable does.
+
+### Iter 12 commits
+
+Walk log only. Drag paths shipped correctly; no source change needed.
