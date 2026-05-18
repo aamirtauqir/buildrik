@@ -266,6 +266,7 @@ export class HistoryManager {
   applyRemoteOperation(patch: Patch): void {
     const wasRecording = this.isRecording;
     this.isRecording = false;
+    this.isRestoringFromHistory = true;
 
     try {
       const currentState = this.getCurrentState();
@@ -273,6 +274,7 @@ export class HistoryManager {
       this.composer.importProject(newState);
       this.currentStateCache = newState;
     } finally {
+      this.isRestoringFromHistory = false;
       this.isRecording = wasRecording;
     }
   }
