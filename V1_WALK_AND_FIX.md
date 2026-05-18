@@ -490,3 +490,30 @@ Look for this pattern at other gates: any server endpoint that bases authorizati
 ### Iter 10 commits
 
 `da3c7ff5` — fix + test (server-side gate + 4-case regression test).
+
+## Iteration 11 — Style inspector controls (size, weight, color) — 2026-05-19
+
+**Goal:** Walk inspector Style tab Typography controls on Heading element. Verify save + reload persistence for each.
+
+### Results — all PASS
+
+| Test | Result | Evidence |
+|---|---|---|
+| Font size 36 → 64px | ✅ | Heading visibly grew; computed `fontSize: 64px`; badge updated `Inter · 36px` → `Inter · 64px` |
+| Weight Bold (700) → Regular (400) | ✅ | Heading thinner; computed `fontWeight: 400`; dropdown reflects Regular |
+| Color → Error token (#EF4444) | ✅ | Heading red; computed `color: rgb(239,68,68)`; binding chip shows "Error" token |
+| Full reload persistence | ✅ | After fresh navigation, all 3 properties intact: size=64px, weight=400, color=Error |
+
+### Observations
+
+- **Color picker UX:** When the value textbox is focused for direct hex entry but the popover swatch grid is also visible, typing keystrokes flow to whichever subfocus the popover gives. My initial `triple_click + type "ff0000"` landed in the swatch *search* box, not the value input. The token-swatch path (click "Error") is the natural happy path; direct hex is a CUSTOM tab feature.
+- **P1-3 candidate — phantom dirty indicator:** Topbar shows "Not saved" (red dot) immediately after a fresh page reload, before any user interaction. Sometimes turns green after a tick. Likely a `state.dirty` flag set during the load sequence + cleared moments later, but the visible "stutter" suggests load completion races the indicator. Not blocking; flag for follow-up walk.
+- **P2 candidate — empty Size input shows "0":** When Size value is the default (font-size inherited from class, no explicit override), the input displays "0" placeholder. Real users may interpret "0" as "current size is zero" rather than "no override applied". Show actual computed value or "—" placeholder per UX convention.
+
+### Pattern recorded
+
+`feedback_execcommand_bypass_artifact.md` saved during Iter 10 saved its weight here: **for native form controls (<select>, <input type=number>), the `Object.getOwnPropertyDescriptor(proto, 'value').set + dispatchEvent` pattern IS the canonical React-state-aware bypass** and does NOT trigger engine duplication artifacts. The execCommand artifact rule applies specifically to contentEditable rich-text paths.
+
+### Iter 11 commits
+
+Walk log only — no source change needed. All three style paths shipped correctly; Iter 10's Pro-gate fix unblocked all saves.
