@@ -539,3 +539,43 @@ Walk log only — no source change needed. All three style paths shipped correct
 ### Iter 12 commits
 
 Walk log only. Drag paths shipped correctly; no source change needed.
+
+## Iteration 13 — context menu + duplicate/delete + REDO P0-9 — 2026-05-19
+
+**Goal:** Test right-click context menu + Cmd+D duplicate + Backspace delete + Cmd+Z/Cmd+Shift+Z undo/redo after multi-mutation churn (regression check on iter 7+9 fixes).
+
+### Results
+
+| Test | Result | Evidence |
+|---|---|---|
+| Right-click on canvas heading → context menu | ❌ P1-4 | No popup. Selection happens but no Duplicate/Copy/Delete menu opens |
+| Element badge chevron → actions dropdown | ❌ | Opens parent navigation tree only (Container > Heading), not actions |
+| Cmd+D duplicate heading | ✅ | Each press creates one duplicate, inherits all styles (red, 64px, regular) |
+| Backspace delete selected | ✅ | h2 count drops by 1, selection moves to parent |
+| Cmd+Z undo (3×) restores deleted + reverses 2 dups | ✅ | h2 count rolled back 8 → 7 → 6, undo toasts shown |
+| Cmd+Shift+Z redo first undone | 🔴 P0-9 | **applyPatch throws "Cannot navigate path: /pages/0/root/children/3/children/0", canvas wipes to zero h2** |
+
+### P0-9 root cause
+
+`HistoryManager.redo()` at line 426 called `applyPatch(currentState, entry.patch)` with a stored JSON-Patch whose recorded path no longer matched the current tree shape after intervening mutations (drag-from-sidebar Iter 12 nested children at /3/children/0 in the sequence, redo step expected those still present).
+
+`applyPatch` threw "Cannot navigate path"; the throw left composer state mid-mutated → canvas blank → broken state was one debounced-save-tick away from persisting to the DB. DB check confirmed save hadn't fired yet, state recoverable.
+
+This is a **distinct defect from Iter 9's PROJECT_LOADED self-guard.** Iter 9 made redo *callable* (stacks no longer wiped on self-restore). Iter 13 fix makes redo *crash-safe* (failed apply doesn't blank the canvas). Both are required for redo to be production-shippable.
+
+### P0-9 fix
+
+Wrapped newState computation in try/catch inside both `undo()` and `redo()` (same divergence pattern applies to both — undo's `reconstructState+createPatch` chain can throw too, just rarer in the wild). On throw:
+- Push popped entry back onto its stack (no data lost)
+- `console.warn` for QA visibility
+- Return false; user loses one redo/undo step but keeps their canvas
+
+Shipped `cf52fd87` with new test "redo bail on patch divergence" asserting the popped entry returns to redo stack and `importProject` is never called on broken state.
+
+### P1-4 right-click context menu missing
+
+The chevron next to element label shows parent navigation only. Real users right-click canvas elements expecting Duplicate / Copy / Delete entries. Currently they have to discover Cmd+D + Backspace keyboard shortcuts. Deferred — not blocking for v1 (kbd works); follow-up sprint should add context menu primitive.
+
+### Iter 13 commits
+
+`cf52fd87` — redo/undo bail guard + 1 test added (6 cases total).
