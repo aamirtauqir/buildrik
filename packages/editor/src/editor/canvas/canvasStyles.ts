@@ -27,17 +27,24 @@ export const wrapperStyles: React.CSSProperties = {
   outline: "none",
 };
 
+// Fallback when the caller passes an unknown DeviceType that's missing
+// from DEVICE_SIZES. Without this the canvas read `undefined.width` and
+// crashed the editor (StudioErrorBoundary) — see the wide-breakpoint fix
+// in Canvas.types.ts.
+const DEFAULT_CANVAS_SIZE = { width: "100%", height: "100%" };
+
 export function getCanvasStyles(
-  size: { width: string; height: string },
+  size: { width: string; height: string } | undefined,
   device: DeviceType,
   scale: number,
   isDragOver: boolean
 ): React.CSSProperties {
+  const safe = size ?? DEFAULT_CANVAS_SIZE;
   return {
-    width: size.width,
-    height: size.height,
-    maxWidth: device === "desktop" ? "100%" : size.width,
-    maxHeight: device === "desktop" ? "100%" : size.height,
+    width: safe.width,
+    height: safe.height,
+    maxWidth: device === "desktop" ? "100%" : safe.width,
+    maxHeight: device === "desktop" ? "100%" : safe.height,
     background: "var(--buildrick-bg-card)",
     borderRadius: 12,
     boxShadow: isDragOver

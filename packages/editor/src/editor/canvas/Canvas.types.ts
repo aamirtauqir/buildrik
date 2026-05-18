@@ -47,6 +47,10 @@ export interface CanvasRef {
 }
 
 export const DEVICE_SIZES: Record<string, { width: string; height: string }> = {
+  // "wide" was missing — clicking the Wide breakpoint button caused the
+  // canvas to read undefined.width and crash the editor (StudioErrorBoundary).
+  // Width matches BreakpointDropdown.tsx { id: "wide", width: 1920 }.
+  wide: { width: "1920px", height: "100%" },
   desktop: { width: "100%", height: "100%" },
   tablet: { width: "768px", height: "1024px" },
   mobile: { width: "375px", height: "812px" },
