@@ -602,3 +602,22 @@ Mid-scroll, the "Pick a starter design system" modal (Cobalt Default / Stripe Bl
 ### Iter 14 commits
 
 Walk log only. Input path shipped correctly.
+
+## Iteration 15 — Spacing box-model walk — 2026-05-19
+
+**Goal:** Layout primitive. Test margin-top edit on Heading + verify save + reload.
+
+### Results — PASS
+
+| Test | Result | Evidence |
+|---|---|---|
+| Spacing accordion expand | ✅ | MARGIN + PADDING box-model UI with 4 inputs each + CONTENT center |
+| Set margin-top = 80px via input + Tab | ✅ | computed `marginTop: 80px`; heading visibly shifts down |
+| Save | ✅ | "Saved · just now" green |
+| Reload persistence | ✅ | marginTop=80px after full nav reload |
+
+Box-model UI is the standard 9-cell layout (margin/padding/content). Input + Tab commit works cleanly. No P0/P1 surfaced.
+
+### Iter 15 commits
+
+Walk log only.
