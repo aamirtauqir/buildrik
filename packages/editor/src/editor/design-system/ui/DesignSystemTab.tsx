@@ -474,11 +474,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     addToast({ description: `Token "${name}" added`, tone: "success" });
   };
 
-  const headerTitle =
-    activeSection === "tokens"     ? "Design · Tokens"
-  : activeSection === "styles"     ? "Design · Styles"
-  : activeSection === "components" ? "Design · Components"
-  :                                  "Design · Export";
+  // Short titles — the section tablist below the toolbar row already shows
+  // Tokens / Styles / Components / Export, so the header just needs the panel
+  // identity. Long "Design · Components" was clipping to "Design · Compo…" at
+  // the 320px panel width even with the toolbar-row split.
+  const headerTitle = "Design";
 
   const changedSectionLabels = isDirty ? ["Tokens"] : [];
 
