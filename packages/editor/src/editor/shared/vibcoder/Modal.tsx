@@ -43,6 +43,7 @@ import * as RadixDialog from "@radix-ui/react-dialog";
 import {
   forwardRef,
   type ButtonHTMLAttributes,
+  type CSSProperties,
   type HTMLAttributes,
   type ReactNode,
 } from "react";
@@ -115,27 +116,54 @@ export const ModalTrigger = forwardRef<HTMLButtonElement, ModalTriggerProps>(
 );
 ModalTrigger.displayName = "ModalTrigger";
 
-// Content — portals through OverlayMount per E3
-export const ModalContent = forwardRef<HTMLDivElement, ModalContentProps>(
-  ({ children, size, className, ...rest }, ref) => {
-    const container = useOverlayContainer();
-    const classes = [
-      "bd-modal",
-      size && `bd-modal--${size}`,
-      className,
-    ]
-      .filter(Boolean)
-      .join(" ");
-    return (
-      <RadixDialog.Portal container={container ?? undefined}>
-        <RadixDialog.Overlay className="bd-modal-backdrop" />
-        <RadixDialog.Content ref={ref} className={classes} {...rest}>
-          {children}
-        </RadixDialog.Content>
-      </RadixDialog.Portal>
-    );
-  },
-);
+// Visually-hidden span style — sr-only equivalent without adding a new
+// @radix-ui/react-visually-hidden dependency. Used by ModalContent's
+// default DialogTitle fallback.
+const srOnlyStyle: CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0,0,0,0)",
+  whiteSpace: "nowrap",
+  borderWidth: 0,
+};
+
+// Content — portals through OverlayMount per E3.
+//
+// A `RadixDialog.Title` MUST exist for screen reader users (Radix logs a
+// dev-time error otherwise). Callers usually render a visible `<ModalTitle>`
+// child. When they don't — e.g., the modal renders only a confirm prompt or
+// a richly-styled custom heading — we still emit a hidden Title so Radix's
+// a11y contract is satisfied. Callers can override via `srTitle`.
+export const ModalContent = forwardRef<
+  HTMLDivElement,
+  ModalContentProps & { srTitle?: string }
+>(({ children, size, className, srTitle = "Dialog", ...rest }, ref) => {
+  const container = useOverlayContainer();
+  const classes = [
+    "bd-modal",
+    size && `bd-modal--${size}`,
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return (
+    <RadixDialog.Portal container={container ?? undefined}>
+      <RadixDialog.Overlay className="bd-modal-backdrop" />
+      <RadixDialog.Content ref={ref} className={classes} {...rest}>
+        {/* Default sr-only Title so Radix never warns. A visible ModalTitle
+            child takes precedence — Radix wires aria-labelledby to the first
+            Title in DOM order, which will be this one only when the caller
+            didn't supply their own. */}
+        <RadixDialog.Title style={srOnlyStyle}>{srTitle}</RadixDialog.Title>
+        {children}
+      </RadixDialog.Content>
+    </RadixDialog.Portal>
+  );
+});
 ModalContent.displayName = "ModalContent";
 
 // Close — asChild per E1
