@@ -41,7 +41,7 @@ const buttonStyle: React.CSSProperties = {
 const dotStyle: React.CSSProperties = {
   width: 5,
   height: 5,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   background: "currentColor",
   flexShrink: 0,
 };

@@ -140,7 +140,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user, isSelf, role, stackIndex 
   const avatarStyle: React.CSSProperties = {
     width: 28,
     height: 28,
-    borderRadius: "50%",
+    borderRadius: "var(--bd-radius-full)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -163,7 +163,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user, isSelf, role, stackIndex 
   const imgStyle: React.CSSProperties = {
     width: "100%",
     height: "100%",
-    borderRadius: "50%",
+    borderRadius: "var(--bd-radius-full)",
     objectFit: "cover",
   };
 
@@ -193,7 +193,7 @@ const OverflowBadge: React.FC<OverflowBadgeProps> = ({ count, stackIndex }) => {
   const style: React.CSSProperties = {
     width: 28,
     height: 28,
-    borderRadius: "50%",
+    borderRadius: "var(--bd-radius-full)",
     backgroundColor: "var(--buildrick-surface-4)",
     display: "flex",
     alignItems: "center",
@@ -241,7 +241,7 @@ const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({ status }) => 
     height: 12,
     border: "2px solid var(--buildrick-border)",
     borderTopColor: "var(--buildrick-accent)",
-    borderRadius: "50%",
+    borderRadius: "var(--bd-radius-full)",
     animation: "bd-spin 1s linear infinite",
     flexShrink: 0,
   };

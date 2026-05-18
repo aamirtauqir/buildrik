@@ -96,7 +96,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
           style={{
             width: 6,
             height: 6,
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
             background: syncConnected
               ? "var(--buildrick-success)"
               : "var(--buildrick-text-muted)",

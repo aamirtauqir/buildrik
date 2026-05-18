@@ -69,7 +69,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
       style={{
         width: 6,
         height: 6,
-        borderRadius: "50%",
+        borderRadius: "var(--bd-radius-full)",
         background: isPublished
           ? "var(--bd-success, #22c55e)"
           : "var(--bd-warning)",

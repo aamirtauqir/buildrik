@@ -160,7 +160,7 @@ const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, is
             right: -2,
             width: 5,
             height: 5,
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
             background: "var(--bd-warning, #f59e0b)",
           }}
         />

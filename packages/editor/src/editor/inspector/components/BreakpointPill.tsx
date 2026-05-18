@@ -78,7 +78,7 @@ export const BreakpointPill: React.FC<BreakpointPillProps> = ({
             style={{
               width: 5,
               height: 5,
-              borderRadius: "50%",
+              borderRadius: "var(--bd-radius-full)",
               background: "var(--bd-accent)",
             }}
           />

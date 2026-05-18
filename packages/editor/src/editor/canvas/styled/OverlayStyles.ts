@@ -87,7 +87,7 @@ export const DragHandleDot = styled.div`
   width: 3px;
   height: 3px;
   background: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
+  border-radius: "var(--bd-radius-full)";
 `;
 
 // ============================================================================

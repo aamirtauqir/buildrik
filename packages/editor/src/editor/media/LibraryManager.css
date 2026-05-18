@@ -37,7 +37,7 @@
   font-size: 10px;
   font-weight: 700;
   padding: 2px 7px;
-  border-radius: 12px;
+  border-radius: var(--bd-radius-lg);
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
@@ -113,7 +113,7 @@
 .mgr-btn {
   height: 34px;
   padding: 0 var(--bd-space-3);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--buildrick-border);
   background: var(--buildrick-bg-card);
   color: var(--buildrick-text-secondary);
@@ -132,7 +132,7 @@
 .mgr-btn-primary {
   height: 34px;
   padding: 0 14px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--buildrick-accent);
   background: var(--buildrick-accent);
   color: var(--buildrick-bg-card);
@@ -151,7 +151,7 @@
 .mgr-close {
   width: 34px;
   height: 34px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--buildrick-border);
   background: var(--buildrick-bg-card);
   color: var(--buildrick-text-disabled);
@@ -271,7 +271,7 @@
 
 .mgr-node .mgr-node-dot {
   width: 8px; height: 8px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   flex-shrink: 0;
 }
 
@@ -327,7 +327,7 @@
   align-items: center;
   height: 24px;
   padding: 0 10px;
-  border-radius: 12px;
+  border-radius: var(--bd-radius-lg);
   background: var(--buildrick-bg-subtle);
   color: var(--buildrick-text-secondary);
   font-size: 11px;
@@ -442,7 +442,7 @@
   gap: 3px;
   height: 16px;
   padding: 0 6px;
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -458,7 +458,7 @@
   top: 6px; right: 6px;
   height: 16px;
   padding: 0 6px;
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   background: rgba(29,78,216,0.85);
   color: var(--buildrick-bg-card);
   font-size: 9px;
@@ -520,7 +520,7 @@
   min-width: 160px;
   background: var(--buildrick-bg-card, #fff);
   border: 1px solid var(--buildrick-border, #D1D9E6);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
   padding: var(--bd-space-1);
   display: flex;
@@ -800,7 +800,7 @@
   background: var(--buildrick-accent-tint);
   color: var(--buildrick-text-primary);
   padding: 2px 7px;
-  border-radius: 12px;
+  border-radius: var(--bd-radius-lg);
   font-size: 10px;
 }
 
@@ -840,7 +840,7 @@
 
 .mgr-status-dot {
   width: 3px; height: 3px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--buildrick-text-disabled);
 }
 
@@ -872,7 +872,7 @@
   padding: 3px var(--bd-space-2);
   background: var(--bd-warning-tint);
   color: var(--bd-warning);
-  border-radius: 12px;
+  border-radius: var(--bd-radius-lg);
   font-size: 10px;
   font-weight: 600;
 }
@@ -940,7 +940,7 @@
 .mgr-empty-ring {
   width: 80px;
   height: 80px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--buildrick-bg-subtle);
   display: flex;
   align-items: center;

@@ -195,7 +195,7 @@
   right: 6px;
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--buildrick-warning, #F59E0B);
   pointer-events: none;
 }

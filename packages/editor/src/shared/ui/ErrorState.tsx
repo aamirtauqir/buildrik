@@ -146,7 +146,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           style={{
             width: 20,
             height: 20,
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
             background: config.color,
             color: "var(--buildrick-text-on-accent)",
             display: "flex",
@@ -211,7 +211,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         style={{
           width: sizes.iconSize + sizes.iconPadding * 2,
           height: sizes.iconSize + sizes.iconPadding * 2,
-          borderRadius: "50%",
+          borderRadius: "var(--bd-radius-full)",
           background: config.bgColor,
           border: `2px solid ${config.borderColor}`,
           display: "flex",

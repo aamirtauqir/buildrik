@@ -45,7 +45,7 @@ export const ColorModeToggle: React.FC<ColorModeToggleProps> = ({ composer }) =>
         alignItems: "center",
         gap: 2,
         padding: 2,
-        borderRadius: 9999,
+        borderRadius: "var(--bd-radius-full)",
         border: "1px solid var(--bd-border)",
         background: "var(--bd-bg-subtle)",
       }}
@@ -76,7 +76,7 @@ const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
       fontSize: 11,
       fontWeight: 600,
       border: "none",
-      borderRadius: 9999,
+      borderRadius: "var(--bd-radius-full)",
       cursor: "pointer",
       background: active ? "var(--bd-accent)" : "transparent",
       color: active ? "#fff" : "var(--bd-fg-muted)",

@@ -175,7 +175,7 @@
   justify-content: center;
   gap: var(--bd-space-1);
   padding: 6px var(--bd-space-1);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   background: var(--bd-bg-card, var(--bd-bg-card));
   border: 1px solid var(--bd-border, var(--bd-border));
   color: var(--bd-fg-primary, var(--bd-fg-primary));
@@ -217,7 +217,7 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   background: var(--bd-bg-subtle);
   color: var(--bd-fg-secondary);
   transition: background 120ms ease, color 120ms ease;
@@ -396,7 +396,7 @@
   align-items: center;
   gap: var(--bd-space-1);
   padding: var(--bd-space-2) var(--bd-space-1);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   background: linear-gradient(135deg, var(--bd-bg-subtle, var(--bd-bg-subtle)) 0%, var(--bd-border) 100%);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -420,7 +420,7 @@
   height: 1px;
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 1.0) 20%, rgba(255, 255, 255, 1.0) 80%, transparent 100%);
   opacity: 0.6;
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--bd-radius-sm-plus) var(--bd-radius-sm-plus) 0 0;
 }
 
 .bld-sec-type-card:focus-visible {
@@ -489,7 +489,7 @@
   height: 1px;
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 1.0) 20%, rgba(255, 255, 255, 1.0) 80%, transparent 100%);
   opacity: 0.6;
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--bd-radius-sm-plus) var(--bd-radius-sm-plus) 0 0;
 }
 
 .bld-sec-type-card--active .bld-sec-type-name {
@@ -518,7 +518,7 @@
 .bld-sec-card {
   height: 86px;
   padding: var(--bd-space-3);
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   border: 1px solid var(--bd-border-light, var(--bd-border));
   background: linear-gradient(135deg, var(--bd-bg-card, var(--bd-bg-card)) 0%, var(--bd-bg-panel) 100%);
   cursor: grab;
@@ -672,7 +672,7 @@
   border: 1px solid rgba(45, 109, 255, 0.2);
   cursor: pointer;
   padding: var(--bd-space-1) 10px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   text-decoration: none;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 2px rgba(45, 109, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -688,7 +688,7 @@
   height: 1px;
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 1.0) 20%, rgba(255, 255, 255, 1.0) 80%, transparent 100%);
   opacity: 0.6;
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--bd-radius-sm-plus) var(--bd-radius-sm-plus) 0 0;
 }
 
 .bld-clear-search:hover {
@@ -755,7 +755,7 @@
   margin: 0 0 var(--bd-space-3) 0;
   background: linear-gradient(135deg, var(--bd-accent-tint) 0%, rgba(45, 109, 255, 0.04) 100%);
   border: 1px solid var(--bd-accent, var(--bd-accent));
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   font-size: 12px;
   color: var(--bd-fg-primary, #f0f0f5);
   box-shadow: 0 2px 8px rgba(45, 109, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1.0);
@@ -772,7 +772,7 @@
   height: 1px;
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 1.0) 20%, rgba(255, 255, 255, 1.0) 80%, transparent 100%);
   opacity: 0.6;
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--bd-radius-md) var(--bd-radius-md) 0 0;
 }
 
 .bld-change-callout:hover {
@@ -808,7 +808,7 @@
   background: linear-gradient(135deg, var(--bd-accent) 0%, var(--bd-accent-hover) 100%);
   color: var(--bd-bg-card);
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   font: inherit;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(45, 109, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -825,7 +825,7 @@
   height: 1px;
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 1.0) 20%, rgba(255, 255, 255, 1.0) 80%, transparent 100%);
   opacity: 0.6;
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--bd-radius-sm-plus) var(--bd-radius-sm-plus) 0 0;
 }
 
 .bld-retry-btn:hover {

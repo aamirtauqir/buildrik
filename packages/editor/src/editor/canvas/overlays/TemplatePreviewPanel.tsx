@@ -361,7 +361,7 @@ const infoCardStyles: React.CSSProperties = {
   padding: 20,
   background: "var(--buildrick-bg-card)",
   borderTop: "1px solid rgba(0, 0, 0, 0.06)",
-  borderRadius: "0 0 12px 12px",
+  borderRadius: "0 0 var(--bd-radius-lg) var(--bd-radius-lg)",
   margin: "-20px auto 40px",
 };
 
@@ -468,7 +468,7 @@ const closeButtonStyles: React.CSSProperties = {
   padding: 0,
   background: "rgba(255, 255, 255, 0.9)",
   border: "none",
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   color: "var(--buildrick-text-muted)",
   cursor: "pointer",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",

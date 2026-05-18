@@ -93,7 +93,7 @@ const s: Record<string, React.CSSProperties> = {
   stepDot: {
     width: 20,
     height: 20,
-    borderRadius: "50%",
+    borderRadius: "var(--bd-radius-full)",
     background: "var(--buildrick-border)",
     display: "flex",
     alignItems: "center",

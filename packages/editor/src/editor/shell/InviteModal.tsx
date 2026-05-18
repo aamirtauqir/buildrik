@@ -328,7 +328,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                         style={{
                           width: 32,
                           height: 32,
-                          borderRadius: "50%",
+                          borderRadius: "var(--bd-radius-full)",
                           background: m.avatarColor,
                           display: "flex",
                           alignItems: "center",

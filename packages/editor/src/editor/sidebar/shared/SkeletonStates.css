@@ -36,7 +36,7 @@
 
 .skel-search .skel-bar {
   height: 36px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
 }
 
 .skel-row {
@@ -55,7 +55,7 @@
 
 .skel-add-body .skel-label { width: 100px; height: 10px; }
 .skel-add-body .skel-grid { display: flex; gap: var(--bd-space-2); }
-.skel-add-body .skel-card { width: 50%; height: 64px; border-radius: 8px; }
+.skel-add-body .skel-card { width: var(--bd-radius-full); height: 64px; border-radius: var(--bd-radius-md); }
 
 /* Layers tab skeleton */
 .skel-tree { padding: var(--bd-space-2) var(--bd-space-3); display: flex; flex-direction: column; gap: var(--bd-space-1); }
@@ -67,9 +67,9 @@
 
 /* Media tab skeleton */
 .skel-media-body { padding: var(--bd-space-2) var(--bd-space-3); display: flex; flex-direction: column; gap: 10px; }
-.skel-media-upload { height: 80px; border-radius: 8px; }
+.skel-media-upload { height: 80px; border-radius: var(--bd-radius-md); }
 .skel-media-grid { display: flex; gap: var(--bd-space-2); flex-wrap: wrap; }
-.skel-media-thumb { width: 72px; height: 72px; border-radius: 6px; }
+.skel-media-thumb { width: 72px; height: 72px; border-radius: var(--bd-radius-sm-plus); }
 
 /* Components tab skeleton */
 .skel-comps { padding: var(--bd-space-2) var(--bd-space-3); display: flex; flex-direction: column; gap: var(--bd-space-2); }
@@ -84,7 +84,7 @@
 .skel-tpl-pills { padding: 10px var(--bd-space-6); display: flex; gap: var(--bd-space-2); }
 .skel-tpl-pill { width: 80px; height: 28px; border-radius: 14px; }
 .skel-tpl-grid { padding: var(--bd-space-4) var(--bd-space-6); display: flex; gap: var(--bd-space-4); flex-wrap: wrap; }
-.skel-tpl-card { width: calc(50% - 8px); height: 180px; border-radius: 8px; }
+.skel-tpl-card { width: calc(var(--bd-radius-full) - var(--bd-radius-md)); height: 180px; border-radius: var(--bd-radius-md); }
 
 /* Settings tab skeleton (fullpage — 2-column layout) */
 .skel-settings { display: flex; height: 100%; }

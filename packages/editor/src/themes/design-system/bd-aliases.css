@@ -136,6 +136,10 @@
 
   /* ─── RADIUS ─────────────────────────────────────────────────────────── */
   --bd-radius-sm: var(--buildrick-radius-sm);
+  /* sm-plus = 6px (between sm=4 and md=8). Heavily used in chrome card +
+   * pill chrome (67 raw 6px instances drained 2026-05-18). Maps to the
+   * pre-existing legacy --buildrick-rounded token. */
+  --bd-radius-sm-plus: var(--buildrick-rounded);
   --bd-radius-md: var(--buildrick-radius-md);
   --bd-radius-lg: var(--buildrick-radius-lg);
   --bd-radius-xl: var(--buildrick-radius-xl);

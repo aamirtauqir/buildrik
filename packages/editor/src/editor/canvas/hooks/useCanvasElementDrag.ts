@@ -283,7 +283,7 @@ export function useCanvasElementDrag({
         overflow: hidden;
         background: var(--buildrick-bg-card);
         border: 2px solid var(--buildrick-accent);
-        border-radius: 8px;
+        border-radius: "var(--bd-radius-md)";
         box-shadow: var(--buildrick-shadow-lg, 0 8px 32px rgba(45, 109, 255, 0.18));
         pointer-events: none;
         z-index: 99999;

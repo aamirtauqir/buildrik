@@ -343,7 +343,7 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
           marginLeft: 4,
           background: "transparent",
           border: "none",
-          borderRadius: "50%",
+          borderRadius: "var(--bd-radius-full)",
           color: CANVAS_COLORS.textMuted,
           fontSize: 12,
           cursor: "pointer",

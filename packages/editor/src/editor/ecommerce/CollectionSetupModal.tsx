@@ -153,7 +153,7 @@ const descriptionStyles: React.CSSProperties = {
 
 const checkboxContainerStyles: React.CSSProperties = {
   background: "var(--buildrick-bg-elevated)",
-  borderRadius: "8px",
+  borderRadius: "var(--bd-radius-md)",
   padding: "12px",
   border: "1px solid var(--buildrick-border)",
 };

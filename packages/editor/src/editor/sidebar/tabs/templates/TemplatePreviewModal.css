@@ -22,7 +22,7 @@
   background: var(--bd-bg-panel);
   display: flex;
   flex-direction: column;
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   overflow: hidden;
   border: 1px solid var(--bd-border);
   animation: tmpl-preview-in 0.15s ease;

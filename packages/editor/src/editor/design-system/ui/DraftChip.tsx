@@ -44,7 +44,7 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
         style={{
           width: 6,
           height: 6,
-          borderRadius: "50%",
+          borderRadius: "var(--bd-radius-full)",
           background: "var(--bd-warning, #f59e0b)",
           flexShrink: 0,
           animation: "buildrick-dot-pulse 1.5s infinite",

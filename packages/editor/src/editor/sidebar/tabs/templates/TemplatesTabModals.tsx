@@ -120,7 +120,7 @@ export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUp
             height: 56,
             margin: "4px auto 16px",
             background: "linear-gradient(135deg, #fff7ed, #fed7aa)",
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

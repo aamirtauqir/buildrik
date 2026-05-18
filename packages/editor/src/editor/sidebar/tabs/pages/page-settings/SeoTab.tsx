@@ -71,7 +71,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       </div>
       {/* ── 2. SEO SCORE ────────────────────────────────────────────────── */}
       {!s.allowIndex ? (
-        <div style={{ padding: "10px var(--bd-space-3)", background: "var(--bd-warning-tint)", border: "1px solid var(--bd-warning-border)", borderRadius: 4, font: "400 12px var(--bd-font)", color: "var(--bd-warning)" }} role="alert">
+        <div style={{ padding: "10px var(--bd-space-3)", background: "var(--bd-warning-tint)", border: "1px solid var(--bd-warning-border)", borderRadius: 4, font: "400 var(--bd-radius-lg) var(--bd-font)", color: "var(--bd-warning)" }} role="alert">
           <div>
             <strong style={{ color: "var(--bd-fg-heading)" }}>noIndex is ON</strong> — search engines won&apos;t index this page regardless of your
             SEO settings.
@@ -105,7 +105,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                   { label: "Allow indexing", ok: s.seoChecks.indexingOn, pts: "+40 pts" },
                 ].map((c) => (
                   <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 6, font: "400 11px var(--bd-font)", color: c.ok ? "var(--bd-fg-primary)" : "var(--bd-fg-muted)" }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: c.ok ? "var(--bd-success)" : "var(--bd-fg-muted)", flexShrink: 0 }} />
+                    <span style={{ width: 6, height: 6, borderRadius: "var(--bd-radius-full)", background: c.ok ? "var(--bd-success)" : "var(--bd-fg-muted)", flexShrink: 0 }} />
                     <span>{c.label}</span>
                     <span style={{ marginLeft: "auto", font: "500 10px var(--bd-mono)", color: "var(--bd-fg-muted)" }}>{c.pts}</span>
                   </div>
@@ -135,7 +135,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             variant="ghost"
             size="sm"
             type="button"
-            style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "var(--bd-space-1)", padding: "3px var(--bd-space-2)", border: "1px solid var(--bd-accent)", borderRadius: 9999, background: "var(--bd-accent-subtle)", color: "var(--bd-accent)", font: "500 10.5px var(--bd-font)", transition: "background 100ms" }}
+            style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "var(--bd-space-1)", padding: "3px var(--bd-space-2)", border: "1px solid var(--bd-accent)", borderRadius: "var(--bd-radius-full)", background: "var(--bd-accent-subtle)", color: "var(--bd-accent)", font: "500 10.5px var(--bd-font)", transition: "background 100ms" }}
             aria-label="Suggest SEO title"
             onClick={() => { /* TODO: AI suggestion */ }}
           >

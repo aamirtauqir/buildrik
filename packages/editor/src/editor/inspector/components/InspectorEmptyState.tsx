@@ -144,7 +144,7 @@ const containerStyle: React.CSSProperties = {
 const iconCircleStyle: React.CSSProperties = {
   width: 48,
   height: 48,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   background: "var(--bd-bg-subtle)",
   display: "flex",
   alignItems: "center",
@@ -186,7 +186,7 @@ const primaryButtonStyle: React.CSSProperties = {
   background: "var(--buildrick-accent)",
   color: "var(--buildrick-text-on-accent)",
   border: "none",
-  borderRadius: "6px",
+  borderRadius: "var(--bd-radius-sm-plus)",
   fontSize: "12px",
   fontWeight: 600,
   cursor: "pointer",

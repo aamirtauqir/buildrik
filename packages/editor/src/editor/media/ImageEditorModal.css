@@ -13,7 +13,7 @@
   width: min(1100px, 95vw);
   height: min(720px, 90vh);
   background: var(--buildrick-bg-panel, var(--bd-bg-panel));
-  border-radius: 12px;
+  border-radius: var(--bd-radius-lg);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
@@ -45,7 +45,7 @@
 .ie-btn-ghost {
   height: 32px;
   padding: 0 var(--bd-space-3);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--buildrick-border, #D1D9E6);
   background: var(--buildrick-bg-card, #fff);
   color: var(--buildrick-text-secondary, #475569);
@@ -59,7 +59,7 @@
 .ie-btn-primary {
   height: 32px;
   padding: 0 14px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--buildrick-accent);
   background: var(--buildrick-accent);
   color: var(--buildrick-bg-card);
@@ -78,7 +78,7 @@
 .ie-close {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--buildrick-border);
   background: var(--buildrick-bg-card);
   color: var(--buildrick-text-disabled);
@@ -218,7 +218,7 @@
   appearance: none;
   width: 14px;
   height: 14px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--buildrick-accent);
   cursor: pointer;
   border: 2px solid var(--buildrick-bg-card);
@@ -244,7 +244,7 @@
 .ie-preset {
   height: 28px;
   padding: 0 10px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--buildrick-border);
   background: var(--buildrick-bg-card);
   color: var(--buildrick-text-secondary);
@@ -269,7 +269,7 @@
 .ie-tool-btn {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   border: 1px solid var(--buildrick-border);
   background: var(--buildrick-bg-card);
   color: var(--buildrick-text-secondary);

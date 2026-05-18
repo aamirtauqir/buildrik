@@ -50,7 +50,7 @@
 .bd-ai-scope-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--bd-accent);
   flex-shrink: 0;
 }

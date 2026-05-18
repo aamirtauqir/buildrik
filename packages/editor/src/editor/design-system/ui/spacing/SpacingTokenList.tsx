@@ -118,7 +118,7 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
             right: -2,
             width: 6,
             height: 6,
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
             background: "var(--bd-warning, #f59e0b)",
           }}
         />

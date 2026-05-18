@@ -21,7 +21,7 @@
   color: var(--bd-fg-primary);
   overflow: hidden;
   border: 1px solid var(--bd-border);
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 /* ux-fixes.css 40px button global deleted 2026-04-25 — override no longer needed. */
@@ -101,7 +101,7 @@
 .bdi-ehdr .bdi-eic {
   width: 26px;
   height: 26px;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   background: var(--bd-accent-tint);
   color: var(--bd-accent);
   display: inline-flex;
@@ -174,7 +174,7 @@
   display: inline-block;
   width: 4px;
   height: 4px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--bd-accent);
 }
 
@@ -234,7 +234,7 @@
   display: inline-block;
   width: 4px;
   height: 4px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: currentColor;
   margin-left: 3px;
   vertical-align: middle;
@@ -696,7 +696,7 @@
 .bdi-pad .bdi-d {
   width: 5px;
   height: 5px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--bd-border-medium);
   align-self: center;
   justify-self: center;
@@ -860,7 +860,7 @@
   width: 22px;
   height: 12px;
   background: var(--bd-accent);
-  border-radius: 9999px;
+  border-radius: var(--bd-radius-full);
   border: none;
   cursor: pointer;
   padding: 0;
@@ -877,7 +877,7 @@
   width: 8px;
   height: 8px;
   background: var(--bd-bg-card, var(--bd-bg-card));
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
   transition: left 120ms;
 }
@@ -1016,7 +1016,7 @@
   padding: 18px var(--bd-space-3);
   text-align: center;
   border: 1px dashed var(--bd-border);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
 }
 .bdi-empty .bdi-empty-ttl {
   font: 500 11px var(--bd-font);
@@ -1134,7 +1134,7 @@ textarea.bdi-text {
 .bdi-override-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--bd-accent);
   display: inline-block;
   flex-shrink: 0;

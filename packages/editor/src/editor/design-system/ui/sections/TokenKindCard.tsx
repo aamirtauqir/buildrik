@@ -47,7 +47,7 @@ const bodyStyle: React.CSSProperties = {
 const dirtyDotStyle: React.CSSProperties = {
   width: 6,
   height: 6,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   background: "var(--bd-warning)",
   flexShrink: 0,
 };

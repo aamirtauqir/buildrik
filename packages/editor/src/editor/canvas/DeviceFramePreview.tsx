@@ -125,7 +125,7 @@ const notchStyle: React.CSSProperties = {
 const notchCameraStyle: React.CSSProperties = {
   width: 10,
   height: 10,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   background: "#2a2a2e",
   border: "1.5px solid #3a3a3e",
 };

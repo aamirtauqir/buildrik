@@ -127,7 +127,7 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
                 display: "inline-block",
                 width: 8,
                 height: 8,
-                borderRadius: "50%",
+                borderRadius: "var(--bd-radius-full)",
                 background: "var(--buildrick-warning)",
                 flexShrink: 0,
               }}
@@ -314,7 +314,7 @@ const SyncDot: React.FC<SyncDotProps> = ({ status }) => {
             display: "inline-block",
             width: 8,
             height: 8,
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
             background: config.color,
             flexShrink: 0,
             animation: config.pulse ? "bd-status-pulse 1s ease-in-out infinite" : "none",

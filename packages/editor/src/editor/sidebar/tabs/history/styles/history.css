@@ -984,7 +984,7 @@
   appearance: none;
   width: 18px;
   height: 18px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--bd-accent);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(45, 109, 255, 0.4);
@@ -994,7 +994,7 @@
   width: 18px;
   height: 18px;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--bd-accent);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(45, 109, 255, 0.4);

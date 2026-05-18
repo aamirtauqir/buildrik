@@ -105,7 +105,7 @@ function getDropLineStyle(top: number): React.CSSProperties {
 const dotStyle = (isHovered: boolean): React.CSSProperties => ({
   width: 3,
   height: 3,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   background: isHovered ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.7)",
 });
 

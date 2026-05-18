@@ -561,7 +561,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
               style={{
                 height: 36,
                 padding: "0 12px",
-                borderRadius: "6px 6px 0 0",
+                borderRadius: "var(--bd-radius-sm-plus) var(--bd-radius-sm-plus) 0 0",
                 border: "none",
                 background: "transparent",
                 color: activeSection === s.id ? "var(--bd-fg-primary)" : "var(--bd-fg-muted)",
@@ -582,7 +582,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                   style={{
                     width: 5,
                     height: 5,
-                    borderRadius: "50%",
+                    borderRadius: "var(--bd-radius-full)",
                     background: "var(--bd-warning)",
                     flexShrink: 0,
                   }}

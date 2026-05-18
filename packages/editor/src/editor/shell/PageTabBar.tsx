@@ -439,7 +439,7 @@ const tabStyles: React.CSSProperties = {
   padding: "6px 12px",
   background: "transparent",
   border: "none",
-  borderRadius: "6px 6px 0 0",
+  borderRadius: "var(--bd-radius-sm-plus) var(--bd-radius-sm-plus) 0 0",
   fontSize: 13,
   color: "var(--buildrick-text-secondary)",
   cursor: "pointer",
@@ -469,7 +469,7 @@ const tabNameStyles: React.CSSProperties = {
 const dirtyDotStyles: React.CSSProperties = {
   width: 6,
   height: 6,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   background: "var(--buildrick-accent)",
   flexShrink: 0,
 };

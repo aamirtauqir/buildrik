@@ -429,7 +429,7 @@ const CloneBadge: React.FC<{ rect: DOMRect }> = ({ rect }) => (
       height: 18,
       background: COLORS.cloneMode,
       color: "var(--buildrick-text-on-color, var(--bd-bg-card))",
-      borderRadius: "50%",
+      borderRadius: "var(--bd-radius-full)",
       fontSize: 12,
       fontWeight: 700,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",

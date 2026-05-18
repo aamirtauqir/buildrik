@@ -212,7 +212,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
           padding: "0 10px",
           background: cfg.bg,
           border: "none",
-          borderRadius: publishState === "draft" ? "9999px 0 0 9999px" : 9999,
+          borderRadius: publishState === "draft" ? "var(--bd-radius-full) 0 0 var(--bd-radius-full)" : "var(--bd-radius-full)",
           color: cfg.textColor,
           fontSize: 12,
           fontWeight: 700,
@@ -256,7 +256,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
             background: cfg.bg,
             border: "none",
             borderLeft: `1px solid ${cfg.hoverBg}`,
-            borderRadius: "0 9999px 9999px 0",
+            borderRadius: "0 var(--bd-radius-full) var(--bd-radius-full) 0",
             cursor: "pointer",
             transition: "background 0.12s ease",
           }}

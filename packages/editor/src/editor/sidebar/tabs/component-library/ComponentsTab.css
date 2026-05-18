@@ -14,7 +14,7 @@
   padding: 0 var(--bd-space-3);
   height: 36px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   font-size: 13px;
   color: var(--bd-fg-primary);
   transition: background 100ms ease;
@@ -34,7 +34,7 @@
   margin-left: auto;
   padding: 2px 6px;
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
-  border-radius: 999px;
+  border-radius: var(--bd-radius-full);
   font-size: 11px;
   color: var(--bd-fg-muted, var(--bd-fg-secondary));
   font-weight: 500;

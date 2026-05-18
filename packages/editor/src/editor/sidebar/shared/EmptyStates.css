@@ -15,7 +15,7 @@
 .empty-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--bd-radius-lg);
   background: var(--buildrick-bg-subtle, var(--bd-bg-subtle));
   display: flex;
   align-items: center;
@@ -41,7 +41,7 @@
 
 .empty-action {
   padding: var(--bd-space-2) var(--bd-space-4);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: none;
   background: var(--buildrick-accent);
   color: var(--buildrick-bg-card);

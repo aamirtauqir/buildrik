@@ -13,7 +13,7 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
           display: "inline-block",
           width: 6,
           height: 6,
-          borderRadius: "50%",
+          borderRadius: "var(--bd-radius-full)",
           background: "var(--buildrick-warning)",
           marginRight: 4,
         }}
@@ -43,7 +43,7 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
         style={{
           width: 4,
           height: 4,
-          borderRadius: "50%",
+          borderRadius: "var(--bd-radius-full)",
           background: "var(--buildrick-warning)",
           boxShadow: "0 0 4px var(--buildrick-warning)",
         }}

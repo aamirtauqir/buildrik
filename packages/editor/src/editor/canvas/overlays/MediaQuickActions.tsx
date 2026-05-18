@@ -81,7 +81,7 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
         style={{
           background: "var(--buildrick-bg-card)",
           border: "1px solid var(--buildrick-border-light)",
-          borderRadius: "6px",
+          borderRadius: "var(--bd-radius-sm-plus)",
           display: "flex",
           alignItems: "center",
           padding: "4px",
@@ -190,7 +190,7 @@ const popoverStyle: React.CSSProperties = {
   transform: "translateX(-50%) translateY(8px)",
   background: "var(--buildrick-bg-card)",
   border: "1px solid var(--buildrick-border-light)",
-  borderRadius: "6px",
+  borderRadius: "var(--bd-radius-sm-plus)",
   padding: "10px",
   boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
   display: "flex",

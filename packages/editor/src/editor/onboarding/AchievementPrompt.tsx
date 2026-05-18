@@ -120,7 +120,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
               style={{
                 width: 40,
                 height: 40,
-                borderRadius: "50%",
+                borderRadius: "var(--bd-radius-full)",
                 background: isLastStep
                   ? "rgba(16,185,129,0.15)"
                   : "rgba(45, 109, 255, 0.15)",

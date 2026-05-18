@@ -166,7 +166,7 @@ const overlayStyles: React.CSSProperties = {
 
 const modalStyles: React.CSSProperties = {
   background: "var(--buildrick-surface, #fff)",
-  borderRadius: "12px",
+  borderRadius: "var(--bd-radius-lg)",
   padding: "24px",
   maxWidth: "500px",
   width: "90%",
@@ -205,7 +205,7 @@ const versionCardStyles: React.CSSProperties = {
   flex: 1,
   padding: "16px",
   background: "var(--buildrick-surface-2, #f5f5f5)",
-  borderRadius: "8px",
+  borderRadius: "var(--bd-radius-md)",
   display: "flex",
   flexDirection: "column",
   gap: "12px",
@@ -242,7 +242,7 @@ const vsStyles: React.CSSProperties = {
 const buttonStyles: React.CSSProperties = {
   padding: "10px 16px",
   border: "none",
-  borderRadius: "6px",
+  borderRadius: "var(--bd-radius-sm-plus)",
   fontSize: "13px",
   fontWeight: 500,
   cursor: "pointer",

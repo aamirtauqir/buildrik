@@ -285,7 +285,7 @@ const pillStyles: React.CSSProperties = {
 const pillDotStyles = (done: boolean): React.CSSProperties => ({
   width: 8,
   height: 8,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   background: done ? "var(--buildrick-success)" : "var(--bd-accent)",
   flexShrink: 0,
 });
@@ -415,7 +415,7 @@ const stepRowStyles: React.CSSProperties = {
 const circleStyles: React.CSSProperties = {
   width: 18,
   height: 18,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   border: "1.5px solid",
   flexShrink: 0,
   display: "flex",

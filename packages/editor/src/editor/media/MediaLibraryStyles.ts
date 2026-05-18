@@ -97,7 +97,7 @@ export const assetCardStyles = {
     right: 4,
     width: 24,
     height: 24,
-    borderRadius: "50%",
+    borderRadius: "var(--bd-radius-full)",
     background: "rgba(0,0,0,0.6)",
     border: "none",
     color: "var(--buildrick-text-on-accent)",

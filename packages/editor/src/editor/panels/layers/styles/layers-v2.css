@@ -316,7 +316,7 @@
   z-index: 1000;
   background: var(--bd-bg-card);
   border: 1px solid var(--bd-border);
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
   padding: var(--bd-space-1);
   min-width: 180px;
@@ -386,7 +386,7 @@
   z-index: 1000;
   background: var(--bd-bg-card);
   border: 1px solid var(--bd-border);
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
   padding: 10px var(--bd-space-3);
   min-width: 220px;
@@ -417,7 +417,7 @@
   width: 18px;
   height: 10px;
   background: var(--bd-border);
-  border-radius: 999px;
+  border-radius: var(--bd-radius-full);
   cursor: pointer;
   transition: background 120ms;
 }
@@ -429,7 +429,7 @@
   width: 8px;
   height: 8px;
   background: var(--bd-bg-card);
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   transition: transform 120ms;
 }
 .bdc-switch:checked { background: var(--bd-accent); }
@@ -557,7 +557,7 @@
   margin: 10px 10px 0;
   background: var(--bd-bg-subtle);
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   font: 500 11px var(--bd-font);
 }
 .bdc-psearch svg {

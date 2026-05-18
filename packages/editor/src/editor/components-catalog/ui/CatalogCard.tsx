@@ -132,7 +132,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
             width: 14,
             height: 14,
             border: "1px solid var(--bd-border)",
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
           }}
         />
       );
@@ -155,7 +155,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
               width: 12,
               height: 12,
               background: "#fff",
-              borderRadius: "50%",
+              borderRadius: "var(--bd-radius-full)",
             }}
           />
         </div>
@@ -172,7 +172,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
             height: 14,
             border: "2px solid var(--bd-border)",
             borderTopColor: "#2D6DFF",
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
           }}
         />
       );
@@ -224,7 +224,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
           style={{
             width: 22,
             height: 22,
-            borderRadius: "50%",
+            borderRadius: "var(--bd-radius-full)",
             background: "var(--bd-border)",
           }}
         />

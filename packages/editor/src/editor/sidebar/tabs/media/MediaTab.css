@@ -21,7 +21,7 @@
 .med-bulk-btn {
   height: 28px;
   padding: 0 var(--bd-space-3);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--bd-border);
   background: var(--bd-bg-card);
   color: var(--bd-fg-secondary);
@@ -166,7 +166,7 @@
   max-height: 200px;
   overflow-y: auto;
   border: 1px solid var(--bd-border-light, var(--bd-border));
-  border-radius: var(--bd-radius-md, 6px);
+  border-radius: var(--bd-radius-md, var(--bd-radius-sm-plus));
 }
 .med-rx-page-row {
   border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
@@ -386,7 +386,7 @@
   font-size: 11px;
   font-weight: 600;
   padding: var(--bd-space-1) var(--bd-space-3);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   background: var(--bd-accent);
   color: white;
   border: none;
@@ -414,7 +414,7 @@
   max-height: 80vh;
   background: var(--bd-bg-panel);
   border: 1px solid var(--bd-border-light, rgba(255,255,255,0.08));
-  border-radius: 12px;
+  border-radius: var(--bd-radius-lg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -442,7 +442,7 @@
   color: var(--bd-fg-disabled);
   cursor: pointer;
   padding: var(--bd-space-1);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   display: flex;
 }
 
@@ -493,7 +493,7 @@
 .stock-orientation-group {
   display: flex;
   background: var(--bd-bg-subtle);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   padding: 2px;
 }
 
@@ -532,7 +532,7 @@
 .stock-color-dot {
   width: 18px;
   height: 18px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   border: 1px solid var(--bd-border-light);
   padding: 0;
   flex-shrink: 0;
@@ -591,7 +591,7 @@
   padding: 10px;
   background: var(--bd-bg-subtle);
   border: 1px solid var(--bd-border-light);
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   color: var(--bd-fg-secondary);
   font-size: 13px;
   cursor: pointer;
@@ -614,7 +614,7 @@
   padding: 6px var(--bd-space-3);
   background: var(--bd-bg-subtle);
   border: 1px dashed var(--bd-border-light);
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   color: var(--bd-accent);
   font-size: 12px;
   font-weight: 500;
@@ -645,7 +645,7 @@
   gap: 2px;
   padding: 2px;
   background: var(--bd-bg-soft, var(--bd-bg-subtle));
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
 }
 
 /* TypePills — individual pill */
@@ -692,7 +692,7 @@
   color: var(--bd-fg-muted);
   background: var(--bd-bg-soft);
   padding: 0 4px;
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   min-width: 14px;
   text-align: center;
 }
@@ -847,7 +847,7 @@
   color: var(--bd-fg-muted);
   background: var(--bd-bg-soft, var(--bd-bg-subtle));
   padding: 1px 6px;
-  border-radius: 8px;
+  border-radius: var(--bd-radius-md);
   min-width: 16px;
   text-align: center;
 }
@@ -897,7 +897,7 @@
   min-width: 160px;
   background: var(--bd-bg, var(--bd-bg-card));
   border: 1px solid var(--bd-border-light);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
   padding: 4px;
 }
@@ -949,7 +949,7 @@
   padding: 8px 12px;
   background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.08));
   border: 1px solid var(--bd-cobalt-soft, rgba(45, 109, 255, 0.2));
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   font-size: 12px;
 }
 .med-multi-select-banner__count {
@@ -1019,7 +1019,7 @@
   aspect-ratio: 1;
   background: var(--bd-bg-soft);
   border: 1px dashed var(--bd-border);
-  border-radius: 6px;
+  border-radius: var(--bd-radius-sm-plus);
   overflow: hidden;
 }
 .med-upload-ghost-bar {
@@ -1390,7 +1390,7 @@
   min-width: 18px;
   height: 18px;
   padding: 0 6px;
-  border-radius: 9999px;
+  border-radius: var(--bd-radius-full);
   background: var(--bd-bg-soft, var(--bd-bg-subtle));
   color: var(--bd-fg-muted, var(--bd-fg-secondary));
   font-size: 10px;
@@ -1635,7 +1635,7 @@
 .med-selection-bar__pulse {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: rgba(255, 255, 255, 0.7);
   animation: bd-status-pulse 2s infinite;
 }
@@ -1668,7 +1668,7 @@
 .med-usage-pip {
   width: 5px;
   height: 5px;
-  border-radius: 50%;
+  border-radius: var(--bd-radius-full);
   background: var(--bd-accent);
 }
 .med-usage-pip--overflow {

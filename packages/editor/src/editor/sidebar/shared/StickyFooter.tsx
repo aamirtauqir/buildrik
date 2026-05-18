@@ -100,7 +100,7 @@ const indicatorStyles: React.CSSProperties = {
 const dotStyles: React.CSSProperties = {
   width: 6,
   height: 6,
-  borderRadius: "50%",
+  borderRadius: "var(--bd-radius-full)",
   background: "var(--buildrick-warning)",
 };
 
