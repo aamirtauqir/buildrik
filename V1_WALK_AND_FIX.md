@@ -181,4 +181,34 @@ PASS. Editor loads. Canvas visible (`@e1 [main] "Design canvas"`). Starter Galle
 
 ### Next blocker
 
-Iteration 4 walk: Steps 4-7 (edit, publish, persistence). In progress.
+See Iteration 4.
+
+## Iteration 4 — 2026-05-18
+
+- Walk: **Steps 1-3 PASS regression. Step 4 in progress, partial.**
+- Same browser session.
+
+### Walk observations (Step 4)
+
+- Skipped Starter Gallery Modal via JS-click (browse-binary click timed out — possibly extension overlay; JS fallback worked).
+- Full editor UI loaded: topbar (Switch project, Undo/Redo, History, breakpoint group, Not saved, + Invite), Add panel left sidebar with 53 blocks across 6 categories (Basic 11, Layout 8, Forms 16, Media 8, Navigation 3, Interactive 7).
+- Clicked "Heading" element via JS (`button.click()` on text-matched element).
+- Canvas DOM check: 0 headings, 0 buttons added. HTML length 1291 chars = empty canvas shell unchanged.
+- Hypothesis: editor element-add requires drag-and-drop, not click-to-add (despite the button tooltip "click to add"). OR click-to-add wires through a handler not triggered by raw JS .click().
+
+### Findings logged but not yet diagnosed
+
+- **P0-4 candidate**: clicking add-element button doesn't add to canvas (drag-only?). Needs source investigation to confirm whether click-to-add is supposed to work and is broken, OR whether it's drag-only by design (in which case the walk's "click" approach needs adjustment + the tooltip "click to add" is misleading copy = separate P2).
+- **Browse-binary limitation**: native click via browse times out on Buildrik chrome modals. JS click works but bypasses real event flow. Future walks should account for this (use JS clicks consistently OR find a better browse pattern).
+
+### Commit (pending fix)
+
+### Re-walk (pending fix)
+
+### Next blocker
+
+Iteration 4 P0-4 needs source investigation. Click-to-add vs drag-only? Then continue Step 4 (add 4 elements) → Step 5 (save) → Step 6 (publish) → Step 7 (persistence).
+
+### Session pause point
+
+9 commits ahead of origin. 4 P0s found, 3 fixed (login, site create, editor crash). Walk progressed from "Step 1 blocked" to "Step 4 in progress." All user-facing infra (signup → site → editor open) now functional end-to-end.
