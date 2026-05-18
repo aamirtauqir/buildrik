@@ -198,7 +198,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         title={component.name}
         parentName="Components"
         onBack={onBack}
-        onClose={onClose}
       />
       {/* Scrollable content */}
       <div>

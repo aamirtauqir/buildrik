@@ -770,8 +770,6 @@ export const SettingsTab: React.FC<
                 onBack={navigateToRoot}
                 isDirty={screenIsDirty}
                 onBackAttempt={() => setGuardOpen(true)}
-                onHelpClick={onHelpClick}
-                onClose={onClose}
               />
               <div className="bd-set-pane-body" key={resetKey}>
                 {renderContent()}
