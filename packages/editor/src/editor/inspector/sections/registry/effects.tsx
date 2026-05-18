@@ -117,9 +117,6 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
         interactions: getInteractions(),
         onInteractionsChange: handleInteractionsChange,
         onPreview: handleInteractionPreview,
-        onOpenTimeline: () => {
-          if (import.meta.env.DEV) console.warn("[Inspector] onOpenTimeline: animation section navigation not yet implemented");
-        },
         isOpen: ctx.isOpen,
         onToggle: ctx.onToggle,
         tier: ctx.tier,

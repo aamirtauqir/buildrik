@@ -178,7 +178,7 @@
 
   /* ─── SHORT-FORM CHROME SYNONYMS (drained 2026-05-18 from Gate 17 ghosts)
    * Consumers across editor chrome reach for shorter names than the formal
-   * --buildrick-*/--bd-fg-primary style. Aliased here so Gate 17 sees them
+   * canonical (e.g. --bd-fg-primary). Aliased here so Gate 17 sees them
    * defined (was: 34 ghost references with inline rgba fallbacks). All map
    * to existing canonical tokens — no new color values introduced.
    */

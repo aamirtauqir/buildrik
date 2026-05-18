@@ -20,7 +20,6 @@ export interface InteractionItemProps {
   onRemove: (id: string) => void;
   onToggleEnabled: (id: string) => void;
   onPreview?: (interaction: Interaction) => void;
-  onOpenTimeline?: (interaction: Interaction) => void;
 }
 
 // ============================================================================
@@ -73,7 +72,6 @@ export const InteractionItem: React.FC<InteractionItemProps> = ({
   onRemove,
   onToggleEnabled,
   onPreview,
-  onOpenTimeline,
 }) => {
   const triggerInfo = getTriggerInfo(interaction.trigger);
 
@@ -95,7 +93,6 @@ export const InteractionItem: React.FC<InteractionItemProps> = ({
           onRemove={onRemove}
           onToggleEnabled={onToggleEnabled}
           onPreview={onPreview}
-          onOpenTimeline={onOpenTimeline}
         />
       )}
     </div>

@@ -46,7 +46,6 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   interactions,
   onInteractionsChange,
   onPreview,
-  onOpenTimeline,
   isOpen,
   onToggle,
   tier = "tertiary",
@@ -116,7 +115,6 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
             onRemove={removeInteraction}
             onToggleEnabled={toggleEnabled}
             onPreview={onPreview}
-            onOpenTimeline={onOpenTimeline}
           />
         ))}
 

@@ -44,8 +44,6 @@ export interface InteractionsSectionProps {
   onInteractionsChange: (interactions: Interaction[]) => void;
   /** Preview an interaction */
   onPreview?: (interaction: Interaction) => void;
-  /** Open timeline editor */
-  onOpenTimeline?: (interaction: Interaction) => void;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
   /** Called when the section header is toggled */

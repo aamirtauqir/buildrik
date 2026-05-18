@@ -20,7 +20,6 @@ export interface InteractionEditorProps {
   onRemove: (id: string) => void;
   onToggleEnabled: (id: string) => void;
   onPreview?: (interaction: Interaction) => void;
-  onOpenTimeline?: (interaction: Interaction) => void;
 }
 
 // ============================================================================
@@ -78,7 +77,6 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
   onRemove,
   onToggleEnabled,
   onPreview,
-  onOpenTimeline,
 }) => {
   const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate(interaction.id, {
@@ -159,14 +157,9 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         >
           Preview
         </Button>
-        <Button
-          onClick={() => onOpenTimeline?.(interaction)}
-          variant="secondary"
-          size="sm"
-          style={{ flex: 1 }}
-        >
-          Timeline
-        </Button>
+        {/* Timeline button removed 2026-05-18 — its onOpenTimeline handler
+         * was a console.warn("not yet implemented") stub. No timeline view
+         * exists in the editor. See memory project_animation_audit_20260518.md. */}
       </div>
       <div style={styles.buttonRowSecondary}>
         <Button

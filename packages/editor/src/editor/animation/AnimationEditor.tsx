@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { SelectField, NumberField, SliderField } from "../../shared/forms";
-import type { AnimationConfig, AnimationTrigger } from "../../shared/types/animations";
+import type { AnimationConfig } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
@@ -173,58 +173,11 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
           />
         </Stack>
       </div>
-      {/* Trigger */}
-      <div style={{ marginTop: 24 }}>
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            textTransform: "uppercase",
-            color: "var(--buildrick-text-muted)",
-            marginBottom: 12,
-          }}
-        >
-          Trigger
-        </div>
-
-        <div style={{ display: "flex", gap: 8 }}>
-          {["load", "scroll", "hover", "click"].map((trigger) => (
-            <Button
-              key={trigger}
-              onClick={() => updateAnimation({ trigger: trigger as AnimationTrigger })}
-              style={{
-                flex: 1,
-                padding: "10px 8px",
-                background:
-                  animation.trigger === trigger
-                    ? "var(--buildrick-accent)"
-                    : "var(--buildrick-bg-panel-secondary)",
-                border: "none",
-                borderRadius: 6,
-                color: animation.trigger === trigger ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
-                fontSize: 12,
-                cursor: "pointer",
-                textTransform: "capitalize",
-              }}
-            >
-              {trigger}
-            </Button>
-          ))}
-        </div>
-
-        {animation.trigger === "scroll" && (
-          <div style={{ marginTop: 12 }}>
-            <SliderField
-              label="Scroll Offset"
-              value={animation.scrollOffset || 100}
-              onChange={(v) => updateAnimation({ scrollOffset: v })}
-              min={0}
-              max={500}
-              step={10}
-            />
-          </div>
-        )}
-      </div>
+      {/* Trigger row removed 2026-05-18 — UI promised load/scroll/hover/click
+       * options but engine never honored them (generateAnimationCSS only reads
+       * type/duration/easing/delay/iterations). For triggered animations use
+       * the Interactions section, which is GSAP-wired via InteractionRuntime.
+       * See memory project_animation_audit_20260518.md. */}
       {/* Preview */}
       <div style={{ marginTop: 24 }}>
         <Button onClick={onPreview} style={{
