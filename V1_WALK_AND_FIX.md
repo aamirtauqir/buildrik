@@ -107,10 +107,35 @@ See Iteration 2.
 - Impact: Cannot create a site. Walk steps 3-7 (open editor, edit, publish, persistence) all gated on site existence and unreachable.
 - Severity rationale: console.error + flow continuation blocked = P0.
 
-### Commit (pending fix)
+### Commit
 
-### Re-walk (pending fix)
+Fix landed via `npx prisma migrate deploy` (DB-only). No source change.
+
+### Re-walk
+
+PASS. Direct API call returned full site row:
+
+```
+POST /api/trpc/sites.create → 200
+  → id: cmpbav1xe0007xoe9l6su00kr
+  → name: test-site-iter2
+  → slug: test-site-iter2
+  → status: DRAFT
+  → creationMethod: BLANK
+  → cspPolicy: null (column now exists)
+```
+
+### Fix details
+
+- **Root cause:** Database 3 migrations behind schema. Unapplied:
+  - `20260508040253_add_site_security_headers` (adds `cspPolicy`, `hstsMaxAge`, `xFrameOptions`, `referrerPolicy`, `permissionsPolicy`)
+  - `20260508041500_add_api_tokens`
+  - `20260508050000_add_localization`
+- Site model in `prisma/schema.prisma` lists these columns. `prisma migrate status` confirmed unapplied.
+- During `sites.create` → `generateUniqueSlug` → `prisma.site.findFirst()`, Prisma generates query against current schema and hits missing column → throws `PrismaClientKnownRequestError: column "sites.cspPolicy" does not exist`.
+- **Fix:** `npx prisma migrate deploy` applied all 3 pending migrations. Verified via direct in-browser fetch returning 200 with row data.
+- **No source change.** Migration files already existed in `prisma/migrations/`.
 
 ### Next blocker
 
-User to pick: P0-2 is sole P0 for this iteration. Default = fix it.
+Iteration 3 walk: continue Steps 3-7 in same browser session.
