@@ -29,7 +29,6 @@ import {
   TopbarStatusDot,
 } from "@/editor/shared/vibcoder";
 import type { Issue } from "./hooks/useStudioState";
-import { AccountModal } from "./AccountModal";
 import { CommandPalette } from "./modals/CommandPalette";
 import { InviteModal } from "./InviteModal";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
@@ -172,7 +171,6 @@ export interface TopbarProps {
   onOpenIssues?: () => void;
   onCommandPalette?: () => void;
   onHelp?: () => void;
-  onAccount?: () => void;
   onInvite?: () => void;
 
   // Legacy / StudioHeader wiring
@@ -244,16 +242,13 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenIssues,
   onOpenHistory,
   onHelp,
-  onAccount,
   onExportHTML,
   onDeviceChange,
 }) => {
   const publishEnabled = isFeatureEnabled("publish");
-  const accountEnabled = isFeatureEnabled("account");
   const inviteEnabled = isFeatureEnabled("invite");
   const [cmdOpen, setCmdOpen] = React.useState(false);
   const [inviteOpen, setInviteOpen] = React.useState(false);
-  const [accountOpen, setAccountOpen] = React.useState(false);
 
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -535,29 +530,29 @@ export const Topbar: React.FC<TopbarProps> = ({
             </TooltipPortal>
           </Tooltip>
 
-          {accountEnabled && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton
-                  onClick={() => {
-                    setAccountOpen(true);
-                    onAccount?.();
-                  }}
-                  aria-label="Account"
-                >
-                  <IconUser />
-                </IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>Account</TooltipContent>
-              </TooltipPortal>
-            </Tooltip>
-          )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                onClick={() =>
+                  window.open(
+                    `${dashboardUrl}/dashboard/settings/account`,
+                    "_blank",
+                    "noopener,noreferrer"
+                  )
+                }
+                aria-label="Account settings"
+              >
+                <IconUser />
+              </IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Account settings</TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
         </TopbarGroup>
       </VibcoderTopbar>
       {cmdOpen && <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} />}
       {inviteOpen && inviteEnabled && <InviteModal onClose={() => setInviteOpen(false)} />}
-      {accountOpen && accountEnabled && <AccountModal onClose={() => setAccountOpen(false)} />}
     </>
   );
 };

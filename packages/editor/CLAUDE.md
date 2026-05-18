@@ -454,7 +454,6 @@ set in the host platform (Vercel project settings → Environment Variables).
 | `VITE_DASHBOARD_URL` | tRPC API base for dashboard package (publish jobs, BuildrikSyncProvider) | `http://localhost:3000` | `https://app.buildrik.com` (or canonical dashboard host) |
 | `VITE_SENTRY_DSN` | Sentry error reporting DSN | unset → console-only | Sentry project DSN (required) |
 | `VITE_FEATURE_PUBLISH` | Gate for Publish dropdown + publish flow | `false` | `true` once Vercel pipeline live |
-| `VITE_FEATURE_ACCOUNT` | Gate for AccountModal | `false` | `true` once account UI is real |
 | `VITE_FEATURE_INVITE` | Gate for InviteModal | `false` | `true` once invite flow ships |
 
 Notes:
