@@ -363,3 +363,23 @@ Tech-debt freeze remains active per spec Section 5. Still waiting on real-user (
 ### Memory cross-ref
 
 This is exactly the kind of P0 that automation walk catches and human walk would NOT have caught: undo silently wipes everything but produces no error, no toast, no console.error. Real user hits Ctrl+Z out of muscle memory, loses everything, has no idea why. The walk-and-fix loop earns its keep on these kinds of silent-data-loss surfaces. See [[feedback-v1-walk-and-fix-loop]].
+
+## Iteration 8 — pages CRUD coverage — 2026-05-19
+
+**Goal:** Verify page rename + page delete primitives. Iters 1-7 only tested page CREATE.
+
+### Results — all PASS
+
+| Test | Result | Evidence |
+|---|---|---|
+| Rename page (About → "About Us") | ✅ | Inline edit on tree row. Slug preserved (`about` unchanged) per safe-rename contract. DB Page.name updated. |
+| Delete page (with confirm dialog) | ✅ | Right-click → Delete → ConfirmDialog → confirm. DB Page row removed (count 2 → 1). No orphaned blocks. |
+| Reload after rename | ✅ | "About Us" persists across full reload + re-open. |
+
+### Iter 8 commits
+
+Just iteration log update. No source change — these primitives already worked correctly.
+
+### Why this matters
+
+Page CRUD is the "scaffold-the-site" loop. Real users iterate page structure constantly during build — rename for clarity, delete for re-plan. Both must be fast + irreversible-feeling-safe (no data corruption, no orphaned children). Both verified.
