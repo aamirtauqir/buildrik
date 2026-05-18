@@ -439,3 +439,54 @@ The Iter 7 fix solved one symptom and surfaced another. **Lesson for codex pre-c
 ### Iter 9b — sibling fix
 
 Same defect class found by post-fix sweep: `HistoryManager.applyRemoteOperation()` also calls `composer.importProject(newState)` (line 274). Without the new guard, an incoming collab teammate operation would silently wipe the local user's undo + redo stacks (silent-data-loss class P0 in collab sessions). Two-line fix: set `isRestoringFromHistory = true` inside its try/finally too. Both `importProject` callers inside HistoryManager now self-guarded. Shipped in `c764a170`.
+
+## Iteration 10 — inspector walk → P0-8 Pro-gate false-positive — 2026-05-19
+
+**Goal:** Test inspector edits (text/color/size) on existing canvas elements + verify edit→save→reload cycle.
+
+### Walk path attempted
+
+1. Open editor on `cmpbibfyn000211lowtqr8a8r` (existing 5-heading test site)
+2. Click Heading → inspector right panel mounts with Style/Element/Effects tabs ✅
+3. Element tab shows only "Classes" — no text content editor surfaced (P1 — see below)
+4. Double-click Heading → rich-text toolbar appears at canvas ✅
+5. Cmd+A + type "Welcome to Buildrik" + click outside ✅
+6. **Save FAILS** — red toast "Save failed — Changes are unsaved" 🔴
+7. Console: `[BuildrikSync] auto-save failed: Custom code requires Pro or above`
+
+### P0-8 root cause + fix
+
+`server/services/site-settings.service.ts:100` gated `CUSTOM_CODE_NOT_AVAILABLE` on `data.headCode !== undefined`. Editor's `extractSiteColumnPatch` (`BuildrikSyncProvider.ts:84`) always sends `headScripts=""` and `bodyScripts=""` because the editor's customCode settings default to empty strings (not undefined). Every Free-tier auto-save was throwing FORBIDDEN → entire edit session lost on each save tick.
+
+Fix: gate on actual content. Empty strings now pass (also allows Free user to CLEAR previously-set custom code on downgrade path). Only non-empty headCode/bodyCode triggers the plan check.
+
+Test added: `server/services/__tests__/site-settings-customCode-gate.test.ts` — 4 cases lock the invariant (Free empty allowed / Free non-empty rejected / Pro non-empty allowed / Free clearing allowed).
+
+### Live-verified
+
+Edit heading → topbar `Saved · just now` (green) ✅
+Refresh page → text "Welcome to Buildrik!" persists with exclamation, 9 elements, 9 unique IDs, 0 duplicates ✅
+
+### False-alarm caught and recorded
+
+Mid-walk I observed massive DOM duplication (13 children in `#root`, 8 IDs duplicated) AND confirmed it in the DB (13 children in blocks JSON). Initially flagged as P0-7 catastrophic state corruption. Then walked the SAME edit path via real keystrokes (instead of my JS `execCommand('insertText',...)`) and dedup was clean. Concluded: my JS bypass triggered the engine's mutation observer to append a tree copy instead of mutate-in-place. The doubling was NOT user-reachable via the rich-text toolbar. DB cleaned via python dedup before continuing the walk. Recorded as a methodology trap, not a product P0.
+
+**Lesson:** `execCommand` direct mutations in walk scripts bypass the engine's controlled-edit code paths. For inline-edit walks, simulate real keystrokes via the browser tool's `type` action, not `document.execCommand`. The bypass route exercises code paths real users never hit + creates false-positive bug reports.
+
+### P1 candidates (deferred to post-v1)
+
+- **P1-2 Element tab text editor missing for h2:** clicking Heading + Element tab shows only "Classes" accordion. No text content input. Real users have to discover the double-click inline-edit pattern instead. Inspector "Element" tab is the discoverability home for content edits and should expose a textContent field for text-bearing elements.
+
+### Pattern caught
+
+The walk exposed a **default-shape vs presence-check mismatch** — a class of bug that crops up at the editor↔server boundary:
+
+- Editor's project settings have a fixed shape with default empty strings.
+- Server gates were written for "absence means no change" but the editor always SENDS the shape.
+- Result: every save tick attempts a Pro-only field, even when the field is conceptually empty.
+
+Look for this pattern at other gates: any server endpoint that bases authorization on `!== undefined` is potentially broken when the client uses a complete-shape default object.
+
+### Iter 10 commits
+
+`da3c7ff5` — fix + test (server-side gate + 4-case regression test).
