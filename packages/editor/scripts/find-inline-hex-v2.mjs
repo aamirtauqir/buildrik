@@ -43,6 +43,29 @@ const FULL_CHROME_ROOTS = [
 const EDITOR_ONLY_ROOTS = ["src/editor"];
 const EDITOR_EXCLUDE_DIRS = ["inspector"]; // mid-flight port; re-include later
 
+// User-content paths — hex literals in these files are USER DATA, not chrome
+// drift. Excluded from both Gate 10 (global) and Gate 16 (editor-only) so the
+// gate measures genuine chrome-decoration drift, not user-facing token defaults.
+//
+// Each entry is a relative path from EDITOR_ROOT (packages/editor/). Matched
+// against the absolute file path before counting. Add new exclusions here when
+// a new user-content surface lands.
+//
+// Categories (added 2026-05-18 in the hex drain closeout — see memory
+// project_hex_drain_20260518.md):
+//   • Template HTML       — pre-built website templates with site colors
+//   • Wizard pre-fills    — starter content user picks at site creation
+//   • DS DEFAULT_TOKENS   — initial values the user can edit in Design tab
+//   • DS starter presets  — opinionated starting palettes per template style
+//   • Stock photo filter  — color-filter palette for stock image picker
+const USER_CONTENT_EXCLUDES = [
+  "src/editor/sidebar/tabs/templates/templatesData.ts",
+  "src/editor/wizard/sectionData.ts",
+  "src/editor/design-system/constants.ts",
+  "src/editor/design-system/starters/", // entire directory
+  "src/editor/sidebar/tabs/media/components/StockSourceModal.tsx",
+];
+
 const CHROME_ROOTS = EDITOR_ONLY ? EDITOR_ONLY_ROOTS : FULL_CHROME_ROOTS;
 const EXTRA_FILES = EDITOR_ONLY
   ? []
@@ -54,6 +77,15 @@ const HEX_RE = /#[0-9A-Fa-f]{3,8}\b/g;
 const FALLBACK_HEX_RE = /var\(\s*--[a-z0-9-]+\s*,\s*(#[0-9A-Fa-f]{3,8})\b/gi;
 const POLICY_RE = /@lint-hex-policy:/;
 
+function isUserContent(absPath) {
+  // Match relative to EDITOR_ROOT (packages/editor/). Directory entries end in
+  // "/" so test with startsWith; file entries are exact path matches.
+  const rel = path.relative(EDITOR_ROOT, absPath);
+  return USER_CONTENT_EXCLUDES.some((p) =>
+    p.endsWith("/") ? rel.startsWith(p) : rel === p
+  );
+}
+
 function walk(dir, out = []) {
   if (!fs.existsSync(dir)) return out;
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -63,6 +95,7 @@ function walk(dir, out = []) {
       if (EDITOR_ONLY && EDITOR_EXCLUDE_DIRS.includes(e.name)) continue;
       walk(full, out);
     } else if (/\.(css|ts|tsx)$/.test(e.name) && !/\.test\.(ts|tsx)$/.test(e.name)) {
+      if (isUserContent(full)) continue;
       out.push(full);
     }
   }
