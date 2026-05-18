@@ -18,12 +18,9 @@
 import { describe, expect, it } from "vitest";
 import { EVENTS } from "../events";
 
-const KNOWN_COLLISIONS = new Set<string>([
-  // SyncManager + CollaborationManager both emit "sync:error"; useSaveIndicator
-  // subscribes. Documented in events.ts. Splitting requires updating 4 call
-  // sites — tracked as separate work, not an E-005-style cleanup.
-  "sync:error",
-]);
+// Cloud-sync stack removed; SyncManager no longer emits "sync:error", so the
+// COLLAB_SYNC_ERROR/SYNC_ERROR collision is gone. Set kept for future entries.
+const KNOWN_COLLISIONS = new Set<string>([]);
 
 describe("EVENTS constants invariants", () => {
   it("has no duplicate keys", () => {

@@ -63,7 +63,7 @@ export function useSaveIndicator(composer: Composer | null): SaveIndicatorState 
     // Subscribe to composer events
     composer.on(EVENTS.PROJECT_SAVING, handleSaveStart);
     composer.on(EVENTS.PROJECT_SAVED, handleSaveSuccess);
-    composer.on(EVENTS.SYNC_ERROR, handleSaveError);
+    composer.on(EVENTS.COLLAB_SYNC_ERROR, handleSaveError);
     composer.on(EVENTS.NETWORK_ONLINE, handleOnline);
     composer.on(EVENTS.NETWORK_OFFLINE, handleOffline);
 
@@ -79,7 +79,7 @@ export function useSaveIndicator(composer: Composer | null): SaveIndicatorState 
     return () => {
       composer.off(EVENTS.PROJECT_SAVING, handleSaveStart);
       composer.off(EVENTS.PROJECT_SAVED, handleSaveSuccess);
-      composer.off(EVENTS.SYNC_ERROR, handleSaveError);
+      composer.off(EVENTS.COLLAB_SYNC_ERROR, handleSaveError);
       composer.off(EVENTS.NETWORK_ONLINE, handleOnline);
       composer.off(EVENTS.NETWORK_OFFLINE, handleOffline);
       window.removeEventListener("online", handleOnline);

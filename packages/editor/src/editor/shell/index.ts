@@ -26,4 +26,3 @@ export { useFormHandler, type UseFormHandlerResult } from "./hooks/useFormHandle
 export { useDataManager, type UseDataManagerResult } from "./hooks/useDataManager";
 export { useTemplateManager, type UseTemplateManagerResult } from "./hooks/useTemplateManager";
 export { useMediaManager, type UseMediaManagerResult } from "./hooks/useMediaManager";
-export { useSyncStatus, type UseSyncStatusResult } from "./hooks/useSyncStatus";

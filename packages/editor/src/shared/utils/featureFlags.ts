@@ -13,8 +13,6 @@ const env = import.meta.env;
 export const FEATURES = {
   /** Publish-to-host workflow. Backend: Vercel API integration. Phase 1. */
   publish: env.VITE_FEATURE_PUBLISH === "true",
-  /** Cloud sync (CloudSyncService + SyncManager). SCAFFOLD — never wired. */
-  sync: env.VITE_FEATURE_SYNC === "true",
   /** S6 dual-section Components panel (Catalog + UserSaved + DSStatusChip). */
   componentsV2: env.VITE_FEATURE_COMPONENTS_V2 === "true",
   /** DS AI production wire — AIAssistService → ai.streamPrompt tRPC. Phase C.1. */

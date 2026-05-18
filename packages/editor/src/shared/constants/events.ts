@@ -386,21 +386,11 @@ export const EVENTS = {
   FORM_RESET: "form:reset",
 
   // ============================================
-  // Sync Events (AQUI-038)
+  // Network Events
   // ============================================
-  SYNC_STARTED: "sync:started",
-  SYNC_COMPLETED: "sync:completed",
-  // KNOWN COLLISION: shares value "sync:error" with COLLAB_SYNC_ERROR (line 208).
-  // Both are actively emitted — SyncManager fires for cloud-sync failures,
-  // CollaborationManager fires for OT-protocol failures. useSaveIndicator
-  // subscribes to "sync:error" and currently handles BOTH classes of errors
-  // identically. If save-indicator semantics need to distinguish them,
-  // split values (e.g., "sync:cloud:error" vs "sync:collab:error") and
-  // update the 3 emit sites + 1 subscribe site. Tracked separately from
-  // E-005 unification arc.
-  SYNC_ERROR: "sync:error",
-  SYNC_CONFLICT: "sync:conflict",
-  SYNC_CONFLICT_RESOLVED: "sync:conflict:resolved",
+  // Cloud-sync events (SYNC_STARTED/COMPLETED/ERROR/CONFLICT/CONFLICT_RESOLVED)
+  // removed with the SyncManager + CloudSyncService scaffold deletion.
+  // Collaboration-sync events live in the COLLAB_* block above.
   NETWORK_ONLINE: "network:online",
   NETWORK_OFFLINE: "network:offline",
 

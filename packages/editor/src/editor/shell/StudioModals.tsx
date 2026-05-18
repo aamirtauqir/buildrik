@@ -10,8 +10,6 @@ import { AIAssistant } from "../../ai/AIAssistant";
 import type { AIGenerationResult } from "../../ai/AIAssistant";
 import { AICopilot } from "../../ai/AICopilot";
 import type { Composer } from "../../engine";
-import type { SyncManagerState } from "../../engine/sync/SyncManager";
-import type { SyncConflict, ConflictResolution } from "../../services/CloudSyncService";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { SaveTemplate } from "../../templates/SaveTemplate";
 import type { Template } from "../../templates/TemplateLibrary";
@@ -21,8 +19,6 @@ import { ExportModal } from "../export";
 import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
 import { useToast } from "@/editor/shared/vibcoder";
-import { FEATURES } from "../../shared/utils/featureFlags";
-import { ConflictModal } from "../sync/ConflictModal";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CommandPalette } from "./modals/CommandPalette";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
@@ -203,42 +199,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
     [composer]
   );
 
-  // Track sync conflicts. E-010: gated on FEATURES.sync — SyncManager is
-  // SCAFFOLD until cloudSyncService.configure() is wired (see SyncManager.ts
-  // header). Without the gate, the subscription would fire on every Composer
-  // change while resolving to a perpetually inert state.
-  const [activeConflict, setActiveConflict] = React.useState<SyncConflict | null>(null);
-
-  React.useEffect(() => {
-    if (!FEATURES.sync) return;
-    if (!composer?.collab.sync) return;
-
-    // Set initial state
-    const state = composer.collab.sync.getState();
-    setActiveConflict(state.activeConflict);
-
-    // Subscribe to state changes
-    const unsubscribe = composer.collab.sync.onStateChange((newState: SyncManagerState) => {
-      setActiveConflict(newState.activeConflict);
-    });
-
-    return () => unsubscribe();
-  }, [composer]);
-
-  // Handle conflict resolution
-  const handleResolveConflict = React.useCallback(
-    (resolution: ConflictResolution) => {
-      if (!composer?.collab.sync || !activeConflict) return;
-      composer.collab.sync.resolveConflict(resolution);
-      setActiveConflict(null);
-    },
-    [composer, activeConflict]
-  );
-
-  const handleCancelConflict = React.useCallback(() => {
-    setActiveConflict(null);
-  }, []);
-
   // Compute context label for AI assistant
   const contextLabel = React.useMemo(() => {
     if (aiContext?.elementType) {
@@ -346,16 +306,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         onError={makeModalErrorHandler("Collection setup")}
         onSkip={onCloseCollectionSetup}
       />
-
-      {/* Sync Conflict Modal */}
-      {activeConflict && (
-        <ConflictModal
-          conflict={activeConflict}
-          onResolve={handleResolveConflict}
-          onError={makeModalErrorHandler("Resolve sync conflict")}
-          onCancel={handleCancelConflict}
-        />
-      )}
 
       {/* Create Component Modal — sidebar header + LeftSidebar "+" flow.
           Carries variants/description/tags UX. Single-elementId payload. */}

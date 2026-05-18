@@ -45,7 +45,6 @@ import { SelectionManager } from "./SelectionManager";
 import { StorageAdapter } from "./storage/StorageAdapter";
 import { GlobalStyleManager } from "./styles/GlobalStyleManager";
 import { StyleEngine } from "./styles/StyleEngine";
-import { SyncManager } from "./sync/SyncManager";
 import { TemplateManager } from "./templates/TemplateManager";
 import type { Patch } from "./utils/JsonPatch";
 import { MigrationManager } from "./migration/MigrationManager";
@@ -130,7 +129,7 @@ export class Composer extends EventEmitter {
   // Facade groupings — D3 Stage 1 (Option B-tight). Three clusters where
   // ≥2 managers share a domain:
   //   cms.{collections, bindings}
-  //   collab.{manager, sync}
+  //   collab.{manager}        (was {manager, sync} — cloud sync stack removed)
   //   canvas.{indicators, resize, drag, interactions}
   readonly cms!: {
     readonly collections: CollectionManager;
@@ -138,7 +137,6 @@ export class Composer extends EventEmitter {
   };
   readonly collab!: {
     readonly manager: CollaborationManager;
-    readonly sync: SyncManager;
   };
   readonly canvas!: {
     readonly indicators: CanvasIndicators;
@@ -228,7 +226,6 @@ export class Composer extends EventEmitter {
     };
     this.collab = {
       manager: new CollaborationManager(this),
-      sync: new SyncManager(this),
     };
     this.canvas = {
       indicators: new CanvasIndicators(this),
@@ -330,7 +327,6 @@ export class Composer extends EventEmitter {
 
     // Initialize async managers
     await this.media.init();
-    await this.collab.sync.init();
 
     // Load project if configured
     if (this.config.project?.autoLoad) {
@@ -841,7 +837,6 @@ ${html}
     if (this.cms.bindings?.destroy) this.cms.bindings.destroy();
     if (this.collab.manager?.destroy) this.collab.manager.destroy();
     if (this.forms?.destroy) this.forms.destroy();
-    if (this.collab.sync?.destroy) this.collab.sync.destroy();
     if (this.recovery?.destroy) this.recovery.destroy();
     if (this.media?.destroy) this.media.destroy();
     if (this.canvas.drag?.destroy) this.canvas.drag.destroy();
