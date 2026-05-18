@@ -55,10 +55,34 @@ Screenshot: `packages/editor/src/.gstack/qa-reports/screenshots/01-auth-after-co
 - **P2 a11y**: Console warning `Missing 'Description' or 'aria-describedby={undefined}' for {DialogContent}`. Radix UI complaint. Defer.
 - **P2 cosmetic**: Cookie consent banner (`Accept All` / `Essential Only` / `Manage Preferences`) overlays bottom of page on first visit. Could block clicks on full-width footer elements. Defer.
 
-### Commit (none yet — fix not started)
+### Commit
 
-### Re-walk (pending fix)
+Fix landed via `.env.local` (gitignored) — no source change. See "Fix details" below.
+
+### Re-walk
+
+PASS. Login flow end-to-end:
+
+```
+POST /api/trpc/auth.checkEmail      → 200 (80B)
+POST /api/trpc/auth.login           → 200 (182B)
+POST /api/auth/create-session       → 200 (16B)
+GET  /auth/redirect                 → 200
+GET  /dashboard                     → 200 (11781B)
+GET  /api/trpc/dashboard.[10 batch] → 200 (2624B)
+```
+
+URL landed: `http://localhost:3000/dashboard`. Sidebar visible (Dashboard, My Sites, "Free Sites 0/3" quota). "Welcome to Buildrik!" heading present.
+
+Console post-fix: only WebSocket HMR connection errors (dev-only Next.js HMR noise; not user-facing). Pre-existing Radix DialogContent a11y warning unchanged.
+
+### Fix details
+
+- **Root cause:** `.env.local` (gitignored, local-only) had `AUTH_URL`, `NEXTAUTH_URL`, `NEXT_PUBLIC_APP_URL` all set to `http://localhost:3100`. Dashboard dev server runs on `:3000` (Next.js default — `dev` script is `next dev --turbopack` with no `-p` flag).
+- The CSRF Origin pin at `packages/dashboard/app/api/trpc/[trpc]/route.ts:21-26` allowlist = `[EDITOR_ORIGIN || localhost:5050, NEXT_PUBLIC_APP_URL || localhost:3000]`. With `NEXT_PUBLIC_APP_URL=:3100`, allowlist became `[:5050, :3100]`. Browser POST from `:3000` page → Origin: `:3000` → not in allowlist → 403.
+- **Fix:** Changed all 3 env vars to `http://localhost:3000` in `.env.local`. Restarted dashboard. All 3 consumers (`email.service.ts:39`, `create-session/route.ts:25`, `trpc/[trpc]/route.ts:24`) now align.
+- **No source change.** `.env.local` is gitignored — commit logs change but cannot ship the file.
 
 ### Next blocker
 
-User to pick: P0-1 is the only P0. Default = fix it.
+Iteration 2 walk in progress (continuing Steps 2-7 in same browser session).
