@@ -62,6 +62,9 @@ export class HistoryManager {
   /** Current user ID for team attribution — set from session when available */
   private currentUserId: string | null = null;
 
+  /** True while restoreSnapshot is in flight — suppresses our own PROJECT_LOADED handler so undo/redo don't wipe their own stacks. */
+  private isRestoringFromHistory: boolean = false;
+
   constructor(composer: Composer) {
     this.composer = composer;
     this.config = {
@@ -122,6 +125,10 @@ export class HistoryManager {
     // the wrapped-data emits which carry the actual ProjectData shape.
     this.composer.on(EVENTS.PROJECT_LOADED, (data: unknown) => {
       if (this.isDestroyed) return;
+      // Skip our own restoreSnapshot calls — those re-emit PROJECT_LOADED via
+      // importProject and resetting the stacks here would silently wipe the
+      // undo/redo state mid-operation (P1-1 from iter 7).
+      if (this.isRestoringFromHistory) return;
       const isProjectData =
         data != null &&
         typeof data === "object" &&
@@ -341,9 +348,14 @@ export class HistoryManager {
 
   private restoreSnapshot(snapshot: ProjectData): void {
     this.isRecording = false;
-    this.composer.importProject(snapshot);
-    this.currentStateCache = snapshot;
-    this.isRecording = true;
+    this.isRestoringFromHistory = true;
+    try {
+      this.composer.importProject(snapshot);
+      this.currentStateCache = snapshot;
+    } finally {
+      this.isRestoringFromHistory = false;
+      this.isRecording = true;
+    }
   }
 
   // ─── Undo / Redo ────────────────────────────────────────────────────────────
