@@ -125,8 +125,32 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const hasManuallyToggledSpacing = React.useRef(false);
   const { addToast } = useToast();
 
-  // Wizard state: show on first load when canvas is blank
-  const [showWizard, setShowWizard] = React.useState(true);
+  // Wizard state: show on first load when canvas is blank.
+  // Persisted via localStorage so Skip/Complete sticks across reloads.
+  // Also gates against showing alongside StarterGalleryModal (DS arc T1)
+  // which now owns the first-run starter-picker path.
+  const WIZARD_DISMISSED_KEY = "buildrik:page-wizard-dismissed";
+  const [showWizard, setShowWizard] = React.useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      // Dismissed previously → never re-show. Also stays dismissed for users
+      // who completed the StarterGalleryModal flow (DS arc owns onboarding).
+      if (localStorage.getItem(WIZARD_DISMISSED_KEY) === "true") return false;
+      if (localStorage.getItem("buildrik:starter-gallery-seen-default") === "1") return false;
+    } catch {
+      // SecurityError → never show wizard rather than spam.
+      return false;
+    }
+    return true;
+  });
+  const dismissWizard = React.useCallback(() => {
+    setShowWizard(false);
+    try {
+      localStorage.setItem(WIZARD_DISMISSED_KEY, "true");
+    } catch {
+      // Private mode: state-flip alone is enough for this session.
+    }
+  }, []);
 
   // Use extracted hooks
   const state = useStudioState();
@@ -447,12 +471,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       {/* Onboarding is managed by useOnboardingOrchestrator */}
 
-      {/* Page Wizard - shown on first load for blank canvas */}
+      {/* Page Wizard — shown on first load for a blank canvas. Persists
+          dismissal so Skip/Complete sticks across reloads (was always
+          re-mounting alongside StarterGalleryModal pre-fix). */}
       {showWizard && (
         <PageWizard
           composer={composer}
-          onComplete={() => setShowWizard(false)}
-          onSkip={() => setShowWizard(false)}
+          onComplete={dismissWizard}
+          onSkip={dismissWizard}
         />
       )}
     </Stack>
