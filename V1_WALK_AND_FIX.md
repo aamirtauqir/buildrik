@@ -159,10 +159,26 @@ See Iteration 3.
 - Impact: Walk steps 4-7 (edit, publish, persistence) unreachable. Editor open for any blank site = crash.
 - Severity rationale: console.error + flow continuation blocked = P0.
 
-### Commit (pending fix)
+### Commit
 
-### Re-walk (pending fix)
+Single-line defensive fix at `packages/editor/src/engine/styles/StyleEngine.ts:490`:
+- Before: `Object.entries(style.properties)`
+- After:  `Object.entries(style.properties ?? {})`
+
+### Re-walk
+
+PASS. Editor loads. Canvas visible (`@e1 [main] "Design canvas"`). Starter Gallery Modal renders cleanly (Cobalt Default radio checked + 5 other starter options). No "Something went wrong" screen.
+
+### Fix details
+
+- **Root cause:** Wrong hypothesis initially. Investigated:
+  1. First guess: 0 pages → editor crash on missing active page. Server-side fix added (auto-create Home page for blank-method sites). Did NOT unblock editor.
+  2. Second guess: `root: p.blocks ?? DEFAULT_ROOT` returns `[]` when blocks is empty-array (non-nullish). Did NOT match real stack trace.
+  3. Actual: console stack trace pointed to `StyleEngine.generateStyleRule:490` called from `Composer.exportHTML` called from `StudioModals.tsx:119`. `Object.entries(style.properties)` throws on undefined/null properties.
+- **Fix:** Default `style.properties` to empty object via nullish-coalescing. Skips empty styles instead of crashing.
+- **Reverted** the server-side createSite change + the BuildrikSyncProvider DEFAULT_ROOT shape check (both wrong guesses, no longer needed).
+- **Memory cross-ref:** `feedback_phantom_bugs_static_analysis.md` — first 2 hypotheses were phantom-debug pattern. Stack trace beats source-reading speculation.
 
 ### Next blocker
 
-Fix P0-3.
+Iteration 4 walk: Steps 4-7 (edit, publish, persistence). In progress.

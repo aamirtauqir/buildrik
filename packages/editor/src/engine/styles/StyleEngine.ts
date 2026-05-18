@@ -487,7 +487,7 @@ export class StyleEngine {
    */
   private generateStyleRule(style: StyleData, scope?: string): string {
     const selector = scope ? `${scope} ${style.selector}` : style.selector;
-    const props = Object.entries(style.properties)
+    const props = Object.entries(style.properties ?? {})
       .map(([key, value]) => `  ${camelToKebab(key)}: ${value};`)
       .join("\n");
 
