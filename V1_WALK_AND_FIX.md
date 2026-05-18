@@ -299,3 +299,33 @@ Wrote `project_v1_shipped_20260518.md`.
 1. ✅ Declare v1 done
 2. ✅ Write `project_v1_shipped_<date>.md` memory entry
 3. ⏸ Unfreeze tech-debt arcs (user-decision — recommend keeping freeze until edits-by-real-user verified)
+
+## Iteration 6 — extended walk — 2026-05-18
+
+**Goal:** Cover full walk Step 4 (Section + Image, not just Heading + Button) + verify multi-page workflow. Strengthen A-bar evidence beyond original 2-element walk.
+
+### Results — all PASS
+
+| Test | Result | Evidence |
+|---|---|---|
+| Section element (Layout cat) | ✅ | `SECTION + DIV` added inside root. Layout accordion expand worked via `.bld-cat-row` click. |
+| Image element (Media cat) | ✅ | `IMG` element on canvas. Media accordion expand worked. No src auto-picker (P1 — `element:needs-asset` event fired per code but no modal opened). |
+| Save with 6 elements | ✅ | DB blocks grew 290B → 822B. All elements serialized. |
+| Add second page | ✅ | Click `[aria-label="Add new page"]` created About page directly (no dialog). DB pages count 1 → 2. |
+| Multi-page persistence | ✅ | After reload, both pages in DB: Home (822B, isHomePage=true) + About (125B default empty root, position=1). |
+
+### Minor observations (P1/P2 for post-v1)
+
+- **P1 — Image needs-asset auto-picker missing**: useBlockInsertion emits `element:needs-asset` event for media types without src (per `useBlockInsertion.ts:121-127`), but no Media tab picker opens automatically. Image element ships with no src, user has to manually open Media tab to set. Real-user friction.
+- **P2 — Pages tab tree didn't repaint after reload**: Tree items returned empty array post-reload. May just be default-tab is Add panel post-reload (Pages tab not auto-selected). Not blocking; DB state correct.
+- **P1 — Browse session loses cookies on browse-binary restart**: 3rd occurrence this session. Not a product bug per se, but real-user analog = session expiration mid-edit silently fails saves with no toast (existing P1 documented earlier).
+
+### Iter 6 commits
+
+Just this iteration log update. No source change — the walk was a coverage extension, not a fix.
+
+### V1 status update
+
+**V1 ship still holds.** Extended walk validates A bar wasn't a 2-element fluke. All 4 walk-script element types + multi-page workflow work end-to-end.
+
+Tech-debt freeze remains active per spec Section 5. Still waiting on real-user (manual, in-real-Chrome-not-test-browser) walk before unfreeze.
