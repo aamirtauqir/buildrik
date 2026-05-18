@@ -367,21 +367,33 @@ export class HistoryManager {
 
     const current = this.undoStack.pop()!;
 
-    if (current.type === "checkpoint") {
-      const previousState = this.reconstructState(this.undoStack.length - 1);
-      const patch = createPatch(previousState, current.snapshot);
-      this.redoStack.push({
-        type: "patch",
-        timestamp: Date.now(),
-        patch,
-        reversePatch: reversePatch(patch),
-        label: current.label,
-      });
-    } else {
-      this.redoStack.push(current);
+    // Build the redo entry + target state inside try/catch. JSON-Patch path
+    // navigation throws when the recorded patch references a tree shape that
+    // has diverged from the current state (iter 13 P0-9). Bail without
+    // mutating composer state — restore stacks to pre-undo position.
+    let previousState: ProjectData;
+    let redoEntry: HistoryEntry;
+    try {
+      previousState = this.reconstructState(this.undoStack.length - 1);
+      if (current.type === "checkpoint") {
+        const patch = createPatch(previousState, current.snapshot);
+        redoEntry = {
+          type: "patch",
+          timestamp: Date.now(),
+          patch,
+          reversePatch: reversePatch(patch),
+          label: current.label,
+        };
+      } else {
+        redoEntry = current;
+      }
+    } catch (err) {
+      this.undoStack.push(current);
+      console.warn("[HistoryManager] undo bailed — state shape diverged from recorded patch:", err);
+      return false;
     }
 
-    const previousState = this.reconstructState(this.undoStack.length - 1);
+    this.redoStack.push(redoEntry);
     this.restoreSnapshot(previousState);
     this.updatePatchCounter();
     this.validateSelectionAfterRestore();
@@ -421,11 +433,23 @@ export class HistoryManager {
     const entry = this.redoStack.pop()!;
     const currentState = this.getCurrentState();
 
+    // applyPatch throws "Cannot navigate path" when the patch's recorded path
+    // (e.g. /pages/0/root/children/3/children/0) doesn't match the current
+    // tree shape — happens after divergent mutations between record and apply
+    // (iter 13 P0-9). Compute newState in try/catch; on failure, restore the
+    // entry to the redo stack so user can choose to retry (or undo to a state
+    // where the patch path resolves).
     let newState: ProjectData;
-    if (entry.type === "patch") {
-      newState = applyPatch(currentState, entry.patch);
-    } else {
-      newState = deepClone(entry.snapshot);
+    try {
+      if (entry.type === "patch") {
+        newState = applyPatch(currentState, entry.patch);
+      } else {
+        newState = deepClone(entry.snapshot);
+      }
+    } catch (err) {
+      this.redoStack.push(entry);
+      console.warn("[HistoryManager] redo bailed — patch path diverged from current state:", err);
+      return false;
     }
 
     this.undoStack.push(entry);

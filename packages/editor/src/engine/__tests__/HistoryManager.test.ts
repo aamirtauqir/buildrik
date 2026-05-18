@@ -28,6 +28,43 @@ describe("HistoryManager reconstructState", () => {
   });
 });
 
+describe("HistoryManager redo bail on patch divergence (P0-9)", () => {
+  it("rolls back the popped entry + returns false when applyPatch throws", () => {
+    const mockComposer = {
+      on: vi.fn(),
+      off: vi.fn(),
+      emit: vi.fn(),
+      exportProject: vi.fn(() => ({ pages: [{ id: "p1", elements: [] }], styles: [], assets: [] })),
+      importProject: vi.fn(),
+    } as any;
+
+    const hm = new HistoryManager(mockComposer);
+    // Seed a redo entry whose patch references a path that doesn't exist.
+    // applyPatch should throw inside redo(), guard catches and bails.
+    const badPatch = [{ op: "replace", path: "/pages/0/root/children/3/children/0/content", value: "X" }];
+    (hm as any).redoStack = [
+      {
+        type: "patch",
+        timestamp: Date.now(),
+        patch: badPatch,
+        reversePatch: [],
+        label: "bad-redo",
+      },
+    ];
+    (hm as any).currentStateCache = { pages: [{ id: "p1" }] };
+
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const ok = hm.redo();
+    warnSpy.mockRestore();
+
+    expect(ok).toBe(false);
+    // Entry must be back on redo stack (no entry lost).
+    expect((hm as any).redoStack.length).toBe(1);
+    // importProject must NOT have been called (no broken state applied).
+    expect(mockComposer.importProject).not.toHaveBeenCalled();
+  });
+});
+
 describe("HistoryManager PROJECT_LOADED self-guard", () => {
   it("skips stack reset when PROJECT_LOADED fires from restoreSnapshot (undo/redo path)", () => {
     const listeners = new Map<string, ((data: unknown) => void)[]>();
