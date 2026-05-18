@@ -138,4 +138,31 @@ POST /api/trpc/sites.create → 200
 
 ### Next blocker
 
-Iteration 3 walk: continue Steps 3-7 in same browser session.
+See Iteration 3.
+
+## Iteration 3 — 2026-05-18
+
+- Walk: **Steps 1-2 PASS regression. Step 3 FAIL.**
+- Site `test-site-iter2` (created in Iter 2) used as target.
+
+### P0 blockers
+
+**P0-3: Editor crashes on load for blank-method site — "Cannot convert undefined or null to object"**
+
+- Repro: from `/dashboard/sites`, click Edit on `test-site-iter2`. Editor navigates to `http://localhost:5050/?siteId=cmpbav1xe0007xoe9l6su00kr`.
+- Observed:
+  - Editor shell loads. Dashboard data fetch succeeds (toast: "Project loaded — Loaded from dashboard").
+  - Recovery system trips: `[Recovery] Runtime fault (error): Cannot convert undefined or null to object`, followed by `[Recovery] Active page missing, recovering...`
+  - User-visible: "Something went wrong" error screen with Reload button. No canvas, no sidebar interactivity.
+- Cross-check `sites.create` blank-method response (Iter 2): site row has `pages: 0`. No Page record created for blank sites.
+- Hypothesis: editor expects at least 1 active page; blank-method `createSite` skips page creation (template-method does create pages, see `sites.service.ts:184-204`); editor renderer hits undefined when computing active page.
+- Impact: Walk steps 4-7 (edit, publish, persistence) unreachable. Editor open for any blank site = crash.
+- Severity rationale: console.error + flow continuation blocked = P0.
+
+### Commit (pending fix)
+
+### Re-walk (pending fix)
+
+### Next blocker
+
+Fix P0-3.
