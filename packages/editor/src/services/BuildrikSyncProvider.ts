@@ -162,7 +162,9 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
         name: p.name,
         slug: p.slug,
         isHome: p.isHomePage,
-        root: p.blocks ?? DEFAULT_ROOT,
+        root: (p.blocks && typeof p.blocks === "object" && !Array.isArray(p.blocks))
+          ? p.blocks
+          : DEFAULT_ROOT,
         settings: p.settings,
         meta: p.meta ?? undefined,
         updatedAt: p.updatedAt,
