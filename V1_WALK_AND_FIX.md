@@ -85,4 +85,32 @@ Console post-fix: only WebSocket HMR connection errors (dev-only Next.js HMR noi
 
 ### Next blocker
 
-Iteration 2 walk in progress (continuing Steps 2-7 in same browser session).
+See Iteration 2.
+
+## Iteration 2 — 2026-05-18
+
+- Walk: **Step 1 PASS** (regression check — login still works post-config fix). **Step 2 FAIL.**
+- Continued from Iteration 1's live browser session — no fresh login required.
+
+### P0 blockers
+
+**P0-2: `sites.create` returns 500 on click "Start from Scratch"**
+
+- Repro: from `/dashboard`, click "New Site" link → page `/dashboard/sites/new` shows 3 creation modes (Template / AI / Scratch). Fill site name field with `test-site-1`, click `📄 Start from Scratch`.
+- Observed:
+  - `POST /api/trpc/sites.create?batch=1 → 500 (72ms, 7907B)`
+  - Console error: `Failed to load resource: 500 (Internal Server Error)`
+  - URL stays at `/dashboard/sites/new`, no redirect to editor
+  - Page remains on creation chooser, no error message visible to user
+- Dashboard log: `POST /api/trpc/sites.create?batch=1 500 in 72ms (application-code: 54ms)`. 54ms in application code means the handler did run — this is a thrown error, not auth/middleware rejection.
+- Cross-check: direct curl WITHOUT session cookie returned `UNAUTHORIZED 401` (correct). So the 500 from browser is NOT auth-related — it's an actual server-side error in the handler when called WITH valid session.
+- Impact: Cannot create a site. Walk steps 3-7 (open editor, edit, publish, persistence) all gated on site existence and unreachable.
+- Severity rationale: console.error + flow continuation blocked = P0.
+
+### Commit (pending fix)
+
+### Re-walk (pending fix)
+
+### Next blocker
+
+User to pick: P0-2 is sole P0 for this iteration. Default = fix it.
