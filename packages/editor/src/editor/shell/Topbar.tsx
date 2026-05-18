@@ -328,7 +328,11 @@ export const Topbar: React.FC<TopbarProps> = ({
             B
           </a>
           <TopbarBrand>Buildrik</TopbarBrand>
-          <IconButton size="xs" aria-label="Switch project">
+          <IconButton
+            size="xs"
+            aria-label="Switch project"
+            onClick={() => window.open(`${dashboardUrl}/dashboard/sites`, "_blank", "noopener,noreferrer")}
+          >
             <IconChevDown />
           </IconButton>
         </div>
