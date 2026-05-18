@@ -32,6 +32,7 @@ import type { UseStudioModalsReturn } from "./useStudioModals";
 export interface EditorEventListenerStateSetters {
   setLeftPanelTab: (tab: string) => void;
   setIsLeftPanelOpen: (open: boolean) => void;
+  openLeftPanelToTab: (primaryTab: string, subTab?: string) => void;
   setShowSpacingIndicators: (v: boolean) => void;
   setShowBadges: (v: boolean) => void;
   setShowGuides: (v: boolean) => void;
@@ -118,6 +119,22 @@ export function useEditorEventListeners({
       composer.off(EVENTS.SHOW_IN_LAYERS, handle);
     };
   }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
+
+  // 3b) UI_PANEL_OPEN → open the requested left-panel tab (and optional sub-screen).
+  // Emitters: command palette navigation, SmartSuggestions, canvas cmd palette.
+  // Before this listener, all those emits routed to nowhere.
+  const { openLeftPanelToTab } = state;
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = (event: { panel: string; screen?: string }) => {
+      if (!event?.panel) return;
+      openLeftPanelToTab(event.panel, event.screen);
+    };
+    composer.on(EVENTS.UI_PANEL_OPEN, handle);
+    return () => {
+      composer.off(EVENTS.UI_PANEL_OPEN, handle);
+    };
+  }, [composer, openLeftPanelToTab]);
 
   // 4) Overlay defaults init.
   const { setShowSpacingIndicators, setShowBadges, setShowGuides, setShowGrid } = state;

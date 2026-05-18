@@ -187,6 +187,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     state: {
       setLeftPanelTab: state.setLeftPanelTab,
       setIsLeftPanelOpen: state.setIsLeftPanelOpen,
+      openLeftPanelToTab: state.openLeftPanelToTab,
       setShowSpacingIndicators: state.setShowSpacingIndicators,
       setShowBadges: state.setShowBadges,
       setShowGuides: state.setShowGuides,
