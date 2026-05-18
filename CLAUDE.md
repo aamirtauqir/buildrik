@@ -124,6 +124,25 @@ Key constraints:
 - 4px base spacing, compact density.
 - Minimal motion. No spring physics, no scroll choreography.
 
+## V1 freeze policy
+
+Until v1 ships (see `docs/v1-walk-and-fix-design.md`):
+
+- No new specs.
+- No new audits.
+- No new tech-debt arcs.
+- Only items from `V1_WALK_AND_FIX.md` may be worked on.
+- Memory entries allowed (record what happened).
+- Violating the freeze = auto-reject.
+
+## V1 fix protocol
+
+Before any commit during V1 walk-and-fix:
+
+1. Run the codex pre-check (5-step list in `docs/v1-walk-and-fix-design.md`).
+2. Commit message footer must include: `pre-check: grep ✓ / read ✓ / token-verified ✓`
+3. Missing footer = revert + redo.
+
 ## Skill routing
 
 When the user's request matches an available skill, ALWAYS invoke it using the Skill
