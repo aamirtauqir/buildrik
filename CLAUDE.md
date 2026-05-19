@@ -143,6 +143,23 @@ Before any commit during V1 walk-and-fix:
 2. Commit message footer must include: `pre-check: grep ✓ / read ✓ / token-verified ✓`
 3. Missing footer = revert + redo.
 
+## Server env vars
+
+Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packages/editor/CLAUDE.md`.
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `DATABASE_URL` | Postgres connection string | Yes |
+| `NEXTAUTH_SECRET` | NextAuth session signing key | Yes |
+| `RESEND_API_KEY` | Transactional email (verification, magic links) | Yes for production |
+| `VERCEL_TOKEN` | Shared Vercel API token (legacy — being replaced by per-workspace OAuth) | Optional during OAuth rollout |
+| `ENCRYPTION_KEY` | 32-byte hex (`openssl rand -hex 32`) for AES-256-GCM token-at-rest (Vercel OAuth + future integrations). Rotate by re-encrypting all rows. | Yes for Vercel OAuth flow |
+| `VERCEL_OAUTH_CLIENT_ID` | OAuth integration public client id (from vercel.com/integrations/console) | Yes for Vercel OAuth flow |
+| `VERCEL_OAUTH_CLIENT_SECRET` | OAuth integration secret | Yes for Vercel OAuth flow |
+| `VERCEL_OAUTH_REDIRECT_URI` | Callback URL registered with Vercel (e.g. `https://app.buildrik.com/api/integrations/vercel/callback` in prod, `http://localhost:3000/api/integrations/vercel/callback` in dev) | Yes for Vercel OAuth flow |
+
+`.env.local` (gitignored, repo root) holds dev values. Production values live in Vercel project env settings. Never commit secrets.
+
 ## Skill routing
 
 When the user's request matches an available skill, ALWAYS invoke it using the Skill
