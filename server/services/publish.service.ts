@@ -185,6 +185,9 @@ export async function runVercelDeploy(
 ): Promise<{ url: string; deploymentId: string } | null> {
   const conn = await getActiveVercelConnection(workspaceId);
   if (!conn) {
+    // Dev returns null so the worker can fall through to runSimulation
+    // (preserves no-credentials dev loop). Prod throws so the editor toast
+    // can surface a reconnect link (Task 14 wires the toast).
     if (process.env.NODE_ENV === "development") return null;
     throw new Error("VERCEL_NOT_CONNECTED");
   }

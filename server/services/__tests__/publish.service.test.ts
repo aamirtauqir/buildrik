@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 const getConnMock = vi.fn();
 const markInactiveMock = vi.fn();
 const createDepMock = vi.fn();
-const updateJobMock = vi.fn();
 
 vi.mock("@server/services/integrations.service", () => ({
   getActiveVercelConnection: (...args: unknown[]) => getConnMock(...args),
@@ -18,10 +17,7 @@ vi.mock("@/lib/vercel", () => ({
 }));
 
 vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    publishJob: { update: (...args: unknown[]) => updateJobMock(...args) },
-    site: { update: vi.fn(() => Promise.resolve()) },
-  },
+  prisma: {},
 }));
 
 // Import after mocks
@@ -32,7 +28,6 @@ describe("publish.service Vercel connection gating", () => {
     getConnMock.mockReset();
     markInactiveMock.mockReset();
     createDepMock.mockReset();
-    updateJobMock.mockReset();
   });
 
   afterEach(() => {

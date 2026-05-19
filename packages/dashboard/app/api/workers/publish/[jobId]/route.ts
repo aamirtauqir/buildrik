@@ -50,9 +50,11 @@ export async function POST(
   const payload = (job.log ?? null) as { pages?: PublishPage[] } | null;
   const pages = payload?.pages ?? [];
 
-  // Branch: real Vercel path requires both env config AND pages payload.
-  // Otherwise fall back to dev simulation so existing flows keep working.
-  const useVercel = isVercelConfigured() && pages.length > 0;
+  // Vercel path now requires only a pages payload — the workspace OAuth
+  // connection check moved into runVercelDeploy (publish.service). Legacy
+  // env-token kept as dev fallback through isVercelConfigured() probe so
+  // dashboards that haven't set up OAuth yet still publish in dev.
+  const useVercel = pages.length > 0 && (isVercelConfigured() || process.env.NODE_ENV !== "development");
 
   // Single log line — primary debug signal for Phase 1d ("did real Vercel
   // path fire or did we fall through to sim?"). See editor CLAUDE.md
