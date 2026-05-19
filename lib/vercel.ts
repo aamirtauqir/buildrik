@@ -5,9 +5,9 @@
  * to deploy site HTML to Vercel and read deployment status.
  *
  * Env:
- *   VERCEL_TOKEN          — required for real deployments. If unset, callers
- *                           should fall back to dev simulation.
- *   VERCEL_TEAM_ID        — optional. If set, deployments scope to this team.
+ *   VERCEL_TOKEN          — read only by `isVercelConfigured()` as a dev-mode
+ *                           probe. HTTP helpers receive the token as a param.
+ *   VERCEL_TEAM_ID        — read only by callers, passed in as `teamId` param.
  *   VERCEL_PROJECT_PREFIX — optional. Defaults to "buildrik-site-".
  *
  * See docs/plans/2026-05-06-phase-1-vercel-publish.md for design rationale.
@@ -69,18 +69,15 @@ export function slugifyProjectName(slug: string): string {
   return name.slice(0, 100);
 }
 
-function authHeaders(): HeadersInit {
-  const token = process.env.VERCEL_TOKEN;
-  if (!token) throw new Error("VERCEL_TOKEN is not set");
+function authHeaders(token: string): HeadersInit {
   return {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   };
 }
 
-function teamQueryString(): string {
-  const team = process.env.VERCEL_TEAM_ID;
-  return team ? `?teamId=${encodeURIComponent(team)}` : "";
+function teamQueryString(teamId: string | null | undefined): string {
+  return teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
 }
 
 /**
@@ -91,10 +88,17 @@ function teamQueryString(): string {
  *
  * Throws VercelApiError on non-2xx response.
  */
-export async function createVercelDeployment(
-  projectName: string,
-  files: VercelFile[],
-): Promise<DeploymentResult> {
+export async function createVercelDeployment({
+  token,
+  teamId,
+  projectName,
+  files,
+}: {
+  token: string;
+  teamId: string | null | undefined;
+  projectName: string;
+  files: VercelFile[];
+}): Promise<DeploymentResult> {
   const body = {
     name: projectName,
     target: "production",
@@ -106,9 +110,9 @@ export async function createVercelDeployment(
     projectSettings: { framework: null },
   };
 
-  const res = await fetch(`${VERCEL_API_BASE}/v13/deployments${teamQueryString()}`, {
+  const res = await fetch(`${VERCEL_API_BASE}/v13/deployments${teamQueryString(teamId)}`, {
     method: "POST",
-    headers: authHeaders(),
+    headers: authHeaders(token),
     body: JSON.stringify(body),
   });
 
@@ -134,12 +138,18 @@ export async function createVercelDeployment(
 /**
  * Get current status of a deployment by id.
  */
-export async function getDeploymentStatus(
-  deploymentId: string,
-): Promise<DeploymentStatus> {
+export async function getDeploymentStatus({
+  token,
+  teamId,
+  deploymentId,
+}: {
+  token: string;
+  teamId: string | null | undefined;
+  deploymentId: string;
+}): Promise<DeploymentStatus> {
   const res = await fetch(
-    `${VERCEL_API_BASE}/v13/deployments/${deploymentId}${teamQueryString()}`,
-    { headers: authHeaders() },
+    `${VERCEL_API_BASE}/v13/deployments/${deploymentId}${teamQueryString(teamId)}`,
+    { headers: authHeaders(token) },
   );
 
   if (!res.ok) {
@@ -174,16 +184,23 @@ export async function getDeploymentStatus(
  *
  * Caller should treat timeout as an error and surface to the user.
  */
-export async function waitForDeploymentReady(
-  deploymentId: string,
-  signal?: AbortSignal,
-): Promise<DeploymentStatus> {
+export async function waitForDeploymentReady({
+  token,
+  teamId,
+  deploymentId,
+  signal,
+}: {
+  token: string;
+  teamId: string | null | undefined;
+  deploymentId: string;
+  signal?: AbortSignal;
+}): Promise<DeploymentStatus> {
   const deadline = Date.now() + POLL_TIMEOUT_MS;
 
   while (Date.now() < deadline) {
     if (signal?.aborted) throw new Error("ABORTED");
 
-    const status = await getDeploymentStatus(deploymentId);
+    const status = await getDeploymentStatus({ token, teamId, deploymentId });
     if (status.readyState === "READY" || status.readyState === "ERROR" || status.readyState === "CANCELED") {
       return status;
     }

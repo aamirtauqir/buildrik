@@ -196,6 +196,9 @@ async function runVercelDeploy(
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
 
+  const token = process.env.VERCEL_TOKEN!;
+  const teamId = process.env.VERCEL_TEAM_ID ?? null;
+
   const projectName = slugifyProjectName(site.slug);
   const files: VercelFile[] = pages.map((p) => ({ file: p.path, data: p.html }));
 
@@ -211,7 +214,7 @@ async function runVercelDeploy(
   await checkCancelled(jobId);
   let deployment;
   try {
-    deployment = await createVercelDeployment(projectName, files);
+    deployment = await createVercelDeployment({ token, teamId, projectName, files });
   } catch (e) {
     if (e instanceof VercelApiError) {
       throw new Error(`Vercel ${e.status} ${e.code}: ${e.message}`);
@@ -226,7 +229,7 @@ async function runVercelDeploy(
 
   // Step 3 — Verifying SSL: poll Vercel until READY (or ERROR/CANCELED).
   await checkCancelled(jobId);
-  const status = await waitForDeploymentReady(deployment.id);
+  const status = await waitForDeploymentReady({ token, teamId, deploymentId: deployment.id });
   if (status.readyState !== "READY") {
     throw new Error(
       `Vercel deployment ${status.readyState}${status.errorMessage ? `: ${status.errorMessage}` : ""}`,
