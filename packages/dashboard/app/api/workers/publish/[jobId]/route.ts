@@ -1,6 +1,6 @@
 import { type NextRequest } from "next/server";
 import { prisma } from "@lib/prisma";
-import { isVercelConfigured, type VercelFile } from "@lib/vercel";
+import { isVercelConfigured, slugifyProjectName, type VercelFile } from "@lib/vercel";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { runVercelDeploy } from "@server/services/publish.service";
@@ -204,7 +204,8 @@ async function runVercelDeployJob(
 
   // Step 2 — Deploying to CDN: delegate to service (handles OAuth connection gating).
   await checkCancelled(jobId);
-  const result = await runVercelDeploy(workspaceId, siteId, jobId, files);
+  const projectName = slugifyProjectName(site.slug);
+  const result = await runVercelDeploy(workspaceId, projectName, files);
   if (result === null) {
     // dev mode + no workspace connection → fall through to simulation
     return runSimulation(jobId, siteId);

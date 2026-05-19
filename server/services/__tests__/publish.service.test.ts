@@ -44,7 +44,7 @@ describe("publish.service Vercel connection gating", () => {
     getConnMock.mockResolvedValueOnce(null);
 
     await expect(
-      runVercelDeploy("ws_1", "site_1", "job_1", []),
+      runVercelDeploy("ws_1", "buildrik-site-test",[]),
     ).rejects.toThrow("VERCEL_NOT_CONNECTED");
   });
 
@@ -53,7 +53,7 @@ describe("publish.service Vercel connection gating", () => {
     getConnMock.mockResolvedValueOnce(null);
 
     // runVercelDeploy returns null in dev/no-connection so caller can fall to sim
-    const result = await runVercelDeploy("ws_1", "site_1", "job_1", []);
+    const result = await runVercelDeploy("ws_1", "buildrik-site-test",[]);
     expect(result).toBeNull();
   });
 
@@ -62,7 +62,7 @@ describe("publish.service Vercel connection gating", () => {
     getConnMock.mockResolvedValueOnce({ id: "intg_1", token: "vt_abc", teamId: "team_x" });
     createDepMock.mockResolvedValueOnce({ id: "dep_1", url: "x.vercel.app", readyState: "READY" });
 
-    await runVercelDeploy("ws_1", "site_1", "job_1", [{ file: "index.html", data: "<p>hi</p>" }]);
+    await runVercelDeploy("ws_1", "buildrik-site-test",[{ file: "index.html", data: "<p>hi</p>" }]);
 
     expect(createDepMock).toHaveBeenCalledWith(
       expect.objectContaining({ token: "vt_abc", teamId: "team_x" }),
@@ -76,7 +76,7 @@ describe("publish.service Vercel connection gating", () => {
     createDepMock.mockRejectedValueOnce(new VercelApiError(401, "UNAUTHORIZED", "Token revoked"));
 
     await expect(
-      runVercelDeploy("ws_1", "site_1", "job_1", [{ file: "index.html", data: "<p>x</p>" }]),
+      runVercelDeploy("ws_1", "buildrik-site-test",[{ file: "index.html", data: "<p>x</p>" }]),
     ).rejects.toThrow("VERCEL_TOKEN_INVALID");
 
     expect(markInactiveMock).toHaveBeenCalledWith("intg_1");

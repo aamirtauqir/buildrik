@@ -180,8 +180,7 @@ export async function unpublishSite(siteId: string) {
  */
 export async function runVercelDeploy(
   workspaceId: string,
-  siteId: string,
-  jobId: string,
+  projectName: string,
   files: VercelFile[],
 ): Promise<{ url: string; deploymentId: string } | null> {
   const conn = await getActiveVercelConnection(workspaceId);
@@ -189,8 +188,6 @@ export async function runVercelDeploy(
     if (process.env.NODE_ENV === "development") return null;
     throw new Error("VERCEL_NOT_CONNECTED");
   }
-
-  const projectName = `buildrik-site-${siteId}`;
 
   try {
     const dep = await createVercelDeployment({
