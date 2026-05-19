@@ -1,11 +1,91 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { IntegrationsTab } from "@/components/settings/integrations-tab";
 
+function VercelIntegrationSection({ workspaceId }: { workspaceId: string }) {
+  const conn = trpc.integrations.vercel.getConnection.useQuery(
+    { workspaceId },
+    { enabled: !!workspaceId },
+  );
+  const disconnect = trpc.integrations.vercel.disconnect.useMutation({
+    onSuccess: () => { conn.refetch(); },
+  });
+  const search = useSearchParams();
+  const oauthError = search.get("error");
+
+  const handleConnect = () => {
+    window.location.href = `/api/integrations/vercel/authorize?workspaceId=${encodeURIComponent(workspaceId)}`;
+  };
+
+  return (
+    <section className="rounded-xl border border-neutral-200 p-4">
+      {oauthError === "oauth_state_invalid" && (
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          OAuth session expired. Click Connect to retry.
+        </div>
+      )}
+      {oauthError === "oauth_denied" && (
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          Vercel didn&apos;t authorize the connection. Try again or check your Vercel account.
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-base font-semibold">Vercel</h2>
+          <p className="mt-1 text-sm text-neutral-600">
+            Deploy your sites to Vercel. Connect once per workspace.
+          </p>
+        </div>
+
+        {conn.isLoading ? (
+          <div className="h-8 w-28 animate-pulse rounded-md bg-neutral-100" />
+        ) : conn.data?.connected && conn.data.isActive ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-neutral-600">
+              Connected{conn.data.teamId ? ` (team ${conn.data.teamId})` : ""}
+            </span>
+            <button
+              type="button"
+              onClick={() => disconnect.mutate({ workspaceId })}
+              disabled={disconnect.isPending}
+              className="rounded-md border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+            >
+              {disconnect.isPending ? "Disconnecting…" : "Disconnect"}
+            </button>
+          </div>
+        ) : conn.data?.connected && !conn.data.isActive ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-red-600">Connection lost</span>
+            <button
+              type="button"
+              onClick={handleConnect}
+              className="rounded-md border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50"
+            >
+              Reconnect
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleConnect}
+            className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700"
+          >
+            Connect Vercel
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function IntegrationsPage() {
   const { addToast } = useToast();
+  const wsQuery = trpc.account.workspace.get.useQuery();
+  const workspaceId = wsQuery.data?.id;
   const intQuery = trpc.account.integrations.list.useQuery();
 
   const addMutation = trpc.account.integrations.add.useMutation({
@@ -16,7 +96,7 @@ export default function IntegrationsPage() {
     onSuccess: () => { intQuery.refetch(); addToast("success", "Integration removed"); },
   });
 
-  if (intQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />;
+  if (intQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl bg-neutral-100" />;
 
   const connected = (intQuery.data ?? []).map((item) => ({
     id: item.id,
@@ -25,14 +105,17 @@ export default function IntegrationsPage() {
   }));
 
   return (
-    <IntegrationsTab
-      connected={connected}
-      onAdd={(provider, config) =>
-        addMutation.mutate({ provider, config })
-      }
-      onRemove={(id) => removeMutation.mutate({ id })}
-      onTestEvent={(provider) => addToast("success", "Test event sent", `Test event sent to ${provider}`)}
-      saving={addMutation.isPending || removeMutation.isPending}
-    />
+    <div className="space-y-6">
+      {workspaceId && <VercelIntegrationSection workspaceId={workspaceId} />}
+      <IntegrationsTab
+        connected={connected}
+        onAdd={(provider, config) =>
+          addMutation.mutate({ provider, config })
+        }
+        onRemove={(id) => removeMutation.mutate({ id })}
+        onTestEvent={(provider) => addToast("success", "Test event sent", `Test event sent to ${provider}`)}
+        saving={addMutation.isPending || removeMutation.isPending}
+      />
+    </div>
   );
 }
