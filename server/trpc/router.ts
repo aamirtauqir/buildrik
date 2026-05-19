@@ -16,6 +16,7 @@ import { uploadRouter } from "./routers/upload";
 import { aiRouter } from "./routers/ai";
 import { mediaRouter } from "./routers/media";
 import { apiTokensRouter } from "./routers/api-tokens";
+import { vercelIntegrationsRouter } from "./routers/integrations";
 
 export const appRouter = router({
   auth: authRouter,
@@ -35,6 +36,7 @@ export const appRouter = router({
   ai: aiRouter,
   media: mediaRouter,
   apiTokens: apiTokensRouter,
+  integrations: router({ vercel: vercelIntegrationsRouter }),
 });
 
 export type AppRouter = typeof appRouter;

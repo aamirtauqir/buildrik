@@ -695,7 +695,7 @@ model WorkspaceIntegration {
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@index([workspaceId, provider])
+  @@unique([workspaceId, provider])
   @@map("workspace_integrations")
 }
 
