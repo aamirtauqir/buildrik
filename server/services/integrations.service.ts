@@ -33,3 +33,38 @@ export async function removeIntegration(id: string) {
     where: { id },
   });
 }
+
+import { decrypt } from "@/lib/encryption";
+
+export interface ActiveVercelConnection {
+  id: string;
+  token: string;
+  teamId: string | null;
+}
+
+export async function getActiveVercelConnection(
+  workspaceId: string,
+): Promise<ActiveVercelConnection | null> {
+  const row = await prisma.workspaceIntegration.findFirst({
+    where: { workspaceId, provider: "vercel", isActive: true },
+  });
+  if (!row) return null;
+  const config = row.config as Record<string, unknown>;
+  const encryptedToken = config.encryptedToken;
+  if (typeof encryptedToken !== "string") {
+    throw new Error("VERCEL_CONFIG_MALFORMED");
+  }
+  const token = decrypt(encryptedToken);
+  return {
+    id: row.id,
+    token,
+    teamId: typeof config.teamId === "string" ? config.teamId : null,
+  };
+}
+
+export async function markInactive(id: string): Promise<void> {
+  await prisma.workspaceIntegration.update({
+    where: { id },
+    data: { isActive: false },
+  });
+}
