@@ -7,6 +7,7 @@ export default defineConfig({
     environment: "jsdom",
     include: [
       "__tests__/**/*.test.{ts,tsx}",
+      "lib/**/*.test.{ts,tsx}",
       "packages/editor/src/**/*.test.{ts,tsx}",
       "packages/shared/**/*.test.{ts,tsx}",
       "server/**/*.test.{ts,tsx}",
