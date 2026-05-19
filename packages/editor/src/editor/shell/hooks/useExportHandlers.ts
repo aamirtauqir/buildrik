@@ -133,11 +133,28 @@ export function useExportHandlers({
         duration: 6000,
       });
     } else if (publishJob.uiState === "failed" && publishJob.error) {
-      addToast({
-        title: "Publish failed",
-        description: publishJob.error,
-        tone: "error",
-      });
+      const msg = publishJob.error;
+      const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL ?? "http://localhost:3000";
+      const openIntegrations = () =>
+        window.open(`${dashboardUrl}/dashboard/settings/integrations`, "_blank");
+
+      if (msg.includes("VERCEL_NOT_CONNECTED")) {
+        addToast({
+          title: "Vercel not connected",
+          description: "Connect this workspace to Vercel before publishing.",
+          tone: "error",
+          action: { label: "Open settings", onClick: openIntegrations },
+        });
+      } else if (msg.includes("VERCEL_TOKEN_INVALID")) {
+        addToast({
+          title: "Vercel connection lost",
+          description: "Reconnect Vercel in workspace settings to publish again.",
+          tone: "error",
+          action: { label: "Reconnect", onClick: openIntegrations },
+        });
+      } else {
+        addToast({ title: "Publish failed", description: msg, tone: "error" });
+      }
     }
   }, [publishJob.uiState, publishJob.publishedUrl, publishJob.error, addToast]);
 
