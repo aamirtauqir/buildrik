@@ -621,3 +621,32 @@ Box-model UI is the standard 9-cell layout (margin/padding/content). Input + Tab
 ### Iter 15 commits
 
 Walk log only.
+
+## Iteration 16 — source-only sweep + P1-3 fix — 2026-05-19
+
+Browser extension dropped mid-walk; pivoted to source-only deferred-P1 audit + fix arc.
+
+### Sub-1: P0-8 sibling sweep (no findings)
+
+Grepped `!== undefined` field-presence patterns server-side. Only one match (`site-settings.service.ts:134` for `publishedPassword`). Verified safe because `hashPublishedPassword("")` already returns null. Other plan gates use numeric `PLAN_LIMITS[plan].X` comparisons that don't fire on default-shape sends. **No fix needed.**
+
+### Sub-2: P1-3 phantom "Not saved" on fresh load — FIXED
+
+Root cause: `useStudioState` seeds `saveState.lastSavedAt = undefined`. The load path in `useComposerInit` calls `instance.importProject(toImport)` but never sets `saveState`. `Topbar.renderSavedLabel` falls through `isDirty=false && lastSavedAt==null` → "Not saved".
+
+Fix: after `importProject` succeeds, seed `setSaveState({ status:"idle", lastSavedAt: Date.now(), error: undefined })` + `setIsDirty(false)`. The just-loaded state IS the persisted state.
+
+Shipped `97e707ce`. Browser walk-verify deferred until extension reconnects.
+
+### Sub-3: P1-2 + P1-4 RETRACTED
+
+Code review found both deferred P1s are source-side correct — walk-tool quirks gave false-positive observations:
+
+- **P1-2 Element tab missing heading text:** `config.ts:91-92` has `heading: [{ id: "content", label: "Heading Text", type: "textarea" }]`. `ElementPropertiesSection` (line 261-294) renders Section header `defaultOpen` + the textarea. Likely just collapsed/scrolled-past during my Iter 10 walk.
+- **P1-4 right-click context menu missing:** `Canvas.tsx:437` wires `onContextMenu={handleContextMenu}` + `ElementContextMenu` component at line 559. The browse tool's `right_click` may not have fired the React synthetic event, OR my click landed on an overlay shielding canvas. Real users with native clicks should see the menu.
+
+Both deferred for browser re-verify (not source bugs).
+
+### Iter 16 commits
+
+`97e707ce` — P1-3 phantom dirty load-state fix.
