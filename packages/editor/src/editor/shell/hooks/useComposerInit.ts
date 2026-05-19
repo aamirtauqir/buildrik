@@ -146,6 +146,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               });
             }
             instance.importProject(toImport);
+            // P1-3 (iter 16): seed saveState so topbar shows "Saved · just now"
+            // instead of "Not saved" on fresh load. The just-loaded state IS
+            // the persisted state; without this seed lastSavedAt stays null
+            // and the indicator falsely warns of unsaved work.
+            setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
+            setIsDirty(false);
             // Phase B3: hydrate media library from server. Additive — never
             // throws. Returns null on offline/auth/unconfigured; we just
             // keep going with engine-only state in that case.
