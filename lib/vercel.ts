@@ -76,7 +76,7 @@ function authHeaders(token: string): HeadersInit {
   };
 }
 
-function teamQueryString(teamId: string | null | undefined): string {
+function teamQueryString(teamId: string | null): string {
   return teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
 }
 
@@ -95,7 +95,7 @@ export async function createVercelDeployment({
   files,
 }: {
   token: string;
-  teamId: string | null | undefined;
+  teamId: string | null;
   projectName: string;
   files: VercelFile[];
 }): Promise<DeploymentResult> {
@@ -144,7 +144,7 @@ export async function getDeploymentStatus({
   deploymentId,
 }: {
   token: string;
-  teamId: string | null | undefined;
+  teamId: string | null;
   deploymentId: string;
 }): Promise<DeploymentStatus> {
   const res = await fetch(
@@ -191,7 +191,7 @@ export async function waitForDeploymentReady({
   signal,
 }: {
   token: string;
-  teamId: string | null | undefined;
+  teamId: string | null;
   deploymentId: string;
   signal?: AbortSignal;
 }): Promise<DeploymentStatus> {

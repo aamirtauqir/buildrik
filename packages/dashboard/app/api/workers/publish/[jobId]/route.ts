@@ -196,7 +196,8 @@ async function runVercelDeploy(
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
 
-  const token = process.env.VERCEL_TOKEN!;
+  const token = process.env.VERCEL_TOKEN;
+  if (!token) throw new Error("VERCEL_TOKEN missing");
   const teamId = process.env.VERCEL_TEAM_ID ?? null;
 
   const projectName = slugifyProjectName(site.slug);
