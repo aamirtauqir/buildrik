@@ -51,4 +51,9 @@ describe("encryption (AES-256-GCM)", () => {
     process.env.ENCRYPTION_KEY = "tooshort";
     expect(() => encrypt("x")).toThrow(/ENCRYPTION_KEY/);
   });
+
+  it("encrypt throws if ENCRYPTION_KEY has non-hex characters", () => {
+    process.env.ENCRYPTION_KEY = "z".repeat(64); // 64 chars but non-hex
+    expect(() => encrypt("x")).toThrow(/hex chars/);
+  });
 });
