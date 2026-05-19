@@ -59,7 +59,7 @@ export function verifyState(token: string): { workspaceId: string; userId: strin
   } catch {
     return null;
   }
-  if (typeof payload.exp !== "number" || Date.now() > payload.exp) return null;
+  if (typeof payload.exp !== "number" || Date.now() >= payload.exp) return null;
   return { workspaceId: payload.workspaceId, userId: payload.userId };
 }
 
@@ -101,6 +101,10 @@ export async function exchangeCodeForToken(code: string, redirectUri: string): P
   });
 
   if (!res.ok) {
+    // Server-side log only — body may include Vercel error code (invalid_code,
+    // invalid_client, expired_code). Don't leak to client error message.
+    const errBody = await res.text().catch(() => "");
+    console.error(`[vercel-oauth] /access_token ${res.status}: ${errBody.slice(0, 500)}`);
     throw new Error(`Vercel /access_token failed: ${res.status}`);
   }
 
@@ -134,6 +138,11 @@ export async function listTeams(accessToken: string): Promise<VercelTeam[]> {
     // Non-fatal — caller proceeds with empty team list (personal account only)
     return [];
   }
-  const data = (await res.json()) as { teams: VercelTeam[] };
-  return data.teams ?? [];
+  try {
+    const data = (await res.json()) as { teams: VercelTeam[] };
+    return data.teams ?? [];
+  } catch {
+    // Malformed body (proxy interstitial, gateway HTML) — same non-fatal contract.
+    return [];
+  }
 }
