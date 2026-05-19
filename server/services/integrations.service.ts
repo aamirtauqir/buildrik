@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { AddIntegrationInput } from "@buildrik/shared/schemas/account";
+import { decrypt } from "@/lib/encryption";
 
 export async function listIntegrations(workspaceId: string) {
   return prisma.workspaceIntegration.findMany({
@@ -33,8 +34,6 @@ export async function removeIntegration(id: string) {
     where: { id },
   });
 }
-
-import { decrypt } from "@/lib/encryption";
 
 export interface ActiveVercelConnection {
   id: string;
