@@ -40,10 +40,20 @@ describe("getActiveVercelConnection", () => {
     expect(result).toBeNull();
   });
 
-  it("returns null when row exists but isActive=false", async () => {
-    findFirstMock.mockResolvedValueOnce(null); // findFirst with isActive:true won't return inactive row
+  it("queries with isActive:true filter so inactive rows are excluded", async () => {
+    findFirstMock.mockResolvedValueOnce(null);
     const result = await getActiveVercelConnection("ws_1");
     expect(result).toBeNull();
+    expect(findFirstMock).toHaveBeenCalledWith({
+      where: { workspaceId: "ws_1", provider: "vercel", isActive: true },
+    });
+  });
+
+  it("returns null and does not throw when config is null (legacy row)", async () => {
+    findFirstMock.mockResolvedValueOnce({ id: "intg_1", config: null });
+    await expect(getActiveVercelConnection("ws_1")).rejects.toThrow(
+      /VERCEL_CONFIG_MALFORMED/,
+    );
   });
 
   it("returns decrypted token + teamId when active row exists", async () => {

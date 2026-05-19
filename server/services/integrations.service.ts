@@ -48,6 +48,9 @@ export async function getActiveVercelConnection(
     where: { workspaceId, provider: "vercel", isActive: true },
   });
   if (!row) return null;
+  if (!row.config || typeof row.config !== "object" || Array.isArray(row.config)) {
+    throw new Error("VERCEL_CONFIG_MALFORMED");
+  }
   const config = row.config as Record<string, unknown>;
   const encryptedToken = config.encryptedToken;
   if (typeof encryptedToken !== "string") {
