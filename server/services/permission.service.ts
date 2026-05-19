@@ -68,3 +68,24 @@ export async function checkSiteRole(
     throw new PermissionError("FORBIDDEN", "Insufficient permissions");
   }
 }
+
+export async function checkWorkspaceRole(
+  db: PrismaClient,
+  userId: string,
+  workspaceId: string,
+  minRole: Exclude<UserRoleType, "VIEWER">,
+  bearer?: BearerScope | null,
+): Promise<void> {
+  if (bearer && bearer.workspaceId !== workspaceId) {
+    throw new PermissionError("FORBIDDEN", "Token is not scoped to this workspace.");
+  }
+  const member = await db.workspaceMember.findFirst({
+    where: { userId, workspaceId, status: "ACTIVE" },
+    select: { role: true },
+  });
+  if (!member) throw new PermissionError("FORBIDDEN");
+  const role = member.role as UserRoleType;
+  if ((ROLE_RANK[role] ?? -1) < ROLE_RANK[minRole]) {
+    throw new PermissionError("FORBIDDEN", "Insufficient permissions");
+  }
+}

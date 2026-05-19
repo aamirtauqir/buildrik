@@ -734,16 +734,3 @@ export async function userCanEditSite(
   return !!site;
 }
 
-export async function checkWorkspaceRole(
-  userId: string,
-  workspaceId: string,
-  minRole: "ADMIN" | "OWNER",
-): Promise<void> {
-  const member = await prisma.workspaceMember.findFirst({
-    where: { userId, workspaceId },
-    select: { role: true },
-  });
-  if (!member) throw new Error("FORBIDDEN");
-  const allowed = minRole === "OWNER" ? ["OWNER"] : ["OWNER", "ADMIN"];
-  if (!allowed.includes(member.role)) throw new Error("FORBIDDEN");
-}
