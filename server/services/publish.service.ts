@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import type { PrePublishChecksResult, PublishPage } from "@buildrik/shared/schemas/publish";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
+import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
+import {
+  createVercelDeployment,
+  waitForDeploymentReady,
+  VercelApiError,
+  type VercelFile,
+} from "@/lib/vercel";
 
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
   const [pageCount, site, domain, emptyPages] = await Promise.all([
@@ -162,4 +169,50 @@ export async function unpublishSite(siteId: string) {
     where: { id: siteId },
     data: { status: "DRAFT", publishedUrl: null },
   });
+}
+
+/**
+ * Run a real Vercel deployment for the workspace's active OAuth connection.
+ * Returns null when there's no active connection in development mode
+ * (caller falls through to runSimulation). Throws VERCEL_NOT_CONNECTED
+ * in production. Throws VERCEL_TOKEN_INVALID on 401 (also marks
+ * integration inactive).
+ */
+export async function runVercelDeploy(
+  workspaceId: string,
+  siteId: string,
+  jobId: string,
+  files: VercelFile[],
+): Promise<{ url: string; deploymentId: string } | null> {
+  const conn = await getActiveVercelConnection(workspaceId);
+  if (!conn) {
+    if (process.env.NODE_ENV === "development") return null;
+    throw new Error("VERCEL_NOT_CONNECTED");
+  }
+
+  const projectName = `buildrik-site-${siteId}`;
+
+  try {
+    const dep = await createVercelDeployment({
+      token: conn.token,
+      teamId: conn.teamId,
+      projectName,
+      files,
+    });
+    const ready = await waitForDeploymentReady({
+      token: conn.token,
+      teamId: conn.teamId,
+      deploymentId: dep.id,
+    });
+    if (ready.readyState !== "READY") {
+      throw new Error(`VERCEL_DEPLOY_${ready.readyState}`);
+    }
+    return { url: `https://${ready.url}`, deploymentId: ready.id };
+  } catch (err) {
+    if (err instanceof VercelApiError && err.status === 401) {
+      await markInactive(conn.id);
+      throw new Error("VERCEL_TOKEN_INVALID");
+    }
+    throw err;
+  }
 }

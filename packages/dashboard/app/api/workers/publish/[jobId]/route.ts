@@ -1,15 +1,9 @@
 import { type NextRequest } from "next/server";
 import { prisma } from "@lib/prisma";
-import {
-  isVercelConfigured,
-  createVercelDeployment,
-  waitForDeploymentReady,
-  slugifyProjectName,
-  VercelApiError,
-  type VercelFile,
-} from "@lib/vercel";
+import { isVercelConfigured, type VercelFile } from "@lib/vercel";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
+import { runVercelDeploy } from "@server/services/publish.service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -80,7 +74,7 @@ export async function POST(
     });
 
     const publicUrl = useVercel
-      ? await runVercelDeploy(jobId, job.siteId, pages)
+      ? await runVercelDeployJob(jobId, job.siteId, job.workspaceId, pages)
       : await runSimulation(jobId, job.siteId);
 
     await prisma.$transaction([
@@ -182,12 +176,14 @@ async function setStep(jobId: string, stepIndex: number): Promise<void> {
 }
 
 /**
- * Real Vercel deployment path.
+ * Real Vercel deployment path. Orchestrates steps/progress tracking,
+ * delegates actual Vercel HTTP work to runVercelDeploy in publish.service.
  * Returns the public URL on success. Throws on failure.
  */
-async function runVercelDeploy(
+async function runVercelDeployJob(
   jobId: string,
   siteId: string,
+  workspaceId: string,
   pages: PublishPage[],
 ): Promise<string> {
   const site = await prisma.site.findUnique({
@@ -196,11 +192,6 @@ async function runVercelDeploy(
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
 
-  const token = process.env.VERCEL_TOKEN;
-  if (!token) throw new Error("VERCEL_TOKEN missing");
-  const teamId = process.env.VERCEL_TEAM_ID ?? null;
-
-  const projectName = slugifyProjectName(site.slug);
   const files: VercelFile[] = pages.map((p) => ({ file: p.path, data: p.html }));
 
   // Step 0 — Generating pages: editor already rendered HTML; just mark done.
@@ -211,31 +202,21 @@ async function runVercelDeploy(
   await checkCancelled(jobId);
   await setStep(jobId, 1);
 
-  // Step 2 — Deploying to CDN: actual Vercel API call.
+  // Step 2 — Deploying to CDN: delegate to service (handles OAuth connection gating).
   await checkCancelled(jobId);
-  let deployment;
-  try {
-    deployment = await createVercelDeployment({ token, teamId, projectName, files });
-  } catch (e) {
-    if (e instanceof VercelApiError) {
-      throw new Error(`Vercel ${e.status} ${e.code}: ${e.message}`);
-    }
-    throw e;
+  const result = await runVercelDeploy(workspaceId, siteId, jobId, files);
+  if (result === null) {
+    // dev mode + no workspace connection → fall through to simulation
+    return runSimulation(jobId, siteId);
   }
   await prisma.publishBuildJob.update({
     where: { id: jobId },
-    data: { deploymentId: deployment.id },
+    data: { deploymentId: result.deploymentId },
   });
   await setStep(jobId, 2);
 
-  // Step 3 — Verifying SSL: poll Vercel until READY (or ERROR/CANCELED).
+  // Step 3 — Verifying SSL: deployment already polled to READY by service.
   await checkCancelled(jobId);
-  const status = await waitForDeploymentReady({ token, teamId, deploymentId: deployment.id });
-  if (status.readyState !== "READY") {
-    throw new Error(
-      `Vercel deployment ${status.readyState}${status.errorMessage ? `: ${status.errorMessage}` : ""}`,
-    );
-  }
   await setStep(jobId, 3);
 
   // Step 4 — Performance check: skipped in MVP (Lighthouse comes later).
@@ -246,7 +227,7 @@ async function runVercelDeploy(
     where: { siteId, status: "VERIFIED", isPrimary: true },
     select: { domain: true },
   });
-  return domain?.domain ? `https://${domain.domain}` : `https://${status.url}`;
+  return domain?.domain ? `https://${domain.domain}` : result.url;
 }
 
 /**
