@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
 
 const ORIGINAL_KEY = process.env.ENCRYPTION_KEY;
 const ORIGINAL_CLIENT = process.env.VERCEL_CLIENT_ID;
@@ -27,17 +27,15 @@ import {
 } from "@server/services/vercel-oauth.service";
 
 describe("buildAuthUrl", () => {
-  it("includes integration slug, state, redirect_uri", () => {
-    const url = buildAuthUrl("ws_1", "u_1", "http://localhost:3000");
+  it("includes integration slug + state (callback URL is fixed at Vercel app registration)", () => {
+    const url = buildAuthUrl("ws_1", "u_1");
     expect(url).toContain("vercel.com/integrations/buildrik/new");
     expect(url).toContain("state=");
-    // Vercel integration install URL embeds state via query param
   });
 
   it("throws if VERCEL_INTEGRATION_ID is missing", () => {
     delete process.env.VERCEL_INTEGRATION_ID;
-    expect(() => buildAuthUrl("ws_1", "u_1", "http://localhost:3000"))
-      .toThrow(/VERCEL_INTEGRATION_ID/);
+    expect(() => buildAuthUrl("ws_1", "u_1")).toThrow(/VERCEL_INTEGRATION_ID/);
   });
 });
 

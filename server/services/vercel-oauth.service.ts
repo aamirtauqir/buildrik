@@ -63,11 +63,12 @@ export function verifyState(token: string): { workspaceId: string; userId: strin
   return { workspaceId: payload.workspaceId, userId: payload.userId };
 }
 
-export function buildAuthUrl(workspaceId: string, userId: string, appUrl: string): string {
+export function buildAuthUrl(workspaceId: string, userId: string): string {
   const integrationId = process.env.VERCEL_INTEGRATION_ID;
   if (!integrationId) throw new Error("VERCEL_INTEGRATION_ID env var is not set");
   const state = buildStateToken(workspaceId, userId);
-  // Vercel integration install URL format
+  // Vercel install URL takes only state + optional next; callback URL is
+  // configured at integration-registration time (vercel.com/integrations/console).
   const params = new URLSearchParams({ state });
   return `https://vercel.com/integrations/${integrationId}/new?${params}`;
 }
