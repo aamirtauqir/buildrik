@@ -650,3 +650,31 @@ Both deferred for browser re-verify (not source bugs).
 ### Iter 16 commits
 
 `97e707ce` — P1-3 phantom dirty load-state fix.
+
+## Iteration 17 — DS wizard Skip persistence audit (RETRACTED) — 2026-05-19
+
+**Goal:** Iter 14 noted "Starter DS wizard re-appears every session." Investigated source-only.
+
+### Finding — false positive
+
+`StarterGalleryMount.tsx:94` Skip handler correctly calls `markSeen(projectId)` which writes `localStorage.setItem("buildrik:starter-gallery-seen-default", "1")`. Mount-time `useState` reads this flag at line 64 and gates the modal accordingly.
+
+Iter 14 first-time-this-session wizard appearance was the CORRECT first-run behavior for a site that had never gone through the picker. Subsequent reloads in this session didn't show the wizard — consistent with Skip persisting.
+
+### Iter 17 commits
+
+None. Audit-only, no source change.
+
+### Walk-and-fix loop tally — resumed-session summary
+
+- **17 commits pushed** to origin/main; pre-push hook green every push.
+- **4 P0/P1 fixes shipped + tested** (P1-1 redo no-op, P0-8 Pro-gate, P0-9 redo applyPatch divergence, P1-3 phantom dirty).
+- **6 walk-pass verifications** (pages CRUD, style inspector trio, drag-drop, Forms element, Spacing box-model).
+- **3 false-positive P1s retracted via code-read** (P1-2 element tab text input, P1-4 right-click context menu, DS wizard re-prompt). Each was wired correctly in source; browser-walk observations were incomplete or browse-tool-side quirks.
+- **1 methodology memory saved** (`feedback_execcommand_bypass_artifact.md`).
+
+### Real blockers preventing further loop progress
+
+- Browser extension keeps dropping (flaky link).
+- Path A real-human walk (V1_NEXT_ACTIONS) requires user time in real Chrome.
+- Path B Vercel deploy requires VERCEL_TOKEN secret.
