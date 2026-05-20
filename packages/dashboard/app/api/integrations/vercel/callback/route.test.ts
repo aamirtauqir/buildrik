@@ -67,7 +67,7 @@ describe("GET /api/integrations/vercel/callback", () => {
     const setCookie = res.headers.get("Set-Cookie") ?? "";
     expect(setCookie).toContain("buildrik_vercel_pending=");
     expect(setCookie).toContain("HttpOnly");
-    expect(setCookie.toLowerCase()).toContain("samesite=strict");
+    expect(setCookie.toLowerCase()).toContain("samesite=lax");
   });
 
   it("when Vercel returned team_id, skips listTeams but still routes through team-picker", async () => {

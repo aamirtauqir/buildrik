@@ -78,7 +78,11 @@ export async function GET(req: Request): Promise<Response> {
   res.cookies.set(PENDING_COOKIE, encrypted, {
     httpOnly: true,
     secure: url.protocol === "https:",
-    sameSite: "strict",
+    // Lax (NOT Strict) — Strict blocks the cookie when the request chain
+    // originated from vercel.com (cross-site), even though the callback →
+    // team-picker hop is technically same-site. OAuth callback flows must
+    // be Lax to survive the cross-origin entry point.
+    sameSite: "lax",
     maxAge: PENDING_TTL_SECONDS,
     path: "/",
   });
