@@ -87,3 +87,21 @@ export async function fetchPublishStatus(jobId: string): Promise<PublishStatus> 
 export async function cancelPublish(jobId: string): Promise<void> {
   await getClient().sites.cancelPublish.mutate({ jobId });
 }
+
+/**
+ * Read whether a site has been previously published. Used by editor mount
+ * to hydrate the Topbar's "Published" state so a returning user sees the
+ * correct status without having to re-publish.
+ */
+export async function fetchSitePublishState(
+  siteId: string,
+): Promise<{ isPublished: boolean; publishedUrl: string | null }> {
+  const site = (await getClient().sites.get.query({ id: siteId })) as {
+    status?: string | null;
+    publishedUrl?: string | null;
+  };
+  return {
+    isPublished: site.status === "PUBLISHED" && !!site.publishedUrl,
+    publishedUrl: site.publishedUrl ?? null,
+  };
+}

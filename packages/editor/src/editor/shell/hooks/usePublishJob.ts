@@ -13,9 +13,11 @@ import {
   publishSite,
   fetchPublishStatus,
   cancelPublish as cancelPublishCall,
+  fetchSitePublishState,
   type PublishPagePayload,
   type PublishStatus,
 } from "@/services/PublishService";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 
 const POLL_INTERVAL_MS = 2000;
 const TERMINAL = new Set(["COMPLETED", "FAILED", "CANCELLED"]);
@@ -42,6 +44,10 @@ export function usePublishJob(): UsePublishJobResult {
   const [jobId, setJobId] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<PublishStatus | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  // Server-hydrated state separate from in-session job state so a returning
+  // user sees the correct "Published" Topbar without poisoning the publish()
+  // re-entrancy guard (which keys on jobId).
+  const [hydratedUrl, setHydratedUrl] = React.useState<string | null>(null);
   const pollTimer = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const abortRef = React.useRef(false);
 
@@ -124,21 +130,44 @@ export function usePublishJob(): UsePublishJobResult {
     };
   }, [stopPolling]);
 
-  const uiState: PublishUiState = !jobId
-    ? "idle"
-    : status?.status === "COMPLETED"
+  // Hydrate Topbar state from server on mount. Without this, every editor
+  // reload of a previously published site shows "Publish" (draft) until the
+  // user republishes — misleading because the site IS live.
+  React.useEffect(() => {
+    const siteId = getSiteIdFromUrl();
+    if (!siteId) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const state = await fetchSitePublishState(siteId);
+        if (cancelled) return;
+        if (state.isPublished) setHydratedUrl(state.publishedUrl);
+      } catch {
+        // Hydration is best-effort — failures fall back to draft UI.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const uiState: PublishUiState = jobId
+    ? status?.status === "COMPLETED"
       ? "published"
       : status?.status === "FAILED"
         ? "failed"
         : status?.status === "CANCELLED"
           ? "cancelled"
-          : "publishing";
+          : "publishing"
+    : hydratedUrl
+      ? "published"
+      : "idle";
 
   return {
     uiState,
     jobId,
     progress: status?.progress ?? 0,
-    publishedUrl: status?.publishedUrl ?? null,
+    publishedUrl: status?.publishedUrl ?? hydratedUrl,
     error,
     publish,
     cancel,

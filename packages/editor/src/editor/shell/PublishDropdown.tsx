@@ -101,6 +101,7 @@ const STATE_OPTIONS: Record<PublishState, DropdownOption[]> = {
     { label: "View Live Site", external: true },
   ],
   published: [
+    { label: "Publish Update", sublabel: "Deploy latest edits — replaces the live site" },
     { label: "Submit for Review", sublabel: "Live site stays live during review" },
     { label: "Unpublish", danger: true },
     { label: "View Live Site", external: true },
@@ -173,7 +174,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
       if (opt.label === "Copy Published URL") {
         return { ...opt, onClick: handleCopyUrl, disabled: !publishedUrl };
       }
-      if (opt.label === "Publish Now" || opt.label === "Publish Directly") {
+      if (opt.label === "Publish Now" || opt.label === "Publish Directly" || opt.label === "Publish Update") {
         return { ...opt, onClick: handlePublishNow };
       }
       return opt;
