@@ -1,6 +1,6 @@
 import { type NextRequest } from "next/server";
 import { prisma } from "@lib/prisma";
-import { isVercelConfigured, slugifyProjectName, type VercelFile } from "@lib/vercel";
+import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { runVercelDeploy } from "@server/services/publish.service";
@@ -50,11 +50,14 @@ export async function POST(
   const payload = (job.log ?? null) as { pages?: PublishPage[] } | null;
   const pages = payload?.pages ?? [];
 
-  // Vercel path now requires only a pages payload — the workspace OAuth
-  // connection check moved into runVercelDeploy (publish.service). Legacy
-  // env-token kept as dev fallback through isVercelConfigured() probe so
-  // dashboards that haven't set up OAuth yet still publish in dev.
-  const useVercel = pages.length > 0 && (isVercelConfigured() || process.env.NODE_ENV !== "development");
+  // Vercel path requires only a pages payload — the workspace OAuth
+  // connection check lives inside runVercelDeploy (publish.service), which
+  // returns null in dev when neither workspace OAuth nor env token is
+  // available, letting runVercelDeployJob fall through to runSimulation.
+  // Earlier gate also required isVercelConfigured() (env-only VERCEL_TOKEN
+  // probe) which blocked dev workspaces that connected via OAuth from ever
+  // reaching the real path.
+  const useVercel = pages.length > 0;
 
   // Single log line — primary debug signal for Phase 1d ("did real Vercel
   // path fire or did we fall through to sim?"). See editor CLAUDE.md
