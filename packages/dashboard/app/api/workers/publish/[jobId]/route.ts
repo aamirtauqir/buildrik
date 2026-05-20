@@ -129,10 +129,26 @@ export async function POST(
       where: { id: jobId },
       data: { status: "FAILED", error: message, steps: buildSteps(0, true) },
     });
-    await prisma.site.update({
+    // Preserve PUBLISHED status on republish failure — the live deployment
+    // from a prior successful publish is still serving. Discriminator is
+    // publishedUrl presence (not site.status, which is "PUBLISHING" during
+    // the in-flight attempt). Only demote to DRAFT when the very first
+    // publish failed (site never had a live URL).
+    const currentSite = await prisma.site.findUnique({
       where: { id: job.siteId },
-      data: { status: "DRAFT", lastPublishError: message },
+      select: { publishedUrl: true },
     });
+    if (!currentSite?.publishedUrl) {
+      await prisma.site.update({
+        where: { id: job.siteId },
+        data: { status: "DRAFT", lastPublishError: message },
+      });
+    } else {
+      await prisma.site.update({
+        where: { id: job.siteId },
+        data: { status: "PUBLISHED", lastPublishError: message },
+      });
+    }
 
     const failedSite = await prisma.site.findUnique({
       where: { id: job.siteId },

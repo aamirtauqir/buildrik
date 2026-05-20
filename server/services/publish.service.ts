@@ -209,7 +209,15 @@ export async function runVercelDeploy(
     }
     return { url: `https://${ready.url}`, deploymentId: ready.id };
   } catch (err) {
-    if (err instanceof VercelApiError && err.status === 401) {
+    // Vercel returns 401 for expired/invalid bearer tokens AND 403 when
+    // the OAuth integration was uninstalled from the Vercel side (token
+    // technically valid but no longer authorized for the team's resources).
+    // Both paths must surface as VERCEL_TOKEN_INVALID so the editor toast
+    // prompts a reconnect rather than showing a generic error.
+    if (
+      err instanceof VercelApiError &&
+      (err.status === 401 || err.status === 403)
+    ) {
       await markInactive(conn.id);
       throw new Error("VERCEL_TOKEN_INVALID");
     }
