@@ -123,25 +123,43 @@ export const vercelIntegrationsRouter = router({
       const row = await prisma.workspaceIntegration.findFirst({
         where: { workspaceId: input.workspaceId, provider: "vercel" },
       });
-      if (!row) return { success: true };
+      if (!row) return { success: true, vercelStillInstalled: false };
 
       const config = row.config as Record<string, unknown>;
       const configurationId = typeof config.configurationId === "string" ? config.configurationId : null;
 
+      // Track whether Vercel-side configuration was actually revoked so the
+      // UI can hint the user to finish removal at vercel.com when needed.
+      // OAuth-issued tokens do NOT have permission to delete integration
+      // configurations (Vercel returns 403 forbidden), so most disconnects
+      // will leave the configuration installed on Vercel's side. The local
+      // DB row is always deleted regardless.
+      let vercelStillInstalled = false;
       if (configurationId) {
         try {
           const token = decrypt(
             typeof config.encryptedToken === "string" ? config.encryptedToken : "",
           );
-          await fetch(
-            `https://api.vercel.com/v1/integrations/configuration/${configurationId}`,
+          const teamId = typeof config.teamId === "string" ? config.teamId : null;
+          const teamQs = teamId ? `?teamId=${encodeURIComponent(teamId)}` : "";
+          const res = await fetch(
+            `https://api.vercel.com/v1/integrations/configuration/${configurationId}${teamQs}`,
             {
               method: "DELETE",
               headers: { Authorization: `Bearer ${token}` },
             },
           );
+          if (!res.ok && res.status !== 404) {
+            // 404 = already removed on Vercel side, fine. Anything else
+            // (typically 403 for OAuth-scoped tokens) means orphan install.
+            vercelStillInstalled = true;
+            const body = await res.text().catch(() => "");
+            console.warn(
+              `[vercel] disconnect DELETE returned ${res.status}: ${body.slice(0, 200)}`,
+            );
+          }
         } catch (err) {
-          // best-effort; proceed with local delete regardless
+          vercelStillInstalled = true;
           console.warn("[vercel] disconnect revoke failed:", err);
         }
       }
@@ -157,6 +175,6 @@ export const vercelIntegrationsRouter = router({
         },
       });
 
-      return { success: true };
+      return { success: true, vercelStillInstalled };
     }),
 });

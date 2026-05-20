@@ -6,12 +6,27 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { IntegrationsTab } from "@/components/settings/integrations-tab";
 
 function VercelIntegrationSection({ workspaceId }: { workspaceId: string }) {
+  const { addToast } = useToast();
   const conn = trpc.integrations.vercel.getConnection.useQuery(
     { workspaceId },
     { enabled: !!workspaceId },
   );
   const disconnect = trpc.integrations.vercel.disconnect.useMutation({
-    onSuccess: () => { conn.refetch(); },
+    onSuccess: (data) => {
+      conn.refetch();
+      if (data.vercelStillInstalled) {
+        // OAuth tokens can't revoke the Vercel-side install (Vercel returns
+        // 403). Local connection is gone but the integration remains visible
+        // at vercel.com — guide the user to finish revocation there.
+        addToast(
+          "info",
+          "Disconnected from this workspace",
+          "Buildrik can no longer publish from here. To fully revoke access, open Vercel → Integrations → Buildrik → Remove.",
+        );
+      } else {
+        addToast("success", "Vercel disconnected");
+      }
+    },
   });
   const search = useSearchParams();
   const oauthError = search.get("error");
