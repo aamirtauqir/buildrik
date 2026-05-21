@@ -69,7 +69,6 @@ export interface UseBuildTabReturn {
   searchQuery: string;
   tipDismissed: boolean;
   tipsCollapsed: boolean;
-  myCompOpen: boolean;
   favOpen: boolean;
   searchResults: SearchGroup[];
   allElements: FlatElEntry[];
@@ -79,7 +78,6 @@ export interface UseBuildTabReturn {
   setSearchQuery: (q: string) => void;
   toggleFav: ToggleFavFn;
   toggleCat: (catId: string) => void;
-  setMyCompOpen: (open: boolean) => void;
   setFavOpen: (open: boolean) => void;
   clearFavs: () => void;
   restoreFavs: (snapshot: Set<string>) => void;
@@ -128,7 +126,6 @@ export function useBuildTab(
   const [tipsCollapsed, setTipsCollapsed] = React.useState<boolean>(() =>
     ls.getBool(STORAGE_KEYS.BUILD_TIPS_COLLAPSED)
   );
-  const [myCompOpen, setMyCompOpen] = React.useState(false);
   const [favOpen, setFavOpen] = React.useState(false);
   const [tipIdx, setTipIdx] = React.useState(0);
 
@@ -266,7 +263,6 @@ export function useBuildTab(
     searchQuery,
     tipDismissed,
     tipsCollapsed,
-    myCompOpen,
     favOpen,
     tipIdx,
     searchResults,
@@ -275,7 +271,6 @@ export function useBuildTab(
     setSearchQuery,
     toggleFav,
     toggleCat,
-    setMyCompOpen,
     setFavOpen,
     clearFavs,
     restoreFavs,

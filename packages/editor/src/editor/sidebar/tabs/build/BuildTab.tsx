@@ -22,7 +22,6 @@ import { useCallout } from "./hooks/useCallout";
 import { TipsFooter } from "./components/TipsFooter";
 import { CatAccordion } from "./components/CatAccordion";
 import { SearchResults } from "./components/SearchResults";
-import { MyComponents } from "./components/MyComponents";
 import { TransitionCallout } from "./components/TransitionCallout";
 import "./BuildTab.css";
 
@@ -99,12 +98,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) =>
         ) : (
           <div className="bld-scroll">
             {callout.visible && <TransitionCallout />}
-
-            <MyComponents
-              open={tab.myCompOpen}
-              onToggle={() => tab.setMyCompOpen(!tab.myCompOpen)}
-              composer={composer}
-            />
 
             <div className="bld-cats">
               {CATALOG.map((cat) => (
