@@ -158,6 +158,11 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
 
   return (
     <Screen>
+      <div role="alert" style={enforcementBannerStyles}>
+        <strong>Not yet enforced.</strong> Values save to your site config but
+        are not applied to HTTP responses until the published-site middleware
+        ships. Treat this screen as storage-only for now.
+      </div>
       <Section
         title="Content Security Policy"
         desc="Restricts which scripts, styles, images, and other resources can load on your site. Wrong values can break the site — leave empty to use the platform default."
@@ -263,11 +268,6 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
       </Section>
 
       <Section title="">
-        <div style={enforcementNoteStyles}>
-          <strong>Note:</strong> headers persist now but are enforced once Phase D
-          ships the published-site middleware. Until then, these values are stored
-          on your site config but not yet applied to HTTP responses.
-        </div>
         {saveError && (
           <div role="alert" style={errorStyles}>{saveError}</div>
         )}
@@ -305,14 +305,14 @@ const errorStyles: React.CSSProperties = {
   borderRadius: 6,
 };
 
-const enforcementNoteStyles: React.CSSProperties = {
-  marginTop: 8,
-  marginBottom: 8,
-  padding: "10px 12px",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-fg-secondary)",
-  background: "var(--bd-bg-sub)",
-  border: "1px dashed var(--bd-border-default)",
+const enforcementBannerStyles: React.CSSProperties = {
+  marginBottom: 16,
+  padding: "12px 14px",
+  font: "500 12px var(--bd-font)",
+  color: "var(--bd-fg-default)",
+  background: "var(--bd-warning-tint)",
+  border: "1px solid var(--bd-warning-border)",
+  borderLeft: "3px solid var(--bd-warning)",
   borderRadius: 6,
   lineHeight: 1.5,
 };
