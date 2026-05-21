@@ -122,19 +122,75 @@ export function useEditorEventListeners({
 
   // 3b) UI_PANEL_OPEN → open the requested left-panel tab (and optional sub-screen).
   // Emitters: command palette navigation, SmartSuggestions, canvas cmd palette.
-  // Before this listener, all those emits routed to nowhere.
+  // Allowlist on panel id — SmartSuggestions historically emitted inspector
+  // subpanel ids (layout/style/typography/size) here, which opened a blank
+  // drawer because none are real left tabs. Unknown ids no-op.
+  const VALID_LEFT_TABS = React.useMemo(
+    () => new Set([
+      "home", "add", "design", "templates", "pages", "build",
+      "media", "assets", "settings", "history", "layers",
+    ]),
+    [],
+  );
   const { openLeftPanelToTab } = state;
   React.useEffect(() => {
     if (!composer) return;
     const handle = (event: { panel: string; screen?: string }) => {
       if (!event?.panel) return;
+      if (!VALID_LEFT_TABS.has(event.panel)) return;
       openLeftPanelToTab(event.panel, event.screen);
     };
     composer.on(EVENTS.UI_PANEL_OPEN, handle);
     return () => {
       composer.off(EVENTS.UI_PANEL_OPEN, handle);
     };
-  }, [composer, openLeftPanelToTab]);
+  }, [composer, openLeftPanelToTab, VALID_LEFT_TABS]);
+
+  // 3c) UI_TOGGLE_LAYERS → switch to layers tab + open drawer.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = () => {
+      setLeftPanelTab("layers");
+      setIsLeftPanelOpen(true);
+    };
+    composer.on(EVENTS.UI_TOGGLE_LAYERS, handle);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_LAYERS, handle);
+    };
+  }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
+
+  // 3d) UI_TOGGLE_PREVIEW → flip composer preview mode.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = () => {
+      composer.setPreviewMode(!composer.isPreviewMode());
+    };
+    composer.on(EVENTS.UI_TOGGLE_PREVIEW, handle);
+    return () => {
+      composer.off(EVENTS.UI_TOGGLE_PREVIEW, handle);
+    };
+  }, [composer]);
+
+  // 3e) ELEMENT_QUICK_ADD → create + insert an element via the engine API.
+  // Emitters: SmartSuggestions empty-container actions + canvas command palette.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = (event: { parentId?: string; type?: string }) => {
+      const type = (event?.type ?? "container") as Parameters<typeof composer.elements.createElement>[0];
+      const created = composer.elements.createElement(type);
+      const parentId =
+        event?.parentId ??
+        composer.selection.getSelectedIds()[0] ??
+        composer.elements.getActivePage()?.root?.id;
+      if (!parentId) return;
+      const added = composer.elements.addElement(created, parentId);
+      if (added) composer.selection.select(created);
+    };
+    composer.on(EVENTS.ELEMENT_QUICK_ADD, handle);
+    return () => {
+      composer.off(EVENTS.ELEMENT_QUICK_ADD, handle);
+    };
+  }, [composer]);
 
   // 4) Overlay defaults init.
   const { setShowSpacingIndicators, setShowBadges, setShowGuides, setShowGrid } = state;

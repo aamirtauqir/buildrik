@@ -87,7 +87,9 @@ function getContainerSuggestions(
     ];
   }
 
-  // Container with children
+  // Container with children — quick-add is the only meaningful action here.
+  // Layout/Style controls live in the inspector which is already visible on
+  // selection.
   return [
     {
       id: "add-child",
@@ -95,94 +97,28 @@ function getContainerSuggestions(
       icon: "+",
       action: () => composer.emit(EVENTS.ELEMENT_QUICK_ADD, { parentId: elementId }),
     },
-    {
-      id: "layout",
-      label: "Layout",
-      icon: "⬚",
-      action: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "layout", elementId }),
-    },
-    {
-      id: "style",
-      label: "Style",
-      icon: "🎨",
-      action: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "style", elementId }),
-    },
   ];
 }
 
-function getTextSuggestions(composer: Composer, element: Element): Suggestion[] {
-  const elementId = element.getId();
-
-  return [
-    {
-      id: "edit-text",
-      label: "Edit",
-      icon: "✏",
-      action: () => composer.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId }),
-    },
-    {
-      id: "add-link",
-      label: "Add link",
-      icon: "🔗",
-      action: () => composer.emit(EVENTS.ELEMENT_ADD_LINK, { elementId }),
-    },
-    {
-      id: "typography",
-      label: "Typography",
-      icon: "Aa",
-      action: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "typography", elementId }),
-    },
-  ];
+function getTextSuggestions(_composer: Composer, _element: Element): Suggestion[] {
+  // Text-specific quick actions (inline-edit, add-link) require modal
+  // infrastructure that doesn't exist yet — they were emitting dead events.
+  // Inspector opens automatically on selection so users can still reach
+  // typography/link controls there.
+  return [];
 }
 
-function getImageSuggestions(composer: Composer, element: Element): Suggestion[] {
-  const elementId = element.getId();
-
-  return [
-    {
-      id: "change-image",
-      label: "Change",
-      icon: "🖼",
-      action: () => composer.emit(EVENTS.ELEMENT_CHANGE_IMAGE, { elementId }),
-    },
-    {
-      id: "add-alt",
-      label: "Alt text",
-      icon: "📝",
-      action: () => composer.emit(EVENTS.ELEMENT_EDIT_ALT, { elementId }),
-    },
-    {
-      id: "resize",
-      label: "Resize",
-      icon: "↔",
-      action: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "size", elementId }),
-    },
-  ];
+function getImageSuggestions(_composer: Composer, _element: Element): Suggestion[] {
+  // Image-specific quick actions (change-image, edit-alt) require media-picker
+  // and alt-text modals that aren't wired. Inspector handles both via the
+  // standard image-properties panel on selection.
+  return [];
 }
 
-function getButtonSuggestions(composer: Composer, element: Element): Suggestion[] {
-  const elementId = element.getId();
-
-  return [
-    {
-      id: "edit-text",
-      label: "Edit text",
-      icon: "✏",
-      action: () => composer.emit(EVENTS.ELEMENT_EDIT_INLINE, { elementId }),
-    },
-    {
-      id: "add-link",
-      label: "Link",
-      icon: "🔗",
-      action: () => composer.emit(EVENTS.ELEMENT_ADD_LINK, { elementId }),
-    },
-    {
-      id: "style",
-      label: "Style",
-      icon: "🎨",
-      action: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "style", elementId }),
-    },
-  ];
+function getButtonSuggestions(_composer: Composer, _element: Element): Suggestion[] {
+  // Button-specific quick actions (edit-text, add-link) need the same inline
+  // editor + link modal as text suggestions. Inspector exposes both fields.
+  return [];
 }
 
 function getDefaultSuggestions(composer: Composer, element: Element): Suggestion[] {
@@ -194,12 +130,6 @@ function getDefaultSuggestions(composer: Composer, element: Element): Suggestion
       label: "Duplicate",
       icon: "⧉",
       action: () => composer.elements.duplicateElement(elementId),
-    },
-    {
-      id: "style",
-      label: "Style",
-      icon: "🎨",
-      action: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "style", elementId }),
     },
     {
       id: "delete",
