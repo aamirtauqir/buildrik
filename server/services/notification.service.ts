@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import type { ListNotificationsInput } from "@buildrik/shared/schemas/notifications";
+import { MENTION_NOTIFICATION_TYPES, type ListNotificationsInput } from "@buildrik/shared/schemas/notifications";
 
 export async function listNotifications(userId: string, input: ListNotificationsInput) {
   const { page = 1, perPage = 20, filter = "all" } = input;
 
   const where: Record<string, unknown> = { userId };
   if (filter === "unread") where.read = false;
-  if (filter === "mentions") where.type = "mention";
+  if (filter === "mentions") where.type = { in: [...MENTION_NOTIFICATION_TYPES] };
 
   const [total, data] = await Promise.all([
     prisma.notification.count({ where }),
@@ -49,15 +49,13 @@ export async function getRecentNotifications(userId: string, limit = 5) {
   });
 }
 
-const MENTION_TYPES = ["MEMBER_INVITED", "SITE_TRANSFERRED", "FEEDBACK_RECEIVED"];
-
 export async function listGroupedNotifications(
   userId: string,
   filter: "all" | "unread" | "mentions" = "all"
 ) {
   const where: Record<string, unknown> = { userId };
   if (filter === "unread") where.read = false;
-  if (filter === "mentions") where.type = { in: MENTION_TYPES };
+  if (filter === "mentions") where.type = { in: [...MENTION_NOTIFICATION_TYPES] };
 
   const notifications = await prisma.notification.findMany({
     where,
