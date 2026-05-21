@@ -9,6 +9,7 @@ import * as React from "react";
 import { X, Download, SquareArrowOutUpRight } from "lucide-react";
 import { useEscapeKey } from "../../../../../shared/hooks/useEscapeKey";
 import { SearchBar } from "../../../shared/SearchBar";
+import { IS_STOCK_CONFIGURED } from "../../../../../services/stock/StockService";
 import type {
   DiscoveryViewProps,
   DiscOrientation,
@@ -101,6 +102,28 @@ export function StockSourceModal({
             <X size={18} />
           </Button>
         </div>
+
+        {!IS_STOCK_CONFIGURED && (
+          <div
+            role="alert"
+            data-testid="stock-not-configured"
+            style={{
+              margin: "12px 20px 0",
+              padding: "10px 12px",
+              background: "var(--bd-warning-tint)",
+              border: "1px solid var(--bd-warning-border)",
+              borderLeft: "3px solid var(--bd-warning)",
+              borderRadius: 4,
+              fontSize: 12,
+              lineHeight: 1.5,
+              color: "var(--bd-fg-default)",
+            }}
+          >
+            <strong>Stock providers not configured.</strong> Searches return
+            empty until an Unsplash / Pexels / Pixabay key is wired into the
+            dashboard. Upload your own images via the Library tab.
+          </div>
+        )}
 
         {/* S19 quota strip — hidden when prop absent */}
         {quota && (

@@ -46,6 +46,15 @@ export interface StockService {
 }
 
 /**
+ * Set to true once a real provider (Unsplash / Pexels / Pixabay) is wired
+ * up — either by replacing the stub below or swapping to the dashboard
+ * tRPC `media.searchStock` route. UI consumers should gate "Browse stock"
+ * surfaces on this flag so users see a "not configured" banner instead of
+ * empty results that look like "no matches."
+ */
+export const IS_STOCK_CONFIGURED = false;
+
+/**
  * Empty stub. Returns `[]` for every query. Keeps the UI functional —
  * empty-state messaging is already designed ("No results, try stock search").
  *
