@@ -28,6 +28,7 @@ export const uploadRouter = router({
       return await confirmUpload(input.fileId);
     } catch (e: unknown) {
       if (e instanceof Error && e.message === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Upload not found or expired." });
+      if (e instanceof Error && e.message === "NOT_UPLOADED") throw new TRPCError({ code: "BAD_REQUEST", message: "File was not uploaded before confirm. Call PUT /api/upload/{fileId} with the file body first." });
       throw e;
     }
   }),
