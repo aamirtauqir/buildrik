@@ -1,13 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { submitForm } from "@server/services/form-submission.service";
+import { checkRateLimit } from "@server/services/rate-limiter";
+
+const FORM_SUBMIT_MAX = 10;
+const FORM_SUBMIT_WINDOW_MS = 60_000;
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ siteId: string; formBlockId: string }> }
 ) {
   const { siteId, formBlockId } = await params;
-  const body = await req.json();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+  const limit = checkRateLimit(
+    `form-submit:${siteId}:${formBlockId}:${ip}`,
+    FORM_SUBMIT_MAX,
+    FORM_SUBMIT_WINDOW_MS,
+  );
+  if (!limit.allowed) {
+    const retryAfterSec = Math.max(1, Math.ceil((limit.resetAt - Date.now()) / 1000));
+    return NextResponse.json(
+      { error: "Too many submissions. Please wait before trying again." },
+      { status: 429, headers: { "Retry-After": String(retryAfterSec) } },
+    );
+  }
+
+  const body = await req.json();
 
   try {
     const result = await submitForm(siteId, formBlockId, body, ip);
