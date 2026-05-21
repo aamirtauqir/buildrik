@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import type { PrismaClient } from "@prisma/client";
+
+interface WorkspaceCtx {
+  prisma: PrismaClient;
+  session: { user: { id: string } } | null;
+}
 import {
   getDashboardStats,
   getRecentSites,
@@ -10,7 +16,8 @@ import {
 } from "@/server/services/dashboard.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
-async function getWorkspaceMember(ctx: { prisma: any; session: any }) {
+async function getWorkspaceMember(ctx: WorkspaceCtx) {
+  if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
   const member = await ctx.prisma.workspaceMember.findFirst({
     where: { userId: ctx.session.user.id },
     select: { workspaceId: true, role: true },

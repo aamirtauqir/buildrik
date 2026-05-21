@@ -10,6 +10,8 @@ interface BearerSession {
   apiToken: { workspaceId: string; scopes: Scope[]; tokenId: string };
 }
 
+export type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>;
+
 export const createTRPCContext = async (opts?: { headers?: Headers }) => {
   const session = await auth();
 

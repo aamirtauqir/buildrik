@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import type { PrismaClient } from "@prisma/client";
+
+interface WorkspaceCtx {
+  prisma: PrismaClient;
+  session: { user: { id: string } } | null;
+}
 import {
   getTeamStats, listMembers, inviteMembers, changeRole,
   revokeMember, deleteMember, listPendingInvites, revokeInvite, resendInvite, getTeamActivity,
@@ -8,7 +14,8 @@ import {
 import { inviteMembersSchema, listMembersSchema } from "@buildrik/shared/schemas/team";
 import { type PlanName } from "@/lib/constants/plan-limits";
 
-async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: PlanName }> {
+async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
+  if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
   const member = await ctx.prisma.workspaceMember.findFirst({
     where: { userId: ctx.session.user.id },
     include: { workspace: { select: { plan: true } } },
