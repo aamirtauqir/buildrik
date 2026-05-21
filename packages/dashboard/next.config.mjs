@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ["@prisma/client", "bcryptjs"],
@@ -43,4 +45,12 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// withSentryConfig is safe to call even without DSN — it only activates
+// source-map upload + release tagging when SENTRY_AUTH_TOKEN + SENTRY_ORG
+// + SENTRY_PROJECT are set in Vercel env. Dev builds stay untouched.
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  disableLogger: true,
+});
