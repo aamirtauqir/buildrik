@@ -309,7 +309,7 @@ const enforcementBannerStyles: React.CSSProperties = {
   marginBottom: 16,
   padding: "12px 14px",
   font: "500 12px var(--bd-font)",
-  color: "var(--bd-fg-default)",
+  color: "var(--bd-fg-primary)",
   background: "var(--bd-warning-tint)",
   border: "1px solid var(--bd-warning-border)",
   borderLeft: "3px solid var(--bd-warning)",

@@ -116,7 +116,7 @@ export function StockSourceModal({
               borderRadius: 4,
               fontSize: 12,
               lineHeight: 1.5,
-              color: "var(--bd-fg-default)",
+              color: "var(--bd-fg-primary)",
             }}
           >
             <strong>Stock providers not configured.</strong> Searches return
