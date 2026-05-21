@@ -123,12 +123,17 @@ export function scanTokenAliasSSOT(root) {
   }
   const violations = [];
   for (const [token, locs] of byToken) {
-    if (locs.length > 1) {
+    // Only flag cross-file duplicates. Multiple definitions in the SAME file
+    // are legitimate CSS cascade — e.g., :root sets the default and
+    // [data-theme="dark"] overrides under a layered selector. SSOT is about
+    // "one canonical home" (file), not "one declaration site" (line).
+    const distinctFiles = new Set(locs.map((l) => l.path));
+    if (distinctFiles.size > 1) {
       violations.push({
         path: locs[0].path,
         line: locs[0].line,
         severity: 'important',
-        message: `Token "${token}" defined in ${locs.length} files: ${locs.map((l) => `${l.path}:${l.line}`).join(', ')}`,
+        message: `Token "${token}" defined in ${distinctFiles.size} files: ${locs.map((l) => `${l.path}:${l.line}`).join(', ')}`,
         suggestion: 'Pick canonical alias file; delete duplicate definition.',
       });
     }

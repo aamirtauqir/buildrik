@@ -235,3 +235,24 @@
   --bd-font-size-sm: var(--buildrick-text-sm);
   --bd-font-size-xs: var(--buildrick-text-xs);
 }
+
+/* Scoped dark-mode preview for DS panel ONLY (spec D8 / T10).
+   Editor chrome (Inspector, canvas, topbar) stays light. Merged here from
+   the former ds-panel-dark.css so --bd-* tokens have a single canonical
+   home — SSOT gate sees one definition per token name. */
+@layer overrides {
+  [data-ds-preview="dark"] {
+    --bd-bg-panel: #0F172A;
+    --bd-bg-subtle: #1E293B;
+    --bd-fg-primary: #F8FAFC;
+    --bd-fg-muted: #94A3B8;
+    --bd-fg-secondary: #CBD5E1;
+    --bd-border: #1E293B;
+  }
+  [data-ds-preview="dark"] [data-token-row]:hover {
+    background: #1E293B !important;
+  }
+  [data-ds-preview="dark"] [data-token-row][data-lint-warn="true"] {
+    background: rgba(245, 158, 11, 0.15) !important;
+  }
+}
