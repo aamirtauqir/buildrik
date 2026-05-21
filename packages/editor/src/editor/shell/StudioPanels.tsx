@@ -227,17 +227,21 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       onLeftPanelTabChange?.("add");
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
+    const openTemplates = () => {
+      onLeftPanelTabChange?.("templates");
+      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+    };
     const openDesign = () => {
       onLeftPanelTabChange?.("design");
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
 
     composer.on(EVENTS.UI_OPEN_BUILD_PANEL, openBuild);
-    composer.on(EVENTS.UI_BROWSE_TEMPLATES, openBuild);
+    composer.on(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
     composer.on(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
     return () => {
       composer.off(EVENTS.UI_OPEN_BUILD_PANEL, openBuild);
-      composer.off(EVENTS.UI_BROWSE_TEMPLATES, openBuild);
+      composer.off(EVENTS.UI_BROWSE_TEMPLATES, openTemplates);
       composer.off(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
     };
   }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
