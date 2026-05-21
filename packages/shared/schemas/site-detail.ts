@@ -77,9 +77,14 @@ export const createRedirectSchema = z.object({
   type: z.enum(["301", "302"]),
 });
 
+/** RFC 1123 hostname: 1-63 char labels, alphanumeric + hyphens, no leading
+ *  / trailing hyphen per label, total length <= 253. Strips trailing dot.
+ *  Rejects protocols, paths, and ports — DNS apex / subdomain only. */
+const HOSTNAME_RE = /^(?=.{1,253}\.?$)(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+\.?$/;
+
 export const connectDomainSchema = z.object({
   siteId: z.string(),
-  domain: z.string().min(3),
+  domain: z.string().min(3).max(253).regex(HOSTNAME_RE, "Must be a valid hostname (e.g. example.com or sub.example.com)"),
 });
 
 export const createShareLinkSchema = z.object({

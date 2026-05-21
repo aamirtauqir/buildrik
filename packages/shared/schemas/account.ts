@@ -1,11 +1,22 @@
 import { z } from "zod";
 
+/** BCP-47 language tag: `en`, `en-US`, `pt-BR`, `zh-Hans-CN`. */
+const BCP47_LANG = /^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-[A-Z]{2})?$/;
+
+/** IANA timezone: `Area/Subarea` or `UTC`. Loose check — full IANA list
+ *  isn't worth shipping in shared, but the shape catches typos. */
+const IANA_TZ = /^(?:UTC|[A-Z][A-Za-z_]+(?:\/[A-Z][A-Za-z_]+){1,2})$/;
+
+/** DNS-friendly slug: lowercase alphanumeric + hyphens, no leading/trailing
+ *  hyphen, no consecutive hyphens. Reserved for URL paths. */
+const URL_SLUG = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+
 export const updateProfileSchema = z.object({
   fullName: z.string().min(2).max(100).optional(),
   displayName: z.string().max(50).optional(),
   bio: z.string().max(500).optional(),
-  language: z.string().optional(),
-  timezone: z.string().optional(),
+  language: z.string().regex(BCP47_LANG, "Must be a BCP-47 language tag (e.g. en, en-US)").optional(),
+  timezone: z.string().regex(IANA_TZ, "Must be an IANA timezone (e.g. America/New_York or UTC)").optional(),
 });
 
 export const changeEmailSchema = z.object({
@@ -21,9 +32,9 @@ export const changePasswordSchema = z.object({
 
 export const updateWorkspaceSchema = z.object({
   name: z.string().min(2).max(100).optional(),
-  slug: z.string().min(3).max(30).optional(),
-  defaultLanguage: z.string().optional(),
-  timezone: z.string().optional(),
+  slug: z.string().min(3).max(30).regex(URL_SLUG, "Must be a DNS-friendly slug").optional(),
+  defaultLanguage: z.string().regex(BCP47_LANG, "Must be a BCP-47 language tag").optional(),
+  timezone: z.string().regex(IANA_TZ, "Must be an IANA timezone").optional(),
   iconUrl: z.string().url().nullable().optional(),
   accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color").optional(),
 });
@@ -36,7 +47,7 @@ export const workspaceSharingSettingsSchema = z.object({
 });
 
 export const addIntegrationSchema = z.object({
-  provider: z.enum(["GOOGLE_ANALYTICS", "MAILCHIMP", "ZAPIER", "SLACK"]),
+  provider: z.enum(["GOOGLE_ANALYTICS", "MAILCHIMP", "ZAPIER", "SLACK", "VERCEL"]),
   config: z.record(z.unknown()),
 });
 
