@@ -14,8 +14,8 @@ export async function createShareLink(
   data: { name: string; password?: string; expiresInDays?: number },
   userId?: string
 ) {
-  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
-  if (!site) throw new Error("SITE_NOT_FOUND");
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, deletedAt: true } });
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
   let plan: PlanName;
   if (userId) {
     const member = await prisma.workspaceMember.findFirst({

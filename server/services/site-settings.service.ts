@@ -57,11 +57,12 @@ export async function getSiteSettings(siteId: string) {
       permissionsPolicy: true,
       defaultLocale: true,
       enabledLocales: true,
+      deletedAt: true,
       workspace: { select: { plan: true } },
     },
   });
 
-  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   // P0.3: redact publishedPassword. Client gets a boolean indicator,
   // never the hash. Editor's "password is set" UI works on the boolean.
@@ -109,9 +110,11 @@ export async function updateSiteSettings(
       where: { id: siteId },
       select: {
         slug: true,
+        deletedAt: true,
         workspace: { select: { plan: true } },
       },
     });
+    if (current?.deletedAt) throw new Error("SITE_NOT_FOUND");
 
     if (wantsCustomCode) {
       const plan = current?.workspace?.plan ?? "FREE";

@@ -52,7 +52,7 @@ export async function getPage(pageId: string) {
 
 export async function createPage(input: CreatePageInput) {
   const site = await prisma.site.findUnique({ where: { id: input.siteId } });
-  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   const member = await prisma.workspaceMember.findFirst({
     where: { workspaceId: site.workspaceId },

@@ -28,11 +28,12 @@ export async function submitForm(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { workspaceId: true, name: true },
+    select: { workspaceId: true, name: true, deletedAt: true },
   });
+  if (!site || site.deletedAt) throw new Error("FORM_NOT_FOUND");
 
   const member = await prisma.workspaceMember.findFirst({
-    where: { workspaceId: site!.workspaceId },
+    where: { workspaceId: site.workspaceId },
     select: { workspace: { select: { plan: true } } },
   });
 

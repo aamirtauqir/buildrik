@@ -14,7 +14,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     prisma.page.count({ where: { siteId } }),
     prisma.site.findUnique({
       where: { id: siteId },
-      select: { metaTitleTemplate: true, touchIcon: true },
+      select: { metaTitleTemplate: true, touchIcon: true, deletedAt: true },
     }),
     prisma.domain.findFirst({
       where: { siteId, status: "VERIFIED" },
@@ -81,8 +81,9 @@ export async function startPublish(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { name: true },
+    select: { name: true, deletedAt: true },
   });
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   // Persist HTML payload (if provided) on the job so the worker can deploy
   // without re-fetching from the editor. `log` is an existing Json column.
