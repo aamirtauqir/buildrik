@@ -50,6 +50,12 @@ export function usePublishJob(): UsePublishJobResult {
   const [hydratedUrl, setHydratedUrl] = React.useState<string | null>(null);
   const pollTimer = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const abortRef = React.useRef(false);
+  // Mirror status into a ref so publish()'s re-entrancy guard can read latest
+  // status without rotating useCallback identity per poll tick.
+  const statusRef = React.useRef<PublishStatus | null>(null);
+  React.useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
 
   const stopPolling = React.useCallback(() => {
     if (pollTimer.current) {
@@ -85,7 +91,9 @@ export function usePublishJob(): UsePublishJobResult {
 
   const publish = React.useCallback(
     async (siteId: string, pages: PublishPagePayload[]) => {
-      if (jobId) return;
+      // Block only when a job is still in-flight. After a terminal state
+      // (COMPLETED/FAILED/CANCELLED), allow republish.
+      if (jobId && statusRef.current && !TERMINAL.has(statusRef.current.status)) return;
       setError(null);
       try {
         const { jobId: id } = await publishSite(siteId, pages);
