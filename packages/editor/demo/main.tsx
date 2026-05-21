@@ -8,8 +8,15 @@ import { createRoot } from "react-dom/client";
 import { Agentation } from "agentation";
 import { AquibraStudio } from "../src/editor/shell/AquibraStudio";
 import type { Composer } from "../src/engine/Composer";
+import { initErrorTracking } from "../src/shared/utils/errorTracking";
 // Global styles
 import "../src/themes/default.css";
+
+// Fire-and-forget Sentry init. No-ops when VITE_SENTRY_DSN is absent or
+// @sentry/react isn't installed — safe in dev. captureError() calls inside
+// ErrorBoundary components relied on this running first; previously init
+// was never called and Sentry didn't know the DSN.
+void initErrorTracking();
 // Note: canvas CSS now loaded via src/editor/canvas/Canvas.tsx import (./Canvas.css).
 // Legacy import "../src/components/Canvas/Canvas.css" deleted 2026-05-02 with src/components/.
 
