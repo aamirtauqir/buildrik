@@ -219,8 +219,10 @@ export const TokensSection: React.FC<TokensSectionProps> = ({
   React.useEffect(() => {
     if (!composer) return;
     const onSettingsShift = () => {
-      const next = (composer.getProjectSettings()?.designTokens ?? []) as Parameters<typeof resetAll>[0];
-      if (next.length > 0) resetAll(next);
+      const settings = composer.getProjectSettings();
+      if (!settings) return;
+      const next = (settings.designTokens ?? []) as Parameters<typeof resetAll>[0];
+      resetAll(next);
     };
     composer.on("project:changed", onSettingsShift);
     composer.on("history:undo", onSettingsShift);
