@@ -1,4 +1,4 @@
-import type { DesignToken } from "../../editor/design-system";
+import type { DesignToken } from "../designSystem/types";
 import type { EventEmitter } from "../EventEmitter";
 
 /**

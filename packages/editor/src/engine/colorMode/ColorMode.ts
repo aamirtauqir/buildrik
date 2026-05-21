@@ -1,5 +1,5 @@
 import type { EventEmitter } from "../EventEmitter";
-import type { ThemeMode } from "../../editor/design-system";
+import type { ThemeMode } from "../designSystem/types";
 
 const STORAGE_KEY = "buildrik:colorMode";
 const VALID_MODES: readonly ThemeMode[] = ["light", "dark", "system"];
