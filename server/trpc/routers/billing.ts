@@ -7,15 +7,7 @@ import {
 } from "@/server/services/billing.service";
 import { upgradeSchema, cancelSchema } from "@buildrik/shared/schemas/billing";
 import { type PlanName } from "@/lib/constants/plan-limits";
-
-async function getWorkspaceId(ctx: any): Promise<string> {
-  const member = await ctx.prisma.workspaceMember.findFirst({
-    where: { userId: ctx.session.user.id },
-    select: { workspaceId: true },
-  });
-  if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
-  return member.workspaceId;
-}
+import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 
 export const billingRouter = router({
   overview: protectedProcedure.query(async ({ ctx }) => {

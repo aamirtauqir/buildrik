@@ -43,22 +43,7 @@ import {
 } from "@buildrik/shared/schemas/sites";
 import { prePublishCheckSchema, publishInputSchema } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
-
-async function getWorkspaceId(ctx: {
-  prisma: { workspaceMember: { findFirst: Function } };
-  session: { user: { id: string } };
-}): Promise<string> {
-  const member = await ctx.prisma.workspaceMember.findFirst({
-    where: { userId: ctx.session.user.id },
-    select: { workspaceId: true },
-  });
-  if (!member)
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "No workspace found",
-    });
-  return member.workspaceId;
-}
+import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 
 export const sitesRouter = router({
   list: protectedProcedure

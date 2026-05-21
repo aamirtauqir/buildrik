@@ -4,18 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { listTemplates, getTemplate, useTemplate } from "@/server/services/template.service";
 import { createGenerationJob, getJobStatus, cancelJob } from "@/server/services/ai-generation.service";
 import { listTemplatesSchema, generateSiteSchema } from "@buildrik/shared/schemas/templates";
-
-async function getWorkspaceId(ctx: {
-  prisma: { workspaceMember: { findFirst: Function } };
-  session: { user: { id: string } };
-}): Promise<string> {
-  const member = await ctx.prisma.workspaceMember.findFirst({
-    where: { userId: ctx.session.user.id },
-    select: { workspaceId: true },
-  });
-  if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
-  return member.workspaceId;
-}
+import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 
 export const templatesRouter = router({
   list: protectedProcedure
