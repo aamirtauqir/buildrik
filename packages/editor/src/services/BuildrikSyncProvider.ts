@@ -106,7 +106,7 @@ function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
  * so any value present on the Site row wins over projectSettings JSON.
  */
 function mergeSiteColumnsIntoSettings(
-  baseSettings: ProjectData["settings"],
+  baseSettings: ProjectData["settings"] | undefined,
   siteCols: SiteColumnSettings
 ): ProjectData["settings"] {
   const settings = { ...(baseSettings ?? {}) };
@@ -149,7 +149,13 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
       .slice()
       .sort((a, b) => a.position - b.position);
 
-    const baseSettings = undefined; // load-from-server: projectSettings JSON not exported by sites.get yet
+    // sites.get returns the full Site row including the projectSettings Json
+    // column (Prisma findFirst defaults to selecting all scalars). Pull that
+    // as the base so non-mirrored settings (e.g. things only persisted in the
+    // JSON blob) survive editor reload from dashboard.
+    const baseSettings = (site as { projectSettings?: unknown }).projectSettings as
+      | ProjectData["settings"]
+      | undefined;
     const mergedSettings = settingsResult
       ? mergeSiteColumnsIntoSettings(baseSettings, settingsResult as SiteColumnSettings)
       : baseSettings;
