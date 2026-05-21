@@ -6,6 +6,10 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
+import { checkRateLimit } from "@/server/services/rate-limiter";
+
+const CREDENTIALS_MAX_ATTEMPTS = 5;
+const CREDENTIALS_WINDOW_MS = 5 * 60 * 1000;
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -23,11 +27,26 @@ export const authConfig: NextAuthConfig = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         const email = credentials?.email as string | undefined;
         const password = credentials?.password as string | undefined;
 
         if (!email || !password) return null;
+
+        // IP-rate-limit BEFORE bcrypt + DB lookup. Brute-force attempts on a
+        // valid email otherwise hit ~80ms bcrypt per try, which is cheap
+        // enough for an attacker. Limiting at the IP boundary forces them
+        // to rotate IPs to keep trying.
+        const ip =
+          request?.headers?.get?.("x-forwarded-for")?.split(",")[0]?.trim() ||
+          request?.headers?.get?.("x-real-ip") ||
+          "unknown";
+        const limit = checkRateLimit(
+          `login:${ip}`,
+          CREDENTIALS_MAX_ATTEMPTS,
+          CREDENTIALS_WINDOW_MS,
+        );
+        if (!limit.allowed) return null;
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || !user.passwordHash) return null;
