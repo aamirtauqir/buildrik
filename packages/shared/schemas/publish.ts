@@ -4,21 +4,52 @@ export const prePublishCheckSchema = z.object({
   siteId: z.string(),
 });
 
+/** Per-page HTML cap — 2 MB. Real-world rendered HTML for a page is
+ *  rarely above 200 KB; 2 MB leaves headroom for embedded data URIs while
+ *  still rejecting obvious abuse (gzip bombs, accidental dataURL spam).
+ *  Server-side PublishBuildJob.log persists pages verbatim, so unbounded
+ *  HTML would force huge JSON DB writes + worker memory use. */
+export const MAX_PAGE_HTML_BYTES = 2 * 1024 * 1024;
+
+/** Total payload cap across all pages — 16 MB. */
+export const MAX_PUBLISH_PAYLOAD_BYTES = 16 * 1024 * 1024;
+
+/** Max pages per publish — sanity check against runaway publishes. */
+export const MAX_PUBLISH_PAGES = 500;
+
 /** Payload sent by editor when publishing — one entry per page. */
 export const publishPageSchema = z.object({
   /** Path inside deployment, e.g. "index.html", "about/index.html". */
   path: z.string().min(1).max(500),
-  /** Rendered HTML for this page. */
-  html: z.string().min(1),
+  /** Rendered HTML for this page. Capped at MAX_PAGE_HTML_BYTES. */
+  html: z
+    .string()
+    .min(1)
+    .refine(
+      (s) => new TextEncoder().encode(s).length <= MAX_PAGE_HTML_BYTES,
+      { message: `Page HTML exceeds ${MAX_PAGE_HTML_BYTES} bytes` },
+    ),
 });
 
 /** Editor → dashboard publish input. `pages` is optional so existing
  *  callers (without HTML render) still work — worker falls back to
  *  simulation when pages absent or Vercel unconfigured. */
-export const publishInputSchema = z.object({
-  siteId: z.string(),
-  pages: z.array(publishPageSchema).optional(),
-});
+export const publishInputSchema = z
+  .object({
+    siteId: z.string(),
+    pages: z.array(publishPageSchema).max(MAX_PUBLISH_PAGES).optional(),
+  })
+  .refine(
+    (input) => {
+      if (!input.pages) return true;
+      const total = input.pages.reduce(
+        (sum, p) => sum + new TextEncoder().encode(p.html).length,
+        0,
+      );
+      return total <= MAX_PUBLISH_PAYLOAD_BYTES;
+    },
+    { message: `Total HTML payload exceeds ${MAX_PUBLISH_PAYLOAD_BYTES} bytes` },
+  );
 
 export type PublishPage = z.infer<typeof publishPageSchema>;
 export type PublishInput = z.infer<typeof publishInputSchema>;
