@@ -27,10 +27,10 @@ export async function getDashboardStats(
     memberRows,
     lastPublished,
   ] = await Promise.all([
-    prisma.site.count({ where: { workspaceId } }),
-    prisma.site.count({ where: { workspaceId, status: "PUBLISHED" } }),
-    prisma.site.count({ where: { workspaceId, status: "DRAFT" } }),
-    prisma.site.count({ where: { workspaceId, status: "ARCHIVED" } }),
+    prisma.site.count({ where: { workspaceId, deletedAt: null } }),
+    prisma.site.count({ where: { workspaceId, status: "PUBLISHED", deletedAt: null } }),
+    prisma.site.count({ where: { workspaceId, status: "DRAFT", deletedAt: null } }),
+    prisma.site.count({ where: { workspaceId, status: "ARCHIVED", deletedAt: null } }),
     prisma.workspaceMember.count({ where: { workspaceId } }),
     prisma.invite.count({ where: { workspaceId, status: "PENDING" } }),
     prisma.siteAnalytics.aggregate({
@@ -55,7 +55,7 @@ export async function getDashboardStats(
       include: { user: { select: { fullName: true, avatar: true } } },
     }),
     prisma.site.findMany({
-      where: { workspaceId, lastPublishedAt: { not: null } },
+      where: { workspaceId, lastPublishedAt: { not: null }, deletedAt: null },
       orderBy: { lastPublishedAt: "desc" },
       take: 1,
       select: { name: true, lastPublishedAt: true },
@@ -106,7 +106,7 @@ export async function getRecentSites(
   limit = 4
 ): Promise<RecentSite[]> {
   const sites = await prisma.site.findMany({
-    where: { workspaceId },
+    where: { workspaceId, deletedAt: null },
     orderBy: { lastEditedAt: "desc" },
     take: limit,
     select: {
@@ -335,7 +335,7 @@ export async function getWorkspaceHealth(
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   const [siteCount, membership, aiJobCount] = await Promise.all([
-    prisma.site.count({ where: { workspaceId } }),
+    prisma.site.count({ where: { workspaceId, deletedAt: null } }),
     prisma.workspaceMember.findFirst({
       where: { workspaceId, userId },
       include: { workspace: { select: { plan: true } } },

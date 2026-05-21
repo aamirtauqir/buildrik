@@ -15,7 +15,7 @@ async function getUsageCounts(workspaceId: string) {
 
   const [sites, teamMembers, domains, aiCredits, formSubmissions, redirects] =
     await Promise.all([
-      prisma.site.count({ where: { workspaceId } }),
+      prisma.site.count({ where: { workspaceId, deletedAt: null } }),
       prisma.workspaceMember.count({ where: { workspaceId } }),
       prisma.domain.count({ where: { site: { workspaceId } } }),
       prisma.aIGenerationJob.count({
