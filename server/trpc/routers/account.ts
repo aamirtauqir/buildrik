@@ -16,7 +16,7 @@ import {
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion } from "@/server/services/workspace-settings.service";
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
-import { updateProfileSchema, changePasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema } from "@buildrik/shared/schemas/account";
+import { updateProfileSchema, changePasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
 import { type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
@@ -180,7 +180,7 @@ export const accountRouter = router({
       });
     }),
     exportData: protectedProcedure.mutation(({ ctx }) => requestDataExport(ctx.session.user.id)),
-    deleteAccount: protectedProcedure.input(z.object({ reason: z.string().max(500).optional() })).mutation(({ ctx, input }) => requestAccountDeletion(ctx.session.user.id, input.reason)),
+    deleteAccount: protectedProcedure.input(deleteAccountSchema).mutation(({ ctx, input }) => requestAccountDeletion(ctx.session.user.id, input.reason)),
     cancelAccountDeletion: protectedProcedure.mutation(({ ctx }) => {
       return ctx.prisma.accountDeletionReq.updateMany({
         where: { userId: ctx.session.user.id, processedAt: null, cancelledAt: null },

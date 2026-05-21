@@ -11,7 +11,7 @@ import {
   getTeamStats, listMembers, inviteMembers, changeRole,
   revokeMember, deleteMember, listPendingInvites, revokeInvite, resendInvite, getTeamActivity,
 } from "@/server/services/team.service";
-import { inviteMembersSchema, listMembersSchema } from "@buildrik/shared/schemas/team";
+import { inviteMembersSchema, listMembersSchema, changeRoleSchema } from "@buildrik/shared/schemas/team";
 import { type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
@@ -43,7 +43,7 @@ export const teamRouter = router({
     }
   }),
   changeRole: protectedProcedure
-    .input(z.object({ memberId: z.string(), role: z.enum(["ADMIN", "EDITOR", "VIEWER"]) }))
+    .input(changeRoleSchema)
     .mutation(async ({ ctx, input }) => {
       try {
         return await changeRole(input.memberId, input.role, ctx.session.user.id);
