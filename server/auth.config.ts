@@ -76,15 +76,25 @@ export const authConfig: NextAuthConfig = {
       return true;
     },
     async jwt({ token, user }) {
+      // First call (sign-in) — populate from `user`. Subsequent calls reuse
+      // whatever is already on the token, so we only hit the DB once per
+      // login cycle. Workspace lookup is cheap (indexed FK) but doing it on
+      // every request would be wasteful.
       if (user) {
         token.userId = user.id;
+        const member = await prisma.workspaceMember.findFirst({
+          where: { userId: user.id },
+          select: { workspaceId: true },
+        });
+        token.workspaceId = member?.workspaceId ?? null;
       }
       return token;
     },
     async session({ session, token }) {
       if (token.userId) {
-        session.user.id = token.userId as string;
+        session.user.id = token.userId;
       }
+      session.user.workspaceId = token.workspaceId ?? null;
       return session;
     },
   },
