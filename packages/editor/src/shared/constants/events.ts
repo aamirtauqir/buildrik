@@ -479,6 +479,9 @@ export const EVENTS = {
   UI_OPEN_BUILD_PANEL: "ui:open-build-panel",
   /** Open the Design/Global Styles panel in the left sidebar */
   UI_OPEN_DESIGN_PANEL: "ui:open-design-panel",
+  /** Open the StarterGalleryModal — re-trigger for users to browse
+   *  themes after the auto-open was disabled (2026-05-22 D3). */
+  UI_OPEN_STARTERS: "ui:open-starters",
 
   // ============================================
   // Additional Style Events

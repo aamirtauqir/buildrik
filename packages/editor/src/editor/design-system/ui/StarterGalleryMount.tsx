@@ -22,6 +22,8 @@ import {
   useTypeRegistry,
 } from "../state/TokenRegistryContext";
 import { StarterGalleryModal } from "./StarterGalleryModal";
+import type { Composer } from "../../../engine/Composer";
+import { EVENTS } from "../../../shared/constants/events";
 
 const SEEN_KEY_PREFIX = "buildrik:starter-gallery-seen-";
 
@@ -52,9 +54,13 @@ function markSeen(projectId: string | null | undefined): void {
 
 export interface StarterGalleryMountProps {
   projectId?: string | null;
+  /** Optional composer reference — used to subscribe to UI_OPEN_STARTERS
+   *  event so the Design tab "Browse themes" button can re-open the
+   *  modal after the auto-open was disabled (2026-05-22 D3). */
+  composer?: Composer | null;
 }
 
-export const StarterGalleryMount: React.FC<StarterGalleryMountProps> = ({ projectId }) => {
+export const StarterGalleryMount: React.FC<StarterGalleryMountProps> = ({ projectId, composer }) => {
   const colorRegistry = useColorRegistry();
   const spacingRegistry = useSpacingRegistry();
   const typeRegistry = useTypeRegistry();
@@ -74,6 +80,18 @@ export const StarterGalleryMount: React.FC<StarterGalleryMountProps> = ({ projec
   React.useEffect(() => {
     if (!readSeen(projectId)) markSeen(projectId);
   }, [projectId]);
+
+  // Imperative re-open hook — Design tab "Browse themes" button emits
+  // UI_OPEN_STARTERS, mount listens and flips open. Subscriber lives here
+  // because the modal state belongs to this component.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handler = () => setOpen(true);
+    composer.on(EVENTS.UI_OPEN_STARTERS, handler);
+    return () => {
+      composer.off(EVENTS.UI_OPEN_STARTERS, handler);
+    };
+  }, [composer]);
 
   const handleApply = React.useCallback(
     (starterId: string) => {

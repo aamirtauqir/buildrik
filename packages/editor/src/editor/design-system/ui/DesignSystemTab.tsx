@@ -514,6 +514,31 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         <DSModeToggle />
         {composer && composer.colorMode ? <ColorModeToggle composer={composer} /> : null}
         <span style={{ flex: 1 }} />
+        {/* Browse themes — re-opens StarterGalleryModal after the 2026-05-22
+            D3 onboarding fix hid the auto-open. StarterGalleryMount in
+            StudioPanels subscribes to EVENTS.UI_OPEN_STARTERS. */}
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => composer?.emit(EVENTS.UI_OPEN_STARTERS, {})}
+          aria-label="Browse starter themes"
+          title="Browse starter themes"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 28,
+            height: 24,
+            background: "transparent",
+            border: "1px solid var(--bd-border)",
+            borderRadius: "var(--bd-radius-sm-plus)",
+            cursor: "pointer",
+            color: "var(--bd-fg-muted)",
+            fontSize: 14,
+          }}
+        >
+          {"🎨"}
+        </Button>
         <Button
           type="button"
           variant="ghost"

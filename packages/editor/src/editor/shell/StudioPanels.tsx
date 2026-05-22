@@ -365,7 +365,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     <TokenRegistryProvider projectId={projectId} composer={composer ?? undefined}>
     <StylePresetRegistryProvider projectId={projectId}>
       <MigrationProgressMount composer={composer} />
-      <StarterGalleryMount projectId={projectId} />
+      <StarterGalleryMount projectId={projectId} composer={composer} />
       <LayoutShell
         drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
         drawerPinned={panelPinned}
