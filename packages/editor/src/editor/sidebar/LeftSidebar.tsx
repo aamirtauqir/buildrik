@@ -34,6 +34,13 @@ import {
   Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+  TooltipProvider,
+} from "@/editor/shared/vibcoder/Tooltip";
 
 // ============================================
 // Icon map — lucide icon name → component
@@ -126,19 +133,30 @@ function RailZone({
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
-          <Button
-            key={tab.id}
-            className={`ls-btn${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
-            onClick={() => onBtnClick(tab.id)}
-            role="tab"
-            aria-selected={isVisibleActive}
-            aria-label={tab.ariaLabel}
-            data-tab={tab.id}
-          >
-            {isVisibleActive && <div className="ls-btn-bar" />}
-            {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
-            <Icon size={20} />
-          </Button>
+          <Tooltip key={tab.id}>
+            <TooltipTrigger asChild>
+              <Button
+                className={`ls-btn${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
+                onClick={() => onBtnClick(tab.id)}
+                role="tab"
+                aria-selected={isVisibleActive}
+                aria-label={tab.ariaLabel}
+                data-tab={tab.id}
+              >
+                {isVisibleActive && <div className="ls-btn-bar" />}
+                {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
+                <Icon size={20} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent side="right" sideOffset={8}>
+                {tab.label}
+                {tab.shortcut && (
+                  <span style={{ opacity: 0.6, marginLeft: 6 }}>{tab.shortcut}</span>
+                )}
+              </TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
         );
       })}
     </div>
@@ -338,6 +356,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   };
 
   return (
+    <TooltipProvider delayDuration={200}>
     <div className="ls-root">
       {/* Rail */}
       <nav
@@ -423,6 +442,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         variant="danger"
       />
     </div>
+    </TooltipProvider>
   );
 };
 
