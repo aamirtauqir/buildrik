@@ -16,7 +16,7 @@ import {
   useSpacingRegistry,
   useTypeRegistry,
 } from "../state/TokenRegistryContext";
-import type { LintIssue } from "../linter";
+import type { LintIssue } from "../../../engine/designSystem/linter";
 import { DSLintBanner } from "./DSLintBanner";
 
 const DEBOUNCE_MS = 500;

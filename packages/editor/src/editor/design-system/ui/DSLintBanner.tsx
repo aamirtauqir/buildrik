@@ -20,7 +20,7 @@
  */
 import * as React from "react";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import type { LintIssue, LintRuleId } from "../linter";
+import type { LintIssue, LintRuleId } from "../../../engine/designSystem/linter";
 
 export interface DSLintBannerProps {
   issues: readonly LintIssue[];

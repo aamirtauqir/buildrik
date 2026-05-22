@@ -2,7 +2,7 @@ import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { DSLintBanner } from "../DSLintBanner";
-import type { LintIssue } from "../../linter";
+import type { LintIssue } from "../../../../engine/designSystem/linter";
 
 const mixed: LintIssue[] = [
   { rule: "banned-hue", severity: "error", tokenId: "color-bad", message: "..." },

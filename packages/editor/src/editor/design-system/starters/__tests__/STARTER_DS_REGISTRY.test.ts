@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { STARTER_DS_REGISTRY, getStarterById } from "../index";
-import { DSLinter } from "../../linter";
+import { DSLinter } from "../../../../engine/designSystem/linter";
 
 describe("STARTER_DS_REGISTRY · structure", () => {
   it("ships 6 starter DSes (D6 spec target: 6-8)", () => {

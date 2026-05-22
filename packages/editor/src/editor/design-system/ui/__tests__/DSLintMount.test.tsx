@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import * as React from "react";
 import { DSLintMount } from "../DSLintMount";
 import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
-import type { LintIssue } from "../../linter";
+import type { LintIssue } from "../../../../engine/designSystem/linter";
 
 function wrap(children: React.ReactNode, projectId = "ds-lint-mount-test") {
   return <TokenRegistryProvider projectId={projectId}>{children}</TokenRegistryProvider>;
