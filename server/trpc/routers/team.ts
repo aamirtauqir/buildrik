@@ -5,7 +5,8 @@ import type { PrismaClient } from "@prisma/client";
 
 interface WorkspaceCtx {
   prisma: PrismaClient;
-  session: { user: { id: string } } | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  session: { user: any } | null;
 }
 import {
   getTeamStats, listMembers, inviteMembers, changeRole,

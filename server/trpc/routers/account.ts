@@ -3,9 +3,17 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@prisma/client";
 
+/** Minimal context shape WorkspaceCtx helpers need. Wider than `{user:{id}}`
+ *  to accept both cookie-session (has `expires`) + bearer-session (has
+ *  `apiToken`) branches without forcing exhaustive narrowing at the
+ *  router boundary. */
+/** Loose session shape — accepts both cookie-session (with `expires`) and
+ *  bearer-session (with `apiToken`) branches from createTRPCContext without
+ *  forcing exhaustive narrowing here. PrismaClient typed for real safety. */
 interface WorkspaceCtx {
   prisma: PrismaClient;
-  session: { user: { id: string } } | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  session: { user: any } | null;
 }
 import {
   getProfile, updateProfile, changePassword, requestEmailChange, getActiveSessions, revokeSession,
