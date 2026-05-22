@@ -258,7 +258,7 @@ export async function transferSite(
   currentUserId: string
 ) {
   const site = await prisma.site.findUnique({ where: { id: siteId } });
-  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
   if (site.createdBy !== currentUserId) throw new Error("NOT_OWNER");
 
   const currentMember = await prisma.workspaceMember.findFirst({
@@ -328,7 +328,7 @@ export async function duplicateSite(
   userId: string
 ) {
   const original = await prisma.site.findUnique({ where: { id: siteId } });
-  if (!original) throw new Error("SITE_NOT_FOUND");
+  if (!original || original.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   const membership = await prisma.workspaceMember.findFirst({
     where: { workspaceId, userId },
@@ -403,7 +403,7 @@ export async function unarchiveSite(siteId: string) {
 
 export async function deleteSite(siteId: string, confirmName: string) {
   const site = await prisma.site.findUnique({ where: { id: siteId } });
-  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   if (site.name !== confirmName) {
     throw new Error("NAME_MISMATCH");
@@ -495,35 +495,35 @@ export async function bulkAction(
   switch (action) {
     case "archive": {
       const result = await prisma.site.updateMany({
-        where: { id: { in: siteIds }, workspaceId },
+        where: { id: { in: siteIds }, workspaceId, deletedAt: null },
         data: { status: "ARCHIVED" },
       });
       return { succeeded: siteIds.slice(0, result.count), failed: [] };
     }
     case "unarchive": {
       const result = await prisma.site.updateMany({
-        where: { id: { in: siteIds }, workspaceId },
+        where: { id: { in: siteIds }, workspaceId, deletedAt: null },
         data: { status: "DRAFT" },
       });
       return { succeeded: siteIds.slice(0, result.count), failed: [] };
     }
     case "publish": {
       const result = await prisma.site.updateMany({
-        where: { id: { in: siteIds }, workspaceId },
+        where: { id: { in: siteIds }, workspaceId, deletedAt: null },
         data: { status: "PUBLISHED" },
       });
       return { succeeded: siteIds.slice(0, result.count), failed: [] };
     }
     case "unpublish": {
       const result = await prisma.site.updateMany({
-        where: { id: { in: siteIds }, workspaceId },
+        where: { id: { in: siteIds }, workspaceId, deletedAt: null },
         data: { status: "DRAFT" },
       });
       return { succeeded: siteIds.slice(0, result.count), failed: [] };
     }
     case "delete": {
       const result = await prisma.site.updateMany({
-        where: { id: { in: siteIds }, workspaceId },
+        where: { id: { in: siteIds }, workspaceId, deletedAt: null },
         data: { deletedAt: new Date() },
       });
       return { succeeded: siteIds.slice(0, result.count), failed: [] };
@@ -548,7 +548,7 @@ export async function bulkAction(
  */
 export async function saveProjectData(input: SaveProjectDataInput) {
   const site = await prisma.site.findUnique({ where: { id: input.siteId } });
-  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   const savedAt = new Date();
 
@@ -681,6 +681,7 @@ export async function getProjectData(siteId: string) {
     select: {
       id: true,
       name: true,
+      deletedAt: true,
       projectStyles: true,
       projectAssets: true,
       projectSettings: true,
@@ -706,7 +707,7 @@ export async function getProjectData(siteId: string) {
     },
   });
 
-  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
   return {
     siteId: site.id,
