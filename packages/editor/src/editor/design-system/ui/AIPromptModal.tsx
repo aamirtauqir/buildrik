@@ -32,7 +32,7 @@ import {
 import type {
   AIAssistService,
   ComponentSchema,
-} from "../services/AIAssistService";
+} from "../../../engine/designSystem/services/AIAssistService";
 
 type ModalState =
   | { kind: "idle" }

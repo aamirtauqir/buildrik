@@ -1,4 +1,4 @@
-import type { EventEmitter } from "../../../engine/EventEmitter";
+import type { EventEmitter } from "../../EventEmitter";
 import {
   AITimeoutError,
   AIRateLimitError,

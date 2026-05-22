@@ -15,7 +15,7 @@ import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
 import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
 import { ToastProvider } from "@/editor/shared/vibcoder";
-import { AIAssistService } from "../../services/AIAssistService";
+import { AIAssistService } from "../../../../engine/designSystem/services/AIAssistService";
 import { EventEmitter } from "../../../../engine/EventEmitter";
 
 type Listener = (payload: unknown) => void;

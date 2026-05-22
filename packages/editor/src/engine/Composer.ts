@@ -57,7 +57,7 @@ import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import { applyContrastFix } from "./designSystem/contrastFix";
 import { CSSBundler } from "./designSystem/bundler";
 import { DSLinter } from "./designSystem/linter";
-import { AIAssistService } from "../editor/design-system/services";
+import { AIAssistService } from "./designSystem/services";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 

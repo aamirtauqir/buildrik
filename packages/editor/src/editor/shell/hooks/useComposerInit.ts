@@ -22,7 +22,7 @@ import {
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import type { ToastInput } from "@/editor/shared/vibcoder";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
-import { ComponentSchemaAIClient } from "@/editor/design-system/services";
+import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 
 export type ComposerOptions = Partial<ComposerConfig> & {

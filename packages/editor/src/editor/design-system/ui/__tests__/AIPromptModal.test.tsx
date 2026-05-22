@@ -2,7 +2,7 @@ import { render, fireEvent, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { AIPromptModal } from "../AIPromptModal";
-import { AIAssistService, type ComponentSchema } from "../../services/AIAssistService";
+import { AIAssistService, type ComponentSchema } from "../../../../engine/designSystem/services/AIAssistService";
 import { EventEmitter } from "../../../../engine/EventEmitter";
 
 const validSchema: ComponentSchema = {
