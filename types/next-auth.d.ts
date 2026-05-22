@@ -15,6 +15,17 @@ declare module "next-auth" {
   }
 }
 
+// NextAuth 5 re-exports JWT from @auth/core/jwt; declaration merging must
+// land on the canonical module so the session callback's `token` param
+// picks up our additions. Augmenting `next-auth/jwt` alone leaves the
+// rich type invisible to the @auth/core resolution path used internally.
+declare module "@auth/core/jwt" {
+  interface JWT {
+    userId?: string;
+    workspaceId?: string | null;
+  }
+}
+
 declare module "next-auth/jwt" {
   interface JWT {
     userId?: string;

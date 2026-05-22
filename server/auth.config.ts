@@ -110,10 +110,14 @@ export const authConfig: NextAuthConfig = {
       return token;
     },
     async session({ session, token }) {
-      if (token.userId) {
+      // @auth/core JWT declares `interface JWT extends Record<string, unknown>`,
+      // so our declaration-merged `userId?: string` widens to `unknown` at
+      // index access. Narrow before assigning.
+      if (typeof token.userId === "string") {
         session.user.id = token.userId;
       }
-      session.user.workspaceId = token.workspaceId ?? null;
+      session.user.workspaceId =
+        typeof token.workspaceId === "string" ? token.workspaceId : null;
       return session;
     },
   },

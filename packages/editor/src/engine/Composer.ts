@@ -248,7 +248,7 @@ export class Composer extends EventEmitter {
       applyAutoFix: (tokenId, hint) => {
         if (!hint) return null;
         const settings = this.getProjectSettings();
-        const tokens = (settings.designTokens ?? []) as Array<{ id: string; value: string } & Record<string, unknown>>;
+        const tokens = settings.designTokens ?? [];
         const target = tokens.find((t) => t.id === tokenId);
         if (!target) return null;
         const fixed = applyContrastFix(target.value, hint);
