@@ -90,7 +90,11 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     label: "Templates",
     ariaLabel: "Browse page and section templates",
     section: "top",
-    pattern: "standalone",
+    // 2026-05-22 D2: TemplatesTab already drills in internally
+    // (detailTemplate state at TemplatesTab.tsx:113) — was mislabeled
+    // as "standalone". Truthful pattern: card-drill-in matches Add +
+    // Components for IA symmetry in CREATION zone.
+    pattern: "card-drill-in",
     shortcut: "T",
     mode: "panel",
     panelWidth: 320,
@@ -139,7 +143,11 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     label: "Components",
     ariaLabel: "Create and use reusable components",
     section: "top",
-    pattern: "standalone",
+    // 2026-05-22 D2: ComponentsTab already drills in internally
+    // (detailComponent state at ComponentsTab.tsx:169) — was mislabeled
+    // as "standalone". Truthful pattern: card-drill-in matches Add +
+    // Templates for IA symmetry in CREATION zone.
+    pattern: "card-drill-in",
     shortcut: "⇧A",
     mode: "panel",
     panelWidth: 280,
