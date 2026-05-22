@@ -33,7 +33,7 @@ const DEFAULT_SOCIAL: SocialSettings = {
   linkedin: "",
 };
 
-export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
+export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, registerFlushHandler }) => {
   const identity = useSettingsScreen(
     composer,
     (s) => ({
@@ -81,23 +81,34 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
     setLinkedin(social.value.linkedin);
   }, [social.value.twitter, social.value.facebook, social.value.linkedin]);
 
-  // Sync local edits to composer's in-memory settings so central savebar's
-  // saveProject() picks them up. Only writes when dirty — avoids reentrant
-  // loops when composer emits SETTINGS_CHANGE back via setProjectSettings.
+  // Register flush handler — SettingsTab.handleSave invokes this BEFORE
+  // composer.saveProject(). Pulls latest local state from refs so the
+  // closure stays single — re-registering per keystroke would defeat the
+  // fan-out reduction this whole refactor exists for.
+  const stateRef = React.useRef({ siteName, favicon, language, twitter, facebook, linkedin });
+  stateRef.current = { siteName, favicon, language, twitter, facebook, linkedin };
   React.useEffect(() => {
-    if (!composer || !isDirty) return;
-    const current = composer.getProjectSettings();
-    composer.setProjectSettings({
-      ...current,
-      seo: {
-        ...current.seo,
-        siteName,
-        favicon,
-        language,
-        socialLinks: { twitter, facebook, linkedin },
-      },
+    if (!composer || !registerFlushHandler) return;
+    registerFlushHandler(() => {
+      const current = composer.getProjectSettings();
+      const s = stateRef.current;
+      composer.setProjectSettings({
+        ...current,
+        seo: {
+          ...current.seo,
+          siteName: s.siteName,
+          favicon: s.favicon,
+          language: s.language,
+          socialLinks: {
+            twitter: s.twitter,
+            facebook: s.facebook,
+            linkedin: s.linkedin,
+          },
+        },
+      });
     });
-  }, [composer, siteName, favicon, language, twitter, facebook, linkedin, isDirty]);
+    return () => registerFlushHandler(null);
+  }, [composer, registerFlushHandler]);
 
   return (
     <Screen>

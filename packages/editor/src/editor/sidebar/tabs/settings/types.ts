@@ -39,6 +39,19 @@ export interface ScreenProps {
    * Pass `null` to clear (e.g. when screen becomes clean or unmounts).
    */
   registerSaveHandler?: (handler: (() => Promise<void>) | null) => void;
+  /**
+   * Called by composer-backed screens (General / SEO / Analytics / Advanced)
+   * that hold edits in local state and flush to composer once on Save. Runs
+   * BEFORE `composer.saveProject()` so the typed values get persisted.
+   * Pass `null` to clear on unmount.
+   *
+   * Why: prior pattern wrote `composer.setProjectSettings()` per keystroke,
+   * which fanned out PROJECT_CHANGED across ~7 listeners (history,
+   * autosave, sync, inspector, page tabs, undo controls). The other 3
+   * screens silently lost typed values because their local `handleSave`
+   * was never wired. This contract fixes both cases with one path.
+   */
+  registerFlushHandler?: (handler: (() => void) | null) => void;
 }
 
 // ============================================

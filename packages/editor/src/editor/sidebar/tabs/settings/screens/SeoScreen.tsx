@@ -15,8 +15,8 @@ const DEFAULT_SEO = {
   defaultOgImage: "",
 };
 
-export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
-  const { value: seo, markDirty, markClean } = useSettingsScreen(
+export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, registerFlushHandler }) => {
+  const { value: seo, isDirty, markDirty } = useSettingsScreen(
     composer,
     (s) => ({
       twitterHandle: s.seo?.twitterHandle ?? "",
@@ -28,25 +28,34 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
   const [twitterHandle, setTwitterHandle] = React.useState(seo.twitterHandle);
   const [defaultOgImage, setDefaultOgImage] = React.useState(seo.defaultOgImage);
 
+  React.useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
+
   // Sync local state when composer reloads (preserves user's unsaved edits)
   React.useEffect(() => {
     setTwitterHandle(seo.twitterHandle);
     setDefaultOgImage(seo.defaultOgImage);
   }, [seo.twitterHandle, seo.defaultOgImage]);
 
-  const handleSave = () => {
-    if (!composer) return;
-    const current = composer.getProjectSettings();
-    composer.setProjectSettings({
-      ...current,
-      seo: {
-        ...current.seo,
-        twitterHandle,
-        defaultOgImage,
-      },
+  // Flush local buffer → composer once on Save click (see SettingsTab).
+  const stateRef = React.useRef({ twitterHandle, defaultOgImage });
+  stateRef.current = { twitterHandle, defaultOgImage };
+  React.useEffect(() => {
+    if (!composer || !registerFlushHandler) return;
+    registerFlushHandler(() => {
+      const current = composer.getProjectSettings();
+      composer.setProjectSettings({
+        ...current,
+        seo: {
+          ...current.seo,
+          twitterHandle: stateRef.current.twitterHandle,
+          defaultOgImage: stateRef.current.defaultOgImage,
+        },
+      });
     });
-    markClean();
-  };
+    return () => registerFlushHandler(null);
+  }, [composer, registerFlushHandler]);
 
   return (
     <Screen>

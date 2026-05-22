@@ -11,14 +11,13 @@ import type { ScreenProps } from "../types";
 // GA4 measurement ID: exactly G- followed by 10 alphanumeric characters (EC-05)
 const GA_ID_REGEX = /^G-[A-Z0-9]{10}$/i;
 
-export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
+export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, registerFlushHandler }) => {
   const [gaId, setGaId] = React.useState("");
   const [gaEnabled, setGaEnabled] = React.useState(false);
   const [metaPixelId, setMetaPixelId] = React.useState("");
   const [metaPixelEnabled, setMetaPixelEnabled] = React.useState(false);
   const [cookieBanner, setCookieBanner] = React.useState(true);
   const [hasChanges, setHasChanges] = React.useState(false);
-  const hasLoadedRef = React.useRef(false);
 
   const loadSettings = React.useCallback(() => {
     if (!composer) return;
@@ -29,7 +28,6 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
     setMetaPixelId(analytics.facebookPixel?.pixelId ?? "");
     setMetaPixelEnabled(analytics.facebookPixel?.enabled ?? false);
     setCookieBanner(analytics.cookieConsent?.enabled ?? true);
-    hasLoadedRef.current = true;
     setHasChanges(false);
   }, [composer]);
 
@@ -54,29 +52,26 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
   const pixelError = metaPixelId && !/^\d{15,16}$/.test(metaPixelId);
   const isValidGA = !gaError;
   const isValidPixel = !pixelError;
-  const canSave = isValidGA && isValidPixel;
 
-  const handleSave = () => {
-    if (!composer) return;
-    const current = composer.getProjectSettings();
-    composer.setProjectSettings({
-      ...current,
-      analytics: {
-        googleAnalytics: {
-          enabled: gaEnabled && !!gaId,
-          measurementId: gaId,
+  // Flush local buffer → composer on Save (see SettingsTab).
+  const stateRef = React.useRef({ gaId, gaEnabled, metaPixelId, metaPixelEnabled, cookieBanner });
+  stateRef.current = { gaId, gaEnabled, metaPixelId, metaPixelEnabled, cookieBanner };
+  React.useEffect(() => {
+    if (!composer || !registerFlushHandler) return;
+    registerFlushHandler(() => {
+      const current = composer.getProjectSettings();
+      const s = stateRef.current;
+      composer.setProjectSettings({
+        ...current,
+        analytics: {
+          googleAnalytics: { enabled: s.gaEnabled && !!s.gaId, measurementId: s.gaId },
+          facebookPixel: { enabled: s.metaPixelEnabled && !!s.metaPixelId, pixelId: s.metaPixelId },
+          cookieConsent: { enabled: s.cookieBanner },
         },
-        facebookPixel: {
-          enabled: metaPixelEnabled && !!metaPixelId,
-          pixelId: metaPixelId,
-        },
-        cookieConsent: {
-          enabled: cookieBanner,
-        },
-      },
+      });
     });
-    setHasChanges(false);
-  };
+    return () => registerFlushHandler(null);
+  }, [composer, registerFlushHandler]);
 
   return (
     <Screen>

@@ -318,13 +318,25 @@ export const SettingsTab: React.FC<
     []
   );
 
+  // Composer-backed screens (General/SEO/Analytics/Advanced) flush local
+  // edit buffer into composer right before saveProject() so PROJECT_CHANGED
+  // fires once per Save instead of once per keystroke.
+  const screenFlushHandlerRef = React.useRef<(() => void) | null>(null);
+  const registerFlushHandler = React.useCallback(
+    (handler: (() => void) | null) => {
+      screenFlushHandlerRef.current = handler;
+    },
+    []
+  );
+
   React.useEffect(() => {
     setScreenIsDirty(false);
     setDirtyCount(0);
     setGuardOpen(false);
-    // Clear stale handler on screen change — old screen unmounts, new screen
-    // re-registers if applicable.
+    // Clear stale handlers on screen change — old screen unmounts, new
+    // screen re-registers if applicable.
     screenSaveHandlerRef.current = null;
+    screenFlushHandlerRef.current = null;
     // B1: capture composer's current projectSettings so Discard can restore.
     // Server-side screens (Redirects/Headers/Localization) own their own state
     // and don't write through composer — null snapshot means restore is a no-op
@@ -539,6 +551,11 @@ export const SettingsTab: React.FC<
       return;
     }
     if (!composer) return;
+    // Composer-backed screens (General/SEO/Analytics/Advanced) hold edits in
+    // local state. Flush once now so composer holds the user's typed values
+    // before saveProject() serializes. Without this, screens with a dead
+    // local handleSave (SEO/Analytics/Advanced) would silently drop input.
+    screenFlushHandlerRef.current?.();
     const maybePromise = composer.saveProject?.();
     // B1: refresh snapshot to the just-saved state. After Save, the user's
     // edits ARE the new baseline — Discard from this point onwards should
@@ -572,7 +589,13 @@ export const SettingsTab: React.FC<
     }
     switch (currentScreen) {
       case "general":
-        return <SiteSettingsScreen composer={composer} onDirtyChange={handleScreenDirty} />;
+        return (
+          <SiteSettingsScreen
+            composer={composer}
+            onDirtyChange={handleScreenDirty}
+            registerFlushHandler={registerFlushHandler}
+          />
+        );
       case "branding":
         return (
           <BrandingSection
@@ -585,11 +608,29 @@ export const SettingsTab: React.FC<
           />
         );
       case "seo":
-        return <SeoScreen composer={composer} onDirtyChange={handleScreenDirty} />;
+        return (
+          <SeoScreen
+            composer={composer}
+            onDirtyChange={handleScreenDirty}
+            registerFlushHandler={registerFlushHandler}
+          />
+        );
       case "analytics":
-        return <AnalyticsScreen composer={composer} onDirtyChange={handleScreenDirty} />;
+        return (
+          <AnalyticsScreen
+            composer={composer}
+            onDirtyChange={handleScreenDirty}
+            registerFlushHandler={registerFlushHandler}
+          />
+        );
       case "custom-code":
-        return <AdvancedScreen composer={composer} onDirtyChange={handleScreenDirty} />;
+        return (
+          <AdvancedScreen
+            composer={composer}
+            onDirtyChange={handleScreenDirty}
+            registerFlushHandler={registerFlushHandler}
+          />
+        );
       case "integrations":
         return <IntegrationsHub composer={composer} onDirtyChange={handleScreenDirty} />;
       // A1 day-3 complete: all 4 stubs drained (Redirects, Forms, Headers, Localization).

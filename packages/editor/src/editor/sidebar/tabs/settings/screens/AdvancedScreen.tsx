@@ -18,8 +18,8 @@ const DEFAULT_CUSTOM_CODE: CustomCodeConfig = {
   globalCss: "",
 };
 
-export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
-  const { value: savedCode, markClean } = useSettingsScreen(
+export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, registerFlushHandler }) => {
+  const { value: savedCode } = useSettingsScreen(
     composer,
     (s) => s.customCode ?? DEFAULT_CUSTOM_CODE,
     DEFAULT_CUSTOM_CODE
@@ -68,20 +68,25 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange 
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
 
-  const handleSave = React.useCallback(() => {
-    if (!composer) return;
-    const current = composer.getProjectSettings();
-    composer.setProjectSettings({
-      ...current,
-      customCode: {
-        headScripts: headCode,
-        bodyScripts: bodyCode,
-        globalCss: cssCode,
-      },
+  // Flush local buffer → composer on Save (see SettingsTab).
+  const stateRef = React.useRef({ headCode, bodyCode, cssCode });
+  stateRef.current = { headCode, bodyCode, cssCode };
+  React.useEffect(() => {
+    if (!composer || !registerFlushHandler) return;
+    registerFlushHandler(() => {
+      const current = composer.getProjectSettings();
+      const s = stateRef.current;
+      composer.setProjectSettings({
+        ...current,
+        customCode: {
+          headScripts: s.headCode,
+          bodyScripts: s.bodyCode,
+          globalCss: s.cssCode,
+        },
+      });
     });
-    setIsDirty(false);
-    markClean();
-  }, [composer, headCode, bodyCode, cssCode, markClean]);
+    return () => registerFlushHandler(null);
+  }, [composer, registerFlushHandler]);
 
   return (
     <Screen>
