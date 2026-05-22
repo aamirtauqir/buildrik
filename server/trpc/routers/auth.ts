@@ -234,7 +234,11 @@ export const authRouter = router({
       }
 
       const user = ctx.session.user;
-      if (!user?.id) {
+      // Narrow to the rich branch — the session.user union has a minimal
+      // `{ id }` fallback shape; only the augmented branch carries email,
+      // which we need for the INVITE_EMAIL_MISMATCH audit log + the
+      // MEMBER_JOINED notification message below.
+      if (!user?.id || !("email" in user) || typeof user.email !== "string") {
         throw new TRPCError({ code: "UNAUTHORIZED", message: "Not authenticated" });
       }
       const userId = user.id;

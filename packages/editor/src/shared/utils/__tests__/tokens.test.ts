@@ -23,12 +23,13 @@ describe("getToken", () => {
   });
 
   it("warns in development when token is missing", () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "development";
+    // vi.stubEnv handles read-only NODE_ENV in @types/node 22+ where direct
+    // assignment was tightened. Unstubs automatically on test teardown.
+    vi.stubEnv("NODE_ENV", "development");
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     getToken("nonexistent" as TokenName);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining("not defined"));
     warn.mockRestore();
-    process.env.NODE_ENV = originalEnv;
+    vi.unstubAllEnvs();
   });
 });

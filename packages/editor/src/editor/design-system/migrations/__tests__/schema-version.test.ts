@@ -36,16 +36,14 @@ describe("schema version — load path branches", () => {
     expect(migrated).toEqual(tokens);
   });
 
-  it("project at older version runs migration (or no-op at CURRENT=1)", () => {
+  it("project at older version runs migration", () => {
+    // CURRENT_SCHEMA_VERSION advanced past 1 long ago (now 4). Keep the
+    // test as a forward-compat guard: v1 storage should always migrate
+    // to whatever CURRENT is without throwing.
     const tokens = [stubToken];
-    const storedVersion = 1;
-    if (CURRENT_SCHEMA_VERSION === 1) {
-      expect(migrateDesignTokens(tokens, 1, CURRENT_SCHEMA_VERSION)).toEqual(tokens);
-    } else {
-      const migrated = migrateDesignTokens(tokens, 1, CURRENT_SCHEMA_VERSION);
-      expect(migrated).toBeDefined();
-      expect(Array.isArray(migrated)).toBe(true);
-    }
+    const migrated = migrateDesignTokens(tokens, 1, CURRENT_SCHEMA_VERSION);
+    expect(migrated).toBeDefined();
+    expect(Array.isArray(migrated)).toBe(true);
   });
 
   // B5 lock (2026-05-16): v2 migration adds optional semanticKind field.

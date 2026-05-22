@@ -35,6 +35,8 @@ const RULE_LABEL: Record<LintRuleId, string> = {
   "empty-value": "empty token value",
   "missing-dark": "missing dark variant",
   "unresolved-binding": "unresolved token binding",
+  "alias-depth-exceeded": "alias chain too deep",
+  "semantic-needs-alias": "semantic token needs alias",
 };
 
 export const DSLintBanner: React.FC<DSLintBannerProps> = ({
