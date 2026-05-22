@@ -59,9 +59,12 @@ export interface CanvasOverlayGroupProps {
   zoom: number;
   canvasSize: { width: number; height: number };
   rulerGuides: CanvasGuide[];
-  addGuide: (guide: CanvasGuide) => void;
-  updateGuide: (index: number, position: number) => void;
-  removeGuide: (index: number) => void;
+  // Match useCanvasGuides hook signatures (id-based, not index/Guide-based).
+  // Drift fixed 2026-05-22 — interface previously claimed Guide/index-based
+  // shapes that didn't match the hook OR what child overlays consumed.
+  addGuide: (type: "horizontal" | "vertical", position: number) => void;
+  updateGuide: (id: string, position: number) => void;
+  removeGuide: (id: string) => void;
 
   // Selection
   selectedId: string | null;
@@ -80,6 +83,11 @@ export interface CanvasOverlayGroupProps {
   // Hover
   shouldShowHover: boolean;
   hoveredElementId: string | null;
+  /** Inspector mode forces full hover detail (drift-fix 2026-05-22 —
+   *  Canvas was passing these but interface didn't declare them). */
+  isInspectorEnabled?: boolean;
+  /** Dev mode debug overlay flag — unused today but parent passes it. */
+  devMode?: boolean;
 
   // Drag & Resize
   isResizing: boolean;
@@ -95,19 +103,22 @@ export interface CanvasOverlayGroupProps {
 
   // Guides & Snapping
   showGuides: boolean;
-  guides: SpacingIndicator[];
+  // Parent passes CanvasGuide[] (ruler-placed). The legacy SpacingIndicator[]
+  // type here didn't match what GuideLines actually accepts — fixed 2026-05-22.
+  guides: CanvasGuide[];
   snapLines: SnapLine[];
 
   // Indicators
   showSpacing: boolean;
   spacingIndicators: SpacingIndicator[];
 
-  // Section Reordering
+  // Section Reordering — match useSectionReorder hook + SectionReorderHandles
+  // child interface (drift fixed 2026-05-22).
   sectionBoundaries: SectionBoundary[];
   sectionDragState: SectionDragState | null;
   hoveredSectionBoundary: string | null;
-  onSectionStartDrag: (id: string, e: React.MouseEvent) => void;
-  onSectionUpdateDrag: (e: MouseEvent) => void;
+  onSectionStartDrag: (sectionId: string, fromIndex: number) => void;
+  onSectionUpdateDrag: (clientY: number) => void;
   onSectionCompleteDrag: () => void;
   onSectionCancelDrag: () => void;
   onSectionHoverBoundary: (id: string | null) => void;
@@ -150,6 +161,7 @@ export function CanvasOverlayGroup({
   onClear,
   shouldShowHover,
   hoveredElementId,
+  isInspectorEnabled,
   isResizing,
   setIsResizing,
   cursorState,
@@ -199,9 +211,12 @@ export function CanvasOverlayGroup({
       {/* Hover highlight — only show when not dragging/resizing */}
       {shouldShowHover && hoveredElementId && canvasRef.current && (
         <ElementHoverOverlay
-          composer={composer}
-          elementId={hoveredElementId}
-          cursorState={cursorState}
+          hoveredElementId={hoveredElementId}
+          canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
+          altHeld={cursorState?.altHeld}
+          shiftHeld={cursorState?.shiftHeld}
+          isCloneMode={cursorState?.ctrlHeld}
+          inspectorEnabled={isInspectorEnabled}
         />
       )}
 
@@ -220,18 +235,20 @@ export function CanvasOverlayGroup({
       {/* Rulers and persistent guides */}
       {showRulers && canvasRef.current && (
         <RulersOverlay
-          guides={rulerGuides}
           canvasSize={canvasSize}
           zoom={zoom}
-          onAddGuide={addGuide}
-          onUpdateGuide={updateGuide}
-          onRemoveGuide={removeGuide}
+          onCreateGuide={addGuide}
         />
       )}
 
       {/* User-placed guides (from rulers) */}
       {showRulers && rulerGuides.length > 0 && (
-        <GuidesOverlay guides={rulerGuides} canvasSize={canvasSize} />
+        <GuidesOverlay
+          guides={rulerGuides}
+          zoom={zoom}
+          onDragGuide={updateGuide}
+          onRemoveGuide={removeGuide}
+        />
       )}
 
       {/* Persistent canvas guides (user-placed via rulers) */}
@@ -259,7 +276,6 @@ export function CanvasOverlayGroup({
             elementId={selectedId}
             selectedIds={selectedIds}
             onResizeStateChange={setIsResizing}
-            onOpenImageEditor={onOpenImageEditor}
           />
           {selectedId && canvasRef.current && (
             <SelectionLabel
@@ -283,13 +299,12 @@ export function CanvasOverlayGroup({
               onMoveUp={onMoveUp}
               onMoveDown={onMoveDown}
               onUndo={onUndo}
-              onClear={onClear}
             />
           )}
           {selectedIds.length > 1 && (
             <div style={alignmentToolbarStyles}>
               <AlignmentToolbar composer={composer} selectedIds={selectedIds} />
-              <MultiSelectBadge count={selectedIds.length} />
+              <MultiSelectBadge selectedIds={selectedIds} onClear={onClear} />
             </div>
           )}
         </div>
@@ -297,24 +312,20 @@ export function CanvasOverlayGroup({
 
       {/* Inline Text Editor */}
       {editing.id && (
-        <RichTextEditor
-          id={editing.id}
-          composer={composer}
-          initialValue={editing.content}
-          onCommand={onInlineCommand}
-        />
+        <RichTextEditor onCommand={onInlineCommand} />
       )}
 
       {/* Drag & drop feedback (slot indicators, breadcrumb) */}
       {isDragOver && canvasRef.current && (
         <DropFeedbackOverlay
-          composer={composer}
+          isDragOver={isDragOver}
           dropTargetId={dropTargetId}
           dropPosition={dropPosition}
-          isValid={isValidDrop}
+          isValidDrop={isValidDrop}
           invalidReason={invalidDropReason}
-          slotRect={dropSlotRect}
-          breadcrumbPath={dropTargetPath}
+          canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
+          dropSlotRect={dropSlotRect}
+          dropTargetPath={dropTargetPath}
         />
       )}
 
@@ -329,6 +340,9 @@ export function CanvasOverlayGroup({
         dragState={sectionDragState}
         hoveredBoundary={hoveredSectionBoundary}
         onStartDrag={onSectionStartDrag}
+        onUpdateDrag={onSectionUpdateDrag}
+        onCompleteDrag={onSectionCompleteDrag}
+        onCancelDrag={onSectionCancelDrag}
         onHoverBoundary={onSectionHoverBoundary}
       />
 
