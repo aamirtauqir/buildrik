@@ -78,11 +78,13 @@ describe("cross-origin inventory (Phase 0 D14)", () => {
 
   it("`http://localhost:3000` literals stay at known-baseline count", () => {
     const hits = scan(/http:\/\/localhost:3000/);
-    // Baseline 2026-05-11: 11 files —services (PublishService, AltTextService,
-    // AssetUploadService, BuildrikSyncProvider) + SettingsTab + 5 settings
-    // screens + 1 other. If count grows, new code is hard-coding a
-    // cross-origin literal — investigate before raising the cap.
-    expect(hits.length).toBeLessThanOrEqual(11);
+    // Baseline 2026-05-22: 12 files — services (PublishService, AltTextService,
+    // AssetUploadService, BuildrikSyncProvider) + SettingsTab + 4 server-side
+    // settings screens (Localization/Forms/Headers/Redirects) + Topbar +
+    // useServerStorageQuota + useExportHandlers. All are VITE_DASHBOARD_URL
+    // fallbacks. If count grows, new code is hard-coding a cross-origin
+    // literal — investigate before raising the cap.
+    expect(hits.length).toBeLessThanOrEqual(12);
   });
 
   it("`credentials: 'include'` usage stays at known-baseline count", () => {

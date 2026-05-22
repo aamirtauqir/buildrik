@@ -78,6 +78,7 @@ vi.mock("../drag/dropOperations", () => ({
   handleElementDrop: vi.fn(() => false),
   handleComponentDrop: vi.fn(() => Promise.resolve(false)),
   handleTemplateDrop: vi.fn(() => false),
+  handleCatalogDrop: vi.fn(() => false),
   handleBlockDrop: vi.fn(() => true),
 }));
 

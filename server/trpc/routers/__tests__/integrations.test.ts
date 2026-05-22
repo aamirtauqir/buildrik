@@ -169,7 +169,11 @@ describe("integrations.vercel.disconnect", () => {
     const caller = vercelIntegrationsRouter.createCaller(makeCtx("u_1") as never);
     const result = await caller.disconnect({ workspaceId: "ws_1" });
 
-    expect(result).toEqual({ success: true });
+    // OAuth walk sprint (2026-05-20) added `vercelStillInstalled` to surface
+    // the Vercel-side "still installed?" hint to the disconnect UI — a 410
+    // means the token was revoked locally but the install may persist on
+    // Vercel until the user removes it from their org's integration list.
+    expect(result).toEqual({ success: true, vercelStillInstalled: true });
     expect(deleteIntegMock).toHaveBeenCalledWith({ where: { id: "i_1" } });
     fetchSpy.mockRestore();
   });

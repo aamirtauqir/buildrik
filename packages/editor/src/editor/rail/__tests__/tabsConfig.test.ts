@@ -72,6 +72,9 @@ describe("tabsConfig helpers", () => {
       expect(ids).toContain("add");
       expect(ids).toContain("templates");
       expect(ids).toContain("assets");
+      // 2026-05-22 D2: Components moved from STRUCTURE → CREATION zone
+      // (library/insert surface, matches Add + Templates mental class).
+      expect(ids).toContain("components");
     });
 
     it("returns structure zone tabs", () => {
@@ -79,7 +82,6 @@ describe("tabsConfig helpers", () => {
       const ids = tabs.map((t) => t.id);
       expect(ids).toContain("layers");
       expect(ids).toContain("pages");
-      expect(ids).toContain("components");
     });
 
     it("returns config zone tabs", () => {
