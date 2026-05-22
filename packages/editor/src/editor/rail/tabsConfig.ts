@@ -41,7 +41,16 @@ export interface GroupedTabConfig {
   accent?: boolean;
   /** Whether this tab opens a 280px panel or replaces the canvas with a full-page view */
   mode: TabMode;
-  /** Panel width in pixels (only for mode="panel"). Defaults to 280 if omitted. */
+  /** Panel width in pixels (only for mode="panel"). Defaults to 280 if omitted.
+   *
+   *  Width rule (locked 2026-05-22):
+   *   - 280  → list/tree surfaces (Layers, Pages, Add, Components, Publish, History)
+   *   - 320  → browse / canvas-rich surfaces (AI conversation, Templates, Media, Design)
+   *   - mode="fullpage" → workflow surfaces (Settings — too page-shaped for a drawer)
+   *
+   *  New tabs MUST pick one of these widths OR document why they're an
+   *  exception. The 700px Settings outlier is the historical reason this
+   *  rule exists. */
   panelWidth?: number;
   /** Which rail zone this tab appears in. undefined = no rail button (design, publish). */
   zone?: TabZone;
@@ -126,15 +135,19 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "components",
-    iconName: "Diamond",
-    label: "Comps",
+    iconName: "Box",
+    label: "Components",
     ariaLabel: "Create and use reusable components",
     section: "top",
     pattern: "standalone",
     shortcut: "⇧A",
     mode: "panel",
     panelWidth: 280,
-    zone: "structure",
+    // Reclassified 2026-05-22: Components is a library (browse + insert
+    // reusable patterns) — same mental class as Add/Templates. Moved to
+    // CREATION zone for IA symmetry. Previously labeled "Comps" (truncated)
+    // with Diamond icon (opaque); now full name + Box icon.
+    zone: "creation",
   },
   // ── CONFIG: site configuration ─────────────────────────────────────────────
   {
@@ -171,6 +184,11 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     shortcut: "U",
     mode: "panel",
     panelWidth: 280,
+    // Classified 2026-05-22: publish is the user's GOAL after building, not
+    // a config-tier concern. Stays bottom-section visually (alongside
+    // Settings + History) but joins CONFIG zone for taxonomy. If we add a
+    // dedicated "deploy" zone later this moves.
+    zone: "config",
   },
   {
     id: "history",

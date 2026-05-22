@@ -26,10 +26,12 @@ import {
   Image,
   Layers,
   File,
-  Diamond,
+  Box,
   Palette,
   Settings,
   Timer,
+  Sparkles,
+  Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -43,10 +45,12 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Image,
   Layers,
   File,
-  Diamond,
+  Box,
   Palette,
   Settings,
   Timer,
+  Sparkles,
+  Rocket,
 };
 
 // ============================================
