@@ -74,13 +74,13 @@ export async function inviteMembers(
     where: { workspaceId },
     select: { user: { select: { email: true } } },
   });
-  const memberEmails = new Set(existingMembers.map((m: any) => m.user.email));
+  const memberEmails = new Set(existingMembers.map((m) => m.user.email));
 
   const pendingInvites = await prisma.invite.findMany({
     where: { workspaceId, status: "PENDING" },
     select: { email: true },
   });
-  const pendingEmails = new Set(pendingInvites.map((i: any) => i.email));
+  const pendingEmails = new Set(pendingInvites.map((i) => i.email));
 
   const toInvite: string[] = [];
   let skipped = 0;

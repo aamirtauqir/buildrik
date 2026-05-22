@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { GenerateSiteInput } from "@buildrik/shared/schemas/templates";
 
@@ -47,8 +48,9 @@ export async function createGenerationJob(
       businessType: input.businessType,
       selectedPages: input.pages,
       description: input.description ?? null,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      metadata: Object.keys(metadata).length > 0 ? (metadata as any) : undefined,
+      metadata: Object.keys(metadata).length > 0
+        ? (metadata as Prisma.InputJsonValue)
+        : undefined,
     },
   });
 }

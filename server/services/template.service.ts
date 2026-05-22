@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { ListTemplatesInput } from "@buildrik/shared/schemas/templates";
 
@@ -103,7 +104,7 @@ export async function useTemplate(
     slug: string;
     position: number;
     isHomePage: boolean;
-    blocks: any[];
+    blocks: Prisma.InputJsonValue;
   }>;
 
   const site = await prisma.site.create({
