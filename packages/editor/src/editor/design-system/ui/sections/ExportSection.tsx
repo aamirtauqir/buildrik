@@ -22,10 +22,10 @@ import {
   useBreakpointRegistry, useGridRegistry, useSizingRegistry,
   useIconRegistry, useImageryRegistry,
 } from "../../state/TokenRegistryContext";
-import { CSSBundler } from "../../bundler";
+import { CSSBundler } from "../../../../engine/designSystem/bundler";
 import { buildExport, downloadFile, type ExportFormat } from "../../utils/exportUtils";
 import type { DesignToken } from "../../types";
-import type { BundleOptions } from "../../bundler/CSSBundler";
+import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Radio } from "@/editor/shared/vibcoder/Radio";
