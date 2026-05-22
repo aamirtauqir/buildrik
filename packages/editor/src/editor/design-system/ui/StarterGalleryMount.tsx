@@ -59,9 +59,21 @@ export const StarterGalleryMount: React.FC<StarterGalleryMountProps> = ({ projec
   const spacingRegistry = useSpacingRegistry();
   const typeRegistry = useTypeRegistry();
 
-  // Initialize from localStorage; further opens come from explicit user
-  // action (e.g., a "Browse starters" button — out of scope here).
-  const [open, setOpen] = React.useState<boolean>(() => !readSeen(projectId));
+  // 2026-05-22 design plan review D3: starter gallery NO LONGER auto-opens
+  // on first project load. Decision: AI generator (PageWizard) is the
+  // content-first default surface. Theme picker stays available but
+  // discoverable rather than blocking — user can open it via Design tab
+  // (entry point still TODO — see follow-up task).
+  //
+  // Mark seen on first mount so the PageWizard's dependent check
+  // (`if starter-gallery-seen → skip wizard re-show after dismiss`) still
+  // works correctly. Without this mark, the wizard logic would never
+  // detect that starter gallery had been "shown" and could re-show wizard
+  // forever even after user dismissed.
+  const [open, setOpen] = React.useState<boolean>(false);
+  React.useEffect(() => {
+    if (!readSeen(projectId)) markSeen(projectId);
+  }, [projectId]);
 
   const handleApply = React.useCallback(
     (starterId: string) => {

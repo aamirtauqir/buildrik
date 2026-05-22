@@ -171,7 +171,12 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "card-drill-in",
     shortcut: "S",
     mode: "panel",
-    panelWidth: 700,
+    // 2026-05-22 design plan review D1: normalized 700px outlier → 320px.
+    // Matches Media + Design + AI + Templates panel widths. Drill-in
+    // pattern stays — root shows category cards, drilled-in screens
+    // (SEO, Headers, Redirects, Locale) wrap form fields to the narrower
+    // 320px column.
+    panelWidth: 320,
     zone: "config",
   },
   {
