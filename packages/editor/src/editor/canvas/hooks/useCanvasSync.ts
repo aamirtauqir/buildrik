@@ -25,7 +25,8 @@ export interface UseCanvasSyncResult {
 export function useCanvasSync({ composer }: UseCanvasSyncOptions): UseCanvasSyncResult {
   const [content, setContent] = React.useState("");
 
-  // Sync canvas content from Composer element tree
+  // Immediate sync — exposed to imperative callers (keyboard actions in
+  // useCanvasKeyboard need a synchronous refresh right after cut/paste/delete).
   const syncFromComposer = React.useCallback(() => {
     if (!composer) return;
     try {
@@ -36,11 +37,26 @@ export function useCanvasSync({ composer }: UseCanvasSyncOptions): UseCanvasSync
     }
   }, [composer]);
 
+  // RAF-coalesced sync — used by the event subscriptions below. 12 composer
+  // events each trigger a full `elements.toHTML()` regen; drag/resize/move
+  // tick at native frame rate, fanning hundreds of full-tree serializations
+  // per gesture. Coalescing to one regen per animation frame collapses the
+  // storm without changing perceived behavior. (Codex editor audit P2 #10.)
+  const pendingRafRef = React.useRef<number | null>(null);
+  const scheduleSync = React.useCallback(() => {
+    if (pendingRafRef.current != null) return;
+    pendingRafRef.current = requestAnimationFrame(() => {
+      pendingRafRef.current = null;
+      syncFromComposer();
+    });
+  }, [syncFromComposer]);
+
   // Subscribe to composer events for content sync
   React.useEffect(() => {
     if (!composer) return;
 
-    // Initial sync when composer is ready or immediately if already ready
+    // Initial sync — fire IMMEDIATELY (not via scheduleSync). First paint
+    // shouldn't wait for the next animation frame.
     if (typeof composer.isReady === "function" && composer.isReady()) {
       syncFromComposer();
     } else {
@@ -62,13 +78,17 @@ export function useCanvasSync({ composer }: UseCanvasSyncOptions): UseCanvasSync
       "element:resized",
     ];
 
-    events.forEach((event) => composer.on(event, syncFromComposer));
+    events.forEach((event) => composer.on(event, scheduleSync));
 
     return () => {
       composer.off(EVENTS.COMPOSER_READY, syncFromComposer);
-      events.forEach((event) => composer.off(event, syncFromComposer));
+      events.forEach((event) => composer.off(event, scheduleSync));
+      if (pendingRafRef.current != null) {
+        cancelAnimationFrame(pendingRafRef.current);
+        pendingRafRef.current = null;
+      }
     };
-  }, [composer, syncFromComposer]);
+  }, [composer, syncFromComposer, scheduleSync]);
 
   return {
     content,
