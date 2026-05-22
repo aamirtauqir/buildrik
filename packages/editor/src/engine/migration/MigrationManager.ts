@@ -1,6 +1,6 @@
 import type { EventEmitter } from "../EventEmitter";
-import { runProjectMigrations, type RunnerInput, type RunnerResult } from "../../editor/design-system/migrations/projectMigrations/runner";
-import { TARGET_PROJECT_VERSION } from "../../editor/design-system/migrations/projectMigrations/index";
+import { runProjectMigrations, type RunnerInput, type RunnerResult } from "../designSystem/migrations/projectMigrations/runner";
+import { TARGET_PROJECT_VERSION } from "../designSystem/migrations/projectMigrations/index";
 
 /**
  * Composer-owned manager for project-level DS schema migrations.

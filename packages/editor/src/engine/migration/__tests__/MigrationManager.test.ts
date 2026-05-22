@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { MigrationManager } from "../MigrationManager";
 import { EventEmitter } from "../../EventEmitter";
-import type { ProjectPayload } from "../../../editor/design-system/migrations/projectMigrations";
+import type { ProjectPayload } from "../../designSystem/migrations/projectMigrations";
 
 describe("MigrationManager", () => {
   beforeEach(() => localStorage.clear());

@@ -23,7 +23,7 @@ import type { Composer } from "../../../engine";
 import {
   PROJECT_MIGRATIONS,
   TARGET_PROJECT_VERSION,
-} from "../migrations/projectMigrations";
+} from "../../../engine/designSystem/migrations/projectMigrations";
 import { MigrationProgressModal, type MigrationStep } from "./MigrationProgressModal";
 
 interface MigrationStartedPayload {
