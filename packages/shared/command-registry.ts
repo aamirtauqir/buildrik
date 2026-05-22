@@ -27,7 +27,12 @@ export type CommandGroup =
 export interface Command {
   id: string;
   label: string;
-  group: CommandGroup;
+  /** Palette section header. Optional — palette UI groups by this when
+   *  rendered, but commands without a group fall into a default
+   *  "actions" bucket. Was required, but no current consumer reads it
+   *  and the requirement was blocking simpler test fixtures. Re-tighten
+   *  if/when palette wiring actually depends on grouping. */
+  group?: CommandGroup;
   icon?: ReactNode;
   shortcut?: string;
   /** Imperative action. Receives router. May return a promise for awaiting. */
