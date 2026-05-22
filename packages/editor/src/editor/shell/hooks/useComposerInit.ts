@@ -80,9 +80,35 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     openCollectionSetup,
   } = params;
 
+  // Codex P2 (2026-05-21): mount-only init effect previously captured
+  // `options`/`onReady`/`onEditor`/`onUpdate`/`addToast`/`openCollectionSetup`
+  // in its closure forever, with explicit exhaustive-deps suppression.
+  // Callers passing new function refs (e.g. inline arrow props from parent
+  // re-render) silently kept calling the FIRST-render version.
+  //
+  // Fix: stash mutable callbacks in refs synced every render. Init effect
+  // still runs mount-only (empty deps preserved), but reads `.current`
+  // through the refs so it always sees the latest functions. State setters
+  // (setComposer/setIsDirty/etc.) are stable by React contract — kept as
+  // captured.
+  const optionsRef = React.useRef(options);
+  const onReadyRef = React.useRef(onReady);
+  const onEditorRef = React.useRef(onEditor);
+  const onUpdateRef = React.useRef(onUpdate);
+  const addToastRef = React.useRef(addToast);
+  const openCollectionSetupRef = React.useRef(openCollectionSetup);
+  React.useEffect(() => {
+    optionsRef.current = options;
+    onReadyRef.current = onReady;
+    onEditorRef.current = onEditor;
+    onUpdateRef.current = onUpdate;
+    addToastRef.current = addToast;
+    openCollectionSetupRef.current = openCollectionSetup;
+  });
+
   // Initialize composer
   React.useEffect(() => {
-    const { project: projectConfig, ...composerOptions } = options || {};
+    const { project: projectConfig, ...composerOptions } = optionsRef.current || {};
     // Phase B2: wire remote asset sync. Always provided — the service
     // gracefully falls back to local-only on auth fail / offline / dashboard
     // unconfigured. siteId scopes asset rows when known.
@@ -107,7 +133,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
 
     // Store event handlers for proper cleanup
     const composerReadyHandler = () => {
-      onReady?.(instance);
+      onReadyRef.current?.(instance);
 
       const siteId = getSiteIdFromUrl();
 
@@ -139,7 +165,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               );
             } catch (err) {
               console.error("[BuildrikSync] DS migration failed:", err);
-              addToast({
+              addToastRef.current({
                 title: "Project update failed",
                 description: "Could not update design system schema. Loaded as-is.",
                 tone: "warning",
@@ -159,7 +185,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             if (remote) {
               await instance.media.importServerAssets(remote.assets, remote.folders);
             }
-            addToast({
+            addToastRef.current({
               title: "Project loaded",
               description: "Loaded from dashboard.",
               tone: "success",
@@ -167,7 +193,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           })
           .catch((err) => {
             console.error("[BuildrikSync] load failed:", err);
-            addToast({
+            addToastRef.current({
               title: "Load failed",
               description: "Could not load project from dashboard. Falling back to local.",
               tone: "warning",
@@ -191,7 +217,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           if (data) loadedFromStorage = true;
         })
         .catch(() => {
-          addToast({
+          addToastRef.current({
             title: "Load failed",
             description: "Could not load saved project.",
             tone: "warning",
@@ -230,7 +256,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // Note: setCanUndo/setCanRedo are intentionally NOT called here to avoid duplicate updates.
     // These are managed by a separate useEffect (lines 130-144) that handles undo/redo state changes.
     const projectChangedHandler = () => {
-      onUpdate?.(instance.exportProject());
+      onUpdateRef.current?.(instance.exportProject());
     };
 
     // Note: setCanUndo/setCanRedo are intentionally NOT called here to avoid duplicate updates.
@@ -259,7 +285,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     instance.on("zoom:changed", zoomChangedHandler);
 
     setComposer(instance);
-    onEditor?.(instance);
+    onEditorRef.current?.(instance);
 
     // Cleanup: Remove all event listeners before destroying
     return () => {
