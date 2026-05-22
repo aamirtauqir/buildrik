@@ -104,6 +104,7 @@ export async function listApiTokens(workspaceId: string) {
       user: { select: { id: true, fullName: true, email: true } },
     },
     orderBy: { createdAt: "desc" },
+    take: 100,
   });
 }
 

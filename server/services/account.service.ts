@@ -85,6 +85,7 @@ export async function getActiveSessions(userId: string) {
   return prisma.session.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    take: 50,
   });
 }
 
