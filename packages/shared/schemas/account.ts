@@ -46,8 +46,16 @@ export const workspaceSharingSettingsSchema = z.object({
   notify: z.boolean().optional(),
 });
 
+/**
+ * Manual / config-blob integrations. Vercel is INTENTIONALLY excluded —
+ * it ships as an OAuth-only integration via `vercelIntegrationsRouter`
+ * which writes `provider="vercel"` (lowercase) directly. Adding "VERCEL"
+ * here previously produced a footgun: callers could write uppercase
+ * "VERCEL" rows that `integrations.service.ts` lowercase lookups never
+ * find — silent duplicates that orphaned the OAuth flow.
+ */
 export const addIntegrationSchema = z.object({
-  provider: z.enum(["GOOGLE_ANALYTICS", "MAILCHIMP", "ZAPIER", "SLACK", "VERCEL"]),
+  provider: z.enum(["GOOGLE_ANALYTICS", "MAILCHIMP", "ZAPIER", "SLACK"]),
   config: z.record(z.unknown()),
 });
 

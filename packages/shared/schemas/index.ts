@@ -2,6 +2,7 @@ export * from "./account";
 export * from "./auth";
 export * from "./billing";
 export * from "./dashboard";
+export * from "./designToken";
 export * from "./forms";
 export * from "./help";
 export * from "./notifications";
