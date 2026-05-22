@@ -125,6 +125,45 @@ export const saveProjectDataSchema = z.object({
   dsSchemaVersion: z.number().int().min(0).optional(),
 });
 
+/**
+ * sites.saveProject — the EDITOR-side save path used by
+ * BuildrikSyncProvider.saveProject. Distinct from saveProjectDataSchema
+ * above which the dashboard's saveProjectData uses. Codex shared P1
+ * 2026-05-22: editor schema was inlined in routers/sites.ts with z.any()
+ * blobs and bypassed shared entirely — every editor save could drift
+ * silently. Extracted as-is here so shared is now the source of truth.
+ *
+ * Field shape uses `root` (engine element tree) rather than the
+ * dashboard-side `blocks` field, matching Page.blocks column rename
+ * Prisma does in saveProjectFromEditor service.
+ */
+export const editorSaveProjectSchema = z.object({
+  siteId: z.string(),
+  projectData: z.object({
+    version: z.string(),
+    pages: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string().optional(),
+        isHome: z.boolean().optional(),
+        root: z.unknown(),
+        styles: z.unknown().optional(),
+        settings: z.unknown().optional(),
+        meta: z.unknown().optional(),
+        slugHistory: z.unknown().optional(),
+        slugManuallySet: z.boolean().optional(),
+        seoTitle: z.string().nullable().optional(),
+        seoDescription: z.string().nullable().optional(),
+      })
+    ),
+    styles: z.array(z.unknown()),
+    assets: z.array(z.unknown()),
+    metadata: z.unknown().optional(),
+    settings: z.unknown().optional(),
+  }),
+});
+
 export const getProjectDataSchema = z.object({
   siteId: z.string(),
 });
@@ -133,3 +172,4 @@ export type CreateSiteInput = z.infer<typeof createSiteSchema>;
 export type ListSitesInput = z.infer<typeof listSitesSchema>;
 export type BulkActionInput = z.infer<typeof bulkActionSchema>;
 export type SaveProjectDataInput = z.infer<typeof saveProjectDataSchema>;
+export type EditorSaveProjectInput = z.infer<typeof editorSaveProjectSchema>;

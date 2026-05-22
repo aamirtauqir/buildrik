@@ -40,6 +40,7 @@ import {
   checkSlugSchema,
   saveProjectDataSchema,
   getProjectDataSchema,
+  editorSaveProjectSchema,
 } from "@buildrik/shared/schemas/sites";
 import { prePublishCheckSchema, publishInputSchema } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
@@ -227,35 +228,7 @@ export const sitesRouter = router({
     }),
 
   saveProject: protectedProcedure
-    .input(
-      z.object({
-        siteId: z.string(),
-        projectData: z.object({
-          version: z.string(),
-          pages: z.array(
-            z.object({
-              id: z.string(),
-              name: z.string(),
-              slug: z.string().optional(),
-              isHome: z.boolean().optional(),
-              root: z.any(),
-              styles: z.any().optional(),
-              settings: z.any().optional(),
-              // Phase -1: full page persistence — applied-template state, slug history, etc.
-              meta: z.any().optional(),
-              slugHistory: z.any().optional(),
-              slugManuallySet: z.boolean().optional(),
-              seoTitle: z.string().nullable().optional(),
-              seoDescription: z.string().nullable().optional(),
-            })
-          ),
-          styles: z.array(z.any()),
-          assets: z.array(z.any()),
-          metadata: z.any().optional(),
-          settings: z.any().optional(),
-        }),
-      })
-    )
+    .input(editorSaveProjectSchema)
     .mutation(async ({ input, ctx }) => {
       const site = await ctx.prisma.site.findUnique({
         where: { id: input.siteId },
