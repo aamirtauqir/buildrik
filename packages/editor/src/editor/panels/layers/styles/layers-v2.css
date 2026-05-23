@@ -533,20 +533,10 @@
   min-height: 0;
 }
 
-/* Panel header title column (h2 + sub) */
-.bdc-panel-h-ttl {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-/* Panel header action row (expand-all, collapse-all, gear) */
-.bdc-panel-h-acts {
-  display: inline-flex;
-  gap: 3px;
-  flex-shrink: 0;
-}
+/* .bdc-panel-h-ttl + .bdc-panel-h-acts removed 2026-05-24 — LayersTab
+   header migrated to TabFrame.Header (commit 0a2410a4). Action icons
+   now ride as children of TabFrame.Header; layout sourced from
+   PanelHeader's HeaderActions. */
 
 /* Search field (prototype .psearch shape) */
 .bdc-psearch {

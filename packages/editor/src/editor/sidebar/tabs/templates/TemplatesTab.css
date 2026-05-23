@@ -411,57 +411,10 @@
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
 }
 
-/* ── Panel header: breadcrumb row in detail mode (prototype-v3 §2) ── */
-.tpl-header-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-.tpl-header-back {
-  height: 24px;
-  padding: 2px 6px;
-  background: transparent;
-  border: none;
-  color: var(--bd-fg-muted, var(--bd-fg-secondary));
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 4px;
-  font-family: inherit;
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-.tpl-header-back:hover {
-  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
-  color: var(--bd-fg, var(--bd-fg-primary));
-}
-.tpl-header-path {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  flex: 1;
-  min-width: 0;
-}
-.tpl-header-path-cat {
-  color: var(--bd-fg-muted, var(--bd-fg-secondary));
-  text-transform: capitalize;
-  flex-shrink: 0;
-}
-.tpl-header-path-sep {
-  color: var(--bd-fg-muted, var(--bd-fg-muted));
-  flex-shrink: 0;
-}
-.tpl-header-path-current {
-  color: var(--bd-fg, var(--bd-fg-primary));
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+/* Breadcrumb row rules deleted 2026-05-24 in header-pattern migration
+   (commit 54f16df4). Detail mode now uses DrillInHeader (canonical
+   drill-in pattern). Removed: .tpl-header-breadcrumb, .tpl-header-back
+   (+ hover), .tpl-header-path*. */
 
 /* ── Detail panel: APPLIED HERE badge on preview ── */
 .tpl-detail-applied-badge {
@@ -807,44 +760,11 @@
   }
 }
 
-/* ── Custom header (replaces PanelHeader) ── */
-.tpl-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 48px;
-  padding: 0 var(--bd-space-6);
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
-  background: var(--bd-bg-card, var(--bd-bg-card));
-}
-.tpl-header-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--bd-fg-primary);
-  margin: 0;
-}
-/* Title-stack for parity with TabFrame.Header (Add / Layers / Pages),
-   which exposes a subtitle line below the heading. Templates uses a
-   bespoke header due to breadcrumb + newpage modes, so the
-   subtitle ships inline here. */
-.tpl-header-title-group {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.tpl-header-subtitle {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--bd-fg-muted, var(--bd-fg-secondary));
-  margin-top: 1px;
-  line-height: 1.2;
-}
-.tpl-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+/* Custom header rules deleted 2026-05-24 in header-pattern migration
+   (commit 54f16df4). Templates 3-mode header now uses canonical
+   TabFrame.Header + DrillInHeader (mode-routing). Removed: .tpl-header,
+   .tpl-header-title, .tpl-header-title-group, .tpl-header-subtitle,
+   .tpl-header-actions. */
 
 /* ── Breadcrumb (Screen cV3OT) ── */
 .tpl-breadcrumb {
@@ -875,15 +795,7 @@
 }
 
 
-/* ── New page context header ── */
-.tpl-newpage-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.tpl-header-title--sm {
-  font-size: 15px;
-}
+/* ── New page chip (still live in TabFrame.Header children slot) ── */
 .tpl-newpage-chip {
   height: 28px;
   padding: 0 var(--bd-space-3);
@@ -896,6 +808,8 @@
   align-items: center;
   white-space: nowrap;
 }
+/* .tpl-newpage-header + .tpl-header-title--sm removed 2026-05-24 —
+   newpage mode now uses TabFrame.Header with chip as a child. */
 
 /* ── Create flow modal variants ── */
 .tpl-modal--create {
