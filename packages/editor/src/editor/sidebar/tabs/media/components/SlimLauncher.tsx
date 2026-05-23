@@ -9,9 +9,10 @@
  */
 
 import * as React from "react";
-import { X, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { TypePills } from "./TypePills";
@@ -66,28 +67,14 @@ export function SlimLauncher(props: SlimLauncherProps) {
   }, [props.libraryItems, activeType, searchQuery]);
 
   return (
-    <div className="sl-launcher">
+    <TabFrame className="sl-launcher">
       {selectionContext ? (
         <SelectionContextBar
           label={selectionContext.label}
           onCancel={onCancelSelection ?? (() => {})}
         />
       ) : null}
-      <header className="sl-header">
-        <h3 className="sl-title">Media</h3>
-        <div className="sl-header-actions">
-          {onClose ? (
-            <Button
-              type="button"
-              className="sl-icon-btn"
-              onClick={onClose}
-              aria-label="Close panel"
-            >
-              <X size={16} />
-            </Button>
-          ) : null}
-        </div>
-      </header>
+      <TabFrame.Header title="Media" onClose={onClose} />
       <div className="sl-controls">
         <TypePills
           activeType={activeType}
@@ -156,6 +143,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
           disabled={props.storage.used >= props.storage.total}
         />
       </div>
-    </div>
+    </TabFrame>
   );
 }
