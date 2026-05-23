@@ -7,9 +7,9 @@
  * `tokenToCssVar(id)` in `editor/design-system/types.ts`.
  *
  * Used by Inspector controls participating in token binding (spec §6.4).
- * Today's planned consumers: ColorInput, FourSideInput (margin/padding axes).
- * Existing inline duplicates that should adopt this util: SizeSection.tsx,
- * typography/FontControls.tsx.
+ * Today's consumers: ColorInput, SpacingBox (margin/padding axes — replaced
+ * legacy FourSideInput, removed 2026-05-24). Existing inline duplicates
+ * that should adopt this util: SizeSection.tsx, typography/FontControls.tsx.
  *
  * @license BSD-3-Clause
  */

@@ -68,8 +68,9 @@ export const StarterGalleryMount: React.FC<StarterGalleryMountProps> = ({ projec
   // 2026-05-22 design plan review D3: starter gallery NO LONGER auto-opens
   // on first project load. Decision: AI generator (PageWizard) is the
   // content-first default surface. Theme picker stays available but
-  // discoverable rather than blocking — user can open it via Design tab
-  // (entry point still TODO — see follow-up task).
+  // discoverable rather than blocking — user opens it via Design tab's
+  // "Browse starter themes" button (shipped commit 70bdceee, emits
+  // UI_OPEN_STARTERS which this Mount subscribes to below).
   //
   // Mark seen on first mount so the PageWizard's dependent check
   // (`if starter-gallery-seen → skip wizard re-show after dismiss`) still

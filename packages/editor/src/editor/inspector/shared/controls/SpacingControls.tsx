@@ -156,93 +156,11 @@ export const SpacingBox: React.FC<SpacingBoxProps> = ({
 );
 
 // ============================================================================
-// LEGACY FourSideInput — kept for back-compat (renders single quad).
-// Consumers should migrate to SpacingBox for combined margin+padding.
-// ============================================================================
-
-export interface FourSideInputProps {
-  label: string;
-  values: { top: string; right: string; bottom: string; left: string };
-  onChange: (side: Side, value: string) => void;
-  onLinkToggle?: () => void;
-  linked?: boolean;
-  disabledSides?: Partial<Record<Side, boolean | undefined>>;
-  disabledReason?: string;
-  // TODO(ds-phase-d1): chip integration deferred — FourSideInput has 0 production callers as of D.1. SpacingBox (canonical) gains the chip.
-  composer?: Composer | null;
-}
-
-export const FourSideInput: React.FC<FourSideInputProps> = ({
-  label,
-  values,
-  onChange,
-  onLinkToggle,
-  linked = false,
-  disabledSides,
-  disabledReason,
-}) => (
-  <Stack gap="xs">
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 4,
-      }}
-    >
-      <span className="bdi-sub-label" title={disabledReason}>
-        {label}
-      </span>
-      {onLinkToggle && (
-        <Button
-          type="button"
-          onClick={onLinkToggle}
-          title={linked ? "Unlink sides" : "Link all sides"}
-          aria-label={linked ? "Unlink sides" : "Link all sides"}
-          className="bdi-icon-btn"
-          style={{
-            width: 18,
-            height: 18,
-            color: linked ? "var(--bd-accent)" : "var(--bd-fg-muted)",
-          }}
-        >
-          {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
-        </Button>
-      )}
-    </div>
-    <div className="bdi-quad">
-      {(["top", "right", "bottom", "left"] as const).map((side) => {
-        const { num, unit, isKeyword } = parseValue(values[side]);
-        return (
-          <div
-            key={side}
-            className="bdi-num axis"
-            data-axis={SIDE_POS[side].toUpperCase()}
-            style={disabledSides?.[side] ? { opacity: 0.5, pointerEvents: "none" } : undefined}
-          >
-            <Input
-              type="text"
-              value={num}
-              onChange={(e) => {
-                const v = e.target.value;
-                if (v === "" || v === "auto" || v === "inherit") onChange(side, v);
-                else if (/^-?[\d.]+$/.test(v)) onChange(side, `${v}px`);
-              }}
-              placeholder="0"
-              className={isKeyword ? "muted" : ""}
-              aria-label={side}
-            />
-            {unit && !isKeyword && <span className="bdi-u">{unit}</span>}
-          </div>
-        );
-      })}
-    </div>
-  </Stack>
-);
-
-// ============================================================================
 // CORNER RADIUS INPUT
 // ============================================================================
+// Note: legacy FourSideInput (single-quad spacing control) removed
+// 2026-05-24. Had zero production callers since DS Phase D.1; the
+// canonical control is SpacingBox above.
 
 export interface CornerRadiusInputProps {
   values: { tl: string; tr: string; br: string; bl: string };

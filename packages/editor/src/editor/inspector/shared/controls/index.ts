@@ -32,8 +32,8 @@ export { SliderInput, RangeSlider } from "./SliderControls";
 export type { SliderInputProps, RangeSliderProps } from "./SliderControls";
 
 // Spacing controls
-export { SpacingBox, FourSideInput, CornerRadiusInput } from "./SpacingControls";
-export type { SpacingBoxProps, FourSideInputProps, CornerRadiusInputProps } from "./SpacingControls";
+export { SpacingBox, CornerRadiusInput } from "./SpacingControls";
+export type { SpacingBoxProps, CornerRadiusInputProps } from "./SpacingControls";
 
 // Linked gap input (flex + grid)
 export { LinkedGapInput } from "./LinkedGapInput";
