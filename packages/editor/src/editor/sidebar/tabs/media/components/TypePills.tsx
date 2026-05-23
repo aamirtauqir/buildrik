@@ -22,11 +22,11 @@ interface TypePillsProps {
 // narrow Media-panel width without horizontal-scroll clipping the last
 // pill. `title` exposes the full word for hover + screen readers.
 const PILLS: Array<{ key: MediaTypeFilter; label: string; title: string }> = [
-  { key: "all", label: "All",   title: "All" },
-  { key: "img", label: "Img",   title: "Images" },
-  { key: "vid", label: "Video", title: "Video" },
-  { key: "ico", label: "Icons", title: "Icons" },
-  { key: "fnt", label: "Fonts", title: "Fonts" },
+  { key: "all", label: "All", title: "All" },
+  { key: "img", label: "Img", title: "Images" },
+  { key: "vid", label: "Vid", title: "Video" },
+  { key: "ico", label: "Ico", title: "Icons" },
+  { key: "fnt", label: "Fnt", title: "Fonts" },
 ];
 
 export function TypePills({

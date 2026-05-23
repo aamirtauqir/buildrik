@@ -45,7 +45,12 @@ const STATE_CONFIG: Record<PublishState, StateConfig> = {
     iconColor: "var(--bd-bg-card)",
     textColor: "var(--bd-bg-card)",
     chevronColor: "var(--bd-accent-tint)",
-    badge: { label: "Draft", bg: "var(--bd-accent-pressed)", text: "var(--bd-accent-alpha-30)" },
+    // Draft pill sits on the cobalt Publish button. Text was
+    // --bd-accent-alpha-30 (30% cobalt) on bg --bd-accent-pressed (darker
+    // cobalt) — both same hue family, near-zero contrast, label
+    // unreadable in the live walk. White-tint matches the in-review pill
+    // pattern (light text on darker brand color) and stays accessible.
+    badge: { label: "Draft", bg: "var(--bd-accent-pressed)", text: "var(--bd-bg-card)" },
   },
   "in-review": {
     buttonLabel: "In Review",

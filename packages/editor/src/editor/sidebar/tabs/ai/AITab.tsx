@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import { ScopeChip } from "./ScopeChip";
 import { ChatThread } from "./ChatThread";
 import { Composer as PromptComposer } from "./Composer";
@@ -16,7 +17,7 @@ export interface AITabProps {
   onClose: () => void;
 }
 
-export const AITab: React.FC<AITabProps> = ({ composer }) => {
+export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) => {
   const { scope, status, lock, unlock } = useAIScope(composer);
   const stream = useStreamPrompt();
   const [model, setModel] = React.useState<AIModel>(DEFAULT_MODEL);
@@ -72,7 +73,13 @@ export const AITab: React.FC<AITabProps> = ({ composer }) => {
   }, [messages, submit]);
 
   return (
-    <div className="bd-ai-tab" role="region" aria-label="AI assistant">
+    <TabFrame className="bd-ai-tab">
+      <TabFrame.Header
+        title="AI"
+        subtitle="Chat with Claude to edit your page"
+        onHelpClick={onHelpClick}
+        onClose={onClose}
+      />
       <ScopeChip scope={scope} status={status} />
       <ChatThread
         messages={messages}
@@ -89,7 +96,7 @@ export const AITab: React.FC<AITabProps> = ({ composer }) => {
         onStop={stream.stop}
         streaming={stream.streaming}
       />
-    </div>
+    </TabFrame>
   );
 };
 
