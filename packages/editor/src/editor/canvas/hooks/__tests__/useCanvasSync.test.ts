@@ -68,14 +68,14 @@ describe("useCanvasSync — RAF coalescing", () => {
     expect(composer._toHTML).toHaveBeenCalledTimes(1);
   });
 
-  it("100 element:updated events collapse to one toHTML call per frame", () => {
+  it("100 project:changed events collapse to one toHTML call per frame", () => {
     const composer = makeFakeComposer();
     renderHook(() => useCanvasSync({ composer: composer as never }));
     composer._toHTML.mockClear();
 
     act(() => {
       for (let i = 0; i < 100; i++) {
-        composer.emit("element:updated");
+        composer.emit("project:changed");
       }
     });
 
@@ -105,15 +105,16 @@ describe("useCanvasSync — RAF coalescing", () => {
     composer._toHTML.mockClear();
 
     act(() => {
-      composer.emit("element:moved");
-      composer.emit("element:resized");
+      // Two emits in the same frame collapse to one toHTML.
+      composer.emit("project:changed");
+      composer.emit("project:changed");
     });
     act(() => flushRaf());
     expect(composer._toHTML).toHaveBeenCalledTimes(1);
 
     act(() => {
-      composer.emit("element:updated");
-      composer.emit("element:updated");
+      composer.emit("project:changed");
+      composer.emit("project:changed");
     });
     act(() => flushRaf());
     expect(composer._toHTML).toHaveBeenCalledTimes(2);
@@ -126,7 +127,7 @@ describe("useCanvasSync — RAF coalescing", () => {
     );
     composer._toHTML.mockClear();
 
-    act(() => composer.emit("element:updated"));
+    act(() => composer.emit("project:changed"));
     expect(rafQueue.length).toBe(1);
 
     unmount();

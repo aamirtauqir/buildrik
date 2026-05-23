@@ -37,11 +37,16 @@ export function useCanvasSync({ composer }: UseCanvasSyncOptions): UseCanvasSync
     }
   }, [composer]);
 
-  // RAF-coalesced sync — used by the event subscriptions below. 12 composer
-  // events each trigger a full `elements.toHTML()` regen; drag/resize/move
-  // tick at native frame rate, fanning hundreds of full-tree serializations
-  // per gesture. Coalescing to one regen per animation frame collapses the
-  // storm without changing perceived behavior. (Codex editor audit P2 #10.)
+  // RAF-coalesced sync — used by the event subscriptions below.
+  // `project:changed` is the authoritative content-changed signal: every
+  // mutation in the engine calls `composer.markDirty()` which emits it,
+  // so a single subscriber catches element/page/style changes alike.
+  // Coalescing to one regen per animation frame collapses drag-tick
+  // storms without changing perceived behavior. (Codex editor audit P2
+  // #10. Prior arc subscribed to 12 specific events — 5 were dead
+  // listeners with zero emitters in engine source, and the live 6 were
+  // structurally redundant since markDirty() always follows the
+  // specific-event emit. Verified via engine audit 2026-05-23.)
   const pendingRafRef = React.useRef<number | null>(null);
   const scheduleSync = React.useCallback(() => {
     if (pendingRafRef.current != null) return;
@@ -63,26 +68,16 @@ export function useCanvasSync({ composer }: UseCanvasSyncOptions): UseCanvasSync
       composer.on(EVENTS.COMPOSER_READY, syncFromComposer);
     }
 
-    const events = [
-      "project:imported",
-      "project:loaded",
-      "project:changed",
-      "page:created",
-      "page:deleted",
-      "page:changed",
-      "element:created",
-      "element:deleted",
-      "element:duplicated",
-      "element:updated",
-      "element:moved",
-      "element:resized",
-    ];
-
-    events.forEach((event) => composer.on(event, scheduleSync));
+    // PROJECT_LOADED fires once per fresh project (cloud load / import /
+    // open-file). PROJECT_CHANGED fires after every mutation via
+    // markDirty. Both go through scheduleSync for RAF coalescing.
+    composer.on(EVENTS.PROJECT_LOADED, scheduleSync);
+    composer.on(EVENTS.PROJECT_CHANGED, scheduleSync);
 
     return () => {
       composer.off(EVENTS.COMPOSER_READY, syncFromComposer);
-      events.forEach((event) => composer.off(event, scheduleSync));
+      composer.off(EVENTS.PROJECT_LOADED, scheduleSync);
+      composer.off(EVENTS.PROJECT_CHANGED, scheduleSync);
       if (pendingRafRef.current != null) {
         cancelAnimationFrame(pendingRafRef.current);
         pendingRafRef.current = null;
