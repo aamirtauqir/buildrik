@@ -106,12 +106,8 @@
   font-variant-numeric: tabular-nums;
 }
 .bd-pg-footer-stats b { color: var(--bd-fg-heading); font-weight: 600; }
-.bd-pg-add-ghost {
-  background: transparent !important;
-  color: var(--bd-fg-primary) !important;
-  border: 1px solid var(--bd-border-medium) !important;
-}
-.bd-pg-add-ghost:hover { background: var(--bd-bg-subtle) !important; }
+/* .bd-pg-add-ghost (+ :hover) removed 2026-05-24 — JSX consumer deleted
+   in earlier Pages refactor; CSS left orphan. */
 
 /* ─── LIST ────────────────────────────────────────────────────────────── */
 .bd-pg-list-shell {
@@ -428,76 +424,10 @@
   gap: 6px;
   background: linear-gradient(to top, var(--bd-bg-panel) 80%, transparent);
 }
-.bd-pg-add {
-  width: 100%;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: var(--bd-accent);
-  color: var(--bd-fg-on-accent);
-  border: 0;
-  border-radius: var(--bd-radius-md);
-  font: 600 12.5px var(--bd-font);
-  cursor: pointer;
-  transition: background 100ms;
-}
-.bd-pg-add:hover { background: var(--bd-accent-hover); }
-.bd-pg-add svg { width: 12px; height: 12px; }
-.bd-pg-add-wrap {
-  position: relative;
-  display: flex;
-  gap: var(--bd-space-1);
-}
-.bd-pg-add-wrap .bd-pg-add { flex: 1; }
-.bd-pg-add-overflow {
-  display: inline-grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: var(--bd-bg-subtle);
-  color: var(--bd-fg-muted);
-  cursor: pointer;
-  transition: background 100ms;
-}
-.bd-pg-add-overflow:hover {
-  background: rgba(15, 23, 42, 0.08);
-  color: var(--bd-fg-heading);
-}
-.bd-pg-add-overflow svg { width: 14px; height: 14px; }
-.bd-pg-add-popover {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  right: 0;
-  min-width: 160px;
-  padding: var(--bd-space-1);
-  border-radius: 4px;
-  background: var(--bd-bg-card);
-  color: var(--bd-fg-primary);
-  border: 1px solid var(--bd-border-light);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-  z-index: 10;
-}
-.bd-pg-add-option {
-  display: block;
-  width: 100%;
-  padding: 6px 10px;
-  text-align: left;
-  background: transparent;
-  border: 0;
-  border-radius: 3px;
-  color: var(--bd-fg-primary);
-  font: 400 12px var(--bd-font);
-  cursor: pointer;
-}
-.bd-pg-add-option:hover {
-  background: var(--bd-accent-tint);
-  color: var(--bd-fg-heading);
-}
+/* .bd-pg-add + .bd-pg-add-wrap/-overflow/-popover/-option families
+   removed 2026-05-24 — JSX consumer deleted in earlier Pages refactor;
+   CSS left orphan. Footer "+ Page" button now renders via vibcoder
+   Button + Popover, not these bespoke classes. */
 .bd-pg-stats {
   font-family: var(--bd-mono);
   font-size: 10.5px;
@@ -1211,164 +1141,18 @@
   line-height: 1.4;
 }
 
-/* ─── SETTINGS DRAWER — ADVANCED TAB (Task 9d) ────────────────────────── */
-.bd-pg-adv {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.bd-pg-adv-section { display: flex; flex-direction: column; gap: var(--bd-space-2); }
-.bd-pg-adv-section-label {
-  font: 600 11px var(--bd-font);
-  color: var(--bd-fg-heading);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.bd-pg-adv-hint {
-  font: 400 11px var(--bd-font);
-  color: var(--bd-fg-muted);
-  line-height: 1.45;
-}
-
-/* Visibility segmented control */
-.bd-pg-adv-seg {
-  display: inline-flex;
-  padding: 2px;
-  background: var(--bd-bg-subtle);
-  border: 1px solid var(--bd-border);
-  border-radius: 4px;
-}
-.bd-pg-adv-seg-btn {
-  flex: 1;
-  padding: 5px 14px;
-  border: 0;
-  background: transparent;
-  color: var(--bd-fg-secondary);
-  font: 500 11.5px var(--bd-font);
-  cursor: pointer;
-  border-radius: 3px;
-  transition: background 100ms, color 100ms;
-}
-.bd-pg-adv-seg-btn:hover { color: var(--bd-fg-heading); }
-.bd-pg-adv-seg-btn--on {
-  background: var(--bd-bg-card);
-  color: var(--bd-fg-heading);
-  box-shadow: var(--bd-shadow-xs);
-}
-
-/* Password reveal block */
-.bd-pg-adv-password {
-  padding: 10px;
-  background: var(--bd-bg-subtle);
-  border: 1px solid var(--bd-border);
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--bd-space-2);
-}
-.bd-pg-adv-password-row { display: flex; gap: 6px; }
-.bd-pg-adv-password-input {
-  flex: 1;
-  padding: 6px 10px;
-  background: var(--bd-bg-card);
-  border: 1px solid var(--bd-border);
-  border-radius: 4px;
-  color: var(--bd-fg-heading);
-  font: 500 12px var(--bd-mono);
-  outline: 0;
-  transition: border-color 100ms, box-shadow 100ms;
-}
-.bd-pg-adv-password-input:focus {
-  border-color: var(--bd-accent);
-  box-shadow: 0 0 0 3px var(--bd-accent-tint);
-}
-.bd-pg-adv-password-btn {
-  padding: 0 10px;
-  border: 1px solid var(--bd-border);
-  background: var(--bd-bg-card);
-  color: var(--bd-fg-secondary);
-  font: 500 11px var(--bd-font);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 100ms, color 100ms;
-}
-.bd-pg-adv-password-btn:hover {
-  background: var(--bd-bg-hover);
-  color: var(--bd-fg-heading);
-}
-.bd-pg-adv-password-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Indexing toggle row + iOS-style toggle switch */
-.bd-pg-adv-toggle-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 6px 0;
-}
-.bd-pg-adv-toggle-info { flex: 1; min-width: 0; }
-.bd-pg-adv-toggle-label {
-  font: 500 12px var(--bd-font);
-  color: var(--bd-fg-heading);
-}
-.bd-pg-adv-toggle-hint {
-  margin-top: 2px;
-  font: 400 10.5px var(--bd-font);
-  color: var(--bd-fg-muted);
-  line-height: 1.45;
-}
-.bd-pg-adv-toggle {
-  width: 28px;
-  height: 16px;
-  padding: 0;
-  border: 0;
-  background: var(--bd-border-strong);
-  border-radius: var(--bd-radius-full);
-  position: relative;
-  flex-shrink: 0;
-  margin-top: 2px;
-  cursor: pointer;
-  transition: background 150ms;
-}
-.bd-pg-adv-toggle::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 12px;
-  height: 12px;
-  border-radius: var(--bd-radius-full);
-  background: var(--bd-fg-on-accent);
-  transition: left 150ms ease-out;
-  box-shadow: var(--bd-shadow-xs);
-}
-.bd-pg-adv-toggle--on { background: var(--bd-accent); }
-.bd-pg-adv-toggle--on::after { left: 14px; }
-
-/* Custom <head> code textarea — taller + monospace */
-.bd-pg-adv-head {
-  min-height: 100px;
-  font-family: var(--bd-mono);
-  font-size: 11.5px;
-  line-height: 1.4;
-}
+/* .bd-pg-adv* (Settings Drawer Advanced tab) family removed 2026-05-24 —
+   JSX consumer (PageAdvancedTab) deleted in earlier Pages refactor; CSS
+   left orphan. Settings drawer now uses vibcoder primitives (Toggle,
+   Segmented, Input). Task 9d artifact. */
 
 /* ─── A11Y FOCUS RING ─────────────────────────────────────────────────── */
 .bd-pg-row:focus-visible,
-.bd-pg-add:focus-visible,
 .bd-pg-row-overflow:focus-visible,
 .bd-pg-bulk-toolbar button:focus-visible,
-.bd-pg-row-disclosure:focus-visible,
 .bd-pg-drawer-back:focus-visible,
 .bd-pg-drawer-save:focus-visible,
-.bd-pg-drawer-tab:focus-visible,
-.bd-pg-panel-kbd-btn:focus-visible,
-.bd-pg-error-retry:focus-visible,
-.bd-pg-adv-seg-btn:focus-visible,
-.bd-pg-adv-toggle:focus-visible,
-.bd-pg-adv-password-btn:focus-visible {
+.bd-pg-drawer-tab:focus-visible {
   outline: 2px solid var(--bd-accent);
   outline-offset: 2px;
 }

@@ -1,5 +1,6 @@
 @import "./tabs/history/styles/history.css";
-@import "./tabs/settings/styles/settings.css";
+/* settings.css @import removed 2026-05-24 — file deleted (3 orphan classes
+   .buildrick-form-group/.bd-input-error/.bd-settings-pane, zero consumers). */
 @import "../design-system/styles/design-tokens.css";
 @import "./tabs/media/MediaTab.css";
 @import "./shared/SkeletonStates.css";
