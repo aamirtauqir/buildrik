@@ -1,23 +1,21 @@
-import { EditorCommandRegistryProvider } from "@/components/command-palette/EditorCommandRegistryContext";
-
 /**
  * /edit/[siteId] layout.
  *
- * Pass-through plus EditorCommandRegistryProvider so editor commands can
- * register into the dashboard's Cmd+K registry without editor importing
- * dashboard directly (preserves editor → shared → dashboard dependency
- * direction). Cherry-pick #4.
+ * Pass-through. Previously wrapped children in EditorCommandRegistryProvider
+ * (cherry-pick #4 Cmd+K registry bridge), but the registry layer never had
+ * a consumer — no editor code called useRegisterCommand, and the dashboard
+ * command palette uses static lists, not the registry. Dropped the layer
+ * 2026-05-23 honesty drain. Cmd+K full build (if ever shipped) should be
+ * a separate arc that wires palette → registry → editor consumers in
+ * lockstep, not scaffold-first.
  *
- * Dashboard chrome (Sidebar+Topbar at app/dashboard/layout.tsx) does NOT wrap
- * this route — different folder.
- *
- * SSR skeleton currently rendered by EditorSkeleton during dynamic-import
- * load state. Promoting to a true SSR shell here is a Phase 1 polish task.
+ * Dashboard chrome (Sidebar+Topbar at app/dashboard/layout.tsx) does NOT
+ * wrap this route — different folder.
  */
 export default function EditorLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <EditorCommandRegistryProvider>{children}</EditorCommandRegistryProvider>;
+  return <>{children}</>;
 }
