@@ -215,7 +215,12 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
               <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
             )}
             {displayPrefs.showElementIds && (
-              <span className="bdc-lr-id" aria-hidden>#{layer.id.slice(0, 8)}</span>
+              // 8-char slice truncates IDs with shared prefix (e.g. multiple
+              // elements born from one createElement burst share `el-mpebx*`
+              // and diverge only in the trailing 4 chars). Bumping to 12 +
+              // exposing the full id via title disambiguates the layer
+              // tree without ballooning row width.
+              <span className="bdc-lr-id" title={layer.id} aria-hidden>#{layer.id.slice(0, 12)}</span>
             )}
             {layer.isComponent && (
               <span className="bdc-lr-cmp" title="Component instance" aria-label="Component instance">⚡</span>
