@@ -84,7 +84,46 @@ export const pageMetaSchema = z
   })
   .passthrough();
 
-export const pageSettingsSchema = z.unknown(); // shape owned by editor; forward-compat
+/**
+ * Page SEO metadata — mirrors editor's `PageSEO` interface in
+ * packages/editor/src/shared/types/project.ts. All fields optional;
+ * structuredData passes through as a free-form record so JSON-LD
+ * payloads survive validation without us pinning their shape.
+ */
+export const pageSeoSchema = z
+  .object({
+    metaTitle: z.string().optional(),
+    metaDescription: z.string().optional(),
+    ogImage: z.string().optional(),
+    ogTitle: z.string().optional(),
+    ogDescription: z.string().optional(),
+    twitterCard: z.enum(["summary", "summary_large_image"]).optional(),
+    twitterTitle: z.string().optional(),
+    twitterDescription: z.string().optional(),
+    twitterImage: z.string().optional(),
+    noIndex: z.boolean().optional(),
+    noFollow: z.boolean().optional(),
+    canonicalUrl: z.string().optional(),
+    structuredData: z.record(z.unknown()).optional(),
+  })
+  .passthrough();
+
+/**
+ * Per-page settings — mirrors editor's `PageSettings` interface in
+ * packages/editor/src/shared/types/project.ts. Was `z.unknown()` —
+ * Codex shared P2 audit flagged the unshaped contract field. Now
+ * shaped with passthrough so unknown future keys still round-trip.
+ */
+export const pageSettingsSchema = z
+  .object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    head: z.string().optional(),
+    seo: pageSeoSchema.optional(),
+    visibility: z.enum(["live", "hidden", "password"]).optional(),
+    password: z.string().optional(),
+  })
+  .passthrough();
 
 /**
  * Slug-change history entry. Matches editor's `SlugChange` interface in
