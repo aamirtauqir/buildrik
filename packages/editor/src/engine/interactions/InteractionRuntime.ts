@@ -391,5 +391,7 @@ export class InteractionRuntime {
     }
   }
 }
-
-export const interactionRuntime = new InteractionRuntime();
+// Singleton `interactionRuntime` removed 2026-05-24 — zero consumers.
+// InteractionManager instantiates its own InteractionRuntime per Composer
+// instance, so a module-level singleton was just an unused allocation
+// at module load. Re-add if a real cross-Composer use case appears.
