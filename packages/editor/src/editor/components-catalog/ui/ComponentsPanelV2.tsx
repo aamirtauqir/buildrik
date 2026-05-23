@@ -184,22 +184,28 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
         onPinToggle={onPinToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleOpenAI}
-          data-components-ai-entry
-          aria-label="Add component via AI"
-          style={headerAiButtonStyle}
-        >
-          + AI
-        </Button>
-      </PanelHeader>
+      />
 
+      {/* AI-entry moved from header to subheader (2026-05-23 walk):
+          header had five controls in the narrow panel chrome
+          (Title + Pin + Help + Close + AI pill). Pin/Help/Close are
+          baseline; AI is an action that lives more naturally next to
+          DSStatusChip. Keeps header pattern parity with other panels. */}
       <div style={subHeaderStyle}>
         <DSStatusChip onJumpToDesign={onJumpToDesign} />
+        <div style={{ marginLeft: "auto" }}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleOpenAI}
+            data-components-ai-entry
+            aria-label="Add component via AI"
+            style={headerAiButtonStyle}
+          >
+            + AI
+          </Button>
+        </div>
       </div>
 
       <div style={filterRowStyle} role="radiogroup" aria-label="Filter components">
