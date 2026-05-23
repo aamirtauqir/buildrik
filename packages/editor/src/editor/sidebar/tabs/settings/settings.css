@@ -232,16 +232,9 @@
   color: var(--bd-fg-muted);
   font-size: 9.5px;
 }
-.bd-set-field-cc {
-  font: 500 9px var(--bd-mono);
-  color: var(--bd-fg-muted);
-}
-.bd-set-field-cc.warn {
-  color: var(--bd-warning);
-}
-.bd-set-field-cc.err {
-  color: var(--bd-error);
-}
+/* .bd-set-field-cc (+ .warn/.err) removed 2026-05-24 — zero JSX
+   consumers. Char-count display now uses vibcoder SectionLabel
+   counter slot, not bespoke class. */
 
 /* ── Input / Textarea / Select ── */
 .bd-set-input {
@@ -383,15 +376,8 @@ textarea.bd-set-input {
   border-radius: var(--bd-radius-sm-plus);
   margin: var(--bd-space-3);
 }
-.bd-set-branding-placeholder-t {
-  font: 600 11.5px var(--bd-font);
-  color: var(--bd-fg-heading);
-}
-.bd-set-branding-placeholder-d {
-  font: 500 10.5px var(--bd-font);
-  color: var(--bd-fg-secondary);
-  line-height: 1.5;
-}
+/* .bd-set-branding-placeholder-t/-d removed 2026-05-24 — zero JSX
+   consumers. Branding placeholder uses vibcoder EmptyState now. */
 
 /* ── Branding field map (signposts to where each field lives) ── */
 .bd-set-branding-map {
