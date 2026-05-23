@@ -40,8 +40,16 @@ const extractCssVar = (val: string): string | null => {
 /**
  * Extract element ID from an [data-buildrick-id="..."] selector.
  * Handles pseudo selectors: [data-buildrick-id="foo"]:hover → "foo"
+ *
+ * Returns null for any non-string input. StyleData.selector is typed as
+ * `string` per the contract, but project payloads from older clients can
+ * land with selector=undefined when an import path emitted a malformed
+ * rule (e.g. legacy save shape, partial deserialize). Without the guard
+ * here, useMemo throws → DesignSystemTab + every panel above the error
+ * boundary unmounts to "Something went wrong" (real bug found 2026-05-23).
  */
-const extractElementIdFromSelector = (selector: string): string | null => {
+export const extractElementIdFromSelector = (selector: unknown): string | null => {
+  if (typeof selector !== "string") return null;
   const m = selector.match(/\[data-buildrick-id="([^"]+)"\]/);
   return m ? m[1] : null;
 };
