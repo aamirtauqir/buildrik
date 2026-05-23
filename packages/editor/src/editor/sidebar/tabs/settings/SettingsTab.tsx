@@ -715,43 +715,12 @@ export const SettingsTab: React.FC<
 
   return (
     <TabFrame>
-      <div className="bd-set-panel-h">
-        <div className="bd-set-panel-h-ttl">
-          <h2>{isRoot ? "Settings" : current.title}</h2>
-          {!isRoot && current.subtitle ? (
-            <span className="bd-set-panel-sub">{current.subtitle}</span>
-          ) : null}
-        </div>
-        <div className="bd-set-panel-acts">
-          {onHelpClick ? (
-            <Button
-              type="button"
-              className="bd-set-icon-btn"
-              onClick={onHelpClick}
-              aria-label="Help"
-              title="Help"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 17v-.5 M12 8a2 2 0 012 2c0 2-2 2-2 3.5" />
-              </svg>
-            </Button>
-          ) : null}
-          {onClose ? (
-            <Button
-              type="button"
-              className="bd-set-icon-btn"
-              onClick={onClose}
-              aria-label="Close"
-              title="Close"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M4 4l16 16M20 4L4 20" />
-              </svg>
-            </Button>
-          ) : null}
-        </div>
-      </div>
+      <TabFrame.Header
+        title={isRoot ? "Settings" : current.title}
+        subtitle={!isRoot ? current.subtitle : undefined}
+        onHelpClick={onHelpClick}
+        onClose={onClose}
+      />
       <TabFrame.Body noScroll>
         <div
           className={`bd-set-stack${transitioning ? " transitioning" : ""}${prefersReducedMotion ? " no-motion" : ""}`}
