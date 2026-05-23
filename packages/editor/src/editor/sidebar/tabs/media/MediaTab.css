@@ -18,24 +18,9 @@
   to { transform: translateY(0); }
 }
 
-.med-bulk-btn {
-  height: 28px;
-  padding: 0 var(--bd-space-3);
-  border-radius: var(--bd-radius-sm-plus);
-  border: 1px solid var(--bd-border);
-  background: var(--bd-bg-card);
-  color: var(--bd-fg-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.med-bulk-btn.danger {
-  color: var(--bd-error);
-  border-color: var(--bd-error);
-}
+/* .med-bulk-btn (+ .danger) removed 2026-05-24 — zero JSX consumers.
+   Bulk-mode actions now render via MultiSelectBanner with vibcoder
+   Button primitives, not bespoke buttons (Phase 5 SSOT). */
 
 .med-grid {
   display: grid;
