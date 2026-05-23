@@ -412,16 +412,36 @@ export class StyleEngine {
   }
 
   /**
-   * Import styles
+   * Import styles. Drops malformed entries (missing id / non-string
+   * selector / missing properties) instead of letting them poison the
+   * engine state. Legacy project payloads have shipped with rules
+   * carrying selector=undefined; without this filter they reach
+   * downstream consumers (useTokenUsageMap, generateCSS) and crash
+   * the panel via the error boundary above DesignSystemTab.
    */
   importStyles(styles: StyleData[]): void {
-    styles.forEach((style) => {
+    let dropped = 0;
+    for (const style of styles) {
+      const valid =
+        style != null &&
+        typeof style.id === "string" && style.id.length > 0 &&
+        typeof style.selector === "string" && style.selector.length > 0 &&
+        style.properties != null && typeof style.properties === "object";
+      if (!valid) {
+        dropped += 1;
+        continue;
+      }
       this.styles.set(style.id, style);
       this.ruleIndex.set(
         this.ruleKey(style.selector, style.mediaQuery ?? undefined),
         style
       );
-    });
+    }
+    if (dropped > 0) {
+      console.warn(
+        `[StyleEngine.importStyles] dropped ${dropped} malformed rule(s) — selector/id/properties missing or invalid`,
+      );
+    }
     this.updateStylesheet();
   }
 

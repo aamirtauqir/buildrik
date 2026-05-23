@@ -121,3 +121,83 @@ describe("StyleEngine rule index", () => {
     expect(engine.getRule(".a")).toBeUndefined();
   });
 });
+
+// L2 defense (2026-05-23): importStyles must drop malformed entries
+// instead of letting them poison engine state. Bad rules previously
+// reached useTokenUsageMap, crashed DesignSystemTab via undefined
+// selector, and rendered "Something went wrong" across 4 sidebar tabs.
+describe("StyleEngine.importStyles — validation", () => {
+  let engine: StyleEngine;
+  let warnSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] });
+    engine = new StyleEngine(makeComposer());
+    warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    engine.destroy();
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("imports valid rules", () => {
+    engine.importStyles([
+      { id: "s1", selector: ".a", properties: { color: "red" } },
+      { id: "s2", selector: ".b", properties: { color: "blue" } },
+    ]);
+    expect(engine.getRule(".a")?.properties.color).toBe("red");
+    expect(engine.getRule(".b")?.properties.color).toBe("blue");
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("drops rule with undefined selector + warns", () => {
+    engine.importStyles([
+      { id: "s1", selector: ".a", properties: { color: "red" } },
+      { id: "s2", selector: undefined as unknown as string, properties: {} },
+    ]);
+    expect(engine.getRule(".a")).toBeDefined();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("dropped 1"));
+  });
+
+  it("drops rule with empty-string selector", () => {
+    engine.importStyles([
+      { id: "s1", selector: "", properties: {} },
+    ]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("dropped 1"));
+  });
+
+  it("drops rule with missing id", () => {
+    engine.importStyles([
+      { id: undefined as unknown as string, selector: ".a", properties: {} },
+    ]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("dropped 1"));
+  });
+
+  it("drops rule with missing properties", () => {
+    engine.importStyles([
+      { id: "s1", selector: ".a", properties: undefined as unknown as Record<string, string> },
+    ]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("dropped 1"));
+  });
+
+  it("drops null entry without throwing", () => {
+    engine.importStyles([
+      null as unknown as { id: string; selector: string; properties: Record<string, string> },
+      { id: "s1", selector: ".ok", properties: {} },
+    ]);
+    expect(engine.getRule(".ok")).toBeDefined();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("dropped 1"));
+  });
+
+  it("counts multiple drops in a single warn", () => {
+    engine.importStyles([
+      { id: "s1", selector: undefined as unknown as string, properties: {} },
+      { id: "", selector: ".x", properties: {} },
+      { id: "s3", selector: ".ok", properties: { color: "green" } },
+    ]);
+    expect(engine.getRule(".ok")).toBeDefined();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("dropped 2"));
+  });
+});
