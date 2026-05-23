@@ -58,11 +58,10 @@ describe("TemplatesTab — inline detail layout (prototype-v3 §2)", () => {
     const cards = container.querySelectorAll(".tpl-card");
     await user.click(cards[0]);
 
-    // Title is replaced by breadcrumb
+    // Title is replaced by breadcrumb (DrillInHeader canonical pattern)
     expect(screen.queryByRole("heading", { name: "Templates" })).toBeNull();
-    const headerBreadcrumb = container.querySelector(".tpl-header .tpl-header-breadcrumb");
-    expect(headerBreadcrumb).not.toBeNull();
-    expect(container.querySelector(".tpl-header-back")).not.toBeNull();
-    expect(container.querySelector(".tpl-header-path-current")).not.toBeNull();
+    // DrillInHeader renders a back button + breadcrumb nav
+    expect(screen.queryByRole("button", { name: /back to templates/i })).not.toBeNull();
+    expect(screen.queryByRole("navigation", { name: /breadcrumb/i })).not.toBeNull();
   });
 });

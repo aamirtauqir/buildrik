@@ -11,6 +11,7 @@ import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { useToast } from "@/editor/shared/vibcoder";
 import { TabFrame } from "@/shared/extensions/TabFrame";
+import { DrillInHeader } from "../../shared/DrillInHeader";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType, DEFAULT_TEMPLATE_VERSION } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, ProModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
@@ -261,55 +262,44 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
 
   return (
     <TabFrame className="tpl-shell">
-      {/* Header — tpl-header class controls height via tpl-header-title sizing. */}
-      <div className="tpl-header">
-        {newPageMode ? (
-          <div className="tpl-newpage-header">
-            <h2 className="tpl-header-title tpl-header-title--sm">Choose a template for your new page</h2>
-            <div className="tpl-newpage-chip">New Page</div>
-          </div>
-        ) : detailTemplate ? (
-          <div className="tpl-header-breadcrumb">
-            <Button
-              className="tpl-header-back"
-              onClick={() => sel.setDetailId(null)}
-              aria-label="Back to templates"
-            >
-              ‹ Back
-            </Button>
-            <span className="tpl-header-path">
-              <span className="tpl-header-path-cat">
-                {(detailTemplate.category || "Templates").replace(/-/g, " ")}
-              </span>
-              <span className="tpl-header-path-sep">›</span>
-              <span className="tpl-header-path-current">{detailTemplate.name}</span>
-            </span>
-          </div>
-        ) : (
-          <div className="tpl-header-title-group">
-            <h2 className="tpl-header-title">Templates</h2>
-            <span className="tpl-header-subtitle">
-              {SITE_TEMPLATES.length} templates
-            </span>
-          </div>
-        )}
-        <div className="tpl-header-actions">
-          {!detailTemplate && (
-            <Button
-              className="tpl-header-btn"
-              onClick={() => setShowSearch(!showSearch)}
-              aria-label={showSearch ? "Close search" : "Search templates"}
-            >
-              <Search size={16} />
-            </Button>
-          )}
+      {/* Header — 3 modes via TabFrame.Header / DrillInHeader. Breadcrumb
+          mode uses the canonical drill-in pattern (back button + path);
+          newpage + default modes use the standard panel header. */}
+      {detailTemplate ? (
+        <DrillInHeader
+          title={detailTemplate.name}
+          parentName="Templates"
+          breadcrumb={[
+            (detailTemplate.category || "Templates").replace(/-/g, " "),
+            detailTemplate.name,
+          ]}
+          onBack={() => sel.setDetailId(null)}
+          onClose={onClose}
+        />
+      ) : newPageMode ? (
+        <TabFrame.Header title="Choose a template for your new page">
+          <div className="tpl-newpage-chip">New Page</div>
           {onClose && (
             <Button className="tpl-header-btn" onClick={onClose} aria-label="Close templates">
               <X size={16} />
             </Button>
           )}
-        </div>
-      </div>
+        </TabFrame.Header>
+      ) : (
+        <TabFrame.Header
+          title="Templates"
+          subtitle={`${SITE_TEMPLATES.length} templates`}
+          onClose={onClose}
+        >
+          <Button
+            className="tpl-header-btn"
+            onClick={() => setShowSearch(!showSearch)}
+            aria-label={showSearch ? "Close search" : "Search templates"}
+          >
+            <Search size={16} />
+          </Button>
+        </TabFrame.Header>
+      )}
       {/* Search input */}
       {showSearch && (
         <div className="tpl-search-wrap">
