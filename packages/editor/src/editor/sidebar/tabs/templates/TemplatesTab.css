@@ -824,6 +824,22 @@
   color: var(--bd-fg-primary);
   margin: 0;
 }
+/* Title-stack for parity with TabFrame.Header (Add / Layers / Pages),
+   which exposes a subtitle line below the heading. Templates uses a
+   bespoke header due to breadcrumb + newpage modes, so the
+   subtitle ships inline here. */
+.tpl-header-title-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.tpl-header-subtitle {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
+  margin-top: 1px;
+  line-height: 1.2;
+}
 .tpl-header-actions {
   display: flex;
   align-items: center;

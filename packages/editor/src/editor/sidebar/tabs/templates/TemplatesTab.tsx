@@ -286,7 +286,12 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             </span>
           </div>
         ) : (
-          <h2 className="tpl-header-title">Templates</h2>
+          <div className="tpl-header-title-group">
+            <h2 className="tpl-header-title">Templates</h2>
+            <span className="tpl-header-subtitle">
+              {SITE_TEMPLATES.length} templates
+            </span>
+          </div>
         )}
         <div className="tpl-header-actions">
           {!detailTemplate && (
