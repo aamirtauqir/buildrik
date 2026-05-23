@@ -145,7 +145,12 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
       client.siteDetail.settings.get.query({ siteId }).catch(() => null),
     ]);
 
-    const sortedPages: DashboardPageRow[] = (pages as DashboardPageRow[])
+    // tRPC `pages.list` returns Prisma rows with Json columns typed as
+    // JsonValue. Runtime shape matches DashboardPageRow (blocks/settings/meta
+    // are persisted typed at write time + validated via shared schemas).
+    // Two-step `unknown as` cast satisfies TS — JsonValue → typed shape
+    // doesn't structurally overlap without the bridge.
+    const sortedPages: DashboardPageRow[] = (pages as unknown as DashboardPageRow[])
       .slice()
       .sort((a, b) => a.position - b.position);
 

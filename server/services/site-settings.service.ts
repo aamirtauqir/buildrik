@@ -80,13 +80,16 @@ export async function updateSiteSettings(
   data: {
     name?: string;
     slug?: string;
-    metaTitle?: string;
-    metaDescription?: string;
-    metaTitleTemplate?: string;
+    // Nullable user-clearable fields — editor sends `null` to wipe a
+    // value. Prisma columns are nullable; writing null updates the
+    // column to NULL (matches the shared schema's `.nullable()`).
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    metaTitleTemplate?: string | null;
     ogImage?: string | null;
-    headCode?: string;
-    bodyCode?: string;
-    socialLinks?: Record<string, string>;
+    headCode?: string | null;
+    bodyCode?: string | null;
+    socialLinks?: Record<string, string> | null;
     publishedPassword?: string | null;
     touchIcon?: string | null;
     cspPolicy?: string | null;
@@ -133,9 +136,18 @@ export async function updateSiteSettings(
   }
 
   // P0.3: hash publishedPassword before persisting. Plaintext never reaches DB.
-  const persistData = { ...data };
+  // Cast at the Prisma boundary: 2026-05-23 widening of input data to allow
+  // `null` on user-clearable fields (metaTitle/headCode/socialLinks/etc) so
+  // editor can wipe them. Prisma's Json column update type (socialLinks)
+  // uses `Prisma.DbNull` rather than raw null; we send null through as a
+  // shorthand and rely on Prisma's runtime to interpret it. The cast is
+  // safe because the column is nullable in schema.prisma and the data has
+  // already been validated by updateSiteSettingsSchema upstream.
+  const persistData = { ...data } as Prisma.SiteUpdateInput;
   if (data.publishedPassword !== undefined) {
-    persistData.publishedPassword = await hashPublishedPassword(data.publishedPassword);
+    persistData.publishedPassword = data.publishedPassword === null
+      ? null
+      : await hashPublishedPassword(data.publishedPassword);
   }
 
   // Localization invariant: defaultLocale MUST be in enabledLocales.

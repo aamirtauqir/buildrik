@@ -463,22 +463,29 @@ export async function saveProjectFromEditor(
     dsSchemaVersion?: number;
   }
 ) {
+  // 2026-05-23: array-level cast — Zod's passthrough output type
+  // (`objectOutputType<{...},...,"passthrough">`) for the `meta` field
+  // structurally diverges from `Record<string, unknown>` because the
+  // typed slot `appliedTemplates` wants a specific array shape but
+  // Record's index returns `unknown`. Each `p` is already
+  // Zod-validated at the tRPC input boundary, so the cast is safe.
+  const mappedPages = projectData.pages.map((p, index) => ({
+    id: p.id,
+    blocks: p.root,
+    name: p.name,
+    slug: p.slug,
+    isHomePage: p.isHome,
+    position: index,
+    seoTitle: p.seoTitle ?? undefined,
+    seoDescription: p.seoDescription ?? undefined,
+    meta: p.meta as Record<string, unknown> | undefined,
+    settings: p.settings,
+    slugHistory: p.slugHistory as Array<{ fromSlug: string; toSlug: string; changedAt: string }> | undefined,
+    slugManuallySet: p.slugManuallySet,
+  })) as unknown as SaveProjectDataInput["pages"];
   return saveProjectData({
     siteId,
-    pages: projectData.pages.map((p, index) => ({
-      id: p.id,
-      blocks: p.root,
-      name: p.name,
-      slug: p.slug,
-      isHomePage: p.isHome,
-      position: index,
-      seoTitle: p.seoTitle ?? undefined,
-      seoDescription: p.seoDescription ?? undefined,
-      meta: p.meta as Record<string, unknown> | undefined,
-      settings: p.settings,
-      slugHistory: p.slugHistory as Array<{ fromSlug: string; toSlug: string; changedAt: string }> | undefined,
-      slugManuallySet: p.slugManuallySet,
-    })),
+    pages: mappedPages,
     styles: projectData.styles,
     assets: projectData.assets,
     settings: projectData.settings,

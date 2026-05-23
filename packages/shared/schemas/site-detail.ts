@@ -43,13 +43,18 @@ export const updateSiteSettingsSchema = z.object({
   id: z.string(),
   name: z.string().min(2).max(100).optional(),
   slug: z.string().min(3).max(50).optional(),
-  metaTitle: z.string().max(60).optional(),
-  metaDescription: z.string().max(160).optional(),
-  metaTitleTemplate: z.string().optional(),
+  // 2026-05-23: nullable() added on user-clearable fields so the editor
+  // can send `null` to clear values (matches Prisma column nullability).
+  // Prior `.optional()`-only shape rejected `null` and forced editor to
+  // strip null at the boundary, which leaked into BuildrikSyncProvider
+  // tRPC mutate-input typecheck failures.
+  metaTitle: z.string().max(60).nullable().optional(),
+  metaDescription: z.string().max(160).nullable().optional(),
+  metaTitleTemplate: z.string().nullable().optional(),
   ogImage: z.string().url().nullable().optional(),
-  headCode: z.string().max(10240).optional(),
-  bodyCode: z.string().max(10240).optional(),
-  socialLinks: z.record(z.string()).optional(),
+  headCode: z.string().max(10240).nullable().optional(),
+  bodyCode: z.string().max(10240).nullable().optional(),
+  socialLinks: z.record(z.string()).nullable().optional(),
   publishedPassword: z.string().nullable().optional(),
   touchIcon: z.string().nullable().optional(),
   cspPolicy: z.string().max(4096).nullable().optional(),
