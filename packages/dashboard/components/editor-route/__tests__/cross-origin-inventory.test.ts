@@ -89,9 +89,11 @@ describe("cross-origin inventory (Phase 0 D14)", () => {
 
   it("`credentials: 'include'` usage stays at known-baseline count", () => {
     const hits = scan(/credentials:\s*['"]include['"]/);
-    // Baseline 2026-05-11: AssetUploadService.ts:113 (Vercel Blob upload
-    // currently sets credentials:'include' for cookie auth). Same-origin
-    // after Phase 4 will make this a no-op but harmless to keep.
-    expect(hits.length).toBeLessThanOrEqual(1);
+    // Baseline 2026-05-23: 2 hits — AssetUploadService.ts (Vercel Blob
+    // upload cookie auth) + api-client.ts (tRPC fetch, moved from
+    // packages/shared to packages/editor/src/services on 2026-05-23 as
+    // part of the shared-contract cleanup arc). Same-origin after
+    // Phase 4 will make these no-ops but harmless to keep.
+    expect(hits.length).toBeLessThanOrEqual(2);
   });
 });
