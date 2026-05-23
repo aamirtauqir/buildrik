@@ -12,7 +12,7 @@
  *
  * @license BSD-3-Clause
  */
-import { createBuildrikApiClient } from "@buildrik/shared";
+import { createBuildrikApiClient } from "./api-client";
 
 const DASHBOARD_URL =
   import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";

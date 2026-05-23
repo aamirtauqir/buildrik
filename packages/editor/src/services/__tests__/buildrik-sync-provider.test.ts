@@ -15,7 +15,7 @@ const mocks = {
   siteDetailSettingsUpdateMutate: vi.fn().mockResolvedValue({ success: true }),
 };
 
-vi.mock("@buildrik/shared", () => ({
+vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
     sites: {
       get: { query: (...args: any[]) => mocks.sitesGetQuery(...args) },

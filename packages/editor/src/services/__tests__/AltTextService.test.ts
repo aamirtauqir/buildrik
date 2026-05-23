@@ -10,7 +10,7 @@ const mocks = {
   generateAltTextMutate: vi.fn(),
 };
 
-vi.mock("@buildrik/shared", () => ({
+vi.mock("../api-client", () => ({
   createBuildrikApiClient: () => ({
     media: {
       generateAltText: {

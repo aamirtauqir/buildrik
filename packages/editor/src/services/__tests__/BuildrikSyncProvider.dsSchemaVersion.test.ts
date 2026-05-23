@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
   siteDetailSettingsGetQuery: vi.fn(),
 }));
 
-vi.mock("@buildrik/shared", () => ({
+vi.mock("../api-client", () => ({
   createBuildrikApiClient: vi.fn(() => ({
     sites: { get: { query: mocks.sitesGetQuery } },
     pages: { list: { query: mocks.pagesListQuery } },

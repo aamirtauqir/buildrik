@@ -8,7 +8,7 @@
  * @license BSD-3-Clause
  */
 
-import { createBuildrikApiClient } from "@buildrik/shared";
+import { createBuildrikApiClient } from "./api-client";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
 

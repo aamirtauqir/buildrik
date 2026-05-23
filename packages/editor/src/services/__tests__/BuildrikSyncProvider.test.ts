@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
   siteDetailSettingsUpdateMutate: vi.fn().mockResolvedValue({ success: true }),
 }));
 
-vi.mock("@buildrik/shared", () => ({
+vi.mock("../api-client", () => ({
   createBuildrikApiClient: vi.fn(() => ({
     sites: {
       get: {

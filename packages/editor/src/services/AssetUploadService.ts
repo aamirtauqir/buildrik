@@ -20,7 +20,7 @@
  */
 
 import { upload } from "@vercel/blob/client";
-import { createBuildrikApiClient } from "@buildrik/shared";
+import { createBuildrikApiClient } from "./api-client";
 import type { RemoteAssetSync } from "@/shared/types/media";
 
 const DASHBOARD_URL =

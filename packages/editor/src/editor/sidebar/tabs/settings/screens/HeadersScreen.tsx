@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { createBuildrikApiClient } from "@buildrik/shared";
+import { createBuildrikApiClient } from "@/services/api-client";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Input, Screen, Section, Select, Textarea } from "../shared";
 import type { ScreenProps } from "../types";

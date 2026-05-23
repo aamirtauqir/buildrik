@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { createBuildrikApiClient } from "@buildrik/shared";
+import { createBuildrikApiClient } from "@/services/api-client";
 import type { Composer } from "@/engine/Composer";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 
