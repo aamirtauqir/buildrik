@@ -2,7 +2,10 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 
-export const TONE_OPTIONS = [
+// Module-local — no external consumers. Was exported, but grep across
+// packages/ + server/ shows zero importers. Keeping export was a false
+// "may be reused" signal that bloats the public surface.
+const TONE_OPTIONS = [
   { value: "professional", label: "Professional" },
   { value: "casual", label: "Casual" },
   { value: "creative", label: "Creative" },
@@ -11,13 +14,13 @@ export const TONE_OPTIONS = [
   { value: "playful", label: "Playful" },
 ] as const;
 
-export const CONTENT_OPTIONS = [
+const CONTENT_OPTIONS = [
   { value: "generate", label: "Generate placeholder content" },
   { value: "lorem", label: "Use lorem ipsum" },
   { value: "empty", label: "Leave empty" },
 ] as const;
 
-export const IMAGE_OPTIONS = [
+const IMAGE_OPTIONS = [
   { value: "stock", label: "Stock photos" },
   { value: "placeholders", label: "Colored placeholders" },
   { value: "none", label: "No images" },
