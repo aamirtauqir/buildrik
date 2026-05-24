@@ -5,6 +5,7 @@ import { getActiveVercelConnection, markInactive } from "@server/services/integr
 import {
   createVercelDeployment,
   waitForDeploymentReady,
+  pickPublicUrl,
   VercelApiError,
   type VercelFile,
 } from "@/lib/vercel";
@@ -208,7 +209,7 @@ export async function runVercelDeploy(
     if (ready.readyState !== "READY") {
       throw new Error(`VERCEL_DEPLOY_${ready.readyState}`);
     }
-    return { url: `https://${ready.url}`, deploymentId: ready.id };
+    return { url: pickPublicUrl(ready, projectName), deploymentId: ready.id };
   } catch (err) {
     // Vercel returns 401 for expired/invalid bearer tokens AND 403 when
     // the OAuth integration was uninstalled from the Vercel side (token

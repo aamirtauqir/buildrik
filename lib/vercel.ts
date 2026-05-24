@@ -27,12 +27,48 @@ export interface VercelFile {
 
 export interface DeploymentResult {
   id: string;
+  /** Deployment-specific URL — includes hash + team suffix, may be SSO-gated. */
   url: string;
+  /**
+   * Production aliases assigned to this deployment. The shortest entry is
+   * the canonical project URL (`<project>.vercel.app`) which is the public
+   * public face of the site; the longer team-scoped entries are typically
+   * gated by Vercel's deployment protection.
+   */
+  alias?: string[];
   readyState: "QUEUED" | "INITIALIZING" | "BUILDING" | "READY" | "ERROR" | "CANCELED";
 }
 
 export interface DeploymentStatus extends DeploymentResult {
   errorMessage?: string;
+}
+
+/**
+ * Pick the public-facing URL from a deployment.
+ *
+ * Order of preference:
+ * 1. Shortest entry from `alias[]` — Vercel's production canonical, public
+ *    on hobby+pro accounts regardless of team deployment-protection.
+ * 2. `${projectName}.vercel.app` — Vercel always assigns this for production
+ *    deploys but the alias field can be empty for a few seconds after
+ *    readyState=READY. This is the deterministic fallback when we know
+ *    the project name.
+ * 3. The deployment-specific `url` — only used when both above are absent.
+ *    Note that this URL is SSO-gated on Pro+ teams and will serve the
+ *    Vercel auth wall to end users, so we avoid it whenever possible.
+ */
+export function pickPublicUrl(
+  d: { url: string; alias?: string[] },
+  projectNameFallback?: string,
+): string {
+  if (d.alias && d.alias.length > 0) {
+    const shortest = [...d.alias].sort((a, b) => a.length - b.length)[0];
+    return `https://${shortest}`;
+  }
+  if (projectNameFallback) {
+    return `https://${projectNameFallback}.vercel.app`;
+  }
+  return `https://${d.url}`;
 }
 
 export class VercelApiError extends Error {
@@ -130,9 +166,10 @@ export async function createVercelDeployment({
   const data = (await res.json()) as {
     id: string;
     url: string;
+    alias?: string[];
     readyState: DeploymentResult["readyState"];
   };
-  return { id: data.id, url: data.url, readyState: data.readyState };
+  return { id: data.id, url: data.url, alias: data.alias, readyState: data.readyState };
 }
 
 /**
@@ -166,6 +203,7 @@ export async function getDeploymentStatus({
   const data = (await res.json()) as {
     id: string;
     url: string;
+    alias?: string[];
     readyState: DeploymentResult["readyState"];
     errorMessage?: string;
   };
@@ -173,6 +211,7 @@ export async function getDeploymentStatus({
   return {
     id: data.id,
     url: data.url,
+    alias: data.alias,
     readyState: data.readyState,
     errorMessage: data.errorMessage,
   };
