@@ -26,10 +26,10 @@ function DeleteWorkspaceModal({
         className="relative w-full max-w-md rounded-xl p-6 shadow-xl"
         style={{ backgroundColor: "#fff" }}
       >
-        <h3 className="text-lg font-semibold" style={{ color: "#0D0D0D" }}>
+        <h3 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
           Delete workspace
         </h3>
-        <p className="text-sm mt-2" style={{ color: "#7A7A7A" }}>
+        <p className="text-sm mt-2" style={{ color: "var(--color-text-secondary)" }}>
           This action is permanent and cannot be undone. All sites, forms, members, and data in this workspace will be deleted.
         </p>
 
@@ -41,7 +41,7 @@ function DeleteWorkspaceModal({
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Type <span className="font-semibold">{workspaceName}</span> to confirm
           </label>
           <input
@@ -50,7 +50,7 @@ function DeleteWorkspaceModal({
             onChange={(e) => setConfirmText(e.target.value)}
             placeholder={workspaceName}
             className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             autoFocus
           />
         </div>
@@ -60,7 +60,7 @@ function DeleteWorkspaceModal({
             type="button"
             onClick={onClose}
             className="px-4 py-2 text-sm rounded-md border"
-            style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             Cancel
           </button>
@@ -94,7 +94,7 @@ export default function WorkspacePage() {
     onError: (err) => addToast("error", "Failed", err.message),
   });
 
-  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />;
+  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   if (!wsQuery.data) return null;
 
   const ws = wsQuery.data;
@@ -120,7 +120,7 @@ export default function WorkspacePage() {
         saving={updateMutation.isPending || sharingMutation.isPending}
       />
 
-      <div style={{ borderTop: "1px solid #E8E8E8" }} />
+      <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
 
       <div>
         <h2 className="text-base font-semibold" style={{ color: "#dc2626" }}>
@@ -131,10 +131,10 @@ export default function WorkspacePage() {
           style={{ borderColor: "#fecaca" }}
         >
           <div>
-            <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>
+            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Delete workspace
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "#7A7A7A" }}>
+            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
               Permanently delete this workspace and all its data. This cannot be undone.
             </p>
           </div>

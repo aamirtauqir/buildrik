@@ -24,11 +24,11 @@ export default function MaintenancePage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center"
-      style={{ backgroundColor: "#FAFAFA" }}
+      style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       <div className="text-center max-w-md mx-auto px-4">
         <div className="mx-auto mb-8">
-          <h1 className="text-2xl font-bold" style={{ color: "#0D0D0D" }}>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>
             Buildrik
           </h1>
         </div>
@@ -49,11 +49,11 @@ export default function MaintenancePage() {
         </div>
         <h2
           className="text-xl font-semibold"
-          style={{ color: "#0D0D0D" }}
+          style={{ color: "var(--color-text-primary)" }}
         >
           We&apos;ll be back shortly
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
+        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           We&apos;re performing scheduled maintenance. This page will
           automatically refresh when we&apos;re back online.
         </p>

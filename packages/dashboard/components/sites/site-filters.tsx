@@ -14,9 +14,9 @@ export const SORT_OPTIONS = [
 ] as const;
 
 export const STATUS_FILTER_OPTIONS = [
-  { value: "PUBLISHED", label: "Published", color: "#22C55E" },
+  { value: "PUBLISHED", label: "Published", color: "var(--color-success)" },
   { value: "DRAFT", label: "Draft", color: "#EAB308" },
-  { value: "ARCHIVED", label: "Archived", color: "#EA580C" },
+  { value: "ARCHIVED", label: "Archived", color: "var(--color-warning)" },
 ] as const;
 
 const DATE_RANGE_OPTIONS = [
@@ -79,27 +79,27 @@ export function SiteFilters({
       <div className="flex items-center gap-3">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "#B0B0B0" }} />
-          <input type="text" value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search sites..." className="w-full rounded-lg border py-2 pl-9 pr-3 text-sm" style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }} />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+          <input type="text" value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search sites..." className="w-full rounded-lg border py-2 pl-9 pr-3 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }} />
         </div>
         {/* Status chips */}
         <div className="flex gap-1">
           {STATUS_FILTER_OPTIONS.map((opt) => (
-            <button key={opt.value} onClick={() => onStatusChange(status === opt.value ? undefined : opt.value)} className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", status === opt.value ? "text-white" : "border")} style={status === opt.value ? { backgroundColor: opt.color } : { borderColor: "#E8E8E8", color: "#7A7A7A" }}>
+            <button key={opt.value} onClick={() => onStatusChange(status === opt.value ? undefined : opt.value)} className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", status === opt.value ? "text-white" : "border")} style={status === opt.value ? { backgroundColor: opt.color } : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
               {opt.label}
             </button>
           ))}
         </div>
         {/* Sort dropdown */}
         <div className="relative">
-          <button onClick={() => setSortOpen(!sortOpen)} className="flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>
+          <button onClick={() => setSortOpen(!sortOpen)} className="flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
             {SORT_OPTIONS.find((o) => o.value === sort)?.label ?? "Sort"}
             <ChevronDown className="h-3 w-3" />
           </button>
           {sortOpen && (
-            <div className="absolute right-0 top-full z-10 mt-1 w-44 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "#E8E8E8" }}>
+            <div className="absolute right-0 top-full z-10 mt-1 w-44 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
               {SORT_OPTIONS.map((opt) => (
-                <button key={opt.value} onClick={() => { onSortChange(opt.value); setSortOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: sort === opt.value ? "var(--color-primary)" : "#0D0D0D" }}>
+                <button key={opt.value} onClick={() => { onSortChange(opt.value); setSortOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[var(--color-bg-subtle)]" style={{ color: sort === opt.value ? "var(--color-primary)" : "var(--color-text-primary)" }}>
                   {opt.label}
                 </button>
               ))}
@@ -110,7 +110,7 @@ export function SiteFilters({
         <button
           onClick={() => setAdvancedOpen(!advancedOpen)}
           className={cn("flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors", hasAdvancedFilters && "border-[var(--color-primary)] text-[var(--color-primary)]")}
-          style={hasAdvancedFilters ? undefined : { borderColor: "#E8E8E8", color: "#7A7A7A" }}
+          style={hasAdvancedFilters ? undefined : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
         >
           Filters
           {advancedOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -119,20 +119,20 @@ export function SiteFilters({
 
       {/* Advanced filters row */}
       {advancedOpen && (
-        <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3" style={{ borderColor: "#E8E8E8", backgroundColor: "#FAFAFA" }}>
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
           {/* Created by dropdown */}
           <div className="relative">
-            <button onClick={() => setCreatedByOpen(!createdByOpen)} className="flex items-center gap-1 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium" style={{ borderColor: "#E8E8E8", color: createdBy ? "#0D0D0D" : "#7A7A7A" }}>
+            <button onClick={() => setCreatedByOpen(!createdByOpen)} className="flex items-center gap-1 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium" style={{ borderColor: "var(--color-border-default)", color: createdBy ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>
               {createdBy ? members.find((m: { userId: string; fullName: string; email: string }) => m.userId === createdBy)?.fullName ?? "Member" : "Created by"}
               <ChevronDown className="h-3 w-3" />
             </button>
             {createdByOpen && (
-              <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "#E8E8E8" }}>
-                <button onClick={() => { onCreatedByChange(undefined); setCreatedByOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: !createdBy ? "var(--color-primary)" : "#0D0D0D" }}>
+              <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
+                <button onClick={() => { onCreatedByChange(undefined); setCreatedByOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[var(--color-bg-subtle)]" style={{ color: !createdBy ? "var(--color-primary)" : "var(--color-text-primary)" }}>
                   All members
                 </button>
                 {members.map((m: { userId: string; fullName: string; email: string }) => (
-                  <button key={m.userId} onClick={() => { onCreatedByChange(m.userId); setCreatedByOpen(false); }} className="block w-full truncate px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: createdBy === m.userId ? "var(--color-primary)" : "#0D0D0D" }}>
+                  <button key={m.userId} onClick={() => { onCreatedByChange(m.userId); setCreatedByOpen(false); }} className="block w-full truncate px-3 py-1.5 text-left text-xs hover:bg-[var(--color-bg-subtle)]" style={{ color: createdBy === m.userId ? "var(--color-primary)" : "var(--color-text-primary)" }}>
                     {m.fullName || m.email}
                   </button>
                 ))}
@@ -143,7 +143,7 @@ export function SiteFilters({
           {/* Date range chips */}
           <div className="flex gap-1">
             {DATE_RANGE_OPTIONS.map((opt) => (
-              <button key={opt.value} onClick={() => onDateRangeChange(dateRange === opt.value ? undefined : opt.value)} className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", dateRange === opt.value ? "bg-[#0D0D0D] text-white" : "border bg-white")} style={dateRange === opt.value ? undefined : { borderColor: "#E8E8E8", color: "#7A7A7A" }}>
+              <button key={opt.value} onClick={() => onDateRangeChange(dateRange === opt.value ? undefined : opt.value)} className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", dateRange === opt.value ? "bg-[var(--color-text-primary)] text-white" : "border bg-white")} style={dateRange === opt.value ? undefined : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
                 {opt.label}
               </button>
             ))}
@@ -151,17 +151,17 @@ export function SiteFilters({
 
           {/* Template dropdown */}
           <div className="relative">
-            <button onClick={() => setTemplateOpen(!templateOpen)} className="flex items-center gap-1 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium" style={{ borderColor: "#E8E8E8", color: templateUsed ? "#0D0D0D" : "#7A7A7A" }}>
+            <button onClick={() => setTemplateOpen(!templateOpen)} className="flex items-center gap-1 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium" style={{ borderColor: "var(--color-border-default)", color: templateUsed ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>
               {templateUsed ? templates.find((t: { id: string; name: string }) => t.id === templateUsed)?.name ?? "Template" : "Template"}
               <ChevronDown className="h-3 w-3" />
             </button>
             {templateOpen && (
-              <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "#E8E8E8" }}>
-                <button onClick={() => { onTemplateUsedChange(undefined); setTemplateOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: !templateUsed ? "var(--color-primary)" : "#0D0D0D" }}>
+              <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
+                <button onClick={() => { onTemplateUsedChange(undefined); setTemplateOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[var(--color-bg-subtle)]" style={{ color: !templateUsed ? "var(--color-primary)" : "var(--color-text-primary)" }}>
                   All templates
                 </button>
                 {templates.map((t: { id: string; name: string }) => (
-                  <button key={t.id} onClick={() => { onTemplateUsedChange(t.id); setTemplateOpen(false); }} className="block w-full truncate px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: templateUsed === t.id ? "var(--color-primary)" : "#0D0D0D" }}>
+                  <button key={t.id} onClick={() => { onTemplateUsedChange(t.id); setTemplateOpen(false); }} className="block w-full truncate px-3 py-1.5 text-left text-xs hover:bg-[var(--color-bg-subtle)]" style={{ color: templateUsed === t.id ? "var(--color-primary)" : "var(--color-text-primary)" }}>
                     {t.name}
                   </button>
                 ))}
@@ -177,10 +177,10 @@ export function SiteFilters({
               else onHasCustomDomainChange(undefined);
             }}
             className="flex items-center gap-1.5 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium"
-            style={{ borderColor: hasCustomDomain !== undefined ? "#0D0D0D" : "#E8E8E8", color: hasCustomDomain !== undefined ? "#0D0D0D" : "#7A7A7A" }}
+            style={{ borderColor: hasCustomDomain !== undefined ? "var(--color-text-primary)" : "var(--color-border-default)", color: hasCustomDomain !== undefined ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}
           >
             {hasCustomDomain !== undefined ? (
-              <ToggleRight className="h-4 w-4" style={{ color: hasCustomDomain ? "#22C55E" : "var(--color-primary)" }} />
+              <ToggleRight className="h-4 w-4" style={{ color: hasCustomDomain ? "var(--color-success)" : "var(--color-primary)" }} />
             ) : (
               <ToggleLeft className="h-4 w-4" />
             )}
@@ -190,7 +190,7 @@ export function SiteFilters({
           {/* Traffic chips */}
           <div className="flex gap-1">
             {TRAFFIC_OPTIONS.map((opt) => (
-              <button key={opt.value} onClick={() => onHasTrafficChange(hasTraffic === opt.value ? undefined : opt.value)} className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", hasTraffic === opt.value ? "bg-[#0D0D0D] text-white" : "border bg-white")} style={hasTraffic === opt.value ? undefined : { borderColor: "#E8E8E8", color: "#7A7A7A" }}>
+              <button key={opt.value} onClick={() => onHasTrafficChange(hasTraffic === opt.value ? undefined : opt.value)} className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", hasTraffic === opt.value ? "bg-[var(--color-text-primary)] text-white" : "border bg-white")} style={hasTraffic === opt.value ? undefined : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
                 {opt.label}
               </button>
             ))}

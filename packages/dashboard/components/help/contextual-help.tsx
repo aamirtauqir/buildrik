@@ -73,8 +73,8 @@ export function ContextualHelp() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="rounded-lg p-2 transition-colors hover:bg-[#F4F4F4]"
-        style={{ color: "#7A7A7A" }}
+        className="rounded-lg p-2 transition-colors hover:bg-[var(--color-bg-subtle)]"
+        style={{ color: "var(--color-text-secondary)" }}
         aria-label="Help"
       >
         <HelpCircle className="h-5 w-5" />
@@ -83,12 +83,12 @@ export function ContextualHelp() {
       {open && (
         <div
           className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border bg-white shadow-lg"
-          style={{ borderColor: "#E8E8E8" }}
+          style={{ borderColor: "var(--color-border-default)" }}
         >
-          <div className="border-b px-4 py-3" style={{ borderColor: "#E8E8E8" }}>
-            <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Helpful Articles</p>
+          <div className="border-b px-4 py-3" style={{ borderColor: "var(--color-border-default)" }}>
+            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Helpful Articles</p>
           </div>
-          <div className="divide-y" style={{ borderColor: "#E8E8E8" }}>
+          <div className="divide-y" style={{ borderColor: "var(--color-border-default)" }}>
             {articles.map((article) => (
               <Link
                 key={article.slug}
@@ -96,15 +96,15 @@ export function ContextualHelp() {
                 onClick={() => setOpen(false)}
                 className="flex flex-col gap-1 px-4 py-3 transition-colors hover:bg-[#FFF5F4]"
               >
-                <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{article.title}</p>
-                <div className="flex items-center gap-1" style={{ color: "#7A7A7A" }}>
+                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{article.title}</p>
+                <div className="flex items-center gap-1" style={{ color: "var(--color-text-secondary)" }}>
                   <Clock className="h-3 w-3" />
                   <span className="text-xs">{article.readTime} min read</span>
                 </div>
               </Link>
             ))}
           </div>
-          <div className="border-t px-4 py-3" style={{ borderColor: "#E8E8E8" }}>
+          <div className="border-t px-4 py-3" style={{ borderColor: "var(--color-border-default)" }}>
             <Link
               href="/dashboard/help"
               onClick={() => setOpen(false)}

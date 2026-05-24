@@ -75,58 +75,58 @@ export function DangerZoneTab({
     <div className="space-y-8">
       {/* Export Section */}
       <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "#0D0D0D" }}>
+        <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
           Export your data
         </h2>
-        <p className="text-sm mb-4" style={{ color: "#7A7A7A" }}>
+        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
           Download a copy of everything we store about you and your workspace.
         </p>
 
         <div
           className="p-4 rounded-lg border mb-4"
-          style={{ borderColor: "#E8E8E8" }}
+          style={{ borderColor: "var(--color-border-default)" }}
         >
-          <p className="text-sm font-medium mb-2" style={{ color: "#0D0D0D" }}>
+          <p className="text-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
             What&apos;s included:
           </p>
           <ul className="space-y-1">
             {EXPORT_INCLUDES.map((item) => (
-              <li key={item} className="flex items-center gap-2 text-sm" style={{ color: "#7A7A7A" }}>
+              <li key={item} className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 <span style={{ color: "#16a34a" }}>&#10003;</span>
                 {item}
               </li>
             ))}
           </ul>
-          <p className="text-xs mt-3" style={{ color: "#B0B0B0" }}>
+          <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
             Estimated size: {estimatedSize}
           </p>
         </div>
 
         {previousExports.length > 0 && (
           <div className="mb-4">
-            <p className="text-sm font-medium mb-2" style={{ color: "#0D0D0D" }}>
+            <p className="text-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
               Previous exports
             </p>
             <div
               className="rounded-lg border overflow-hidden"
-              style={{ borderColor: "#E8E8E8" }}
+              style={{ borderColor: "var(--color-border-default)" }}
             >
               {previousExports.map((exp, idx) => (
                 <div
                   key={exp.id}
                   className="flex items-center justify-between px-4 py-3"
-                  style={{ borderBottom: idx < previousExports.length - 1 ? "1px solid #E8E8E8" : undefined }}
+                  style={{ borderBottom: idx < previousExports.length - 1 ? "1px solid var(--color-border-default)" : undefined }}
                 >
                   <div>
-                    <p className="text-sm" style={{ color: "#0D0D0D" }}>
+                    <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
                       {exp.date}
                     </p>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                      <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                         {exp.size}
                       </p>
                       {exp.expiresAt && (
-                        <p className="text-xs" style={{ color: "#B0B0B0" }}>
+                        <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                           {getExpiryText(exp.expiresAt)}
                         </p>
                       )}
@@ -141,7 +141,7 @@ export function DangerZoneTab({
                       Download
                     </a>
                   ) : (
-                    <span className="text-xs" style={{ color: "#B0B0B0" }}>
+                    <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                       Processing...
                     </span>
                   )}
@@ -156,20 +156,20 @@ export function DangerZoneTab({
           onClick={onExport}
           disabled={isExporting}
           className="px-4 py-2 text-sm font-medium rounded-md border disabled:opacity-60"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           {isExporting ? "Preparing export..." : "Export My Data"}
         </button>
       </section>
 
-      <div style={{ borderTop: "1px solid #E8E8E8" }} />
+      <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
 
       {/* Delete Account Section */}
       <section>
         <h2 className="text-base font-semibold mb-1" style={{ color: "#7F1D1D" }}>
           Delete account
         </h2>
-        <p className="text-sm mb-4" style={{ color: "#7A7A7A" }}>
+        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
           Once you delete your account, there is no going back. All your data will be permanently removed.
         </p>
 
@@ -232,7 +232,7 @@ export function DangerZoneTab({
         ) : (
           <form onSubmit={handleDelete} className="space-y-4 max-w-sm">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+              <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Reason (optional)
               </label>
               <textarea
@@ -242,16 +242,16 @@ export function DangerZoneTab({
                 maxLength={500}
                 placeholder="Tell us why you're leaving..."
                 className="w-full px-3 py-2 text-sm rounded-md border outline-none resize-none"
-                style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+              <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Type{" "}
                 <code
                   className="px-1 py-0.5 rounded text-xs font-mono"
-                  style={{ backgroundColor: "#E8E8E8" }}
+                  style={{ backgroundColor: "var(--color-border-default)" }}
                 >
                   DELETE
                 </code>{" "}
@@ -263,7 +263,7 @@ export function DangerZoneTab({
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="DELETE"
                 className="w-full px-3 py-2 text-sm rounded-md border outline-none font-mono"
-                style={{ borderColor: canDelete ? "#7F1D1D" : "#E8E8E8", color: "#0D0D0D" }}
+                style={{ borderColor: canDelete ? "#7F1D1D" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
               />
             </div>
 
@@ -284,7 +284,7 @@ export function DangerZoneTab({
                   setReason("");
                 }}
                 className="px-4 py-2 text-sm font-medium rounded-md border"
-                style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
               >
                 Cancel
               </button>

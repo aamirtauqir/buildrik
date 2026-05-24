@@ -36,34 +36,34 @@ function formatVisitors(count: number): string {
 export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFullProps) {
   const statusColor = STATUS_COLORS[site.status] ?? STATUS_COLORS.DRAFT;
   return (
-    <div className={cn("group relative rounded-xl border bg-white transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")} style={{ borderColor: "#E8E8E8" }}>
+    <div className={cn("group relative rounded-xl border bg-white transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")} style={{ borderColor: "var(--color-border-default)" }}>
       <div className="absolute left-3 top-3 z-10">
         <input type="checkbox" checked={selected} onChange={() => {}} className="h-4 w-4 rounded border-gray-300 accent-[var(--color-primary)]" onClick={(e) => { e.stopPropagation(); onSelect(site.id, e); }} />
       </div>
       <Link href={`/dashboard/sites/${site.id}`}>
-        <div className="flex h-36 items-center justify-center rounded-t-xl" style={{ backgroundColor: "#F4F4F4" }}>
-          <Globe className="h-10 w-10" style={{ color: "#B0B0B0" }} />
+        <div className="flex h-36 items-center justify-center rounded-t-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
+          <Globe className="h-10 w-10" style={{ color: "var(--color-text-muted)" }} />
         </div>
         <div className="p-4">
           <div className="flex items-center justify-between">
-            <h3 className="truncate text-sm font-semibold" style={{ color: "#0D0D0D" }}>{site.name}</h3>
+            <h3 className="truncate text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{site.name}</h3>
             <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: statusColor.bg, color: statusColor.text }}>{site.status.toLowerCase()}</span>
           </div>
-          <p className="mt-1 text-xs" style={{ color: "#B0B0B0" }}>{site.slug}.buildrik.app</p>
-          <div className="mt-2 flex items-center gap-3 text-xs" style={{ color: "#7A7A7A" }}>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p>
+          <div className="mt-2 flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
             <span className="flex items-center gap-1"><FileText className="h-3 w-3" />{site.pages} pages</span>
             <span className="flex items-center gap-1"><Users className="h-3 w-3" />{formatVisitors(site.visitors30d)} visitors</span>
           </div>
-          <p className="mt-1.5 flex items-center gap-1 text-xs" style={{ color: "#B0B0B0" }}>
+          <p className="mt-1.5 flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
             <Clock className="h-3 w-3" />Edited {getTimeAgo(site.lastEditedAt)}
           </p>
         </div>
       </Link>
-      <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-b-xl bg-white/95 px-4 py-3 opacity-0 transition-opacity group-hover:opacity-100" style={{ borderTop: "1px solid #E8E8E8" }}>
+      <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-b-xl bg-white/95 px-4 py-3 opacity-0 transition-opacity group-hover:opacity-100" style={{ borderTop: "1px solid var(--color-border-default)" }}>
         <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
           <Pencil className="h-3 w-3" />Edit
         </EditorLink>
-        <Link href={`/dashboard/sites/${site.id}`} className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>
+        <Link href={`/dashboard/sites/${site.id}`} className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
           <Settings className="h-3 w-3" />Manage
         </Link>
         <div className="ml-auto">

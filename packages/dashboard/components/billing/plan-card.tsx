@@ -18,9 +18,9 @@ export interface PlanCardProps {
 }
 
 const PLAN_BADGE: Record<PlanId, { bg: string; color: string }> = {
-  FREE: { bg: "#F4F4F4", color: "#7A7A7A" },
-  PRO: { bg: "#F4F4F4", color: "#0D0D0D" },
-  BUSINESS: { bg: "#0D0D0D", color: "#FFFFFF" },
+  FREE: { bg: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" },
+  PRO: { bg: "var(--color-bg-subtle)", color: "var(--color-text-primary)" },
+  BUSINESS: { bg: "var(--color-text-primary)", color: "#FFFFFF" },
 };
 
 function formatPrice(price: number, currency: string, interval: Interval): string {
@@ -46,7 +46,7 @@ export function PlanCard({
     <div
       className={cn(
         "rounded-2xl border bg-white p-6",
-        isCurrent ? "border-[var(--color-primary)]" : "border-[#E8E8E8]"
+        isCurrent ? "border-[var(--color-primary)]" : "border-[var(--color-border-default)]"
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -77,15 +77,15 @@ export function PlanCard({
       </div>
 
       <div className="mt-4">
-        <span className="text-3xl font-bold" style={{ color: "#0D0D0D" }}>
+        <span className="text-3xl font-bold" style={{ color: "var(--color-text-primary)" }}>
           {formatPrice(price, currency, interval)}
         </span>
       </div>
 
       <ul className="mt-5 space-y-2">
         {features.map((feature) => (
-          <li key={feature} className="flex items-center gap-2 text-sm" style={{ color: "#0D0D0D" }}>
-            <span style={{ color: "#22C55E" }}>&#10003;</span>
+          <li key={feature} className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text-primary)" }}>
+            <span style={{ color: "var(--color-success)" }}>&#10003;</span>
             {feature}
           </li>
         ))}

@@ -81,7 +81,7 @@ function Toggle({
       type="button"
       onClick={() => onChange(!checked)}
       className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-      style={{ backgroundColor: checked ? "var(--color-primary)" : "#E8E8E8" }}
+      style={{ backgroundColor: checked ? "var(--color-primary)" : "var(--color-border-default)" }}
     >
       <span
         className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -101,7 +101,7 @@ function GoogleAnalyticsConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "#0D0D0D" }}>
+        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Tracking ID
         </label>
         <input
@@ -110,11 +110,11 @@ function GoogleAnalyticsConfig({
           onChange={(e) => onChange("trackingId", e.target.value)}
           placeholder="G-XXXXXXXXXX"
           className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </div>
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium" style={{ color: "#0D0D0D" }}>
+        <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>
           Apply to all sites
         </p>
         <Toggle
@@ -123,7 +123,7 @@ function GoogleAnalyticsConfig({
         />
       </div>
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium" style={{ color: "#0D0D0D" }}>
+        <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>
           Anonymize IP
         </p>
         <Toggle
@@ -145,7 +145,7 @@ function MailchimpConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "#0D0D0D" }}>
+        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           API Key
         </label>
         <input
@@ -154,11 +154,11 @@ function MailchimpConfig({
           onChange={(e) => onChange("apiKey", e.target.value)}
           placeholder="Enter your Mailchimp API key"
           className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </div>
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "#0D0D0D" }}>
+        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Audience ID
         </label>
         <input
@@ -167,15 +167,15 @@ function MailchimpConfig({
           onChange={(e) => onChange("audienceId", e.target.value)}
           placeholder="Enter your audience ID"
           className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </div>
       {values["audienceId"] && (
         <div
           className="rounded-md p-3 text-xs"
-          style={{ backgroundColor: "#fafafa", color: "#7A7A7A" }}
+          style={{ backgroundColor: "var(--color-bg-page)", color: "var(--color-text-secondary)" }}
         >
-          <p className="font-medium mb-1" style={{ color: "#0D0D0D" }}>Field mapping</p>
+          <p className="font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>Field mapping</p>
           <p>Email → EMAIL</p>
           <p>Name → FNAME, LNAME</p>
           <p>Custom fields → MERGE tags</p>
@@ -206,7 +206,7 @@ function ZapierConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "#0D0D0D" }}>
+        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Webhook URL
         </label>
         <input
@@ -215,11 +215,11 @@ function ZapierConfig({
           onChange={(e) => onChange("webhookUrl", e.target.value)}
           placeholder="https://hooks.zapier.com/\u2026"
           className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </div>
       <div>
-        <p className="text-xs font-medium mb-2" style={{ color: "#0D0D0D" }}>
+        <p className="text-xs font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
           Trigger events
         </p>
         <div className="space-y-2">
@@ -231,7 +231,7 @@ function ZapierConfig({
                 onChange={() => toggleTrigger(evt.key)}
                 className="rounded"
               />
-              <span className="text-xs" style={{ color: "#0D0D0D" }}>
+              <span className="text-xs" style={{ color: "var(--color-text-primary)" }}>
                 {evt.label}
               </span>
             </label>
@@ -243,7 +243,7 @@ function ZapierConfig({
           type="button"
           onClick={onTestEvent}
           className="text-xs px-3 py-1.5 rounded-md border font-medium"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           Send test event
         </button>
@@ -262,7 +262,7 @@ function SlackConfig({
   return (
     <div className="space-y-3">
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "#0D0D0D" }}>
+        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Webhook URL
         </label>
         <input
@@ -271,11 +271,11 @@ function SlackConfig({
           onChange={(e) => onChange("webhookUrl", e.target.value)}
           placeholder="https://hooks.slack.com/\u2026"
           className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </div>
       <div>
-        <label className="block text-xs font-medium mb-1" style={{ color: "#0D0D0D" }}>
+        <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Channel name
         </label>
         <input
@@ -284,15 +284,15 @@ function SlackConfig({
           onChange={(e) => onChange("channelName", e.target.value)}
           placeholder="#general"
           className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
       </div>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-medium" style={{ color: "#0D0D0D" }}>
+          <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>
             Quiet hours
           </p>
-          <p className="text-xs" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
             Suppress notifications 10 PM - 8 AM
           </p>
         </div>
@@ -362,16 +362,16 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
           <div
             key={cfg.provider}
             className="rounded-lg border overflow-hidden"
-            style={{ borderColor: connection ? "#bbf7d0" : "#E8E8E8" }}
+            style={{ borderColor: connection ? "#bbf7d0" : "var(--color-border-default)" }}
           >
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-3">
                 <IconPlaceholder name={cfg.icon} />
                 <div>
-                  <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+                  <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                     {cfg.name}
                   </p>
-                  <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                     {cfg.description}
                   </p>
                 </div>
@@ -385,7 +385,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
                 ) : (
                   <span
                     className="text-xs px-2 py-0.5 rounded-full font-medium"
-                    style={{ backgroundColor: "#f5f5f5", color: "#7A7A7A" }}
+                    style={{ backgroundColor: "#f5f5f5", color: "var(--color-text-secondary)" }}
                   >
                     Disconnected
                   </span>
@@ -401,7 +401,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
                         setExpandedProvider(isExpanded ? null : cfg.provider)
                       }
                       className="text-sm px-3 py-1.5 rounded-md border"
-                      style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+                      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                     >
                       {isExpanded ? "Hide" : "Configure"}
                     </button>
@@ -410,7 +410,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
                       onClick={() => onRemove?.(connection.id)}
                       disabled={saving}
                       className="text-sm px-3 py-1.5 rounded-md border disabled:opacity-60"
-                      style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+                      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                     >
                       Disconnect
                     </button>
@@ -433,7 +433,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
             {isExpanded && (
               <div
                 className="px-4 pb-4 pt-2 space-y-3"
-                style={{ borderTop: "1px solid #E8E8E8", backgroundColor: "#fafafa" }}
+                style={{ borderTop: "1px solid var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
               >
                 <ProviderConfigFields
                   provider={cfg.provider}
@@ -457,7 +457,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
                     type="button"
                     onClick={() => setExpandedProvider(null)}
                     className="text-sm px-4 py-2 rounded-md border"
-                    style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                   >
                     {connection ? "Close" : "Cancel"}
                   </button>

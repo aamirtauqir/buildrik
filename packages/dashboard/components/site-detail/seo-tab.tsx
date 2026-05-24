@@ -58,12 +58,12 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
         <div className="space-y-4">
           <div>
             <div className="flex justify-between">
-              <label className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+              <label className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Meta Title
               </label>
               <span
                 className="text-xs"
-                style={{ color: metaTitle.length > 60 ? "var(--color-primary)" : "#B0B0B0" }}
+                style={{ color: metaTitle.length > 60 ? "var(--color-primary)" : "var(--color-text-muted)" }}
               >
                 {metaTitle.length}/60
               </span>
@@ -74,17 +74,17 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
               onChange={(e) => setMetaTitle(e.target.value)}
               maxLength={60}
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-              style={{ borderColor: "#E8E8E8" }}
+              style={{ borderColor: "var(--color-border-default)" }}
             />
           </div>
           <div>
             <div className="flex justify-between">
-              <label className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+              <label className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Meta Description
               </label>
               <span
                 className="text-xs"
-                style={{ color: metaDesc.length > 160 ? "var(--color-primary)" : "#B0B0B0" }}
+                style={{ color: metaDesc.length > 160 ? "var(--color-primary)" : "var(--color-text-muted)" }}
               >
                 {metaDesc.length}/160
               </span>
@@ -95,14 +95,14 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
               maxLength={160}
               rows={3}
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-              style={{ borderColor: "#E8E8E8" }}
+              style={{ borderColor: "var(--color-border-default)" }}
             />
           </div>
         </div>
       </Section>
 
       <Section title="Google Search Preview">
-        <div className="rounded-lg border p-4" style={{ borderColor: "#E8E8E8" }}>
+        <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           <p className="text-sm" style={{ color: "#1a0dab" }}>
             {metaTitle || "Page Title"}
           </p>
@@ -122,9 +122,9 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
             value={metaTitleTemplate}
             onChange={(e) => setMetaTitleTemplate(e.target.value)}
             className="w-full rounded-lg border px-3 py-2 text-sm"
-            style={{ borderColor: "#E8E8E8" }}
+            style={{ borderColor: "var(--color-border-default)" }}
           />
-          <p className="mt-1 text-xs" style={{ color: "#B0B0B0" }}>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
             Applies to all pages. Use {"{page_title}"} and {"{site_name}"} as placeholders.
           </p>
         </div>
@@ -137,7 +137,7 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
               type="button"
               onClick={() => ogImageInputRef.current?.click()}
               className="rounded-lg border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               Upload Image
             </button>
@@ -148,7 +148,7 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
               onChange={handleOgImageUpload}
               className="hidden"
             />
-            <p className="text-xs" style={{ color: "#B0B0B0" }}>
+            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
               Recommended: 1200x630px. JPG or PNG, max 2MB.
             </p>
           </div>
@@ -192,8 +192,8 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
-      <h3 className="mb-4 text-sm font-semibold" style={{ color: "#0D0D0D" }}>
+    <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+      <h3 className="mb-4 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
         {title}
       </h3>
       {children}
@@ -216,12 +216,12 @@ function SocialCardPreview({
 }) {
   return (
     <div>
-      <p className="mb-1 text-xs font-medium" style={{ color: "#7A7A7A" }}>
+      <p className="mb-1 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
         {variant === "twitter" ? "Twitter / X Preview" : "Facebook Preview"}
       </p>
       <div
         className="overflow-hidden rounded-lg border"
-        style={{ borderColor: "#E8E8E8", maxWidth: variant === "twitter" ? 504 : 524 }}
+        style={{ borderColor: "var(--color-border-default)", maxWidth: variant === "twitter" ? 504 : 524 }}
       >
         <div
           className="w-full bg-cover bg-center"
@@ -231,14 +231,14 @@ function SocialCardPreview({
           }}
         />
         <div className="p-3" style={{ backgroundColor: variant === "twitter" ? "#fff" : "#F0F2F5" }}>
-          <p className="text-xs" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
             {slug}.buildrik.app
           </p>
-          <p className="truncate text-sm font-semibold" style={{ color: "#0D0D0D" }}>
+          <p className="truncate text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             {title || "Page Title"}
           </p>
           {variant === "facebook" && (
-            <p className="truncate text-xs" style={{ color: "#7A7A7A" }}>
+            <p className="truncate text-xs" style={{ color: "var(--color-text-secondary)" }}>
               {description || "No description set"}
             </p>
           )}

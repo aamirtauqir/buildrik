@@ -86,16 +86,16 @@ export function SubmissionDrawer({
         {/* Header */}
         <div
           className="flex items-center justify-between border-b px-6 py-4"
-          style={{ borderColor: "#E8E8E8" }}
+          style={{ borderColor: "var(--color-border-default)" }}
         >
-          <h2 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Submission Details
           </h2>
           <button
             onClick={onClose}
             className="rounded-lg p-1.5 transition-colors hover:bg-gray-100"
           >
-            <X className="h-5 w-5" style={{ color: "#7A7A7A" }} />
+            <X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} />
           </button>
         </div>
 
@@ -105,12 +105,12 @@ export function SubmissionDrawer({
           <div className="space-y-4">
             <h3
               className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "#7A7A7A" }}
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Form Data
             </h3>
             {fields.length === 0 ? (
-              <p className="text-sm" style={{ color: "#B0B0B0" }}>
+              <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
                 No fields submitted.
               </p>
             ) : (
@@ -119,13 +119,13 @@ export function SubmissionDrawer({
                   <div key={key}>
                     <p
                       className="text-xs font-medium"
-                      style={{ color: "#7A7A7A" }}
+                      style={{ color: "var(--color-text-secondary)" }}
                     >
                       {key}
                     </p>
                     <p
                       className="mt-0.5 text-sm break-words"
-                      style={{ color: "#0D0D0D" }}
+                      style={{ color: "var(--color-text-primary)" }}
                     >
                       {String(value) || "\u2014"}
                     </p>
@@ -138,11 +138,11 @@ export function SubmissionDrawer({
           {/* Metadata */}
           <div
             className="mt-6 border-t pt-5 space-y-3"
-            style={{ borderColor: "#F4F4F4" }}
+            style={{ borderColor: "var(--color-bg-subtle)" }}
           >
             <h3
               className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "#7A7A7A" }}
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Metadata
             </h3>
@@ -158,11 +158,11 @@ export function SubmissionDrawer({
           {/* Toggles */}
           <div
             className="mt-6 border-t pt-5 space-y-3"
-            style={{ borderColor: "#F4F4F4" }}
+            style={{ borderColor: "var(--color-bg-subtle)" }}
           >
             <h3
               className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "#7A7A7A" }}
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Status
             </h3>
@@ -188,7 +188,7 @@ export function SubmissionDrawer({
         {onDelete && (
           <div
             className="border-t px-6 py-4"
-            style={{ borderColor: "#E8E8E8" }}
+            style={{ borderColor: "var(--color-border-default)" }}
           >
             <button
               onClick={() => onDelete(submission.id)}
@@ -208,12 +208,12 @@ export function SubmissionDrawer({
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <p className="text-xs font-medium shrink-0" style={{ color: "#7A7A7A" }}>
+      <p className="text-xs font-medium shrink-0" style={{ color: "var(--color-text-secondary)" }}>
         {label}
       </p>
       <p
         className="text-xs text-right break-words"
-        style={{ color: "#0D0D0D" }}
+        style={{ color: "var(--color-text-primary)" }}
       >
         {value}
       </p>
@@ -232,13 +232,13 @@ function ToggleRow({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm" style={{ color: "#0D0D0D" }}>
+      <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
         {label}
       </span>
       <button
         onClick={() => onChange(!checked)}
         className="relative h-5 w-9 rounded-full transition-colors"
-        style={{ backgroundColor: checked ? "var(--color-primary)" : "#E8E8E8" }}
+        style={{ backgroundColor: checked ? "var(--color-primary)" : "var(--color-border-default)" }}
         role="switch"
         aria-checked={checked}
       >

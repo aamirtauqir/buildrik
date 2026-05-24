@@ -125,22 +125,26 @@ fi
 pass "D6: @theme block present in globals.css"
 
 # ─────────────────────────────────────────────────────────────
-# Gate D7 — Zero-tolerance for hardcoded #E42313 in tsx/ts chrome.
-# Brand red must reference `var(--color-primary)` or Tailwind `text-primary` /
-# `bg-primary` classes, never hardcoded hex. Codemod ran 2026-05-24, baseline
-# locked at 0 — every consumer routes through the token now.
-# globals.css excepted (canonical token definition).
+# Gate D7 — Zero-tolerance for hardcoded token-backed hex in tsx/ts chrome.
+# Every consumer must reference var(--color-*) (or Tailwind text-primary/bg-primary
+# style mapped class), never hardcoded hex. Codemod ran 2026-05-24:
+#   - 266 brand red (#E42313)            → var(--color-primary)
+#   - 1383 slate-neutral palette         → var(--color-text-*/border-*/bg-*)
+#   - 38 semantic (success/warning/info) → var(--color-success/warning/info)
+# Total drained: 1687 occurrences. Locked at 0 going forward.
 # emails/ excepted (email clients have no CSS-var support).
+# globals.css excepted (canonical token definition site).
 # ─────────────────────────────────────────────────────────────
-D7_HITS=$(grep -rEn "#E42313" packages/dashboard \
+D7_HEX_PATTERN="#(E42313|7A7A7A|0D0D0D|E8E8E8|F4F4F4|B0B0B0|FAFAFA|D4D4D4|22C55E|EA580C|7a7a7a|0d0d0d|e8e8e8|f4f4f4|b0b0b0|fafafa|d4d4d4|22c55e|ea580c)"
+D7_HITS=$(grep -rEn "$D7_HEX_PATTERN" packages/dashboard \
   --include="*.tsx" --include="*.ts" 2>/dev/null \
   | grep -v "/node_modules/" \
   | grep -v "/.next/" \
   | grep -v "/emails/" \
   | wc -l | tr -d ' ')
 if [ "$D7_HITS" -gt 0 ]; then
-  echo "GATE FAIL: D7 — $D7_HITS hardcoded #E42313 in dashboard chrome tsx/ts (use var(--color-primary) or text-primary/bg-primary)"
-  grep -rEn "#E42313" packages/dashboard \
+  echo "GATE FAIL: D7 — $D7_HITS hardcoded token-backed hex in dashboard chrome tsx/ts (use var(--color-*) or token classes)"
+  grep -rEn "$D7_HEX_PATTERN" packages/dashboard \
     --include="*.tsx" --include="*.ts" 2>/dev/null \
     | grep -v "/node_modules/" \
     | grep -v "/.next/" \
@@ -148,7 +152,7 @@ if [ "$D7_HITS" -gt 0 ]; then
     | head -5
   exit 1
 fi
-pass "D7: no hardcoded #E42313 in dashboard chrome tsx/ts (emails + globals.css exempt)"
+pass "D7: no hardcoded token-backed hex in dashboard chrome tsx/ts (emails + globals.css exempt)"
 
 echo
 echo "=== Dashboard DS gates: 7 passed ==="

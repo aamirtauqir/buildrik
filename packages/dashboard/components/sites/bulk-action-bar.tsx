@@ -33,9 +33,9 @@ export function BulkActionBar({ selectedCount, onAction, onClear, folders = [] }
   if (selectedCount === 0) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-xl border bg-white px-4 py-2.5 shadow-xl" style={{ borderColor: "#E8E8E8" }}>
-      <span className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{selectedCount} selected</span>
-      <div className="mx-2 h-5 w-px" style={{ backgroundColor: "#E8E8E8" }} />
+    <div className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-xl border bg-white px-4 py-2.5 shadow-xl" style={{ borderColor: "var(--color-border-default)" }}>
+      <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{selectedCount} selected</span>
+      <div className="mx-2 h-5 w-px" style={{ backgroundColor: "var(--color-border-default)" }} />
       {BULK_ACTIONS.map((item) => {
         const Icon = iconMap[item.icon as keyof typeof iconMap];
         const isDestructive = item.action === "delete";
@@ -50,16 +50,16 @@ export function BulkActionBar({ selectedCount, onAction, onClear, folders = [] }
                   onAction(item.action);
                 }
               }}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4]"
-              style={{ color: isDestructive ? "var(--color-primary)" : "#7A7A7A" }}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+              style={{ color: isDestructive ? "var(--color-primary)" : "var(--color-text-secondary)" }}
             >
               <Icon className="h-3.5 w-3.5" />{item.label}
               {isMove && <ChevronDown className="h-3 w-3" />}
             </button>
             {isMove && folderDropdownOpen && (
-              <div className="absolute bottom-full left-0 mb-2 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "#E8E8E8" }}>
+              <div className="absolute bottom-full left-0 mb-2 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
                 {folders.length === 0 && (
-                  <p className="px-3 py-2 text-xs" style={{ color: "#7A7A7A" }}>No folders available</p>
+                  <p className="px-3 py-2 text-xs" style={{ color: "var(--color-text-secondary)" }}>No folders available</p>
                 )}
                 {folders.map((folder) => (
                   <button
@@ -68,10 +68,10 @@ export function BulkActionBar({ selectedCount, onAction, onClear, folders = [] }
                       onAction("move", folder.id);
                       setFolderDropdownOpen(false);
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-1.5 text-xs transition-colors hover:bg-[#F4F4F4]"
-                    style={{ color: "#0D0D0D" }}
+                    className="flex w-full items-center gap-2 px-3 py-1.5 text-xs transition-colors hover:bg-[var(--color-bg-subtle)]"
+                    style={{ color: "var(--color-text-primary)" }}
                   >
-                    <FolderInput className="h-3.5 w-3.5" style={{ color: "#7A7A7A" }} />
+                    <FolderInput className="h-3.5 w-3.5" style={{ color: "var(--color-text-secondary)" }} />
                     {folder.name}
                   </button>
                 ))}
@@ -80,7 +80,7 @@ export function BulkActionBar({ selectedCount, onAction, onClear, folders = [] }
           </div>
         );
       })}
-      <button onClick={onClear} className="ml-1 rounded p-1 hover:bg-[#F4F4F4]"><X className="h-4 w-4" style={{ color: "#7A7A7A" }} /></button>
+      <button onClick={onClear} className="ml-1 rounded p-1 hover:bg-[var(--color-bg-subtle)]"><X className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
     </div>
   );
 }

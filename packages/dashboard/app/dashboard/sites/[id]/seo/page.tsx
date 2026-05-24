@@ -21,7 +21,7 @@ export default function SiteSeoPage() {
   });
 
   if (settingsQuery.isLoading) {
-    return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />;
+    return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   }
 
   // settingsQuery.data may be undefined during initial load. SeoTab's prop

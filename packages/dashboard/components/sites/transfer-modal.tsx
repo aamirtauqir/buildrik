@@ -46,11 +46,11 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
       <div className="w-[440px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>Transfer Site</h2>
-          <button onClick={onClose}><X className="h-5 w-5" style={{ color: "#7A7A7A" }} /></button>
+          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Transfer Site</h2>
+          <button onClick={onClose}><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
         </div>
 
-        <p className="mt-3 text-sm" style={{ color: "#7A7A7A" }}>
+        <p className="mt-3 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           Select a team member to transfer ownership of this site.
         </p>
 
@@ -59,28 +59,28 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm"
-            style={{ borderColor: "#E8E8E8", color: selectedMember ? "#0D0D0D" : "#B0B0B0" }}
+            style={{ borderColor: "var(--color-border-default)", color: selectedMember ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
           >
             {selectedMember ? selectedMember.fullName : "Select a member..."}
-            <ChevronDown className="h-4 w-4" style={{ color: "#7A7A7A" }} />
+            <ChevronDown className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
           </button>
           {dropdownOpen && (
-            <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border bg-white shadow-lg" style={{ borderColor: "#E8E8E8" }}>
+            <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border bg-white shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
               {membersQuery.isLoading && (
-                <p className="px-3 py-2 text-sm" style={{ color: "#7A7A7A" }}>Loading...</p>
+                <p className="px-3 py-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading...</p>
               )}
               {eligibleMembers.length === 0 && !membersQuery.isLoading && (
-                <p className="px-3 py-2 text-sm" style={{ color: "#7A7A7A" }}>No eligible members</p>
+                <p className="px-3 py-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>No eligible members</p>
               )}
               {eligibleMembers.map((member) => (
                 <button
                   key={member.userId}
                   onClick={() => { setSelectedMemberId(member.userId); setDropdownOpen(false); }}
-                  className="flex w-full items-center justify-between px-3 py-2 text-sm transition-colors hover:bg-[#F4F4F4]"
-                  style={{ color: "#0D0D0D" }}
+                  className="flex w-full items-center justify-between px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  style={{ color: "var(--color-text-primary)" }}
                 >
                   <span>{member.fullName}</span>
-                  <span className="text-xs" style={{ color: "#B0B0B0" }}>{member.role.toLowerCase()}</span>
+                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{member.role.toLowerCase()}</span>
                 </button>
               ))}
             </div>
@@ -96,7 +96,7 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
 
         {/* Actions */}
         <div className="mt-4 flex gap-2 justify-end">
-          <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>
+          <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
             Cancel
           </button>
           <button

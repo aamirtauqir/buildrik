@@ -32,7 +32,7 @@ export default function SiteAccessPage() {
   });
 
   if (linksQuery.isLoading) {
-    return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />;
+    return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   }
 
   return (

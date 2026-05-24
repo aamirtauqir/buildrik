@@ -29,11 +29,11 @@ export default function DashboardError({
         </div>
         <h2
           className="text-lg font-semibold"
-          style={{ color: "#0D0D0D" }}
+          style={{ color: "var(--color-text-primary)" }}
         >
           Failed to load this page
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
+        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           Something went wrong while loading this section.
         </p>
         <div className="mt-6 flex gap-3 justify-center">
@@ -47,7 +47,7 @@ export default function DashboardError({
           <Link
             href="/dashboard"
             className="px-4 py-2 rounded-lg text-sm font-medium border"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             Back to Dashboard
           </Link>

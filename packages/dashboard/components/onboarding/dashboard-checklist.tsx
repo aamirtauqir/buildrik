@@ -110,19 +110,19 @@ export function DashboardChecklist({
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 rounded-2xl border border-[#E8E8E8] bg-white shadow-lg">
+    <div className="fixed bottom-6 right-6 z-50 w-80 rounded-2xl border border-[var(--color-border-default)] bg-white shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border-default)]">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-[#0D0D0D]">Getting Started</span>
-          <span className="text-xs font-medium text-[#7A7A7A]">
+          <span className="text-sm font-semibold text-[var(--color-text-primary)]">Getting Started</span>
+          <span className="text-xs font-medium text-[var(--color-text-secondary)]">
             {completedCount}/{total}
           </span>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setCollapsed((c) => !c)}
-            className="rounded-md p-1 text-[#7A7A7A] hover:bg-[#F4F4F4] transition-colors"
+            className="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] transition-colors"
             aria-label={collapsed ? "Expand checklist" : "Collapse checklist"}
           >
             {collapsed ? (
@@ -133,7 +133,7 @@ export function DashboardChecklist({
           </button>
           <button
             onClick={handleDismiss}
-            className="rounded-md p-1 text-[#7A7A7A] hover:bg-[#F4F4F4] transition-colors"
+            className="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] transition-colors"
             aria-label="Dismiss checklist"
           >
             <X className="h-4 w-4" />
@@ -143,7 +143,7 @@ export function DashboardChecklist({
 
       {/* Progress bar */}
       <div className="px-4 pt-2 pb-1">
-        <div className="h-1.5 w-full rounded-full bg-[#F4F4F4]">
+        <div className="h-1.5 w-full rounded-full bg-[var(--color-bg-subtle)]">
           <div
             className="h-1.5 rounded-full bg-[var(--color-primary)] transition-all duration-300"
             style={{ width: `${progressPct}%` }}
@@ -174,13 +174,13 @@ export function DashboardChecklist({
                   <p
                     className={cn(
                       "text-sm font-medium",
-                      done ? "text-[#B0B0B0] line-through" : "text-[#0D0D0D]"
+                      done ? "text-[var(--color-text-muted)] line-through" : "text-[var(--color-text-primary)]"
                     )}
                   >
                     {item.label}
                   </p>
                   {!done && (
-                    <p className="text-xs text-[#7A7A7A]">{item.description}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">{item.description}</p>
                   )}
                 </div>
               </li>

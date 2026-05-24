@@ -31,7 +31,7 @@ function MobileTabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 flex h-14 items-center justify-around border-t bg-white lg:hidden" style={{ borderColor: "#E8E8E8" }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-30 flex h-14 items-center justify-around border-t bg-white lg:hidden" style={{ borderColor: "var(--color-border-default)" }}>
       {SIDEBAR_NAV_ITEMS.map((item) => {
         const active = isActiveRoute(pathname, item.href);
         const Icon = iconMap[item.icon as keyof typeof iconMap];
@@ -41,7 +41,7 @@ function MobileTabBar() {
             href={item.href}
             className={cn(
               "flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors",
-              active ? "text-[var(--color-primary)]" : "text-[#7A7A7A]"
+              active ? "text-[var(--color-primary)]" : "text-[var(--color-text-secondary)]"
             )}
           >
             <Icon className="h-5 w-5" />
@@ -67,9 +67,9 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop sidebar — hidden below lg */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[220px] flex-col border-r bg-white lg:flex" style={{ borderColor: "#E8E8E8" }}>
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[220px] flex-col border-r bg-white lg:flex" style={{ borderColor: "var(--color-border-default)" }}>
         <div className="flex h-14 items-center px-5">
-          <Link href="/dashboard" className="text-lg font-bold" style={{ color: "#0D0D0D" }}>Buildrik</Link>
+          <Link href="/dashboard" className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>Buildrik</Link>
         </div>
         <nav className="flex-1 px-3 py-2">
           <ul className="space-y-1">
@@ -80,7 +80,7 @@ export function Sidebar() {
                 <li key={item.href}>
                   <Link href={item.href} className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    active ? "bg-red-50 text-[var(--color-primary)]" : "text-[#7A7A7A] hover:bg-[#F4F4F4] hover:text-[#0D0D0D]"
+                    active ? "bg-red-50 text-[var(--color-primary)]" : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
                   )}>
                     <Icon className="h-5 w-5" />
                     {item.label}
@@ -90,12 +90,12 @@ export function Sidebar() {
             })}
           </ul>
         </nav>
-        <div className="border-t px-4 py-3 space-y-2" style={{ borderColor: "#E8E8E8" }}>
+        <div className="border-t px-4 py-3 space-y-2" style={{ borderColor: "var(--color-border-default)" }}>
           <div className="flex items-center justify-between">
-            <p className="text-xs font-medium" style={{ color: "#0D0D0D" }}>My Workspace</p>
+            <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>My Workspace</p>
             <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{
-              backgroundColor: plan === "FREE" ? "#F4F4F4" : "#FEF2F2",
-              color: plan === "FREE" ? "#7A7A7A" : "var(--color-primary)",
+              backgroundColor: plan === "FREE" ? "var(--color-bg-subtle)" : "#FEF2F2",
+              color: plan === "FREE" ? "var(--color-text-secondary)" : "var(--color-primary)",
             }}>
               {PLAN_LABELS[plan] ?? plan}
             </span>
@@ -103,17 +103,17 @@ export function Sidebar() {
           {!health.isLoading && (
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <span className="text-[11px]" style={{ color: "#7A7A7A" }}>Sites</span>
-                <span className="text-[11px] font-medium" style={{ color: "#0D0D0D" }}>
+                <span className="text-[11px]" style={{ color: "var(--color-text-secondary)" }}>Sites</span>
+                <span className="text-[11px] font-medium" style={{ color: "var(--color-text-primary)" }}>
                   {sitesUsed}/{sitesLimit}
                 </span>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E8E8E8]">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border-default)]">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
                     width: `${usagePct}%`,
-                    backgroundColor: usagePct >= 85 ? "#EF4444" : usagePct >= 60 ? "#EAB308" : "#22C55E",
+                    backgroundColor: usagePct >= 85 ? "#EF4444" : usagePct >= 60 ? "#EAB308" : "var(--color-success)",
                   }}
                 />
               </div>

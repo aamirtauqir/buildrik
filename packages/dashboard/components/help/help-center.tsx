@@ -64,7 +64,7 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
       {/* Search */}
       <form onSubmit={handleSearchSubmit}>
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" style={{ color: "#7A7A7A" }} />
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" style={{ color: "var(--color-text-secondary)" }} />
           <input
             type="text"
             placeholder="Search help articles..."
@@ -72,8 +72,8 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
             onChange={(e) => setQuery(e.target.value)}
             className="w-full rounded-xl border py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2"
             style={{
-              borderColor: "#E8E8E8",
-              color: "#0D0D0D",
+              borderColor: "var(--color-border-default)",
+              color: "var(--color-text-primary)",
             }}
           />
           {query && (
@@ -90,7 +90,7 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
 
       {/* Categories */}
       <section>
-        <h2 className="mb-4 text-base font-semibold" style={{ color: "#0D0D0D" }}>Browse by Category</h2>
+        <h2 className="mb-4 text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Browse by Category</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {HELP_CATEGORY_LIST.map((cat) => {
             const Icon = ICON_MAP[cat.icon];
@@ -98,11 +98,11 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
               <div
                 key={cat.key}
                 className="flex cursor-pointer flex-col gap-2 rounded-xl border p-4 transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
-                style={{ borderColor: "#E8E8E8" }}
+                style={{ borderColor: "var(--color-border-default)" }}
               >
                 {Icon && <Icon className="h-5 w-5" style={{ color: "var(--color-primary)" }} />}
-                <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{cat.label}</p>
-                <p className="text-xs" style={{ color: "#7A7A7A" }}>Coming soon</p>
+                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{cat.label}</p>
+                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Coming soon</p>
               </div>
             );
           })}
@@ -111,32 +111,32 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
 
       {/* Contact Support */}
       <section>
-        <h2 className="mb-4 text-base font-semibold" style={{ color: "#0D0D0D" }}>Contact Support</h2>
+        <h2 className="mb-4 text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Contact Support</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <button
             onClick={onContactLiveChat}
             className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
-            style={{ borderColor: "#E8E8E8" }}
+            style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
               <MessageCircle className="h-5 w-5" style={{ color: "var(--color-primary)" }} />
             </div>
             <div>
-              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Live Chat</p>
-              <p className="text-xs" style={{ color: "#7A7A7A" }}>Chat with our support team</p>
+              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Live Chat</p>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Chat with our support team</p>
             </div>
           </button>
           <button
             onClick={onContactEmail}
             className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
-            style={{ borderColor: "#E8E8E8" }}
+            style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
               <Mail className="h-5 w-5" style={{ color: "var(--color-primary)" }} />
             </div>
             <div>
-              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Email Support</p>
-              <p className="text-xs" style={{ color: "#7A7A7A" }}>Get a reply within 24 hours</p>
+              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Email Support</p>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Get a reply within 24 hours</p>
             </div>
           </button>
         </div>
@@ -145,30 +145,30 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
       {/* Keyboard Shortcuts */}
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>Keyboard Shortcuts</h2>
+          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Keyboard Shortcuts</h2>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4]"
-            style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+            className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             <Printer className="h-3.5 w-3.5" />
             Print
           </button>
         </div>
-        <div className="rounded-xl border" style={{ borderColor: "#E8E8E8" }}>
+        <div className="rounded-xl border" style={{ borderColor: "var(--color-border-default)" }}>
           {KEYBOARD_SHORTCUTS.map((shortcut, i) => (
             <div
               key={i}
               className="flex items-center justify-between px-4 py-3"
-              style={{ borderBottom: i < KEYBOARD_SHORTCUTS.length - 1 ? "1px solid #E8E8E8" : "none" }}
+              style={{ borderBottom: i < KEYBOARD_SHORTCUTS.length - 1 ? "1px solid var(--color-border-default)" : "none" }}
             >
-              <span className="text-sm" style={{ color: "#0D0D0D" }}>{shortcut.description}</span>
+              <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{shortcut.description}</span>
               <div className="flex items-center gap-1">
                 {shortcut.keys.map((key, ki) => (
                   <kbd
                     key={ki}
                     className="rounded border px-1.5 py-0.5 text-xs font-medium"
-                    style={{ borderColor: "#E8E8E8", color: "#7A7A7A", backgroundColor: "#F4F4F4" }}
+                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}
                   >
                     {key}
                   </kbd>

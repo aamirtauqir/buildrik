@@ -17,7 +17,7 @@ type EmptyStateConfig = {
   showVideoArea?: boolean;
 };
 
-const ICON_CLASS = "h-10 w-10 text-[#7A7A7A]";
+const ICON_CLASS = "h-10 w-10 text-[var(--color-text-secondary)]";
 
 function getConfig(variant: EmptyStateVariant): EmptyStateConfig {
   switch (variant) {
@@ -80,13 +80,13 @@ export function EmptyState({ variant }: EmptyStateProps) {
   const config = getConfig(variant);
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#E8E8E8] bg-[#F4F4F4] px-8 py-16 text-center">
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] px-8 py-16 text-center">
       <div className="mb-4">{config.icon}</div>
-      <h2 className="text-xl font-semibold text-[#0D0D0D]">{config.heading}</h2>
-      <p className="mt-2 max-w-md text-sm text-[#7A7A7A]">{config.description}</p>
+      <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">{config.heading}</h2>
+      <p className="mt-2 max-w-md text-sm text-[var(--color-text-secondary)]">{config.description}</p>
 
       {config.showVideoArea && (
-        <div className="mt-6 h-40 w-72 rounded-lg border border-dashed border-[#E8E8E8] bg-white" />
+        <div className="mt-6 h-40 w-72 rounded-lg border border-dashed border-[var(--color-border-default)] bg-white" />
       )}
 
       {config.ctas.length > 0 && (
@@ -98,7 +98,7 @@ export function EmptyState({ variant }: EmptyStateProps) {
               className={
                 i === 0
                   ? "flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[#c91e0f]"
-                  : "flex items-center gap-2 rounded-lg border border-[#E8E8E8] bg-white px-4 py-2 text-sm font-medium text-[#0D0D0D] hover:bg-[#F4F4F4]"
+                  : "flex items-center gap-2 rounded-lg border border-[var(--color-border-default)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-bg-subtle)]"
               }
             >
               {cta.icon}

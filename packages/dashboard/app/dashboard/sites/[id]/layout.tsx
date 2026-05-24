@@ -20,9 +20,9 @@ export default function SiteDetailLayout({
   if (siteQuery.isLoading) {
     return (
       <div>
-        <div className="h-6 w-48 animate-pulse rounded" style={{ backgroundColor: "#F4F4F4" }} />
-        <div className="mt-4 h-10 w-full animate-pulse rounded" style={{ backgroundColor: "#F4F4F4" }} />
-        <div className="mt-6 h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+        <div className="h-6 w-48 animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        <div className="mt-4 h-10 w-full animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        <div className="mt-6 h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
       </div>
     );
   }
@@ -30,10 +30,10 @@ export default function SiteDetailLayout({
   if (!site) {
     return (
       <div className="flex flex-col items-center py-16 text-center">
-        <p className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
+        <p className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
           Site not found
         </p>
-        <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
+        <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           This site may have been deleted or you don&apos;t have access.
         </p>
       </div>

@@ -5,7 +5,7 @@ export function GoBackButton() {
     <button
       onClick={() => window.history.back()}
       className="px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer"
-      style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
     >
       Go Back
     </button>

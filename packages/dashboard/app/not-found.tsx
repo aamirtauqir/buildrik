@@ -11,7 +11,7 @@ export default async function NotFound() {
   return (
     <div
       className="min-h-screen flex items-center justify-center"
-      style={{ backgroundColor: "#FAFAFA" }}
+      style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       <div className="text-center max-w-md mx-auto px-4">
         <h1 className="text-6xl font-bold" style={{ color: "var(--color-primary)" }}>
@@ -19,11 +19,11 @@ export default async function NotFound() {
         </h1>
         <h2
           className="mt-4 text-xl font-semibold"
-          style={{ color: "#0D0D0D" }}
+          style={{ color: "var(--color-text-primary)" }}
         >
           Page Not Found
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
+        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <div className="mt-8 flex gap-3 justify-center">

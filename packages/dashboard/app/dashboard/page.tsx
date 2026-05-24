@@ -64,30 +64,30 @@ export default function DashboardPage() {
     return (
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Dashboard</h1>
+          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Dashboard</h1>
         </div>
         {/* Stat cards skeleton */}
         <div className="mt-6 grid grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+            <div key={i} className="h-28 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
         </div>
         {/* Quick actions skeleton */}
         <div className="mt-6 grid grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+            <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
         </div>
         {/* Recent sites skeleton */}
         <div className="mt-6 grid grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-40 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+            <div key={i} className="h-40 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
         </div>
         {/* Activity + Health skeleton */}
         <div className="mt-6 grid grid-cols-3 gap-6">
-          <div className="col-span-2 h-48 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
-          <div className="h-48 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+          <div className="col-span-2 h-48 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div className="h-48 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         </div>
       </div>
     );
@@ -138,7 +138,7 @@ export default function DashboardPage() {
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Dashboard</h1>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Dashboard</h1>
         <Link href="/dashboard/sites/new" className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
           <Plus className="h-4 w-4" />New Site
         </Link>
@@ -160,9 +160,9 @@ export default function DashboardPage() {
               visual={
                 <MiniDonut
                   segments={[
-                    { value: stats.data?.publishedSites ?? 0, color: "#22C55E" },
+                    { value: stats.data?.publishedSites ?? 0, color: "var(--color-success)" },
                     { value: stats.data?.draftSites ?? 0, color: "#EAB308" },
-                    { value: stats.data?.archivedSites ?? 0, color: "#7A7A7A" },
+                    { value: stats.data?.archivedSites ?? 0, color: "var(--color-text-secondary)" },
                   ]}
                 />
               }
@@ -220,8 +220,8 @@ export default function DashboardPage() {
                     onClick={() => setActivityFilter(f)}
                     className={
                       activityFilter === f
-                        ? "rounded-lg bg-[#F4F4F4] px-3 py-1 text-xs font-medium text-[#0D0D0D]"
-                        : "rounded-lg px-3 py-1 text-xs text-[#7A7A7A] hover:bg-[#F4F4F4]"
+                        ? "rounded-lg bg-[var(--color-bg-subtle)] px-3 py-1 text-xs font-medium text-[var(--color-text-primary)]"
+                        : "rounded-lg px-3 py-1 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)]"
                     }
                   >
                     {f === "all" ? "All" : f === "mine" ? "My Activity" : "Team"}

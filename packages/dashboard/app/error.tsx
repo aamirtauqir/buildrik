@@ -12,7 +12,7 @@ export default function GlobalError({
   return (
     <div
       className="min-h-screen flex items-center justify-center"
-      style={{ backgroundColor: "#FAFAFA" }}
+      style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       <div className="text-center max-w-md mx-auto px-4">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "#FEF2F2" }}>
@@ -36,15 +36,15 @@ export default function GlobalError({
         </h1>
         <h2
           className="mt-4 text-xl font-semibold"
-          style={{ color: "#0D0D0D" }}
+          style={{ color: "var(--color-text-primary)" }}
         >
           Something Went Wrong
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
+        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           Our team has been notified. Please try again in a moment.
         </p>
         {error.digest && (
-          <p className="mt-3 text-xs font-mono" style={{ color: "#7A7A7A" }}>
+          <p className="mt-3 text-xs font-mono" style={{ color: "var(--color-text-secondary)" }}>
             Error ID: {error.digest}
           </p>
         )}
@@ -59,7 +59,7 @@ export default function GlobalError({
           <Link
             href="/dashboard"
             className="px-4 py-2 rounded-lg text-sm font-medium border"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             Go to Dashboard
           </Link>

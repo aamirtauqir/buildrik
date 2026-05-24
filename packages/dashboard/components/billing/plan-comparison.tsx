@@ -27,9 +27,9 @@ const PLAN_PRICES: Record<PlanKey, { monthly: number; yearly: number }> = {
 };
 
 const PLAN_BADGE: Record<PlanKey, { bg: string; color: string; label: string }> = {
-  FREE: { bg: "#F4F4F4", color: "#7A7A7A", label: "Free" },
-  PRO: { bg: "#F4F4F4", color: "#0D0D0D", label: "Pro" },
-  BUSINESS: { bg: "#0D0D0D", color: "#FFFFFF", label: "Business" },
+  FREE: { bg: "var(--color-bg-subtle)", color: "var(--color-text-secondary)", label: "Free" },
+  PRO: { bg: "var(--color-bg-subtle)", color: "var(--color-text-primary)", label: "Pro" },
+  BUSINESS: { bg: "var(--color-text-primary)", color: "#FFFFFF", label: "Business" },
 };
 
 export interface UsageMetric {
@@ -83,7 +83,7 @@ export function PlanComparison({
   return (
     <div>
       <div className="mb-6 flex items-center justify-center gap-3">
-        <span className="text-sm font-medium" style={{ color: yearly ? "#7A7A7A" : "#0D0D0D" }}>
+        <span className="text-sm font-medium" style={{ color: yearly ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}>
           Monthly
         </span>
         <button
@@ -92,7 +92,7 @@ export function PlanComparison({
           onClick={() => setYearly((v) => !v)}
           className={cn(
             "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-            yearly ? "bg-[var(--color-primary)]" : "bg-[#E8E8E8]"
+            yearly ? "bg-[var(--color-primary)]" : "bg-[var(--color-border-default)]"
           )}
         >
           <span
@@ -102,22 +102,22 @@ export function PlanComparison({
             )}
           />
         </button>
-        <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: yearly ? "#0D0D0D" : "#7A7A7A" }}>
+        <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: yearly ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>
           Yearly
           <span
             className="rounded-full px-2 py-0.5 text-xs font-semibold"
-            style={{ backgroundColor: "#F0FDF4", color: "#22C55E" }}
+            style={{ backgroundColor: "#F0FDF4", color: "var(--color-success)" }}
           >
             Save 20%
           </span>
         </span>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[#E8E8E8]">
+      <div className="overflow-x-auto rounded-2xl border border-[var(--color-border-default)]">
         <table className="w-full text-sm">
           <thead>
-            <tr style={{ backgroundColor: "#FAFAFA" }}>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "#7A7A7A" }}>
+            <tr style={{ backgroundColor: "var(--color-bg-page)" }}>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
                 Feature
               </th>
               {plans.map((plan) => {
@@ -134,7 +134,7 @@ export function PlanComparison({
                       {isBest && (
                         <span
                           className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
-                          style={{ backgroundColor: "#F0FDF4", color: "#22C55E" }}
+                          style={{ backgroundColor: "#F0FDF4", color: "var(--color-success)" }}
                         >
                           Best for you
                         </span>
@@ -150,7 +150,7 @@ export function PlanComparison({
                           Current
                         </span>
                       )}
-                      <span className="mt-1 text-base font-bold" style={{ color: "#0D0D0D" }}>
+                      <span className="mt-1 text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
                         {price === 0 ? "Free" : `$${price}/mo`}
                       </span>
                     </div>
@@ -168,11 +168,11 @@ export function PlanComparison({
                 <tr
                   key={row.label}
                   className={cn(
-                    "border-t border-[#E8E8E8]",
-                    i % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]"
+                    "border-t border-[var(--color-border-default)]",
+                    i % 2 === 0 ? "bg-white" : "bg-[var(--color-bg-page)]"
                   )}
                 >
-                  <td className="px-6 py-3 font-medium" style={{ color: "#0D0D0D" }}>
+                  <td className="px-6 py-3 font-medium" style={{ color: "var(--color-text-primary)" }}>
                     <span className="flex items-center gap-2">
                       {row.label}
                       {showWarning && (
@@ -197,7 +197,7 @@ export function PlanComparison({
                       <td
                         key={key}
                         className={cn("px-6 py-3 text-center text-sm", isCurrent && "bg-[#FEF2F2]")}
-                        style={{ color: "#7A7A7A" }}
+                        style={{ color: "var(--color-text-secondary)" }}
                       >
                         {row[key]}
                       </td>
@@ -209,7 +209,7 @@ export function PlanComparison({
           </tbody>
           {onSelectPlan && (
             <tfoot>
-              <tr className="border-t border-[#E8E8E8] bg-white">
+              <tr className="border-t border-[var(--color-border-default)] bg-white">
                 <td className="px-6 py-4" />
                 {plans.map((plan) => {
                   const isCurrent = plan === currentPlan;
@@ -221,7 +221,7 @@ export function PlanComparison({
                           onClick={() => onSelectPlan(plan, interval)}
                           className={cn(
                             "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90",
-                            isBest && "ring-2 ring-[#22C55E] ring-offset-2"
+                            isBest && "ring-2 ring-[var(--color-success)] ring-offset-2"
                           )}
                           style={{ backgroundColor: "var(--color-primary)" }}
                         >

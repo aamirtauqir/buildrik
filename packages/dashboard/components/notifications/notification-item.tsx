@@ -53,23 +53,23 @@ export function NotificationItem({
 
   return (
     <div
-      className="group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-[#F4F4F4]"
+      className="group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-[var(--color-bg-subtle)]"
       style={{
-        backgroundColor: notification.read ? undefined : "#F4F4F4",
+        backgroundColor: notification.read ? undefined : "var(--color-bg-subtle)",
         opacity: notification.read ? 0.6 : 1,
         cursor: notification.actionUrl ? "pointer" : "default",
       }}
       onClick={handleClick}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-sm" style={{ color: "#0D0D0D" }}>
+        <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
           {notification.actorName && (
             <span className="font-semibold">{notification.actorName} </span>
           )}
           {notification.message}
         </p>
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-xs" style={{ color: "#7A7A7A" }}>
+          <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
             {timeAgo(notification.createdAt)}
           </span>
           {notification.actionUrl && (
@@ -87,8 +87,8 @@ export function NotificationItem({
       <div className="hidden shrink-0 items-center gap-1 group-hover:flex" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => onToggleRead(notification.id, !notification.read)}
-          className="rounded p-1 transition-colors hover:bg-[#E8E8E8]"
-          style={{ color: "#7A7A7A" }}
+          className="rounded p-1 transition-colors hover:bg-[var(--color-border-default)]"
+          style={{ color: "var(--color-text-secondary)" }}
           aria-label={notification.read ? "Mark as unread" : "Mark as read"}
         >
           {notification.read ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -96,8 +96,8 @@ export function NotificationItem({
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen((o) => !o)}
-            className="rounded p-1 transition-colors hover:bg-[#E8E8E8]"
-            style={{ color: "#7A7A7A" }}
+            className="rounded p-1 transition-colors hover:bg-[var(--color-border-default)]"
+            style={{ color: "var(--color-text-secondary)" }}
             aria-label="More actions"
           >
             <MoreHorizontal className="h-4 w-4" />
@@ -105,13 +105,13 @@ export function NotificationItem({
           {menuOpen && (
             <div
               className="absolute right-0 top-full z-10 mt-1 w-44 overflow-hidden rounded-lg border bg-white shadow-lg"
-              style={{ borderColor: "#E8E8E8" }}
+              style={{ borderColor: "var(--color-border-default)" }}
             >
               {onMuteType && (
                 <button
                   onClick={() => { onMuteType(notification.type); setMenuOpen(false); }}
-                  className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[#F4F4F4]"
-                  style={{ color: "#0D0D0D" }}
+                  className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  style={{ color: "var(--color-text-primary)" }}
                 >
                   Mute this type
                 </button>
@@ -119,7 +119,7 @@ export function NotificationItem({
               {onDelete && (
                 <button
                   onClick={() => { onDelete(notification.id); setMenuOpen(false); }}
-                  className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[#F4F4F4]"
+                  className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
                   style={{ color: "var(--color-primary)" }}
                 >
                   Delete

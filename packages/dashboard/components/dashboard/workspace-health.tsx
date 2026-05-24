@@ -29,14 +29,14 @@ function HealthBar({ label, used, limit, unit = "" }: HealthBarProps) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-[#7A7A7A]">{label}</span>
-        <span className="font-medium text-[#0D0D0D]">
+        <span className="text-[var(--color-text-secondary)]">{label}</span>
+        <span className="font-medium text-[var(--color-text-primary)]">
           {used}
           {unit} / {limit}
           {unit}
         </span>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E8E8E8]">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border-default)]">
         <div
           className={`h-full rounded-full ${COLOR_CLASSES[color]}`}
           style={{ width: `${pct}%` }}
@@ -71,9 +71,9 @@ export function WorkspaceHealth({ data }: WorkspaceHealthProps) {
   if (!hasUsage || !anyOver50) return null;
 
   return (
-    <div className="rounded-xl border border-[#E8E8E8] bg-white p-5">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-white p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-[#0D0D0D]">Workspace Usage</h3>
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Workspace Usage</h3>
         <Link href="/dashboard/billing" className="text-xs text-[var(--color-primary)] hover:underline">
           Manage plan →
         </Link>

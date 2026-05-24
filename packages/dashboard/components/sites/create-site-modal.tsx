@@ -45,14 +45,14 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
       <div className="w-[480px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold" style={{ color: "#0D0D0D" }}>Create New Site</h2>
-          <button onClick={onClose} className="rounded p-1 hover:bg-[#F4F4F4]"><X className="h-5 w-5" style={{ color: "#7A7A7A" }} /></button>
+          <h2 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>Create New Site</h2>
+          <button onClick={onClose} className="rounded p-1 hover:bg-[var(--color-bg-subtle)]"><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
         </div>
         <div className="mt-4">
-          <label className="text-sm font-medium" style={{ color: "#7A7A7A" }}>Site Name</label>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }} />
+          <label className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Site Name</label>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }} />
           <div className="mt-1 flex items-center gap-2">
-            <p className="text-xs" style={{ color: "#B0B0B0" }}>{slug}.buildrik.app</p>
+            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{slug}.buildrik.app</p>
             {debouncedSlug.length >= 3 && slugCheck.data && (
               slugCheck.data.available ? (
                 <span className="flex items-center gap-1 text-xs text-green-600">
@@ -69,10 +69,10 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         {atSiteLimit ? (
           <div className="mt-6 rounded-xl border p-5 text-center" style={{ borderColor: "#FCA5A5", backgroundColor: "#FEF2F2" }}>
             <Lock className="mx-auto h-8 w-8 mb-2" style={{ color: "var(--color-primary)" }} />
-            <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>
+            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Site limit reached ({sitesUsed}/{sitesLimit})
             </p>
-            <p className="mt-1 text-xs" style={{ color: "#7A7A7A" }}>
+            <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
               Upgrade your plan to create more sites.
             </p>
             <Link
@@ -86,37 +86,37 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
           </div>
         ) : (
           <div className="mt-6 space-y-3">
-            <button onClick={() => onSubmit({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[#F4F4F4]" style={{ borderColor: "#E8E8E8" }}>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#F4F4F4" }}><LayoutTemplate className="h-5 w-5" style={{ color: "#7A7A7A" }} /></div>
-              <div><p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Use a Template</p><p className="text-xs" style={{ color: "#7A7A7A" }}>Browse 50+ templates</p></div>
+            <button onClick={() => onSubmit({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><LayoutTemplate className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
+              <div><p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Use a Template</p><p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ templates</p></div>
             </button>
-            <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-red-50/50" style={{ borderColor: "#E8E8E8" }}>
+            <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-red-50/50" style={{ borderColor: "var(--color-border-default)" }}>
               <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FEF2F2" }}><Sparkles className="h-5 w-5" style={{ color: "var(--color-primary)" }} /></div>
               <div className="flex-1">
-                <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Generate with AI</p>
-                <p className="text-xs" style={{ color: "#7A7A7A" }}>AI-powered site creation</p>
+                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
+                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>AI-powered site creation</p>
               </div>
               {aiCredits && (
                 <div className="text-right">
                   {aiCredits.used < aiCredits.limit ? (
-                    <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                    <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                       {aiCredits.used}/{aiCredits.limit} credits remaining
                     </p>
                   ) : (
-                    <p className="flex items-center gap-1 text-xs" style={{ color: "#B0B0B0" }}>
+                    <p className="flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
                       <Lock className="h-3 w-3" /> Upgrade for more
                     </p>
                   )}
                 </div>
               )}
             </button>
-            <button onClick={() => onSubmit({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[#F4F4F4]" style={{ borderColor: "#E8E8E8" }}>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#F4F4F4" }}><Plus className="h-5 w-5" style={{ color: "#7A7A7A" }} /></div>
-              <div><p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Start from Scratch</p><p className="text-xs" style={{ color: "#7A7A7A" }}>Full creative control</p></div>
+            <button onClick={() => onSubmit({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)" }}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><Plus className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
+              <div><p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p><p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Full creative control</p></div>
             </button>
           </div>
         )}
-        <button onClick={onClose} className="mt-4 w-full rounded-lg border py-2 text-sm font-medium transition-colors hover:bg-[#F4F4F4]" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>Cancel</button>
+        <button onClick={onClose} className="mt-4 w-full rounded-lg border py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
       </div>
     </div>
   );

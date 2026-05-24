@@ -21,14 +21,14 @@ const ROLE_CARDS = [
     role: "Editor",
     description: "Create and edit sites. Cannot publish or manage team.",
     bg: "#F0FDF4",
-    color: "#22C55E",
+    color: "var(--color-success)",
     Icon: Pencil,
   },
   {
     role: "Viewer",
     description: "View published sites only. Read-only access.",
     bg: "#F3F4F6",
-    color: "#7A7A7A",
+    color: "var(--color-text-secondary)",
     Icon: Eye,
   },
 ];
@@ -47,10 +47,10 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
         <Users className="h-8 w-8" style={{ color: "var(--color-primary)" }} />
       </div>
 
-      <h2 className="text-xl font-semibold" style={{ color: "#0D0D0D" }}>
+      <h2 className="text-xl font-semibold" style={{ color: "var(--color-text-primary)" }}>
         No team members yet
       </h2>
-      <p className="mt-2 max-w-sm text-center text-sm" style={{ color: "#7A7A7A" }}>
+      <p className="mt-2 max-w-sm text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
         Invite your colleagues to collaborate. Choose the right role for each person based on what they need to do.
       </p>
 
@@ -66,7 +66,7 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
         {ROLE_CARDS.map((card) => (
           <div
             key={card.role}
-            className="rounded-xl border border-[#E8E8E8] p-4"
+            className="rounded-xl border border-[var(--color-border-default)] p-4"
           >
             <div
               className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg"
@@ -74,10 +74,10 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
             >
               <card.Icon className="h-4 w-4" style={{ color: card.color }} />
             </div>
-            <p className="text-sm font-bold" style={{ color: "#0D0D0D" }}>
+            <p className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
               {card.role}
             </p>
-            <p className="mt-1 text-xs" style={{ color: "#7A7A7A" }}>
+            <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
               {card.description}
             </p>
           </div>

@@ -33,7 +33,7 @@ export function LimitReached({
   const pct = limit === 0 ? 100 : Math.min(100, Math.round((used / limit) * 100));
 
   return (
-    <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6">
+    <div className="rounded-2xl border border-[var(--color-border-default)] bg-white p-6">
       <div className="flex items-start gap-4">
         <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
@@ -49,19 +49,19 @@ export function LimitReached({
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
+          <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
             {resource} limit reached
           </h3>
-          <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
+          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
             You've used {formatValue(used, unit)} of your {formatValue(limit, unit)} {resource.toLowerCase()} allowance.
           </p>
 
           <div className="mt-4">
-            <div className="mb-1 flex items-center justify-between text-xs" style={{ color: "#7A7A7A" }}>
+            <div className="mb-1 flex items-center justify-between text-xs" style={{ color: "var(--color-text-secondary)" }}>
               <span>{formatValue(used, unit)} used</span>
               <span>{formatValue(limit, unit)} limit</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E8E8E8" }}>
+            <div className="h-2 w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--color-border-default)" }}>
               <div
                 className="h-full rounded-full"
                 style={{ width: `${pct}%`, backgroundColor: "var(--color-primary)" }}
@@ -85,14 +85,14 @@ export function LimitReached({
                   <button
                     onClick={onComparePlans}
                     className="text-sm font-medium underline-offset-2 hover:underline"
-                    style={{ color: "#7A7A7A" }}
+                    style={{ color: "var(--color-text-secondary)" }}
                   >
                     Compare plans
                   </button>
                 )}
               </>
             ) : (
-              <p className="text-sm" style={{ color: "#7A7A7A" }}>
+              <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 Contact your workspace admin to upgrade.
               </p>
             )}

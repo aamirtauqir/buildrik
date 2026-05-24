@@ -7,7 +7,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg-page)" }}>
       <Sidebar />
       <Topbar />
       <main className="pt-14 lg:ml-[220px]">

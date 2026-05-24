@@ -125,13 +125,13 @@ export function WorkspaceForm({
   return (
     <div className="space-y-8">
       <form onSubmit={handleSubmit} className="space-y-5">
-        <h2 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
+        <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
           General
         </h2>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Workspace name
             </label>
             <input
@@ -140,19 +140,19 @@ export function WorkspaceForm({
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="Acme Inc."
               className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             />
-            <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
               Visible to all workspace members.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Workspace URL
             </label>
-            <div className="flex items-center rounded-md border overflow-hidden" style={{ borderColor: "#E8E8E8" }}>
-              <span className="px-3 py-2 text-sm border-r" style={{ borderColor: "#E8E8E8", backgroundColor: "#fafafa", color: "#7A7A7A" }}>
+            <div className="flex items-center rounded-md border overflow-hidden" style={{ borderColor: "var(--color-border-default)" }}>
+              <span className="px-3 py-2 text-sm border-r" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)", color: "var(--color-text-secondary)" }}>
                 buildrik.io/
               </span>
               <input
@@ -161,11 +161,11 @@ export function WorkspaceForm({
                 onChange={(e) => setSlug(slugify(e.target.value))}
                 placeholder="acme"
                 className="flex-1 px-3 py-2 text-sm outline-none"
-                style={{ color: "#0D0D0D" }}
+                style={{ color: "var(--color-text-primary)" }}
               />
             </div>
             {slug && (
-              <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+              <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
                 Preview: buildrik.io/{slug}
               </p>
             )}
@@ -174,14 +174,14 @@ export function WorkspaceForm({
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Default language
             </label>
             <select
               value={defaultLanguage}
               onChange={(e) => setDefaultLanguage(e.target.value)}
               className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               {LANGUAGES.map((l) => (
                 <option key={l.value} value={l.value}>
@@ -192,14 +192,14 @@ export function WorkspaceForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Timezone
             </label>
             <select
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
               className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               {TIMEZONES.map((tz) => (
                 <option key={tz.value} value={tz.value}>
@@ -211,12 +211,12 @@ export function WorkspaceForm({
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold mb-3" style={{ color: "#0D0D0D" }}>
+          <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
             Branding
           </h3>
           <div className="flex items-start gap-6">
             <div>
-              <p className="text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+              <p className="text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Workspace icon
               </p>
               <input
@@ -230,22 +230,22 @@ export function WorkspaceForm({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="w-16 h-16 rounded-lg border flex items-center justify-center cursor-pointer overflow-hidden"
-                style={{ borderColor: "#E8E8E8", backgroundColor: "#fafafa" }}
+                style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
               >
                 {iconUrl ? (
                   <img src={iconUrl} alt="Workspace icon" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-xs" style={{ color: "#B0B0B0" }}>
+                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                     64x64
                   </span>
                 )}
               </button>
-              <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+              <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
                 PNG or SVG recommended.
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+              <p className="text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Accent color
               </p>
               <div className="flex items-center gap-2">
@@ -257,7 +257,7 @@ export function WorkspaceForm({
                     setHexInput(e.target.value);
                   }}
                   className="w-9 h-9 rounded border cursor-pointer"
-                  style={{ borderColor: "#E8E8E8" }}
+                  style={{ borderColor: "var(--color-border-default)" }}
                 />
                 <input
                   type="text"
@@ -266,13 +266,13 @@ export function WorkspaceForm({
                   maxLength={7}
                   className="w-24 px-2 py-1.5 text-sm font-mono rounded-md border outline-none"
                   style={{
-                    borderColor: isValidHex(hexInput) ? "#E8E8E8" : "#ef4444",
-                    color: "#0D0D0D",
+                    borderColor: isValidHex(hexInput) ? "var(--color-border-default)" : "#ef4444",
+                    color: "var(--color-text-primary)",
                   }}
                 />
                 <div
                   className="w-9 h-9 rounded border"
-                  style={{ backgroundColor: accentColor, borderColor: "#E8E8E8" }}
+                  style={{ backgroundColor: accentColor, borderColor: "var(--color-border-default)" }}
                 />
               </div>
               {!isValidHex(hexInput) && (
@@ -296,23 +296,23 @@ export function WorkspaceForm({
         </div>
       </form>
 
-      <div style={{ borderTop: "1px solid #E8E8E8" }} />
+      <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
 
       <form onSubmit={handleSharingSubmit} className="space-y-4">
-        <h2 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
+        <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
           Default sharing settings
         </h2>
 
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Link expiration
             </label>
             <select
               value={defaultExpiration ?? ""}
               onChange={(e) => setDefaultExpiration(e.target.value || null)}
               className="w-full max-w-xs px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               {EXPIRY_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -320,17 +320,17 @@ export function WorkspaceForm({
                 </option>
               ))}
             </select>
-            <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
               Default expiration for new shared links.
             </p>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Require password on shared links
               </p>
-              <p className="text-xs" style={{ color: "#7A7A7A" }}>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                 New shared links will require a password by default.
               </p>
             </div>
@@ -338,7 +338,7 @@ export function WorkspaceForm({
               type="button"
               onClick={() => setRequirePw(!requirePw)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-              style={{ backgroundColor: requirePw ? "var(--color-primary)" : "#E8E8E8" }}
+              style={{ backgroundColor: requirePw ? "var(--color-primary)" : "var(--color-border-default)" }}
             >
               <span
                 className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -349,10 +349,10 @@ export function WorkspaceForm({
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Allow editors to share
               </p>
-              <p className="text-xs" style={{ color: "#7A7A7A" }}>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                 Editors can create and manage shared links.
               </p>
             </div>
@@ -360,7 +360,7 @@ export function WorkspaceForm({
               type="button"
               onClick={() => setAllowEditors(!allowEditors)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-              style={{ backgroundColor: allowEditors ? "var(--color-primary)" : "#E8E8E8" }}
+              style={{ backgroundColor: allowEditors ? "var(--color-primary)" : "var(--color-border-default)" }}
             >
               <span
                 className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -371,10 +371,10 @@ export function WorkspaceForm({
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Activity summary emails
               </p>
-              <p className="text-xs" style={{ color: "#7A7A7A" }}>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                 Receive weekly summaries of workspace activity.
               </p>
             </div>
@@ -382,7 +382,7 @@ export function WorkspaceForm({
               type="button"
               onClick={() => setNotify(!notify)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-              style={{ backgroundColor: notify ? "var(--color-primary)" : "#E8E8E8" }}
+              style={{ backgroundColor: notify ? "var(--color-primary)" : "var(--color-border-default)" }}
             >
               <span
                 className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"

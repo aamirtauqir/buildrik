@@ -62,7 +62,7 @@ export function OfflineBanner() {
     return (
       <div
         className="fixed left-0 right-0 top-0 z-[10000] flex items-center justify-center gap-3 px-4 py-2"
-        style={{ backgroundColor: "#F0FDF4", borderBottom: "1px solid #22C55E" }}
+        style={{ backgroundColor: "#F0FDF4", borderBottom: "1px solid var(--color-success)" }}
         role="status"
       >
         <Wifi className="h-4 w-4" style={{ color: "#166534" }} />

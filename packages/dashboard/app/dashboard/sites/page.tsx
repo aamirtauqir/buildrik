@@ -314,7 +314,7 @@ export default function SitesPage() {
       <div className="flex items-center justify-between">
         <h1
           className="text-[22px] font-bold"
-          style={{ color: "#0D0D0D" }}
+          style={{ color: "var(--color-text-primary)" }}
         >
           My Sites
         </h1>
@@ -388,7 +388,7 @@ export default function SitesPage() {
             <div
               key={i}
               className="h-52 animate-pulse rounded-xl"
-              style={{ backgroundColor: "#F4F4F4" }}
+              style={{ backgroundColor: "var(--color-bg-subtle)" }}
             />
           ))}
         </div>
@@ -397,9 +397,9 @@ export default function SitesPage() {
       {/* Content */}
       {!sitesQuery.isLoading && sites.length === 0 && (search || status || createdBy || dateRange || templateUsed || hasCustomDomain !== undefined || hasTraffic) && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Search className="h-10 w-10 mb-4" style={{ color: "#B0B0B0" }} />
-          <h3 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>No sites found</h3>
-          <p className="text-sm mt-1" style={{ color: "#7A7A7A" }}>
+          <Search className="h-10 w-10 mb-4" style={{ color: "var(--color-text-muted)" }} />
+          <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>No sites found</h3>
+          <p className="text-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Try a different search term or filter.
           </p>
         </div>
@@ -408,17 +408,17 @@ export default function SitesPage() {
       {!sitesQuery.isLoading && sites.length === 0 && !search && !status && !createdBy && !dateRange && !templateUsed && hasCustomDomain === undefined && !hasTraffic && (
         <div
           className="mt-8 flex flex-col items-center rounded-xl border-2 border-dashed py-16 text-center"
-          style={{ borderColor: "#E8E8E8" }}
+          style={{ borderColor: "var(--color-border-default)" }}
         >
           <p
             className="text-base font-semibold"
-            style={{ color: "#0D0D0D" }}
+            style={{ color: "var(--color-text-primary)" }}
           >
             No sites yet
           </p>
           <p
             className="mt-1 text-sm"
-            style={{ color: "#7A7A7A" }}
+            style={{ color: "var(--color-text-secondary)" }}
           >
             Create your first site to get started.
           </p>
@@ -458,7 +458,7 @@ export default function SitesPage() {
       {/* Pagination */}
       {sitesQuery.data && sitesQuery.data.totalPages > 1 && (
         <div className="flex items-center justify-between mt-6">
-          <p className="text-sm" style={{ color: "#7A7A7A" }}>
+          <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
             Page {page} of {sitesQuery.data.totalPages} ({sitesQuery.data.total} sites)
           </p>
           <div className="flex gap-2">
@@ -466,7 +466,7 @@ export default function SitesPage() {
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
               className="px-3 py-1.5 text-sm rounded-lg border disabled:opacity-50"
-              style={{ borderColor: "#E8E8E8" }}
+              style={{ borderColor: "var(--color-border-default)" }}
             >
               Previous
             </button>
@@ -474,7 +474,7 @@ export default function SitesPage() {
               disabled={page >= sitesQuery.data.totalPages}
               onClick={() => setPage(p => p + 1)}
               className="px-3 py-1.5 text-sm rounded-lg border disabled:opacity-50"
-              style={{ borderColor: "#E8E8E8" }}
+              style={{ borderColor: "var(--color-border-default)" }}
             >
               Next
             </button>
@@ -541,7 +541,7 @@ export default function SitesPage() {
       {createFolderOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-bold" style={{ color: "#0D0D0D" }}>New Folder</h2>
+            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>New Folder</h2>
             <input
               type="text"
               value={newFolderName}
@@ -557,13 +557,13 @@ export default function SitesPage() {
               placeholder="Folder name"
               autoFocus
               className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             />
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => { setCreateFolderOpen(false); setNewFolderName(""); }}
-                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[#FAFAFA]"
-                style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Cancel
               </button>

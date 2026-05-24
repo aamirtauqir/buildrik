@@ -96,10 +96,10 @@ export default function TeamPage() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Team</h1>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Team</h1>
         <div className="mt-6 grid grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+            <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
         </div>
       </div>
@@ -110,7 +110,7 @@ export default function TeamPage() {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Team</h1>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Team</h1>
         <button
           onClick={() => setInviteOpen(true)}
           className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
@@ -145,7 +145,7 @@ export default function TeamPage() {
           {/* Pending Invites */}
           {pendingQuery.data && pendingQuery.data.length > 0 && (
             <div>
-              <h2 className="mb-3 text-base font-semibold" style={{ color: "#0D0D0D" }}>Pending Invitations</h2>
+              <h2 className="mb-3 text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Pending Invitations</h2>
               <PendingInvites
                 invites={pendingQuery.data}
                 onRevoke={(inviteId) => revokeInviteMutation.mutate({ inviteId })}
@@ -155,21 +155,21 @@ export default function TeamPage() {
           )}
 
           {/* Team Activity */}
-          <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
-            <h3 className="mb-3 text-sm font-semibold" style={{ color: "#0D0D0D" }}>Team Activity</h3>
+          <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+            <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Team Activity</h3>
             {activityQuery.data && activityQuery.data.length > 0 ? (
               <div className="space-y-3">
                 {activityQuery.data.map((entry) => (
                   <div key={entry.id} className="flex items-start gap-2">
                     <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "var(--color-primary)" }} />
                     <div>
-                      <p className="text-sm" style={{ color: "#0D0D0D" }}>
+                      <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
                         {entry.actorName && (
                           <span className="font-medium">{entry.actorName} </span>
                         )}
                         {entry.description ?? entry.action}
                       </p>
-                      <p className="text-xs" style={{ color: "#B0B0B0" }}>
+                      <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                         {new Date(entry.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -177,7 +177,7 @@ export default function TeamPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm" style={{ color: "#7A7A7A" }}>No team activity yet</p>
+              <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>No team activity yet</p>
             )}
           </div>
         </div>

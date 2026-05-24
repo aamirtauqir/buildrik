@@ -34,7 +34,7 @@ export function TabNav({ siteId }: { siteId: string }) {
   return (
     <>
       {/* Desktop / Tablet: horizontal tabs with scroll */}
-      <nav className="hidden border-b md:block" style={{ borderColor: "#E8E8E8" }}>
+      <nav className="hidden border-b md:block" style={{ borderColor: "var(--color-border-default)" }}>
         <ul className="flex gap-0 overflow-x-auto">
           {SITE_DETAIL_TABS.map((tab) => {
             const href = getTabHref(base, tab.segment);
@@ -43,7 +43,7 @@ export function TabNav({ siteId }: { siteId: string }) {
               <li key={tab.segment} className="shrink-0">
                 <Link href={href} className={cn(
                   "inline-block px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap",
-                  isActive ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]" : "text-[#7A7A7A] hover:text-[#0D0D0D]"
+                  isActive ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]" : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                 )}>{tab.label}</Link>
               </li>
             );
@@ -52,11 +52,11 @@ export function TabNav({ siteId }: { siteId: string }) {
       </nav>
 
       {/* Mobile: dropdown selector */}
-      <div className="relative border-b md:hidden" style={{ borderColor: "#E8E8E8" }}>
+      <div className="relative border-b md:hidden" style={{ borderColor: "var(--color-border-default)" }}>
         <select
           value={activeTab.segment}
           onChange={(e) => router.push(getTabHref(base, e.target.value))}
-          className="w-full appearance-none bg-white py-2.5 pl-4 pr-10 text-sm font-medium text-[#0D0D0D] focus:outline-none"
+          className="w-full appearance-none bg-white py-2.5 pl-4 pr-10 text-sm font-medium text-[var(--color-text-primary)] focus:outline-none"
         >
           {SITE_DETAIL_TABS.map((tab) => (
             <option key={tab.segment} value={tab.segment}>
@@ -64,7 +64,7 @@ export function TabNav({ siteId }: { siteId: string }) {
             </option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7A7A7A]" />
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-secondary)]" />
       </div>
     </>
   );

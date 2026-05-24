@@ -8,7 +8,7 @@ export default function PrivacyPage() {
   return (
     <main
       className="min-h-screen flex justify-center"
-      style={{ backgroundColor: "#FAFAFA" }}
+      style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       <article className="max-w-2xl w-full px-6 py-16 text-[15px] leading-relaxed text-slate-700">
         <h1 className="text-3xl font-semibold text-slate-900">Privacy Policy</h1>

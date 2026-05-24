@@ -136,7 +136,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full rounded-lg border px-3 py-2 text-sm"
-            style={{ borderColor: "#E8E8E8" }}
+            style={{ borderColor: "var(--color-border-default)" }}
           />
         </Field>
         <Field label="Slug" hint={`${slug}.buildrik.app`}>
@@ -145,7 +145,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             className="w-full rounded-lg border px-3 py-2 text-sm"
-            style={{ borderColor: "#E8E8E8" }}
+            style={{ borderColor: "var(--color-border-default)" }}
           />
         </Field>
       </Section>
@@ -157,7 +157,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               type="button"
               onClick={() => faviconInputRef.current?.click()}
               className="rounded-lg border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               Upload Favicon
             </button>
@@ -183,7 +183,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               type="button"
               onClick={() => touchIconInputRef.current?.click()}
               className="rounded-lg border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               Upload Touch Icon
             </button>
@@ -218,14 +218,14 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 setPasswordEnabled((v) => !v);
               }}
               className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors"
-              style={{ backgroundColor: passwordEnabled ? "var(--color-primary)" : "#E8E8E8" }}
+              style={{ backgroundColor: passwordEnabled ? "var(--color-primary)" : "var(--color-border-default)" }}
             >
               <span
                 className="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
                 style={{ transform: passwordEnabled ? "translateX(20px)" : "translateX(0)" }}
               />
             </button>
-            <span className="text-sm" style={{ color: "#0D0D0D" }}>
+            <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
               Require password to view published site
             </span>
           </div>
@@ -237,7 +237,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter site password"
                 className="w-full rounded-lg border px-3 py-2 text-sm"
-                style={{ borderColor: "#E8E8E8" }}
+                style={{ borderColor: "var(--color-border-default)" }}
               />
             </div>
           )}
@@ -255,7 +255,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               }}
               rows={4}
               className="w-full rounded-lg border px-3 py-2 text-sm font-mono"
-              style={{ borderColor: "#E8E8E8" }}
+              style={{ borderColor: "var(--color-border-default)" }}
               disabled={!isPro}
             />
           </Field>
@@ -268,7 +268,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               }}
               rows={4}
               className="w-full rounded-lg border px-3 py-2 text-sm font-mono"
-              style={{ borderColor: "#E8E8E8" }}
+              style={{ borderColor: "var(--color-border-default)" }}
               disabled={!isPro}
             />
           </Field>
@@ -279,7 +279,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
         <div className="space-y-3">
           {visiblePlatforms.map((platform) => (
             <div key={platform} className="flex items-center gap-2">
-              <label className="w-28 shrink-0 text-sm font-medium" style={{ color: "#0D0D0D" }}>
+              <label className="w-28 shrink-0 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                 {PLATFORM_LABELS[platform]}
               </label>
               <input
@@ -288,7 +288,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 onChange={(e) => updateSocialLink(platform, e.target.value)}
                 placeholder={`https://${platform}.com/...`}
                 className="flex-1 rounded-lg border px-3 py-2 text-sm"
-                style={{ borderColor: "#E8E8E8" }}
+                style={{ borderColor: "var(--color-border-default)" }}
               />
               <button
                 type="button"
@@ -305,7 +305,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               type="button"
               onClick={addPlatform}
               className="rounded-lg border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               + Add Social Link
             </button>
@@ -326,8 +326,8 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
-      <h3 className="mb-4 text-sm font-semibold" style={{ color: "#0D0D0D" }}>
+    <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+      <h3 className="mb-4 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
         {title}
       </h3>
       <div className="space-y-4">{children}</div>
@@ -338,11 +338,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+      <label className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
         {label}
       </label>
       {hint && (
-        <p className="text-xs" style={{ color: "#B0B0B0" }}>
+        <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
           {hint}
         </p>
       )}

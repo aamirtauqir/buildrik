@@ -16,7 +16,7 @@ export function RecentSites({ sites }: RecentSitesProps) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-[#0D0D0D]">Recent Sites</h2>
+        <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Recent Sites</h2>
         <Link href="/dashboard/sites" className="text-xs text-[var(--color-primary)] hover:underline">
           View All &rarr;
         </Link>
@@ -28,12 +28,12 @@ export function RecentSites({ sites }: RecentSitesProps) {
         {showEmptySlot && (
           <Link
             href="/dashboard/sites/new"
-            className="flex h-full min-h-[160px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#E8E8E8] bg-[#F4F4F4] hover:border-[var(--color-primary)]/40 transition-colors"
+            className="flex h-full min-h-[160px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] hover:border-[var(--color-primary)]/40 transition-colors"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E8E8E8] bg-white">
-              <Plus className="h-4 w-4 text-[#7A7A7A]" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-white">
+              <Plus className="h-4 w-4 text-[var(--color-text-secondary)]" />
             </span>
-            <span className="text-xs text-[#7A7A7A]">Create your next project</span>
+            <span className="text-xs text-[var(--color-text-secondary)]">Create your next project</span>
           </Link>
         )}
       </div>

@@ -16,8 +16,8 @@ export interface PendingInvite {
 
 const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
   ADMIN: { bg: "#EFF6FF", color: "#3B82F6" },
-  EDITOR: { bg: "#F0FDF4", color: "#22C55E" },
-  VIEWER: { bg: "#F3F4F6", color: "#7A7A7A" },
+  EDITOR: { bg: "#F0FDF4", color: "var(--color-success)" },
+  VIEWER: { bg: "#F3F4F6", color: "var(--color-text-secondary)" },
 };
 
 const MAX_RESENDS = 2;
@@ -41,17 +41,17 @@ interface PendingInvitesProps {
 export function PendingInvites({ invites, onResend, onRevoke, resendingId, revokingId }: PendingInvitesProps) {
   if (invites.length === 0) {
     return (
-      <div className="rounded-xl border border-[#E8E8E8] bg-white px-6 py-10 text-center">
-        <p className="text-sm" style={{ color: "#7A7A7A" }}>No pending invitations.</p>
+      <div className="rounded-xl border border-[var(--color-border-default)] bg-white px-6 py-10 text-center">
+        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>No pending invitations.</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-[#E8E8E8] bg-white">
+    <div className="overflow-x-auto rounded-xl border border-[var(--color-border-default)] bg-white">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-[#E8E8E8]" style={{ backgroundColor: "#FAFAFA" }}>
+          <tr className="border-b border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-page)" }}>
             {["Email", "Role", "Sent", "Expires In", "Resends", ""].map((h) => (
               <th
                 key={h}
@@ -59,7 +59,7 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                   "px-4 py-3 text-xs font-semibold uppercase tracking-wide",
                   h === "" ? "text-right" : "text-left"
                 )}
-                style={{ color: "#7A7A7A" }}
+                style={{ color: "var(--color-text-secondary)" }}
               >
                 {h}
               </th>
@@ -74,8 +74,8 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
             const resendDisabled = invite.resendCount >= MAX_RESENDS;
 
             return (
-              <tr key={invite.id} className="border-b border-[#E8E8E8] transition-colors last:border-0 hover:bg-[#FAFAFA]">
-                <td className="px-4 py-3 font-medium" style={{ color: "#0D0D0D" }}>
+              <tr key={invite.id} className="border-b border-[var(--color-border-default)] transition-colors last:border-0 hover:bg-[var(--color-bg-page)]">
+                <td className="px-4 py-3 font-medium" style={{ color: "var(--color-text-primary)" }}>
                   {invite.email}
                 </td>
                 <td className="px-4 py-3">
@@ -86,13 +86,13 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                     {invite.role}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: "#7A7A7A" }}>
+                <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
                   {formatDate(invite.createdAt)}
                 </td>
-                <td className="px-4 py-3 text-xs font-medium" style={{ color: expiringSoon ? "var(--color-primary)" : "#7A7A7A" }}>
+                <td className="px-4 py-3 text-xs font-medium" style={{ color: expiringSoon ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
                   {days === 0 ? "Expires today" : `Expires in ${days}d`}
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: resendDisabled ? "var(--color-primary)" : "#7A7A7A" }}>
+                <td className="px-4 py-3 text-xs" style={{ color: resendDisabled ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
                   Resent {invite.resendCount}/{MAX_RESENDS} times
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -100,8 +100,8 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                     <button
                       onClick={() => onResend(invite.id)}
                       disabled={!!resendingId || resendDisabled}
-                      className="rounded-lg border border-[#E8E8E8] px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4] disabled:opacity-50"
-                      style={{ color: "#0D0D0D" }}
+                      className="rounded-lg border border-[var(--color-border-default)] px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-50"
+                      style={{ color: "var(--color-text-primary)" }}
                       title={resendDisabled ? "Maximum resends reached" : undefined}
                     >
                       {resendingId === invite.id ? "Sending..." : "Resend"}

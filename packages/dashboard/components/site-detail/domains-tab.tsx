@@ -32,17 +32,17 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: Domai
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
-        <h3 className="mb-4 text-sm font-semibold" style={{ color: "#0D0D0D" }}>Connect Domain</h3>
+      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+        <h3 className="mb-4 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Connect Domain</h3>
         <div className="flex gap-2">
-          <input type="text" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="www.example.com" className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8" }} />
+          <input type="text" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="www.example.com" className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
           <button onClick={() => { onConnect(newDomain); setNewDomain(""); }} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Connect</button>
         </div>
         <div className="mt-3">
-          <p className="text-xs font-medium mb-1" style={{ color: "#7A7A7A" }}>DNS provider guides:</p>
+          <p className="text-xs font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>DNS provider guides:</p>
           <div className="flex flex-wrap gap-2">
             {PROVIDER_GUIDES.map((g) => (
-              <a key={g.name} href={g.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-[#F4F4F4]" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>
+              <a key={g.name} href={g.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
                 {g.name}<ExternalLink className="h-3 w-3" />
               </a>
             ))}
@@ -51,20 +51,20 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: Domai
       </div>
 
       {domains.length > 0 && (
-        <div className="rounded-xl border bg-white" style={{ borderColor: "#E8E8E8" }}>
+        <div className="rounded-xl border bg-white" style={{ borderColor: "var(--color-border-default)" }}>
           <table className="w-full text-sm">
-            <thead><tr className="border-b" style={{ borderColor: "#E8E8E8" }}>
-              <th className="px-5 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Domain</th>
-              <th className="px-5 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Status</th>
-              <th className="px-5 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>SSL</th>
-              <th className="px-5 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Primary</th>
+            <thead><tr className="border-b" style={{ borderColor: "var(--color-border-default)" }}>
+              <th className="px-5 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Domain</th>
+              <th className="px-5 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Status</th>
+              <th className="px-5 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>SSL</th>
+              <th className="px-5 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Primary</th>
               <th className="px-5 py-3 w-10"></th>
             </tr></thead>
             <tbody>{domains.map((d) => (
-              <tr key={d.id} className="border-b" style={{ borderColor: "#E8E8E8" }}>
+              <tr key={d.id} className="border-b" style={{ borderColor: "var(--color-border-default)" }}>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" style={{ color: "#7A7A7A" }} />
+                    <Globe className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
                     {d.domain}
                   </div>
                 </td>
@@ -74,12 +74,12 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: Domai
                     onClick={() => setExpandedSsl(expandedSsl === d.id ? null : d.id)}
                     className="flex items-center gap-1"
                   >
-                    <Shield className="h-3 w-3" style={{ color: d.sslStatus === "ACTIVE" ? "#22C55E" : "#7A7A7A" }} />
+                    <Shield className="h-3 w-3" style={{ color: d.sslStatus === "ACTIVE" ? "var(--color-success)" : "var(--color-text-secondary)" }} />
                     <span className="text-sm">{d.sslStatus.toLowerCase()}</span>
-                    {expandedSsl === d.id ? <ChevronUp className="h-3 w-3" style={{ color: "#7A7A7A" }} /> : <ChevronDown className="h-3 w-3" style={{ color: "#7A7A7A" }} />}
+                    {expandedSsl === d.id ? <ChevronUp className="h-3 w-3" style={{ color: "var(--color-text-secondary)" }} /> : <ChevronDown className="h-3 w-3" style={{ color: "var(--color-text-secondary)" }} />}
                   </button>
                   {expandedSsl === d.id && (
-                    <div className="mt-2 rounded-lg border p-3 text-xs space-y-1" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>
+                    <div className="mt-2 rounded-lg border p-3 text-xs space-y-1" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
                       <p><span className="font-medium">Status:</span> {d.sslStatus === "ACTIVE" ? "Valid" : "Provisioning"}</p>
                       <p><span className="font-medium">Issuer:</span> Let&apos;s Encrypt</p>
                       <p><span className="font-medium">Expiry:</span> {d.sslStatus === "ACTIVE" ? "Auto-renewed" : "Pending verification"}</p>
@@ -95,8 +95,8 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: Domai
                   ) : (
                     <button
                       onClick={() => onSetPrimary(d.id)}
-                      className="rounded-md border px-2 py-1 text-xs hover:bg-[#F4F4F4]"
-                      style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+                      className="rounded-md border px-2 py-1 text-xs hover:bg-[var(--color-bg-subtle)]"
+                      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                     >
                       Set as Primary
                     </button>

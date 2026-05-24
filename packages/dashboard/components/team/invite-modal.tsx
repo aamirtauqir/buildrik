@@ -80,26 +80,26 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-2xl">
+      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--color-border-default)] bg-white p-6 shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded p-1 hover:bg-[#F4F4F4]"
+          className="absolute right-4 top-4 rounded p-1 hover:bg-[var(--color-bg-subtle)]"
           aria-label="Close"
         >
-          <X className="h-4 w-4" style={{ color: "#7A7A7A" }} />
+          <X className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
         </button>
 
-        <h2 className="text-lg font-semibold" style={{ color: "#0D0D0D" }}>
+        <h2 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
           Invite Team Members
         </h2>
-        <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
+        <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           Add up to 10 email addresses separated by commas or new lines.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
           {/* Email input */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: "#0D0D0D" }}>
+            <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
               Email addresses
             </label>
             <textarea
@@ -109,9 +109,9 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
               placeholder={"alice@example.com\nbob@example.com"}
               className={cn(
                 "w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--color-primary)]",
-                tooMany || hasInvalid ? "border-[var(--color-primary)]" : "border-[#E8E8E8]"
+                tooMany || hasInvalid ? "border-[var(--color-primary)]" : "border-[var(--color-border-default)]"
               )}
-              style={{ color: "#0D0D0D" }}
+              style={{ color: "var(--color-text-primary)" }}
             />
             {tooMany && (
               <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>
@@ -127,7 +127,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
 
           {/* Role selector */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: "#0D0D0D" }}>
+            <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
               Role
             </label>
             <div className="flex flex-col gap-2">
@@ -136,7 +136,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                   key={opt.value}
                   className={cn(
                     "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
-                    role === opt.value ? "border-[var(--color-primary)] bg-red-50" : "border-[#E8E8E8] hover:bg-[#F4F4F4]"
+                    role === opt.value ? "border-[var(--color-primary)] bg-red-50" : "border-[var(--color-border-default)] hover:bg-[var(--color-bg-subtle)]"
                   )}
                 >
                   <input
@@ -148,10 +148,10 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                     className="mt-0.5 accent-[var(--color-primary)]"
                   />
                   <div>
-                    <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+                    <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                       {opt.label}
                     </p>
-                    <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                    <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                       {opt.description}
                     </p>
                   </div>
@@ -162,7 +162,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
 
           {/* Site access */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: "#0D0D0D" }}>
+            <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
               Site Access
             </label>
             <div className="flex gap-2">
@@ -173,9 +173,9 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                   "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
                   accessMode === "all"
                     ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]"
-                    : "border-[#E8E8E8] hover:bg-[#F4F4F4]"
+                    : "border-[var(--color-border-default)] hover:bg-[var(--color-bg-subtle)]"
                 )}
-                style={accessMode !== "all" ? { color: "#0D0D0D" } : undefined}
+                style={accessMode !== "all" ? { color: "var(--color-text-primary)" } : undefined}
               >
                 All sites
               </button>
@@ -186,26 +186,26 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                   "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
                   accessMode === "specific"
                     ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]"
-                    : "border-[#E8E8E8] hover:bg-[#F4F4F4]"
+                    : "border-[var(--color-border-default)] hover:bg-[var(--color-bg-subtle)]"
                 )}
-                style={accessMode !== "specific" ? { color: "#0D0D0D" } : undefined}
+                style={accessMode !== "specific" ? { color: "var(--color-text-primary)" } : undefined}
               >
                 Specific sites
               </button>
             </div>
 
             {accessMode === "specific" && (
-              <div className="mt-3 max-h-40 overflow-y-auto rounded-lg border border-[#E8E8E8] p-2">
+              <div className="mt-3 max-h-40 overflow-y-auto rounded-lg border border-[var(--color-border-default)] p-2">
                 {sitesQuery.isLoading && (
-                  <p className="py-3 text-center text-xs" style={{ color: "#7A7A7A" }}>Loading sites...</p>
+                  <p className="py-3 text-center text-xs" style={{ color: "var(--color-text-secondary)" }}>Loading sites...</p>
                 )}
                 {sitesQuery.data && sitesQuery.data.data.length === 0 && (
-                  <p className="py-3 text-center text-xs" style={{ color: "#7A7A7A" }}>No sites found.</p>
+                  <p className="py-3 text-center text-xs" style={{ color: "var(--color-text-secondary)" }}>No sites found.</p>
                 )}
                 {sitesQuery.data?.data.map((site: { id: string; name: string }) => (
                   <label
                     key={site.id}
-                    className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-[#F4F4F4]"
+                    className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
                   >
                     <input
                       type="checkbox"
@@ -213,7 +213,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                       onChange={() => toggleSite(site.id)}
                       className="accent-[var(--color-primary)]"
                     />
-                    <span className="text-sm" style={{ color: "#0D0D0D" }}>{site.name}</span>
+                    <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{site.name}</span>
                   </label>
                 ))}
               </div>
@@ -222,9 +222,9 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
 
           {/* Personal message */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: "#0D0D0D" }}>
+            <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
               Personal message{" "}
-              <span className="font-normal" style={{ color: "#B0B0B0" }}>
+              <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>
                 (optional)
               </span>
             </label>
@@ -234,8 +234,8 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
               onChange={(e) => setMessage(e.target.value)}
               maxLength={500}
               placeholder="Add a note to your invitation..."
-              className="w-full resize-none rounded-lg border border-[#E8E8E8] px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
-              style={{ color: "#0D0D0D" }}
+              className="w-full resize-none rounded-lg border border-[var(--color-border-default)] px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+              style={{ color: "var(--color-text-primary)" }}
             />
           </div>
 
@@ -244,8 +244,8 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[#E8E8E8] py-2.5 text-sm font-medium transition-colors hover:bg-[#F4F4F4]"
-              style={{ color: "#7A7A7A" }}
+              className="flex-1 rounded-lg border border-[var(--color-border-default)] py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Cancel
             </button>

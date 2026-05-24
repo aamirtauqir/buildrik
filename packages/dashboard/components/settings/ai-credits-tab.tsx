@@ -57,22 +57,22 @@ export function AICreditsTab({
   return (
     <div className="space-y-8">
       <section>
-        <h2 className="text-base font-semibold mb-3" style={{ color: "#0D0D0D" }}>
+        <h2 className="text-base font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
           AI site generation credits
         </h2>
         <div
           className="p-4 rounded-lg border"
-          style={{ borderColor: "#E8E8E8" }}
+          style={{ borderColor: "var(--color-border-default)" }}
         >
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm" style={{ color: "#0D0D0D" }}>
+            <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
               <span className="font-semibold text-lg">{remaining}</span> remaining this month
             </p>
-            <p className="text-sm font-medium" style={{ color: "#7A7A7A" }}>
+            <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
               {used}/{limit} credits used
             </p>
           </div>
-          <div className="h-2.5 w-full rounded-full" style={{ backgroundColor: "#E8E8E8" }}>
+          <div className="h-2.5 w-full rounded-full" style={{ backgroundColor: "var(--color-border-default)" }}>
             <div
               className="h-2.5 rounded-full transition-all"
               style={{
@@ -81,7 +81,7 @@ export function AICreditsTab({
               }}
             />
           </div>
-          <p className="text-xs mt-2" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
             Credits reset on the 1st of each month.
           </p>
         </div>
@@ -101,26 +101,26 @@ export function AICreditsTab({
       </section>
 
       <section>
-        <h2 className="text-base font-semibold mb-3" style={{ color: "#0D0D0D" }}>
+        <h2 className="text-base font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
           Generation history
         </h2>
         <div
           className="rounded-lg border overflow-hidden"
-          style={{ borderColor: "#E8E8E8" }}
+          style={{ borderColor: "var(--color-border-default)" }}
         >
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ borderBottom: "1px solid #E8E8E8", backgroundColor: "#fafafa" }}>
-                <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
+              <tr style={{ borderBottom: "1px solid var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
+                <th className="text-left px-4 py-2.5 font-medium" style={{ color: "var(--color-text-secondary)" }}>
                   Date
                 </th>
-                <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
+                <th className="text-left px-4 py-2.5 font-medium" style={{ color: "var(--color-text-secondary)" }}>
                   Business Type
                 </th>
-                <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
+                <th className="text-left px-4 py-2.5 font-medium" style={{ color: "var(--color-text-secondary)" }}>
                   Status
                 </th>
-                <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
+                <th className="text-left px-4 py-2.5 font-medium" style={{ color: "var(--color-text-secondary)" }}>
                   Site
                 </th>
               </tr>
@@ -131,7 +131,7 @@ export function AICreditsTab({
                   <td
                     colSpan={4}
                     className="px-4 py-6 text-center text-sm"
-                    style={{ color: "#B0B0B0" }}
+                    style={{ color: "var(--color-text-muted)" }}
                   >
                     No generations yet. Use your credits to create your first AI site.
                   </td>
@@ -142,11 +142,11 @@ export function AICreditsTab({
                 const isComplete = record.status === "COMPLETED";
                 const isProcessing = record.status === "QUEUED" || record.status === "PROCESSING";
                 return (
-                  <tr key={record.id} style={{ borderBottom: "1px solid #E8E8E8" }}>
-                    <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>
+                  <tr key={record.id} style={{ borderBottom: "1px solid var(--color-border-default)" }}>
+                    <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
                       {formatDate(record.createdAt)}
                     </td>
-                    <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>
+                    <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
                       {record.businessType}
                     </td>
                     <td className="px-4 py-3">
@@ -171,7 +171,7 @@ export function AICreditsTab({
                           Generating...
                         </span>
                       ) : (
-                        <span className="text-xs" style={{ color: "#B0B0B0" }}>
+                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                           --
                         </span>
                       )}
@@ -185,7 +185,7 @@ export function AICreditsTab({
       </section>
 
       <section>
-        <h2 className="text-base font-semibold mb-3" style={{ color: "#0D0D0D" }}>
+        <h2 className="text-base font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
           More AI tools
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -193,21 +193,21 @@ export function AICreditsTab({
             <div
               key={tool.name}
               className="relative p-4 rounded-lg border cursor-default select-none"
-              style={{ borderColor: "#E8E8E8", opacity: 0.6 }}
+              style={{ borderColor: "var(--color-border-default)", opacity: 0.6 }}
               aria-disabled="true"
             >
               <div className="absolute top-3 right-3">
                 <span
                   className="text-xs font-medium px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: "#E8E8E8", color: "#7A7A7A" }}
+                  style={{ backgroundColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                 >
                   Coming Soon
                 </span>
               </div>
-              <p className="text-sm font-semibold pr-24" style={{ color: "#0D0D0D" }}>
+              <p className="text-sm font-semibold pr-24" style={{ color: "var(--color-text-primary)" }}>
                 {tool.name}
               </p>
-              <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+              <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
                 {tool.description}
               </p>
             </div>

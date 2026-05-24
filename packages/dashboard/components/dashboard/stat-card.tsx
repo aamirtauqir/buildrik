@@ -81,7 +81,7 @@ function AvatarStack({ avatars }: { avatars: { name: string; avatar: string | nu
       {visible.map((a, i) => (
         <div
           key={i}
-          className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-white bg-[#F4F4F4] text-[10px] font-medium text-[#7A7A7A]"
+          className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-white bg-[var(--color-bg-subtle)] text-[10px] font-medium text-[var(--color-text-secondary)]"
           style={{ marginLeft: i === 0 ? 0 : -8, zIndex: maxShown - i }}
           title={a.name}
         >
@@ -94,7 +94,7 @@ function AvatarStack({ avatars }: { avatars: { name: string; avatar: string | nu
       ))}
       {overflow > 0 && (
         <div
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-white bg-[#F4F4F4] text-[10px] font-medium text-[#7A7A7A]"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-white bg-[var(--color-bg-subtle)] text-[10px] font-medium text-[var(--color-text-secondary)]"
           style={{ marginLeft: -8, zIndex: 0 }}
         >
           +{overflow}
@@ -107,7 +107,7 @@ function AvatarStack({ avatars }: { avatars: { name: string; avatar: string | nu
 function TrendArrow({ value }: { value: number }) {
   const isPositive = value > 0;
   const isZero = value === 0;
-  const color = isZero ? "#7A7A7A" : isPositive ? "#22C55E" : "var(--color-primary)";
+  const color = isZero ? "var(--color-text-secondary)" : isPositive ? "var(--color-success)" : "var(--color-primary)";
   const arrow = isZero ? "" : isPositive ? "\u2191" : "\u2193";
   const sign = isPositive ? "+" : "";
 
@@ -139,13 +139,13 @@ export function StatCard({ title, value, subtitle, href, trend, visual }: StatCa
     <Link
       href={href}
       aria-label={`View ${title} details`}
-      className="block rounded-xl border border-[#E8E8E8] bg-white p-5 hover:border-[var(--color-primary)]/30 transition-colors"
+      className="block rounded-xl border border-[var(--color-border-default)] bg-white p-5 hover:border-[var(--color-primary)]/30 transition-colors"
     >
       <div className="flex items-start justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-[#7A7A7A]">{title}</p>
-          <p className="mt-2 text-2xl font-bold text-[#0D0D0D]">{value}</p>
-          {subtitle && <p className="mt-1 text-xs text-[#B0B0B0]">{subtitle}</p>}
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">{title}</p>
+          <p className="mt-2 text-2xl font-bold text-[var(--color-text-primary)]">{value}</p>
+          {subtitle && <p className="mt-1 text-xs text-[var(--color-text-muted)]">{subtitle}</p>}
           {trend && (
             <p
               className={cn(
@@ -155,7 +155,7 @@ export function StatCard({ title, value, subtitle, href, trend, visual }: StatCa
             >
               <span>{isPositive ? "\u2191" : "\u2193"}</span>
               <span>{Math.abs(trend.value)}%</span>
-              <span className="font-normal text-[#7A7A7A]">{trend.label}</span>
+              <span className="font-normal text-[var(--color-text-secondary)]">{trend.label}</span>
             </p>
           )}
         </div>

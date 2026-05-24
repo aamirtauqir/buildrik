@@ -17,7 +17,7 @@ export function OnboardingSidebar() {
   return (
     <aside
       className="fixed left-0 top-0 z-30 flex h-screen w-[72px] flex-col items-center py-6"
-      style={{ backgroundColor: "#0D0D0D" }}
+      style={{ backgroundColor: "var(--color-text-primary)" }}
     >
       {/* Logo */}
       <div className="mb-8 flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--color-primary)]">
@@ -33,7 +33,7 @@ export function OnboardingSidebar() {
             <div key={step.id} className="relative flex flex-col items-center">
               {done ? (
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white">
-                  <Check className="h-3 w-3 text-[#0D0D0D]" strokeWidth={3} />
+                  <Check className="h-3 w-3 text-[var(--color-text-primary)]" strokeWidth={3} />
                 </div>
               ) : (
                 <div

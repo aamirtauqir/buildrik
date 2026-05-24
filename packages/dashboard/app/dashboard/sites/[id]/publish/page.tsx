@@ -94,7 +94,7 @@ export default function PublishPage() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="mx-auto max-w-lg text-center">
           <p className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Publish Error</p>
-          <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>{publishError ?? "Something went wrong."}</p>
+          <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>{publishError ?? "Something went wrong."}</p>
           <button
             onClick={handleRetryFromError}
             className="mt-4 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"

@@ -44,18 +44,18 @@ export default function SharePasswordGate() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#FAFAFA" }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--color-bg-page)" }}>
       <div className="w-full max-w-sm mx-auto px-4">
-        <div className="bg-white rounded-2xl p-8 shadow-sm" style={{ border: "1px solid #E8E8E8" }}>
+        <div className="bg-white rounded-2xl p-8 shadow-sm" style={{ border: "1px solid var(--color-border-default)" }}>
           <div className="flex justify-center mb-6">
             <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FEF2F2" }}>
               <Lock className="w-6 h-6" style={{ color: "var(--color-primary)" }} />
             </div>
           </div>
-          <h1 className="text-lg font-semibold text-center" style={{ color: "#0D0D0D" }}>
+          <h1 className="text-lg font-semibold text-center" style={{ color: "var(--color-text-primary)" }}>
             This site is password protected
           </h1>
-          <p className="text-sm text-center mt-1 mb-6" style={{ color: "#7A7A7A" }}>
+          <p className="text-sm text-center mt-1 mb-6" style={{ color: "var(--color-text-secondary)" }}>
             Enter the password to view this site
           </p>
           <form onSubmit={handleSubmit}>
@@ -66,7 +66,7 @@ export default function SharePasswordGate() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full h-11 px-3 rounded-lg text-sm"
               style={{
-                border: error ? "2px solid #EF4444" : "1px solid #E8E8E8",
+                border: error ? "2px solid #EF4444" : "1px solid var(--color-border-default)",
                 backgroundColor: error ? "#FEF2F2" : "#FFFFFF",
               }}
               autoFocus

@@ -68,8 +68,8 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
           <div className="flex items-start gap-3">
             <XCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
             <div className="flex-1">
-              <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Publish failed</p>
-              <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
+              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Publish failed</p>
+              <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 {job?.error ?? "An unexpected error occurred during publishing."}
               </p>
               <button
@@ -89,10 +89,10 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
       {!isFailed && (
         <div>
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Publishing...</p>
-            <p className="text-sm font-medium" style={{ color: "#7A7A7A" }}>{progress}%</p>
+            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Publishing...</p>
+            <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{progress}%</p>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ backgroundColor: "#F4F4F4" }}>
+          <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
             <div
               className="h-2 rounded-full transition-all duration-500"
               style={{ width: `${progress}%`, backgroundColor: "var(--color-primary)" }}
@@ -111,17 +111,17 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
               return (
                 <div key={step.name} className="flex items-center gap-3">
                   {isDone ? (
-                    <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "#22C55E" }} />
+                    <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "var(--color-success)" }} />
                   ) : isActive ? (
                     <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "var(--color-primary)" }} />
                   ) : isFail ? (
                     <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
                   ) : (
-                    <Circle className="h-5 w-5 shrink-0" style={{ color: "#D4D4D4" }} />
+                    <Circle className="h-5 w-5 shrink-0" style={{ color: "var(--color-border-strong)" }} />
                   )}
                   <span
                     className="text-sm font-medium"
-                    style={{ color: isDone ? "#22C55E" : isActive ? "#0D0D0D" : isFail ? "var(--color-primary)" : "#B0B0B0" }}
+                    style={{ color: isDone ? "var(--color-success)" : isActive ? "var(--color-text-primary)" : isFail ? "var(--color-primary)" : "var(--color-text-muted)" }}
                   >
                     {step.name}
                   </span>
@@ -135,15 +135,15 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
               return (
                 <div key={step} className="flex items-center gap-3">
                   {isStepCompleted ? (
-                    <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "#22C55E" }} />
+                    <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "var(--color-success)" }} />
                   ) : isCurrent ? (
                     <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "var(--color-primary)" }} />
                   ) : (
-                    <Circle className="h-5 w-5 shrink-0" style={{ color: "#D4D4D4" }} />
+                    <Circle className="h-5 w-5 shrink-0" style={{ color: "var(--color-border-strong)" }} />
                   )}
                   <span
                     className="text-sm font-medium"
-                    style={{ color: isStepCompleted ? "#22C55E" : isCurrent ? "#0D0D0D" : "#B0B0B0" }}
+                    style={{ color: isStepCompleted ? "var(--color-success)" : isCurrent ? "var(--color-text-primary)" : "var(--color-text-muted)" }}
                   >
                     {step}
                   </span>
@@ -156,8 +156,8 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
       {!isFailed && !isCompleted && (
         <>
           {showConfirm ? (
-            <div className="flex items-center gap-3 rounded-xl border p-3" style={{ borderColor: "#E8E8E8" }}>
-              <p className="text-sm" style={{ color: "#7A7A7A" }}>Cancel this publish?</p>
+            <div className="flex items-center gap-3 rounded-xl border p-3" style={{ borderColor: "var(--color-border-default)" }}>
+              <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Cancel this publish?</p>
               <button
                 onClick={handleCancelPublish}
                 disabled={cancelMutation.isPending}
@@ -169,7 +169,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
               <button
                 onClick={() => setShowConfirm(false)}
                 className="rounded-lg px-3 py-1 text-sm font-medium"
-                style={{ color: "#7A7A7A", backgroundColor: "#F4F4F4" }}
+                style={{ color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}
               >
                 No
               </button>
@@ -178,7 +178,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
             <button
               onClick={() => setShowConfirm(true)}
               className="text-sm font-medium"
-              style={{ color: "#7A7A7A" }}
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Cancel publish
             </button>

@@ -30,16 +30,16 @@ export function TemplateCard({ template, onPreview, onUse }: TemplateCardProps) 
   const diff = DIFFICULTY_STYLES[template.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
 
   return (
-    <div className="group relative overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-md" style={{ borderColor: "#E8E8E8" }}>
-      <div className="flex h-44 items-center justify-center" style={{ backgroundColor: "#F4F4F4" }}>
-        <Globe className="h-12 w-12" style={{ color: "#B0B0B0" }} />
+    <div className="group relative overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-md" style={{ borderColor: "var(--color-border-default)" }}>
+      <div className="flex h-44 items-center justify-center" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
+        <Globe className="h-12 w-12" style={{ color: "var(--color-text-muted)" }} />
       </div>
       <div className="p-4">
-        <h3 className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>{template.name}</h3>
+        <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{template.name}</h3>
         <div className="mt-1 flex items-center gap-2">
-          <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#F4F4F4", color: "#7A7A7A" }}>{template.category.toLowerCase()}</span>
+          <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>{template.category.toLowerCase()}</span>
           <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>{diff.label}</span>
-          <span className="text-xs" style={{ color: "#B0B0B0" }}>{count} sites</span>
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{count} sites</span>
         </div>
       </div>
       {/* Hover overlay */}

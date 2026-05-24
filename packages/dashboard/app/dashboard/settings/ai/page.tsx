@@ -6,7 +6,7 @@ import { AICreditsTab } from "@/components/settings/ai-credits-tab";
 export default function AICreditsPage() {
   const creditsQuery = trpc.account.aiCredits.useQuery();
 
-  if (creditsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />;
+  if (creditsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   if (!creditsQuery.data) return null;
 
   return (

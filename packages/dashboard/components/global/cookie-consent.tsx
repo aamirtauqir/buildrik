@@ -65,11 +65,11 @@ export function CookieConsent() {
       >
         <div className="w-[480px] rounded-xl bg-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
+            <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Cookie Preferences
             </h3>
             <button onClick={() => setShowManage(false)}>
-              <X className="h-5 w-5" style={{ color: "#7A7A7A" }} />
+              <X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} />
             </button>
           </div>
           <div className="mt-4 space-y-3">
@@ -77,13 +77,13 @@ export function CookieConsent() {
               <div
                 key={cat.key}
                 className="flex items-center justify-between rounded-lg border p-3"
-                style={{ borderColor: "#E8E8E8" }}
+                style={{ borderColor: "var(--color-border-default)" }}
               >
                 <div>
-                  <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+                  <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                     {cat.label}
                   </p>
-                  <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                     {cat.description}
                   </p>
                 </div>
@@ -95,7 +95,7 @@ export function CookieConsent() {
                     onChange={() => cat.canDisable && setAnalytics(!analytics)}
                     className="sr-only peer"
                   />
-                  <div className="h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-[#22C55E] peer-disabled:opacity-70 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-full" />
+                  <div className="h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-[var(--color-success)] peer-disabled:opacity-70 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-full" />
                 </label>
               </div>
             ))}
@@ -116,14 +116,14 @@ export function CookieConsent() {
     <div
       className="fixed bottom-0 left-0 right-0 z-[9998] border-t bg-white px-4 py-3 shadow-lg sm:px-6"
       style={{
-        borderColor: "#E8E8E8",
+        borderColor: "var(--color-border-default)",
         paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))",
       }}
     >
       <div className="mx-auto flex w-full max-w-[1220px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3 sm:items-center">
-          <Shield className="h-5 w-5 shrink-0" style={{ color: "#7A7A7A" }} />
-          <p className="text-sm" style={{ color: "#0D0D0D" }}>
+          <Shield className="h-5 w-5 shrink-0" style={{ color: "var(--color-text-secondary)" }} />
+          <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
             We use cookies to improve your experience. You can manage your
             preferences at any time.
           </p>
@@ -139,14 +139,14 @@ export function CookieConsent() {
           <button
             onClick={() => saveConsent("essential_only")}
             className="rounded-lg border px-4 py-2 text-sm font-medium"
-            style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             Essential Only
           </button>
           <button
             onClick={() => setShowManage(true)}
             className="text-sm font-medium underline"
-            style={{ color: "#7A7A7A" }}
+            style={{ color: "var(--color-text-secondary)" }}
           >
             Manage Preferences
           </button>

@@ -119,13 +119,13 @@ export function GenerationProgress({
   return (
     <div className="mx-auto max-w-[500px] text-center">
       {/* Progress bar */}
-      <div className="h-2 rounded-full" style={{ backgroundColor: "#F4F4F4" }}>
+      <div className="h-2 rounded-full" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
         <div
           className="h-2 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%`, backgroundColor: isFailed ? "var(--color-primary)" : "#22C55E" }}
+          style={{ width: `${progress}%`, backgroundColor: isFailed ? "var(--color-primary)" : "var(--color-success)" }}
         />
       </div>
-      <p className="mt-2 text-sm font-medium" style={{ color: "#0D0D0D" }}>
+      <p className="mt-2 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
         {progress}%
       </p>
 
@@ -138,7 +138,7 @@ export function GenerationProgress({
           return (
             <div key={step.key} className="flex items-center gap-3">
               {stepStatus === "completed" && (
-                <CheckCircle className="h-5 w-5 shrink-0" style={{ color: "#22C55E" }} />
+                <CheckCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-success)" }} />
               )}
               {stepStatus === "in_progress" && (
                 <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "var(--color-primary)" }} />
@@ -146,7 +146,7 @@ export function GenerationProgress({
               {stepStatus === "pending" && (
                 <div
                   className="h-5 w-5 shrink-0 rounded-full border-2"
-                  style={{ borderColor: "#E8E8E8" }}
+                  style={{ borderColor: "var(--color-border-default)" }}
                 />
               )}
               {stepStatus === "failed" && (
@@ -154,7 +154,7 @@ export function GenerationProgress({
               )}
               <span
                 className="text-sm"
-                style={{ color: stepStatus === "pending" ? "#B0B0B0" : "#0D0D0D" }}
+                style={{ color: stepStatus === "pending" ? "var(--color-text-muted)" : "var(--color-text-primary)" }}
               >
                 {step.label}
               </span>
@@ -183,7 +183,7 @@ export function GenerationProgress({
               <button
                 onClick={onUseTemplate}
                 className="rounded-lg border px-4 py-1.5 text-sm font-medium"
-                style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Use Template Instead
               </button>
@@ -192,7 +192,7 @@ export function GenerationProgress({
               <button
                 onClick={onStartBlank}
                 className="rounded-lg px-4 py-1.5 text-sm font-medium"
-                style={{ color: "#7A7A7A" }}
+                style={{ color: "var(--color-text-secondary)" }}
               >
                 Start Blank
               </button>
@@ -204,7 +204,7 @@ export function GenerationProgress({
       {/* Success state */}
       {isComplete && siteId && (
         <div className="mt-6">
-          <p className="text-sm font-medium" style={{ color: "#22C55E" }}>
+          <p className="text-sm font-medium" style={{ color: "var(--color-success)" }}>
             Site generated successfully!
           </p>
           <button
@@ -222,7 +222,7 @@ export function GenerationProgress({
         <button
           onClick={handleCancelClick}
           className="mt-6 text-sm font-medium"
-          style={{ color: "#7A7A7A" }}
+          style={{ color: "var(--color-text-secondary)" }}
         >
           Cancel
         </button>
@@ -232,17 +232,17 @@ export function GenerationProgress({
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
+            <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Cancel generation?
             </h2>
-            <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
+            <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
               All progress will be lost.
             </p>
             <div className="mt-5 flex justify-end gap-2">
               <button
                 onClick={() => setShowCancelModal(false)}
                 className="rounded-lg border px-4 py-2 text-sm font-medium"
-                style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Keep Generating
               </button>
@@ -262,10 +262,10 @@ export function GenerationProgress({
       {showCreditsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
+            <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
               AI credits used up
             </h2>
-            <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
+            <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
               Upgrade for more AI generations.
             </p>
             <div className="mt-5 flex flex-col gap-2">
@@ -288,7 +288,7 @@ export function GenerationProgress({
                     onUseTemplate();
                   }}
                   className="rounded-lg border px-4 py-2 text-sm font-medium"
-                  style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                 >
                   Use a Template Instead
                 </button>

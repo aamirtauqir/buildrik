@@ -71,7 +71,7 @@ function QrCodeCanvas({ url }: { url: string }) {
     const data = simpleQrMatrix(url, modules);
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, size, size);
-    ctx.fillStyle = "#0D0D0D";
+    ctx.fillStyle = "var(--color-text-primary)";
     for (let y = 0; y < modules; y++) {
       for (let x = 0; x < modules; x++) {
         if (data[y][x]) {
@@ -101,14 +101,14 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
+      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Share Links</h3>
+          <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Share Links</h3>
           <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}><Plus className="h-3 w-3" />New Link</button>
         </div>
         {showCreate && (
-          <div className="mb-4 rounded-lg border p-4 space-y-3" style={{ borderColor: "#E8E8E8" }}>
-            <input type="text" value={linkName} onChange={(e) => setLinkName(e.target.value)} placeholder="Link name (e.g. Client Review)" className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8" }} />
+          <div className="mb-4 rounded-lg border p-4 space-y-3" style={{ borderColor: "var(--color-border-default)" }}>
+            <input type="text" value={linkName} onChange={(e) => setLinkName(e.target.value)} placeholder="Link name (e.g. Client Review)" className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
             <div className="relative">
               <input
                 type="password"
@@ -117,11 +117,11 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                 placeholder={allowPasswords ? "Password (optional)" : "Password (upgrade to PRO)"}
                 disabled={!allowPasswords}
                 className="w-full rounded-lg border px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ borderColor: "#E8E8E8" }}
+                style={{ borderColor: "var(--color-border-default)" }}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: "#7A7A7A" }}>Expiry</label>
+              <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>Expiry</label>
               <div className="flex flex-wrap gap-2">
                 {EXPIRY_OPTIONS.map((opt) => {
                   const disabled = opt.days > 0 && maxExpiryDays > 0 && opt.days > maxExpiryDays;
@@ -133,8 +133,8 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                       onClick={() => setLinkExpiry(selected ? "" : String(opt.days))}
                       className="rounded-md border px-2 py-1 text-xs disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{
-                        borderColor: selected ? "var(--color-primary)" : "#E8E8E8",
-                        color: selected ? "var(--color-primary)" : "#7A7A7A",
+                        borderColor: selected ? "var(--color-primary)" : "var(--color-border-default)",
+                        color: selected ? "var(--color-primary)" : "var(--color-text-secondary)",
                         backgroundColor: selected ? "#FEF2F2" : "transparent",
                       }}
                     >
@@ -148,33 +148,33 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
           </div>
         )}
         {shareLinks.length === 0 ? (
-          <p className="text-sm" style={{ color: "#B0B0B0" }}>No share links yet. Create one to share this site with clients.</p>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>No share links yet. Create one to share this site with clients.</p>
         ) : (
           <div className="space-y-2">
             {shareLinks.map((link) => {
               const shareUrl = `preview.buildrik.app/share/${link.token}`;
               return (
-                <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "#E8E8E8" }}>
+                <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{link.name}</p>
-                      <div className="mt-1 flex items-center gap-3 text-xs" style={{ color: "#7A7A7A" }}>
+                      <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{link.name}</p>
+                      <div className="mt-1 flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
                         <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{link.viewCount} views</span>
                         {link.passwordHash && <span className="flex items-center gap-1"><Lock className="h-3 w-3" />Password</span>}
                         {link.expiresAt && <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />Expires {new Date(link.expiresAt).toLocaleDateString()}</span>}
-                        <span className="text-xs" style={{ color: "#B0B0B0" }}>Created {new Date(link.createdAt).toLocaleDateString()}</span>
+                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Created {new Date(link.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[#F4F4F4]" title="QR Code"><QrCode className="h-4 w-4" style={{ color: "#7A7A7A" }} /></button>
-                      <button onClick={() => navigator.clipboard.writeText(shareUrl)} className="rounded p-1.5 hover:bg-[#F4F4F4]" title="Copy link"><Copy className="h-4 w-4" style={{ color: "#7A7A7A" }} /></button>
-                      <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[#F4F4F4]" title="Revoke"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
+                      <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="QR Code"><QrCode className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                      <button onClick={() => navigator.clipboard.writeText(shareUrl)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                      <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Revoke"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
                     </div>
                   </div>
                   {showQr === link.id && (
-                    <div className="mt-3 flex flex-col items-center gap-2 rounded-lg border p-4" style={{ borderColor: "#E8E8E8" }}>
+                    <div className="mt-3 flex flex-col items-center gap-2 rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
                       <QrCodeCanvas url={`https://${shareUrl}`} />
-                      <p className="text-xs font-mono" style={{ color: "#7A7A7A" }}>{shareUrl}</p>
+                      <p className="text-xs font-mono" style={{ color: "var(--color-text-secondary)" }}>{shareUrl}</p>
                     </div>
                   )}
                 </div>

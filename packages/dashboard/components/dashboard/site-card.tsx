@@ -11,7 +11,7 @@ import { EditorLink } from "@/components/editor-route/EditorLink";
 const STATUS_STYLES: Record<string, string> = {
   published: "bg-[#DCFCE7] text-[#166534]",
   draft: "bg-[#FEF9C3] text-[#854D0E]",
-  archived: "bg-[#F4F4F4] text-[#7A7A7A]",
+  archived: "bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]",
 };
 
 function timeAgo(date: Date): string {
@@ -31,7 +31,7 @@ type SiteCardProps = {
 
 export function SiteCard({ site }: SiteCardProps) {
   const [copied, setCopied] = useState(false);
-  const statusStyle = STATUS_STYLES[site.status] ?? "bg-[#F4F4F4] text-[#7A7A7A]";
+  const statusStyle = STATUS_STYLES[site.status] ?? "bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]";
 
   function handleCopyUrl(e: React.MouseEvent) {
     e.preventDefault();
@@ -43,9 +43,9 @@ export function SiteCard({ site }: SiteCardProps) {
   }
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-[#E8E8E8] bg-white hover:border-[var(--color-primary)]/30 transition-colors">
+    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-[var(--color-border-default)] bg-white hover:border-[var(--color-primary)]/30 transition-colors">
       {/* Thumbnail */}
-      <div className="relative flex h-32 items-center justify-center bg-[#F4F4F4]">
+      <div className="relative flex h-32 items-center justify-center bg-[var(--color-bg-subtle)]">
         {site.thumbnail ? (
           <Image
             src={site.thumbnail}
@@ -54,7 +54,7 @@ export function SiteCard({ site }: SiteCardProps) {
             className="object-cover"
           />
         ) : (
-          <Globe className="h-8 w-8 text-[#B0B0B0]" />
+          <Globe className="h-8 w-8 text-[var(--color-text-muted)]" />
         )}
 
         {/* Hover overlay */}
@@ -105,12 +105,12 @@ export function SiteCard({ site }: SiteCardProps) {
       {/* Info */}
       <div className="p-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-sm font-medium text-[#0D0D0D]">{site.name}</p>
+          <p className="truncate text-sm font-medium text-[var(--color-text-primary)]">{site.name}</p>
           <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-xs font-medium capitalize", statusStyle)}>
             {site.status}
           </span>
         </div>
-        <p className="mt-1 text-xs text-[#B0B0B0]">
+        <p className="mt-1 text-xs text-[var(--color-text-muted)]">
           Edited {timeAgo(site.lastEditedAt)} · {site.pages} page{site.pages !== 1 ? "s" : ""}
         </p>
       </div>

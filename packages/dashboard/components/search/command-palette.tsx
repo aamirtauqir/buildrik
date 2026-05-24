@@ -332,14 +332,14 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       <div
         className="relative w-full overflow-hidden rounded-xl border bg-white shadow-2xl"
-        style={{ maxWidth: 640, maxHeight: 480, borderColor: "#E8E8E8" }}
+        style={{ maxWidth: 640, maxHeight: 480, borderColor: "var(--color-border-default)" }}
       >
         {/* Search input */}
         <div
           className="flex items-center gap-3 border-b px-4"
-          style={{ borderColor: "#E8E8E8" }}
+          style={{ borderColor: "var(--color-border-default)" }}
         >
-          <Search className="h-4 w-4 shrink-0" style={{ color: "#7A7A7A" }} />
+          <Search className="h-4 w-4 shrink-0" style={{ color: "var(--color-text-secondary)" }} />
           <input
             ref={inputRef}
             value={query}
@@ -351,10 +351,10 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             placeholder="Search or jump to..."
             aria-label="Search Buildrik"
             className="flex-1 border-0 bg-transparent py-3 text-sm outline-none"
-            style={{ color: "#0D0D0D" }}
+            style={{ color: "var(--color-text-primary)" }}
           />
           {query && (
-            <button onClick={() => setQuery("")} style={{ color: "#7A7A7A" }}>
+            <button onClick={() => setQuery("")} style={{ color: "var(--color-text-secondary)" }}>
               <X className="h-4 w-4" />
             </button>
           )}
@@ -365,7 +365,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           {isSearching && flatItems.length === 0 ? (
             <p
               className="px-4 py-8 text-center text-sm"
-              style={{ color: "#7A7A7A" }}
+              style={{ color: "var(--color-text-secondary)" }}
             >
               No results for &ldquo;{term}&rdquo;
             </p>
@@ -376,7 +376,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 <div key={group.scope}>
                   <p
                     className="px-4 py-1.5 text-xs font-medium uppercase tracking-wide"
-                    style={{ color: "#7A7A7A" }}
+                    style={{ color: "var(--color-text-secondary)" }}
                   >
                     {group.label}
                   </p>
@@ -389,20 +389,20 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                         onClick={() => selectItem(item)}
                         className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors"
                         style={{
-                          color: "#0D0D0D",
+                          color: "var(--color-text-primary)",
                           backgroundColor:
-                            selectedIndex === idx ? "#F4F4F4" : "transparent",
+                            selectedIndex === idx ? "var(--color-bg-subtle)" : "transparent",
                         }}
                       >
                         <ScopeIcon
                           className="h-4 w-4 shrink-0"
-                          style={{ color: "#7A7A7A" }}
+                          style={{ color: "var(--color-text-secondary)" }}
                         />
                         <span className="flex-1 truncate">{item.label}</span>
                         {item.description && (
                           <span
                             className="truncate text-xs"
-                            style={{ color: "#7A7A7A" }}
+                            style={{ color: "var(--color-text-secondary)" }}
                           >
                             {item.description}
                           </span>
@@ -419,13 +419,13 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
         {/* Scope shortcuts */}
         <div
           className="flex items-center gap-4 border-t px-4 py-2"
-          style={{ borderColor: "#E8E8E8" }}
+          style={{ borderColor: "var(--color-border-default)" }}
         >
           {SEARCH_SCOPES.map((s) => (
             <button
               key={s.key}
               className="text-xs transition-colors hover:underline"
-              style={{ color: "#7A7A7A" }}
+              style={{ color: "var(--color-text-secondary)" }}
               onClick={() => {
                 setQuery(`${s.label}: `);
                 inputRef.current?.focus();

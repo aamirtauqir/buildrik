@@ -26,12 +26,12 @@ type SortDir = "asc" | "desc";
 const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
   OWNER: { bg: "#FEF2F2", color: "var(--color-primary)" },
   ADMIN: { bg: "#EFF6FF", color: "#3B82F6" },
-  EDITOR: { bg: "#F0FDF4", color: "#22C55E" },
-  VIEWER: { bg: "#F3F4F6", color: "#7A7A7A" },
+  EDITOR: { bg: "#F0FDF4", color: "var(--color-success)" },
+  VIEWER: { bg: "#F3F4F6", color: "var(--color-text-secondary)" },
 };
 
 const STATUS_BADGE: Record<Status, { label: string; color: string }> = {
-  ACTIVE: { label: "Active", color: "#22C55E" },
+  ACTIVE: { label: "Active", color: "var(--color-success)" },
   PENDING: { label: "Pending", color: "#F59E0B" },
   SUSPENDED: { label: "Suspended", color: "var(--color-primary)" },
 };
@@ -73,7 +73,7 @@ function Initials({ name }: { name: string }) {
 }
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active) return <span className="ml-1 text-[#B0B0B0]">{"\u2195"}</span>;
+  if (!active) return <span className="ml-1 text-[var(--color-text-muted)]">{"\u2195"}</span>;
   return <span className="ml-1" style={{ color: "var(--color-primary)" }}>{dir === "asc" ? "\u2191" : "\u2193"}</span>;
 }
 
@@ -92,7 +92,7 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-      <div ref={ref} className="w-full max-w-sm rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-2xl">
+      <div ref={ref} className="w-full max-w-sm rounded-2xl border border-[var(--color-border-default)] bg-white p-6 shadow-2xl">
         <div className="flex items-center gap-4">
           {member.avatar ? (
             <img src={member.avatar} alt={member.fullName} className="h-14 w-14 rounded-full object-cover" />
@@ -109,40 +109,40 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
           )}
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>{member.fullName}</h3>
+              <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>{member.fullName}</h3>
               {isOnline(member.lastActiveAt) && (
-                <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#22C55E" }} />
+                <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--color-success)" }} />
               )}
             </div>
-            <p className="text-sm" style={{ color: "#7A7A7A" }}>{member.email}</p>
+            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>{member.email}</p>
           </div>
         </div>
 
         <div className="mt-5 space-y-3">
           <div className="flex justify-between text-sm">
-            <span style={{ color: "#7A7A7A" }}>Role</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>Role</span>
             <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ backgroundColor: badge.bg, color: badge.color }}>
               {member.role}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span style={{ color: "#7A7A7A" }}>Sites Access</span>
-            <span style={{ color: "#0D0D0D" }}>{member.sitesAccess}</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>Sites Access</span>
+            <span style={{ color: "var(--color-text-primary)" }}>{member.sitesAccess}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span style={{ color: "#7A7A7A" }}>Last Active</span>
-            <span style={{ color: "#0D0D0D" }}>{relativeTime(member.lastActiveAt)}</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>Last Active</span>
+            <span style={{ color: "var(--color-text-primary)" }}>{relativeTime(member.lastActiveAt)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span style={{ color: "#7A7A7A" }}>Joined</span>
-            <span style={{ color: "#0D0D0D" }}>{formatDate(member.joinedAt)}</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>Joined</span>
+            <span style={{ color: "var(--color-text-primary)" }}>{formatDate(member.joinedAt)}</span>
           </div>
         </div>
 
         <button
           onClick={onClose}
-          className="mt-5 w-full rounded-lg border border-[#E8E8E8] py-2 text-sm font-medium transition-colors hover:bg-[#F4F4F4]"
-          style={{ color: "#7A7A7A" }}
+          className="mt-5 w-full rounded-lg border border-[var(--color-border-default)] py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+          style={{ color: "var(--color-text-secondary)" }}
         >
           Close
         </button>
@@ -203,10 +203,10 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
 
   return (
     <>
-      <div className="overflow-x-auto rounded-xl border border-[#E8E8E8] bg-white">
+      <div className="overflow-x-auto rounded-xl border border-[var(--color-border-default)] bg-white">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#E8E8E8]" style={{ backgroundColor: "#FAFAFA" }}>
+            <tr className="border-b border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-page)" }}>
               <th className="w-10 px-4 py-3">
                 <input
                   type="checkbox"
@@ -226,7 +226,7 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                 <th
                   key={col.key}
                   className="cursor-pointer select-none px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide"
-                  style={{ color: "#7A7A7A" }}
+                  style={{ color: "var(--color-text-secondary)" }}
                   onClick={() => toggleSort(col.key)}
                 >
                   {col.label}
@@ -235,11 +235,11 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
               ))}
               <th
                 className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide"
-                style={{ color: "#7A7A7A" }}
+                style={{ color: "var(--color-text-secondary)" }}
               >
                 Sites Access
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style={{ color: "#7A7A7A" }}>
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
                 Actions
               </th>
             </tr>
@@ -256,7 +256,7 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                 <tr
                   key={member.id}
                   className={cn(
-                    "cursor-pointer border-b border-[#E8E8E8] transition-colors last:border-0 hover:bg-[#FAFAFA]",
+                    "cursor-pointer border-b border-[var(--color-border-default)] transition-colors last:border-0 hover:bg-[var(--color-bg-page)]",
                     selected.has(member.id) && "bg-red-50"
                   )}
                   onClick={() => setDetailMember(member)}
@@ -280,13 +280,13 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                         {online && (
                           <span
                             className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white"
-                            style={{ backgroundColor: "#22C55E" }}
+                            style={{ backgroundColor: "var(--color-success)" }}
                           />
                         )}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="font-medium" style={{ color: "#0D0D0D" }}>
+                          <span className="font-medium" style={{ color: "var(--color-text-primary)" }}>
                             {member.fullName}
                           </span>
                           {isOwner && (
@@ -295,12 +295,12 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                             </span>
                           )}
                           {isCurrentUser && (
-                            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "#F3F4F6", color: "#7A7A7A" }}>
+                            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "#F3F4F6", color: "var(--color-text-secondary)" }}>
                               You
                             </span>
                           )}
                         </div>
-                        <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                        <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                           {member.email}
                         </p>
                       </div>
@@ -326,10 +326,10 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                       {statusInfo.label}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-xs" style={{ color: "#7A7A7A" }}>
+                  <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
                     {relativeTime(member.lastActiveAt)}
                   </td>
-                  <td className="px-4 py-3 text-xs" style={{ color: "#7A7A7A" }}>
+                  <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
                     {member.sitesAccess}
                   </td>
                   <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>

@@ -49,14 +49,14 @@ function BarItem({ item }: { item: UsageItem }) {
   return (
     <div>
       <div className="mb-1 flex items-center justify-between gap-2">
-        <span className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+        <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           {item.label}
         </span>
-        <span className="text-xs" style={{ color: isNearLimit ? color : "#7A7A7A" }}>
+        <span className="text-xs" style={{ color: isNearLimit ? color : "var(--color-text-secondary)" }}>
           {formatValue(item.used, item.unit)} / {formatValue(item.limit, item.unit)}
         </span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E8E8E8" }}>
+      <div className="h-2 w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--color-border-default)" }}>
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -66,7 +66,7 @@ function BarItem({ item }: { item: UsageItem }) {
         <a
           href={ctaHref}
           className="mt-1 inline-block text-xs font-medium underline-offset-2 hover:underline"
-          style={{ color: "#7A7A7A" }}
+          style={{ color: "var(--color-text-secondary)" }}
         >
           {ctaLabel}
         </a>

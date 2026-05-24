@@ -12,7 +12,7 @@ export default function SettingsProfilePage() {
     onError: (err) => addToast("error", "Failed", err.message),
   });
 
-  if (profileQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />;
+  if (profileQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   if (!profileQuery.data) return null;
 
   const { fullName, displayName, email, bio, language, timezone, avatar } = profileQuery.data;

@@ -121,7 +121,7 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="text-sm font-medium px-3 py-1.5 rounded-md border"
-              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               Upload photo
             </button>
@@ -130,7 +130,7 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
                 type="button"
                 onClick={handleRemovePhoto}
                 className="text-sm font-medium px-3 py-1.5 rounded-md border"
-                style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
               >
                 Remove photo
               </button>
@@ -143,7 +143,7 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
             onChange={handleFileSelect}
             className="hidden"
           />
-          <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
             JPG, PNG or GIF. Max 2 MB.
           </p>
         </div>
@@ -151,7 +151,7 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Full name
           </label>
           <input
@@ -160,15 +160,15 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
             onChange={(e) => setFullName(e.target.value)}
             placeholder="Jane Smith"
             className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           />
-          <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Appears on published sites.
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Display name
           </label>
           <input
@@ -177,16 +177,16 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="jane"
             className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           />
-          <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Shown to team members.
           </p>
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+        <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Email
         </label>
         <input
@@ -194,15 +194,15 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
           value={initialData?.email ?? ""}
           readOnly
           className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-          style={{ borderColor: "#E8E8E8", color: "#7A7A7A", backgroundColor: "#FAFAFA" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-page)" }}
         />
-        <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+        <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
           Read-only. Change in Account tab.
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+        <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
           Bio
         </label>
         <textarea
@@ -212,23 +212,23 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
           maxLength={500}
           placeholder="A short bio about yourself..."
           className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2 resize-none"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
-        <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+        <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
           Optional. Shown on your profile. {bio.length}/500
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Language
           </label>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
             className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             {LANGUAGES.map((l) => (
               <option key={l.value} value={l.value}>
@@ -236,20 +236,20 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
               </option>
             ))}
           </select>
-          <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Used for email and date formatting.
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+          <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
             Timezone
           </label>
           <select
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
             className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             {TIMEZONES.map((tz) => (
               <option key={tz.value} value={tz.value}>
@@ -257,7 +257,7 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
               </option>
             ))}
           </select>
-          <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Used for email and date formatting.
           </p>
         </div>

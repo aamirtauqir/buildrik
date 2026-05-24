@@ -99,62 +99,62 @@ export default function NewSitePage() {
   if (view === "choose") {
     return (
       <div className="mx-auto max-w-[600px] pt-12 text-center">
-        <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>
           Create New Site
         </h1>
-        <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
+        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
           Choose how you want to get started
         </p>
         <div className="mt-6 text-left">
-          <label className="text-sm font-medium" style={{ color: "#7A7A7A" }}>Site name</label>
+          <label className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Site name</label>
           <input
             type="text"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
             className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             placeholder="My New Site"
           />
         </div>
         <div className="mt-6 space-y-3">
           <button
             onClick={() => setView("templates")}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[#FAFAFA]"
-            style={{ borderColor: "#E8E8E8" }}
+            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)]"
+            style={{ borderColor: "var(--color-border-default)" }}
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "#F4F4F4" }}>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
               <span className="text-xl">📋</span>
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Use a Template</p>
-              <p className="text-xs" style={{ color: "#7A7A7A" }}>Browse 50+ professionally designed templates</p>
+              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Use a Template</p>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ professionally designed templates</p>
             </div>
           </button>
           <button
             onClick={() => setView("ai-type")}
             className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-red-50/30"
-            style={{ borderColor: "#E8E8E8" }}
+            style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "#FEF2F2" }}>
               <span className="text-xl">✨</span>
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Generate with AI</p>
-              <p className="text-xs" style={{ color: "#7A7A7A" }}>Describe your site and let AI build it</p>
+              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Describe your site and let AI build it</p>
             </div>
           </button>
           <button
             onClick={() => createSiteMutation.mutate({ name: siteName.trim() || "My New Site", method: "blank" })}
             disabled={createSiteMutation.isPending}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[#FAFAFA] disabled:opacity-50"
-            style={{ borderColor: "#E8E8E8" }}
+            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-50"
+            style={{ borderColor: "var(--color-border-default)" }}
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "#F4F4F4" }}>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
               <span className="text-xl">📄</span>
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Start from Scratch</p>
-              <p className="text-xs" style={{ color: "#7A7A7A" }}>Full creative control from the first pixel</p>
+              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Full creative control from the first pixel</p>
             </div>
           </button>
         </div>

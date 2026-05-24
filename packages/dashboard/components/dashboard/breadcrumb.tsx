@@ -17,11 +17,11 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
           const isLast = index === items.length - 1;
           return (
             <li key={item.label} className="flex items-center gap-1">
-              {index > 0 && <ChevronRight className="h-3.5 w-3.5" style={{ color: "#B0B0B0" }} />}
+              {index > 0 && <ChevronRight className="h-3.5 w-3.5" style={{ color: "var(--color-text-muted)" }} />}
               {isLast || !item.href ? (
-                <span className="font-medium" style={{ color: isLast ? "#0D0D0D" : "#7A7A7A" }}>{item.label}</span>
+                <span className="font-medium" style={{ color: isLast ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>{item.label}</span>
               ) : (
-                <Link href={item.href} className="transition-colors hover:underline" style={{ color: "#7A7A7A" }}>{item.label}</Link>
+                <Link href={item.href} className="transition-colors hover:underline" style={{ color: "var(--color-text-secondary)" }}>{item.label}</Link>
               )}
             </li>
           );

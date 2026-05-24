@@ -18,12 +18,12 @@ export function TeamStatCards({ total, active, pending }: TeamStatCardsProps) {
       {cards.map((card) => (
         <div
           key={card.label}
-          className="rounded-xl border border-[#E8E8E8] bg-white p-5"
+          className="rounded-xl border border-[var(--color-border-default)] bg-white p-5"
         >
-          <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "#7A7A7A" }}>
+          <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
             {card.label}
           </p>
-          <p className="mt-2 text-2xl font-bold" style={{ color: "#0D0D0D" }}>
+          <p className="mt-2 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>
             {card.value}
           </p>
         </div>

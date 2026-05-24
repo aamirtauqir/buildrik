@@ -52,8 +52,8 @@ export function NotificationDropdown() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative rounded-lg p-2 transition-colors hover:bg-[#F4F4F4]"
-        style={{ color: "#7A7A7A" }}
+        className="relative rounded-lg p-2 transition-colors hover:bg-[var(--color-bg-subtle)]"
+        style={{ color: "var(--color-text-secondary)" }}
         aria-label={`Notifications${(unreadCount ?? 0) > 0 ? ` (${unreadCount} unread)` : ""}`}
       >
         <Bell className="h-5 w-5" />
@@ -67,20 +67,20 @@ export function NotificationDropdown() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-lg border bg-white shadow-lg" style={{ borderColor: "#E8E8E8" }}>
-          <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "#E8E8E8" }}>
-            <span className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Notifications</span>
+        <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-lg border bg-white shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
+          <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "var(--color-border-default)" }}>
+            <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Notifications</span>
             <button
               onClick={() => markAllRead.mutate()}
               className="text-xs font-medium hover:underline"
-              style={{ color: "#7A7A7A" }}
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Mark all read
             </button>
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm" style={{ color: "#7A7A7A" }}>
+              <p className="px-4 py-8 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 No notifications yet
               </p>
             ) : (
@@ -93,11 +93,11 @@ export function NotificationDropdown() {
               ))
             )}
           </div>
-          <div className="border-t px-4 py-2 text-center" style={{ borderColor: "#E8E8E8" }}>
+          <div className="border-t px-4 py-2 text-center" style={{ borderColor: "var(--color-border-default)" }}>
             <a
               href="/dashboard/notifications"
               className="text-xs font-medium hover:underline"
-              style={{ color: "#7A7A7A" }}
+              style={{ color: "var(--color-text-secondary)" }}
             >
               View All &rarr;
             </a>

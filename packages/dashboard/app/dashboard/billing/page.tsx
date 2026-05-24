@@ -114,10 +114,10 @@ export default function BillingPage() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Billing</h1>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Billing</h1>
         <div className="mt-6 space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+            <div key={i} className="h-32 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
         </div>
       </div>
@@ -130,11 +130,11 @@ export default function BillingPage() {
     return (
       <div>
         <div className="flex items-center justify-between">
-          <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Choose a Plan</h1>
+          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Choose a Plan</h1>
           <button
             onClick={() => setShowPlans(false)}
             className="rounded-lg border px-4 py-2 text-sm font-medium"
-            style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             Back to Billing
           </button>
@@ -143,12 +143,12 @@ export default function BillingPage() {
           <div className="space-y-4">
             <div
               className="rounded-xl border p-4 text-center"
-              style={{ borderColor: "#E8E8E8", backgroundColor: "#FAFAFA" }}
+              style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
             >
-              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Payment processing coming soon
               </p>
-              <p className="mt-1 text-xs" style={{ color: "#7A7A7A" }}>
+              <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
                 We&apos;re integrating Stripe. Upgrades will be available here once it&apos;s ready.
               </p>
             </div>
@@ -165,7 +165,7 @@ export default function BillingPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Billing</h1>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Billing</h1>
         {planKey === "FREE" && (
           <button
             onClick={() => setShowPlans(true)}
@@ -217,12 +217,12 @@ export default function BillingPage() {
 
             {/* C) Interval switch */}
             {planKey !== "FREE" && (
-              <div className="flex items-center justify-between rounded-xl border border-[#E8E8E8] bg-white px-5 py-4">
+              <div className="flex items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-white px-5 py-4">
                 <div>
-                  <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
+                  <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                     Billing interval
                   </p>
-                  <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                     Currently billed {currentInterval === "YEARLY" ? "annually" : "monthly"}
                   </p>
                 </div>
@@ -230,8 +230,8 @@ export default function BillingPage() {
                   onClick={() =>
                     setSwitchInterval(currentInterval === "MONTHLY" ? "YEARLY" : "MONTHLY")
                   }
-                  className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[#FAFAFA]"
-                  style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+                  className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                 >
                   Switch to {currentInterval === "MONTHLY" ? "Yearly" : "Monthly"}
                 </button>
@@ -273,17 +273,17 @@ export default function BillingPage() {
       {switchInterval && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-bold" style={{ color: "#0D0D0D" }}>
+            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>
               Switch to {PLAN_NAMES[planKey]} {switchInterval === "YEARLY" ? "Yearly" : "Monthly"}?
             </h2>
-            <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
+            <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
               You&apos;ll be charged a prorated amount for the remainder of your current billing period.
             </p>
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setSwitchInterval(null)}
-                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[#FAFAFA]"
-                style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Cancel
               </button>

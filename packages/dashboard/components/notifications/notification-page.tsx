@@ -69,25 +69,25 @@ export function NotificationPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold" style={{ color: "#0D0D0D" }}>Notifications</h1>
+        <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Notifications</h1>
         <button
           onClick={() => markAllRead.mutate()}
-          className="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[#F4F4F4]"
-          style={{ color: "#7A7A7A" }}
+          className="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+          style={{ color: "var(--color-text-secondary)" }}
         >
           Mark All Read
         </button>
       </div>
 
-      <div className="mt-4 flex gap-1 border-b" style={{ borderColor: "#E8E8E8" }}>
+      <div className="mt-4 flex gap-1 border-b" style={{ borderColor: "var(--color-border-default)" }}>
         {NOTIFICATION_TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className="px-4 py-2 text-sm font-medium transition-colors"
             style={{
-              color: activeTab === tab.key ? "#0D0D0D" : "#7A7A7A",
-              borderBottom: activeTab === tab.key ? "2px solid #0D0D0D" : "2px solid transparent",
+              color: activeTab === tab.key ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+              borderBottom: activeTab === tab.key ? "2px solid var(--color-text-primary)" : "2px solid transparent",
             }}
           >
             {tab.label}
@@ -95,13 +95,13 @@ export function NotificationPage() {
         ))}
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-lg border" style={{ borderColor: "#E8E8E8" }}>
+      <div className="mt-4 overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
         {isLoading ? (
-          <p className="px-4 py-8 text-center text-sm" style={{ color: "#7A7A7A" }}>Loading...</p>
+          <p className="px-4 py-8 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading...</p>
         ) : groups.length === 0 ? (
           <div className="flex flex-col items-center py-16">
-            <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>No notifications</p>
-            <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
+            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No notifications</p>
+            <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
               You&apos;re all caught up!
             </p>
           </div>
@@ -128,8 +128,8 @@ export function NotificationPage() {
                 />
                 <button
                   onClick={() => toggleGroup(group.id)}
-                  className="flex w-full items-center gap-1 px-4 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4]"
-                  style={{ color: "#7A7A7A" }}
+                  className="flex w-full items-center gap-1 px-4 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  style={{ color: "var(--color-text-secondary)" }}
                 >
                   {isExpanded ? (
                     <ChevronUp className="h-3 w-3" />

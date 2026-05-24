@@ -47,17 +47,17 @@ function formatVisitors(count: number): string {
 
 export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSelected, onAction }: SiteListViewProps) {
   return (
-    <div className="rounded-xl border bg-white" style={{ borderColor: "#E8E8E8" }}>
+    <div className="rounded-xl border bg-white" style={{ borderColor: "var(--color-border-default)" }}>
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b" style={{ borderColor: "#E8E8E8" }}>
+          <tr className="border-b" style={{ borderColor: "var(--color-border-default)" }}>
             <th className="w-10 px-4 py-3"><input type="checkbox" checked={allSelected} onChange={onSelectAll} className="h-4 w-4 rounded accent-[var(--color-primary)]" /></th>
-            <th className="px-4 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Name</th>
-            <th className="px-4 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Status</th>
-            <th className="px-4 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Pages</th>
-            <th className="px-4 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Visitors (30d)</th>
-            <th className="px-4 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Domain</th>
-            <th className="px-4 py-3 text-left font-medium" style={{ color: "#7A7A7A" }}>Last Edited</th>
+            <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Name</th>
+            <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Status</th>
+            <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Pages</th>
+            <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Visitors (30d)</th>
+            <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Domain</th>
+            <th className="px-4 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Last Edited</th>
             <th className="w-10 px-4 py-3"></th>
           </tr>
         </thead>
@@ -65,14 +65,14 @@ export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSel
           {sites.map((site) => {
             const sc = STATUS_COLORS[site.status] ?? STATUS_COLORS.DRAFT;
             return (
-              <tr key={site.id} className="border-b transition-colors hover:bg-[#FAFAFA]" style={{ borderColor: "#E8E8E8" }}>
+              <tr key={site.id} className="border-b transition-colors hover:bg-[var(--color-bg-page)]" style={{ borderColor: "var(--color-border-default)" }}>
                 <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.has(site.id)} onChange={() => {}} className="h-4 w-4 rounded accent-[var(--color-primary)]" onClick={(e) => onSelect(site.id, e)} /></td>
-                <td className="px-4 py-3"><Link href={`/dashboard/sites/${site.id}`} className="font-medium hover:underline" style={{ color: "#0D0D0D" }}>{site.name}</Link><p className="text-xs" style={{ color: "#B0B0B0" }}>{site.slug}.buildrik.app</p></td>
+                <td className="px-4 py-3"><Link href={`/dashboard/sites/${site.id}`} className="font-medium hover:underline" style={{ color: "var(--color-text-primary)" }}>{site.name}</Link><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p></td>
                 <td className="px-4 py-3"><span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: sc.bg, color: sc.text }}>{site.status.toLowerCase()}</span></td>
-                <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>{site.pages}</td>
-                <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>{formatVisitors(site.visitors30d)}</td>
-                <td className="px-4 py-3" style={{ color: site.domain ? "#0D0D0D" : "#B0B0B0" }}>{site.domain ?? "--"}</td>
-                <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>{getTimeAgo(site.lastEditedAt)}</td>
+                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>{site.pages}</td>
+                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>{formatVisitors(site.visitors30d)}</td>
+                <td className="px-4 py-3" style={{ color: site.domain ? "var(--color-text-primary)" : "var(--color-text-muted)" }}>{site.domain ?? "--"}</td>
+                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>{getTimeAgo(site.lastEditedAt)}</td>
                 <td className="px-4 py-3"><ContextMenu siteStatus={site.status} onAction={(action) => onAction(action, site.id)} /></td>
               </tr>
             );

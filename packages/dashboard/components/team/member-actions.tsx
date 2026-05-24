@@ -36,13 +36,13 @@ export function MemberActions({ memberId, isOwner, isCurrentUser, onAction }: Me
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="rounded p-1.5 hover:bg-[#F4F4F4] transition-colors"
+        className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)] transition-colors"
         aria-label="Member actions"
       >
-        <MoreHorizontal className="h-4 w-4" style={{ color: "#7A7A7A" }} />
+        <MoreHorizontal className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
       </button>
       {open && (
-        <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-[#E8E8E8] bg-white shadow-lg">
+        <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-[var(--color-border-default)] bg-white shadow-lg">
           {MEMBER_ACTIONS.map((item) => {
             const isDestructive = item.action === "delete" || item.action === "revoke";
             const disabled = isCurrentUser && item.action === "delete";
@@ -54,8 +54,8 @@ export function MemberActions({ memberId, isOwner, isCurrentUser, onAction }: Me
                   onAction(item.action, memberId);
                   setOpen(false);
                 }}
-                className="flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-[#F4F4F4] disabled:cursor-not-allowed disabled:opacity-40"
-                style={{ color: isDestructive ? "var(--color-primary)" : "#0D0D0D" }}
+                className="flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ color: isDestructive ? "var(--color-primary)" : "var(--color-text-primary)" }}
               >
                 {item.label}
               </button>

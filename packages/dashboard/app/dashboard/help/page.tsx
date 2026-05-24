@@ -31,15 +31,15 @@ export default function HelpPage() {
           <button
             onClick={() => setView("home")}
             className="text-sm transition-colors hover:underline"
-            style={{ color: "#7A7A7A" }}
+            style={{ color: "var(--color-text-secondary)" }}
           >
             Help Center
           </button>
-          <span style={{ color: "#E8E8E8" }}>/</span>
-          <span className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Submit Ticket</span>
+          <span style={{ color: "var(--color-border-default)" }}>/</span>
+          <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Submit Ticket</span>
         </div>
         <div className="max-w-lg">
-          <h1 className="mb-6 text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Submit a Support Ticket</h1>
+          <h1 className="mb-6 text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Submit a Support Ticket</h1>
           <TicketForm />
         </div>
       </div>
@@ -53,18 +53,18 @@ export default function HelpPage() {
           <button
             onClick={() => setView("home")}
             className="text-sm transition-colors hover:underline"
-            style={{ color: "#7A7A7A" }}
+            style={{ color: "var(--color-text-secondary)" }}
           >
             Help Center
           </button>
-          <span style={{ color: "#E8E8E8" }}>/</span>
-          <span className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Search results for &quot;{searchQuery}&quot;</span>
+          <span style={{ color: "var(--color-border-default)" }}>/</span>
+          <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Search results for &quot;{searchQuery}&quot;</span>
         </div>
-        <h1 className="mb-6 text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Search Results</h1>
+        <h1 className="mb-6 text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Search Results</h1>
         {searchResults.isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+              <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
             ))}
           </div>
         ) : (
@@ -84,11 +84,11 @@ export default function HelpPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Help Center</h1>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Help Center</h1>
         <button
           onClick={() => setView("ticket")}
           className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[#FFF5F4]"
-          style={{ borderColor: "#E8E8E8", color: "var(--color-primary)" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-primary)" }}
         >
           Submit a Ticket
         </button>

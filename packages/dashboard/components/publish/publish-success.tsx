@@ -25,9 +25,9 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
 
   return (
     <div className="mx-auto max-w-lg text-center">
-      <CheckCircle2 className="mx-auto h-16 w-16" style={{ color: "#22C55E" }} />
-      <h2 className="mt-4 text-2xl font-bold" style={{ color: "#0D0D0D" }}>Site Published!</h2>
-      <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>Your site is now live and accessible to the world.</p>
+      <CheckCircle2 className="mx-auto h-16 w-16" style={{ color: "var(--color-success)" }} />
+      <h2 className="mt-4 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>Site Published!</h2>
+      <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>Your site is now live and accessible to the world.</p>
 
       {/* Buildrik URL */}
       <UrlRow
@@ -49,11 +49,11 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
 
       {/* Custom domain upgrade nudge for FREE plan users without a custom domain */}
       {plan === "FREE" && !customDomain && (
-        <div className="mt-4 rounded-xl border p-4 text-left" style={{ borderColor: "#E8E8E8", backgroundColor: "#FAFAFA" }}>
-          <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>
+        <div className="mt-4 rounded-xl border p-4 text-left" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
+          <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Your site is live on <span style={{ color: "var(--color-primary)" }}>{slug}.buildrik.app</span>
           </p>
-          <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
+          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
             Upgrade to PRO to connect your own domain — your client will never see buildrik.app.
           </p>
           <Link
@@ -68,11 +68,11 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
       )}
 
       {/* Lighthouse placeholder */}
-      <div className="mt-4 rounded-xl border p-4" style={{ borderColor: "#E8E8E8" }}>
-        <p className="text-xs font-medium" style={{ color: "#7A7A7A" }}>Lighthouse Score</p>
+      <div className="mt-4 rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
+        <p className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>Lighthouse Score</p>
         <div className="mt-2 flex items-center justify-center gap-2">
-          <Loader2 className="h-4 w-4 animate-spin" style={{ color: "#7A7A7A" }} />
-          <p className="text-sm font-medium" style={{ color: "#7A7A7A" }}>Calculating...</p>
+          <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--color-text-secondary)" }} />
+          <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Calculating...</p>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
         <Link
           href={`/dashboard/sites/${siteId}/analytics`}
           className="flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <BarChart3 className="h-4 w-4" />
           View Analytics
@@ -97,7 +97,7 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
         <Link
           href={`/dashboard/sites/${siteId}`}
           className="flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <Pencil className="h-4 w-4" />
           Edit Site
@@ -105,7 +105,7 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
         <Link
           href="/dashboard/sites"
           className="flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <LayoutDashboard className="h-4 w-4" />
           Dashboard
@@ -118,18 +118,18 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
 function UrlRow({ label, url, isCopied, onCopy }: { label: string; url: string; isCopied: boolean; onCopy: () => void }) {
   return (
     <div className="mt-4">
-      <p className="mb-1 text-left text-xs font-medium" style={{ color: "#7A7A7A" }}>
+      <p className="mb-1 text-left text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
         <Globe className="mr-1 inline-block h-3.5 w-3.5" />
         {label}
       </p>
-      <div className="flex items-center gap-2 rounded-xl border p-3" style={{ borderColor: "#E8E8E8" }}>
-        <span className="flex-1 truncate text-left text-sm font-medium" style={{ color: "#0D0D0D" }}>{url}</span>
+      <div className="flex items-center gap-2 rounded-xl border p-3" style={{ borderColor: "var(--color-border-default)" }}>
+        <span className="flex-1 truncate text-left text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{url}</span>
         <button
           onClick={onCopy}
           className="shrink-0 rounded-lg p-2 hover:bg-gray-100"
           title="Copy URL"
         >
-          <Copy className="h-4 w-4" style={{ color: isCopied ? "#22C55E" : "#7A7A7A" }} />
+          <Copy className="h-4 w-4" style={{ color: isCopied ? "var(--color-success)" : "var(--color-text-secondary)" }} />
         </button>
         <a
           href={url}
@@ -138,7 +138,7 @@ function UrlRow({ label, url, isCopied, onCopy }: { label: string; url: string; 
           className="shrink-0 rounded-lg p-2 hover:bg-gray-100"
           title="Open in new tab"
         >
-          <ExternalLink className="h-4 w-4" style={{ color: "#7A7A7A" }} />
+          <ExternalLink className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
         </a>
       </div>
     </div>

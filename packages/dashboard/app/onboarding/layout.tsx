@@ -13,7 +13,7 @@ export default function OnboardingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`min-h-screen ${spaceGrotesk.variable}`} style={{ backgroundColor: "#FAFAFA" }}>
+    <div className={`min-h-screen ${spaceGrotesk.variable}`} style={{ backgroundColor: "var(--color-bg-page)" }}>
       <OnboardingSidebar />
       <main className="ml-[72px] flex min-h-screen items-center justify-center">
         {children}

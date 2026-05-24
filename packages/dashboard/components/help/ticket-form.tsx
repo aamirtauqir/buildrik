@@ -114,19 +114,19 @@ export function TicketForm() {
           <CheckCircle className="h-6 w-6" style={{ color: "#16A34A" }} />
         </div>
         <div>
-          <h3 className="text-lg font-semibold" style={{ color: "#0D0D0D" }}>
+          <h3 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Ticket #{confirmation.ticketNumber} Created
           </h3>
-          <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
+          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
             We&apos;ve received your support request.
           </p>
         </div>
         <div
           className="w-full rounded-lg border px-4 py-3 text-left text-sm"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <p className="font-medium">Expected response time</p>
-          <p className="mt-0.5" style={{ color: "#7A7A7A" }}>{sla}</p>
+          <p className="mt-0.5" style={{ color: "var(--color-text-secondary)" }}>{sla}</p>
         </div>
       </div>
     );
@@ -136,7 +136,7 @@ export function TicketForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Subject */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium" style={{ color: "#0D0D0D" }}>
+        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           Subject
         </label>
         <input
@@ -146,24 +146,24 @@ export function TicketForm() {
           placeholder="Brief summary of your issue"
           maxLength={200}
           className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.subject ? "var(--color-primary)" : "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: errors.subject ? "var(--color-primary)" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
         {errors.subject && (
           <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>{errors.subject}</p>
         )}
-        <p className="mt-1 text-right text-xs" style={{ color: "#7A7A7A" }}>{subject.length}/200</p>
+        <p className="mt-1 text-right text-xs" style={{ color: "var(--color-text-secondary)" }}>{subject.length}/200</p>
       </div>
 
       {/* Category */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium" style={{ color: "#0D0D0D" }}>
+        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           Category
         </label>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value as SupportTicketInput["category"])}
           className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           {TICKET_CATEGORIES.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -173,7 +173,7 @@ export function TicketForm() {
 
       {/* Description */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium" style={{ color: "#0D0D0D" }}>
+        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           Description
         </label>
         <textarea
@@ -183,19 +183,19 @@ export function TicketForm() {
           rows={6}
           maxLength={5000}
           className="w-full resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.description ? "var(--color-primary)" : "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: errors.description ? "var(--color-primary)" : "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
         {errors.description && (
           <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>{errors.description}</p>
         )}
-        <p className="mt-1 text-right text-xs" style={{ color: "#7A7A7A" }}>{description.length}/5000</p>
+        <p className="mt-1 text-right text-xs" style={{ color: "var(--color-text-secondary)" }}>{description.length}/5000</p>
       </div>
 
       {/* Attachments */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium" style={{ color: "#0D0D0D" }}>
+        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           Attachments
-          <span className="ml-1 font-normal" style={{ color: "#7A7A7A" }}>
+          <span className="ml-1 font-normal" style={{ color: "var(--color-text-secondary)" }}>
             (optional, max {MAX_ATTACHMENTS})
           </span>
         </label>
@@ -206,18 +206,18 @@ export function TicketForm() {
               <div
                 key={`${file.name}-${i}`}
                 className="flex items-center justify-between rounded-lg border px-3 py-2"
-                style={{ borderColor: "#E8E8E8" }}
+                style={{ borderColor: "var(--color-border-default)" }}
               >
-                <span className="truncate text-sm" style={{ color: "#0D0D0D" }}>
+                <span className="truncate text-sm" style={{ color: "var(--color-text-primary)" }}>
                   {file.name}
                 </span>
                 <button
                   type="button"
                   onClick={() => removeAttachment(i)}
-                  className="ml-2 shrink-0 rounded p-0.5 transition-colors hover:bg-[#F4F4F4]"
+                  className="ml-2 shrink-0 rounded p-0.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
                   aria-label={`Remove ${file.name}`}
                 >
-                  <X className="h-4 w-4" style={{ color: "#7A7A7A" }} />
+                  <X className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
                 </button>
               </div>
             ))}
@@ -228,8 +228,8 @@ export function TicketForm() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[#F4F4F4]"
-            style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+            className="flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             <Paperclip className="h-4 w-4" />
             Attach file (PNG, JPG, PDF)
