@@ -4,7 +4,7 @@ import path from "path";
 
 describe("Signup page redirect", () => {
   const signupSource = readFileSync(
-    path.resolve(__dirname, "../app/auth/signup/page.tsx"),
+    path.resolve(__dirname, "../packages/dashboard/app/auth/signup/page.tsx"),
     "utf-8"
   );
 

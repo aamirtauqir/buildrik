@@ -18,7 +18,7 @@ import { readFileSync } from "fs";
 import path from "path";
 
 const source = readFileSync(
-  path.resolve(__dirname, "../app/auth/page.tsx"),
+  path.resolve(__dirname, "../packages/dashboard/app/auth/page.tsx"),
   "utf-8"
 );
 

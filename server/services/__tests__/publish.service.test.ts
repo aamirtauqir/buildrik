@@ -13,6 +13,10 @@ vi.mock("@/lib/vercel", () => ({
   createVercelDeployment: (...args: unknown[]) => createDepMock(...args),
   waitForDeploymentReady: vi.fn(() => Promise.resolve({ readyState: "READY", url: "x.vercel.app", id: "dep_1" })),
   isVercelConfigured: () => false, // dev-sim disabled in tests
+  // Shipped 5d2e127d — runVercelDeploy now passes ready + projectName to
+  // pickPublicUrl. Mock with passthrough on `d.url`; pickPublicUrl's own
+  // alias-vs-fallback logic is tested separately in __tests__/vercel-pickPublicUrl.test.ts.
+  pickPublicUrl: (d: { url: string }) => `https://${d.url}`,
   VercelApiError: class extends Error { constructor(public status: number, public code: string, msg: string) { super(msg); } },
 }));
 

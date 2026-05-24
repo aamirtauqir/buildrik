@@ -3,12 +3,12 @@ import { readFileSync } from "fs";
 import path from "path";
 
 const twoFASource = readFileSync(
-  path.resolve(__dirname, "../app/auth/2fa/page.tsx"),
+  path.resolve(__dirname, "../packages/dashboard/app/auth/2fa/page.tsx"),
   "utf-8"
 );
 
 const backupSource = readFileSync(
-  path.resolve(__dirname, "../app/auth/2fa/backup/page.tsx"),
+  path.resolve(__dirname, "../packages/dashboard/app/auth/2fa/backup/page.tsx"),
   "utf-8"
 );
 

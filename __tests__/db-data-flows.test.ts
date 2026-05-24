@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import path from "path";
 
 const createSessionSource = readFileSync(
-  path.resolve(__dirname, "../app/api/auth/create-session/route.ts"),
+  path.resolve(__dirname, "../packages/dashboard/app/api/auth/create-session/route.ts"),
   "utf-8"
 );
 

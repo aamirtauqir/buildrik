@@ -7,7 +7,7 @@ function readFile(filePath: string): string {
 }
 
 describe("B1: logout decode() wrapped in try-catch", () => {
-  const src = readFile("app/api/auth/logout/route.ts");
+  const src = readFile("packages/dashboard/app/api/auth/logout/route.ts");
 
   it("has try-catch around decode call", () => {
     // decode should be inside try block
@@ -21,7 +21,7 @@ describe("B1: logout decode() wrapped in try-catch", () => {
 });
 
 describe("B2: create-session validates user BEFORE invalidating token", () => {
-  const src = readFile("app/api/auth/create-session/route.ts");
+  const src = readFile("packages/dashboard/app/api/auth/create-session/route.ts");
 
   it("findUnique comes BEFORE invalidateToken in function body", () => {
     // Skip imports — search from the POST function body

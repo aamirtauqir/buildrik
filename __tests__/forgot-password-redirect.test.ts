@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import path from "path";
 
 const fpSource = readFileSync(
-  path.resolve(__dirname, "../app/auth/forgot-password/page.tsx"),
+  path.resolve(__dirname, "../packages/dashboard/app/auth/forgot-password/page.tsx"),
   "utf-8"
 );
 
