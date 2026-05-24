@@ -678,3 +678,106 @@ None. Audit-only, no source change.
 - Browser extension keeps dropping (flaky link).
 - Path A real-human walk (V1_NEXT_ACTIONS) requires user time in real Chrome.
 - Path B Vercel deploy requires VERCEL_TOKEN secret.
+
+## Iteration 18 — Real-user walk + dashboard DS gate suite — 2026-05-24
+
+**Goal:** Run the locked walk script end-to-end after 5-day gap. Surface lurking
+post-publish-flow bugs. Then close the audit gap on dashboard DS enforcement.
+
+### Walk #1 — happy path
+
+Walked all 7 script steps:
+1. Sign in (via session_grant DB injection — QA user `qa@buildrik.local`)
+2. Pick site "My New Site" from /dashboard/sites
+3. Open in Editor (:5050)
+4. Add Heading element to canvas
+5. Auto-save sites.saveProject → 200
+6. Publish dropdown → Publish Update
+7. Job COMPLETED, deploymentId `dpl_3F7inBV955woPcYNaT6nQWiogR11`
+
+### P0 found + shipped — non-OAuth JWT missing workspaceId
+
+Editor first-load showed "Save failed" topbar state + 401 storm in console
+(sites.get, pages.list, sites.saveProject). Root cause:
+
+`packages/dashboard/app/api/auth/create-session/route.ts` minted JWT with
+`{sub, email, name, userId}` only. NextAuth's `jwt` callback in
+`server/auth.config.ts:97-110` only populates `token.workspaceId` on
+first-call-after-signIn (the `if (user)` branch). Since `create-session`
+bypasses signIn entirely, jwt callback never ran to populate workspaceId,
+leaving `session.user.workspaceId` null forever for ALL non-OAuth sessions
+(credentials, magic-link, 2FA, forgot-password).
+
+Editor's `scopedProcedure` requires workspaceId → 401 everywhere for these
+sessions. Only OAuth (Google/GitHub) sessions worked, because OAuth goes
+through standard signIn → jwt callback path.
+
+Fix: lookup workspaceMember + embed workspaceId before encode(). 9-line patch
+mirroring existing jwt callback shape. Shipped `5380cb7e`.
+
+### 3 false positives retracted via DESIGN.md re-read
+
+- "Edit in Editor" red button: DESIGN.md L11-17 explicitly defines two-accent
+  system (dashboard red, editor cobalt). Red is correct.
+- target="_blank" on Edit-in-Editor: intentional UX (dashboard tab persists).
+- Stale "Save failed" on editor first-load: side effect of P0 401 storm.
+  Resolved by same fix.
+
+### Walk #2 — credentials login confirmation
+
+Re-walked auth via /auth form (password "walktest123" set via psql + bcrypt).
+Email-first flow → password screen → Sign In → /dashboard redirect → session
+has workspaceId → editor loads with all tRPC 200, topbar "Published" clean.
+0 new bugs. P0 fix verified for credentials path too.
+
+### Latent P1 caught — NewSite Suspense (Next.js 16)
+
+While smoke-testing post-codemod, `pnpm run build` failed:
+
+  Error occurred prerendering page "/dashboard/sites/new"
+  useSearchParams() should be wrapped in a suspense boundary
+
+Page `/dashboard/sites/new` used `useSearchParams()` directly inside the
+default export. Next.js 16 strict-prerender requires Suspense wrap. Wrapped
+inner in `<Suspense fallback={null}>`. Pre-existing bug (not caused by today's
+codemod). Build now green. Shipped `1fb5e636`.
+
+Verified other useSearchParams callers (`/dashboard/settings/integrations`)
+are dynamic-routed (`ƒ` Next.js marker), so no prerender, no error.
+
+### DS audit gate suite (commits 53af755e / c98c3ac1 / 0063ad6b)
+
+Replaced subjective DS scoring with objective gate-pass rate. Built 7-gate
+dashboard equivalent of editor's verify:ds:
+
+- D1: no banned font fallbacks (system-ui/Roboto/Helvetica) in chrome
+- D2: no purple/violet/indigo bleed
+- D3: --color-primary = #E42313 sentinel (two-accent dashboard red)
+- D4: NO BLACK rule
+- D5: layout token sentinel (--sidebar-width, --topbar-height)
+- D6: @theme block sentinel (Tailwind v4 token source)
+- D7: zero-tolerance hardcoded token-backed hex in tsx/ts
+
+Codemod swept 1687 hardcoded hex literals → var(--color-*) across 100+ files
+(266 brand red + 1383 slate-neutral palette + 38 semantic). emails/ exempt
+(email clients have no CSS-var support).
+
+Pre-push hook extended to gate both packages BLOCKING. Single push refused
+on any failure across editor 25/25 or dashboard 7/7.
+
+### Iter 18 commits (11 pushed)
+
+`5380cb7e` non-OAuth JWT workspaceId, `53af755e` dashboard 6-gate suite +
+system-ui drop, `c98c3ac1` #E42313 codemod + D7, `0063ad6b` palette codemod
++ D7 extended, `1fb5e636` NewSite Suspense wrap, plus 6 CSS drain commits.
+
+### Walk-and-fix loop tally (updated)
+
+- **28 total commits** to main since loop start.
+- **5 P0/P1 fixes shipped + tested** (P1-1 redo, P0-8 Pro-gate, P0-9 redo
+  applyPatch, P1-3 phantom dirty, P0-18 workspaceId JWT).
+- **7+ walk-pass verifications** (now includes credentials login full chain
+  + editor publish E2E with real Vercel deploy).
+- **3 false-positive P1s + 3 new false positives retracted** all via DESIGN.md
+  / code-read (totals: 6 retracts across 2 sessions).
+- **5 methodology memories** saved.
