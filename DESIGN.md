@@ -1,5 +1,17 @@
 # Design System — Buildrik
 
+> **Staleness notice (2026-05-24 audit):** Sections §Typography, §Color, §Spacing,
+> §Layout, §Sidebar Panel System are partially stale. Token namespace migrated
+> `--aqb-*` → `--buildrick-*` after this doc was written but not back-patched.
+> Width rule + tab list expanded since 2026-04-16. Canonical sources:
+> - **Token defs:** `packages/editor/src/themes/design-system/*.css`
+> - **Chrome enforcement:** `pnpm --filter @buildrik/editor verify:ds`
+> - **Dashboard enforcement:** `pnpm --filter @buildrik/dashboard gate:ds`
+> - **Architecture decisions:** `Decisions Log` section + memory entries
+>   `project_ds_*_20260*.md`
+> See L128-136 (drained tokens), L156 (tabs), L168 (PanelShell→TabFrame) for
+> specific patches landed this audit. Full rewrite deferred.
+
 ## Product Context
 - **What this is:** AI-powered drag-and-drop website builder editor. Three creation modes (drag, templates, AI generate) sharing one element vocabulary.
 - **Who it's for:** Solo designers currently billing clients on Webflow or Framer. Time-constrained power users, not beginners.
@@ -125,14 +137,17 @@ The primary text color matches topbar `.tbBreadcrumb-page` (`#334155`). Secondar
 
 Use for status indicators only (save state, validation, toasts). Never for decoration.
 
-### Removed / Migrated Tokens (delete on next token pass)
+### Removed / Migrated Tokens (DRAINED 2026-04 → 2026-05)
 
-- Every dark surface token: `--aqb-bg-dark`, `--aqb-bg-darker`, `--aqb-bg-panel-secondary`, `--aqb-bg-panel-tertiary`, `--aqb-bg-elevated` old values, `--aqb-surface-1` through `--aqb-surface-5` — remove entirely.
-- Every dark-theme `--ls-*` token aliased to dark — reroute to new light `--aqb-*`.
-- `--aqb-primary`, `--aqb-primary-hover`, `--aqb-primary-active`, `--aqb-primary-light`, `--aqb-primary-muted`, `--aqb-primary-subtle` — delete, use `--accent` family only. These are historical aliases from the pre-cobalt migration.
-- `--bar`, `--bar2`, `--barStroke`, `--pillStroke`, `--pillStroke2`, `--txt`, `--muted`, `--blue`, `--blue2`, `--green`, `--green2` — legacy "navbar" tokens from the first editor. Delete.
-- Any hex literals inside `.tb*` topbar classes — replace with new `--aqb-*` tokens.
-- `--media-img`, `--media-vid`, `--media-ico`, `--media-fnt` — category-colored accents. Delete.
+Audit 2026-05-24 verified: all tokens listed below have zero defs remaining
+in `packages/editor/src/themes/`. No "delete on next pass" pending — done.
+
+- ~~`--aqb-bg-dark`, `--aqb-bg-darker`, `--aqb-bg-panel-secondary`, `--aqb-bg-panel-tertiary`, `--aqb-surface-1..5`~~ — drained.
+- ~~Dark-theme `--ls-*` aliases~~ — drained (0 defs).
+- ~~`--aqb-primary*` family~~ — drained (cobalt-only).
+- ~~`--bar`, `--bar2`, `--barStroke`, `--pillStroke`, `--pillStroke2`, `--txt`, `--muted`, `--blue`, `--blue2`, `--green`, `--green2`~~ — drained (0 defs).
+- ~~`--media-img`, `--media-vid`, `--media-ico`, `--media-fnt`~~ — drained.
+- Topbar `.tb*` hex literals — drained (audit verified, gate-enforced).
 
 ## Spacing
 - **Base unit:** 4px.
@@ -153,19 +168,30 @@ Use for status indicators only (save state, validation, toasts). Never for decor
 
 ## Sidebar Panel System
 
-The left sidebar has 8 rail-visible tabs (Add, Templates, Media, Layers, Pages, Components, Settings, History). Every panel composes the same primitives. Every tab is the same machine with different cargo.
+The left sidebar has 11 rail-visible tabs as of 2026-05-24 (Add/elements,
+Templates, Media, Layers, Pages, Components, Settings, History, plus AI,
+Build, Publish). Every panel composes the same primitives. Every tab is the
+same machine with different cargo.
 
-### Grammar — PanelShell
+Original spec listed 8 tabs (Add/Templates/Media/Layers/Pages/Components/Settings/History).
+"Add" renamed to "elements". AI/Build/Publish added since the 2026-04-16 spec.
+
+### Grammar — TabFrame (was PanelShell pre-2026-05)
 
 ```
-PanelShell
-├── PanelHeader    (44px, required)   title · spacer · icon actions · pin · close
-├── PanelToolbar   (36px, optional)   search · filters · primary action
-├── PanelContent   (flex, scrollable) 12px padding · 4px gap rhythm
-└── PanelFooter    (40px, optional)   selection count · batch actions · status
+TabFrame
+├── TabFrame.Header    (44px, required)   title · subtitle · actions · close
+├── TabFrame.Toolbar   (36px, optional)   search · filters · primary action
+├── TabFrame.Content   (flex, scrollable) 12px padding · 4px gap rhythm
+└── TabFrame.Footer    (40px, optional)   selection count · batch actions · status
 ```
 
-All 8 tabs compose these four zones. Lives at `packages/editor/src/editor/sidebar/shared/panel/`. Canonical classnames `ps-*`.
+All tabs compose these four zones. Lives at
+`packages/editor/src/shared/extensions/TabFrame.tsx`. Canonical classnames
+`bd-surface-head__*` (header internals) + `bd-*` tab-specific prefixes.
+
+Pre-2026-05 name `PanelShell` + `ps-*` classes are dead — drained during sidebar
+header canonicalization (commits `0a2410a4`..`f9377302`).
 
 ### Width Rule
 
