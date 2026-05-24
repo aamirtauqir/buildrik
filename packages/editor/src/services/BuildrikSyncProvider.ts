@@ -182,8 +182,20 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
         slugManuallySet: p.slugManuallySet ?? false,
         slugHistory: p.slugHistory ?? [],
       })),
+      // projectStyles holds StyleEngine CSS rules ({id, selector, properties}).
+      // Legacy data also contains design-token entries ({id, kind, cssVar, ...})
+      // from before tokens migrated to TokenRegistry — those fail StyleEngine
+      // validation and warn "dropped N malformed rule(s)" on every site open.
+      // Filter at load so only real CSS rules reach the engine; tokens are
+      // hydrated separately by the DS layer.
       styles: (Array.isArray((site as { projectStyles?: unknown }).projectStyles)
-        ? (site as { projectStyles: unknown[] }).projectStyles
+        ? ((site as { projectStyles: unknown[] }).projectStyles as unknown[]).filter(
+            (s): s is { selector: string } =>
+              s != null &&
+              typeof s === "object" &&
+              typeof (s as { selector?: unknown }).selector === "string" &&
+              (s as { selector: string }).selector.length > 0
+          )
         : []) as ProjectData["styles"],
       assets: [],
       settings: mergedSettings,
