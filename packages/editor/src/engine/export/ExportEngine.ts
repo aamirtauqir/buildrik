@@ -357,7 +357,14 @@ export class ExportEngine {
    * @returns Promise resolving to export result with files array
    */
   async exportAllPages(options: MultiPageExportOptions): Promise<MultiPageExportResult> {
-    const pages = this.composer.elements.getAllPages?.() ?? [];
+    // exportPages() rehydrates root via live Element.toJSON(); getAllPages()
+    // returns the stale ctx.pages snapshot, which misses click-to-add children
+    // because element mutations only touch Element instances, not page.root JSON.
+    // Without this, deployed sites publish empty <div></div> bodies.
+    const pages =
+      this.composer.elements.exportPages?.() ??
+      this.composer.elements.getAllPages?.() ??
+      [];
     const files: MultiPageExportFile[] = [];
 
     // Use generateResponsiveCSS for proper breakpoint ordering, or fall back to generateCSS
