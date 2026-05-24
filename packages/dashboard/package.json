@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "gate:ds": "bash scripts/ds-grep-gates.sh"
   },
   "dependencies": {
     "@buildrik/editor": "workspace:*",

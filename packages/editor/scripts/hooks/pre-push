@@ -35,15 +35,20 @@ echo "────────────────────────�
 echo " Buildrik DS gates (pre-push, BLOCKING mode)"
 echo "──────────────────────────────────────────────"
 
-# Run the gate but capture exit code instead of letting it kill the hook.
-if pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1; then
-  echo " ✓ all gates passing"
+# Run editor + dashboard gates, capture combined exit. Dashboard gate added
+# 2026-05-24 — DESIGN.md two-accent enforcement for dashboard chrome.
+EDITOR_OK=0
+DASH_OK=0
+pnpm run verify:ds > /tmp/buildrik-pre-push-gate.log 2>&1 || EDITOR_OK=$?
+(cd "$REPO_ROOT/packages/dashboard" && pnpm run gate:ds) >> /tmp/buildrik-pre-push-gate.log 2>&1 || DASH_OK=$?
+if [ "$EDITOR_OK" = "0" ] && [ "$DASH_OK" = "0" ]; then
+  echo " ✓ all gates passing (editor + dashboard)"
   echo "──────────────────────────────────────────────"
   exit 0
 fi
 
 # Gate failed. Show what broke and either warn-or-block.
-echo " ✗ one or more gates failing"
+echo " ✗ one or more gates failing (editor=$EDITOR_OK dashboard=$DASH_OK)"
 echo ""
 tail -20 /tmp/buildrik-pre-push-gate.log | sed 's/^/   /'
 echo ""

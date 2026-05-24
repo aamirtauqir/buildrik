@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 @theme inline {
-  --font-sans: 'Inter Tight', system-ui, sans-serif;
+  --font-sans: 'Inter Tight', sans-serif;
 
   /* Auth colors */
   --color-auth-cta: #EF4444;
