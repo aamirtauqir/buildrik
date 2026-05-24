@@ -81,8 +81,8 @@ export function WorkspaceForm({
   const [defaultLanguage, setDefaultLanguage] = useState(initialData?.defaultLanguage ?? "en");
   const [timezone, setTimezone] = useState(initialData?.timezone ?? "UTC");
   const [iconUrl, setIconUrl] = useState<string | null>(initialData?.iconUrl ?? null);
-  const [accentColor, setAccentColor] = useState(initialData?.accentColor ?? "#E42313");
-  const [hexInput, setHexInput] = useState(initialData?.accentColor ?? "#E42313");
+  const [accentColor, setAccentColor] = useState(initialData?.accentColor ?? "var(--color-primary)");
+  const [hexInput, setHexInput] = useState(initialData?.accentColor ?? "var(--color-primary)");
   const [defaultExpiration, setDefaultExpiration] = useState<string | null>(
     initialData?.defaultExpiration ?? null
   );
@@ -289,7 +289,7 @@ export function WorkspaceForm({
             type="submit"
             disabled={saving}
             className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {saving ? "Saving\u2026" : "Save changes"}
           </button>
@@ -338,7 +338,7 @@ export function WorkspaceForm({
               type="button"
               onClick={() => setRequirePw(!requirePw)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-              style={{ backgroundColor: requirePw ? "#E42313" : "#E8E8E8" }}
+              style={{ backgroundColor: requirePw ? "var(--color-primary)" : "#E8E8E8" }}
             >
               <span
                 className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -360,7 +360,7 @@ export function WorkspaceForm({
               type="button"
               onClick={() => setAllowEditors(!allowEditors)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-              style={{ backgroundColor: allowEditors ? "#E42313" : "#E8E8E8" }}
+              style={{ backgroundColor: allowEditors ? "var(--color-primary)" : "#E8E8E8" }}
             >
               <span
                 className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -382,7 +382,7 @@ export function WorkspaceForm({
               type="button"
               onClick={() => setNotify(!notify)}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-              style={{ backgroundColor: notify ? "#E42313" : "#E8E8E8" }}
+              style={{ backgroundColor: notify ? "var(--color-primary)" : "#E8E8E8" }}
             >
               <span
                 className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -397,7 +397,7 @@ export function WorkspaceForm({
             type="submit"
             disabled={saving}
             className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {saving ? "Saving\u2026" : "Save sharing settings"}
           </button>

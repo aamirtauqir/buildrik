@@ -39,7 +39,7 @@ export function TemplatePreview({ template, onBack, onUse }: TemplatePreviewProp
           {template.previewUrl && (
             <a href={template.previewUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}><ExternalLink className="h-3 w-3" />Live Demo</a>
           )}
-          <button onClick={onUse} className="rounded-lg px-6 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>Use Template</button>
+          <button onClick={onUse} className="rounded-lg px-6 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Use Template</button>
         </div>
       </div>
       <div className="flex-1 overflow-auto p-6" style={{ backgroundColor: "#FAFAFA" }}>

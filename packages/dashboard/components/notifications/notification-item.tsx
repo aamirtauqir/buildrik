@@ -76,7 +76,7 @@ export function NotificationItem({
             <a
               href={notification.actionUrl}
               className="text-xs font-medium hover:underline"
-              style={{ color: "#E42313" }}
+              style={{ color: "var(--color-primary)" }}
               onClick={(e) => e.stopPropagation()}
             >
               View
@@ -120,7 +120,7 @@ export function NotificationItem({
                 <button
                   onClick={() => { onDelete(notification.id); setMenuOpen(false); }}
                   className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[#F4F4F4]"
-                  style={{ color: "#E42313" }}
+                  style={{ color: "var(--color-primary)" }}
                 >
                   Delete
                 </button>

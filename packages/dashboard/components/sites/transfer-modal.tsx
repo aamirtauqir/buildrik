@@ -103,7 +103,7 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
             disabled={!selectedMemberId || transferMutation.isPending}
             onClick={() => transferMutation.mutate({ siteId, newOwnerId: selectedMemberId })}
             className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {transferMutation.isPending ? "Transferring..." : "Transfer"}
           </button>

@@ -20,7 +20,7 @@ export function OnboardingSidebar() {
       style={{ backgroundColor: "#0D0D0D" }}
     >
       {/* Logo */}
-      <div className="mb-8 flex h-9 w-9 items-center justify-center rounded-lg bg-[#E42313]">
+      <div className="mb-8 flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--color-primary)]">
         <span className="text-sm font-bold text-white">B</span>
       </div>
 
@@ -39,7 +39,7 @@ export function OnboardingSidebar() {
                 <div
                   className={cn(
                     "h-2.5 w-2.5 rounded-full transition-colors",
-                    active ? "bg-[#E42313]" : "bg-[#3A3A3A]"
+                    active ? "bg-[var(--color-primary)]" : "bg-[#3A3A3A]"
                   )}
                 />
               )}

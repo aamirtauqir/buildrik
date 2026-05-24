@@ -7,7 +7,7 @@ import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 const STATUS_ICON = {
   pass: <CheckCircle2 className="h-5 w-5" style={{ color: "#22C55E" }} />,
   warning: <AlertTriangle className="h-5 w-5" style={{ color: "#F59E0B" }} />,
-  fail: <XCircle className="h-5 w-5" style={{ color: "#E42313" }} />,
+  fail: <XCircle className="h-5 w-5" style={{ color: "var(--color-primary)" }} />,
 } as const;
 
 interface PrePublishChecksProps {
@@ -63,7 +63,7 @@ export function PrePublishChecks({ checks, onPublish, onCancel }: PrePublishChec
             onClick={() => onPublish(notifyTeam)}
             disabled={!checks.ready}
             className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Publish
           </button>

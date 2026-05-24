@@ -89,10 +89,10 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                 <td className="px-4 py-3 text-xs" style={{ color: "#7A7A7A" }}>
                   {formatDate(invite.createdAt)}
                 </td>
-                <td className="px-4 py-3 text-xs font-medium" style={{ color: expiringSoon ? "#E42313" : "#7A7A7A" }}>
+                <td className="px-4 py-3 text-xs font-medium" style={{ color: expiringSoon ? "var(--color-primary)" : "#7A7A7A" }}>
                   {days === 0 ? "Expires today" : `Expires in ${days}d`}
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: resendDisabled ? "#E42313" : "#7A7A7A" }}>
+                <td className="px-4 py-3 text-xs" style={{ color: resendDisabled ? "var(--color-primary)" : "#7A7A7A" }}>
                   Resent {invite.resendCount}/{MAX_RESENDS} times
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -110,7 +110,7 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                       onClick={() => onRevoke(invite.id)}
                       disabled={!!revokingId}
                       className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-red-50 disabled:opacity-50"
-                      style={{ borderColor: "#E42313", color: "#E42313" }}
+                      style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
                     >
                       {revokingId === invite.id ? "Revoking..." : "Revoke"}
                     </button>

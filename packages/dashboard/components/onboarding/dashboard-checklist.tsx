@@ -145,7 +145,7 @@ export function DashboardChecklist({
       <div className="px-4 pt-2 pb-1">
         <div className="h-1.5 w-full rounded-full bg-[#F4F4F4]">
           <div
-            className="h-1.5 rounded-full bg-[#E42313] transition-all duration-300"
+            className="h-1.5 rounded-full bg-[var(--color-primary)] transition-all duration-300"
             style={{ width: `${progressPct}%` }}
           />
         </div>

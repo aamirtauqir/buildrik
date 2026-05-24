@@ -23,7 +23,7 @@ function EntryRow({ entry }: { entry: ActivityEntry }) {
           className="mt-0.5 h-5 w-5 shrink-0 rounded-full object-cover"
         />
       ) : (
-        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#E42313]" />
+        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--color-primary)]" />
       )}
       <div className="flex-1 min-w-0">
         <p className="text-sm text-[#0D0D0D]">

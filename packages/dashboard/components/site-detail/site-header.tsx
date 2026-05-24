@@ -52,7 +52,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
               <ExternalLink className="h-4 w-4" />View Site
             </span>
           )}
-          <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>
+          <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
             <Pencil className="h-4 w-4" />Edit in Editor
           </EditorLink>
           {site.status === "DRAFT" && onPublish && (

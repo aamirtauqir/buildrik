@@ -43,7 +43,7 @@ export function SiteCard({ site }: SiteCardProps) {
   }
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-[#E8E8E8] bg-white hover:border-[#E42313]/30 transition-colors">
+    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-[#E8E8E8] bg-white hover:border-[var(--color-primary)]/30 transition-colors">
       {/* Thumbnail */}
       <div className="relative flex h-32 items-center justify-center bg-[#F4F4F4]">
         {site.thumbnail ? (
@@ -63,7 +63,7 @@ export function SiteCard({ site }: SiteCardProps) {
             siteId={site.id}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-lg bg-[#E42313] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#C91F10] transition-colors"
+            className="flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#C91F10] transition-colors"
           >
             <Pencil className="h-3 w-3" />
             Edit

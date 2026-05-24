@@ -122,7 +122,7 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
             <button
               disabled
               className="rounded-lg px-4 py-2 text-sm font-semibold text-white opacity-50"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               Save Card
             </button>

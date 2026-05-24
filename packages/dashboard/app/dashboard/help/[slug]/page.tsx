@@ -55,7 +55,7 @@ export default function ArticleDetailPage() {
         </div>
       ) : articleQuery.error ? (
         <div className="py-12 text-center">
-          <p className="text-sm font-medium" style={{ color: "#E42313" }}>Article not found</p>
+          <p className="text-sm font-medium" style={{ color: "var(--color-primary)" }}>Article not found</p>
           <p className="mt-1 text-xs" style={{ color: "#7A7A7A" }}>
             This article may have been moved or deleted.
           </p>

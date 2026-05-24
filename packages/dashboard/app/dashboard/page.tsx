@@ -112,7 +112,7 @@ export default function DashboardPage() {
             onClick={() => cancelWsDelete.mutate()}
             disabled={cancelWsDelete.isPending}
             className="mt-2 text-sm font-semibold underline"
-            style={{ color: "#E42313" }}
+            style={{ color: "var(--color-primary)" }}
           >
             {cancelWsDelete.isPending ? "Cancelling..." : "Cancel Deletion"}
           </button>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
             onClick={() => cancelAcctDelete.mutate()}
             disabled={cancelAcctDelete.isPending}
             className="mt-2 text-sm font-semibold underline"
-            style={{ color: "#E42313" }}
+            style={{ color: "var(--color-primary)" }}
           >
             {cancelAcctDelete.isPending ? "Cancelling..." : "Cancel Deletion"}
           </button>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Dashboard</h1>
-        <Link href="/dashboard/sites/new" className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>
+        <Link href="/dashboard/sites/new" className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
           <Plus className="h-4 w-4" />New Site
         </Link>
       </div>

@@ -74,7 +74,7 @@ export function WorkspaceHealth({ data }: WorkspaceHealthProps) {
     <div className="rounded-xl border border-[#E8E8E8] bg-white p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-[#0D0D0D]">Workspace Usage</h3>
-        <Link href="/dashboard/billing" className="text-xs text-[#E42313] hover:underline">
+        <Link href="/dashboard/billing" className="text-xs text-[var(--color-primary)] hover:underline">
           Manage plan →
         </Link>
       </div>

@@ -7,7 +7,7 @@ const ROLE_CARDS = [
     role: "Owner",
     description: "Full control of workspace, billing, and settings",
     bg: "#FEF2F2",
-    color: "#E42313",
+    color: "var(--color-primary)",
     Icon: Crown,
   },
   {
@@ -44,7 +44,7 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
         className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl"
         style={{ backgroundColor: "#FEF2F2" }}
       >
-        <Users className="h-8 w-8" style={{ color: "#E42313" }} />
+        <Users className="h-8 w-8" style={{ color: "var(--color-primary)" }} />
       </div>
 
       <h2 className="text-xl font-semibold" style={{ color: "#0D0D0D" }}>
@@ -57,7 +57,7 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
       <button
         onClick={onInvite}
         className="mt-6 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
-        style={{ backgroundColor: "#E42313" }}
+        style={{ backgroundColor: "var(--color-primary)" }}
       >
         Invite Team Members
       </button>

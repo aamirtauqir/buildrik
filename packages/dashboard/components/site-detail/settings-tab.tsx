@@ -218,7 +218,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 setPasswordEnabled((v) => !v);
               }}
               className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors"
-              style={{ backgroundColor: passwordEnabled ? "#E42313" : "#E8E8E8" }}
+              style={{ backgroundColor: passwordEnabled ? "var(--color-primary)" : "#E8E8E8" }}
             >
               <span
                 className="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform"
@@ -294,7 +294,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 type="button"
                 onClick={() => removePlatform(platform)}
                 className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium"
-                style={{ color: "#E42313" }}
+                style={{ color: "var(--color-primary)" }}
               >
                 Remove
               </button>
@@ -316,7 +316,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
       <button
         onClick={handleSave}
         className="rounded-lg px-6 py-2 text-sm font-medium text-white"
-        style={{ backgroundColor: "#E42313" }}
+        style={{ backgroundColor: "var(--color-primary)" }}
       >
         Save Changes
       </button>
@@ -357,7 +357,7 @@ function ProGate({ isPro, children }: { isPro: boolean; children: React.ReactNod
       {!isPro && (
         <div className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: "#FFF8F7" }}>
           <LockIcon />
-          <span className="text-xs font-medium" style={{ color: "#E42313" }}>
+          <span className="text-xs font-medium" style={{ color: "var(--color-primary)" }}>
             Available on Pro
           </span>
         </div>
@@ -369,7 +369,7 @@ function ProGate({ isPro, children }: { isPro: boolean; children: React.ReactNod
 
 function LockIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E42313" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0110 0v4" />
     </svg>

@@ -26,7 +26,7 @@ function PasswordStrengthBar({ password }: { password: string }) {
   ].filter(Boolean).length;
 
   const label = ["", "Weak", "Fair", "Good", "Strong", "Very strong"][score];
-  const colors = ["", "#E42313", "#f59e0b", "#3b82f6", "#22c55e", "#16a34a"];
+  const colors = ["", "var(--color-primary)", "#f59e0b", "#3b82f6", "#22c55e", "#16a34a"];
   const width = `${(score / 5) * 100}%`;
 
   if (!password) return null;
@@ -160,12 +160,12 @@ export function AccountTab({
               required
               className="w-full px-3 py-2 text-sm rounded-md border outline-none"
               style={{
-                borderColor: confirmError ? "#E42313" : "#E8E8E8",
+                borderColor: confirmError ? "var(--color-primary)" : "#E8E8E8",
                 color: "#0D0D0D",
               }}
             />
             {confirmError && (
-              <p className="text-xs mt-1" style={{ color: "#E42313" }}>
+              <p className="text-xs mt-1" style={{ color: "var(--color-primary)" }}>
                 {confirmError}
               </p>
             )}
@@ -175,7 +175,7 @@ export function AccountTab({
             type="submit"
             disabled={saving}
             className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {saving ? "Saving..." : isSocialOnly ? "Set password" : "Update password"}
           </button>

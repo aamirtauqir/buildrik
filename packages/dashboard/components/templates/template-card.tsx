@@ -45,7 +45,7 @@ export function TemplateCard({ template, onPreview, onUse }: TemplateCardProps) 
       {/* Hover overlay */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
         <button onClick={() => onPreview(template.id)} className="rounded-lg border border-white px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">Preview</button>
-        <button onClick={() => onUse(template.id)} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>Use Template</button>
+        <button onClick={() => onUse(template.id)} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Use Template</button>
       </div>
     </div>
   );

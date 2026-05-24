@@ -170,7 +170,7 @@ export default function BillingPage() {
           <button
             onClick={() => setShowPlans(true)}
             className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             View Plans
           </button>
@@ -193,7 +193,7 @@ export default function BillingPage() {
             onClick={() => reactivateMutation.mutate()}
             disabled={reactivateMutation.isPending}
             className="ml-4 shrink-0 rounded-lg px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {reactivateMutation.isPending ? "Reactivating..." : "Reactivate"}
           </button>
@@ -291,7 +291,7 @@ export default function BillingPage() {
                 onClick={() => switchIntervalMutation.mutate({ interval: switchInterval })}
                 disabled={switchIntervalMutation.isPending}
                 className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: "#E42313" }}
+                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {switchIntervalMutation.isPending ? "Switching..." : "Confirm Switch"}
               </button>

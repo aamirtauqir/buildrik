@@ -146,10 +146,10 @@ export function TicketForm() {
           placeholder="Brief summary of your issue"
           maxLength={200}
           className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.subject ? "#E42313" : "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: errors.subject ? "var(--color-primary)" : "#E8E8E8", color: "#0D0D0D" }}
         />
         {errors.subject && (
-          <p className="mt-1 text-xs" style={{ color: "#E42313" }}>{errors.subject}</p>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>{errors.subject}</p>
         )}
         <p className="mt-1 text-right text-xs" style={{ color: "#7A7A7A" }}>{subject.length}/200</p>
       </div>
@@ -183,10 +183,10 @@ export function TicketForm() {
           rows={6}
           maxLength={5000}
           className="w-full resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.description ? "#E42313" : "#E8E8E8", color: "#0D0D0D" }}
+          style={{ borderColor: errors.description ? "var(--color-primary)" : "#E8E8E8", color: "#0D0D0D" }}
         />
         {errors.description && (
-          <p className="mt-1 text-xs" style={{ color: "#E42313" }}>{errors.description}</p>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>{errors.description}</p>
         )}
         <p className="mt-1 text-right text-xs" style={{ color: "#7A7A7A" }}>{description.length}/5000</p>
       </div>
@@ -246,7 +246,7 @@ export function TicketForm() {
         />
 
         {errors.attachments && (
-          <p className="mt-1 text-xs" style={{ color: "#E42313" }}>{errors.attachments}</p>
+          <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>{errors.attachments}</p>
         )}
       </div>
 
@@ -254,7 +254,7 @@ export function TicketForm() {
         type="submit"
         disabled={createTicket.isPending}
         className="w-full rounded-lg py-2.5 text-sm font-medium text-white transition-opacity disabled:opacity-60"
-        style={{ backgroundColor: "#E42313" }}
+        style={{ backgroundColor: "var(--color-primary)" }}
       >
         {createTicket.isPending ? "Submitting..." : "Submit Ticket"}
       </button>

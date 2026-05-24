@@ -55,7 +55,7 @@ export function MemberActions({ memberId, isOwner, isCurrentUser, onAction }: Me
                   setOpen(false);
                 }}
                 className="flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-[#F4F4F4] disabled:cursor-not-allowed disabled:opacity-40"
-                style={{ color: isDestructive ? "#E42313" : "#0D0D0D" }}
+                style={{ color: isDestructive ? "var(--color-primary)" : "#0D0D0D" }}
               >
                 {item.label}
               </button>

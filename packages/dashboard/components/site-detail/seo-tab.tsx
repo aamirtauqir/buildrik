@@ -63,7 +63,7 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
               </label>
               <span
                 className="text-xs"
-                style={{ color: metaTitle.length > 60 ? "#E42313" : "#B0B0B0" }}
+                style={{ color: metaTitle.length > 60 ? "var(--color-primary)" : "#B0B0B0" }}
               >
                 {metaTitle.length}/60
               </span>
@@ -84,7 +84,7 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
               </label>
               <span
                 className="text-xs"
-                style={{ color: metaDesc.length > 160 ? "#E42313" : "#B0B0B0" }}
+                style={{ color: metaDesc.length > 160 ? "var(--color-primary)" : "#B0B0B0" }}
               >
                 {metaDesc.length}/160
               </span>
@@ -182,7 +182,7 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
           })
         }
         className="rounded-lg px-6 py-2 text-sm font-medium text-white"
-        style={{ backgroundColor: "#E42313" }}
+        style={{ backgroundColor: "var(--color-primary)" }}
       >
         Save SEO
       </button>

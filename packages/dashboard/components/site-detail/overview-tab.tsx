@@ -184,7 +184,7 @@ export function OverviewTab({
             <button
               onClick={onRetry}
               className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               <RefreshCw className="h-4 w-4" />
               Retry
@@ -203,7 +203,7 @@ export function OverviewTab({
     );
   }
 
-  const healthColor = stats.healthScore > 70 ? "#22C55E" : stats.healthScore > 40 ? "#EA580C" : "#E42313";
+  const healthColor = stats.healthScore > 70 ? "#22C55E" : stats.healthScore > 40 ? "#EA580C" : "var(--color-primary)";
 
   return (
     <div className="space-y-8">
@@ -279,13 +279,13 @@ export function OverviewTab({
             <div className="grid grid-cols-2 gap-4">
               {HEALTH_METRICS.map((m) => {
                 const score = stats.healthBreakdown[m.key];
-                const barColor = score > 70 ? "#22C55E" : score > 40 ? "#EA580C" : "#E42313";
+                const barColor = score > 70 ? "#22C55E" : score > 40 ? "#EA580C" : "var(--color-primary)";
                 const Icon = m.icon;
                 return (
                   <Link
                     key={m.key}
                     href={`/dashboard/sites/${siteId}/${m.tab}`}
-                    className="group rounded-lg border p-3 transition-colors hover:border-[#E42313]/30"
+                    className="group rounded-lg border p-3 transition-colors hover:border-[var(--color-primary)]/30"
                     style={{ borderColor: "#E8E8E8" }}
                   >
                     <div className="flex items-center justify-between">
@@ -317,7 +317,7 @@ export function OverviewTab({
             <Link
               href={`/dashboard/sites/${siteId}/submissions`}
               className="text-xs font-medium"
-              style={{ color: "#E42313" }}
+              style={{ color: "var(--color-primary)" }}
             >
               View All Submissions
             </Link>
@@ -354,7 +354,7 @@ export function OverviewTab({
                         <Link
                           href={`/dashboard/sites/${siteId}/submissions?form=${fb.id}`}
                           className="font-medium"
-                          style={{ color: "#E42313" }}
+                          style={{ color: "var(--color-primary)" }}
                         >
                           View details
                         </Link>
@@ -462,7 +462,7 @@ export function OverviewTab({
                               {s.isSpam && (
                                 <span
                                   className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                                  style={{ backgroundColor: "#FEF2F2", color: "#E42313" }}
+                                  style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}
                                 >
                                   Spam
                                 </span>
@@ -536,7 +536,7 @@ export function OverviewTab({
           <div className="mt-3 space-y-3">
             {activity.map((a) => (
               <div key={a.id} className="flex items-start gap-2">
-                <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "#E42313" }} />
+                <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "var(--color-primary)" }} />
                 <div>
                   <p className="text-sm" style={{ color: "#0D0D0D" }}>{a.description ?? a.action}</p>
                   <p className="text-xs" style={{ color: "#B0B0B0" }}>{timeAgo(a.createdAt)}</p>
@@ -612,20 +612,20 @@ function StatBox({
       <p className="mt-2 text-xl font-bold" style={{ color: valueColor ?? "#0D0D0D" }}>{value}</p>
       {subtitle && <p className="mt-1 text-xs" style={{ color: "#B0B0B0" }}>{subtitle}</p>}
       {trend !== undefined && (
-        <p className="mt-1 text-xs font-medium" style={{ color: trend >= 0 ? "#22C55E" : "#E42313" }}>
+        <p className="mt-1 text-xs font-medium" style={{ color: trend >= 0 ? "#22C55E" : "var(--color-primary)" }}>
           {trend >= 0 ? "\u2191" : "\u2193"} {Math.abs(trend)}%
         </p>
       )}
       {badge && (
         <span
           className="mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium"
-          style={{ backgroundColor: "#FEF2F2", color: "#E42313" }}
+          style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}
         >
           {badge}
         </span>
       )}
       {link && (
-        <Link href={link.href} className="mt-1 block text-xs font-medium" style={{ color: "#E42313" }}>
+        <Link href={link.href} className="mt-1 block text-xs font-medium" style={{ color: "var(--color-primary)" }}>
           {link.label}
         </Link>
       )}

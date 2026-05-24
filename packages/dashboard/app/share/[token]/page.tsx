@@ -49,7 +49,7 @@ export default function SharePasswordGate() {
         <div className="bg-white rounded-2xl p-8 shadow-sm" style={{ border: "1px solid #E8E8E8" }}>
           <div className="flex justify-center mb-6">
             <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FEF2F2" }}>
-              <Lock className="w-6 h-6" style={{ color: "#E42313" }} />
+              <Lock className="w-6 h-6" style={{ color: "var(--color-primary)" }} />
             </div>
           </div>
           <h1 className="text-lg font-semibold text-center" style={{ color: "#0D0D0D" }}>
@@ -78,7 +78,7 @@ export default function SharePasswordGate() {
               type="submit"
               disabled={loading || !password}
               className="w-full h-11 mt-4 rounded-lg text-sm font-medium text-white disabled:opacity-50"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               {loading ? "Verifying..." : "View Site"}
             </button>

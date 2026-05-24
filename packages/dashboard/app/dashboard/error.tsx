@@ -17,7 +17,7 @@ export default function DashboardError({
             className="h-6 w-6"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#E42313"
+            stroke="var(--color-primary)"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -40,7 +40,7 @@ export default function DashboardError({
           <button
             onClick={reset}
             className="px-4 py-2 rounded-lg text-sm font-medium text-white cursor-pointer"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Retry
           </button>

@@ -24,7 +24,7 @@ type SortKey = "fullName" | "role" | "status" | "lastActiveAt";
 type SortDir = "asc" | "desc";
 
 const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
-  OWNER: { bg: "#FEF2F2", color: "#E42313" },
+  OWNER: { bg: "#FEF2F2", color: "var(--color-primary)" },
   ADMIN: { bg: "#EFF6FF", color: "#3B82F6" },
   EDITOR: { bg: "#F0FDF4", color: "#22C55E" },
   VIEWER: { bg: "#F3F4F6", color: "#7A7A7A" },
@@ -33,7 +33,7 @@ const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
 const STATUS_BADGE: Record<Status, { label: string; color: string }> = {
   ACTIVE: { label: "Active", color: "#22C55E" },
   PENDING: { label: "Pending", color: "#F59E0B" },
-  SUSPENDED: { label: "Suspended", color: "#E42313" },
+  SUSPENDED: { label: "Suspended", color: "var(--color-primary)" },
 };
 
 function isOnline(lastActiveAt: Date | null): boolean {
@@ -65,7 +65,7 @@ function Initials({ name }: { name: string }) {
   return (
     <div
       className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
-      style={{ backgroundColor: "#E42313" }}
+      style={{ backgroundColor: "var(--color-primary)" }}
     >
       {initials.toUpperCase()}
     </div>
@@ -74,7 +74,7 @@ function Initials({ name }: { name: string }) {
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   if (!active) return <span className="ml-1 text-[#B0B0B0]">{"\u2195"}</span>;
-  return <span className="ml-1" style={{ color: "#E42313" }}>{dir === "asc" ? "\u2191" : "\u2193"}</span>;
+  return <span className="ml-1" style={{ color: "var(--color-primary)" }}>{dir === "asc" ? "\u2191" : "\u2193"}</span>;
 }
 
 function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => void }) {
@@ -99,7 +99,7 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
           ) : (
             <div
               className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold text-white"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               {member.fullName.trim().split(" ").length > 1
                 ? member.fullName.trim().split(" ")[0][0] + member.fullName.trim().split(" ").slice(-1)[0][0]
@@ -212,7 +212,7 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                   type="checkbox"
                   checked={allSelected}
                   onChange={toggleAll}
-                  className="accent-[#E42313]"
+                  className="accent-[var(--color-primary)]"
                 />
               </th>
               {(
@@ -266,7 +266,7 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                       type="checkbox"
                       checked={selected.has(member.id)}
                       onChange={() => toggleOne(member.id)}
-                      className="accent-[#E42313]"
+                      className="accent-[var(--color-primary)]"
                     />
                   </td>
                   <td className="px-4 py-3">
@@ -290,7 +290,7 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                             {member.fullName}
                           </span>
                           {isOwner && (
-                            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "#FEF2F2", color: "#E42313" }}>
+                            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}>
                               Owner
                             </span>
                           )}

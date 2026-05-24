@@ -162,7 +162,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
               onClick={is2FAEnabled ? () => setShowDisableModal(true) : handleEnable}
               disabled={enableMutation.isPending}
               className="text-sm px-3 py-1.5 rounded-md font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: is2FAEnabled ? "#7A7A7A" : "#E42313" }}
+              style={{ backgroundColor: is2FAEnabled ? "#7A7A7A" : "var(--color-primary)" }}
             >
               {enableMutation.isPending ? "Setting up..." : is2FAEnabled ? "Disable" : "Enable 2FA"}
             </button>
@@ -204,7 +204,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
               type="button"
               onClick={() => setSetupStep("backup")}
               className="text-sm px-3 py-1.5 rounded-md font-medium text-white"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               Next: View backup codes
             </button>
@@ -237,7 +237,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
               type="button"
               onClick={() => setSetupStep("verify")}
               className="text-sm px-3 py-1.5 rounded-md font-medium text-white"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               Next: Verify setup
             </button>
@@ -276,7 +276,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                 onClick={handleConfirm}
                 disabled={verifyCode.length !== 6 || confirmMutation.isPending}
                 className="text-sm px-3 py-1.5 rounded-md font-medium text-white disabled:opacity-60"
-                style={{ backgroundColor: "#E42313" }}
+                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {confirmMutation.isPending ? "Verifying..." : "Verify & Enable"}
               </button>
@@ -328,7 +328,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                 onClick={handleDisable}
                 disabled={disableMutation.isPending}
                 className="text-sm px-3 py-1.5 rounded-md font-medium text-white disabled:opacity-60"
-                style={{ backgroundColor: "#E42313" }}
+                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {disableMutation.isPending ? "Disabling..." : "Disable 2FA"}
               </button>
@@ -361,7 +361,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
               onClick={handleRevokeAll}
               disabled={revokingAll}
               className="text-sm font-medium disabled:opacity-60"
-              style={{ color: "#E42313" }}
+              style={{ color: "var(--color-primary)" }}
             >
               {revokingAll ? "Revoking..." : "Revoke all other sessions"}
             </button>
@@ -412,7 +412,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                         {isCurrent && (
                           <span
                             className="text-xs px-1.5 py-0.5 rounded-full font-medium"
-                            style={{ backgroundColor: "#E42313", color: "#fff" }}
+                            style={{ backgroundColor: "var(--color-primary)", color: "#fff" }}
                           >
                             Current
                           </span>
@@ -432,7 +432,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                           onClick={() => handleRevoke(session.id)}
                           disabled={revoking === session.id}
                           className="text-sm disabled:opacity-60"
-                          style={{ color: "#E42313" }}
+                          style={{ color: "var(--color-primary)" }}
                         >
                           {revoking === session.id ? "Revoking..." : "Revoke"}
                         </button>

@@ -92,7 +92,7 @@ export function PlanComparison({
           onClick={() => setYearly((v) => !v)}
           className={cn(
             "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-            yearly ? "bg-[#E42313]" : "bg-[#E8E8E8]"
+            yearly ? "bg-[var(--color-primary)]" : "bg-[#E8E8E8]"
           )}
         >
           <span
@@ -146,7 +146,7 @@ export function PlanComparison({
                         {badge.label}
                       </span>
                       {isCurrent && (
-                        <span className="text-[10px] font-semibold" style={{ color: "#E42313" }}>
+                        <span className="text-[10px] font-semibold" style={{ color: "var(--color-primary)" }}>
                           Current
                         </span>
                       )}
@@ -223,13 +223,13 @@ export function PlanComparison({
                             "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90",
                             isBest && "ring-2 ring-[#22C55E] ring-offset-2"
                           )}
-                          style={{ backgroundColor: "#E42313" }}
+                          style={{ backgroundColor: "var(--color-primary)" }}
                         >
                           {isBest ? "Upgrade — Best for you" : "Upgrade"}
                         </button>
                       )}
                       {isCurrent && (
-                        <span className="text-sm font-semibold" style={{ color: "#E42313" }}>
+                        <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
                           Current Plan
                         </span>
                       )}

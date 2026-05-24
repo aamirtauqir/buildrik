@@ -60,7 +60,7 @@ export function NotificationDropdown() {
         {(unreadCount ?? 0) > 0 && (
           <span
             className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {unreadCount}
           </span>

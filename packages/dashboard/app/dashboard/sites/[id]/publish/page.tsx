@@ -63,7 +63,7 @@ export default function PublishPage() {
     if (checks.isLoading) {
       return (
         <div className="flex min-h-[400px] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200" style={{ borderTopColor: "#E42313" }} />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200" style={{ borderTopColor: "var(--color-primary)" }} />
         </div>
       );
     }
@@ -93,12 +93,12 @@ export default function PublishPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="mx-auto max-w-lg text-center">
-          <p className="text-sm font-semibold" style={{ color: "#E42313" }}>Publish Error</p>
+          <p className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Publish Error</p>
           <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>{publishError ?? "Something went wrong."}</p>
           <button
             onClick={handleRetryFromError}
             className="mt-4 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Try Again
           </button>

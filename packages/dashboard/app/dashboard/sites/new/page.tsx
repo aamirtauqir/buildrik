@@ -111,7 +111,7 @@ export default function NewSitePage() {
             type="text"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[#E42313]"
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
             style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
             placeholder="My New Site"
           />

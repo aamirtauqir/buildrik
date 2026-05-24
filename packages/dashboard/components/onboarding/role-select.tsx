@@ -58,14 +58,14 @@ export function OnboardingRoleSelect({ onContinue, loading }: OnboardingRoleSele
                 className={cn(
                   "w-full flex items-center gap-4 rounded-xl border-2 px-5 py-4 text-left transition-all",
                   isSelected
-                    ? "border-[#E42313] bg-red-50"
+                    ? "border-[var(--color-primary)] bg-red-50"
                     : "border-[#E8E8E8] bg-white hover:border-[#C0C0C0]"
                 )}
               >
                 <div
                   className={cn(
                     "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg",
-                    isSelected ? "bg-[#E42313]" : "bg-[#F4F4F4]"
+                    isSelected ? "bg-[var(--color-primary)]" : "bg-[#F4F4F4]"
                   )}
                 >
                   <Icon
@@ -87,7 +87,7 @@ export function OnboardingRoleSelect({ onContinue, loading }: OnboardingRoleSele
           className={cn(
             "w-full rounded-xl py-3 text-sm font-semibold transition-colors",
             selected && !loading
-              ? "bg-[#E42313] text-white hover:bg-[#c91d0e]"
+              ? "bg-[var(--color-primary)] text-white hover:bg-[#c91d0e]"
               : "bg-[#E8E8E8] text-[#B0B0B0] cursor-not-allowed"
           )}
         >

@@ -44,7 +44,7 @@ export function LimitReached({
               fillRule="evenodd"
               clipRule="evenodd"
               d="M10 2a3 3 0 0 0-3 3v3H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1V5a3 3 0 0 0-3-3ZM9 5a1 1 0 1 1 2 0v3H9V5Zm1 7a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0v-2a1 1 0 0 0-1-1Z"
-              fill="#E42313"
+              fill="var(--color-primary)"
             />
           </svg>
         </div>
@@ -64,7 +64,7 @@ export function LimitReached({
             <div className="h-2 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E8E8E8" }}>
               <div
                 className="h-full rounded-full"
-                style={{ width: `${pct}%`, backgroundColor: "#E42313" }}
+                style={{ width: `${pct}%`, backgroundColor: "var(--color-primary)" }}
               />
             </div>
           </div>
@@ -76,7 +76,7 @@ export function LimitReached({
                   <button
                     onClick={onUpgrade}
                     className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: "#E42313" }}
+                    style={{ backgroundColor: "var(--color-primary)" }}
                   >
                     Upgrade to {upgradePlanName} &mdash; {upgradePlanPrice}
                   </button>

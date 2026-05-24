@@ -68,7 +68,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         </div>
         {atSiteLimit ? (
           <div className="mt-6 rounded-xl border p-5 text-center" style={{ borderColor: "#FCA5A5", backgroundColor: "#FEF2F2" }}>
-            <Lock className="mx-auto h-8 w-8 mb-2" style={{ color: "#E42313" }} />
+            <Lock className="mx-auto h-8 w-8 mb-2" style={{ color: "var(--color-primary)" }} />
             <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>
               Site limit reached ({sitesUsed}/{sitesLimit})
             </p>
@@ -79,7 +79,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
               href="/dashboard/billing"
               onClick={onClose}
               className="mt-4 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               Upgrade Plan <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
@@ -91,7 +91,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
               <div><p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Use a Template</p><p className="text-xs" style={{ color: "#7A7A7A" }}>Browse 50+ templates</p></div>
             </button>
             <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-red-50/50" style={{ borderColor: "#E8E8E8" }}>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FEF2F2" }}><Sparkles className="h-5 w-5" style={{ color: "#E42313" }} /></div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FEF2F2" }}><Sparkles className="h-5 w-5" style={{ color: "var(--color-primary)" }} /></div>
               <div className="flex-1">
                 <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Generate with AI</p>
                 <p className="text-xs" style={{ color: "#7A7A7A" }}>AI-powered site creation</p>

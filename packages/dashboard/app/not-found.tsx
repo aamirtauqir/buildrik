@@ -14,7 +14,7 @@ export default async function NotFound() {
       style={{ backgroundColor: "#FAFAFA" }}
     >
       <div className="text-center max-w-md mx-auto px-4">
-        <h1 className="text-6xl font-bold" style={{ color: "#E42313" }}>
+        <h1 className="text-6xl font-bold" style={{ color: "var(--color-primary)" }}>
           404
         </h1>
         <h2
@@ -30,7 +30,7 @@ export default async function NotFound() {
           <Link
             href={ctaHref}
             className="px-4 py-2 rounded-lg text-sm font-medium text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {ctaLabel}
           </Link>

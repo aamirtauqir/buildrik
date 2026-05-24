@@ -26,7 +26,7 @@ const TIMEZONES = [
 ];
 
 const INITIALS_COLORS = [
-  "#E42313", "#3b82f6", "#8b5cf6", "#059669", "#d97706",
+  "var(--color-primary)", "#3b82f6", "#8b5cf6", "#059669", "#d97706",
   "#dc2626", "#7c3aed", "#0891b2", "#be185d", "#4f46e5",
 ];
 
@@ -268,7 +268,7 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
           type="submit"
           disabled={saving}
           className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-          style={{ backgroundColor: "#E42313" }}
+          style={{ backgroundColor: "var(--color-primary)" }}
         >
           {saving ? "Saving..." : "Save changes"}
         </button>

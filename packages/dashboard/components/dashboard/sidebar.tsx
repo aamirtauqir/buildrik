@@ -41,7 +41,7 @@ function MobileTabBar() {
             href={item.href}
             className={cn(
               "flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors",
-              active ? "text-[#E42313]" : "text-[#7A7A7A]"
+              active ? "text-[var(--color-primary)]" : "text-[#7A7A7A]"
             )}
           >
             <Icon className="h-5 w-5" />
@@ -80,7 +80,7 @@ export function Sidebar() {
                 <li key={item.href}>
                   <Link href={item.href} className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    active ? "bg-red-50 text-[#E42313]" : "text-[#7A7A7A] hover:bg-[#F4F4F4] hover:text-[#0D0D0D]"
+                    active ? "bg-red-50 text-[var(--color-primary)]" : "text-[#7A7A7A] hover:bg-[#F4F4F4] hover:text-[#0D0D0D]"
                   )}>
                     <Icon className="h-5 w-5" />
                     {item.label}
@@ -95,7 +95,7 @@ export function Sidebar() {
             <p className="text-xs font-medium" style={{ color: "#0D0D0D" }}>My Workspace</p>
             <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{
               backgroundColor: plan === "FREE" ? "#F4F4F4" : "#FEF2F2",
-              color: plan === "FREE" ? "#7A7A7A" : "#E42313",
+              color: plan === "FREE" ? "#7A7A7A" : "var(--color-primary)",
             }}>
               {PLAN_LABELS[plan] ?? plan}
             </span>
@@ -123,7 +123,7 @@ export function Sidebar() {
             <Link
               href="/dashboard/billing"
               className="flex items-center gap-1 text-[11px] font-medium hover:underline"
-              style={{ color: "#E42313" }}
+              style={{ color: "var(--color-primary)" }}
             >
               Upgrade
               <ArrowUpRight className="h-3 w-3" />

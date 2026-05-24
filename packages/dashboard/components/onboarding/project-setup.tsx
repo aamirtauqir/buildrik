@@ -73,10 +73,10 @@ export function OnboardingProjectSetup({ onContinue, onBack, loading }: Onboardi
             placeholder="e.g. My Portfolio"
             minLength={2}
             maxLength={100}
-            className="w-full rounded-xl border-2 border-[#E8E8E8] px-4 py-3 text-sm text-[#0D0D0D] placeholder-[#B0B0B0] outline-none transition-colors focus:border-[#E42313]"
+            className="w-full rounded-xl border-2 border-[#E8E8E8] px-4 py-3 text-sm text-[#0D0D0D] placeholder-[#B0B0B0] outline-none transition-colors focus:border-[var(--color-primary)]"
           />
           {projectName.trim().length > 0 && projectName.trim().length < 2 && (
-            <p className="mt-1 text-xs text-[#E42313]">Name must be at least 2 characters</p>
+            <p className="mt-1 text-xs text-[var(--color-primary)]">Name must be at least 2 characters</p>
           )}
         </div>
 
@@ -91,7 +91,7 @@ export function OnboardingProjectSetup({ onContinue, onBack, loading }: Onboardi
                 className={cn(
                   "w-full flex items-center gap-4 rounded-xl border-2 px-5 py-4 text-left transition-all",
                   isSelected
-                    ? "border-[#E42313] bg-red-50"
+                    ? "border-[var(--color-primary)] bg-red-50"
                     : "border-[#E8E8E8] bg-white hover:border-[#C0C0C0]"
                 )}
               >
@@ -99,7 +99,7 @@ export function OnboardingProjectSetup({ onContinue, onBack, loading }: Onboardi
                   className={cn(
                     "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg",
                     isSelected
-                      ? "bg-[#E42313]"
+                      ? "bg-[var(--color-primary)]"
                       : m.primary
                       ? "bg-[#0D0D0D]"
                       : "bg-[#F4F4F4]"
@@ -118,7 +118,7 @@ export function OnboardingProjectSetup({ onContinue, onBack, loading }: Onboardi
                   <p className="text-xs text-[#7A7A7A]">{m.description}</p>
                 </div>
                 {m.primary && !isSelected && (
-                  <span className="ml-auto text-xs font-medium text-[#E42313] bg-red-50 px-2 py-0.5 rounded-full">
+                  <span className="ml-auto text-xs font-medium text-[var(--color-primary)] bg-red-50 px-2 py-0.5 rounded-full">
                     Recommended
                   </span>
                 )}
@@ -135,7 +135,7 @@ export function OnboardingProjectSetup({ onContinue, onBack, loading }: Onboardi
           className={cn(
             "w-full rounded-xl py-3 text-sm font-semibold transition-colors",
             isValid && !loading
-              ? "bg-[#E42313] text-white hover:bg-[#c91d0e]"
+              ? "bg-[var(--color-primary)] text-white hover:bg-[#c91d0e]"
               : "bg-[#E8E8E8] text-[#B0B0B0] cursor-not-allowed"
           )}
         >

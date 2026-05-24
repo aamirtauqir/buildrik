@@ -81,14 +81,14 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
           </legend>
           <div className="space-y-2">
             {CANCEL_REASONS.map((r) => (
-              <label key={r.value} className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-[#FAFAFA]" style={{ borderColor: reason === r.value ? "#E42313" : "#E8E8E8" }}>
+              <label key={r.value} className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-[#FAFAFA]" style={{ borderColor: reason === r.value ? "var(--color-primary)" : "#E8E8E8" }}>
                 <input
                   type="radio"
                   name="cancel-reason"
                   value={r.value}
                   checked={reason === r.value}
                   onChange={() => setReason(r.value)}
-                  className="accent-[#E42313]"
+                  className="accent-[var(--color-primary)]"
                 />
                 <span className="text-sm" style={{ color: "#0D0D0D" }}>
                   {r.label}
@@ -111,7 +111,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
             maxLength={500}
             rows={3}
             placeholder="Tell us more..."
-            className="w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[#E42313]"
+            className="w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
             style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
           />
           <div className="mt-1 text-right text-xs" style={{ color: "#B0B0B0" }}>
@@ -123,7 +123,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
           <button
             onClick={onClose}
             className="flex-1 rounded-lg border py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "#E42313", borderColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)", borderColor: "var(--color-primary)" }}
           >
             Keep My Plan
           </button>

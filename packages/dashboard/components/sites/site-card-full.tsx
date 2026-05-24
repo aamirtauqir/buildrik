@@ -36,9 +36,9 @@ function formatVisitors(count: number): string {
 export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFullProps) {
   const statusColor = STATUS_COLORS[site.status] ?? STATUS_COLORS.DRAFT;
   return (
-    <div className={cn("group relative rounded-xl border bg-white transition-shadow hover:shadow-md", selected && "ring-2 ring-[#E42313]")} style={{ borderColor: "#E8E8E8" }}>
+    <div className={cn("group relative rounded-xl border bg-white transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")} style={{ borderColor: "#E8E8E8" }}>
       <div className="absolute left-3 top-3 z-10">
-        <input type="checkbox" checked={selected} onChange={() => {}} className="h-4 w-4 rounded border-gray-300 accent-[#E42313]" onClick={(e) => { e.stopPropagation(); onSelect(site.id, e); }} />
+        <input type="checkbox" checked={selected} onChange={() => {}} className="h-4 w-4 rounded border-gray-300 accent-[var(--color-primary)]" onClick={(e) => { e.stopPropagation(); onSelect(site.id, e); }} />
       </div>
       <Link href={`/dashboard/sites/${site.id}`}>
         <div className="flex h-36 items-center justify-center rounded-t-xl" style={{ backgroundColor: "#F4F4F4" }}>
@@ -60,7 +60,7 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
         </div>
       </Link>
       <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-b-xl bg-white/95 px-4 py-3 opacity-0 transition-opacity group-hover:opacity-100" style={{ borderTop: "1px solid #E8E8E8" }}>
-        <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: "#E42313" }}>
+        <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
           <Pencil className="h-3 w-3" />Edit
         </EditorLink>
         <Link href={`/dashboard/sites/${site.id}`} className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>

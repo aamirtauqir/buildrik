@@ -54,12 +54,12 @@ export default function TermsPage() {
 
           <h2 className="text-xl font-semibold text-slate-900">7. Contact</h2>
           <p>
-            Questions about these terms: <a className="text-[#E42313] underline" href="mailto:legal@buildrik.app">legal@buildrik.app</a>
+            Questions about these terms: <a className="text-[var(--color-primary)] underline" href="mailto:legal@buildrik.app">legal@buildrik.app</a>
           </p>
         </section>
 
         <p className="mt-12 text-sm">
-          <Link href="/auth" className="text-[#E42313] underline">
+          <Link href="/auth" className="text-[var(--color-primary)] underline">
             ← Back to sign in
           </Link>
         </p>

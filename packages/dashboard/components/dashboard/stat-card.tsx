@@ -62,7 +62,7 @@ function Sparkline({ data }: { data: number[] }) {
       <polyline
         points={points}
         fill="none"
-        stroke="#E42313"
+        stroke="var(--color-primary)"
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -107,7 +107,7 @@ function AvatarStack({ avatars }: { avatars: { name: string; avatar: string | nu
 function TrendArrow({ value }: { value: number }) {
   const isPositive = value > 0;
   const isZero = value === 0;
-  const color = isZero ? "#7A7A7A" : isPositive ? "#22C55E" : "#E42313";
+  const color = isZero ? "#7A7A7A" : isPositive ? "#22C55E" : "var(--color-primary)";
   const arrow = isZero ? "" : isPositive ? "\u2191" : "\u2193";
   const sign = isPositive ? "+" : "";
 
@@ -139,7 +139,7 @@ export function StatCard({ title, value, subtitle, href, trend, visual }: StatCa
     <Link
       href={href}
       aria-label={`View ${title} details`}
-      className="block rounded-xl border border-[#E8E8E8] bg-white p-5 hover:border-[#E42313]/30 transition-colors"
+      className="block rounded-xl border border-[#E8E8E8] bg-white p-5 hover:border-[var(--color-primary)]/30 transition-colors"
     >
       <div className="flex items-start justify-between">
         <div className="min-w-0">

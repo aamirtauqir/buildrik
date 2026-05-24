@@ -22,7 +22,7 @@ export function RenameModal({ open, currentName, onClose, onSubmit }: RenameModa
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-4 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8" }} autoFocus />
         <div className="mt-4 flex gap-2 justify-end">
           <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>Cancel</button>
-          <button onClick={() => onSubmit(name)} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>Save</button>
+          <button onClick={() => onSubmit(name)} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Save</button>
         </div>
       </div>
     </div>

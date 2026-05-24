@@ -103,7 +103,7 @@ export function CookieConsent() {
           <button
             onClick={() => saveConsent("manage")}
             className="mt-4 w-full rounded-lg py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Save Preferences
           </button>
@@ -132,7 +132,7 @@ export function CookieConsent() {
           <button
             onClick={() => saveConsent("accept_all")}
             className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Accept All
           </button>

@@ -109,7 +109,7 @@ export function ContextualHelp() {
               href="/dashboard/help"
               onClick={() => setOpen(false)}
               className="flex items-center gap-1.5 text-sm font-medium transition-colors hover:underline"
-              style={{ color: "#E42313" }}
+              style={{ color: "var(--color-primary)" }}
             >
               View Help Center
               <ExternalLink className="h-3.5 w-3.5" />

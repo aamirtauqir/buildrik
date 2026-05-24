@@ -32,7 +32,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       {/* Date range picker */}
       <div className="flex items-center gap-2">
         {DATE_RANGE_OPTIONS.map((opt) => (
-          <button key={opt.value} onClick={() => onRangeChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors" style={{ backgroundColor: range === opt.value ? "#FEF2F2" : "transparent", color: range === opt.value ? "#E42313" : "#7A7A7A" }}>
+          <button key={opt.value} onClick={() => onRangeChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors" style={{ backgroundColor: range === opt.value ? "#FEF2F2" : "transparent", color: range === opt.value ? "var(--color-primary)" : "#7A7A7A" }}>
             {opt.label}
           </button>
         ))}
@@ -63,7 +63,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
                 <div key={m.label} className="rounded-xl border bg-white p-4" style={{ borderColor: "#E8E8E8" }}>
                   <p className="text-xs font-medium" style={{ color: "#7A7A7A" }}>{m.label}</p>
                   <p className="mt-1 text-xl font-bold" style={{ color: "#0D0D0D" }}>{m.value}</p>
-                  {m.change !== undefined && <p className="mt-1 text-xs font-medium" style={{ color: m.change >= 0 ? "#22C55E" : "#E42313" }}>{m.change >= 0 ? "↑" : "↓"} {Math.abs(m.change)}%</p>}
+                  {m.change !== undefined && <p className="mt-1 text-xs font-medium" style={{ color: m.change >= 0 ? "#22C55E" : "var(--color-primary)" }}>{m.change >= 0 ? "↑" : "↓"} {Math.abs(m.change)}%</p>}
                 </div>
               ))}
             </div>
@@ -74,7 +74,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
             <h3 className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Traffic Overview</h3>
             <div className="mt-4 flex h-48 items-end gap-1">
               {data.timeSeries.map((d, i) => (
-                <div key={i} className="flex-1 rounded-t" style={{ height: `${Math.max(10, (d.visitors / Math.max(...data.timeSeries.map((t) => t.visitors), 1)) * 100)}%`, backgroundColor: "#E42313", opacity: 0.7 }} title={`${d.date}: ${d.visitors} visitors`} />
+                <div key={i} className="flex-1 rounded-t" style={{ height: `${Math.max(10, (d.visitors / Math.max(...data.timeSeries.map((t) => t.visitors), 1)) * 100)}%`, backgroundColor: "var(--color-primary)", opacity: 0.7 }} title={`${d.date}: ${d.visitors} visitors`} />
               ))}
             </div>
           </div>

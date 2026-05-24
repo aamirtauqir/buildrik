@@ -81,7 +81,7 @@ function Toggle({
       type="button"
       onClick={() => onChange(!checked)}
       className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-      style={{ backgroundColor: checked ? "#E42313" : "#E8E8E8" }}
+      style={{ backgroundColor: checked ? "var(--color-primary)" : "#E8E8E8" }}
     >
       <span
         className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -422,7 +422,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
                       setExpandedProvider(isExpanded ? null : cfg.provider)
                     }
                     className="text-sm px-3 py-1.5 rounded-md font-medium text-white"
-                    style={{ backgroundColor: "#E42313" }}
+                    style={{ backgroundColor: "var(--color-primary)" }}
                   >
                     Connect
                   </button>
@@ -448,7 +448,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
                       onClick={() => handleConnect(cfg.provider)}
                       disabled={saving}
                       className="text-sm px-4 py-2 rounded-md font-medium text-white disabled:opacity-60"
-                      style={{ backgroundColor: "#E42313" }}
+                      style={{ backgroundColor: "var(--color-primary)" }}
                     >
                       {saving ? "Connecting\u2026" : "Save & connect"}
                     </button>

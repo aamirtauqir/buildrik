@@ -128,7 +128,7 @@ export function NotificationPrefs() {
                   onClick={() => update(pref.category, { inApp: !pref.inApp })}
                   className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    backgroundColor: pref.inApp ? "#E42313" : "#E8E8E8",
+                    backgroundColor: pref.inApp ? "var(--color-primary)" : "#E8E8E8",
                   }}
                   aria-label={`Toggle in-app for ${pref.category}`}
                 >

@@ -62,20 +62,20 @@ export function StepPages({ businessType, suggestedPages, onBack, onGenerate }: 
       {/* Page list */}
       <div className="mt-6 space-y-2">
         {allPages.map((page) => (
-          <label key={page} className="flex items-center gap-3 rounded-lg border px-4 py-2.5 cursor-pointer transition-colors hover:bg-[#FAFAFA]" style={{ borderColor: selectedPages.includes(page) ? "#E42313" : "#E8E8E8" }}>
-            <input type="checkbox" checked={selectedPages.includes(page)} disabled={page === "Home"} onChange={() => togglePage(page)} className="h-4 w-4 rounded accent-[#E42313]" />
+          <label key={page} className="flex items-center gap-3 rounded-lg border px-4 py-2.5 cursor-pointer transition-colors hover:bg-[#FAFAFA]" style={{ borderColor: selectedPages.includes(page) ? "var(--color-primary)" : "#E8E8E8" }}>
+            <input type="checkbox" checked={selectedPages.includes(page)} disabled={page === "Home"} onChange={() => togglePage(page)} className="h-4 w-4 rounded accent-[var(--color-primary)]" />
             <span className="text-sm" style={{ color: "#0D0D0D" }}>{page}</span>
             {page === "Home" && <span className="text-xs" style={{ color: "#B0B0B0" }}>(required)</span>}
           </label>
         ))}
       </div>
-      <p className="mt-2 text-xs" style={{ color: selectedPages.length >= 8 ? "#E42313" : "#7A7A7A" }}>{selectedPages.length}/8 pages selected</p>
+      <p className="mt-2 text-xs" style={{ color: selectedPages.length >= 8 ? "var(--color-primary)" : "#7A7A7A" }}>{selectedPages.length}/8 pages selected</p>
 
       {/* Description */}
       <div className="mt-6">
         <label className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Describe your business (optional)</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} rows={3} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8" }} placeholder="Describe your business (optional)" />
-        <p className="mt-1 text-xs text-right" style={{ color: description.length > 450 ? "#E42313" : "#B0B0B0" }}>{description.length}/500</p>
+        <p className="mt-1 text-xs text-right" style={{ color: description.length > 450 ? "var(--color-primary)" : "#B0B0B0" }}>{description.length}/500</p>
       </div>
 
       {/* Preferences */}
@@ -87,7 +87,7 @@ export function StepPages({ businessType, suggestedPages, onBack, onGenerate }: 
 
       {/* Generate CTA */}
       <div className="mt-8 text-center">
-        <button onClick={() => onGenerate({ pages: selectedPages, description: description || undefined, tone: tone || undefined, content: content || undefined, images: images || undefined })} disabled={selectedPages.length === 0} className="rounded-lg px-8 py-2.5 text-sm font-medium text-white disabled:opacity-50" style={{ backgroundColor: "#E42313" }}>
+        <button onClick={() => onGenerate({ pages: selectedPages, description: description || undefined, tone: tone || undefined, content: content || undefined, images: images || undefined })} disabled={selectedPages.length === 0} className="rounded-lg px-8 py-2.5 text-sm font-medium text-white disabled:opacity-50" style={{ backgroundColor: "var(--color-primary)" }}>
           Generate Site
         </button>
       </div>
@@ -101,7 +101,7 @@ function PreferenceRow({ label, options, value, onChange }: { label: string; opt
       <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{label}</p>
       <div className="mt-1 flex flex-wrap gap-1">
         {options.map((opt) => (
-          <button key={opt.value} onClick={() => onChange(value === opt.value ? "" : opt.value)} className="rounded-full px-3 py-1 text-xs font-medium transition-colors" style={{ backgroundColor: value === opt.value ? "#FEF2F2" : "#F4F4F4", color: value === opt.value ? "#E42313" : "#7A7A7A" }}>
+          <button key={opt.value} onClick={() => onChange(value === opt.value ? "" : opt.value)} className="rounded-full px-3 py-1 text-xs font-medium transition-colors" style={{ backgroundColor: value === opt.value ? "#FEF2F2" : "#F4F4F4", color: value === opt.value ? "var(--color-primary)" : "#7A7A7A" }}>
             {opt.label}
           </button>
         ))}

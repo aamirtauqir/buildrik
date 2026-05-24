@@ -36,7 +36,7 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: Domai
         <h3 className="mb-4 text-sm font-semibold" style={{ color: "#0D0D0D" }}>Connect Domain</h3>
         <div className="flex gap-2">
           <input type="text" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="www.example.com" className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8" }} />
-          <button onClick={() => { onConnect(newDomain); setNewDomain(""); }} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>Connect</button>
+          <button onClick={() => { onConnect(newDomain); setNewDomain(""); }} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Connect</button>
         </div>
         <div className="mt-3">
           <p className="text-xs font-medium mb-1" style={{ color: "#7A7A7A" }}>DNS provider guides:</p>
@@ -103,7 +103,7 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: Domai
                   )}
                 </td>
                 <td className="px-5 py-3">
-                  <button onClick={() => onRemove(d.id)}><Trash2 className="h-4 w-4" style={{ color: "#E42313" }} /></button>
+                  <button onClick={() => onRemove(d.id)}><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
                 </td>
               </tr>
             ))}</tbody>

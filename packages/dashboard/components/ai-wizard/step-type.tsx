@@ -24,7 +24,7 @@ export function StepType({ selected, onSelect, onNext }: StepTypeProps) {
     <div className="mx-auto max-w-[600px]">
       <div className="text-center">
         <div className="inline-flex items-center gap-2">
-          <Sparkles className="h-6 w-6" style={{ color: "#E42313" }} />
+          <Sparkles className="h-6 w-6" style={{ color: "var(--color-primary)" }} />
           <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>What kind of site are you building?</h1>
         </div>
       </div>
@@ -33,9 +33,9 @@ export function StepType({ selected, onSelect, onNext }: StepTypeProps) {
           const Icon = iconMap[type.icon as keyof typeof iconMap];
           const isSelected = selected === type.value;
           return (
-            <button key={type.value} onClick={() => onSelect(type.value)} className={cn("flex items-start gap-3 rounded-xl border p-4 text-left transition-all", isSelected ? "border-[#E42313] bg-red-50/50 ring-1 ring-[#E42313]" : "hover:border-[#D4D4D4]")} style={{ borderColor: isSelected ? "#E42313" : "#E8E8E8" }}>
+            <button key={type.value} onClick={() => onSelect(type.value)} className={cn("flex items-start gap-3 rounded-xl border p-4 text-left transition-all", isSelected ? "border-[var(--color-primary)] bg-red-50/50 ring-1 ring-[var(--color-primary)]" : "hover:border-[#D4D4D4]")} style={{ borderColor: isSelected ? "var(--color-primary)" : "#E8E8E8" }}>
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: isSelected ? "#FEF2F2" : "#F4F4F4" }}>
-                <Icon className="h-5 w-5" style={{ color: isSelected ? "#E42313" : "#7A7A7A" }} />
+                <Icon className="h-5 w-5" style={{ color: isSelected ? "var(--color-primary)" : "#7A7A7A" }} />
               </div>
               <div>
                 <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>{type.label}</p>
@@ -46,7 +46,7 @@ export function StepType({ selected, onSelect, onNext }: StepTypeProps) {
         })}
       </div>
       <div className="mt-8 text-center">
-        <button onClick={onNext} disabled={!selected} className="rounded-lg px-8 py-2.5 text-sm font-medium text-white disabled:opacity-50" style={{ backgroundColor: "#E42313" }}>Next</button>
+        <button onClick={onNext} disabled={!selected} className="rounded-lg px-8 py-2.5 text-sm font-medium text-white disabled:opacity-50" style={{ backgroundColor: "var(--color-primary)" }}>Next</button>
       </div>
     </div>
   );

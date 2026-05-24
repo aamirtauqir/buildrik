@@ -51,7 +51,7 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
       {plan === "FREE" && !customDomain && (
         <div className="mt-4 rounded-xl border p-4 text-left" style={{ borderColor: "#E8E8E8", backgroundColor: "#FAFAFA" }}>
           <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>
-            Your site is live on <span style={{ color: "#E42313" }}>{slug}.buildrik.app</span>
+            Your site is live on <span style={{ color: "var(--color-primary)" }}>{slug}.buildrik.app</span>
           </p>
           <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
             Upgrade to PRO to connect your own domain — your client will never see buildrik.app.
@@ -59,7 +59,7 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
           <Link
             href="/dashboard/billing"
             className="mt-3 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Connect a custom domain
             <ArrowUpRight className="h-3.5 w-3.5" />
@@ -81,7 +81,7 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
         <Link
           href={`/dashboard/sites/${siteId}/sharing`}
           className="flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
-          style={{ backgroundColor: "#E42313" }}
+          style={{ backgroundColor: "var(--color-primary)" }}
         >
           <Share2 className="h-4 w-4" />
           Share with Client

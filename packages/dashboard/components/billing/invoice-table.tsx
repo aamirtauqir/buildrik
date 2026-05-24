@@ -23,7 +23,7 @@ interface InvoiceTableProps {
 
 const STATUS_BADGE: Record<InvoiceStatus, { bg: string; color: string; label: string }> = {
   PAID: { bg: "#F0FDF4", color: "#22C55E", label: "Paid" },
-  FAILED: { bg: "#FEF2F2", color: "#E42313", label: "Failed" },
+  FAILED: { bg: "#FEF2F2", color: "var(--color-primary)", label: "Failed" },
   PENDING: { bg: "#FFFBEB", color: "#F59E0B", label: "Pending" },
   REFUNDED: { bg: "#F3F4F6", color: "#7A7A7A", label: "Refunded" },
 };
@@ -94,7 +94,7 @@ export function InvoiceTable({ invoices, page = 1, totalPages = 1, onPageChange 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs font-medium underline-offset-2 hover:underline"
-                      style={{ color: "#E42313" }}
+                      style={{ color: "var(--color-primary)" }}
                     >
                       PDF
                     </a>

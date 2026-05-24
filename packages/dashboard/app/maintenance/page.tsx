@@ -38,7 +38,7 @@ export default function MaintenancePage() {
             className="h-8 w-8"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#E42313"
+            stroke="var(--color-primary)"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"

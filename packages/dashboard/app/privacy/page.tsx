@@ -48,7 +48,7 @@ export default function PrivacyPage() {
           <p>
             You can access, export, correct, or delete your data from your
             account settings, or by emailing{" "}
-            <a className="text-[#E42313] underline" href="mailto:privacy@buildrik.app">
+            <a className="text-[var(--color-primary)] underline" href="mailto:privacy@buildrik.app">
               privacy@buildrik.app
             </a>
             . EU residents have additional rights under GDPR. California
@@ -63,12 +63,12 @@ export default function PrivacyPage() {
 
           <h2 className="text-xl font-semibold text-slate-900">Contact</h2>
           <p>
-            Data protection inquiries: <a className="text-[#E42313] underline" href="mailto:privacy@buildrik.app">privacy@buildrik.app</a>
+            Data protection inquiries: <a className="text-[var(--color-primary)] underline" href="mailto:privacy@buildrik.app">privacy@buildrik.app</a>
           </p>
         </section>
 
         <p className="mt-12 text-sm">
-          <Link href="/auth" className="text-[#E42313] underline">
+          <Link href="/auth" className="text-[var(--color-primary)] underline">
             ← Back to sign in
           </Link>
         </p>

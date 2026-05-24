@@ -50,11 +50,11 @@ export function TemplateGallery({ open, onClose, templates, isLoading, category,
         {/* Category tabs */}
         <div className="flex items-center gap-1 border-b px-6" style={{ borderColor: "#E8E8E8" }}>
           {TEMPLATE_CATEGORIES.map((cat) => (
-            <button key={cat.value} onClick={() => onCategoryChange(cat.value)} className={cn("px-4 py-2.5 text-sm font-medium transition-colors", category === cat.value ? "border-b-2 border-[#E42313] text-[#E42313]" : "text-[#7A7A7A] hover:text-[#0D0D0D]")}>{cat.label}</button>
+            <button key={cat.value} onClick={() => onCategoryChange(cat.value)} className={cn("px-4 py-2.5 text-sm font-medium transition-colors", category === cat.value ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]" : "text-[#7A7A7A] hover:text-[#0D0D0D]")}>{cat.label}</button>
           ))}
           <div className="ml-auto flex gap-1">
             {TEMPLATE_SORT_OPTIONS.map((opt) => (
-              <button key={opt.value} onClick={() => onSortChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium" style={{ backgroundColor: sort === opt.value ? "#FEF2F2" : "transparent", color: sort === opt.value ? "#E42313" : "#7A7A7A" }}>{opt.label}</button>
+              <button key={opt.value} onClick={() => onSortChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium" style={{ backgroundColor: sort === opt.value ? "#FEF2F2" : "transparent", color: sort === opt.value ? "var(--color-primary)" : "#7A7A7A" }}>{opt.label}</button>
             ))}
           </div>
         </div>

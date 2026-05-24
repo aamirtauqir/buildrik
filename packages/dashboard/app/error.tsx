@@ -21,7 +21,7 @@ export default function GlobalError({
             className="h-8 w-8"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#E42313"
+            stroke="var(--color-primary)"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -31,7 +31,7 @@ export default function GlobalError({
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
         </div>
-        <h1 className="text-4xl font-bold" style={{ color: "#E42313" }}>
+        <h1 className="text-4xl font-bold" style={{ color: "var(--color-primary)" }}>
           500
         </h1>
         <h2
@@ -52,7 +52,7 @@ export default function GlobalError({
           <button
             onClick={reset}
             className="px-4 py-2 rounded-lg text-sm font-medium text-white cursor-pointer"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Try Again
           </button>

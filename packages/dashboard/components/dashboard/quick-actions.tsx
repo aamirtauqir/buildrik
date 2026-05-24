@@ -46,10 +46,10 @@ export function QuickActions({ actions }: QuickActionsProps) {
           <Link
             key={action.label}
             href={action.href}
-            className="flex flex-1 items-center gap-3 rounded-xl border border-[#E8E8E8] bg-white p-4 hover:border-[#E42313]/30 transition-colors"
+            className="flex flex-1 items-center gap-3 rounded-xl border border-[#E8E8E8] bg-white p-4 hover:border-[var(--color-primary)]/30 transition-colors"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50">
-              <Icon className="h-4 w-4 text-[#E42313]" />
+              <Icon className="h-4 w-4 text-[var(--color-primary)]" />
             </span>
             <div>
               <p className="text-sm font-medium text-[#0D0D0D]">{action.label}</p>

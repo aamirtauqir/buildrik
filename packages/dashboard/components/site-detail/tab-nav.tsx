@@ -43,7 +43,7 @@ export function TabNav({ siteId }: { siteId: string }) {
               <li key={tab.segment} className="shrink-0">
                 <Link href={href} className={cn(
                   "inline-block px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap",
-                  isActive ? "border-b-2 border-[#E42313] text-[#E42313]" : "text-[#7A7A7A] hover:text-[#0D0D0D]"
+                  isActive ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]" : "text-[#7A7A7A] hover:text-[#0D0D0D]"
                 )}>{tab.label}</Link>
               </li>
             );

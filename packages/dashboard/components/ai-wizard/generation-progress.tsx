@@ -122,7 +122,7 @@ export function GenerationProgress({
       <div className="h-2 rounded-full" style={{ backgroundColor: "#F4F4F4" }}>
         <div
           className="h-2 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%`, backgroundColor: isFailed ? "#E42313" : "#22C55E" }}
+          style={{ width: `${progress}%`, backgroundColor: isFailed ? "var(--color-primary)" : "#22C55E" }}
         />
       </div>
       <p className="mt-2 text-sm font-medium" style={{ color: "#0D0D0D" }}>
@@ -141,7 +141,7 @@ export function GenerationProgress({
                 <CheckCircle className="h-5 w-5 shrink-0" style={{ color: "#22C55E" }} />
               )}
               {stepStatus === "in_progress" && (
-                <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "#E42313" }} />
+                <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "var(--color-primary)" }} />
               )}
               {stepStatus === "pending" && (
                 <div
@@ -150,7 +150,7 @@ export function GenerationProgress({
                 />
               )}
               {stepStatus === "failed" && (
-                <XCircle className="h-5 w-5 shrink-0" style={{ color: "#E42313" }} />
+                <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
               )}
               <span
                 className="text-sm"
@@ -174,7 +174,7 @@ export function GenerationProgress({
               <button
                 onClick={onRetry}
                 className="rounded-lg px-4 py-1.5 text-sm font-medium text-white"
-                style={{ backgroundColor: "#E42313" }}
+                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 Retry
               </button>
@@ -210,7 +210,7 @@ export function GenerationProgress({
           <button
             onClick={() => onViewSite(siteId)}
             className="mt-3 rounded-lg px-6 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Open in Editor
           </button>
@@ -249,7 +249,7 @@ export function GenerationProgress({
               <button
                 onClick={handleConfirmCancel}
                 className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-                style={{ backgroundColor: "#E42313" }}
+                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 Cancel Generation
               </button>
@@ -276,7 +276,7 @@ export function GenerationProgress({
                     onUpgrade();
                   }}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-                  style={{ backgroundColor: "#E42313" }}
+                  style={{ backgroundColor: "var(--color-primary)" }}
                 >
                   Upgrade Plan
                 </button>

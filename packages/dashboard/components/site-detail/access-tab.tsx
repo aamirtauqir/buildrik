@@ -104,7 +104,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
       <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Share Links</h3>
-          <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}><Plus className="h-3 w-3" />New Link</button>
+          <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}><Plus className="h-3 w-3" />New Link</button>
         </div>
         {showCreate && (
           <div className="mb-4 rounded-lg border p-4 space-y-3" style={{ borderColor: "#E8E8E8" }}>
@@ -133,8 +133,8 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                       onClick={() => setLinkExpiry(selected ? "" : String(opt.days))}
                       className="rounded-md border px-2 py-1 text-xs disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{
-                        borderColor: selected ? "#E42313" : "#E8E8E8",
-                        color: selected ? "#E42313" : "#7A7A7A",
+                        borderColor: selected ? "var(--color-primary)" : "#E8E8E8",
+                        color: selected ? "var(--color-primary)" : "#7A7A7A",
                         backgroundColor: selected ? "#FEF2F2" : "transparent",
                       }}
                     >
@@ -144,7 +144,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                 })}
               </div>
             </div>
-            <button onClick={handleCreate} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>Create Link</button>
+            <button onClick={handleCreate} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Create Link</button>
           </div>
         )}
         {shareLinks.length === 0 ? (
@@ -168,7 +168,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                     <div className="flex items-center gap-1">
                       <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[#F4F4F4]" title="QR Code"><QrCode className="h-4 w-4" style={{ color: "#7A7A7A" }} /></button>
                       <button onClick={() => navigator.clipboard.writeText(shareUrl)} className="rounded p-1.5 hover:bg-[#F4F4F4]" title="Copy link"><Copy className="h-4 w-4" style={{ color: "#7A7A7A" }} /></button>
-                      <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[#F4F4F4]" title="Revoke"><Trash2 className="h-4 w-4" style={{ color: "#E42313" }} /></button>
+                      <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[#F4F4F4]" title="Revoke"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
                     </div>
                   </div>
                   {showQr === link.id && (

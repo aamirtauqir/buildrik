@@ -92,7 +92,7 @@ export function AICreditsTab({
             className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white ${
               remaining === 0 ? "pointer-events-none opacity-50" : ""
             }`}
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
             aria-disabled={remaining === 0}
           >
             Generate New Site
@@ -162,7 +162,7 @@ export function AICreditsTab({
                         <Link
                           href={`/dashboard/sites/${record.siteId}`}
                           className="text-sm font-medium"
-                          style={{ color: "#E42313" }}
+                          style={{ color: "var(--color-primary)" }}
                         >
                           View site
                         </Link>

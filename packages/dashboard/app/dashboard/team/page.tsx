@@ -114,7 +114,7 @@ export default function TeamPage() {
         <button
           onClick={() => setInviteOpen(true)}
           className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: "#E42313" }}
+          style={{ backgroundColor: "var(--color-primary)" }}
         >
           <UserPlus className="h-4 w-4" />
           Invite Member
@@ -161,7 +161,7 @@ export default function TeamPage() {
               <div className="space-y-3">
                 {activityQuery.data.map((entry) => (
                   <div key={entry.id} className="flex items-start gap-2">
-                    <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "#E42313" }} />
+                    <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "var(--color-primary)" }} />
                     <div>
                       <p className="text-sm" style={{ color: "#0D0D0D" }}>
                         {entry.actorName && (

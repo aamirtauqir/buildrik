@@ -46,7 +46,7 @@ export function PlanCard({
     <div
       className={cn(
         "rounded-2xl border bg-white p-6",
-        isCurrent ? "border-[#E42313]" : "border-[#E8E8E8]"
+        isCurrent ? "border-[var(--color-primary)]" : "border-[#E8E8E8]"
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -60,7 +60,7 @@ export function PlanCard({
           {isCurrent && (
             <span
               className="rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{ backgroundColor: "#FEF2F2", color: "#E42313" }}
+              style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}
             >
               Current Plan
             </span>
@@ -95,7 +95,7 @@ export function PlanCard({
         <button
           onClick={onChangePlan}
           className="mt-6 w-full rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "#E42313" }}
+          style={{ backgroundColor: "var(--color-primary)" }}
         >
           Change Plan
         </button>
@@ -103,7 +103,7 @@ export function PlanCard({
       {isCurrent && (
         <div
           className="mt-6 w-full rounded-lg py-2.5 text-center text-sm font-semibold"
-          style={{ backgroundColor: "#FEF2F2", color: "#E42313" }}
+          style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}
         >
           Active
         </div>

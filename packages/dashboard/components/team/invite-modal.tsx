@@ -108,18 +108,18 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
               onChange={(e) => setEmailsRaw(e.target.value)}
               placeholder={"alice@example.com\nbob@example.com"}
               className={cn(
-                "w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors focus:border-[#E42313]",
-                tooMany || hasInvalid ? "border-[#E42313]" : "border-[#E8E8E8]"
+                "w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--color-primary)]",
+                tooMany || hasInvalid ? "border-[var(--color-primary)]" : "border-[#E8E8E8]"
               )}
               style={{ color: "#0D0D0D" }}
             />
             {tooMany && (
-              <p className="mt-1 text-xs" style={{ color: "#E42313" }}>
+              <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>
                 Maximum 10 emails allowed. You have {validCount}.
               </p>
             )}
             {hasInvalid && !tooMany && (
-              <p className="mt-1 text-xs" style={{ color: "#E42313" }}>
+              <p className="mt-1 text-xs" style={{ color: "var(--color-primary)" }}>
                 Invalid: {invalidEmails.join(", ")}
               </p>
             )}
@@ -136,7 +136,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                   key={opt.value}
                   className={cn(
                     "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
-                    role === opt.value ? "border-[#E42313] bg-red-50" : "border-[#E8E8E8] hover:bg-[#F4F4F4]"
+                    role === opt.value ? "border-[var(--color-primary)] bg-red-50" : "border-[#E8E8E8] hover:bg-[#F4F4F4]"
                   )}
                 >
                   <input
@@ -145,7 +145,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                     value={opt.value}
                     checked={role === opt.value}
                     onChange={() => setRole(opt.value)}
-                    className="mt-0.5 accent-[#E42313]"
+                    className="mt-0.5 accent-[var(--color-primary)]"
                   />
                   <div>
                     <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>
@@ -172,7 +172,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                 className={cn(
                   "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
                   accessMode === "all"
-                    ? "border-[#E42313] bg-red-50 text-[#E42313]"
+                    ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]"
                     : "border-[#E8E8E8] hover:bg-[#F4F4F4]"
                 )}
                 style={accessMode !== "all" ? { color: "#0D0D0D" } : undefined}
@@ -185,7 +185,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                 className={cn(
                   "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
                   accessMode === "specific"
-                    ? "border-[#E42313] bg-red-50 text-[#E42313]"
+                    ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]"
                     : "border-[#E8E8E8] hover:bg-[#F4F4F4]"
                 )}
                 style={accessMode !== "specific" ? { color: "#0D0D0D" } : undefined}
@@ -211,7 +211,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                       type="checkbox"
                       checked={selectedSiteIds.has(site.id)}
                       onChange={() => toggleSite(site.id)}
-                      className="accent-[#E42313]"
+                      className="accent-[var(--color-primary)]"
                     />
                     <span className="text-sm" style={{ color: "#0D0D0D" }}>{site.name}</span>
                   </label>
@@ -234,7 +234,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
               onChange={(e) => setMessage(e.target.value)}
               maxLength={500}
               placeholder="Add a note to your invitation..."
-              className="w-full resize-none rounded-lg border border-[#E8E8E8] px-3 py-2.5 text-sm outline-none transition-colors focus:border-[#E42313]"
+              className="w-full resize-none rounded-lg border border-[#E8E8E8] px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
               style={{ color: "#0D0D0D" }}
             />
           </div>
@@ -253,7 +253,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
               type="submit"
               disabled={validCount === 0 || tooMany || hasInvalid || isLoading}
               className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               {isLoading
                 ? "Sending..."

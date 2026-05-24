@@ -55,9 +55,9 @@ export function ContextMenu({ siteStatus, onAction }: ContextMenuProps) {
                     disabled={isDisabled}
                     onClick={() => { onAction(item.action); setOpen(false); }}
                     className="flex w-full items-center gap-2.5 px-3 py-1.5 text-sm transition-colors hover:bg-[#F4F4F4] disabled:cursor-not-allowed disabled:opacity-40"
-                    style={{ color: isDestructive ? "#E42313" : "#0D0D0D" }}
+                    style={{ color: isDestructive ? "var(--color-primary)" : "#0D0D0D" }}
                   >
-                    <Icon className="h-4 w-4" style={{ color: isDestructive ? "#E42313" : "#7A7A7A" }} />{item.label}
+                    <Icon className="h-4 w-4" style={{ color: isDestructive ? "var(--color-primary)" : "#7A7A7A" }} />{item.label}
                   </button>
                   {isDisabled && (
                     <div className="pointer-events-none absolute bottom-full left-1/2 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md px-2 py-1 text-xs text-white group-hover:block" style={{ backgroundColor: "#0D0D0D" }}>

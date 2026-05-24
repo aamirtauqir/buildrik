@@ -80,7 +80,7 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
             <button
               type="submit"
               className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1 text-xs font-medium text-white"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               Search
             </button>
@@ -97,10 +97,10 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
             return (
               <div
                 key={cat.key}
-                className="flex cursor-pointer flex-col gap-2 rounded-xl border p-4 transition-colors hover:border-[#E42313]/30 hover:bg-[#FFF5F4]"
+                className="flex cursor-pointer flex-col gap-2 rounded-xl border p-4 transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
                 style={{ borderColor: "#E8E8E8" }}
               >
-                {Icon && <Icon className="h-5 w-5" style={{ color: "#E42313" }} />}
+                {Icon && <Icon className="h-5 w-5" style={{ color: "var(--color-primary)" }} />}
                 <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{cat.label}</p>
                 <p className="text-xs" style={{ color: "#7A7A7A" }}>Coming soon</p>
               </div>
@@ -115,11 +115,11 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <button
             onClick={onContactLiveChat}
-            className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[#E42313]/30 hover:bg-[#FFF5F4]"
+            className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
             style={{ borderColor: "#E8E8E8" }}
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
-              <MessageCircle className="h-5 w-5" style={{ color: "#E42313" }} />
+              <MessageCircle className="h-5 w-5" style={{ color: "var(--color-primary)" }} />
             </div>
             <div>
               <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Live Chat</p>
@@ -128,11 +128,11 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
           </button>
           <button
             onClick={onContactEmail}
-            className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[#E42313]/30 hover:bg-[#FFF5F4]"
+            className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
             style={{ borderColor: "#E8E8E8" }}
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
-              <Mail className="h-5 w-5" style={{ color: "#E42313" }} />
+              <Mail className="h-5 w-5" style={{ color: "var(--color-primary)" }} />
             </div>
             <div>
               <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Email Support</p>

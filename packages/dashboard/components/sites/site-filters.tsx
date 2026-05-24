@@ -99,7 +99,7 @@ export function SiteFilters({
           {sortOpen && (
             <div className="absolute right-0 top-full z-10 mt-1 w-44 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "#E8E8E8" }}>
               {SORT_OPTIONS.map((opt) => (
-                <button key={opt.value} onClick={() => { onSortChange(opt.value); setSortOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: sort === opt.value ? "#E42313" : "#0D0D0D" }}>
+                <button key={opt.value} onClick={() => { onSortChange(opt.value); setSortOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: sort === opt.value ? "var(--color-primary)" : "#0D0D0D" }}>
                   {opt.label}
                 </button>
               ))}
@@ -109,7 +109,7 @@ export function SiteFilters({
         {/* Advanced filters toggle */}
         <button
           onClick={() => setAdvancedOpen(!advancedOpen)}
-          className={cn("flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors", hasAdvancedFilters && "border-[#E42313] text-[#E42313]")}
+          className={cn("flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors", hasAdvancedFilters && "border-[var(--color-primary)] text-[var(--color-primary)]")}
           style={hasAdvancedFilters ? undefined : { borderColor: "#E8E8E8", color: "#7A7A7A" }}
         >
           Filters
@@ -128,11 +128,11 @@ export function SiteFilters({
             </button>
             {createdByOpen && (
               <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "#E8E8E8" }}>
-                <button onClick={() => { onCreatedByChange(undefined); setCreatedByOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: !createdBy ? "#E42313" : "#0D0D0D" }}>
+                <button onClick={() => { onCreatedByChange(undefined); setCreatedByOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: !createdBy ? "var(--color-primary)" : "#0D0D0D" }}>
                   All members
                 </button>
                 {members.map((m: { userId: string; fullName: string; email: string }) => (
-                  <button key={m.userId} onClick={() => { onCreatedByChange(m.userId); setCreatedByOpen(false); }} className="block w-full truncate px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: createdBy === m.userId ? "#E42313" : "#0D0D0D" }}>
+                  <button key={m.userId} onClick={() => { onCreatedByChange(m.userId); setCreatedByOpen(false); }} className="block w-full truncate px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: createdBy === m.userId ? "var(--color-primary)" : "#0D0D0D" }}>
                     {m.fullName || m.email}
                   </button>
                 ))}
@@ -157,11 +157,11 @@ export function SiteFilters({
             </button>
             {templateOpen && (
               <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "#E8E8E8" }}>
-                <button onClick={() => { onTemplateUsedChange(undefined); setTemplateOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: !templateUsed ? "#E42313" : "#0D0D0D" }}>
+                <button onClick={() => { onTemplateUsedChange(undefined); setTemplateOpen(false); }} className="block w-full px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: !templateUsed ? "var(--color-primary)" : "#0D0D0D" }}>
                   All templates
                 </button>
                 {templates.map((t: { id: string; name: string }) => (
-                  <button key={t.id} onClick={() => { onTemplateUsedChange(t.id); setTemplateOpen(false); }} className="block w-full truncate px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: templateUsed === t.id ? "#E42313" : "#0D0D0D" }}>
+                  <button key={t.id} onClick={() => { onTemplateUsedChange(t.id); setTemplateOpen(false); }} className="block w-full truncate px-3 py-1.5 text-left text-xs hover:bg-[#F4F4F4]" style={{ color: templateUsed === t.id ? "var(--color-primary)" : "#0D0D0D" }}>
                     {t.name}
                   </button>
                 ))}
@@ -180,7 +180,7 @@ export function SiteFilters({
             style={{ borderColor: hasCustomDomain !== undefined ? "#0D0D0D" : "#E8E8E8", color: hasCustomDomain !== undefined ? "#0D0D0D" : "#7A7A7A" }}
           >
             {hasCustomDomain !== undefined ? (
-              <ToggleRight className="h-4 w-4" style={{ color: hasCustomDomain ? "#22C55E" : "#E42313" }} />
+              <ToggleRight className="h-4 w-4" style={{ color: hasCustomDomain ? "#22C55E" : "var(--color-primary)" }} />
             ) : (
               <ToggleLeft className="h-4 w-4" />
             )}
@@ -207,7 +207,7 @@ export function SiteFilters({
                 onHasTrafficChange(undefined);
               }}
               className="text-xs font-medium underline"
-              style={{ color: "#E42313" }}
+              style={{ color: "var(--color-primary)" }}
             >
               Clear all
             </button>

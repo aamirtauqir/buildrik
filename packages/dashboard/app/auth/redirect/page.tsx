@@ -23,7 +23,7 @@ export default function AuthRedirectPage() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-white">
       <div className="text-center">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#E42313] border-t-transparent" />
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
         <p className="mt-4 text-sm" style={{ color: "#7A7A7A" }}>Signing you in...</p>
       </div>
     </div>

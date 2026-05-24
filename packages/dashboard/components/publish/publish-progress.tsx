@@ -66,7 +66,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
       {isFailed && (
         <div className="rounded-xl border p-4" style={{ borderColor: "#FCA5A5", backgroundColor: "#FEF2F2" }}>
           <div className="flex items-start gap-3">
-            <XCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "#E42313" }} />
+            <XCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
             <div className="flex-1">
               <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>Publish failed</p>
               <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
@@ -75,7 +75,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
               <button
                 onClick={handleRetry}
                 className="mt-3 flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-white"
-                style={{ backgroundColor: "#E42313" }}
+                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 <RotateCcw className="h-4 w-4" />
                 Retry
@@ -95,7 +95,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
           <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ backgroundColor: "#F4F4F4" }}>
             <div
               className="h-2 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%`, backgroundColor: "#E42313" }}
+              style={{ width: `${progress}%`, backgroundColor: "var(--color-primary)" }}
             />
           </div>
         </div>
@@ -113,15 +113,15 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
                   {isDone ? (
                     <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "#22C55E" }} />
                   ) : isActive ? (
-                    <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "#E42313" }} />
+                    <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "var(--color-primary)" }} />
                   ) : isFail ? (
-                    <XCircle className="h-5 w-5 shrink-0" style={{ color: "#E42313" }} />
+                    <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
                   ) : (
                     <Circle className="h-5 w-5 shrink-0" style={{ color: "#D4D4D4" }} />
                   )}
                   <span
                     className="text-sm font-medium"
-                    style={{ color: isDone ? "#22C55E" : isActive ? "#0D0D0D" : isFail ? "#E42313" : "#B0B0B0" }}
+                    style={{ color: isDone ? "#22C55E" : isActive ? "#0D0D0D" : isFail ? "var(--color-primary)" : "#B0B0B0" }}
                   >
                     {step.name}
                   </span>
@@ -137,7 +137,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
                   {isStepCompleted ? (
                     <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "#22C55E" }} />
                   ) : isCurrent ? (
-                    <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "#E42313" }} />
+                    <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "var(--color-primary)" }} />
                   ) : (
                     <Circle className="h-5 w-5 shrink-0" style={{ color: "#D4D4D4" }} />
                   )}
@@ -162,7 +162,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
                 onClick={handleCancelPublish}
                 disabled={cancelMutation.isPending}
                 className="rounded-lg px-3 py-1 text-sm font-medium text-white"
-                style={{ backgroundColor: "#E42313" }}
+                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {cancelMutation.isPending ? "Cancelling..." : "Yes, cancel"}
               </button>

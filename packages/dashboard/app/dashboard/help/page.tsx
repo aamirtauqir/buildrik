@@ -73,7 +73,7 @@ export default function HelpPage() {
         <button
           onClick={() => setView("home")}
           className="mt-6 text-sm transition-colors hover:underline"
-          style={{ color: "#E42313" }}
+          style={{ color: "var(--color-primary)" }}
         >
           Back to Help Center
         </button>
@@ -88,7 +88,7 @@ export default function HelpPage() {
         <button
           onClick={() => setView("ticket")}
           className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[#FFF5F4]"
-          style={{ borderColor: "#E8E8E8", color: "#E42313" }}
+          style={{ borderColor: "#E8E8E8", color: "var(--color-primary)" }}
         >
           Submit a Ticket
         </button>

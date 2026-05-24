@@ -326,7 +326,7 @@ export default function SitesPage() {
           <button
             onClick={() => setCreateOpen(true)}
             className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             <Plus className="h-4 w-4" />
             New Site
@@ -425,7 +425,7 @@ export default function SitesPage() {
           <button
             onClick={() => setCreateOpen(true)}
             className="mt-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "#E42313" }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             <Plus className="h-4 w-4" />
             Create Site
@@ -556,7 +556,7 @@ export default function SitesPage() {
               }}
               placeholder="Folder name"
               autoFocus
-              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[#E42313]"
+              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
               style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
             />
             <div className="mt-6 flex gap-3">
@@ -573,7 +573,7 @@ export default function SitesPage() {
                 }}
                 disabled={!newFolderName.trim() || createFolderMutation.isPending}
                 className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: "#E42313" }}
+                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {createFolderMutation.isPending ? "Creating..." : "Create Folder"}
               </button>

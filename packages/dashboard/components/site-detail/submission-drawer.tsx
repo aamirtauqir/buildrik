@@ -193,7 +193,7 @@ export function SubmissionDrawer({
             <button
               onClick={() => onDelete(submission.id)}
               className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90"
-              style={{ backgroundColor: "#E42313" }}
+              style={{ backgroundColor: "var(--color-primary)" }}
             >
               <Trash2 className="h-4 w-4" />
               Delete Submission
@@ -238,7 +238,7 @@ function ToggleRow({
       <button
         onClick={() => onChange(!checked)}
         className="relative h-5 w-9 rounded-full transition-colors"
-        style={{ backgroundColor: checked ? "#E42313" : "#E8E8E8" }}
+        style={{ backgroundColor: checked ? "var(--color-primary)" : "#E8E8E8" }}
         role="switch"
         aria-checked={checked}
       >

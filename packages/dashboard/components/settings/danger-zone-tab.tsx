@@ -136,7 +136,7 @@ export function DangerZoneTab({
                     <a
                       href={exp.downloadUrl}
                       className="text-sm font-medium"
-                      style={{ color: "#E42313" }}
+                      style={{ color: "var(--color-primary)" }}
                     >
                       Download
                     </a>

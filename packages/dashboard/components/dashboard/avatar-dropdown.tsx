@@ -57,7 +57,7 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
         disabled={loading}
         className={loading
           ? "h-9 w-9 animate-pulse rounded-full bg-[#F4F4F4]"
-          : "flex h-9 w-9 items-center justify-center rounded-full bg-[#E42313] text-sm font-bold text-white"
+          : "flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-bold text-white"
         }
       >
         {!loading && initials}

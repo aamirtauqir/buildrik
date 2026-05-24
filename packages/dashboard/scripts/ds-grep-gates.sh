@@ -124,5 +124,31 @@ if ! grep -qE "^@theme" packages/dashboard/app/globals.css 2>/dev/null; then
 fi
 pass "D6: @theme block present in globals.css"
 
+# ─────────────────────────────────────────────────────────────
+# Gate D7 — Zero-tolerance for hardcoded #E42313 in tsx/ts chrome.
+# Brand red must reference `var(--color-primary)` or Tailwind `text-primary` /
+# `bg-primary` classes, never hardcoded hex. Codemod ran 2026-05-24, baseline
+# locked at 0 — every consumer routes through the token now.
+# globals.css excepted (canonical token definition).
+# emails/ excepted (email clients have no CSS-var support).
+# ─────────────────────────────────────────────────────────────
+D7_HITS=$(grep -rEn "#E42313" packages/dashboard \
+  --include="*.tsx" --include="*.ts" 2>/dev/null \
+  | grep -v "/node_modules/" \
+  | grep -v "/.next/" \
+  | grep -v "/emails/" \
+  | wc -l | tr -d ' ')
+if [ "$D7_HITS" -gt 0 ]; then
+  echo "GATE FAIL: D7 — $D7_HITS hardcoded #E42313 in dashboard chrome tsx/ts (use var(--color-primary) or text-primary/bg-primary)"
+  grep -rEn "#E42313" packages/dashboard \
+    --include="*.tsx" --include="*.ts" 2>/dev/null \
+    | grep -v "/node_modules/" \
+    | grep -v "/.next/" \
+    | grep -v "/emails/" \
+    | head -5
+  exit 1
+fi
+pass "D7: no hardcoded #E42313 in dashboard chrome tsx/ts (emails + globals.css exempt)"
+
 echo
-echo "=== Dashboard DS gates: 6 passed ==="
+echo "=== Dashboard DS gates: 7 passed ==="
