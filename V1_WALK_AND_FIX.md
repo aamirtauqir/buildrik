@@ -6,7 +6,7 @@
 ## Locked walk script
 
 ```
-1. dashboard login: qa@buildrik.local / qa-test-1234 (seeded via prisma/seed.ts)
+1. dashboard login: qa@buildrik.local / walktest123 (seed default was qa-test-1234; Iter 18 reset via psql + bcrypt, Iter 19 reconfirmed)
 2. dashboard → create site "test-site-N" (N = iteration number)
 3. click "Open in editor"
 4. editor: add Section → add Heading → add Image (from media tab) → add Button → save
@@ -781,3 +781,124 @@ system-ui drop, `c98c3ac1` #E42313 codemod + D7, `0063ad6b` palette codemod
 - **3 false-positive P1s + 3 new false positives retracted** all via DESIGN.md
   / code-read (totals: 6 retracts across 2 sessions).
 - **5 methodology memories** saved.
+
+## Iteration 19 — publish-can't-go-live arc — 2026-05-24
+
+**Goal:** Real-user QA via `/qa` skill. User reported editor blocked from going
+live. Walk all 7 steps end-to-end, curl the deployed URL to verify it actually
+serves the published canvas (Iters 5/18 only confirmed job COMPLETED, not body).
+
+### Walk results
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1. Login `qa@buildrik.local` | ✅ (env fix needed) | See P0-19a |
+| 2. Create blank site | ✅ | `cmpjvkag3000augbc63zgdnee` (test-site-qa1) |
+| 3. Open editor | ✅ | canvas + topbar clean, no recovery screen |
+| 4. Add Section/Heading/Button/Image | ✅ | 4 user elements + section container = 5 added nodes |
+| 5. Save | ✅ | 4 × `saveProject → 200`, "Saved · just now" green |
+| 6. Publish | 🔴→✅ | See P0-19b + P0-19c |
+| 7. Persistence | ✅ | reload → canvas re-hydrated all 6 nodes |
+
+### Dev-env config drift (not a code bug, but blocked Step 1)
+
+`.env.local` had `AUTH_URL`, `NEXTAUTH_URL`, `NEXT_PUBLIC_APP_URL`,
+`VITE_DASHBOARD_URL` all pointing to `localhost:3001`. Dashboard runs on `:3000`
+(next dev default). CSRF Origin pin at `app/api/trpc/[trpc]/route.ts:21-26`
+allowlist = `[:5050, :3001]`, browser POSTs from `:3000` → 403. Exact repro of
+Iter 1's bug class, regression introduced by a prior session's port-conflict
+workaround that was never reverted (the comment `"walk session 2026-05-24 —
+:3000 held by ranklar-new"` confirms intent).
+
+Fix: aligned all 4 vars back to `:3000` in `.env.local` (gitignored, no commit).
+Restarted dashboard. checkEmail/login chain green.
+
+### P0-19a (real source bug): editor published empty `<div></div>`
+
+**Symptom**: every Vercel deploy succeeded (`status: COMPLETED`, deploymentId
+present) but the live URL served `<body><div></div></body>` regardless of what
+was on the canvas. Why we'd missed it: Iter 5 used the simulation path; Iter 18
+verified job COMPLETED + deploymentId but never curled the deployed URL body.
+
+Root cause: `ExportEngine.exportAllPages` at line 360 used
+`composer.elements.getAllPages()` which returns the raw `ctx.pages` Map values.
+Click-to-add and drag-and-drop only mutate the Element instance tree, not the
+`PageData.root` JSON snapshot in that Map. Canvas renders correctly because
+`HTMLParser.toHTML` rebuilds root via `rootElement.toJSON()`. Publish never did.
+
+Fix (`34807811`): prefer `PageManager.exportPages()` which already rebuilds
+root via `Element.toJSON()` per page. Fallback to `getAllPages()` preserved for
+older composer builds + existing test mocks.
+
+Regression test:
+`packages/editor/src/engine/export/__tests__/ExportEngine.multiPage.regression.test.ts`
+— 3 cases lock the contract.
+
+### P0-19b (real source bug): saved publishedUrl was Vercel-SSO-gated
+
+**Symptom**: After P0-19a fix, deployed body had elements ✓, but the URL stored
+in `sites.publishedUrl` returned `HTTP 401 Authentication Required`. End users
+hitting it got Vercel's SSO login wall.
+
+Root cause: Vercel's `/v13/deployments` POST returns:
+- `url`: deployment-specific URL `<project>-<hash>-<team>.vercel.app` (gated by
+  Vercel deployment protection on Pro+ team scope)
+- `alias`: array of production aliases. Shortest entry is canonical
+  `<project>.vercel.app` (always public for production deploys)
+
+We were saving `https://${ready.url}` — the deploy URL. Empirical check:
+`https://buildrik-site-test-site-qa1-771qmbefh-shah8.vercel.app` → 401 SSO;
+`https://buildrik-site-test-site-qa1.vercel.app` → 200 public.
+
+Fix (`5d2e127d`): added `pickPublicUrl(d, projectNameFallback?)` to
+`lib/vercel.ts`. Prefers shortest alias, falls back to
+`${projectName}.vercel.app` when alias propagation lags (1-3s after
+readyState=READY for fresh deploys), and only as last resort returns the deploy
+URL. Wired into `runVercelDeploy` with `projectName` from
+`slugifyProjectName(site.slug)`.
+
+Verified end-to-end: republished test-site-qa1 → `publishedUrl` now
+`https://buildrik-site-test-site-qa1.vercel.app` (HTTP 200, body has H2 +
+Button + Section + IMG).
+
+### Why this pair only surfaced now
+
+Iter 5 used the simulation path (no `VERCEL_TOKEN`), bypassing real export +
+real deploy entirely. Iter 18 used real Vercel for the first time but verified
+only `status: COMPLETED` + deploymentId existence — never curled the URL or
+inspected body. /qa skill protocol always curls the deployed URL, which is what
+caught both. Loop-quality lesson: "publish succeeded" is not the same as
+"site is live and shows what the user built."
+
+### Memory cross-refs
+
+- `feedback_audit_by_file_presence_unreliable.md` — code review reads doc,
+  live-verify catches; both Iter 19 bugs evaded prior QA because no one
+  curled the deployed URL.
+- `feedback_tool_artifact_vs_product_bug.md` — this iter's bugs were the
+  opposite: real product bugs that LOOKED like environment issues until the
+  URL body got inspected.
+
+### Iter 19 commits
+
+- `34807811` ExportEngine fresh-tree contract + 3-case regression test
+- `5d2e127d` Vercel canonical URL preference + 5-case regression test
+
+### Walk-and-fix loop tally (updated)
+
+- **30 total commits** to main since loop start (28 + 2 this iter).
+- **7 P0/P1 fixes shipped + tested** (prior 5 + P0-19a + P0-19b).
+- **8+ walk-pass verifications** (Iter 19 first that curl'd the deployed URL).
+- **6 methodology memories** saved.
+
+### Minor observations (deferred to V1_POST_DEFERRED if a list exists)
+
+- **P2 doc-drift**: walk script's password (`qa-test-1234`) was stale since
+  Iter 18 reset to `walktest123`. Patched the locked walk script header.
+- **P2 console**: editor init emits
+  `[StyleEngine.importStyles] dropped 18 malformed rule(s)`. Likely stale
+  starter styles in seed/template data. Not blocking — no broken UI.
+- **P2 environment**: claude-in-chrome extension UI bleeds into browse
+  snapshots (MCP/Webhooks panel as `@e11+` refs). Same Iter 1 caveat. Run in
+  extension-free profile for cleaner snapshots.
+
