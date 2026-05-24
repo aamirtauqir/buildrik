@@ -10,6 +10,10 @@ export default defineConfig({
     // matchMedia, scrollIntoView) used by Radix / cmdk component tests.
     // Without this, ~10% of the suite blows up with "Invalid Chai property".
     setupFiles: [path.resolve(__dirname, "packages/editor/src/test-setup.ts")],
+    // Editor's vitest.config sets 15s. Some DesignSystemTab / SettingsTab
+    // section-switch tests genuinely take 5-8s due to IndexedDB seed + 14
+    // accordion mounts. Default 5s timed them out spuriously.
+    testTimeout: 15000,
     include: [
       "__tests__/**/*.test.{ts,tsx}",
       "lib/**/*.test.{ts,tsx}",

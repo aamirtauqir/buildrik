@@ -17,11 +17,13 @@ describe("Dashboard Components", () => {
   });
 
   describe("AvatarDropdown", () => {
-    it("exports AVATAR_MENU_ITEMS with 5 items", async () => {
+    // Profile entry removed — Settings doubles as the profile page.
+    // Update + alignment confirmed against the canonical export.
+    it("exports AVATAR_MENU_ITEMS with 4 items (no separate Profile entry)", async () => {
       const mod = await import("@/components/dashboard/avatar-dropdown");
-      expect(mod.AVATAR_MENU_ITEMS).toHaveLength(5);
+      expect(mod.AVATAR_MENU_ITEMS).toHaveLength(4);
       const labels = mod.AVATAR_MENU_ITEMS.map((i: { label: string }) => i.label);
-      expect(labels).toEqual(["Profile", "Settings", "Billing", "Help", "Logout"]);
+      expect(labels).toEqual(["Settings", "Billing", "Help", "Logout"]);
     });
   });
 
