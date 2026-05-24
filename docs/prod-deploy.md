@@ -221,6 +221,25 @@ If V1 publish-flow breaks on prod:
 DO NOT rollback Postgres migrations unless they're explicitly reversible —
 data loss risk. Prefer forward-fix migrations.
 
+## Rate limiter — swap to Upstash before scale (Sprint 7)
+
+Default `server/services/rate-limiter.ts` uses an in-process `Map`. Each
+Vercel serverless invocation may land on a cold instance with an empty
+Map — so brute-force throttling across instances doesn't actually fire.
+At launch traffic this won't bite; once abuse pressure shows up it will.
+
+Drop-in template ready at `server/services/rate-limiter.upstash.ts`.
+Full enablement steps are in the file header. Summary:
+
+1. Provision Upstash Redis (free tier ~10k req/day) → grab REST URL + token
+2. Set `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` in Vercel env
+3. `pnpm --filter @buildrik/dashboard add @upstash/ratelimit @upstash/redis`
+4. Uncomment the body of `rate-limiter.upstash.ts`
+5. Swap 2 import lines in `server/auth.config.ts` + `server/trpc/trpc.ts`
+6. Rollback = revert step 5 (single-line revert per file)
+
+Both callers already await; the sync → Promise signature swap is clean.
+
 ## Known prod-only gotchas (lessons from dev walks)
 
 - **CSRF Origin pin is exact-match.** Trailing slash, wrong subdomain,
