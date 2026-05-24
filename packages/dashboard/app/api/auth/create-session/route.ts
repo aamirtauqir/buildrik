@@ -49,12 +49,21 @@ export async function POST(req: NextRequest) {
 
   const maxAge = rememberMe ? 30 * 24 * 60 * 60 : undefined;
 
+  // Mirror NextAuth jwt callback (server/auth.config.ts) — non-OAuth
+  // flows bypass signIn → jwt; without this lookup, session.user.workspaceId
+  // stays null and scopedProcedure rejects every editor tRPC call with 401.
+  const member = await prisma.workspaceMember.findFirst({
+    where: { userId: user.id },
+    select: { workspaceId: true },
+  });
+
   const token = await encode({
     token: {
       sub: user.id,
       email: user.email,
       name: user.fullName,
       userId: user.id,
+      workspaceId: member?.workspaceId ?? null,
     },
     secret: process.env.NEXTAUTH_SECRET!,
     salt: cookieName,
