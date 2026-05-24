@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
@@ -14,7 +14,17 @@ import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/u
 
 type View = "choose" | "templates" | "preview" | "ai-type" | "ai-pages" | "ai-progress";
 
+// Wraps NewSitePageInner in Suspense because useSearchParams() requires it
+// in Next.js 16 production builds (causes CSR bailout error otherwise).
 export default function NewSitePage() {
+  return (
+    <Suspense fallback={null}>
+      <NewSitePageInner />
+    </Suspense>
+  );
+}
+
+function NewSitePageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToast } = useToast();
