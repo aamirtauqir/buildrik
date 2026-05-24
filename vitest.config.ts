@@ -5,6 +5,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
+    // Loads @testing-library/jest-dom matchers (toBeInTheDocument /
+    // toHaveAttribute / toHaveClass) + jsdom polyfills (ResizeObserver,
+    // matchMedia, scrollIntoView) used by Radix / cmdk component tests.
+    // Without this, ~10% of the suite blows up with "Invalid Chai property".
+    setupFiles: [path.resolve(__dirname, "packages/editor/src/test-setup.ts")],
     include: [
       "__tests__/**/*.test.{ts,tsx}",
       "lib/**/*.test.{ts,tsx}",
