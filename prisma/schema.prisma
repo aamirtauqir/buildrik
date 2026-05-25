@@ -1,5 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // native = developer's local target (darwin on Mac, linux on dev box).
+  // Linux targets cover the cPanel CloudLinux production hosts and
+  // common container/serverless platforms. Update if prod stderr emits
+  // "could not locate the Query Engine for runtime X" — add X here.
+  binaryTargets = ["native", "debian-openssl-1.0.x", "rhel-openssl-1.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
