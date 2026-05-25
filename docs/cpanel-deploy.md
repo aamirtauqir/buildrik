@@ -1,29 +1,37 @@
-# cPanel Deploy — buildrick.io (LiteSpeed)
+# cPanel Deploy — buildrick.io (LiteSpeed) — SINGLE-SUBDOMAIN
 
-Steps to deploy dashboard (Next.js) + editor (Vite) to your LiteSpeed
-cPanel host. Pair with `docs/prod-deploy.md` env table for the variable
-values.
+Steps to deploy Buildrik (dashboard + editor mounted inside) to your
+LiteSpeed cPanel host on a single subdomain. Pair with `docs/prod-deploy.md`
+env table for the variable values.
 
-## Build artifacts ready
+## Architecture — one URL, one Node app
 
-Local-built. Re-build via `pnpm build` in each package after any code change.
+```
+https://app.buildrick.io/              → dashboard home + auth + site list
+https://app.buildrick.io/auth          → login
+https://app.buildrick.io/dashboard     → site list (after login)
+https://app.buildrick.io/edit/[siteId] → editor (unified — same React tree)
+https://app.buildrick.io/api/...       → tRPC + auth + workers
+```
+
+Editor is transpiled into the dashboard bundle via Next.js's
+`transpilePackages: ["@buildrik/editor"]`. The `/edit/[siteId]` route
+imports `AquibraStudio` from `@buildrik/editor` workspace and renders
+it inline (client-side, dynamic import). Same-origin = no cross-origin
+CSRF issues, single set of env vars, single deploy unit.
+
+Enabled via `NEXT_PUBLIC_UNIFIED_EDITOR=true` runtime env.
+
+## Build artifact ready
+
+Local-built. Re-run `pnpm build` in `packages/dashboard` after any code change.
 
 | Artifact | Path | Size | What |
 |---|---|---|---|
-| Editor SPA | `/tmp/editor-build.zip` | 862 KB | Vite static → unzip to web root |
-| Dashboard standalone | `/tmp/dashboard-standalone.zip` | 60 MB | Next.js portable Node app |
+| Dashboard standalone (+ editor) | `/tmp/dashboard-standalone.zip` | 60 MB | Single Next.js portable Node app, contains everything |
 
-## Subdomain layout (recommended)
-
-| Subdomain | Hosts | Stack |
-|---|---|---|
-| `app.buildrick.io` | Dashboard | Next.js (Node.js app) |
-| `editor.buildrick.io` | Editor | Static Vite SPA |
-
-> If you keep editor at `app.buildrick.io` (current state), the
-> dashboard needs a different subdomain like `dashboard.buildrick.io`
-> or `api.buildrick.io`. Pick one, then **rebuild the editor with
-> `VITE_DASHBOARD_URL` pointing at that subdomain.**
+No separate editor zip — editor module is bundled into the dashboard
+build via Next.js workspace transpilation.
 
 ## Pre-deploy — DB + Resend
 
@@ -59,38 +67,17 @@ openssl rand -hex 32   # → ENCRYPTION_KEY
 openssl rand -hex 32   # → CRON_SECRET
 ```
 
-## Step A — Editor (static, 5 min)
+## Step A — Remove old editor static (5 min)
 
-Editor zip is at `/tmp/editor-build.zip` (already built with
-`VITE_DASHBOARD_URL=https://app.buildrick.io` baked in — see "rebuild
-editor" below if dashboard goes to a different subdomain).
+The current static editor at `app.buildrick.io` (last updated 2026-04-28)
+gets REPLACED by the unified-deploy. Move it out of the way:
 
 1. cPanel → File Manager
-2. Navigate to web root for editor subdomain. Examples:
-   - `public_html/editor.buildrick.io/`
-   - or `public_html/editor/`
-3. Delete existing contents (current 2026-04-28 build)
-4. Upload `/tmp/editor-build.zip`
-5. Right-click → Extract → contents become `dist/...`
-6. Move `dist/*` to subdomain web root (or unzip and cut paste)
-7. Visit `https://editor.buildrick.io/` → editor should mount
+2. Navigate to web root for `app.buildrick.io` (usually `public_html/`)
+3. Rename existing contents to `_old/` (or backup zip)
+4. Web root will be empty — ready for Node app
 
-If you need to rebuild editor with a different `VITE_DASHBOARD_URL`:
-
-```bash
-cd packages/editor
-VITE_DASHBOARD_URL='https://dashboard.buildrick.io' \
-VITE_FEATURE_PUBLISH=false \
-VITE_FEATURE_COMPONENTS_V2=true \
-  pnpm build
-# new build at packages/editor/dist/
-zip -r /tmp/editor-build.zip dist/
-```
-
-`VITE_FEATURE_PUBLISH=false` recommended for first deploy — publish flow
-needs Vercel OAuth integration which adds setup time. Turn on later.
-
-## Step B — Dashboard (Node.js app, 30-60 min)
+## Step B — Dashboard (Node.js app — includes editor inline, 30-60 min)
 
 ### B.1 Create Node.js App in cPanel
 
@@ -144,7 +131,8 @@ cPanel Node app UI has an "Environment Variables" section. Add each one:
 | `NEXTAUTH_URL` | `https://app.buildrick.io` |
 | `AUTH_TRUST_HOST` | `true` |
 | `NEXT_PUBLIC_APP_URL` | `https://app.buildrick.io` |
-| `EDITOR_ORIGIN` | `https://editor.buildrick.io` (where editor lives) |
+| `EDITOR_ORIGIN` | `https://app.buildrick.io` (same — unified-editor on same subdomain) |
+| `NEXT_PUBLIC_UNIFIED_EDITOR` | `true` (enables /edit/[siteId] unified mode) |
 | `SESSION_GRANT_SECRET` | (random 32 bytes) |
 | `ENCRYPTION_KEY` | (random 32 bytes) |
 | `CRON_SECRET` | (random 32 bytes) |
@@ -212,8 +200,10 @@ Use the SAME `$CRON_SECRET` value from the env vars.
 cd /Users/shahg/Desktop/pencil/buildrik
 pnpm smoke:prod \
   --dashboard https://app.buildrick.io \
-  --editor    https://editor.buildrick.io
+  --editor    https://app.buildrick.io
 ```
+
+(dashboard + editor on same URL since unified mode)
 
 8 checks. Each fails surfaces what to fix.
 
