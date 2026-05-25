@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { type NextRequest } from "next/server";
 
 vi.mock("dns", () => ({
+  // Node's `dns` module ships both a default export AND named exports (incl. `promises`).
+  // Vitest fully replaces the module, so both shapes must be provided if any
+  // consumer (or transitive dep) reads the default.
+  default: { resolve: vi.fn() },
   promises: {
     resolve: vi.fn(),
   },

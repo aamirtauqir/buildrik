@@ -48,6 +48,20 @@ vi.mock("@/lib/prisma", () => ({
             update: vi.fn(),
             updateMany: vi.fn(),
           },
+          // V1 Iter 5 fix: createSite atomically creates a Home Page row
+          // inside the same transaction (sites.service.ts:235). Mock must
+          // expose tx.page.create or the call site throws "Cannot read
+          // properties of undefined (reading 'create')".
+          page: {
+            create: vi.fn().mockResolvedValue({
+              id: "new-page",
+              siteId: "new-site",
+              name: "Home",
+              slug: "home",
+              position: 0,
+              isHomePage: true,
+            }),
+          },
         });
       }
       return Promise.all(input);

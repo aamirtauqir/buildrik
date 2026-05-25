@@ -27,6 +27,12 @@ describe("Account Service", () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue({
         id: "u1", fullName: "Ali Khan", displayName: "Ali", email: "ali@test.com",
         avatar: null, bio: null, language: "en", timezone: "UTC",
+        // Required by getProfile() since it destructures passwordHash + walks
+        // accounts[]. Missing fields → "Cannot read properties of undefined
+        // (reading 'filter')" at account.service.ts:70.
+        passwordHash: null,
+        accounts: [],
+        twoFactorEnabled: false,
       } as any);
       const result = await getProfile("u1");
       expect(result?.fullName).toBe("Ali Khan");
