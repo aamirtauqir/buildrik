@@ -15,7 +15,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "env:check": "node scripts/check-prod-env.mjs",
-    "env:check:local": "node scripts/check-prod-env.mjs --file .env.local --dev"
+    "env:check:local": "node scripts/check-prod-env.mjs --file .env.local --dev",
+    "dev:clean": "node scripts/dev-clean.mjs",
+    "dev:reset": "node scripts/dev-clean.mjs && rm -rf packages/dashboard/.next packages/editor/dist packages/editor/node_modules/.vite"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",

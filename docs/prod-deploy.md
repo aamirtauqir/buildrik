@@ -262,6 +262,32 @@ Full enablement steps are in the file header. Summary:
 
 Both callers already await; the sync → Promise signature swap is clean.
 
+## Local-dev gotchas (lessons from autonomous walk attempts)
+
+Not prod-blocking, but bite hard during dev/QA loops:
+
+- **Next dev lockfile leak.** `kill -9` of the dev wrapper leaves
+  `packages/dashboard/.next/dev/lock`. Subsequent `pnpm dev` refuses to
+  start with "Another next dev server is already running". Fix:
+  `pnpm dev:clean` (kills orphans, removes lockfile, frees ports).
+- **Orphan webpack-loaders + postcss workers.** Survive parent-process
+  death and hold file locks. Same `dev:clean` cleans them too.
+- **Multi-dashboard race.** When :3000 is held by a stuck dashboard,
+  next `pnpm dev` auto-falls-back to :3001. Browser at :3000 hits the
+  stuck one; debugger at :3001 finds nothing matching. Always
+  `pnpm dev:clean` before starting a fresh dev cycle.
+- **Cold-compile time.** First request to ANY route after a fresh
+  dev-server start takes 30-90s under Turbopack with Buildrik's dep
+  graph. Browse-binary's 15s navigation timeout will fail; manual
+  QA in real Chrome must just wait. Subsequent requests fast.
+
+Cleanup commands:
+
+```bash
+pnpm dev:clean    # kill orphans + remove lockfile + free ports
+pnpm dev:reset    # all of above + nuke .next/ + dist/ + .vite cache (slow restart)
+```
+
 ## Known prod-only gotchas (lessons from dev walks)
 
 - **CSRF Origin pin is exact-match.** Trailing slash, wrong subdomain,
