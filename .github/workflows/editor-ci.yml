@@ -24,6 +24,11 @@ on:
   pull_request:
     paths:
       - "packages/editor/**"
+      - "packages/shared/**"
+      - "server/**"
+      - "lib/**"
+      - "__tests__/**"
+      - "vitest.config.ts"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - ".github/workflows/editor-ci.yml"
@@ -32,6 +37,11 @@ on:
       - main
     paths:
       - "packages/editor/**"
+      - "packages/shared/**"
+      - "server/**"
+      - "lib/**"
+      - "__tests__/**"
+      - "vitest.config.ts"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - ".github/workflows/editor-ci.yml"
@@ -145,4 +155,13 @@ jobs:
 
       - name: Run editor tests
         working-directory: packages/editor
+        run: npx vitest run --reporter=default
+
+      # Repo-root vitest run — exercises root vitest.config.ts which has its
+      # own setupFiles + aliases + globs distinct from packages/editor's
+      # config. Without this step, the 253-failure setupFiles regression
+      # (fixed in a81ed8b1) would not be caught by CI — it's invisible to
+      # packages/editor's vitest because the editor's own config is correct.
+      # Includes server/, __tests__/, lib/, packages/shared/ test trees too.
+      - name: Run repo-root tests
         run: npx vitest run --reporter=default
