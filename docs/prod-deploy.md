@@ -202,6 +202,26 @@ Both should turn green within ~3 min. If `prisma generate` fails: add
 `postinstall: prisma generate --schema=packages/dashboard/prisma/schema.prisma`
 to root `package.json` (or rely on Next's build step to invoke it).
 
+## Step 9.5 — Public-surface smoke (curl)
+
+Run before the manual walk to catch the obvious blockers:
+
+```bash
+pnpm smoke:prod --dashboard https://app.buildrik.com \
+                --editor https://editor.buildrik.com
+# Optional: pass a known-published site to validate ExportEngine end-to-end:
+pnpm smoke:prod --dashboard ... --editor ... --site https://your-test-site.vercel.app
+```
+
+8 checks (~3 seconds total):
+- Dashboard /auth + HSTS + /robots + /favicon + /api/auth/session
+- Editor `/` returns 200 + has `<script src=>` bundle + references the
+  dashboard host (verifies VITE_DASHBOARD_URL baked correctly at build)
+- Site body has content (catches the "empty `<div></div>` deploy"
+  regression that V1 Iter 19 fix-`34807811` addressed)
+
+Exits non-zero on any fail. Run it on every deploy; cheap insurance.
+
 ## Step 10 — Post-deploy smoke (the real walk)
 
 Open `https://app.buildrik.com` in real Chrome (NOT incognito; cookies
