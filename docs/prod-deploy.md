@@ -152,6 +152,28 @@ keeping dev + prod separate, create a new GitHub OAuth App entirely.)
 3. Set `EMAIL_FROM=noreply@buildrik.com` in dashboard env
 4. Test by triggering a magic-link or 2FA flow against the live site
 
+## Step 7.5 — Run env preflight
+
+Catches the deploy-killing typos before Vercel does:
+
+```bash
+# Pull prod env from Vercel into a temp file
+vercel env pull .env.production --environment=production
+
+# Run the preflight
+pnpm env:check --file .env.production
+```
+
+The validator checks: required vars present, secrets are not dev
+placeholders (`dev-secret-change-in-prod` etc.), URLs are https://, and
+the cross-var alignments that the CSRF Origin pin + NextAuth callback
+URL all depend on (NEXT_PUBLIC_APP_URL ↔ AUTH_URL ↔ NEXTAUTH_URL ↔
+VITE_DASHBOARD_URL ↔ VERCEL_OAUTH_REDIRECT_URI prefix).
+
+Exits non-zero on any failure. Print includes the specific reason per
+var. Source of truth for required-var list is `scripts/check-prod-env.mjs`
+— keep in sync with the env table above.
+
 ## Step 8 — Pre-deploy smoke (local against prod DB)
 
 Once env vars set in Vercel UI, before pulling the deploy trigger:

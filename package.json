@@ -13,7 +13,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "email:dev": "email dev --dir emails",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "env:check": "node scripts/check-prod-env.mjs",
+    "env:check:local": "node scripts/check-prod-env.mjs --file .env.local --dev"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
