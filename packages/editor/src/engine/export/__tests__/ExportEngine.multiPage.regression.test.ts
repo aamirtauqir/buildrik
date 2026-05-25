@@ -95,4 +95,73 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
     const indexHtml = result.files.find((f) => f.name === "index.html");
     expect(indexHtml!.content).toMatch(/<body>\s*<div><\/div>\s*<\/body>/);
   });
+
+  // Sprint 5 prep: Iter 19's fix only verified single-page (Home) end-to-end.
+  // Multi-page sites are common — landing + about + pricing + ... each needs
+  // its own element content in the deployed HTML. This locks the contract
+  // that every page in the project gets its fresh-tree treatment, not just
+  // the active one.
+  it("multi-page: every non-Home page also gets fresh-tree content", async () => {
+    const aboutPage = {
+      id: "p2",
+      name: "About",
+      slug: "about",
+      isHome: false,
+      root: {
+        id: "root2",
+        type: "container",
+        tagName: "div",
+        children: [
+          { id: "h-about", type: "heading", tagName: "h1", content: "About Us", children: [] },
+        ],
+      },
+    };
+    const pricingPage = {
+      id: "p3",
+      name: "Pricing",
+      slug: "pricing",
+      isHome: false,
+      root: {
+        id: "root3",
+        type: "container",
+        tagName: "div",
+        children: [
+          { id: "p-section", type: "section", tagName: "section", children: [
+            { id: "p-h", type: "heading", tagName: "h2", content: "Plans", children: [] },
+            { id: "p-btn", type: "button", tagName: "button", content: "Buy", children: [] },
+          ] },
+        ],
+      },
+    };
+    const composer = makeMockComposer({
+      exportPagesReturn: [freshPage, aboutPage, pricingPage],
+    });
+
+    const engine = new ExportEngine(composer);
+    const result = await engine.exportAllPages({ format: "html", minify: false });
+
+    // 3 HTML files emitted, one per page
+    const htmlFiles = result.files.filter((f) => f.type === "html");
+    expect(htmlFiles).toHaveLength(3);
+
+    // Each file under expected name: home → index.html, slugged otherwise
+    const index = htmlFiles.find((f) => f.name === "index.html");
+    const about = htmlFiles.find((f) => f.name === "about.html");
+    const pricing = htmlFiles.find((f) => f.name === "pricing.html");
+    expect(index, "missing index.html").toBeDefined();
+    expect(about, "missing about.html").toBeDefined();
+    expect(pricing, "missing pricing.html").toBeDefined();
+
+    // Each page's user content lands in its own body
+    expect(index!.content).toContain("<h2>Hello</h2>");
+    expect(about!.content).toContain("<h1>About Us</h1>");
+    expect(pricing!.content).toContain("<h2>Plans</h2>");
+    expect(pricing!.content).toContain("<button>Buy</button>");
+    expect(pricing!.content).toContain("<section>");
+
+    // None of the pages should leak into another (no cross-contamination)
+    expect(index!.content).not.toContain("About Us");
+    expect(about!.content).not.toContain("Hello");
+    expect(pricing!.content).not.toContain("About Us");
+  });
 });
