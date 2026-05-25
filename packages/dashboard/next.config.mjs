@@ -2,6 +2,19 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Standalone output for cPanel / LiteSpeed Node-app deploys.
+  // Produces .next/standalone/ — a self-contained portable Node server
+  // with only the deps actually used at runtime (~80MB vs 571MB full build).
+  // Run via: cd .next/standalone/packages/dashboard && node server.js
+  //
+  // outputFileTracingRoot pinned to monorepo root so the standalone bundle
+  // does NOT embed the developer's absolute path (default behavior would
+  // create .next/standalone/Users/<you>/.../buildrik/... which breaks
+  // deploy portability).
+  output: "standalone",
+  outputFileTracingRoot: process.cwd().includes("packages/dashboard")
+    ? process.cwd().replace(/\/packages\/dashboard$/, "")
+    : process.cwd(),
   serverExternalPackages: ["@prisma/client", "bcryptjs"],
   transpilePackages: ["@buildrik/editor"],
   compiler: { emotion: true },
