@@ -2,8 +2,12 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import path from "path";
 
+// `app/auth/login/page.tsx` was refactored to a thin redirect stub —
+// it just calls redirect("/auth?email=...") so /login URLs keep working.
+// The actual login form + create-session POST + signIn() lives in
+// `app/auth/page.tsx`. Read from there for these assertions.
 const loginPageSource = readFileSync(
-  path.resolve(__dirname, "../packages/dashboard/app/auth/login/page.tsx"),
+  path.resolve(__dirname, "../packages/dashboard/app/auth/page.tsx"),
   "utf-8"
 );
 

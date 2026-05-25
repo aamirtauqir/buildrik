@@ -62,9 +62,15 @@ describe("Notification Service", () => {
       ] as any);
 
       await listNotifications("user1", { page: 1, perPage: 20, filter: "mentions" });
+      // mentions filter applies `type: { in: [...MENTION_NOTIFICATION_TYPES] }`
+      // (one of: mention / reply / reaction). Test originally asserted
+      // `type: "mention"` literal — pre-multi-mention-types refactor.
       expect(prisma.notification.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { userId: "user1", type: "mention" },
+          where: expect.objectContaining({
+            userId: "user1",
+            type: expect.objectContaining({ in: expect.any(Array) }),
+          }),
         }),
       );
     });

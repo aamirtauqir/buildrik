@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
+vi.mock("@/lib/prisma", () => {
+  // Build the mock as a local const so $transaction's callback can reference
+  // the SAME object the tests will override per-case via vi.mocked(prisma.X).
+  const prismaMock: any = {
     site: {
       count: vi.fn(),
       findMany: vi.fn(),
@@ -22,6 +24,7 @@ vi.mock("@/lib/prisma", () => ({
       findFirst: vi.fn(),
     },
     page: {
+      create: vi.fn().mockResolvedValue({}),
       createMany: vi.fn(),
     },
     shareLink: {
@@ -30,44 +33,21 @@ vi.mock("@/lib/prisma", () => ({
     formBlock: {
       updateMany: vi.fn(),
     },
-    $transaction: vi.fn((input: any) => {
-      if (typeof input === "function") {
-        return input({
-          site: {
-            count: vi.fn().mockResolvedValue(0),
-            create: vi.fn().mockResolvedValue({
-              id: "new-site",
-              name: "Test",
-              slug: "test",
-              status: "DRAFT",
-              pages: 0,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              lastEditedAt: new Date(),
-            }),
-            update: vi.fn(),
-            updateMany: vi.fn(),
-          },
-          // V1 Iter 5 fix: createSite atomically creates a Home Page row
-          // inside the same transaction (sites.service.ts:235). Mock must
-          // expose tx.page.create or the call site throws "Cannot read
-          // properties of undefined (reading 'create')".
-          page: {
-            create: vi.fn().mockResolvedValue({
-              id: "new-page",
-              siteId: "new-site",
-              name: "Home",
-              slug: "home",
-              position: 0,
-              isHomePage: true,
-            }),
-          },
-        });
-      }
-      return Promise.all(input);
-    }),
-  },
-}));
+  };
+  // $transaction has two call shapes:
+  //   1. Array of pre-built queries → resolves to array of results
+  //   2. Async callback receiving a `tx` client → forwards to inner closure
+  //
+  // For (2), delegate to the OUTER prisma mock so per-test
+  // `vi.mocked(prisma.X.method).mockResolvedValue(...)` calls land where
+  // the production code reads them. Without this, tx.site.create has its
+  // own inner mock and outer overrides were ignored.
+  prismaMock.$transaction = vi.fn((input: any) => {
+    if (typeof input === "function") return input(prismaMock);
+    return Promise.all(input);
+  });
+  return { prisma: prismaMock };
+});
 
 import { prisma } from "@/lib/prisma";
 import {

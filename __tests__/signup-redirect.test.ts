@@ -3,8 +3,11 @@ import { readFileSync } from "fs";
 import path from "path";
 
 describe("Signup page redirect", () => {
+  // app/auth/signup/page.tsx was refactored to a thin redirect stub —
+  // it just forwards /signup to /auth?email=... The actual signup form +
+  // verify-email redirect logic lives in app/auth/page.tsx. Read there.
   const signupSource = readFileSync(
-    path.resolve(__dirname, "../packages/dashboard/app/auth/signup/page.tsx"),
+    path.resolve(__dirname, "../packages/dashboard/app/auth/page.tsx"),
     "utf-8"
   );
 
