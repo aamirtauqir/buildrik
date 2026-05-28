@@ -1,7 +1,7 @@
 # V1 Walk-and-Fix — Iteration Log
 
 **Spec:** `docs/v1-walk-and-fix-design.md`
-**Status:** Loop active. Day 0 setup complete.
+**Status:** CLOSED 2026-05-28. V1 shipped 2026-05-18 (Iter 19 final pass). 30 commits, 19 iterations, walk script green end-to-end. Freeze lifted in CLAUDE.md same day. Next arc: collab (multi-user editing + presence + comments).
 
 ## Locked walk script
 
