@@ -6,11 +6,14 @@
  */
 
 import * as React from "react";
+import { Sparkles } from "lucide-react";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { useToast } from "@/editor/shared/vibcoder";
+import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 import { getElementNameFromType } from "../utils/elementInfo";
 import { BlockPickerModal } from "./BlockPickerModal";
+import { AiPromptPopover } from "./AiPromptPopover";
 import { ToolbarActionsSection } from "./toolbar/ToolbarActionsSection";
 import { ToolbarNavSection } from "./toolbar/ToolbarNavSection";
 import { toolbarStyles, formatElementName } from "./toolbar/toolbarStyles";
@@ -67,6 +70,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
   const [showAncestorMenu, setShowAncestorMenu] = React.useState(false);
   const [showMoreMenu, setShowMoreMenu] = React.useState(false);
   const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [aiOpen, setAiOpen] = React.useState(false);
   const ancestorMenuRef = React.useRef<HTMLDivElement>(null);
   const moreMenuRef = React.useRef<HTMLDivElement>(null);
   const toolbarRef = React.useRef<HTMLDivElement>(null);
@@ -295,7 +299,26 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
           onMoveDown={handleMoveDown}
           onMoreMenuToggle={() => setShowMoreMenu((v) => !v)}
         />
+        <IconButton
+          variant="primary"
+          size="sm"
+          aria-label="Edit with AI"
+          pressed={aiOpen}
+          onClick={() => setAiOpen((v) => !v)}
+        >
+          <Sparkles size={14} />
+        </IconButton>
       </div>
+
+      {aiOpen && (
+        <AiPromptPopover
+          composer={composer}
+          elementId={elementId}
+          top={position.top + 36}
+          left={position.left}
+          onClose={() => setAiOpen(false)}
+        />
+      )}
 
       <BlockPickerModal
         composer={composer}

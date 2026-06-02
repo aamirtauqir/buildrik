@@ -27,7 +27,19 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
 
   const submit = React.useCallback((text: string) => {
     const serverScope = toServerScope(scope);
-    if (!serverScope) return;
+    if (!serverScope) {
+      // Multi-select (or no scope): surface a message instead of a silent no-op.
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `sys-${Date.now()}`,
+          role: "assistant",
+          text: "AI editing supports one element at a time in v1 — select a single element.",
+          createdAt: Date.now(),
+        },
+      ]);
+      return;
+    }
     lock();
     const userId = `u-${Date.now()}`;
     const aId = `a-${Date.now() + 1}`;
