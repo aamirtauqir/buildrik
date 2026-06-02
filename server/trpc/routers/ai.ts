@@ -10,7 +10,12 @@ import {
   streamContent,
   generateComponentSchema,
 } from "../../services/ai.service";
-import { checkQuota, recordUsage } from "../../services/quota.service";
+import {
+  checkQuota,
+  reserveQuota,
+  releaseQuota,
+  resolveModelForUser,
+} from "../../services/quota.service";
 import { modelSchema, DEFAULT_MODEL } from "../../services/types";
 
 const contentInputSchema = z.object({
@@ -213,7 +218,13 @@ export const aiRouter = router({
     .input(streamPromptInputSchema)
     .subscription(async function* ({ ctx, input, signal }) {
       const userId = ctx.session.user.id;
-      const quota = await checkQuota(userId);
+      // Server-authoritative model: client model is only a hint, gated by tier.
+      const model = modelSchema.parse(
+        await resolveModelForUser(userId, input.model),
+      );
+      // Reserve one unit atomically before the provider call (closes the
+      // concurrent check-then-act bypass); refund if nothing is delivered.
+      const quota = await reserveQuota(userId, model);
       if (!quota.ok) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
@@ -221,17 +232,26 @@ export const aiRouter = router({
         });
       }
       const ac = signal ?? new AbortController().signal;
-      for await (const chunk of streamContent(input.prompt, input.model, ac)) {
-        yield chunk;
+      let delivered = false;
+      try {
+        for await (const chunk of streamContent(input.prompt, model, ac)) {
+          delivered = true;
+          yield chunk;
+        }
+      } catch (e) {
+        if (!delivered) await releaseQuota(userId);
+        throw e;
       }
-      await recordUsage(userId, input.model);
     }),
 
   componentSchema: protectedProcedure
     .input(componentSchemaInputSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      const quota = await checkQuota(userId);
+      const model = modelSchema.parse(
+        await resolveModelForUser(userId, input.model),
+      );
+      const quota = await reserveQuota(userId, model);
       if (!quota.ok) {
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
@@ -241,11 +261,11 @@ export const aiRouter = router({
       try {
         const raw = await generateComponentSchema({
           prompt: input.prompt,
-          model: input.model,
+          model,
         });
-        await recordUsage(userId, input.model);
         return { raw };
       } catch (e: unknown) {
+        await releaseQuota(userId);
         const err = e as { status?: number; message?: string };
         if (err.status === 429) {
           throw new TRPCError({
