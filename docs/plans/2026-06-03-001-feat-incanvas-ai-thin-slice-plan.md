@@ -9,6 +9,8 @@ deepened: 2026-06-03
 
 # In-Canvas AI Thin Slice (Command Bus De-Risk)
 
+> **Status 2026-06-03: ALL UNITS SHIPPED** — commits a4ca69a9 (P), 7164e3e5 (0), a9617fa2 (1), 29c65940 (2), 75f8046b (3), 33dfb516 (4). Server suite 74/74, editor build clean. **Next: live demo gate** — run the editor, select an element, prompt it.
+
 ## Overview
 
 Prove the smallest real slice of in-canvas AI: select one element → prompt ("make this dark") → AI proposes a style change shown as a diff → accept applies it as **one undo step**. The goal is to **de-risk two unknowns cheaply** before committing further: (1) can a prompt reliably produce a *valid* style command, and (2) does editing the selected element feel better than the existing Inspector. A pre-registered demo gate decides: expand idea #2, or pivot to idea #1 (hybrid publish).
@@ -122,7 +124,7 @@ Select element ─► Floating prompt (anchored, single element)
 
 ## Implementation Units
 
-- [ ] **Unit P (Prerequisite, decoupled): AI hardening on the existing path**
+- [x] **Unit P (Prerequisite, decoupled): AI hardening on the existing path**
 
 **Goal:** Close the quota/model/auth holes that exist today for all AI endpoints — independent of the probe.
 
@@ -185,7 +187,7 @@ Select element ─► Floating prompt (anchored, single element)
 
 **Verification:** Written findings: (a) record-timing + the force-flush decision, (b) diff rows render today: yes/no.
 
-- [ ] **Unit 1: `set-style` apply function (no registry)**
+- [x] **Unit 1: `set-style` apply function (no registry)**
 
 **Goal:** A small, locally-validated function that sets a desktop/normal inline style on one element — the leaf the client calls on accept.
 
@@ -212,7 +214,7 @@ Select element ─► Floating prompt (anchored, single element)
 
 **Verification:** Apply changes the element's desktop style; unsafe values and unknown ids are rejected.
 
-- [ ] **Unit 2: Server constrained-JSON command-emit**
+- [x] **Unit 2: Server constrained-JSON command-emit**
 
 **Goal:** Turn a scoped prompt into a validated `[{commandId:"set-style", args}]` batch via single-shot generation, scope-guarded by exact id.
 
@@ -243,7 +245,7 @@ Select element ─► Floating prompt (anchored, single element)
 
 **Verification:** A scoped prompt yields a validated, in-scope `set-style` batch; injection and malformed output are contained.
 
-- [ ] **Unit 3: Client apply — one transaction, clean rollback**
+- [x] **Unit 3: Client apply — one transaction, clean rollback**
 
 **Goal:** Wire `onAccept` to run the parsed batch atomically; reject/abandon leaves the canvas untouched.
 
@@ -271,7 +273,7 @@ Select element ─► Floating prompt (anchored, single element)
 
 **Verification:** Accept mutates and reverts in one undo; failure rolls back cleanly; no leaked transaction.
 
-- [ ] **Unit 4: Floating prompt UI + diff-row render**
+- [x] **Unit 4: Floating prompt UI + diff-row render**
 
 **Goal:** A selection-anchored prompt that drives the stream and **renders the diff** (net-new), with resolved collision and explicit states; multi-select blocked with a message.
 
