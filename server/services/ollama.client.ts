@@ -15,6 +15,10 @@ export function isOllamaConfigured(): boolean {
   return (process.env.OLLAMA_BASE_URL ?? "").length > 0;
 }
 
+// Local models can be slow to (re)load into memory, especially large ones, so
+// allow a generous timeout. Override with OLLAMA_TIMEOUT_MS.
+const OLLAMA_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 300_000);
+
 let _client: OpenAI | undefined;
 function getOllamaClient(): OpenAI {
   if (!_client) {
@@ -22,6 +26,8 @@ function getOllamaClient(): OpenAI {
     _client = new OpenAI({
       baseURL: `${base}/v1`,
       apiKey: "ollama", // Ollama ignores the key, but the SDK requires one.
+      timeout: OLLAMA_TIMEOUT_MS,
+      maxRetries: 1,
     });
   }
   return _client;
