@@ -5,6 +5,10 @@ export const modelSchema = z.enum([
   "claude-sonnet-4-6",
   "claude-haiku-4-5",
   "gpt-4o-mini",
+  // Placeholder for the locally-hosted Ollama model. The real model name is
+  // configured via OLLAMA_MODEL; the server forces this when OLLAMA_BASE_URL
+  // is set so no paid API key is needed.
+  "ollama",
 ]);
 
 export type AIModel = z.infer<typeof modelSchema>;
@@ -17,6 +21,10 @@ export function isClaudeModel(model: AIModel): boolean {
 
 export function isOpenAIModel(model: AIModel): boolean {
   return model.startsWith("gpt-");
+}
+
+export function isOllamaModel(model: AIModel): boolean {
+  return model === "ollama";
 }
 
 export interface TokenChunk {

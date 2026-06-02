@@ -133,4 +133,15 @@ describe("resolveModelForUser (server-authoritative)", () => {
       "claude-sonnet-4-6",
     );
   });
+
+  it("forces 'ollama' when OLLAMA_BASE_URL is set, bypassing tier and hint", async () => {
+    process.env.OLLAMA_BASE_URL = "http://localhost:11434";
+    try {
+      await expect(resolveModelForUser("u1", "claude-opus-4-7")).resolves.toBe(
+        "ollama",
+      );
+    } finally {
+      delete process.env.OLLAMA_BASE_URL;
+    }
+  });
 });

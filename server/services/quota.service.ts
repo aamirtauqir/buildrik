@@ -120,6 +120,9 @@ export async function resolveModelForUser(
   userId: string,
   hint?: string,
 ): Promise<string> {
+  // Local Ollama mode: when configured, force the local model regardless of
+  // tier or client hint so no paid API key is used. Quota still applies.
+  if ((process.env.OLLAMA_BASE_URL ?? "").length > 0) return "ollama";
   const plan = await getUserPlan(userId);
   const cfg = PLAN_MODELS[plan];
   if (hint && cfg.allowed.includes(hint)) return hint;

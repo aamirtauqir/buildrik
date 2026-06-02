@@ -442,8 +442,10 @@ ${pageInfo}`,
 
 // ─── Provider abstraction (T3) ────────────────────────────────────────────
 import { anthropicProvider } from "./anthropic.client";
+import { ollamaProvider } from "./ollama.client";
 import {
   isClaudeModel,
+  isOllamaModel,
   DEFAULT_MODEL,
   type AIModel,
   type AIProvider,
@@ -484,6 +486,7 @@ class OpenAIProvider implements AIProvider {
 const openAIProvider = new OpenAIProvider();
 
 export function getProvider(model: AIModel): AIProvider {
+  if (isOllamaModel(model)) return ollamaProvider;
   return isClaudeModel(model) ? anthropicProvider : openAIProvider;
 }
 
