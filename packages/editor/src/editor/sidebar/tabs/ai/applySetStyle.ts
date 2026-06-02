@@ -74,3 +74,41 @@ export function applySetStyle(composer: Composer, args: SetStyleArgs): void {
   }
   el.setStyle(args.property, args.value);
 }
+
+/**
+ * Run an accepted AI edit's command batch inside ONE outer transaction so the
+ * whole edit is a single undo step. Each command is re-validated client-side
+ * (defense in depth — the server already validated) before applying; invalid
+ * entries are skipped. `endTransaction` runs in `finally`, never
+ * `rollbackTransaction` (Unit 0 finding #3: rollback suppresses the history
+ * record without reverting the in-memory mutation, which would strand a
+ * visible-but-unrecorded change). Returns how many commands were applied.
+ */
+export function applyAiEdit(
+  composer: Composer,
+  edit: {
+    applyOps: {
+      commit: Record<string, unknown>;
+      preview?: Record<string, unknown>;
+    };
+  },
+): { applied: number } {
+  const commit = edit.applyOps.commit as { commands?: unknown };
+  const commands = Array.isArray(commit.commands) ? commit.commands : [];
+
+  composer.beginTransaction("ai-edit");
+  let applied = 0;
+  try {
+    for (const c of commands) {
+      const cmd = c as { commandId?: unknown; args?: unknown };
+      if (cmd.commandId !== "set-style") continue;
+      const parsed = setStyleArgsSchema.safeParse(cmd.args);
+      if (!parsed.success) continue;
+      applySetStyle(composer, parsed.data);
+      applied++;
+    }
+  } finally {
+    composer.endTransaction();
+  }
+  return { applied };
+}

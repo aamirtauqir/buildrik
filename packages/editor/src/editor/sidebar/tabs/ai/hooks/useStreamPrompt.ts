@@ -6,6 +6,8 @@ interface StartArgs {
   prompt: string;
   scope: ServerScope;
   model: AIModel;
+  /** "text" = chat stream; "style-command" = in-canvas set-style batch. */
+  intent?: "text" | "style-command";
 }
 
 type ServerScope = { kind: "element"; id: string } | { kind: "page" };
@@ -72,7 +74,12 @@ export function useStreamPrompt(): UseStreamPromptResult {
 
     const client = getAiSubscriptionClient();
     subRef.current = client.ai.streamPrompt.subscribe(
-      { prompt: args.prompt, scope: args.scope, model: args.model },
+      {
+        prompt: args.prompt,
+        scope: args.scope,
+        model: args.model,
+        intent: args.intent ?? "text",
+      },
       {
         onData: (chunk: { type: string; text?: string; edit?: ServerEdit }) => {
           if (chunk.type === "text" && chunk.text) {

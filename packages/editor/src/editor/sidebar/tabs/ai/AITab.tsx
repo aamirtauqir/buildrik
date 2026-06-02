@@ -6,6 +6,7 @@ import { ChatThread } from "./ChatThread";
 import { Composer as PromptComposer } from "./Composer";
 import { useAIScope } from "./hooks/useAIScope";
 import { useStreamPrompt, toServerScope } from "./hooks/useStreamPrompt";
+import { applyAiEdit } from "./applySetStyle";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
 
@@ -55,9 +56,16 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
   }, [stream.text, stream.streaming, stream.stopped, stream.edit, unlock]);
 
   const onAccept = React.useCallback((msgId: string) => {
+    const msg = messages.find((m) => m.id === msgId);
+    if (msg?.edit && composer) {
+      // Apply the command batch in one transaction (one undo step). A bad
+      // element id throws but the transaction still closes (endTransaction in
+      // finally) and the partial edit is recorded as one undoable entry.
+      try { applyAiEdit(composer, msg.edit); } catch { /* partial recorded */ }
+    }
     setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "applied" } } : m));
     unlock();
-  }, [unlock]);
+  }, [messages, composer, unlock]);
 
   const onReject = React.useCallback((msgId: string) => {
     setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "rejected" } } : m));
