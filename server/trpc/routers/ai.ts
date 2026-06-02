@@ -9,6 +9,7 @@ import {
   suggestMilestone,
   streamContent,
   generateComponentSchema,
+  generateStyleCommands,
 } from "../../services/ai.service";
 import {
   checkQuota,
@@ -90,6 +91,9 @@ const streamPromptInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
   scope: scopeSchema,
   model: modelSchema.default(DEFAULT_MODEL),
+  // "text" = existing chat stream; "style-command" = in-canvas AI that emits a
+  // validated set-style command batch (element scope only).
+  intent: z.enum(["text", "style-command"]).default("text"),
 });
 
 const componentSchemaInputSchema = z.object({
@@ -231,6 +235,40 @@ export const aiRouter = router({
           message: `Daily limit reached (${quota.limit}). Resets at ${quota.resetsAt.toISOString()}.`,
         });
       }
+      // In-canvas AI: emit a validated set-style command batch (single-shot),
+      // not a token stream. Element scope only.
+      if (input.intent === "style-command" && input.scope.kind === "element") {
+        const elementId = input.scope.id;
+        let commands;
+        try {
+          commands = await generateStyleCommands({
+            prompt: input.prompt,
+            elementId,
+            model,
+          });
+        } catch (e) {
+          await releaseQuota(userId);
+          throw e;
+        }
+        yield {
+          type: "edit" as const,
+          edit: {
+            target: elementId,
+            summary: commands.length
+              ? `${commands.length} style change${commands.length > 1 ? "s" : ""}`
+              : "No applicable change",
+            rows: commands.map((c) => ({
+              field: c.args.property,
+              from: "",
+              to: c.args.value,
+            })),
+            applyOps: { preview: {}, commit: { commands } },
+          },
+        };
+        yield { type: "done" as const };
+        return;
+      }
+
       const ac = signal ?? new AbortController().signal;
       let delivered = false;
       try {
