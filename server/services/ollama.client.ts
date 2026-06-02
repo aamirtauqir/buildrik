@@ -3,13 +3,13 @@ import type { AIModel, AIProvider, TokenChunk } from "./types";
 
 /**
  * Local Ollama provider via its OpenAI-compatible endpoint. Lets the editor run
- * AI features against a self-hosted model (e.g. qwen2.5, llama3.2) with no paid
- * API key. Enabled by setting OLLAMA_BASE_URL (e.g. http://localhost:11434);
- * the model name is OLLAMA_MODEL. The AIModel passed in is the "ollama"
- * placeholder — the real model name comes from env.
+ * AI features against a self-hosted model (e.g. qwen3.5, on Apple Silicon
+ * qwen3.5:9b-mlx) with no paid API key. Enabled by setting OLLAMA_BASE_URL
+ * (e.g. http://localhost:11434); the model name is OLLAMA_MODEL. The AIModel
+ * passed in is the "ollama" placeholder — the real model name comes from env.
  */
 
-export const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "qwen2.5";
+export const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? "qwen3.5";
 
 export function isOllamaConfigured(): boolean {
   return (process.env.OLLAMA_BASE_URL ?? "").length > 0;
