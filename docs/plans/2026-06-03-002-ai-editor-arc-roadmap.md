@@ -127,11 +127,17 @@ set-style + duplicate + undo confirmed; delete/move/add-section share the path.
 ### Remaining to COMPLETE the whole-editor-AI arc (next-session checklist)
 - [x] **Live-verify** the element commands in the browser — done 2026-06-04
       (set-style/duplicate/undo walked; 2 bugs fixed; see UPDATE above).
-- [ ] **P2 full element coverage** — more commands: `set-attribute` (href/alt/
-      target), spacing/border/font/layout style coverage, and the **two style
-      stores** (pseudo-state + breakpoint via `StyleEngine.setRule`, not just
-      `el.setStyle`). Each new command = the 4-edit pattern (union + validate +
-      prompt + apply-dispatch).
+- [~] **P2 full element coverage** — `set-attribute` (href/alt/target/title/rel/
+      aria-label/name) SHIPPED 2026-06-04 (commit `d67480fe`, 8th command,
+      live-verified). STILL TODO: spacing/border/font/layout style coverage, and
+      the **two style stores** (pseudo-state + breakpoint via
+      `StyleEngine.setRule`, not just `el.setStyle`). Each new command = the
+      4-edit pattern (union + validate + prompt + apply-dispatch).
+- [x] **Bonus fixes 2026-06-04**: error-surfacing in panel (`5d3ebb49` — quota/
+      provider errors were silent) + **data-loss guard** (`ea93f9f7` —
+      raced/empty `loadProject` + auto-save was wiping server content; wiped this
+      test site's Home page mid-session). When restarting the dashboard, wait for
+      it to fully warm before reloading the editor.
 - [ ] **P1b registry** (per-side decided) — collapse the if-chains in
       `isValidEditCommand`/`editCommandToRow`/prompt (server) and `applyAiEdit`
       (editor) into a registry once it hurts (~10+ commands).
