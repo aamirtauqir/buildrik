@@ -183,6 +183,30 @@ export function applyDuplicateElement(
   }
 }
 
+export const moveElementArgsSchema = z.object({
+  elementId: z.string().min(1),
+  direction: z.enum(["up", "down"]),
+});
+export type MoveElementArgs = z.infer<typeof moveElementArgsSchema>;
+
+/** Reorder an element among its siblings (up = earlier, down = later). */
+export function applyMoveElement(composer: Composer, args: MoveElementArgs): void {
+  const el = composer.elements.getElement(args.elementId);
+  const parent = el?.getParent?.();
+  if (!el || !parent) {
+    throw new Error(`move-element: no parent to reorder within (${args.elementId})`);
+  }
+  const siblings = parent.getChildren();
+  const idx = siblings.findIndex((c) => c.getId() === args.elementId);
+  if (idx < 0) throw new Error(`move-element: not a child (${args.elementId})`);
+
+  const target = args.direction === "up" ? idx - 1 : idx + 1;
+  if (target < 0 || target >= siblings.length) return; // already at the edge — no-op
+  if (!composer.elements.moveElement(args.elementId, parent.getId(), target)) {
+    throw new Error(`move-element: move failed (${args.elementId})`);
+  }
+}
+
 /**
  * Run an accepted AI edit's command batch inside ONE outer transaction so the
  * whole edit is a single undo step. Each command is re-validated client-side
@@ -233,6 +257,11 @@ export function applyAiEdit(
         const parsed = elementRefArgsSchema.safeParse(cmd.args);
         if (!parsed.success) continue;
         applyDuplicateElement(composer, parsed.data);
+        applied++;
+      } else if (cmd.commandId === "move-element") {
+        const parsed = moveElementArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applyMoveElement(composer, parsed.data);
         applied++;
       }
     }

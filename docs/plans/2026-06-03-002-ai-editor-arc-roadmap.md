@@ -56,6 +56,26 @@ is also an agent tool. Builds on P1b's registry + P3's page context.
 - Live-verify add/delete/duplicate in a clean browser session.
 - Quota model (count vs token) for the metering gate.
 
+## CEO review (2026-06-03) — breadth-first sequencing kept
+
+Reviewed the sequencing. The generation-first counter-argument was raised and
+considered; the founder chose to keep breadth-first (P1b → P2 → P3 → P4). Mode:
+HOLD SCOPE. Carry-forward risks to track regardless of order:
+
+1. **P3 needs page context** — the server only receives one element id, no
+   element tree (001 finding). Generation/multi-element AI is a real
+   architectural prereq, not just "more commands." Plan the context-passing
+   before P3.
+2. **Free-local AI is under-leveraged.** It's a genuine wedge — no competitor
+   offers free, no-credit, runs-on-your-machine AI building (Webflow charges AI
+   credits, Framer charges for AI). Elevate it to a product/marketing pillar,
+   not an infra note, even under breadth-first.
+3. **Per-element AI competes with the Inspector.** Before exhaustively expanding
+   P2 (every property as a command), measure whether users actually reach for
+   AI per-element vs the panel. Add commands on demand, not speculatively.
+4. **Workspace/siteId auth still deferred** (Unit P) — security debt; any
+   server-side AI write (P3/P4) must add it.
+
 ## Notes
 - Dashboard runs `next dev --turbopack` — service-layer edits need a full
   `.next` nuke to take effect (see memory `reference_nextjs_turbopack_stale_server`).

@@ -6,6 +6,7 @@ import {
   applyAddElement,
   applyDeleteElement,
   applyDuplicateElement,
+  applyMoveElement,
   applyAiEdit,
   setStyleArgsSchema,
 } from "../applySetStyle";
@@ -326,5 +327,45 @@ describe("applyDeleteElement / applyDuplicateElement", () => {
     expect(() => applyDuplicateElement(composer, { elementId: "x" })).toThrow(
       /failed/i,
     );
+  });
+});
+
+describe("applyMoveElement", () => {
+  function makeMoveComposer(elementId: string, siblingIds: string[]) {
+    const moveElement = vi.fn(() => true);
+    const siblings = siblingIds.map((id) => ({ getId: () => id }));
+    const parent = { getId: () => "parent", getChildren: () => siblings };
+    const el = { getParent: () => parent };
+    const composer = {
+      elements: { getElement: vi.fn(() => el), moveElement },
+    } as unknown as Composer;
+    return { composer, moveElement };
+  }
+
+  it("moves up to the previous index", () => {
+    const { composer, moveElement } = makeMoveComposer("b", ["a", "b", "c"]);
+    applyMoveElement(composer, { elementId: "b", direction: "up" });
+    expect(moveElement).toHaveBeenCalledWith("b", "parent", 0);
+  });
+
+  it("moves down to the next index", () => {
+    const { composer, moveElement } = makeMoveComposer("b", ["a", "b", "c"]);
+    applyMoveElement(composer, { elementId: "b", direction: "down" });
+    expect(moveElement).toHaveBeenCalledWith("b", "parent", 2);
+  });
+
+  it("is a no-op at the top edge (up from index 0)", () => {
+    const { composer, moveElement } = makeMoveComposer("a", ["a", "b"]);
+    applyMoveElement(composer, { elementId: "a", direction: "up" });
+    expect(moveElement).not.toHaveBeenCalled();
+  });
+
+  it("throws when the element has no parent", () => {
+    const composer = {
+      elements: { getElement: vi.fn(() => ({ getParent: () => null })) },
+    } as unknown as Composer;
+    expect(() =>
+      applyMoveElement(composer, { elementId: "x", direction: "up" }),
+    ).toThrow(/no parent/i);
   });
 });

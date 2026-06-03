@@ -585,7 +585,11 @@ export type EditCommand =
       args: { elementId: string; elementType: string; text?: string };
     }
   | { commandId: "delete-element"; args: { elementId: string } }
-  | { commandId: "duplicate-element"; args: { elementId: string } };
+  | { commandId: "duplicate-element"; args: { elementId: string } }
+  | {
+      commandId: "move-element";
+      args: { elementId: string; direction: "up" | "down" };
+    };
 
 export interface EditCommandInput {
   prompt: string;
@@ -613,6 +617,9 @@ export function editCommandToRow(
   if (c.commandId === "duplicate-element") {
     return { field: "duplicate", from: "", to: "this element" };
   }
+  if (c.commandId === "move-element") {
+    return { field: "move", from: "", to: c.args.direction };
+  }
   return { field: c.args.property, from: "", to: c.args.value };
 }
 
@@ -631,7 +638,8 @@ Rules:
 - For add-element: "elementType" must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}. Include "text" for content elements (heading/text/paragraph/button/link). Use this when the request asks to ADD or INSERT something new.
 - delete-element: {"commandId":"delete-element","args":{"elementId":"${elementId}"}} — only when the request clearly asks to delete/remove this element.
 - duplicate-element: {"commandId":"duplicate-element","args":{"elementId":"${elementId}"}} — when asked to duplicate/copy this element.
-- Use set-text for wording, set-style for appearance, add-element to insert, delete-element to remove, duplicate-element to copy.
+- move-element: {"commandId":"move-element","args":{"elementId":"${elementId}","direction":"up|down"}} — when asked to move/reorder this element up or down among its siblings.
+- Use set-text for wording, set-style for appearance, add-element to insert, delete-element to remove, duplicate-element to copy, move-element to reorder.
 - Return [] if the request cannot be expressed with these commands.
 - No markdown fences, no prose — JSON array only.
 
@@ -694,6 +702,9 @@ function isValidEditCommand(c: unknown, elementId: string): c is EditCommand {
   }
   if (cmd.commandId === "delete-element" || cmd.commandId === "duplicate-element") {
     return true; // only needs elementId, already exact-id guarded above
+  }
+  if (cmd.commandId === "move-element") {
+    return cmd.args.direction === "up" || cmd.args.direction === "down";
   }
   return false;
 }

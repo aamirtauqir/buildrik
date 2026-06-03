@@ -161,4 +161,19 @@ describe("extractValidEditCommands", () => {
     ]);
     expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
+
+  it("accepts move-element up/down", () => {
+    const raw = JSON.stringify([
+      { commandId: "move-element", args: { elementId: EL, direction: "up" } },
+      { commandId: "move-element", args: { elementId: EL, direction: "down" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(2);
+  });
+
+  it("drops move-element with an invalid direction", () => {
+    const raw = JSON.stringify([
+      { commandId: "move-element", args: { elementId: EL, direction: "left" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
 });
