@@ -4,6 +4,7 @@ import { fireEvent } from "@testing-library/react";
 
 // Capture the onData handler the hook registers so tests can drive the stream.
 const lastSubscribe: {
+  input?: { scope?: { kind?: string; elements?: unknown[] }; intent?: string };
   onData?: (chunk: unknown) => void;
   onError?: (err: { message?: string }) => void;
 } = {};
@@ -11,7 +12,8 @@ vi.mock("@/services/ai/subscriptionClient", () => ({
   getAiSubscriptionClient: () => ({
     ai: {
       streamPrompt: {
-        subscribe: vi.fn((_input: unknown, cbs: { onData?: (c: unknown) => void; onError?: (e: { message?: string }) => void }) => {
+        subscribe: vi.fn((input: unknown, cbs: { onData?: (c: unknown) => void; onError?: (e: { message?: string }) => void }) => {
+          lastSubscribe.input = input as typeof lastSubscribe.input;
           lastSubscribe.onData = cbs.onData;
           lastSubscribe.onError = cbs.onError;
           return { unsubscribe: vi.fn() };
@@ -92,6 +94,32 @@ describe("AITab — scope + composer wiring", () => {
     });
 
     expect(screen.getByLabelText("Apply changes")).toBeInTheDocument();
+  });
+
+  it("page scope sends the element list + intent style-command (P3 multi-element)", () => {
+    // No selection → page scope. Composer exposes the page elements.
+    const handlers: Record<string, (() => void)[]> = {};
+    const composer = {
+      selection: { getAllSelected: () => [] },
+      elements: {
+        getAllElements: () => [
+          { getId: () => "h1", getType: () => "heading", getContent: () => "Title" },
+          { getId: () => "b1", getType: () => "button", getContent: () => "Click" },
+        ],
+      },
+      on: (e: string, cb: () => void) => { (handlers[e] ??= []).push(cb); },
+      off: () => {},
+    } as never;
+    const { container } = render(
+      <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+    );
+    const ta = container.querySelector("textarea")!;
+    fireEvent.change(ta, { target: { value: "make the page modern" } });
+    fireEvent.keyDown(ta, { key: "Enter" });
+
+    expect(lastSubscribe.input?.scope?.kind).toBe("page");
+    expect(lastSubscribe.input?.scope?.elements).toHaveLength(2);
+    expect(lastSubscribe.input?.intent).toBe("style-command");
   });
 
   it("surfaces a stream error in the assistant message instead of a silent empty reply", () => {

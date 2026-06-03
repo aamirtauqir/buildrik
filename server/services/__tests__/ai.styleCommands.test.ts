@@ -5,9 +5,47 @@
  * security-critical surface.
  */
 import { describe, it, expect } from "vitest";
-import { extractValidEditCommands, buildEditCommandPrompt } from "@server/services/ai.service";
+import {
+  extractValidEditCommands,
+  extractValidPageEditCommands,
+  buildEditCommandPrompt,
+  buildPageEditCommandPrompt,
+} from "@server/services/ai.service";
 
 const EL = "el-1";
+
+describe("page-scope (multi-element) extraction", () => {
+  const ALLOWED = new Set(["a", "b", "c"]);
+
+  it("accepts commands targeting any id on the page", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-style", args: { elementId: "a", property: "color", value: "#111" } },
+      { commandId: "set-text", args: { elementId: "b", text: "Hello" } },
+      { commandId: "set-style", args: { elementId: "c", property: "font-size", value: "20px" } },
+    ]);
+    expect(extractValidPageEditCommands(raw, ALLOWED)).toHaveLength(3);
+  });
+
+  it("drops commands targeting an id NOT on the page (no invented ids)", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-style", args: { elementId: "a", property: "color", value: "#111" } },
+      { commandId: "set-style", args: { elementId: "ghost", property: "color", value: "#222" } },
+    ]);
+    const r = extractValidPageEditCommands(raw, ALLOWED);
+    expect(r).toHaveLength(1);
+    expect(r[0].args.elementId).toBe("a");
+  });
+
+  it("buildPageEditCommandPrompt lists element ids + fences the request", () => {
+    const p = buildPageEditCommandPrompt(
+      [{ id: "a", type: "heading", text: "Hi" }, { id: "b", type: "button" }],
+      "make headings bigger",
+    );
+    expect(p).toContain('id="a"');
+    expect(p).toContain('id="b"');
+    expect(p).toContain("<request>make headings bigger</request>");
+  });
+});
 
 describe("buildEditCommandPrompt (agent-callable registry)", () => {
   it("includes every agent-callable command rule + the scoped element id", () => {

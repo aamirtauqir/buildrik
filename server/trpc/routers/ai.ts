@@ -10,6 +10,7 @@ import {
   streamContent,
   generateComponentSchema,
   generateEditCommands,
+  generatePageEditCommands,
   editCommandToRow,
 } from "../../services/ai.service";
 import {
@@ -83,9 +84,16 @@ const milestoneSuggestInputSchema = z.object({
     .optional(),
 });
 
+const pageElementRefSchema = z.object({
+  id: z.string().min(1),
+  type: z.string().min(1).max(40),
+  text: z.string().max(200).optional(),
+});
+
 const scopeSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("element"), id: z.string().min(1) }),
-  z.object({ kind: z.literal("page") }),
+  // Page scope may carry the page's element list for multi-element edits (P3).
+  z.object({ kind: z.literal("page"), elements: z.array(pageElementRefSchema).max(200).optional() }),
 ]);
 
 const streamPromptInputSchema = z.object({
@@ -236,17 +244,25 @@ export const aiRouter = router({
           message: `Daily limit reached (${quota.limit}). Resets at ${quota.resetsAt.toISOString()}.`,
         });
       }
-      // In-canvas AI: emit a validated set-style command batch (single-shot),
-      // not a token stream. Element scope only.
-      if (input.intent === "style-command" && input.scope.kind === "element") {
-        const elementId = input.scope.id;
+      // In-canvas AI: emit a validated edit-command batch (single-shot), not a
+      // token stream. Element scope edits one element; page scope (P3) edits
+      // across the supplied page element list.
+      if (
+        input.intent === "style-command" &&
+        (input.scope.kind === "element" ||
+          (input.scope.kind === "page" && (input.scope.elements?.length ?? 0) > 0))
+      ) {
+        const target = input.scope.kind === "element" ? input.scope.id : "page";
         let commands;
         try {
-          commands = await generateEditCommands({
-            prompt: input.prompt,
-            elementId,
-            model,
-          });
+          commands =
+            input.scope.kind === "element"
+              ? await generateEditCommands({ prompt: input.prompt, elementId: input.scope.id, model })
+              : await generatePageEditCommands({
+                  prompt: input.prompt,
+                  elements: input.scope.elements ?? [],
+                  model,
+                });
         } catch (e) {
           await releaseQuota(userId);
           throw e;
@@ -254,7 +270,7 @@ export const aiRouter = router({
         yield {
           type: "edit" as const,
           edit: {
-            target: elementId,
+            target,
             summary: commands.length
               ? `${commands.length} change${commands.length > 1 ? "s" : ""}`
               : "No applicable change",

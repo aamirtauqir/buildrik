@@ -40,6 +40,33 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
       ]);
       return;
     }
+
+    // Element scope edits the one element. Page scope (P3) attaches the page's
+    // element list so the AI can edit across many elements in one batch
+    // ("make the whole page modern"); that promotes page scope from chat to an
+    // edit command batch the user accepts.
+    let finalScope = serverScope;
+    let intent: "text" | "style-command" =
+      serverScope.kind === "element" ? "style-command" : "text";
+    if (serverScope.kind === "page" && composer) {
+      const elements = composer.elements
+        .getAllElements()
+        .map((el) => {
+          const content = el.getContent?.();
+          return {
+            id: el.getId(),
+            type: el.getType(),
+            text: content ? String(content).slice(0, 200) : undefined,
+          };
+        })
+        .filter((e) => e.id)
+        .slice(0, 200);
+      if (elements.length > 0) {
+        finalScope = { kind: "page", elements };
+        intent = "style-command";
+      }
+    }
+
     lock();
     const userId = `u-${Date.now()}`;
     const aId = `a-${Date.now() + 1}`;
@@ -49,16 +76,8 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
       { id: userId, role: "user", text, createdAt: Date.now() },
       { id: aId, role: "assistant", text: "", streaming: true, createdAt: Date.now() },
     ]);
-    // When an element is selected, the sidebar AI edits it (command batch the
-    // user accepts) — same pipeline as the in-canvas popover. Page scope stays
-    // a text chat until page-level generation lands.
-    stream.start({
-      prompt: text,
-      scope: serverScope,
-      model,
-      intent: serverScope.kind === "element" ? "style-command" : "text",
-    });
-  }, [scope, model, lock, stream]);
+    stream.start({ prompt: text, scope: finalScope, model, intent });
+  }, [scope, model, lock, stream, composer]);
 
   React.useEffect(() => {
     // Capture the streaming message id in a local BEFORE setMessages. The

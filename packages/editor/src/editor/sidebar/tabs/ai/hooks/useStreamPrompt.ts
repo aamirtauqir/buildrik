@@ -10,7 +10,14 @@ interface StartArgs {
   intent?: "text" | "style-command";
 }
 
-type ServerScope = { kind: "element"; id: string } | { kind: "page" };
+interface PageElementRef {
+  id: string;
+  type: string;
+  text?: string;
+}
+type ServerScope =
+  | { kind: "element"; id: string }
+  | { kind: "page"; elements?: PageElementRef[] };
 
 interface ServerEdit {
   target: string;
