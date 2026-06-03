@@ -5,9 +5,25 @@
  * security-critical surface.
  */
 import { describe, it, expect } from "vitest";
-import { extractValidEditCommands } from "@server/services/ai.service";
+import { extractValidEditCommands, buildEditCommandPrompt } from "@server/services/ai.service";
 
 const EL = "el-1";
+
+describe("buildEditCommandPrompt (agent-callable registry)", () => {
+  it("includes every agent-callable command rule + the scoped element id", () => {
+    const p = buildEditCommandPrompt(EL, "do something");
+    for (const id of [
+      "set-style", "set-text", "add-element", "delete-element",
+      "duplicate-element", "move-element", "set-style-variant",
+      "set-attribute", "add-section",
+    ]) {
+      expect(p).toContain(id);
+    }
+    expect(p).toContain(EL);
+    // The user prompt is fenced as data, never instructions.
+    expect(p).toContain("<request>do something</request>");
+  });
+});
 
 describe("extractValidEditCommands", () => {
   it("parses a clean JSON array of valid commands", () => {

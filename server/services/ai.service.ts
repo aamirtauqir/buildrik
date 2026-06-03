@@ -711,7 +711,78 @@ export function editCommandToRow(
   return { field: c.args.property, from: "", to: c.args.value };
 }
 
-function buildEditCommandPrompt(elementId: string, userPrompt: string): string {
+// Per-command prompt knowledge + the AI exposure allow-list. `agentCallable`
+// gates which commands the model is even told about (the roadmap's safety
+// allow-list) — flip one to false to retire a command from AI without touching
+// the validator. `rule(elementId)` is the command's bullet in the prompt. The
+// security validators (isValidEditCommand) stay as type-narrowed union handlers
+// — collapsing them into this registry would erase the discriminated union and
+// force `as` casts. Order here is the order the rules appear in the prompt.
+interface CommandPromptSpec {
+  agentCallable: boolean;
+  rule: (elementId: string) => string;
+}
+
+const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandPromptSpec> = [
+  {
+    id: "set-style",
+    agentCallable: true,
+    rule: () =>
+      `- For set-style: "property" must be one of: ${[...STYLE_PROPERTY_ALLOWLIST].join(", ")}. "value" is a plain CSS value (e.g. "#0b0b0b", "24px", "bold") — never url(), expression(), data:, or javascript:. Desktop / normal state only.`,
+  },
+  {
+    id: "set-text",
+    agentCallable: true,
+    rule: () => `- For set-text: "text" is plain text content only — no HTML, no angle brackets.`,
+  },
+  {
+    id: "add-element",
+    agentCallable: true,
+    rule: () =>
+      `- For add-element: "elementType" must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}. Include "text" for content elements (heading/text/paragraph/button/link). Use this when the request asks to ADD or INSERT something new.`,
+  },
+  {
+    id: "delete-element",
+    agentCallable: true,
+    rule: (id) =>
+      `- delete-element: {"commandId":"delete-element","args":{"elementId":"${id}"}} — only when the request clearly asks to delete/remove this element.`,
+  },
+  {
+    id: "duplicate-element",
+    agentCallable: true,
+    rule: (id) =>
+      `- duplicate-element: {"commandId":"duplicate-element","args":{"elementId":"${id}"}} — when asked to duplicate/copy this element.`,
+  },
+  {
+    id: "move-element",
+    agentCallable: true,
+    rule: (id) =>
+      `- move-element: {"commandId":"move-element","args":{"elementId":"${id}","direction":"up|down"}} — when asked to move/reorder this element up or down among its siblings.`,
+  },
+  {
+    id: "set-style-variant",
+    agentCallable: true,
+    rule: (id) =>
+      `- set-style-variant: {"commandId":"set-style-variant","args":{"elementId":"${id}","property":"<css-property>","value":"<css-value>","pseudo":"hover|focus|active|disabled","breakpoint":"tablet|mobile"}} — use INSTEAD of set-style when the request targets a HOVER/focus/active/disabled state ("on hover make it blue") OR a tablet/mobile breakpoint ("on mobile stack the columns"). Include "pseudo" and/or "breakpoint" (at least one); omit the one that does not apply. "property"/"value" follow the same rules as set-style. Plain desktop/normal styling stays as set-style.`,
+  },
+  {
+    id: "set-attribute",
+    agentCallable: true,
+    rule: (id) =>
+      `- set-attribute: {"commandId":"set-attribute","args":{"elementId":"${id}","attribute":"<attr>","value":"<value>"}} — when asked to set a link URL, image alt text, open-in-new-tab, etc. "attribute" must be one of: ${[...ATTRIBUTE_ALLOWLIST].join(", ")}. For "href" use a normal URL (http/https/mailto/tel/relative/#anchor) — never javascript:, data:, or vbscript:. For "target" use one of: ${[...ALLOWED_TARGETS].join(", ")}. Other attributes are plain text (no angle brackets).`,
+  },
+  {
+    id: "add-section",
+    agentCallable: true,
+    rule: (id) =>
+      `- add-section: {"commandId":"add-section","args":{"elementId":"${id}","sectionType":"section|container|columns|grid|flex","children":[{"elementType":"heading","text":"..."},{"elementType":"button","text":"..."}]}} — when asked to BUILD or ADD a whole section/block (e.g. "add a pricing section", "add a hero with a heading and a button"). Put 2-${MAX_SECTION_CHILDREN} child elements inside; each child elementType must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}; include "text" for content children.`,
+  },
+];
+
+export function buildEditCommandPrompt(elementId: string, userPrompt: string): string {
+  const rules = COMMAND_PROMPT_SPECS.filter((s) => s.agentCallable)
+    .map((s) => s.rule(elementId))
+    .join("\n");
   return `You translate a request into edit commands for ONE selected element in a visual web editor.
 
 Return ONLY a JSON array. Each item is one of:
@@ -721,15 +792,7 @@ Return ONLY a JSON array. Each item is one of:
 
 Rules:
 - Target ONLY elementId "${elementId}". Never emit any other id. (For add-element, "${elementId}" is the reference element the new one is placed next to / inside.)
-- For set-style: "property" must be one of: ${[...STYLE_PROPERTY_ALLOWLIST].join(", ")}. "value" is a plain CSS value (e.g. "#0b0b0b", "24px", "bold") — never url(), expression(), data:, or javascript:. Desktop / normal state only.
-- For set-text: "text" is plain text content only — no HTML, no angle brackets.
-- For add-element: "elementType" must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}. Include "text" for content elements (heading/text/paragraph/button/link). Use this when the request asks to ADD or INSERT something new.
-- delete-element: {"commandId":"delete-element","args":{"elementId":"${elementId}"}} — only when the request clearly asks to delete/remove this element.
-- duplicate-element: {"commandId":"duplicate-element","args":{"elementId":"${elementId}"}} — when asked to duplicate/copy this element.
-- move-element: {"commandId":"move-element","args":{"elementId":"${elementId}","direction":"up|down"}} — when asked to move/reorder this element up or down among its siblings.
-- set-style-variant: {"commandId":"set-style-variant","args":{"elementId":"${elementId}","property":"<css-property>","value":"<css-value>","pseudo":"hover|focus|active|disabled","breakpoint":"tablet|mobile"}} — use INSTEAD of set-style when the request targets a HOVER/focus/active/disabled state ("on hover make it blue") OR a tablet/mobile breakpoint ("on mobile stack the columns"). Include "pseudo" and/or "breakpoint" (at least one); omit the one that does not apply. "property"/"value" follow the same rules as set-style. Plain desktop/normal styling stays as set-style.
-- set-attribute: {"commandId":"set-attribute","args":{"elementId":"${elementId}","attribute":"<attr>","value":"<value>"}} — when asked to set a link URL, image alt text, open-in-new-tab, etc. "attribute" must be one of: ${[...ATTRIBUTE_ALLOWLIST].join(", ")}. For "href" use a normal URL (http/https/mailto/tel/relative/#anchor) — never javascript:, data:, or vbscript:. For "target" use one of: ${[...ALLOWED_TARGETS].join(", ")}. Other attributes are plain text (no angle brackets).
-- add-section: {"commandId":"add-section","args":{"elementId":"${elementId}","sectionType":"section|container|columns|grid|flex","children":[{"elementType":"heading","text":"..."},{"elementType":"button","text":"..."}]}} — when asked to BUILD or ADD a whole section/block (e.g. "add a pricing section", "add a hero with a heading and a button"). Put 2-${MAX_SECTION_CHILDREN} child elements inside; each child elementType must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}; include "text" for content children.
+${rules}
 - Use set-text for wording, set-style for appearance, add-element to insert one element, add-section to build a multi-element section, delete-element to remove, duplicate-element to copy, move-element to reorder.
 - Return [] if the request cannot be expressed with these commands.
 - No markdown fences, no prose — JSON array only.

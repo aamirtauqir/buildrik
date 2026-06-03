@@ -391,6 +391,42 @@ export function applySetStyleVariant(composer: Composer, args: SetStyleVariantAr
 }
 
 /**
+ * Client-side command registry: maps a commandId to its Zod validator + apply
+ * fn. `defineCommand` binds the two so the batch loop is a single data-driven
+ * pass — registering a new command is one entry here instead of another arm in
+ * an if-chain. Each handler re-validates (defense in depth; the server already
+ * validated) and skips invalid args.
+ */
+function defineCommand<T>(
+  schema: z.ZodType<T>,
+  apply: (composer: Composer, args: T) => void,
+): { run: (composer: Composer, rawArgs: unknown) => boolean } {
+  return {
+    run(composer, rawArgs) {
+      const parsed = schema.safeParse(rawArgs);
+      if (!parsed.success) return false;
+      apply(composer, parsed.data);
+      return true;
+    },
+  };
+}
+
+const COMMAND_HANDLERS: Record<
+  string,
+  { run: (composer: Composer, rawArgs: unknown) => boolean }
+> = {
+  "set-style": defineCommand(setStyleArgsSchema, applySetStyle),
+  "set-text": defineCommand(setTextArgsSchema, applySetText),
+  "add-element": defineCommand(addElementArgsSchema, applyAddElement),
+  "delete-element": defineCommand(elementRefArgsSchema, applyDeleteElement),
+  "duplicate-element": defineCommand(elementRefArgsSchema, applyDuplicateElement),
+  "move-element": defineCommand(moveElementArgsSchema, applyMoveElement),
+  "add-section": defineCommand(addSectionArgsSchema, applyAddSection),
+  "set-attribute": defineCommand(setAttributeArgsSchema, applySetAttribute),
+  "set-style-variant": defineCommand(setStyleVariantArgsSchema, applySetStyleVariant),
+};
+
+/**
  * Run an accepted AI edit's command batch inside ONE outer transaction so the
  * whole edit is a single undo step. Each command is re-validated client-side
  * (defense in depth — the server already validated) before applying; invalid
@@ -416,52 +452,9 @@ export function applyAiEdit(
   try {
     for (const c of commands) {
       const cmd = c as { commandId?: unknown; args?: unknown };
-      if (cmd.commandId === "set-style") {
-        const parsed = setStyleArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applySetStyle(composer, parsed.data);
-        applied++;
-      } else if (cmd.commandId === "set-text") {
-        const parsed = setTextArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applySetText(composer, parsed.data);
-        applied++;
-      } else if (cmd.commandId === "add-element") {
-        const parsed = addElementArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applyAddElement(composer, parsed.data);
-        applied++;
-      } else if (cmd.commandId === "delete-element") {
-        const parsed = elementRefArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applyDeleteElement(composer, parsed.data);
-        applied++;
-      } else if (cmd.commandId === "duplicate-element") {
-        const parsed = elementRefArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applyDuplicateElement(composer, parsed.data);
-        applied++;
-      } else if (cmd.commandId === "move-element") {
-        const parsed = moveElementArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applyMoveElement(composer, parsed.data);
-        applied++;
-      } else if (cmd.commandId === "add-section") {
-        const parsed = addSectionArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applyAddSection(composer, parsed.data);
-        applied++;
-      } else if (cmd.commandId === "set-attribute") {
-        const parsed = setAttributeArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applySetAttribute(composer, parsed.data);
-        applied++;
-      } else if (cmd.commandId === "set-style-variant") {
-        const parsed = setStyleVariantArgsSchema.safeParse(cmd.args);
-        if (!parsed.success) continue;
-        applySetStyleVariant(composer, parsed.data);
-        applied++;
-      }
+      const handler =
+        typeof cmd.commandId === "string" ? COMMAND_HANDLERS[cmd.commandId] : undefined;
+      if (handler && handler.run(composer, cmd.args)) applied++;
     }
   } finally {
     composer.endTransaction();
