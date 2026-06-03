@@ -145,4 +145,20 @@ describe("extractValidEditCommands", () => {
     ]);
     expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
+
+  it("accepts delete-element and duplicate-element for the scoped id", () => {
+    const raw = JSON.stringify([
+      { commandId: "delete-element", args: { elementId: EL } },
+      { commandId: "duplicate-element", args: { elementId: EL } },
+    ]);
+    const r = extractValidEditCommands(raw, EL);
+    expect(r.map((c) => c.commandId)).toEqual(["delete-element", "duplicate-element"]);
+  });
+
+  it("drops delete-element targeting a different element (exact-id guard)", () => {
+    const raw = JSON.stringify([
+      { commandId: "delete-element", args: { elementId: "other" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
 });

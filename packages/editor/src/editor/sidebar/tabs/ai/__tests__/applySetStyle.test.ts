@@ -4,6 +4,8 @@ import {
   applySetStyle,
   applySetText,
   applyAddElement,
+  applyDeleteElement,
+  applyDuplicateElement,
   applyAiEdit,
   setStyleArgsSchema,
 } from "../applySetStyle";
@@ -290,5 +292,39 @@ describe("applyAddElement", () => {
     });
     applyAddElement(composer, { elementId: "ref", elementType: "section" });
     expect(createElement).toHaveBeenCalledWith("section", {});
+  });
+});
+
+describe("applyDeleteElement / applyDuplicateElement", () => {
+  it("delete calls removeElement", () => {
+    const removeElement = vi.fn(() => true);
+    const composer = { elements: { removeElement } } as unknown as Composer;
+    applyDeleteElement(composer, { elementId: "el-1" });
+    expect(removeElement).toHaveBeenCalledWith("el-1");
+  });
+
+  it("delete throws when removeElement returns false", () => {
+    const composer = {
+      elements: { removeElement: vi.fn(() => false) },
+    } as unknown as Composer;
+    expect(() => applyDeleteElement(composer, { elementId: "gone" })).toThrow(
+      /not found/i,
+    );
+  });
+
+  it("duplicate calls duplicateElement", () => {
+    const duplicateElement = vi.fn(() => ({ id: "copy" }));
+    const composer = { elements: { duplicateElement } } as unknown as Composer;
+    applyDuplicateElement(composer, { elementId: "el-1" });
+    expect(duplicateElement).toHaveBeenCalledWith("el-1");
+  });
+
+  it("duplicate throws when duplicateElement returns null", () => {
+    const composer = {
+      elements: { duplicateElement: vi.fn(() => null) },
+    } as unknown as Composer;
+    expect(() => applyDuplicateElement(composer, { elementId: "x" })).toThrow(
+      /failed/i,
+    );
   });
 });

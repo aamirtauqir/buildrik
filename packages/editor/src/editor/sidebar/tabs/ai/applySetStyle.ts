@@ -164,6 +164,25 @@ export function applyAddElement(composer: Composer, args: AddElementArgs): void 
   }
 }
 
+/** Shared args for commands that only reference an element by id. */
+export const elementRefArgsSchema = z.object({ elementId: z.string().min(1) });
+export type ElementRefArgs = z.infer<typeof elementRefArgsSchema>;
+
+export function applyDeleteElement(composer: Composer, args: ElementRefArgs): void {
+  if (!composer.elements.removeElement(args.elementId)) {
+    throw new Error(`delete-element: element not found (${args.elementId})`);
+  }
+}
+
+export function applyDuplicateElement(
+  composer: Composer,
+  args: ElementRefArgs,
+): void {
+  if (!composer.elements.duplicateElement(args.elementId)) {
+    throw new Error(`duplicate-element: failed (${args.elementId})`);
+  }
+}
+
 /**
  * Run an accepted AI edit's command batch inside ONE outer transaction so the
  * whole edit is a single undo step. Each command is re-validated client-side
@@ -204,6 +223,16 @@ export function applyAiEdit(
         const parsed = addElementArgsSchema.safeParse(cmd.args);
         if (!parsed.success) continue;
         applyAddElement(composer, parsed.data);
+        applied++;
+      } else if (cmd.commandId === "delete-element") {
+        const parsed = elementRefArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applyDeleteElement(composer, parsed.data);
+        applied++;
+      } else if (cmd.commandId === "duplicate-element") {
+        const parsed = elementRefArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applyDuplicateElement(composer, parsed.data);
         applied++;
       }
     }

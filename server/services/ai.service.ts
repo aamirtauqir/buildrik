@@ -583,7 +583,9 @@ export type EditCommand =
   | {
       commandId: "add-element";
       args: { elementId: string; elementType: string; text?: string };
-    };
+    }
+  | { commandId: "delete-element"; args: { elementId: string } }
+  | { commandId: "duplicate-element"; args: { elementId: string } };
 
 export interface EditCommandInput {
   prompt: string;
@@ -605,6 +607,12 @@ export function editCommandToRow(
       to: c.args.text ? `${c.args.elementType} "${c.args.text}"` : c.args.elementType,
     };
   }
+  if (c.commandId === "delete-element") {
+    return { field: "delete", from: "", to: "this element" };
+  }
+  if (c.commandId === "duplicate-element") {
+    return { field: "duplicate", from: "", to: "this element" };
+  }
   return { field: c.args.property, from: "", to: c.args.value };
 }
 
@@ -621,7 +629,9 @@ Rules:
 - For set-style: "property" must be one of: ${[...STYLE_PROPERTY_ALLOWLIST].join(", ")}. "value" is a plain CSS value (e.g. "#0b0b0b", "24px", "bold") — never url(), expression(), data:, or javascript:. Desktop / normal state only.
 - For set-text: "text" is plain text content only — no HTML, no angle brackets.
 - For add-element: "elementType" must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}. Include "text" for content elements (heading/text/paragraph/button/link). Use this when the request asks to ADD or INSERT something new.
-- Use set-text for wording, set-style for appearance, add-element to insert a new element.
+- delete-element: {"commandId":"delete-element","args":{"elementId":"${elementId}"}} — only when the request clearly asks to delete/remove this element.
+- duplicate-element: {"commandId":"duplicate-element","args":{"elementId":"${elementId}"}} — when asked to duplicate/copy this element.
+- Use set-text for wording, set-style for appearance, add-element to insert, delete-element to remove, duplicate-element to copy.
 - Return [] if the request cannot be expressed with these commands.
 - No markdown fences, no prose — JSON array only.
 
@@ -681,6 +691,9 @@ function isValidEditCommand(c: unknown, elementId: string): c is EditCommand {
       text === undefined ||
       (typeof text === "string" && text.length <= MAX_TEXT_LEN && !UNSAFE_TEXT.test(text))
     );
+  }
+  if (cmd.commandId === "delete-element" || cmd.commandId === "duplicate-element") {
+    return true; // only needs elementId, already exact-id guarded above
   }
   return false;
 }
