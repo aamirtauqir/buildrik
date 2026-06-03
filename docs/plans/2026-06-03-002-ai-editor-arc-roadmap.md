@@ -127,12 +127,17 @@ set-style + duplicate + undo confirmed; delete/move/add-section share the path.
 ### Remaining to COMPLETE the whole-editor-AI arc (next-session checklist)
 - [x] **Live-verify** the element commands in the browser — done 2026-06-04
       (set-style/duplicate/undo walked; 2 bugs fixed; see UPDATE above).
-- [~] **P2 full element coverage** — `set-attribute` (href/alt/target/title/rel/
-      aria-label/name) SHIPPED 2026-06-04 (commit `d67480fe`, 8th command,
-      live-verified). STILL TODO: spacing/border/font/layout style coverage, and
-      the **two style stores** (pseudo-state + breakpoint via
-      `StyleEngine.setRule`, not just `el.setStyle`). Each new command = the
-      4-edit pattern (union + validate + prompt + apply-dispatch).
+- [x] **P2 full element coverage** SHIPPED 2026-06-04. `set-attribute`
+      (`d67480fe`), style allowlist ~28→~70 props (`0ee44bad`), and
+      `set-style-variant` (`c019b5a7`, 9th command — pseudo + breakpoint via the
+      second style store). Each new command = the 4-edit pattern.
+- [x] **P1b registries** SHIPPED 2026-06-04 (`13f31a98`) — editor apply map +
+      server prompt-spec/`agentCallable` allow-list. Validators kept as
+      type-narrowed union handlers (registry-izing = banned `as` casts).
+- [x] **P3 v1 page-scope multi-element edits** SHIPPED 2026-06-04 (`174718a1`,
+      live-verified). Scope guard exact-id → allowed-id Set; page scope sends the
+      element list, `generatePageEditCommands` validates ids ∈ page. STILL TODO
+      (P3 deepen): multi-level nesting in add-section, richer diff/preview.
 - [x] **Bonus fixes 2026-06-04**: error-surfacing in panel (`5d3ebb49` — quota/
       provider errors were silent) + **data-loss guard** (`ea93f9f7` —
       raced/empty `loadProject` + auto-save was wiping server content; wiped this
