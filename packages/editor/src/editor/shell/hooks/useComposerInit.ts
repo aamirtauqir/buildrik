@@ -22,6 +22,7 @@ import {
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import type { ToastInput } from "@/editor/shared/vibcoder";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { ComponentSchemaAIClient } from "@/engine/designSystem/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 
@@ -193,11 +194,33 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           })
           .catch((err) => {
             console.error("[BuildrikSync] load failed:", err);
-            addToastRef.current({
-              title: "Load failed",
-              description: "Could not load project from dashboard. Falling back to local.",
-              tone: "warning",
-            });
+            // Distinguish an auth failure from a generic load failure. On
+            // UNAUTHORIZED the generic "falling back to local" message is
+            // misleading — the user has a real site on the server they can't
+            // see because they are signed out. Point them at sign-in instead.
+            const isAuth =
+              err instanceof Error && /unauthorized/i.test(err.message);
+            if (isAuth) {
+              addToastRef.current({
+                title: "Session expired",
+                description:
+                  "Sign in to load this site from the dashboard. Showing local changes for now.",
+                tone: "warning",
+                action: {
+                  label: "Sign in",
+                  onClick: () => {
+                    window.location.href = `${DASHBOARD_URL}/auth`;
+                  },
+                },
+              });
+            } else {
+              addToastRef.current({
+                title: "Load failed",
+                description:
+                  "Could not load project from dashboard. Falling back to local.",
+                tone: "warning",
+              });
+            }
             loadFromLocalStorage(instance, projectConfig);
           });
         return;

@@ -426,6 +426,50 @@ describe("useComposerInit — DS migration runs at project load (A.1)", () => {
     expect(imported.dsSchemaVersion).toBe(0);
     consoleSpy.mockRestore();
   });
+
+  it("shows a Sign in toast (not generic) when load fails with UNAUTHORIZED", async () => {
+    const { getSiteIdFromUrl, loadProject } = await import(
+      "@/services/BuildrikSyncProvider"
+    );
+    (getSiteIdFromUrl as ReturnType<typeof vi.fn>).mockReturnValue("site-auth");
+    (loadProject as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error(
+        "BuildrikSyncProvider.loadProject failed for site site-auth: UNAUTHORIZED"
+      )
+    );
+    const addToast = vi.fn();
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    renderHook(() =>
+      useComposerInit({
+        containerRef: makeContainerRef(),
+        addToast,
+        setCanUndo: vi.fn(),
+        setCanRedo: vi.fn(),
+        setDevice: vi.fn(),
+        setZoom: vi.fn(),
+        setShowTemplates: vi.fn(),
+        setShowExporter: vi.fn(),
+        setShowAI: vi.fn(),
+        setShowComponentView: vi.fn(),
+        setIsDirty: vi.fn(),
+        setSaveState: vi.fn(),
+      })
+    );
+
+    act(() => {
+      mockComposer.emit("composer:ready");
+    });
+    await flushMicrotasks();
+
+    const call = addToast.mock.calls.find(
+      (c) => (c[0] as { title?: string }).title === "Session expired"
+    );
+    expect(call).toBeDefined();
+    const toast = call![0] as { action?: { label?: string } };
+    expect(toast.action?.label).toBe("Sign in");
+    consoleSpy.mockRestore();
+  });
 });
 
 describe("useComposerInit — alias validation runs at load (A.2)", () => {
