@@ -180,6 +180,11 @@
   color: var(--bd-fg-muted);
 }
 
+.bd-ai-msg-error {
+  margin: 0;
+  color: var(--bd-error);
+}
+
 .bd-ai-msg-regenerate {
   align-self: flex-start;
   background: transparent;

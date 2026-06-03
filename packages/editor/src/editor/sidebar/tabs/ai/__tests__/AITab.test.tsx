@@ -3,13 +3,17 @@ import { render, screen, act } from "@testing-library/react";
 import { fireEvent } from "@testing-library/react";
 
 // Capture the onData handler the hook registers so tests can drive the stream.
-const lastSubscribe: { onData?: (chunk: unknown) => void } = {};
+const lastSubscribe: {
+  onData?: (chunk: unknown) => void;
+  onError?: (err: { message?: string }) => void;
+} = {};
 vi.mock("@/services/ai/subscriptionClient", () => ({
   getAiSubscriptionClient: () => ({
     ai: {
       streamPrompt: {
-        subscribe: vi.fn((_input: unknown, cbs: { onData?: (c: unknown) => void }) => {
+        subscribe: vi.fn((_input: unknown, cbs: { onData?: (c: unknown) => void; onError?: (e: { message?: string }) => void }) => {
           lastSubscribe.onData = cbs.onData;
+          lastSubscribe.onError = cbs.onError;
           return { unsubscribe: vi.fn() };
         }),
       },
@@ -88,5 +92,24 @@ describe("AITab — scope + composer wiring", () => {
     });
 
     expect(screen.getByLabelText("Apply changes")).toBeInTheDocument();
+  });
+
+  it("surfaces a stream error in the assistant message instead of a silent empty reply", () => {
+    // Regression: onError set hook state but AITab never rendered it, so a
+    // quota-exhausted (TOO_MANY_REQUESTS) or provider failure showed as a blank
+    // assistant box. The error must be visible to the user.
+    const composer = makeElementScopedComposer();
+    const { container } = render(
+      <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+    );
+    const ta = container.querySelector("textarea")!;
+    fireEvent.change(ta, { target: { value: "duplicate this" } });
+    fireEvent.keyDown(ta, { key: "Enter" });
+
+    act(() => {
+      lastSubscribe.onError?.({ message: "Daily limit reached (10). Resets at 2026-06-04T00:00:00.000Z." });
+    });
+
+    expect(screen.getByText(/Daily limit reached/i)).toBeInTheDocument();
   });
 });

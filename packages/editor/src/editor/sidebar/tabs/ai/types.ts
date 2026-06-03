@@ -31,6 +31,7 @@ export interface ChatMessage {
   streaming?: boolean;
   stopped?: boolean;
   edit?: DiffEdit;
+  error?: string;
   createdAt: number;
 }
 

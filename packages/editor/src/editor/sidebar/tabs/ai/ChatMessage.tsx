@@ -15,12 +15,13 @@ export interface ChatMessageProps {
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   message, onAccept, onReject, onRegenerate,
 }) => {
-  const { role, text, streaming, stopped, edit } = message;
+  const { role, text, streaming, stopped, edit, error } = message;
   return (
     <div className={`bd-ai-msg bd-ai-msg-${role}`}>
       <div className="bd-ai-msg-role">{role === "user" ? "You" : "Assistant"}</div>
       <div className={`bd-ai-msg-body${streaming ? " bd-ai-msg-streaming" : ""}`}>
         {text ? <p>{text}</p> : null}
+        {error ? <p className="bd-ai-msg-error" role="alert">{error}</p> : null}
         {stopped && <span className="bd-ai-msg-stopped">(stopped)</span>}
       </div>
       {edit && (

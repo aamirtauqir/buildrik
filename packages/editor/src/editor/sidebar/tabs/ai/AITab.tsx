@@ -73,7 +73,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
     setMessages((prev) =>
       prev.map((m) =>
         m.id === targetId
-          ? { ...m, text: stream.text, streaming: stream.streaming, stopped: stream.stopped, edit: stream.edit ?? m.edit }
+          ? { ...m, text: stream.text, streaming: stream.streaming, stopped: stream.stopped, edit: stream.edit ?? m.edit, error: stream.error ?? m.error }
           : m,
       ),
     );
@@ -84,7 +84,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
       // couldn't select a new element for the next edit.
       unlock();
     }
-  }, [stream.text, stream.streaming, stream.stopped, stream.edit, unlock]);
+  }, [stream.text, stream.streaming, stream.stopped, stream.edit, stream.error, unlock]);
 
   const onAccept = React.useCallback((msgId: string) => {
     const msg = messages.find((m) => m.id === msgId);
