@@ -10,8 +10,10 @@ import {
   applyMoveElement,
   applyAiEdit,
   applySetAttribute,
+  applySetStyleVariant,
   setStyleArgsSchema,
   setAttributeArgsSchema,
+  setStyleVariantArgsSchema,
 } from "../applySetStyle";
 
 function makeComposer(
@@ -475,5 +477,70 @@ describe("applySetAttribute", () => {
     ]));
     expect(r.applied).toBe(0);
     expect(setAttribute).not.toHaveBeenCalled();
+  });
+});
+
+function makeStyleComposer() {
+  const setRule = vi.fn();
+  const setBreakpointStyle = vi.fn();
+  const composer = {
+    elements: { getElement: vi.fn(() => ({})) },
+    styles: { setRule, setBreakpointStyle },
+    beginTransaction: vi.fn(),
+    endTransaction: vi.fn(),
+    history: { flushPending: vi.fn() },
+  } as unknown as Composer;
+  return { composer, setRule, setBreakpointStyle };
+}
+
+describe("setStyleVariantArgsSchema", () => {
+  it("accepts a pseudo state, a breakpoint, or both", () => {
+    expect(setStyleVariantArgsSchema.safeParse({ elementId: "a", property: "color", value: "#00f", pseudo: "hover" }).success).toBe(true);
+    expect(setStyleVariantArgsSchema.safeParse({ elementId: "a", property: "display", value: "block", breakpoint: "mobile" }).success).toBe(true);
+    expect(setStyleVariantArgsSchema.safeParse({ elementId: "a", property: "gap", value: "8px", pseudo: "focus", breakpoint: "tablet" }).success).toBe(true);
+  });
+
+  it("rejects when neither pseudo nor breakpoint is set, or values are invalid", () => {
+    expect(setStyleVariantArgsSchema.safeParse({ elementId: "a", property: "color", value: "#000" }).success).toBe(false);
+    expect(setStyleVariantArgsSchema.safeParse({ elementId: "a", property: "color", value: "#000", pseudo: "evil" }).success).toBe(false);
+    expect(setStyleVariantArgsSchema.safeParse({ elementId: "a", property: "content", value: "x", pseudo: "hover" }).success).toBe(false);
+    expect(setStyleVariantArgsSchema.safeParse({ elementId: "a", property: "background", value: "url(x)", pseudo: "hover" }).success).toBe(false);
+  });
+});
+
+describe("applySetStyleVariant", () => {
+  it("routes a pseudo state through StyleEngine.setRule with the pseudo + media query", () => {
+    const { composer, setRule, setBreakpointStyle } = makeStyleComposer();
+    applySetStyleVariant(composer, { elementId: "el-1", property: "color", value: "#00f", pseudo: "hover" });
+    expect(setRule).toHaveBeenCalledWith(
+      '[data-buildrick-id="el-1"]',
+      { color: "#00f" },
+      { pseudo: ":hover", mediaQuery: undefined },
+    );
+    expect(setBreakpointStyle).not.toHaveBeenCalled();
+  });
+
+  it("routes a breakpoint-only variant through StyleEngine.setBreakpointStyle", () => {
+    const { composer, setRule, setBreakpointStyle } = makeStyleComposer();
+    applySetStyleVariant(composer, { elementId: "el-1", property: "display", value: "block", breakpoint: "mobile" });
+    expect(setBreakpointStyle).toHaveBeenCalledWith("el-1", "mobile", { display: "block" });
+    expect(setRule).not.toHaveBeenCalled();
+  });
+
+  it("passes the breakpoint media query when pseudo + breakpoint combine", () => {
+    const { composer, setRule } = makeStyleComposer();
+    applySetStyleVariant(composer, { elementId: "el-1", property: "gap", value: "8px", pseudo: "focus", breakpoint: "tablet" });
+    const call = setRule.mock.calls[0];
+    expect(call[2].pseudo).toBe(":focus");
+    expect(typeof call[2].mediaQuery).toBe("string");
+  });
+
+  it("applyAiEdit dispatches a set-style-variant command", () => {
+    const { composer, setRule } = makeStyleComposer();
+    const r = applyAiEdit(composer, commitEdit([
+      { commandId: "set-style-variant", args: { elementId: "el-1", property: "color", value: "#0f0", pseudo: "hover" } },
+    ]));
+    expect(r.applied).toBe(1);
+    expect(setRule).toHaveBeenCalledOnce();
   });
 });

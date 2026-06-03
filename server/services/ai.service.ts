@@ -596,6 +596,12 @@ const SECTION_CONTAINER_TYPES = new Set([
 ]);
 const MAX_SECTION_CHILDREN = 12;
 
+// Pseudo-states + breakpoints the AI may target with set-style-variant. These
+// route to the second style store (StyleEngine.setRule / setBreakpointStyle),
+// not the inline `el.setStyle` path that plain set-style uses.
+const PSEUDO_STATES = new Set(["hover", "focus", "active", "disabled"]);
+const VARIANT_BREAKPOINTS = new Set(["tablet", "mobile"]);
+
 // Element attributes the AI may set. Restricted to safe, common authoring
 // attributes — never event handlers (onclick), style, src, or id.
 const ATTRIBUTE_ALLOWLIST = new Set([
@@ -641,6 +647,16 @@ export type EditCommand =
       args: { elementId: string; attribute: string; value: string };
     }
   | {
+      commandId: "set-style-variant";
+      args: {
+        elementId: string;
+        property: string;
+        value: string;
+        pseudo?: "hover" | "focus" | "active" | "disabled";
+        breakpoint?: "tablet" | "mobile";
+      };
+    }
+  | {
       commandId: "add-section";
       args: {
         elementId: string;
@@ -681,6 +697,10 @@ export function editCommandToRow(
   if (c.commandId === "set-attribute") {
     return { field: c.args.attribute, from: "", to: c.args.value };
   }
+  if (c.commandId === "set-style-variant") {
+    const variant = c.args.pseudo ? `:${c.args.pseudo}` : c.args.breakpoint;
+    return { field: `${c.args.property} (${variant})`, from: "", to: c.args.value };
+  }
   if (c.commandId === "add-section") {
     return {
       field: "add section",
@@ -707,6 +727,7 @@ Rules:
 - delete-element: {"commandId":"delete-element","args":{"elementId":"${elementId}"}} — only when the request clearly asks to delete/remove this element.
 - duplicate-element: {"commandId":"duplicate-element","args":{"elementId":"${elementId}"}} — when asked to duplicate/copy this element.
 - move-element: {"commandId":"move-element","args":{"elementId":"${elementId}","direction":"up|down"}} — when asked to move/reorder this element up or down among its siblings.
+- set-style-variant: {"commandId":"set-style-variant","args":{"elementId":"${elementId}","property":"<css-property>","value":"<css-value>","pseudo":"hover|focus|active|disabled","breakpoint":"tablet|mobile"}} — use INSTEAD of set-style when the request targets a HOVER/focus/active/disabled state ("on hover make it blue") OR a tablet/mobile breakpoint ("on mobile stack the columns"). Include "pseudo" and/or "breakpoint" (at least one); omit the one that does not apply. "property"/"value" follow the same rules as set-style. Plain desktop/normal styling stays as set-style.
 - set-attribute: {"commandId":"set-attribute","args":{"elementId":"${elementId}","attribute":"<attr>","value":"<value>"}} — when asked to set a link URL, image alt text, open-in-new-tab, etc. "attribute" must be one of: ${[...ATTRIBUTE_ALLOWLIST].join(", ")}. For "href" use a normal URL (http/https/mailto/tel/relative/#anchor) — never javascript:, data:, or vbscript:. For "target" use one of: ${[...ALLOWED_TARGETS].join(", ")}. Other attributes are plain text (no angle brackets).
 - add-section: {"commandId":"add-section","args":{"elementId":"${elementId}","sectionType":"section|container|columns|grid|flex","children":[{"elementType":"heading","text":"..."},{"elementType":"button","text":"..."}]}} — when asked to BUILD or ADD a whole section/block (e.g. "add a pricing section", "add a hero with a heading and a button"). Put 2-${MAX_SECTION_CHILDREN} child elements inside; each child elementType must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}; include "text" for content children.
 - Use set-text for wording, set-style for appearance, add-element to insert one element, add-section to build a multi-element section, delete-element to remove, duplicate-element to copy, move-element to reorder.
@@ -778,6 +799,18 @@ function isValidEditCommand(c: unknown, elementId: string): c is EditCommand {
   }
   if (cmd.commandId === "set-attribute") {
     return isValidAttribute(cmd.args.attribute, cmd.args.value);
+  }
+  if (cmd.commandId === "set-style-variant") {
+    const { property, value, pseudo, breakpoint } = cmd.args as {
+      property?: unknown; value?: unknown; pseudo?: unknown; breakpoint?: unknown;
+    };
+    if (typeof property !== "string" || !STYLE_PROPERTY_ALLOWLIST.has(property)) return false;
+    if (typeof value !== "string" || value.length === 0 || value.length > 200) return false;
+    if (UNSAFE_STYLE_VALUE.test(value)) return false;
+    if (pseudo !== undefined && !PSEUDO_STATES.has(pseudo as string)) return false;
+    if (breakpoint !== undefined && !VARIANT_BREAKPOINTS.has(breakpoint as string)) return false;
+    // Must target at least one variant dimension — else it's a plain set-style.
+    return pseudo !== undefined || breakpoint !== undefined;
   }
   if (cmd.commandId === "add-section") {
     const { sectionType, children } = cmd.args as {

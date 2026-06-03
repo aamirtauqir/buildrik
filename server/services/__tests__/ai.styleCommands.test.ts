@@ -221,6 +221,34 @@ describe("extractValidEditCommands", () => {
     expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
 
+  it("accepts set-style-variant with a pseudo state, a breakpoint, or both", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-style-variant", args: { elementId: EL, property: "color", value: "#00f", pseudo: "hover" } },
+      { commandId: "set-style-variant", args: { elementId: EL, property: "display", value: "block", breakpoint: "mobile" } },
+      { commandId: "set-style-variant", args: { elementId: EL, property: "gap", value: "8px", pseudo: "focus", breakpoint: "tablet" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(3);
+  });
+
+  it("rejects set-style-variant with neither pseudo nor breakpoint, or invalid ones", () => {
+    const none = JSON.stringify([
+      { commandId: "set-style-variant", args: { elementId: EL, property: "color", value: "#000" } },
+    ]);
+    const badPseudo = JSON.stringify([
+      { commandId: "set-style-variant", args: { elementId: EL, property: "color", value: "#000", pseudo: "evil" } },
+    ]);
+    const badBp = JSON.stringify([
+      { commandId: "set-style-variant", args: { elementId: EL, property: "color", value: "#000", breakpoint: "watch" } },
+    ]);
+    const badProp = JSON.stringify([
+      { commandId: "set-style-variant", args: { elementId: EL, property: "content", value: "x", pseudo: "hover" } },
+    ]);
+    expect(extractValidEditCommands(none, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(badPseudo, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(badBp, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(badProp, EL)).toHaveLength(0);
+  });
+
   it("accepts expanded layout/position/typography style properties", () => {
     const raw = JSON.stringify([
       { commandId: "set-style", args: { elementId: EL, property: "justify-content", value: "space-between" } },

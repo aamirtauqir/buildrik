@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Composer } from "@/engine/Composer";
+import { getBreakpointQuery } from "@/shared/constants/breakpoints";
 
 /**
  * v1 in-canvas AI command: `set-style`. Desktop / normal-state inline styles
@@ -345,6 +346,51 @@ export function applySetAttribute(composer: Composer, args: SetAttributeArgs): v
 }
 
 /**
+ * v1 in-canvas AI command: `set-style-variant`. Sets a style on the SECOND
+ * style store — a pseudo-state (:hover/:focus/:active/:disabled) and/or a
+ * tablet/mobile breakpoint — via StyleEngine, not the inline `el.setStyle` path
+ * that plain set-style uses. Mirrors the inspector's selector convention
+ * (`[data-buildrick-id="<id>"]`) and routing: pseudo → setRule with the pseudo
+ * + media query; breakpoint-only → setBreakpointStyle.
+ */
+const elementSelector = (id: string) => `[data-buildrick-id="${id}"]`;
+
+export const setStyleVariantArgsSchema = z
+  .object({
+    elementId: z.string().min(1),
+    property: z.enum(ALLOWED_PROPERTIES),
+    value: z
+      .string()
+      .min(1)
+      .max(200)
+      .refine((v) => !UNSAFE_VALUE.test(v), { message: "Unsafe CSS value rejected" }),
+    pseudo: z.enum(["hover", "focus", "active", "disabled"]).optional(),
+    breakpoint: z.enum(["tablet", "mobile"]).optional(),
+  })
+  .refine((a) => a.pseudo !== undefined || a.breakpoint !== undefined, {
+    message: "set-style-variant requires a pseudo state or a breakpoint",
+  });
+
+export type SetStyleVariantArgs = z.infer<typeof setStyleVariantArgsSchema>;
+
+export function applySetStyleVariant(composer: Composer, args: SetStyleVariantArgs): void {
+  const { elementId, property, value, pseudo, breakpoint } = args;
+  if (!composer.elements.getElement(elementId)) {
+    throw new Error(`set-style-variant: element not found (${elementId})`);
+  }
+  const mediaQuery = breakpoint ? getBreakpointQuery(breakpoint) ?? undefined : undefined;
+  if (pseudo) {
+    composer.styles.setRule(
+      elementSelector(elementId),
+      { [property]: value },
+      { pseudo: `:${pseudo}`, mediaQuery },
+    );
+  } else if (breakpoint) {
+    composer.styles.setBreakpointStyle(elementId, breakpoint, { [property]: value });
+  }
+}
+
+/**
  * Run an accepted AI edit's command batch inside ONE outer transaction so the
  * whole edit is a single undo step. Each command is re-validated client-side
  * (defense in depth — the server already validated) before applying; invalid
@@ -409,6 +455,11 @@ export function applyAiEdit(
         const parsed = setAttributeArgsSchema.safeParse(cmd.args);
         if (!parsed.success) continue;
         applySetAttribute(composer, parsed.data);
+        applied++;
+      } else if (cmd.commandId === "set-style-variant") {
+        const parsed = setStyleVariantArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applySetStyleVariant(composer, parsed.data);
         applied++;
       }
     }
