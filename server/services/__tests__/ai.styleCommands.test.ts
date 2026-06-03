@@ -111,4 +111,38 @@ describe("extractValidEditCommands", () => {
     expect(r).toHaveLength(2);
     expect(r.map((c) => c.commandId)).toEqual(["set-style", "set-text"]);
   });
+
+  it("accepts a valid add-element command with text", () => {
+    const raw = JSON.stringify([
+      { commandId: "add-element", args: { elementId: EL, elementType: "button", text: "Buy now" } },
+    ]);
+    const r = extractValidEditCommands(raw, EL);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toEqual({
+      commandId: "add-element",
+      args: { elementId: EL, elementType: "button", text: "Buy now" },
+    });
+  });
+
+  it("accepts add-element without text (e.g. a container)", () => {
+    const raw = JSON.stringify([
+      { commandId: "add-element", args: { elementId: EL, elementType: "container" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(1);
+  });
+
+  it("drops add-element with a non-allow-listed type", () => {
+    const raw = JSON.stringify([
+      { commandId: "add-element", args: { elementId: EL, elementType: "image" } },
+      { commandId: "add-element", args: { elementId: EL, elementType: "script" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
+
+  it("drops add-element whose text contains markup", () => {
+    const raw = JSON.stringify([
+      { commandId: "add-element", args: { elementId: EL, elementType: "heading", text: "<img src=x>" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
 });

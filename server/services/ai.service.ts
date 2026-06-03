@@ -567,12 +567,23 @@ const MAX_TEXT_LEN = 2000;
 // brackets — AI text must be plain text, never markup/script.
 const UNSAFE_TEXT = /[<>]/;
 
+// Element types the AI may insert. Restricted to content/layout primitives that
+// need no external resource (no image/video/embed/upload).
+const ELEMENT_TYPE_ALLOWLIST = new Set([
+  "heading", "text", "paragraph", "button", "link", "list",
+  "container", "section", "columns", "grid", "flex",
+]);
+
 export type EditCommand =
   | {
       commandId: "set-style";
       args: { elementId: string; property: string; value: string };
     }
-  | { commandId: "set-text"; args: { elementId: string; text: string } };
+  | { commandId: "set-text"; args: { elementId: string; text: string } }
+  | {
+      commandId: "add-element";
+      args: { elementId: string; elementType: string; text?: string };
+    };
 
 export interface EditCommandInput {
   prompt: string;
@@ -587,6 +598,13 @@ export function editCommandToRow(
   if (c.commandId === "set-text") {
     return { field: "text", from: "", to: c.args.text };
   }
+  if (c.commandId === "add-element") {
+    return {
+      field: "add",
+      from: "",
+      to: c.args.text ? `${c.args.elementType} "${c.args.text}"` : c.args.elementType,
+    };
+  }
   return { field: c.args.property, from: "", to: c.args.value };
 }
 
@@ -596,12 +614,14 @@ function buildEditCommandPrompt(elementId: string, userPrompt: string): string {
 Return ONLY a JSON array. Each item is one of:
 {"commandId":"set-style","args":{"elementId":"${elementId}","property":"<css-property>","value":"<css-value>"}}
 {"commandId":"set-text","args":{"elementId":"${elementId}","text":"<plain text>"}}
+{"commandId":"add-element","args":{"elementId":"${elementId}","elementType":"<type>","text":"<optional plain text>"}}
 
 Rules:
-- Target ONLY elementId "${elementId}". Never emit any other id.
+- Target ONLY elementId "${elementId}". Never emit any other id. (For add-element, "${elementId}" is the reference element the new one is placed next to / inside.)
 - For set-style: "property" must be one of: ${[...STYLE_PROPERTY_ALLOWLIST].join(", ")}. "value" is a plain CSS value (e.g. "#0b0b0b", "24px", "bold") — never url(), expression(), data:, or javascript:. Desktop / normal state only.
 - For set-text: "text" is plain text content only — no HTML, no angle brackets.
-- Use set-text when the request is about wording/content; use set-style for appearance.
+- For add-element: "elementType" must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}. Include "text" for content elements (heading/text/paragraph/button/link). Use this when the request asks to ADD or INSERT something new.
+- Use set-text for wording, set-style for appearance, add-element to insert a new element.
 - Return [] if the request cannot be expressed with these commands.
 - No markdown fences, no prose — JSON array only.
 
@@ -650,6 +670,16 @@ function isValidEditCommand(c: unknown, elementId: string): c is EditCommand {
       text.length > 0 &&
       text.length <= MAX_TEXT_LEN &&
       !UNSAFE_TEXT.test(text)
+    );
+  }
+  if (cmd.commandId === "add-element") {
+    const { elementType, text } = cmd.args;
+    if (typeof elementType !== "string" || !ELEMENT_TYPE_ALLOWLIST.has(elementType)) {
+      return false;
+    }
+    return (
+      text === undefined ||
+      (typeof text === "string" && text.length <= MAX_TEXT_LEN && !UNSAFE_TEXT.test(text))
     );
   }
   return false;

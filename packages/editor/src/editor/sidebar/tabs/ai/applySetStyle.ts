@@ -102,6 +102,69 @@ export function applySetText(composer: Composer, args: SetTextArgs): void {
 }
 
 /**
+ * v1 in-canvas AI command: `add-element`. Inserts a new element relative to the
+ * reference (selected) element: as a child when the reference is an empty
+ * container, otherwise as the next sibling. Restricted to content/layout
+ * primitives that need no external resource.
+ */
+const ADD_ELEMENT_TYPES = [
+  "heading", "text", "paragraph", "button", "link", "list",
+  "container", "section", "columns", "grid", "flex",
+] as const;
+
+const CONTAINER_TYPES = new Set([
+  "container", "section", "columns", "grid", "flex", "list",
+]);
+
+export const addElementArgsSchema = z.object({
+  elementId: z.string().min(1),
+  elementType: z.enum(ADD_ELEMENT_TYPES),
+  text: z
+    .string()
+    .max(2000)
+    .refine((t) => !/[<>]/.test(t), { message: "Text must be plain (no markup)" })
+    .optional(),
+});
+
+export type AddElementArgs = z.infer<typeof addElementArgsSchema>;
+
+export function applyAddElement(composer: Composer, args: AddElementArgs): void {
+  const ref = composer.elements.getElement(args.elementId);
+  let parentId: string | undefined;
+  let index: number | undefined;
+
+  if (ref) {
+    const children = ref.getChildren?.() ?? [];
+    const isContainer = CONTAINER_TYPES.has(ref.getType?.() ?? "");
+    if (isContainer && children.length === 0) {
+      parentId = ref.getId();
+    } else {
+      const parent = ref.getParent?.();
+      if (parent) {
+        const siblings = parent.getChildren();
+        const idx = siblings.findIndex((c) => c.getId() === ref.getId());
+        parentId = parent.getId();
+        index = idx >= 0 ? idx + 1 : undefined;
+      } else {
+        parentId = ref.getId(); // root-level container — append as child
+      }
+    }
+  }
+
+  if (!parentId) {
+    throw new Error(`add-element: no placement target (${args.elementId})`);
+  }
+
+  const created = composer.elements.createElement(
+    args.elementType,
+    args.text ? { content: args.text } : {},
+  );
+  if (!composer.elements.addElement(created, parentId, index)) {
+    throw new Error("add-element: insert failed");
+  }
+}
+
+/**
  * Run an accepted AI edit's command batch inside ONE outer transaction so the
  * whole edit is a single undo step. Each command is re-validated client-side
  * (defense in depth — the server already validated) before applying; invalid
@@ -136,6 +199,11 @@ export function applyAiEdit(
         const parsed = setTextArgsSchema.safeParse(cmd.args);
         if (!parsed.success) continue;
         applySetText(composer, parsed.data);
+        applied++;
+      } else if (cmd.commandId === "add-element") {
+        const parsed = addElementArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applyAddElement(composer, parsed.data);
         applied++;
       }
     }

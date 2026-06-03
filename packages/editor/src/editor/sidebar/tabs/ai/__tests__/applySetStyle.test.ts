@@ -3,6 +3,7 @@ import type { Composer } from "@/engine/Composer";
 import {
   applySetStyle,
   applySetText,
+  applyAddElement,
   applyAiEdit,
   setStyleArgsSchema,
 } from "../applySetStyle";
@@ -225,5 +226,69 @@ describe("applySetText", () => {
     expect(() =>
       applySetText(composer, { elementId: "missing", text: "x" }),
     ).toThrow(/element not found/i);
+  });
+});
+
+describe("applyAddElement", () => {
+  function makeAddComposer(ref: {
+    type: string;
+    children?: unknown[];
+    parentChildren?: { getId: () => string }[];
+  }) {
+    const created = { id: "new" };
+    const createElement = vi.fn(() => created);
+    const addElement = vi.fn(() => true);
+    const refEl = {
+      getId: () => "ref",
+      getType: () => ref.type,
+      getChildren: () => ref.children ?? [],
+      getParent: () =>
+        ref.parentChildren
+          ? {
+              getId: () => "parent",
+              getChildren: () => ref.parentChildren,
+            }
+          : null,
+    };
+    const composer = {
+      elements: {
+        getElement: vi.fn(() => refEl),
+        createElement,
+        addElement,
+      },
+    } as unknown as Composer;
+    return { composer, createElement, addElement };
+  }
+
+  it("inserts as the next sibling of a non-container reference", () => {
+    const { composer, createElement, addElement } = makeAddComposer({
+      type: "heading",
+      parentChildren: [{ getId: () => "ref" }],
+    });
+    applyAddElement(composer, {
+      elementId: "ref",
+      elementType: "button",
+      text: "Buy",
+    });
+    expect(createElement).toHaveBeenCalledWith("button", { content: "Buy" });
+    expect(addElement).toHaveBeenCalledWith({ id: "new" }, "parent", 1);
+  });
+
+  it("inserts as a child of an empty container reference", () => {
+    const { composer, addElement } = makeAddComposer({
+      type: "container",
+      children: [],
+    });
+    applyAddElement(composer, { elementId: "ref", elementType: "text", text: "Hi" });
+    expect(addElement).toHaveBeenCalledWith({ id: "new" }, "ref", undefined);
+  });
+
+  it("creates without content when no text is given", () => {
+    const { composer, createElement } = makeAddComposer({
+      type: "container",
+      children: [],
+    });
+    applyAddElement(composer, { elementId: "ref", elementType: "section" });
+    expect(createElement).toHaveBeenCalledWith("section", {});
   });
 });
