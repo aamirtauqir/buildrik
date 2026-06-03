@@ -9,6 +9,7 @@
  */
 
 import { createBuildrikApiClient } from "./api-client";
+import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
 
@@ -34,9 +35,6 @@ interface DashboardPageRow {
   slugHistory?: SlugChange[];
 }
 
-const DASHBOARD_URL =
-  import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";
-
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {
   if (!_client) _client = createBuildrikApiClient(DASHBOARD_URL);
@@ -48,6 +46,19 @@ const DEFAULT_ROOT: ElementData = {
   type: "container",
   children: [],
 };
+
+/**
+ * A project "has content" if any page's root element contains children. Used to
+ * gate auto-save (see initBuildrikSync): an empty project-tree is what a failed
+ * or raced `loadProject` produces, and persisting it would overwrite the
+ * server's real content.
+ */
+function projectHasContent(data: ProjectData): boolean {
+  return (data.pages ?? []).some((p) => {
+    const root = p.root as ElementData | undefined;
+    return Array.isArray(root?.children) && root.children.length > 0;
+  });
+}
 
 /**
  * P0.2b SSOT: shape of Site columns that mirror editor projectSettings fields.
@@ -351,6 +362,16 @@ export async function initBuildrikSync(
   const data = await loadProject(siteId);
   composer.importProject(data);
 
+  // Data-loss guard: track whether real content has EVER been observed this
+  // session. A failed/raced load returns an empty project; importing it and
+  // then letting auto-save run would clobber the server's real content (the
+  // 2026-06-04 fixture-wipe incident). We refuse to persist an empty
+  // project-tree until content has been observed — either the load brought it,
+  // or the user added some. An empty page has nothing to lose; a user who
+  // deletes every block after a content-bearing load still saves normally
+  // because observedContent is already true by then.
+  let observedContent = projectHasContent(data);
+
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
   let isSaving = false;
   let pendingChanges = false;
@@ -361,8 +382,18 @@ export async function initBuildrikSync(
       return;
     }
     saveTimeout = setTimeout(() => {
-      isSaving = true;
       const projectData = composer.exportProject();
+      if (projectHasContent(projectData)) {
+        observedContent = true;
+      } else if (!observedContent) {
+        console.warn(
+          "[BuildrikSync] skipped empty auto-save: no content observed this " +
+            "session (likely a failed or raced load — refusing to overwrite " +
+            "server content)",
+        );
+        return;
+      }
+      isSaving = true;
       saveProject(siteId, projectData)
         .catch((err: unknown) => {
           const error = err instanceof Error ? err : new Error("Save failed");

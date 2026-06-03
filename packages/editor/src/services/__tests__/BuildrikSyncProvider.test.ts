@@ -42,6 +42,38 @@ describe("loadProject error handling", () => {
   });
 });
 
+// A page whose root has children — `projectHasContent` returns true for this.
+const PROJECT_WITH_CONTENT = {
+  version: "1.0",
+  pagesOrder: ["p1"],
+  pages: [{ id: "p1", name: "Home", slug: "/", isHome: true, root: { id: "root", type: "container", children: [{ id: "h1", type: "heading" }] } }],
+  styles: [],
+  assets: [],
+  metadata: {},
+} as any;
+
+const EMPTY_PROJECT = {
+  version: "1.0",
+  pagesOrder: [],
+  pages: [],
+  styles: [],
+  assets: [],
+  metadata: {},
+} as any;
+
+function makeComposer(exportValue: unknown) {
+  const handlers: Record<string, (() => void)[]> = {};
+  return {
+    importProject: vi.fn(),
+    exportProject: vi.fn(() => exportValue),
+    on: vi.fn((event: string, cb: () => void) => {
+      (handlers[event] ??= []).push(cb);
+    }),
+    emit: vi.fn((event: string) => handlers[event]?.forEach((cb) => cb())),
+    handlers,
+  };
+}
+
 describe("initBuildrikSync", () => {
   it("queues pending changes while a save is in flight", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -53,21 +85,12 @@ describe("initBuildrikSync", () => {
       return new Promise((resolve) => setTimeout(() => resolve({ success: true, savedAt: new Date() }), 20));
     });
 
-    const handlers: Record<string, (() => void)[]> = {};
-    const composer = {
-      importProject: vi.fn(),
-      exportProject: vi.fn(() => ({ version: "1.0", pagesOrder: [], pages: [], styles: [], assets: [], metadata: {} } as any)),
-      on: vi.fn((event: string, cb: () => void) => {
-        if (!handlers[event]) handlers[event] = [];
-        handlers[event].push(cb);
-      }),
-      emit: vi.fn((event: string) => {
-        handlers[event]?.forEach((cb) => cb());
-      }),
-    };
+    // Export real content so the data-loss guard allows the save — this test
+    // exercises the in-flight queue mechanism, not empty-save semantics.
+    const composer = makeComposer(PROJECT_WITH_CONTENT);
 
     await initBuildrikSync(composer as any, "s1");
-    const handler = handlers["project:changed"]![0];
+    const handler = composer.handlers["project:changed"]![0];
 
     handler(); // schedules first timeout
     vi.advanceTimersByTime(5000); // first save starts
@@ -76,6 +99,44 @@ describe("initBuildrikSync", () => {
     vi.advanceTimersByTime(5000); // second save starts
     expect(saveCount).toBe(2);
 
+    vi.useRealTimers();
+  });
+
+  it("refuses to auto-save an empty project when the load brought no content (data-loss guard)", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    // Load returns no pages → no content observed at mount.
+    mocks.sitesGetQuery.mockResolvedValue({ name: "Test Site" });
+    mocks.pagesListQuery.mockResolvedValue([]);
+    mocks.sitesSaveProjectMutate.mockClear();
+    mocks.sitesSaveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
+
+    // The editor exports an empty tree (the raced/failed-load scenario).
+    const composer = makeComposer(EMPTY_PROJECT);
+    await initBuildrikSync(composer as any, "s1");
+    composer.handlers["project:changed"]![0]();
+    await vi.advanceTimersByTimeAsync(6000);
+
+    expect(mocks.sitesSaveProjectMutate).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it("saves an empty project once content has been observed (genuine delete-all)", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    mocks.sitesGetQuery.mockResolvedValue({ name: "Test Site" });
+    // Load brings content → observedContent starts true.
+    mocks.pagesListQuery.mockResolvedValue([
+      { id: "p1", name: "Home", slug: "/", isHomePage: true, position: 0, blocks: { id: "root", type: "container", children: [{ id: "h1", type: "heading" }] } },
+    ]);
+    mocks.sitesSaveProjectMutate.mockClear();
+    mocks.sitesSaveProjectMutate.mockResolvedValue({ success: true, savedAt: new Date() });
+
+    // User deletes everything → export is now empty, but content WAS observed.
+    const composer = makeComposer(EMPTY_PROJECT);
+    await initBuildrikSync(composer as any, "s1");
+    composer.handlers["project:changed"]![0]();
+    await vi.advanceTimersByTimeAsync(6000);
+
+    expect(mocks.sitesSaveProjectMutate).toHaveBeenCalledTimes(1);
     vi.useRealTimers();
   });
 });
