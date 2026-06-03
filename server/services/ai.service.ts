@@ -557,6 +557,22 @@ const STYLE_PROPERTY_ALLOWLIST = new Set([
   "height", "gap", "display", "text-align", "font-size", "font-weight",
   "line-height", "letter-spacing", "border-radius", "border-width",
   "border-color", "border-style", "box-shadow",
+  // Layout: flex + grid
+  "flex-direction", "flex-wrap", "justify-content", "align-items",
+  "align-content", "align-self", "flex-grow", "flex-shrink", "flex-basis",
+  "order", "grid-template-columns", "grid-template-rows", "grid-auto-flow",
+  "grid-column", "grid-row", "place-items", "place-content",
+  // Position
+  "position", "top", "right", "bottom", "left", "z-index", "inset", "float",
+  // Sizing
+  "max-width", "min-width", "max-height", "min-height", "aspect-ratio",
+  "object-fit", "object-position", "box-sizing",
+  // Typography
+  "font-family", "font-style", "text-decoration", "text-transform",
+  "white-space", "word-break", "text-overflow", "font-variant",
+  // Misc visual
+  "overflow", "overflow-x", "overflow-y", "cursor", "visibility",
+  "transform", "transition", "filter", "backdrop-filter",
 ]);
 
 const UNSAFE_STYLE_VALUE =

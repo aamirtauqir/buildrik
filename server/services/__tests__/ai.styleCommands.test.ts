@@ -221,6 +221,23 @@ describe("extractValidEditCommands", () => {
     expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
 
+  it("accepts expanded layout/position/typography style properties", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-style", args: { elementId: EL, property: "justify-content", value: "space-between" } },
+      { commandId: "set-style", args: { elementId: EL, property: "position", value: "absolute" } },
+      { commandId: "set-style", args: { elementId: EL, property: "grid-template-columns", value: "1fr 1fr" } },
+      { commandId: "set-style", args: { elementId: EL, property: "text-transform", value: "uppercase" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(4);
+  });
+
+  it("still rejects url()-bearing values on the new properties", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-style", args: { elementId: EL, property: "filter", value: "url(#evil)" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
+
   it("accepts set-attribute for href / alt / target", () => {
     const raw = JSON.stringify([
       { commandId: "set-attribute", args: { elementId: EL, attribute: "href", value: "https://buildrik.com" } },
