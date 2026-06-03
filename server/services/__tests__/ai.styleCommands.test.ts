@@ -176,4 +176,48 @@ describe("extractValidEditCommands", () => {
     ]);
     expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
+
+  it("accepts add-section with valid children", () => {
+    const raw = JSON.stringify([
+      {
+        commandId: "add-section",
+        args: {
+          elementId: EL,
+          sectionType: "section",
+          children: [
+            { elementType: "heading", text: "Pricing" },
+            { elementType: "button", text: "Buy" },
+          ],
+        },
+      },
+    ]);
+    const r = extractValidEditCommands(raw, EL);
+    expect(r).toHaveLength(1);
+    expect(r[0].commandId).toBe("add-section");
+  });
+
+  it("drops add-section with a non-container sectionType", () => {
+    const raw = JSON.stringify([
+      { commandId: "add-section", args: { elementId: EL, sectionType: "button", children: [{ elementType: "text" }] } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
+
+  it("drops add-section with a bad child type or markup", () => {
+    const badType = JSON.stringify([
+      { commandId: "add-section", args: { elementId: EL, sectionType: "section", children: [{ elementType: "image" }] } },
+    ]);
+    const markup = JSON.stringify([
+      { commandId: "add-section", args: { elementId: EL, sectionType: "section", children: [{ elementType: "heading", text: "<b>x</b>" }] } },
+    ]);
+    expect(extractValidEditCommands(badType, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(markup, EL)).toHaveLength(0);
+  });
+
+  it("drops add-section with empty children", () => {
+    const raw = JSON.stringify([
+      { commandId: "add-section", args: { elementId: EL, sectionType: "section", children: [] } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
 });

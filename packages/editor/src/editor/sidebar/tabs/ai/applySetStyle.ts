@@ -128,39 +128,82 @@ export const addElementArgsSchema = z.object({
 
 export type AddElementArgs = z.infer<typeof addElementArgsSchema>;
 
-export function applyAddElement(composer: Composer, args: AddElementArgs): void {
-  const ref = composer.elements.getElement(args.elementId);
-  let parentId: string | undefined;
-  let index: number | undefined;
-
-  if (ref) {
-    const children = ref.getChildren?.() ?? [];
-    const isContainer = CONTAINER_TYPES.has(ref.getType?.() ?? "");
-    if (isContainer && children.length === 0) {
-      parentId = ref.getId();
-    } else {
-      const parent = ref.getParent?.();
-      if (parent) {
-        const siblings = parent.getChildren();
-        const idx = siblings.findIndex((c) => c.getId() === ref.getId());
-        parentId = parent.getId();
-        index = idx >= 0 ? idx + 1 : undefined;
-      } else {
-        parentId = ref.getId(); // root-level container — append as child
-      }
-    }
+/**
+ * Where a newly-inserted element goes relative to the reference element: as a
+ * child when the reference is an empty container, otherwise as the next sibling.
+ */
+function resolvePlacement(
+  composer: Composer,
+  refId: string,
+): { parentId?: string; index?: number } {
+  const ref = composer.elements.getElement(refId);
+  if (!ref) return {};
+  const children = ref.getChildren?.() ?? [];
+  const isContainer = CONTAINER_TYPES.has(ref.getType?.() ?? "");
+  if (isContainer && children.length === 0) return { parentId: ref.getId() };
+  const parent = ref.getParent?.();
+  if (parent) {
+    const siblings = parent.getChildren();
+    const idx = siblings.findIndex((c) => c.getId() === ref.getId());
+    return { parentId: parent.getId(), index: idx >= 0 ? idx + 1 : undefined };
   }
+  return { parentId: ref.getId() }; // root-level container — append as child
+}
 
+export function applyAddElement(composer: Composer, args: AddElementArgs): void {
+  const { parentId, index } = resolvePlacement(composer, args.elementId);
   if (!parentId) {
     throw new Error(`add-element: no placement target (${args.elementId})`);
   }
-
   const created = composer.elements.createElement(
     args.elementType,
     args.text ? { content: args.text } : {},
   );
   if (!composer.elements.addElement(created, parentId, index)) {
     throw new Error("add-element: insert failed");
+  }
+}
+
+/**
+ * v1 page generation: build a section (a container with a flat set of child
+ * elements) in one command. The container is placed relative to the selected
+ * element; each child is created and appended into the container.
+ */
+export const addSectionArgsSchema = z.object({
+  elementId: z.string().min(1),
+  sectionType: z.enum(["section", "container", "columns", "grid", "flex"]),
+  children: z
+    .array(
+      z.object({
+        elementType: z.enum(ADD_ELEMENT_TYPES),
+        text: z
+          .string()
+          .max(2000)
+          .refine((t) => !/[<>]/.test(t), { message: "Text must be plain" })
+          .optional(),
+      }),
+    )
+    .min(1)
+    .max(12),
+});
+export type AddSectionArgs = z.infer<typeof addSectionArgsSchema>;
+
+export function applyAddSection(composer: Composer, args: AddSectionArgs): void {
+  const { parentId, index } = resolvePlacement(composer, args.elementId);
+  if (!parentId) {
+    throw new Error(`add-section: no placement target (${args.elementId})`);
+  }
+  const section = composer.elements.createElement(args.sectionType, {});
+  if (!composer.elements.addElement(section, parentId, index)) {
+    throw new Error("add-section: insert failed");
+  }
+  const sectionId = section.getId();
+  for (const child of args.children) {
+    const el = composer.elements.createElement(
+      child.elementType,
+      child.text ? { content: child.text } : {},
+    );
+    composer.elements.addElement(el, sectionId);
   }
 }
 
@@ -262,6 +305,11 @@ export function applyAiEdit(
         const parsed = moveElementArgsSchema.safeParse(cmd.args);
         if (!parsed.success) continue;
         applyMoveElement(composer, parsed.data);
+        applied++;
+      } else if (cmd.commandId === "add-section") {
+        const parsed = addSectionArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applyAddSection(composer, parsed.data);
         applied++;
       }
     }

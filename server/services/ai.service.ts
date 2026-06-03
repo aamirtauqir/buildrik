@@ -574,6 +574,12 @@ const ELEMENT_TYPE_ALLOWLIST = new Set([
   "container", "section", "columns", "grid", "flex",
 ]);
 
+// Container types that can wrap a generated section's children.
+const SECTION_CONTAINER_TYPES = new Set([
+  "section", "container", "columns", "grid", "flex",
+]);
+const MAX_SECTION_CHILDREN = 12;
+
 export type EditCommand =
   | {
       commandId: "set-style";
@@ -589,6 +595,14 @@ export type EditCommand =
   | {
       commandId: "move-element";
       args: { elementId: string; direction: "up" | "down" };
+    }
+  | {
+      commandId: "add-section";
+      args: {
+        elementId: string;
+        sectionType: string;
+        children: Array<{ elementType: string; text?: string }>;
+      };
     };
 
 export interface EditCommandInput {
@@ -620,6 +634,13 @@ export function editCommandToRow(
   if (c.commandId === "move-element") {
     return { field: "move", from: "", to: c.args.direction };
   }
+  if (c.commandId === "add-section") {
+    return {
+      field: "add section",
+      from: "",
+      to: `${c.args.sectionType} (${c.args.children.length} items)`,
+    };
+  }
   return { field: c.args.property, from: "", to: c.args.value };
 }
 
@@ -639,7 +660,8 @@ Rules:
 - delete-element: {"commandId":"delete-element","args":{"elementId":"${elementId}"}} — only when the request clearly asks to delete/remove this element.
 - duplicate-element: {"commandId":"duplicate-element","args":{"elementId":"${elementId}"}} — when asked to duplicate/copy this element.
 - move-element: {"commandId":"move-element","args":{"elementId":"${elementId}","direction":"up|down"}} — when asked to move/reorder this element up or down among its siblings.
-- Use set-text for wording, set-style for appearance, add-element to insert, delete-element to remove, duplicate-element to copy, move-element to reorder.
+- add-section: {"commandId":"add-section","args":{"elementId":"${elementId}","sectionType":"section|container|columns|grid|flex","children":[{"elementType":"heading","text":"..."},{"elementType":"button","text":"..."}]}} — when asked to BUILD or ADD a whole section/block (e.g. "add a pricing section", "add a hero with a heading and a button"). Put 2-${MAX_SECTION_CHILDREN} child elements inside; each child elementType must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}; include "text" for content children.
+- Use set-text for wording, set-style for appearance, add-element to insert one element, add-section to build a multi-element section, delete-element to remove, duplicate-element to copy, move-element to reorder.
 - Return [] if the request cannot be expressed with these commands.
 - No markdown fences, no prose — JSON array only.
 
@@ -705,6 +727,33 @@ function isValidEditCommand(c: unknown, elementId: string): c is EditCommand {
   }
   if (cmd.commandId === "move-element") {
     return cmd.args.direction === "up" || cmd.args.direction === "down";
+  }
+  if (cmd.commandId === "add-section") {
+    const { sectionType, children } = cmd.args as {
+      sectionType?: unknown;
+      children?: unknown;
+    };
+    if (typeof sectionType !== "string" || !SECTION_CONTAINER_TYPES.has(sectionType)) {
+      return false;
+    }
+    if (
+      !Array.isArray(children) ||
+      children.length < 1 ||
+      children.length > MAX_SECTION_CHILDREN
+    ) {
+      return false;
+    }
+    return children.every((ch) => {
+      if (!ch || typeof ch !== "object") return false;
+      const { elementType, text } = ch as { elementType?: unknown; text?: unknown };
+      if (typeof elementType !== "string" || !ELEMENT_TYPE_ALLOWLIST.has(elementType)) {
+        return false;
+      }
+      return (
+        text === undefined ||
+        (typeof text === "string" && text.length <= MAX_TEXT_LEN && !UNSAFE_TEXT.test(text))
+      );
+    });
   }
   return false;
 }

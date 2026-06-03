@@ -4,6 +4,7 @@ import {
   applySetStyle,
   applySetText,
   applyAddElement,
+  applyAddSection,
   applyDeleteElement,
   applyDuplicateElement,
   applyMoveElement,
@@ -293,6 +294,47 @@ describe("applyAddElement", () => {
     });
     applyAddElement(composer, { elementId: "ref", elementType: "section" });
     expect(createElement).toHaveBeenCalledWith("section", {});
+  });
+});
+
+describe("applyAddSection", () => {
+  it("creates a container and appends children into it", () => {
+    const createElement = vi.fn(() => {
+      const n = createElement.mock.calls.length;
+      return { getId: () => (n === 1 ? "sec" : `c${n}`) };
+    });
+    const addElement = vi.fn(
+      (_el: unknown, _parentId: string, _index?: number) => true,
+    );
+    const refEl = {
+      getId: () => "ref",
+      getType: () => "heading", // not a container → sibling placement
+      getChildren: () => [],
+      getParent: () => ({
+        getId: () => "parent",
+        getChildren: () => [{ getId: () => "ref" }],
+      }),
+    };
+    const composer = {
+      elements: { getElement: vi.fn(() => refEl), createElement, addElement },
+    } as unknown as Composer;
+
+    applyAddSection(composer, {
+      elementId: "ref",
+      sectionType: "section",
+      children: [
+        { elementType: "heading", text: "Pricing" },
+        { elementType: "button", text: "Buy" },
+      ],
+    });
+
+    // 1 container + 2 children created
+    expect(createElement).toHaveBeenCalledTimes(3);
+    // container inserted next to the reference (parent, index 1)
+    expect(addElement).toHaveBeenNthCalledWith(1, { getId: expect.any(Function) }, "parent", 1);
+    // both children appended into the new section
+    expect(addElement.mock.calls[1][1]).toBe("sec");
+    expect(addElement.mock.calls[2][1]).toBe("sec");
   });
 });
 
