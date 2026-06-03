@@ -76,7 +76,58 @@ HOLD SCOPE. Carry-forward risks to track regardless of order:
 4. **Workspace/siteId auth still deferred** (Unit P) — security debt; any
    server-side AI write (P3/P4) must add it.
 
+## SESSION HANDOFF (2026-06-04) — resume here to complete the arc
+
+### Shipped so far (18 commits, a4ca69a9 → ba4457d3, all on `main`)
+- **In-canvas AI**, free on local Ollama (no paid key). Two surfaces: the ✨
+  popover on the selection toolbar AND the sidebar AI panel (both edit).
+- **7 commands**: set-style, set-text, add-element, delete-element,
+  duplicate-element, move-element, **add-section** (generative — builds a nested
+  multi-element section from one prompt).
+- Server pipeline: `generateEditCommands` (constrained JSON, fence-strip +
+  repair, exact-id scope guard, per-command validation) in
+  `server/services/ai.service.ts`; routed via `streamPrompt intent:"style-command"`.
+- Apply pipeline: `applyAiEdit` in
+  `packages/editor/src/editor/sidebar/tabs/ai/applySetStyle.ts` — one outer
+  transaction + `HistoryManager.flushPending()` = one clean undo.
+- Ollama provider (`server/services/ollama.client.ts`), env-forced via
+  `OLLAMA_BASE_URL` (in root `.env.local`, model `gemini-3-flash-preview:latest`).
+- Hardening: atomic quota reserve + server-authoritative model (`quota.service.ts`).
+- Fixes: undo flush race; auth-aware load-failure toast (`useComposerInit.ts`).
+- Tests: server 27/27 AI, editor 62/62 AI (+ history/popover/chatmessage).
+
+### Remaining to COMPLETE the whole-editor-AI arc (next-session checklist)
+- [ ] **Live-verify** add/delete/duplicate/move/add-section in the browser
+      (log in first — see Run below; the pipeline is proven via smoke, the
+      click-walk is the gap).
+- [ ] **P2 full element coverage** — more commands: `set-attribute` (href/alt/
+      target), spacing/border/font/layout style coverage, and the **two style
+      stores** (pseudo-state + breakpoint via `StyleEngine.setRule`, not just
+      `el.setStyle`). Each new command = the 4-edit pattern (union + validate +
+      prompt + apply-dispatch).
+- [ ] **P1b registry** (per-side decided) — collapse the if-chains in
+      `isValidEditCommand`/`editCommandToRow`/prompt (server) and `applyAiEdit`
+      (editor) into a registry once it hurts (~10+ commands).
+- [ ] **P3 deepen** — multi-level nesting in add-section; page-level context to
+      the server (today it only gets one element id, no tree) for "make the
+      whole page modern"; multi-element diff/preview.
+- [ ] **P4 agent** — multi-step build loop (needs native provider tool-use, the
+      single-shot JSON path won't scale).
+- [ ] **Security debt** — add workspace/`siteId` authorization to the AI
+      endpoints before any server-side AI write.
+- [ ] SSOT: resolve the duplicate `AIModel` enum; shared `CommandInvocation` type.
+
+### Run (servers + login) — for live work next session
+- Editor: `cd packages/editor && nohup npm run dev &` → http://localhost:5050
+- Dashboard: `cd packages/dashboard && nohup npm run dev &` → http://localhost:3000
+- Ollama: `ollama serve` (model already pulled: `gemini-3-flash-preview:latest`)
+- Test account: `saqib@vortexwebinnovate.com` / `Aamir786!`; site
+  `cmpxu9ttq000gysraqrcu5h4s` ("Demo AI Site").
+- Open: log in at :3000, then http://localhost:5050/?siteId=cmpxu9ttq000gysraqrcu5h4s
+
 ## Notes
 - Dashboard runs `next dev --turbopack` — service-layer edits need a full
   `.next` nuke to take effect (see memory `reference_nextjs_turbopack_stale_server`).
 - Editor (Vite :5050) is process-fragile; relaunch with nohup.
+- Verify AI code independently of the running server with a `tsx` smoke that
+  imports `ai.service` directly (CJS interop: `(mod as any).default ?? mod`).
