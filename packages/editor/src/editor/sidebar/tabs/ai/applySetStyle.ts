@@ -76,6 +76,32 @@ export function applySetStyle(composer: Composer, args: SetStyleArgs): void {
 }
 
 /**
+ * v1 in-canvas AI command: `set-text`. Replaces an element's text content.
+ * Text is plain only (no angle brackets) — element content is rendered into the
+ * canvas innerHTML, so markup must never reach it.
+ */
+export const setTextArgsSchema = z.object({
+  elementId: z.string().min(1),
+  text: z
+    .string()
+    .min(1)
+    .max(2000)
+    .refine((t) => !/[<>]/.test(t), {
+      message: "Text must be plain (no markup)",
+    }),
+});
+
+export type SetTextArgs = z.infer<typeof setTextArgsSchema>;
+
+export function applySetText(composer: Composer, args: SetTextArgs): void {
+  const el = composer.elements.getElement(args.elementId);
+  if (!el || typeof el.setContent !== "function") {
+    throw new Error(`set-text: element not found (${args.elementId})`);
+  }
+  el.setContent(args.text);
+}
+
+/**
  * Run an accepted AI edit's command batch inside ONE outer transaction so the
  * whole edit is a single undo step. Each command is re-validated client-side
  * (defense in depth — the server already validated) before applying; invalid
@@ -101,11 +127,17 @@ export function applyAiEdit(
   try {
     for (const c of commands) {
       const cmd = c as { commandId?: unknown; args?: unknown };
-      if (cmd.commandId !== "set-style") continue;
-      const parsed = setStyleArgsSchema.safeParse(cmd.args);
-      if (!parsed.success) continue;
-      applySetStyle(composer, parsed.data);
-      applied++;
+      if (cmd.commandId === "set-style") {
+        const parsed = setStyleArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applySetStyle(composer, parsed.data);
+        applied++;
+      } else if (cmd.commandId === "set-text") {
+        const parsed = setTextArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applySetText(composer, parsed.data);
+        applied++;
+      }
     }
   } finally {
     composer.endTransaction();

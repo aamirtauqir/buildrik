@@ -9,7 +9,8 @@ import {
   suggestMilestone,
   streamContent,
   generateComponentSchema,
-  generateStyleCommands,
+  generateEditCommands,
+  editCommandToRow,
 } from "../../services/ai.service";
 import {
   checkQuota,
@@ -241,7 +242,7 @@ export const aiRouter = router({
         const elementId = input.scope.id;
         let commands;
         try {
-          commands = await generateStyleCommands({
+          commands = await generateEditCommands({
             prompt: input.prompt,
             elementId,
             model,
@@ -255,13 +256,9 @@ export const aiRouter = router({
           edit: {
             target: elementId,
             summary: commands.length
-              ? `${commands.length} style change${commands.length > 1 ? "s" : ""}`
+              ? `${commands.length} change${commands.length > 1 ? "s" : ""}`
               : "No applicable change",
-            rows: commands.map((c) => ({
-              field: c.args.property,
-              from: "",
-              to: c.args.value,
-            })),
+            rows: commands.map(editCommandToRow),
             applyOps: { preview: {}, commit: { commands } },
           },
         };

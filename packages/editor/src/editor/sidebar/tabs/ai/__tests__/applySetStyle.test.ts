@@ -1,25 +1,33 @@
 import { describe, it, expect, vi } from "vitest";
 import type { Composer } from "@/engine/Composer";
-import { applySetStyle, applyAiEdit, setStyleArgsSchema } from "../applySetStyle";
+import {
+  applySetStyle,
+  applySetText,
+  applyAiEdit,
+  setStyleArgsSchema,
+} from "../applySetStyle";
 
-function makeComposer(el: { setStyle?: unknown } | undefined) {
+function makeComposer(el: { setStyle?: unknown; setContent?: unknown } | undefined) {
   return {
     elements: { getElement: vi.fn(() => el) },
   } as unknown as Composer;
 }
 
-function makeTxComposer(el: { setStyle?: unknown } | undefined) {
+function makeTxComposer(present = true) {
   const beginTransaction = vi.fn();
   const endTransaction = vi.fn();
   const flushPending = vi.fn();
-  const setStyle = (el?.setStyle as ReturnType<typeof vi.fn>) ?? vi.fn();
+  const setStyle = vi.fn();
+  const setContent = vi.fn();
   const composer = {
-    elements: { getElement: vi.fn(() => (el ? { setStyle } : undefined)) },
+    elements: {
+      getElement: vi.fn(() => (present ? { setStyle, setContent } : undefined)),
+    },
     beginTransaction,
     endTransaction,
     history: { flushPending },
   } as unknown as Composer;
-  return { composer, beginTransaction, endTransaction, flushPending, setStyle };
+  return { composer, beginTransaction, endTransaction, flushPending, setStyle, setContent };
 }
 
 function commitEdit(commands: unknown[]) {
@@ -99,7 +107,7 @@ describe("applySetStyle", () => {
 describe("applyAiEdit", () => {
   it("applies a batch inside exactly one transaction (one undo step)", () => {
     const { composer, beginTransaction, endTransaction, setStyle } =
-      makeTxComposer({ setStyle: vi.fn() });
+      makeTxComposer();
     const r = applyAiEdit(
       composer,
       commitEdit([
@@ -114,7 +122,7 @@ describe("applyAiEdit", () => {
   });
 
   it("flushes the pending history record so the edit is one immediate undo step", () => {
-    const { composer, flushPending } = makeTxComposer({ setStyle: vi.fn() });
+    const { composer, flushPending } = makeTxComposer();
     applyAiEdit(
       composer,
       commitEdit([
@@ -126,7 +134,7 @@ describe("applyAiEdit", () => {
 
   it("skips invalid / non-set-style entries but still wraps in a transaction", () => {
     const { composer, beginTransaction, endTransaction, setStyle } =
-      makeTxComposer({ setStyle: vi.fn() });
+      makeTxComposer();
     const r = applyAiEdit(
       composer,
       commitEdit([
@@ -142,7 +150,7 @@ describe("applyAiEdit", () => {
   });
 
   it("closes the transaction even when applying throws (endTransaction in finally)", () => {
-    const { composer, endTransaction } = makeTxComposer(undefined); // getElement → undefined
+    const { composer, endTransaction } = makeTxComposer(false); // getElement → undefined
     expect(() =>
       applyAiEdit(
         composer,
@@ -155,12 +163,67 @@ describe("applyAiEdit", () => {
   });
 
   it("handles a missing commands payload as a no-op (still balanced transaction)", () => {
-    const { composer, beginTransaction, endTransaction } = makeTxComposer({
-      setStyle: vi.fn(),
-    });
+    const { composer, beginTransaction, endTransaction } = makeTxComposer();
     const r = applyAiEdit(composer, { applyOps: { preview: {}, commit: {} } });
     expect(r.applied).toBe(0);
     expect(beginTransaction).toHaveBeenCalledOnce();
     expect(endTransaction).toHaveBeenCalledOnce();
+  });
+
+  it("applies a set-text command via el.setContent", () => {
+    const { composer, setContent } = makeTxComposer();
+    const r = applyAiEdit(
+      composer,
+      commitEdit([
+        { commandId: "set-text", args: { elementId: "el-1", text: "Welcome" } },
+      ]),
+    );
+    expect(r.applied).toBe(1);
+    expect(setContent).toHaveBeenCalledWith("Welcome");
+  });
+
+  it("applies a mixed style + text batch in one transaction", () => {
+    const { composer, setStyle, setContent, beginTransaction, endTransaction } =
+      makeTxComposer();
+    const r = applyAiEdit(
+      composer,
+      commitEdit([
+        { commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#fff" } },
+        { commandId: "set-text", args: { elementId: "el-1", text: "Hello" } },
+      ]),
+    );
+    expect(r.applied).toBe(2);
+    expect(setStyle).toHaveBeenCalledOnce();
+    expect(setContent).toHaveBeenCalledWith("Hello");
+    expect(beginTransaction).toHaveBeenCalledOnce();
+    expect(endTransaction).toHaveBeenCalledOnce();
+  });
+
+  it("rejects set-text with markup (does not reach setContent)", () => {
+    const { composer, setContent } = makeTxComposer();
+    const r = applyAiEdit(
+      composer,
+      commitEdit([
+        { commandId: "set-text", args: { elementId: "el-1", text: "<b>hi</b>" } },
+      ]),
+    );
+    expect(r.applied).toBe(0);
+    expect(setContent).not.toHaveBeenCalled();
+  });
+});
+
+describe("applySetText", () => {
+  it("calls el.setContent with the text", () => {
+    const setContent = vi.fn();
+    const composer = makeComposer({ setContent });
+    applySetText(composer, { elementId: "el-1", text: "Hi there" });
+    expect(setContent).toHaveBeenCalledWith("Hi there");
+  });
+
+  it("throws when the element is not found", () => {
+    const composer = makeComposer(undefined);
+    expect(() =>
+      applySetText(composer, { elementId: "missing", text: "x" }),
+    ).toThrow(/element not found/i);
   });
 });

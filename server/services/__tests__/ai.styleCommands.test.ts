@@ -5,16 +5,16 @@
  * security-critical surface.
  */
 import { describe, it, expect } from "vitest";
-import { extractValidStyleCommands } from "@server/services/ai.service";
+import { extractValidEditCommands } from "@server/services/ai.service";
 
 const EL = "el-1";
 
-describe("extractValidStyleCommands", () => {
+describe("extractValidEditCommands", () => {
   it("parses a clean JSON array of valid commands", () => {
     const raw = JSON.stringify([
       { commandId: "set-style", args: { elementId: EL, property: "color", value: "#000000" } },
     ]);
-    const r = extractValidStyleCommands(raw, EL);
+    const r = extractValidEditCommands(raw, EL);
     expect(r).toHaveLength(1);
     expect(r[0].args).toEqual({ elementId: EL, property: "color", value: "#000000" });
   });
@@ -22,27 +22,27 @@ describe("extractValidStyleCommands", () => {
   it("strips markdown ```json fences", () => {
     const raw =
       '```json\n[{"commandId":"set-style","args":{"elementId":"el-1","property":"padding","value":"24px"}}]\n```';
-    expect(extractValidStyleCommands(raw, EL)).toHaveLength(1);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(1);
   });
 
   it("repairs prose-wrapped JSON (extracts the first array)", () => {
     const raw =
       'Sure! Here you go:\n[{"commandId":"set-style","args":{"elementId":"el-1","property":"font-size","value":"32px"}}]\nHope that helps.';
-    expect(extractValidStyleCommands(raw, EL)).toHaveLength(1);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(1);
   });
 
   it("drops commands targeting a different element (exact-id scope guard)", () => {
     const raw = JSON.stringify([
       { commandId: "set-style", args: { elementId: "other-el", property: "color", value: "#fff" } },
     ]);
-    expect(extractValidStyleCommands(raw, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
 
   it("drops a property outside the allow-list (e.g. pseudo-state)", () => {
     const raw = JSON.stringify([
       { commandId: "set-style", args: { elementId: EL, property: "color:hover", value: "#f00" } },
     ]);
-    expect(extractValidStyleCommands(raw, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
 
   it.each([
@@ -53,15 +53,15 @@ describe("extractValidStyleCommands", () => {
     const raw = JSON.stringify([
       { commandId: "set-style", args: { elementId: EL, property: "background", value } },
     ]);
-    expect(extractValidStyleCommands(raw, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
 
   it("returns [] for malformed / non-JSON output", () => {
-    expect(extractValidStyleCommands("not json at all", EL)).toEqual([]);
+    expect(extractValidEditCommands("not json at all", EL)).toEqual([]);
   });
 
   it("returns [] when the model returns a JSON object instead of an array", () => {
-    expect(extractValidStyleCommands('{"foo":"bar"}', EL)).toEqual([]);
+    expect(extractValidEditCommands('{"foo":"bar"}', EL)).toEqual([]);
   });
 
   it("keeps only the valid entries from a mixed batch", () => {
@@ -71,11 +71,44 @@ describe("extractValidStyleCommands", () => {
       { commandId: "remove-element", args: { elementId: EL } },
       { commandId: "set-style", args: { elementId: EL, property: "border-radius", value: "8px" } },
     ]);
-    const r = extractValidStyleCommands(raw, EL);
+    const r = extractValidEditCommands(raw, EL);
     expect(r).toHaveLength(2);
-    expect(r.map((c: { args: { property: string } }) => c.args.property)).toEqual([
+    expect(r.map((c) => (c.commandId === "set-style" ? c.args.property : "?"))).toEqual([
       "color",
       "border-radius",
     ]);
+  });
+
+  it("accepts a valid set-text command", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-text", args: { elementId: EL, text: "Welcome to Buildrik" } },
+    ]);
+    const r = extractValidEditCommands(raw, EL);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toEqual({ commandId: "set-text", args: { elementId: EL, text: "Welcome to Buildrik" } });
+  });
+
+  it("drops set-text containing markup (angle brackets)", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-text", args: { elementId: EL, text: "<script>alert(1)</script>" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
+
+  it("drops empty set-text", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-text", args: { elementId: EL, text: "" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+  });
+
+  it("handles a mixed style + text batch", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-style", args: { elementId: EL, property: "color", value: "#fff" } },
+      { commandId: "set-text", args: { elementId: EL, text: "Hello" } },
+    ]);
+    const r = extractValidEditCommands(raw, EL);
+    expect(r).toHaveLength(2);
+    expect(r.map((c) => c.commandId)).toEqual(["set-style", "set-text"]);
   });
 });
