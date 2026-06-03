@@ -1,6 +1,7 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { ChatMessage as ChatMessageType, DiffEdit } from "./types";
+import { DiffRows } from "./DiffRows";
 
 export interface ChatMessageProps {
   message: ChatMessageType;
@@ -12,17 +13,41 @@ export interface ChatMessageProps {
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
-  message, onRegenerate,
+  message, onAccept, onReject, onRegenerate,
 }) => {
-  const { role, text, streaming, stopped } = message;
+  const { role, text, streaming, stopped, edit } = message;
   return (
     <div className={`bd-ai-msg bd-ai-msg-${role}`}>
       <div className="bd-ai-msg-role">{role === "user" ? "You" : "Assistant"}</div>
       <div className={`bd-ai-msg-body${streaming ? " bd-ai-msg-streaming" : ""}`}>
-        <p>{text}</p>
+        {text ? <p>{text}</p> : null}
         {stopped && <span className="bd-ai-msg-stopped">(stopped)</span>}
       </div>
-      {role === "assistant" && !streaming && (
+      {edit && (
+        <div className="bd-ai-msg-edit">
+          <DiffRows edit={edit} />
+          {edit.state === "pending" ? (
+            <div className="bd-ai-msg-edit-actions">
+              <Button
+                type="button"
+                variant="bare"
+                aria-label="Discard"
+                onClick={() => onReject(message.id)}
+              >Discard</Button>
+              <Button
+                type="button"
+                aria-label="Apply changes"
+                onClick={() => onAccept(message.id)}
+              >Apply</Button>
+            </div>
+          ) : (
+            <span className="bd-ai-msg-edit-state">
+              {edit.state === "applied" ? "✓ Applied" : "Discarded"}
+            </span>
+          )}
+        </div>
+      )}
+      {role === "assistant" && !streaming && !edit && (
         <Button
           type="button"
           className="bd-ai-msg-regenerate"

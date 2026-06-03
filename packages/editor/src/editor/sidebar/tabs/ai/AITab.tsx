@@ -49,7 +49,15 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
       { id: userId, role: "user", text, createdAt: Date.now() },
       { id: aId, role: "assistant", text: "", streaming: true, createdAt: Date.now() },
     ]);
-    stream.start({ prompt: text, scope: serverScope, model });
+    // When an element is selected, the sidebar AI edits it (command batch the
+    // user accepts) — same pipeline as the in-canvas popover. Page scope stays
+    // a text chat until page-level generation lands.
+    stream.start({
+      prompt: text,
+      scope: serverScope,
+      model,
+      intent: serverScope.kind === "element" ? "style-command" : "text",
+    });
   }, [scope, model, lock, stream]);
 
   React.useEffect(() => {
@@ -63,7 +71,10 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
     );
     if (!stream.streaming) {
       streamingMsgIdRef.current = null;
-      if (stream.stopped) unlock();
+      // Unlock on any completion (done or stopped). Previously only `stopped`
+      // unlocked, so a normal completion left the scope locked and the user
+      // couldn't select a new element for the next edit.
+      unlock();
     }
   }, [stream.text, stream.streaming, stream.stopped, stream.edit, unlock]);
 
