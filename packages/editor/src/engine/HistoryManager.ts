@@ -221,6 +221,31 @@ export class HistoryManager {
   }
 
   /**
+   * Commit any pending (debounced) record synchronously and cancel its timers.
+   * Use after a programmatic edit that the user may immediately undo (e.g. an
+   * applied AI edit): without this, the 500ms coalesce window leaves the edit
+   * uncommitted, so an undo fired within that window reverts the PREVIOUS
+   * action and the late record then clears the redo stack. Flushing makes the
+   * edit a committed undo step before control returns to the user.
+   */
+  flushPending(): void {
+    if (this.pendingRecordTimeoutId) {
+      clearTimeout(this.pendingRecordTimeoutId);
+      this.pendingRecordTimeoutId = null;
+    }
+    if (this.coalesceTimeoutId) {
+      clearTimeout(this.coalesceTimeoutId);
+      this.coalesceTimeoutId = null;
+    }
+    if (!this.pendingRecord) return;
+    this.pendingRecord = false;
+    if (this.isDestroyed || !this.isRecording) return;
+    const label = this.getCoalescedLabel();
+    this.coalescedLabels = [];
+    this.record(label);
+  }
+
+  /**
    * Set the current user ID for team attribution on undo history entries.
    * Called by the shell when session becomes available (spec §2.10).
    */

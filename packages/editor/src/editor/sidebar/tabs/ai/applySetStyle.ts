@@ -110,5 +110,10 @@ export function applyAiEdit(
   } finally {
     composer.endTransaction();
   }
+  // Commit the edit to history synchronously. History records are debounced
+  // ~500ms; without flushing, an undo fired right after Apply reverts the
+  // PREVIOUS action (the edit isn't committed yet) and the late record then
+  // clears the redo stack. Flush makes the AI edit one clean, immediate undo.
+  composer.history?.flushPending?.();
   return { applied };
 }

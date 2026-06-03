@@ -11,13 +11,15 @@ function makeComposer(el: { setStyle?: unknown } | undefined) {
 function makeTxComposer(el: { setStyle?: unknown } | undefined) {
   const beginTransaction = vi.fn();
   const endTransaction = vi.fn();
+  const flushPending = vi.fn();
   const setStyle = (el?.setStyle as ReturnType<typeof vi.fn>) ?? vi.fn();
   const composer = {
     elements: { getElement: vi.fn(() => (el ? { setStyle } : undefined)) },
     beginTransaction,
     endTransaction,
+    history: { flushPending },
   } as unknown as Composer;
-  return { composer, beginTransaction, endTransaction, setStyle };
+  return { composer, beginTransaction, endTransaction, flushPending, setStyle };
 }
 
 function commitEdit(commands: unknown[]) {
@@ -109,6 +111,17 @@ describe("applyAiEdit", () => {
     expect(beginTransaction).toHaveBeenCalledOnce();
     expect(endTransaction).toHaveBeenCalledOnce();
     expect(setStyle).toHaveBeenCalledTimes(2);
+  });
+
+  it("flushes the pending history record so the edit is one immediate undo step", () => {
+    const { composer, flushPending } = makeTxComposer({ setStyle: vi.fn() });
+    applyAiEdit(
+      composer,
+      commitEdit([
+        { commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#000" } },
+      ]),
+    );
+    expect(flushPending).toHaveBeenCalledOnce();
   });
 
   it("skips invalid / non-set-style entries but still wraps in a transaction", () => {
