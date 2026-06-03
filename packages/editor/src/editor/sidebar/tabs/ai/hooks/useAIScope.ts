@@ -42,6 +42,23 @@ export function useAIScope(composer: Composer | null): UseAIScopeResult {
     composer.on(EVENTS.ELEMENT_DESELECTED, onDeselected);
     composer.on(EVENTS.SELECTION_MULTIPLE, onMulti);
 
+    // Seed from the CURRENT selection. The events above only fire on future
+    // selection changes, so an element selected BEFORE this panel mounted would
+    // otherwise leave the scope stuck on "page" — and submits would chat
+    // (intent "text") instead of editing the element (intent "style-command").
+    if (statusRef.current !== "locked") {
+      const current = composer.selection?.getAllSelected?.() ?? [];
+      if (current.length > 1) {
+        setScope({ kind: "multi", count: current.length });
+      } else if (current.length === 1) {
+        setScope({
+          kind: "element",
+          id: current[0].getId(),
+          label: deriveLabel(current[0]),
+        });
+      }
+    }
+
     return () => {
       composer.off(EVENTS.ELEMENT_SELECTED, onSelected);
       composer.off(EVENTS.ELEMENT_DESELECTED, onDeselected);

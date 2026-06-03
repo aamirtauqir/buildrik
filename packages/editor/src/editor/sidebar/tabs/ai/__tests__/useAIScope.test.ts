@@ -17,9 +17,10 @@ function makeFakeElement(id: string, type: string, name?: string): FakeElement {
   };
 }
 
-function makeComposer() {
+function makeComposer(initialSelected: FakeElement[] = []) {
   const handlers = new Map<string, Set<(...a: unknown[]) => void>>();
   const composer = {
+    selection: { getAllSelected: () => initialSelected },
     on(evt: string, fn: (...a: unknown[]) => void) {
       if (!handlers.has(evt)) handlers.set(evt, new Set());
       handlers.get(evt)!.add(fn);
@@ -45,6 +46,29 @@ describe("useAIScope", () => {
     const { result } = renderHook(() => useAIScope(composer as never));
     expect(result.current.status).toBe("idle");
     expect(result.current.scope.kind).toBe("page");
+  });
+
+  it("seeds element scope from the CURRENT selection on mount (element selected before the panel opened)", () => {
+    // Regression: the selection events only fire on future changes, so an
+    // element already selected when the panel mounts must be read directly —
+    // otherwise scope stays "page" and submits chat instead of editing it.
+    const seeded = makeComposer([makeFakeElement("el-pre", "button", "Click Me")]);
+    const { result } = renderHook(() => useAIScope(seeded as never));
+    expect(result.current.scope.kind).toBe("element");
+    if (result.current.scope.kind === "element") {
+      expect(result.current.scope.id).toBe("el-pre");
+      expect(result.current.scope.label).toBe("Click Me");
+    }
+  });
+
+  it("seeds multi scope on mount when several elements are already selected", () => {
+    const seeded = makeComposer([
+      makeFakeElement("a", "text"),
+      makeFakeElement("b", "text"),
+    ]);
+    const { result } = renderHook(() => useAIScope(seeded as never));
+    expect(result.current.scope.kind).toBe("multi");
+    if (result.current.scope.kind === "multi") expect(result.current.scope.count).toBe(2);
   });
 
   it("auto-tracks element selection and uses aria-label as label when present", () => {

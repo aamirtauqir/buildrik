@@ -61,10 +61,18 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
   }, [scope, model, lock, stream]);
 
   React.useEffect(() => {
-    if (!streamingMsgIdRef.current) return;
+    // Capture the streaming message id in a local BEFORE setMessages. The
+    // functional updater runs during React's render pass — later than this
+    // effect body — so reading `streamingMsgIdRef.current` inside it would see
+    // the value AFTER the `= null` below ran, dropping the final chunk. The
+    // final chunk is exactly the one carrying the edit (edit + done arrive in
+    // one flush with streaming already false), so the edit was silently lost
+    // and the canvas never changed. Bind the id locally to close the race.
+    const targetId = streamingMsgIdRef.current;
+    if (!targetId) return;
     setMessages((prev) =>
       prev.map((m) =>
-        m.id === streamingMsgIdRef.current
+        m.id === targetId
           ? { ...m, text: stream.text, streaming: stream.streaming, stopped: stream.stopped, edit: stream.edit ?? m.edit }
           : m,
       ),
