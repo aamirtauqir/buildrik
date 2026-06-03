@@ -96,10 +96,37 @@ HOLD SCOPE. Carry-forward risks to track regardless of order:
 - Fixes: undo flush race; auth-aware load-failure toast (`useComposerInit.ts`).
 - Tests: server 27/27 AI, editor 62/62 AI (+ history/popover/chatmessage).
 
+### UPDATE 2026-06-04 — live-verify done, sidebar AI was broken (commit `ab68d7b6`)
+Browser-walked the sidebar AI panel. It did NOT edit the canvas end-to-end
+despite the "shipped" status + 138 green tests — the tests mock the subscription
+and composer, hiding two integration bugs (both now fixed + regression-tested):
+1. **Scope stuck on "Whole page".** `useAIScope` only updated on future
+   selection events, never read the current selection on mount → select-then-open
+   ran chat (`intent:"text"`), not element edit-commands. Seeded from
+   `composer.selection.getAllSelected()`.
+2. **Edit silently dropped.** AITab's sync effect read `streamingMsgIdRef.current`
+   inside the `setMessages` updater (runs after the synchronous `ref=null` on the
+   final flush); edit+done arrive together so the edit chunk matched a null id and
+   was lost (no diff/Apply, canvas unchanged). Bound id to a local const.
+
+After fixes, verified live on **free Ollama** (no paid key): scope→element,
+"make text green" applies (white→green), one-step undo, "duplicate"→2 buttons.
+set-style + duplicate + undo confirmed; delete/move/add-section share the path.
+
+**Runtime notes for next session:**
+- `resolveModelForUser` forces `"ollama"` when `OLLAMA_BASE_URL` is set (free).
+  A dashboard started before the var was added won't have it — restart with a
+  `.next` nuke. `packages/dashboard/.env.local` is a symlink to root.
+- Quota (`prisma.aIUsage`, 10/day FREE) meters free-local Ollama too; exhausted →
+  `TOO_MANY_REQUESTS` shown as an EMPTY assistant box (silent). Reset via
+  `aIUsage.deleteMany({where:{userId}})`. **New work item:** surface
+  quota-exhausted + provider errors in the panel instead of a blank reply.
+- Pencil annotation overlay (`styles-module__*`, z≤100000) intercepts clicks on
+  localhost — hide via JS before any headless walk.
+
 ### Remaining to COMPLETE the whole-editor-AI arc (next-session checklist)
-- [ ] **Live-verify** add/delete/duplicate/move/add-section in the browser
-      (log in first — see Run below; the pipeline is proven via smoke, the
-      click-walk is the gap).
+- [x] **Live-verify** the element commands in the browser — done 2026-06-04
+      (set-style/duplicate/undo walked; 2 bugs fixed; see UPDATE above).
 - [ ] **P2 full element coverage** — more commands: `set-attribute` (href/alt/
       target), spacing/border/font/layout style coverage, and the **two style
       stores** (pseudo-state + breakpoint via `StyleEngine.setRule`, not just
