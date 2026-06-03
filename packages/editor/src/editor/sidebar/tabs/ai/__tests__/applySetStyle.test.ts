@@ -9,10 +9,14 @@ import {
   applyDuplicateElement,
   applyMoveElement,
   applyAiEdit,
+  applySetAttribute,
   setStyleArgsSchema,
+  setAttributeArgsSchema,
 } from "../applySetStyle";
 
-function makeComposer(el: { setStyle?: unknown; setContent?: unknown } | undefined) {
+function makeComposer(
+  el: { setStyle?: unknown; setContent?: unknown; setAttribute?: unknown } | undefined,
+) {
   return {
     elements: { getElement: vi.fn(() => el) },
   } as unknown as Composer;
@@ -409,5 +413,67 @@ describe("applyMoveElement", () => {
     expect(() =>
       applyMoveElement(composer, { elementId: "x", direction: "up" }),
     ).toThrow(/no parent/i);
+  });
+});
+
+describe("setAttributeArgsSchema", () => {
+  it("accepts a normal href, alt text, and a valid target", () => {
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "href", value: "https://x.com" }).success).toBe(true);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "alt", value: "A photo" }).success).toBe(true);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "target", value: "_blank" }).success).toBe(true);
+  });
+
+  it("rejects javascript:/data: hrefs, bad targets, disallowed attrs, and markup", () => {
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "href", value: "javascript:alert(1)" }).success).toBe(false);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "href", value: "data:text/html,x" }).success).toBe(false);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "target", value: "_evil" }).success).toBe(false);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "onclick", value: "x()" }).success).toBe(false);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "alt", value: "<img onerror=x>" }).success).toBe(false);
+  });
+});
+
+describe("applySetAttribute", () => {
+  it("calls el.setAttribute with the attribute and value", () => {
+    const setAttribute = vi.fn();
+    const composer = makeComposer({ setAttribute });
+    applySetAttribute(composer, { elementId: "a", attribute: "href", value: "https://x.com" });
+    expect(setAttribute).toHaveBeenCalledWith("href", "https://x.com");
+  });
+
+  it("throws when the element is missing", () => {
+    const composer = makeComposer(undefined);
+    expect(() =>
+      applySetAttribute(composer, { elementId: "a", attribute: "alt", value: "x" }),
+    ).toThrow(/element not found/i);
+  });
+
+  it("applyAiEdit dispatches a set-attribute command", () => {
+    const setAttribute = vi.fn();
+    const composer = {
+      elements: { getElement: vi.fn(() => ({ setAttribute })) },
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      history: { flushPending: vi.fn() },
+    } as unknown as Composer;
+    const r = applyAiEdit(composer, commitEdit([
+      { commandId: "set-attribute", args: { elementId: "a", attribute: "href", value: "https://x.com" } },
+    ]));
+    expect(r.applied).toBe(1);
+    expect(setAttribute).toHaveBeenCalledWith("href", "https://x.com");
+  });
+
+  it("applyAiEdit skips a set-attribute with an unsafe href", () => {
+    const setAttribute = vi.fn();
+    const composer = {
+      elements: { getElement: vi.fn(() => ({ setAttribute })) },
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      history: { flushPending: vi.fn() },
+    } as unknown as Composer;
+    const r = applyAiEdit(composer, commitEdit([
+      { commandId: "set-attribute", args: { elementId: "a", attribute: "href", value: "javascript:alert(1)" } },
+    ]));
+    expect(r.applied).toBe(0);
+    expect(setAttribute).not.toHaveBeenCalled();
   });
 });

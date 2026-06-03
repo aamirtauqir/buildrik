@@ -220,4 +220,37 @@ describe("extractValidEditCommands", () => {
     ]);
     expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
   });
+
+  it("accepts set-attribute for href / alt / target", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-attribute", args: { elementId: EL, attribute: "href", value: "https://buildrik.com" } },
+      { commandId: "set-attribute", args: { elementId: EL, attribute: "alt", value: "Team photo" } },
+      { commandId: "set-attribute", args: { elementId: EL, attribute: "target", value: "_blank" } },
+    ]);
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(3);
+  });
+
+  it("rejects set-attribute href with a javascript:/data: URI", () => {
+    for (const value of ["javascript:alert(1)", " JavaScript:x", "data:text/html,x", "vbscript:x"]) {
+      const raw = JSON.stringify([
+        { commandId: "set-attribute", args: { elementId: EL, attribute: "href", value } },
+      ]);
+      expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+    }
+  });
+
+  it("rejects set-attribute with a disallowed attribute or bad target", () => {
+    const onclick = JSON.stringify([
+      { commandId: "set-attribute", args: { elementId: EL, attribute: "onclick", value: "x()" } },
+    ]);
+    const badTarget = JSON.stringify([
+      { commandId: "set-attribute", args: { elementId: EL, attribute: "target", value: "_evil" } },
+    ]);
+    const markupAlt = JSON.stringify([
+      { commandId: "set-attribute", args: { elementId: EL, attribute: "alt", value: "<img onerror=x>" } },
+    ]);
+    expect(extractValidEditCommands(onclick, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(badTarget, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(markupAlt, EL)).toHaveLength(0);
+  });
 });

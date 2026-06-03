@@ -251,6 +251,45 @@ export function applyMoveElement(composer: Composer, args: MoveElementArgs): voi
 }
 
 /**
+ * v1 in-canvas AI command: `set-attribute`. Sets a safe authoring attribute
+ * (href / alt / title / target / rel / aria-label / name) via `el.setAttribute`.
+ * Per-attribute value guards mirror the server: href rejects script/data URIs,
+ * target is enum-restricted, the rest are plain text (no markup). The property
+ * allow-list excludes event handlers, `style`, `src`, and `id`.
+ */
+const ATTRIBUTE_NAMES = [
+  "href", "alt", "title", "target", "rel", "aria-label", "name",
+] as const;
+const UNSAFE_HREF = /^\s*(javascript|data|vbscript):/i;
+const ALLOWED_TARGETS = ["_blank", "_self", "_parent", "_top"] as const;
+
+export const setAttributeArgsSchema = z
+  .object({
+    elementId: z.string().min(1),
+    attribute: z.enum(ATTRIBUTE_NAMES),
+    value: z.string().min(1).max(1000),
+  })
+  .refine(
+    (a) => {
+      if (a.attribute === "href") return !UNSAFE_HREF.test(a.value);
+      if (a.attribute === "target")
+        return (ALLOWED_TARGETS as readonly string[]).includes(a.value);
+      return !/[<>]/.test(a.value);
+    },
+    { message: "Unsafe or invalid attribute value rejected" },
+  );
+
+export type SetAttributeArgs = z.infer<typeof setAttributeArgsSchema>;
+
+export function applySetAttribute(composer: Composer, args: SetAttributeArgs): void {
+  const el = composer.elements.getElement(args.elementId);
+  if (!el || typeof el.setAttribute !== "function") {
+    throw new Error(`set-attribute: element not found (${args.elementId})`);
+  }
+  el.setAttribute(args.attribute, args.value);
+}
+
+/**
  * Run an accepted AI edit's command batch inside ONE outer transaction so the
  * whole edit is a single undo step. Each command is re-validated client-side
  * (defense in depth — the server already validated) before applying; invalid
@@ -310,6 +349,11 @@ export function applyAiEdit(
         const parsed = addSectionArgsSchema.safeParse(cmd.args);
         if (!parsed.success) continue;
         applyAddSection(composer, parsed.data);
+        applied++;
+      } else if (cmd.commandId === "set-attribute") {
+        const parsed = setAttributeArgsSchema.safeParse(cmd.args);
+        if (!parsed.success) continue;
+        applySetAttribute(composer, parsed.data);
         applied++;
       }
     }

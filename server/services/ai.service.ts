@@ -580,6 +580,30 @@ const SECTION_CONTAINER_TYPES = new Set([
 ]);
 const MAX_SECTION_CHILDREN = 12;
 
+// Element attributes the AI may set. Restricted to safe, common authoring
+// attributes — never event handlers (onclick), style, src, or id.
+const ATTRIBUTE_ALLOWLIST = new Set([
+  "href", "alt", "title", "target", "rel", "aria-label", "name",
+]);
+// href/target get value-specific guards; the rest are plain text.
+const UNSAFE_HREF = /^\s*(javascript|data|vbscript):/i;
+const ALLOWED_TARGETS = new Set(["_blank", "_self", "_parent", "_top"]);
+const MAX_ATTR_LEN = 1000;
+
+/** Validate one attribute name+value pair against the per-attribute rules. */
+function isValidAttribute(attribute: unknown, value: unknown): boolean {
+  if (typeof attribute !== "string" || !ATTRIBUTE_ALLOWLIST.has(attribute)) {
+    return false;
+  }
+  if (typeof value !== "string" || value.length === 0 || value.length > MAX_ATTR_LEN) {
+    return false;
+  }
+  if (attribute === "href") return !UNSAFE_HREF.test(value);
+  if (attribute === "target") return ALLOWED_TARGETS.has(value);
+  // alt / title / rel / aria-label / name: plain text, no markup.
+  return !UNSAFE_TEXT.test(value);
+}
+
 export type EditCommand =
   | {
       commandId: "set-style";
@@ -595,6 +619,10 @@ export type EditCommand =
   | {
       commandId: "move-element";
       args: { elementId: string; direction: "up" | "down" };
+    }
+  | {
+      commandId: "set-attribute";
+      args: { elementId: string; attribute: string; value: string };
     }
   | {
       commandId: "add-section";
@@ -634,6 +662,9 @@ export function editCommandToRow(
   if (c.commandId === "move-element") {
     return { field: "move", from: "", to: c.args.direction };
   }
+  if (c.commandId === "set-attribute") {
+    return { field: c.args.attribute, from: "", to: c.args.value };
+  }
   if (c.commandId === "add-section") {
     return {
       field: "add section",
@@ -660,6 +691,7 @@ Rules:
 - delete-element: {"commandId":"delete-element","args":{"elementId":"${elementId}"}} — only when the request clearly asks to delete/remove this element.
 - duplicate-element: {"commandId":"duplicate-element","args":{"elementId":"${elementId}"}} — when asked to duplicate/copy this element.
 - move-element: {"commandId":"move-element","args":{"elementId":"${elementId}","direction":"up|down"}} — when asked to move/reorder this element up or down among its siblings.
+- set-attribute: {"commandId":"set-attribute","args":{"elementId":"${elementId}","attribute":"<attr>","value":"<value>"}} — when asked to set a link URL, image alt text, open-in-new-tab, etc. "attribute" must be one of: ${[...ATTRIBUTE_ALLOWLIST].join(", ")}. For "href" use a normal URL (http/https/mailto/tel/relative/#anchor) — never javascript:, data:, or vbscript:. For "target" use one of: ${[...ALLOWED_TARGETS].join(", ")}. Other attributes are plain text (no angle brackets).
 - add-section: {"commandId":"add-section","args":{"elementId":"${elementId}","sectionType":"section|container|columns|grid|flex","children":[{"elementType":"heading","text":"..."},{"elementType":"button","text":"..."}]}} — when asked to BUILD or ADD a whole section/block (e.g. "add a pricing section", "add a hero with a heading and a button"). Put 2-${MAX_SECTION_CHILDREN} child elements inside; each child elementType must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}; include "text" for content children.
 - Use set-text for wording, set-style for appearance, add-element to insert one element, add-section to build a multi-element section, delete-element to remove, duplicate-element to copy, move-element to reorder.
 - Return [] if the request cannot be expressed with these commands.
@@ -727,6 +759,9 @@ function isValidEditCommand(c: unknown, elementId: string): c is EditCommand {
   }
   if (cmd.commandId === "move-element") {
     return cmd.args.direction === "up" || cmd.args.direction === "down";
+  }
+  if (cmd.commandId === "set-attribute") {
+    return isValidAttribute(cmd.args.attribute, cmd.args.value);
   }
   if (cmd.commandId === "add-section") {
     const { sectionType, children } = cmd.args as {
