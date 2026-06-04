@@ -425,6 +425,14 @@ describe("setAttributeArgsSchema", () => {
     expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "target", value: "_blank" }).success).toBe(true);
   });
 
+  it("accepts src http(s)/relative, rejects data:/blob:/js for src", () => {
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "src", value: "https://x.com/a.png" }).success).toBe(true);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "src", value: "/assets/a.png" }).success).toBe(true);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "src", value: "data:image/png;base64,x" }).success).toBe(false);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "src", value: "blob:http://x" }).success).toBe(false);
+    expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "src", value: "javascript:alert(1)" }).success).toBe(false);
+  });
+
   it("rejects javascript:/data: hrefs, bad targets, disallowed attrs, and markup", () => {
     expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "href", value: "javascript:alert(1)" }).success).toBe(false);
     expect(setAttributeArgsSchema.safeParse({ elementId: "a", attribute: "href", value: "data:text/html,x" }).success).toBe(false);

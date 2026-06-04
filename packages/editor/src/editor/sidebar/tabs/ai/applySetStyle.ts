@@ -314,10 +314,20 @@ export function applyMoveElement(composer: Composer, args: MoveElementArgs): voi
  * allow-list excludes event handlers, `style`, `src`, and `id`.
  */
 const ATTRIBUTE_NAMES = [
-  "href", "alt", "title", "target", "rel", "aria-label", "name",
+  "href", "alt", "title", "target", "rel", "aria-label", "name", "src",
 ] as const;
 const UNSAFE_HREF = /^\s*(javascript|data|vbscript):/i;
 const ALLOWED_TARGETS = ["_blank", "_self", "_parent", "_top"] as const;
+
+// `src` uses a scheme allowlist (http/https/relative only), mirroring the
+// server guard — rejects data:/blob:/javascript: and url-breaking characters.
+function isSafeSrcValue(value: string): boolean {
+  if (/[)"'<>]/.test(value)) return false;
+  const scheme = value.trim().match(/^([a-z][a-z0-9+.-]*):/i);
+  if (!scheme) return value.startsWith("/") || /^[\w.-]/.test(value.trim());
+  const s = scheme[1].toLowerCase();
+  return s === "http" || s === "https";
+}
 
 export const setAttributeArgsSchema = z
   .object({
@@ -330,6 +340,7 @@ export const setAttributeArgsSchema = z
       if (a.attribute === "href") return !UNSAFE_HREF.test(a.value);
       if (a.attribute === "target")
         return (ALLOWED_TARGETS as readonly string[]).includes(a.value);
+      if (a.attribute === "src") return isSafeSrcValue(a.value);
       return !/[<>]/.test(a.value);
     },
     { message: "Unsafe or invalid attribute value rejected" },

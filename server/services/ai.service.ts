@@ -605,12 +605,27 @@ const VARIANT_BREAKPOINTS = new Set(["tablet", "mobile"]);
 // Element attributes the AI may set. Restricted to safe, common authoring
 // attributes — never event handlers (onclick), style, src, or id.
 const ATTRIBUTE_ALLOWLIST = new Set([
-  "href", "alt", "title", "target", "rel", "aria-label", "name",
+  "href", "alt", "title", "target", "rel", "aria-label", "name", "src",
 ]);
-// href/target get value-specific guards; the rest are plain text.
+// href/target/src get value-specific guards; the rest are plain text.
 const UNSAFE_HREF = /^\s*(javascript|data|vbscript):/i;
 const ALLOWED_TARGETS = new Set(["_blank", "_self", "_parent", "_top"]);
 const MAX_ATTR_LEN = 1000;
+
+/**
+ * `src` (image/media) uses a scheme ALLOWLIST, not a blocklist (codex finding):
+ * only http(s) or a relative/root path, and no characters that break out of a
+ * url(...) or quoted attribute. Rejects data:/blob:/javascript:/vbscript:/file:.
+ * (Full "asset must exist in the media library" recall is a follow-up that needs
+ * the asset list fed into the prompt — this is the security floor.)
+ */
+function isSafeSrcValue(value: string): boolean {
+  if (/[)"'<>]/.test(value)) return false;
+  const scheme = value.trim().match(/^([a-z][a-z0-9+.-]*):/i);
+  if (!scheme) return value.startsWith("/") || /^[\w.-]/.test(value.trim()); // relative
+  const s = scheme[1].toLowerCase();
+  return s === "http" || s === "https";
+}
 
 /** Validate one attribute name+value pair against the per-attribute rules. */
 function isValidAttribute(attribute: unknown, value: unknown): boolean {
@@ -622,6 +637,7 @@ function isValidAttribute(attribute: unknown, value: unknown): boolean {
   }
   if (attribute === "href") return !UNSAFE_HREF.test(value);
   if (attribute === "target") return ALLOWED_TARGETS.has(value);
+  if (attribute === "src") return isSafeSrcValue(value);
   // alt / title / rel / aria-label / name: plain text, no markup.
   return !UNSAFE_TEXT.test(value);
 }
@@ -769,7 +785,7 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
     id: "set-attribute",
     agentCallable: true,
     rule: (id) =>
-      `- set-attribute: {"commandId":"set-attribute","args":{"elementId":"${id}","attribute":"<attr>","value":"<value>"}} — when asked to set a link URL, image alt text, open-in-new-tab, etc. "attribute" must be one of: ${[...ATTRIBUTE_ALLOWLIST].join(", ")}. For "href" use a normal URL (http/https/mailto/tel/relative/#anchor) — never javascript:, data:, or vbscript:. For "target" use one of: ${[...ALLOWED_TARGETS].join(", ")}. Other attributes are plain text (no angle brackets).`,
+      `- set-attribute: {"commandId":"set-attribute","args":{"elementId":"${id}","attribute":"<attr>","value":"<value>"}} — when asked to set a link URL, an image source, image alt text, open-in-new-tab, etc. "attribute" must be one of: ${[...ATTRIBUTE_ALLOWLIST].join(", ")}. For "href" use a normal URL (http/https/mailto/tel/relative/#anchor) — never javascript:, data:, or vbscript:. For "src" (image source) use an http(s) or relative URL only — never data:, blob:, or javascript:. For "target" use one of: ${[...ALLOWED_TARGETS].join(", ")}. Other attributes are plain text (no angle brackets).`,
   },
   {
     id: "add-section",

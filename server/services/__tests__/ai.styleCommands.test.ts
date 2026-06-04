@@ -381,6 +381,17 @@ describe("extractValidEditCommands", () => {
     expect(extractValidEditCommands(raw, EL)).toHaveLength(3);
   });
 
+  it("accepts set-attribute src with http(s)/relative, rejects data:/blob:/js + url-breakers", () => {
+    for (const value of ["https://cdn.x.com/a.png", "/assets/logo.svg", "images/hero.jpg"]) {
+      const raw = JSON.stringify([{ commandId: "set-attribute", args: { elementId: EL, attribute: "src", value } }]);
+      expect(extractValidEditCommands(raw, EL)).toHaveLength(1);
+    }
+    for (const value of ["data:image/png;base64,xxx", "blob:http://x", "javascript:alert(1)", 'https://x.com/a.png")', "x'onload"]) {
+      const raw = JSON.stringify([{ commandId: "set-attribute", args: { elementId: EL, attribute: "src", value } }]);
+      expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+    }
+  });
+
   it("rejects set-attribute href with a javascript:/data: URI", () => {
     for (const value of ["javascript:alert(1)", " JavaScript:x", "data:text/html,x", "vbscript:x"]) {
       const raw = JSON.stringify([
