@@ -8,11 +8,63 @@ import { describe, it, expect } from "vitest";
 import {
   extractValidEditCommands,
   extractValidPageEditCommands,
+  extractValidPlan,
   buildEditCommandPrompt,
   buildPageEditCommandPrompt,
+  buildPlanPrompt,
 } from "@server/services/ai.service";
 
 const EL = "el-1";
+
+describe("extractValidPlan (P4 agent plan)", () => {
+  const IDS = new Set(["a", "b"]);
+
+  it("accepts a {steps:[...]} object with element + page scopes", () => {
+    const raw = JSON.stringify({
+      steps: [
+        { title: "Style heading", scope: { kind: "element", id: "a" }, instruction: "make it bold" },
+        { title: "Add pricing", scope: { kind: "page" }, instruction: "add a pricing section" },
+      ],
+    });
+    const plan = extractValidPlan(raw, IDS);
+    expect(plan).toHaveLength(2);
+    expect(plan[0].scope).toEqual({ kind: "element", id: "a" });
+    expect(plan[1].scope).toEqual({ kind: "page" });
+  });
+
+  it("accepts a bare array and strips ```json fences", () => {
+    const raw = '```json\n[{"title":"x","scope":{"kind":"page"},"instruction":"do x"}]\n```';
+    expect(extractValidPlan(raw, IDS)).toHaveLength(1);
+  });
+
+  it("drops steps with an unknown element id, markup, or missing fields", () => {
+    const raw = JSON.stringify({
+      steps: [
+        { title: "ok", scope: { kind: "element", id: "ghost" }, instruction: "x" },
+        { title: "<b>bad</b>", scope: { kind: "page" }, instruction: "x" },
+        { title: "no instruction", scope: { kind: "page" } },
+        { title: "good", scope: { kind: "element", id: "b" }, instruction: "tweak" },
+      ],
+    });
+    const plan = extractValidPlan(raw, IDS);
+    expect(plan).toHaveLength(1);
+    expect(plan[0].title).toBe("good");
+  });
+
+  it("caps the plan at 8 steps and returns [] on garbage", () => {
+    const many = { steps: Array.from({ length: 20 }, (_, i) => ({ title: `s${i}`, scope: { kind: "page" }, instruction: "x" })) };
+    expect(extractValidPlan(JSON.stringify(many), IDS)).toHaveLength(8);
+    expect(extractValidPlan("not json", IDS)).toEqual([]);
+    expect(extractValidPlan(JSON.stringify({ steps: [] }), IDS)).toEqual([]);
+  });
+
+  it("buildPlanPrompt lists element ids + fences the request", () => {
+    const p = buildPlanPrompt([{ id: "a", type: "heading" }], "build a landing page");
+    expect(p).toContain('id="a"');
+    expect(p).toContain("<request>build a landing page</request>");
+    expect(p).toContain('"steps"');
+  });
+});
 
 describe("page-scope (multi-element) extraction", () => {
   const ALLOWED = new Set(["a", "b", "c"]);

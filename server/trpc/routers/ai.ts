@@ -11,6 +11,7 @@ import {
   generateComponentSchema,
   generateEditCommands,
   generatePageEditCommands,
+  generatePlan,
   editCommandToRow,
 } from "../../services/ai.service";
 import {
@@ -102,7 +103,8 @@ const streamPromptInputSchema = z.object({
   model: modelSchema.default(DEFAULT_MODEL),
   // "text" = existing chat stream; "style-command" = in-canvas AI that emits a
   // validated set-style command batch (element scope only).
-  intent: z.enum(["text", "style-command"]).default("text"),
+  // "plan" (P4) = agent build loop; returns an ordered step plan, not edits.
+  intent: z.enum(["text", "style-command", "plan"]).default("text"),
 });
 
 const componentSchemaInputSchema = z.object({
@@ -243,6 +245,24 @@ export const aiRouter = router({
           code: "TOO_MANY_REQUESTS",
           message: `Daily limit reached (${quota.limit}). Resets at ${quota.resetsAt.toISOString()}.`,
         });
+      }
+      // Agent build loop (P4): return an ordered plan of steps (not edits). The
+      // editor walks each step through the style-command path at run time.
+      if (input.intent === "plan" && input.scope.kind === "page") {
+        let steps;
+        try {
+          steps = await generatePlan({
+            prompt: input.prompt,
+            elements: input.scope.elements ?? [],
+            model,
+          });
+        } catch (e) {
+          await releaseQuota(userId);
+          throw e;
+        }
+        yield { type: "plan" as const, plan: { steps } };
+        yield { type: "done" as const };
+        return;
       }
       // In-canvas AI: emit a validated edit-command batch (single-shot), not a
       // token stream. Element scope edits one element; page scope (P3) edits
