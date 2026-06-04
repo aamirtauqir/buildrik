@@ -124,6 +124,17 @@ set-style + duplicate + undo confirmed; delete/move/add-section share the path.
 - Pencil annotation overlay (`styles-module__*`, z≤100000) intercepts clicks on
   localhost — hide via JS before any headless walk.
 
+### UPDATE 2026-06-04 (cont.) — P4 SHIPPED, ARC COMPLETE
+- [x] **P4 agent build loop** SHIPPED (`f8d2ed9e` server + `280846e6` editor).
+      Plan→walk→approve loop over the proven pipeline (NO native tool-use — eureka).
+      Eng-reviewed + codex-challenged; plan at `docs/plans/2026-06-04-001-feat-p4-agent-loop-plan.md`.
+      Live-verified on free Ollama (7-step plan, apply/skip/stop, "Run complete").
+- **WHOLE AI-EDITOR ARC COMPLETE**: P1(7 cmds) + P1b(registries) + P2(9 cmds) +
+      P3(page multi-element) + P4(agent loop), plus 3 live-verify fixes + the
+      data-loss guard. Leftovers (non-blocking): workspace auth (only if server-side
+      AI writes land), free-Ollama metering revisit, dup AIModel enum SSOT, P3-deepen,
+      agent v2 (auto-apply / publish-in-loop / editable plans — see P4 plan NOT-in-scope).
+
 ### Remaining to COMPLETE the whole-editor-AI arc (next-session checklist)
 - [x] **Live-verify** the element commands in the browser — done 2026-06-04
       (set-style/duplicate/undo walked; 2 bugs fixed; see UPDATE above).
