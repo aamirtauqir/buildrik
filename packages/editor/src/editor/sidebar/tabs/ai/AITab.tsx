@@ -3,9 +3,11 @@ import type { Composer } from "../../../../engine";
 import { TabFrame } from "@/shared/extensions/TabFrame";
 import { ScopeChip } from "./ScopeChip";
 import { ChatThread } from "./ChatThread";
+import { AgentPlan } from "./AgentPlan";
 import { Composer as PromptComposer } from "./Composer";
 import { useAIScope } from "./hooks/useAIScope";
 import { useStreamPrompt, toServerScope } from "./hooks/useStreamPrompt";
+import { useAgentRunner } from "./hooks/useAgentRunner";
 import { applyAiEdit } from "./applySetStyle";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
@@ -22,8 +24,10 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
   const { scope, status, lock, unlock } = useAIScope(composer);
   const stream = useStreamPrompt();
   const [model, setModel] = React.useState<AIModel>(DEFAULT_MODEL);
+  const [mode, setMode] = React.useState<"chat" | "agent">("chat");
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const streamingMsgIdRef = React.useRef<string | null>(null);
+  const agent = useAgentRunner(composer, model);
 
   const submit = React.useCallback((text: string) => {
     const serverScope = toServerScope(scope);
@@ -138,21 +142,55 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
-      <ScopeChip scope={scope} status={status} />
-      <ChatThread
-        messages={messages}
-        onAccept={onAccept}
-        onReject={onReject}
-        onRegenerate={onRegenerate}
-        onPreviewEnter={() => {}}
-        onPreviewLeave={() => {}}
-      />
+      <div className="bd-ai-mode" role="tablist" aria-label="AI mode">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === "chat"}
+          className={`bd-ai-mode-btn${mode === "chat" ? " bd-ai-mode-active" : ""}`}
+          onClick={() => setMode("chat")}
+        >
+          Chat
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === "agent"}
+          className={`bd-ai-mode-btn${mode === "agent" ? " bd-ai-mode-active" : ""}`}
+          onClick={() => setMode("agent")}
+        >
+          Agent
+        </button>
+      </div>
+      {mode === "chat" ? (
+        <>
+          <ScopeChip scope={scope} status={status} />
+          <ChatThread
+            messages={messages}
+            onAccept={onAccept}
+            onReject={onReject}
+            onRegenerate={onRegenerate}
+            onPreviewEnter={() => {}}
+            onPreviewLeave={() => {}}
+          />
+        </>
+      ) : (
+        <AgentPlan
+          phase={agent.phase}
+          steps={agent.steps}
+          currentIndex={agent.currentIndex}
+          error={agent.error}
+          onApprove={agent.approve}
+          onSkip={agent.skip}
+          onStop={agent.stop}
+        />
+      )}
       <PromptComposer
         model={model}
         onModelChange={setModel}
-        onSubmit={submit}
-        onStop={stream.stop}
-        streaming={stream.streaming}
+        onSubmit={mode === "agent" ? agent.start : submit}
+        onStop={mode === "agent" ? agent.stop : stream.stop}
+        streaming={mode === "agent" ? agent.phase === "planning" || agent.phase === "running" : stream.streaming}
       />
     </TabFrame>
   );
