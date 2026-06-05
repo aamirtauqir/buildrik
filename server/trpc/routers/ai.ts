@@ -22,6 +22,8 @@ import {
   resolveModelForUser,
 } from "../../services/quota.service";
 import { modelSchema, DEFAULT_MODEL } from "../../services/types";
+import { aiAdoptionInputSchema } from "@buildrik/shared/schemas/ai-adoption";
+import { recordAiAdoption } from "../../services/ai-adoption.service";
 
 const contentInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
@@ -375,5 +377,15 @@ export const aiRouter = router({
           message: err.message ?? "Component schema generation failed",
         });
       }
+    }),
+
+  // Task-level AI adoption telemetry. Fire-and-forget from the editor; the
+  // service never throws and verifies site membership. Returns immediately so a
+  // logging failure can never block the edit.
+  logAdoption: protectedProcedure
+    .input(aiAdoptionInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      await recordAiAdoption(ctx.session.user.id, input);
+      return { ok: true };
     }),
 });

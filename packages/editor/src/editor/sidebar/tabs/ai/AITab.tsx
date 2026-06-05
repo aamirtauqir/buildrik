@@ -9,6 +9,7 @@ import { useAIScope } from "./hooks/useAIScope";
 import { useStreamPrompt, toServerScope } from "./hooks/useStreamPrompt";
 import { useAgentRunner } from "./hooks/useAgentRunner";
 import { applyAiEdit } from "./applySetStyle";
+import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
 
@@ -117,11 +118,14 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
       // finally) and the partial edit is recorded as one undoable entry.
       // applyAiEdit is async (some commands, e.g. insert-component, are async);
       // await so the "applied" state flips only after the mutation lands.
-      try { await applyAiEdit(composer, msg.edit); } catch { /* partial recorded */ }
+      try {
+        await applyAiEdit(composer, msg.edit);
+        trackAiEditApplied({ applyOps: msg.edit.applyOps, surface: "chat", model });
+      } catch { /* partial recorded */ }
     }
     setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "applied" } } : m));
     unlock();
-  }, [messages, composer, unlock]);
+  }, [messages, composer, unlock, model]);
 
   const onReject = React.useCallback((msgId: string) => {
     setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "rejected" } } : m));

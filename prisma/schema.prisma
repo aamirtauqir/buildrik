@@ -140,6 +140,7 @@ model Workspace {
   sharingSettings WSSharingSettings?
   folders         Folder[]
   activityLogs    ActivityLog[]
+  aiAdoptionEvents AiAdoptionEvent[]
   apiTokens       ApiToken[]
 
   @@map("workspaces")
@@ -431,6 +432,29 @@ model AIUsage {
   @@unique([userId, dayBucket])
   @@index([userId])
   @@map("ai_usage")
+}
+
+// AI adoption telemetry (task-level): which AI edits get applied, reverted, and
+// agent-run outcomes. Kept SEPARATE from ActivityLog so high-volume AI events
+// never pollute the user-facing activity feeds. Privacy: metadata holds
+// STRUCTURAL metrics only (command names, scope, counts, durations) — never
+// prompt text, token values, or page content.
+model AiAdoptionEvent {
+  id          String   @id @default(cuid())
+  workspaceId String
+  siteId      String?
+  actorId     String?
+  event       String // "edit.applied" | "edit.reverted" | "agent.run"
+  surface     String? // "inline" | "chat" | "agent"
+  model       String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, event, createdAt])
+  @@index([siteId, createdAt])
+  @@map("ai_adoption_events")
 }
 
 model NotificationPref {

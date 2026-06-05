@@ -10,6 +10,7 @@ import {
   type TokenRef,
 } from "./runPromptOnce";
 import { AI_EDITABLE_TOKEN_TYPES } from "@/engine/designSystem/tokenValueGuard";
+import { trackAgentRun } from "@/services/ai/adoptionTracker";
 
 /**
  * P4 agent build loop. Generates an ordered plan, then walks each step through
@@ -76,7 +77,25 @@ export function useAgentRunner(
   const autoApplyRef = React.useRef(false);
   autoApplyRef.current = autoApply;
   const generateStepRef = React.useRef<(i: number) => void>(() => {});
+  // Adoption telemetry: one agent.run report per run (start time + once-guard).
+  const runStartRef = React.useRef(0);
+  const reportedRef = React.useRef(true);
   const setAutoApply = React.useCallback((on: boolean) => setAutoApplyState(on), []);
+
+  const reportRun = React.useCallback(() => {
+    if (reportedRef.current) return;
+    reportedRef.current = true;
+    const steps = stepsRef.current;
+    if (steps.length === 0) return;
+    trackAgentRun({
+      stepsPlanned: steps.length,
+      stepsApplied: steps.filter((s) => s.status === "applied").length,
+      stepsSkipped: steps.filter((s) => s.status === "skipped").length,
+      stepsFailed: steps.filter((s) => s.status === "failed").length,
+      durationMs: Math.max(0, Date.now() - runStartRef.current),
+      model,
+    });
+  }, [model]);
 
   const gatherElements = React.useCallback((): PageElementRef[] => {
     if (!composer) return [];
@@ -113,10 +132,11 @@ export function useAgentRunner(
     if (cancelledRef.current || next >= stepsRef.current.length) {
       setPhase("done");
       setCurrentIndex(-1);
+      reportRun();
       return;
     }
     generateStepRef.current(next);
-  }, []);
+  }, [reportRun]);
 
   const generateStep = React.useCallback(
     async (i: number) => {
@@ -170,6 +190,8 @@ export function useAgentRunner(
     async (prompt: string) => {
       if (!composer) return;
       cancelledRef.current = false;
+      runStartRef.current = Date.now();
+      reportedRef.current = false;
       setError(null);
       setSteps([]);
       stepsRef.current = [];
@@ -226,7 +248,8 @@ export function useAgentRunner(
     cancelledRef.current = true;
     setPhase("done");
     setCurrentIndex(-1);
-  }, []);
+    reportRun();
+  }, [reportRun]);
 
   const reset = React.useCallback(() => {
     cancelledRef.current = true;

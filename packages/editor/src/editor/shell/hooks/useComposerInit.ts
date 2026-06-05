@@ -11,6 +11,7 @@ import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
+import { attachAdoptionRevertListener } from "../../../services/ai/adoptionTracker";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
 import type { DesignToken } from "@/editor/design-system";
 import {
@@ -310,8 +311,12 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     setComposer(instance);
     onEditorRef.current?.(instance);
 
+    // Adoption telemetry: report when the user undoes an AI edit ("ai-edit" label).
+    const detachAdoption = attachAdoptionRevertListener(instance);
+
     // Cleanup: Remove all event listeners before destroying
     return () => {
+      detachAdoption();
       instance.off("composer:ready", composerReadyHandler);
       instance.off("project:changed", projectChangedHandler);
       instance.off("history:recorded", historyRecordedHandler);

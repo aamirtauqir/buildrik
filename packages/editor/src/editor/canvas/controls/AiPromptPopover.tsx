@@ -13,6 +13,7 @@ import { useStreamPrompt } from "../../sidebar/tabs/ai/hooks/useStreamPrompt";
 import { applyAiEdit } from "../../sidebar/tabs/ai/applySetStyle";
 import { DiffRows } from "../../sidebar/tabs/ai/DiffRows";
 import { DEFAULT_MODEL } from "../../sidebar/tabs/ai/types";
+import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import "./AiPromptPopover.css";
 
 export interface AiPromptPopoverProps {
@@ -52,6 +53,7 @@ export const AiPromptPopover: React.FC<AiPromptPopoverProps> = ({
       // transaction still closes; the partial edit is recorded once.
       try {
         applyAiEdit(composer, stream.edit);
+        trackAiEditApplied({ applyOps: stream.edit.applyOps, surface: "inline", model: DEFAULT_MODEL });
       } catch {
         /* partial recorded */
       }

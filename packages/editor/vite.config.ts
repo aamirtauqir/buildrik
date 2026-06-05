@@ -24,6 +24,7 @@ export default defineConfig({
       "@hooks": resolve(__dirname, "./src/hooks"),
       "@utils": resolve(__dirname, "./src/utils"),
       "@shared": resolve(__dirname, "./src/shared"),
+      "@buildrik/shared": resolve(__dirname, "../shared"),
     },
   },
   define: {
