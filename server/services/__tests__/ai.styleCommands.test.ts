@@ -12,9 +12,26 @@ import {
   buildEditCommandPrompt,
   buildPageEditCommandPrompt,
   buildPlanPrompt,
+  assertProviderConfigured,
 } from "@server/services/ai.service";
 
 const EL = "el-1";
+
+describe("assertProviderConfigured (W3 hosted-model guard)", () => {
+  it("throws a clear error when the resolved provider has no key", () => {
+    const savedA = process.env.ANTHROPIC_API_KEY;
+    const savedO = process.env.OLLAMA_BASE_URL;
+    delete process.env.ANTHROPIC_API_KEY;
+    delete process.env.OLLAMA_BASE_URL;
+    expect(() => assertProviderConfigured("claude-sonnet-4-6")).toThrow(/not configured/i);
+    expect(() => assertProviderConfigured("ollama")).toThrow(/not configured/i);
+    // Ollama configured → ok.
+    process.env.OLLAMA_BASE_URL = "http://localhost:11434";
+    expect(() => assertProviderConfigured("ollama")).not.toThrow();
+    if (savedA === undefined) delete process.env.ANTHROPIC_API_KEY; else process.env.ANTHROPIC_API_KEY = savedA;
+    if (savedO === undefined) delete process.env.OLLAMA_BASE_URL; else process.env.OLLAMA_BASE_URL = savedO;
+  });
+});
 
 describe("extractValidPlan (P4 agent plan)", () => {
   const IDS = new Set(["a", "b"]);

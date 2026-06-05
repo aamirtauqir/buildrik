@@ -13,6 +13,7 @@ import {
   generatePageEditCommands,
   generatePlan,
   editCommandToRow,
+  assertProviderConfigured,
 } from "../../services/ai.service";
 import {
   checkQuota,
@@ -237,6 +238,17 @@ export const aiRouter = router({
       const model = modelSchema.parse(
         await resolveModelForUser(userId, input.model),
       );
+      // W3 guard: fail fast + clearly if the model's provider has no key, BEFORE
+      // reserving quota (so we don't reserve+refund) and instead of an opaque
+      // deep 401 / silent empty reply.
+      try {
+        assertProviderConfigured(model);
+      } catch (e) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: e instanceof Error ? e.message : "AI provider not configured",
+        });
+      }
       // Reserve one unit atomically before the provider call (closes the
       // concurrent check-then-act bypass); refund if nothing is delivered.
       const quota = await reserveQuota(userId, model);

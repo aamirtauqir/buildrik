@@ -446,6 +446,7 @@ import { ollamaProvider } from "./ollama.client";
 import {
   isClaudeModel,
   isOllamaModel,
+  isOpenAIModel,
   DEFAULT_MODEL,
   type AIModel,
   type AIProvider,
@@ -488,6 +489,28 @@ const openAIProvider = new OpenAIProvider();
 export function getProvider(model: AIModel): AIProvider {
   if (isOllamaModel(model)) return ollamaProvider;
   return isClaudeModel(model) ? anthropicProvider : openAIProvider;
+}
+
+/**
+ * Fail fast (W3 cost/ops guard) if the resolved model's provider has no
+ * credentials. Without this the SDK call fails deep with an opaque 401 AFTER
+ * quota is reserved, or (for in-canvas AI) surfaces as a silent empty reply.
+ * The router calls this BEFORE reserving quota and translates the thrown
+ * message into a clear FAILED_PRECONDITION the panel can show.
+ */
+export function assertProviderConfigured(model: AIModel): void {
+  if (isOllamaModel(model)) {
+    if (!(process.env.OLLAMA_BASE_URL ?? "").length) {
+      throw new Error("Local AI is not configured (set OLLAMA_BASE_URL).");
+    }
+    return;
+  }
+  if (isClaudeModel(model) && !process.env.ANTHROPIC_API_KEY) {
+    throw new Error("AI is not configured: no Anthropic API key on the server.");
+  }
+  if (isOpenAIModel(model) && !process.env.OPENAI_API_KEY) {
+    throw new Error("AI is not configured: no OpenAI API key on the server.");
+  }
 }
 
 export async function* streamContent(
