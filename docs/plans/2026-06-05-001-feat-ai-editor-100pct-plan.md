@@ -171,9 +171,13 @@ store's product schema.
 Set the page locale / request a translation pass via the LocalizationScreen +
 localization engine (decision `LOC: A,A` — subdirectory URLs + JSON column).
 
-### W12 — Component authoring (save-as-component)
+### W12 — Component authoring (save-as-component) — SHIPPED 2026-06-06 (commit 37041445)
 `save-as-component`: turn the selected element subtree into a reusable component
 via `composer.components.createComponent`. Node-cap the subtree. Async.
+DONE: element-scoped async command (defineAsyncCommand), reuses countNodes +
+MAX_COMPONENT_NODES(200) cap (editor-side, server has no tree), name plain≤60.
+14th command. Tests green. (Codex's full "props/slots/variants/versioning" product
+area deferred — this is the thin slice: save a subtree as a flat component.)
 
 ### W13 — Site settings / SEO / redirects (set-site-setting)
 Config command: site-wide meta, social links, redirects, head/body code (head/body
