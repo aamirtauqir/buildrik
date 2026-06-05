@@ -116,6 +116,20 @@ registries (re-applies CSS vars for every kind via `resetFromSaved`/
 - v1 kinds via TokenType: color/length/font-size/font-family/number/string;
   shadow/select rejected (composite/enumerated — can't validate from a free string).
 
+### W14 adoption instrumentation SHIPPED 2026-06-06 (commit 544a9c2b)
+Task-level (codex #7), not vanity. 3 signals via a dedicated `AiAdoptionEvent`
+model (separate from ActivityLog so it can't pollute user activity feeds):
+- `edit.applied` (inline + chat surfaces), `agent.run` (planned/applied/skipped/
+  failed + duration = acceptance), `edit.reverted` (undo attributed by the
+  `ai-edit` history label = survival/regret). Revert-rate = reverted/applied.
+- Capability scope: server verifies actor ∈ site workspace; never-throws.
+- Privacy: structural metrics only (command type names, scope, counts, durations)
+  — never prompt text / token values / content.
+- Client tracker fire-and-forget; suppressed when no siteId.
+**NEXT GATE per the revised recommendation: STOP and MEASURE** which jobs users
+actually attempt (query `ai_adoption_events`) BEFORE building W5–W13 heavy
+surfaces. Do not big-bang the 10 surfaces blind.
+
 ### W5 — Media recall (set-image v2)
 set-image works (src). Add recall: editor gathers the media asset list (ids +
 urls + names, like P3's element list) → prompt, so the model picks REAL library
