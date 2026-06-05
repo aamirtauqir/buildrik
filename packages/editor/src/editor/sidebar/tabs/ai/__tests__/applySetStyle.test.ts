@@ -584,9 +584,10 @@ describe("applySetStyleVariant", () => {
     const composer = {
       elements: { getElement: vi.fn(() => ({ getChildren: () => [], getType: () => "container", getId: () => "p" })) },
       components: {
+        // User-saved ids (NOT catalog ids — those route through placeCatalogComponent).
         getComponent: vi.fn((id: string) =>
-          id === "card" ? { masterTree: { id: "r", type: "card", children: [{ id: "c", type: "text" }] } }
-          : id === "huge" ? { masterTree: { id: "r", type: "x", children: Array.from({ length: 300 }, (_, i) => ({ id: `n${i}`, type: "text" })) } }
+          id === "saved-card" ? { masterTree: { id: "r", type: "card", children: [{ id: "c", type: "text" }] } }
+          : id === "saved-huge" ? { masterTree: { id: "r", type: "x", children: Array.from({ length: 300 }, (_, i) => ({ id: `n${i}`, type: "text" })) } }
           : undefined,
         ),
         instantiateComponent,
@@ -597,18 +598,18 @@ describe("applySetStyleVariant", () => {
     } as unknown as Composer;
 
     const ok = await applyAiEdit(composer, commitEdit([
-      { commandId: "insert-component", args: { elementId: "p", componentId: "card" } },
+      { commandId: "insert-component", args: { elementId: "p", componentId: "saved-card" } },
     ]));
     expect(ok.applied).toBe(1);
-    expect(instantiateComponent).toHaveBeenCalledWith("card", "p", undefined);
+    expect(instantiateComponent).toHaveBeenCalledWith("saved-card", "p", undefined);
 
     instantiateComponent.mockClear();
-    // unknown id → rejected (throws → batch rejects), and oversized → rejected
+    // unknown id (not catalog, not user-saved) → rejected; oversized user-saved → rejected
     await expect(applyAiEdit(composer, commitEdit([
       { commandId: "insert-component", args: { elementId: "p", componentId: "ghost" } },
     ]))).rejects.toThrow(/unknown component/i);
     await expect(applyAiEdit(composer, commitEdit([
-      { commandId: "insert-component", args: { elementId: "p", componentId: "huge" } },
+      { commandId: "insert-component", args: { elementId: "p", componentId: "saved-huge" } },
     ]))).rejects.toThrow(/too large/i);
     expect(instantiateComponent).not.toHaveBeenCalled();
   });

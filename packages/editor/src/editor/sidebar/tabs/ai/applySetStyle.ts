@@ -1,6 +1,8 @@
 import { z } from "zod";
 import type { Composer } from "@/engine/Composer";
 import { getBreakpointQuery } from "@/shared/constants/breakpoints";
+import { CATALOG } from "@/editor/components-catalog/catalog";
+import { placeCatalogComponent } from "@/editor/components-catalog/placeCatalogComponent";
 
 /**
  * v1 in-canvas AI command: `set-style`. Desktop / normal-state inline styles
@@ -434,6 +436,20 @@ export async function applyInsertComponent(
   composer: Composer,
   args: InsertComponentArgs,
 ): Promise<void> {
+  const { parentId, index } = resolvePlacement(composer, args.elementId);
+  if (!parentId) {
+    throw new Error(`insert-component: no placement target (${args.elementId})`);
+  }
+  // Two distinct registries (codex finding): the Buildrik-shipped CATALOG
+  // (compile-time, trusted, bounded — placed via placeCatalogComponent, sync)
+  // and user-saved components (browser IndexedDB — instantiated async, and
+  // node-capped since the user authored the tree). Try catalog first.
+  const catalogItem = CATALOG.find((c) => c.id === args.componentId);
+  if (catalogItem) {
+    const res = placeCatalogComponent(composer, catalogItem, parentId, index);
+    if (!res.elementId) throw new Error("insert-component: catalog placement failed");
+    return;
+  }
   const def = composer.components?.getComponent?.(args.componentId);
   if (!def) {
     throw new Error(`insert-component: unknown component (${args.componentId})`);
@@ -441,10 +457,6 @@ export async function applyInsertComponent(
   const nodes = countNodes(def.masterTree as { children?: unknown[] } | undefined);
   if (nodes > MAX_COMPONENT_NODES) {
     throw new Error(`insert-component: component too large (${nodes} nodes)`);
-  }
-  const { parentId, index } = resolvePlacement(composer, args.elementId);
-  if (!parentId) {
-    throw new Error(`insert-component: no placement target (${args.elementId})`);
   }
   const id = await composer.components.instantiateComponent(args.componentId, parentId, index);
   if (!id) throw new Error("insert-component: instantiate failed");
