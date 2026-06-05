@@ -90,6 +90,32 @@ test + live-verify (set token → canvas changes → undo reverts var).
   view, NOT at a long session's tail. (B) ships set-token sooner but leaves the
   undo-coordination wart. Decide (A vs B) at the start of the W4 build session.
 
+### W4 DECISION + SHIPPED 2026-06-05 (commit cce564b1) — Path C (neither A nor B)
+The A-vs-B framing was built on a wrong premise. Grounding in the actual code
+showed the propagation+undo path the plan called "the RISK / hard part" was
+ALREADY SHIPPED by Arc D6.c (2026-05-16): `composer.designSystem.applyAutoFix`
+writes a token to `projectSettings.designTokens` inside a labeled transaction →
+`project:changed` → `TokensSection` (`useResetAllKinds`) re-hydrates all 14 kind
+registries (re-applies CSS vars for every kind via `resetFromSaved`/
+`hydrateFromExternal`) AND Cmd+Z roundtrips. Integration-tested
+(`autofix-history.integration.test.tsx`).
+- **Path C** = make `set-token` a sibling of `applyAutoFix`: a single engine write
+  method `setDesignToken(id, value)`, command dispatches to it, propagation+undo
+  are inherited. This IS (A)'s correctness model (one engine write path, undo in
+  the composer transaction) WITHOUT (A)'s 14-hook-inversion blast radius and
+  WITHOUT (B)'s separate-undo-stack wart. Directly answers codex #6 — not a new
+  event-choreography patch, but reuse of the shipped+tested path.
+- Transaction nesting is depth-counted, so `setDesignToken`'s own transaction
+  coalesces safely into applyAiEdit's outer `ai-edit` transaction (one undo step).
+- The panel keeps writing through its hooks (no inversion). Full (A) — making the
+  panel ALSO write via the composer + the 14 hooks read-only — remains a future
+  DS-arc refactor if tokens start mutating from many surfaces (codex #6's caveat),
+  but is not needed for the AI write path.
+- Trust boundary: per-type value guard + unsafe guard + capability-scoped ids
+  (tokenId ∈ sent registry). Recall: page scope ships the token registry.
+- v1 kinds via TokenType: color/length/font-size/font-family/number/string;
+  shadow/select rejected (composite/enumerated — can't validate from a free string).
+
 ### W5 — Media recall (set-image v2)
 set-image works (src). Add recall: editor gathers the media asset list (ids +
 urls + names, like P3's element list) → prompt, so the model picks REAL library
