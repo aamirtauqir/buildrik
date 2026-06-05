@@ -355,6 +355,15 @@ describe("extractValidEditCommands", () => {
     expect(extractValidEditCommands(badProp, EL)).toHaveLength(0);
   });
 
+  it("accepts insert-component shape (id validated editor-side), rejects empty/oversized id", () => {
+    const ok = JSON.stringify([{ commandId: "insert-component", args: { elementId: EL, componentId: "card" } }]);
+    expect(extractValidEditCommands(ok, EL)).toHaveLength(1);
+    const empty = JSON.stringify([{ commandId: "insert-component", args: { elementId: EL, componentId: "" } }]);
+    const huge = JSON.stringify([{ commandId: "insert-component", args: { elementId: EL, componentId: "x".repeat(101) } }]);
+    expect(extractValidEditCommands(empty, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(huge, EL)).toHaveLength(0);
+  });
+
   it("accepts expanded layout/position/typography style properties", () => {
     const raw = JSON.stringify([
       { commandId: "set-style", args: { elementId: EL, property: "justify-content", value: "space-between" } },

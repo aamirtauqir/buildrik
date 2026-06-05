@@ -402,16 +402,65 @@ export function applySetStyleVariant(composer: Composer, args: SetStyleVariantAr
 }
 
 /**
+ * v1 in-canvas AI command: `insert-component`. Inserts a component (catalog or
+ * user-saved) from the loaded component registry, relative to the selected
+ * element. This is the first ASYNC command — `instantiateComponent` returns a
+ * Promise (it can load + clone a saved master tree) — so it runs on the async
+ * apply path (applyAiEdit awaits each handler).
+ *
+ * Codex guards: the component id is validated against the LIVE registry
+ * (`getComponent`, which covers both catalog and user-saved — the server cannot
+ * validate user-saved ids that live in browser IndexedDB), and the cloned
+ * subtree is node-capped so one command cannot inject an unbounded tree.
+ */
+export const insertComponentArgsSchema = z.object({
+  elementId: z.string().min(1),
+  componentId: z.string().min(1).max(100),
+});
+export type InsertComponentArgs = z.infer<typeof insertComponentArgsSchema>;
+
+const MAX_COMPONENT_NODES = 200;
+
+function countNodes(tree: { children?: unknown[] } | undefined): number {
+  if (!tree || typeof tree !== "object") return 0;
+  const children = Array.isArray(tree.children) ? tree.children : [];
+  return 1 + children.reduce<number>(
+    (n, c) => n + countNodes(c as { children?: unknown[] }),
+    0,
+  );
+}
+
+export async function applyInsertComponent(
+  composer: Composer,
+  args: InsertComponentArgs,
+): Promise<void> {
+  const def = composer.components?.getComponent?.(args.componentId);
+  if (!def) {
+    throw new Error(`insert-component: unknown component (${args.componentId})`);
+  }
+  const nodes = countNodes(def.masterTree as { children?: unknown[] } | undefined);
+  if (nodes > MAX_COMPONENT_NODES) {
+    throw new Error(`insert-component: component too large (${nodes} nodes)`);
+  }
+  const { parentId, index } = resolvePlacement(composer, args.elementId);
+  if (!parentId) {
+    throw new Error(`insert-component: no placement target (${args.elementId})`);
+  }
+  const id = await composer.components.instantiateComponent(args.componentId, parentId, index);
+  if (!id) throw new Error("insert-component: instantiate failed");
+}
+
+/**
  * Client-side command registry: maps a commandId to its Zod validator + apply
- * fn. `defineCommand` binds the two so the batch loop is a single data-driven
- * pass — registering a new command is one entry here instead of another arm in
- * an if-chain. Each handler re-validates (defense in depth; the server already
- * validated) and skips invalid args.
+ * fn. `defineCommand` (sync) and `defineAsyncCommand` (async) both produce a
+ * handler whose `run` re-validates (defense in depth; the server already
+ * validated) and skips invalid args. The batch loop awaits every `run`, so sync
+ * and async commands compose in one transaction → one undo step.
  */
 function defineCommand<T>(
   schema: z.ZodType<T>,
   apply: (composer: Composer, args: T) => void,
-): { run: (composer: Composer, rawArgs: unknown) => boolean } {
+): { run: (composer: Composer, rawArgs: unknown) => boolean | Promise<boolean> } {
   return {
     run(composer, rawArgs) {
       const parsed = schema.safeParse(rawArgs);
@@ -422,9 +471,23 @@ function defineCommand<T>(
   };
 }
 
+function defineAsyncCommand<T>(
+  schema: z.ZodType<T>,
+  apply: (composer: Composer, args: T) => Promise<void>,
+): { run: (composer: Composer, rawArgs: unknown) => Promise<boolean> } {
+  return {
+    async run(composer, rawArgs) {
+      const parsed = schema.safeParse(rawArgs);
+      if (!parsed.success) return false;
+      await apply(composer, parsed.data);
+      return true;
+    },
+  };
+}
+
 const COMMAND_HANDLERS: Record<
   string,
-  { run: (composer: Composer, rawArgs: unknown) => boolean }
+  { run: (composer: Composer, rawArgs: unknown) => boolean | Promise<boolean> }
 > = {
   "set-style": defineCommand(setStyleArgsSchema, applySetStyle),
   "set-text": defineCommand(setTextArgsSchema, applySetText),
@@ -435,6 +498,7 @@ const COMMAND_HANDLERS: Record<
   "add-section": defineCommand(addSectionArgsSchema, applyAddSection),
   "set-attribute": defineCommand(setAttributeArgsSchema, applySetAttribute),
   "set-style-variant": defineCommand(setStyleVariantArgsSchema, applySetStyleVariant),
+  "insert-component": defineAsyncCommand(insertComponentArgsSchema, applyInsertComponent),
 };
 
 /**
@@ -446,7 +510,7 @@ const COMMAND_HANDLERS: Record<
  * record without reverting the in-memory mutation, which would strand a
  * visible-but-unrecorded change). Returns how many commands were applied.
  */
-export function applyAiEdit(
+export async function applyAiEdit(
   composer: Composer,
   edit: {
     applyOps: {
@@ -454,7 +518,7 @@ export function applyAiEdit(
       preview?: Record<string, unknown>;
     };
   },
-): { applied: number } {
+): Promise<{ applied: number }> {
   const commit = edit.applyOps.commit as { commands?: unknown };
   const commands = Array.isArray(commit.commands) ? commit.commands : [];
 
@@ -465,7 +529,10 @@ export function applyAiEdit(
       const cmd = c as { commandId?: unknown; args?: unknown };
       const handler =
         typeof cmd.commandId === "string" ? COMMAND_HANDLERS[cmd.commandId] : undefined;
-      if (handler && handler.run(composer, cmd.args)) applied++;
+      // Await every handler — sync ones resolve immediately (await of a boolean),
+      // async ones (insert-component) settle their mutation before the next
+      // command + before endTransaction, keeping the whole batch one undo step.
+      if (handler && (await handler.run(composer, cmd.args))) applied++;
     }
   } finally {
     composer.endTransaction();

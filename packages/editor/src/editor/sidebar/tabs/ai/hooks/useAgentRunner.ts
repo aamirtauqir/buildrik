@@ -172,12 +172,12 @@ export function useAgentRunner(
     [composer, model, gatherElements],
   );
 
-  const approve = React.useCallback(() => {
+  const approve = React.useCallback(async () => {
     const i = indexRef.current;
     const step = stepsRef.current[i];
     if (!step || step.status !== "awaiting" || !step.edit || !composer) return;
     try {
-      applyAiEdit(composer, { applyOps: step.edit.applyOps });
+      await applyAiEdit(composer, { applyOps: step.edit.applyOps });
       setStep(i, { status: "applied" });
     } catch {
       setStep(i, { status: "failed" });

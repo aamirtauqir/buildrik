@@ -109,13 +109,15 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
     }
   }, [stream.text, stream.streaming, stream.stopped, stream.edit, stream.error, unlock]);
 
-  const onAccept = React.useCallback((msgId: string) => {
+  const onAccept = React.useCallback(async (msgId: string) => {
     const msg = messages.find((m) => m.id === msgId);
     if (msg?.edit && composer) {
       // Apply the command batch in one transaction (one undo step). A bad
       // element id throws but the transaction still closes (endTransaction in
       // finally) and the partial edit is recorded as one undoable entry.
-      try { applyAiEdit(composer, msg.edit); } catch { /* partial recorded */ }
+      // applyAiEdit is async (some commands, e.g. insert-component, are async);
+      // await so the "applied" state flips only after the mutation lands.
+      try { await applyAiEdit(composer, msg.edit); } catch { /* partial recorded */ }
     }
     setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "applied" } } : m));
     unlock();

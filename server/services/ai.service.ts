@@ -663,6 +663,10 @@ export type EditCommand =
       args: { elementId: string; attribute: string; value: string };
     }
   | {
+      commandId: "insert-component";
+      args: { elementId: string; componentId: string };
+    }
+  | {
       commandId: "set-style-variant";
       args: {
         elementId: string;
@@ -712,6 +716,9 @@ export function editCommandToRow(
   }
   if (c.commandId === "set-attribute") {
     return { field: c.args.attribute, from: "", to: c.args.value };
+  }
+  if (c.commandId === "insert-component") {
+    return { field: "insert component", from: "", to: c.args.componentId };
   }
   if (c.commandId === "set-style-variant") {
     const variant = c.args.pseudo ? `:${c.args.pseudo}` : c.args.breakpoint;
@@ -792,6 +799,12 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
     agentCallable: true,
     rule: (id) =>
       `- add-section: {"commandId":"add-section","args":{"elementId":"${id}","sectionType":"section|container|columns|grid|flex","children":[{"elementType":"heading","text":"..."},{"elementType":"button","text":"..."}]}} — when asked to BUILD or ADD a whole section/block (e.g. "add a pricing section", "add a hero with a heading and a button"). Put 2-${MAX_SECTION_CHILDREN} child elements inside; each child elementType must be one of: ${[...ELEMENT_TYPE_ALLOWLIST].join(", ")}; include "text" for content children.`,
+  },
+  {
+    id: "insert-component",
+    agentCallable: true,
+    rule: (id) =>
+      `- insert-component: {"commandId":"insert-component","args":{"elementId":"${id}","componentId":"<component id>"}} — when asked to insert a prebuilt UI component (e.g. a card, alert, badge, avatar, breadcrumb, form-field, spinner, switch). "componentId" is a known component id (e.g. card, alert, badge, avatar, breadcrumb, form-field, spinner, switch, label). The new component is placed relative to "${id}".`,
   },
 ];
 
@@ -883,6 +896,17 @@ function isValidEditCommand(c: unknown, allowedIds: Set<string>): c is EditComma
   }
   if (cmd.commandId === "set-attribute") {
     return isValidAttribute(cmd.args.attribute, cmd.args.value);
+  }
+  if (cmd.commandId === "insert-component") {
+    // Shape-only: the component id can't be validated server-side (catalog is
+    // editor-bundled, user-saved live in browser IndexedDB). The editor apply
+    // validates against the live registry + caps the cloned subtree size.
+    const { componentId } = cmd.args as { componentId?: unknown };
+    return (
+      typeof componentId === "string" &&
+      componentId.length > 0 &&
+      componentId.length <= 100
+    );
   }
   if (cmd.commandId === "set-style-variant") {
     const { property, value, pseudo, breakpoint } = cmd.args as {

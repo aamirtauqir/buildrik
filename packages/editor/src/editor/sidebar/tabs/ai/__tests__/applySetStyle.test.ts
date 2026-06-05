@@ -116,10 +116,10 @@ describe("applySetStyle", () => {
 });
 
 describe("applyAiEdit", () => {
-  it("applies a batch inside exactly one transaction (one undo step)", () => {
+  it("applies a batch inside exactly one transaction (one undo step)", async () => {
     const { composer, beginTransaction, endTransaction, setStyle } =
       makeTxComposer();
-    const r = applyAiEdit(
+    const r = await applyAiEdit(
       composer,
       commitEdit([
         { commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#000" } },
@@ -132,9 +132,9 @@ describe("applyAiEdit", () => {
     expect(setStyle).toHaveBeenCalledTimes(2);
   });
 
-  it("flushes the pending history record so the edit is one immediate undo step", () => {
+  it("flushes the pending history record so the edit is one immediate undo step", async () => {
     const { composer, flushPending } = makeTxComposer();
-    applyAiEdit(
+    await applyAiEdit(
       composer,
       commitEdit([
         { commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#000" } },
@@ -143,10 +143,10 @@ describe("applyAiEdit", () => {
     expect(flushPending).toHaveBeenCalledOnce();
   });
 
-  it("skips invalid / non-set-style entries but still wraps in a transaction", () => {
+  it("skips invalid / non-set-style entries but still wraps in a transaction", async () => {
     const { composer, beginTransaction, endTransaction, setStyle } =
       makeTxComposer();
-    const r = applyAiEdit(
+    const r = await applyAiEdit(
       composer,
       commitEdit([
         { commandId: "remove-element", args: { elementId: "el-1" } },
@@ -160,30 +160,30 @@ describe("applyAiEdit", () => {
     expect(endTransaction).toHaveBeenCalledOnce();
   });
 
-  it("closes the transaction even when applying throws (endTransaction in finally)", () => {
+  it("closes the transaction even when applying throws (endTransaction in finally)", async () => {
     const { composer, endTransaction } = makeTxComposer(false); // getElement → undefined
-    expect(() =>
+    await expect(
       applyAiEdit(
         composer,
         commitEdit([
           { commandId: "set-style", args: { elementId: "gone", property: "color", value: "#000" } },
         ]),
       ),
-    ).toThrow(/element not found/i);
+    ).rejects.toThrow(/element not found/i);
     expect(endTransaction).toHaveBeenCalledOnce();
   });
 
-  it("handles a missing commands payload as a no-op (still balanced transaction)", () => {
+  it("handles a missing commands payload as a no-op (still balanced transaction)", async () => {
     const { composer, beginTransaction, endTransaction } = makeTxComposer();
-    const r = applyAiEdit(composer, { applyOps: { preview: {}, commit: {} } });
+    const r = await applyAiEdit(composer, { applyOps: { preview: {}, commit: {} } });
     expect(r.applied).toBe(0);
     expect(beginTransaction).toHaveBeenCalledOnce();
     expect(endTransaction).toHaveBeenCalledOnce();
   });
 
-  it("applies a set-text command via el.setContent", () => {
+  it("applies a set-text command via el.setContent", async () => {
     const { composer, setContent } = makeTxComposer();
-    const r = applyAiEdit(
+    const r = await applyAiEdit(
       composer,
       commitEdit([
         { commandId: "set-text", args: { elementId: "el-1", text: "Welcome" } },
@@ -193,10 +193,10 @@ describe("applyAiEdit", () => {
     expect(setContent).toHaveBeenCalledWith("Welcome");
   });
 
-  it("applies a mixed style + text batch in one transaction", () => {
+  it("applies a mixed style + text batch in one transaction", async () => {
     const { composer, setStyle, setContent, beginTransaction, endTransaction } =
       makeTxComposer();
-    const r = applyAiEdit(
+    const r = await applyAiEdit(
       composer,
       commitEdit([
         { commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#fff" } },
@@ -210,9 +210,9 @@ describe("applyAiEdit", () => {
     expect(endTransaction).toHaveBeenCalledOnce();
   });
 
-  it("rejects set-text with markup (does not reach setContent)", () => {
+  it("rejects set-text with markup (does not reach setContent)", async () => {
     const { composer, setContent } = makeTxComposer();
-    const r = applyAiEdit(
+    const r = await applyAiEdit(
       composer,
       commitEdit([
         { commandId: "set-text", args: { elementId: "el-1", text: "<b>hi</b>" } },
@@ -457,7 +457,7 @@ describe("applySetAttribute", () => {
     ).toThrow(/element not found/i);
   });
 
-  it("applyAiEdit dispatches a set-attribute command", () => {
+  it("applyAiEdit dispatches a set-attribute command", async () => {
     const setAttribute = vi.fn();
     const composer = {
       elements: { getElement: vi.fn(() => ({ setAttribute })) },
@@ -465,14 +465,14 @@ describe("applySetAttribute", () => {
       endTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
     } as unknown as Composer;
-    const r = applyAiEdit(composer, commitEdit([
+    const r = await applyAiEdit(composer, commitEdit([
       { commandId: "set-attribute", args: { elementId: "a", attribute: "href", value: "https://x.com" } },
     ]));
     expect(r.applied).toBe(1);
     expect(setAttribute).toHaveBeenCalledWith("href", "https://x.com");
   });
 
-  it("applyAiEdit skips a set-attribute with an unsafe href", () => {
+  it("applyAiEdit skips a set-attribute with an unsafe href", async () => {
     const setAttribute = vi.fn();
     const composer = {
       elements: { getElement: vi.fn(() => ({ setAttribute })) },
@@ -480,7 +480,7 @@ describe("applySetAttribute", () => {
       endTransaction: vi.fn(),
       history: { flushPending: vi.fn() },
     } as unknown as Composer;
-    const r = applyAiEdit(composer, commitEdit([
+    const r = await applyAiEdit(composer, commitEdit([
       { commandId: "set-attribute", args: { elementId: "a", attribute: "href", value: "javascript:alert(1)" } },
     ]));
     expect(r.applied).toBe(0);
@@ -543,12 +543,46 @@ describe("applySetStyleVariant", () => {
     expect(typeof call[2].mediaQuery).toBe("string");
   });
 
-  it("applyAiEdit dispatches a set-style-variant command", () => {
+  it("applyAiEdit dispatches a set-style-variant command", async () => {
     const { composer, setRule } = makeStyleComposer();
-    const r = applyAiEdit(composer, commitEdit([
+    const r = await applyAiEdit(composer, commitEdit([
       { commandId: "set-style-variant", args: { elementId: "el-1", property: "color", value: "#0f0", pseudo: "hover" } },
     ]));
     expect(r.applied).toBe(1);
     expect(setRule).toHaveBeenCalledOnce();
+  });
+
+  it("applyAiEdit dispatches an async insert-component command + caps subtree size", async () => {
+    const instantiateComponent = vi.fn(async () => "new-el");
+    const composer = {
+      elements: { getElement: vi.fn(() => ({ getChildren: () => [], getType: () => "container", getId: () => "p" })) },
+      components: {
+        getComponent: vi.fn((id: string) =>
+          id === "card" ? { masterTree: { id: "r", type: "card", children: [{ id: "c", type: "text" }] } }
+          : id === "huge" ? { masterTree: { id: "r", type: "x", children: Array.from({ length: 300 }, (_, i) => ({ id: `n${i}`, type: "text" })) } }
+          : undefined,
+        ),
+        instantiateComponent,
+      },
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      history: { flushPending: vi.fn() },
+    } as unknown as Composer;
+
+    const ok = await applyAiEdit(composer, commitEdit([
+      { commandId: "insert-component", args: { elementId: "p", componentId: "card" } },
+    ]));
+    expect(ok.applied).toBe(1);
+    expect(instantiateComponent).toHaveBeenCalledWith("card", "p", undefined);
+
+    instantiateComponent.mockClear();
+    // unknown id → rejected (throws → batch rejects), and oversized → rejected
+    await expect(applyAiEdit(composer, commitEdit([
+      { commandId: "insert-component", args: { elementId: "p", componentId: "ghost" } },
+    ]))).rejects.toThrow(/unknown component/i);
+    await expect(applyAiEdit(composer, commitEdit([
+      { commandId: "insert-component", args: { elementId: "p", componentId: "huge" } },
+    ]))).rejects.toThrow(/too large/i);
+    expect(instantiateComponent).not.toHaveBeenCalled();
   });
 });
