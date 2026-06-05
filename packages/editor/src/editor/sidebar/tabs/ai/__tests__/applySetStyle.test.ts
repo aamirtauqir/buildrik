@@ -16,6 +16,7 @@ import {
   setStyleVariantArgsSchema,
   setPageSettingArgsSchema,
   setTokenArgsSchema,
+  saveAsComponentArgsSchema,
 } from "../applySetStyle";
 
 function makeComposer(
@@ -666,5 +667,47 @@ describe("set-token (W4) — design-token command", () => {
     );
     expect(setDesignToken).toHaveBeenCalledWith("color-brand", "#2D6DFF");
     expect(r.applied).toBe(1);
+  });
+});
+
+describe("save-as-component (W12)", () => {
+  it("schema accepts elementId+name, rejects markup/over-length/empty", () => {
+    expect(saveAsComponentArgsSchema.safeParse({ elementId: "el-1", name: "Hero Card" }).success).toBe(true);
+    expect(saveAsComponentArgsSchema.safeParse({ elementId: "el-1", name: "<b>x</b>" }).success).toBe(false);
+    expect(saveAsComponentArgsSchema.safeParse({ elementId: "el-1", name: "x".repeat(61) }).success).toBe(false);
+    expect(saveAsComponentArgsSchema.safeParse({ elementId: "el-1", name: "" }).success).toBe(false);
+  });
+
+  it("calls composer.components.createComponent with (name, elementId)", async () => {
+    const createComponent = vi.fn(() => Promise.resolve({ id: "c1" }));
+    const composer = {
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      history: { flushPending: vi.fn() },
+      elements: { getElement: vi.fn(() => ({ toJSON: () => ({ children: [{ children: [] }] }) })) },
+      components: { createComponent },
+    } as unknown as Composer;
+    const r = await applyAiEdit(
+      composer,
+      commitEdit([{ commandId: "save-as-component", args: { elementId: "el-1", name: "Hero" } }]),
+    );
+    expect(createComponent).toHaveBeenCalledWith("Hero", "el-1");
+    expect(r.applied).toBe(1);
+  });
+
+  it("rejects an oversized subtree (node cap) and never creates", async () => {
+    const big = { children: Array.from({ length: 250 }, () => ({ children: [] })) };
+    const createComponent = vi.fn();
+    const composer = {
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      history: { flushPending: vi.fn() },
+      elements: { getElement: vi.fn(() => ({ toJSON: () => big })) },
+      components: { createComponent },
+    } as unknown as Composer;
+    await expect(
+      applyAiEdit(composer, commitEdit([{ commandId: "save-as-component", args: { elementId: "el-1", name: "Big" } }])),
+    ).rejects.toThrow(/too large/);
+    expect(createComponent).not.toHaveBeenCalled();
   });
 });

@@ -738,6 +738,11 @@ export type EditCommand =
       args: { tokenId: string; value: string };
     }
   | {
+      // W12 — save the selected element subtree as a reusable component.
+      commandId: "save-as-component";
+      args: { elementId: string; name: string };
+    }
+  | {
       commandId: "set-style-variant";
       args: {
         elementId: string;
@@ -796,6 +801,9 @@ export function editCommandToRow(
   }
   if (c.commandId === "set-token") {
     return { field: c.args.tokenId, from: "", to: c.args.value };
+  }
+  if (c.commandId === "save-as-component") {
+    return { field: "save as component", from: "", to: c.args.name };
   }
   if (c.commandId === "set-style-variant") {
     const variant = c.args.pseudo ? `:${c.args.pseudo}` : c.args.breakpoint;
@@ -888,6 +896,12 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
     agentCallable: true,
     rule: () =>
       `- set-page-setting: {"commandId":"set-page-setting","args":{"setting":"metaTitle|metaDescription|slug","value":"<text>"}} — when asked to set the page's SEO title, meta description, or URL slug. No elementId (it edits the whole page). metaTitle ≤ 60 chars, metaDescription ≤ 160 (plain text). slug is kebab-case (lowercase letters/digits/hyphens, e.g. "pricing-plans").`,
+  },
+  {
+    id: "save-as-component",
+    agentCallable: true,
+    rule: (id) =>
+      `- save-as-component: {"commandId":"save-as-component","args":{"elementId":"${id}","name":"<component name>"}} — when asked to save/turn an element (and its children) into a reusable component. "name" is a short plain-text label (≤ 60 chars, no markup). Use the element id of the subtree's root.`,
   },
   {
     id: "set-token",
@@ -1030,6 +1044,17 @@ function isValidEditCommand(
       typeof componentId === "string" &&
       componentId.length > 0 &&
       componentId.length <= 100
+    );
+  }
+  if (cmd.commandId === "save-as-component") {
+    // elementId already scope-guarded above; the subtree node-cap is enforced
+    // editor-side (the server has no tree). Validate the name is plain + bounded.
+    const { name } = cmd.args as { name?: unknown };
+    return (
+      typeof name === "string" &&
+      name.length > 0 &&
+      name.length <= 60 &&
+      !UNSAFE_TEXT.test(name)
     );
   }
   if (cmd.commandId === "set-style-variant") {

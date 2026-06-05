@@ -601,3 +601,22 @@ describe("set-image recall (W5) — set-attribute src validation against the med
     expect(p).toContain("https://blob.example.com/hero.webp");
   });
 });
+
+describe("save-as-component (W12) — element-scoped, name-validated", () => {
+  const ELS = new Set(["el-1"]);
+  const run = (cmd: unknown) => extractValidPageEditCommands(JSON.stringify([cmd]), ELS);
+
+  it("accepts a plain bounded name on an in-scope element", () => {
+    expect(run({ commandId: "save-as-component", args: { elementId: "el-1", name: "Hero Card" } })).toHaveLength(1);
+  });
+
+  it("rejects markup / over-length / empty name", () => {
+    for (const name of ["<b>x</b>", "x".repeat(61), ""]) {
+      expect(run({ commandId: "save-as-component", args: { elementId: "el-1", name } })).toHaveLength(0);
+    }
+  });
+
+  it("rejects an elementId not on the page (scope guard)", () => {
+    expect(run({ commandId: "save-as-component", args: { elementId: "ghost", name: "X" } })).toHaveLength(0);
+  });
+});

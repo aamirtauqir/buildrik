@@ -463,6 +463,37 @@ export async function applyInsertComponent(
 }
 
 /**
+ * save-as-component (W12) — turn the selected element subtree into a reusable
+ * component via `composer.components.createComponent`. Async. The subtree is
+ * node-capped (same MAX as insert-component) so one command can't persist an
+ * unbounded tree. The name is plain text (it labels a UI catalog entry).
+ */
+export const saveAsComponentArgsSchema = z.object({
+  elementId: z.string().min(1),
+  name: z
+    .string()
+    .min(1)
+    .max(60)
+    .refine((v) => !/[<>]/.test(v), { message: "Name must be plain text (no markup)" }),
+});
+export type SaveAsComponentArgs = z.infer<typeof saveAsComponentArgsSchema>;
+
+export async function applySaveAsComponent(
+  composer: Composer,
+  args: SaveAsComponentArgs,
+): Promise<void> {
+  const el = composer.elements.getElement(args.elementId);
+  if (!el) throw new Error(`save-as-component: element not found (${args.elementId})`);
+  const tree = el.toJSON?.() as { children?: unknown[] } | undefined;
+  const nodes = countNodes(tree);
+  if (nodes > MAX_COMPONENT_NODES) {
+    throw new Error(`save-as-component: subtree too large (${nodes} nodes)`);
+  }
+  const def = await composer.components.createComponent(args.name, args.elementId);
+  if (!def) throw new Error("save-as-component: create failed");
+}
+
+/**
  * v1 in-canvas AI config command: `set-page-setting`. Edits the ACTIVE page's
  * SEO title / meta description — no element target. Reads + merges the current
  * `settings.seo` (updatePage shallow-merges `settings`, so the whole `seo`
@@ -574,6 +605,7 @@ const COMMAND_HANDLERS: Record<
   "insert-component": defineAsyncCommand(insertComponentArgsSchema, applyInsertComponent),
   "set-page-setting": defineCommand(setPageSettingArgsSchema, applySetPageSetting),
   "set-token": defineCommand(setTokenArgsSchema, applySetToken),
+  "save-as-component": defineAsyncCommand(saveAsComponentArgsSchema, applySaveAsComponent),
 };
 
 /**
