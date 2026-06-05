@@ -606,6 +606,35 @@ const MAX_TEXT_LEN = 2000;
 // brackets — AI text must be plain text, never markup/script.
 const UNSAFE_TEXT = /[<>]/;
 
+// set-token (W4) value guard — mirror of the editor's tokenValueGuard.ts. Same
+// cross-package duplication as set-page-setting's SLUG_RE/SEO_LIMITS: the editor
+// engine and the server validate independently against the same rules. A token
+// value is validated by the token's `type` (carried in the recall registry).
+const UNSAFE_TOKEN_VALUE = /url\(|expression\(|javascript:|@import|[<>{};]/i;
+const TOKEN_COLOR_RE = /^(?:#[0-9a-fA-F]{3,8}|rgba?\([\d.,\s%]+\)|hsla?\([\d.,\s%]+\)|[a-zA-Z]+)$/;
+const TOKEN_LENGTH_RE = /^-?(?:\d+\.?\d*|\.\d+)(?:px|rem|em|%|vh|vw|vmin|vmax|ch|ex|fr|pt)?$/;
+const TOKEN_NUMBER_RE = /^-?(?:\d+\.?\d*|\.\d+)$/;
+const TOKEN_FONT_RE = /^[a-zA-Z0-9 ,'"\-]+$/;
+
+function isValidTokenValue(type: string | undefined, value: string): boolean {
+  if (typeof value !== "string" || value.length === 0 || value.length > 120) return false;
+  if (UNSAFE_TOKEN_VALUE.test(value)) return false;
+  switch (type) {
+    case "color":
+      return TOKEN_COLOR_RE.test(value);
+    case "length":
+    case "font-size":
+      return TOKEN_LENGTH_RE.test(value);
+    case "number":
+      return TOKEN_NUMBER_RE.test(value);
+    case "font-family":
+    case "string":
+      return TOKEN_FONT_RE.test(value);
+    default:
+      return false;
+  }
+}
+
 // Element types the AI may insert. Restricted to content/layout primitives that
 // need no external resource (no image/video/embed/upload).
 const ELEMENT_TYPE_ALLOWLIST = new Set([
@@ -695,6 +724,11 @@ export type EditCommand =
       args: { setting: "metaTitle" | "metaDescription" | "slug"; value: string };
     }
   | {
+      // Config command (W4) — edits a design token, no element target.
+      commandId: "set-token";
+      args: { tokenId: string; value: string };
+    }
+  | {
       commandId: "set-style-variant";
       args: {
         elementId: string;
@@ -750,6 +784,9 @@ export function editCommandToRow(
   }
   if (c.commandId === "set-page-setting") {
     return { field: c.args.setting, from: "", to: c.args.value };
+  }
+  if (c.commandId === "set-token") {
+    return { field: c.args.tokenId, from: "", to: c.args.value };
   }
   if (c.commandId === "set-style-variant") {
     const variant = c.args.pseudo ? `:${c.args.pseudo}` : c.args.breakpoint;
@@ -843,6 +880,12 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
     rule: () =>
       `- set-page-setting: {"commandId":"set-page-setting","args":{"setting":"metaTitle|metaDescription|slug","value":"<text>"}} — when asked to set the page's SEO title, meta description, or URL slug. No elementId (it edits the whole page). metaTitle ≤ 60 chars, metaDescription ≤ 160 (plain text). slug is kebab-case (lowercase letters/digits/hyphens, e.g. "pricing-plans").`,
   },
+  {
+    id: "set-token",
+    agentCallable: true,
+    rule: () =>
+      `- set-token: {"commandId":"set-token","args":{"tokenId":"<id>","value":"<value>"}} — when asked to change a design/theme token (a brand color, a spacing step, a font). No elementId. "tokenId" MUST be one of the ids in the "Design tokens" list below — never invent one. "value" matches that token's type: a color (e.g. "#2D6DFF", "rgb(45,109,255)"), a length (e.g. "16px", "1.5rem"), a number, or a font family — plain values only, never url(), expression(), or markup. Prefer set-token over set-style when the request is about the theme/brand globally rather than one element.`,
+  },
 ];
 
 export function buildEditCommandPrompt(elementId: string, userPrompt: string): string {
@@ -888,7 +931,11 @@ function parseCommandArray(raw: string): unknown[] {
 // SEO field length caps (mirror the DB VarChar limits: title 60, description 160).
 const SEO_LIMITS: Record<string, number> = { metaTitle: 60, metaDescription: 160 };
 
-function isValidEditCommand(c: unknown, allowedIds: Set<string>): c is EditCommand {
+function isValidEditCommand(
+  c: unknown,
+  allowedIds: Set<string>,
+  allowedTokens: Map<string, string> = new Map(),
+): c is EditCommand {
   if (!c || typeof c !== "object") return false;
   const cmd = c as { commandId?: unknown; args?: Record<string, unknown> };
 
@@ -905,6 +952,17 @@ function isValidEditCommand(c: unknown, allowedIds: Set<string>): c is EditComma
     if (typeof setting !== "string" || !(setting in SEO_LIMITS)) return false;
     if (UNSAFE_TEXT.test(value)) return false;
     return value.length <= SEO_LIMITS[setting];
+  }
+
+  // set-token (W4) is also a config command — no elementId. The id must be a
+  // member of the token registry sent with the request (capability-scoped: the
+  // model can only touch tokens we showed it), and the value must be valid for
+  // that token's type. Validated before the element scope guard.
+  if (cmd.commandId === "set-token") {
+    const { tokenId, value } = (cmd.args ?? {}) as { tokenId?: unknown; value?: unknown };
+    if (typeof tokenId !== "string" || !allowedTokens.has(tokenId)) return false;
+    if (typeof value !== "string") return false;
+    return isValidTokenValue(allowedTokens.get(tokenId), value);
   }
 
   // Scope guard: the target id must be in the allowed set. Element scope passes
@@ -1030,9 +1088,10 @@ export function extractValidEditCommands(
 export function extractValidPageEditCommands(
   raw: string,
   allowedIds: Set<string>,
+  allowedTokens: Map<string, string> = new Map(),
 ): EditCommand[] {
   return parseCommandArray(raw).filter((c): c is EditCommand =>
-    isValidEditCommand(c, allowedIds),
+    isValidEditCommand(c, allowedIds, allowedTokens),
   );
 }
 
@@ -1067,18 +1126,31 @@ export interface PageElementRef {
   text?: string;
 }
 
+/** Token registry entry for set-token recall (W4): id + current value + type,
+ * so the model picks a real token and the server validates value-by-type. */
+export interface TokenRef {
+  id: string;
+  name: string;
+  value: string;
+  type: string;
+}
+
 export interface PageEditCommandInput {
   prompt: string;
   elements: PageElementRef[];
+  tokens?: TokenRef[];
   model?: AIModel;
 }
 
 // Cap the element list so the prompt cannot blow past context on a huge page.
 const MAX_PAGE_ELEMENTS = 200;
+// Cap the token registry for the same reason (retrieval bound, not prompt-stuff).
+const MAX_PAGE_TOKENS = 120;
 
 export function buildPageEditCommandPrompt(
   elements: PageElementRef[],
   userPrompt: string,
+  tokens: TokenRef[] = [],
 ): string {
   const list = elements
     .slice(0, MAX_PAGE_ELEMENTS)
@@ -1087,6 +1159,13 @@ export function buildPageEditCommandPrompt(
         `- id="${e.id}" <${e.type}>${e.text ? ` text: "${e.text.slice(0, 50)}"` : ""}`,
     )
     .join("\n");
+  const tokenList = tokens
+    .slice(0, MAX_PAGE_TOKENS)
+    .map((t) => `- id="${t.id}" (${t.type}) ${t.name} = ${t.value}`)
+    .join("\n");
+  const tokenSection = tokenList
+    ? `\nDesign tokens (for set-token — use these ids only):\n${tokenList}\n`
+    : "";
   const rules = COMMAND_PROMPT_SPECS.filter((s) => s.agentCallable)
     .map((s) => s.rule("<one of the element ids listed above>"))
     .join("\n");
@@ -1094,7 +1173,7 @@ export function buildPageEditCommandPrompt(
 
 Page elements:
 ${list}
-
+${tokenSection}
 Return ONLY a JSON array. Every item's args.elementId MUST be one of the ids listed above — never invent an id.
 
 Rules:
@@ -1117,11 +1196,13 @@ export async function generatePageEditCommands(
   const model = input.model ?? DEFAULT_MODEL;
   const provider = getProvider(model);
   const allowedIds = new Set(input.elements.map((e) => e.id));
+  const tokens = input.tokens ?? [];
+  const allowedTokens = new Map(tokens.map((t) => [t.id, t.type]));
   const raw = await provider.generate(
-    buildPageEditCommandPrompt(input.elements, input.prompt),
+    buildPageEditCommandPrompt(input.elements, input.prompt, tokens),
     model,
   );
-  return extractValidPageEditCommands(raw, allowedIds);
+  return extractValidPageEditCommands(raw, allowedIds, allowedTokens);
 }
 
 // ─── P4: agent build loop — plan generation ───────────────────────────────

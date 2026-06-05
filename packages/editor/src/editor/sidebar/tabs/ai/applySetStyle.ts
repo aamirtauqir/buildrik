@@ -508,6 +508,22 @@ export function applySetPageSetting(composer: Composer, args: SetPageSettingArgs
 }
 
 /**
+ * set-token (W4) — config command, no element target. Shape-only schema; the
+ * engine (`setDesignToken`) is the authority: it checks the id is a registered
+ * token and validates the value against the token's type. A rejected/no-op value
+ * leaves the canvas unchanged (mirrors insert-component's engine-validated id).
+ */
+export const setTokenArgsSchema = z.object({
+  tokenId: z.string().min(1).max(100),
+  value: z.string().min(1).max(120),
+});
+export type SetTokenArgs = z.infer<typeof setTokenArgsSchema>;
+
+export function applySetToken(composer: Composer, args: SetTokenArgs): void {
+  composer.designSystem.setDesignToken(args.tokenId, args.value);
+}
+
+/**
  * Client-side command registry: maps a commandId to its Zod validator + apply
  * fn. `defineCommand` (sync) and `defineAsyncCommand` (async) both produce a
  * handler whose `run` re-validates (defense in depth; the server already
@@ -557,6 +573,7 @@ const COMMAND_HANDLERS: Record<
   "set-style-variant": defineCommand(setStyleVariantArgsSchema, applySetStyleVariant),
   "insert-component": defineAsyncCommand(insertComponentArgsSchema, applyInsertComponent),
   "set-page-setting": defineCommand(setPageSettingArgsSchema, applySetPageSetting),
+  "set-token": defineCommand(setTokenArgsSchema, applySetToken),
 };
 
 /**

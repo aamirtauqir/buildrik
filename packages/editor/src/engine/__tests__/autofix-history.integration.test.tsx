@@ -240,4 +240,85 @@ describe("Arc D6.c · Auto-fix history-awareness", () => {
       );
     });
   });
+
+  // W4 set-token rides the SAME engine→project:changed→re-hydrate→undo path as
+  // Auto-fix. This asserts composer.designSystem.setDesignToken (the AI write)
+  // updates the live registry value AND that Cmd+Z reverts it — the propagation
+  // + undo contract the AI relies on (it never touches the React hooks).
+  it("set-token (W4): setDesignToken updates the registry value AND undo reverts", async () => {
+    localStorage.setItem(
+      `buildrick-design-tokens-${projectId}-v1`,
+      JSON.stringify({ schemaVersion: 2, tokens: [seedToken] }),
+    );
+
+    const composer = new Composer({} as any);
+    composer.history.setCoalesceDelay(0);
+    seed(composer);
+    await new Promise((r) => setTimeout(r, 20));
+
+    const { container } = render(
+      wrap(composer, <TokensSection composer={composer} />),
+    );
+
+    const colorRow = await waitFor(() => {
+      const el = container.querySelector(
+        `[data-token-row="${seedToken.id}"]`,
+      ) as HTMLElement | null;
+      if (!el) throw new Error("token row not found");
+      return el;
+    });
+    fireEvent.click(colorRow);
+
+    const valueInputBefore = await waitFor(() => {
+      const el = container.querySelector(
+        'input[aria-label="Light value"]',
+      ) as HTMLInputElement | null;
+      if (!el) throw new Error("value input not found");
+      return el;
+    });
+    const preValue = valueInputBefore.value;
+    expect(preValue.toLowerCase()).toBe(seedToken.value.toLowerCase());
+
+    // The AI write path: engine-side, no React hooks.
+    let written: string | null = null;
+    await act(async () => {
+      written = composer.designSystem.setDesignToken(seedToken.id, "#123456");
+      await new Promise((r) => setTimeout(r, 20));
+    });
+    expect(written).toBe("#123456");
+
+    await waitFor(() => {
+      const after = (container.querySelector(
+        'input[aria-label="Light value"]',
+      ) as HTMLInputElement).value;
+      expect(after.toLowerCase()).toBe("#123456");
+    });
+
+    await act(async () => {
+      composer.history.undo();
+      await new Promise((r) => setTimeout(r, 20));
+    });
+
+    await waitFor(() => {
+      const reverted = (container.querySelector(
+        'input[aria-label="Light value"]',
+      ) as HTMLInputElement).value;
+      expect(reverted.toLowerCase()).toBe(preValue.toLowerCase());
+    });
+  });
+
+  it("set-token (W4): rejects an unknown id and an unsafe/type-mismatched value", () => {
+    const composer = new Composer({} as any);
+    seed(composer);
+    // Unknown id → null (never writes a token that isn't registered).
+    expect(composer.designSystem.setDesignToken("color-ghost", "#000")).toBeNull();
+    // Color token with a non-color value → null.
+    expect(composer.designSystem.setDesignToken(seedToken.id, "16px")).toBeNull();
+    // Unsafe value → null.
+    expect(composer.designSystem.setDesignToken(seedToken.id, "url(http://x)")).toBeNull();
+    // No-op (same value) → null.
+    expect(composer.designSystem.setDesignToken(seedToken.id, seedToken.value)).toBeNull();
+    // Valid change → returns the value.
+    expect(composer.designSystem.setDesignToken(seedToken.id, "#0a0a0a")).toBe("#0a0a0a");
+  });
 });

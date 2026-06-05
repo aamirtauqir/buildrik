@@ -470,3 +470,79 @@ describe("extractValidEditCommands", () => {
     expect(extractValidEditCommands(markupAlt, EL)).toHaveLength(0);
   });
 });
+
+describe("set-token (W4) — design-token command validation", () => {
+  // id → type registry, mirroring what the editor sends with page scope.
+  const TOKENS = new Map<string, string>([
+    ["color-brand", "color"],
+    ["space-4", "length"],
+    ["font-body", "font-family"],
+    ["weight-bold", "number"],
+    ["shadow-card", "shadow"], // present but NOT AI-editable
+  ]);
+  const NO_IDS = new Set<string>(); // set-token carries no elementId
+
+  const run = (cmd: unknown) =>
+    extractValidPageEditCommands(JSON.stringify([cmd]), NO_IDS, TOKENS);
+
+  it("accepts a color value for a color token (no elementId needed)", () => {
+    const r = run({ commandId: "set-token", args: { tokenId: "color-brand", value: "#2D6DFF" } });
+    expect(r).toHaveLength(1);
+    expect(r[0].commandId).toBe("set-token");
+  });
+
+  it("accepts rgb()/hsl() colors and a length for a length token", () => {
+    expect(run({ commandId: "set-token", args: { tokenId: "color-brand", value: "rgb(45,109,255)" } })).toHaveLength(1);
+    expect(run({ commandId: "set-token", args: { tokenId: "space-4", value: "1.5rem" } })).toHaveLength(1);
+    expect(run({ commandId: "set-token", args: { tokenId: "weight-bold", value: "700" } })).toHaveLength(1);
+    expect(run({ commandId: "set-token", args: { tokenId: "font-body", value: '"Inter Tight", sans-serif' } })).toHaveLength(1);
+  });
+
+  it("rejects an id that is not in the sent token registry (capability scope)", () => {
+    expect(run({ commandId: "set-token", args: { tokenId: "color-ghost", value: "#fff" } })).toHaveLength(0);
+  });
+
+  it("rejects a value that does not match the token's type", () => {
+    // color value into a length token, and vice-versa
+    expect(run({ commandId: "set-token", args: { tokenId: "space-4", value: "#fff" } })).toHaveLength(0);
+    expect(run({ commandId: "set-token", args: { tokenId: "color-brand", value: "16px" } })).toHaveLength(0);
+    expect(run({ commandId: "set-token", args: { tokenId: "weight-bold", value: "bold" } })).toHaveLength(0);
+  });
+
+  it("rejects unsafe values (url/expression/javascript/markup/braces)", () => {
+    for (const value of [
+      "url(http://evil.com/x.png)",
+      "expression(alert(1))",
+      "javascript:alert(1)",
+      "red; } body { display:none",
+      "<script>",
+      "@import 'x'",
+    ]) {
+      expect(run({ commandId: "set-token", args: { tokenId: "color-brand", value } })).toHaveLength(0);
+    }
+  });
+
+  it("rejects editing a non-AI-editable token type (shadow/select)", () => {
+    expect(run({ commandId: "set-token", args: { tokenId: "shadow-card", value: "0 1px 2px #000" } })).toHaveLength(0);
+  });
+
+  it("rejects over-length values", () => {
+    expect(run({ commandId: "set-token", args: { tokenId: "font-body", value: "a".repeat(121) } })).toHaveLength(0);
+  });
+
+  it("drops set-token when NO token registry was sent (page scope without tokens)", () => {
+    const raw = JSON.stringify([{ commandId: "set-token", args: { tokenId: "color-brand", value: "#fff" } }]);
+    expect(extractValidPageEditCommands(raw, NO_IDS)).toHaveLength(0);
+  });
+
+  it("buildPageEditCommandPrompt lists token ids + types for recall", () => {
+    const p = buildPageEditCommandPrompt(
+      [{ id: "a", type: "heading" }],
+      "make the brand color blue",
+      [{ id: "color-brand", name: "Brand", value: "#111", type: "color" }],
+    );
+    expect(p).toContain("Design tokens");
+    expect(p).toContain('id="color-brand"');
+    expect(p).toContain("(color)");
+  });
+});

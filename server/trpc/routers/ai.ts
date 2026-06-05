@@ -92,10 +92,23 @@ const pageElementRefSchema = z.object({
   text: z.string().max(200).optional(),
 });
 
+// Token registry sent with page scope for set-token recall (W4).
+const tokenRefSchema = z.object({
+  id: z.string().min(1).max(100),
+  name: z.string().max(80),
+  value: z.string().max(120),
+  type: z.string().max(40),
+});
+
 const scopeSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("element"), id: z.string().min(1) }),
-  // Page scope may carry the page's element list for multi-element edits (P3).
-  z.object({ kind: z.literal("page"), elements: z.array(pageElementRefSchema).max(200).optional() }),
+  // Page scope may carry the page's element list for multi-element edits (P3)
+  // and the design-token registry for set-token recall (W4).
+  z.object({
+    kind: z.literal("page"),
+    elements: z.array(pageElementRefSchema).max(200).optional(),
+    tokens: z.array(tokenRefSchema).max(120).optional(),
+  }),
 ]);
 
 const streamPromptInputSchema = z.object({
@@ -293,6 +306,7 @@ export const aiRouter = router({
               : await generatePageEditCommands({
                   prompt: input.prompt,
                   elements: input.scope.elements ?? [],
+                  tokens: input.scope.tokens ?? [],
                   model,
                 });
         } catch (e) {

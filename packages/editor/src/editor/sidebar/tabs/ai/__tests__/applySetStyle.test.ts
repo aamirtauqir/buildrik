@@ -15,6 +15,7 @@ import {
   setAttributeArgsSchema,
   setStyleVariantArgsSchema,
   setPageSettingArgsSchema,
+  setTokenArgsSchema,
 } from "../applySetStyle";
 
 function makeComposer(
@@ -639,5 +640,31 @@ describe("applySetStyleVariant", () => {
       { commandId: "insert-component", args: { elementId: "p", componentId: "saved-huge" } },
     ]))).rejects.toThrow(/too large/i);
     expect(instantiateComponent).not.toHaveBeenCalled();
+  });
+});
+
+describe("set-token (W4) — design-token command", () => {
+  it("schema accepts a bounded id + value, rejects empty/over-length", () => {
+    expect(setTokenArgsSchema.safeParse({ tokenId: "color-brand", value: "#2D6DFF" }).success).toBe(true);
+    expect(setTokenArgsSchema.safeParse({ tokenId: "", value: "#fff" }).success).toBe(false);
+    expect(setTokenArgsSchema.safeParse({ tokenId: "x", value: "" }).success).toBe(false);
+    expect(setTokenArgsSchema.safeParse({ tokenId: "x", value: "a".repeat(121) }).success).toBe(false);
+  });
+
+  it("routes the command to composer.designSystem.setDesignToken", async () => {
+    const setDesignToken = vi.fn(() => "#2D6DFF");
+    const composer = {
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      history: { flushPending: vi.fn() },
+      designSystem: { setDesignToken },
+    } as unknown as Composer;
+
+    const r = await applyAiEdit(
+      composer,
+      commitEdit([{ commandId: "set-token", args: { tokenId: "color-brand", value: "#2D6DFF" } }]),
+    );
+    expect(setDesignToken).toHaveBeenCalledWith("color-brand", "#2D6DFF");
+    expect(r.applied).toBe(1);
   });
 });

@@ -16,6 +16,8 @@ const composer = {
       { getId: () => "a", getType: () => "heading", getContent: () => "Hi" },
     ],
   },
+  // set-token recall (W4): gatherTokens reads the design-token registry.
+  getProjectSettings: () => ({ designTokens: [] }),
 } as never;
 
 const PLAN = [

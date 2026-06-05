@@ -22,9 +22,18 @@ export interface PageElementRef {
   text?: string;
 }
 
+/** Token registry entry sent for set-token recall (W4): the model picks a real
+ * id + sees the current value, and the server validates membership + value/type. */
+export interface TokenRef {
+  id: string;
+  name: string;
+  value: string;
+  type: string;
+}
+
 export type RunScope =
   | { kind: "element"; id: string }
-  | { kind: "page"; elements?: PageElementRef[] };
+  | { kind: "page"; elements?: PageElementRef[]; tokens?: TokenRef[] };
 
 export interface ServerEdit {
   target: string;

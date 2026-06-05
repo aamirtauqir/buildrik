@@ -55,6 +55,7 @@ import { TokenUsageTracker } from "./designSystem/TokenUsageTracker";
 import { LintState } from "./designSystem/LintState";
 import { TokenBindingResolver } from "./designSystem/TokenBindingResolver";
 import { applyContrastFix } from "./designSystem/contrastFix";
+import { isAiEditableTokenValue } from "./designSystem/tokenValueGuard";
 import { CSSBundler } from "./designSystem/bundler";
 import { DSLinter } from "./designSystem/linter";
 import { AIAssistService } from "./designSystem/services";
@@ -176,6 +177,18 @@ export class Composer extends EventEmitter {
      * registries on every emission, so Cmd+Z roundtrips back into the UI.
      */
     readonly applyAutoFix: (tokenId: string, hint: string | undefined) => string | null;
+    /**
+     * AI token write (W4 set-token). Models on `applyAutoFix`: looks the token up
+     * in `projectSettings.designTokens`, validates the value against the token's
+     * `type` (the trust boundary — see tokenValueGuard), and writes it inside a
+     * labeled transaction so the `project:changed` re-hydration in TokensSection
+     * re-applies the live CSS var AND Cmd+Z roundtrips through the same path.
+     *
+     * Returns the new value on success, or `null` when the id is unknown, the
+     * type is not AI-editable, the value fails its format guard, or it is a no-op.
+     * The single engine write path means the AI never touches the React hooks.
+     */
+    readonly setDesignToken: (tokenId: string, value: string) => string | null;
   };
 
   constructor(config: ComposerConfig) {
@@ -258,6 +271,19 @@ export class Composer extends EventEmitter {
         this.setProjectSettings({ ...settings, designTokens: updated });
         this.endTransaction();
         return fixed;
+      },
+      setDesignToken: (tokenId, value) => {
+        const settings = this.getProjectSettings();
+        const tokens = settings.designTokens ?? [];
+        const target = tokens.find((t) => t.id === tokenId);
+        if (!target) return null; // unknown id — never write a token that isn't registered
+        if (!isAiEditableTokenValue(target.type, value)) return null; // per-type value guard
+        if (value === target.value) return null; // no-op
+        this.beginTransaction("Set design token");
+        const updated = tokens.map((t) => (t.id === tokenId ? { ...t, value } : t));
+        this.setProjectSettings({ ...settings, designTokens: updated });
+        this.endTransaction();
+        return value;
       },
     };
     // Recompute token usage whenever element trees or styles change. These

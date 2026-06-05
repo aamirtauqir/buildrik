@@ -7,7 +7,9 @@ import {
   type PlanStep,
   type ServerEdit,
   type PageElementRef,
+  type TokenRef,
 } from "./runPromptOnce";
+import { AI_EDITABLE_TOKEN_TYPES } from "@/engine/designSystem/tokenValueGuard";
 
 /**
  * P4 agent build loop. Generates an ordered plan, then walks each step through
@@ -92,6 +94,17 @@ export function useAgentRunner(
       .slice(0, 200);
   }, [composer]);
 
+  // Token registry for set-token recall: only the AI-editable types (the model
+  // can't safely set shadow/select from a free string), capped so a large token
+  // set can't blow the prompt context.
+  const gatherTokens = React.useCallback((): TokenRef[] => {
+    if (!composer) return [];
+    return (composer.getProjectSettings().designTokens ?? [])
+      .filter((t) => t.type !== undefined && AI_EDITABLE_TOKEN_TYPES.has(t.type))
+      .map((t) => ({ id: t.id, name: t.name, value: t.value, type: t.type as string }))
+      .slice(0, 120);
+  }, [composer]);
+
   const setStep = React.useCallback((i: number, patch: Partial<RunStep>) => {
     setSteps((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
   }, []);
@@ -116,7 +129,7 @@ export function useAgentRunner(
       // target the id the plan chose.
       const scope =
         step.plan.scope.kind === "page"
-          ? { kind: "page" as const, elements: gatherElements() }
+          ? { kind: "page" as const, elements: gatherElements(), tokens: gatherTokens() }
           : step.plan.scope;
       try {
         const { edit } = await runPromptOnce({
@@ -149,7 +162,7 @@ export function useAgentRunner(
         advance(i + 1);
       }
     },
-    [composer, model, gatherElements, setStep, advance],
+    [composer, model, gatherElements, gatherTokens, setStep, advance],
   );
   generateStepRef.current = generateStep;
 
@@ -166,7 +179,7 @@ export function useAgentRunner(
         const elements = gatherElements();
         const { plan } = await runPromptOnce({
           prompt,
-          scope: { kind: "page", elements },
+          scope: { kind: "page", elements, tokens: gatherTokens() },
           model,
           intent: "plan",
         });
@@ -186,7 +199,7 @@ export function useAgentRunner(
         setPhase("done");
       }
     },
-    [composer, model, gatherElements],
+    [composer, model, gatherElements, gatherTokens],
   );
 
   const approve = React.useCallback(async () => {
