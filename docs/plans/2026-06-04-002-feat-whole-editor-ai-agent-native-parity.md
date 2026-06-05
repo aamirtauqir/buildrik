@@ -40,6 +40,18 @@ publish / deploy                       ✗                   agent publish step 
 
 ## Workstreams
 
+### SEQUENCING CORRECTION (2026-06-05, found during build)
+`instantiateComponent` is **async** (ComponentManager.instantiateComponent →
+Promise; user-saved comps load from IndexedDB). `applyAiEdit` is a **synchronous**
+transaction (begin → apply commands → endTransaction → flushPending = one undo).
+Running an async insert inside the sync transaction is the async-undo race that
+already caused real damage this session. So **insert-component is NOT a simple W1
+canvas command — it depends on the async-aware executor seam (W2 prereq).** Build
+order corrected: **executor seam FIRST** (an async-capable apply path that opens
+the transaction, awaits the command, then closes + flushes), THEN insert-component
++ set-page-setting + set-token ride it. set-image (sync el.setAttribute) was the
+only truly-in-pattern W1 command and is already shipped.
+
 ### W1 — Element-creation parity (media + components)
 - **set-image**: target an image element, set its `src` to an asset already in the
   media library (validate the asset id/url exists; reuse `set-attribute` value
