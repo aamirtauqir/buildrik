@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import type { AiAdoptionInput } from "@buildrik/shared/schemas/ai-adoption";
+import {
+  summarizeAdoptionRows,
+  type AiAdoptionSummary,
+} from "./ai-adoption.summary";
 
 /**
  * Persist one AI adoption event. Resolves the site's workspace and verifies the
@@ -39,4 +43,22 @@ export async function recordAiAdoption(
   } catch {
     // Adoption telemetry must never crash the editing path.
   }
+}
+
+/**
+ * Aggregate the task-level adoption signals for a workspace. This is what the
+ * STOP-AND-MEASURE gate reads: which jobs users actually run (commandFrequency /
+ * bySurface), whether they keep AI edits (revertRate), and whether they accept
+ * agent steps (agent.acceptanceRate). Fetch + delegate to the pure summarizer.
+ */
+export async function getAiAdoptionSummary(
+  workspaceId: string,
+  sinceDays = 30,
+): Promise<AiAdoptionSummary> {
+  const since = new Date(Date.now() - sinceDays * 86_400_000);
+  const rows = await prisma.aiAdoptionEvent.findMany({
+    where: { workspaceId, createdAt: { gte: since } },
+    select: { event: true, surface: true, metadata: true },
+  });
+  return summarizeAdoptionRows(rows, sinceDays);
 }
