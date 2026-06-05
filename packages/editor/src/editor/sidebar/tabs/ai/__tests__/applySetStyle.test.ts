@@ -14,6 +14,7 @@ import {
   setStyleArgsSchema,
   setAttributeArgsSchema,
   setStyleVariantArgsSchema,
+  setPageSettingArgsSchema,
 } from "../applySetStyle";
 
 function makeComposer(
@@ -541,6 +542,32 @@ describe("applySetStyleVariant", () => {
     const call = setRule.mock.calls[0];
     expect(call[2].pseudo).toBe(":focus");
     expect(typeof call[2].mediaQuery).toBe("string");
+  });
+
+  it("applySetPageSetting merges into existing seo without clobbering siblings", async () => {
+    const updatePage = vi.fn();
+    const composer = {
+      elements: {
+        getActivePage: () => ({ id: "p1", settings: { seo: { metaTitle: "Old", ogImage: "/x.png" } } }),
+        updatePage,
+      },
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      history: { flushPending: vi.fn() },
+    } as unknown as Composer;
+    const r = await applyAiEdit(composer, commitEdit([
+      { commandId: "set-page-setting", args: { setting: "metaDescription", value: "New desc" } },
+    ]));
+    expect(r.applied).toBe(1);
+    expect(updatePage).toHaveBeenCalledWith("p1", {
+      settings: { seo: { metaTitle: "Old", ogImage: "/x.png", metaDescription: "New desc" } },
+    });
+  });
+
+  it("set-page-setting schema enforces length caps + plain text", () => {
+    expect(setPageSettingArgsSchema.safeParse({ setting: "metaTitle", value: "Hi" }).success).toBe(true);
+    expect(setPageSettingArgsSchema.safeParse({ setting: "metaTitle", value: "x".repeat(61) }).success).toBe(false);
+    expect(setPageSettingArgsSchema.safeParse({ setting: "metaDescription", value: "<b>x</b>" }).success).toBe(false);
   });
 
   it("applyAiEdit dispatches a set-style-variant command", async () => {

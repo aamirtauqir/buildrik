@@ -667,6 +667,11 @@ export type EditCommand =
       args: { elementId: string; componentId: string };
     }
   | {
+      // Config command — no element target (operates on the active page).
+      commandId: "set-page-setting";
+      args: { setting: "metaTitle" | "metaDescription"; value: string };
+    }
+  | {
       commandId: "set-style-variant";
       args: {
         elementId: string;
@@ -719,6 +724,9 @@ export function editCommandToRow(
   }
   if (c.commandId === "insert-component") {
     return { field: "insert component", from: "", to: c.args.componentId };
+  }
+  if (c.commandId === "set-page-setting") {
+    return { field: c.args.setting, from: "", to: c.args.value };
   }
   if (c.commandId === "set-style-variant") {
     const variant = c.args.pseudo ? `:${c.args.pseudo}` : c.args.breakpoint;
@@ -806,6 +814,12 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
     rule: (id) =>
       `- insert-component: {"commandId":"insert-component","args":{"elementId":"${id}","componentId":"<component id>"}} — when asked to insert a prebuilt UI component (e.g. a card, alert, badge, avatar, breadcrumb, form-field, spinner, switch). "componentId" is a known component id (e.g. card, alert, badge, avatar, breadcrumb, form-field, spinner, switch, label). The new component is placed relative to "${id}".`,
   },
+  {
+    id: "set-page-setting",
+    agentCallable: true,
+    rule: () =>
+      `- set-page-setting: {"commandId":"set-page-setting","args":{"setting":"metaTitle|metaDescription","value":"<text>"}} — when asked to set the page's SEO title or meta description. No elementId (it edits the whole page). "value" is plain text — metaTitle ≤ 60 chars, metaDescription ≤ 160.`,
+  },
 ];
 
 export function buildEditCommandPrompt(elementId: string, userPrompt: string): string {
@@ -848,9 +862,23 @@ function parseCommandArray(raw: string): unknown[] {
   }
 }
 
+// SEO field length caps (mirror the DB VarChar limits: title 60, description 160).
+const SEO_LIMITS: Record<string, number> = { metaTitle: 60, metaDescription: 160 };
+
 function isValidEditCommand(c: unknown, allowedIds: Set<string>): c is EditCommand {
   if (!c || typeof c !== "object") return false;
   const cmd = c as { commandId?: unknown; args?: Record<string, unknown> };
+
+  // Config commands operate on the active page, not an element — they carry NO
+  // elementId, so they are validated BEFORE the element scope guard below.
+  if (cmd.commandId === "set-page-setting") {
+    const { setting, value } = (cmd.args ?? {}) as { setting?: unknown; value?: unknown };
+    if (typeof setting !== "string" || !(setting in SEO_LIMITS)) return false;
+    if (typeof value !== "string" || value.length === 0) return false;
+    if (UNSAFE_TEXT.test(value)) return false;
+    return value.length <= SEO_LIMITS[setting];
+  }
+
   // Scope guard: the target id must be in the allowed set. Element scope passes
   // a single-id set (exact-id guard); page scope passes every id on the page,
   // so the model can edit across elements but never invent an id.

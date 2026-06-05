@@ -355,6 +355,24 @@ describe("extractValidEditCommands", () => {
     expect(extractValidEditCommands(badProp, EL)).toHaveLength(0);
   });
 
+  it("accepts set-page-setting WITHOUT an elementId (config command bypasses the scope guard)", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-page-setting", args: { setting: "metaTitle", value: "Pricing — Acme" } },
+      { commandId: "set-page-setting", args: { setting: "metaDescription", value: "Plans and pricing for Acme." } },
+    ]);
+    // EL is the allowed element id; these commands have no elementId yet still validate.
+    expect(extractValidEditCommands(raw, EL)).toHaveLength(2);
+  });
+
+  it("rejects set-page-setting with bad setting, over-length, or markup", () => {
+    const bad = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "slug", value: "x" } }]);
+    const longTitle = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "metaTitle", value: "x".repeat(61) } }]);
+    const markup = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "metaDescription", value: "<script>" } }]);
+    expect(extractValidEditCommands(bad, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(longTitle, EL)).toHaveLength(0);
+    expect(extractValidEditCommands(markup, EL)).toHaveLength(0);
+  });
+
   it("accepts insert-component shape (id validated editor-side), rejects empty/oversized id", () => {
     const ok = JSON.stringify([{ commandId: "insert-component", args: { elementId: EL, componentId: "card" } }]);
     expect(extractValidEditCommands(ok, EL)).toHaveLength(1);

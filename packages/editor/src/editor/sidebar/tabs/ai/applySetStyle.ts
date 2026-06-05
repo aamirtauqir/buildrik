@@ -451,6 +451,37 @@ export async function applyInsertComponent(
 }
 
 /**
+ * v1 in-canvas AI config command: `set-page-setting`. Edits the ACTIVE page's
+ * SEO title / meta description — no element target. Reads + merges the current
+ * `settings.seo` (updatePage shallow-merges `settings`, so the whole `seo`
+ * object must be written back to avoid clobbering sibling SEO fields). Length
+ * caps mirror the DB columns (title 60, description 160).
+ */
+const SEO_LIMITS = { metaTitle: 60, metaDescription: 160 } as const;
+
+export const setPageSettingArgsSchema = z
+  .object({
+    setting: z.enum(["metaTitle", "metaDescription"]),
+    value: z
+      .string()
+      .min(1)
+      .refine((v) => !/[<>]/.test(v), { message: "Text must be plain (no markup)" }),
+  })
+  .refine((a) => a.value.length <= SEO_LIMITS[a.setting], {
+    message: "SEO value exceeds the length limit",
+  });
+export type SetPageSettingArgs = z.infer<typeof setPageSettingArgsSchema>;
+
+export function applySetPageSetting(composer: Composer, args: SetPageSettingArgs): void {
+  const page = composer.elements.getActivePage?.();
+  if (!page) throw new Error("set-page-setting: no active page");
+  const currentSeo = ((page.settings as { seo?: Record<string, unknown> } | undefined)?.seo) ?? {};
+  composer.elements.updatePage(page.id, {
+    settings: { seo: { ...currentSeo, [args.setting]: args.value } },
+  });
+}
+
+/**
  * Client-side command registry: maps a commandId to its Zod validator + apply
  * fn. `defineCommand` (sync) and `defineAsyncCommand` (async) both produce a
  * handler whose `run` re-validates (defense in depth; the server already
@@ -499,6 +530,7 @@ const COMMAND_HANDLERS: Record<
   "set-attribute": defineCommand(setAttributeArgsSchema, applySetAttribute),
   "set-style-variant": defineCommand(setStyleVariantArgsSchema, applySetStyleVariant),
   "insert-component": defineAsyncCommand(insertComponentArgsSchema, applyInsertComponent),
+  "set-page-setting": defineCommand(setPageSettingArgsSchema, applySetPageSetting),
 };
 
 /**
