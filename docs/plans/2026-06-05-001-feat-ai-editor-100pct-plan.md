@@ -130,11 +130,17 @@ model (separate from ActivityLog so it can't pollute user activity feeds):
 actually attempt (query `ai_adoption_events`) BEFORE building W5–W13 heavy
 surfaces. Do not big-bang the 10 surfaces blind.
 
-### W5 — Media recall (set-image v2)
+### W5 — Media recall (set-image v2) — SHIPPED 2026-06-06 (commit c4b335f0)
 set-image works (src). Add recall: editor gathers the media asset list (ids +
 urls + names, like P3's element list) → prompt, so the model picks REAL library
 assets, not guessed URLs. Validate the chosen id/url ∈ the sent list.
 OUT v1: AI uploading a File (binary handling) — user uploads via media tab.
+DONE: `composer.media.getAssets()` (http assets only) → page scope `assets` →
+prompt "Media library" section + set-attribute src rule. Validation: src ∈ sent
+asset urls when a library is sent (guessed urls rejected); else isSafeSrcValue
+scheme floor. Mirrors the W4 token-recall plumbing. Tests green; NOT live-E2E'd
+(needs a project with an http image asset; recall mechanism identical to W4 +
+the client→tRPC wire already E2E-verified in W14).
 
 ### W6 — Publish via agent (explicit confirm)
 A `publish` agent step (NOT a canvas command) that triggers the existing
