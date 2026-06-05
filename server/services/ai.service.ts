@@ -692,7 +692,7 @@ export type EditCommand =
   | {
       // Config command — no element target (operates on the active page).
       commandId: "set-page-setting";
-      args: { setting: "metaTitle" | "metaDescription"; value: string };
+      args: { setting: "metaTitle" | "metaDescription" | "slug"; value: string };
     }
   | {
       commandId: "set-style-variant";
@@ -841,7 +841,7 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
     id: "set-page-setting",
     agentCallable: true,
     rule: () =>
-      `- set-page-setting: {"commandId":"set-page-setting","args":{"setting":"metaTitle|metaDescription","value":"<text>"}} — when asked to set the page's SEO title or meta description. No elementId (it edits the whole page). "value" is plain text — metaTitle ≤ 60 chars, metaDescription ≤ 160.`,
+      `- set-page-setting: {"commandId":"set-page-setting","args":{"setting":"metaTitle|metaDescription|slug","value":"<text>"}} — when asked to set the page's SEO title, meta description, or URL slug. No elementId (it edits the whole page). metaTitle ≤ 60 chars, metaDescription ≤ 160 (plain text). slug is kebab-case (lowercase letters/digits/hyphens, e.g. "pricing-plans").`,
   },
 ];
 
@@ -896,8 +896,13 @@ function isValidEditCommand(c: unknown, allowedIds: Set<string>): c is EditComma
   // elementId, so they are validated BEFORE the element scope guard below.
   if (cmd.commandId === "set-page-setting") {
     const { setting, value } = (cmd.args ?? {}) as { setting?: unknown; value?: unknown };
-    if (typeof setting !== "string" || !(setting in SEO_LIMITS)) return false;
     if (typeof value !== "string" || value.length === 0) return false;
+    if (setting === "slug") {
+      // kebab-case format only (collision is checked editor-side against the
+      // page list — the server has no page context here).
+      return value.length <= 100 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
+    }
+    if (typeof setting !== "string" || !(setting in SEO_LIMITS)) return false;
     if (UNSAFE_TEXT.test(value)) return false;
     return value.length <= SEO_LIMITS[setting];
   }

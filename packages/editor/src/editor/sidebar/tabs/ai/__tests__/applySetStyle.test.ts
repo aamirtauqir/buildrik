@@ -564,10 +564,37 @@ describe("applySetStyleVariant", () => {
     });
   });
 
-  it("set-page-setting schema enforces length caps + plain text", () => {
+  it("set-page-setting schema enforces length caps + plain text + slug format", () => {
     expect(setPageSettingArgsSchema.safeParse({ setting: "metaTitle", value: "Hi" }).success).toBe(true);
     expect(setPageSettingArgsSchema.safeParse({ setting: "metaTitle", value: "x".repeat(61) }).success).toBe(false);
     expect(setPageSettingArgsSchema.safeParse({ setting: "metaDescription", value: "<b>x</b>" }).success).toBe(false);
+    expect(setPageSettingArgsSchema.safeParse({ setting: "slug", value: "pricing-plans" }).success).toBe(true);
+    expect(setPageSettingArgsSchema.safeParse({ setting: "slug", value: "Pricing Plans" }).success).toBe(false);
+  });
+
+  it("set-page-setting slug rejects a collision with another page, applies a free slug", async () => {
+    const updatePage = vi.fn();
+    const composer = {
+      elements: {
+        getActivePage: () => ({ id: "p1", slug: "home", settings: {} }),
+        getAllPages: () => [{ id: "p1", slug: "home" }, { id: "p2", slug: "about" }],
+        updatePage,
+      },
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      history: { flushPending: vi.fn() },
+    } as unknown as Composer;
+    // collision with p2's slug → rejected (throws → batch rejects)
+    await expect(applyAiEdit(composer, commitEdit([
+      { commandId: "set-page-setting", args: { setting: "slug", value: "about" } },
+    ]))).rejects.toThrow(/already in use/i);
+    expect(updatePage).not.toHaveBeenCalled();
+    // free slug → applied
+    const r = await applyAiEdit(composer, commitEdit([
+      { commandId: "set-page-setting", args: { setting: "slug", value: "pricing" } },
+    ]));
+    expect(r.applied).toBe(1);
+    expect(updatePage).toHaveBeenCalledWith("p1", { slug: "pricing", slugManuallySet: true });
   });
 
   it("applyAiEdit dispatches a set-style-variant command", async () => {

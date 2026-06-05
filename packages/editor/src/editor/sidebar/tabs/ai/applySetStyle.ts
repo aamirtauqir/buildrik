@@ -470,23 +470,37 @@ export async function applyInsertComponent(
  * caps mirror the DB columns (title 60, description 160).
  */
 const SEO_LIMITS = { metaTitle: 60, metaDescription: 160 } as const;
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export const setPageSettingArgsSchema = z
   .object({
-    setting: z.enum(["metaTitle", "metaDescription"]),
+    setting: z.enum(["metaTitle", "metaDescription", "slug"]),
     value: z
       .string()
       .min(1)
       .refine((v) => !/[<>]/.test(v), { message: "Text must be plain (no markup)" }),
   })
-  .refine((a) => a.value.length <= SEO_LIMITS[a.setting], {
-    message: "SEO value exceeds the length limit",
-  });
+  .refine(
+    (a) =>
+      a.setting === "slug"
+        ? a.value.length <= 100 && SLUG_RE.test(a.value)
+        : a.value.length <= SEO_LIMITS[a.setting],
+    { message: "Invalid page-setting value" },
+  );
 export type SetPageSettingArgs = z.infer<typeof setPageSettingArgsSchema>;
 
 export function applySetPageSetting(composer: Composer, args: SetPageSettingArgs): void {
   const page = composer.elements.getActivePage?.();
   if (!page) throw new Error("set-page-setting: no active page");
+  if (args.setting === "slug") {
+    // Collision check against the OTHER pages (the server can't — no page list).
+    const others = (composer.elements.getAllPages?.() ?? []).filter((p) => p.id !== page.id);
+    if (others.some((p) => p.slug === args.value)) {
+      throw new Error(`set-page-setting: slug "${args.value}" already in use`);
+    }
+    composer.elements.updatePage(page.id, { slug: args.value, slugManuallySet: true });
+    return;
+  }
   const currentSeo = ((page.settings as { seo?: Record<string, unknown> } | undefined)?.seo) ?? {};
   composer.elements.updatePage(page.id, {
     settings: { seo: { ...currentSeo, [args.setting]: args.value } },

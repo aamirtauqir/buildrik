@@ -382,8 +382,17 @@ describe("extractValidEditCommands", () => {
     expect(extractValidEditCommands(raw, EL)).toHaveLength(2);
   });
 
+  it("accepts a kebab-case slug, rejects spaces/uppercase/path chars", () => {
+    const ok = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "slug", value: "pricing-plans" } }]);
+    expect(extractValidEditCommands(ok, EL)).toHaveLength(1);
+    for (const value of ["Pricing Plans", "pricing/plans", "-bad", "bad-", "UPPER"]) {
+      const raw = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "slug", value } }]);
+      expect(extractValidEditCommands(raw, EL)).toHaveLength(0);
+    }
+  });
+
   it("rejects set-page-setting with bad setting, over-length, or markup", () => {
-    const bad = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "slug", value: "x" } }]);
+    const bad = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "author", value: "x" } }]);
     const longTitle = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "metaTitle", value: "x".repeat(61) } }]);
     const markup = JSON.stringify([{ commandId: "set-page-setting", args: { setting: "metaDescription", value: "<script>" } }]);
     expect(extractValidEditCommands(bad, EL)).toHaveLength(0);
