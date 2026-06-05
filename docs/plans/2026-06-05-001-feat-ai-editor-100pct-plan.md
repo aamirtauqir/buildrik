@@ -59,6 +59,37 @@ visually update, and undo would revert the stored value but not the live var.
 RISK: design-system state layer (14 kinds + dark-mode resolver). Careful; full
 test + live-verify (set token → canvas changes → undo reverts var).
 
+### W4 architecture finding (investigated 2026-06-05 — code, not speculation)
+- **Today's ownership:** React per-kind hooks (`useTokenBase`, one per the 14 kinds:
+  color/spacing/type/radius/shadow/motion/border/opacity/zindex/breakpoint/grid/
+  sizing/icon/imagery) own the LIVE token state, apply the CSS vars (e.g.
+  `useSpacingTokens.applyPreset` → `document.documentElement.style.setProperty`),
+  AND keep their OWN undo/redo stacks (`useTokenBase` setUndoStack/setRedoStack).
+  Engine `projectSettings.designTokens` is a save-time MIRROR (written via
+  `composer.setProjectSettings` + `persistAll` to localStorage on apply).
+- **Why AI can't just write:** AI applies engine-side (in applyAiEdit, no React).
+  It can't call the React hooks, and an engine-only write neither updates the
+  live CSS var nor the React state nor coordinates with the hooks' separate undo.
+- **Two candidate architectures:**
+  - **(A) Invert to engine SSOT (proper, big):** `composer.setDesignToken(id,
+    value)` becomes the ONE write path — updates projectSettings, applies the CSS
+    var (var-application moves to an engine-owned layer), emits TOKENS_CHANGED;
+    React hooks become read-only mirrors that subscribe + derive; the PANEL also
+    writes via this method. One writer, undo lives in the composer transaction
+    (undo reverts projectSettings → emits → vars revert). Blast radius: all 14
+    hooks + panel write paths + dark-mode resolver. Migrate kind-by-kind / flagged.
+  - **(B) Bridge AI → the panel's writer (smaller v1):** AI engine-write emits an
+    event; a TokenRegistry bridge effect routes it into the SAME kind-hook
+    `updateToken(id, value)` the panel uses (so React state + CSS var update
+    identically — not a parallel patch). UNDO is the catch: the hook's undo stack
+    is separate from applyAiEdit's transaction → set-token undo would need
+    coordination (or accept the token undo lives in the panel's stack, not the
+    global undo — a UX inconsistency). Scope to color/spacing/type.
+- **Recommendation:** (A) is the stable answer codex asked for, but it's a focused
+  DS-state refactor — do it in a fresh session with the design system's own arc in
+  view, NOT at a long session's tail. (B) ships set-token sooner but leaves the
+  undo-coordination wart. Decide (A vs B) at the start of the W4 build session.
+
 ### W5 — Media recall (set-image v2)
 set-image works (src). Add recall: editor gathers the media asset list (ids +
 urls + names, like P3's element list) → prompt, so the model picks REAL library
