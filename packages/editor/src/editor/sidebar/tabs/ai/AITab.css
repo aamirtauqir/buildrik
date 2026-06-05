@@ -283,3 +283,13 @@
   margin-top: var(--bd-space-2);
   color: var(--bd-fg-muted);
 }
+
+.bd-ai-agent-autoapply {
+  display: flex;
+  align-items: center;
+  gap: var(--bd-space-1);
+  margin-bottom: var(--bd-space-2);
+  font: 500 var(--bd-text-xs) var(--bd-font);
+  color: var(--bd-fg-muted);
+  cursor: pointer;
+}

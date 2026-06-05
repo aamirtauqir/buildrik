@@ -47,6 +47,8 @@ interface UseAgentRunnerResult {
   steps: RunStep[];
   currentIndex: number;
   error: string | null;
+  autoApply: boolean;
+  setAutoApply: (on: boolean) => void;
   start: (prompt: string) => void;
   approve: () => void;
   skip: () => void;
@@ -62,13 +64,17 @@ export function useAgentRunner(
   const [steps, setSteps] = React.useState<RunStep[]>([]);
   const [currentIndex, setCurrentIndex] = React.useState(-1);
   const [error, setError] = React.useState<string | null>(null);
+  const [autoApply, setAutoApplyState] = React.useState(false);
 
   const stepsRef = React.useRef<RunStep[]>([]);
   stepsRef.current = steps;
   const indexRef = React.useRef(-1);
   indexRef.current = currentIndex;
   const cancelledRef = React.useRef(false);
+  const autoApplyRef = React.useRef(false);
+  autoApplyRef.current = autoApply;
   const generateStepRef = React.useRef<(i: number) => void>(() => {});
+  const setAutoApply = React.useCallback((on: boolean) => setAutoApplyState(on), []);
 
   const gatherElements = React.useCallback((): PageElementRef[] => {
     if (!composer) return [];
@@ -121,7 +127,18 @@ export function useAgentRunner(
         });
         if (cancelledRef.current) return;
         if (edit && edit.rows.length > 0) {
-          setStep(i, { status: "awaiting", edit });
+          if (autoApplyRef.current) {
+            // Auto-apply mode (opt-in): apply without waiting for approval.
+            try {
+              await applyAiEdit(composer, { applyOps: edit.applyOps });
+              setStep(i, { status: "applied", edit });
+            } catch {
+              setStep(i, { status: "failed", edit });
+            }
+            advance(i + 1);
+          } else {
+            setStep(i, { status: "awaiting", edit });
+          }
         } else {
           setStep(i, { status: "nochange" });
           advance(i + 1);
@@ -207,5 +224,5 @@ export function useAgentRunner(
     setError(null);
   }, []);
 
-  return { phase, steps, currentIndex, error, start, approve, skip, stop, reset };
+  return { phase, steps, currentIndex, error, autoApply, setAutoApply, start, approve, skip, stop, reset };
 }

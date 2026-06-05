@@ -13,6 +13,8 @@ export interface AgentPlanProps {
   steps: RunStep[];
   currentIndex: number;
   error: string | null;
+  autoApply: boolean;
+  onAutoApplyChange: (on: boolean) => void;
   onApprove: () => void;
   onSkip: () => void;
   onStop: () => void;
@@ -33,15 +35,28 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   steps,
   currentIndex,
   error,
+  autoApply,
+  onAutoApplyChange,
   onApprove,
   onSkip,
   onStop,
 }) => {
+  const autoApplyToggle = (
+    <label className="bd-ai-agent-autoapply">
+      <input
+        type="checkbox"
+        checked={autoApply}
+        onChange={(e) => onAutoApplyChange(e.target.checked)}
+      />
+      Auto-apply steps (skip per-step approval)
+    </label>
+  );
   if (phase === "idle") {
     return (
       <div className="bd-ai-agent-empty">
-        Describe what to build. The agent will plan it, then walk each step for
-        your approval.
+        {autoApplyToggle}
+        Describe what to build. The agent will plan it, then walk each step
+        {autoApply ? " and apply automatically" : " for your approval"}.
       </div>
     );
   }

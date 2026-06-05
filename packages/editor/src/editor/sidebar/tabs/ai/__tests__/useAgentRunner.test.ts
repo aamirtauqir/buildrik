@@ -96,6 +96,20 @@ describe("useAgentRunner", () => {
     expect(result.current.steps[0].status).toBe("nochange");
   });
 
+  it("auto-apply mode applies every step without approve() + runs to done", async () => {
+    runPromptOnce.mockImplementation(async (args: { intent: string }) =>
+      args.intent === "plan"
+        ? { plan: PLAN, edit: null, text: "" }
+        : { plan: null, edit: editWithRows(1), text: "" },
+    );
+    const { result } = renderHook(() => useAgentRunner(composer, "claude-sonnet-4-6"));
+    act(() => { result.current.setAutoApply(true); });
+    await act(async () => { result.current.start("build"); });
+    await waitFor(() => expect(result.current.phase).toBe("done"));
+    expect(result.current.steps.every((s) => s.status === "applied")).toBe(true);
+    expect(applyAiEdit).toHaveBeenCalledTimes(2);
+  });
+
   it("stop ends the run mid-flight", async () => {
     runPromptOnce.mockImplementation(async (args: { intent: string }) =>
       args.intent === "plan"
