@@ -6,12 +6,12 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const mutate = vi.fn(() => Promise.resolve({ ok: true }));
+const mutate = vi.fn((_input: unknown) => Promise.resolve({ ok: true }));
 vi.mock("../subscriptionClient", () => ({
   getAiSubscriptionClient: () => ({ ai: { logAdoption: { mutate } } }),
 }));
 
-const getSiteIdFromUrl = vi.fn<[], string | null>(() => "site-1");
+const getSiteIdFromUrl = vi.fn(() => "site-1" as string | null);
 vi.mock("@/services/BuildrikSyncProvider", () => ({
   getSiteIdFromUrl: () => getSiteIdFromUrl(),
 }));

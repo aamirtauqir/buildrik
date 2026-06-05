@@ -9,6 +9,7 @@ import { useAIScope } from "./hooks/useAIScope";
 import { useStreamPrompt, toServerScope } from "./hooks/useStreamPrompt";
 import { useAgentRunner } from "./hooks/useAgentRunner";
 import { applyAiEdit } from "./applySetStyle";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
 import "./AITab.css";
@@ -149,24 +150,26 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
         onClose={onClose}
       />
       <div className="bd-ai-mode" role="tablist" aria-label="AI mode">
-        <button
+        <Button
           type="button"
+          variant="bare"
           role="tab"
           aria-selected={mode === "chat"}
           className={`bd-ai-mode-btn${mode === "chat" ? " bd-ai-mode-active" : ""}`}
           onClick={() => setMode("chat")}
         >
           Chat
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="bare"
           role="tab"
           aria-selected={mode === "agent"}
           className={`bd-ai-mode-btn${mode === "agent" ? " bd-ai-mode-active" : ""}`}
           onClick={() => setMode("agent")}
         >
           Agent
-        </button>
+        </Button>
       </div>
       {mode === "chat" ? (
         <>

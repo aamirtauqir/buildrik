@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { DiffRows } from "./DiffRows";
 import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
 
@@ -42,14 +43,12 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   onStop,
 }) => {
   const autoApplyToggle = (
-    <label className="bd-ai-agent-autoapply">
-      <input
-        type="checkbox"
-        checked={autoApply}
-        onChange={(e) => onAutoApplyChange(e.target.checked)}
-      />
-      Auto-apply steps (skip per-step approval)
-    </label>
+    <Checkbox
+      className="bd-ai-agent-autoapply"
+      checked={autoApply}
+      onChange={(e) => onAutoApplyChange(e.target.checked)}
+      label="Auto-apply steps (skip per-step approval)"
+    />
   );
   if (phase === "idle") {
     return (
