@@ -85,7 +85,8 @@ describe("page-scope (multi-element) extraction", () => {
     ]);
     const r = extractValidPageEditCommands(raw, ALLOWED);
     expect(r).toHaveLength(1);
-    expect(r[0].args.elementId).toBe("a");
+    expect(r[0].commandId).toBe("set-style");
+    if (r[0].commandId === "set-style") expect(r[0].args.elementId).toBe("a");
   });
 
   it("buildPageEditCommandPrompt lists element ids + fences the request", () => {
