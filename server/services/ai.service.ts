@@ -679,8 +679,15 @@ function isSafeSrcValue(value: string): boolean {
   return s === "http" || s === "https";
 }
 
-/** Validate one attribute name+value pair against the per-attribute rules. */
-function isValidAttribute(attribute: unknown, value: unknown): boolean {
+/** Validate one attribute name+value pair against the per-attribute rules.
+ * `allowedAssetUrls` (W5 set-image recall) — when the request shipped a media
+ * library list, an AI-set `src` must be one of those real asset URLs (no guessed
+ * URLs). With no library sent, fall back to the scheme floor (isSafeSrcValue). */
+function isValidAttribute(
+  attribute: unknown,
+  value: unknown,
+  allowedAssetUrls: Set<string> = new Set(),
+): boolean {
   if (typeof attribute !== "string" || !ATTRIBUTE_ALLOWLIST.has(attribute)) {
     return false;
   }
@@ -689,7 +696,9 @@ function isValidAttribute(attribute: unknown, value: unknown): boolean {
   }
   if (attribute === "href") return !UNSAFE_HREF.test(value);
   if (attribute === "target") return ALLOWED_TARGETS.has(value);
-  if (attribute === "src") return isSafeSrcValue(value);
+  if (attribute === "src") {
+    return allowedAssetUrls.size > 0 ? allowedAssetUrls.has(value) : isSafeSrcValue(value);
+  }
   // alt / title / rel / aria-label / name: plain text, no markup.
   return !UNSAFE_TEXT.test(value);
 }
@@ -860,7 +869,7 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
     id: "set-attribute",
     agentCallable: true,
     rule: (id) =>
-      `- set-attribute: {"commandId":"set-attribute","args":{"elementId":"${id}","attribute":"<attr>","value":"<value>"}} — when asked to set a link URL, an image source, image alt text, open-in-new-tab, etc. "attribute" must be one of: ${[...ATTRIBUTE_ALLOWLIST].join(", ")}. For "href" use a normal URL (http/https/mailto/tel/relative/#anchor) — never javascript:, data:, or vbscript:. For "src" (image source) use an http(s) or relative URL only — never data:, blob:, or javascript:. For "target" use one of: ${[...ALLOWED_TARGETS].join(", ")}. Other attributes are plain text (no angle brackets).`,
+      `- set-attribute: {"commandId":"set-attribute","args":{"elementId":"${id}","attribute":"<attr>","value":"<value>"}} — when asked to set a link URL, an image source, image alt text, open-in-new-tab, etc. "attribute" must be one of: ${[...ATTRIBUTE_ALLOWLIST].join(", ")}. For "href" use a normal URL (http/https/mailto/tel/relative/#anchor) — never javascript:, data:, or vbscript:. For "src" (image source): when a "Media library" list is provided below, you MUST use one of those exact urls — never invent or guess an image url; otherwise use an http(s) or relative URL only (never data:, blob:, or javascript:). For "target" use one of: ${[...ALLOWED_TARGETS].join(", ")}. Other attributes are plain text (no angle brackets).`,
   },
   {
     id: "add-section",
@@ -935,6 +944,7 @@ function isValidEditCommand(
   c: unknown,
   allowedIds: Set<string>,
   allowedTokens: Map<string, string> = new Map(),
+  allowedAssetUrls: Set<string> = new Set(),
 ): c is EditCommand {
   if (!c || typeof c !== "object") return false;
   const cmd = c as { commandId?: unknown; args?: Record<string, unknown> };
@@ -1009,7 +1019,7 @@ function isValidEditCommand(
     return cmd.args.direction === "up" || cmd.args.direction === "down";
   }
   if (cmd.commandId === "set-attribute") {
-    return isValidAttribute(cmd.args.attribute, cmd.args.value);
+    return isValidAttribute(cmd.args.attribute, cmd.args.value, allowedAssetUrls);
   }
   if (cmd.commandId === "insert-component") {
     // Shape-only: the component id can't be validated server-side (catalog is
@@ -1089,9 +1099,10 @@ export function extractValidPageEditCommands(
   raw: string,
   allowedIds: Set<string>,
   allowedTokens: Map<string, string> = new Map(),
+  allowedAssetUrls: Set<string> = new Set(),
 ): EditCommand[] {
   return parseCommandArray(raw).filter((c): c is EditCommand =>
-    isValidEditCommand(c, allowedIds, allowedTokens),
+    isValidEditCommand(c, allowedIds, allowedTokens, allowedAssetUrls),
   );
 }
 
@@ -1135,10 +1146,19 @@ export interface TokenRef {
   type: string;
 }
 
+/** Media asset for set-image recall (W5): id + url + name, so the model picks a
+ * REAL library asset url and the server validates the chosen src ∈ this list. */
+export interface MediaAssetRef {
+  id: string;
+  url: string;
+  name: string;
+}
+
 export interface PageEditCommandInput {
   prompt: string;
   elements: PageElementRef[];
   tokens?: TokenRef[];
+  assets?: MediaAssetRef[];
   model?: AIModel;
 }
 
@@ -1146,11 +1166,14 @@ export interface PageEditCommandInput {
 const MAX_PAGE_ELEMENTS = 200;
 // Cap the token registry for the same reason (retrieval bound, not prompt-stuff).
 const MAX_PAGE_TOKENS = 120;
+// Cap the media asset list (same retrieval bound).
+const MAX_PAGE_ASSETS = 100;
 
 export function buildPageEditCommandPrompt(
   elements: PageElementRef[],
   userPrompt: string,
   tokens: TokenRef[] = [],
+  assets: MediaAssetRef[] = [],
 ): string {
   const list = elements
     .slice(0, MAX_PAGE_ELEMENTS)
@@ -1166,6 +1189,13 @@ export function buildPageEditCommandPrompt(
   const tokenSection = tokenList
     ? `\nDesign tokens (for set-token — use these ids only):\n${tokenList}\n`
     : "";
+  const assetList = assets
+    .slice(0, MAX_PAGE_ASSETS)
+    .map((a) => `- ${a.name}: ${a.url}`)
+    .join("\n");
+  const assetSection = assetList
+    ? `\nMedia library (for set-attribute "src" — use one of these exact urls, never invent an image url):\n${assetList}\n`
+    : "";
   const rules = COMMAND_PROMPT_SPECS.filter((s) => s.agentCallable)
     .map((s) => s.rule("<one of the element ids listed above>"))
     .join("\n");
@@ -1173,7 +1203,7 @@ export function buildPageEditCommandPrompt(
 
 Page elements:
 ${list}
-${tokenSection}
+${tokenSection}${assetSection}
 Return ONLY a JSON array. Every item's args.elementId MUST be one of the ids listed above — never invent an id.
 
 Rules:
@@ -1198,11 +1228,13 @@ export async function generatePageEditCommands(
   const allowedIds = new Set(input.elements.map((e) => e.id));
   const tokens = input.tokens ?? [];
   const allowedTokens = new Map(tokens.map((t) => [t.id, t.type]));
+  const assets = input.assets ?? [];
+  const allowedAssetUrls = new Set(assets.map((a) => a.url));
   const raw = await provider.generate(
-    buildPageEditCommandPrompt(input.elements, input.prompt, tokens),
+    buildPageEditCommandPrompt(input.elements, input.prompt, tokens, assets),
     model,
   );
-  return extractValidPageEditCommands(raw, allowedIds, allowedTokens);
+  return extractValidPageEditCommands(raw, allowedIds, allowedTokens, allowedAssetUrls);
 }
 
 // ─── P4: agent build loop — plan generation ───────────────────────────────

@@ -102,14 +102,23 @@ const tokenRefSchema = z.object({
   type: z.string().max(40),
 });
 
+// Media asset list sent with page scope for set-image recall (W5).
+const mediaAssetRefSchema = z.object({
+  id: z.string().min(1).max(100),
+  url: z.string().max(2048),
+  name: z.string().max(200),
+});
+
 const scopeSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("element"), id: z.string().min(1) }),
-  // Page scope may carry the page's element list for multi-element edits (P3)
-  // and the design-token registry for set-token recall (W4).
+  // Page scope may carry the page's element list for multi-element edits (P3),
+  // the design-token registry for set-token recall (W4), and the media library
+  // for set-image recall (W5).
   z.object({
     kind: z.literal("page"),
     elements: z.array(pageElementRefSchema).max(200).optional(),
     tokens: z.array(tokenRefSchema).max(120).optional(),
+    assets: z.array(mediaAssetRefSchema).max(100).optional(),
   }),
 ]);
 
@@ -309,6 +318,7 @@ export const aiRouter = router({
                   prompt: input.prompt,
                   elements: input.scope.elements ?? [],
                   tokens: input.scope.tokens ?? [],
+                  assets: input.scope.assets ?? [],
                   model,
                 });
         } catch (e) {

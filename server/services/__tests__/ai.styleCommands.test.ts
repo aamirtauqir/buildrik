@@ -546,3 +546,58 @@ describe("set-token (W4) — design-token command validation", () => {
     expect(p).toContain("(color)");
   });
 });
+
+describe("set-image recall (W5) — set-attribute src validation against the media library", () => {
+  const ELS = new Set(["el-1"]);
+  const NOTOK = new Map<string, string>();
+  const ASSETS = new Set([
+    "https://blob.example.com/hero.webp",
+    "https://blob.example.com/logo.png",
+  ]);
+
+  const run = (value: string, assets = ASSETS) =>
+    extractValidPageEditCommands(
+      JSON.stringify([{ commandId: "set-attribute", args: { elementId: "el-1", attribute: "src", value } }]),
+      ELS,
+      NOTOK,
+      assets,
+    );
+
+  it("accepts a src that is one of the sent library urls", () => {
+    expect(run("https://blob.example.com/hero.webp")).toHaveLength(1);
+  });
+
+  it("rejects a guessed/unlisted src even when it is a safe http url", () => {
+    expect(run("https://other.com/guessed.jpg")).toHaveLength(0);
+  });
+
+  it("falls back to the scheme floor when NO library was sent (explicit url ok, data: rejected)", () => {
+    const noAssets = new Set<string>();
+    expect(run("https://anywhere.com/x.png", noAssets)).toHaveLength(1);
+    expect(run("/images/local.png", noAssets)).toHaveLength(1);
+    expect(run("data:image/png;base64,AAAA", noAssets)).toHaveLength(0);
+    expect(run("javascript:alert(1)", noAssets)).toHaveLength(0);
+  });
+
+  it("still rejects unsafe schemes when a library IS sent (membership is the only pass)", () => {
+    expect(run("data:image/png;base64,AAAA")).toHaveLength(0);
+  });
+
+  it("does not affect non-src attributes (alt still plain-text validated)", () => {
+    const raw = JSON.stringify([
+      { commandId: "set-attribute", args: { elementId: "el-1", attribute: "alt", value: "A hero image" } },
+    ]);
+    expect(extractValidPageEditCommands(raw, ELS, NOTOK, ASSETS)).toHaveLength(1);
+  });
+
+  it("buildPageEditCommandPrompt lists the media library urls for recall", () => {
+    const p = buildPageEditCommandPrompt(
+      [{ id: "el-1", type: "image" }],
+      "use the hero image",
+      [],
+      [{ id: "a1", url: "https://blob.example.com/hero.webp", name: "hero" }],
+    );
+    expect(p).toContain("Media library");
+    expect(p).toContain("https://blob.example.com/hero.webp");
+  });
+});

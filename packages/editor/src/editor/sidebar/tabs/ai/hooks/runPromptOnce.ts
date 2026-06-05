@@ -31,9 +31,22 @@ export interface TokenRef {
   type: string;
 }
 
+/** Media asset sent for set-image recall (W5): the model picks a REAL library
+ * asset url, and the server validates the chosen src ∈ the sent list. */
+export interface MediaAssetRef {
+  id: string;
+  url: string;
+  name: string;
+}
+
 export type RunScope =
   | { kind: "element"; id: string }
-  | { kind: "page"; elements?: PageElementRef[]; tokens?: TokenRef[] };
+  | {
+      kind: "page";
+      elements?: PageElementRef[];
+      tokens?: TokenRef[];
+      assets?: MediaAssetRef[];
+    };
 
 export interface ServerEdit {
   target: string;

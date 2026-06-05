@@ -18,6 +18,8 @@ const composer = {
   },
   // set-token recall (W4): gatherTokens reads the design-token registry.
   getProjectSettings: () => ({ designTokens: [] }),
+  // set-image recall (W5): gatherMediaAssets reads the media library.
+  media: { getAssets: () => [] },
 } as never;
 
 const PLAN = [

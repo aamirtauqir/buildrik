@@ -8,6 +8,7 @@ import {
   type ServerEdit,
   type PageElementRef,
   type TokenRef,
+  type MediaAssetRef,
 } from "./runPromptOnce";
 import { AI_EDITABLE_TOKEN_TYPES } from "@/engine/designSystem/tokenValueGuard";
 import { trackAgentRun } from "@/services/ai/adoptionTracker";
@@ -124,6 +125,18 @@ export function useAgentRunner(
       .slice(0, 120);
   }, [composer]);
 
+  // Media assets for set-image recall: only persisted http(s) urls (skip data:
+  // URLs — too large for the prompt, and local-only). The model references these
+  // real library assets instead of guessing image URLs.
+  const gatherMediaAssets = React.useCallback((): MediaAssetRef[] => {
+    if (!composer) return [];
+    return composer.media
+      .getAssets()
+      .filter((a) => a.src.startsWith("http"))
+      .map((a) => ({ id: a.id, url: a.src, name: a.originalName || a.name }))
+      .slice(0, 100);
+  }, [composer]);
+
   const setStep = React.useCallback((i: number, patch: Partial<RunStep>) => {
     setSteps((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
   }, []);
@@ -149,7 +162,12 @@ export function useAgentRunner(
       // target the id the plan chose.
       const scope =
         step.plan.scope.kind === "page"
-          ? { kind: "page" as const, elements: gatherElements(), tokens: gatherTokens() }
+          ? {
+              kind: "page" as const,
+              elements: gatherElements(),
+              tokens: gatherTokens(),
+              assets: gatherMediaAssets(),
+            }
           : step.plan.scope;
       try {
         const { edit } = await runPromptOnce({
@@ -182,7 +200,7 @@ export function useAgentRunner(
         advance(i + 1);
       }
     },
-    [composer, model, gatherElements, gatherTokens, setStep, advance],
+    [composer, model, gatherElements, gatherTokens, gatherMediaAssets, setStep, advance],
   );
   generateStepRef.current = generateStep;
 
@@ -201,7 +219,7 @@ export function useAgentRunner(
         const elements = gatherElements();
         const { plan } = await runPromptOnce({
           prompt,
-          scope: { kind: "page", elements, tokens: gatherTokens() },
+          scope: { kind: "page", elements, tokens: gatherTokens(), assets: gatherMediaAssets() },
           model,
           intent: "plan",
         });
@@ -221,7 +239,7 @@ export function useAgentRunner(
         setPhase("done");
       }
     },
-    [composer, model, gatherElements, gatherTokens],
+    [composer, model, gatherElements, gatherTokens, gatherMediaAssets],
   );
 
   const approve = React.useCallback(async () => {
