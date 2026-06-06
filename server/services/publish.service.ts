@@ -67,14 +67,57 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   return { ready: !hasFail, checks };
 }
 
+// A QUEUED row older than this is treated as stranded (worker dispatch was
+// lost before the worker route claimed it). Future publishes ignore it
+// instead of refusing with ALREADY_PUBLISHING. The worker route already
+// short-circuits if status !== "QUEUED" so double-start can't happen.
+const STALE_QUEUED_AFTER_MS = 5 * 60 * 1000;
+
+// Retry the worker dispatch a few times. The route is long-running by design
+// (maxDuration=300 — entire build runs inside POST), so we can't await the
+// full response. Race the fetch against a short window: if the call hasn't
+// settled in that window the connection is up and the worker is processing
+// (success). If it throws or returns non-2xx inside the window, dispatch
+// failed — retry.
+async function dispatchWorker(baseUrl: string, jobId: string): Promise<boolean> {
+  const retryDelaysMs = [200, 500];
+  for (let attempt = 0; attempt <= retryDelaysMs.length; attempt++) {
+    const settled = fetch(`${baseUrl}/api/workers/publish/${jobId}`, {
+      method: "POST",
+      headers: { "x-worker-secret": process.env.CRON_SECRET ?? "" },
+    }).then(
+      (res) => (res.ok ? "ok" : "http-error") as "ok" | "http-error",
+      () => "network-error" as const,
+    );
+
+    const result = await Promise.race([
+      settled,
+      new Promise<"in-flight">((r) => setTimeout(() => r("in-flight"), 2000)),
+    ]);
+
+    if (result === "in-flight" || result === "ok") return true;
+    if (attempt < retryDelaysMs.length) {
+      await new Promise((r) => setTimeout(r, retryDelaysMs[attempt]));
+    }
+  }
+  return false;
+}
+
 export async function startPublish(
   siteId: string,
   workspaceId: string,
   userId: string,
   pages?: PublishPage[],
 ) {
+  const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const existing = await prisma.publishBuildJob.findFirst({
-    where: { siteId, status: { in: ["QUEUED", "BUILDING", "DEPLOYING"] } },
+    where: {
+      siteId,
+      OR: [
+        { status: { in: ["BUILDING", "DEPLOYING"] } },
+        { status: "QUEUED", createdAt: { gte: staleCutoff } },
+      ],
+    },
   });
   if (existing) {
     throw new Error("ALREADY_PUBLISHING");
@@ -82,7 +125,7 @@ export async function startPublish(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { name: true, deletedAt: true },
+    select: { name: true, deletedAt: true, publishedUrl: true },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
@@ -112,12 +155,24 @@ export async function startPublish(
     `/dashboard/sites/${siteId}`,
   ).catch(() => {});
 
-  // Fire-and-forget: kick off the publish pipeline worker
   const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
-  fetch(`${baseUrl}/api/workers/publish/${job.id}`, {
-    method: "POST",
-    headers: { "x-worker-secret": process.env.CRON_SECRET ?? "" },
-  }).catch(() => {});
+  const dispatched = await dispatchWorker(baseUrl, job.id);
+  if (!dispatched) {
+    // Roll the job into FAILED so a future publish can claim a new one
+    // immediately (without waiting for the 5-min stale cutoff). Restore
+    // site.status — keep PUBLISHED if a prior deploy is still live.
+    await prisma.$transaction([
+      prisma.publishBuildJob.update({
+        where: { id: job.id },
+        data: { status: "FAILED", error: "WORKER_DISPATCH_FAILED" },
+      }),
+      prisma.site.update({
+        where: { id: siteId },
+        data: { status: site.publishedUrl ? "PUBLISHED" : "DRAFT" },
+      }),
+    ]);
+    throw new Error("WORKER_DISPATCH_FAILED");
+  }
 
   return job;
 }
