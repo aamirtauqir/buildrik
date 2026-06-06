@@ -124,6 +124,21 @@ export async function startPublish(
     throw new Error("ALREADY_PUBLISHING");
   }
 
+  // Stranded-row cleanup: any QUEUED row older than the stale cutoff
+  // belongs to a publish whose worker dispatch was lost before the worker
+  // could claim it. The precheck above already considers it dead, but the
+  // partial unique index publish_build_jobs_active_unique would still
+  // collide with our new INSERT. Flip those rows to FAILED first so the
+  // slot is free; the FAILED rows stay in the audit trail.
+  await prisma.publishBuildJob.updateMany({
+    where: {
+      siteId,
+      status: "QUEUED",
+      createdAt: { lt: staleCutoff },
+    },
+    data: { status: "FAILED", error: "STRANDED_BY_WORKER_DISPATCH_LOSS", log: Prisma.DbNull },
+  });
+
   const site = await prisma.site.findUnique({
     where: { id: siteId },
     select: { name: true, deletedAt: true, publishedUrl: true },
