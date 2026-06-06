@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { PrePublishChecksResult, PublishPage } from "@buildrik/shared/schemas/publish";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
@@ -164,7 +165,7 @@ export async function startPublish(
     await prisma.$transaction([
       prisma.publishBuildJob.update({
         where: { id: job.id },
-        data: { status: "FAILED", error: "WORKER_DISPATCH_FAILED" },
+        data: { status: "FAILED", error: "WORKER_DISPATCH_FAILED", log: Prisma.DbNull },
       }),
       prisma.site.update({
         where: { id: siteId },
@@ -205,7 +206,10 @@ export async function cancelPublish(jobId: string) {
   const [updated] = await prisma.$transaction([
     prisma.publishBuildJob.update({
       where: { id: jobId },
-      data: { status: "CANCELLED" },
+      // Clear `log` — it holds the raw page HTML payload from startPublish.
+      // Once the job is terminal we don't need it; leaving it bloats the
+      // row and keeps the rendered HTML at rest forever.
+      data: { status: "CANCELLED", log: Prisma.DbNull },
     }),
     prisma.site.update({
       where: { id: job.siteId },
@@ -222,7 +226,7 @@ export async function completePublish(jobId: string, publicUrl: string) {
   const [updated] = await prisma.$transaction([
     prisma.publishBuildJob.update({
       where: { id: jobId },
-      data: { status: "COMPLETED", completedAt: new Date() },
+      data: { status: "COMPLETED", completedAt: new Date(), log: Prisma.DbNull },
     }),
     prisma.site.update({
       where: { id: job.siteId },

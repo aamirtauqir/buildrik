@@ -1,4 +1,5 @@
 import { type NextRequest } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@lib/prisma";
 import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
@@ -90,6 +91,10 @@ export async function POST(
           progress: 100,
           completedAt: new Date(),
           steps: buildSteps(STEPS.length),
+          // Clear `log` (raw page HTML payload). See publish.service.ts
+          // for the data-at-rest rationale; same treatment in every
+          // terminal-state update.
+          log: Prisma.DbNull,
         },
       }),
       prisma.site.update({
@@ -127,7 +132,7 @@ export async function POST(
     const message = err instanceof Error ? err.message : "Unknown error";
     await prisma.publishBuildJob.update({
       where: { id: jobId },
-      data: { status: "FAILED", error: message, steps: buildSteps(0, true) },
+      data: { status: "FAILED", error: message, steps: buildSteps(0, true), log: Prisma.DbNull },
     });
     // Preserve PUBLISHED status on republish failure — the live deployment
     // from a prior successful publish is still serving. Discriminator is
