@@ -123,7 +123,23 @@ export async function startPublish(
 }
 
 export async function getPublishStatus(jobId: string) {
-  return prisma.publishBuildJob.findUnique({ where: { id: jobId } });
+  // Explicit select — NEVER return the `log` column to clients: it holds the raw
+  // page HTML payload (see startPublish). Clients only need progress/status.
+  return prisma.publishBuildJob.findUnique({
+    where: { id: jobId },
+    select: {
+      id: true,
+      siteId: true,
+      status: true,
+      progress: true,
+      steps: true,
+      deploymentId: true,
+      error: true,
+      startedAt: true,
+      completedAt: true,
+      createdAt: true,
+    },
+  });
 }
 
 export async function cancelPublish(jobId: string) {

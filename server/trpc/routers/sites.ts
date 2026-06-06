@@ -263,7 +263,13 @@ export const sitesRouter = router({
 
   prePublishChecks: protectedProcedure
     .input(prePublishCheckSchema)
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       return runPrePublishChecks(input.siteId);
     }),
 
@@ -291,9 +297,17 @@ export const sitesRouter = router({
 
   publishStatus: protectedProcedure
     .input(z.object({ jobId: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const job = await getPublishStatus(input.jobId);
       if (!job) throw new TRPCError({ code: "NOT_FOUND" });
+      // Authz: only a member of the job's site may poll its status (was open to
+      // any authenticated user).
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, job.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       return job;
     }),
 
