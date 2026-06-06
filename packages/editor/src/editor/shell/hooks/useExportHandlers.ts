@@ -28,6 +28,7 @@ import type { Composer } from "../../../engine";
 import { ExportEngine } from "../../../engine/export";
 import type { ToastInput } from "@/editor/shared/vibcoder/Toast";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
+import { DASHBOARD_URL as dashboardUrlFromEnv } from "@/shared/utils/runtimeEnv";
 import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";
 
 export interface DeployPayload {
@@ -134,7 +135,7 @@ export function useExportHandlers({
       });
     } else if (publishJob.uiState === "failed" && publishJob.error) {
       const msg = publishJob.error;
-      const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL ?? "http://localhost:3000";
+      const dashboardUrl = dashboardUrlFromEnv;
       const openIntegrations = () =>
         window.open(`${dashboardUrl}/dashboard/settings/integrations`, "_blank");
 

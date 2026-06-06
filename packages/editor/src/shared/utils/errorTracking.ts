@@ -8,7 +8,7 @@
  * @module utils/errorTracking
  */
 
-const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
+import { SENTRY_DSN } from "./runtimeEnv";
 
 // Lazy-loaded Sentry — avoids build error when @sentry/react isn't installed
 let _sentry: typeof import("@sentry/react") | null = null;

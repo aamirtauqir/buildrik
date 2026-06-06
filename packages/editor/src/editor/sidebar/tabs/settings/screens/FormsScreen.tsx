@@ -14,6 +14,7 @@ import { createBuildrikApiClient } from "@/services/api-client";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 interface FormBlockRow {
   id: string;
@@ -42,7 +43,6 @@ interface SubmissionsPage {
   perPage: number;
 }
 
-const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";
 const PER_PAGE = 20;
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;

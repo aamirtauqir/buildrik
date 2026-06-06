@@ -21,6 +21,7 @@ import * as React from "react";
 import { createBuildrikApiClient } from "@/services/api-client";
 import type { Composer } from "@/engine/Composer";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 interface ServerStorageQuota {
   ok: boolean;
@@ -38,8 +39,6 @@ interface UseServerStorageQuota {
   isAvailable: boolean;
   refetch: () => void;
 }
-
-const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";
 
 let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
 function getClient() {

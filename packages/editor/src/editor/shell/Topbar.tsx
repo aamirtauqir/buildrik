@@ -32,11 +32,10 @@ import type { Issue } from "./hooks/useStudioState";
 import { CommandPalette } from "./modals/CommandPalette";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
+import { DASHBOARD_URL as dashboardUrl } from "@/shared/utils/runtimeEnv";
 import { ColorModeIconCycle } from "@/editor/design-system/ui/ColorModeIconCycle";
 
 import "./chrome.css";
-
-const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";
 
 // ── icons ────────────────────────────────────────────────────────────────────
 

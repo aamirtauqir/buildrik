@@ -8,15 +8,12 @@
  * the gating call sites in the same PR. Do not let flags rot.
  */
 
-const env = import.meta.env;
+import { FEATURE_PUBLISH, FEATURE_COMPONENTS_V2, FEATURE_DS_AI } from "./runtimeEnv";
 
 export const FEATURES = {
-  /** Publish-to-host workflow. Backend: Vercel API integration. Phase 1. */
-  publish: env.VITE_FEATURE_PUBLISH === "true",
-  /** S6 dual-section Components panel (Catalog + UserSaved + DSStatusChip). */
-  componentsV2: env.VITE_FEATURE_COMPONENTS_V2 === "true",
-  /** DS AI production wire — AIAssistService → ai.streamPrompt tRPC. Phase C.1. */
-  dsAi: env.VITE_FEATURE_DS_AI === "true",
+  publish: FEATURE_PUBLISH,
+  componentsV2: FEATURE_COMPONENTS_V2,
+  dsAi: FEATURE_DS_AI,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURES;
