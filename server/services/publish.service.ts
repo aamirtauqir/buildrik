@@ -133,16 +133,30 @@ export async function startPublish(
   // Persist HTML payload (if provided) on the job so the worker can deploy
   // without re-fetching from the editor. `log` is an existing Json column.
   // Pages omitted = worker falls back to dev simulation (current behavior).
-  const job = await prisma.publishBuildJob.create({
-    data: {
-      siteId,
-      workspaceId,
-      status: "QUEUED",
-      progress: 0,
-      steps: [],
-      log: pages ? { pages } : undefined,
-    },
-  });
+  //
+  // The partial unique index publish_build_jobs_active_unique guarantees
+  // at most one ACTIVE job per site at the DB layer. A parallel publish
+  // that races past the precheck above lands here and the create throws
+  // P2002 — we translate that to ALREADY_PUBLISHING so callers see the
+  // same error either way.
+  let job;
+  try {
+    job = await prisma.publishBuildJob.create({
+      data: {
+        siteId,
+        workspaceId,
+        status: "QUEUED",
+        progress: 0,
+        steps: [],
+        log: pages ? { pages } : undefined,
+      },
+    });
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+      throw new Error("ALREADY_PUBLISHING");
+    }
+    throw err;
+  }
 
   await prisma.site.update({
     where: { id: siteId },

@@ -845,6 +845,13 @@ model LoginAttempt {
   @@map("login_attempts")
 }
 
+/// Hand-authored partial UNIQUE index — see
+/// migrations/20260607000001_publish_job_active_unique. Enforces at
+/// most one row per `siteId` with status in
+/// ('QUEUED','BUILDING','DEPLOYING'). Prisma's schema language has no
+/// way to express partial unique indexes, so the constraint lives only
+/// in SQL. Do NOT add an `@@unique([siteId])` here — that would create
+/// a separate, conflicting full unique index on next migrate.
 model PublishBuildJob {
   id           String    @id @default(cuid())
   siteId       String
