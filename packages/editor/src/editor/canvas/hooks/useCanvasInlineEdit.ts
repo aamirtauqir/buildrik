@@ -8,6 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { getElementId } from "../../../shared/utils/dragDrop";
+import { sanitizeHTML } from "../../../shared/utils/html";
 
 export interface EditingState {
   id: string | null;
@@ -134,7 +135,9 @@ export function useCanvasInlineEdit({
 
       try {
         if (commit) {
-          const newHtml = el.innerHTML;
+          // contentEditable can hold pasted/typed markup — sanitize before it
+          // is persisted into the element tree and re-rendered onto the canvas.
+          const newHtml = sanitizeHTML(el.innerHTML);
           if (newHtml !== editing.original) {
             composer.beginTransaction("inline-edit");
             try {
@@ -148,7 +151,7 @@ export function useCanvasInlineEdit({
             });
           }
         } else {
-          el.innerHTML = editing.original;
+          el.innerHTML = sanitizeHTML(editing.original);
         }
       } finally {
         el.contentEditable = "false";

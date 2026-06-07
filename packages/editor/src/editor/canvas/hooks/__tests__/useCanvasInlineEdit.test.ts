@@ -147,4 +147,37 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
     expect(result.current.isEditing).toBe(false);
     expect(result.current.editing.id).toBeNull();
   });
+
+  it("sanitizes pasted markup before persisting it on commit (T4)", () => {
+    const setContent = vi.fn();
+    const composer = {
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+      saveProject: vi.fn().mockResolvedValue(undefined),
+      elements: { getElement: vi.fn().mockReturnValue({ setContent }) },
+    } as unknown as Composer;
+
+    const { result } = renderHook(() => useCanvasInlineEdit({ composer, canvasRef }));
+
+    act(() => {
+      result.current.handleDoubleClick({
+        target: editableEl,
+        stopPropagation: vi.fn(),
+      } as unknown as React.MouseEvent);
+    });
+
+    // Simulate the user pasting hostile markup into the contentEditable element
+    act(() => {
+      editableEl.innerHTML = '<img src="x" onerror="alert(1)">';
+    });
+
+    // Commit via left-click outside
+    act(() => {
+      outsideEl.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true, button: 0 }));
+    });
+
+    expect(setContent).toHaveBeenCalledTimes(1);
+    const persisted = setContent.mock.calls[0][0] as string;
+    expect(persisted).not.toMatch(/onerror/i);
+  });
 });

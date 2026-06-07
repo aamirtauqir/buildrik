@@ -12,6 +12,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { devLog } from "../../../shared/utils/devLogger";
+import { isSafeUrl, sanitizeHTML } from "../../../shared/utils/html";
 
 interface UseCanvasInlineCommandsParams {
   composer: Composer | null;
@@ -88,7 +89,9 @@ export function useCanvasInlineCommands({
           break;
         }
         case "createLink": {
-          if (value) {
+          // Reject unsafe schemes (javascript:, non-media data:, etc.) before
+          // they become a clickable link in the user's content.
+          if (value && isSafeUrl(value)) {
             const link = document.createElement("a");
             link.href = value;
             link.target = "_blank";
@@ -127,9 +130,10 @@ export function useCanvasInlineCommands({
           devLog("Canvas", `Unsupported inline command: ${command}`);
       }
 
-      // Notify composer of content change
+      // Notify composer of content change — sanitize the edited markup before
+      // it is persisted and re-rendered onto the canvas.
       if (composer && editingId) {
-        const newContent = editingEl.innerHTML;
+        const newContent = sanitizeHTML(editingEl.innerHTML);
         composer.elements.getElement(editingId)?.setContent(newContent);
       }
     },
