@@ -18,6 +18,7 @@
  */
 
 import DOMPurify from "dompurify";
+import type { ElementData } from "../../types";
 import {
   ALLOWED_URL_SCHEMES,
   DANGEROUS_PATTERNS,
@@ -133,6 +134,23 @@ export function sanitizeHTML(html: string, options: SanitizeOptions = {}): strin
   }
 
   return DOMPurify.sanitize(html, config) as unknown as string;
+}
+
+/**
+ * Sanitize the rich-text `content` of every node in an ElementData tree,
+ * in place. This is the ingest trust boundary: external project JSON
+ * (localStorage, dashboard blocks, templates) flows into the element tree
+ * through importProject without otherwise passing the HTML sanitizer, and
+ * `content` is later emitted raw into the canvas. Run it once per load.
+ *
+ * Attribute safety is handled separately by the serializer (buildAttributeString);
+ * this covers the one field that is emitted unescaped.
+ */
+export function sanitizeElementTreeContent(data: ElementData): void {
+  if (typeof data.content === "string" && data.content.length > 0) {
+    data.content = sanitizeHTML(data.content);
+  }
+  data.children?.forEach((child) => sanitizeElementTreeContent(child));
 }
 
 /**

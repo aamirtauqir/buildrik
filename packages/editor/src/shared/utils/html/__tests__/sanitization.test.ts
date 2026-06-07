@@ -7,7 +7,8 @@
  * on form/SVG attributes surviving the round-trip — the sanitizer must keep them.
  */
 import { describe, it, expect } from "vitest";
-import { sanitizeHTML } from "../sanitization";
+import { sanitizeHTML, sanitizeElementTreeContent } from "../sanitization";
+import type { ElementData } from "../../../types";
 
 describe("sanitizeHTML — XSS invariants", () => {
   it("strips on* event-handler attributes", () => {
@@ -63,5 +64,46 @@ describe("sanitizeHTML — editor preservation invariants", () => {
   it("preserves data:image/png on img src", () => {
     const out = sanitizeHTML('<img src="data:image/png;base64,iVBORw0KGgo=">');
     expect(out).toMatch(/data:image\/png/);
+  });
+});
+
+describe("sanitizeElementTreeContent — ingest boundary", () => {
+  it("sanitizes content on every node in a nested tree", () => {
+    const tree: ElementData = {
+      id: "root",
+      type: "container",
+      tagName: "div",
+      content: "",
+      children: [
+        { id: "c1", type: "text", tagName: "p", content: '<img src=x onerror="alert(1)">' },
+        {
+          id: "c2",
+          type: "container",
+          tagName: "div",
+          children: [
+            { id: "c3", type: "text", tagName: "span", content: '<a href="javascript:alert(1)">x</a>' },
+          ],
+        },
+      ],
+    };
+
+    sanitizeElementTreeContent(tree);
+
+    expect(tree.children![0].content).not.toMatch(/onerror/i);
+    expect(tree.children![1].children![0].content).not.toMatch(/javascript:/i);
+  });
+
+  it("preserves safe rich-text content", () => {
+    const tree: ElementData = {
+      id: "r",
+      type: "text",
+      tagName: "p",
+      content: "<b>Hello</b> <i>world</i>",
+    };
+
+    sanitizeElementTreeContent(tree);
+
+    expect(tree.content).toContain("<b>Hello</b>");
+    expect(tree.content).toContain("<i>world</i>");
   });
 });

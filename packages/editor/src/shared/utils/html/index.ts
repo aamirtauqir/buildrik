@@ -71,6 +71,7 @@ export {
   DEFAULT_ALLOWED_ATTRS,
   ALLOWED_URL_SCHEMES,
   sanitizeHTML,
+  sanitizeElementTreeContent,
   stripAllTags,
   removeTags,
   isSafeUrl,

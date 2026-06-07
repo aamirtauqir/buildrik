@@ -17,6 +17,7 @@ import type {
   ExportResult,
 } from "../shared/types";
 import { clamp } from "../shared/utils/helpers";
+import { sanitizeElementTreeContent } from "../shared/utils/html";
 import { CanvasIndicators } from "./canvas/indicators";
 import { ResizeHandler } from "./canvas/ResizeHandler";
 import { CMSBindingManager } from "./cms/CMSBindingManager";
@@ -453,9 +454,15 @@ export class Composer extends EventEmitter {
     this.elements.clear();
     this.styles.clear();
 
-    // Import pages and elements
+    // Import pages and elements. Sanitize each page's content tree at this
+    // trust boundary — external project JSON (localStorage, dashboard blocks,
+    // templates) reaches the element tree here without otherwise passing the
+    // HTML sanitizer, and content is later emitted raw onto the canvas.
     if (data.pages) {
       data.pages.forEach((page) => {
+        if (page.root) {
+          sanitizeElementTreeContent(page.root);
+        }
         this.elements.importPage(page);
       });
     }
