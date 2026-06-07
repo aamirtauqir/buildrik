@@ -9,6 +9,7 @@
 import type { ElementData } from "../../types";
 import { camelToKebab } from "../helpers";
 import { escapeAttr } from "./encoding";
+import { isSafeAttrValue } from "./sanitization";
 import { isSelfClosing } from "./tagCategories";
 
 // =============================================================================
@@ -73,26 +74,32 @@ export function buildAttributeString(
     parts.push(`class="${escapeAttr(data.classes.join(" "))}"`);
   }
 
-  // Other attributes (except id, already handled)
+  // Other attributes (except id, already handled). Drop anything unsafe by
+  // construction: on* handlers, dangerous values, and bad href/src/action
+  // schemes never reach the serialized HTML, even if the ElementData bypassed
+  // the import-time sanitizer.
   if (data.attributes) {
     Object.entries(data.attributes).forEach(([key, value]) => {
-      if (key !== "id") {
-        if (value === "" || value === "true") {
-          // Boolean attribute
-          parts.push(key);
-        } else if (value !== "false") {
-          parts.push(`${key}="${escapeAttr(value)}"`);
-        }
+      if (key === "id") return;
+      if (!isSafeAttrValue(key, value, "")) return;
+      if (value === "" || value === "true") {
+        // Boolean attribute
+        parts.push(key);
+      } else if (value !== "false") {
+        parts.push(`${key}="${escapeAttr(value)}"`);
       }
     });
   }
 
-  // Inline styles
+  // Inline styles — drop the whole declaration block if it carries a dangerous
+  // CSS pattern (expression(), -moz-binding, behavior:).
   if (data.styles && Object.keys(data.styles).length > 0) {
     const styleStr = Object.entries(data.styles)
       .map(([k, v]) => `${camelToKebab(k)}: ${v}`)
       .join("; ");
-    parts.push(`style="${escapeAttr(styleStr)}"`);
+    if (isSafeAttrValue("style", styleStr, "")) {
+      parts.push(`style="${escapeAttr(styleStr)}"`);
+    }
   }
 
   return parts.length > 0 ? " " + parts.join(" ") : "";
