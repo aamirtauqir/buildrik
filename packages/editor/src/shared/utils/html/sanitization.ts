@@ -1,19 +1,28 @@
 /**
  * HTML Sanitization
- * Functions for sanitizing HTML content
+ * DOMPurify-backed HTML sanitizer plus URL / attribute safety helpers.
+ *
+ * `sanitizeHTML` is the single canonical sanitizer for the editor. DOMPurify
+ * (already a dependency, used for SVG upload, head code, AI output, and
+ * template tokens) does the dangerous-markup stripping: it always removes
+ * `on*` event handlers, blocks `javascript:`/`vbscript:`, and only permits
+ * `data:` URLs on media tags. We layer an editor-aware allowance on top so the
+ * canvas keeps the attributes it depends on (`data-buildrick-*`, `class`,
+ * `style`, `target`).
+ *
+ * `isSafeUrl` / `isSafeAttrValue` remain standalone helpers — the HTML
+ * generator uses them to make attribute serialization safe by construction.
  *
  * @module utils/html/sanitization
  * @license BSD-3-Clause
  */
 
+import DOMPurify from "dompurify";
 import {
-  DEFAULT_ALLOWED_TAGS,
-  DEFAULT_ALLOWED_ATTRS,
   ALLOWED_URL_SCHEMES,
   DANGEROUS_PATTERNS,
   type SanitizeOptions,
 } from "./sanitizationConfig";
-import { isSelfClosing } from "./tagCategories";
 
 // Re-export config for convenience
 export {
@@ -80,141 +89,50 @@ export function isSafeAttrValue(attr: string, value: string, _tag: string): bool
   return true;
 }
 
-/**
- * Check if attribute is allowed
- */
-function isAllowedAttr(tag: string, attr: string, options: SanitizeOptions): boolean {
-  const {
-    allowedAttrs = DEFAULT_ALLOWED_ATTRS,
-    allowDataAttrs = true,
-    allowAriaAttrs = true,
-  } = options;
-
-  // Check data-* attributes
-  if (attr.startsWith("data-") && allowDataAttrs) {
-    return true;
-  }
-
-  // Check aria-* attributes
-  if (attr.startsWith("aria-") && allowAriaAttrs) {
-    return true;
-  }
-
-  // Check global attributes
-  const global = allowedAttrs["*"];
-  if (global?.has(attr)) {
-    return true;
-  }
-
-  // Check tag-specific attributes
-  const tagAttrs = allowedAttrs[tag];
-  if (tagAttrs?.has(attr)) {
-    return true;
-  }
-
-  return false;
-}
-
 // =============================================================================
 // SANITIZATION FUNCTIONS
 // =============================================================================
 
 /**
- * Sanitize HTML string (removes dangerous elements and attributes)
+ * Attributes DOMPurify strips by default that the editor canvas needs.
+ * `data-*` and `aria-*` are kept via ALLOW_DATA_ATTR / ALLOW_ARIA_ATTR;
+ * these are the named exceptions DOMPurify does not allow out of the box.
+ */
+const EDITOR_ADD_ATTR = ["target", "data-buildrick-id", "data-buildrick-type"];
+
+/**
+ * Sanitize an HTML string, removing dangerous elements and attributes while
+ * preserving the editor's structural attributes.
  */
 export function sanitizeHTML(html: string, options: SanitizeOptions = {}): string {
-  const { allowedTags = DEFAULT_ALLOWED_TAGS, stripTags = false, removeEmpty = false } = options;
+  const {
+    stripTags = false,
+    allowedTags,
+    allowDataAttrs = true,
+    allowAriaAttrs = true,
+  } = options;
 
   if (stripTags) {
     return stripAllTags(html);
   }
 
-  // Use DOMParser for proper HTML parsing
-  if (typeof DOMParser !== "undefined") {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    sanitizeNode(doc.body, allowedTags, options, removeEmpty);
-    return doc.body.innerHTML;
+  // DOMPurify requires a DOM. In any non-browser context (SSR, worker without
+  // DOM) fall back to a conservative text-only strip rather than returning
+  // unsanitized markup.
+  if (typeof window === "undefined" || typeof DOMParser === "undefined") {
+    return stripAllTags(html);
   }
 
-  // Fallback: basic regex sanitization (less safe)
-  return sanitizeHTMLRegex(html, allowedTags);
-}
+  const config: Parameters<typeof DOMPurify.sanitize>[1] = {
+    ADD_ATTR: EDITOR_ADD_ATTR,
+    ALLOW_DATA_ATTR: allowDataAttrs,
+    ALLOW_ARIA_ATTR: allowAriaAttrs,
+  };
+  if (allowedTags) {
+    config.ALLOWED_TAGS = Array.from(allowedTags);
+  }
 
-/**
- * Recursively sanitize a DOM node
- */
-function sanitizeNode(
-  node: Node,
-  allowedTags: Set<string>,
-  options: SanitizeOptions,
-  removeEmpty: boolean
-): void {
-  const nodesToRemove: Node[] = [];
-
-  node.childNodes.forEach((child) => {
-    if (child.nodeType === Node.ELEMENT_NODE) {
-      const el = child as Element;
-      const tag = el.tagName.toLowerCase();
-
-      // Remove disallowed tags
-      if (!allowedTags.has(tag)) {
-        // Keep text content, remove the tag
-        const text = document.createTextNode(el.textContent || "");
-        node.replaceChild(text, child);
-        return;
-      }
-
-      // Sanitize attributes
-      const attrsToRemove: string[] = [];
-      for (const attr of Array.from(el.attributes)) {
-        if (!isAllowedAttr(tag, attr.name, options)) {
-          attrsToRemove.push(attr.name);
-        } else if (!isSafeAttrValue(attr.name, attr.value, tag)) {
-          attrsToRemove.push(attr.name);
-        }
-      }
-      attrsToRemove.forEach((attr) => el.removeAttribute(attr));
-
-      // Recursively sanitize children
-      sanitizeNode(el, allowedTags, options, removeEmpty);
-
-      // Remove empty elements if option is set
-      if (removeEmpty && !el.hasChildNodes() && !isSelfClosing(tag)) {
-        nodesToRemove.push(el);
-      }
-    } else if (child.nodeType === Node.COMMENT_NODE) {
-      // Remove comments
-      nodesToRemove.push(child);
-    }
-  });
-
-  nodesToRemove.forEach((n) => node.removeChild(n));
-}
-
-/**
- * Fallback regex-based sanitization (less thorough)
- */
-function sanitizeHTMLRegex(html: string, allowedTags: Set<string>): string {
-  // Remove script tags and content
-  let result = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
-
-  // Remove style tags and content
-  result = result.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "");
-
-  // Remove event handlers
-  result = result.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, "");
-
-  // Remove javascript: URLs
-  result = result.replace(/javascript:/gi, "");
-
-  // Remove disallowed tags (keep content)
-  const tagPattern = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
-  result = result.replace(tagPattern, (match, tag) => {
-    return allowedTags.has(tag.toLowerCase()) ? match : "";
-  });
-
-  return result;
+  return DOMPurify.sanitize(html, config) as unknown as string;
 }
 
 /**
