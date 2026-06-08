@@ -249,6 +249,19 @@ export const authRouter = router({
         throw new TRPCError({ code: "CONFLICT", message: "You are already a member of this workspace" });
       }
 
+      // Reject before any membership write: an invite token is bound to the
+      // email it was sent to. Without this, anyone holding the token could
+      // join the workspace under a different account.
+      if (invite.email.toLowerCase() !== user.email.toLowerCase()) {
+        await logAuditEvent("INVITE_EMAIL_MISMATCH", "failure", {
+          userId, metadata: { inviteEmail: invite.email, userEmail: user.email },
+        });
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "This invite was sent to a different email address.",
+        });
+      }
+
       await ctx.prisma.$transaction(async (tx) => {
         const member = await tx.workspaceMember.create({
           data: { userId, workspaceId: invite.workspaceId, role: invite.role, invitedBy: invite.invitedBy },
@@ -266,11 +279,6 @@ export const authRouter = router({
         await tx.invite.update({ where: { id: invite.id }, data: { status: "ACCEPTED" } });
       });
 
-      if (invite.email !== user.email) {
-        await logAuditEvent("INVITE_EMAIL_MISMATCH", "success", {
-          userId, metadata: { inviteEmail: invite.email, userEmail: user.email },
-        });
-      }
       await logAuditEvent("INVITE_ACCEPTED", "success", { userId, metadata: { workspaceId: invite.workspaceId } });
 
       createNotification({
