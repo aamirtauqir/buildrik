@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, PlanName } from "@/lib/constants/plan-limits";
+import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import type {
   CreatePageInput,
   UpdatePageInput,
@@ -105,7 +106,9 @@ export async function updatePage(input: UpdatePageInput) {
     where: { id: pageId },
     data: {
       ...fields,
-      ...(blocks !== undefined ? { blocks: blocks as Prisma.InputJsonValue } : {}),
+      ...(blocks !== undefined
+        ? { blocks: sanitizeBlocks(blocks) as Prisma.InputJsonValue }
+        : {}),
     },
   });
 }
@@ -202,7 +205,7 @@ export async function setTranslation(input: SetTranslationInput) {
   const existing = (page.translations ?? {}) as TranslationMap;
   const next: TranslationMap = {
     ...existing,
-    [input.locale]: { blocks: input.blocks as Prisma.JsonValue },
+    [input.locale]: { blocks: sanitizeBlocks(input.blocks) as Prisma.JsonValue },
   };
 
   return prisma.page.update({
