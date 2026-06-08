@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
+import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
   ListSitesInput,
@@ -737,14 +738,16 @@ export async function userCanEditSite(
   userId: string,
   siteId: string,
 ): Promise<boolean> {
-  const site = await prisma.site.findFirst({
-    where: {
-      id: siteId,
-      deletedAt: null,
-      workspace: { members: { some: { userId } } },
-    },
-    select: { id: true },
-  });
-  return !!site;
+  // Edit access requires EDITOR (respects per-site role overrides). A VIEWER
+  // member must not load the editor. checkSiteRole throws on insufficient role.
+  try {
+    await checkSiteRole(prisma, userId, siteId, "EDITOR");
+    return true;
+  } catch (e) {
+    // Deny on authorization failure; let real errors (DB, etc.) propagate so
+    // an outage is not silently reported as "no access".
+    if (e instanceof PermissionError) return false;
+    throw e;
+  }
 }
 

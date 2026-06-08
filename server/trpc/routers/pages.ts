@@ -19,11 +19,23 @@ import {
   setTranslationSchema,
   removeTranslationSchema,
 } from "@buildrik/shared/schemas/pages";
-import { assertSiteAccess, PermissionError } from "@/server/services/permission.service";
+import { assertSiteAccess, checkSiteRole, PermissionError } from "@/server/services/permission.service";
 
+// Read gate: any active member (incl. VIEWER) may read.
 async function guardSite(prisma: typeof import("@/lib/prisma").prisma, userId: string, siteId: string): Promise<void> {
   try {
     await assertSiteAccess(prisma, userId, siteId);
+  } catch (e) {
+    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+    throw e;
+  }
+}
+
+// Write gate: content mutations require EDITOR. A VIEWER must not create,
+// update, delete, or translate pages.
+async function guardSiteEditor(prisma: typeof import("@/lib/prisma").prisma, userId: string, siteId: string): Promise<void> {
+  try {
+    await checkSiteRole(prisma, userId, siteId, "EDITOR");
   } catch (e) {
     if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
     throw e;
@@ -42,7 +54,7 @@ export const pagesRouter = router({
     return page;
   }),
   create: protectedProcedure.input(createPageSchema).mutation(async ({ ctx, input }) => {
-    await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+    await guardSiteEditor(ctx.prisma, ctx.session.user.id, input.siteId);
     try { return await createPage(input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "PAGE_LIMIT") throw new TRPCError({ code: "FORBIDDEN", message: "Page limit reached." });
@@ -50,7 +62,7 @@ export const pagesRouter = router({
     }
   }),
   update: protectedProcedure.input(updatePageSchema).mutation(async ({ ctx, input }) => {
-    await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+    await guardSiteEditor(ctx.prisma, ctx.session.user.id, input.siteId);
     try { return await updatePage(input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "CONFLICT") throw new TRPCError({ code: "CONFLICT", message: "Page was updated elsewhere." });
@@ -58,7 +70,7 @@ export const pagesRouter = router({
     }
   }),
   delete: protectedProcedure.input(deletePageSchema).mutation(async ({ ctx, input }) => {
-    await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+    await guardSiteEditor(ctx.prisma, ctx.session.user.id, input.siteId);
     try { await deletePage(input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "LAST_PAGE") throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot delete last page." });
@@ -72,7 +84,7 @@ export const pagesRouter = router({
     return resolveTranslation(input.pageId, input.locale);
   }),
   setTranslation: protectedProcedure.input(setTranslationSchema).mutation(async ({ ctx, input }) => {
-    await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+    await guardSiteEditor(ctx.prisma, ctx.session.user.id, input.siteId);
     try { return await setTranslation(input); }
     catch (e: unknown) {
       if (!(e instanceof Error)) throw e;
@@ -85,7 +97,7 @@ export const pagesRouter = router({
     }
   }),
   removeTranslation: protectedProcedure.input(removeTranslationSchema).mutation(async ({ ctx, input }) => {
-    await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+    await guardSiteEditor(ctx.prisma, ctx.session.user.id, input.siteId);
     try { return await removeTranslation(input); }
     catch (e: unknown) {
       if (!(e instanceof Error)) throw e;

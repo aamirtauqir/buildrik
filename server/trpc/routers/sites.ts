@@ -230,24 +230,13 @@ export const sitesRouter = router({
   saveProject: protectedProcedure
     .input(editorSaveProjectSchema)
     .mutation(async ({ input, ctx }) => {
-      const site = await ctx.prisma.site.findUnique({
-        where: { id: input.siteId },
-        select: { workspaceId: true },
-      });
-      if (!site)
-        throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
-
-      const member = await ctx.prisma.workspaceMember.findFirst({
-        where: {
-          workspaceId: site.workspaceId,
-          userId: ctx.session.user.id,
-        },
-      });
-      if (!member)
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Not authorized",
-        });
+      // Content save requires EDITOR — a VIEWER must not mutate site content.
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
 
       try {
         return await saveProjectFromEditor(input.siteId, input.projectData);
@@ -362,7 +351,7 @@ export const sitesRouter = router({
     .input(saveProjectDataSchema)
     .mutation(async ({ ctx, input }) => {
       try {
-        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
