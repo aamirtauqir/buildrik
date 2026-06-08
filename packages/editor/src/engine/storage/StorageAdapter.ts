@@ -9,7 +9,7 @@
 /* eslint-disable no-useless-catch */
 
 import { EVENTS, THRESHOLDS } from "../../shared/constants";
-import type { StorageConfig, ProjectData } from "../../shared/types";
+import type { StorageConfig, ProjectData, ProjectSettings } from "../../shared/types";
 import { debounce } from "../../shared/utils/helpers";
 import type { Composer } from "../Composer";
 
@@ -164,6 +164,34 @@ export class StorageAdapter {
   // Local Storage
   // ============================================
 
+  /**
+   * Strip secrets that must not sit in browser storage at rest (readable by any
+   * XSS or shared-device access): the email integration API key and the
+   * published-site password. Everything else is kept (publishable keys are
+   * public by design; custom code is user-authored site content). Returns a
+   * shallow-cloned copy so the original object is untouched — the dashboard
+   * sync path receives exportProject() data directly and still transmits the
+   * secrets to the server over HTTPS.
+   */
+  private redactSecretsForBrowserStorage(data: ProjectData): ProjectData {
+    const s = data.settings;
+    if (!s) return data;
+
+    const email = s.integrations?.email;
+    const hasApiKey = !!email?.apiKey;
+    const hasPassword = s.publishing?.publishedPassword != null;
+    if (!hasApiKey && !hasPassword) return data;
+
+    const settings: ProjectSettings = { ...s };
+    if (hasApiKey) {
+      settings.integrations = { ...s.integrations, email: { ...email!, apiKey: undefined } };
+    }
+    if (hasPassword) {
+      settings.publishing = { ...s.publishing!, publishedPassword: null };
+    }
+    return { ...data, settings };
+  }
+
   private loadFromLocalStorage(key: string): ProjectData | null {
     try {
       const data = localStorage.getItem(key);
@@ -175,7 +203,7 @@ export class StorageAdapter {
 
   private saveToLocalStorage(key: string, data: ProjectData): void {
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      localStorage.setItem(key, JSON.stringify(this.redactSecretsForBrowserStorage(data)));
     } catch (error) {
       throw error;
     }
@@ -196,7 +224,7 @@ export class StorageAdapter {
 
   private saveToSessionStorage(key: string, data: ProjectData): void {
     try {
-      sessionStorage.setItem(key, JSON.stringify(data));
+      sessionStorage.setItem(key, JSON.stringify(this.redactSecretsForBrowserStorage(data)));
     } catch (error) {
       throw error;
     }
@@ -255,7 +283,7 @@ export class StorageAdapter {
     return new Promise((resolve, reject) => {
       const tx = db.transaction("projects", "readwrite");
       const store = tx.objectStore("projects");
-      store.put({ id: key, data, updatedAt: Date.now() });
+      store.put({ id: key, data: this.redactSecretsForBrowserStorage(data), updatedAt: Date.now() });
 
       tx.oncomplete = () => {
         db.close();
