@@ -23,13 +23,7 @@
 // HTML PARSING
 // =============================================================================
 
-export {
-  parseHTML,
-  parseHTMLToFragment,
-  serializeHTML,
-  sanitizeHTML,
-  type SanitizeOptions,
-} from "./htmlParser";
+export { parseHTML, parseHTMLToFragment, serializeHTML } from "./htmlParser";
 
 // =============================================================================
 // CSS PARSING

@@ -107,6 +107,12 @@ const QUICK_ACTIONS: QuickAction[] = [
 // SANITIZATION
 // =============================================================================
 
+// Intentionally narrower than the canonical canvas sanitizer
+// (shared/utils/html/sanitization.ts): this only renders AI chat/layout
+// previews inside the copilot panel, so it allows just the formatting tags a
+// preview needs — not the full editor element set. Same engine (DOMPurify).
+// When AI HTML is actually inserted into the page it is sanitized by the
+// canonical path (HTMLParser.insertHTMLToElement -> sanitizeHTML).
 const sanitizeHtml = (html: string): string => {
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
