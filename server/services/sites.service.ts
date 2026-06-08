@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
+import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import type {
   CreateSiteInput,
   ListSitesInput,
@@ -197,7 +198,7 @@ export async function createSite(
             name: tp.name,
             slug: tp.slug,
             position: i,
-            blocks: tp.blocks ?? [],
+            blocks: sanitizeBlocks(tp.blocks ?? []),
             isHomePage: tp.isHomePage ?? i === 0,
           },
         });
@@ -583,6 +584,11 @@ export async function saveProjectData(input: SaveProjectDataInput) {
 
     // Upsert each incoming page.
     for (const [index, page] of input.pages.entries()) {
+      // Defense-in-depth: strip XSS from the stored element tree at the write
+      // boundary. The editor sanitizes on import/serialize, but a direct API
+      // write (bypassing the editor) would otherwise persist hostile blocks.
+      sanitizeBlocks(page.blocks);
+
       const slug =
         page.slug ?? (page.name ? page.name.toLowerCase().replace(/\s+/g, "-") : undefined);
 

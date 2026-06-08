@@ -15,7 +15,7 @@ const nextConfig = {
   outputFileTracingRoot: process.cwd().includes("packages/dashboard")
     ? process.cwd().replace(/\/packages\/dashboard$/, "")
     : process.cwd(),
-  serverExternalPackages: ["@prisma/client", "bcryptjs"],
+  serverExternalPackages: ["@prisma/client", "bcryptjs", "isomorphic-dompurify"],
   transpilePackages: ["@buildrik/editor"],
   compiler: { emotion: true },
   // Legacy ?siteId= bookmark forwarding on dashboard origin only.
