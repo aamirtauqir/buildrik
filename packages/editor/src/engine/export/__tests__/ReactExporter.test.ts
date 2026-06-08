@@ -95,6 +95,29 @@ describe("ReactExporter", () => {
     expect(aboutTsx.content).toContain('World');
   });
 
+  it("respects an explicit heading tagName (h1) instead of the type default (h2)", () => {
+    const composer = makeTestComposer([
+      {
+        id: "page-1",
+        name: "About",
+        root: makeElement({
+          id: "el-1",
+          type: "container",
+          children: [
+            makeElement({ id: "el-2", type: "heading", tagName: "h1", content: "Title", children: [] }),
+          ],
+        }),
+      },
+    ]);
+
+    const exporter = new ReactExporter(composer);
+    const result = exporter.export();
+
+    const aboutTsx = result.files!.find((f) => f.name === "components/About.tsx")!;
+    expect(aboutTsx.content).toContain("<h1");
+    expect(aboutTsx.content).not.toContain("<h2");
+  });
+
   it("handles self-closing tags", () => {
     const composer = makeTestComposer([
       {

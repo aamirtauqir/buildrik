@@ -168,7 +168,7 @@ export class ReactExporter {
     cssClasses: Map<string, CSSClassEntry>,
     indent: number
   ): string {
-    const tag = getTagForType(element.type);
+    const tag = element.tagName || getTagForType(element.type);
     const indentStr = "  ".repeat(indent);
     const children = element.children ?? [];
     const content = element.content ?? "";

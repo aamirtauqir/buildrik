@@ -184,7 +184,9 @@ export class ExportEngine {
     const styles = element.getStyles?.() || {};
     const children = element.getChildren?.() || [];
 
-    const tag = getTagForType(type);
+    // Prefer the element's explicit tagName (e.g. an h1/h3 heading the user
+    // chose) so the export matches the canvas; fall back to the type→tag map.
+    const tag = element.getData?.().tagName || getTagForType(type);
     const className = `${config.cssPrefix}${id}`;
     const indentStr = config.minify ? "" : "  ".repeat(indent);
     const newline = config.minify ? "" : "\n";
@@ -534,7 +536,7 @@ ${bodyContent}
   private renderPageElement(element: PageData["root"], indent = 1): string {
     if (!element) return "";
 
-    const tag = getTagForType(element.type);
+    const tag = element.tagName || getTagForType(element.type);
     const indentStr = "  ".repeat(indent);
     const children = element.children ?? [];
     const content = element.content ?? "";
