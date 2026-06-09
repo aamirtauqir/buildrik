@@ -250,6 +250,33 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // Live global custom CSS (Settings → Advanced) injected into the canvas.
     const globalCustomCss = useGlobalCustomCss(composer);
 
+    // Zoom to fit: scale so the whole page fits the canvas viewport. The zoom
+    // transform sits on the canvas content's parent, so canvasRef.offsetWidth is
+    // the unscaled device width — measure against the wrapper's client box.
+    const handleFitToScreen = React.useCallback(() => {
+      const content = canvasRef.current;
+      const viewport = wrapperRef.current;
+      if (!content || !viewport || !composer) return;
+      const cw = content.offsetWidth;
+      const ch = content.offsetHeight;
+      if (!cw || !ch) return;
+      const vw = viewport.clientWidth - 64; // breathing room
+      const vh = viewport.clientHeight - 64;
+      if (vw <= 0 || vh <= 0) return;
+      const scale = Math.min(vw / cw, vh / ch);
+      const clamped = Math.max(0.1, Math.min(5, scale));
+      composer.setZoom(Math.round(clamped * 100) / 100);
+    }, [composer]);
+
+    React.useEffect(() => {
+      if (!composer) return;
+      const handler = () => handleFitToScreen();
+      composer.on(EVENTS.ZOOM_FIT, handler);
+      return () => {
+        composer.off(EVENTS.ZOOM_FIT, handler);
+      };
+    }, [composer, handleFitToScreen]);
+
     // Command palette + cheat sheet (delegated to hooks)
     const { isPaletteOpen, closePalette, commands } = useCanvasCommandPalette({
       composer,
@@ -556,6 +583,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               zoom={zoom}
               onOverlayChange={onOverlayChange}
               onZoomChange={onZoomChange}
+              onFitToScreen={handleFitToScreen}
               onHelpClick={openCheatSheet}
             />
             <DeviceFrameToggle

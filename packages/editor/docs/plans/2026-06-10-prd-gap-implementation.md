@@ -4,7 +4,9 @@ Source: 10-module fable gap audit vs `docs/prd/Module*.md`. Status legend: ☐ t
 
 ## Tier A — BROKEN / silent no-op / data-loss (code-only, ship now)
 
-- ☐ **A1 (P0) Cross-site version bleed** — `VersionTimelineManager.projectId` hardcoded `"default"` (`engine/VersionTimelineManager.ts:56`), `setProjectId` zero callers. Restoring a version imports ANOTHER site's content; autosave persists it. Fix: call `versions.setProjectId(siteId)` + `components.setProjectId(siteId)` on load in `useComposerInit`.
+Done so far: A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅ A6 ✅ A7 ✅ A11 ✅ (commits 25125900 + follow-up). A12-rulers deferred (multi-file thread, nicety; grid already works). A8/A10 touch server/dashboard files already modified by an in-flight auth arc — skipped to avoid commit entanglement. A9 (mount editor onboarding) pending — needs care (runs on every editor load).
+
+- ☑ **A1 (P0) Cross-site version bleed** — `VersionTimelineManager.projectId` hardcoded `"default"` (`engine/VersionTimelineManager.ts:56`), `setProjectId` zero callers. Restoring a version imports ANOTHER site's content; autosave persists it. Fix: call `versions.setProjectId(siteId)` + `components.setProjectId(siteId)` on load in `useComposerInit`.
 - ☐ **A2 Inspector transform clobbering** — `EffectsSection.tsx` transform sliders each write a single-function value → setting rotate wipes scale. Compose translate/scale/rotate/skew into one transform string.
 - ☐ **A3 Inspector filter clobbering** — same in filter sliders (blur wipes brightness). Compose filter functions.
 - ☐ **A4 Group/Ungroup dead menu** — `standaloneActions.ts` emits `elements:group`/`elements:ungroup` with zero listeners. Implement handlers or remove the menu items.
