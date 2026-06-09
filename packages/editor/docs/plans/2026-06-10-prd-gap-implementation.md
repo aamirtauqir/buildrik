@@ -19,6 +19,14 @@ Done: A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅ A6 ✅ A7 ✅ A11 ✅ A12 ✅ (7 commit
 - ☐ **A11 Zoom-to-Fit Cmd+1 conflict** — bound to device-desktop; no fit math. Rebind + implement fit-to-content.
 - ☐ **A12 Grid/Ruler toggles unreachable** — `toggleOverlay("showGrid")` no call site; `showRulers` never passed. Wire footer toggles.
 
+## Missing inspector controls (registry defs existed, no rendered control) — shipped
+
+- ☑ box-sizing (layout), select-options editor, transition-delay, text-shadow, will-change (effects)
+- ☑ word-spacing, text-indent, vertical-align (typography), background-blend-mode (visual)
+- Each updates the section's `styleKeys` (enforced by registry.styleKeys exhaustiveness test).
+- Verified non-gaps (audit false positives): grid justify-items/align-items already editable via AlignmentGrid.
+- Remaining niche/low-value: border-image, background-origin/clip, animation-direction/fill-mode/play-state, multi-stop gradient, multi-shadow list. Long tail.
+
 ## Tier B — UI missing for shipped backend
 
 - ☐ B1 Transfer-ownership UI (backend done) — dashboard, in-flight-arc files
