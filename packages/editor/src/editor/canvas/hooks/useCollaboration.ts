@@ -124,7 +124,15 @@ export function useCollaboration(composer: Composer | null): UseCollaborationRes
     const updateStats = () => {
       const otEngine = composer.collab.manager.getOTEngine();
       const stats = otEngine.getAckStats();
-      setConnectionStats(stats);
+      // Bail when nothing changed — the 2s poll otherwise re-rendered every
+      // consumer on each tick even when the stats were identical.
+      setConnectionStats((prev) => {
+        const keys = Object.keys(stats) as (keyof ConnectionQualityStats)[];
+        const same =
+          keys.length === Object.keys(prev).length &&
+          keys.every((k) => prev[k] === stats[k]);
+        return same ? prev : stats;
+      });
     };
 
     // Update immediately

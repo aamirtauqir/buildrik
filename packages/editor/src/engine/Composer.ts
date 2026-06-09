@@ -16,7 +16,7 @@ import type {
   ExportOptions,
   ExportResult,
 } from "../shared/types";
-import { clamp } from "../shared/utils/helpers";
+import { clamp, deepClone } from "../shared/utils/helpers";
 import { sanitizeElementTreeContent } from "../shared/utils/html";
 import { CanvasIndicators } from "./canvas/indicators";
 import { ResizeHandler } from "./canvas/ResizeHandler";
@@ -79,6 +79,8 @@ export class Composer extends EventEmitter {
 
   private transactionDepth = 0;
   private transactionDirty = false;
+  /** Pre-transaction snapshot captured at the outermost begin, used by rollbackTransaction. */
+  private transactionSnapshot: ProjectData | null = null;
 
   // Project-wide settings (analytics, integrations)
   private projectSettings: ProjectSettings = {};
@@ -712,6 +714,11 @@ ${html}
 
     if (this.transactionDepth === 1) {
       this.transactionDirty = false;
+      // Capture a pre-transaction snapshot so rollbackTransaction can actually
+      // restore state on error. Transactions wrap discrete user ops (delete,
+      // paste, move, drag-drop) — not per-tick edits — so one clone per
+      // outermost transaction is acceptable cost.
+      this.transactionSnapshot = deepClone(this.exportProject());
       this.emit(EVENTS.TRANSACTION_BEGIN, { label });
     }
   }
@@ -724,6 +731,7 @@ ${html}
     this.transactionDepth--;
 
     if (this.transactionDepth === 0) {
+      this.transactionSnapshot = null;
       this.emit(EVENTS.TRANSACTION_END);
 
       if (this.transactionDirty) {
@@ -750,8 +758,20 @@ ${html}
     this.transactionDepth--;
 
     if (this.transactionDepth === 0) {
-      // Discard any changes made during this transaction
+      // Restore the pre-transaction snapshot so partial mutations made before
+      // the error are actually discarded — not just hidden from PROJECT_CHANGED.
+      // Quiet restore: no history record, no stack reset.
+      const snapshot = this.transactionSnapshot;
+      this.transactionSnapshot = null;
       this.transactionDirty = false;
+      if (snapshot) {
+        // importProject resets state.dirty = false. Preserve the pre-transaction
+        // dirty flag so a rollback doesn't strand earlier unsaved edits (autosave
+        // gates on isDirty()).
+        const wasDirty = this.state.dirty;
+        this.history.runWithoutTracking(() => this.importProject(snapshot));
+        this.state.dirty = wasDirty;
+      }
       this.emit(EVENTS.TRANSACTION_END, { rolledBack: true });
     }
   }
@@ -795,8 +815,9 @@ ${html}
     const clampedZoom = clamp(zoom, THRESHOLDS.ZOOM_MIN, THRESHOLDS.ZOOM_MAX);
     if (this.state.zoom !== clampedZoom) {
       this.state.zoom = clampedZoom;
+      // viewport.setZoom already emits VIEWPORT_ZOOM — don't double-fire it
+      // (every zoom listener ran twice).
       this.viewport.setZoom(clampedZoom);
-      this.emit(EVENTS.VIEWPORT_ZOOM, clampedZoom);
     }
   }
 

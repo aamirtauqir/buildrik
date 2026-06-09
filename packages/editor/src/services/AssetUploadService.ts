@@ -110,11 +110,13 @@ export async function isUploadServiceReachable(): Promise<boolean> {
       method: "POST",
       credentials: "include",
       headers: { "content-type": "application/json" },
-      // Empty body — Vercel's handleUpload will return 400, but the route
-      // itself responds. Network/auth errors give different status codes.
+      // Empty body — for an authenticated session the route's handleUpload
+      // rejects with 400 (route reachable + usable). A 401 means the session
+      // is dead, so the service is NOT usable for server-mirroring — return
+      // false per this function's contract ("false on ... auth fail").
       body: JSON.stringify({}),
     });
-    return res.status === 400 || res.status === 401;
+    return res.status === 400;
   } catch {
     return false;
   }

@@ -234,7 +234,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   });
 
   // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
-  useEditorShortcuts({ composer, canvasRef, modals, saveProject });
+  useEditorShortcuts({ composer, modals, saveProject });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
   // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook
@@ -251,16 +251,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setExportLoading: modals.setExportLoading,
   });
 
-  // Auto-enable spacing on first selection
+  // Auto-enable spacing on first selection. Deps are the specific values read
+  // (not the whole `state` object, which is a fresh literal every render and
+  // made this effect run on every render).
+  const showSpacingIndicators = state.overlays.showSpacingIndicators;
+  const setShowSpacingIndicators = state.setShowSpacingIndicators;
   React.useEffect(() => {
-    if (
-      !selectedElement ||
-      state.overlays.showSpacingIndicators ||
-      hasManuallyToggledSpacing.current
-    )
-      return;
-    state.setShowSpacingIndicators(true);
-  }, [state]);
+    if (!selectedElement || showSpacingIndicators || hasManuallyToggledSpacing.current) return;
+    setShowSpacingIndicators(true);
+  }, [selectedElement, showSpacingIndicators, setShowSpacingIndicators]);
 
   if (!composer) {
     return <StudioSkeleton />;
@@ -379,8 +378,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         devMode={state.overlays.devMode}
         onOverlayChange={(overlay, enabled) => {
           if (overlay === "guides") state.setShowGuides(enabled);
-          else if (overlay === "spacing") state.setShowSpacingIndicators(enabled);
-          else if (overlay === "grid") state.setShowGrid(enabled);
+          else if (overlay === "spacing") {
+            // Mark spacing as user-controlled so the auto-enable-on-selection
+            // effect stops re-enabling it after the user turns it off.
+            hasManuallyToggledSpacing.current = true;
+            state.setShowSpacingIndicators(enabled);
+          } else if (overlay === "grid") state.setShowGrid(enabled);
           else if (overlay === "badges") state.setShowBadges(enabled);
           else if (overlay === "xray") state.setShowXRay(enabled);
         }}

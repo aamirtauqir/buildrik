@@ -85,8 +85,11 @@ export class EventEmitter {
       toCall.forEach(({ handler }) => {
         try {
           handler(...args);
-        } catch {
-          // Error in event handler - silently continue
+        } catch (err) {
+          // One handler throwing must not break the others, but swallowing it
+          // silently hid real engine failures (e.g. a throwing history record).
+          // Surface it without rethrowing.
+          console.error(`[EventEmitter] handler for "${event}" threw:`, err);
         }
       });
     }

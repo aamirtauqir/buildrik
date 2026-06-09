@@ -5,7 +5,7 @@
  * @license BSD-3-Clause
  */
 
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCClient, httpBatchLink, TRPCClientError } from "@trpc/client";
 import superjson from "superjson";
 import type { AppRouter } from "../../../../../server/trpc/router";
 import { aiCache } from "./AICache";
@@ -31,6 +31,25 @@ export interface AIResponse<T> {
   cached: boolean;
   duration: number;
   tokensUsed?: number;
+}
+
+function isRetryable(err: unknown, isTooManyRequests: boolean): boolean {
+  if (isTooManyRequests) return true; // rate-limit: retry after backoff
+  // Decide on the STRUCTURED tRPC error, not the message string — the message
+  // is the server's human text (a Zod BAD_REQUEST has no "BAD_REQUEST"
+  // substring), so substring matching only ever caught bare UNAUTHORIZED.
+  if (err instanceof TRPCClientError) {
+    const status = err.data?.httpStatus as number | undefined;
+    if (typeof status === "number") {
+      // 4xx is a client error (validation/auth/forbidden) — re-firing a
+      // non-idempotent, credit-consuming AI mutation just re-spends and
+      // re-fails. Retry only 408 (timeout) and 429 (rate limit).
+      if (status >= 400 && status < 500) return status === 408 || status === 429;
+      return true; // 5xx / transient server fault — retry
+    }
+  }
+  // No structured status (network/abort) — treat as transient, retry.
+  return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -137,6 +156,9 @@ class RequestQueue {
 // TRPC CLIENT
 // ---------------------------------------------------------------------------
 
+// Relative "/api/trpc" is intentional: the editor is served same-origin with
+// the dashboard (unification spec §572 / trpc-same-origin.test.ts), so an
+// absolute URL would force CORS the unification arc deletes.
 function getTrpcClient() {
   return createTRPCClient<AppRouter>({
     links: [
@@ -283,6 +305,13 @@ class AiTrpcClient {
           } else {
             lastError = createAIError(errorMessage, "API_ERROR");
           }
+
+          // Only retry transient failures. AI mutations consume credits and
+          // are non-idempotent — retrying a 4xx (validation, UNAUTHORIZED,
+          // FORBIDDEN, BAD_REQUEST) just re-spends and re-fails. Bail unless
+          // the error is a rate-limit or a clearly transient server/network
+          // fault.
+          if (!isRetryable(err, isTooManyRequests)) break;
 
           if (attempt < retries) {
             const delay =

@@ -79,11 +79,10 @@ export function useHistoryState(composer: Composer | null): UseHistoryStateRetur
   }, [composer]);
 
   const clear = React.useCallback(() => {
-    if (composer?.history) {
-      composer.history.clear();
-      // Record initial state after clear so undo works again
-      composer.history.forceCheckpoint("Cleared history");
-    }
+    // history.clear() now re-seeds its own baseline checkpoint, so the old
+    // compensating forceCheckpoint here would leave TWO checkpoints — making
+    // canUndo() true right after a clear (undo to an identical state).
+    composer?.history?.clear();
   }, [composer]);
 
   return {

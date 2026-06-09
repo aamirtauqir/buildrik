@@ -287,6 +287,13 @@ export class ExportEngine {
       head += `${indent}<link rel="stylesheet" href="styles.css">${nl}`;
     }
 
+    // User's global custom CSS (Settings → Advanced). Emitted last so it can
+    // override generated element styles. Previously stored but injected nowhere.
+    const globalCss = this.composer.getProjectSettings?.()?.customCode?.globalCss;
+    if (globalCss && globalCss.trim()) {
+      head += `${indent}<style>${nl}${globalCss}${nl}${indent}</style>${nl}`;
+    }
+
     // Inject analytics scripts before closing head tag
     const analyticsScripts = generateAnalyticsScripts(config.analytics);
     if (analyticsScripts) {
@@ -449,6 +456,13 @@ export class ExportEngine {
 
     if (css) {
       headParts.push('  <link rel="stylesheet" href="styles.css">');
+    }
+
+    // User's global custom CSS (Settings → Advanced), emitted after the
+    // stylesheet link so it can override generated styles.
+    const globalCss = this.composer.getProjectSettings?.()?.customCode?.globalCss;
+    if (globalCss && globalCss.trim()) {
+      headParts.push(`  <style>\n${globalCss}\n  </style>`);
     }
 
     let html = `<!DOCTYPE html>

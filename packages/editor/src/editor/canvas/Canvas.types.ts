@@ -42,8 +42,6 @@ export interface CanvasRef {
   getHTML: () => string;
   getCSS: () => string;
   getContent: () => string;
-  /** Open the command palette (Cmd+Shift+P) */
-  openCommandPalette: () => void;
 }
 
 export const DEVICE_SIZES: Record<string, { width: string; height: string }> = {

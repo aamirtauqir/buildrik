@@ -86,6 +86,57 @@ const parseFilter = (filter: string | undefined, type: string, defaultValue: str
   return match?.[1] || defaultValue;
 };
 
+// Compose a multi-function CSS property (transform / filter) by merging a single
+// function into the existing value instead of replacing the whole string.
+// Without this, adjusting one slider (e.g. rotate) wiped every other function
+// (scale, translate, …) — silently destroying the user's other effects.
+const composeFunctional = (
+  current: string | undefined,
+  order: string[],
+  identity: Record<string, string>,
+  fn: string,
+  arg: string
+): string => {
+  const map = new Map<string, string>();
+  if (current && current !== "none") {
+    const re = /([\w-]+)\(([^)]*)\)/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(current))) map.set(m[1], m[2]);
+  }
+  const trimmed = arg.trim();
+  if (trimmed === "" || trimmed === identity[fn]) map.delete(fn);
+  else map.set(fn, trimmed);
+
+  const parts: string[] = [];
+  for (const key of order) {
+    const v = map.get(key);
+    if (v === undefined || v === "" || v === identity[key]) continue;
+    parts.push(`${key}(${v})`);
+  }
+  return parts.length ? parts.join(" ") : "none";
+};
+
+const TRANSFORM_ORDER = ["translateX", "translateY", "scale", "rotate", "skew"];
+const TRANSFORM_IDENTITY: Record<string, string> = {
+  translateX: "0px",
+  translateY: "0px",
+  scale: "1",
+  rotate: "0deg",
+  skew: "0deg",
+};
+export const composeTransform = (current: string | undefined, fn: string, arg: string) =>
+  composeFunctional(current, TRANSFORM_ORDER, TRANSFORM_IDENTITY, fn, arg);
+
+const FILTER_ORDER = ["blur", "brightness", "contrast", "grayscale"];
+const FILTER_IDENTITY: Record<string, string> = {
+  blur: "0px",
+  brightness: "100%",
+  contrast: "100%",
+  grayscale: "0%",
+};
+export const composeFilter = (current: string | undefined, fn: string, arg: string) =>
+  composeFunctional(current, FILTER_ORDER, FILTER_IDENTITY, fn, arg);
+
 export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange, isOpen, onToggle, tier = "tertiary", mixedKeys, isMultiSelect }) => {
   // Parse opacity
   const opacity = styles.opacity ? parseFloat(styles.opacity) * 100 : 100;
@@ -223,7 +274,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Scale"
           value={scaleValue}
-          onChange={(v) => onChange("transform", `scale(${v / 100})`)}
+          onChange={(v) => onChange("transform", composeTransform(styles.transform, "scale", `${v / 100}`))}
           min={0}
           max={200}
           unit="x"
@@ -233,7 +284,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Rotate"
           value={rotateValue}
-          onChange={(v) => onChange("transform", `rotate(${v}deg)`)}
+          onChange={(v) => onChange("transform", composeTransform(styles.transform, "rotate", `${v}deg`))}
           min={-180}
           max={180}
           unit="°"
@@ -243,21 +294,21 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <TextInputRow
           label="Move X"
           value={translateX}
-          onChange={(v) => onChange("transform", `translateX(${v})`)}
+          onChange={(v) => onChange("transform", composeTransform(styles.transform, "translateX", v))}
           placeholder="0px"
         />
 
         <TextInputRow
           label="Move Y"
           value={translateY}
-          onChange={(v) => onChange("transform", `translateY(${v})`)}
+          onChange={(v) => onChange("transform", composeTransform(styles.transform, "translateY", v))}
           placeholder="0px"
         />
 
         <RangeSlider
           label="Skew"
           value={skewValue}
-          onChange={(v) => onChange("transform", `skew(${v}deg)`)}
+          onChange={(v) => onChange("transform", composeTransform(styles.transform, "skew", `${v}deg`))}
           min={-45}
           max={45}
           unit="°"
@@ -346,7 +397,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Blur"
           value={blurValue}
-          onChange={(v) => onChange("filter", `blur(${v}px)`)}
+          onChange={(v) => onChange("filter", composeFilter(styles.filter, "blur", `${v}px`))}
           min={0}
           max={20}
           unit="px"
@@ -355,7 +406,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Brightness"
           value={brightnessValue}
-          onChange={(v) => onChange("filter", `brightness(${v}%)`)}
+          onChange={(v) => onChange("filter", composeFilter(styles.filter, "brightness", `${v}%`))}
           min={0}
           max={200}
           unit="%"
@@ -364,7 +415,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Contrast"
           value={contrastValue}
-          onChange={(v) => onChange("filter", `contrast(${v}%)`)}
+          onChange={(v) => onChange("filter", composeFilter(styles.filter, "contrast", `${v}%`))}
           min={0}
           max={200}
           unit="%"
@@ -373,7 +424,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Grayscale"
           value={grayscaleValue}
-          onChange={(v) => onChange("filter", `grayscale(${v}%)`)}
+          onChange={(v) => onChange("filter", composeFilter(styles.filter, "grayscale", `${v}%`))}
           min={0}
           max={100}
           unit="%"

@@ -80,6 +80,18 @@ export class ComponentManager {
     if (isStorageAvailable() && this.config.enabled) {
       this.initialize();
     }
+
+    // Repopulate the instance map whenever a project finishes loading — the
+    // instance data lives on the elements but the Map is rebuilt empty.
+    this.composer.on(EVENTS.PROJECT_LOADED, (data: unknown) => {
+      const isProjectData =
+        data != null &&
+        typeof data === "object" &&
+        "pages" in (data as Record<string, unknown>) &&
+        !("importing" in (data as Record<string, unknown>)) &&
+        !("loading" in (data as Record<string, unknown>));
+      if (isProjectData) this.rehydrateInstances();
+    });
   }
 
   /** Shared InstanceMaps reference for specialist modules. */
@@ -104,6 +116,27 @@ export class ComponentManager {
     this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, {
       components: this.getAllComponents(),
     });
+  }
+
+  /**
+   * Rebuild the in-memory instance map from element data after a project loads.
+   * Instances are persisted on `element.data.data.componentInstance` (round-trips
+   * through export/import), but the Map is reconstructed empty — without this,
+   * instance counts, detach, sync, variant resolution, and override application
+   * all silently stop working after a reload.
+   */
+  rehydrateInstances(): void {
+    this.instances.clear();
+    for (const el of this.composer.elements.getAllElements()) {
+      const instance = el.getData().data?.componentInstance as
+        | ComponentInstance
+        | undefined;
+      if (instance && instance.componentId && !instance.isDetached) {
+        // Re-key on the live element id (ids are stable across import, but be
+        // defensive) and keep the persisted overrides/variant selection.
+        this.instances.set(el.getId(), { ...instance, elementId: el.getId() });
+      }
+    }
   }
 
   // ─── Component CRUD ──────────────────────────────────────────────────────────

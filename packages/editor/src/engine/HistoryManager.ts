@@ -229,6 +229,18 @@ export class HistoryManager {
    * edit a committed undo step before control returns to the user.
    */
   flushPending(): void {
+    // An edit is "owed" a record if ANY of the timer chain is still pending:
+    // the PROJECT_CHANGED handler arms setTimeout(0) → which sets
+    // pendingRecord=false and arms the 500ms coalesce timer. So for any flush
+    // arriving after that macrotask (the common case — a real keypress), the
+    // owed work lives in coalesceTimeoutId while pendingRecord is already
+    // false. Capture owed-ness from all three before clearing, or flush
+    // silently drops the edit (the very race this exists to fix).
+    const owed =
+      this.pendingRecord ||
+      this.coalesceTimeoutId !== null ||
+      this.pendingRecordTimeoutId !== null;
+
     if (this.pendingRecordTimeoutId) {
       clearTimeout(this.pendingRecordTimeoutId);
       this.pendingRecordTimeoutId = null;
@@ -237,8 +249,8 @@ export class HistoryManager {
       clearTimeout(this.coalesceTimeoutId);
       this.coalesceTimeoutId = null;
     }
-    if (!this.pendingRecord) return;
     this.pendingRecord = false;
+    if (!owed) return;
     if (this.isDestroyed || !this.isRecording) return;
     const label = this.getCoalescedLabel();
     this.coalescedLabels = [];
@@ -296,8 +308,11 @@ export class HistoryManager {
     try {
       const currentState = this.getCurrentState();
       const newState = applyPatch(currentState, patch);
+      // Clone before import — importProject mutates its input (see
+      // restoreSnapshot). Cache the clean copy so the next diff is correct.
+      const clean = deepClone(newState);
       this.composer.importProject(newState);
-      this.currentStateCache = newState;
+      this.currentStateCache = clean;
     } finally {
       this.isRestoringFromHistory = false;
       this.isRecording = wasRecording;
@@ -377,17 +392,47 @@ export class HistoryManager {
     this.isRecording = false;
     this.isRestoringFromHistory = true;
     try {
+      // importProject → importPage → buildElementTree mutates the passed
+      // object in place (every `data.children` is emptied while the live tree
+      // is rebuilt from Element instances). Cache a clean clone taken BEFORE
+      // import — otherwise currentStateCache points at a tree with all
+      // children arrays gutted, and the next redo/record diffs against that
+      // empty base and silently drops elements (P0 QA 2026-06-09).
+      const clean = deepClone(snapshot);
       this.composer.importProject(snapshot);
-      this.currentStateCache = snapshot;
+      this.currentStateCache = clean;
     } finally {
       this.isRestoringFromHistory = false;
       this.isRecording = true;
     }
   }
 
+  /**
+   * Run a state-restoring operation (e.g. a transaction rollback) without
+   * recording it as an undo step and without letting it reset the undo/redo
+   * stacks. importProject re-emits PROJECT_LOADED, which the load handler would
+   * otherwise treat as a fresh project and wipe history.
+   */
+  runWithoutTracking(fn: () => void): void {
+    const wasRecording = this.isRecording;
+    this.isRecording = false;
+    this.isRestoringFromHistory = true;
+    try {
+      fn();
+    } finally {
+      this.isRestoringFromHistory = false;
+      this.isRecording = wasRecording;
+    }
+  }
+
   // ─── Undo / Redo ────────────────────────────────────────────────────────────
 
   undo(): boolean {
+    // Commit any edit still inside the 500ms coalesce window before undoing.
+    // Without this, an edit made just before Cmd+Z is never recorded, so undo
+    // pops the PREVIOUS step and reverts both — losing the pending edit
+    // entirely (it never reaches the redo stack). SSOT for all undo callers.
+    this.flushPending();
     if (!this.canUndo()) return false;
 
     const current = this.undoStack.pop()!;
@@ -436,16 +481,36 @@ export class HistoryManager {
   // post-restore: if the selected ID isn't in the new tree, clear selection.
   private validateSelectionAfterRestore(): void {
     try {
-      const selected = this.composer.selection?.getSelected?.();
-      if (!selected) return;
-      const id = selected.getId();
-      if (!id) {
-        this.composer.selection.clear();
+      const selection = this.composer.selection;
+      if (!selection) return;
+
+      // importProject rebuilt every Element instance. The selection manager
+      // still holds the OLD (detached) instances — inspector edits would mutate
+      // objects that exportProject never reads, so they silently vanish.
+      // Re-resolve every selected id to its fresh instance, dropping any that
+      // no longer exist in the restored tree.
+      const multi = selection.getAllSelected?.() ?? [];
+      if (multi.length > 1) {
+        const fresh = multi
+          .map((el) => this.composer.elements?.getElement?.(el.getId()))
+          .filter((el): el is NonNullable<typeof el> => Boolean(el));
+        if (fresh.length === 0) {
+          selection.clear();
+        } else {
+          selection.selectMultiple(fresh);
+        }
         return;
       }
-      const stillExists = this.composer.elements?.getElement?.(id);
-      if (!stillExists) {
-        this.composer.selection.clear();
+
+      const selected = selection.getSelected?.();
+      if (!selected) return;
+      const id = selected.getId();
+      const fresh = id ? this.composer.elements?.getElement?.(id) : null;
+      if (!fresh) {
+        selection.clear();
+      } else if (fresh !== selected) {
+        // Same id, new instance — re-point the selection at the live element.
+        selection.select(fresh);
       }
     } catch {
       // Defensive: never let selection validation break undo/redo.
@@ -453,6 +518,10 @@ export class HistoryManager {
   }
 
   redo(): boolean {
+    // A pending (uncommitted) edit branches history — commit it first so the
+    // redo stack reflects reality. flushPending() clears the redo stack when
+    // it records, which correctly invalidates a stale redo after a new edit.
+    this.flushPending();
     if (!this.canRedo()) return false;
 
     const entry = this.redoStack.pop()!;
@@ -620,6 +689,13 @@ export class HistoryManager {
     this.redoStack = [];
     this.currentStateCache = null;
     this.patchesSinceCheckpoint = 0;
+    // Re-seed a baseline checkpoint so recording continues after a clear. The
+    // PROJECT_CHANGED handler only schedules a record when undoStack is
+    // non-empty, and getCurrentState() throws on a fully empty stack — without
+    // a baseline, clear() permanently disables undo. Skip during destroy().
+    if (!this.isDestroyed) {
+      this.recordCheckpoint("cleared");
+    }
     this.composer.emit(EVENTS.HISTORY_CLEARED);
   }
 

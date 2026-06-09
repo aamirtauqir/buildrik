@@ -62,9 +62,17 @@ describe("cross-origin inventory (Phase 0 D14)", () => {
     expect(hits, `unexpected editor.buildrik.com literals:\n${hits.join("\n")}`).toEqual([]);
   });
 
-  it("editor source contains no `NEXT_PUBLIC_APP_URL` env reads", () => {
+  it("editor source reads `NEXT_PUBLIC_APP_URL` only in the sanctioned env bridge", () => {
     const hits = scan(/NEXT_PUBLIC_APP_URL/);
-    expect(hits, `unexpected NEXT_PUBLIC_APP_URL refs:\n${hits.join("\n")}`).toEqual([]);
+    // runtimeEnv.ts is THE Vite↔Next env bridge: when the editor is bundled
+    // inside the Next dashboard (transpilePackages), import.meta.env is absent,
+    // so DASHBOARD_URL falls back to the Next-baked NEXT_PUBLIC_APP_URL there.
+    // This single read is intentional (the unified-editor env trap helper);
+    // any OTHER file reading it is the regression this test guards.
+    expect(
+      hits,
+      `unexpected NEXT_PUBLIC_APP_URL refs outside runtimeEnv:\n${hits.join("\n")}`,
+    ).toEqual(["shared/utils/runtimeEnv.ts"]);
   });
 
   // ── Known D14 partial-cleanup state ─────────────────────────────────

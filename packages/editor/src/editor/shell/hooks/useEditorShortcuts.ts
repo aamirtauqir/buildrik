@@ -8,7 +8,6 @@
  *   Cmd/Ctrl+Shift+Z      → composer.history.redo()
  *   Cmd/Ctrl+Y            → composer.history.redo()
  *   Cmd/Ctrl+/            → modals.setShowShortcuts(true)
- *   Cmd/Ctrl+K            → canvasRef.current.openCommandPalette()
  *   Cmd/Ctrl+J            → modals.setShowAI(toggle)
  *   Escape                → close shortcuts + AI modals
  *   ?                     → modals.setShowShortcuts(true)
@@ -17,12 +16,16 @@
  * editable surface (input/textarea/select/contenteditable) so users
  * typing don't trigger global shortcuts.
  *
+ * Cmd/Ctrl+K is intentionally NOT handled here — Topbar owns it and opens
+ * the shell CommandPalette. (Binding it here too opened a second, canvas-level
+ * palette on the same keypress.) The canvas palette is Cmd/Ctrl+Shift+P,
+ * registered inside useCanvasCommandPalette.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import type { CanvasRef } from "../../canvas/Canvas";
 
 // Modals subset the shortcut handler reads. Match the public surface of
 // useStudioModals; passing the full modals object keeps mocking simple.
@@ -33,14 +36,12 @@ export interface ShortcutModals {
 
 export interface UseEditorShortcutsOptions {
   composer: Composer | null;
-  canvasRef: React.RefObject<CanvasRef | null>;
   modals: ShortcutModals;
   saveProject: () => void;
 }
 
 export function useEditorShortcuts({
   composer,
-  canvasRef,
   modals,
   saveProject,
 }: UseEditorShortcutsOptions): void {
@@ -76,10 +77,6 @@ export function useEditorShortcuts({
         e.preventDefault();
         modals.setShowShortcuts(true);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        canvasRef.current?.openCommandPalette();
-      }
       if ((e.ctrlKey || e.metaKey) && e.key === "j") {
         e.preventDefault();
         modals.setShowAI((prev) => !prev);
@@ -96,5 +93,5 @@ export function useEditorShortcuts({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [saveProject, composer, modals, canvasRef]);
+  }, [saveProject, composer, modals]);
 }

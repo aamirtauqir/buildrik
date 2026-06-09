@@ -146,6 +146,7 @@ function createObjectPatch(
  */
 function createArrayPatch(oldArr: unknown[], newArr: unknown[], basePath: string): Patch {
   const patch: Patch = [];
+  const removals: Patch = [];
   const maxLen = Math.max(oldArr.length, newArr.length);
 
   for (let i = 0; i < maxLen; i++) {
@@ -155,12 +156,19 @@ function createArrayPatch(oldArr: unknown[], newArr: unknown[], basePath: string
       // New element added
       patch.push({ op: "add", path: indexPath, value: deepCloneValue(newArr[i]) });
     } else if (i >= newArr.length) {
-      // Element removed (process removals in reverse order later)
-      patch.push({ op: "remove", path: indexPath, oldValue: deepCloneValue(oldArr[i]) });
+      // Element removed. Collected separately and appended in DESCENDING index
+      // order — applying ascending splices shifts later indices left, so each
+      // subsequent remove would target the wrong (or an out-of-range) slot,
+      // silently leaving elements behind on replay (P0 QA 2026-06-09).
+      removals.push({ op: "remove", path: indexPath, oldValue: deepCloneValue(oldArr[i]) });
     } else {
       // Element at same index, check for differences
       patch.push(...createPatch(oldArr[i], newArr[i], indexPath));
     }
+  }
+
+  for (let i = removals.length - 1; i >= 0; i--) {
+    patch.push(removals[i]);
   }
 
   return patch;

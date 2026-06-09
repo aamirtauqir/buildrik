@@ -159,8 +159,15 @@ export class FormSubmissionService {
     for (const [field, rules] of Object.entries(validation)) {
       const value = data[field];
 
-      // Required validation
-      if (rules.required && (!value || value === "")) {
+      // Required validation. Only null/undefined/empty-string/NaN are
+      // "missing" — a falsy-but-valid value like 0 or false (number inputs,
+      // checkboxes) must pass.
+      if (
+        rules.required &&
+        (value == null ||
+          value === "" ||
+          (typeof value === "number" && Number.isNaN(value)))
+      ) {
         errors.push({ field, message: `${field} is required` });
         continue;
       }

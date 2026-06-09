@@ -33,14 +33,6 @@ function makeModals(): ShortcutModals & {
   };
 }
 
-function makeCanvasRef() {
-  return {
-    current: {
-      openCommandPalette: vi.fn(),
-    },
-  } as unknown as UseEditorShortcutsOptions["canvasRef"];
-}
-
 function dispatchKey(opts: {
   key: string;
   ctrlKey?: boolean;
@@ -66,14 +58,12 @@ function dispatchKey(opts: {
 describe("useEditorShortcuts", () => {
   let composer: ReturnType<typeof makeComposer>;
   let modals: ReturnType<typeof makeModals>;
-  let canvasRef: ReturnType<typeof makeCanvasRef>;
   let saveProject: ReturnType<typeof vi.fn>;
 
   function mount(overrides: Partial<UseEditorShortcutsOptions> = {}) {
     return renderHook(() =>
       useEditorShortcuts({
         composer: (composer as unknown) as UseEditorShortcutsOptions["composer"],
-        canvasRef,
         modals,
         saveProject,
         ...overrides,
@@ -84,7 +74,6 @@ describe("useEditorShortcuts", () => {
   beforeEach(() => {
     composer = makeComposer();
     modals = makeModals();
-    canvasRef = makeCanvasRef();
     saveProject = vi.fn();
   });
 
@@ -163,19 +152,11 @@ describe("useEditorShortcuts", () => {
     expect(modals.setShowShortcuts).not.toHaveBeenCalled();
   });
 
-  it("Cmd+K opens command palette via canvasRef", () => {
+  it("Cmd+K is NOT handled here (Topbar owns it — avoids double palette)", () => {
     mount();
-    dispatchKey({ key: "k", metaKey: true });
-    const palette = (canvasRef.current as unknown as {
-      openCommandPalette: ReturnType<typeof vi.fn>;
-    }).openCommandPalette;
-    expect(palette).toHaveBeenCalledTimes(1);
-  });
-
-  it("Cmd+K is safe when canvasRef.current is null", () => {
-    canvasRef = { current: null } as unknown as UseEditorShortcutsOptions["canvasRef"];
-    mount();
-    expect(() => dispatchKey({ key: "k", metaKey: true })).not.toThrow();
+    const ev = dispatchKey({ key: "k", metaKey: true });
+    // This hook must not consume Cmd+K; Topbar's listener does.
+    expect(ev.defaultPrevented).toBe(false);
   });
 
   it("Cmd+J toggles AI modal (setter receives a function)", () => {

@@ -24,12 +24,20 @@ interface UseCMSPreviewResult {
 export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseCMSPreviewResult {
   const [resolvedContent, setResolvedContent] = React.useState(content);
   const [isResolving, setIsResolving] = React.useState(false);
+  // Bumped on CMS content:updated/created so the resolve effect actually
+  // re-runs (an identity setState bailed out and bindings went stale).
+  const [revision, setRevision] = React.useState(0);
 
   React.useEffect(() => {
     if (!content || !composer?.cms.bindings) {
       setResolvedContent(content);
+      setIsResolving(false);
       return;
     }
+
+    // Guard against out-of-order async resolution: a stale run must not
+    // overwrite a newer one's result.
+    let cancelled = false;
 
     const resolveBindings = async () => {
       setIsResolving(true);
@@ -85,26 +93,31 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
         });
 
         await Promise.all(resolvePromises);
+        if (cancelled) return;
         setResolvedContent(doc.body.innerHTML);
       } catch (error) {
         // On error, use original content
+        if (cancelled) return;
         devError("useCMSPreview", "Failed to resolve CMS bindings", error);
         setResolvedContent(content);
       } finally {
-        setIsResolving(false);
+        if (!cancelled) setIsResolving(false);
       }
     };
 
     resolveBindings();
-  }, [content, composer]);
+    return () => {
+      cancelled = true;
+    };
+  }, [content, composer, revision]);
 
   // Listen for CMS content changes
   React.useEffect(() => {
     if (!composer?.cms.collections) return;
 
     const handleContentChange = () => {
-      // Trigger re-resolution by updating content dependency
-      setResolvedContent((prev) => prev); // Force re-run of above effect
+      // Bump revision → resolve effect re-runs and re-resolves bindings.
+      setRevision((r) => r + 1);
     };
 
     composer.cms.collections.on("content:updated", handleContentChange);

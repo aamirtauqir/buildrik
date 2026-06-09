@@ -47,6 +47,7 @@ import {
   useSectionReorder,
 } from "./hooks";
 import type { DropError, DropSuccess } from "./hooks/useCanvasDragDrop";
+import { useGlobalCustomCss } from "./hooks/useGlobalCustomCss";
 import { ElementContextMenu } from "./menus";
 import { CanvasOverlayGroup } from "./overlays";
 import "./Canvas.css";
@@ -246,8 +247,11 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       inspectorEnabled: isInspectorEnabled,
     });
 
+    // Live global custom CSS (Settings → Advanced) injected into the canvas.
+    const globalCustomCss = useGlobalCustomCss(composer);
+
     // Command palette + cheat sheet (delegated to hooks)
-    const { isPaletteOpen, closePalette, openPalette, commands } = useCanvasCommandPalette({
+    const { isPaletteOpen, closePalette, commands } = useCanvasCommandPalette({
       composer,
       selectedId,
       clear,
@@ -357,13 +361,17 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         composer?.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>",
       getCSS: () => composer?.styles.toCSS() || "/* No styles */",
       getContent: () => content,
-      openCommandPalette: () => openPalette(),
     }));
 
-    // Close context menu on selection change
+    // Close context menu on selection change — but NOT when the selection
+    // change was caused by opening this very menu. Right-clicking an unselected
+    // element calls select() (changing selectedId) in the same commit as
+    // setContextMenu, so an unguarded close would dismiss the menu the instant
+    // it opens (it only survived on already-selected elements).
     React.useEffect(() => {
+      if (contextMenu && contextMenu.elementId === selectedId) return;
       closeContextMenu();
-    }, [selectedId, closeContextMenu]);
+    }, [selectedId, closeContextMenu, contextMenu]);
 
     // ── Aria-live selection announcements (WCAG 4.1.3) ──────────────────────
     const liveAnnouncement = useSelectionAnnouncement({ composer, selectedId, selectedIds });
@@ -451,6 +459,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             ...(pickMode ? { cursor: "crosshair" } : {}),
           }}
         >
+          {/* User's global custom CSS — applied live on the canvas. */}
+          {globalCustomCss ? <style>{globalCustomCss}</style> : null}
+
           {/* Canvas Content */}
           <div
             ref={canvasRef}

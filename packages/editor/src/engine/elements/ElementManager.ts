@@ -197,6 +197,55 @@ export class ElementManager {
     return this.elementCRUD.moveElement(elementId, newParentId, index);
   }
 
+  /**
+   * Wrap ≥2 sibling elements in a new container ("group"). The elements must
+   * share a parent. The container is inserted at the earliest sibling index and
+   * the elements are moved into it in document order. Returns the new container,
+   * or null if the selection can't be grouped.
+   */
+  groupElements(ids: string[]): Element | null {
+    if (ids.length < 2) return null;
+    const els = ids
+      .map((id) => this.getElement(id))
+      .filter((e): e is Element => Boolean(e));
+    if (els.length < 2) return null;
+
+    const parent = els[0].getParent();
+    if (!parent) return null;
+    const parentId = parent.getId();
+    if (!els.every((e) => e.getParent()?.getId() === parentId)) return null;
+
+    const indexOf = (el: Element) =>
+      parent.getChildren().findIndex((s) => s.getId() === el.getId());
+    const ordered = [...els].sort((a, b) => indexOf(a) - indexOf(b));
+    const minIndex = Math.min(...ordered.map(indexOf));
+
+    const group = this.createElement("container", { tagName: "div" });
+    this.addElement(group, parentId, minIndex);
+    ordered.forEach((el, i) => this.moveElement(el.getId(), group.getId(), i));
+    return group;
+  }
+
+  /**
+   * Dissolve a container: move its children into the container's parent at the
+   * container's position (preserving order), then delete the empty container.
+   */
+  ungroupElement(id: string): boolean {
+    const group = this.getElement(id);
+    if (!group) return false;
+    const parent = group.getParent();
+    if (!parent) return false;
+    const parentId = parent.getId();
+    const groupIndex = parent.getChildren().findIndex((s) => s.getId() === id);
+    const children = [...group.getChildren()];
+    if (children.length === 0) return false;
+    children.forEach((child, i) => {
+      this.moveElement(child.getId(), parentId, groupIndex + i);
+    });
+    this.removeElement(id);
+    return true;
+  }
+
   /** Duplicate element */
   duplicateElement(id: string): Element | null {
     return this.elementCRUD.duplicateElement(id);

@@ -58,6 +58,32 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       },
     },
     {
+      id: "group",
+      label: "Group",
+      shortcut: "ctrl+g",
+      run: (c) => {
+        const ids = c.selection.getSelectedIds();
+        if (ids.length < 2) return;
+        c.beginTransaction("group-elements");
+        const group = c.elements.groupElements(ids);
+        c.endTransaction();
+        if (group) c.selection.select(group);
+      },
+    },
+    {
+      id: "ungroup",
+      label: "Ungroup",
+      shortcut: "ctrl+shift+g",
+      run: (c) => {
+        const selected = c.selection.getSelected();
+        if (!selected || selected.getType() !== "container") return;
+        c.beginTransaction("ungroup-elements");
+        c.elements.ungroupElement(selected.getId());
+        c.endTransaction();
+        c.selection.clear();
+      },
+    },
+    {
       id: "duplicate",
       label: "Duplicate",
       shortcut: "ctrl+d",

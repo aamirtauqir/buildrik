@@ -7,6 +7,9 @@ import {
 import superjson from "superjson";
 import type { AppRouter } from "../../../../../server/trpc/router";
 
+// Relative "/api/trpc" is intentional — the editor is served same-origin with
+// the dashboard (unification spec §572 / trpc-same-origin.test.ts), so the
+// session cookie rides along without CORS / explicit credentials.
 const TRPC_URL = "/api/trpc";
 
 let _client: ReturnType<typeof createTRPCClient<AppRouter>> | null = null;

@@ -140,6 +140,13 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       const siteId = getSiteIdFromUrl();
 
       if (siteId) {
+        // Scope the per-site IndexedDB buckets. Without this, every site edited
+        // in the same browser shares the "default" bucket — version snapshots
+        // and saved components bleed across sites, and restoring a version
+        // imports ANOTHER site's content (then autosave persists the bleed).
+        void instance.versions.setProjectId(siteId);
+        void instance.components.setProjectId(siteId);
+
         loadProject(siteId)
           .then(async (data) => {
             // A.1 integration: run DS schema migrations on the loaded payload

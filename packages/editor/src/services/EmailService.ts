@@ -131,7 +131,7 @@ const TEMPLATES: Record<
         <div style="background: #f5f5f5; padding: 16px; border-radius: 8px; margin: 16px 0;">
           ${vars.formData || "No data provided"}
         </div>
-        <p style="color: #666; font-size: 14px;">Form: ${vars.formName || "Unknown"} | Submitted: ${vars.timestamp || new Date().toISOString()}</p>
+        <p style="color: #666; font-size: 14px;">Form: ${escapeHTML(vars.formName || "Unknown")} | Submitted: ${escapeHTML(vars.timestamp || new Date().toISOString())}</p>
       </div>
     `,
     text: `New Form Submission\n\nA new form submission has been received:\n\n${vars.formData || "No data provided"}\n\nForm: ${vars.formName || "Unknown"} | Submitted: ${vars.timestamp || new Date().toISOString()}`,
@@ -141,7 +141,7 @@ const TEMPLATES: Record<
     subject: vars.subject || "Welcome!",
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #333;">Welcome${vars.name ? `, ${vars.name}` : ""}!</h1>
+        <h1 style="color: #333;">Welcome${vars.name ? `, ${escapeHTML(vars.name)}` : ""}!</h1>
         <p>Thank you for signing up. We're excited to have you.</p>
       </div>
     `,
@@ -150,7 +150,9 @@ const TEMPLATES: Record<
 
   custom: (vars) => ({
     subject: vars.subject || "Message",
-    html: vars.html || `<p>${vars.text || ""}</p>`,
+    // vars.html is intentionally raw (caller-supplied HTML email). The text
+    // fallback must escape — vars.text is plain text, not markup.
+    html: vars.html || `<p>${escapeHTML(vars.text || "")}</p>`,
     text: vars.text || "",
   }),
 };

@@ -365,14 +365,23 @@ export function useTouchDrag({
     [resetTouchState]
   );
 
-  return {
-    isTouchDragging: touchDraggingRef.current,
-    touchHandlers: {
+  // Memoize so the handlers object keeps a stable identity. A consumer effect
+  // lists it as a dep to bind 9 delegation listeners — a fresh literal each
+  // render tore them down and re-attached them on every Canvas re-render
+  // (including mid-drag snap-line ticks).
+  const touchHandlers = React.useMemo(
+    () => ({
       onTouchStart: handleTouchStart,
       onTouchMove: handleTouchMove,
       onTouchEnd: handleTouchEnd,
       onTouchCancel: handleTouchCancel,
-    },
+    }),
+    [handleTouchStart, handleTouchMove, handleTouchEnd, handleTouchCancel]
+  );
+
+  return {
+    isTouchDragging: touchDraggingRef.current,
+    touchHandlers,
     resetTouchState,
   };
 }

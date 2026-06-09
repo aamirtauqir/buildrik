@@ -100,30 +100,32 @@ export function useCursorIntelligence({
     ctrlHeld: false,
   });
 
-  // Track modifier keys
+  // Track modifier keys. Bail when the modifier state is unchanged — otherwise
+  // every keystroke anywhere (typing in the sidebar/inspector) allocates a new
+  // object and re-renders the Canvas subtree. We only care about Alt/Shift/
+  // Ctrl/Meta transitions.
   React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      setModifiers({
+    const sync = (e: KeyboardEvent) => {
+      const next = {
         altHeld: e.altKey,
         shiftHeld: e.shiftKey,
         ctrlHeld: e.ctrlKey || e.metaKey,
-      });
+      };
+      setModifiers((prev) =>
+        prev.altHeld === next.altHeld &&
+        prev.shiftHeld === next.shiftHeld &&
+        prev.ctrlHeld === next.ctrlHeld
+          ? prev
+          : next
+      );
     };
 
-    const handleKeyUp = (e: KeyboardEvent) => {
-      setModifiers({
-        altHeld: e.altKey,
-        shiftHeld: e.shiftKey,
-        ctrlHeld: e.ctrlKey || e.metaKey,
-      });
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keydown", sync);
+    window.addEventListener("keyup", sync);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keydown", sync);
+      window.removeEventListener("keyup", sync);
     };
   }, []);
 

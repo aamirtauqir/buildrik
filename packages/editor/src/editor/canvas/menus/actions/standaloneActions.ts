@@ -63,11 +63,14 @@ export const standaloneActions: ContextAction[] = [
     icon: "box",
     group: "standalone",
     shortcut: "Ctrl+G",
-    isVisible: ({ elementStack }) => Boolean(elementStack && elementStack.length >= 2),
-    handler: ({ composer, elementStack }) => {
-      if (!elementStack || elementStack.length < 2) return;
+    // Group the current multi-selection (≥2 elements sharing a parent).
+    isVisible: ({ composer }) => composer.selection.getSelectedIds().length >= 2,
+    handler: ({ composer }) => {
+      const ids = composer.selection.getSelectedIds();
+      if (ids.length < 2) return;
       runTransaction(composer, "group-elements", () => {
-        composer.emit?.("elements:group", { ids: elementStack });
+        const group = composer.elements.groupElements(ids);
+        if (group) composer.selection.select(group as never);
       });
     },
   },
@@ -80,11 +83,12 @@ export const standaloneActions: ContextAction[] = [
     isVisible: ({ element }) => {
       const type = element.getType?.();
       // Show Ungroup for containers that wrap other elements
-      return type === "container";
+      return type === "container" && (element.getChildren?.()?.length ?? 0) > 0;
     },
     handler: ({ composer, element }) => {
       runTransaction(composer, "ungroup-elements", () => {
-        composer.emit?.("elements:ungroup", { id: element.getId() });
+        composer.elements.ungroupElement(element.getId());
+        composer.selection.clear();
       });
     },
   },
