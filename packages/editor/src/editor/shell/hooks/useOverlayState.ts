@@ -36,6 +36,7 @@ export function useOverlayState(): UseOverlayStateReturn {
   const [showBadges, setShowBadges] = React.useState(false);
   const [showGuides, setShowGuides] = React.useState(true);
   const [showGrid, setShowGrid] = React.useState(false);
+  const [showRulers, setShowRulers] = React.useState(false);
   const [devMode, setDevMode] = React.useState(false);
   const [showSuggestions, setShowSuggestions] = React.useState(true);
 
@@ -48,6 +49,7 @@ export function useOverlayState(): UseOverlayStateReturn {
       showBadges,
       showGuides,
       showGrid,
+      showRulers,
       devMode,
       showSuggestions,
     }),
@@ -58,6 +60,7 @@ export function useOverlayState(): UseOverlayStateReturn {
       showBadges,
       showGuides,
       showGrid,
+      showRulers,
       devMode,
       showSuggestions,
     ]

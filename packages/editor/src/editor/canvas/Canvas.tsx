@@ -577,6 +577,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
                 guides: showGuides,
                 spacing: showSpacing,
                 grid: showGrid,
+                rulers: showRulers,
                 badges: showBadges,
                 xray: showXRay,
               }}

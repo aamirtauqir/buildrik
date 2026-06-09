@@ -34,6 +34,7 @@ export interface CanvasOverlayState {
   guides: boolean;
   spacing: boolean;
   grid: boolean;
+  rulers: boolean;
   badges: boolean;
   xray: boolean;
 }
@@ -73,6 +74,13 @@ const GridIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="3" y="3" width="18" height="18" rx="2" />
     <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
+  </svg>
+);
+
+const RulersIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M3 3h4v18H3zM3 3h18v4H3z" strokeLinejoin="round" />
+    <path d="M3 8h2M3 12h2M3 16h2M8 3v2M12 3v2M16 3v2" strokeLinecap="round" />
   </svg>
 );
 
@@ -203,6 +211,12 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           label="Grid"
           active={overlays.grid}
           onClick={() => onOverlayChange("grid", !overlays.grid)}
+        />
+        <OverlayButton
+          icon={<RulersIcon />}
+          label="Rulers"
+          active={overlays.rulers}
+          onClick={() => onOverlayChange("rulers", !overlays.rulers)}
         />
         <OverlayButton
           icon={<BadgesIcon />}

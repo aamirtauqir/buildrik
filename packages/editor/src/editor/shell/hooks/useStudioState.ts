@@ -51,6 +51,7 @@ export interface OverlayState {
   showBadges: boolean;
   showGuides: boolean;
   showGrid: boolean;
+  showRulers: boolean;
   devMode: boolean;
   showSuggestions: boolean;
 }
@@ -98,6 +99,7 @@ export interface UseStudioStateReturn {
   setShowBadges: React.Dispatch<React.SetStateAction<boolean>>;
   setShowGuides: React.Dispatch<React.SetStateAction<boolean>>;
   setShowGrid: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowRulers: React.Dispatch<React.SetStateAction<boolean>>;
   setDevMode: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSuggestions: React.Dispatch<React.SetStateAction<boolean>>;
   toggleOverlay: (overlay: keyof OverlayState) => void;
@@ -197,6 +199,7 @@ export function useStudioState(): UseStudioStateReturn {
   const [showBadges, setShowBadges] = React.useState(false);
   const [showGuides, setShowGuides] = React.useState(true);
   const [showGrid, setShowGrid] = React.useState(false);
+  const [showRulers, setShowRulers] = React.useState(false);
   const [devMode, setDevMode] = React.useState(false);
   const [showSuggestions, setShowSuggestions] = React.useState(true);
 
@@ -283,6 +286,7 @@ export function useStudioState(): UseStudioStateReturn {
       showBadges,
       showGuides,
       showGrid,
+      showRulers,
       devMode,
       showSuggestions,
     }),
@@ -293,6 +297,7 @@ export function useStudioState(): UseStudioStateReturn {
       showBadges,
       showGuides,
       showGrid,
+      showRulers,
       devMode,
       showSuggestions,
     ]
@@ -318,6 +323,9 @@ export function useStudioState(): UseStudioStateReturn {
         break;
       case "showGrid":
         setShowGrid((prev) => !prev);
+        break;
+      case "showRulers":
+        setShowRulers((prev) => !prev);
         break;
       case "devMode":
         setDevMode((prev) => !prev);
@@ -396,6 +404,7 @@ export function useStudioState(): UseStudioStateReturn {
     setShowBadges,
     setShowGuides,
     setShowGrid,
+    setShowRulers,
     setDevMode,
     setShowSuggestions,
     toggleOverlay,

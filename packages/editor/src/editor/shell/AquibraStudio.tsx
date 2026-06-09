@@ -373,6 +373,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         showBadges={state.overlays.showBadges}
         showGuides={state.overlays.showGuides}
         showGrid={state.overlays.showGrid}
+        showRulers={state.overlays.showRulers}
         showComponentView={state.overlays.showComponentView}
         showXRay={state.overlays.showXRay}
         devMode={state.overlays.devMode}
@@ -384,6 +385,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             hasManuallyToggledSpacing.current = true;
             state.setShowSpacingIndicators(enabled);
           } else if (overlay === "grid") state.setShowGrid(enabled);
+          else if (overlay === "rulers") state.setShowRulers(enabled);
           else if (overlay === "badges") state.setShowBadges(enabled);
           else if (overlay === "xray") state.setShowXRay(enabled);
         }}
