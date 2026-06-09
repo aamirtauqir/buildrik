@@ -88,12 +88,16 @@ export function buildDefaultCommands(composer: Composer): CommandData[] {
       label: "Duplicate",
       shortcut: "ctrl+d",
       run: (c) => {
-        const selected = c.selection.getSelected();
-        if (selected) {
-          c.beginTransaction("duplicate");
-          c.elements.duplicateElement(selected.getId());
-          c.endTransaction();
-        }
+        const ids = c.selection.getSelectedIds();
+        if (ids.length === 0) return;
+        c.beginTransaction("duplicate");
+        const clones = ids
+          .map((id) => c.elements.duplicateElement(id))
+          .filter((el): el is NonNullable<typeof el> => Boolean(el));
+        c.endTransaction();
+        // Re-select the duplicates so the next action targets them.
+        if (clones.length === 1) c.selection.select(clones[0]);
+        else if (clones.length > 1) c.selection.selectMultiple(clones);
       },
     },
     {
