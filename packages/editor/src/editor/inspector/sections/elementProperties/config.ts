@@ -196,6 +196,12 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
 
   select: [
     { id: "name", label: "Name", type: "text", placeholder: "field_name" },
+    {
+      id: "options",
+      label: "Options (one per line)",
+      type: "textarea",
+      placeholder: "Option 1\nOption 2\nOption 3",
+    },
     { id: "required", label: "Required", type: "checkbox" },
     { id: "disabled", label: "Disabled", type: "checkbox" },
     { id: "multiple", label: "Multiple", type: "checkbox" },

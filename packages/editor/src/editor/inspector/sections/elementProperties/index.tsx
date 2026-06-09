@@ -9,6 +9,7 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../../../shared/types/media";
 import { Section, type SectionTier } from "../../shared/controls";
+import { escapeHTML } from "../../../../shared/utils/html/encoding";
 import { getPropertiesForType } from "./config";
 import { DataAttributeEditor } from "./DataAttributeEditor";
 import {
@@ -175,6 +176,14 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
         loaded[prop.id] = el.getTagName?.() || "h2";
         return;
       }
+      // Select options read from the inner <option> elements (one per line).
+      if (prop.id === "options" && selectedElement.type === "select") {
+        const content = el.getContent?.() || "";
+        loaded[prop.id] = [...content.matchAll(/<option[^>]*>([\s\S]*?)<\/option>/gi)]
+          .map((m) => m[1].trim())
+          .join("\n");
+        return;
+      }
       // Textarea default value uses inner content when attribute is absent
       if (selectedElement.type === "textarea" && prop.id === "value") {
         loaded[prop.id] = el.getAttribute?.("value") || el.getContent?.() || "";
@@ -219,6 +228,21 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
     if (id === "level" && selectedElement.type === "heading") {
       runTxn(composer, "heading-level-change", () => {
         el.setTagName(value);
+      });
+      setAttrs((prev) => ({ ...prev, [id]: value }));
+      return;
+    }
+
+    // Select options — one per line, rebuilt into <option> elements.
+    if (id === "options" && selectedElement.type === "select") {
+      runTxn(composer, "select-options-change", () => {
+        const html = value
+          .split("\n")
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0)
+          .map((line) => `<option>${escapeHTML(line)}</option>`)
+          .join("");
+        el.setContent?.(html);
       });
       setAttrs((prev) => ({ ...prev, [id]: value }));
       return;
