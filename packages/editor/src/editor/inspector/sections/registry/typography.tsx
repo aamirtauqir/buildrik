@@ -14,7 +14,7 @@ export const TYPOGRAPHY_SECTIONS: Record<string, AnySectionEntry> = {
   typography: defineSection({
     Component: TypographySection,
     advancedKey: "typography",
-    styleKeys: ["font-family", "font-size", "font-weight", "font-style", "line-height", "letter-spacing", "color", "text-align", "text-transform", "text-decoration", "white-space", "word-break"],
+    styleKeys: ["font-family", "font-size", "font-weight", "font-style", "line-height", "letter-spacing", "color", "text-align", "text-transform", "text-decoration", "white-space", "word-break", "word-spacing", "text-indent", "vertical-align"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       advancedExpanded: ctx.advancedExpanded,

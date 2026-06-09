@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { SelectRow, ButtonGroup, ColorInput, MixedValueIndicator } from "../../shared/controls";
+import { SelectRow, ButtonGroup, ColorInput, MixedValueIndicator, InputWithUnit } from "../../shared/controls";
 
 interface TextControlsProps {
   styles: Record<string, string>;
@@ -81,6 +81,35 @@ export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChan
           { value: "break-all", label: "Break All" },
           { value: "keep-all", label: "Keep All" },
           { value: "break-word", label: "Break Word" },
+        ]}
+      />
+
+      {/* Word Spacing */}
+      <InputWithUnit
+        label="Word Spacing"
+        value={styles["word-spacing"] || ""}
+        onChange={(v) => onChange("word-spacing", v)}
+      />
+
+      {/* Text Indent */}
+      <InputWithUnit
+        label="Text Indent"
+        value={styles["text-indent"] || ""}
+        onChange={(v) => onChange("text-indent", v)}
+      />
+
+      {/* Vertical Align */}
+      <SelectRow
+        label="Vertical Align"
+        value={styles["vertical-align"] || ""}
+        onChange={(v) => onChange("vertical-align", v)}
+        options={[
+          { value: "baseline", label: "Baseline" },
+          { value: "top", label: "Top" },
+          { value: "middle", label: "Middle" },
+          { value: "bottom", label: "Bottom" },
+          { value: "sub", label: "Sub" },
+          { value: "super", label: "Super" },
         ]}
       />
     </>
