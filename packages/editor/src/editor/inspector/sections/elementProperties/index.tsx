@@ -170,6 +170,11 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
         loaded[prop.id] = el.getContent?.() || "";
         return;
       }
+      // Heading level reads from the element's tag, not an attribute.
+      if (prop.id === "level" && selectedElement.type === "heading") {
+        loaded[prop.id] = el.getTagName?.() || "h2";
+        return;
+      }
       // Textarea default value uses inner content when attribute is absent
       if (selectedElement.type === "textarea" && prop.id === "value") {
         loaded[prop.id] = el.getAttribute?.("value") || el.getContent?.() || "";
@@ -205,6 +210,15 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
     if (id === "content") {
       runTxn(composer, "content-change", () => {
         handleContentChange(el, value);
+      });
+      setAttrs((prev) => ({ ...prev, [id]: value }));
+      return;
+    }
+
+    // Heading level — maps to the element's tag (h1–h6).
+    if (id === "level" && selectedElement.type === "heading") {
+      runTxn(composer, "heading-level-change", () => {
+        el.setTagName(value);
       });
       setAttrs((prev) => ({ ...prev, [id]: value }));
       return;

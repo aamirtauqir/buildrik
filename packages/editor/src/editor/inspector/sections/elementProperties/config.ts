@@ -90,6 +90,19 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
 
   heading: [
     { id: "content", label: "Heading Text", type: "textarea", placeholder: "Enter heading..." },
+    {
+      id: "level",
+      label: "Level",
+      type: "select",
+      options: [
+        { value: "h1", label: "H1" },
+        { value: "h2", label: "H2" },
+        { value: "h3", label: "H3" },
+        { value: "h4", label: "H4" },
+        { value: "h5", label: "H5" },
+        { value: "h6", label: "H6" },
+      ],
+    },
   ],
 
   text: [{ id: "content", label: "Text Content", type: "textarea", placeholder: "Enter text..." }],
