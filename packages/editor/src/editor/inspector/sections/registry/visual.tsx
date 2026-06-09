@@ -16,7 +16,7 @@ export const VISUAL_SECTIONS: Record<string, AnySectionEntry> = {
   background: defineSection({
     Component: BackgroundSection,
     advancedKey: "background",
-    styleKeys: ["background", "background-color", "background-image", "background-size", "background-position", "background-repeat", "background-attachment"],
+    styleKeys: ["background", "background-color", "background-image", "background-size", "background-position", "background-repeat", "background-attachment", "background-blend-mode"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onOpenMediaLibrary: ctx.onOpenMediaLibrary,

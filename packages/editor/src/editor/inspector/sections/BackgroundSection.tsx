@@ -355,6 +355,22 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   { value: "local", label: "Local" },
                 ]}
               />
+
+              <SelectRow
+                label="Blend Mode"
+                value={styles["background-blend-mode"] || ""}
+                onChange={(v) => onChange("background-blend-mode", v)}
+                options={[
+                  { value: "normal", label: "Normal" },
+                  { value: "multiply", label: "Multiply" },
+                  { value: "screen", label: "Screen" },
+                  { value: "overlay", label: "Overlay" },
+                  { value: "darken", label: "Darken" },
+                  { value: "lighten", label: "Lighten" },
+                  { value: "color-dodge", label: "Color Dodge" },
+                  { value: "difference", label: "Difference" },
+                ]}
+              />
             </>
           )}
 
