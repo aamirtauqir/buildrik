@@ -144,8 +144,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
         // in the same browser shares the "default" bucket — version snapshots
         // and saved components bleed across sites, and restoring a version
         // imports ANOTHER site's content (then autosave persists the bleed).
-        void instance.versions.setProjectId(siteId);
-        void instance.components.setProjectId(siteId);
+        void instance.versions?.setProjectId?.(siteId);
+        void instance.components?.setProjectId?.(siteId);
 
         loadProject(siteId)
           .then(async (data) => {
