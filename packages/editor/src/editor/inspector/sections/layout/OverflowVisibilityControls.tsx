@@ -71,9 +71,32 @@ export const OverflowControls: React.FC<OverflowVisibilityControlsProps> = ({
       </div>
       {/* Overflow X/Y */}
       <OverflowXYControls styles={styles} onChange={onChange} inputStyle={inputStyle} />
+      {/* Box sizing */}
+      <div style={rowStyle}>
+        {mixedKeys?.has("box-sizing") && <MixedValueBadge compact />}
+        <div style={{ display: "flex", gap: 2, flex: 1 }}>
+          {BOX_SIZING_OPTIONS.map((option) => (
+            <Button
+              key={option.value}
+              style={compactBtn((styles["box-sizing"] || "content-box") === option.value)}
+              onClick={() => onChange("box-sizing", option.value)}
+              title={option.tooltip}
+              aria-label={option.tooltip}
+              aria-pressed={(styles["box-sizing"] || "content-box") === option.value}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+      </div>
     </>
   );
 };
+
+const BOX_SIZING_OPTIONS = [
+  { value: "content-box", label: "content", tooltip: "Size excludes padding + border (content-box)" },
+  { value: "border-box", label: "border", tooltip: "Size includes padding + border (border-box)" },
+];
 
 // ============================================================================
 // OVERFLOW XY CONTROLS (sub-component)

@@ -28,7 +28,7 @@ export const LAYOUT_SECTIONS: Record<string, AnySectionEntry> = {
   layout: defineSection({
     Component: LayoutSection,
     advancedKey: "layout",
-    styleKeys: ["display", "position", "width", "height", "top", "right", "bottom", "left", "z-index", "overflow", "overflow-x", "overflow-y", "float", "clear", "visibility"],
+    styleKeys: ["display", "position", "width", "height", "top", "right", "bottom", "left", "z-index", "overflow", "overflow-x", "overflow-y", "box-sizing", "float", "clear", "visibility"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       propertyStates: ctx.propertyStates,
