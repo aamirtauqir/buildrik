@@ -345,6 +345,14 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
           labelWidth={70}
         />
 
+        <TextInputRow
+          label="Delay"
+          value={styles["transition-delay"] || ""}
+          onChange={(v) => onChange("transition-delay", v)}
+          placeholder="0s"
+          labelWidth={70}
+        />
+
         <SelectRow
           label="Easing"
           value={styles["transition-timing-function"] || ""}
@@ -447,6 +455,27 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
           { value: "color-burn", label: "Color Burn" },
           { value: "difference", label: "Difference" },
           { value: "exclusion", label: "Exclusion" },
+        ]}
+      />
+
+      <TextInputRow
+        label="Text Shadow"
+        value={styles["text-shadow"] || ""}
+        onChange={(v) => onChange("text-shadow", v)}
+        placeholder="2px 2px 4px rgba(0,0,0,0.3)"
+        labelWidth={84}
+      />
+
+      <SelectRow
+        label="Will Change"
+        value={styles["will-change"] || ""}
+        onChange={(v) => onChange("will-change", v)}
+        options={[
+          { value: "auto", label: "Auto" },
+          { value: "transform", label: "Transform" },
+          { value: "opacity", label: "Opacity" },
+          { value: "scroll-position", label: "Scroll" },
+          { value: "contents", label: "Contents" },
         ]}
       />
     </Section>

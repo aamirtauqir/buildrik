@@ -14,7 +14,7 @@ import { VisibilitySection } from "../VisibilitySection";
 export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
   effects: defineSection({
     Component: EffectsSection,
-    styleKeys: ["opacity", "box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-timing-function"],
+    styleKeys: ["opacity", "box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-delay", "transition-timing-function", "text-shadow", "will-change"],
     adaptProps: adaptBaseStyleProps,
   }),
 
