@@ -14,6 +14,8 @@ import {
 } from "@/server/services/team.service";
 import { inviteMembersSchema, listMembersSchema, changeRoleSchema } from "@buildrik/shared/schemas/team";
 import { type PlanName } from "@/lib/constants/plan-limits";
+import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
+import { record as recordActivity } from "@/server/services/activity-log.service";
 
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
   if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -23,6 +25,19 @@ async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string
   });
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return { workspaceId: member.workspaceId, plan: member.workspace.plan as PlanName };
+}
+
+// Team-management mutations require ADMIN/OWNER. Returns the actor's workspace
+// so the service can scope the target row to it (IDOR guard).
+async function requireAdmin(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
+  const wc = await getWorkspaceCtx(ctx);
+  try {
+    await checkWorkspaceRole(ctx.prisma, ctx.session!.user.id, wc.workspaceId, "ADMIN");
+  } catch (e) {
+    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+    throw e;
+  }
+  return wc;
 }
 
 export const teamRouter = router({
@@ -35,9 +50,16 @@ export const teamRouter = router({
     return listMembers(workspaceId, input);
   }),
   invite: protectedProcedure.input(inviteMembersSchema).mutation(async ({ ctx, input }) => {
-    const { workspaceId, plan } = await getWorkspaceCtx(ctx);
+    const { workspaceId, plan } = await requireAdmin(ctx);
     try {
-      return await inviteMembers(workspaceId, ctx.session.user.id, input, plan);
+      const result = await inviteMembers(workspaceId, ctx.session.user.id, input, plan);
+      await recordActivity({
+        workspaceId,
+        actorId: ctx.session.user.id,
+        action: "MEMBER_INVITED",
+        metadata: { count: input.emails?.length ?? 1 },
+      });
+      return result;
     } catch (e: unknown) {
       if (e instanceof Error && e.message === "TEAM_LIMIT") throw new TRPCError({ code: "FORBIDDEN", message: "Team member limit reached." });
       throw e;
@@ -46,17 +68,48 @@ export const teamRouter = router({
   changeRole: protectedProcedure
     .input(changeRoleSchema)
     .mutation(async ({ ctx, input }) => {
+      const { workspaceId } = await requireAdmin(ctx);
       try {
-        return await changeRole(input.memberId, input.role, ctx.session.user.id);
+        const result = await changeRole(input.memberId, input.role, workspaceId);
+        await recordActivity({
+          workspaceId,
+          actorId: ctx.session.user.id,
+          action: "MEMBER_ROLE_CHANGED",
+          targetType: "member",
+          targetId: input.memberId,
+          metadata: { role: input.role },
+        });
+        return result;
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "CANNOT_CHANGE_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Cannot change owner role." });
         if (e instanceof Error && e.message === "LAST_ADMIN") throw new TRPCError({ code: "FORBIDDEN", message: "Cannot demote last admin." });
         throw e;
       }
     }),
-  revoke: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ input }) => revokeMember(input.memberId)),
-  delete: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ input }) => {
-    try { await deleteMember(input.memberId); } catch (e: unknown) {
+  revoke: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ ctx, input }) => {
+    const { workspaceId } = await requireAdmin(ctx);
+    const result = await revokeMember(input.memberId, workspaceId);
+    await recordActivity({
+      workspaceId,
+      actorId: ctx.session.user.id,
+      action: "MEMBER_REMOVED",
+      targetType: "member",
+      targetId: input.memberId,
+    });
+    return result;
+  }),
+  delete: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ ctx, input }) => {
+    const { workspaceId } = await requireAdmin(ctx);
+    try {
+      await deleteMember(input.memberId, workspaceId);
+      await recordActivity({
+        workspaceId,
+        actorId: ctx.session.user.id,
+        action: "MEMBER_REMOVED",
+        targetType: "member",
+        targetId: input.memberId,
+      });
+    } catch (e: unknown) {
       if (e instanceof Error && e.message === "CANNOT_DELETE_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Cannot remove workspace owner." });
       throw e;
     }
@@ -65,8 +118,14 @@ export const teamRouter = router({
     const { workspaceId } = await getWorkspaceCtx(ctx);
     return listPendingInvites(workspaceId);
   }),
-  revokeInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ input }) => revokeInvite(input.inviteId)),
-  resendInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ input }) => resendInvite(input.inviteId)),
+  revokeInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ ctx, input }) => {
+    const { workspaceId } = await requireAdmin(ctx);
+    return revokeInvite(input.inviteId, workspaceId);
+  }),
+  resendInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ ctx, input }) => {
+    const { workspaceId } = await requireAdmin(ctx);
+    return resendInvite(input.inviteId, workspaceId);
+  }),
   activity: protectedProcedure.query(async ({ ctx }) => {
     const { workspaceId } = await getWorkspaceCtx(ctx);
     return getTeamActivity(workspaceId);

@@ -130,12 +130,14 @@ export async function inviteMembers(
 export async function changeRole(
   memberId: string,
   role: string,
-  actorId: string,
+  workspaceId: string,
 ) {
   const member = await prisma.workspaceMember.findUnique({
     where: { id: memberId },
   });
-  if (!member) throw new Error("MEMBER_NOT_FOUND");
+  // Scope to the actor's workspace: a valid memberId from another workspace
+  // must not be mutable here (IDOR guard).
+  if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_CHANGE_OWNER");
 
   if (member.role === "ADMIN" && role !== "ADMIN") {
@@ -154,11 +156,11 @@ export async function changeRole(
   });
 }
 
-export async function revokeMember(memberId: string) {
+export async function revokeMember(memberId: string, workspaceId: string) {
   const member = await prisma.workspaceMember.findUnique({
     where: { id: memberId },
   });
-  if (!member) throw new Error("MEMBER_NOT_FOUND");
+  if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_REVOKE_OWNER");
 
   return prisma.workspaceMember.update({
@@ -167,11 +169,11 @@ export async function revokeMember(memberId: string) {
   });
 }
 
-export async function deleteMember(memberId: string) {
+export async function deleteMember(memberId: string, workspaceId: string) {
   const member = await prisma.workspaceMember.findUnique({
     where: { id: memberId },
   });
-  if (!member) throw new Error("MEMBER_NOT_FOUND");
+  if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_DELETE_OWNER");
 
   return prisma.workspaceMember.delete({ where: { id: memberId } });
@@ -184,13 +186,17 @@ export async function listPendingInvites(workspaceId: string) {
   });
 }
 
-export async function revokeInvite(inviteId: string) {
-  return prisma.invite.delete({ where: { id: inviteId } });
+export async function revokeInvite(inviteId: string, workspaceId: string) {
+  // Scoped delete: a cross-workspace inviteId matches zero rows (no-op),
+  // never another workspace's invite.
+  const result = await prisma.invite.deleteMany({ where: { id: inviteId, workspaceId } });
+  if (result.count === 0) throw new Error("INVITE_NOT_FOUND");
+  return result;
 }
 
-export async function resendInvite(inviteId: string) {
+export async function resendInvite(inviteId: string, workspaceId: string) {
   const invite = await prisma.invite.findUnique({ where: { id: inviteId } });
-  if (!invite) throw new Error("INVITE_NOT_FOUND");
+  if (!invite || invite.workspaceId !== workspaceId) throw new Error("INVITE_NOT_FOUND");
   if (invite.resendCount >= 2) throw new Error("MAX_RESENDS");
 
   const expiresAt = new Date();

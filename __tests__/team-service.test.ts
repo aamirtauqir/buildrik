@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     workspaceMember: { findMany: vi.fn(), findUnique: vi.fn(), count: vi.fn(), update: vi.fn(), delete: vi.fn() },
-    invite: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn(), findUnique: vi.fn() },
+    invite: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), deleteMany: vi.fn(), count: vi.fn(), findUnique: vi.fn() },
     user: { findUnique: vi.fn(), findMany: vi.fn() },
     workspace: { findUnique: vi.fn() },
     site: { count: vi.fn() },
@@ -98,16 +98,16 @@ describe("Team Service", () => {
       vi.mocked(prisma.workspaceMember.update).mockResolvedValue({
         id: "m1", role: "ADMIN",
       } as any);
-      const result = await changeRole("m1", "ADMIN", "u1");
+      const result = await changeRole("m1", "ADMIN", "ws1");
       expect(result.role).toBe("ADMIN");
     });
 
     it("prevents changing owner role", async () => {
       const { changeRole } = await import("@/server/services/team.service");
       vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "OWNER", userId: "u1",
+        id: "m1", role: "OWNER", userId: "u1", workspaceId: "ws1",
       } as any);
-      await expect(changeRole("m1", "EDITOR", "u2")).rejects.toThrow("CANNOT_CHANGE_OWNER");
+      await expect(changeRole("m1", "EDITOR", "ws1")).rejects.toThrow("CANNOT_CHANGE_OWNER");
     });
 
     it("prevents demoting last admin", async () => {
@@ -116,7 +116,7 @@ describe("Team Service", () => {
         id: "m1", role: "ADMIN", userId: "u2", workspaceId: "ws1",
       } as any);
       vi.mocked(prisma.workspaceMember.count).mockResolvedValue(1);
-      await expect(changeRole("m1", "EDITOR", "u1")).rejects.toThrow("LAST_ADMIN");
+      await expect(changeRole("m1", "EDITOR", "ws1")).rejects.toThrow("LAST_ADMIN");
     });
   });
 
@@ -124,12 +124,12 @@ describe("Team Service", () => {
     it("sets member status to SUSPENDED", async () => {
       const { revokeMember } = await import("@/server/services/team.service");
       vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "EDITOR",
+        id: "m1", role: "EDITOR", workspaceId: "ws1",
       } as any);
       vi.mocked(prisma.workspaceMember.update).mockResolvedValue({
         id: "m1", status: "SUSPENDED",
       } as any);
-      const result = await revokeMember("m1");
+      const result = await revokeMember("m1", "ws1");
       expect(result.status).toBe("SUSPENDED");
     });
   });
@@ -138,19 +138,19 @@ describe("Team Service", () => {
     it("removes member from workspace", async () => {
       const { deleteMember } = await import("@/server/services/team.service");
       vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "EDITOR",
+        id: "m1", role: "EDITOR", workspaceId: "ws1",
       } as any);
       vi.mocked(prisma.workspaceMember.delete).mockResolvedValue({ id: "m1" } as any);
-      await deleteMember("m1");
+      await deleteMember("m1", "ws1");
       expect(prisma.workspaceMember.delete).toHaveBeenCalledWith({ where: { id: "m1" } });
     });
 
     it("prevents deleting owner", async () => {
       const { deleteMember } = await import("@/server/services/team.service");
       vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "OWNER",
+        id: "m1", role: "OWNER", workspaceId: "ws1",
       } as any);
-      await expect(deleteMember("m1")).rejects.toThrow("CANNOT_DELETE_OWNER");
+      await expect(deleteMember("m1", "ws1")).rejects.toThrow("CANNOT_DELETE_OWNER");
     });
   });
 
@@ -168,9 +168,9 @@ describe("Team Service", () => {
   describe("revokeInvite", () => {
     it("deletes invite", async () => {
       const { revokeInvite } = await import("@/server/services/team.service");
-      vi.mocked(prisma.invite.delete).mockResolvedValue({ id: "inv1" } as any);
-      await revokeInvite("inv1");
-      expect(prisma.invite.delete).toHaveBeenCalled();
+      vi.mocked(prisma.invite.deleteMany).mockResolvedValue({ count: 1 } as any);
+      await revokeInvite("inv1", "ws1");
+      expect(prisma.invite.deleteMany).toHaveBeenCalledWith({ where: { id: "inv1", workspaceId: "ws1" } });
     });
   });
 

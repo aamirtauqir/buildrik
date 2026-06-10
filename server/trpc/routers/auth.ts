@@ -13,6 +13,7 @@ import {
 import { generateToken } from "@/server/services/token.service";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createNotification } from "@/server/services/notification.trigger";
+import { record as recordActivity } from "@/server/services/activity-log.service";
 
 // Strict: 5 attempts per 15 min (login, 2FA, token verification)
 const strictRateLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
@@ -287,6 +288,14 @@ export const authRouter = router({
         message: `${user.email} joined the workspace`,
         actorId: userId,
         actionUrl: "/dashboard/team",
+      }).catch(() => {});
+
+      // Activity-log entry so the team activity feed (getTeamActivity) reflects
+      // the join — the notification alone never reached that feed.
+      await recordActivity({
+        workspaceId: invite.workspaceId,
+        actorId: userId,
+        action: "MEMBER_JOINED",
       }).catch(() => {});
 
       return { success: true, workspaceId: invite.workspaceId, workspaceName: invite.workspace.name };
