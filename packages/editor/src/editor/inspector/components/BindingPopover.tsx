@@ -14,7 +14,7 @@ import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
-import type { CMSCollection } from "../../../shared/types/cms";
+import type { CMSCollection, CMSContentItem } from "../../../shared/types/cms";
 
 // =============================================================================
 // TYPES
@@ -161,6 +161,8 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
   const [open, setOpen] = React.useState(false);
   const [collections, setCollections] = React.useState<CMSCollection[]>([]);
   const [selectedCollection, setSelectedCollection] = React.useState<CMSCollection | null>(null);
+  const [selectedField, setSelectedField] = React.useState<{ slug: string; name: string } | null>(null);
+  const [records, setRecords] = React.useState<CMSContentItem[]>([]);
   const [isBound, setIsBound] = React.useState(false);
   const [boundLabel, setBoundLabel] = React.useState<string | null>(null);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
@@ -186,17 +188,40 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
     []
   );
 
+  // Field then record: a single-element binding needs BOTH a field and a
+  // specific record (itemId), otherwise resolveBinding has nothing to read and
+  // always returns the fallback (the old flow bound with itemId=undefined).
   const handleSelectField = React.useCallback(
-    (collectionId: string, fieldId: string, fieldName: string) => {
-      if (!elementId) return;
-      // Bind element to field using the CMS bindings manager
-      composer?.cms.bindings?.bindToField?.(elementId, collectionId, undefined, fieldId, "content");
-      setBoundLabel(`${selectedCollection?.name ?? ""} › ${fieldName}`);
+    (fieldSlug: string, fieldName: string) => {
+      setSelectedField({ slug: fieldSlug, name: fieldName });
+      if (composer && selectedCollection) {
+        void composer.cms.collections
+          .getContentItems(selectedCollection.id)
+          .then((rows) => setRecords(rows))
+          .catch(() => setRecords([]));
+      }
+    },
+    [composer, selectedCollection]
+  );
+
+  const handleSelectRecord = React.useCallback(
+    (itemId: string) => {
+      if (!elementId || !selectedCollection || !selectedField) return;
+      composer?.cms.bindings?.bindToField?.(
+        elementId,
+        selectedCollection.id,
+        itemId,
+        selectedField.slug,
+        "content"
+      );
+      setBoundLabel(`${selectedCollection.name} › ${selectedField.name}`);
       setIsBound(true);
       setOpen(false);
       setSelectedCollection(null);
+      setSelectedField(null);
+      setRecords([]);
     },
-    [elementId, composer, selectedCollection]
+    [elementId, composer, selectedCollection, selectedField]
   );
 
   const handleUnbind = React.useCallback(() => {
@@ -304,8 +329,8 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
               </>
             )}
 
-            {/* Field list (when collection selected) */}
-            {selectedCollection && (
+            {/* Field list (collection selected, no field yet) */}
+            {selectedCollection && !selectedField && (
               <>
                 <Button
                   type="button"
@@ -328,9 +353,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                     key={field.id}
                     type="button"
                     style={s.listItem}
-                    onClick={() =>
-                      handleSelectField(selectedCollection.id, field.slug, field.name)
-                    }
+                    onClick={() => handleSelectField(field.slug, field.name)}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLElement).style.background =
                         "var(--buildrick-bg-elevated)";
@@ -351,6 +374,48 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                     </span>
                   </Button>
                 ))}
+              </>
+            )}
+
+            {/* Record list (field selected) — pick which record to bind. */}
+            {selectedCollection && selectedField && (
+              <>
+                <Button
+                  type="button"
+                  style={{ ...s.listItem, color: "var(--buildrick-accent)", fontSize: 11 }}
+                  onClick={() => {
+                    setSelectedField(null);
+                    setRecords([]);
+                  }}
+                >
+                  ← {selectedField.name}
+                </Button>
+                <div style={s.divider} />
+                <div style={s.sectionTitle}>Record</div>
+                {records.length === 0 && (
+                  <div style={{ ...s.emptyMsg, padding: "10px 12px" }}>
+                    No records yet. Add records via the command palette → “Manage CMS Records”.
+                  </div>
+                )}
+                {records.map((rec) => {
+                  const key = selectedCollection.displayField || selectedCollection.fields[0]?.slug;
+                  const label = key && rec.data[key] != null && rec.data[key] !== ""
+                    ? String(rec.data[key])
+                    : "(untitled)";
+                  return (
+                    <Button
+                      key={rec.id}
+                      type="button"
+                      style={s.listItem}
+                      onClick={() => handleSelectRecord(rec.id)}
+                    >
+                      {label}
+                      <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--buildrick-text-muted)" }}>
+                        {rec.status}
+                      </span>
+                    </Button>
+                  );
+                })}
               </>
             )}
           </div>
