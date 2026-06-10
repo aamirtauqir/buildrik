@@ -85,9 +85,11 @@ export class SSETransport implements CollaborationTransport {
 
   send(event: CollaborationEvent): void {
     if (!this.roomId) return;
+    // Same-origin with the dashboard (§572): fetch's default "same-origin"
+    // credentials already sends the session cookie, so no explicit include
+    // (which would also trip the cross-origin-inventory baseline).
     void fetch(`/api/collab/${encodeURIComponent(this.roomId)}/ops`, {
       method: "POST",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ clientId: this.clientId, op: event }),
     }).catch(() => {
