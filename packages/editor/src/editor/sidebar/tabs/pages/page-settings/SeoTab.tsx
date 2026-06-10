@@ -22,6 +22,7 @@ import {
   TooltipPortal,
   TooltipContent,
 } from "@/editor/shared/vibcoder";
+import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
@@ -50,6 +51,24 @@ const rangeLabel: Record<TitleRange, string> = {
 export const SeoTab: React.FC<Props> = ({ s, page }) => {
   const domain = s.domain ?? "yoursite.aquibra.io";
   const range = titleRange(s.seoTitle);
+  const [aiBusy, setAiBusy] = React.useState(false);
+
+  // Generate an SEO title via the AI service (was a dead TODO handler).
+  const suggestTitle = React.useCallback(async () => {
+    if (aiBusy) return;
+    setAiBusy(true);
+    try {
+      const context = [page.name, s.seoDesc].filter(Boolean).join(" — ");
+      const prompt = `Write one concise, compelling SEO page title (max 60 characters, no quotes) for this page: ${context || "a web page"}.`;
+      const title = await generateContent(prompt, "headline", "professional");
+      const clean = title.replace(/^["']|["']$/g, "").trim().slice(0, 60);
+      if (clean) s.setSeoTitle(clean);
+    } catch {
+      // AI unavailable — leave the field for manual entry.
+    } finally {
+      setAiBusy(false);
+    }
+  }, [aiBusy, page.name, s]);
 
   return (
     <Stack gap="lg">
@@ -137,7 +156,9 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             type="button"
             style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "var(--bd-space-1)", padding: "3px var(--bd-space-2)", border: "1px solid var(--bd-accent)", borderRadius: "var(--bd-radius-full)", background: "var(--bd-accent-subtle)", color: "var(--bd-accent)", font: "500 10.5px var(--bd-font)", transition: "background 100ms" }}
             aria-label="Suggest SEO title"
-            onClick={() => { /* TODO: AI suggestion */ }}
+            busy={aiBusy}
+            disabled={aiBusy}
+            onClick={suggestTitle}
           >
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M5 3l14 9-14 9V3z" />

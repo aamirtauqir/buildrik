@@ -48,8 +48,11 @@ export const dashboardRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const member = await getWorkspaceMember(ctx);
-      const userId = input?.filter === "mine" ? ctx.session.user.id : undefined;
-      return getActivityFeed(member.workspaceId, { userId });
+      const me = ctx.session.user.id;
+      return getActivityFeed(member.workspaceId, {
+        userId: input?.filter === "mine" ? me : undefined,
+        excludeUserId: input?.filter === "team" ? me : undefined,
+      });
     }),
 
   health: protectedProcedure.query(async ({ ctx }) => {

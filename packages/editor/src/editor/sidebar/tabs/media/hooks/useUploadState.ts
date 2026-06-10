@@ -114,23 +114,32 @@ export function useUploadState(
       : STORAGE_QUOTA_BYTES;
 
   const upload = useCallback(
-    (files: File[], opts: { folderId?: string | null } = {}) => {
+    async (files: File[], opts: { folderId?: string | null } = {}): Promise<boolean> => {
       const totalNew = files.reduce((acc, f) => acc + f.size, 0);
       // Skip cap check on unlimited tier (BUSINESS).
       if (!isUnlimited && storageUsed + totalNew > storageTotal) {
         showToast("Not enough storage — delete some files to free space", "error");
-        return;
+        return false;
       }
       const uploadOpts =
         opts.folderId != null ? { folderId: opts.folderId } : undefined;
-      files.forEach((file) => {
-        // Duplicate filename info toast
-        const existing = composer.media.getAssets().find((a) => a.name === file.name);
-        if (existing) {
-          showToast(`"${file.name}" already exists — uploading as duplicate`, "info");
-        }
-        composer.media.uploadFile(file, uploadOpts);
-      });
+      // Await the uploads so callers can report success only after they
+      // actually complete. Was fire-and-forget — callers toasted success
+      // before uploadFile resolved, masking silent failures.
+      const results = await Promise.allSettled(
+        files.map((file) => {
+          const existing = composer.media.getAssets().find((a) => a.name === file.name);
+          if (existing) {
+            showToast(`"${file.name}" already exists — uploading as duplicate`, "info");
+          }
+          return composer.media.uploadFile(file, uploadOpts);
+        }),
+      );
+      const failed = results.filter((r) => r.status === "rejected").length;
+      if (failed > 0) {
+        showToast(`${failed} upload${failed === 1 ? "" : "s"} failed`, "error");
+      }
+      return failed === 0;
     },
     [composer, storageUsed, storageTotal, isUnlimited, showToast]
   );

@@ -233,14 +233,31 @@ export function useDiscoveryState(
     loadStatic();
   }, [composer]);
 
+  // Icons + fonts are loaded once and were rendered unfiltered — the search
+  // box did nothing for those tabs. Filter them client-side by the query so
+  // search applies across all tabs, not just stock photos/videos.
+  const _q = discoverySearch.trim().toLowerCase();
+  const filteredIcons = _q
+    ? discIcons.filter(
+        (i) =>
+          i.name.toLowerCase().includes(_q) || i.category.toLowerCase().includes(_q),
+      )
+    : discIcons;
+  const filteredFonts = _q
+    ? discFonts.filter(
+        (f) =>
+          f.family.toLowerCase().includes(_q) || f.category.toLowerCase().includes(_q),
+      )
+    : discFonts;
+
   return {
     stockPhotos,
     stockVideos,
-    discIcons,
-    discFonts,
+    discIcons: filteredIcons,
+    discFonts: filteredFonts,
     discLoading,
     discoverySearch,
-    isDiscoveryEmpty: stockPhotos.length === 0 && stockVideos.length === 0 && discIcons.length === 0,
+    isDiscoveryEmpty: stockPhotos.length === 0 && stockVideos.length === 0 && filteredIcons.length === 0,
     discOrientation,
     discColor,
     discSource,

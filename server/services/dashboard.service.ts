@@ -126,14 +126,16 @@ export async function getRecentSites(
 
 export async function getActivityFeed(
   workspaceId: string,
-  options: { userId?: string; limit?: number; offset?: number } = {}
+  options: { userId?: string; excludeUserId?: string; limit?: number; offset?: number } = {}
 ): Promise<ActivityFeed> {
-  const { userId, limit = 20, offset = 0 } = options;
+  const { userId, excludeUserId, limit = 20, offset = 0 } = options;
 
   const logs = await prisma.activityLog.findMany({
     where: {
       workspaceId,
+      // "mine" → only my actions; "team" → everyone except me.
       ...(userId ? { actorId: userId } : {}),
+      ...(excludeUserId ? { actorId: { not: excludeUserId } } : {}),
     },
     orderBy: { createdAt: "desc" },
     take: limit,

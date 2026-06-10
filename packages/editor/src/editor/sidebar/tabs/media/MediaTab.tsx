@@ -93,9 +93,9 @@ function MediaTabWithComposer({
           
           const file = new File([blob], `${fileName}.${blob.type.split('/')[1]}`, { type: blob.type });
           
-          // Upload new file
-          state.upload([file]);
-          showToast(`New version of ${item.name} created ✓`, "success");
+          // Upload new file — await so we only claim success when it lands.
+          const ok = await state.upload([file]);
+          if (ok) showToast(`New version of ${item.name} created ✓`, "success");
         } catch (err) {
           console.error("Failed to process edited image:", err);
           showToast("Could not save edited version", "error");

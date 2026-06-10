@@ -198,12 +198,15 @@ export function useCanvasCommandPalette({
         handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "analytics" }),
       },
       {
+        // Per-page SEO/slug/status live in the Pages tab (each page's gear \u2192
+        // Settings \u2192 SEO). Opening Pages is the honest target; deep-linking
+        // straight to the SEO drawer needs PagesTab drawer-routing (follow-up).
         id: "open-seo",
-        label: "Open SEO Settings",
+        label: "Open Page Settings (SEO, slug, status)",
         category: "Navigate",
         icon: "\ud83d\udd0d",
-        keywords: ["seo", "meta", "title", "description", "search"],
-        handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages", screen: "seo" }),
+        keywords: ["seo", "meta", "title", "description", "search", "page", "settings", "slug"],
+        handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages" }),
       },
       {
         id: "open-export",
