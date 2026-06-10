@@ -128,6 +128,14 @@ export function useCanvasCommandPalette({
         handler: () => composer.emit(EVENTS.ZOOM_FIT, {}),
       },
       {
+        id: "cms-records",
+        label: "Manage CMS Records",
+        category: "CMS",
+        icon: "\u{1F5C3}",
+        keywords: ["cms", "content", "collection", "records", "data"],
+        handler: () => composer.emit(EVENTS.CMS_MANAGE_RECORDS, {}),
+      },
+      {
         id: "add-text",
         label: "Add Text",
         category: "Add",

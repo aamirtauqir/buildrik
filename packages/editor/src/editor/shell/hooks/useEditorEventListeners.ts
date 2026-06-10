@@ -41,7 +41,10 @@ export interface EditorEventListenerStateSetters {
 
 export interface UseEditorEventListenersOptions {
   composer: Composer | null;
-  modals: Pick<UseStudioModalsReturn, "openCreateComponent" | "openSaveAsComponent">;
+  modals: Pick<
+    UseStudioModalsReturn,
+    "openCreateComponent" | "openSaveAsComponent" | "openCMSRecords"
+  >;
   state: EditorEventListenerStateSetters;
   /** Hide the first-run wizard once the project has any content. */
   setShowWizard: (v: boolean) => void;
@@ -72,7 +75,7 @@ export function useEditorEventListeners({
   }, [composer, setShowWizard]);
 
   // 2) COMPONENT_CREATE_REQUESTED → open the create-component modal.
-  const { openCreateComponent, openSaveAsComponent } = modals;
+  const { openCreateComponent, openSaveAsComponent, openCMSRecords } = modals;
   React.useEffect(() => {
     if (!composer) return;
     const handle = (event: { elementId: string }) => {
@@ -101,6 +104,16 @@ export function useEditorEventListeners({
       composer.off(EVENTS.COMPONENT_SAVE_AS_REQUESTED, handle);
     };
   }, [composer, openSaveAsComponent]);
+
+  // 2c) CMS_MANAGE_RECORDS → open the records management modal.
+  React.useEffect(() => {
+    if (!composer) return;
+    const handle = () => openCMSRecords();
+    composer.on(EVENTS.CMS_MANAGE_RECORDS, handle);
+    return () => {
+      composer.off(EVENTS.CMS_MANAGE_RECORDS, handle);
+    };
+  }, [composer, openCMSRecords]);
 
   // 3) SHOW_IN_LAYERS → switch tab + open drawer + scroll-to-selection.
   const { setLeftPanelTab, setIsLeftPanelOpen } = state;

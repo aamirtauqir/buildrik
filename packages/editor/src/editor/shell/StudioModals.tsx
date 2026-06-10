@@ -20,6 +20,7 @@ import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
 import { useToast } from "@/editor/shared/vibcoder";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
+import { CMSRecordsModal } from "./modals/CMSRecordsModal";
 import { CommandPalette } from "./modals/CommandPalette";
 import { CreateComponentModal } from "./modals/CreateComponentModal";
 import { CreateComponentModal as SaveAsComponentModal } from "../sidebar/tabs/component-library/CreateComponentModal";
@@ -114,6 +115,8 @@ export interface StudioModalsProps {
   // CMS Collection Setup modal (WS-14a)
   showCMSCollectionSetup: boolean;
   onCloseCMSCollectionSetup: () => void;
+  showCMSRecords: boolean;
+  onCloseCMSRecords: () => void;
 
   // Command Palette
   showCommandPalette: boolean;
@@ -167,6 +170,8 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   onCloseProjectSettings,
   showCMSCollectionSetup,
   onCloseCMSCollectionSetup,
+  showCMSRecords,
+  onCloseCMSRecords,
   showCommandPalette,
   onCloseCommandPalette,
 }) => {
@@ -352,6 +357,13 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
       <CMSCollectionSetupModal
         isOpen={showCMSCollectionSetup}
         onClose={onCloseCMSCollectionSetup}
+        composer={composer}
+      />
+
+      {/* CMS Records management */}
+      <CMSRecordsModal
+        isOpen={showCMSRecords}
+        onClose={onCloseCMSRecords}
         composer={composer}
       />
 

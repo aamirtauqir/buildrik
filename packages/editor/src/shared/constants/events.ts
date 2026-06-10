@@ -537,6 +537,7 @@ export const EVENTS = {
   // CMS Binding Events
   // ============================================
   CMS_COLLECTION_BOUND: "cms:collection:bound",
+  CMS_MANAGE_RECORDS: "cms:manage-records",
   CMS_COLLECTION_UNBOUND: "cms:collection:unbound",
 
   // ============================================

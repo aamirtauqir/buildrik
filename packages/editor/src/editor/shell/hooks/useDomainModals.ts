@@ -47,6 +47,11 @@ export interface UseDomainModalsReturn {
   openCMSCollectionSetup: () => void;
   closeCMSCollectionSetup: () => void;
 
+  // CMS Records management
+  showCMSRecords: boolean;
+  openCMSRecords: () => void;
+  closeCMSRecords: () => void;
+
   /** Reset every modal in this hook (called by useStudioModals.closeAll). */
   resetDomainModals: () => void;
 }
@@ -65,6 +70,7 @@ export function useDomainModals(): UseDomainModalsReturn {
     React.useState<SaveAsComponentContext | null>(null);
 
   const [showCMSCollectionSetup, setShowCMSCollectionSetup] = React.useState(false);
+  const [showCMSRecords, setShowCMSRecords] = React.useState(false);
 
   const openCollectionSetup = React.useCallback(
     (onConfirm: (includeSampleData: boolean) => Promise<void>) => {
@@ -99,6 +105,9 @@ export function useDomainModals(): UseDomainModalsReturn {
   const openCMSCollectionSetup = React.useCallback(() => setShowCMSCollectionSetup(true), []);
   const closeCMSCollectionSetup = React.useCallback(() => setShowCMSCollectionSetup(false), []);
 
+  const openCMSRecords = React.useCallback(() => setShowCMSRecords(true), []);
+  const closeCMSRecords = React.useCallback(() => setShowCMSRecords(false), []);
+
   const resetDomainModals = React.useCallback(() => {
     setShowCollectionSetup(false);
     setCollectionSetupContext(null);
@@ -107,6 +116,7 @@ export function useDomainModals(): UseDomainModalsReturn {
     setShowSaveAsComponent(false);
     setSaveAsComponentContext(null);
     setShowCMSCollectionSetup(false);
+    setShowCMSRecords(false);
   }, []);
 
   return {
@@ -125,6 +135,9 @@ export function useDomainModals(): UseDomainModalsReturn {
     showCMSCollectionSetup,
     openCMSCollectionSetup,
     closeCMSCollectionSetup,
+    showCMSRecords,
+    openCMSRecords,
+    closeCMSRecords,
     resetDomainModals,
   };
 }
