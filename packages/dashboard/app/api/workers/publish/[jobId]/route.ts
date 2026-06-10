@@ -69,6 +69,16 @@ export async function POST(
   );
 
   try {
+    // Honesty guard: in production, a job with no page payload cannot really
+    // deploy — falling through to runSimulation would mark it COMPLETED and the
+    // user would believe a non-existent site went live. Fail loudly instead.
+    // (Dev keeps the simulation path so local flows work without Vercel.)
+    if (pages.length === 0 && process.env.NODE_ENV === "production") {
+      throw new Error(
+        "No page content to deploy. Open the site in the editor and publish from there.",
+      );
+    }
+
     await prisma.publishBuildJob.update({
       where: { id: jobId },
       data: {

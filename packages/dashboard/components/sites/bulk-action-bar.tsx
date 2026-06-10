@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
-import { Send, EyeOff, Archive, FolderInput, Trash2, Download, X, ChevronDown } from "lucide-react";
+import { Archive, FolderInput, Trash2, Download, X, ChevronDown } from "lucide-react";
 
+// Bulk Publish/Unpublish were removed: they only flipped site.status without
+// creating publish jobs or deploying/tearing down, so they reported success
+// while the live site never changed. Per-site publish goes through the editor.
 export const BULK_ACTIONS = [
-  { label: "Publish All", action: "publish", icon: "Send" },
-  { label: "Unpublish All", action: "unpublish", icon: "EyeOff" },
   { label: "Archive All", action: "archive", icon: "Archive" },
   { label: "Move to Folder", action: "move", icon: "FolderInput" },
   { label: "Delete All", action: "delete", icon: "Trash2" },
@@ -13,7 +14,7 @@ export const BULK_ACTIONS = [
 
 export const BULK_SELECTION_CAP = 25;
 
-const iconMap = { Send, EyeOff, Archive, FolderInput, Trash2, Download } as const;
+const iconMap = { Archive, FolderInput, Trash2, Download } as const;
 
 interface Folder {
   id: string;

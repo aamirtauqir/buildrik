@@ -27,11 +27,13 @@ describe("Sites Components", () => {
   });
 
   describe("BulkActionBar", () => {
-    it("exports BULK_ACTIONS with 6 actions", async () => {
+    it("exports BULK_ACTIONS without the fake publish/unpublish flips", async () => {
       const mod = await import("@/components/sites/bulk-action-bar");
-      expect(mod.BULK_ACTIONS).toHaveLength(6);
+      expect(mod.BULK_ACTIONS).toHaveLength(4);
       const labels = mod.BULK_ACTIONS.map((a: { label: string }) => a.label);
-      expect(labels).toContain("Publish All");
+      // Removed — they only flipped status without real deploy/teardown.
+      expect(labels).not.toContain("Publish All");
+      expect(labels).not.toContain("Unpublish All");
       expect(labels).toContain("Delete All");
       expect(labels).toContain("Archive All");
     });
