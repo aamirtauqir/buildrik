@@ -206,6 +206,22 @@ async function setStep(jobId: string, stepIndex: number): Promise<void> {
  * delegates actual Vercel HTTP work to runVercelDeploy in publish.service.
  * Returns the public URL on success. Throws on failure.
  */
+/**
+ * Inject the first-party analytics beacon into a page's HTML before deploy.
+ * The deployed site is cross-origin, so the beacon posts to the dashboard's
+ * absolute /api/public/track/<siteId> on load. sendBeacon keeps it
+ * fire-and-forget; a per-browser sessionId enables unique-visitor counts.
+ * Without this the analytics write path is never triggered and stats stay 0.
+ */
+function injectAnalyticsBeacon(html: string, siteId: string): string {
+  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+  if (!base) return html; // no dashboard URL configured → skip silently
+  const url = `${base}/api/public/track/${siteId}`;
+  const snippet = `<script>(function(){try{var s=localStorage.getItem("_bk_sid");if(!s){s=Math.random().toString(36).slice(2)+Date.now().toString(36);try{localStorage.setItem("_bk_sid",s)}catch(e){}}var d={path:location.pathname,referrer:document.referrer,sessionId:s,viewportWidth:window.innerWidth};var b=new Blob([JSON.stringify(d)],{type:"application/json"});if(navigator.sendBeacon){navigator.sendBeacon(${JSON.stringify(url)},b)}else{fetch(${JSON.stringify(url)},{method:"POST",body:b,keepalive:true})}}catch(e){}})();</script>`;
+  if (html.includes("</body>")) return html.replace("</body>", `${snippet}</body>`);
+  return html + snippet;
+}
+
 async function runVercelDeployJob(
   jobId: string,
   siteId: string,
@@ -218,7 +234,10 @@ async function runVercelDeployJob(
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
 
-  const files: VercelFile[] = pages.map((p) => ({ file: p.path, data: p.html }));
+  const files: VercelFile[] = pages.map((p) => ({
+    file: p.path,
+    data: injectAnalyticsBeacon(p.html, siteId),
+  }));
 
   // Step 0 — Generating pages: editor already rendered HTML; just mark done.
   await checkCancelled(jobId);

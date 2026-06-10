@@ -49,6 +49,48 @@ function clampRange(range: AnalyticsRange, maxDays: number): AnalyticsRange {
   return "7d";
 }
 
+/**
+ * Ingest a single page-view event from a published site's first-party beacon.
+ * This is the write half of analytics — without it `analytics_events` is never
+ * populated and every dashboard stat reads zero. Silently no-ops for unknown
+ * sites so a stale/forged beacon can't create orphan rows. All free-text is
+ * length-capped defensively (the endpoint is public).
+ */
+export async function recordPageView(
+  siteId: string,
+  data: {
+    path: string;
+    referrer?: string | null;
+    sessionId?: string | null;
+    userAgent?: string | null;
+    country?: string | null;
+    viewportWidth?: number | null;
+  }
+): Promise<boolean> {
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { id: true } });
+  if (!site) return false;
+
+  const cap = (v: string | null | undefined, n: number) =>
+    typeof v === "string" && v.length > 0 ? v.slice(0, n) : null;
+  const vw =
+    typeof data.viewportWidth === "number" && data.viewportWidth > 0
+      ? Math.min(Math.round(data.viewportWidth), 10000)
+      : null;
+
+  await prisma.analyticsEvent.create({
+    data: {
+      siteId,
+      path: (cap(data.path, 1024) ?? "/"),
+      referrer: cap(data.referrer, 1024),
+      sessionId: cap(data.sessionId, 128),
+      userAgent: cap(data.userAgent, 512),
+      country: cap(data.country, 8),
+      viewportWidth: vw,
+    },
+  });
+  return true;
+}
+
 export async function getSiteAnalytics(
   siteId: string,
   query: { range: AnalyticsRange; granularity: AnalyticsGranularity }
