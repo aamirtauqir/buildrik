@@ -8,6 +8,12 @@ import { Prisma } from "@prisma/client";
 // makes multi-user editing functional on the existing stack.
 
 const MAX_BATCH = 200;
+// Replayable retention window. Ops older than this are pruned so the op-log
+// doesn't grow without bound. A client whose last-seen seq predates the window
+// resyncs via a full project reload (the SSE "hello" head seq exposes the gap),
+// not op replay, so dropping old ops is safe.
+const RETENTION_MS = 24 * 60 * 60 * 1000;
+const PRUNE_PROBABILITY = 0.02;
 
 export async function appendCollabOp(
   siteId: string,
@@ -19,6 +25,13 @@ export async function appendCollabOp(
     data: { siteId, authorId, clientId, op: op as Prisma.InputJsonValue },
     select: { id: true, seq: true },
   });
+  // Opportunistic, best-effort prune on a small fraction of appends — keeps the
+  // table bounded without a delete on every write or a separate cron.
+  if (Math.random() < PRUNE_PROBABILITY) {
+    void prisma.collabOperation
+      .deleteMany({ where: { siteId, createdAt: { lt: new Date(Date.now() - RETENTION_MS) } } })
+      .catch(() => {});
+  }
   return row;
 }
 
