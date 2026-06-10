@@ -252,3 +252,74 @@ export async function waitForDeploymentReady({
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/** A DNS record Vercel requires for domain verification / routing. */
+export interface VercelDomainVerification {
+  type: string;
+  domain: string;
+  value: string;
+  reason?: string;
+}
+
+export interface AddDomainResult {
+  name: string;
+  /** True once Vercel can serve the domain (DNS points at Vercel). */
+  verified: boolean;
+  /** Records the user must add at their DNS provider (when not yet verified). */
+  verification: VercelDomainVerification[];
+}
+
+/**
+ * Attach a custom domain to a Vercel project so the project actually serves it.
+ * Without this call a "connected" domain in our DB resolved to nothing — the
+ * DNS instructions pointed at a host Vercel was never told to route. Returns
+ * Vercel's verification records (TXT/CNAME) for the user to add.
+ *
+ * `409 domain_already_in_use` is treated as success (idempotent re-connect):
+ * the domain is already attached to this project.
+ *
+ * Throws VercelApiError on other non-2xx responses.
+ */
+export async function addDomainToVercelProject({
+  token,
+  teamId,
+  projectName,
+  domain,
+}: {
+  token: string;
+  teamId: string | null;
+  projectName: string;
+  domain: string;
+}): Promise<AddDomainResult> {
+  const res = await fetch(
+    `${VERCEL_API_BASE}/v10/projects/${encodeURIComponent(projectName)}/domains${teamQueryString(teamId)}`,
+    {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ name: domain }),
+    },
+  );
+
+  if (!res.ok) {
+    const errBody = (await res.json().catch(() => ({}))) as {
+      error?: { code?: string; message?: string };
+    };
+    const code = errBody.error?.code ?? "UNKNOWN";
+    // Already attached → idempotent success.
+    if (res.status === 409 || code === "domain_already_in_use") {
+      return { name: domain, verified: true, verification: [] };
+    }
+    throw new VercelApiError(res.status, code, errBody.error?.message ?? `Vercel API ${res.status}`);
+  }
+
+  const data = (await res.json()) as {
+    name?: string;
+    verified?: boolean;
+    verification?: VercelDomainVerification[];
+  };
+  return {
+    name: data.name ?? domain,
+    verified: Boolean(data.verified),
+    verification: data.verification ?? [],
+  };
+}
