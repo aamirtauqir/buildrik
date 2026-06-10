@@ -40,9 +40,9 @@ Done: A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅ A6 ✅ A7 ✅ A11 ✅ A12 ✅ (7 commit
 
 - ☑ **Analytics ingestion** — was read-only (stats always 0). Added `recordPageView` service + `POST /api/public/track/[siteId]` beacon endpoint + first-party beacon injected by the publish worker. Unit-tested; needs a live published-site smoke test for the full beacon→DB round-trip.
 - ☑ **CMS made usable** — engine CRUD was fully orphaned. Added `CMSRecordsModal` (records list + field-driven add/edit/delete, command-palette trigger) AND fixed the binding popover to bind to a specific record (was `itemId=undefined` → never resolved). CMS loop now works: collection → records → bind → resolve.
-- ☐ **AI site-gen worker** — needs real AI keys + generated-output→blocks mapping + live smoke test. Best as a focused session.
-- ☐ **Real-time collaboration server** — needs a running WebSocket server (genuine infra). Hard-blocked without it.
-- ☐ **Custom-domain serving + SSL** — needs Vercel domains API + DNS + a real domain to verify.
+- ☑ **AI site-gen worker** — built (smoke-test caveat). New `POST /api/workers/ai-generate/[jobId]` claims the QUEUED job, generates pages via the AI service, wraps HTML sections into `Page.blocks`, creates Site+Pages, marks COMPLETED; `createGenerationJob` now dispatches it. Fixes the infinite-loading flow. Unit-tested; generated content needs a live AI-key run to tune.
+- ☑ **Custom-domain serving** — built. `addDomainToVercelProject` (lib/vercel) + `connectDomain` attaches the domain to the workspace's Vercel project and stores Vercel's real verification records (was a dead `sites.buildrik.app` CNAME). Unit-tested; needs a real domain+DNS for full E2E.
+- ☐ **Real-time collaboration server** — the ONLY genuine hard-block: needs a running WebSocket server process (can't run error-free in serverless). Editor OT scaffold exists but the outbound path (`recordForCollaboration`/`broadcastOperation`) is dead and there's no transport impl. Requires infra the user must stand up.
 
 ## Tier C — Missing backend / infra (needs product/infra decision — NOT auto-built)
 
