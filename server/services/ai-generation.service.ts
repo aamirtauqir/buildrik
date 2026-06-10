@@ -39,7 +39,7 @@ export async function createGenerationJob(
   if (input.content) metadata.content = input.content;
   if (input.images) metadata.images = input.images;
 
-  return prisma.aIGenerationJob.create({
+  const job = await prisma.aIGenerationJob.create({
     data: {
       workspaceId,
       userId,
@@ -53,6 +53,27 @@ export async function createGenerationJob(
         : undefined,
     },
   });
+
+  // Dispatch the worker that actually generates the site. Fire-and-forget — the
+  // client polls job status. Without this the job sat QUEUED forever (the UI
+  // spun indefinitely). A dns-style retry isn't needed; a stuck QUEUED job can
+  // be re-dispatched.
+  void dispatchAIWorker(job.id);
+
+  return job;
+}
+
+async function dispatchAIWorker(jobId: string): Promise<void> {
+  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+  if (!base) return; // no base URL configured (e.g. some test envs) → skip
+  try {
+    await fetch(`${base}/api/workers/ai-generate/${jobId}`, {
+      method: "POST",
+      headers: { "x-worker-secret": process.env.CRON_SECRET ?? "" },
+    });
+  } catch {
+    // Worker dispatch failed — job stays QUEUED and can be re-dispatched.
+  }
 }
 
 export async function getJobStatus(jobId: string) {
