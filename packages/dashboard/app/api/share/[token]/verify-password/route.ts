@@ -27,6 +27,12 @@ export async function POST(
   }
 
   if (!link.passwordHash) {
+    // Count the visit for password-less links too (was only counted after a
+    // password check, so open links always reported zero views).
+    await prisma.shareLink.update({
+      where: { id: link.id },
+      data: { viewCount: { increment: 1 } },
+    });
     const redirectUrl = link.site.publishedUrl ?? `/${link.site.slug}`;
     return NextResponse.json({ redirectUrl });
   }

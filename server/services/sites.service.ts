@@ -69,13 +69,19 @@ export async function listSites(
 
   const orderBy = SORT_MAP[sort] ?? SORT_MAP.lastEdited;
 
+  // visitors30d is a 30-day aggregate, not a column, so it can't be filtered or
+  // sorted in SQL here. When the request needs it (traffic filter or traffic
+  // sort) we scan all matching sites and paginate in memory; otherwise we keep
+  // efficient DB pagination. Was: filter applied AFTER skip/take, which dropped
+  // matching sites on other pages and reported the wrong total.
+  const needsFullScan = !!hasTraffic || sort === "traffic";
+
   const [total, data] = await Promise.all([
     prisma.site.count({ where }),
     prisma.site.findMany({
       where,
       orderBy,
-      skip,
-      take: perPage,
+      ...(needsFullScan ? {} : { skip, take: perPage }),
       select: {
         id: true,
         name: true,
@@ -119,23 +125,33 @@ export async function listSites(
     };
   });
 
-  const filtered = hasTraffic
-    ? enriched.filter((s) => {
-        switch (hasTraffic) {
-          case "none": return s.visitors30d === 0;
-          case "1-100": return s.visitors30d >= 1 && s.visitors30d <= 100;
-          case "100-1000": return s.visitors30d > 100 && s.visitors30d <= 1000;
-          case "1000+": return s.visitors30d > 1000;
-          default: return true;
-        }
-      })
-    : enriched;
+  // Fast path: no traffic filter/sort → enriched is already the correct page.
+  if (!needsFullScan) {
+    return { data: enriched, total, page, totalPages: Math.ceil(total / perPage) };
+  }
 
+  let rows = enriched;
+  if (sort === "traffic") {
+    rows = [...rows].sort((a, b) => b.visitors30d - a.visitors30d);
+  }
+  if (hasTraffic) {
+    rows = rows.filter((s) => {
+      switch (hasTraffic) {
+        case "none": return s.visitors30d === 0;
+        case "1-100": return s.visitors30d >= 1 && s.visitors30d <= 100;
+        case "100-1000": return s.visitors30d > 100 && s.visitors30d <= 1000;
+        case "1000+": return s.visitors30d > 1000;
+        default: return true;
+      }
+    });
+  }
+
+  const pageRows = rows.slice(skip, skip + perPage);
   return {
-    data: filtered,
-    total: hasTraffic ? filtered.length : total,
+    data: pageRows,
+    total: rows.length,
     page,
-    totalPages: Math.ceil((hasTraffic ? filtered.length : total) / perPage),
+    totalPages: Math.ceil(rows.length / perPage),
   };
 }
 

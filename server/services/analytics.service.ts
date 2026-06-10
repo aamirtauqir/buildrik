@@ -104,21 +104,26 @@ export async function getSiteAnalytics(
   const clampedRange = clampRange(query.range, maxDays);
   const { start, end } = computeDateRange(clampedRange);
 
-  const [timeSeries, trafficSourcesRaw, countriesRaw] = await Promise.all([
+  const evWindow = { siteId, createdAt: { gte: start, lte: end } };
+  const [timeSeries, trafficSourcesRaw, countriesRaw, mobile, tablet, desktop] = await Promise.all([
     prisma.siteAnalytics.findMany({
       where: { siteId, date: { gte: start, lte: end } },
       orderBy: { date: "asc" },
     }),
     prisma.analyticsEvent.groupBy({
       by: ["referrer"],
-      where: { siteId, createdAt: { gte: start, lte: end } },
+      where: evWindow,
       _count: true,
     }),
     prisma.analyticsEvent.groupBy({
       by: ["country"],
-      where: { siteId, createdAt: { gte: start, lte: end } },
+      where: evWindow,
       _count: true,
     }),
+    // Coarse device classes derived from the collected viewport width.
+    prisma.analyticsEvent.count({ where: { ...evWindow, viewportWidth: { lt: 768 } } }),
+    prisma.analyticsEvent.count({ where: { ...evWindow, viewportWidth: { gte: 768, lt: 1024 } } }),
+    prisma.analyticsEvent.count({ where: { ...evWindow, viewportWidth: { gte: 1024 } } }),
   ]);
 
   const trafficSources = trafficSourcesRaw.map((r) => ({
@@ -131,18 +136,78 @@ export async function getSiteAnalytics(
     count: r._count,
   }));
 
+  const dailyRows = timeSeries.map((row) => ({
+    date: row.date,
+    visitors: row.visitors,
+    uniqueVisitors: row.uniqueVisitors,
+    pageViews: row.pageViews,
+    avgSession: row.avgSession,
+    bounceRate: row.bounceRate,
+  }));
+
+  const devices = [
+    { device: "mobile", count: mobile },
+    { device: "tablet", count: tablet },
+    { device: "desktop", count: desktop },
+  ].filter((d) => d.count > 0);
+
   return {
     clampedRange,
-    timeSeries: timeSeries.map((row) => ({
-      date: row.date,
-      visitors: row.visitors,
-      uniqueVisitors: row.uniqueVisitors,
-      pageViews: row.pageViews,
-      avgSession: row.avgSession,
-      bounceRate: row.bounceRate,
-    })),
+    // Source rows are daily; bucket them to the requested granularity. (hourly
+    // has no finer source than daily, so it falls back to daily.)
+    timeSeries: bucketByGranularity(dailyRows, query.granularity),
     trafficSources,
     countries,
-    devices: [],
+    devices,
   };
+}
+
+type DailyRow = {
+  date: Date;
+  visitors: number;
+  uniqueVisitors: number;
+  pageViews: number;
+  avgSession: number;
+  bounceRate: number;
+};
+
+function bucketKey(date: Date, granularity: AnalyticsGranularity): string {
+  const y = date.getUTCFullYear();
+  const m = `${date.getUTCMonth() + 1}`.padStart(2, "0");
+  if (granularity === "monthly") return `${y}-${m}`;
+  if (granularity === "weekly") {
+    // ISO-ish week bucket: start-of-week (Monday) date as the key.
+    const d = new Date(Date.UTC(y, date.getUTCMonth(), date.getUTCDate()));
+    const day = (d.getUTCDay() + 6) % 7; // 0 = Monday
+    d.setUTCDate(d.getUTCDate() - day);
+    return d.toISOString().slice(0, 10);
+  }
+  return date.toISOString().slice(0, 10); // daily / hourly fallback
+}
+
+function bucketByGranularity(rows: DailyRow[], granularity: AnalyticsGranularity): DailyRow[] {
+  if (granularity === "daily" || granularity === "hourly" || rows.length === 0) return rows;
+  const buckets = new Map<string, DailyRow & { _n: number }>();
+  for (const r of rows) {
+    const key = bucketKey(r.date, granularity);
+    const b = buckets.get(key);
+    if (!b) {
+      buckets.set(key, { ...r, _n: 1 });
+    } else {
+      b.visitors += r.visitors;
+      b.uniqueVisitors += r.uniqueVisitors;
+      b.pageViews += r.pageViews;
+      b.avgSession += r.avgSession;
+      b.bounceRate += r.bounceRate;
+      b._n += 1;
+    }
+  }
+  // Sums for counts; averages for rate/duration metrics.
+  return [...buckets.values()]
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
+    .map(({ _n, ...row }) => ({
+      ...row,
+      avgSession: Math.round(row.avgSession / _n),
+      bounceRate: Math.round((row.bounceRate / _n) * 100) / 100,
+    }));
 }

@@ -154,6 +154,19 @@ export class CollaborationManager extends EventEmitter {
 
     await this.connectToRoom(roomId, userId);
 
+    // Set room state on successful join. createRoom() did this but joinRoom()
+    // did not, so isConnected() (which requires room !== null) stayed false —
+    // presence + all connected-only flows never activated. In the DB-fanout
+    // model there's no designated host; ops replay from the DB for everyone, so
+    // the joiner is its own host.
+    this.room = {
+      id: roomId,
+      projectId: roomId,
+      users: [this.currentUser],
+      createdAt: Date.now(),
+      host: userId,
+    };
+
     // Send join event to others
     this.broadcast({
       type: "join",

@@ -87,8 +87,14 @@ export async function removeDomain(id: string) {
 }
 
 export async function setPrimaryDomain(id: string, siteId: string) {
-  return prisma.$transaction([
-    prisma.domain.updateMany({ where: { siteId }, data: { isPrimary: false } }),
-    prisma.domain.update({ where: { id }, data: { isPrimary: true } }),
-  ]);
+  // Scope the promotion to {id, siteId}: a domain id belonging to another site
+  // matches zero rows instead of being mutated under this site's authz check.
+  return prisma.$transaction(async (tx) => {
+    await tx.domain.updateMany({ where: { siteId }, data: { isPrimary: false } });
+    const promoted = await tx.domain.updateMany({
+      where: { id, siteId },
+      data: { isPrimary: true },
+    });
+    if (promoted.count === 0) throw new Error("DOMAIN_NOT_FOUND");
+  });
 }

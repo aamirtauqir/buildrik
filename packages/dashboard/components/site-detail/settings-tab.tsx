@@ -23,6 +23,7 @@ interface SettingsTabProps {
     socialLinks: Record<string, string> | unknown;
     metaTitleTemplate: string | null;
     publishedPassword: string | null;
+    hasPublishedPassword: boolean;
     touchIcon: string | null;
     plan: string;
   };
@@ -42,8 +43,11 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
   const [visiblePlatforms, setVisiblePlatforms] = useState<SocialPlatform[]>(
     SOCIAL_PLATFORMS.filter((p) => socialLinks[p]),
   );
-  const [passwordEnabled, setPasswordEnabled] = useState(!!site.publishedPassword);
-  const [password, setPassword] = useState(site.publishedPassword ?? "");
+  // The server redacts the hash and returns a boolean. Initializing from the
+  // (always-null) publishedPassword made the toggle default off and then saved
+  // publishedPassword:null on every unrelated save, silently clearing it.
+  const [passwordEnabled, setPasswordEnabled] = useState(site.hasPublishedPassword);
+  const [password, setPassword] = useState("");
   const [faviconPreview, setFaviconPreview] = useState<string | null>(null);
   const [touchIconPreview, setTouchIconPreview] = useState<string | null>(site.touchIcon);
   const faviconInputRef = useRef<HTMLInputElement>(null);
@@ -116,15 +120,24 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
       if (v.trim()) filteredSocial[k] = v.trim();
     }
 
-    onSave({
+    // Only touch publishedPassword on an explicit change. Omitting it (the
+    // server skips undefined) preserves the existing hash, so unrelated saves
+    // no longer wipe the password.
+    const data: Record<string, unknown> = {
       name,
       slug,
       headCode,
       bodyCode,
       socialLinks: filteredSocial,
-      publishedPassword: passwordEnabled ? password : null,
       touchIcon: touchIconPreview,
-    });
+    };
+    if (!passwordEnabled) {
+      if (site.hasPublishedPassword) data.publishedPassword = null; // explicit removal
+    } else if (password) {
+      data.publishedPassword = password; // set or changed
+    } // enabled + blank field = keep existing (omit)
+
+    onSave(data);
   }
 
   return (

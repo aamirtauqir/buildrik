@@ -13,7 +13,7 @@ vi.mock("@/lib/prisma", () => ({
     domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), findFirst: vi.fn(), count: vi.fn() },
     workspace: { findUnique: vi.fn() },
     shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
-    analyticsEvent: { findMany: vi.fn(), groupBy: vi.fn() },
+    analyticsEvent: { findMany: vi.fn(), groupBy: vi.fn(), count: vi.fn() },
     dnsRecord: { createMany: vi.fn() },
   },
 }));
@@ -152,9 +152,19 @@ describe("Site Detail Service", () => {
         { date: new Date("2026-03-20"), visitors: 100, uniqueVisitors: 80, pageViews: 200, avgSession: 120, bounceRate: 0.4, topPages: null },
       ] as any);
       vi.mocked(prisma.analyticsEvent.groupBy).mockResolvedValue([]);
+      // 3 device-bucket counts: mobile, tablet, desktop.
+      vi.mocked(prisma.analyticsEvent.count)
+        .mockResolvedValueOnce(10)
+        .mockResolvedValueOnce(0)
+        .mockResolvedValueOnce(40);
       const result = await getSiteAnalytics("s1", { range: "7d", granularity: "daily" });
       expect(result.timeSeries).toHaveLength(1);
       expect(result.timeSeries[0].visitors).toBe(100);
+      // Devices derived from viewport buckets; empty buckets dropped.
+      expect(result.devices).toEqual([
+        { device: "mobile", count: 10 },
+        { device: "desktop", count: 40 },
+      ]);
     });
   });
 });
