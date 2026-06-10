@@ -7,6 +7,7 @@ import {
   createVercelDeployment,
   waitForDeploymentReady,
   pickPublicUrl,
+  setProjectPasswordProtection,
   VercelApiError,
   type VercelFile,
 } from "@/lib/vercel";
@@ -288,6 +289,9 @@ export async function runVercelDeploy(
   workspaceId: string,
   projectName: string,
   files: VercelFile[],
+  // Plaintext published password to enforce via Vercel deployment protection
+  // (string = set, null = clear). undefined = leave protection untouched.
+  publishedPasswordPlain?: string | null,
 ): Promise<{ url: string; deploymentId: string } | null> {
   const conn = await getActiveVercelConnection(workspaceId);
   if (!conn) {
@@ -312,6 +316,27 @@ export async function runVercelDeploy(
     });
     if (ready.readyState !== "READY") {
       throw new Error(`VERCEL_DEPLOY_${ready.readyState}`);
+    }
+    // Reconcile published-site password protection on the live URL. Best-effort:
+    // password protection is a Vercel Pro/Enterprise feature, so 402/403 means
+    // "not available on this plan" and must not fail an otherwise-good deploy.
+    if (publishedPasswordPlain !== undefined) {
+      try {
+        await setProjectPasswordProtection({
+          token: conn.token,
+          teamId: conn.teamId,
+          projectName,
+          password: publishedPasswordPlain,
+        });
+      } catch (err) {
+        if (err instanceof VercelApiError && (err.status === 402 || err.status === 403)) {
+          console.warn(
+            `[publish] Vercel password protection unavailable on plan for ${projectName} (${err.status})`,
+          );
+        } else {
+          throw err;
+        }
+      }
     }
     return { url: pickPublicUrl(ready, projectName), deploymentId: ready.id };
   } catch (err) {

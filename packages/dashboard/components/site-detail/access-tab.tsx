@@ -102,10 +102,15 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
   return (
     <div className="space-y-6">
       <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-1">
           <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Share Links</h3>
           <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}><Plus className="h-3 w-3" />New Link</button>
         </div>
+        <p className="mb-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
+          Share links control who you hand the URL to. To actually restrict who can
+          open a published site, set a published-site password in Settings — that is
+          enforced on the live URL by the host.
+        </p>
         {showCreate && (
           <div className="mb-4 rounded-lg border p-4 space-y-3" style={{ borderColor: "var(--color-border-default)" }}>
             <input type="text" value={linkName} onChange={(e) => setLinkName(e.target.value)} placeholder="Link name (e.g. Client Review)" className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />

@@ -1,37 +1,57 @@
 import bcrypt from "bcryptjs";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { encrypt, decrypt } from "@/lib/encryption";
 
 /**
- * P0.3 — publishedPassword storage policy.
+ * publishedPassword storage policy.
  *
- * Hashes are bcrypt rounds=10 (consistent with auth.service.ts + account.service.ts).
- * The Site row only ever stores the hash — plaintext never persists past
- * the boundary of updateSiteSettings.
+ * Stored AES-256-GCM **encrypted** (reversible), not bcrypt-hashed, because the
+ * publish path must hand the plaintext to Vercel's deployment password
+ * protection — which is what actually enforces the password on the live
+ * `<project>.vercel.app` URL. A one-way hash could never be pushed to Vercel.
  *
- * Pattern detection: a stored value is treated as already-hashed if it
- * starts with `$2` (bcrypt prefix). Plain strings get re-hashed. This
- * makes the migration self-healing: any pre-existing plaintext row that
- * receives a save (with publishedPassword unchanged or changed) ends
- * up with a proper hash without a separate backfill script.
- *
- * Empty string and null both clear the gate (no password required).
+ * Format detection: `v1:` prefix = our AES ciphertext; `$2` prefix = a legacy
+ * bcrypt hash (irreversible — verify still works, but it can't be pushed to
+ * Vercel until the owner re-sets the password). Empty/null = no gate.
  */
-const BCRYPT_ROUNDS = 10;
-
-function isAlreadyHashed(value: string): boolean {
+function isEncrypted(value: string): boolean {
+  return value.startsWith("v1:");
+}
+function isLegacyBcrypt(value: string): boolean {
   return value.startsWith("$2");
 }
 
 export async function hashPublishedPassword(plain: string | null | undefined): Promise<string | null> {
   if (plain === null || plain === undefined || plain === "") return null;
-  if (isAlreadyHashed(plain)) return plain;
-  return bcrypt.hash(plain, BCRYPT_ROUNDS);
+  // Already a stored form (re-saved unchanged) → keep as-is.
+  if (isEncrypted(plain) || isLegacyBcrypt(plain)) return plain;
+  return encrypt(plain);
 }
 
-export async function verifyPublishedPassword(plain: string, hash: string | null): Promise<boolean> {
-  if (!hash) return true;
-  return bcrypt.compare(plain, hash);
+export async function verifyPublishedPassword(plain: string, stored: string | null): Promise<boolean> {
+  if (!stored) return true;
+  if (isEncrypted(stored)) {
+    try {
+      return decrypt(stored) === plain;
+    } catch {
+      return false;
+    }
+  }
+  return bcrypt.compare(plain, stored); // legacy bcrypt rows
+}
+
+/**
+ * Plaintext for pushing to Vercel deployment protection. Null when unset or a
+ * legacy bcrypt hash (irreversible — owner must re-set to enable enforcement).
+ */
+export function decryptPublishedPassword(stored: string | null): string | null {
+  if (!stored || !isEncrypted(stored)) return null;
+  try {
+    return decrypt(stored);
+  } catch {
+    return null;
+  }
 }
 
 export async function getSiteSettings(siteId: string) {

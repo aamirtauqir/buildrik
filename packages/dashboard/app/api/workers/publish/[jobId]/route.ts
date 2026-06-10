@@ -5,6 +5,7 @@ import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { runVercelDeploy } from "@server/services/publish.service";
+import { decryptPublishedPassword } from "@server/services/site-settings.service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -240,9 +241,13 @@ async function runVercelDeployJob(
 ): Promise<string> {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { slug: true, name: true },
+    select: { slug: true, name: true, publishedPassword: true },
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
+
+  // Enforce the published-site password on the live URL via Vercel deployment
+  // protection. null = no/legacy password → clears protection on deploy.
+  const passwordPlain = decryptPublishedPassword(site.publishedPassword);
 
   const files: VercelFile[] = pages.map((p) => ({
     file: p.path,
@@ -260,7 +265,7 @@ async function runVercelDeployJob(
   // Step 2 — Deploying to CDN: delegate to service (handles OAuth connection gating).
   await checkCancelled(jobId);
   const projectName = slugifyProjectName(site.slug);
-  const result = await runVercelDeploy(workspaceId, projectName, files);
+  const result = await runVercelDeploy(workspaceId, projectName, files, passwordPlain);
   if (result === null) {
     // dev mode + no workspace connection → fall through to simulation
     return runSimulation(jobId, siteId);

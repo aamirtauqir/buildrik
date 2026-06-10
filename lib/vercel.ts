@@ -323,3 +323,51 @@ export async function addDomainToVercelProject({
     verification: data.verification ?? [],
   };
 }
+
+/**
+ * Enable or disable Vercel deployment password protection on a project. This is
+ * what actually enforces a published-site password on the public
+ * `<project>.vercel.app` URL — the static deploy is otherwise world-readable.
+ *
+ * Pass a plaintext password to enable; pass null to disable. Password
+ * protection is a Vercel Pro/Enterprise feature: on Hobby the API returns
+ * 402/403. Callers should treat that as "not available on this plan" rather
+ * than a hard publish failure (see VercelApiError.status).
+ *
+ * Throws VercelApiError on non-2xx (including the plan-gating 402/403).
+ */
+export async function setProjectPasswordProtection({
+  token,
+  teamId,
+  projectName,
+  password,
+}: {
+  token: string;
+  teamId: string | null;
+  projectName: string;
+  password: string | null;
+}): Promise<void> {
+  const res = await fetch(
+    `${VERCEL_API_BASE}/v9/projects/${encodeURIComponent(projectName)}${teamQueryString(teamId)}`,
+    {
+      method: "PATCH",
+      headers: authHeaders(token),
+      body: JSON.stringify({
+        passwordProtection: password
+          ? { deploymentType: "all", password }
+          : null,
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    const errBody = (await res.json().catch(() => ({}))) as {
+      error?: { code?: string; message?: string };
+    };
+    throw new VercelApiError(
+      res.status,
+      errBody.error?.code ?? "UNKNOWN",
+      errBody.error?.message ?? `Vercel API ${res.status}`,
+    );
+  }
+}
