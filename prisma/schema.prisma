@@ -905,3 +905,20 @@ model ApiToken {
   @@index([workspaceId])
   @@map("api_tokens")
 }
+
+/// Operation log for DB-backed real-time collaboration (SSE fan-out).
+/// Clients POST ops here; an SSE stream replays ops with seq > the client's
+/// last-seen seq. Pruned by a cron once applied/old.
+model CollabOperation {
+  id        String   @id @default(cuid())
+  siteId    String
+  seq       Int      @default(autoincrement())
+  authorId  String
+  clientId  String
+  op        Json
+  createdAt DateTime @default(now())
+
+  @@index([siteId, seq])
+  @@index([createdAt])
+  @@map("collab_operations")
+}
