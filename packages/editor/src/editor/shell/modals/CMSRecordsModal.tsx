@@ -14,6 +14,7 @@ import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Select } from "@/editor/shared/vibcoder/Select";
@@ -121,14 +122,13 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     const common = { key: field.id, style: { marginBottom: 10 } as React.CSSProperties };
     if (field.type === "boolean") {
       return (
-        <label {...common} style={{ ...common.style, display: "flex", alignItems: "center", gap: 8 }}>
-          <input
-            type="checkbox"
+        <div {...common}>
+          <Checkbox
             checked={Boolean(value)}
             onChange={(e) => setField(field.slug, e.target.checked)}
+            label={field.name}
           />
-          {field.name}
-        </label>
+        </div>
       );
     }
     if (field.type === "textarea" || field.type === "richtext") {
@@ -182,9 +182,9 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </ModalClose>
-          <div className="bd-modal__body" style={{ minHeight: 320 }}>
+          <div className="bd-modal__body" style={{ minHeight: "20rem" }}>
             {collections.length === 0 ? (
-              <p style={{ color: "var(--bd-text-secondary)" }}>
+              <p style={{ color: "var(--bd-fg-secondary)" }}>
                 No collections yet. Create one from an element&apos;s CMS binding first.
               </p>
             ) : (
@@ -218,7 +218,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                 ) : (
                   <>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                      <span style={{ fontSize: 12, color: "var(--bd-text-secondary)" }}>
+                      <span style={{ fontSize: 12, color: "var(--bd-fg-secondary)" }}>
                         {items.length} record{items.length === 1 ? "" : "s"}
                       </span>
                       <Button variant="secondary" size="sm" onClick={startAdd} disabled={!collection}>
@@ -227,7 +227,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                     </div>
                     <div>
                       {items.length === 0 ? (
-                        <p style={{ color: "var(--bd-text-secondary)", fontSize: 13 }}>No records yet.</p>
+                        <p style={{ color: "var(--bd-fg-secondary)", fontSize: 13 }}>No records yet.</p>
                       ) : (
                         items.map((item) => (
                           <div
@@ -236,7 +236,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                           >
                             <span style={{ fontSize: 13 }}>
                               {collection ? displayValue(item, collection) : item.id}
-                              <span style={{ marginLeft: 8, fontSize: 11, color: "var(--bd-text-tertiary)" }}>{item.status}</span>
+                              <span style={{ marginLeft: 8, fontSize: 11, color: "var(--bd-fg-muted)" }}>{item.status}</span>
                             </span>
                             <span style={{ display: "flex", gap: 4 }}>
                               <Button variant="ghost" size="sm" onClick={() => startEdit(item)} aria-label="Edit record">
@@ -262,7 +262,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
 };
 
 const FieldLabel: React.FC<{ field: CMSField }> = ({ field }) => (
-  <label style={{ display: "block", fontSize: 12, marginBottom: 4, color: "var(--bd-text-secondary)" }}>
+  <label style={{ display: "block", fontSize: 12, marginBottom: 4, color: "var(--bd-fg-secondary)" }}>
     {field.name}
     {field.validation?.required && <span style={{ color: "var(--bd-danger)" }}> *</span>}
   </label>
