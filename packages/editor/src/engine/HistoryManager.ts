@@ -108,7 +108,7 @@ export class HistoryManager {
             if (!this.isDestroyed && this.isRecording) {
               const combinedLabel = this.getCoalescedLabel();
               this.coalescedLabels = [];
-              this.record(combinedLabel);
+              this.recordAndMaybeBroadcast(combinedLabel);
             }
           }, this.config.coalesceDelay);
         }
@@ -221,6 +221,22 @@ export class HistoryManager {
   }
 
   /**
+   * Record a change, and when a collaboration session is connected, also emit
+   * the resulting OT operation to peers. recordForCollaboration() is the
+   * existing record variant that returns the operation; this just routes to it
+   * when connected (without touching the plain record() / undo-restore paths).
+   */
+  private recordAndMaybeBroadcast(label?: string): void {
+    const collab = this.composer.collab?.manager;
+    if (collab?.isConnected?.()) {
+      const op = this.recordForCollaboration(label);
+      if (op) collab.broadcastOperation(op);
+      return;
+    }
+    this.record(label);
+  }
+
+  /**
    * Commit any pending (debounced) record synchronously and cancel its timers.
    * Use after a programmatic edit that the user may immediately undo (e.g. an
    * applied AI edit): without this, the 500ms coalesce window leaves the edit
@@ -254,7 +270,7 @@ export class HistoryManager {
     if (this.isDestroyed || !this.isRecording) return;
     const label = this.getCoalescedLabel();
     this.coalescedLabels = [];
-    this.record(label);
+    this.recordAndMaybeBroadcast(label);
   }
 
   /**

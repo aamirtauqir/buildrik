@@ -24,6 +24,7 @@ import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 import { OTEngine } from "./OTEngine";
+import { SSETransport } from "./SSETransport";
 import type { OTOperation } from "./OTTypes";
 import type { CollaborationTransport } from "./types";
 import { ProjectDataSchema } from "../../shared/schemas/project";
@@ -168,6 +169,17 @@ export class CollaborationManager extends EventEmitter {
       timestamp: Date.now(),
       payload: {},
     });
+  }
+
+  /**
+   * Start a collaboration session for a site: wire the default DB-backed SSE
+   * transport (if none set) and join the room keyed by siteId. This is the
+   * single entry point the UI calls — previously there was none, so the whole
+   * collaboration stack was unreachable.
+   */
+  async startSession(siteId: string, userName: string): Promise<void> {
+    if (!this.transport) this.setTransport(new SSETransport());
+    await this.joinRoom(siteId, userName);
   }
 
   /**

@@ -10,6 +10,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
+import { getSiteIdFromUrl } from "../../../services/BuildrikSyncProvider";
 import type { CommandAction } from "../controls";
 
 interface UseCanvasCommandPaletteParams {
@@ -134,6 +135,17 @@ export function useCanvasCommandPalette({
         icon: "\u{1F5C3}",
         keywords: ["cms", "content", "collection", "records", "data"],
         handler: () => composer.emit(EVENTS.CMS_MANAGE_RECORDS, {}),
+      },
+      {
+        id: "start-collab",
+        label: "Start collaboration session",
+        category: "Collaborate",
+        icon: "\u{1F465}",
+        keywords: ["collaborate", "team", "real-time", "multiplayer", "share"],
+        handler: () => {
+          const siteId = getSiteIdFromUrl();
+          if (siteId) void composer.collab.manager.startSession(siteId, "Editor").catch(() => {});
+        },
       },
       {
         id: "add-text",
