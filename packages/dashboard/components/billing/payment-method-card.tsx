@@ -109,7 +109,8 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
             </div>
           </div>
           <p className="mt-1.5 text-xs" style={{ color: "var(--color-text-muted)" }}>
-            Stripe Elements will replace this placeholder
+            Online card updates are coming soon. To change your payment method now,
+            contact support.
           </p>
           <div className="mt-4 flex gap-3">
             <button

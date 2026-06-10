@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { WorkspaceForm } from "@/components/settings/workspace-form";
@@ -81,12 +82,26 @@ function DeleteWorkspaceModal({
 
 export default function WorkspacePage() {
   const { addToast } = useToast();
+  const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const wsQuery = trpc.account.workspace.get.useQuery();
 
   const updateMutation = trpc.account.workspace.update.useMutation({
     onSuccess: () => { wsQuery.refetch(); addToast("success", "Workspace updated"); },
     onError: (err) => addToast("error", "Failed", err.message),
+  });
+
+  // Wire the real delete mutation (was a fake "Not yet available" toast). The
+  // server validates the typed name + owner-only; on success we leave the
+  // (now-gone) workspace and return to the dashboard.
+  const deleteMutation = trpc.account.workspace.delete.useMutation({
+    onSuccess: () => {
+      addToast("success", "Workspace deleted");
+      setShowDeleteModal(false);
+      router.push("/dashboard");
+      router.refresh();
+    },
+    onError: (err) => addToast("error", "Could not delete workspace", err.message),
   });
 
   const sharingMutation = trpc.account.workspace.sharing.useMutation({
@@ -152,12 +167,9 @@ export default function WorkspacePage() {
       {showDeleteModal && (
         <DeleteWorkspaceModal
           workspaceName={workspaceName}
-          onConfirm={() => {
-            addToast("error", "Not yet available", "Workspace deletion will be available soon.");
-            setShowDeleteModal(false);
-          }}
+          onConfirm={() => deleteMutation.mutate({ confirmName: workspaceName })}
           onClose={() => setShowDeleteModal(false)}
-          deleting={false}
+          deleting={deleteMutation.isPending}
         />
       )}
     </div>

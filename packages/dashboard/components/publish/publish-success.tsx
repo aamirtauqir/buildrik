@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Copy, ExternalLink, Share2, BarChart3, Pencil, LayoutDashboard, Globe, Loader2, ArrowUpRight } from "lucide-react";
+import { CheckCircle2, Copy, ExternalLink, Share2, BarChart3, Pencil, LayoutDashboard, Globe, ArrowUpRight } from "lucide-react";
 
 interface PublishSuccessProps {
   siteId: string;
@@ -66,15 +66,6 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
           </Link>
         </div>
       )}
-
-      {/* Lighthouse placeholder */}
-      <div className="mt-4 rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
-        <p className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>Lighthouse Score</p>
-        <div className="mt-2 flex items-center justify-center gap-2">
-          <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--color-text-secondary)" }} />
-          <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Calculating...</p>
-        </div>
-      </div>
 
       {/* CTAs */}
       <div className="mt-6 grid grid-cols-2 gap-3">
