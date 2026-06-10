@@ -36,6 +36,14 @@ Done: A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅ A6 ✅ A7 ✅ A11 ✅ A12 ✅ (7 commit
 - ◐ B5 Multi-select: duplicate ✅ (commit). copy/cut/paste deferred (clipboard-array refactor)
 - ☑ B6 Heading H1–H6 level switcher (commit). select-options editor still TODO
 
+## Tier C — progress
+
+- ☑ **Analytics ingestion** — was read-only (stats always 0). Added `recordPageView` service + `POST /api/public/track/[siteId]` beacon endpoint + first-party beacon injected by the publish worker. Unit-tested; needs a live published-site smoke test for the full beacon→DB round-trip.
+- ☑ **CMS made usable** — engine CRUD was fully orphaned. Added `CMSRecordsModal` (records list + field-driven add/edit/delete, command-palette trigger) AND fixed the binding popover to bind to a specific record (was `itemId=undefined` → never resolved). CMS loop now works: collection → records → bind → resolve.
+- ☐ **AI site-gen worker** — needs real AI keys + generated-output→blocks mapping + live smoke test. Best as a focused session.
+- ☐ **Real-time collaboration server** — needs a running WebSocket server (genuine infra). Hard-blocked without it.
+- ☐ **Custom-domain serving + SSL** — needs Vercel domains API + DNS + a real domain to verify.
+
 ## Tier C — Missing backend / infra (needs product/infra decision — NOT auto-built)
 
 - Real-time collaboration server (WebSocket transport) — entire §2 of Module 6
