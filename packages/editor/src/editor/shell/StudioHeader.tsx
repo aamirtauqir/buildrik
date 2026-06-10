@@ -11,6 +11,9 @@ import type { DeviceType } from "../../shared/types";
 import { sanitizeHTMLForPreview, setupPreviewWindow } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { PresenceIndicators } from "../collaboration";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Users } from "lucide-react";
+import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { Topbar } from "./Topbar";
 import type { ToastInput } from "@/editor/shared/vibcoder";
@@ -161,8 +164,27 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     isConnected,
   } = useCollaboration(composer);
 
-  // Gate: no real-time transport in demo — flip when WebSocket/OT transport is connected
+  // Gate: presence shows once a session is connected. When not connected we
+  // show a visible "Collaborate" button so the session is discoverable (it was
+  // only reachable via a hidden command-palette action before).
   const hasTransport = isConnected;
+
+  const handleStartCollab = React.useCallback(() => {
+    const siteId = getSiteIdFromUrl();
+    if (!siteId || !composer) {
+      addToast?.({ title: "Save your site first", description: "Open a saved site to collaborate.", tone: "info" });
+      return;
+    }
+    void composer.collab.manager
+      .startSession(siteId, currentUser?.name ?? "Editor")
+      .catch(() =>
+        addToast?.({
+          title: "Couldn't start collaboration",
+          description: "Try again in a moment.",
+          tone: "error",
+        }),
+      );
+  }, [composer, currentUser, addToast]);
 
   /**
    * Handle preview - opens sanitized HTML in new window with sandboxed iframe
@@ -270,7 +292,18 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       collaborationSlot={
         hasTransport ? (
           <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
-        ) : undefined
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleStartCollab}
+            aria-label="Start collaboration session"
+            title="Start a real-time collaboration session"
+          >
+            <Users size={14} />
+            <span style={{ marginLeft: 4 }}>Collaborate</span>
+          </Button>
+        )
       }
     />
   );

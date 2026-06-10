@@ -178,6 +178,7 @@ export const EVENTS = {
   // ============================================
   TEMPLATE_LOADED: "template:loaded",
   TEMPLATE_SAVED: "template:saved",
+  TEMPLATE_SAVE_REQUESTED: "template:save-requested",
   TEMPLATE_APPLIED: "template:applied",
   TEMPLATE_REMOVED: "template:removed",
   /** Template begins loading from a source */

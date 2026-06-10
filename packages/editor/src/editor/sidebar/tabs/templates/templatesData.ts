@@ -57,7 +57,39 @@ export const DEFAULT_TEMPLATE_VERSION = "1.0.0";
 // ============================================================================
 
 const RECENT_STORAGE_KEY = "buildrick-recent-templates";
+const MY_TEMPLATES_KEY = "buildrick-my-templates";
 const MAX_RECENT = 3;
+
+/**
+ * User-saved templates (written by "Save as Template" → handleSaveTemplate).
+ * The "My Templates" filter returned [] before, so saved templates were
+ * invisible. Reads the localStorage store and maps to TemplateItem.
+ */
+export function getMyTemplates(): TemplateItem[] {
+  try {
+    const stored = localStorage.getItem(MY_TEMPLATES_KEY);
+    if (!stored) return [];
+    const rows = JSON.parse(stored) as Array<{
+      id?: string;
+      name?: string;
+      description?: string;
+      html?: string;
+    }>;
+    return rows
+      .filter((r) => r && r.id && r.html)
+      .map((r) => ({
+        id: r.id as string,
+        name: r.name || "Untitled template",
+        type: "page",
+        icon: "📄",
+        html: r.html as string,
+        description: r.description,
+        category: "my-templates",
+      }));
+  } catch {
+    return [];
+  }
+}
 
 /** Get recent templates from localStorage */
 export function getRecentTemplates(): RecentTemplate[] {

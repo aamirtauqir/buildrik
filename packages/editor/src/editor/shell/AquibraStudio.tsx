@@ -24,6 +24,7 @@ import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMi
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { PageWizard } from "../wizard/PageWizard";
+import { OnboardingMount } from "../onboarding/OnboardingMount";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
@@ -478,7 +479,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         composer={composer}
       />
 
-      {/* Onboarding is managed by useOnboardingOrchestrator */}
+      {/* First-time onboarding checklist (gated to new users by the orchestrator). */}
+      <OnboardingMount composer={composer} />
 
       {/* Page Wizard — shown on first load for a blank canvas. Persists
           dismissal so Skip/Complete sticks across reloads (was always

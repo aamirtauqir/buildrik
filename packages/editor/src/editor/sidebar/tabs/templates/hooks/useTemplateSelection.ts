@@ -9,6 +9,7 @@ import {
   type TemplateItem,
   type TemplateType,
   SITE_TEMPLATES,
+  getMyTemplates,
 } from "../templatesData";
 
 const PAGE_SIZE = 6;
@@ -63,9 +64,12 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
   }, [activeFilter]);
 
   const filteredTemplates = React.useMemo(() => {
-    // "my-templates" is a placeholder — user-saved templates are a separate arc.
-    if (activeFilter === "my-templates") return [];
     const q = searchQ.toLowerCase().trim();
+    // "My Templates" reads the user's saved templates from localStorage.
+    if (activeFilter === "my-templates") {
+      const mine = getMyTemplates();
+      return q ? mine.filter((t) => t.name.toLowerCase().includes(q)) : mine;
+    }
     return SITE_TEMPLATES.filter((t) => {
       const mq = !q || t.name.toLowerCase().includes(q);
       const mc = activeFilter === "all" || t.category === activeFilter;

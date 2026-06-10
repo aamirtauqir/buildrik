@@ -137,6 +137,14 @@ export function useCanvasCommandPalette({
         handler: () => composer.emit(EVENTS.CMS_MANAGE_RECORDS, {}),
       },
       {
+        id: "save-template",
+        label: "Save page as template",
+        category: "Templates",
+        icon: "\u{1F4BE}",
+        keywords: ["template", "save", "reuse", "my templates"],
+        handler: () => composer.emit(EVENTS.TEMPLATE_SAVE_REQUESTED, {}),
+      },
+      {
         id: "start-collab",
         label: "Start collaboration session",
         category: "Collaborate",
