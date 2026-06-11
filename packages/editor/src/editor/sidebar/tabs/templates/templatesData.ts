@@ -11,6 +11,8 @@
  * @license BSD-3-Clause
  */
 
+import { STORAGE_KEYS } from "@/shared/constants/storageKeys";
+
 // ============================================================================
 // TYPES & INTERFACES
 // ============================================================================
@@ -57,7 +59,7 @@ export const DEFAULT_TEMPLATE_VERSION = "1.0.0";
 // ============================================================================
 
 const RECENT_STORAGE_KEY = "buildrick-recent-templates";
-const MY_TEMPLATES_KEY = "buildrick-my-templates";
+const MY_TEMPLATES_KEY = STORAGE_KEYS.MY_TEMPLATES;
 const MAX_RECENT = 3;
 
 /**
