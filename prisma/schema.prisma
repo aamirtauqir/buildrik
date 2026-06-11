@@ -457,6 +457,26 @@ model AiAdoptionEvent {
   @@map("ai_adoption_events")
 }
 
+// Single-use confirmation grant for a privileged AI action (platform phase 5).
+// propose creates a row; confirm consumes it atomically (usedAt) so a grant can
+// be executed exactly once and only before it expires — replaces the replayable
+// stateless HMAC token. The row id IS the token (random cuid, unguessable);
+// confirm also checks actorId matches the session.
+model ActionConfirmation {
+  id        String    @id @default(cuid())
+  actorId   String
+  siteId    String
+  actionId  String
+  argsHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([actorId])
+  @@index([expiresAt])
+  @@map("action_confirmations")
+}
+
 model NotificationPref {
   id       String  @id @default(cuid())
   userId   String

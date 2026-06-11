@@ -63,6 +63,10 @@ interface UseAgentRunnerResult {
 export function useAgentRunner(
   composer: Composer | null,
   model: AIModel,
+  // A privileged-action proposal (e.g. publish) emitted mid-run is routed to the
+  // confirm gate, NOT silently dropped. Without this the agent path would discard
+  // applyAiEdit's `proposals`.
+  onProposal?: (actionId: string) => void,
 ): UseAgentRunnerResult {
   const [phase, setPhase] = React.useState<RunPhase>("idle");
   const [steps, setSteps] = React.useState<RunStep[]>([]);
@@ -181,7 +185,8 @@ export function useAgentRunner(
           if (autoApplyRef.current) {
             // Auto-apply mode (opt-in): apply without waiting for approval.
             try {
-              await applyAiEdit(composer, { applyOps: edit.applyOps });
+              const { proposals } = await applyAiEdit(composer, { applyOps: edit.applyOps });
+              if (proposals.length > 0) onProposal?.(proposals[0].actionId);
               setStep(i, { status: "applied", edit });
             } catch {
               setStep(i, { status: "failed", edit });
@@ -200,7 +205,7 @@ export function useAgentRunner(
         advance(i + 1);
       }
     },
-    [composer, model, gatherElements, gatherTokens, gatherMediaAssets, setStep, advance],
+    [composer, model, gatherElements, gatherTokens, gatherMediaAssets, setStep, advance, onProposal],
   );
   generateStepRef.current = generateStep;
 
@@ -247,13 +252,14 @@ export function useAgentRunner(
     const step = stepsRef.current[i];
     if (!step || step.status !== "awaiting" || !step.edit || !composer) return;
     try {
-      await applyAiEdit(composer, { applyOps: step.edit.applyOps });
+      const { proposals } = await applyAiEdit(composer, { applyOps: step.edit.applyOps });
+      if (proposals.length > 0) onProposal?.(proposals[0].actionId);
       setStep(i, { status: "applied" });
     } catch {
       setStep(i, { status: "failed" });
     }
     advance(i + 1);
-  }, [composer, setStep, advance]);
+  }, [composer, setStep, advance, onProposal]);
 
   const skip = React.useCallback(() => {
     const i = indexRef.current;

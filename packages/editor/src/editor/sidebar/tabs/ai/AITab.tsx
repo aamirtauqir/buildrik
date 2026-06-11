@@ -31,8 +31,8 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
   const [mode, setMode] = React.useState<"chat" | "agent">("chat");
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const streamingMsgIdRef = React.useRef<string | null>(null);
-  const agent = useAgentRunner(composer, model);
   const actionGate = useAiActionGate(composer);
+  const agent = useAgentRunner(composer, model, actionGate.propose);
 
   const submit = React.useCallback((text: string) => {
     const serverScope = toServerScope(scope);

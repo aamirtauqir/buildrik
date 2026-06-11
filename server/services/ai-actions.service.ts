@@ -1,10 +1,19 @@
 import { z } from "zod";
 import { checkSiteRole } from "@/server/services/permission.service";
+import type { UserRoleType } from "@/lib/constants/enums";
 import { startPublish } from "@/server/services/publish.service";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { publishPageSchema, type PublishPage } from "@buildrik/shared/schemas/publish";
-import type { ActionClaims } from "@/server/services/action-token.service";
 import type { TRPCContext } from "@/server/trpc/trpc";
+
+// The execute-time claims: the consumed confirmation's siteId/actionId/argsHash
+// plus the session actorId the router merges in.
+export interface ActionClaims {
+  actorId: string;
+  siteId: string;
+  actionId: string;
+  argsHash: string;
+}
 
 // The minimal ctx an action needs: session + bearer for resolveWorkspaceId, plus
 // the FULL prisma client (checkSiteRole wants PrismaClient, not the narrower
@@ -25,6 +34,9 @@ export type ActionCtx = Omit<Parameters<typeof resolveWorkspaceId>[0], "prisma">
  * proof-of-proposal, NOT a role grant.
  */
 export interface ActionDef {
+  /** Role checked at PROPOSE so non-admins fail early (correct failure point);
+   *  execute still re-checks via the domain path (token is not a role grant). */
+  minRole: Exclude<UserRoleType, "VIEWER">;
   schema: z.ZodTypeAny;
   payloadSchema: z.ZodTypeAny;
   describe(args: unknown): { title: string; consequence: string; undoable: boolean };
@@ -33,6 +45,7 @@ export interface ActionDef {
 
 const PRIVILEGED_ACTIONS: Record<string, ActionDef> = {
   "site.publish": {
+    minRole: "ADMIN",
     schema: z.object({}).strip(), // publish takes no AI-supplied args
     payloadSchema: z.object({ pages: z.array(publishPageSchema).max(500).optional() }),
     describe: () => ({

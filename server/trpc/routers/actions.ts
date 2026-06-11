@@ -1,24 +1,38 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../trpc";
-import { assertSiteAccess, PermissionError } from "@/server/services/permission.service";
-import { signActionToken, verifyActionToken } from "@/server/services/action-token.service";
+import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
+import {
+  createConfirmation,
+  consumeConfirmation,
+} from "@/server/services/action-confirmation.service";
 import { getAction } from "@/server/services/ai-actions.service";
+import { checkRateLimit } from "@/server/services/rate-limiter";
 
 /**
- * Privileged-action platform (phase 3) — propose → confirm-token → execute.
+ * Privileged-action platform — propose → single-use confirm → execute.
  *
- *   propose: validate the action + args, verify the caller is a site member,
- *            issue a server-signed confirmation token + a consequence string.
- *   confirm: verify the token against the session actor, then execute through
- *            the action's domain path (which re-checks the hard role).
+ *   propose: validate the action + args, check the caller has the action's role
+ *            (fail non-admins HERE, the correct failure point), issue a single-use
+ *            confirmation grant + a consequence string.
+ *   confirm: atomically CONSUME the grant (one execution, before expiry, matching
+ *            actor), then execute through the action's domain path (which re-checks
+ *            the role). The grant is single-use, so a captured token can't be
+ *            replayed.
  *
- * No execution happens at propose. The confirm gate (a per-action explicit
- * approval in the editor) sits between the two; it is NEVER folded into the
- * agent's auto-apply.
+ * Both procedures are rate-limited per user+action — these mint/spend privileged
+ * grants, not ordinary reads.
  */
+const rateLimitedAction = protectedProcedure.use(async ({ ctx, path, next }) => {
+  const key = `action:${ctx.session.user!.id!}:${path}`;
+  if (!checkRateLimit(key, 20, 60_000).allowed) {
+    throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many action requests. Try again shortly." });
+  }
+  return next();
+});
+
 export const actionsRouter = router({
-  propose: protectedProcedure
+  propose: rateLimitedAction
     .input(
       z.object({
         siteId: z.string().min(1),
@@ -31,10 +45,10 @@ export const actionsRouter = router({
       if (!def) {
         throw new TRPCError({ code: "BAD_REQUEST", message: `Unknown action: ${input.actionId}` });
       }
-      // Membership gate — never issue a token to a non-member. The hard role
-      // (e.g. ADMIN for publish) is re-checked at execute via the domain path.
+      // Role gate at propose — non-admins fail here, not after they read the
+      // consequence and click confirm. Execute re-checks via the domain path.
       try {
-        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, def.minRole);
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
@@ -43,7 +57,7 @@ export const actionsRouter = router({
       if (!parsed.success) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid action args" });
       }
-      const token = signActionToken({
+      const token = await createConfirmation({
         actorId: ctx.session.user!.id!,
         siteId: input.siteId,
         actionId: input.actionId,
@@ -52,14 +66,14 @@ export const actionsRouter = router({
       return { token, confirm: def.describe(parsed.data) };
     }),
 
-  confirm: protectedProcedure
+  confirm: rateLimitedAction
     .input(z.object({ token: z.string().min(1), payload: z.unknown().optional() }))
     .mutation(async ({ ctx, input }) => {
-      const v = verifyActionToken(input.token, ctx.session.user!.id!);
-      if (!v.ok) {
-        throw new TRPCError({ code: "FORBIDDEN", message: `Invalid confirmation token (${v.reason})` });
+      const consumed = await consumeConfirmation(input.token, ctx.session.user!.id!);
+      if (!consumed.ok) {
+        throw new TRPCError({ code: "FORBIDDEN", message: `Invalid confirmation (${consumed.reason})` });
       }
-      const def = getAction(v.claims.actionId);
+      const def = getAction(consumed.claims.actionId);
       if (!def) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Unknown action" });
       }
@@ -68,7 +82,7 @@ export const actionsRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid action payload" });
       }
       try {
-        return await def.execute(ctx, v.claims, parsed.data);
+        return await def.execute(ctx, { actorId: ctx.session.user!.id!, ...consumed.claims }, parsed.data);
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         if (e instanceof Error && e.message === "ALREADY_PUBLISHING") {

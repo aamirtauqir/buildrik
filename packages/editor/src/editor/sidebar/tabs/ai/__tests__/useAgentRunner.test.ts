@@ -36,6 +36,8 @@ const editWithRows = (n: number) => ({
 beforeEach(() => {
   runPromptOnce.mockReset();
   applyAiEdit.mockReset();
+  // applyAiEdit returns { applied, proposals } — the runner destructures proposals.
+  applyAiEdit.mockResolvedValue({ applied: 1, proposals: [] });
 });
 
 describe("useAgentRunner", () => {
