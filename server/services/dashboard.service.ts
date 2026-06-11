@@ -31,7 +31,9 @@ export async function getDashboardStats(
     prisma.site.count({ where: { workspaceId, status: "PUBLISHED", deletedAt: null } }),
     prisma.site.count({ where: { workspaceId, status: "DRAFT", deletedAt: null } }),
     prisma.site.count({ where: { workspaceId, status: "ARCHIVED", deletedAt: null } }),
-    prisma.workspaceMember.count({ where: { workspaceId } }),
+    // "Collaborators" excludes the owner — matches the Team page, which
+    // treats an owner-only workspace as "No team members yet".
+    prisma.workspaceMember.count({ where: { workspaceId, role: { not: "OWNER" } } }),
     prisma.invite.count({ where: { workspaceId, status: "PENDING" } }),
     prisma.siteAnalytics.aggregate({
       where: { site: { workspaceId }, date: { gte: thirtyDaysAgo } },
