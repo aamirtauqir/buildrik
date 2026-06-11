@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { placeholderImageSrc } from "../../shared/constants/media";
 
 export interface GalleryImage {
   src: string;
@@ -240,9 +241,9 @@ export const galleryBlockConfig = {
   content:
     '<div class="buildrick-image-gallery" data-buildrick-type="gallery">' +
     '<div class="buildrick-gallery-grid">' +
-    '<img src="https://via.placeholder.com/400x260" alt="Gallery item 1"/>' +
-    '<img src="https://via.placeholder.com/400x260" alt="Gallery item 2"/>' +
-    '<img src="https://via.placeholder.com/400x260" alt="Gallery item 3"/>' +
+    `<img src="${placeholderImageSrc(400, 260)}" alt="Gallery item 1"/>` +
+    `<img src="${placeholderImageSrc(400, 260)}" alt="Gallery item 2"/>` +
+    `<img src="${placeholderImageSrc(400, 260)}" alt="Gallery item 3"/>` +
     "</div>" +
     "</div>",
 };

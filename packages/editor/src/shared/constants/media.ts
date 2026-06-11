@@ -215,3 +215,24 @@ export function getAssetTypeFromMime(
   if (isAllowedAudioType(mimeType)) return "audio";
   return null;
 }
+
+// ============================================
+// Placeholder Image
+// ============================================
+
+/**
+ * Inline SVG placeholder for block templates that need a visible default
+ * image. Replaces the dead via.placeholder.com service (shut down 2024 —
+ * its URLs render the browser broken-image icon and fail network requests).
+ */
+export function placeholderImageSrc(width: number, height: number): string {
+  const cx = Math.round(width * 0.38);
+  const cy = Math.round(height * 0.35);
+  const svg =
+    `<svg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}'>` +
+    `<rect width='${width}' height='${height}' fill='#E2E8F0'/>` +
+    `<circle cx='${cx}' cy='${cy}' r='${Math.round(height * 0.07)}' fill='#94A3B8'/>` +
+    `<path d='M${width * 0.18} ${height * 0.78} L${width * 0.38} ${height * 0.5} L${width * 0.52} ${height * 0.66} L${width * 0.64} ${height * 0.54} L${width * 0.82} ${height * 0.78} Z' fill='#94A3B8'/>` +
+    `</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}

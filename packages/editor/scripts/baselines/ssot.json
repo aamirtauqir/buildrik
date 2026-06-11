@@ -16,9 +16,9 @@
     "violations": [
       {
         "path": "src/editor/canvas/Canvas.css",
-        "line": 587,
+        "line": 601,
         "severity": "important",
-        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:587, src/themes/design-system/a11y.css:56",
+        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:601, src/themes/design-system/a11y.css:56",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       },
       {
