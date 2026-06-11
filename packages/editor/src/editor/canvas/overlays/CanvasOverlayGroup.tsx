@@ -277,7 +277,10 @@ export function CanvasOverlayGroup({
             selectedIds={selectedIds}
             onResizeStateChange={setIsResizing}
           />
-          {selectedId && canvasRef.current && (
+          {/* Legacy label only when the unified toolbar is hidden (resize /
+              multi-select) — both render at the same spot and the toolbar's
+              backdrop blur smears the dark label pill underneath. */}
+          {selectedId && canvasRef.current && (selectedIds.length !== 1 || isResizing) && (
             <SelectionLabel
               composer={composer}
               elementId={selectedId}
