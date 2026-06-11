@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { checkQuota, recordUsage, streamContent } = vi.hoisted(() => ({
+const { checkQuota, reserveQuota, resolveModelForUser, recordUsage, streamContent } = vi.hoisted(() => ({
   checkQuota: vi.fn(),
+  reserveQuota: vi.fn(),
+  resolveModelForUser: vi.fn(),
   recordUsage: vi.fn(),
   streamContent: vi.fn(),
 }));
@@ -11,7 +13,12 @@ vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 vi.mock("@/server/services/rate-limiter", () => ({
   checkRateLimit: vi.fn(() => ({ allowed: true })),
 }));
-vi.mock("@/server/services/quota.service", () => ({ checkQuota, recordUsage }));
+vi.mock("@/server/services/quota.service", () => ({
+  checkQuota,
+  reserveQuota,
+  resolveModelForUser,
+  recordUsage,
+}));
 vi.mock("@/server/services/ai.service", () => ({
   streamContent,
   generateContent: vi.fn(),
@@ -19,6 +26,8 @@ vi.mock("@/server/services/ai.service", () => ({
   generateLayout: vi.fn(),
   summarizeChanges: vi.fn(),
   suggestMilestone: vi.fn(),
+  // W3 provider-key guard — no-op in tests (no real API keys configured).
+  assertProviderConfigured: vi.fn(),
 }));
 
 import { aiRouter } from "@server/trpc/routers/ai";
@@ -29,8 +38,13 @@ const callerCtx = { session: { user: { id: "user-1" } } } as never;
 describe("ai router", () => {
   beforeEach(() => {
     checkQuota.mockReset();
+    reserveQuota.mockReset();
+    resolveModelForUser.mockReset();
     recordUsage.mockReset();
     streamContent.mockReset();
+    // Server resolves the model from the user's tier; the client model is a
+    // hint. Default to echoing the requested model for these tests.
+    resolveModelForUser.mockResolvedValue("claude-sonnet-4-6");
   });
 
   it("getQuotaStatus returns current quota", async () => {
@@ -42,7 +56,7 @@ describe("ai router", () => {
   });
 
   it("streamPrompt throws TOO_MANY_REQUESTS when quota exhausted", async () => {
-    checkQuota.mockResolvedValueOnce({ ok: false, used: 10, limit: 10, resetsAt: new Date() });
+    reserveQuota.mockResolvedValueOnce({ ok: false, used: 10, limit: 10, resetsAt: new Date() });
     const caller = aiRouter.createCaller(callerCtx);
     let caught: TRPCError | null = null;
     try {
@@ -61,7 +75,7 @@ describe("ai router", () => {
   });
 
   it("streamPrompt records usage on success", async () => {
-    checkQuota.mockResolvedValueOnce({ ok: true, used: 0, limit: 200, resetsAt: new Date() });
+    reserveQuota.mockResolvedValueOnce({ ok: true, used: 0, limit: 200, resetsAt: new Date() });
     streamContent.mockImplementationOnce(async function* () {
       yield { type: "text", text: "hi" };
       yield { type: "done" };
@@ -77,6 +91,9 @@ describe("ai router", () => {
     const collected: unknown[] = [];
     for await (const chunk of sub) collected.push(chunk);
     expect(collected.length).toBe(2);
-    expect(recordUsage).toHaveBeenCalledWith("user-1", "claude-sonnet-4-6");
+    // Usage is now accounted by reserveQuota (reserve-then-stream), not a
+    // separate recordUsage call — the router resolves the model server-side
+    // and reserves against it.
+    expect(reserveQuota).toHaveBeenCalledWith("user-1", "claude-sonnet-4-6");
   });
 });
