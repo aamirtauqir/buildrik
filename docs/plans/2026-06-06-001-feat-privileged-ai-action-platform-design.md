@@ -161,23 +161,25 @@ compensation, warning + audit (codex decision #4).
 - **Retrieval, not prompt-stuffing** — large media/CMS/catalog/token inventories
   must be searched/paged, not dumped (W4/W5 already cap at 120/100; formalize).
 
-## 6. PREREQUISITE — fix the publish path FIRST (codex finding #3)
+## 6. PREREQUISITE — publish path — MOSTLY DONE (status 2026-06-06)
 
-Codex's biggest-risk call: do NOT wrap publish until its real bugs are fixed, or
-we standardize a leaky substrate. These are pre-existing bugs in the human publish
-flow, surfaced by this design pass — worth fixing regardless of AI:
-- **`publishStatus` has NO access check** (`sites.ts:292`) — any authed user can
-  poll any job's status. SECURITY. Add `checkSiteRole`/membership.
-- **`prePublishChecks` skips authorization** (`sites.ts:264`). Add the role check.
-- **read-then-create race in `startPublish`** (`publish.service.ts:76`) — two
-  publishes can both pass the "already publishing?" check. Make it atomic
-  (unique partial index or a transactional guard).
-- **worker dispatch is fire-and-forget HTTP** (`publish.service.ts:115`) — a lost
-  request strands a QUEUED job forever. Needs a retry/claim or a real queue.
-- **raw page HTML stored in the job `log` column** (`publish.service.ts:89`,
-  `schema.prisma:848`) — bloat + data-at-rest concern. Move out of the job row.
+Codex's biggest-risk call: do NOT wrap publish until its real bugs are fixed.
+Status after verifying against live code:
+- ✅ **`publishStatus` authz** — FIXED `ca8c280d` (asserts active site membership).
+- ✅ **`prePublishChecks` authz** — FIXED `ca8c280d`.
+- ✅ **raw HTML leak via status** — FIXED `ca8c280d` (`getPublishStatus` no longer
+  selects the `log` column).
+- ✅ **`startPublish` read-then-create race** — ALREADY FIXED in the prior
+  publish-path arc (migration `20260607000001`, partial unique index
+  `publish_build_jobs_active_unique` + P2002 path). Codex's line ref was stale.
+- ✅ **worker fire-and-forget durability** — ALREADY mitigated (stale-QUEUED guard
+  + stranded-row cleanup, same prior arc).
+- ⏳ **HTML still stored at rest in the job `log` column** — deferred (bigger:
+  relocate the payload out of the job row; the leak is closed, storage remains).
+- ⏳ **audit is best-effort** (`recordForSite` swallows failures) — deferred; decide
+  whether privileged actions need a hard audit guarantee.
 
-These are their own small fix-arc (separable, shippable independently of AI).
+Prerequisite is effectively cleared for the propose-action core (phase 3).
 
 ## 6b. Proof surface: `site.publish` via propose/confirm (AFTER 6)
 
