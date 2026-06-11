@@ -22,6 +22,19 @@ export interface OnboardingMountProps {
 export const OnboardingMount: React.FC<OnboardingMountProps> = ({ composer }) => {
   const o = useOnboardingOrchestrator();
 
+  // Collapse to the pill when the user selects an element — the expanded
+  // panel sits over the inspector exactly when they want to style something.
+  const minimizeRef = React.useRef(o.minimize);
+  minimizeRef.current = o.minimize;
+  React.useEffect(() => {
+    if (!composer) return;
+    const onSelect = () => minimizeRef.current();
+    composer.on(EVENTS.ELEMENT_SELECTED, onSelect);
+    return () => {
+      composer.off(EVENTS.ELEMENT_SELECTED, onSelect);
+    };
+  }, [composer]);
+
   const handleAction = React.useCallback(
     (actionKey: string) => {
       if (!composer) return;
