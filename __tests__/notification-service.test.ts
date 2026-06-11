@@ -92,14 +92,13 @@ describe("Notification Service", () => {
   describe("markAsRead", () => {
     it("updates notification read to true", async () => {
       const { markAsRead } = await import("@/server/services/notification.service");
-      vi.mocked(prisma.notification.update).mockResolvedValue({
-        id: "n1", read: true,
-      } as any);
+      vi.mocked(prisma.notification.updateMany).mockResolvedValue({ count: 1 } as any);
 
-      const result = await markAsRead("n1");
-      expect(result.read).toBe(true);
-      expect(prisma.notification.update).toHaveBeenCalledWith({
-        where: { id: "n1" },
+      const result = await markAsRead("n1", "user1");
+      expect(result.count).toBe(1);
+      // Scoped by userId so one user cannot mark another's notification read.
+      expect(prisma.notification.updateMany).toHaveBeenCalledWith({
+        where: { id: "n1", userId: "user1" },
         data: { read: true },
       });
     });

@@ -27,9 +27,10 @@ export async function getUnreadCount(userId: string) {
   });
 }
 
-export async function markAsRead(notificationId: string) {
-  return prisma.notification.update({
-    where: { id: notificationId },
+export async function markAsRead(notificationId: string, userId: string) {
+  // Scoped update: only the owner can mark their notification read (IDOR guard).
+  return prisma.notification.updateMany({
+    where: { id: notificationId, userId },
     data: { read: true },
   });
 }

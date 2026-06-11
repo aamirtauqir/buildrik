@@ -81,7 +81,7 @@ export const accountRouter = router({
   }),
   sessions: router({
     list: protectedProcedure.query(({ ctx }) => getActiveSessions(ctx.session.user.id)),
-    revoke: protectedProcedure.input(z.object({ sessionId: z.string() })).mutation(({ input }) => revokeSession(input.sessionId)),
+    revoke: protectedProcedure.input(z.object({ sessionId: z.string() })).mutation(({ ctx, input }) => revokeSession(input.sessionId, ctx.session.user.id)),
     revokeAll: protectedProcedure.input(z.object({ currentSessionId: z.string() })).mutation(({ ctx, input }) => revokeAllOtherSessions(ctx.session.user.id, input.currentSessionId)),
   }),
   loginHistory: protectedProcedure.query(({ ctx }) => getLoginHistory(ctx.session.user.id)),
@@ -174,7 +174,7 @@ export const accountRouter = router({
         throw e;
       }
     }),
-    remove: protectedProcedure.input(z.object({ id: z.string() })).mutation(({ input }) => removeIntegration(input.id)),
+    remove: protectedProcedure.input(z.object({ id: z.string() })).mutation(({ ctx, input }) => removeIntegration(input.id, ctx.session.user.id)),
   }),
   aiCredits: protectedProcedure.query(async ({ ctx }) => {
     const { workspaceId, plan } = await getWorkspaceCtx(ctx);

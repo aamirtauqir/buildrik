@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { AddIntegrationInput } from "@buildrik/shared/schemas/account";
 import { decrypt } from "@/lib/encryption";
+import { checkWorkspaceRole } from "@/server/services/permission.service";
 
 export async function listIntegrations(workspaceId: string) {
   return prisma.workspaceIntegration.findMany({
@@ -29,10 +30,16 @@ export async function addIntegration(workspaceId: string, input: AddIntegrationI
   });
 }
 
-export async function removeIntegration(id: string) {
-  return prisma.workspaceIntegration.delete({
+export async function removeIntegration(id: string, userId: string) {
+  // Integrations are workspace-owned: verify the actor is an ADMIN of the
+  // integration's workspace before deleting (IDOR + privilege guard).
+  const integration = await prisma.workspaceIntegration.findUnique({
     where: { id },
+    select: { workspaceId: true },
   });
+  if (!integration) throw new Error("INTEGRATION_NOT_FOUND");
+  await checkWorkspaceRole(prisma, userId, integration.workspaceId, "ADMIN");
+  return prisma.workspaceIntegration.delete({ where: { id } });
 }
 
 export interface ActiveVercelConnection {

@@ -15,8 +15,8 @@ export const notificationsRouter = router({
   }),
   markRead: protectedProcedure
     .input(z.object({ notificationId: z.string() }))
-    .mutation(async ({ input }) => {
-      return markAsRead(input.notificationId);
+    .mutation(async ({ ctx, input }) => {
+      return markAsRead(input.notificationId, ctx.session.user.id);
     }),
   markAllRead: protectedProcedure.mutation(async ({ ctx }) => {
     return markAllAsRead(ctx.session.user.id);

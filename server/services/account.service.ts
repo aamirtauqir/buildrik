@@ -89,9 +89,11 @@ export async function getActiveSessions(userId: string) {
   });
 }
 
-export async function revokeSession(sessionId: string) {
-  return prisma.session.delete({
-    where: { id: sessionId },
+export async function revokeSession(sessionId: string, userId: string) {
+  // Scoped delete: a session id owned by another user matches zero rows, so
+  // one user cannot revoke another's session (IDOR guard).
+  return prisma.session.deleteMany({
+    where: { id: sessionId, userId },
   });
 }
 
