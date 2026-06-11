@@ -82,8 +82,10 @@ export async function updateProfile(userId: string, data: UpdateProfileInput) {
 }
 
 export async function getActiveSessions(userId: string) {
+  // "Active" means unexpired — expired rows linger until the cleanup cron
+  // runs and must not appear in the Security tab's Active sessions list.
   return prisma.session.findMany({
-    where: { userId },
+    where: { userId, expires: { gt: new Date() } },
     orderBy: { createdAt: "desc" },
     take: 50,
   });
