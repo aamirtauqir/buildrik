@@ -154,7 +154,7 @@ export default function BillingPage() {
             </div>
             <PlanComparison
               currentPlan={planKey}
-              onSelectPlan={() => {}}
+              upgradesDisabled
             />
           </div>
         </div>

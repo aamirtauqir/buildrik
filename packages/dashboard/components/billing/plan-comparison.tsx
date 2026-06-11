@@ -43,6 +43,8 @@ interface PlanComparisonProps {
   nearLimitFeatures?: string[];
   usage?: UsageMetric[];
   onSelectPlan?: (plan: PlanKey, interval: "MONTHLY" | "YEARLY") => void;
+  /** Renders Upgrade buttons disabled with a "Coming soon" label (payments not live yet). */
+  upgradesDisabled?: boolean;
 }
 
 function getWarningPercent(usage: UsageMetric[], label: string): number | null {
@@ -74,6 +76,7 @@ export function PlanComparison({
   nearLimitFeatures = [],
   usage = [],
   onSelectPlan,
+  upgradesDisabled = false,
 }: PlanComparisonProps) {
   const [yearly, setYearly] = useState(false);
   const interval = yearly ? "YEARLY" : "MONTHLY";
@@ -207,7 +210,7 @@ export function PlanComparison({
               );
             })}
           </tbody>
-          {onSelectPlan && (
+          {(onSelectPlan || upgradesDisabled) && (
             <tfoot>
               <tr className="border-t border-[var(--color-border-default)] bg-white">
                 <td className="px-6 py-4" />
@@ -218,14 +221,23 @@ export function PlanComparison({
                     <td key={plan} className={cn("px-6 py-4 text-center", isCurrent && "bg-[#FEF2F2]")}>
                       {!isCurrent && plan !== "FREE" && (
                         <button
-                          onClick={() => onSelectPlan(plan, interval)}
+                          onClick={() => onSelectPlan?.(plan, interval)}
+                          disabled={upgradesDisabled}
+                          title={upgradesDisabled ? "Payment processing is coming soon" : undefined}
                           className={cn(
-                            "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90",
-                            isBest && "ring-2 ring-[var(--color-success)] ring-offset-2"
+                            "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity",
+                            upgradesDisabled
+                              ? "cursor-not-allowed opacity-50"
+                              : "hover:opacity-90",
+                            !upgradesDisabled && isBest && "ring-2 ring-[var(--color-success)] ring-offset-2"
                           )}
                           style={{ backgroundColor: "var(--color-primary)" }}
                         >
-                          {isBest ? "Upgrade — Best for you" : "Upgrade"}
+                          {upgradesDisabled
+                            ? "Coming soon"
+                            : isBest
+                              ? "Upgrade — Best for you"
+                              : "Upgrade"}
                         </button>
                       )}
                       {isCurrent && (
