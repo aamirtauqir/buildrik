@@ -59,6 +59,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Need HEAD's parent so the vocab-add gate can diff new --buildrick-*
+          # tokens against the prior commit. Default fetch-depth:1 leaves HEAD
+          # parentless, making `git show HEAD` treat every token as added.
+          fetch-depth: 2
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
