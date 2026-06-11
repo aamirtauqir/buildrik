@@ -241,6 +241,21 @@ NOT a 10-surface program. Each surface lands when usage justifies it.
 - **Async at 6 surfaces = 2s-polling load.** Before the 2nd async surface,
   reconsider the polling model (shared poll / push) — don't copy usePublishJob 6×.
 
+### PHASE 5 — hardening DONE 2026-06-11 (`3037a14e`, codex post-impl review)
+Codex reviewed the shipped platform; fixed:
+- ✅ **Replay** (was unsafe): stateless HMAC token was replayable for 5 min →
+  replaced with DB-backed **single-use grant** (`ActionConfirmation`, consumed
+  atomically). `action-token.service` deleted.
+- ✅ **Agent path** (was broken): useAgentRunner dropped `proposals` → now an
+  `onProposal` callback routes to the same gate (AITab wires `actionGate.propose`).
+- ✅ **Role failure point**: propose checks `ActionDef.minRole` (publish→ADMIN) so
+  non-admins fail at propose; execute still re-checks.
+- ✅ **Rate limit**: propose/confirm per-user+action (20/min).
+- ✅ **Router tests**: `actions.test.ts` via createCaller (was none) + single-use
+  confirmation service test.
+Still deferred: revokedAt/revocation surface (no consumer yet); audit best-effort;
+2s-polling at scale.
+
 ## NOT in scope (this doc)
 - Building any of it. This is the shape; codex challenges, then we build phase 2.
 - head/body custom code via AI (script injection — gated/excluded everywhere).
