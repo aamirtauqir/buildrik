@@ -1,5 +1,6 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import { ZodError } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/server/auth";
 import { checkRateLimit } from "@/server/services/rate-limiter";
@@ -55,8 +56,16 @@ export const createTRPCContext = async (opts?: { headers?: Headers }) => {
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
+    // Zod input failures default to a JSON.stringify of the issue array —
+    // unreadable when surfaced in a toast. Rewrite to "field: message" lines.
+    const zod = error.cause instanceof ZodError ? error.cause : null;
     return {
       ...shape,
+      message: zod
+        ? zod.issues
+            .map((i) => `${i.path.join(".") || "input"}: ${i.message}`)
+            .join("; ")
+        : shape.message,
       data: {
         ...shape.data,
         cause: error.cause instanceof Error ? undefined : error.cause,

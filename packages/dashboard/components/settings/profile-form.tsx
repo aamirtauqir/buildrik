@@ -214,7 +214,10 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
           className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2 resize-none"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         />
-        <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+        <p
+          className="text-xs mt-1"
+          style={{ color: bio.length > 500 ? "var(--color-error)" : "var(--color-text-secondary)" }}
+        >
           Optional. Shown on your profile. {bio.length}/500
         </p>
       </div>
