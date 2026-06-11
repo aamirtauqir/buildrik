@@ -24,6 +24,12 @@ vi.mock("@/services/ai/subscriptionClient", () => ({
 }));
 
 import { AITab } from "../AITab";
+import { ToastProvider } from "@/editor/shared/vibcoder/Toast";
+
+// AITab now uses useToast (via the AI action gate), so it must render inside a
+// ToastProvider. The `wrapper` option also applies to rerender automatically.
+const renderWithToast = (ui: Parameters<typeof render>[0]) =>
+  render(ui, { wrapper: ToastProvider });
 
 /** Minimal composer mock with a single element already selected. */
 function makeElementScopedComposer() {
@@ -42,19 +48,19 @@ function makeElementScopedComposer() {
 
 describe("AITab skeleton", () => {
   it("renders the empty thread message when no messages exist", () => {
-    render(<AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
+    renderWithToast(<AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
     expect(screen.getByText(/Try a quick action or type a prompt to start/i)).toBeInTheDocument();
   });
 
   it("renders a composer textarea", () => {
-    render(<AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
+    renderWithToast(<AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
     expect(screen.getByPlaceholderText(/Ask Claude/i)).toBeInTheDocument();
   });
 });
 
 describe("AITab — scope + composer wiring", () => {
   it("submitting a prompt locks the scope chip", () => {
-    const { rerender, container } = render(
+    const { rerender, container } = renderWithToast(
       <AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;
@@ -71,7 +77,7 @@ describe("AITab — scope + composer wiring", () => {
     // The edit + done arrive together, so the diff/Apply UI never rendered and
     // the canvas never changed. Binding the id locally fixes it.
     const composer = makeElementScopedComposer();
-    const { container } = render(
+    const { container } = renderWithToast(
       <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;
@@ -110,7 +116,7 @@ describe("AITab — scope + composer wiring", () => {
       on: (e: string, cb: () => void) => { (handlers[e] ??= []).push(cb); },
       off: () => {},
     } as never;
-    const { container } = render(
+    const { container } = renderWithToast(
       <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;
@@ -127,7 +133,7 @@ describe("AITab — scope + composer wiring", () => {
     // quota-exhausted (TOO_MANY_REQUESTS) or provider failure showed as a blank
     // assistant box. The error must be visible to the user.
     const composer = makeElementScopedComposer();
-    const { container } = render(
+    const { container } = renderWithToast(
       <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
     );
     const ta = container.querySelector("textarea")!;

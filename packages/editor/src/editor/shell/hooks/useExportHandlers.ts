@@ -30,6 +30,7 @@ import type { ToastInput } from "@/editor/shared/vibcoder/Toast";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL as dashboardUrlFromEnv } from "@/shared/utils/runtimeEnv";
 import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";
+import { exportPublishPages } from "../exportPublishPages";
 
 export interface DeployPayload {
   files: { path: string; content: string }[];
@@ -102,10 +103,8 @@ export function useExportHandlers({
       return;
     }
     try {
-      const exported = await handleExportForDeploy();
-      const pages = exported.files
-        .filter((f) => f.path.endsWith(".html"))
-        .map((f) => ({ path: f.path, html: f.content }));
+      if (!composer) throw new Error("Composer not ready");
+      const pages = await exportPublishPages(composer);
       if (pages.length === 0) {
         addToast({
           title: "Nothing to publish",
@@ -122,7 +121,7 @@ export function useExportHandlers({
         tone: "error",
       });
     }
-  }, [handleExportForDeploy, publishJob, addToast]);
+  }, [composer, publishJob, addToast]);
 
   // Surface publish completion / failure as toasts.
   React.useEffect(() => {

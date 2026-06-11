@@ -8,7 +8,9 @@ import { Composer as PromptComposer } from "./Composer";
 import { useAIScope } from "./hooks/useAIScope";
 import { useStreamPrompt, toServerScope } from "./hooks/useStreamPrompt";
 import { useAgentRunner } from "./hooks/useAgentRunner";
+import { useAiActionGate } from "./hooks/useAiActionGate";
 import { applyAiEdit } from "./applySetStyle";
+import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { trackAiEditApplied } from "@/services/ai/adoptionTracker";
 import { DEFAULT_MODEL, type AIModel, type ChatMessage, type DiffEdit } from "./types";
@@ -30,6 +32,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const streamingMsgIdRef = React.useRef<string | null>(null);
   const agent = useAgentRunner(composer, model);
+  const actionGate = useAiActionGate(composer);
 
   const submit = React.useCallback((text: string) => {
     const serverScope = toServerScope(scope);
@@ -120,13 +123,16 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
       // applyAiEdit is async (some commands, e.g. insert-component, are async);
       // await so the "applied" state flips only after the mutation lands.
       try {
-        await applyAiEdit(composer, msg.edit);
+        const { proposals } = await applyAiEdit(composer, msg.edit);
         trackAiEditApplied({ applyOps: msg.edit.applyOps, surface: "chat", model });
+        // A privileged action (e.g. publish) was proposed — route it to the
+        // explicit confirm gate instead of applying it to the canvas.
+        if (proposals.length > 0) void actionGate.propose(proposals[0].actionId);
       } catch { /* partial recorded */ }
     }
     setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "applied" } } : m));
     unlock();
-  }, [messages, composer, unlock, model]);
+  }, [messages, composer, unlock, model, actionGate]);
 
   const onReject = React.useCallback((msgId: string) => {
     setMessages((prev) => prev.map((m) => m.id === msgId && m.edit ? { ...m, edit: { ...m.edit, state: "rejected" } } : m));
@@ -202,6 +208,16 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
         onSubmit={mode === "agent" ? agent.start : submit}
         onStop={mode === "agent" ? agent.stop : stream.stop}
         streaming={mode === "agent" ? agent.phase === "planning" || agent.phase === "running" : stream.streaming}
+      />
+      <ConfirmDialog
+        isOpen={actionGate.state.open}
+        title={actionGate.state.title}
+        message={actionGate.state.consequence}
+        confirmText={actionGate.state.busy ? "Publishing…" : "Publish"}
+        cancelText="Cancel"
+        variant="primary"
+        onConfirm={actionGate.confirm}
+        onClose={actionGate.cancel}
       />
     </TabFrame>
   );
