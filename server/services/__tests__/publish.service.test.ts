@@ -20,12 +20,29 @@ vi.mock("@/lib/vercel", () => ({
   VercelApiError: class extends Error { constructor(public status: number, public code: string, msg: string) { super(msg); } },
 }));
 
+const jobFindUniqueMock = vi.fn();
 vi.mock("@/lib/prisma", () => ({
-  prisma: {},
+  prisma: {
+    publishBuildJob: { findUnique: (...a: unknown[]) => jobFindUniqueMock(...a) },
+  },
 }));
 
 // Import after mocks
-import { runVercelDeploy } from "@server/services/publish.service";
+import { runVercelDeploy, getPublishStatus } from "@server/services/publish.service";
+
+describe("getPublishStatus — never leaks the raw-HTML `log` column", () => {
+  beforeEach(() => jobFindUniqueMock.mockReset());
+
+  it("selects status fields + siteId but NOT log", async () => {
+    jobFindUniqueMock.mockResolvedValueOnce({ id: "job-1", siteId: "site-1", status: "BUILDING" });
+    await getPublishStatus("job-1");
+    const arg = jobFindUniqueMock.mock.calls[0][0];
+    expect(arg.select.log).toBeUndefined(); // log must never be selected
+    expect(arg.select.siteId).toBe(true); // needed for the router authz check
+    expect(arg.select.status).toBe(true);
+    expect(arg.select.progress).toBe(true);
+  });
+});
 
 describe("publish.service Vercel connection gating", () => {
   beforeEach(() => {
