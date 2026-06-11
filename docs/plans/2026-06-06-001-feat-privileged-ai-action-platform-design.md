@@ -197,10 +197,14 @@ way — each is a thin `ActionProposal` + the existing mutation.
 1. **(done) design + codex challenge.**
 2. **Publish-path fix-arc** (section 6) — authz on publishStatus + prePublishChecks,
    startPublish race, worker durability, HTML out of the job row. Ships standalone.
-3. **propose-action core** — one new `ai.ts` intent + `actions.confirm` mutation +
-   the server confirmation-token util + the central trust-policy module. Wraps the
-   (now-fixed) `sites.publish` as the first + only `actionId`.
-4. **Confirm-with-consequences UI** — distinct from the canvas diff gate.
+3. ✅ **propose-action core — DONE `6d29f8f9`.** `actions.propose` + `actions.confirm`
+   tRPC + `action-token.service` (HMAC confirm token) + `ai-actions.service`
+   registry (first actionId `site.publish`, execute re-checks ADMIN). Trust-policy
+   module DEFERRED to the first URL-bearing action (publish has no URL args — an
+   empty policy module now would be speculative). 11 tests.
+4. **Confirm-with-consequences UI + the `propose-action` AI intent** — wire the
+   editor: AI emits `{actionId,args}` → editor calls `actions.propose` → shows the
+   consequence gate → `actions.confirm` with the page export. (next)
 5. **One real new surface**, chosen by adoption data (STOP+MEASURE gate) — a thin
    `ActionProposal` over an existing mutation (redirects is the lightest candidate).
 6. Remaining surfaces, each a thin proposal over its existing mutation.
