@@ -620,3 +620,24 @@ describe("save-as-component (W12) — element-scoped, name-validated", () => {
     expect(run({ commandId: "save-as-component", args: { elementId: "ghost", name: "X" } })).toHaveLength(0);
   });
 });
+
+describe("propose-action (platform phase 4) — agent may only propose allowlisted actions", () => {
+  const NOIDS = new Set<string>();
+  const run = (cmd: unknown) => extractValidPageEditCommands(JSON.stringify([cmd]), NOIDS);
+
+  it("accepts a site.publish proposal (config command, no elementId)", () => {
+    const r = run({ commandId: "propose-action", args: { actionId: "site.publish" } });
+    expect(r).toHaveLength(1);
+    expect(r[0].commandId).toBe("propose-action");
+  });
+
+  it("rejects an unknown actionId (allowlist)", () => {
+    expect(run({ commandId: "propose-action", args: { actionId: "site.delete" } })).toHaveLength(0);
+    expect(run({ commandId: "propose-action", args: { actionId: "wipe-database" } })).toHaveLength(0);
+  });
+
+  it("rejects a missing/non-string actionId", () => {
+    expect(run({ commandId: "propose-action", args: {} })).toHaveLength(0);
+    expect(run({ commandId: "propose-action", args: { actionId: 123 } })).toHaveLength(0);
+  });
+});

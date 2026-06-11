@@ -711,3 +711,30 @@ describe("save-as-component (W12)", () => {
     expect(createComponent).not.toHaveBeenCalled();
   });
 });
+
+describe("propose-action (platform phase 4) — collected, not applied to the canvas", () => {
+  it("returns the proposal and does NOT touch the composer", async () => {
+    const { composer, setStyle } = makeTxComposer();
+    const r = await applyAiEdit(
+      composer,
+      commitEdit([{ commandId: "propose-action", args: { actionId: "site.publish" } }]),
+    );
+    expect(r.applied).toBe(0);
+    expect(r.proposals).toEqual([{ actionId: "site.publish" }]);
+    expect(setStyle).not.toHaveBeenCalled();
+  });
+
+  it("a mixed batch applies the canvas edit AND carries the proposal", async () => {
+    const { composer, setStyle } = makeTxComposer();
+    const r = await applyAiEdit(
+      composer,
+      commitEdit([
+        { commandId: "set-style", args: { elementId: "el-1", property: "color", value: "#fff" } },
+        { commandId: "propose-action", args: { actionId: "site.publish" } },
+      ]),
+    );
+    expect(r.applied).toBe(1);
+    expect(setStyle).toHaveBeenCalledOnce();
+    expect(r.proposals).toEqual([{ actionId: "site.publish" }]);
+  });
+});

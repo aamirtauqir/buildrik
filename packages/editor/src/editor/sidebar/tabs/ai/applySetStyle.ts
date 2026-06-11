@@ -625,15 +625,25 @@ export async function applyAiEdit(
       preview?: Record<string, unknown>;
     };
   },
-): Promise<{ applied: number }> {
+): Promise<{ applied: number; proposals: Array<{ actionId: string }> }> {
   const commit = edit.applyOps.commit as { commands?: unknown };
   const commands = Array.isArray(commit.commands) ? commit.commands : [];
+
+  // propose-action commands are NOT canvas edits — they don't touch the composer
+  // and aren't part of the undo transaction. Collect them for the caller to route
+  // into the propose→confirm-token→execute gate (platform phase 4).
+  const proposals: Array<{ actionId: string }> = [];
 
   composer.beginTransaction("ai-edit");
   let applied = 0;
   try {
     for (const c of commands) {
       const cmd = c as { commandId?: unknown; args?: unknown };
+      if (cmd.commandId === "propose-action") {
+        const actionId = (cmd.args as { actionId?: unknown } | undefined)?.actionId;
+        if (typeof actionId === "string") proposals.push({ actionId });
+        continue;
+      }
       const handler =
         typeof cmd.commandId === "string" ? COMMAND_HANDLERS[cmd.commandId] : undefined;
       // Await every handler — sync ones resolve immediately (await of a boolean),
@@ -649,5 +659,5 @@ export async function applyAiEdit(
   // PREVIOUS action (the edit isn't committed yet) and the late record then
   // clears the redo stack. Flush makes the AI edit one clean, immediate undo.
   composer.history?.flushPending?.();
-  return { applied };
+  return { applied, proposals };
 }

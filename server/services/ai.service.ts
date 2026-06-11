@@ -743,6 +743,12 @@ export type EditCommand =
       args: { elementId: string; name: string };
     }
   | {
+      // Platform (phase 4) — PROPOSE a privileged action. Not applied to the
+      // canvas: the editor routes it to the propose→confirm-token→execute path.
+      commandId: "propose-action";
+      args: { actionId: string };
+    }
+  | {
       commandId: "set-style-variant";
       args: {
         elementId: string;
@@ -804,6 +810,9 @@ export function editCommandToRow(
   }
   if (c.commandId === "save-as-component") {
     return { field: "save as component", from: "", to: c.args.name };
+  }
+  if (c.commandId === "propose-action") {
+    return { field: "action", from: "", to: c.args.actionId };
   }
   if (c.commandId === "set-style-variant") {
     const variant = c.args.pseudo ? `:${c.args.pseudo}` : c.args.breakpoint;
@@ -898,6 +907,12 @@ const COMMAND_PROMPT_SPECS: Array<{ id: EditCommand["commandId"] } & CommandProm
       `- set-page-setting: {"commandId":"set-page-setting","args":{"setting":"metaTitle|metaDescription|slug","value":"<text>"}} — when asked to set the page's SEO title, meta description, or URL slug. No elementId (it edits the whole page). metaTitle ≤ 60 chars, metaDescription ≤ 160 (plain text). slug is kebab-case (lowercase letters/digits/hyphens, e.g. "pricing-plans").`,
   },
   {
+    id: "propose-action",
+    agentCallable: true,
+    rule: () =>
+      `- propose-action: {"commandId":"propose-action","args":{"actionId":"site.publish"}} — ONLY when the user explicitly asks to PUBLISH or DEPLOY the live site. No elementId. This does NOT publish directly: it proposes the action, and the user must explicitly confirm a "this deploys the live site, cannot be undone" gate. The only valid actionId is "site.publish". Never emit this for ordinary edits.`,
+  },
+  {
     id: "save-as-component",
     agentCallable: true,
     rule: (id) =>
@@ -954,6 +969,11 @@ function parseCommandArray(raw: string): unknown[] {
 // SEO field length caps (mirror the DB VarChar limits: title 60, description 160).
 const SEO_LIMITS: Record<string, number> = { metaTitle: 60, metaDescription: 160 };
 
+// Privileged actions the AGENT may propose (platform phase 4). The full registry
+// + authorization lives in ai-actions.service; this is just the model-facing
+// allowlist of what can be surfaced as a proposal. Keep in sync deliberately.
+const AGENT_PROPOSABLE_ACTIONS = new Set(["site.publish"]);
+
 function isValidEditCommand(
   c: unknown,
   allowedIds: Set<string>,
@@ -976,6 +996,15 @@ function isValidEditCommand(
     if (typeof setting !== "string" || !(setting in SEO_LIMITS)) return false;
     if (UNSAFE_TEXT.test(value)) return false;
     return value.length <= SEO_LIMITS[setting];
+  }
+
+  // propose-action (platform phase 4) — no elementId. The actionId must be one
+  // the agent is allowed to propose; the real authorization + execution happen
+  // in the propose→confirm path (actions router). This only gates which actions
+  // the model may even surface. Validated before the element scope guard.
+  if (cmd.commandId === "propose-action") {
+    const { actionId } = (cmd.args ?? {}) as { actionId?: unknown };
+    return typeof actionId === "string" && AGENT_PROPOSABLE_ACTIONS.has(actionId);
   }
 
   // set-token (W4) is also a config command — no elementId. The id must be a
