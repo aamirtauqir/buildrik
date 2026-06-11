@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const checkSiteRoleMock = vi.fn();
 const startPublishMock = vi.fn();
-const resolveWorkspaceIdMock = vi.fn(() => Promise.resolve("ws-1"));
+const resolveWorkspaceIdMock = vi.fn((..._a: unknown[]) => Promise.resolve("ws-1"));
 
 vi.mock("@/server/services/permission.service", () => ({
   checkSiteRole: (...a: unknown[]) => checkSiteRoleMock(...a),
