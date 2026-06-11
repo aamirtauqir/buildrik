@@ -202,9 +202,15 @@ way — each is a thin `ActionProposal` + the existing mutation.
    registry (first actionId `site.publish`, execute re-checks ADMIN). Trust-policy
    module DEFERRED to the first URL-bearing action (publish has no URL args — an
    empty policy module now would be speculative). 11 tests.
-4. **Confirm-with-consequences UI + the `propose-action` AI intent** — wire the
-   editor: AI emits `{actionId,args}` → editor calls `actions.propose` → shows the
-   consequence gate → `actions.confirm` with the page export. (next)
+4a. ✅ **propose-action command + interception — DONE `e04095ba`.** AI emits
+    `{commandId:"propose-action",args:{actionId:"site.publish"}}` (agent-proposable
+    allowlist, validated as a config command); `applyAiEdit` collects it into
+    `proposals[]` (not applied to the canvas). 5 tests.
+4b. **Confirm-with-consequences UI (next)** — in AITab: on a returned proposal,
+    call `actions.propose` → render `ConfirmDialog` (shared/extensions) with the
+    consequence → on confirm, export pages (ExportEngine(composer)) → `actions.confirm`
+    → surface the publish job. NEEDS live-verify (browser). Watch export SSOT — share
+    the page-export map with useExportHandlers, don't duplicate.
 5. **One real new surface**, chosen by adoption data (STOP+MEASURE gate) — a thin
    `ActionProposal` over an existing mutation (redirects is the lightest candidate).
 6. Remaining surfaces, each a thin proposal over its existing mutation.
