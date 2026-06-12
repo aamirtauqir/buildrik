@@ -15,9 +15,9 @@ export const uploadRouter = router({
       throw e;
     }
   }),
-  confirm: protectedProcedure.input(confirmSchema).mutation(async ({ input }) => {
+  confirm: protectedProcedure.input(confirmSchema).mutation(async ({ ctx, input }) => {
     try {
-      return await confirmUpload(input.fileId);
+      return await confirmUpload(input.fileId, ctx.session.user.id);
     } catch (e: unknown) {
       if (e instanceof Error && e.message === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Upload not found or expired." });
       if (e instanceof Error && e.message === "NOT_UPLOADED") throw new TRPCError({ code: "BAD_REQUEST", message: "File was not uploaded before confirm. Call PUT /api/upload/{fileId} with the file body first." });

@@ -926,6 +926,26 @@ model ApiToken {
   @@map("api_tokens")
 }
 
+/// Small-asset upload handshake (presign → PUT body → confirm). Previously an
+/// in-memory Map: on serverless the presign and the PUT hit different lambdas,
+/// so valid uploads 404'd. Rows expire after 10 minutes (enforced on read,
+/// pruned by the session-cleanup cron).
+model PendingUpload {
+  id        String   @id
+  fileName  String
+  fileType  String
+  context   String
+  userId    String
+  wsId      String
+  siteId    String?
+  storedUrl String?
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("pending_uploads")
+}
+
 /// Shared rate-limit counters (serverless-safe — the previous in-memory Map
 /// reset per lambda, multiplying every limit by instance count). One row per
 /// key; count and window reset atomically inside a single upsert. Expired

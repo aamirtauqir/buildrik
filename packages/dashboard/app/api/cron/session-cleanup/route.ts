@@ -22,5 +22,11 @@ export async function GET(req: NextRequest) {
     where: { resetAt: { lt: now } },
   });
 
+  // Upload handshakes expire after 10 minutes (enforced on read in
+  // upload.service); this just clears the dead rows.
+  await prisma.pendingUpload.deleteMany({
+    where: { createdAt: { lt: new Date(now.getTime() - 10 * 60 * 1000) } },
+  });
+
   return Response.json({ ok: true, deleted: count });
 }

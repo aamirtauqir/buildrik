@@ -12,6 +12,7 @@ vi.mock("@/lib/prisma", () => ({
     workspaceTransfer: { updateMany: vi.fn() },
     publishBuildJob: { findMany: vi.fn(), update: vi.fn() },
     rateLimitBucket: { deleteMany: vi.fn() },
+    pendingUpload: { deleteMany: vi.fn() },
     $transaction: vi.fn(async (ops: unknown[]) => ops),
   },
 }));

@@ -22,6 +22,7 @@ import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { auth } from "@server/auth";
 import { prisma } from "@/lib/prisma";
 import { checkStorageQuota, createAsset } from "@server/services/media.service";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { MediaType } from "@buildrik/shared/schemas/media";
 
 // Allow common image/video/font types. Editor sniffs MIME from magic bytes
@@ -109,9 +110,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         if (!parsedClientPayload.filename) {
           throw new Error("Asset upload clientPayload missing 'filename'");
         }
-        if (parsedClientPayload.bytes > MAX_FILE_BYTES) {
+        // Per-plan file-size cap (FREE 10MB / PRO 50MB / BUSINESS 200MB,
+        // clamped to the editor's 50MB UploadZone ceiling). The global
+        // MAX_FILE_BYTES alone let FREE users upload 50MB files.
+        const planMaxMB = PLAN_LIMITS[quota.tier as PlanName].fileUploadMaxMB as number;
+        const maxFileBytes = Math.min(MAX_FILE_BYTES, planMaxMB * 1024 * 1024);
+        if (parsedClientPayload.bytes > maxFileBytes) {
           throw new Error(
-            `File ${pathname} exceeds 50MB limit (${parsedClientPayload.bytes} bytes)`
+            `File ${pathname} exceeds the ${quota.tier} plan limit of ${Math.round(maxFileBytes / (1024 * 1024))}MB`
           );
         }
         if (
@@ -149,7 +155,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         // completion handler doesn't store bytes:0 (P1A bytes=0 fix).
         return {
           allowedContentTypes: ALLOWED_CONTENT_TYPES,
-          maximumSizeInBytes: MAX_FILE_BYTES,
+          maximumSizeInBytes: maxFileBytes,
           tokenPayload: JSON.stringify({
             userId,
             bytes: parsedClientPayload.bytes,

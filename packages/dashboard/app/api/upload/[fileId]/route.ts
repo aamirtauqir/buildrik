@@ -36,7 +36,7 @@ export async function PUT(
     return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
   }
 
-  const pending = getPendingUpload(fileId);
+  const pending = await getPendingUpload(fileId);
   if (!pending) {
     return NextResponse.json({ error: "Upload not found or expired" }, { status: 404 });
   }
@@ -73,7 +73,7 @@ export async function PUT(
       addRandomSuffix: false,
       allowOverwrite: true,
     });
-    setPendingUploadStoredUrl(fileId, blob.url);
+    await setPendingUploadStoredUrl(fileId, blob.url);
     return NextResponse.json({ ok: true, url: blob.url });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Blob upload failed";
@@ -81,7 +81,7 @@ export async function PUT(
   }
 }
 
-function buildBlobPath(pending: ReturnType<typeof getPendingUpload> & object): string {
+function buildBlobPath(pending: NonNullable<Awaited<ReturnType<typeof getPendingUpload>>>): string {
   const ext = guessExt(pending.fileType, pending.fileName);
   const ctx = pending.context;
   const wsId = pending.wsId;
