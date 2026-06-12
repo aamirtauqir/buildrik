@@ -38,7 +38,7 @@ Atomic commit each, live-verify in browser, regression test where logic added.
 - WAVE 2 DONE: W2.6 test-event + W2.7 update (bfb80f1d), + SSRF guard (0cfbb837, security-review caught).
 - WAVE 3 DONE: W3.8 ticket attachments (1efad8d0).
 - Plus billing.upgrade server gate (7c2e33e7) from the prior security finding.
-- BLOCKED: W2.5 OAuth connect/disconnect — needs auth re-architecture (see below).
+- WAVE 2.5 DONE (auth-linking arc built): f7526aef — Account rows on OAuth login + disconnect guard. Live-proven.
 
 ## W2.5 — why it is blocked (decision needed)
 signIn callback (server/auth.config.ts:69) matches OAuth users by EMAIL and NEVER writes an `Account` row. So `connectedAccounts` (account.service.ts:61) is always empty and the Settings → Account "Connect/Disconnect" buttons act on data that never populates. Safe real linking under the JWT session strategy (link the OAuth identity to the CURRENT logged-in user, not whoever the OAuth email maps to) is a real auth sub-arc, not a wire. Options:
