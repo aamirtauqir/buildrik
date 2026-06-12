@@ -43,10 +43,22 @@ export function TemplatePreview({ template, onBack, onUse }: TemplatePreviewProp
         </div>
       </div>
       <div className="flex-1 overflow-auto p-6" style={{ backgroundColor: "var(--color-bg-page)" }}>
-        <div className="mx-auto rounded-xl border bg-white shadow-sm" style={{ borderColor: "var(--color-border-default)", width: DEVICE_OPTIONS.find((d) => d.value === device)?.width, minHeight: "600px" }}>
-          <div className="flex h-full items-center justify-center" style={{ color: "var(--color-text-muted)" }}>
-            <p className="text-sm">Template preview placeholder</p>
-          </div>
+        <div className="mx-auto overflow-hidden rounded-xl border bg-white shadow-sm" style={{ borderColor: "var(--color-border-default)", width: DEVICE_OPTIONS.find((d) => d.value === device)?.width, minHeight: "600px" }}>
+          {template.previewUrl ? (
+            <iframe
+              src={template.previewUrl}
+              title={`${template.name} preview`}
+              className="h-full w-full"
+              style={{ minHeight: "600px", border: "none" }}
+              sandbox="allow-scripts allow-same-origin"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center" style={{ minHeight: "600px", color: "var(--color-text-muted)" }}>
+              <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>No live preview for this template</p>
+              <p className="text-xs">Click &ldquo;Use Template&rdquo; to start a site from it.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
