@@ -61,9 +61,6 @@ export const INVITED_CHECKLIST_ITEMS = [
   },
 ] as const;
 
-/** @deprecated Use FULL_CHECKLIST_ITEMS or INVITED_CHECKLIST_ITEMS */
-export const DASHBOARD_CHECKLIST_ITEMS = FULL_CHECKLIST_ITEMS;
-
 type FullChecklistItemId = (typeof FULL_CHECKLIST_ITEMS)[number]["id"];
 type InvitedChecklistItemId = (typeof INVITED_CHECKLIST_ITEMS)[number]["id"];
 export type ChecklistItemId = FullChecklistItemId | InvitedChecklistItemId;
@@ -88,7 +85,9 @@ export function DashboardChecklist({
   const progressPct = Math.round((completedCount / total) * 100);
 
   const utils = trpc.useUtils();
-  const completeStepMutation = trpc.onboarding.completeStep.useMutation({
+  // Per-task completion — task ids are NOT steps; sending them through
+  // completeStep used to mark ALL of onboarding completed in one click.
+  const completeTaskMutation = trpc.onboarding.completeDashboardTask.useMutation({
     onSuccess: () => {
       utils.onboarding.getState.invalidate();
     },
@@ -100,9 +99,9 @@ export function DashboardChecklist({
     },
   });
 
-  function handleTaskClick(itemId: string) {
+  function handleTaskClick(itemId: ChecklistItemId) {
     if (completedSet.has(itemId)) return;
-    completeStepMutation.mutate({ step: itemId });
+    completeTaskMutation.mutate({ taskId: itemId });
   }
 
   function handleDismiss() {

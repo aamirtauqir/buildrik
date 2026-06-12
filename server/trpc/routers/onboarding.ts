@@ -6,11 +6,16 @@ import {
   selectRole,
   setupProject,
   completeStep,
+  completeDashboardTask,
   dismissOnboarding,
   completeTourStep,
   completeTour,
 } from "@/server/services/onboarding.service";
-import { selectRoleSchema, setupProjectSchema } from "@buildrik/shared/schemas/onboarding";
+import {
+  selectRoleSchema,
+  setupProjectSchema,
+  completeDashboardTaskSchema,
+} from "@buildrik/shared/schemas/onboarding";
 
 export const onboardingRouter = router({
   getState: protectedProcedure.query(async ({ ctx }) => {
@@ -46,8 +51,20 @@ export const onboardingRouter = router({
     .mutation(async ({ ctx, input }) => {
       try {
         return await completeStep(ctx.session.user.id, input.step);
-      } catch {
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "INVALID_STEP")
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Unknown onboarding step" });
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to advance step" });
+      }
+    }),
+
+  completeDashboardTask: protectedProcedure
+    .input(completeDashboardTaskSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await completeDashboardTask(ctx.session.user.id, input.taskId);
+      } catch {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to complete task" });
       }
     }),
 

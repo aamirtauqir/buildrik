@@ -27,18 +27,22 @@ describe("Onboarding Components", () => {
     });
   });
 
-  describe("DASHBOARD_CHECKLIST_ITEMS", () => {
-    it("has at least 4 items", async () => {
+  describe("checklist items", () => {
+    it("full and invited variants each have at least 3 items", async () => {
       const mod = await import("@/components/onboarding/dashboard-checklist");
-      expect(mod.DASHBOARD_CHECKLIST_ITEMS.length).toBeGreaterThanOrEqual(4);
+      expect(mod.FULL_CHECKLIST_ITEMS.length).toBeGreaterThanOrEqual(4);
+      expect(mod.INVITED_CHECKLIST_ITEMS.length).toBeGreaterThanOrEqual(3);
     });
 
-    it("each item has id, label, description", async () => {
+    it("each item has id, label, description and a registered task id", async () => {
       const mod = await import("@/components/onboarding/dashboard-checklist");
-      for (const item of mod.DASHBOARD_CHECKLIST_ITEMS) {
+      const { DASHBOARD_TASK_IDS } = await import("@buildrik/shared/schemas/onboarding");
+      for (const item of [...mod.FULL_CHECKLIST_ITEMS, ...mod.INVITED_CHECKLIST_ITEMS]) {
         expect(item).toHaveProperty("id");
         expect(item).toHaveProperty("label");
         expect(item).toHaveProperty("description");
+        // every rendered task id must be accepted by completeDashboardTask
+        expect(DASHBOARD_TASK_IDS).toContain(item.id);
       }
     });
   });

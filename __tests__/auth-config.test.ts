@@ -18,6 +18,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     account: {
       findFirst: vi.fn(),
+      upsert: vi.fn(),
     },
     $transaction: vi.fn(async (cb: (tx: typeof txClient) => Promise<unknown>) => cb(txClient)),
   },

@@ -5,7 +5,7 @@ vi.mock("@/lib/prisma", () => ({
     template: { findMany: vi.fn(), findUnique: vi.fn(), count: vi.fn(), update: vi.fn() },
     site: { create: vi.fn(), count: vi.fn(), findFirst: vi.fn() },
     page: { createMany: vi.fn() },
-    aIGenerationJob: { create: vi.fn(), findUnique: vi.fn(), update: vi.fn(), count: vi.fn() },
+    aIGenerationJob: { create: vi.fn(), findFirst: vi.fn(), update: vi.fn(), count: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
     workspace: { findUnique: vi.fn() },
   },
@@ -99,30 +99,35 @@ describe("AI Generation Service", () => {
   });
 
   describe("getJobStatus", () => {
-    it("returns job status", async () => {
+    it("returns job status scoped to the workspace", async () => {
       const { getJobStatus } = await import("@/server/services/ai-generation.service");
-      vi.mocked(prisma.aIGenerationJob.findUnique).mockResolvedValue({
+      vi.mocked(prisma.aIGenerationJob.findFirst).mockResolvedValue({
         id: "job1", status: "GENERATING_CONTENT", progress: 50,
         steps: [{ step: "structure", status: "completed" }],
         siteId: null, error: null,
       } as any);
-      const result = await getJobStatus("job1");
+      const result = await getJobStatus("job1", "ws1");
       expect(result?.status).toBe("GENERATING_CONTENT");
       expect(result?.progress).toBe(50);
+      // IDOR guard: the lookup must filter by workspaceId, not just job id
+      const where = vi.mocked(prisma.aIGenerationJob.findFirst).mock.calls[0][0]?.where;
+      expect(where).toMatchObject({ id: "job1", workspaceId: "ws1" });
     });
   });
 
   describe("cancelJob", () => {
-    it("cancels a queued job", async () => {
+    it("cancels a queued job scoped to the workspace", async () => {
       const { cancelJob } = await import("@/server/services/ai-generation.service");
-      vi.mocked(prisma.aIGenerationJob.findUnique).mockResolvedValue({
+      vi.mocked(prisma.aIGenerationJob.findFirst).mockResolvedValue({
         id: "job1", status: "QUEUED",
       } as any);
       vi.mocked(prisma.aIGenerationJob.update).mockResolvedValue({
         id: "job1", status: "CANCELLED",
       } as any);
-      const result = await cancelJob("job1");
+      const result = await cancelJob("job1", "ws1");
       expect(result.status).toBe("CANCELLED");
+      const where = vi.mocked(prisma.aIGenerationJob.findFirst).mock.calls[0][0]?.where;
+      expect(where).toMatchObject({ id: "job1", workspaceId: "ws1" });
     });
   });
 });

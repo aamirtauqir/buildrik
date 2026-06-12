@@ -8,6 +8,9 @@ vi.mock("@/lib/prisma", () => ({
       update: vi.fn(),
       upsert: vi.fn(),
     },
+    site: {
+      findFirst: vi.fn(),
+    },
   },
 }));
 
@@ -17,6 +20,7 @@ import {
   selectRole,
   setupProject,
   completeStep,
+  completeDashboardTask,
   dismissOnboarding,
   completeTourStep,
   completeTour,
@@ -63,6 +67,37 @@ describe("Onboarding Service", () => {
           data: expect.objectContaining({ userId: "user_1", step: "ROLE_SELECT" }),
         })
       );
+    });
+
+    it("read-repairs a user stuck at SITE_CREATION who already owns a site", async () => {
+      vi.mocked(prisma.onboardingState.findUnique).mockResolvedValue({
+        ...mockState,
+        step: "SITE_CREATION",
+      } as any);
+      vi.mocked(prisma.site.findFirst).mockResolvedValue({ id: "site_1" } as any);
+      const repaired = { ...mockState, step: "CHECKLIST" };
+      vi.mocked(prisma.onboardingState.update).mockResolvedValue(repaired as any);
+
+      const result = await getOnboardingState("user_1");
+      expect(result.step).toBe("CHECKLIST");
+      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: "user_1" },
+          data: { step: "CHECKLIST" },
+        })
+      );
+    });
+
+    it("does NOT advance a SITE_CREATION user with no site yet", async () => {
+      vi.mocked(prisma.onboardingState.findUnique).mockResolvedValue({
+        ...mockState,
+        step: "SITE_CREATION",
+      } as any);
+      vi.mocked(prisma.site.findFirst).mockResolvedValue(null);
+
+      const result = await getOnboardingState("user_1");
+      expect(result.step).toBe("SITE_CREATION");
+      expect(prisma.onboardingState.update).not.toHaveBeenCalled();
     });
   });
 
@@ -129,6 +164,55 @@ describe("Onboarding Service", () => {
       vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
       const result = await completeStep("user_1", "CHECKLIST");
       expect(result.completed).toBe(true);
+    });
+
+    it("rejects unknown step ids instead of completing all onboarding", async () => {
+      await expect(completeStep("user_1", "add-text-block")).rejects.toThrow("INVALID_STEP");
+      expect(prisma.onboardingState.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("completeDashboardTask", () => {
+    it("appends the task without touching step/completed", async () => {
+      vi.mocked(prisma.onboardingState.findUnique).mockResolvedValue({
+        ...mockState,
+        step: "CHECKLIST",
+        dashboardTasks: ["add-text-block"],
+      } as any);
+      vi.mocked(prisma.onboardingState.update).mockImplementation(
+        (async (args: any) => ({ ...mockState, ...args.data })) as any
+      );
+
+      await completeDashboardTask("user_1", "upload-image");
+      const call = vi.mocked(prisma.onboardingState.update).mock.calls[0][0];
+      expect(call.data.dashboardTasks).toEqual(
+        expect.arrayContaining(["add-text-block", "upload-image"])
+      );
+      expect(call.data).not.toHaveProperty("completed");
+      expect(call.data).not.toHaveProperty("step");
+    });
+
+    it("flips completed when the final full-checklist task lands", async () => {
+      vi.mocked(prisma.onboardingState.findUnique).mockResolvedValue({
+        ...mockState,
+        step: "CHECKLIST",
+        dashboardTasks: [
+          "add-text-block",
+          "upload-image",
+          "change-site-name",
+          "add-second-page",
+          "preview-site",
+          "invite-team-member",
+        ],
+      } as any);
+      vi.mocked(prisma.onboardingState.update).mockImplementation(
+        (async (args: any) => ({ ...mockState, ...args.data })) as any
+      );
+
+      await completeDashboardTask("user_1", "publish-site");
+      const call = vi.mocked(prisma.onboardingState.update).mock.calls[0][0];
+      expect(call.data.completed).toBe(true);
+      expect(call.data.step).toBe("COMPLETED");
     });
   });
 
