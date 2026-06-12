@@ -171,6 +171,7 @@ export const accountRouter = router({
       try { return await addIntegration(workspaceId, input, plan); }
       catch (e: unknown) {
         if (e instanceof Error && e.message === "INTEGRATION_LIMIT") throw new TRPCError({ code: "FORBIDDEN", message: "Integration limit reached." });
+        if (e instanceof Error && (e.message === "BLOCKED_URL" || e.message === "INVALID_URL")) throw new TRPCError({ code: "BAD_REQUEST", message: "Webhook URL must be a public https address." });
         throw e;
       }
     }),
@@ -181,6 +182,7 @@ export const accountRouter = router({
         try { return await updateIntegration(input.id, input.config, ctx.session.user.id); }
         catch (e: unknown) {
           if (e instanceof Error && e.message === "INTEGRATION_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Integration not found." });
+          if (e instanceof Error && (e.message === "BLOCKED_URL" || e.message === "INVALID_URL")) throw new TRPCError({ code: "BAD_REQUEST", message: "Webhook URL must be a public https address." });
           throw e;
         }
       }),
@@ -191,6 +193,7 @@ export const accountRouter = router({
         catch (e: unknown) {
           if (e instanceof Error && e.message === "INTEGRATION_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Integration not found." });
           if (e instanceof Error && e.message === "NO_WEBHOOK_URL") throw new TRPCError({ code: "BAD_REQUEST", message: "This integration has no webhook URL to test." });
+          if (e instanceof Error && (e.message === "BLOCKED_URL" || e.message === "INVALID_URL")) throw new TRPCError({ code: "BAD_REQUEST", message: "Webhook URL must be a public https address." });
           if (e instanceof Error && e.message === "WEBHOOK_UNREACHABLE") throw new TRPCError({ code: "BAD_REQUEST", message: "Could not reach the webhook URL." });
           throw e;
         }

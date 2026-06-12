@@ -3,6 +3,15 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { AddIntegrationInput } from "@buildrik/shared/schemas/account";
 import { decrypt } from "@/lib/encryption";
 import { checkWorkspaceRole } from "@/server/services/permission.service";
+import { assertPublicHttpsUrl } from "@/lib/url-guard";
+
+async function assertSafeWebhookConfig(config: Record<string, unknown>): Promise<void> {
+  const webhookUrl = config.webhookUrl;
+  if (typeof webhookUrl === "string" && webhookUrl.length > 0) {
+    // SSRF guard at persist time so a private/loopback URL never reaches storage.
+    await assertPublicHttpsUrl(webhookUrl);
+  }
+}
 
 export async function listIntegrations(workspaceId: string) {
   return prisma.workspaceIntegration.findMany({
@@ -19,6 +28,8 @@ export async function addIntegration(workspaceId: string, input: AddIntegrationI
   if (limit !== -1 && existing.length >= limit) {
     throw new Error("INTEGRATION_LIMIT");
   }
+
+  await assertSafeWebhookConfig(input.config as Record<string, unknown>);
 
   return prisma.workspaceIntegration.create({
     data: {
@@ -54,6 +65,7 @@ export async function updateIntegration(
   });
   if (!integration) throw new Error("INTEGRATION_NOT_FOUND");
   await checkWorkspaceRole(prisma, userId, integration.workspaceId, "ADMIN");
+  await assertSafeWebhookConfig(config as Record<string, unknown>);
   return prisma.workspaceIntegration.update({
     where: { id },
     data: { config: config as Record<string, string> },
@@ -83,6 +95,10 @@ export async function sendIntegrationTestEvent(
     throw new Error("NO_WEBHOOK_URL");
   }
 
+  // Re-validate at fetch time (defends against DNS rebinding between persist
+  // and send). Throws BLOCKED_URL/INVALID_URL → surfaced as BAD_REQUEST.
+  await assertPublicHttpsUrl(webhookUrl);
+
   const payload = {
     type: "buildrik.test_event",
     provider: integration.provider,
@@ -95,6 +111,8 @@ export async function sendIntegrationTestEvent(
       headers: { "content-type": "application/json" },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(8000),
+      // Do not auto-follow redirects to a possibly-internal Location.
+      redirect: "manual",
     });
     return { ok: res.ok, status: res.status };
   } catch {
