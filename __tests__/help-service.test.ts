@@ -142,6 +142,25 @@ describe("Help Service", () => {
           subject: "My issue",
           category: "TECHNICAL",
           status: "OPEN",
+          attachments: [],
+        }),
+      });
+    });
+
+    // Regression: W3.8 — attachments were collected in the form then dropped
+    // (service hardcoded attachments: []). Found by /codex audit 2026-06-12.
+    it("persists provided attachment URLs", async () => {
+      const { createTicket } = await import("@/server/services/help.service");
+      vi.mocked(prisma.supportTicket.create).mockResolvedValue({ id: "ticket2" } as any);
+      await createTicket("user1", {
+        subject: "With files",
+        category: "BUG",
+        description: "This is a detailed description with screenshots attached",
+        attachments: ["https://blob.example.com/tickets/user1/a.png"],
+      });
+      expect(prisma.supportTicket.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          attachments: ["https://blob.example.com/tickets/user1/a.png"],
         }),
       });
     });

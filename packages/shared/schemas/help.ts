@@ -13,6 +13,8 @@ export const supportTicketSchema = z.object({
   subject: z.string().min(5).max(200),
   category: z.enum(["GENERAL", "BILLING", "TECHNICAL", "ACCOUNT", "FEATURE", "BUG"]),
   description: z.string().min(20).max(5000),
+  // Blob URLs of uploaded attachments (presign -> PUT -> confirm flow).
+  attachments: z.array(z.string().url()).max(5).optional(),
 });
 
 export const HELP_CATEGORIES = [

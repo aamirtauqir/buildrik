@@ -61,7 +61,7 @@ export async function createTicket(userId: string, input: SupportTicketInput) {
       category: input.category,
       description: input.description,
       status: "OPEN",
-      attachments: [],
+      attachments: input.attachments ?? [],
     },
   });
 }

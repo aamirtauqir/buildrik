@@ -38,6 +38,10 @@ export function TicketForm() {
   const [confirmation, setConfirmation] = useState<TicketConfirmation | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [uploading, setUploading] = useState(false);
+  const presignMutation = trpc.upload.presign.useMutation();
+  const confirmMutation = trpc.upload.confirm.useMutation();
+
   const createTicket = trpc.help.createTicket.useMutation({
     onSuccess(data) {
       const ticket = data as { id: string; ticketNumber?: number; plan?: string };
@@ -48,6 +52,25 @@ export function TicketForm() {
       });
     },
   });
+
+  async function uploadAttachments(): Promise<string[]> {
+    const urls: string[] = [];
+    for (const file of attachments) {
+      const { fileId, uploadUrl } = await presignMutation.mutateAsync({
+        fileName: file.name,
+        fileType: file.type,
+        context: "ticket",
+      });
+      await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const { cdnUrl } = await confirmMutation.mutateAsync({ fileId });
+      urls.push(cdnUrl);
+    }
+    return urls;
+  }
 
   function validate(): boolean {
     const next: Record<string, string> = {};
@@ -97,10 +120,27 @@ export function TicketForm() {
     });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-    createTicket.mutate({ subject, category, description });
+    let attachmentUrls: string[] = [];
+    if (attachments.length > 0) {
+      setUploading(true);
+      try {
+        attachmentUrls = await uploadAttachments();
+      } catch {
+        setErrors((prev) => ({ ...prev, attachments: "Upload failed — please retry." }));
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+    createTicket.mutate({
+      subject,
+      category,
+      description,
+      attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
+    });
   }
 
   if (confirmation) {
@@ -252,11 +292,11 @@ export function TicketForm() {
 
       <button
         type="submit"
-        disabled={createTicket.isPending}
+        disabled={uploading || createTicket.isPending}
         className="w-full rounded-lg py-2.5 text-sm font-medium text-white transition-opacity disabled:opacity-60"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
-        {createTicket.isPending ? "Submitting..." : "Submit Ticket"}
+        {uploading ? "Uploading attachments…" : createTicket.isPending ? "Submitting..." : "Submit Ticket"}
       </button>
     </form>
   );
