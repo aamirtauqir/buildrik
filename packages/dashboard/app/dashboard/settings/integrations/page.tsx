@@ -110,6 +110,17 @@ export default function IntegrationsPage() {
   const removeMutation = trpc.account.integrations.remove.useMutation({
     onSuccess: () => { intQuery.refetch(); addToast("success", "Integration removed"); },
   });
+  const updateMutation = trpc.account.integrations.update.useMutation({
+    onSuccess: () => { intQuery.refetch(); addToast("success", "Integration updated"); },
+    onError: (err: { message: string }) => addToast("error", "Failed", err.message),
+  });
+  const testEventMutation = trpc.account.integrations.testEvent.useMutation({
+    onSuccess: (res: { ok: boolean; status: number }) =>
+      res.ok
+        ? addToast("success", "Test event delivered", `Webhook responded ${res.status}`)
+        : addToast("error", "Test event failed", `Webhook responded ${res.status}`),
+    onError: (err: { message: string }) => addToast("error", "Test event failed", err.message),
+  });
 
   if (intQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl bg-neutral-100" />;
 
@@ -128,8 +139,9 @@ export default function IntegrationsPage() {
           addMutation.mutate({ provider, config })
         }
         onRemove={(id) => removeMutation.mutate({ id })}
-        onTestEvent={(provider) => addToast("success", "Test event sent", `Test event sent to ${provider}`)}
-        saving={addMutation.isPending || removeMutation.isPending}
+        onUpdate={(id, config) => updateMutation.mutate({ id, config })}
+        onTestEvent={(id) => testEventMutation.mutate({ id })}
+        saving={addMutation.isPending || removeMutation.isPending || updateMutation.isPending || testEventMutation.isPending}
       />
     </div>
   );

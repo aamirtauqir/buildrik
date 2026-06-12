@@ -49,7 +49,7 @@ interface IntegrationsTabProps {
   onAdd?: (provider: Provider, config: Record<string, string>) => void;
   onRemove?: (id: string) => void;
   onUpdate?: (id: string, config: Record<string, string>) => void;
-  onTestEvent?: (provider: Provider) => void;
+  onTestEvent?: (integrationId: string) => void;
   saving?: boolean;
 }
 
@@ -238,7 +238,7 @@ function ZapierConfig({
           ))}
         </div>
       </div>
-      {values["webhookUrl"] && (
+      {values["webhookUrl"] && onTestEvent && (
         <button
           type="button"
           onClick={onTestEvent}
@@ -328,7 +328,7 @@ function ProviderConfigFields({
   }
 }
 
-export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, saving }: IntegrationsTabProps) {
+export function IntegrationsTab({ connected = [], onAdd, onRemove, onUpdate, onTestEvent, saving }: IntegrationsTabProps) {
   const [expandedProvider, setExpandedProvider] = useState<Provider | null>(null);
   const [fieldValues, setFieldValues] = useState<Record<string, Record<string, string>>>({});
 
@@ -439,7 +439,7 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
                   provider={cfg.provider}
                   values={values}
                   onChange={(key, value) => handleFieldChange(cfg.provider, key, value)}
-                  onTestEvent={() => onTestEvent?.(cfg.provider)}
+                  onTestEvent={connection ? () => onTestEvent?.(connection.id) : undefined}
                 />
                 <div className="flex gap-2 pt-1">
                   {!connection && (
@@ -451,6 +451,17 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onTestEvent, 
                       style={{ backgroundColor: "var(--color-primary)" }}
                     >
                       {saving ? "Connecting\u2026" : "Save & connect"}
+                    </button>
+                  )}
+                  {connection && (
+                    <button
+                      type="button"
+                      onClick={() => onUpdate?.(connection.id, values)}
+                      disabled={saving}
+                      className="text-sm px-4 py-2 rounded-md font-medium text-white disabled:opacity-60"
+                      style={{ backgroundColor: "var(--color-primary)" }}
+                    >
+                      {saving ? "Saving\u2026" : "Save changes"}
                     </button>
                   )}
                   <button

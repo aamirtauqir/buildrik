@@ -23,7 +23,7 @@ import {
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion } from "@/server/services/workspace-settings.service";
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
-import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
+import { listIntegrations, addIntegration, removeIntegration, updateIntegration, sendIntegrationTestEvent } from "@/server/services/integrations.service";
 import { updateProfileSchema, changePasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
 import { type PlanName } from "@/lib/constants/plan-limits";
 
@@ -175,6 +175,26 @@ export const accountRouter = router({
       }
     }),
     remove: protectedProcedure.input(z.object({ id: z.string() })).mutation(({ ctx, input }) => removeIntegration(input.id, ctx.session.user.id)),
+    update: protectedProcedure
+      .input(z.object({ id: z.string(), config: z.record(z.string(), z.string()) }))
+      .mutation(async ({ ctx, input }) => {
+        try { return await updateIntegration(input.id, input.config, ctx.session.user.id); }
+        catch (e: unknown) {
+          if (e instanceof Error && e.message === "INTEGRATION_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Integration not found." });
+          throw e;
+        }
+      }),
+    testEvent: protectedProcedure
+      .input(z.object({ id: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        try { return await sendIntegrationTestEvent(input.id, ctx.session.user.id); }
+        catch (e: unknown) {
+          if (e instanceof Error && e.message === "INTEGRATION_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Integration not found." });
+          if (e instanceof Error && e.message === "NO_WEBHOOK_URL") throw new TRPCError({ code: "BAD_REQUEST", message: "This integration has no webhook URL to test." });
+          if (e instanceof Error && e.message === "WEBHOOK_UNREACHABLE") throw new TRPCError({ code: "BAD_REQUEST", message: "Could not reach the webhook URL." });
+          throw e;
+        }
+      }),
   }),
   aiCredits: protectedProcedure.query(async ({ ctx }) => {
     const { workspaceId, plan } = await getWorkspaceCtx(ctx);

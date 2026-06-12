@@ -42,6 +42,68 @@ export async function removeIntegration(id: string, userId: string) {
   return prisma.workspaceIntegration.delete({ where: { id } });
 }
 
+export async function updateIntegration(
+  id: string,
+  config: Record<string, string>,
+  userId: string,
+) {
+  // Same ADMIN guard as remove — config can hold credentials/webhook URLs.
+  const integration = await prisma.workspaceIntegration.findUnique({
+    where: { id },
+    select: { workspaceId: true },
+  });
+  if (!integration) throw new Error("INTEGRATION_NOT_FOUND");
+  await checkWorkspaceRole(prisma, userId, integration.workspaceId, "ADMIN");
+  return prisma.workspaceIntegration.update({
+    where: { id },
+    data: { config: config as Record<string, string> },
+  });
+}
+
+export interface TestEventResult {
+  ok: boolean;
+  status: number;
+}
+
+export async function sendIntegrationTestEvent(
+  id: string,
+  userId: string,
+): Promise<TestEventResult> {
+  const integration = await prisma.workspaceIntegration.findUnique({
+    where: { id },
+    select: { workspaceId: true, provider: true, config: true },
+  });
+  if (!integration) throw new Error("INTEGRATION_NOT_FOUND");
+  await checkWorkspaceRole(prisma, userId, integration.workspaceId, "ADMIN");
+
+  const config = (integration.config ?? {}) as Record<string, unknown>;
+  const webhookUrl = typeof config.webhookUrl === "string" ? config.webhookUrl : null;
+  if (!webhookUrl) {
+    // GA/Mailchimp-style integrations have no inbound webhook to test.
+    throw new Error("NO_WEBHOOK_URL");
+  }
+
+  const payload = {
+    type: "buildrik.test_event",
+    provider: integration.provider,
+    message: "Test event from Buildrik — your webhook is connected.",
+  };
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8000),
+    });
+    return { ok: res.ok, status: res.status };
+  } catch {
+    // Network failure / DNS / timeout — report as unreachable, do not throw
+    // a 500 (the URL is user-supplied and may simply be wrong).
+    throw new Error("WEBHOOK_UNREACHABLE");
+  }
+}
+
 export interface ActiveVercelConnection {
   id: string;
   token: string;
