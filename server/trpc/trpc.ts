@@ -128,7 +128,7 @@ export function createRateLimitedProcedure(maxAttempts: number, windowMs: number
     const forwarded = ctx.headers?.get("x-forwarded-for");
     const ip = forwarded?.split(",")[0]?.trim() || "unknown";
     const key = `${ip}:${path}`;
-    const result = checkRateLimit(key, maxAttempts, windowMs);
+    const result = await checkRateLimit(key, maxAttempts, windowMs);
     if (!result.allowed) {
       throw new TRPCError({
         code: "TOO_MANY_REQUESTS",

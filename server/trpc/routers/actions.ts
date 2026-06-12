@@ -25,7 +25,7 @@ import { checkRateLimit } from "@/server/services/rate-limiter";
  */
 const rateLimitedAction = protectedProcedure.use(async ({ ctx, path, next }) => {
   const key = `action:${ctx.session.user!.id!}:${path}`;
-  if (!checkRateLimit(key, 20, 60_000).allowed) {
+  if (!(await checkRateLimit(key, 20, 60_000)).allowed) {
     throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many action requests. Try again shortly." });
   }
   return next();

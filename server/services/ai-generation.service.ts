@@ -76,9 +76,11 @@ async function dispatchAIWorker(jobId: string): Promise<void> {
   }
 }
 
-export async function getJobStatus(jobId: string) {
-  const job = await prisma.aIGenerationJob.findUnique({
-    where: { id: jobId },
+// jobId comes from the client — both reads below scope by workspaceId so a
+// caller can never see or cancel another tenant's job.
+export async function getJobStatus(jobId: string, workspaceId: string) {
+  const job = await prisma.aIGenerationJob.findFirst({
+    where: { id: jobId, workspaceId },
     select: {
       id: true,
       status: true,
@@ -92,9 +94,9 @@ export async function getJobStatus(jobId: string) {
   return job;
 }
 
-export async function cancelJob(jobId: string) {
-  const job = await prisma.aIGenerationJob.findUnique({
-    where: { id: jobId },
+export async function cancelJob(jobId: string, workspaceId: string) {
+  const job = await prisma.aIGenerationJob.findFirst({
+    where: { id: jobId, workspaceId },
   });
 
   if (!job) {

@@ -41,7 +41,7 @@ export const authConfig: NextAuthConfig = {
           request?.headers?.get?.("x-forwarded-for")?.split(",")[0]?.trim() ||
           request?.headers?.get?.("x-real-ip") ||
           "unknown";
-        const limit = checkRateLimit(
+        const limit = await checkRateLimit(
           `login:${ip}`,
           CREDENTIALS_MAX_ATTEMPTS,
           CREDENTIALS_WINDOW_MS,

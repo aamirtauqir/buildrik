@@ -926,6 +926,19 @@ model ApiToken {
   @@map("api_tokens")
 }
 
+/// Shared rate-limit counters (serverless-safe — the previous in-memory Map
+/// reset per lambda, multiplying every limit by instance count). One row per
+/// key; count and window reset atomically inside a single upsert. Expired
+/// rows are pruned by the session-cleanup cron.
+model RateLimitBucket {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+
+  @@index([resetAt])
+  @@map("rate_limit_buckets")
+}
+
 /// Operation log for DB-backed real-time collaboration (SSE fan-out).
 /// Clients POST ops here; an SSE stream replays ops with seq > the client's
 /// last-seen seq. Pruned by a cron once applied/old.

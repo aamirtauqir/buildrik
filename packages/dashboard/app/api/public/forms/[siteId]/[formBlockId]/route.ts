@@ -12,7 +12,7 @@ export async function POST(
   const { siteId, formBlockId } = await params;
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
-  const limit = checkRateLimit(
+  const limit = await checkRateLimit(
     `form-submit:${siteId}:${formBlockId}:${ip}`,
     FORM_SUBMIT_MAX,
     FORM_SUBMIT_WINDOW_MS,

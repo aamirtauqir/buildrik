@@ -50,14 +50,26 @@ export const templatesRouter = router({
 
     status: protectedProcedure
       .input(z.object({ jobId: z.string() }))
-      .query(async ({ input }) => {
-        const status = await getJobStatus(input.jobId);
+      .query(async ({ ctx, input }) => {
+        const workspaceId = await getWorkspaceId(ctx);
+        const status = await getJobStatus(input.jobId, workspaceId);
         if (!status) throw new TRPCError({ code: "NOT_FOUND" });
         return status;
       }),
 
     cancel: protectedProcedure
       .input(z.object({ jobId: z.string() }))
-      .mutation(async ({ input }) => cancelJob(input.jobId)),
+      .mutation(async ({ ctx, input }) => {
+        const workspaceId = await getWorkspaceId(ctx);
+        try {
+          return await cancelJob(input.jobId, workspaceId);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "JOB_NOT_FOUND")
+            throw new TRPCError({ code: "NOT_FOUND", message: "Generation job not found." });
+          if (e instanceof Error && e.message === "JOB_NOT_CANCELLABLE")
+            throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Job can no longer be cancelled." });
+          throw e;
+        }
+      }),
   }),
 });

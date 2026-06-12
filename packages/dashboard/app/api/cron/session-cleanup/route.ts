@@ -10,8 +10,16 @@ export async function GET(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  const now = new Date();
   const { count } = await prisma.session.deleteMany({
-    where: { expires: { lt: new Date() } },
+    where: { expires: { lt: now } },
+  });
+
+  // Rate-limit windows are short (seconds–minutes); anything past resetAt is
+  // dead weight. Pruned here instead of a setInterval in the limiter module
+  // (module-level timers don't run reliably on serverless).
+  await prisma.rateLimitBucket.deleteMany({
+    where: { resetAt: { lt: now } },
   });
 
   return Response.json({ ok: true, deleted: count });

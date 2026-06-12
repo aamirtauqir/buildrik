@@ -1,30 +1,41 @@
-const rateLimit = new Map<string, { count: number; resetAt: number }>();
+import { prisma } from "@/lib/prisma";
 
-// Clean up expired entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, val] of rateLimit) {
-    if (val.resetAt < now) rateLimit.delete(key);
-  }
-}, 60_000);
-
-export function checkRateLimit(
+/**
+ * Fixed-window rate limiter backed by Postgres so the count is shared across
+ * serverless instances (an in-memory Map resets per lambda, silently turning
+ * every limit into N×configured). The whole check is ONE atomic upsert:
+ * concurrent requests serialize on the row, so a burst can't double-spend a
+ * window. Expired rows are pruned by the session-cleanup cron.
+ */
+export async function checkRateLimit(
   key: string,
   maxAttempts: number,
   windowMs: number
-): { allowed: boolean; remaining: number; resetAt: number } {
-  const now = Date.now();
-  const entry = rateLimit.get(key);
+): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
+  const now = new Date();
+  const newResetAt = new Date(now.getTime() + windowMs);
 
-  if (!entry || entry.resetAt < now) {
-    rateLimit.set(key, { count: 1, resetAt: now + windowMs });
-    return { allowed: true, remaining: maxAttempts - 1, resetAt: now + windowMs };
-  }
+  // Raw SQL (physical table name per @@map) — Prisma's upsert can't express
+  // "reset the counter only if the window lapsed" in one statement.
+  const rows = await prisma.$queryRaw<{ count: number; resetAt: Date }[]>`
+    INSERT INTO "rate_limit_buckets" ("key", "count", "resetAt")
+    VALUES (${key}, 1, ${newResetAt})
+    ON CONFLICT ("key") DO UPDATE SET
+      "count" = CASE
+        WHEN "rate_limit_buckets"."resetAt" < ${now} THEN 1
+        ELSE "rate_limit_buckets"."count" + 1
+      END,
+      "resetAt" = CASE
+        WHEN "rate_limit_buckets"."resetAt" < ${now} THEN ${newResetAt}
+        ELSE "rate_limit_buckets"."resetAt"
+      END
+    RETURNING "count", "resetAt"
+  `;
 
-  entry.count++;
-  if (entry.count > maxAttempts) {
-    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
-  }
-
-  return { allowed: true, remaining: maxAttempts - entry.count, resetAt: entry.resetAt };
+  const row = rows[0];
+  return {
+    allowed: row.count <= maxAttempts,
+    remaining: Math.max(0, maxAttempts - row.count),
+    resetAt: row.resetAt.getTime(),
+  };
 }

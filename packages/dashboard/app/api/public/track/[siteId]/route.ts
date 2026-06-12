@@ -26,7 +26,7 @@ export async function POST(
   const { siteId } = await params;
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
-  const limit = checkRateLimit(`track:${siteId}:${ip}`, TRACK_MAX, TRACK_WINDOW_MS);
+  const limit = await checkRateLimit(`track:${siteId}:${ip}`, TRACK_MAX, TRACK_WINDOW_MS);
   if (!limit.allowed) {
     return NextResponse.json({ ok: false }, { status: 429, headers: CORS_HEADERS });
   }
