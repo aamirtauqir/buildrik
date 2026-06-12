@@ -319,7 +319,10 @@ export async function runVercelDeploy(
     }
     // Reconcile published-site password protection on the live URL. Best-effort:
     // password protection is a Vercel Pro/Enterprise feature, so 402/403 means
-    // "not available on this plan" and must not fail an otherwise-good deploy.
+    // "not available on this plan". Clearing protection (password=null) on a
+    // project that has none returns 404 "Password Protection not found" — that
+    // is the desired end state already, so it's an idempotent success. None of
+    // these must fail an otherwise-good deploy.
     if (publishedPasswordPlain !== undefined) {
       try {
         await setProjectPasswordProtection({
@@ -329,9 +332,12 @@ export async function runVercelDeploy(
           password: publishedPasswordPlain,
         });
       } catch (err) {
-        if (err instanceof VercelApiError && (err.status === 402 || err.status === 403)) {
+        if (
+          err instanceof VercelApiError &&
+          (err.status === 402 || err.status === 403 || err.status === 404)
+        ) {
           console.warn(
-            `[publish] Vercel password protection unavailable on plan for ${projectName} (${err.status})`,
+            `[publish] Vercel password protection skipped for ${projectName} (${err.status})`,
           );
         } else {
           throw err;

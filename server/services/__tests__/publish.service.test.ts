@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 const getConnMock = vi.fn();
 const markInactiveMock = vi.fn();
 const createDepMock = vi.fn();
+const setPwMock = vi.fn();
 
 vi.mock("@server/services/integrations.service", () => ({
   getActiveVercelConnection: (...args: unknown[]) => getConnMock(...args),
@@ -17,6 +18,7 @@ vi.mock("@/lib/vercel", () => ({
   // pickPublicUrl. Mock with passthrough on `d.url`; pickPublicUrl's own
   // alias-vs-fallback logic is tested separately in __tests__/vercel-pickPublicUrl.test.ts.
   pickPublicUrl: (d: { url: string }) => `https://${d.url}`,
+  setProjectPasswordProtection: (...args: unknown[]) => setPwMock(...args),
   VercelApiError: class extends Error { constructor(public status: number, public code: string, msg: string) { super(msg); } },
 }));
 
@@ -49,6 +51,7 @@ describe("publish.service Vercel connection gating", () => {
     getConnMock.mockReset();
     markInactiveMock.mockReset();
     createDepMock.mockReset();
+    setPwMock.mockReset();
   });
 
   afterEach(() => {
@@ -96,5 +99,35 @@ describe("publish.service Vercel connection gating", () => {
     ).rejects.toThrow("VERCEL_TOKEN_INVALID");
 
     expect(markInactiveMock).toHaveBeenCalledWith("intg_1");
+  });
+
+  // Clearing password protection (password=null) on a project that has none
+  // returns Vercel 404 "Password Protection not found". That is the desired end
+  // state already, so it must NOT fail the deploy.
+  it("swallows Vercel 404 from password-protection clear and still returns the URL", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    getConnMock.mockResolvedValueOnce({ id: "intg_1", token: "vt_abc", teamId: "team_x" });
+    createDepMock.mockResolvedValueOnce({ id: "dep_1", url: "x.vercel.app", readyState: "READY" });
+    const { VercelApiError } = await import("@/lib/vercel");
+    setPwMock.mockRejectedValueOnce(new VercelApiError(404, "not_found", "Password Protection not found."));
+
+    const result = await runVercelDeploy(
+      "ws_1", "buildrik-site-test", [{ file: "index.html", data: "<p>hi</p>" }], null,
+    );
+
+    expect(result).toEqual({ url: "https://x.vercel.app", deploymentId: "dep_1" });
+    expect(setPwMock).toHaveBeenCalledWith(expect.objectContaining({ password: null }));
+  });
+
+  it("re-throws a non-plan-gating password-protection error (e.g. 500)", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    getConnMock.mockResolvedValueOnce({ id: "intg_1", token: "vt_abc", teamId: "team_x" });
+    createDepMock.mockResolvedValueOnce({ id: "dep_1", url: "x.vercel.app", readyState: "READY" });
+    const { VercelApiError } = await import("@/lib/vercel");
+    setPwMock.mockRejectedValueOnce(new VercelApiError(500, "internal", "Vercel API 500"));
+
+    await expect(
+      runVercelDeploy("ws_1", "buildrik-site-test", [{ file: "index.html", data: "<p>hi</p>" }], "secret"),
+    ).rejects.toThrow("Vercel API 500");
   });
 });
