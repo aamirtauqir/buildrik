@@ -295,26 +295,31 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         Boolean: "boolean",
       };
 
-      if (composer?.cms.collections?.createCollection) {
-        const collection = await composer.cms.collections.createCollection(
-          name.trim(),
-          undefined,
-          description.trim() || undefined
-        );
-
-        // Add fields (skip title which may be auto-created)
-        for (const field of fields) {
-          if (!field.name.trim()) continue;
-          await composer.cms.collections.addField(collection.id, {
-            name: field.name.trim(),
-            slug: field.name.trim().toLowerCase().replace(/\s+/g, "_"),
-            type: typeMap[field.type] as import("../../../shared/types/cms").CMSFieldType,
-            order: fields.indexOf(field),
-          });
-        }
+      const collections = composer?.cms?.collections;
+      if (!collections?.createCollection) {
+        // No fake success: if the engine write path is unavailable, the
+        // collection was NOT created — surface that instead of closing green.
+        throw new Error("Collections are unavailable in this editor session.");
       }
 
-      // Show success even if composer method is absent (mock)
+      const collection = await collections.createCollection(
+        name.trim(),
+        undefined,
+        description.trim() || undefined
+      );
+
+      // Add fields (skip title which may be auto-created)
+      for (const field of fields) {
+        if (!field.name.trim()) continue;
+        await collections.addField(collection.id, {
+          name: field.name.trim(),
+          slug: field.name.trim().toLowerCase().replace(/\s+/g, "_"),
+          type: typeMap[field.type] as import("../../../shared/types/cms").CMSFieldType,
+          order: fields.indexOf(field),
+        });
+      }
+
+      // Only after a confirmed create.
       setSuccess(true);
       setTimeout(() => {
         onClose();
