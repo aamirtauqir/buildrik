@@ -32,3 +32,18 @@ Backend reality verified before planning (audit-phase-specs-against-engine-apis 
 
 ## Per-fix protocol
 Atomic commit each, live-verify in browser, regression test where logic added.
+
+## EXECUTION STATUS (2026-06-12)
+- WAVE 1 DONE: W1.1 CMS fail-hard (cd132f8a), W1.2 template iframe (f017aa78), W1.3 server CSV (5936e19c), W1.4 help categories+dedupe (4844ecca).
+- WAVE 2 DONE: W2.6 test-event + W2.7 update (bfb80f1d), + SSRF guard (0cfbb837, security-review caught).
+- WAVE 3 DONE: W3.8 ticket attachments (1efad8d0).
+- Plus billing.upgrade server gate (7c2e33e7) from the prior security finding.
+- BLOCKED: W2.5 OAuth connect/disconnect — needs auth re-architecture (see below).
+
+## W2.5 — why it is blocked (decision needed)
+signIn callback (server/auth.config.ts:69) matches OAuth users by EMAIL and NEVER writes an `Account` row. So `connectedAccounts` (account.service.ts:61) is always empty and the Settings → Account "Connect/Disconnect" buttons act on data that never populates. Safe real linking under the JWT session strategy (link the OAuth identity to the CURRENT logged-in user, not whoever the OAuth email maps to) is a real auth sub-arc, not a wire. Options:
+  A) Build the auth-linking arc: write Account rows on OAuth sign-in + a session-aware link/unlink flow guarded against removing the last login method.
+  B) Honest-disable the Connect/Disconnect buttons now (label "Social login linking coming soon") until the arc is scheduled.
+
+## Still blocked on external setup (unchanged)
+- Real CAPTCHA (auth/error/captcha) + suspicious-device telemetry (auth/error/suspicious) — orphan, unreferenced routes; real CAPTCHA needs a vendor (Turnstile/hCaptcha) + keys. Decision: provide keys & build, OR delete the orphan scaffold routes.
