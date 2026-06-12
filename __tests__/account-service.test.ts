@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: { findUnique: vi.fn(), update: vi.fn() },
+    account: { deleteMany: vi.fn() },
     session: { findMany: vi.fn(), deleteMany: vi.fn(), delete: vi.fn() },
     loginAttempt: { findMany: vi.fn() },
     workspace: { findUnique: vi.fn(), update: vi.fn() },
@@ -66,6 +67,51 @@ describe("Account Service", () => {
       vi.mocked(prisma.session.deleteMany).mockResolvedValue({ count: 3 });
       const result = await revokeAllOtherSessions("u1", "s1");
       expect(result.count).toBe(3);
+    });
+  });
+
+  describe("disconnectProvider", () => {
+    // W2.5 — must never strand a user with no login method.
+    it("blocks disconnecting the only login method (no password, single provider)", async () => {
+      const { disconnectProvider } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        passwordHash: null,
+        accounts: [{ provider: "google" }],
+      } as any);
+      await expect(disconnectProvider("u1", "google")).rejects.toThrow("LAST_LOGIN_METHOD");
+      expect(prisma.account.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it("allows disconnect when a password remains", async () => {
+      const { disconnectProvider } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        passwordHash: "hash",
+        accounts: [{ provider: "google" }],
+      } as any);
+      vi.mocked(prisma.account.deleteMany).mockResolvedValue({ count: 1 } as any);
+      const r = await disconnectProvider("u1", "google");
+      expect(r.ok).toBe(true);
+      expect(prisma.account.deleteMany).toHaveBeenCalledWith({ where: { userId: "u1", provider: "google" } });
+    });
+
+    it("allows disconnect when another provider remains", async () => {
+      const { disconnectProvider } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        passwordHash: null,
+        accounts: [{ provider: "google" }, { provider: "github" }],
+      } as any);
+      vi.mocked(prisma.account.deleteMany).mockResolvedValue({ count: 1 } as any);
+      const r = await disconnectProvider("u1", "google");
+      expect(r.ok).toBe(true);
+    });
+
+    it("rejects disconnecting a provider that is not connected", async () => {
+      const { disconnectProvider } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        passwordHash: "hash",
+        accounts: [{ provider: "github" }],
+      } as any);
+      await expect(disconnectProvider("u1", "google")).rejects.toThrow("NOT_CONNECTED");
     });
   });
 

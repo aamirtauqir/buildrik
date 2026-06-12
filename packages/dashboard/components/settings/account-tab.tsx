@@ -12,6 +12,7 @@ interface AccountTabProps {
   connectedAccounts?: ConnectedAccount[];
   onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void;
   onSetPassword?: (data: { newPassword: string }) => void;
+  onConnectAccount?: (provider: "google" | "github") => void;
   onDisconnectAccount?: (provider: "google" | "github") => void;
   saving?: boolean;
 }
@@ -67,6 +68,7 @@ export function AccountTab({
   connectedAccounts = [],
   onChangePassword,
   onSetPassword,
+  onConnectAccount,
   onDisconnectAccount,
   saving,
 }: AccountTabProps) {
@@ -231,6 +233,7 @@ export function AccountTab({
                 ) : (
                   <button
                     type="button"
+                    onClick={() => onConnectAccount?.(provider)}
                     className="text-sm px-3 py-1 rounded-md border"
                     style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                   >

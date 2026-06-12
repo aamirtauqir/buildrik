@@ -17,7 +17,7 @@ interface WorkspaceCtx {
 }
 import {
   getProfile, updateProfile, changePassword, requestEmailChange, getActiveSessions, revokeSession,
-  revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
+  disconnectProvider, revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
@@ -62,6 +62,17 @@ export const accountRouter = router({
       throw e;
     }
   }),
+  disconnectProvider: protectedProcedure
+    .input(z.object({ provider: z.enum(["google", "github"]) }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await disconnectProvider(ctx.session.user.id, input.provider);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "LAST_LOGIN_METHOD") throw new TRPCError({ code: "BAD_REQUEST", message: "Set a password before disconnecting your only login method." });
+        if (e instanceof Error && e.message === "NOT_CONNECTED") throw new TRPCError({ code: "BAD_REQUEST", message: "That provider is not connected." });
+        throw e;
+      }
+    }),
   twoFactor: router({
     enable: protectedProcedure.mutation(({ ctx }) => enable2FA(ctx.session.user.id)),
     confirm: protectedProcedure

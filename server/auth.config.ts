@@ -91,6 +91,27 @@ export const authConfig: NextAuthConfig = {
           await prisma.user.update({ where: { id: existing.id }, data: { lastLoginAt: new Date() } });
           await logAuditEvent("OAUTH_LOGIN", "success", { userId: existing.id, email: user.email });
         }
+
+        // Record the provider link so Settings → Account can show + manage
+        // connected accounts. The provider already authenticated this email,
+        // so the link is verified by the OAuth handshake itself.
+        if (account.providerAccountId && user.id) {
+          await prisma.account.upsert({
+            where: {
+              provider_providerAccountId: {
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+              },
+            },
+            create: {
+              userId: user.id,
+              type: account.type,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+            update: { userId: user.id },
+          });
+        }
       }
       return true;
     },

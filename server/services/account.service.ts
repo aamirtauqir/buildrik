@@ -74,6 +74,27 @@ export async function getProfile(userId: string) {
   };
 }
 
+export async function disconnectProvider(userId: string, provider: "google" | "github") {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { passwordHash: true, accounts: { select: { provider: true } } },
+  });
+  if (!user) throw new Error("USER_NOT_FOUND");
+
+  const linked = user.accounts.filter((a) => a.provider === provider);
+  if (linked.length === 0) throw new Error("NOT_CONNECTED");
+
+  // Never strand a user with no way back in: disconnecting is only allowed
+  // when they keep at least one other login method (a password, or another
+  // linked provider).
+  const otherAccounts = user.accounts.filter((a) => a.provider !== provider);
+  const hasOtherLoginMethod = user.passwordHash !== null || otherAccounts.length > 0;
+  if (!hasOtherLoginMethod) throw new Error("LAST_LOGIN_METHOD");
+
+  await prisma.account.deleteMany({ where: { userId, provider } });
+  return { ok: true as const };
+}
+
 export async function updateProfile(userId: string, data: UpdateProfileInput) {
   return prisma.user.update({
     where: { id: userId },
