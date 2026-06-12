@@ -163,6 +163,13 @@ export const siteDetailRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "REDIRECT_LIMIT")
             throw new TRPCError({ code: "FORBIDDEN", message: "Redirect limit exceeded." });
+          if (e instanceof Error && e.message === "CSV_TOO_LARGE")
+            throw new TRPCError({ code: "BAD_REQUEST", message: "CSV exceeds 1000 rows." });
+          if (e instanceof Error && e.message.startsWith("INVALID_CSV_ROW:"))
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `Invalid redirect on line ${e.message.split(":")[1]} — expected "/from,to[,301|302]".`,
+            });
           throw e;
         }
       }),

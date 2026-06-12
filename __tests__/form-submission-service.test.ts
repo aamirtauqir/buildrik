@@ -120,5 +120,24 @@ describe("Form Submission Service", () => {
         expect.objectContaining({ where: { siteId: "s1", formBlockId: "fb1" } }),
       );
     });
+
+    it("neutralizes spreadsheet formula payloads in values AND field names", async () => {
+      const { exportSubmissions } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([
+        {
+          id: "sub1",
+          createdAt: new Date("2026-06-01"),
+          data: { "=evil()": "=cmd|' /C calc'!A0", note: "+SUM(1)" },
+          formBlock: { name: "Contact" },
+        },
+      ] as any);
+
+      const csv = await exportSubmissions("s1", undefined, "csv");
+      // formula-leading cells get an apostrophe prefix inside the quotes
+      expect(csv).toContain(`"'=cmd|' /C calc'!A0"`);
+      expect(csv).toContain(`"'+SUM(1)"`);
+      expect(csv).toContain(`"'=evil()"`); // header row too
+      expect(csv).not.toMatch(/(^|,)"=/m); // no cell starts with a live "="
+    });
   });
 });

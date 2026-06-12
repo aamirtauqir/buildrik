@@ -1,7 +1,12 @@
 import { z } from "zod";
 
+// Public endpoint input — bounds matter: data lands verbatim in a JSON
+// column, so unbounded keys/values are a storage-DoS vector.
 export const formSubmissionSchema = z.object({
-  data: z.record(z.string()),
+  data: z
+    .record(z.string().max(10_000))
+    .refine((d) => Object.keys(d).length <= 100, { message: "Too many fields" })
+    .refine((d) => Object.keys(d).every((k) => k.length <= 200), { message: "Field name too long" }),
   honeypot: z.string().optional(),
 });
 

@@ -9,7 +9,7 @@ vi.mock("@/lib/prisma", () => ({
     workspaceMember: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
     formBlock: { findMany: vi.fn() },
-    redirect: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
+    redirect: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
     domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), findFirst: vi.fn(), count: vi.fn() },
     workspace: { findUnique: vi.fn() },
     shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
@@ -81,6 +81,37 @@ describe("Site Detail Service", () => {
       } as any);
       const result = await createRedirect("s1", { fromPath: "/old", toUrl: "/new", type: "301" }, "FREE");
       expect(result.fromPath).toBe("/old");
+    });
+
+    it("importRedirects rejects malformed rows with the offending line number", async () => {
+      const { importRedirects } = await import("@/server/services/redirect.service");
+      const csv = "from,to,type\n/ok,https://x.com,301\nbroken-row-no-comma";
+      await expect(importRedirects("s1", csv, "FREE")).rejects.toThrow("INVALID_CSV_ROW:3");
+    });
+
+    it("importRedirects rejects fromPath without leading slash", async () => {
+      const { importRedirects } = await import("@/server/services/redirect.service");
+      const csv = "from,to,type\nno-slash,https://x.com,301";
+      await expect(importRedirects("s1", csv, "FREE")).rejects.toThrow("INVALID_CSV_ROW:2");
+    });
+
+    it("importRedirects round-trips its own quoted export format", async () => {
+      const { importRedirects } = await import("@/server/services/redirect.service");
+      vi.mocked(prisma.redirect.count).mockResolvedValue(0);
+      vi.mocked(prisma.redirect.createMany).mockResolvedValue({ count: 1 } as any);
+      const csv = 'from,to,type\n"/old","https://x.com","302"';
+      await importRedirects("s1", csv, "FREE");
+      const data = vi.mocked(prisma.redirect.createMany).mock.calls[0][0]!.data;
+      expect(data).toEqual([{ siteId: "s1", fromPath: "/old", toUrl: "https://x.com", type: "302" }]);
+    });
+
+    it("exportRedirects neutralizes formula payloads", async () => {
+      const { exportRedirects } = await import("@/server/services/redirect.service");
+      vi.mocked(prisma.redirect.findMany).mockResolvedValue([
+        { id: "r1", siteId: "s1", fromPath: "/a", toUrl: "=HYPERLINK(\"http://evil\")", type: "301", createdAt: new Date() },
+      ] as any);
+      const csv = await exportRedirects("s1");
+      expect(csv).toContain(`"'=HYPERLINK`);
     });
   });
 

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { csvCell } from "@/lib/utils";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { FormSubmissionInput, ListSubmissionsInput } from "@buildrik/shared/schemas/forms";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
@@ -138,7 +139,9 @@ export async function exportSubmissions(
   const allKeys = Array.from(
     new Set(submissions.flatMap((s) => Object.keys(s.data as Record<string, string>))),
   );
-  const headers = ["id", "createdAt", "form", ...allKeys].join(",");
+  // Field names AND values are attacker-controlled (public endpoint) — both
+  // go through csvCell so formula payloads can't execute in Excel/Sheets.
+  const headers = ["id", "createdAt", "form", ...allKeys].map(csvCell).join(",");
   const rows = submissions.map((s) => {
     const data = s.data as Record<string, string>;
     const values = [
@@ -147,7 +150,7 @@ export async function exportSubmissions(
       s.formBlock?.name ?? "",
       ...allKeys.map((k) => data[k] ?? ""),
     ];
-    return values.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",");
+    return values.map(csvCell).join(",");
   });
   return [headers, ...rows].join("\n");
 }
