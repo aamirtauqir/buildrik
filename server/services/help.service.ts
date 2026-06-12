@@ -26,6 +26,22 @@ export async function searchArticles(query: string) {
   });
 }
 
+export async function listArticlesByCategory(category: string) {
+  return prisma.helpArticle.findMany({
+    where: { category },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      category: true,
+      excerpt: true,
+      readTime: true,
+    },
+    orderBy: { title: "asc" },
+    take: 50,
+  });
+}
+
 export async function getArticle(slug: string) {
   return prisma.helpArticle.findUnique({ where: { slug } });
 }

@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import {
   listCategories,
   searchArticles,
+  listArticlesByCategory,
   getArticle,
   submitFeedback,
   createTicket,
@@ -16,6 +17,10 @@ export const helpRouter = router({
   search: publicProcedure
     .input(z.object({ query: z.string().min(1).max(200) }))
     .query(async ({ input }) => searchArticles(input.query)),
+
+  byCategory: publicProcedure
+    .input(z.object({ category: z.string().min(1).max(64) }))
+    .query(async ({ input }) => listArticlesByCategory(input.category)),
 
   article: publicProcedure
     .input(z.object({ slug: z.string() }))

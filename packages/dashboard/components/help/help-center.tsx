@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Rocket, Globe, Users, CreditCard, Link, Pencil, MessageCircle, Mail, Printer } from "lucide-react";
+import { Search, Rocket, Globe, Users, CreditCard, Link, Pencil, Mail, Printer } from "lucide-react";
 import { HELP_CATEGORIES } from "@buildrik/shared/schemas/help";
 
 export const HELP_CATEGORY_LIST = HELP_CATEGORIES.map((c) => ({ ...c }));
@@ -29,12 +29,12 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?:
 
 interface HelpCenterProps {
   onSearch: (query: string) => void;
-  onContactLiveChat: () => void;
-  onContactEmail: () => void;
+  onSelectCategory: (key: string, label: string) => void;
+  onContactSupport: () => void;
   searchQuery?: string;
 }
 
-export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, searchQuery = "" }: HelpCenterProps) {
+export function HelpCenter({ onSearch, onSelectCategory, onContactSupport, searchQuery = "" }: HelpCenterProps) {
   const [query, setQuery] = useState(searchQuery);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -95,15 +95,17 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
           {HELP_CATEGORY_LIST.map((cat) => {
             const Icon = ICON_MAP[cat.icon];
             return (
-              <div
+              <button
                 key={cat.key}
-                className="flex cursor-pointer flex-col gap-2 rounded-xl border p-4 transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
+                type="button"
+                onClick={() => onSelectCategory(cat.key, cat.label)}
+                className="flex cursor-pointer flex-col gap-2 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
                 style={{ borderColor: "var(--color-border-default)" }}
               >
                 {Icon && <Icon className="h-5 w-5" style={{ color: "var(--color-primary)" }} />}
                 <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{cat.label}</p>
-                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Coming soon</p>
-              </div>
+                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Browse articles</p>
+              </button>
             );
           })}
         </div>
@@ -112,34 +114,19 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
       {/* Contact Support */}
       <section>
         <h2 className="mb-4 text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Contact Support</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <button
-            onClick={onContactLiveChat}
-            className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
-            style={{ borderColor: "var(--color-border-default)" }}
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
-              <MessageCircle className="h-5 w-5" style={{ color: "var(--color-primary)" }} />
-            </div>
-            <div>
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Live Chat</p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Chat with our support team</p>
-            </div>
-          </button>
-          <button
-            onClick={onContactEmail}
-            className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
-            style={{ borderColor: "var(--color-border-default)" }}
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
-              <Mail className="h-5 w-5" style={{ color: "var(--color-primary)" }} />
-            </div>
-            <div>
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Email Support</p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Get a reply within 24 hours</p>
-            </div>
-          </button>
-        </div>
+        <button
+          onClick={onContactSupport}
+          className="flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
+          style={{ borderColor: "var(--color-border-default)" }}
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
+            <Mail className="h-5 w-5" style={{ color: "var(--color-primary)" }} />
+          </div>
+          <div>
+            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Submit a Ticket</p>
+            <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Response time depends on your plan</p>
+          </div>
+        </button>
       </section>
 
       {/* Keyboard Shortcuts */}
