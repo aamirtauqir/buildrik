@@ -137,7 +137,7 @@ In QA mode, flag any code that doesn't match DESIGN.md — especially: purple/vi
 
 Key constraints:
 - Editor chrome uses the canonical light theme per DESIGN.md (see Color / Token Namespace Contract sections). Desktop-only. Dark-only direction was flipped 2026-04-18 in the theme unification.
-- Single accent color: cobalt `#2D6DFF` (legacy indigo/violet tokens in `themes/default.css` are being migrated out).
+- Single accent color: cobalt `#2D6DFF` (legacy indigo/violet tokens fully drained as of 2026-06-12).
 - Typography: General Sans (display), Inter Tight or Geist (body/UI), Geist Mono (data). No Arial/Helvetica/Roboto fallbacks.
 - 4px base spacing, compact density.
 - Minimal motion. No spring physics, no scroll choreography.
