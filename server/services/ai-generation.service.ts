@@ -14,12 +14,14 @@ export async function createGenerationJob(
   const plan = (ws?.plan ?? "FREE") as PlanName;
   const monthlyLimit = PLAN_LIMITS[plan].aiGenerations as number;
 
-  // Monthly plan limit check (-1 = unlimited)
+  // Monthly plan limit check (-1 = unlimited). Cancelled jobs don't count —
+  // the worker aborts them before any site is written, so charging the
+  // monthly slot would bill work that never happened.
   if (monthlyLimit >= 0) {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthlyCount = await prisma.aIGenerationJob.count({
-      where: { workspaceId, createdAt: { gte: startOfMonth } },
+      where: { workspaceId, createdAt: { gte: startOfMonth }, status: { not: "CANCELLED" } },
     });
     if (monthlyCount >= monthlyLimit) throw new Error("AI_MONTHLY_LIMIT");
   }
@@ -64,8 +66,14 @@ export async function createGenerationJob(
 }
 
 async function dispatchAIWorker(jobId: string): Promise<void> {
-  const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
-  if (!base) return; // no base URL configured (e.g. some test envs) → skip
+  // Same fallback chain as the publish worker dispatch — with only
+  // NEXT_PUBLIC_APP_URL consulted, an unset var silently stranded every job
+  // in QUEUED forever.
+  const base = (
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.NEXTAUTH_URL ??
+    "http://localhost:3000"
+  ).replace(/\/$/, "");
   try {
     await fetch(`${base}/api/workers/ai-generate/${jobId}`, {
       method: "POST",

@@ -46,6 +46,7 @@ function NewSitePageInner() {
   // AI wizard state
   const [businessType, setBusinessType] = useState<string | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
+  const [creditsExhausted, setCreditsExhausted] = useState(false);
 
   // Queries
   const templatesQuery = trpc.templates.list.useQuery(
@@ -92,9 +93,19 @@ function NewSitePageInner() {
   const generateMutation = trpc.templates.generate.create.useMutation({
     onSuccess: (job) => {
       setJobId(job.id);
+      setCreditsExhausted(false);
       setView("ai-progress");
     },
-    onError: (err) => addToast("error", "Generation failed", err.message),
+    onError: (err) => {
+      // Monthly AI quota gone — surface the upgrade/template modal instead of
+      // a raw failure toast (the modal props existed but were never wired).
+      if (err.message === "AI_MONTHLY_LIMIT") {
+        setCreditsExhausted(true);
+        setView("ai-progress");
+        return;
+      }
+      addToast("error", "Generation failed", err.message);
+    },
   });
 
   const cancelMutation = trpc.templates.generate.cancel.useMutation({
@@ -103,6 +114,7 @@ function NewSitePageInner() {
       setView("ai-type");
       addToast("info", "Generation cancelled");
     },
+    onError: (err) => addToast("error", "Couldn't cancel", err.message),
   });
 
   // Choose method view (default)
@@ -244,8 +256,9 @@ function NewSitePageInner() {
     );
   }
 
-  // AI wizard - step 3 (generation progress)
-  if (view === "ai-progress" && jobId) {
+  // AI wizard - step 3 (generation progress; also hosts the credits-exhausted
+  // modal, which can fire before any job exists)
+  if (view === "ai-progress" && (jobId || creditsExhausted)) {
     const status = jobStatusQuery.data;
     return (
       <div className="pt-8">
@@ -256,7 +269,19 @@ function NewSitePageInner() {
           steps={(status?.steps ?? null) as { step: string; status: string }[] | null}
           error={status?.error ?? null}
           siteId={status?.siteId ?? null}
-          onCancel={() => cancelMutation.mutate({ jobId })}
+          creditsExhausted={creditsExhausted}
+          onUpgrade={() => router.push("/dashboard/billing")}
+          onUseTemplate={() => {
+            setCreditsExhausted(false);
+            setJobId(null);
+            setView("templates");
+          }}
+          onStartBlank={() => {
+            setCreditsExhausted(false);
+            setJobId(null);
+            createSiteMutation.mutate({ name: siteName, method: "blank" });
+          }}
+          onCancel={() => jobId && cancelMutation.mutate({ jobId })}
           onRetry={() => {
             setJobId(null);
             setView("ai-pages");

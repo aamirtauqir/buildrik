@@ -58,7 +58,11 @@
     },
     {
       "path": "/api/cron/publish-job-cleanup",
-      "schedule": "0 5 * * *"
+      "schedule": "30 * * * *"
+    },
+    {
+      "path": "/api/cron/ai-job-cleanup",
+      "schedule": "15 * * * *"
     }
   ]
 }

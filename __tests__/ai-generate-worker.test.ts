@@ -1,15 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { type NextRequest } from "next/server";
 
+// Transaction-client mock (worker writes site+pages+job flip atomically)
+const txSiteCreate = vi.fn();
+const txPageCreateMany = vi.fn();
+const txJobUpdateMany = vi.fn();
+const txClient = {
+  site: { create: txSiteCreate },
+  page: { createMany: txPageCreateMany },
+  aIGenerationJob: { updateMany: txJobUpdateMany },
+};
+
 vi.mock("@lib/prisma", () => ({
   prisma: {
     aIGenerationJob: {
       findUnique: vi.fn(),
       updateMany: vi.fn(),
-      update: vi.fn(),
     },
-    site: { create: vi.fn(), findFirst: vi.fn() },
-    page: { create: vi.fn() },
+    site: { findFirst: vi.fn() },
+    $transaction: vi.fn(async (cb: (tx: typeof txClient) => Promise<unknown>) => cb(txClient)),
   },
 }));
 
@@ -22,9 +31,9 @@ import { generatePage } from "@server/services/ai.service";
 import { POST } from "@/app/api/workers/ai-generate/[jobId]/route";
 
 const p = prisma as unknown as {
-  aIGenerationJob: { findUnique: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
-  site: { create: ReturnType<typeof vi.fn>; findFirst: ReturnType<typeof vi.fn> };
-  page: { create: ReturnType<typeof vi.fn> };
+  aIGenerationJob: { findUnique: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
+  site: { findFirst: ReturnType<typeof vi.fn> };
+  $transaction: ReturnType<typeof vi.fn>;
 };
 const genPage = generatePage as ReturnType<typeof vi.fn>;
 
@@ -47,45 +56,80 @@ describe("ai-generate worker", () => {
     expect(res.status).toBe(401);
   });
 
-  it("happy path: generates pages, creates site, marks COMPLETED", async () => {
+  it("happy path: generates pages, creates site+pages in one transaction, marks COMPLETED", async () => {
     p.aIGenerationJob.findUnique.mockResolvedValue({
       id: "j1", status: "QUEUED", workspaceId: "w1", userId: "u1",
       businessType: "BUSINESS", selectedPages: ["landing", "about"], description: "A bakery", metadata: { tone: "bold" },
     });
     p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
     p.site.findFirst.mockResolvedValue(null);
-    p.site.create.mockResolvedValue({ id: "site-1" });
-    p.page.create.mockResolvedValue({ id: "pg" });
-    p.aIGenerationJob.update.mockResolvedValue({});
+    txSiteCreate.mockResolvedValue({ id: "site-1" });
+    txPageCreateMany.mockResolvedValue({ count: 2 });
+    txJobUpdateMany.mockResolvedValue({ count: 1 });
     genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
 
     const res = await POST(req("secret"), ctx);
     expect(res.status).toBe(200);
     expect(genPage).toHaveBeenCalledTimes(2); // one per selected page
-    expect(p.page.create).toHaveBeenCalledTimes(2);
     // bold tone → bold style passed to generatePage
     expect(genPage.mock.calls[0][0].style).toBe("bold");
-    // completed
-    const completed = p.aIGenerationJob.update.mock.calls.find((c) => c[0].data.status === "COMPLETED");
-    expect(completed).toBeTruthy();
-    expect(completed![0].data.siteId).toBe("site-1");
+
+    // claim writes the wizard's first real status, not BUILDING
+    const claim = p.aIGenerationJob.updateMany.mock.calls[0][0];
+    expect(claim.data.status).toBe("GENERATING_STRUCTURE");
+    // progress phases the wizard checklist expects
+    const statuses = p.aIGenerationJob.updateMany.mock.calls.map((c) => c[0].data.status);
+    expect(statuses).toContain("GENERATING_CONTENT");
+    expect(statuses).toContain("GENERATING_STYLES");
+
+    // site + pages + COMPLETED flip all ride the same transaction
+    expect(p.$transaction).toHaveBeenCalledTimes(1);
+    expect(txPageCreateMany.mock.calls[0][0].data).toHaveLength(2);
+    const completed = txJobUpdateMany.mock.calls[0][0];
+    expect(completed.data.status).toBe("COMPLETED");
+    expect(completed.data.siteId).toBe("site-1");
+    // a CANCELLED job must not be overwritten by COMPLETED
+    expect(completed.where.status).toEqual({ not: "CANCELLED" });
   });
 
-  it("marks FAILED when generation throws", async () => {
+  it("marks FAILED when generation throws, without creating any site", async () => {
     p.aIGenerationJob.findUnique.mockResolvedValue({
       id: "j1", status: "QUEUED", workspaceId: "w1", userId: "u1",
       businessType: "BUSINESS", selectedPages: ["landing"], description: null, metadata: null,
     });
     p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
     p.site.findFirst.mockResolvedValue(null);
-    p.site.create.mockResolvedValue({ id: "site-1" });
-    p.aIGenerationJob.update.mockResolvedValue({});
     genPage.mockRejectedValue(new Error("AI down"));
 
     const res = await POST(req("secret"), ctx);
     expect(res.status).toBe(500);
-    const failed = p.aIGenerationJob.update.mock.calls.find((c) => c[0].data.status === "FAILED");
+    expect(p.$transaction).not.toHaveBeenCalled();
+    const failed = p.aIGenerationJob.updateMany.mock.calls.find((c) => c[0].data.status === "FAILED");
     expect(failed).toBeTruthy();
+    expect(failed![0].where.status).toEqual({ not: "CANCELLED" });
+  });
+
+  it("aborts cleanly mid-generation when the job is cancelled", async () => {
+    p.aIGenerationJob.findUnique
+      .mockResolvedValueOnce({
+        id: "j1", status: "QUEUED", workspaceId: "w1", userId: "u1",
+        businessType: "BUSINESS", selectedPages: ["landing", "about"], description: null, metadata: null,
+      })
+      // assertNotCancelled before page 1
+      .mockResolvedValueOnce({ status: "GENERATING_CONTENT" })
+      // assertNotCancelled before page 2 — user cancelled
+      .mockResolvedValueOnce({ status: "CANCELLED" });
+    p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
+    p.site.findFirst.mockResolvedValue(null);
+    genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
+
+    const res = await POST(req("secret"), ctx);
+    expect(res.status).toBe(200); // cancelled, not an error
+    expect(genPage).toHaveBeenCalledTimes(1); // second page never generated
+    expect(p.$transaction).not.toHaveBeenCalled(); // no site row for cancelled job
+    // FAILED must not stomp the CANCELLED status
+    const failed = p.aIGenerationJob.updateMany.mock.calls.find((c) => c[0].data?.status === "FAILED");
+    expect(failed).toBeFalsy();
   });
 
   it("400 when job is not QUEUED", async () => {

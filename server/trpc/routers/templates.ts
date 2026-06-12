@@ -44,6 +44,8 @@ export const templatesRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "AI_RATE_LIMITED")
             throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "AI generation rate limited. Max 3 per hour." });
+          if (e instanceof Error && e.message === "AI_MONTHLY_LIMIT")
+            throw new TRPCError({ code: "FORBIDDEN", message: "AI_MONTHLY_LIMIT" });
           throw e;
         }
       }),
