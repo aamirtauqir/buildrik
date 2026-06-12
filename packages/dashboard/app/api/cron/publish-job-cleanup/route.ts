@@ -1,4 +1,5 @@
 import { type NextRequest } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -13,17 +14,53 @@ export async function GET(req: NextRequest) {
   const now = new Date();
   const cutoff = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour ago
 
-  const { count } = await prisma.publishBuildJob.updateMany({
+  // The worker writes BUILDING (then DEPLOYING) — never IN_PROGRESS. A job
+  // stuck in one of those states past the cutoff lost its worker mid-build;
+  // its site is stranded in PUBLISHING and the partial unique index
+  // publish_build_jobs_active_unique blocks every future publish until the
+  // row leaves the active set.
+  const stale = await prisma.publishBuildJob.findMany({
     where: {
       OR: [
         // QUEUED jobs stuck for over 1 hour (never started)
         { status: "QUEUED", createdAt: { lt: cutoff } },
-        // IN_PROGRESS jobs running for over 1 hour (started but not finished)
-        { status: "IN_PROGRESS", startedAt: { lt: cutoff, not: null } },
+        // BUILDING/DEPLOYING jobs running for over 1 hour (worker died)
+        {
+          status: { in: ["BUILDING", "DEPLOYING"] },
+          OR: [{ startedAt: { lt: cutoff } }, { startedAt: null, createdAt: { lt: cutoff } }],
+        },
       ],
     },
-    data: { status: "FAILED", error: "Timed out — cleaned by cron" },
+    select: {
+      id: true,
+      site: { select: { id: true, status: true, publishedUrl: true } },
+    },
   });
 
-  return Response.json({ ok: true, cleaned: count });
+  const error = "Timed out — cleaned by cron";
+  for (const job of stale) {
+    const ops: Prisma.PrismaPromise<unknown>[] = [
+      prisma.publishBuildJob.update({
+        where: { id: job.id },
+        // Clear `log` — terminal-state rule, it holds raw page HTML at rest.
+        data: { status: "FAILED", error, log: Prisma.DbNull },
+      }),
+    ];
+    // Only touch the site if this dead job left it stuck in PUBLISHING —
+    // same demotion rule as the worker's FAILED path.
+    if (job.site.status === "PUBLISHING") {
+      ops.push(
+        prisma.site.update({
+          where: { id: job.site.id },
+          data: {
+            status: job.site.publishedUrl ? "PUBLISHED" : "DRAFT",
+            lastPublishError: error,
+          },
+        }),
+      );
+    }
+    await prisma.$transaction(ops);
+  }
+
+  return Response.json({ ok: true, cleaned: stale.length });
 }

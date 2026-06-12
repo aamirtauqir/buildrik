@@ -75,6 +75,13 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
 // short-circuits if status !== "QUEUED" so double-start can't happen.
 const STALE_QUEUED_AFTER_MS = 5 * 60 * 1000;
 
+// A BUILDING/DEPLOYING row whose worker died mid-build (lambda crash/timeout)
+// never reaches a terminal state. The worker route's maxDuration is 300s, so
+// anything still "active" 3× past that is dead. Without this cutoff the
+// partial unique index publish_build_jobs_active_unique blocks every future
+// publish for the site forever.
+const STALE_BUILDING_AFTER_MS = 15 * 60 * 1000;
+
 // Retry the worker dispatch a few times. The route is long-running by design
 // (maxDuration=300 — entire build runs inside POST), so we can't await the
 // full response. Race the fetch against a short window: if the call hasn't
@@ -112,11 +119,14 @@ export async function startPublish(
   pages?: PublishPage[],
 ) {
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
+  const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
   const existing = await prisma.publishBuildJob.findFirst({
     where: {
       siteId,
       OR: [
-        { status: { in: ["BUILDING", "DEPLOYING"] } },
+        // startedAt gte cutoff = worker still plausibly alive. A BUILDING row
+        // with null startedAt can't match gte and is treated as stale.
+        { status: { in: ["BUILDING", "DEPLOYING"] }, startedAt: { gte: buildingCutoff } },
         { status: "QUEUED", createdAt: { gte: staleCutoff } },
       ],
     },
@@ -125,17 +135,22 @@ export async function startPublish(
     throw new Error("ALREADY_PUBLISHING");
   }
 
-  // Stranded-row cleanup: any QUEUED row older than the stale cutoff
-  // belongs to a publish whose worker dispatch was lost before the worker
-  // could claim it. The precheck above already considers it dead, but the
-  // partial unique index publish_build_jobs_active_unique would still
+  // Stranded-row cleanup: a QUEUED row older than the stale cutoff lost its
+  // worker dispatch; a BUILDING/DEPLOYING row past the building cutoff lost
+  // its worker mid-build. The precheck above already considers both dead, but
+  // the partial unique index publish_build_jobs_active_unique would still
   // collide with our new INSERT. Flip those rows to FAILED first so the
   // slot is free; the FAILED rows stay in the audit trail.
   await prisma.publishBuildJob.updateMany({
     where: {
       siteId,
-      status: "QUEUED",
-      createdAt: { lt: staleCutoff },
+      OR: [
+        { status: "QUEUED", createdAt: { lt: staleCutoff } },
+        {
+          status: { in: ["BUILDING", "DEPLOYING"] },
+          OR: [{ startedAt: { lt: buildingCutoff } }, { startedAt: null }],
+        },
+      ],
     },
     data: { status: "FAILED", error: "STRANDED_BY_WORKER_DISPATCH_LOSS", log: Prisma.DbNull },
   });

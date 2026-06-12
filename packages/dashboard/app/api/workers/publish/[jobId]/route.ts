@@ -141,30 +141,30 @@ export async function POST(
       return new Response("Cancelled", { status: 200 });
     }
     const message = err instanceof Error ? err.message : "Unknown error";
-    await prisma.publishBuildJob.update({
-      where: { id: jobId },
-      data: { status: "FAILED", error: message, steps: buildSteps(0, true), log: Prisma.DbNull },
-    });
     // Preserve PUBLISHED status on republish failure — the live deployment
     // from a prior successful publish is still serving. Discriminator is
     // publishedUrl presence (not site.status, which is "PUBLISHING" during
     // the in-flight attempt). Only demote to DRAFT when the very first
-    // publish failed (site never had a live URL).
+    // publish failed (site never had a live URL). Job→FAILED and the site
+    // demotion commit together — a crash between the two would otherwise
+    // leave the site stuck in PUBLISHING with no active job.
     const currentSite = await prisma.site.findUnique({
       where: { id: job.siteId },
       select: { publishedUrl: true },
     });
-    if (!currentSite?.publishedUrl) {
-      await prisma.site.update({
+    await prisma.$transaction([
+      prisma.publishBuildJob.update({
+        where: { id: jobId },
+        data: { status: "FAILED", error: message, steps: buildSteps(0, true), log: Prisma.DbNull },
+      }),
+      prisma.site.update({
         where: { id: job.siteId },
-        data: { status: "DRAFT", lastPublishError: message },
-      });
-    } else {
-      await prisma.site.update({
-        where: { id: job.siteId },
-        data: { status: "PUBLISHED", lastPublishError: message },
-      });
-    }
+        data: {
+          status: currentSite?.publishedUrl ? "PUBLISHED" : "DRAFT",
+          lastPublishError: message,
+        },
+      }),
+    ]);
 
     const failedSite = await prisma.site.findUnique({
       where: { id: job.siteId },

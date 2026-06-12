@@ -6,11 +6,12 @@ vi.mock("@/lib/prisma", () => ({
     session: { deleteMany: vi.fn() },
     invite: { updateMany: vi.fn() },
     verificationToken: { deleteMany: vi.fn() },
-    site: { deleteMany: vi.fn() },
+    site: { deleteMany: vi.fn(), update: vi.fn() },
     analyticsEvent: { deleteMany: vi.fn() },
     formSubmission: { deleteMany: vi.fn(), updateMany: vi.fn() },
     workspaceTransfer: { updateMany: vi.fn() },
-    publishBuildJob: { updateMany: vi.fn() },
+    publishBuildJob: { findMany: vi.fn(), update: vi.fn() },
+    $transaction: vi.fn(async (ops: unknown[]) => ops),
   },
 }));
 
@@ -30,11 +31,12 @@ const mockPrisma = prisma as typeof prisma & {
   session: { deleteMany: ReturnType<typeof vi.fn> };
   invite: { updateMany: ReturnType<typeof vi.fn> };
   verificationToken: { deleteMany: ReturnType<typeof vi.fn> };
-  site: { deleteMany: ReturnType<typeof vi.fn> };
+  site: { deleteMany: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
   analyticsEvent: { deleteMany: ReturnType<typeof vi.fn> };
   formSubmission: { deleteMany: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
   workspaceTransfer: { updateMany: ReturnType<typeof vi.fn> };
-  publishBuildJob: { updateMany: ReturnType<typeof vi.fn> };
+  publishBuildJob: { findMany: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
+  $transaction: ReturnType<typeof vi.fn>;
 };
 
 function makeReq(path: string, authHeader?: string): NextRequest {
@@ -307,27 +309,55 @@ describe("publish-job-cleanup", () => {
   });
 
   it("returns 200 with cleaned count on success", async () => {
-    mockPrisma.publishBuildJob.updateMany.mockResolvedValue({ count: 4 });
+    mockPrisma.publishBuildJob.findMany.mockResolvedValue([
+      { id: "j1", site: { id: "s1", status: "PUBLISHING", publishedUrl: null } },
+      { id: "j2", site: { id: "s2", status: "PUBLISHED", publishedUrl: "https://x" } },
+    ]);
     const res = await publishJobCleanup(makeReq("publish-job-cleanup", "Bearer test-secret"));
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual({ ok: true, cleaned: 4 });
+    expect(body).toEqual({ ok: true, cleaned: 2 });
   });
 
-  it("calls updateMany with OR conditions for QUEUED/IN_PROGRESS older than 1 hour and sets FAILED", async () => {
-    mockPrisma.publishBuildJob.updateMany.mockResolvedValue({ count: 0 });
+  it("reaps QUEUED and BUILDING/DEPLOYING (not IN_PROGRESS) older than 1 hour", async () => {
+    mockPrisma.publishBuildJob.findMany.mockResolvedValue([]);
     const before = Date.now();
     await publishJobCleanup(makeReq("publish-job-cleanup", "Bearer test-secret"));
-    const call = mockPrisma.publishBuildJob.updateMany.mock.calls[0][0];
+    const call = mockPrisma.publishBuildJob.findMany.mock.calls[0][0];
     expect(call.where.OR[0].status).toBe("QUEUED");
     expect(call.where.OR[0].createdAt.lt).toBeInstanceOf(Date);
     const oneHourMs = 60 * 60 * 1000;
     expect(before - call.where.OR[0].createdAt.lt.getTime()).toBeGreaterThanOrEqual(oneHourMs - 1000);
-    expect(call.where.OR[1].status).toBe("IN_PROGRESS");
-    expect(call.where.OR[1].startedAt.lt).toBeInstanceOf(Date);
-    expect(call.where.OR[1].startedAt.not).toBeNull();
-    expect(before - call.where.OR[1].startedAt.lt.getTime()).toBeGreaterThanOrEqual(oneHourMs - 1000);
-    expect(call.data.status).toBe("FAILED");
-    expect(call.data.error).toBe("Timed out — cleaned by cron");
+    // The worker writes BUILDING/DEPLOYING — IN_PROGRESS never existed.
+    expect(call.where.OR[1].status).toEqual({ in: ["BUILDING", "DEPLOYING"] });
+    expect(call.where.OR[1].OR[0].startedAt.lt).toBeInstanceOf(Date);
+    expect(before - call.where.OR[1].OR[0].startedAt.lt.getTime()).toBeGreaterThanOrEqual(oneHourMs - 1000);
+    expect(call.where.OR[1].OR[1].startedAt).toBeNull();
+  });
+
+  it("fails the job and demotes a PUBLISHING site in one transaction", async () => {
+    mockPrisma.publishBuildJob.findMany.mockResolvedValue([
+      { id: "j1", site: { id: "s1", status: "PUBLISHING", publishedUrl: null } },
+    ]);
+    await publishJobCleanup(makeReq("publish-job-cleanup", "Bearer test-secret"));
+    expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1);
+    const jobCall = mockPrisma.publishBuildJob.update.mock.calls[0][0];
+    expect(jobCall.where).toEqual({ id: "j1" });
+    expect(jobCall.data.status).toBe("FAILED");
+    expect(jobCall.data.error).toBe("Timed out — cleaned by cron");
+    const siteCall = mockPrisma.site.update.mock.calls[0][0];
+    expect(siteCall.where).toEqual({ id: "s1" });
+    expect(siteCall.data.status).toBe("DRAFT");
+  });
+
+  it("restores PUBLISHED when the stuck site has a live URL, leaves non-PUBLISHING sites alone", async () => {
+    mockPrisma.publishBuildJob.findMany.mockResolvedValue([
+      { id: "j1", site: { id: "s1", status: "PUBLISHING", publishedUrl: "https://live" } },
+      { id: "j2", site: { id: "s2", status: "DRAFT", publishedUrl: null } },
+    ]);
+    await publishJobCleanup(makeReq("publish-job-cleanup", "Bearer test-secret"));
+    expect(mockPrisma.site.update).toHaveBeenCalledTimes(1);
+    expect(mockPrisma.site.update.mock.calls[0][0].data.status).toBe("PUBLISHED");
+    expect(mockPrisma.publishBuildJob.update).toHaveBeenCalledTimes(2);
   });
 });
