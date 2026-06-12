@@ -62,7 +62,7 @@ export const formsRouter = router({
   exportSubmissions: protectedProcedure
     .input(z.object({
       siteId: z.string(),
-      formBlockId: z.string(),
+      formBlockId: z.string().optional(),
       format: z.enum(["csv", "json"]),
     }))
     .query(async ({ ctx, input }) => {

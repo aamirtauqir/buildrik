@@ -140,37 +140,31 @@ export function OverviewTab({
     }
   }, [updateMutation]);
 
-  const handleExportCsv = useCallback(() => {
-    const submissions = submissionsQuery.data?.data;
-    if (!submissions || submissions.length === 0) return;
+  const [exporting, setExporting] = useState(false);
 
-    const allKeys = Array.from(
-      new Set(submissions.flatMap((s) => Object.keys(s.data as Record<string, string>))),
-    );
-    const headers = ["ID", "Submitted", "Form", ...allKeys, "Read", "Spam", "Archived"];
-    const rows = submissions.map((s) => {
-      const data = s.data as Record<string, string>;
-      const formName = (s as FormSubmissionData).formBlock?.name ?? "";
-      return [
-        s.id,
-        new Date(s.createdAt).toISOString(),
-        formName,
-        ...allKeys.map((k) => data[k] ?? ""),
-        String(s.isRead),
-        String(s.isSpam),
-        String(s.isArchived),
-      ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",");
-    });
-
-    const csv = [headers.join(","), ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `submissions-${siteId}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [submissionsQuery.data, siteId]);
+  const handleExportCsv = useCallback(async () => {
+    // Pull the FULL dataset from the server (respecting the active form
+    // filter) instead of serialising only the current 20-row page — the
+    // old client-side CSV silently truncated to the loaded page.
+    setExporting(true);
+    try {
+      const csv = await utils.forms.exportSubmissions.fetch({
+        siteId,
+        formBlockId: filterFormBlockId,
+        format: "csv",
+      });
+      if (!csv) return;
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `submissions-${siteId}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }, [utils, siteId, filterFormBlockId]);
 
   if (isLoading) return <OverviewSkeleton />;
 
@@ -390,12 +384,12 @@ export function OverviewTab({
               </select>
               <button
                 onClick={handleExportCsv}
-                disabled={!submissionsQuery.data?.data.length}
+                disabled={exporting || !submissionsQuery.data?.data.length}
                 className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-gray-50 disabled:opacity-40"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
               >
                 <Download className="h-3.5 w-3.5" />
-                Export CSV
+                {exporting ? "Exporting…" : "Export CSV"}
               </button>
             </div>
           </div>

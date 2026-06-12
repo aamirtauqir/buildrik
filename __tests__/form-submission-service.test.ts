@@ -91,4 +91,34 @@ describe("Form Submission Service", () => {
       expect(result).toHaveLength(1);
     });
   });
+
+  describe("exportSubmissions", () => {
+    // Regression: W1.3 — overview "Export CSV" must export the full
+    // site-wide dataset (formBlockId omitted), not one form / one page.
+    // Found by /codex audit on 2026-06-12.
+    it("queries all forms on the site when formBlockId is omitted", async () => {
+      const { exportSubmissions } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([
+        { id: "s1sub", createdAt: new Date("2026-06-01"), data: { email: "a@b.com" }, formBlock: { name: "Contact" } },
+      ] as any);
+
+      const csv = await exportSubmissions("s1", undefined, "csv");
+
+      expect(prisma.formSubmission.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { siteId: "s1" } }),
+      );
+      expect(csv).toContain("form");
+      expect(csv).toContain("Contact");
+      expect(csv).toContain("a@b.com");
+    });
+
+    it("scopes to one form block when formBlockId is provided", async () => {
+      const { exportSubmissions } = await import("@/server/services/form-submission.service");
+      vi.mocked(prisma.formSubmission.findMany).mockResolvedValue([] as any);
+      await exportSubmissions("s1", "fb1", "csv");
+      expect(prisma.formSubmission.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { siteId: "s1", formBlockId: "fb1" } }),
+      );
+    });
+  });
 });

@@ -118,12 +118,15 @@ export async function listFormBlocks(siteId: string) {
 
 export async function exportSubmissions(
   siteId: string,
-  formBlockId: string,
+  // null/undefined exports every form on the site (the overview "Export CSV"
+  // button) rather than a single form block — the full dataset, not one page.
+  formBlockId: string | null | undefined,
   format: "csv" | "json",
 ): Promise<string> {
   const submissions = await prisma.formSubmission.findMany({
-    where: { siteId, formBlockId },
+    where: { siteId, ...(formBlockId ? { formBlockId } : {}) },
     orderBy: { createdAt: "desc" },
+    include: { formBlock: { select: { name: true } } },
   });
 
   if (format === "json") {
@@ -135,10 +138,15 @@ export async function exportSubmissions(
   const allKeys = Array.from(
     new Set(submissions.flatMap((s) => Object.keys(s.data as Record<string, string>))),
   );
-  const headers = ["id", "createdAt", ...allKeys].join(",");
+  const headers = ["id", "createdAt", "form", ...allKeys].join(",");
   const rows = submissions.map((s) => {
     const data = s.data as Record<string, string>;
-    const values = [s.id, s.createdAt.toISOString(), ...allKeys.map((k) => data[k] ?? "")];
+    const values = [
+      s.id,
+      s.createdAt.toISOString(),
+      s.formBlock?.name ?? "",
+      ...allKeys.map((k) => data[k] ?? ""),
+    ];
     return values.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",");
   });
   return [headers, ...rows].join("\n");
