@@ -37,6 +37,24 @@ Page → tRPC mutation → Router → Service → Prisma/External API
 - Services own all business logic + DB access.
 - This chain is not optional. No skipping layers.
 
+## Intent Layer
+
+**Before modifying code in a subdirectory, read its AGENTS.md (or CLAUDE.md) first** to understand local patterns, invariants, and known pitfalls.
+
+- **Server (tRPC + services)**: `server/AGENTS.md` — data-flow chain, domain errors, raw-SQL and external-client rules
+- **Dashboard (Next.js app)**: `packages/dashboard/AGENTS.md` — routing, tRPC-only data access, embedded-editor traps
+- **Editor package root**: `packages/editor/CLAUDE.md` — stack, path aliases, architecture rules (pre-existing node)
+- **Editor engine (headless)**: `packages/editor/src/engine/AGENTS.md` — Composer, history/undo invariants, sanitize boundary
+- **Editor chrome (React UI)**: `packages/editor/src/editor/AGENTS.md` — canvas mount model, DS gates, orphan-CSS traps
+- **Vibcoder (component library)**: `packages/editor/src/editor/shared/vibcoder/AGENTS.md` — primitive contracts, CSS bundle rules
+
+### Global Invariants
+
+- Validation schemas live only in `packages/shared/schemas/` (SSOT).
+- One accent color: cobalt `#2D6DFF`. Purple/violet/indigo banned (DESIGN.md).
+- Never instantiate external clients at module level — lazy-init.
+- `../../` relative imports banned; use path aliases.
+
 ## Code Quality Rules
 
 ### No pass-through wrappers
