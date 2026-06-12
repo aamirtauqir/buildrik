@@ -155,6 +155,14 @@ export async function listInvoices(
 }
 
 export async function upgradePlan(workspaceId: string, input: UpgradeInput) {
+  // Payments are not wired yet (Stripe pending). Without this gate any
+  // authenticated user can call billing.upgrade directly over tRPC and
+  // provision an ACTIVE paid plan backed by placeholder_* Stripe IDs —
+  // a free upgrade with no payment. Refuse until Stripe is configured.
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("PAYMENTS_NOT_CONFIGURED");
+  }
+
   const existing = await prisma.subscription.findUnique({
     where: { workspaceId },
   });

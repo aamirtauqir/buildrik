@@ -121,10 +121,23 @@ describe("Billing Service", () => {
   });
 
   describe("upgradePlan", () => {
+    it("refuses when Stripe is not configured (no free upgrades)", async () => {
+      const { upgradePlan } = await import(
+        "@/server/services/billing.service"
+      );
+      vi.stubEnv("STRIPE_SECRET_KEY", "");
+      await expect(
+        upgradePlan("ws1", { planId: "PRO", interval: "MONTHLY" }),
+      ).rejects.toThrow("PAYMENTS_NOT_CONFIGURED");
+      expect(prisma.subscription.create).not.toHaveBeenCalled();
+      vi.unstubAllEnvs();
+    });
+
     it("creates subscription for free user", async () => {
       const { upgradePlan } = await import(
         "@/server/services/billing.service"
       );
+      vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_stub");
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null);
       vi.mocked(prisma.subscription.create).mockResolvedValue({
         id: "sub1",
@@ -138,12 +151,14 @@ describe("Billing Service", () => {
         interval: "MONTHLY",
       });
       expect(result.plan).toBe("PRO");
+      vi.unstubAllEnvs();
     });
 
     it("throws if already subscribed", async () => {
       const { upgradePlan } = await import(
         "@/server/services/billing.service"
       );
+      vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_stub");
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
         plan: "PRO",
         status: "ACTIVE",
@@ -151,6 +166,7 @@ describe("Billing Service", () => {
       await expect(
         upgradePlan("ws1", { planId: "PRO", interval: "MONTHLY" }),
       ).rejects.toThrow("ALREADY_SUBSCRIBED");
+      vi.unstubAllEnvs();
     });
   });
 

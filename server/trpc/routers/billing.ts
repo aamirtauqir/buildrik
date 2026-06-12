@@ -31,6 +31,7 @@ export const billingRouter = router({
     try { return await upgradePlan(wsId, input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "ALREADY_SUBSCRIBED") throw new TRPCError({ code: "CONFLICT", message: "Already subscribed." });
+      if (e instanceof Error && e.message === "PAYMENTS_NOT_CONFIGURED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
       throw e;
     }
   }),
