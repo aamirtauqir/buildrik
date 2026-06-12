@@ -21,6 +21,7 @@ Headless document engine: element tree, history, selection, storage, export, mig
 
 - Engine emits HTML strings that chrome mounts directly (see `../editor/AGENTS.md`) — element features need engine-side serialization support, not React props.
 - TemplateManager is soft-deprecated: new template features land on the `importHTMLToActivePage` path or in `editor/sidebar/tabs/templates/`.
+- **`collaboration/` is DEMO-ONLY, production-blocked** (codex review 2026-06-12). The hand-rolled OT in `OTEngine.ts` does not converge under concurrent same-path edits (last-write-wins), remote apply clobbers uncommitted local edits via the 500ms coalesce window, remote ops corrupt the undo stack, SSE reconnect replays non-idempotently, and the ops route trusts client-supplied `clientId`/op JSON (spoofable + peer-crash). Happy path works (2-client distinct-element add-sync). DO NOT ship multiplayer or build on this until a dedicated OT/CRDT arc (evaluate Yjs) fixes the 6 P1s. Full list in memory `project_collab_codex_review_20260612`.
 
 ## Related Context
 
