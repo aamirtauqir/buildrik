@@ -27,28 +27,33 @@ describe("Sites Components", () => {
   });
 
   describe("BulkActionBar", () => {
-    it("exports BULK_ACTIONS without the fake publish/unpublish flips", async () => {
+    it("exports BULK_ACTIONS without the fake publish/unpublish flips or dead Export", async () => {
       const mod = await import("@/components/sites/bulk-action-bar");
-      expect(mod.BULK_ACTIONS).toHaveLength(4);
+      expect(mod.BULK_ACTIONS).toHaveLength(3);
       const labels = mod.BULK_ACTIONS.map((a: { label: string }) => a.label);
-      // Removed — they only flipped status without real deploy/teardown.
+      // Removed — publish/unpublish only flipped status; Export had no backend.
       expect(labels).not.toContain("Publish All");
       expect(labels).not.toContain("Unpublish All");
+      expect(labels).not.toContain("Export All");
       expect(labels).toContain("Delete All");
       expect(labels).toContain("Archive All");
+      expect(labels).toContain("Move to Folder");
     });
   });
 
   describe("ContextMenu", () => {
-    it("exports CONTEXT_MENU_ITEMS with 11 items", async () => {
+    it("exports CONTEXT_MENU_ITEMS without dead Move-to-Folder / Export items", async () => {
       const mod = await import("@/components/sites/context-menu");
-      expect(mod.CONTEXT_MENU_ITEMS).toHaveLength(11);
+      expect(mod.CONTEXT_MENU_ITEMS).toHaveLength(9);
       const labels = mod.CONTEXT_MENU_ITEMS.map((i: { label: string }) => i.label);
       expect(labels).toContain("Edit");
       expect(labels).toContain("Manage");
       expect(labels).toContain("Rename");
       expect(labels).toContain("Duplicate");
       expect(labels).toContain("Delete");
+      // Removed: no handler / no export backend.
+      expect(labels).not.toContain("Move to Folder");
+      expect(labels).not.toContain("Export Site");
     });
   });
 
