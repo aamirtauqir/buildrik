@@ -399,6 +399,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onExportForDeploy={handleExportForDeploy}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
+        publishJob={publishJob}
+        onVercelPublish={handleVercelPublish}
       />
       {/* Tour overlay removed — onboarding handled by orchestrator */}
 

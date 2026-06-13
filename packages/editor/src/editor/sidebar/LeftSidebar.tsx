@@ -14,7 +14,7 @@ import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId, TabZone } from "../rail/tabsConfig";
 import { getTabWidth, getTabConfig, getTabsByZone } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
-import type { PublishResult } from "../../shared/hooks/usePublish";
+import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
@@ -77,8 +77,8 @@ export interface LeftSidebarProps {
   canvasHoveredId?: string | null;
   onReplayTour?: () => void;
   projectId?: string | null;
-  onPublish?: (projectId: string) => Promise<PublishResult>;
-  onUnpublish?: (projectId: string) => Promise<void>;
+  publishJob?: UsePublishJobResult;
+  onVercelPublish?: () => Promise<void>;
   onExportForDeploy?: () => Promise<{
     files: Array<{ path: string; content: string }>;
     projectName?: string;
@@ -180,8 +180,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   canvasHoveredId,
   onReplayTour,
   projectId,
-  onPublish,
-  onUnpublish,
+  publishJob,
+  onVercelPublish,
   onExportForDeploy,
   onOpenLibrary,
   onOpenImageEditor,
@@ -418,8 +418,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onCreateComponent={handleCreateComponent}
                   onReplayTour={onReplayTour}
                   projectId={projectId}
-                  onPublish={onPublish}
-                  onUnpublish={onUnpublish}
+                  publishJob={publishJob}
+                  onVercelPublish={onVercelPublish}
                   onSettingsDirtyChange={setSettingsDirty}
                   onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
                   onOpenLibrary={onOpenLibrary}

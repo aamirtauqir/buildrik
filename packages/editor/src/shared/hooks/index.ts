@@ -15,8 +15,8 @@ export { useSaveIndicator } from "./useSaveIndicator";
 export type { SaveStatus, SaveIndicatorState } from "./useSaveIndicator";
 export { useElementFlash } from "./useElementFlash";
 
-// Publish hook
-export { usePublish } from "./usePublish";
+// (usePublish removed — the sidebar PublishTab now shares the canonical
+//  usePublishJob state machine with the Topbar; see editor/shell/hooks.)
 
 // Form handler hook (composer-backed form registration + submission)
 export { useFormHandler } from "./useFormHandler";
@@ -29,9 +29,3 @@ export { useVersionHistory } from "./useVersionHistory";
 export type { UseVersionHistoryReturn } from "./useVersionHistory";
 export { useAutoMilestone } from "./useAutoMilestone";
 export type { MilestoneSuggestion, UseAutoMilestoneReturn } from "./useAutoMilestone";
-export type {
-  UsePublishReturn,
-  UsePublishOptions,
-  PublishResult,
-  PublishState,
-} from "./usePublish";

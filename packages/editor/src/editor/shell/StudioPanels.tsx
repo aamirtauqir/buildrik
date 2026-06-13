@@ -11,6 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import type { Composer } from "../../engine";
+import type { UsePublishJobResult } from "./hooks/usePublishJob";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode } from "../rail/tabsConfig";
@@ -90,6 +91,10 @@ export interface StudioPanelsProps {
   panelPinned?: boolean;
   onPanelPinnedToggle?: () => void;
   projectId?: string | null;
+  /** Canonical publish state machine (shared with the Topbar) + its fire
+   *  handler, forwarded to the sidebar PublishTab so both drive ONE flow. */
+  publishJob?: UsePublishJobResult;
+  onVercelPublish?: () => Promise<void>;
 }
 
 // ============================================================================
@@ -196,6 +201,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   panelPinned = true,
   onPanelPinnedToggle,
   projectId,
+  publishJob,
+  onVercelPublish,
 }) => {
   const { addToast } = useToast();
   const { handleBlockClick } = useBlockInsertion(composer);
@@ -390,6 +397,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             onBlockClick={handleBlockClick}
             canvasHoveredId={canvasHoveredId}
             projectId={projectId}
+            publishJob={publishJob}
+            onVercelPublish={onVercelPublish}
             onOpenLibrary={handleOpenLibrary}
             onOpenImageEditor={onOpenImageEditor}
             onOpenIconPicker={onOpenIconPicker}

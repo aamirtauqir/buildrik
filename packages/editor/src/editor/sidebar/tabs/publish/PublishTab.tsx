@@ -10,11 +10,10 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
-import { usePublish, type PublishResult } from "../../../../shared/hooks/usePublish";
+import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { useToast } from "@/editor/shared/vibcoder";
 import { TabFrame } from "@/shared/extensions/TabFrame";
-import { Stack } from "@/editor/shared/vibcoder";
+import { Stack, useToast } from "@/editor/shared/vibcoder";
 
 // ============================================
 // Types
@@ -33,10 +32,18 @@ export interface PublishTabProps {
   onHelpClick?: () => void;
   /** Close panel callback */
   onClose?: () => void;
-  /** Async function that publishes the project — provided by host app */
-  onPublish?: (projectId: string) => Promise<PublishResult>;
-  /** Async function that unpublishes the project — provided by host app */
-  onUnpublish?: (projectId: string) => Promise<void>;
+  /**
+   * The canonical publish state machine (shared with the Topbar Publish
+   * dropdown). The sidebar is a read-only subscriber to its state.
+   */
+  publishJob?: UsePublishJobResult;
+  /**
+   * Fire the canonical publish flow (same handler the Topbar uses:
+   * export pages → publishSite → poll). Fire-and-poll; state surfaces via
+   * publishJob. Toast is owned by the canonical path (useExportHandlers), so
+   * the sidebar does not toast.
+   */
+  onVercelPublish?: () => Promise<void>;
   /** Initial published URL from loaded project */
   publishedUrl?: string | null;
   /** Initial published state from loaded project */
@@ -194,73 +201,27 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   onPinToggle,
   onHelpClick,
   onClose,
-  onPublish,
-  onUnpublish,
+  publishJob,
+  onVercelPublish,
   publishedUrl: initialUrl,
   isProjectPublished,
 }) => {
-  const { addToast } = useToast();
-  const {
-    publish,
-    unpublish,
-    isPublishing,
-    publishedUrl,
-    lastPublishedAt,
-    error,
-    isPublished,
-    clearError,
-  } = usePublish(projectId, {
-    onPublish,
-    onUnpublish,
-    initialState: {
-      publishedUrl: initialUrl,
-      isPublished: isProjectPublished,
-    },
-  });
-
-  // Track latest publishedUrl for toast action (avoids stale closure)
-  const publishedUrlRef = React.useRef(publishedUrl);
-  publishedUrlRef.current = publishedUrl;
+  // Read-only view of the ONE canonical publish state machine (the same
+  // instance the Topbar drives). No second state machine, no second toast.
+  const isPublishing = publishJob?.uiState === "publishing";
+  const isPublished = publishJob?.uiState === "published" || !!isProjectPublished;
+  const publishedUrl = publishJob?.publishedUrl ?? initialUrl ?? null;
+  const error = publishJob?.error ?? null;
+  // The canonical handler resolves the site from the URL itself (and toasts if
+  // it can't), so "publishing is wired" == the handler being present. This
+  // matches how the Topbar gates its Publish dropdown on the feature flag.
+  const canPublish = !!onVercelPublish;
 
   const handlePublish = async () => {
-    clearError();
-    const success = await publish();
-    if (success) {
-      addToast?.({
-        description: "Site published successfully",
-        tone: "success",
-        duration: 4000,
-        action: {
-          label: "Open Site",
-          onClick: () => {
-            if (publishedUrlRef.current) {
-              window.open(publishedUrlRef.current, "_blank");
-            }
-          },
-        },
-      });
-    } else {
-      addToast?.({
-        description: "Publish failed. Check your connection and try again.",
-        tone: "error",
-        duration: 5000,
-        action: { label: "Retry", onClick: () => void handlePublish() },
-      });
-    }
-  };
-
-  const handleUnpublish = async () => {
-    clearError();
-    const success = await unpublish();
-    if (success) {
-      addToast?.({ description: "Site unpublished", tone: "info", duration: 3000 });
-    } else {
-      addToast?.({
-        description: "Unpublish failed. Please try again.",
-        tone: "error",
-        duration: 5000,
-      });
-    }
+    if (!onVercelPublish) return;
+    // Fire-and-poll: progress + completion surface via publishJob; the
+    // canonical useExportHandlers effect owns the success/failure toast.
+    await onVercelPublish();
   };
 
   const checks = React.useMemo(() => {
@@ -340,18 +301,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <h3 style={sectionTitleStyles}>Status</h3>
             <StatusBadge isPublished={isPublished} />
           </div>
-
-          {lastPublishedAt && (
-            <p style={metaTextStyles}>
-              Last published:{" "}
-              {lastPublishedAt.toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+          {isPublishing && publishJob && publishJob.progress > 0 && (
+            <p style={metaTextStyles}>Publishing… {publishJob.progress}%</p>
           )}
         </section>
 
@@ -389,7 +340,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 
         {/* Actions */}
         <section style={sectionStyles}>
-          {(!projectId || !onPublish) ? (
+          {!canPublish ? (
             <div style={{
               padding: "12px",
               background: "rgba(245, 158, 11, 0.08)",
@@ -401,7 +352,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             }}>
               Publishing not configured. Contact your administrator to link this project.
             </div>
-          ) : !isPublished ? (
+          ) : (
             <>
               <Button
                 variant="primary"
@@ -409,41 +360,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
                 disabled={isPublishing}
                 style={{ width: "100%" }}
               >
-                {isPublishing ? "Publishing..." : "Publish Site"}
+                {isPublishing ? (isPublished ? "Updating..." : "Publishing...") : isPublished ? "Update Site" : "Publish Site"}
               </Button>
               {isPublishing && (
                 <p style={disabledReasonStyles}>
-                  Publishing in progress — please wait.
-                </p>
-              )}
-            </>
-          ) : (
-            <>
-              <div style={actionRowStyles}>
-                <Button
-                  variant="primary"
-                  onClick={handlePublish}
-                  disabled={isPublishing || !projectId || !onPublish}
-                  style={{ flex: 1 }}
-                >
-                  {isPublishing ? "Updating..." : "Update Site"}
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={handleUnpublish}
-                  disabled={isPublishing || !projectId || !onUnpublish}
-                >
-                  Unpublish
-                </Button>
-              </div>
-              {isPublishing && (
-                <p style={disabledReasonStyles}>
-                  Update in progress — please wait.
-                </p>
-              )}
-              {!onUnpublish && !isPublishing && (
-                <p style={disabledReasonStyles}>
-                  Unpublish not available — contact your administrator.
+                  {isPublished ? "Update" : "Publishing"} in progress — please wait.
                 </p>
               )}
             </>
@@ -467,7 +388,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {error && (
           <div style={errorStyles} role="alert">
             <span>{error}</span>
-            <Button onClick={clearError} style={errorDismissStyles} aria-label="Dismiss error">
+            <Button onClick={() => publishJob?.reset?.()} style={errorDismissStyles} aria-label="Dismiss error">
               <svg
                 width="12"
                 height="12"
@@ -607,12 +528,6 @@ const copyButtonStyles: React.CSSProperties = {
   color: "var(--bd-fg-secondary)",
   cursor: "pointer",
   flexShrink: 0,
-};
-
-const actionRowStyles: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  alignItems: "center",
 };
 
 const disabledReasonStyles: React.CSSProperties = {

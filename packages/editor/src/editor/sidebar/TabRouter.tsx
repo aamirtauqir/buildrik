@@ -24,7 +24,7 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
-import type { PublishResult } from "../../shared/hooks/usePublish";
+import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 
 // Lazy-loaded panel tab components (code splitting)
@@ -67,8 +67,8 @@ export interface TabRouterProps {
   onCreateComponent: () => void;
   onReplayTour?: () => void;
   projectId?: string | null;
-  onPublish?: (projectId: string) => Promise<PublishResult>;
-  onUnpublish?: (projectId: string) => Promise<void>;
+  publishJob?: UsePublishJobResult;
+  onVercelPublish?: () => Promise<void>;
   onSettingsDirtyChange?: (dirty: boolean) => void;
   onTemplatesSwitchTab?: (tab: string) => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
@@ -97,8 +97,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onSwitchToDesign,
   onCreateComponent,
   projectId,
-  onPublish,
-  onUnpublish,
+  publishJob,
+  onVercelPublish,
   onSettingsDirtyChange,
   onReplayTour,
   onOpenLibrary,
@@ -170,13 +170,15 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "publish":
+      // onVercelPublish gated on the same flag as the Topbar Publish dropdown
+      // so the sidebar action only lights up when publishing is enabled.
       return (
         <PublishTab
           composer={composer}
           {...commonTabProps}
           projectId={projectId}
-          onPublish={onPublish}
-          onUnpublish={onUnpublish}
+          publishJob={publishJob}
+          onVercelPublish={isFeatureEnabled("publish") ? onVercelPublish : undefined}
         />
       );
 
