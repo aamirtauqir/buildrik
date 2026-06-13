@@ -8,12 +8,13 @@
  * the gating call sites in the same PR. Do not let flags rot.
  */
 
-import { FEATURE_PUBLISH, FEATURE_COMPONENTS_V2, FEATURE_DS_AI } from "./runtimeEnv";
+import { FEATURE_PUBLISH, FEATURE_COMPONENTS_V2, FEATURE_DS_AI, FEATURE_COLLAB } from "./runtimeEnv";
 
 export const FEATURES = {
   publish: FEATURE_PUBLISH,
   componentsV2: FEATURE_COMPONENTS_V2,
   dsAi: FEATURE_DS_AI,
+  collab: FEATURE_COLLAB,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURES;

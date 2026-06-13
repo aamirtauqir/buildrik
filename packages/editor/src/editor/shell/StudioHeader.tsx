@@ -14,6 +14,7 @@ import { PresenceIndicators } from "../collaboration";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Users } from "lucide-react";
 import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
+import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { Topbar } from "./Topbar";
 import type { ToastInput } from "@/editor/shared/vibcoder";
@@ -292,18 +293,22 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       collaborationSlot={
         hasTransport ? (
           <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
-        ) : (
+        ) : isFeatureEnabled("collab") ? (
+          // Collaboration is DEMO-ONLY (last-write-wins, 6 known P1s). The
+          // CTA is gated behind VITE_FEATURE_COLLAB so it isn't exposed as
+          // production-ready until a real OT/CRDT arc lands. An already-live
+          // session (hasTransport) still shows presence.
           <Button
             variant="ghost"
             size="sm"
             onClick={handleStartCollab}
             aria-label="Start collaboration session"
-            title="Start a real-time collaboration session"
+            title="Start a real-time collaboration session (beta)"
           >
             <Users size={14} />
             <span style={{ marginLeft: 4 }}>Collaborate</span>
           </Button>
-        )
+        ) : null
       }
     />
   );

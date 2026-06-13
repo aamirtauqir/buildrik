@@ -66,7 +66,13 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   }, []);
 
   const handleUpgrade = () => {
-    window.open("/dashboard/settings/subscription", "_blank");
+    // Absolute dashboard billing URL — editor runs on its own origin and
+    // "/dashboard/settings/subscription" was a wrong-origin 404. Billing is
+    // at /dashboard/billing.
+    const dashboardUrl =
+      (import.meta as { env?: { VITE_DASHBOARD_URL?: string } }).env?.VITE_DASHBOARD_URL ||
+      "http://localhost:3000";
+    window.open(`${dashboardUrl}/dashboard/billing`, "_blank");
     handleClose();
   };
 

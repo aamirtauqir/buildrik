@@ -10,7 +10,7 @@ import {
   type TokenRef,
   type MediaAssetRef,
 } from "./runPromptOnce";
-import { AI_EDITABLE_TOKEN_TYPES } from "@/engine/designSystem/tokenValueGuard";
+import { gatherTokens, gatherMediaAssets } from "./aiScopeContext";
 import { trackAgentRun } from "@/services/ai/adoptionTracker";
 
 /**
@@ -118,28 +118,10 @@ export function useAgentRunner(
       .slice(0, 200);
   }, [composer]);
 
-  // Token registry for set-token recall: only the AI-editable types (the model
-  // can't safely set shadow/select from a free string), capped so a large token
-  // set can't blow the prompt context.
-  const gatherTokens = React.useCallback((): TokenRef[] => {
-    if (!composer) return [];
-    return (composer.getProjectSettings().designTokens ?? [])
-      .filter((t) => t.type !== undefined && AI_EDITABLE_TOKEN_TYPES.has(t.type))
-      .map((t) => ({ id: t.id, name: t.name, value: t.value, type: t.type as string }))
-      .slice(0, 120);
-  }, [composer]);
-
-  // Media assets for set-image recall: only persisted http(s) urls (skip data:
-  // URLs — too large for the prompt, and local-only). The model references these
-  // real library assets instead of guessing image URLs.
-  const gatherMediaAssets = React.useCallback((): MediaAssetRef[] => {
-    if (!composer) return [];
-    return composer.media
-      .getAssets()
-      .filter((a) => a.src.startsWith("http"))
-      .map((a) => ({ id: a.id, url: a.src, name: a.originalName || a.name }))
-      .slice(0, 100);
-  }, [composer]);
+  // Token registry + media library for set-token / set-image recall — shared
+  // with AITab chat path via aiScopeContext (SSOT).
+  const gatherTokensCb = React.useCallback((): TokenRef[] => gatherTokens(composer), [composer]);
+  const gatherMediaAssetsCb = React.useCallback((): MediaAssetRef[] => gatherMediaAssets(composer), [composer]);
 
   const setStep = React.useCallback((i: number, patch: Partial<RunStep>) => {
     setSteps((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
@@ -169,8 +151,8 @@ export function useAgentRunner(
           ? {
               kind: "page" as const,
               elements: gatherElements(),
-              tokens: gatherTokens(),
-              assets: gatherMediaAssets(),
+              tokens: gatherTokensCb(),
+              assets: gatherMediaAssetsCb(),
             }
           : step.plan.scope;
       try {
@@ -205,7 +187,7 @@ export function useAgentRunner(
         advance(i + 1);
       }
     },
-    [composer, model, gatherElements, gatherTokens, gatherMediaAssets, setStep, advance, onProposal],
+    [composer, model, gatherElements, gatherTokensCb, gatherMediaAssetsCb, setStep, advance, onProposal],
   );
   generateStepRef.current = generateStep;
 
@@ -224,7 +206,7 @@ export function useAgentRunner(
         const elements = gatherElements();
         const { plan } = await runPromptOnce({
           prompt,
-          scope: { kind: "page", elements, tokens: gatherTokens(), assets: gatherMediaAssets() },
+          scope: { kind: "page", elements, tokens: gatherTokensCb(), assets: gatherMediaAssetsCb() },
           model,
           intent: "plan",
         });

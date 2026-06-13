@@ -468,6 +468,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             if (composer) composer.setZoom(z);
           }}
           selectedElement={selectedElement}
+          // Drive the connection pill from the real save state — it was
+          // hardcoded "Connected · main" regardless of save failures.
+          syncConnected={state.saveState.status !== "error"}
         />
       </footer>
 

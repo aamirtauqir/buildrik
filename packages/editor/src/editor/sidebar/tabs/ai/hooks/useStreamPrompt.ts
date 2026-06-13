@@ -15,9 +15,13 @@ interface PageElementRef {
   type: string;
   text?: string;
 }
+interface ScopeTokenRef { id: string; name: string; value: string; type: string }
+interface ScopeAssetRef { id: string; url: string; name: string }
 type ServerScope =
   | { kind: "element"; id: string }
-  | { kind: "page"; elements?: PageElementRef[] };
+  // tokens/assets let the model recall real token ids + library URLs for
+  // set-token / set-image edits in chat page mode (was dropped → no-op).
+  | { kind: "page"; elements?: PageElementRef[]; tokens?: ScopeTokenRef[]; assets?: ScopeAssetRef[] };
 
 interface ServerEdit {
   target: string;

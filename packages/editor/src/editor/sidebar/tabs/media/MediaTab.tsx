@@ -287,6 +287,7 @@ function MediaTabWithComposer({
         <UploadZone
           storage={state.storage}
           onUpload={state.upload}
+          onRetryUpload={state.retryUpload}
           uploadQueue={state.uploadQueue}
           disabled={state.storage.used >= state.storage.total}
         />

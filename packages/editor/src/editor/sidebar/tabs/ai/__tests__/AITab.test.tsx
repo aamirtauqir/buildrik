@@ -128,6 +128,38 @@ describe("AITab — scope + composer wiring", () => {
     expect(lastSubscribe.input?.intent).toBe("style-command");
   });
 
+  it("page scope ships the token registry + media assets for set-token/set-image recall (D3)", () => {
+    const handlers: Record<string, (() => void)[]> = {};
+    const composer = {
+      selection: { getAllSelected: () => [] },
+      elements: {
+        getAllElements: () => [
+          { getId: () => "h1", getType: () => "heading", getContent: () => "Title" },
+        ],
+      },
+      getProjectSettings: () => ({
+        designTokens: [{ id: "tok1", name: "Brand", value: "#2D6DFF", type: "color" }],
+      }),
+      media: {
+        getAssets: () => [
+          { id: "a1", src: "https://cdn/x.png", name: "x.png", originalName: "x.png", size: 1 },
+        ],
+      },
+      on: (e: string, cb: () => void) => { (handlers[e] ??= []).push(cb); },
+      off: () => {},
+    } as never;
+    const { container } = renderWithToast(
+      <AITab composer={composer} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />,
+    );
+    const ta = container.querySelector("textarea")!;
+    fireEvent.change(ta, { target: { value: "use the brand color" } });
+    fireEvent.keyDown(ta, { key: "Enter" });
+
+    const scope = lastSubscribe.input?.scope as { tokens?: unknown[]; assets?: unknown[] };
+    expect(scope.tokens).toHaveLength(1);
+    expect(scope.assets).toHaveLength(1);
+  });
+
   it("surfaces a stream error in the assistant message instead of a silent empty reply", () => {
     // Regression: onError set hook state but AITab never rendered it, so a
     // quota-exhausted (TOO_MANY_REQUESTS) or provider failure showed as a blank

@@ -341,6 +341,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     failedUploads: upload.failedUploads,
     dismissFailedUploads: upload.dismissFailedUploads,
     upload: upload.upload,
+    retryUpload: upload.retryUpload,
     requestDelete: selection.requestDelete,
     requestBulkDelete: selection.requestBulkDelete,
     executeDelete: selection.executeDelete,

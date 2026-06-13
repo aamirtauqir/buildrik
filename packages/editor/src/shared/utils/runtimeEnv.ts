@@ -57,3 +57,9 @@ export const FEATURE_COMPONENTS_V2: boolean =
 
 export const FEATURE_DS_AI: boolean =
   (vite.VITE_FEATURE_DS_AI ?? proc.NEXT_PUBLIC_FEATURE_DS_AI) === "true";
+
+// Real-time collaboration is DEMO-ONLY (last-write-wins, 6 known
+// non-convergence P1s). Gate the Collaborate CTA behind this flag so it is
+// not exposed as production-ready until a real OT/CRDT arc lands.
+export const FEATURE_COLLAB: boolean =
+  (vite.VITE_FEATURE_COLLAB ?? proc.NEXT_PUBLIC_FEATURE_COLLAB) === "true";

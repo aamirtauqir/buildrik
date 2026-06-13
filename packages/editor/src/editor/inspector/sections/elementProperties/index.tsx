@@ -200,11 +200,16 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
     const el = composer.elements.getElement(selectedElement.id);
     if (!el) return;
 
-    // Special handling for columns count
+    // Special handling for columns count. Must return — without it, control
+    // fell through to the generic attribute handler below and ran a SECOND
+    // transaction writing data-columns as a raw attr (double mutation + two
+    // undo entries per change).
     if (id === "data-columns" && selectedElement.type === "columns") {
       runTxn(composer, "columns-count-change", () => {
         handleColumnsCountChange(el, composer, value);
       });
+      setAttrs((prev) => ({ ...prev, [id]: value }));
+      return;
     }
 
     // Special handling for gap

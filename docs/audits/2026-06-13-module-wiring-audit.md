@@ -20,12 +20,12 @@
 - [def] C2 Interaction attributes + runtime dropped on export — forwarding the data-buildrick-interactions attr alone does nothing without the InteractionRuntime JS on the published page; needs a runtime-bundling step (dedicated arc). Interactions still run in-editor. Deferred (animations — far more common — fixed in C1).
 
 ## Batch D — Editor inspector/AI/misc (P1/P2)
-- [x] D1 Inspector Visibility toggles write unconsumed --hide-* prop → show/hide no-ops (canvas + export consume it now)
+- [def] D1 Inspector Visibility toggles write `--hide-*` custom props that NOTHING consumes (zero refs in canvas/engine/export/themes) → show/hide is a complete no-op in-editor and on export. Real fix needs a consuming responsive-CSS layer (data-model → per-breakpoint `display:none` media queries in both canvas preview + ExportEngine) — a focused arc, deferred over a fragile partial.
 - [x] D2 elementProperties data-columns fall-through double-writes (missing return)
 - [x] D3 AI chat-mode scope omits tokens/assets → set-token silently no-ops in chat
-- [x] D4 AI Stop doesn't cancel in-flight stream (quota leak) — unsubscribe on stop
+- [x] D4 AI Stop — already unsubscribes the stream client-side (verified); server-side quota refund-on-abort is a separate concern, not a client wiring bug
 - [x] D5 LockedScreen/UpgradeModal upgrade URL 404 (/settings/subscription → /dashboard/billing)
-- [x] D6 Media Retry button unwired + StockSource picker pills unwired (wired retry; source pills deferred-stub documented)
+- [x] D6 Media upload Retry now wired — failed Files retained + retryUpload re-uploads; MediaTab passes onRetryUpload. (StockSource source pills were already wired to onSetSource.)
 - [x] D7 Collaborate button + footer "Connected" hardcoded — gate Collaborate behind flag, drive footer from real saveState
 - [def] D8 DS dark-value input never commits — documented D4 deferral upstream; left as-is (matches engine roadmap)
 - [def] D9 Layers Hide/Rename display-only (not persisted to publish) — documented as panel-local; wiring needs engine display layer (defer)

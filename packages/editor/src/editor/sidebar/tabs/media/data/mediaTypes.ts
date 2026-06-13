@@ -128,6 +128,7 @@ export interface UploadStateResult {
   storageTotal: number;
   panelDragOver: boolean;
   upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
+  retryUpload(fileName: string): void;
   dismissFailedUploads(): void;
   handlePanelDragEnter(e: React.DragEvent): void;
   handlePanelDragLeave(e: React.DragEvent): void;
@@ -208,6 +209,7 @@ export interface MediaStateResult {
   shiftSelect(key: string): void;
   enterSelectModeWith(key: string): void;
   upload(files: File[], opts?: { folderId?: string | null }): Promise<boolean>;
+  retryUpload(fileName: string): void;
   failedUploads: FailedUpload[];
   dismissFailedUploads(): void;
   requestDelete(key: string): void;

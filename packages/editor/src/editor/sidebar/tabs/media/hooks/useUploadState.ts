@@ -28,6 +28,9 @@ export function useUploadState(
   const [localStorageUsed, setLocalStorageUsed] = useState(0);
   const [panelDragOver, setPanelDragOver] = useState(false);
   const dragCounterRef = useRef(0);
+  // Retain the actual File for each failed upload so the queue's Retry button
+  // can re-upload it (the failedUploads list only holds {fileName, reason}).
+  const failedFilesRef = useRef<Map<string, File>>(new Map());
 
   // Recalculate localStorageUsed whenever assets change.
   // Used as fallback when server quota unavailable.
@@ -135,6 +138,13 @@ export function useUploadState(
           return composer.media.uploadFile(file, uploadOpts);
         }),
       );
+      // Retain rejected Files so they can be retried; clear retained Files
+      // that succeeded this round.
+      results.forEach((r, i) => {
+        const f = files[i];
+        if (r.status === "rejected") failedFilesRef.current.set(f.name, f);
+        else failedFilesRef.current.delete(f.name);
+      });
       const failed = results.filter((r) => r.status === "rejected").length;
       if (failed > 0) {
         showToast(`${failed} upload${failed === 1 ? "" : "s"} failed`, "error");
@@ -142,6 +152,17 @@ export function useUploadState(
       return failed === 0;
     },
     [composer, storageUsed, storageTotal, isUnlimited, showToast]
+  );
+
+  // Re-upload a previously-failed file by name (queue Retry button).
+  const retryUpload = useCallback(
+    (fileName: string) => {
+      const file = failedFilesRef.current.get(fileName);
+      if (!file) return;
+      setFailedUploads((prev) => prev.filter((f) => f.fileName !== fileName));
+      void upload([file]);
+    },
+    [upload]
   );
 
   const handlePanelDragEnter = useCallback((e: React.DragEvent) => {
@@ -183,6 +204,7 @@ export function useUploadState(
     storageTotal,
     panelDragOver,
     upload,
+    retryUpload,
     dismissFailedUploads,
     handlePanelDragEnter,
     handlePanelDragLeave,

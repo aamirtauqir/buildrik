@@ -7,6 +7,7 @@ import { AgentPlan } from "./AgentPlan";
 import { Composer as PromptComposer } from "./Composer";
 import { useAIScope } from "./hooks/useAIScope";
 import { useStreamPrompt, toServerScope } from "./hooks/useStreamPrompt";
+import { gatherTokens, gatherMediaAssets } from "./hooks/aiScopeContext";
 import { useAgentRunner } from "./hooks/useAgentRunner";
 import { useAiActionGate } from "./hooks/useAiActionGate";
 import { applyAiEdit } from "./applySetStyle";
@@ -71,7 +72,15 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
         .filter((e) => e.id)
         .slice(0, 200);
       if (elements.length > 0) {
-        finalScope = { kind: "page", elements };
+        // Attach the token registry + media library so set-token / set-image
+        // recall works in chat page mode (agent mode already did this; chat
+        // dropped both, so the model guessed non-existent tokens/URLs).
+        finalScope = {
+          kind: "page",
+          elements,
+          tokens: gatherTokens(composer),
+          assets: gatherMediaAssets(composer),
+        };
         intent = "style-command";
       }
     }
