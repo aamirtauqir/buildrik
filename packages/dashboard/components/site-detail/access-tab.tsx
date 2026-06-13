@@ -92,7 +92,10 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
   const [showQr, setShowQr] = useState<string | null>(null);
 
   const handleCreate = useCallback(() => {
-    onCreateLink({ name: linkName, password: linkPw || undefined, expiresInDays: linkExpiry ? Number(linkExpiry) : undefined });
+    // "No expiry" sets linkExpiry to the string "0" (truthy!), which sent
+    // expiresInDays:0 and failed the schema's .min(1). Treat 0/"" as no expiry.
+    const expiresInDays = linkExpiry && linkExpiry !== "0" ? Number(linkExpiry) : undefined;
+    onCreateLink({ name: linkName, password: linkPw || undefined, expiresInDays });
     setShowCreate(false);
     setLinkName("");
     setLinkPw("");

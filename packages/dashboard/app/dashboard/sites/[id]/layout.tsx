@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { SiteHeader } from "@/components/site-detail/site-header";
 import { TabNav } from "@/components/site-detail/tab-nav";
@@ -13,6 +13,7 @@ export default function SiteDetailLayout({
   children: React.ReactNode;
 }) {
   const params = useParams();
+  const router = useRouter();
   const siteId = params.id as string;
   const { addToast } = useToast();
 
@@ -62,6 +63,7 @@ export default function SiteDetailLayout({
       />
       <SiteHeader
         site={site}
+        onPublish={() => router.push(`/dashboard/sites/${siteId}/publish`)}
         onUnpublish={() => unpublishMutation.mutate({ siteId })}
       />
       <div className="mt-4">

@@ -11,31 +11,34 @@ interface ContextualArticle {
   readTime: number;
 }
 
-const CONTEXT_MAP: Record<string, string[]> = {
-  "/dashboard": ["getting-started", "dashboard-guide", "quick-actions"],
-  "/dashboard/sites": ["managing-sites", "publishing", "templates"],
-  "/dashboard/team": ["team-permissions", "inviting-members", "roles"],
-  "/dashboard/billing": ["billing-plans", "payment-methods", "invoices"],
-  "/dashboard/settings": ["account-settings", "security", "workspace"],
+// Slugs/titles/readTimes MUST match the seeded HelpArticle rows
+// (prisma/seed.ts). The previous values were all fictional, so every
+// contextual-help link 404'd.
+const ARTICLE_META: Record<string, ContextualArticle> = {
+  "getting-started-overview": { title: "Getting started with Buildrik", slug: "getting-started-overview", readTime: 4 },
+  "creating-your-first-site": { title: "Creating your first site", slug: "creating-your-first-site", readTime: 3 },
+  "managing-sites-dashboard": { title: "Managing sites from the dashboard", slug: "managing-sites-dashboard", readTime: 3 },
+  "publishing-and-unpublishing": { title: "Publishing and unpublishing", slug: "publishing-and-unpublishing", readTime: 4 },
+  "inviting-team-members": { title: "Inviting team members", slug: "inviting-team-members", readTime: 3 },
+  "roles-and-permissions": { title: "Roles and permissions", slug: "roles-and-permissions", readTime: 3 },
+  "choosing-a-plan": { title: "Choosing a plan", slug: "choosing-a-plan", readTime: 3 },
+  "managing-billing": { title: "Managing your subscription", slug: "managing-billing", readTime: 2 },
+  "connecting-a-domain": { title: "Connecting a custom domain", slug: "connecting-a-domain", readTime: 5 },
+  "editor-basics": { title: "Editor basics", slug: "editor-basics", readTime: 4 },
 };
 
-const ARTICLE_META: Record<string, ContextualArticle> = {
-  "getting-started": { title: "Getting started with Buildrik", slug: "getting-started", readTime: 3 },
-  "dashboard-guide": { title: "Understanding your dashboard", slug: "dashboard-guide", readTime: 2 },
-  "quick-actions": { title: "Quick actions reference", slug: "quick-actions", readTime: 2 },
-  "managing-sites": { title: "Managing your sites", slug: "managing-sites", readTime: 3 },
-  "publishing": { title: "Publishing a site", slug: "publishing", readTime: 2 },
-  "templates": { title: "Using site templates", slug: "templates", readTime: 3 },
-  "team-permissions": { title: "Understanding permissions", slug: "team-permissions", readTime: 4 },
-  "inviting-members": { title: "Inviting team members", slug: "inviting-members", readTime: 3 },
-  "roles": { title: "Managing roles", slug: "roles", readTime: 2 },
-  "billing-plans": { title: "Plans and pricing overview", slug: "billing-plans", readTime: 3 },
-  "payment-methods": { title: "Managing payment methods", slug: "payment-methods", readTime: 2 },
-  "invoices": { title: "Managing invoices", slug: "invoices", readTime: 2 },
-  "account-settings": { title: "Account settings guide", slug: "account-settings", readTime: 3 },
-  "security": { title: "Security & two-factor auth", slug: "security", readTime: 4 },
-  "workspace": { title: "Workspace settings", slug: "workspace", readTime: 2 },
+const CONTEXT_MAP: Record<string, string[]> = {
+  "/dashboard": ["getting-started-overview", "creating-your-first-site"],
+  "/dashboard/sites": ["managing-sites-dashboard", "publishing-and-unpublishing", "editor-basics"],
+  "/dashboard/team": ["inviting-team-members", "roles-and-permissions"],
+  "/dashboard/billing": ["choosing-a-plan", "managing-billing"],
+  "/dashboard/settings": ["connecting-a-domain", "roles-and-permissions"],
 };
+
+const DEFAULT_ARTICLES: ContextualArticle[] = [
+  ARTICLE_META["getting-started-overview"],
+  ARTICLE_META["creating-your-first-site"],
+];
 
 function getArticlesForRoute(pathname: string): ContextualArticle[] {
   const slugs = CONTEXT_MAP[pathname];
@@ -45,12 +48,6 @@ function getArticlesForRoute(pathname: string): ContextualArticle[] {
     .filter((a): a is ContextualArticle => !!a)
     .slice(0, 3);
 }
-
-const DEFAULT_ARTICLES: ContextualArticle[] = [
-  { title: "Getting started with Buildrik", slug: "getting-started", readTime: 3 },
-  { title: "How to contact support", slug: "contact-support", readTime: 2 },
-  { title: "Keyboard shortcuts reference", slug: "keyboard-shortcuts", readTime: 1 },
-];
 
 export function ContextualHelp() {
   const [open, setOpen] = useState(false);

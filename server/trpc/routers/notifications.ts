@@ -15,9 +15,9 @@ export const notificationsRouter = router({
     return getUnreadCount(ctx.session.user.id);
   }),
   markRead: protectedProcedure
-    .input(z.object({ notificationId: z.string() }))
+    .input(z.object({ notificationId: z.string(), read: z.boolean().optional().default(true) }))
     .mutation(async ({ ctx, input }) => {
-      return markAsRead(input.notificationId, ctx.session.user.id);
+      return markAsRead(input.notificationId, ctx.session.user.id, input.read);
     }),
   markAllRead: protectedProcedure.mutation(async ({ ctx }) => {
     return markAllAsRead(ctx.session.user.id);

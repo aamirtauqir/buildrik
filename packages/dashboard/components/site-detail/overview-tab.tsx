@@ -308,13 +308,9 @@ export function OverviewTab({
         <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Form Blocks</h3>
-            <Link
-              href={`/dashboard/sites/${siteId}/submissions`}
-              className="text-xs font-medium"
-              style={{ color: "var(--color-primary)" }}
-            >
-              View All Submissions
-            </Link>
+            {/* "View All Submissions" / "View details" links removed — there is
+                no dashboard submissions route (they 404'd). The per-form
+                submission counts below remain the live, accurate signal. */}
           </div>
           <div className="mt-3 space-y-2">
             {formBlocks.map((fb) => (
@@ -344,14 +340,7 @@ export function OverviewTab({
                       <p className="py-2 text-xs" style={{ color: "var(--color-text-muted)" }}>No submissions yet.</p>
                     ) : (
                       <p className="py-2 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                        {fb._count.submissions} total submission{fb._count.submissions === 1 ? "" : "s"}.{" "}
-                        <Link
-                          href={`/dashboard/sites/${siteId}/submissions?form=${fb.id}`}
-                          className="font-medium"
-                          style={{ color: "var(--color-primary)" }}
-                        >
-                          View details
-                        </Link>
+                        {fb._count.submissions} total submission{fb._count.submissions === 1 ? "" : "s"}.
                       </p>
                     )}
                   </div>

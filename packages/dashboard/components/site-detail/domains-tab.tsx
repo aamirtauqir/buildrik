@@ -2,6 +2,13 @@
 import { useState } from "react";
 import { Globe, Shield, Trash2, Star, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 
+interface DnsRecordEntry {
+  id?: string;
+  type: string;
+  host: string;
+  value: string;
+}
+
 interface DomainEntry {
   id: string;
   domain: string;
@@ -9,6 +16,10 @@ interface DomainEntry {
   sslStatus: string;
   isPrimary: boolean;
   createdAt: Date;
+  // The real Vercel verification records (CNAME/A host+value) the user must
+  // add at their registrar. listDomains includes these; the tab never showed
+  // them, so verification was impossible to follow from the UI.
+  dnsRecords?: DnsRecordEntry[];
 }
 
 interface DomainsTabProps {
@@ -80,10 +91,9 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: Domai
                   </button>
                   {expandedSsl === d.id && (
                     <div className="mt-2 rounded-lg border p-3 text-xs space-y-1" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
-                      <p><span className="font-medium">Status:</span> {d.sslStatus === "ACTIVE" ? "Valid" : "Provisioning"}</p>
-                      <p><span className="font-medium">Issuer:</span> Let&apos;s Encrypt</p>
-                      <p><span className="font-medium">Expiry:</span> {d.sslStatus === "ACTIVE" ? "Auto-renewed" : "Pending verification"}</p>
-                      <p><span className="font-medium">Auto-renew:</span> Enabled</p>
+                      {/* Only fields the backend actually supplies — the
+                          issuer/expiry/auto-renew lines were fabricated. */}
+                      <p><span className="font-medium">Status:</span> {d.sslStatus === "ACTIVE" ? "Active — certificate issued" : "Provisioning — issued automatically once the domain verifies"}</p>
                     </div>
                   )}
                 </td>
@@ -106,7 +116,39 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: Domai
                   <button onClick={() => onRemove(d.id)}><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
                 </td>
               </tr>
-            ))}</tbody>
+            )).flatMap((row, i) => {
+              const d = domains[i];
+              if (d.status === "VERIFIED" || !d.dnsRecords || d.dnsRecords.length === 0) return [row];
+              // Show the actual DNS records the user must add to verify.
+              return [
+                row,
+                <tr key={`${d.id}-dns`} style={{ backgroundColor: "var(--color-bg-page)" }}>
+                  <td colSpan={5} className="px-5 py-3">
+                    <p className="mb-2 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
+                      Add these DNS records at your registrar, then verification runs automatically:
+                    </p>
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr style={{ color: "var(--color-text-muted)" }}>
+                          <th className="py-1 text-left font-medium">Type</th>
+                          <th className="py-1 text-left font-medium">Host / Name</th>
+                          <th className="py-1 text-left font-medium">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {d.dnsRecords!.map((r, ri) => (
+                          <tr key={r.id ?? ri} style={{ color: "var(--color-text-primary)" }}>
+                            <td className="py-1 pr-3 font-mono">{r.type}</td>
+                            <td className="py-1 pr-3 font-mono">{r.host}</td>
+                            <td className="py-1 font-mono break-all">{r.value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>,
+              ];
+            })}</tbody>
           </table>
         </div>
       )}

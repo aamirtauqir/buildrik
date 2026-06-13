@@ -124,7 +124,7 @@ export function NotificationPage() {
                 <NotificationItem
                   key={group.id}
                   notification={lead}
-                  onToggleRead={(id) => markRead.mutate({ notificationId: id })}
+                  onToggleRead={(id, read) => markRead.mutate({ notificationId: id, read })}
                   onDelete={(id) => deleteNotif.mutate({ notificationId: id })}
                   onMuteType={(type) => muteType.mutate({ type })}
                 />
@@ -135,7 +135,7 @@ export function NotificationPage() {
               <div key={group.id}>
                 <NotificationItem
                   notification={lead}
-                  onToggleRead={(id) => markRead.mutate({ notificationId: id })}
+                  onToggleRead={(id, read) => markRead.mutate({ notificationId: id, read })}
                   onDelete={(id) => deleteNotif.mutate({ notificationId: id })}
                   onMuteType={(type) => muteType.mutate({ type })}
                 />
@@ -158,7 +158,7 @@ export function NotificationPage() {
                     <NotificationItem
                       key={n.id}
                       notification={toNotificationData(n)}
-                      onToggleRead={(id) => markRead.mutate({ notificationId: id })}
+                      onToggleRead={(id, read) => markRead.mutate({ notificationId: id, read })}
                   onDelete={(id) => deleteNotif.mutate({ notificationId: id })}
                   onMuteType={(type) => muteType.mutate({ type })}
                     />

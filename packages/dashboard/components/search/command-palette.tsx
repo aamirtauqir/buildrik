@@ -273,7 +273,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             id: `help-${a.slug}`,
             label: a.title,
             description: a.excerpt ?? undefined,
-            href: `/help/${a.slug}`,
+            href: `/dashboard/help/${a.slug}`,
             scope: "help",
           })),
         });

@@ -95,7 +95,7 @@ export function NotificationDropdown() {
                 <NotificationItem
                   key={n.id}
                   notification={n}
-                  onToggleRead={(id) => markRead.mutate({ notificationId: id })}
+                  onToggleRead={(id, read) => markRead.mutate({ notificationId: id, read })}
                 />
               ))
             )}

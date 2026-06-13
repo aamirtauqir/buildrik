@@ -12,8 +12,11 @@ export default function SiteAccessPage() {
   const { addToast } = useToast();
 
   const linksQuery = trpc.siteDetail.sharing.list.useQuery({ siteId });
-  const overviewQuery = trpc.siteDetail.overview.useQuery({ siteId });
-  const plan = (overviewQuery.data as { plan?: string } | undefined)?.plan ?? "FREE";
+  // settings.get returns the workspace `plan`; overview does NOT — reading it
+  // off overview silently collapsed every workspace to FREE (share-link
+  // passwords disabled, expiry capped) regardless of the real plan.
+  const settingsQuery = trpc.siteDetail.settings.get.useQuery({ siteId });
+  const plan = (settingsQuery.data as { plan?: string } | undefined)?.plan ?? "FREE";
   const planLimits = PLAN_LIMITS[plan as PlanName] ?? PLAN_LIMITS.FREE;
 
   const createMutation = trpc.siteDetail.sharing.create.useMutation({
