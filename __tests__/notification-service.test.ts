@@ -7,7 +7,9 @@ vi.mock("@/lib/prisma", () => ({
       count: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
+      deleteMany: vi.fn(),
     },
+    notificationPref: { upsert: vi.fn() },
   },
 }));
 
@@ -115,6 +117,36 @@ describe("Notification Service", () => {
         where: { userId: "user1", read: false },
         data: { read: true },
       });
+    });
+  });
+
+  describe("deleteNotification", () => {
+    it("scopes the delete to the owner (IDOR guard)", async () => {
+      const { deleteNotification } = await import("@/server/services/notification.service");
+      vi.mocked(prisma.notification.deleteMany).mockResolvedValue({ count: 1 });
+      await deleteNotification("n1", "user1");
+      expect(prisma.notification.deleteMany).toHaveBeenCalledWith({
+        where: { id: "n1", userId: "user1" },
+      });
+    });
+  });
+
+  describe("muteNotificationType", () => {
+    it("upserts the category pref to inApp:false", async () => {
+      const { muteNotificationType } = await import("@/server/services/notification.service");
+      vi.mocked(prisma.notificationPref.upsert).mockResolvedValue({} as never);
+      await muteNotificationType("user1", "FORM_SUBMISSION_RECEIVED");
+      expect(prisma.notificationPref.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId_category: { userId: "user1", category: "Forms" } },
+          update: { inApp: false },
+        }),
+      );
+    });
+
+    it("rejects an unknown notification type", async () => {
+      const { muteNotificationType } = await import("@/server/services/notification.service");
+      await expect(muteNotificationType("user1", "NONSENSE_TYPE")).rejects.toThrow("UNKNOWN_NOTIFICATION_TYPE");
     });
   });
 

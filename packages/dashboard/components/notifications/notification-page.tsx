@@ -35,6 +35,15 @@ export function NotificationPage() {
       utils.notifications.unreadCount.invalidate();
     },
   });
+  const deleteNotif = trpc.notifications.delete.useMutation({
+    onSuccess: () => {
+      utils.notifications.listGrouped.invalidate();
+      utils.notifications.unreadCount.invalidate();
+    },
+  });
+  const muteType = trpc.notifications.muteType.useMutation({
+    onSuccess: () => utils.notifications.listGrouped.invalidate(),
+  });
 
   function toggleGroup(groupId: string) {
     setExpandedGroups((prev) => {
@@ -116,6 +125,8 @@ export function NotificationPage() {
                   key={group.id}
                   notification={lead}
                   onToggleRead={(id) => markRead.mutate({ notificationId: id })}
+                  onDelete={(id) => deleteNotif.mutate({ notificationId: id })}
+                  onMuteType={(type) => muteType.mutate({ type })}
                 />
               );
             }
@@ -125,6 +136,8 @@ export function NotificationPage() {
                 <NotificationItem
                   notification={lead}
                   onToggleRead={(id) => markRead.mutate({ notificationId: id })}
+                  onDelete={(id) => deleteNotif.mutate({ notificationId: id })}
+                  onMuteType={(type) => muteType.mutate({ type })}
                 />
                 <button
                   onClick={() => toggleGroup(group.id)}
@@ -146,6 +159,8 @@ export function NotificationPage() {
                       key={n.id}
                       notification={toNotificationData(n)}
                       onToggleRead={(id) => markRead.mutate({ notificationId: id })}
+                  onDelete={(id) => deleteNotif.mutate({ notificationId: id })}
+                  onMuteType={(type) => muteType.mutate({ type })}
                     />
                   ))}
               </div>

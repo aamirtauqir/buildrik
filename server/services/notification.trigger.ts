@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { NOTIFICATION_TYPE_CATEGORY } from "@/lib/constants/enums";
 
 interface CreateNotificationInput {
   userId: string;
@@ -18,6 +19,17 @@ const HIGH_PRIORITY_TYPES = [
 ];
 
 export async function createNotification(input: CreateNotificationInput) {
+  // Honor the user's in-app preference for this type's category. No pref row
+  // = default on (matches the UI's default). Unmapped types always insert.
+  const category = NOTIFICATION_TYPE_CATEGORY[input.type];
+  if (category) {
+    const pref = await prisma.notificationPref.findUnique({
+      where: { userId_category: { userId: input.userId, category } },
+      select: { inApp: true },
+    });
+    if (pref && !pref.inApp) return;
+  }
+
   const priority = input.priority ?? (HIGH_PRIORITY_TYPES.includes(input.type) ? "high" : "medium");
   try {
     return await prisma.notification.create({

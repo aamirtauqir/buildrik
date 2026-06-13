@@ -96,6 +96,34 @@ export const NotificationType = {
   SECURITY_2FA_CHANGED: "SECURITY_2FA_CHANGED",
 } as const;
 
+// Maps each notification type to the preference category surfaced in
+// Settings → Notifications (notification-prefs.tsx NOTIFICATION_CATEGORIES).
+// SSOT for both the in-app pref gate (notification.trigger) and "Mute this
+// type" (notification.service).
+export const NOTIFICATION_TYPE_CATEGORY: Record<string, string> = {
+  SITE_PUBLISHED: "Site Updates",
+  SITE_PUBLISH_FAILED: "Site Updates",
+  SITE_TRANSFERRED: "Site Updates",
+  SITE_ARCHIVED: "Site Updates",
+  SITE_DUPLICATED: "Site Updates",
+  MEMBER_JOINED: "Team",
+  MEMBER_REMOVED: "Team",
+  MEMBER_ROLE_CHANGED: "Team",
+  PAYMENT_FAILED: "Billing",
+  PLAN_LIMIT_WARNING: "Billing",
+  SUBSCRIPTION_CHANGED: "Billing",
+  DOMAIN_VERIFIED: "Domains",
+  DOMAIN_ERROR: "Domains",
+  DOMAIN_SSL_EXPIRING: "Domains",
+  SHARE_LINK_VIEWED: "Feedback",
+  FORM_SUBMISSION_RECEIVED: "Forms",
+  AI_GENERATION_COMPLETE: "AI",
+  AI_GENERATION_FAILED: "AI",
+  SECURITY_LOGIN_NEW_DEVICE: "Security",
+  SECURITY_PASSWORD_CHANGED: "Security",
+  SECURITY_2FA_CHANGED: "Security",
+};
+
 export const OnboardingRole = {
   FREELANCER: "FREELANCER",
   SMALL_TEAM: "SMALL_TEAM",

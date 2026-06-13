@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { NOTIFICATION_TYPE_CATEGORY } from "@/lib/constants/enums";
 import { MENTION_NOTIFICATION_TYPES, type ListNotificationsInput } from "@buildrik/shared/schemas/notifications";
 
 export async function listNotifications(userId: string, input: ListNotificationsInput) {
@@ -39,6 +40,26 @@ export async function markAllAsRead(userId: string) {
   return prisma.notification.updateMany({
     where: { userId, read: false },
     data: { read: true },
+  });
+}
+
+export async function deleteNotification(notificationId: string, userId: string) {
+  // Scoped delete — only the owner can remove their notification (IDOR guard).
+  return prisma.notification.deleteMany({
+    where: { id: notificationId, userId },
+  });
+}
+
+// "Mute this type" maps the notification type to its preference category and
+// turns off the in-app toggle there, so future notifications of that type are
+// suppressed by createNotification (notification.trigger).
+export async function muteNotificationType(userId: string, type: string) {
+  const category = NOTIFICATION_TYPE_CATEGORY[type];
+  if (!category) throw new Error("UNKNOWN_NOTIFICATION_TYPE");
+  return prisma.notificationPref.upsert({
+    where: { userId_category: { userId, category } },
+    create: { userId, category, inApp: false },
+    update: { inApp: false },
   });
 }
 

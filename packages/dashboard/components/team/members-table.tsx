@@ -158,11 +158,26 @@ interface MembersTableProps {
   onChangeRole?: (memberId: string, role: string) => void;
 }
 
-export function MembersTable({ members, currentUserId, onAction }: MembersTableProps) {
+const ASSIGNABLE_ROLES: Role[] = ["ADMIN", "EDITOR", "VIEWER"];
+
+export function MembersTable({ members, currentUserId, onAction, onChangeRole }: MembersTableProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [sortKey, setSortKey] = useState<SortKey>("fullName");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [detailMember, setDetailMember] = useState<Member | null>(null);
+  // "Change Role" used to dispatch onAction("changeRole"), which the page's
+  // switch ignored — a silent dead end. Intercept it here and open a role
+  // picker that calls the (already-wired) onChangeRole mutation.
+  const [roleEditMember, setRoleEditMember] = useState<Member | null>(null);
+
+  function handleMemberAction(action: MemberAction, memberId: string) {
+    if (action === "changeRole") {
+      const m = members.find((x) => x.id === memberId);
+      if (m) setRoleEditMember(m);
+      return;
+    }
+    onAction(action, memberId);
+  }
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -337,7 +352,7 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
                       memberId={member.id}
                       isOwner={isOwner}
                       isCurrentUser={isCurrentUser}
-                      onAction={onAction}
+                      onAction={handleMemberAction}
                     />
                   </td>
                 </tr>
@@ -349,6 +364,48 @@ export function MembersTable({ members, currentUserId, onAction }: MembersTableP
 
       {detailMember && (
         <MemberDetailCard member={detailMember} onClose={() => setDetailMember(null)} />
+      )}
+
+      {roleEditMember && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
+          <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border-default)] bg-white p-6 shadow-2xl">
+            <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              Change role
+            </h3>
+            <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              {roleEditMember.fullName} — currently {roleEditMember.role}
+            </p>
+            <div className="mt-4 space-y-2">
+              {ASSIGNABLE_ROLES.map((role) => {
+                const isCurrent = roleEditMember.role === role;
+                return (
+                  <button
+                    key={role}
+                    disabled={isCurrent}
+                    onClick={() => {
+                      onChangeRole?.(roleEditMember.id, role);
+                      setRoleEditMember(null);
+                    }}
+                    className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
+                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                  >
+                    <span>{role}</span>
+                    {isCurrent && (
+                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>current</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setRoleEditMember(null)}
+              className="mt-4 w-full rounded-lg border border-[var(--color-border-default)] py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
     </>
   );

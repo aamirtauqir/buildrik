@@ -4,13 +4,18 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     notification: { create: vi.fn() },
     workspace: { findUnique: vi.fn() },
+    notificationPref: { findUnique: vi.fn() },
   },
 }));
 
 import { prisma } from "@/lib/prisma";
 
 describe("Notification Triggers", () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Default: no per-category pref row → notifications fire (UI default on).
+    vi.mocked(prisma.notificationPref.findUnique).mockResolvedValue(null as never);
+  });
 
   it("exports createNotification function", async () => {
     const mod = await import("@/server/services/notification.trigger");
@@ -63,6 +68,19 @@ describe("Notification Triggers", () => {
     expect(prisma.notification.create).toHaveBeenCalledWith({
       data: expect.objectContaining({ priority: "high" }),
     });
+  });
+
+  it("suppresses the insert when the category's in-app pref is off", async () => {
+    const { createNotification } = await import("@/server/services/notification.trigger");
+    // FORM_SUBMISSION_RECEIVED maps to category "Forms"; user disabled in-app.
+    vi.mocked(prisma.notificationPref.findUnique).mockResolvedValue({ inApp: false } as never);
+
+    await createNotification({ userId: "u1", type: "FORM_SUBMISSION_RECEIVED", message: "New submission" });
+
+    expect(prisma.notificationPref.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { userId_category: { userId: "u1", category: "Forms" } } }),
+    );
+    expect(prisma.notification.create).not.toHaveBeenCalled();
   });
 
   it("notifyWorkspaceOwner looks up owner and creates notification", async () => {
