@@ -478,6 +478,21 @@ export class ExportEngine {
       headParts.push('  <link rel="stylesheet" href="styles.css">');
     }
 
+    // D1: responsive visibility. Elements carry `--hide-<bp>:true` inline (via
+    // stylesToString, no space after the colon). On the live site the viewport
+    // IS the breakpoint, so real @media rules apply. Emitted only when a hide
+    // flag is present. Widths mirror shared/constants/breakpoints.ts
+    // (mobile ≤767, tablet 768–1023, desktop ≥1024).
+    if (/--hide-(mobile|tablet|desktop):true/.test(bodyContent)) {
+      headParts.push(
+        `  <style>\n` +
+          `@media (max-width:767px){[style*="--hide-mobile:true"]{display:none!important}}\n` +
+          `@media (min-width:768px) and (max-width:1023px){[style*="--hide-tablet:true"]{display:none!important}}\n` +
+          `@media (min-width:1024px){[style*="--hide-desktop:true"]{display:none!important}}\n` +
+          `  </style>`
+      );
+    }
+
     // User's global custom CSS (Settings → Advanced), emitted after the
     // stylesheet link so it can override generated styles.
     const globalCss = this.composer.getProjectSettings?.()?.customCode?.globalCss;
@@ -592,8 +607,26 @@ ${bodyContent}${interactionScript}
       }
     }
 
+    // H1: published elements must carry their styling hooks. renderPageElement
+    // historically emitted only raw data.attributes, dropping the element's
+    // class, base inline styles, AND data-buildrick-id — so deployed sites
+    // rendered structurally but unstyled (base styles gone; the styles.css
+    // breakpoint rules keyed on [data-buildrick-id] matched nothing). Emit all
+    // three. `data-buildrick-id` is also what the StyleEngine breakpoint rules
+    // (generateResponsiveCSS) target, so they now apply on the live site.
+    attrParts.push(`data-buildrick-id="${escapeHTML(element.id)}"`);
+    if (element.classes && element.classes.length > 0) {
+      attrParts.push(`class="${escapeHTML(element.classes.join(" "))}"`);
+    }
+    if (element.styles && Object.keys(element.styles).length > 0) {
+      attrParts.push(`style="${escapeHTML(stylesToString(element.styles))}"`);
+    }
+
     if (element.attributes) {
       for (const [key, value] of Object.entries(element.attributes)) {
+        // class/style/data-buildrick-id emitted above from their canonical
+        // fields — don't double-emit if a raw attribute mirrors them.
+        if (key === "class" || key === "style" || key === "data-buildrick-id") continue;
         attrParts.push(`${key}="${escapeHTML(value)}"`);
       }
     }

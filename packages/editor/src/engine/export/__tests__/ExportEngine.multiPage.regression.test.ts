@@ -69,7 +69,33 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
 
     const indexHtml = result.files.find((f) => f.name === "index.html");
     expect(indexHtml, "index.html missing from export").toBeDefined();
-    expect(indexHtml!.content).toContain("<h2>Hello</h2>");
+    expect(indexHtml!.content).toContain(">Hello</h2>");
+  });
+
+  // H1: published elements must carry their styling hooks (data-buildrick-id +
+  // class + inline base styles). renderPageElement used to emit raw attributes
+  // only, so deployed sites rendered structurally but unstyled.
+  it("emits data-buildrick-id, class, and inline base styles on published elements (H1)", async () => {
+    const styledPage = {
+      id: "p1", name: "Home", slug: "home", isHome: true,
+      root: {
+        id: "root", type: "container", tagName: "div", styles: { backgroundColor: "rgb(1,2,3)" }, classes: ["bd-root"], children: [
+          { id: "box", type: "container", tagName: "div", styles: { color: "rgb(9,9,9)", padding: "16px" }, classes: ["card"], children: [] },
+        ],
+      },
+    };
+    const composer = makeMockComposer({ exportPagesReturn: [styledPage] });
+    const html = (await new ExportEngine(composer).exportAllPages({ format: "html", minify: false }))
+      .files.find((f) => f.name === "index.html")!.content;
+
+    expect(html).toContain('data-buildrick-id="root"');
+    expect(html).toContain('data-buildrick-id="box"');
+    expect(html).toContain('class="bd-root"');
+    expect(html).toContain('class="card"');
+    // base inline styles carried (stylesToString: no space after colon)
+    expect(html).toContain("background-color:rgb(1,2,3)");
+    expect(html).toContain("color:rgb(9,9,9)");
+    expect(html).toContain("padding:16px");
   });
 
   it("falls back to getAllPages when exportPages is not exposed on older composer builds", async () => {
@@ -80,7 +106,7 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
 
     expect((composer as any).elements.getAllPages).toHaveBeenCalled();
     const indexHtml = result.files.find((f) => f.name === "index.html");
-    expect(indexHtml!.content).toContain("<h2>Hello</h2>");
+    expect(indexHtml!.content).toContain(">Hello</h2>");
   });
 
   it("emits empty <div></div> body when both methods return a stale empty root", async () => {
@@ -93,7 +119,8 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
     const result = await engine.exportAllPages({ format: "html", minify: false });
 
     const indexHtml = result.files.find((f) => f.name === "index.html");
-    expect(indexHtml!.content).toMatch(/<body>\s*<div><\/div>\s*<\/body>/);
+    // H1: even the empty root now carries its data-buildrick-id styling hook.
+    expect(indexHtml!.content).toMatch(/<body>\s*<div data-buildrick-id="root"><\/div>\s*<\/body>/);
   });
 
   // Sprint 5 prep: Iter 19's fix only verified single-page (Home) end-to-end.
@@ -153,11 +180,11 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
     expect(pricing, "missing pricing.html").toBeDefined();
 
     // Each page's user content lands in its own body
-    expect(index!.content).toContain("<h2>Hello</h2>");
-    expect(about!.content).toContain("<h1>About Us</h1>");
-    expect(pricing!.content).toContain("<h2>Plans</h2>");
-    expect(pricing!.content).toContain("<button>Buy</button>");
-    expect(pricing!.content).toContain("<section>");
+    expect(index!.content).toContain(">Hello</h2>");
+    expect(about!.content).toContain(">About Us</h1>");
+    expect(pricing!.content).toContain(">Plans</h2>");
+    expect(pricing!.content).toContain(">Buy</button>");
+    expect(pricing!.content).toContain("<section ");
 
     // None of the pages should leak into another (no cross-contamination)
     expect(index!.content).not.toContain("About Us");
@@ -225,5 +252,35 @@ describe("ExportEngine.exportAllPages — interaction export (C2)", () => {
     const index = result.files.find((f) => f.name === "index.html")!;
     expect(index.content).not.toContain("data-buildrick-interactions");
     expect(index.content).not.toContain("<script>");
+  });
+});
+
+// D1 (published half): per-breakpoint hide must reach the live site. The flag
+// rides on the element's inline style (--hide-<bp>:true via H1's emission), and
+// the export adds @media display:none rules keyed on that inline substring.
+describe("ExportEngine.exportAllPages — responsive visibility (D1)", () => {
+  it("emits @media display:none rules when an element is hidden on a breakpoint", async () => {
+    const page = {
+      id: "p1", name: "Home", slug: "home", isHome: true,
+      root: { id: "root", type: "container", tagName: "div", children: [
+        { id: "promo", type: "container", tagName: "div", styles: { "--hide-mobile": "true" }, classes: [], children: [] },
+      ] },
+    };
+    const html = (await new ExportEngine(makeMockComposer({ exportPagesReturn: [page] }))
+      .exportAllPages({ format: "html", minify: false }))
+      .files.find((f) => f.name === "index.html")!.content;
+
+    // flag reached the element inline (no space — stylesToString)
+    expect(html).toContain("--hide-mobile:true");
+    // and a media rule consumes it
+    expect(html).toContain("@media (max-width:767px)");
+    expect(html).toContain('[style*="--hide-mobile:true"]{display:none!important}');
+  });
+
+  it("omits the visibility CSS when no element is hidden", async () => {
+    const html = (await new ExportEngine(makeMockComposer({ exportPagesReturn: [freshPage] }))
+      .exportAllPages({ format: "html", minify: false }))
+      .files.find((f) => f.name === "index.html")!.content;
+    expect(html).not.toContain("--hide-");
   });
 });
