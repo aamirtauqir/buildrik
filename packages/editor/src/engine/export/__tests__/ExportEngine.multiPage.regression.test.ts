@@ -165,3 +165,65 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
     expect(pricing!.content).not.toContain("About Us");
   });
 });
+
+// C2: configured interactions must reach published sites. The editor stores
+// interactions on element.data.interactions and runs them via GSAP in the
+// canvas, but the published export previously dropped both the attribute and
+// any runtime, so interactions silently no-op'd on the live site.
+describe("ExportEngine.exportAllPages — interaction export (C2)", () => {
+  const interactivePage = {
+    id: "p1",
+    name: "Home",
+    slug: "home",
+    isHome: true,
+    root: {
+      id: "root",
+      type: "container",
+      tagName: "div",
+      children: [
+        {
+          id: "btn",
+          type: "button",
+          tagName: "button",
+          content: "Hover me",
+          children: [],
+          data: {
+            interactions: [
+              {
+                id: "i1",
+                trigger: "hover",
+                enabled: true,
+                animation: { preset: "pulse", duration: 300, delay: 0, easing: "easeOut", target: "self" },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+
+  it("emits data-buildrick-interactions and injects the runtime when a page uses interactions", async () => {
+    const composer = makeMockComposer({ exportPagesReturn: [interactivePage] });
+    const engine = new ExportEngine(composer);
+    const result = await engine.exportAllPages({ format: "html", minify: false });
+
+    const index = result.files.find((f) => f.name === "index.html")!;
+    // Attribute carries the interaction JSON (quotes escaped for the attribute)
+    expect(index.content).toContain("data-buildrick-interactions=");
+    expect(index.content).toContain("&quot;preset&quot;:&quot;pulse&quot;");
+    // Runtime script present, with the WAAPI player and the trigger wiring
+    expect(index.content).toContain("<script>");
+    expect(index.content).toContain(".animate(");
+    expect(index.content).toContain("mouseenter");
+  });
+
+  it("does NOT inject the runtime for interaction-free pages (no bloat)", async () => {
+    const composer = makeMockComposer({ exportPagesReturn: [freshPage] });
+    const engine = new ExportEngine(composer);
+    const result = await engine.exportAllPages({ format: "html", minify: false });
+
+    const index = result.files.find((f) => f.name === "index.html")!;
+    expect(index.content).not.toContain("data-buildrick-interactions");
+    expect(index.content).not.toContain("<script>");
+  });
+});

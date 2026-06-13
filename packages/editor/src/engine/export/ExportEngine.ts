@@ -33,6 +33,7 @@ import { SEOInjector } from "./SEOInjector";
 import { SitemapGenerator } from "./SitemapGenerator";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
+import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./interactionRuntime";
 
 // ============================================================================
 // MULTI-PAGE EXPORT TYPES
@@ -208,6 +209,10 @@ export class ExportEngine {
     if (attrs.src) attrParts.push(`src="${escapeHTML(attrs.src)}"`);
     if (attrs.target) attrParts.push(`target="${attrs.target}"`);
     if (attrs.id) attrParts.push(`id="${escapeHTML(attrs.id)}"`);
+    // Configured interactions — emitted so the published runtime can wire them.
+    if (attrs[INTERACTION_ATTR]) {
+      attrParts.push(`${INTERACTION_ATTR}="${escapeHTML(attrs[INTERACTION_ATTR])}"`);
+    }
 
     // Build inline styles if configured
     if (config.cssStyle === "inline" && Object.keys(styles).length > 0) {
@@ -315,7 +320,13 @@ export class ExportEngine {
       head += stripeScripts + nl;
     }
 
-    return `<!DOCTYPE html>${nl}<html lang="en">${nl}<head>${nl}${head}</head>${nl}<body>${nl}${content}</body>${nl}</html>`;
+    // Inject the interaction runtime only when the page actually uses
+    // interactions — keeps interaction-free sites byte-for-byte unchanged.
+    const interactionScript = content.includes(INTERACTION_ATTR)
+      ? buildInteractionRuntimeScript() + nl
+      : "";
+
+    return `<!DOCTYPE html>${nl}<html lang="en">${nl}<head>${nl}${head}</head>${nl}<body>${nl}${content}${interactionScript}</body>${nl}</html>`;
   }
 
   /**
@@ -474,13 +485,18 @@ export class ExportEngine {
       headParts.push(`  <style>\n${globalCss}\n  </style>`);
     }
 
+    // Inject the interaction runtime only when this page uses interactions.
+    const interactionScript = bodyContent.includes(INTERACTION_ATTR)
+      ? "\n" + buildInteractionRuntimeScript()
+      : "";
+
     let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 ${headParts.join("\n")}
 </head>
 <body>
-${bodyContent}
+${bodyContent}${interactionScript}
 </body>
 </html>`;
 
@@ -580,6 +596,15 @@ ${bodyContent}
       for (const [key, value] of Object.entries(element.attributes)) {
         attrParts.push(`${key}="${escapeHTML(value)}"`);
       }
+    }
+
+    // Interactions live on element.data.interactions, NOT element.attributes
+    // (toJSON serializes raw data.attributes; the computed interactions attr is
+    // only added by the live element's getAttributes()). Emit it here so the
+    // published runtime can wire the configured triggers.
+    const interactions = element.data?.interactions;
+    if (Array.isArray(interactions) && interactions.length > 0) {
+      attrParts.push(`${INTERACTION_ATTR}="${escapeHTML(JSON.stringify(interactions))}"`);
     }
 
     const attrStr = attrParts.length > 0 ? " " + attrParts.join(" ") : "";
