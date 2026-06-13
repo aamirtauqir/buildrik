@@ -1,6 +1,9 @@
 # Buildrik — Module-by-Module Wiring Audit (2026-06-13)
 
-8 parallel specialist agents traced every interactive UI → router/handler → service → model across editor + dashboard. Only confirmed gaps (read-verified). Intentional "coming soon" / demo-only / documented-deferral items excluded. Status: [ ] open · [x] fixed · [def] deferred (wire-or-delete decision).
+8 parallel specialist agents traced every interactive UI → router/handler → service → model across editor + dashboard. Only confirmed gaps (read-verified). Intentional "coming soon" / demo-only / documented-deferral items excluded. Status: [ ] open · [x] fixed · [~] partial · [def] deferred (wire-or-delete decision).
+
+## Batch H — NEW critical finding (surfaced during deferred-feature build)
+- [ ] **H1 (P0/P1) Publish path emits style-less HTML.** The multi-page publish path used by Vercel (`ExportEngine.exportAllPages` → `renderPageElement`) emits each element from `element.attributes` ONLY — it drops `element.styles` (inline base styles), `element.classes`, AND `data-buildrick-id`. Empirically verified: a page with styled elements exports HTML containing no `class=`, no `style=`, no `data-buildrick-id`. Consequence: published sites likely ship with element base styling stripped, and StyleEngine breakpoint rules (keyed `[data-buildrick-id]` via `generateResponsiveCSS`) match nothing. NOT a safe blind fix — base styles are inline (higher specificity than the stylesheet's breakpoint media rules), so the correct fix is cascade-sensitive (class-based base styles so `@media` overrides win) and touches the live deploy path. Needs its own arc with a real Vercel deploy to live-verify. Blocks D1's published-site half. The single-page/ZIP export path (`elementToHTML` + `extractStyles`) is class-based and does NOT have this gap. Discovered 2026-06-14 while building C2/D1.
 
 ## Batch A — Editor persistence (DATA-LOSS, P0/P1)
 - [x] A1 Manual Save + Cmd+S persist to localStorage only, fake "Saved" toast — useSaveCallback.ts:62 → route through dashboard saveProject
@@ -20,7 +23,7 @@
 - [def] C2 Interaction attributes + runtime dropped on export — forwarding the data-buildrick-interactions attr alone does nothing without the InteractionRuntime JS on the published page; needs a runtime-bundling step (dedicated arc). Interactions still run in-editor. Deferred (animations — far more common — fixed in C1).
 
 ## Batch D — Editor inspector/AI/misc (P1/P2)
-- [def] D1 Inspector Visibility toggles write `--hide-*` custom props that NOTHING consumes (zero refs in canvas/engine/export/themes) → show/hide is a complete no-op in-editor and on export. Real fix needs a consuming responsive-CSS layer (data-model → per-breakpoint `display:none` media queries in both canvas preview + ExportEngine) — a focused arc, deferred over a fragile partial.
+- [~] D1 Responsive visibility. Toggle writes `--hide-<bp>: true` into the element's inline style; nothing consumed it. **Canvas half SHIPPED** (deferred-build #3): canvas root now carries `data-device`, and `Canvas.css` hides `[style*="--hide-<bp>: true"]` under the matching device — the toggle now visibly hides/shows in the device preview (browser-verified: mobile hides `--hide-mobile`, desktop hides `--hide-desktop`, reactive to device switch). **Published-site half BLOCKED by H1** (the publish path emits no element styles at all, so `--hide-*` can't reach the live site); lands with H1.
 - [x] D2 elementProperties data-columns fall-through double-writes (missing return)
 - [x] D3 AI chat-mode scope omits tokens/assets → set-token silently no-ops in chat
 - [x] D4 AI Stop — already unsubscribes the stream client-side (verified); server-side quota refund-on-abort is a separate concern, not a client wiring bug

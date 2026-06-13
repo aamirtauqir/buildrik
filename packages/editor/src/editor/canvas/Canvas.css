@@ -841,3 +841,17 @@
  * tokens) and a 16px focus offset; this rule used hex fallbacks + 0px focus
  * top + a quarter-rounded radius. a11y.css is authoritative. */
 
+/* Responsive visibility (D1). The inspector's per-breakpoint show/hide toggle
+ * (VisibilitySection) writes `--hide-<bp>: true` into the element's inline
+ * style. Canvas previews a breakpoint by resizing the frame, not by changing
+ * the viewport, so a real @media query can't read the previewed width — we key
+ * off the active device on the canvas root instead. The element stays in the
+ * tree (so it's still selectable to un-hide); only its box is hidden, matching
+ * how it will behave at that breakpoint on the published site.
+ * Inline serialization is `--hide-<bp>: true` (see buildAttributeString). */
+[data-buildrick-canvas][data-device="desktop"] [style*="--hide-desktop: true"],
+[data-buildrick-canvas][data-device="tablet"] [style*="--hide-tablet: true"],
+[data-buildrick-canvas][data-device="mobile"] [style*="--hide-mobile: true"] {
+  display: none !important;
+}
+
