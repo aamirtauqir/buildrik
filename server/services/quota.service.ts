@@ -144,11 +144,3 @@ export async function checkQuota(userId: string): Promise<QuotaStatus> {
   };
 }
 
-export async function recordUsage(userId: string, model: string): Promise<void> {
-  const dayBucket = todayBucket();
-  await prisma.aIUsage.upsert({
-    where: { userId_dayBucket: { userId, dayBucket } },
-    create: { userId, dayBucket, count: 1, model },
-    update: { count: { increment: 1 }, model },
-  });
-}

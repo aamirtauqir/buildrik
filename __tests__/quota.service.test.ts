@@ -13,7 +13,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { checkQuota, recordUsage, UNLIMITED } from "@server/services/quota.service";
+import { checkQuota, UNLIMITED } from "@server/services/quota.service";
 
 describe("quota.service", () => {
   beforeEach(() => {
@@ -68,14 +68,4 @@ describe("quota.service", () => {
     });
   });
 
-  it("recordUsage upserts +1 for the right dayBucket", async () => {
-    aiUsageUpsert.mockResolvedValueOnce({});
-    await recordUsage("user-1", "claude-sonnet-4-6");
-    expect(aiUsageUpsert).toHaveBeenCalledOnce();
-    const call = aiUsageUpsert.mock.calls[0][0];
-    expect(call.create.userId).toBe("user-1");
-    expect(call.create.count).toBe(1);
-    expect(call.update.count.increment).toBe(1);
-    expect(call.update.model).toBe("claude-sonnet-4-6");
-  });
 });

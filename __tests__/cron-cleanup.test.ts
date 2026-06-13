@@ -14,12 +14,15 @@ vi.mock("@/lib/prisma", () => ({
     rateLimitBucket: { deleteMany: vi.fn() },
     pendingUpload: { deleteMany: vi.fn() },
     processedWebhookEvent: { deleteMany: vi.fn() },
+    actionConfirmation: { deleteMany: vi.fn() },
+    collabOperation: { deleteMany: vi.fn() },
     $transaction: vi.fn(async (ops: unknown[]) => ops),
   },
 }));
 
 import { prisma } from "@/lib/prisma";
 import { GET as sessionCleanup } from "@/app/api/cron/session-cleanup/route";
+import { GET as ephemeralPurge } from "@/app/api/cron/ephemeral-purge/route";
 import { GET as inviteExpiry } from "@/app/api/cron/invite-expiry/route";
 import { GET as tokenCleanup } from "@/app/api/cron/token-cleanup/route";
 import { GET as softDeletePurge } from "@/app/api/cron/soft-delete-purge/route";
@@ -39,6 +42,8 @@ const mockPrisma = prisma as typeof prisma & {
   formSubmission: { deleteMany: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
   workspaceTransfer: { updateMany: ReturnType<typeof vi.fn> };
   publishBuildJob: { findMany: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
+  actionConfirmation: { deleteMany: ReturnType<typeof vi.fn> };
+  collabOperation: { deleteMany: ReturnType<typeof vi.fn> };
   $transaction: ReturnType<typeof vi.fn>;
 };
 
@@ -362,5 +367,22 @@ describe("publish-job-cleanup", () => {
     expect(mockPrisma.site.update).toHaveBeenCalledTimes(1);
     expect(mockPrisma.site.update.mock.calls[0][0].data.status).toBe("PUBLISHED");
     expect(mockPrisma.publishBuildJob.update).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("ephemeral-purge", () => {
+  it("returns 401 when authorization header is wrong", async () => {
+    const res = await ephemeralPurge(makeReq("ephemeral-purge", "Bearer wrong"));
+    expect(res.status).toBe(401);
+  });
+
+  it("purges expired action confirmations and old collab operations", async () => {
+    mockPrisma.actionConfirmation.deleteMany.mockResolvedValue({ count: 3 });
+    mockPrisma.collabOperation.deleteMany.mockResolvedValue({ count: 7 });
+    const res = await ephemeralPurge(makeReq("ephemeral-purge", "Bearer test-secret"));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, actionConfirmations: 3, collabOperations: 7 });
+    expect(mockPrisma.actionConfirmation.deleteMany.mock.calls[0][0].where.expiresAt.lt).toBeInstanceOf(Date);
+    expect(mockPrisma.collabOperation.deleteMany.mock.calls[0][0].where.createdAt.lt).toBeInstanceOf(Date);
   });
 });

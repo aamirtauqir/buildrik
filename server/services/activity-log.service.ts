@@ -43,8 +43,10 @@ export async function record(input: RecordInput) {
         metadata: input.metadata ? (input.metadata as object) : undefined,
       },
     });
-  } catch {
-    // Activity logging must never crash the mutation path.
+  } catch (err) {
+    // Activity logging must never crash the mutation path — but a silent
+    // swallow hides a persistently broken audit trail. Log so it's visible.
+    console.error("[activity-log] record failed:", err);
   }
 }
 
@@ -75,7 +77,9 @@ export async function recordForSite(input: RecordForSiteInput) {
       description: input.description,
       metadata: input.metadata,
     });
-  } catch {
-    // Activity logging must never crash the mutation path.
+  } catch (err) {
+    // Activity logging must never crash the mutation path — but log the
+    // swallow so a broken audit trail is diagnosable.
+    console.error("[activity-log] recordForSite failed:", err);
   }
 }

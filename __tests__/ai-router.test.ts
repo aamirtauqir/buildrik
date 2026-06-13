@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { checkQuota, reserveQuota, resolveModelForUser, recordUsage, streamContent } = vi.hoisted(() => ({
+const { checkQuota, reserveQuota, resolveModelForUser, streamContent } = vi.hoisted(() => ({
   checkQuota: vi.fn(),
   reserveQuota: vi.fn(),
   resolveModelForUser: vi.fn(),
-  recordUsage: vi.fn(),
   streamContent: vi.fn(),
 }));
 
@@ -17,7 +16,6 @@ vi.mock("@/server/services/quota.service", () => ({
   checkQuota,
   reserveQuota,
   resolveModelForUser,
-  recordUsage,
 }));
 vi.mock("@/server/services/ai.service", () => ({
   streamContent,
@@ -40,7 +38,6 @@ describe("ai router", () => {
     checkQuota.mockReset();
     reserveQuota.mockReset();
     resolveModelForUser.mockReset();
-    recordUsage.mockReset();
     streamContent.mockReset();
     // Server resolves the model from the user's tier; the client model is a
     // hint. Default to echoing the requested model for these tests.
@@ -80,7 +77,6 @@ describe("ai router", () => {
       yield { type: "text", text: "hi" };
       yield { type: "done" };
     });
-    recordUsage.mockResolvedValueOnce(undefined);
 
     const caller = aiRouter.createCaller(callerCtx);
     const sub = await caller.streamPrompt({

@@ -28,7 +28,11 @@ export async function logAuditEvent(
         metadata: options?.metadata ? JSON.stringify(options.metadata) : null,
       },
     });
-  } catch {
-    // Audit logging should never crash the app
+  } catch (err) {
+    // Audit logging should never crash the app — but security events
+    // (LOGIN_FAILED, 2FA_LOCKED, ...) silently vanishing defeats the point
+    // of an audit trail. Log to the server console as a compliance fallback
+    // sink so a broken audit table is at least visible in logs.
+    console.error(`[audit] failed to record ${action}/${status}:`, err);
   }
 }
