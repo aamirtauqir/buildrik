@@ -176,7 +176,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onDelete={state.handleDetailDelete}
         isInstanceSelected={state.isDetailInstanceSelected}
         onDetachInstance={state.handleDetachInstance}
-        onSwapComponent={state.handleSwapComponent}
       />
     );
   }
@@ -465,36 +464,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   );
                 })}
               </Stack>
-            </div>
-          </ModalContent>
-        </Modal>
-      </OverlayMount>
-      <OverlayMount>
-        <Modal open={!!state.duplicateInfo} onOpenChange={(next) => !next && state.setDuplicateInfo(null)}>
-          <ModalContent size="lg">
-            <ModalTitle>Duplicate Component</ModalTitle>
-            <ModalClose aria-label="Close modal">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </ModalClose>
-            <div className="bd-modal__body">
-              <div style={{ color: "var(--bd-fg-secondary)", fontSize: 13, lineHeight: 1.5 }}>
-                <p style={{ margin: "0 0 12px" }}>
-                  To duplicate &quot;{state.duplicateInfo?.name}&quot;:
-                </p>
-                <ol style={{ margin: 0, paddingLeft: 20 }}>
-                  <li>Insert the component onto canvas (double-click)</li>
-                  <li>Select the inserted instance</li>
-                  <li>
-                    Right-click → &quot;Create Component&quot; with name &quot;
-                    {state.duplicateInfo?.copyName}&quot;
-                  </li>
-                </ol>
-                <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--bd-fg-muted)" }}>
-                  This ensures a proper deep copy with new element IDs.
-                </p>
-              </div>
             </div>
           </ModalContent>
         </Modal>

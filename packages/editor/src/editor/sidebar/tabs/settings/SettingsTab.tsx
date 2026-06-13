@@ -39,6 +39,7 @@ import {
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
 import type { ProjectSettings } from "@/shared/types/project";
+import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
 import "./settings.css";
 
 // ─── Nav definition ──────────────────────────────────────────────────────────
@@ -234,12 +235,16 @@ export const SettingsTab: React.FC<
   onPinToggle: _onPinToggle,
   onHelpClick,
   onClose,
-  userPlan = "starter",
+  userPlan,
   onReplayTour,
   projectId,
   onDirtyChange,
   onOpenDesignTab,
 }) => {
+  // Effective plan: explicit prop wins; otherwise read the real workspace tier
+  // captured at project load. Previously defaulted to "starter" for everyone,
+  // permanently locking the Custom-code + Integrations screens.
+  const effectivePlan: PlanTier = userPlan ?? getEditorPlanTier();
   const { currentScreen, navigateTo } = usePanelNavigation({
     storageKey: `settings-panel${projectId ? `-${projectId}` : ""}`,
     screens: SETTINGS_SCREENS,
@@ -583,7 +588,7 @@ export const SettingsTab: React.FC<
   const current = NAV.find((n) => n.id === currentScreen) ?? NAV[0];
 
   const renderContent = (): React.ReactNode => {
-    if (isScreenLocked(currentScreen, userPlan)) {
+    if (isScreenLocked(currentScreen, effectivePlan)) {
       const requiredPlan = SCREEN_PLAN_REQUIREMENTS[currentScreen];
       return <LockedScreen variant={requiredPlan} />;
     }
@@ -632,7 +637,13 @@ export const SettingsTab: React.FC<
           />
         );
       case "integrations":
-        return <IntegrationsHub composer={composer} onDirtyChange={handleScreenDirty} />;
+        return (
+          <IntegrationsHub
+            composer={composer}
+            onDirtyChange={handleScreenDirty}
+            registerFlushHandler={registerFlushHandler}
+          />
+        );
       // A1 day-3 complete: all 4 stubs drained (Redirects, Forms, Headers, Localization).
       // Redirects/Headers/Localization own server-side save — register handler so
       // the savebar's Save calls their write path instead of composer.saveProject().
@@ -669,7 +680,7 @@ export const SettingsTab: React.FC<
 
   const renderRow = (n: NavDef) => {
     const active = currentScreen === n.id;
-    const locked = isScreenLocked(n.id, userPlan);
+    const locked = isScreenLocked(n.id, effectivePlan);
     const Icon = n.icon;
     return (
       <Button

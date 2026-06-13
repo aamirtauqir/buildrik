@@ -16,6 +16,10 @@ import { AdvancedScreen } from "./AdvancedScreen";
 interface Props {
   composer?: Composer | null;
   onDirtyChange?: (dirty: boolean) => void;
+  /** Parent (SettingsTab) flush slot — single-handler. We multiplex both
+   *  children's flushes into one combined handler so neither clobbers the
+   *  other (the parent ref holds only one). */
+  registerFlushHandler?: (handler: (() => void) | null) => void;
 }
 
 const subHeaderStyle: React.CSSProperties = {
@@ -30,7 +34,7 @@ const subHeaderStyle: React.CSSProperties = {
   marginTop: 16,
 };
 
-export const IntegrationsHub: React.FC<Props> = ({ composer, onDirtyChange }) => {
+export const IntegrationsHub: React.FC<Props> = ({ composer, onDirtyChange, registerFlushHandler }) => {
   // Bubble up dirty state from either child. Track both, OR together.
   const [analyticsDirty, setAnalyticsDirty] = React.useState(false);
   const [advancedDirty, setAdvancedDirty] = React.useState(false);
@@ -39,13 +43,37 @@ export const IntegrationsHub: React.FC<Props> = ({ composer, onDirtyChange }) =>
     onDirtyChange?.(analyticsDirty || advancedDirty);
   }, [analyticsDirty, advancedDirty, onDirtyChange]);
 
+  // Each child registers its flush into a local slot; we register a single
+  // combined flush with the parent so the savebar persists BOTH analytics
+  // (GA/pixel) and advanced (head/body code) edits. Without this, edits made
+  // on the Integrations screen flushed nothing and were dropped on save.
+  const analyticsFlushRef = React.useRef<(() => void) | null>(null);
+  const advancedFlushRef = React.useRef<(() => void) | null>(null);
+
+  React.useEffect(() => {
+    if (!registerFlushHandler) return;
+    registerFlushHandler(() => {
+      analyticsFlushRef.current?.();
+      advancedFlushRef.current?.();
+    });
+    return () => registerFlushHandler(null);
+  }, [registerFlushHandler]);
+
   return (
     <div>
-      <AnalyticsScreen composer={composer} onDirtyChange={setAnalyticsDirty} />
+      <AnalyticsScreen
+        composer={composer}
+        onDirtyChange={setAnalyticsDirty}
+        registerFlushHandler={(h) => { analyticsFlushRef.current = h; }}
+      />
       <div style={subHeaderStyle}>Integrations</div>
       <IntegrationsScreen />
       <div style={subHeaderStyle}>Advanced</div>
-      <AdvancedScreen composer={composer} onDirtyChange={setAdvancedDirty} />
+      <AdvancedScreen
+        composer={composer}
+        onDirtyChange={setAdvancedDirty}
+        registerFlushHandler={(h) => { advancedFlushRef.current = h; }}
+      />
     </div>
   );
 };

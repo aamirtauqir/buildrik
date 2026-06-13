@@ -40,7 +40,6 @@ export interface ComponentDetailScreenProps {
   /** Callback to detach instance */
   onDetachInstance?: () => void;
   /** Callback to swap component */
-  onSwapComponent?: () => void;
 }
 
 // ============================================
@@ -57,7 +56,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   onDelete,
   isInstanceSelected = false,
   onDetachInstance,
-  onSwapComponent,
 }) => {
   // DrillInHeader handles focus-on-mount automatically
   const { addToast } = useToast();
@@ -186,11 +184,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     onDetachInstance?.();
   };
 
-  // Handle swap component
-  const handleSwap = () => {
-    onSwapComponent?.();
-  };
-
   return (
     <div>
       {/* Header with breadcrumb */}
@@ -259,29 +252,19 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
           </Button>
         </div>
 
-        {/* Instance Actions (shown when instance is selected on canvas).
-            Spec H: Detach button is Pro-mode-only; Swap remains visible
-            in both modes. */}
-        {isInstanceSelected && (
+        {/* Instance Actions (shown when an instance is selected on canvas).
+            Detach is Pro-only. The "Swap component" action was removed —
+            it had no completion path (no engine swap API), so it only
+            toasted and never swapped. */}
+        {isInstanceSelected && isPro && (
           <div>
             <h4>Instance Actions</h4>
-            {isPro && (
-              <Button
-
-                onClick={handleDetach}
-                title="Detach this instance from the component"
-              >
-                <Unlink size={14} />
-                <span>Detach instance</span>
-              </Button>
-            )}
             <Button
-
-              onClick={handleSwap}
-              title="Swap with another component"
+              onClick={handleDetach}
+              title="Detach this instance from the component"
             >
-              <RefreshCw size={14} />
-              <span>Swap component</span>
+              <Unlink size={14} />
+              <span>Detach instance</span>
             </Button>
           </div>
         )}

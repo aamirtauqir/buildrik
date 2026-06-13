@@ -47,14 +47,20 @@ export function AssetCell({
     .filter(Boolean)
     .join(" ");
 
-  // §13 — drag-to-folder. Native HTML5 DnD on the cell. Payload carries
-  // the asset key under our internal MIME plus a text/plain fallback for
-  // browsers/tests that read the generic slot. Folder rail drop handlers
-  // in ExpandedMediaPanel pick this up and fire state.moveAsset.
+  // Two drop targets read this drag:
+  //  1. Folder rail (ExpandedMediaPanel) → moves the asset between folders.
+  //     Reads `application/x-buildrik-media-asset-key`.
+  //  2. Canvas (useDropExecution.handleInternalMediaDrop) → inserts the asset
+  //     as an element. Reads `application/x-aquibra-media-src/-type/-name`.
+  // The cell previously set ONLY the folder-move key, so dragging a library
+  // asset onto the canvas did nothing. Carry both payloads.
   const handleDragStart = (e: DragEvent<HTMLButtonElement>) => {
     e.dataTransfer.setData("application/x-buildrik-media-asset-key", item.key);
-    e.dataTransfer.setData("text/plain", item.key);
-    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("application/x-aquibra-media-src", item.src);
+    e.dataTransfer.setData("application/x-aquibra-media-type", item.type);
+    e.dataTransfer.setData("application/x-aquibra-media-name", item.name);
+    e.dataTransfer.setData("text/plain", item.src);
+    e.dataTransfer.effectAllowed = "copyMove";
   };
 
   return (

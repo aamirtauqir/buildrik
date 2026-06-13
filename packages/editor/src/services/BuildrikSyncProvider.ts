@@ -145,6 +145,24 @@ function mergeSiteColumnsIntoSettings(
   return settings;
 }
 
+// Workspace plan for the currently-open site, captured at load time so the
+// editor's plan-gated UI (SettingsTab Custom-code / Integrations screens) can
+// read the REAL tier instead of defaulting everyone to "starter". Dashboard
+// plans (FREE/PRO/BUSINESS) map to the editor's tiers (starter/pro/enterprise).
+type EditorPlanTier = "starter" | "pro" | "enterprise";
+let _editorPlanTier: EditorPlanTier = "starter";
+
+function mapDashboardPlan(plan: unknown): EditorPlanTier {
+  if (plan === "PRO") return "pro";
+  if (plan === "BUSINESS") return "enterprise";
+  return "starter";
+}
+
+/** Plan tier for the open site. Valid after loadProject resolves. */
+export function getEditorPlanTier(): EditorPlanTier {
+  return _editorPlanTier;
+}
+
 export async function loadProject(siteId: string): Promise<ProjectData> {
   try {
     const client = getClient();
@@ -175,6 +193,9 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     const mergedSettings = settingsResult
       ? mergeSiteColumnsIntoSettings(baseSettings, settingsResult as SiteColumnSettings)
       : baseSettings;
+
+    // Capture the workspace plan so plan-gated editor UI reads the real tier.
+    _editorPlanTier = mapDashboardPlan((settingsResult as { plan?: unknown } | null)?.plan);
 
     return {
       version: "1.0",

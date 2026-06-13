@@ -2,7 +2,8 @@
  * ComponentDetailScreen Pro-mode gate tests (Spec H)
  *
  * Detach instance button must be hidden in beginner mode and visible in
- * pro mode. Swap stays in both modes (only Detach is Pro-gated per spec).
+ * pro mode. (The "Swap component" action was removed — it had no engine
+ * completion path; the Instance Actions area is now Detach-only / Pro-only.)
  *
  * Closes the T13 gating gap flagged by holistic final review: T13
  * shipped DetachConfirmModal but did not gate the trigger button.
@@ -43,7 +44,6 @@ function renderAt(mode: DSMode, isInstanceSelected: boolean) {
           onBack={() => {}}
           isInstanceSelected={isInstanceSelected}
           onDetachInstance={() => {}}
-          onSwapComponent={() => {}}
         />
       </DSModeProvider>
     </ToastProvider>
@@ -61,14 +61,13 @@ describe("ComponentDetailScreen — Pro-mode gate for Detach (Spec H)", () => {
     expect(queryByText(/Detach instance/i)).not.toBeNull();
   });
 
-  it("keeps Swap visible in beginner mode (only Detach is Pro-gated)", () => {
-    const { queryByText } = renderAt("beginner", true);
-    expect(queryByText(/Swap component/i)).not.toBeNull();
+  it("does not render the removed Swap action in any mode", () => {
+    expect(renderAt("beginner", true).queryByText(/Swap component/i)).toBeNull();
+    expect(renderAt("pro", true).queryByText(/Swap component/i)).toBeNull();
   });
 
   it("does not render Instance Actions area when no instance is selected", () => {
     const { queryByText } = renderAt("pro", false);
     expect(queryByText(/Detach instance/i)).toBeNull();
-    expect(queryByText(/Swap component/i)).toBeNull();
   });
 });

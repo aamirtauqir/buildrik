@@ -29,6 +29,9 @@ interface Props {
   isContextMenuOpen?: boolean;
   /** Enables drag handle and drag-to-folder when true (pages inside folders). */
   draggable?: boolean;
+  /** When provided, the row is a reorder drop target: dropping another page
+   *  here moves the dragged page to just after this one. */
+  onReorderDrop?: (draggedPageId: string) => void;
   /** Renders with `.nested` class — left-padded for folder children. */
   nested?: boolean;
   /** Whether this row is part of a multi-select. */
@@ -50,6 +53,7 @@ export const PageRow = React.memo<Props>(
     nameError = null,
     isContextMenuOpen = false,
     draggable: isDraggable = false,
+    onReorderDrop,
     nested = false,
     isSelected = false,
     onSelect,
@@ -101,6 +105,20 @@ export const PageRow = React.memo<Props>(
       e.dataTransfer.effectAllowed = "move";
     };
 
+    const handleReorderDragOver = (e: React.DragEvent) => {
+      if (!onReorderDrop) return;
+      e.preventDefault(); // allow drop
+      e.dataTransfer.dropEffect = "move";
+    };
+
+    const handleReorderDrop = (e: React.DragEvent) => {
+      if (!onReorderDrop) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const draggedId = e.dataTransfer.getData("text/plain");
+      if (draggedId && draggedId !== page.id) onReorderDrop(draggedId);
+    };
+
     const handleContextMenuClick = (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
@@ -137,6 +155,8 @@ export const PageRow = React.memo<Props>(
         role="listitem"
         draggable={isDraggable}
         onDragStart={isDraggable ? handleDragStart : undefined}
+        onDragOver={onReorderDrop ? handleReorderDragOver : undefined}
+        onDrop={onReorderDrop ? handleReorderDrop : undefined}
       >
         <div
           className={rowClasses}

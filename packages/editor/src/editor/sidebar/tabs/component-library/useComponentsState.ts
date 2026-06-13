@@ -21,10 +21,6 @@ export interface RenameDialogState {
   id: string;
   currentName: string;
 }
-export interface DuplicateInfoState {
-  name: string;
-  copyName: string;
-}
 export interface PendingToastState {
   message: string;
   variant: "info" | "warning" | "error";
@@ -97,7 +93,6 @@ export function useComponentsState({
   const [confirmDelete, setConfirmDelete] = React.useState<DeleteConfirmState | null>(null);
   const [renameTarget, setRenameTarget] = React.useState<RenameDialogState | null>(null);
   const [variantPicker, setVariantPicker] = React.useState<VariantPickerState | null>(null);
-  const [duplicateInfo, setDuplicateInfo] = React.useState<DuplicateInfoState | null>(null);
   const [pendingToast, setPendingToast] = React.useState<PendingToastState | null>(null);
 
   // Persist favorites
@@ -274,18 +269,14 @@ export function useComponentsState({
     setConfirmDelete(null);
   }, [composer, confirmDelete, setSelectedId]);
 
-  // Duplicate a component — shows info modal instead of native alert()
+  // Duplicate a component — real deep-clone via the engine (was a fake
+  // "here's how to do it manually" info modal while the detail screen used
+  // the real API).
   const handleDuplicate = React.useCallback(
-    (componentId: string) => {
+    async (componentId: string) => {
       if (!composer) return;
-      const component = composer.components?.getComponent(componentId);
-      if (!component) return;
-
-      setDuplicateInfo({
-        name: component.name,
-        copyName: `${component.name} Copy`,
-      });
       setOpenMenuId(null);
+      await composer.components.duplicateComponent(componentId);
     },
     [composer]
   );
@@ -413,16 +404,6 @@ export function useComponentsState({
     composer.components?.detachInstance?.(currentSelectedId);
   }, [composer, canvasSelection]);
 
-  // Swap component action — toast instead of native alert()
-  const handleSwapComponent = React.useCallback(() => {
-    if (!composer || canvasSelection.length === 0) return;
-    setPendingToast({
-      message: "Select another component from the list to swap with this instance.",
-      variant: "info",
-    });
-    setDetailComponent(null);
-  }, [composer, canvasSelection]);
-
   // Close menu when clicking outside
   React.useEffect(() => {
     if (!openMenuId) return;
@@ -485,7 +466,6 @@ export function useComponentsState({
     handleDetailDelete,
     isDetailInstanceSelected,
     handleDetachInstance,
-    handleSwapComponent,
     // Dialog state (replaces native dialogs)
     confirmDelete,
     setConfirmDelete,
@@ -496,8 +476,6 @@ export function useComponentsState({
     variantPicker,
     setVariantPicker,
     confirmVariant,
-    duplicateInfo,
-    setDuplicateInfo,
     pendingToast,
     setPendingToast,
     // Loading & Error

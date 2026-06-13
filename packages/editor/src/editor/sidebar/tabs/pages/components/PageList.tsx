@@ -264,7 +264,10 @@ export const PageList: React.FC<Props> = ({
                   isRenaming={renamingPageId === page.id}
                   nameError={renamingPageId === page.id ? nameError : null}
                   isContextMenuOpen={openContextMenuPageId === page.id}
-                  draggable={folders.length > 0}
+                  draggable
+                  onReorderDrop={(draggedId) =>
+                    composer?.elements.reorderPage(draggedId, page.id)
+                  }
                   isSelected={selectedIds.has(page.id)}
                   onSelect={() => onSelectPage(page.id)}
                   onToggleSelect={(e) => onToggleSelect(page.id, e)}

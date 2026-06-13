@@ -7,7 +7,7 @@
 - [x] A2 Undo/redo + version-restore never auto-persist (autosave only on project:changed) — useComposerInit autosave must also fire on history:undo/redo/version:restored
 
 ## Batch B — Editor wiring (P1)
-- [x] B1 Publish tab buttons dead — StudioPanels never forwards onPublish/onUnpublish (deferred to topbar; sidebar shows honest "use Publish button" notice)
+- [def] B1 Sidebar PublishTab button inert — StudioPanels never forwards onPublish, so usePublish returns false. NOT a simple wiring miss: the sidebar uses a host-callback contract `(projectId)=>Promise<PublishResult>` (await-to-completion) while the canonical Topbar publish (handleVercelPublish) is fire-and-poll `()=>Promise<void>`. The Topbar dropdown is the working publish path (gated VITE_FEATURE_PUBLISH). Unifying the two state machines is a dedicated arc, not a thread-through — deferred to avoid double-publish/double-toast.
 - [x] B2 Settings tab hardcoded userPlan="starter" → Custom-code/Integrations locked for all — thread real plan
 - [x] B3 IntegrationsHub children miss registerFlushHandler → GA/pixel/head/body dropped on save
 - [x] B4 Media drag-to-canvas broken — AssetCell sets wrong MIME; use setMediaDragData SSOT (+ LibraryView cards)
