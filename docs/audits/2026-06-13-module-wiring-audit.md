@@ -90,3 +90,42 @@ Post-build architecture/regression review of the 7-commit deferred-feature arc (
 SHIP — production-safe for the common case (most sites use base styles via element.styles, few breakpoint-editor overrides). F1 fixed inline. F2 (cascade) + F3 (CSP) + F4/F5 are documented follow-ups, none blocking. The H1 cascade refinement is the one item that genuinely wants a live Vercel deploy before it can be called fully production-grade for breakpoint-heavy sites.
 
 NO UNRESOLVED DECISIONS
+
+---
+
+## GSTACK CEO REVIEW REPORT — deferred-feature build (2026-06-14)
+
+Strategic retrospective on the 6-feature build + H1. Product: Buildrik, Webflow/Framer-style visual site builder, ~2 production users, solo founder.
+
+| Lens | Read |
+|------|------|
+| Proxy skepticism | "Complete all features" was a proxy goal; the real goal is publish-fidelity (design → live site matches). H1 proved that core loop was broken. |
+| Opportunity cost | G10 (team transfer), G11 (version refactor), B1 (internal cleanup) = ~0 current-user value at 2 users. The leverage was H1, found only by adjacency. |
+| Inversion | A site builder whose published sites render unstyled fails on first real use. That failure mode was live until H1 was fixed today. |
+| Leverage / focus | One founder + AI should concentrate on the core publish loop until provably perfect, not spread across low-demand features. |
+
+### VERDICT
+The build was executed well (tested, reviewed, shipped) but was the wrong *priority* at this stage. Highest-leverage next move, in order:
+1. Ship the H1 cascade fix (class-based base CSS so breakpoint overrides win on published sites).
+2. Do ONE real Vercel deploy of a genuinely-designed multi-element/multi-breakpoint page and visually verify it matches the canvas (VITE_FEATURE_PUBLISH=true + Vercel creds, editor CLAUDE.md Phase 1d). Validates H1 + cascade together.
+3. Make "publish a real page and eyeball it" a standing gate before any "done" — green test suites coexisted with a fully-broken published product (H1).
+Then pursue 5-10 real users. Stop building deferred features until the core loop is dogfood-proven.
+
+NO UNRESOLVED DECISIONS
+
+---
+
+## GSTACK DESIGN REVIEW (conformance) — deferred-feature build (2026-06-14)
+
+Checked the new UI surfaces (G9 email section in account-tab, G10 transfer section + /transfer/accept page, D1 device-preview) against DESIGN.md.
+
+| Rule | Result |
+|------|--------|
+| Single accent = cobalt #2D6DFF | PASS — all accents via `var(--color-primary)`; no purple/violet/indigo |
+| Tokens not raw hex | PASS — semantic `var(--color-*)` tokens throughout; only hex in scope is the pre-existing Google-logo SVG (legit brand palette, not new) |
+| Reuse primitives | PASS — accept page reuses AuthCard/AuthButton/AuthIcon; forms match existing account/workspace patterns |
+| No AI-slop / banned fonts | PASS — no decorative slop, no Arial/Helvetica/Roboto fallbacks |
+
+VERDICT: conformant. No design follow-ups.
+
+NO UNRESOLVED DECISIONS
