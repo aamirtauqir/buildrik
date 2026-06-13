@@ -21,16 +21,16 @@ function slugify(name: string): string {
 
 async function generateUniqueSlug(name: string): Promise<string> {
   const base = slugify(name);
-  let candidate = base;
-
-  for (let i = 0; i < 10; i++) {
-    const existing = await prisma.site.findFirst({
-      where: { slug: candidate },
-    });
-    if (!existing) return candidate;
-    candidate = `${base}-${i + 2}`;
+  // One query for all base-prefixed slugs instead of up to 10 sequential
+  // findFirst lookups.
+  const taken = new Set(
+    (await prisma.site.findMany({ where: { slug: { startsWith: base } }, select: { slug: true } })).map((s) => s.slug),
+  );
+  if (!taken.has(base)) return base;
+  for (let i = 2; i < 12; i++) {
+    const candidate = `${base}-${i}`;
+    if (!taken.has(candidate)) return candidate;
   }
-
   return `${base}-${Date.now()}`;
 }
 

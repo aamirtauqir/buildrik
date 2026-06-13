@@ -19,17 +19,8 @@ import {
   setTranslationSchema,
   removeTranslationSchema,
 } from "@buildrik/shared/schemas/pages";
-import { assertSiteAccess, checkSiteRole, PermissionError } from "@/server/services/permission.service";
-
-// Read gate: any active member (incl. VIEWER) may read.
-async function guardSite(prisma: typeof import("@/lib/prisma").prisma, userId: string, siteId: string): Promise<void> {
-  try {
-    await assertSiteAccess(prisma, userId, siteId);
-  } catch (e) {
-    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
-    throw e;
-  }
-}
+import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
+import { guardSiteAccess as guardSite } from "@/server/trpc/guards";
 
 // Write gate: content mutations require EDITOR. A VIEWER must not create,
 // update, delete, or translate pages.

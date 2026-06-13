@@ -53,12 +53,19 @@ function sectionsToBlocks(sections: Array<{ type: string; html: string }>): Pris
   } as Prisma.InputJsonValue;
 }
 
-async function uniqueSlug(base: string, workspaceId: string): Promise<string> {
+async function uniqueSlug(base: string): Promise<string> {
   const root = slugify(base);
-  for (let i = 0; i < 50; i++) {
-    const candidate = i === 0 ? root : `${root}-${i}`;
-    const clash = await prisma.site.findFirst({ where: { workspaceId, slug: candidate }, select: { id: true } });
-    if (!clash) return candidate;
+  // Site.slug is GLOBALLY unique (not per-workspace), so the check must be
+  // global too — the old per-workspace findFirst could pass and then hit a
+  // P2002 on create. One query for all root-prefixed slugs instead of up to
+  // 50 sequential lookups.
+  const taken = new Set(
+    (await prisma.site.findMany({ where: { slug: { startsWith: root } }, select: { slug: true } })).map((s) => s.slug),
+  );
+  if (!taken.has(root)) return root;
+  for (let i = 1; i < 50; i++) {
+    const candidate = `${root}-${i}`;
+    if (!taken.has(candidate)) return candidate;
   }
   return `${root}-${Date.now().toString(36)}`;
 }
@@ -119,7 +126,7 @@ export async function POST(
 
   try {
     // Structure phase: resolve the site shell (slug) before content runs.
-    const slug = await uniqueSlug(job.businessType, job.workspaceId);
+    const slug = await uniqueSlug(job.businessType);
 
     // Content phase: every AI call happens before any Site/Page write.
     await setPhase(jobId, "GENERATING_CONTENT", 10);

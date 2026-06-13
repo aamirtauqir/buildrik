@@ -9,16 +9,7 @@ import {
   exportSubmissions,
 } from "@/server/services/form-submission.service";
 import { listSubmissionsSchema, updateSubmissionSchema } from "@buildrik/shared/schemas/forms";
-import { assertSiteAccess, PermissionError } from "@/server/services/permission.service";
-
-async function guardSite(prisma: typeof import("@/lib/prisma").prisma, userId: string, siteId: string): Promise<void> {
-  try {
-    await assertSiteAccess(prisma, userId, siteId);
-  } catch (e) {
-    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
-    throw e;
-  }
-}
+import { guardSiteAccess as guardSite } from "@/server/trpc/guards";
 
 export const formsRouter = router({
   listBlocks: protectedProcedure

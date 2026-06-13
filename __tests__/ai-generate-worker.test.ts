@@ -17,7 +17,7 @@ vi.mock("@lib/prisma", () => ({
       findUnique: vi.fn(),
       updateMany: vi.fn(),
     },
-    site: { findFirst: vi.fn() },
+    site: { findMany: vi.fn() },
     $transaction: vi.fn(async (cb: (tx: typeof txClient) => Promise<unknown>) => cb(txClient)),
   },
 }));
@@ -32,7 +32,7 @@ import { POST } from "@/app/api/workers/ai-generate/[jobId]/route";
 
 const p = prisma as unknown as {
   aIGenerationJob: { findUnique: ReturnType<typeof vi.fn>; updateMany: ReturnType<typeof vi.fn> };
-  site: { findFirst: ReturnType<typeof vi.fn> };
+  site: { findMany: ReturnType<typeof vi.fn> };
   $transaction: ReturnType<typeof vi.fn>;
 };
 const genPage = generatePage as ReturnType<typeof vi.fn>;
@@ -62,7 +62,7 @@ describe("ai-generate worker", () => {
       businessType: "BUSINESS", selectedPages: ["landing", "about"], description: "A bakery", metadata: { tone: "bold" },
     });
     p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
-    p.site.findFirst.mockResolvedValue(null);
+    p.site.findMany.mockResolvedValue([]);
     txSiteCreate.mockResolvedValue({ id: "site-1" });
     txPageCreateMany.mockResolvedValue({ count: 2 });
     txJobUpdateMany.mockResolvedValue({ count: 1 });
@@ -98,7 +98,7 @@ describe("ai-generate worker", () => {
       businessType: "BUSINESS", selectedPages: ["landing"], description: null, metadata: null,
     });
     p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
-    p.site.findFirst.mockResolvedValue(null);
+    p.site.findMany.mockResolvedValue([]);
     genPage.mockRejectedValue(new Error("AI down"));
 
     const res = await POST(req("secret"), ctx);
@@ -120,7 +120,7 @@ describe("ai-generate worker", () => {
       // assertNotCancelled before page 2 — user cancelled
       .mockResolvedValueOnce({ status: "CANCELLED" });
     p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
-    p.site.findFirst.mockResolvedValue(null);
+    p.site.findMany.mockResolvedValue([]);
     genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
 
     const res = await POST(req("secret"), ctx);
