@@ -1,90 +1,46 @@
-"use client";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { prisma } from "@lib/prisma";
+import { SharePasswordGate } from "./password-gate";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
-import { Lock } from "lucide-react";
+export const dynamic = "force-dynamic";
 
-export default function SharePasswordGate() {
-  const params = useParams();
-  const token = params.token as string;
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+// Server component. The verify-password endpoint sets a `share_<token>` cookie
+// on success; this honors it so a returning visitor skips the prompt instead
+// of re-entering the password (the cookie was previously set but read by
+// nothing). Note: this gate guards the share *page* — a published site is also
+// reachable at its own URL, so a hard access boundary needs Vercel deployment
+// protection (publishedPassword), which is enforced separately at publish.
+export default async function SharePage({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}) {
+  const { token } = await params;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/share/${token}/verify-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl;
-        }
-      } else {
-        const data = await res.json();
-        if (res.status === 410) {
-          setError("This share link has expired.");
-        } else if (res.status === 404) {
-          setError("This share link is no longer available.");
-        } else {
-          setError(data.error ?? "Incorrect password");
-        }
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const link = await prisma.shareLink.findUnique({
+    where: { token },
+    include: { site: { select: { publishedUrl: true, slug: true } } },
+  });
 
-  return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--color-bg-page)" }}>
-      <div className="w-full max-w-sm mx-auto px-4">
-        <div className="bg-white rounded-2xl p-8 shadow-sm" style={{ border: "1px solid var(--color-border-default)" }}>
-          <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FEF2F2" }}>
-              <Lock className="w-6 h-6" style={{ color: "var(--color-primary)" }} />
-            </div>
-          </div>
-          <h1 className="text-lg font-semibold text-center" style={{ color: "var(--color-text-primary)" }}>
-            This site is password protected
-          </h1>
-          <p className="text-sm text-center mt-1 mb-6" style={{ color: "var(--color-text-secondary)" }}>
-            Enter the password to view this site
-          </p>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-11 px-3 rounded-lg text-sm"
-              style={{
-                border: error ? "2px solid #EF4444" : "1px solid var(--color-border-default)",
-                backgroundColor: error ? "#FEF2F2" : "#FFFFFF",
-              }}
-              autoFocus
-            />
-            {error && (
-              <p className="text-xs mt-1.5" style={{ color: "#EF4444" }}>{error}</p>
-            )}
-            <button
-              type="submit"
-              disabled={loading || !password}
-              className="w-full h-11 mt-4 rounded-lg text-sm font-medium text-white disabled:opacity-50"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              {loading ? "Verifying..." : "View Site"}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
+  if (!link || !link.isActive) {
+    return <SharePasswordGate />; // gate renders the "no longer available" path on submit
+  }
+  if (link.expiresAt && link.expiresAt < new Date()) {
+    return <SharePasswordGate />;
+  }
+
+  // No password → straight through (count handled by the verify route when
+  // used; here we just forward).
+  if (!link.passwordHash) {
+    redirect(link.site.publishedUrl ?? `/${link.site.slug}`);
+  }
+
+  // Password set: honor a prior successful verification cookie.
+  const jar = await cookies();
+  if (jar.get(`share_${token}`)?.value === "1") {
+    redirect(link.site.publishedUrl ?? `/${link.site.slug}`);
+  }
+
+  return <SharePasswordGate />;
 }
