@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import { addDomainToVercelProject, slugifyProjectName } from "@/lib/vercel";
+import { addDomainToVercelProject, removeDomainFromVercelProject, slugifyProjectName } from "@/lib/vercel";
 import { getActiveVercelConnection } from "@server/services/integrations.service";
 
 // Vercel's canonical CNAME target — what a domain should point at when we have
@@ -70,9 +70,12 @@ export async function connectDomain(siteId: string, domain: string) {
         await prisma.domain.update({ where: { id: created.id }, data: { status: "VERIFIED" } });
       }
     }
-  } catch {
+  } catch (err) {
     // Vercel attach failed — keep the fallback CNAME instructions and leave the
-    // domain PENDING. Never fail the whole connect on an integration hiccup.
+    // domain PENDING (the dns-verify cron re-attempts). Never fail the whole
+    // connect on an integration hiccup, but log it so the silent swallow is
+    // diagnosable rather than invisible.
+    console.error(`[domain] Vercel attach failed for ${domain} (site ${siteId}):`, err);
   }
 
   await prisma.dnsRecord.createMany({
@@ -83,6 +86,28 @@ export async function connectDomain(siteId: string, domain: string) {
 }
 
 export async function removeDomain(id: string) {
+  // Detach from Vercel before dropping our row, otherwise the domain stays
+  // attached to the Vercel project as an orphan. Best-effort: a Vercel hiccup
+  // must not block the user from removing the domain locally.
+  const domain = await prisma.domain.findUnique({
+    where: { id },
+    select: { domain: true, site: { select: { slug: true, workspaceId: true } } },
+  });
+  if (domain?.site) {
+    try {
+      const conn = await getActiveVercelConnection(domain.site.workspaceId);
+      if (conn) {
+        await removeDomainFromVercelProject({
+          token: conn.token,
+          teamId: conn.teamId,
+          projectName: slugifyProjectName(domain.site.slug),
+          domain: domain.domain,
+        });
+      }
+    } catch (err) {
+      console.error(`[domain] Vercel detach failed for ${domain.domain}:`, err);
+    }
+  }
   return prisma.domain.delete({ where: { id } });
 }
 

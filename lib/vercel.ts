@@ -325,6 +325,36 @@ export async function addDomainToVercelProject({
 }
 
 /**
+ * Detach a custom domain from a Vercel project. Called when a user removes a
+ * domain in Buildrik — without it the domain stays attached to the Vercel
+ * project (an orphan) even though our DB row is gone. A 404 means it was
+ * already gone, which is an idempotent success.
+ */
+export async function removeDomainFromVercelProject({
+  token,
+  teamId,
+  projectName,
+  domain,
+}: {
+  token: string;
+  teamId: string | null;
+  projectName: string;
+  domain: string;
+}): Promise<void> {
+  const res = await fetch(
+    `${VERCEL_API_BASE}/v9/projects/${encodeURIComponent(projectName)}/domains/${encodeURIComponent(domain)}${teamQueryString(teamId)}`,
+    {
+      method: "DELETE",
+      headers: authHeaders(token),
+    },
+  );
+  if (!res.ok && res.status !== 404) {
+    const errBody = (await res.json().catch(() => ({}))) as { error?: { code?: string; message?: string } };
+    throw new VercelApiError(res.status, errBody.error?.code ?? "UNKNOWN", errBody.error?.message ?? `Vercel API ${res.status}`);
+  }
+}
+
+/**
  * Enable or disable Vercel deployment password protection on a project. This is
  * what actually enforces a published-site password on the public
  * `<project>.vercel.app` URL — the static deploy is otherwise world-readable.

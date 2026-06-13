@@ -1,5 +1,6 @@
 import { type NextRequest } from "next/server";
 import { prisma } from "@lib/prisma";
+import { reconcileWorkspaceToFreePlan } from "@server/services/billing.service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -26,6 +27,7 @@ export async function GET(req: NextRequest) {
   });
 
   let downgraded = 0;
+  let unpublished = 0;
 
   for (const sub of toDowngrade) {
     await prisma.$transaction([
@@ -38,8 +40,12 @@ export async function GET(req: NextRequest) {
         data: { plan: "FREE" },
       }),
     ]);
+    // Reconcile over-cap resources to the FREE limits. Non-destructive —
+    // excess published sites are unpublished (kept as drafts), nothing
+    // deleted. Runs after the plan flip so the cap is in effect.
+    unpublished += await reconcileWorkspaceToFreePlan(sub.workspaceId);
     downgraded++;
   }
 
-  return Response.json({ ok: true, downgraded });
+  return Response.json({ ok: true, downgraded, unpublished });
 }

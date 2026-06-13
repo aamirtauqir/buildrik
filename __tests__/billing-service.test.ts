@@ -5,7 +5,7 @@ vi.mock("@/lib/prisma", () => ({
     subscription: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() },
     paymentMethod: { findUnique: vi.fn(), upsert: vi.fn() },
     invoice: { findMany: vi.fn(), count: vi.fn() },
-    site: { count: vi.fn() },
+    site: { count: vi.fn(), findMany: vi.fn(), updateMany: vi.fn() },
     workspaceMember: { count: vi.fn(), findFirst: vi.fn() },
     domain: { count: vi.fn() },
     aIGenerationJob: { count: vi.fn() },
@@ -150,6 +150,33 @@ describe("Billing Service", () => {
       expect(prisma.subscription.create).not.toHaveBeenCalled();
       expect(prisma.workspace.update).not.toHaveBeenCalled();
       vi.unstubAllEnvs();
+    });
+  });
+
+  describe("reconcileWorkspaceToFreePlan", () => {
+    it("unpublishes published sites beyond the FREE cap, keeping the newest, deleting nothing", async () => {
+      const { reconcileWorkspaceToFreePlan } = await import("@/server/services/billing.service");
+      // FREE cap is 3 — return 5 published sites (newest first).
+      vi.mocked(prisma.site.findMany).mockResolvedValue([
+        { id: "s1" }, { id: "s2" }, { id: "s3" }, { id: "s4" }, { id: "s5" },
+      ] as any);
+      vi.mocked(prisma.site.updateMany).mockResolvedValue({ count: 2 } as any);
+
+      const n = await reconcileWorkspaceToFreePlan("ws1");
+      expect(n).toBe(2);
+      // only the 2 oldest get unpublished; status→DRAFT, url cleared; no delete
+      expect(prisma.site.updateMany).toHaveBeenCalledWith({
+        where: { id: { in: ["s4", "s5"] } },
+        data: { status: "DRAFT", publishedUrl: null },
+      });
+    });
+
+    it("is a no-op when within the FREE cap", async () => {
+      const { reconcileWorkspaceToFreePlan } = await import("@/server/services/billing.service");
+      vi.mocked(prisma.site.findMany).mockResolvedValue([{ id: "s1" }, { id: "s2" }] as any);
+      const n = await reconcileWorkspaceToFreePlan("ws1");
+      expect(n).toBe(0);
+      expect(prisma.site.updateMany).not.toHaveBeenCalled();
     });
   });
 

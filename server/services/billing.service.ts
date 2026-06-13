@@ -165,6 +165,30 @@ export async function upgradePlan(_workspaceId: string, _input: UpgradeInput) {
   throw new Error("PAYMENTS_NOT_CONFIGURED");
 }
 
+/**
+ * Reconcile a workspace's resources to the FREE plan after a downgrade.
+ * Non-destructive: published sites beyond the FREE cap are UNPUBLISHED (kept
+ * as drafts, fully reversible on re-upgrade), most-recently-published kept.
+ * Nothing is deleted — a downgrade must never destroy user data. Returns the
+ * number of sites unpublished.
+ */
+export async function reconcileWorkspaceToFreePlan(workspaceId: string): Promise<number> {
+  const cap = PLAN_LIMITS.FREE.sites as number;
+  const published = await prisma.site.findMany({
+    where: { workspaceId, deletedAt: null, status: "PUBLISHED" },
+    orderBy: { lastPublishedAt: "desc" },
+    select: { id: true },
+  });
+  const excess = published.slice(cap); // keep the newest `cap`, unpublish the rest
+  if (excess.length === 0) return 0;
+
+  await prisma.site.updateMany({
+    where: { id: { in: excess.map((s) => s.id) } },
+    data: { status: "DRAFT", publishedUrl: null },
+  });
+  return excess.length;
+}
+
 export async function cancelSubscription(
   workspaceId: string,
   input: CancelInput,
