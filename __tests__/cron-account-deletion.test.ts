@@ -15,9 +15,13 @@ vi.mock("@/lib/prisma", () => ({
       delete: vi.fn(),
     },
     workspace: {
-      deleteMany: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
     },
     workspaceMember: {
+      findFirst: vi.fn(),
+      update: vi.fn(),
       deleteMany: vi.fn(),
     },
   },
@@ -36,8 +40,8 @@ const mockPrisma = prisma as typeof prisma & {
     findUnique: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
   };
-  workspace: { deleteMany: ReturnType<typeof vi.fn> };
-  workspaceMember: { deleteMany: ReturnType<typeof vi.fn> };
+  workspace: { findMany: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; delete: ReturnType<typeof vi.fn> };
+  workspaceMember: { findFirst: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn>; deleteMany: ReturnType<typeof vi.fn> };
 };
 
 function makeReq(authHeader?: string): NextRequest {
@@ -62,44 +66,44 @@ describe("account-deletion cron", () => {
     expect(res.status).toBe(401);
   });
 
-  it("happy path: processes pending request, deletes workspace then members then user", async () => {
+  it("happy path: solo workspace is deleted, then members, then user", async () => {
     const req = { id: "req1", userId: "user1" };
     mockPrisma.accountDeletionReq.findMany.mockResolvedValue([req]);
     mockPrisma.user.findUnique.mockResolvedValue({ id: "user1" });
-    mockPrisma.workspace.deleteMany.mockResolvedValue({ count: 1 });
+    mockPrisma.workspace.findMany.mockResolvedValue([{ id: "ws1" }]);
+    mockPrisma.workspaceMember.findFirst.mockResolvedValue(null); // no co-members → solo
+    mockPrisma.workspace.delete.mockResolvedValue({ id: "ws1" });
     mockPrisma.workspaceMember.deleteMany.mockResolvedValue({ count: 0 });
     mockPrisma.user.delete.mockResolvedValue({ id: "user1" });
     mockPrisma.accountDeletionReq.update.mockResolvedValue({});
 
     const res = await GET(makeReq("Bearer test-secret"));
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body).toEqual({ ok: true, deleted: 1 });
+    expect(await res.json()).toEqual({ ok: true, deleted: 1 });
 
-    expect(mockPrisma.$transaction).toHaveBeenCalledOnce();
-    expect(mockPrisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { ownerId: "user1" } });
-    expect(mockPrisma.workspaceMember.deleteMany).toHaveBeenCalledWith({ where: { userId: "user1" } });
+    expect(mockPrisma.workspace.delete).toHaveBeenCalledWith({ where: { id: "ws1" } });
     expect(mockPrisma.user.delete).toHaveBeenCalledWith({ where: { id: "user1" } });
-    expect(mockPrisma.accountDeletionReq.update).toHaveBeenCalledWith({
-      where: { id: "req1" },
-      data: { processedAt: expect.any(Date) },
-    });
+    const wsDeleteOrder = mockPrisma.workspace.delete.mock.invocationCallOrder[0];
+    const userDeleteOrder = mockPrisma.user.delete.mock.invocationCallOrder[0];
+    expect(wsDeleteOrder).toBeLessThan(userDeleteOrder);
   });
 
-  it("deletion order: workspace.deleteMany is called before user.delete", async () => {
-    const req = { id: "req1", userId: "user1" };
+  it("SAFETY: a shared workspace is TRANSFERRED to a co-member, not deleted", async () => {
+    const req = { id: "req1", userId: "owner1" };
     mockPrisma.accountDeletionReq.findMany.mockResolvedValue([req]);
-    mockPrisma.user.findUnique.mockResolvedValue({ id: "user1" });
-    mockPrisma.workspace.deleteMany.mockResolvedValue({ count: 0 });
-    mockPrisma.workspaceMember.deleteMany.mockResolvedValue({ count: 0 });
-    mockPrisma.user.delete.mockResolvedValue({ id: "user1" });
+    mockPrisma.user.findUnique.mockResolvedValue({ id: "owner1" });
+    mockPrisma.workspace.findMany.mockResolvedValue([{ id: "ws1" }]);
+    mockPrisma.workspaceMember.findFirst.mockResolvedValue({ id: "m2", userId: "member2" });
+    mockPrisma.workspaceMember.deleteMany.mockResolvedValue({ count: 1 });
+    mockPrisma.user.delete.mockResolvedValue({ id: "owner1" });
     mockPrisma.accountDeletionReq.update.mockResolvedValue({});
 
     await GET(makeReq("Bearer test-secret"));
 
-    const workspaceDeleteOrder = mockPrisma.workspace.deleteMany.mock.invocationCallOrder[0];
-    const userDeleteOrder = mockPrisma.user.delete.mock.invocationCallOrder[0];
-    expect(workspaceDeleteOrder).toBeLessThan(userDeleteOrder);
+    // ownership transferred, heir promoted to OWNER, workspace NOT deleted
+    expect(mockPrisma.workspace.update).toHaveBeenCalledWith({ where: { id: "ws1" }, data: { ownerId: "member2" } });
+    expect(mockPrisma.workspaceMember.update).toHaveBeenCalledWith({ where: { id: "m2" }, data: { role: "OWNER" } });
+    expect(mockPrisma.workspace.delete).not.toHaveBeenCalled();
   });
 
   it("user already deleted: marks processedAt without attempting deletion", async () => {
@@ -113,7 +117,7 @@ describe("account-deletion cron", () => {
     const body = await res.json();
     expect(body).toEqual({ ok: true, deleted: 0 });
 
-    expect(mockPrisma.workspace.deleteMany).not.toHaveBeenCalled();
+    expect(mockPrisma.workspace.delete).not.toHaveBeenCalled();
     expect(mockPrisma.user.delete).not.toHaveBeenCalled();
     expect(mockPrisma.accountDeletionReq.update).toHaveBeenCalledWith({
       where: { id: "req1" },

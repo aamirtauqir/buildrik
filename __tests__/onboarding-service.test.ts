@@ -22,8 +22,6 @@ import {
   completeStep,
   completeDashboardTask,
   dismissOnboarding,
-  completeTourStep,
-  completeTour,
 } from "@/server/services/onboarding.service";
 
 const mockState = {
@@ -231,33 +229,5 @@ describe("Onboarding Service", () => {
     });
   });
 
-  describe("completeTourStep", () => {
-    it("advances tourStep", async () => {
-      const updated = { ...mockState, tourStep: 2 };
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
-      const result = await completeTourStep("user_1", 1);
-      expect(result.tourStep).toBe(2);
-      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { userId: "user_1" },
-          data: expect.objectContaining({ tourStep: 2 }),
-        })
-      );
-    });
-  });
-
-  describe("completeTour", () => {
-    it("sets tourCompleted=true", async () => {
-      const updated = { ...mockState, tourCompleted: true };
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
-      const result = await completeTour("user_1");
-      expect(result.tourCompleted).toBe(true);
-      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { userId: "user_1" },
-          data: expect.objectContaining({ tourCompleted: true }),
-        })
-      );
-    });
-  });
+  // completeTourStep / completeTour removed — dead procedures (no tour UI).
 });

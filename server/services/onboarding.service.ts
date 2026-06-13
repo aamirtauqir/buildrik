@@ -112,16 +112,3 @@ export async function dismissOnboarding(userId: string) {
   });
 }
 
-export async function completeTourStep(userId: string, step: number) {
-  return prisma.onboardingState.update({
-    where: { userId },
-    data: { tourStep: step + 1 },
-  });
-}
-
-export async function completeTour(userId: string) {
-  return prisma.onboardingState.update({
-    where: { userId },
-    data: { tourCompleted: true },
-  });
-}

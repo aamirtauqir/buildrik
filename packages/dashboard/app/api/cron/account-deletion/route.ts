@@ -36,7 +36,27 @@ export async function GET(req: NextRequest) {
     }
 
     await prisma.$transaction(async (tx) => {
-      await tx.workspace.deleteMany({ where: { ownerId: deletionReq.userId } });
+      // A workspace owned by the departing user may still have OTHER active
+      // members (a team). deleteMany({ownerId}) would destroy every
+      // co-member's shared sites — data loss. Transfer ownership to the
+      // longest-tenured remaining active member; only delete solo workspaces.
+      const ownedWorkspaces = await tx.workspace.findMany({
+        where: { ownerId: deletionReq.userId },
+        select: { id: true },
+      });
+      for (const ws of ownedWorkspaces) {
+        const heir = await tx.workspaceMember.findFirst({
+          where: { workspaceId: ws.id, status: "ACTIVE", userId: { not: deletionReq.userId } },
+          orderBy: { joinedAt: "asc" },
+          select: { id: true, userId: true },
+        });
+        if (heir) {
+          await tx.workspace.update({ where: { id: ws.id }, data: { ownerId: heir.userId } });
+          await tx.workspaceMember.update({ where: { id: heir.id }, data: { role: "OWNER" } });
+        } else {
+          await tx.workspace.delete({ where: { id: ws.id } });
+        }
+      }
       await tx.workspaceMember.deleteMany({ where: { userId: deletionReq.userId } });
       await tx.user.delete({ where: { id: deletionReq.userId } });
       await tx.accountDeletionReq.update({

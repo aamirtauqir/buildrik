@@ -54,11 +54,11 @@
 - [x] G6 Folder error string mismatch FOLDER_EXISTS vs FOLDER_NAME_EXISTS
 - [x] G7 sites context-menu moveToFolder/export dead + bulk Export All dead + more-options button — wire move / remove export
 - [x] G8 Analytics undefined% + dropped devices + dead metrics block + hardcoded archivedCount/SSL-fake/raw lastPublishedBy
-- [def] G9 Change-email UI missing (backend built) — wire minimal form
-- [def] G10 Workspace-transfer vertical fully orphaned (router+service+emails, no UI) — wire-or-delete decision
-- [def] G11 Media asset-version subsystem orphaned (3 procedures) — wire-or-delete
-- [def] G12 Onboarding completeTour/completeStep dead procedures + phantom /onboarding/create sidebar step + invited-checklist unmounted
-- [def] G13 Danger-zone pre-delete guards decorative + cron hard-deletes co-members' workspaces — add server guard
+- [def] G9 Change-email — net-new UI (account-tab has no email-change section at all); backend (requestEmailChange + verify flow) intact. Building the form + verify-landing UX is feature-scope, not a broken interactive.
+- [def] G10 Workspace-transfer — full backend (router+service+3 emails+expiry cron) with no UI. Net-new feature (recipient picker + accept flow), not a broken interactive; backend left intact for the build.
+- [def] G11 Media asset-versions (list/create/restore) — no UI; assetVersionsCap plan-limit signals intent. Net-new version-history UI is feature-scope; backend left intact.
+- [x] G12 Deleted dead completeTour/completeTourStep procedures + service fns (zero consumers; no tour UI). tourStep/tourCompleted columns kept for a future tour.
+- [x] G13 account-deletion cron deleteMany({ownerId}) destroyed shared TEAM workspaces (all co-members' sites). Now transfers ownership of shared workspaces to the longest-tenured member; only solo workspaces deleted.
 
 ## Verified-healthy (NOT flagged — core spines sound)
 Auth spine, sites/pages CRUD + publish pipeline, team invite/role/revoke, settings saves + 2FA + sessions, AI generate worker (real progress/cancel/credits), help seed/ticket/ack, notification prefs/mute/delete, editor Add/Templates/History/Layers-core/Pages-core/Settings-core/AI-apply/Components-core, DS tokens/export, ecommerce modal, wizard.

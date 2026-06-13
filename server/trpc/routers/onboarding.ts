@@ -8,8 +8,6 @@ import {
   completeStep,
   completeDashboardTask,
   dismissOnboarding,
-  completeTourStep,
-  completeTour,
 } from "@/server/services/onboarding.service";
 import {
   selectRoleSchema,
@@ -75,22 +73,7 @@ export const onboardingRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to dismiss onboarding" });
     }
   }),
-
-  completeTourStep: protectedProcedure
-    .input(z.object({ step: z.number().int().min(0) }))
-    .mutation(async ({ ctx, input }) => {
-      try {
-        return await completeTourStep(ctx.session.user.id, input.step);
-      } catch {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to advance tour step" });
-      }
-    }),
-
-  completeTour: protectedProcedure.mutation(async ({ ctx }) => {
-    try {
-      return await completeTour(ctx.session.user.id);
-    } catch {
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to complete tour" });
-    }
-  }),
+  // completeTourStep / completeTour procedures removed — no tour UI calls them
+  // (zero consumers). The tourStep/tourCompleted columns remain on
+  // OnboardingState for when an editor tour is actually built.
 });
