@@ -1,5 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { HELP_CATEGORIES, type SupportTicketInput } from "@buildrik/shared/schemas/help";
+import { sendTicketReceivedEmail } from "@/server/services/email.service";
+
+// SLA copy by plan — mirrors the confirmation UI (ticket-form SLA_BY_PLAN).
+const SLA_COPY: Record<string, string> = {
+  FREE: "Free plans use our help docs — we read every ticket but don't guarantee an email reply.",
+  PRO: "You're on Pro: expect an email response within 48 hours.",
+  BUSINESS: "You're on Business: priority response within 4 hours.",
+};
 
 export function listCategories() {
   return HELP_CATEGORIES.map((c) => ({ ...c }));
@@ -75,6 +83,18 @@ export async function createTicket(userId: string, input: SupportTicketInput) {
       attachments: input.attachments ?? [],
     },
   });
+  // Acknowledge the ticket by email so the SLA promised in the UI isn't a
+  // lie — the ticket previously persisted with no acknowledgement at all.
+  // Fire-and-forget: a mail hiccup must not fail ticket creation.
+  prisma.user
+    .findUnique({ where: { id: userId }, select: { email: true } })
+    .then((u) => {
+      if (u?.email) {
+        return sendTicketReceivedEmail(u.email, ticket.ticketNumber, ticket.subject, SLA_COPY[plan] ?? SLA_COPY.FREE);
+      }
+    })
+    .catch((err) => console.error("[help] ticket ack email failed:", err));
+
   // ticketNumber (real column) + plan feed the confirmation UI, which used to
   // hardcode "#0" and a FREE SLA.
   return { ...ticket, plan };

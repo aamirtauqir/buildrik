@@ -19,6 +19,7 @@ import PlanLimitWarning from "@/emails/plan-limit-warning";
 import WsTransferInvite from "@/emails/ws-transfer-invite";
 import FormSubmission from "@/emails/form-submission";
 import SiteTransferred from "@/emails/site-transferred";
+import TicketReceived from "@/emails/ticket-received";
 
 let _transport: nodemailer.Transporter | null = null;
 function getTransport() {
@@ -99,6 +100,11 @@ export async function sendExportReadyEmail(to: string, downloadUrl: string) {
 export async function sendAccountDeletionEmail(to: string, deletionDate: string) {
   const html = await render(AccountDeletion({ deletionDate, cancelUrl: `${BASE_URL}/settings/danger-zone` }));
   await sendEmail(to, "Account deletion scheduled — Buildrik", html);
+}
+
+export async function sendTicketReceivedEmail(to: string, ticketNumber: number, subject: string, sla: string) {
+  const html = await render(TicketReceived({ ticketNumber, subject, sla }));
+  await sendEmail(to, `We got your request — Ticket #${ticketNumber}`, html);
 }
 
 export async function sendAICompleteEmail(to: string, siteName: string, siteId: string) {

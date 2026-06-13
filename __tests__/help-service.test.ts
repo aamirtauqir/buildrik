@@ -13,6 +13,9 @@ vi.mock("@/lib/prisma", () => ({
     workspaceMember: {
       findMany: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -23,6 +26,8 @@ describe("Help Service", () => {
     vi.clearAllMocks();
     // Default: no memberships → FREE plan. Individual tests override.
     vi.mocked(prisma.workspaceMember.findMany).mockResolvedValue([] as never);
+    // Default: no user row → ack email is skipped (fire-and-forget).
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(null as never);
   });
 
   describe("listCategories()", () => {
