@@ -1,6 +1,21 @@
 import { describe, it, expect } from "vitest";
 import type { LibraryItem } from "./mediaTypes";
-import { countByType, fmtSize } from "./mediaUtils";
+import type { MediaAsset } from "@/shared/types/media";
+import { countByType, fmtSize, toLibraryItem } from "./mediaUtils";
+
+describe("toLibraryItem — assetId threading (G11)", () => {
+  const base = {
+    id: "local_1", name: "hero", type: "image" as const, src: "blob:x",
+    size: 1234, mimeType: "image/png", createdAt: "2026-06-14T00:00:00Z",
+  };
+  it("surfaces the synced serverId as assetId for version-history calls", () => {
+    const synced = { ...base, serverId: "srv_abc" } as unknown as MediaAsset;
+    expect(toLibraryItem(synced).assetId).toBe("srv_abc");
+  });
+  it("leaves assetId undefined for local-only / unsynced assets", () => {
+    expect(toLibraryItem(base as unknown as MediaAsset).assetId).toBeUndefined();
+  });
+});
 
 describe("fmtSize", () => {
   it("formats bytes", () => expect(fmtSize(512)).toBe("512 B"));

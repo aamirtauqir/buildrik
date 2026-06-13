@@ -63,6 +63,13 @@ export interface LibraryItem {
   createdAt: string;
   mimeType: string;
   assetSource?: "uploaded" | "stock" | "ai";
+  /**
+   * Dashboard MediaAsset id (the synced server row). Present once the asset
+   * has been uploaded + synced; absent for local-only / stock items. Used to
+   * read & write the server-side version history (media.{list,create,restore}
+   * AssetVersion) from the detail drawer's Versions tab.
+   */
+  assetId?: string;
 }
 
 // --- Delete confirmation ---

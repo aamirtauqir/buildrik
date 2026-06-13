@@ -28,6 +28,7 @@ import { SelectionContextBar } from "./components/SelectionContextBar";
 import "./MediaTab.css";
 import { useToast } from "@/editor/shared/vibcoder";
 import type { LibraryItem } from "./data/mediaTypes";
+import { createAssetVersion } from "../../../../services/MediaVersionService";
 import type { IconConfig } from "@shared/types/media";
 
 interface MediaTabProps {
@@ -95,7 +96,20 @@ function MediaTabWithComposer({
           
           // Upload new file — await so we only claim success when it lands.
           const ok = await state.upload([file]);
-          if (ok) showToast(`New version of ${item.name} created ✓`, "success");
+          if (ok) {
+            showToast(`New version of ${item.name} created ✓`, "success");
+            // Record a server-side restore point of the pre-edit asset (synced
+            // assets only). Lets the Versions tab roll the asset back to this
+            // state. Best-effort: never block the edit on a version write.
+            if (item.assetId) {
+              createAssetVersion({
+                assetId: item.assetId,
+                url: item.src,
+                bytes: item.size,
+                edits: { via: "image-editor", newFile: fileName },
+              }).catch(() => {});
+            }
+          }
         } catch (err) {
           console.error("Failed to process edited image:", err);
           showToast("Could not save edited version", "error");
@@ -119,8 +133,17 @@ function MediaTabWithComposer({
       const ext = blob.type.split("/")[1] || "webp";
       const fileName = `${cleanName}_opt_v${timestamp % 10000}`;
       const file = new File([blob], `${fileName}.${ext}`, { type: blob.type });
-      state.upload([file]);
+      await state.upload([file]);
       showToast(`Optimized ${item.name} ✓`, "success");
+      // Record a server-side restore point of the pre-optimize asset.
+      if (item.assetId) {
+        createAssetVersion({
+          assetId: item.assetId,
+          url: item.src,
+          bytes: item.size,
+          edits: { via: "optimize", newFile: fileName },
+        }).catch(() => {});
+      }
     } catch (err) {
       console.error("Failed to save optimized image:", err);
       showToast("Could not save optimized image", "error");

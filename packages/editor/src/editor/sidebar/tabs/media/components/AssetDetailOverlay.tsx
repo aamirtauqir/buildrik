@@ -21,6 +21,11 @@ import { OptimizationPanel } from "@/editor/media/OptimizationPanel";
 import type { LibraryItem } from "../data/mediaTypes";
 import { fmtDur, fmtSize } from "../data/mediaUtils";
 import type { Composer } from "../../../../../engine/Composer";
+import {
+  listAssetVersions,
+  restoreAssetVersion,
+  type AssetVersion,
+} from "../../../../../services/MediaVersionService";
 
 type Tab = "preview" | "used" | "versions" | "edit" | "optimize";
 
@@ -95,6 +100,39 @@ export function AssetDetailOverlay({
       .filter((it) => baseName(it.name) === base && it.type === item.type)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [libraryItems, item.name, item.type]);
+
+  // Server-side version history (restore points), for synced assets only. The
+  // sibling heuristic above lists separate edited files; this lists real
+  // mediaAssetVersion records you can restore the asset to.
+  const [dbVersions, setDbVersions] = useState<AssetVersion[]>([]);
+  const [dbVersionsLoading, setDbVersionsLoading] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+
+  const reloadDbVersions = useCallback(() => {
+    if (!item.assetId) { setDbVersions([]); return; }
+    setDbVersionsLoading(true);
+    listAssetVersions(item.assetId)
+      .then((vs) => { if (mountedRef.current) setDbVersions(vs); })
+      .catch(() => { if (mountedRef.current) setDbVersions([]); })
+      .finally(() => { if (mountedRef.current) setDbVersionsLoading(false); });
+  }, [item.assetId]);
+
+  useEffect(() => {
+    if (tab === "versions" && item.assetId) reloadDbVersions();
+  }, [tab, item.assetId, reloadDbVersions]);
+
+  const handleRestoreVersion = useCallback((versionId: string) => {
+    setRestoringId(versionId);
+    restoreAssetVersion(versionId)
+      .then((res) => {
+        if (!mountedRef.current) return;
+        // Reflect the restored URL on the live item + canvas references.
+        onUpdate?.(item.key, { src: res.url });
+        reloadDbVersions();
+      })
+      .catch(() => {})
+      .finally(() => { if (mountedRef.current) setRestoringId(null); });
+  }, [onUpdate, item.key, reloadDbVersions]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -317,6 +355,37 @@ export function AssetDetailOverlay({
                   </li>
                 ))}
               </ul>
+            )}
+
+            {/* Server-side restore points (synced assets). Distinct from the
+                sibling-file list above: these are saved states of THIS asset
+                you can roll back to. */}
+            {item.assetId && (dbVersionsLoading || dbVersions.length > 0) && (
+              <div className="med-detail-restore-points">
+                <div className="med-detail-restore-points-title">Restore points</div>
+                {dbVersionsLoading ? (
+                  <div className="med-detail-empty">Loading…</div>
+                ) : (
+                  <ul className="med-detail-versions-list">
+                    {dbVersions.map((v) => (
+                      <li key={v.id} className="med-detail-version-row">
+                        <span className="med-detail-version-meta">
+                          {fmtSize(v.bytes)} · {new Date(v.createdAt).toLocaleString()}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRestoreVersion(v.id)}
+                          disabled={restoringId !== null}
+                        >
+                          {restoringId === v.id ? "Restoring…" : "Restore"}
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
           </div>
         ) : tab === "edit" ? (
