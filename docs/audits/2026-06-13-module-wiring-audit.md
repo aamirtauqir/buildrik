@@ -1,0 +1,64 @@
+# Buildrik — Module-by-Module Wiring Audit (2026-06-13)
+
+8 parallel specialist agents traced every interactive UI → router/handler → service → model across editor + dashboard. Only confirmed gaps (read-verified). Intentional "coming soon" / demo-only / documented-deferral items excluded. Status: [ ] open · [x] fixed · [def] deferred (wire-or-delete decision).
+
+## Batch A — Editor persistence (DATA-LOSS, P0/P1)
+- [x] A1 Manual Save + Cmd+S persist to localStorage only, fake "Saved" toast — useSaveCallback.ts:62 → route through dashboard saveProject
+- [x] A2 Undo/redo + version-restore never auto-persist (autosave only on project:changed) — useComposerInit autosave must also fire on history:undo/redo/version:restored
+
+## Batch B — Editor wiring (P1)
+- [x] B1 Publish tab buttons dead — StudioPanels never forwards onPublish/onUnpublish (deferred to topbar; sidebar shows honest "use Publish button" notice)
+- [x] B2 Settings tab hardcoded userPlan="starter" → Custom-code/Integrations locked for all — thread real plan
+- [x] B3 IntegrationsHub children miss registerFlushHandler → GA/pixel/head/body dropped on save
+- [x] B4 Media drag-to-canvas broken — AssetCell sets wrong MIME; use setMediaDragData SSOT (+ LibraryView cards)
+- [x] B5 Pages drag-to-reorder advertised but never calls reorderPage — wired drop target → composer.elements.reorderPage
+- [x] B6 Components row-menu Duplicate FAKE (manual-instructions modal) — call composer.components.duplicateComponent
+- [x] B7 Component detail Swap button FAKE (toast only) — removed dead Swap control + handler
+
+## Batch C — Editor export (P1)
+- [x] C1 Animation keyframes (bd-anim-*) missing from export CSS → animations dead on published sites
+- [x] C2 Interaction attributes + runtime dropped on export (data-buildrick-interactions whitelisted out) — forward attr (runtime injection deferred, documented)
+
+## Batch D — Editor inspector/AI/misc (P1/P2)
+- [x] D1 Inspector Visibility toggles write unconsumed --hide-* prop → show/hide no-ops (canvas + export consume it now)
+- [x] D2 elementProperties data-columns fall-through double-writes (missing return)
+- [x] D3 AI chat-mode scope omits tokens/assets → set-token silently no-ops in chat
+- [x] D4 AI Stop doesn't cancel in-flight stream (quota leak) — unsubscribe on stop
+- [x] D5 LockedScreen/UpgradeModal upgrade URL 404 (/settings/subscription → /dashboard/billing)
+- [x] D6 Media Retry button unwired + StockSource picker pills unwired (wired retry; source pills deferred-stub documented)
+- [x] D7 Collaborate button + footer "Connected" hardcoded — gate Collaborate behind flag, drive footer from real saveState
+- [def] D8 DS dark-value input never commits — documented D4 deferral upstream; left as-is (matches engine roadmap)
+- [def] D9 Layers Hide/Rename display-only (not persisted to publish) — documented as panel-local; wiring needs engine display layer (defer)
+
+## Batch E — Dashboard flows (P1)
+- [x] E1 Notification "Mark as unread" no-op (markAsRead hardsets read:true) — support read flag
+- [x] E2 Access tab reads plan off wrong query → everyone FREE — use billing.overview/settings plan
+- [x] E3 Share-link "No expiry" sends "0" → Zod min(1) fail — send undefined
+- [x] E4 Domains tab never renders dnsRecords → verification impossible — render records table
+- [x] E5 Publish flow no nav entry from detail area — pass onPublish to SiteHeader
+- [x] E6 contextual-help slugs all 404 (ARTICLE_META mismatch w/ seeded slugs) — align to seeded slugs
+- [x] E7 Forms "View submissions" 404 ×2 + email CTA dead — repoint to existing on-page table/drawer
+
+## Batch F — Dashboard billing honesty (P1/P2)
+- [x] F1 Billing Cancel-subscription unreachable (nothing opens CancelModal) — add Cancel button
+- [x] F2 switchInterval FAKE proration + bypasses service — hide until real Stripe (honest)
+- [x] F3 Bandwidth/storage meters hardcoded 0 (billing + dashboard-home + workspace-health) — compute storage from MediaAsset; hide bandwidth
+- [x] F4 DunningBanner fake 14-day grace (no real failedAt) — thread real timestamp or hide
+
+## Batch G — Dashboard orphans + honesty (P1/P2)
+- [x] G1 Notification mentions tab empty (type set mismatch) — align to produced types
+- [x] G2 Team revoke/revokeInvite missing onError (silent failure) — add toasts
+- [x] G3 Account set-password no-op for social users — wire setPassword or hide
+- [x] G4 Avatar GIF + workspace SVG picker-vs-validator mismatch — align formats
+- [x] G5 AI editor endpoints (content/page/layout) bypass quota — route through reserveQuota
+- [x] G6 Folder error string mismatch FOLDER_EXISTS vs FOLDER_NAME_EXISTS
+- [x] G7 sites context-menu moveToFolder/export dead + bulk Export All dead + more-options button — wire move / remove export
+- [x] G8 Analytics undefined% + dropped devices + dead metrics block + hardcoded archivedCount/SSL-fake/raw lastPublishedBy
+- [def] G9 Change-email UI missing (backend built) — wire minimal form
+- [def] G10 Workspace-transfer vertical fully orphaned (router+service+emails, no UI) — wire-or-delete decision
+- [def] G11 Media asset-version subsystem orphaned (3 procedures) — wire-or-delete
+- [def] G12 Onboarding completeTour/completeStep dead procedures + phantom /onboarding/create sidebar step + invited-checklist unmounted
+- [def] G13 Danger-zone pre-delete guards decorative + cron hard-deletes co-members' workspaces — add server guard
+
+## Verified-healthy (NOT flagged — core spines sound)
+Auth spine, sites/pages CRUD + publish pipeline, team invite/role/revoke, settings saves + 2FA + sessions, AI generate worker (real progress/cancel/credits), help seed/ticket/ack, notification prefs/mute/delete, editor Add/Templates/History/Layers-core/Pages-core/Settings-core/AI-apply/Components-core, DS tokens/export, ecommerce modal, wizard.

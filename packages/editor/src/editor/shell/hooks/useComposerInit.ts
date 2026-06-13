@@ -377,9 +377,20 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
           });
       }, THRESHOLDS.AUTOSAVE_DEBOUNCE);
     };
+    // Persist on direct edits AND on undo/redo/version-restore. Those last
+    // three go through importProject (emits only history:*/version:restored,
+    // never project:changed), so without these listeners an undo or a
+    // "Restore version" was never auto-saved — the change was lost on reload
+    // while the server kept the pre-undo state.
     composer.on("project:changed", handler);
+    composer.on("history:undo", handler);
+    composer.on("history:redo", handler);
+    composer.on("version:restored", handler);
     return () => {
       composer.off("project:changed", handler);
+      composer.off("history:undo", handler);
+      composer.off("history:redo", handler);
+      composer.off("version:restored", handler);
       if (timeoutId) clearTimeout(timeoutId);
     };
   }, [composer, setIsDirty, setSaveState, addToast]);

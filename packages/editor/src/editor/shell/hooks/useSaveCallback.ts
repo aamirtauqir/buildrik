@@ -21,6 +21,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { ToastInput } from "@/editor/shared/vibcoder/Toast";
 import type { SaveState } from "./useStudioState";
+import { getSiteIdFromUrl, saveProject } from "@/services/BuildrikSyncProvider";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -59,8 +60,15 @@ export function useSaveCallback({
   const save = React.useCallback(() => {
     if (!composer) return;
     setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
-    composer
-      .saveProject()
+    // When the editor is bound to a dashboard site, manual Save / Cmd+S must
+    // persist to the dashboard (same path as autosave) — composer.saveProject()
+    // alone only writes localStorage, so the "Saved" toast was a lie for
+    // dashboard-backed projects.
+    const siteId = getSiteIdFromUrl();
+    const savePromise = siteId
+      ? saveProject(siteId, composer.exportProject()).then(() => undefined)
+      : composer.saveProject();
+    savePromise
       .then(() => {
         setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
         setIsDirty(false);
