@@ -5,6 +5,7 @@ import { trpc } from "@lib/trpc/client";
 import { SiteHeader } from "@/components/site-detail/site-header";
 import { TabNav } from "@/components/site-detail/tab-nav";
 import { Breadcrumb } from "@/components/dashboard/breadcrumb";
+import { useToast } from "@/components/dashboard/toast-provider";
 
 export default function SiteDetailLayout({
   children,
@@ -13,9 +14,19 @@ export default function SiteDetailLayout({
 }) {
   const params = useParams();
   const siteId = params.id as string;
+  const { addToast } = useToast();
 
   const siteQuery = trpc.sites.get.useQuery({ id: siteId });
   const site = siteQuery.data;
+  // Header's Unpublish button had no handler wired, so it never rendered and
+  // the sites.unpublish procedure had no caller. Wire it here.
+  const unpublishMutation = trpc.sites.unpublish.useMutation({
+    onSuccess: () => {
+      siteQuery.refetch();
+      addToast("success", "Site unpublished");
+    },
+    onError: (err) => addToast("error", "Couldn't unpublish", err.message),
+  });
 
   if (siteQuery.isLoading) {
     return (
@@ -49,7 +60,10 @@ export default function SiteDetailLayout({
           { label: site.name },
         ]}
       />
-      <SiteHeader site={site} />
+      <SiteHeader
+        site={site}
+        onUnpublish={() => unpublishMutation.mutate({ siteId })}
+      />
       <div className="mt-4">
         <TabNav siteId={siteId} />
       </div>
