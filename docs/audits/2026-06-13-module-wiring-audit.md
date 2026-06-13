@@ -17,7 +17,7 @@
 
 ## Batch C — Editor export (P1)
 - [x] C1 Animation keyframes (bd-anim-*) missing from export CSS → animations dead on published sites
-- [x] C2 Interaction attributes + runtime dropped on export (data-buildrick-interactions whitelisted out) — forward attr (runtime injection deferred, documented)
+- [def] C2 Interaction attributes + runtime dropped on export — forwarding the data-buildrick-interactions attr alone does nothing without the InteractionRuntime JS on the published page; needs a runtime-bundling step (dedicated arc). Interactions still run in-editor. Deferred (animations — far more common — fixed in C1).
 
 ## Batch D — Editor inspector/AI/misc (P1/P2)
 - [x] D1 Inspector Visibility toggles write unconsumed --hide-* prop → show/hide no-ops (canvas + export consume it now)

@@ -13,6 +13,7 @@ import type {
   ExportedFile,
 } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG } from "../../shared/types/export";
+import { collectUsedKeyframes } from "../../shared/constants/animationKeyframes";
 import { CMSExportResolver } from "../cms/CMSExportResolver";
 import type { CMSExportMode, CMSExportOptions } from "../cms/CMSExportResolver";
 import type { Composer } from "../Composer";
@@ -163,6 +164,14 @@ export class ExportEngine {
 
     const styles = this.extractStyles(rootElement, cfg);
     css += styles;
+
+    // Emit @keyframes for any bd-anim-* animation referenced in the styles.
+    // Element animations write `animation: bd-anim-<name> …` but the exported
+    // site never loads the editor's animation-utils.css, so without this the
+    // keyframes are undefined and the animation silently no-ops on the live
+    // site. Only used keyframes are emitted (no bloat when none are animated).
+    const keyframes = collectUsedKeyframes(css);
+    if (keyframes) css += `\n${keyframes}`;
 
     return cfg.minify ? minifyCSS(css) : css;
   }
