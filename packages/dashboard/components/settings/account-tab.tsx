@@ -8,10 +8,12 @@ interface ConnectedAccount {
 }
 
 interface AccountTabProps {
+  email?: string;
   hasPassword?: boolean;
   connectedAccounts?: ConnectedAccount[];
   onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void;
   onSetPassword?: (data: { newPassword: string }) => void;
+  onChangeEmail?: (data: { newEmail: string; password: string }) => void;
   onConnectAccount?: (provider: "google" | "github") => void;
   onDisconnectAccount?: (provider: "google" | "github") => void;
   saving?: boolean;
@@ -64,10 +66,12 @@ const PROVIDER_ICONS: Record<"google" | "github", React.ReactNode> = {
 };
 
 export function AccountTab({
+  email = "",
   hasPassword = true,
   connectedAccounts = [],
   onChangePassword,
   onSetPassword,
+  onChangeEmail,
   onConnectAccount,
   onDisconnectAccount,
   saving,
@@ -76,8 +80,32 @@ export function AccountTab({
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [confirmError, setConfirmError] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [emailPassword, setEmailPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   const isSocialOnly = !hasPassword;
+
+  function handleEmailSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = newEmail.trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed)) {
+      setEmailError("Enter a valid email address.");
+      return;
+    }
+    if (trimmed === email.toLowerCase()) {
+      setEmailError("That's already your email.");
+      return;
+    }
+    if (hasPassword && !emailPassword) {
+      setEmailError("Enter your password to confirm.");
+      return;
+    }
+    setEmailError("");
+    onChangeEmail?.({ newEmail: trimmed, password: emailPassword });
+    setNewEmail("");
+    setEmailPassword("");
+  }
 
   function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -180,6 +208,72 @@ export function AccountTab({
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             {saving ? "Saving..." : isSocialOnly ? "Set password" : "Update password"}
+          </button>
+        </form>
+      </section>
+
+      <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
+
+      <section>
+        <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
+          Email address
+        </h2>
+        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+          {email ? (
+            <>Currently <span style={{ color: "var(--color-text-primary)" }}>{email}</span>. We'll send a confirmation link to the new address before switching.</>
+          ) : (
+            "We'll send a confirmation link to the new address before switching."
+          )}
+        </p>
+
+        <form onSubmit={handleEmailSubmit} className="space-y-4 max-w-sm">
+          <div>
+            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              New email
+            </label>
+            <input
+              type="email"
+              value={newEmail}
+              onChange={(e) => { setNewEmail(e.target.value); if (emailError) setEmailError(""); }}
+              required
+              placeholder="you@example.com"
+              className="w-full px-3 py-2 text-sm rounded-md border outline-none"
+              style={{
+                borderColor: emailError ? "var(--color-primary)" : "var(--color-border-default)",
+                color: "var(--color-text-primary)",
+              }}
+            />
+          </div>
+
+          {hasPassword && (
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+                Current password
+              </label>
+              <input
+                type="password"
+                value={emailPassword}
+                onChange={(e) => { setEmailPassword(e.target.value); if (emailError) setEmailError(""); }}
+                required
+                className="w-full px-3 py-2 text-sm rounded-md border outline-none"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              />
+            </div>
+          )}
+
+          {emailError && (
+            <p className="text-xs" style={{ color: "var(--color-primary)" }}>
+              {emailError}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            {saving ? "Sending..." : "Send confirmation link"}
           </button>
         </form>
       </section>
