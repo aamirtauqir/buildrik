@@ -10,13 +10,20 @@ vi.mock("@/lib/prisma", () => ({
     supportTicket: {
       create: vi.fn(),
     },
+    workspaceMember: {
+      findMany: vi.fn(),
+    },
   },
 }));
 
 import { prisma } from "@/lib/prisma";
 
 describe("Help Service", () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Default: no memberships → FREE plan. Individual tests override.
+    vi.mocked(prisma.workspaceMember.findMany).mockResolvedValue([] as never);
+  });
 
   describe("listCategories()", () => {
     it("returns 6 categories", async () => {
@@ -136,6 +143,8 @@ describe("Help Service", () => {
       });
       expect(ticket.id).toBe("ticket1");
       expect(ticket.status).toBe("OPEN");
+      // FREE by default (no memberships) — drives the confirmation SLA.
+      expect(ticket.plan).toBe("FREE");
       expect(prisma.supportTicket.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           userId: "user1",
@@ -145,6 +154,20 @@ describe("Help Service", () => {
           attachments: [],
         }),
       });
+    });
+
+    it("returns the user's best plan across active memberships for the SLA", async () => {
+      const { createTicket } = await import("@/server/services/help.service");
+      vi.mocked(prisma.workspaceMember.findMany).mockResolvedValue([
+        { workspace: { plan: "FREE" } },
+        { workspace: { plan: "BUSINESS" } },
+        { workspace: { plan: "PRO" } },
+      ] as never);
+      vi.mocked(prisma.supportTicket.create).mockResolvedValue({ id: "t3", status: "OPEN" } as any);
+      const ticket = await createTicket("user1", {
+        subject: "x", category: "BILLING", description: "needs the better SLA here",
+      });
+      expect(ticket.plan).toBe("BUSINESS");
     });
 
     // Regression: W3.8 — attachments were collected in the form then dropped

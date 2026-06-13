@@ -54,7 +54,18 @@ export async function submitFeedback(articleId: string, helpful: boolean) {
 }
 
 export async function createTicket(userId: string, input: SupportTicketInput) {
-  return prisma.supportTicket.create({
+  const memberships = await prisma.workspaceMember.findMany({
+    where: { userId, status: "ACTIVE" },
+    select: { workspace: { select: { plan: true } } },
+  });
+  // SLA is driven by the user's best plan across active memberships
+  // (BUSINESS > PRO > FREE) — tickets are per-user but plans per-workspace.
+  const PLAN_RANK: Record<string, number> = { FREE: 0, PRO: 1, BUSINESS: 2 };
+  const plan = memberships
+    .map((m) => m.workspace.plan)
+    .reduce((best, p) => ((PLAN_RANK[p] ?? 0) > (PLAN_RANK[best] ?? 0) ? p : best), "FREE");
+
+  const ticket = await prisma.supportTicket.create({
     data: {
       userId,
       subject: input.subject,
@@ -64,4 +75,7 @@ export async function createTicket(userId: string, input: SupportTicketInput) {
       attachments: input.attachments ?? [],
     },
   });
+  // ticketNumber (real column) + plan feed the confirmation UI, which used to
+  // hardcode "#0" and a FREE SLA.
+  return { ...ticket, plan };
 }
