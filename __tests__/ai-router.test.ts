@@ -52,6 +52,15 @@ describe("ai router", () => {
     expect(result.limit).toBe(200);
   });
 
+  it("content endpoint reserves quota and refuses when exhausted (G5)", async () => {
+    reserveQuota.mockResolvedValueOnce({ ok: false, used: 10, limit: 10, resetsAt: new Date() });
+    const caller = aiRouter.createCaller(callerCtx);
+    await expect(
+      caller.content({ prompt: "write copy", type: "content" }),
+    ).rejects.toMatchObject({ code: "TOO_MANY_REQUESTS" });
+    expect(reserveQuota).toHaveBeenCalled();
+  });
+
   it("streamPrompt throws TOO_MANY_REQUESTS when quota exhausted", async () => {
     reserveQuota.mockResolvedValueOnce({ ok: false, used: 10, limit: 10, resetsAt: new Date() });
     const caller = aiRouter.createCaller(callerCtx);

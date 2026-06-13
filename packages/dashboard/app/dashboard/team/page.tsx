@@ -48,6 +48,7 @@ export default function TeamPage() {
       statsQuery.refetch();
       addToast("success", "Access revoked");
     },
+    onError: (err) => addToast("error", "Failed to revoke", err.message),
   });
 
   const deleteMutation = trpc.team.delete.useMutation({
@@ -65,6 +66,7 @@ export default function TeamPage() {
       statsQuery.refetch();
       addToast("success", "Invitation revoked");
     },
+    onError: (err) => addToast("error", "Failed to revoke invitation", err.message),
   });
 
   const resendInviteMutation = trpc.team.resendInvite.useMutation({

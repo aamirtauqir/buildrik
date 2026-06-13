@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Globe, MoreHorizontal, ExternalLink } from "lucide-react";
+import { ArrowLeft, Pencil, Globe, ExternalLink } from "lucide-react";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
@@ -61,7 +61,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
           {site.status === "PUBLISHED" && onUnpublish && (
             <button onClick={onUnpublish} className="rounded-lg border px-4 py-2 text-sm font-medium" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Unpublish</button>
           )}
-          <button className="rounded-lg border p-2" style={{ borderColor: "var(--color-border-default)" }}><MoreHorizontal className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+          {/* Dead "more options" button (no onClick, no menu) removed. */}
         </div>
       </div>
     </div>

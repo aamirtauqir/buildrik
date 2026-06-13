@@ -1,22 +1,23 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Pencil, Settings, Type, Copy, FolderInput, UserCheck, Download, ExternalLink, Link2, Archive, Trash2, MoreHorizontal } from "lucide-react";
+import { Pencil, Settings, Type, Copy, UserCheck, ExternalLink, Link2, Archive, Trash2, MoreHorizontal } from "lucide-react";
 
+// "Move to Folder" + "Export Site" removed — handleSiteAction had no case for
+// either (folder-move works via drag + bulk select; no export backend exists),
+// so both were dead clicks.
 export const CONTEXT_MENU_ITEMS = [
   { label: "Edit", action: "edit", icon: "Pencil" },
   { label: "Manage", action: "manage", icon: "Settings" },
   { label: "Rename", action: "rename", icon: "Type" },
   { label: "Duplicate", action: "duplicate", icon: "Copy" },
-  { label: "Move to Folder", action: "moveToFolder", icon: "FolderInput" },
   { label: "Transfer Site", action: "transfer", icon: "UserCheck" },
-  { label: "Export Site", action: "export", icon: "Download" },
   { label: "View Published", action: "viewPublished", icon: "ExternalLink" },
   { label: "Copy Site URL", action: "copyUrl", icon: "Link2" },
   { label: "Archive", action: "archive", icon: "Archive" },
   { label: "Delete", action: "delete", icon: "Trash2" },
 ] as const;
 
-const iconMap = { Pencil, Settings, Type, Copy, FolderInput, UserCheck, Download, ExternalLink, Link2, Archive, Trash2 } as const;
+const iconMap = { Pencil, Settings, Type, Copy, UserCheck, ExternalLink, Link2, Archive, Trash2 } as const;
 
 interface ContextMenuProps {
   siteStatus?: string;

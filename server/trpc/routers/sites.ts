@@ -396,7 +396,7 @@ export const sitesRouter = router({
         try {
           return await createFolder(workspaceId, input.name);
         } catch (e: unknown) {
-          if (e instanceof Error && e.message === "FOLDER_EXISTS")
+          if (e instanceof Error && e.message === "FOLDER_NAME_EXISTS")
             throw new TRPCError({
               code: "CONFLICT",
               message: "Folder name already exists.",

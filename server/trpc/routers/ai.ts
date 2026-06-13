@@ -25,6 +25,20 @@ import { modelSchema, DEFAULT_MODEL } from "../../services/types";
 import { aiAdoptionInputSchema } from "@buildrik/shared/schemas/ai-adoption";
 import { recordAiAdoption } from "../../services/ai-adoption.service";
 
+// Reserve one AI unit for the user's tier-resolved model before a provider
+// call. content/page/layout previously called the provider with NO quota
+// reservation — unlimited free AI / cost-abuse exposure. Throws on exhaustion.
+async function reserveAiUnit(userId: string): Promise<void> {
+  const model = modelSchema.parse(await resolveModelForUser(userId, DEFAULT_MODEL));
+  const quota = await reserveQuota(userId, model);
+  if (!quota.ok) {
+    throw new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: `Daily AI limit reached (${quota.limit}). Resets at ${quota.resetsAt.toISOString()}.`,
+    });
+  }
+}
+
 const contentInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
   type: z.enum(["content", "layout", "section"]),
@@ -140,7 +154,8 @@ const componentSchemaInputSchema = z.object({
 export const aiRouter = router({
   content: protectedProcedure
     .input(contentInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      await reserveAiUnit(ctx.session.user.id);
       try {
         return await generateContent(input);
       } catch (e: unknown) {
@@ -164,7 +179,8 @@ export const aiRouter = router({
 
   page: protectedProcedure
     .input(pageInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      await reserveAiUnit(ctx.session.user.id);
       try {
         return await generatePage(input);
       } catch (e: unknown) {
@@ -188,7 +204,8 @@ export const aiRouter = router({
 
   layout: protectedProcedure
     .input(layoutInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      await reserveAiUnit(ctx.session.user.id);
       try {
         return await generateLayout(input);
       } catch (e: unknown) {

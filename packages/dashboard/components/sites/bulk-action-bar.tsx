@@ -1,20 +1,21 @@
 "use client";
 import { useState } from "react";
-import { Archive, FolderInput, Trash2, Download, X, ChevronDown } from "lucide-react";
+import { Archive, FolderInput, Trash2, X, ChevronDown } from "lucide-react";
 
 // Bulk Publish/Unpublish were removed: they only flipped site.status without
 // creating publish jobs or deploying/tearing down, so they reported success
 // while the live site never changed. Per-site publish goes through the editor.
+// "Export All" likewise removed — no export backend exists and handleBulkAction
+// had no export branch, so it was a silent dead click.
 export const BULK_ACTIONS = [
   { label: "Archive All", action: "archive", icon: "Archive" },
   { label: "Move to Folder", action: "move", icon: "FolderInput" },
   { label: "Delete All", action: "delete", icon: "Trash2" },
-  { label: "Export All", action: "export", icon: "Download" },
 ] as const;
 
 export const BULK_SELECTION_CAP = 25;
 
-const iconMap = { Archive, FolderInput, Trash2, Download } as const;
+const iconMap = { Archive, FolderInput, Trash2 } as const;
 
 interface Folder {
   id: string;
