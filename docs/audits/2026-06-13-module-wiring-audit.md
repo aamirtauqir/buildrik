@@ -58,7 +58,7 @@
 - [x] G7 sites context-menu moveToFolder/export dead + bulk Export All dead + more-options button — wire move / remove export
 - [x] G8 Analytics undefined% + dropped devices + dead metrics block + hardcoded archivedCount/SSL-fake/raw lastPublishedBy
 - [def] G9 Change-email — net-new UI (account-tab has no email-change section at all); backend (requestEmailChange + verify flow) intact. Building the form + verify-landing UX is feature-scope, not a broken interactive.
-- [def] G10 Workspace-transfer — full backend (router+service+3 emails+expiry cron) with no UI. Net-new feature (recipient picker + accept flow), not a broken interactive; backend left intact for the build.
+- [x] G10 Workspace-transfer UI SHIPPED (deferred-build #4). Added a Transfer-ownership section to workspace settings (initiate form, pending-state with cancel) + the recipient accept-landing page at `/transfer/accept` (matches the invite email's URL). Wired `account.workspace.transfer.{pending,initiate,cancel,accept}`. Live-proven end-to-end: initiate → pending reflects the invited email → cancel → pending clears.
 - [def] G11 Media asset-versions (list/create/restore) — no UI; assetVersionsCap plan-limit signals intent. Net-new version-history UI is feature-scope; backend left intact.
 - [x] G12 Deleted dead completeTour/completeTourStep procedures + service fns (zero consumers; no tour UI). tourStep/tourCompleted columns kept for a future tour.
 - [x] G13 account-deletion cron deleteMany({ownerId}) destroyed shared TEAM workspaces (all co-members' sites). Now transfers ownership of shared workspaces to the longest-tenured member; only solo workspaces deleted.
