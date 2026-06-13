@@ -28,5 +28,11 @@ export async function GET(req: NextRequest) {
     where: { createdAt: { lt: new Date(now.getTime() - 10 * 60 * 1000) } },
   });
 
+  // Stripe stops retrying an event after ~3 days; the idempotency ledger
+  // only needs to outlive that window. Prune anything older than 7 days.
+  await prisma.processedWebhookEvent.deleteMany({
+    where: { processedAt: { lt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } },
+  });
+
   return Response.json({ ok: true, deleted: count });
 }

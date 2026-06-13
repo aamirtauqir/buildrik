@@ -123,7 +123,13 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
 
   function handleDisable() {
     setError("");
-    disableMutation.mutate({ password: disablePassword });
+    // Password accounts verify with the password; OAuth-only accounts verify
+    // with a current authenticator code (the single shared input field).
+    if (profile.data?.hasPassword) {
+      disableMutation.mutate({ password: disablePassword });
+    } else {
+      disableMutation.mutate({ code: disablePassword });
+    }
   }
 
   const sessionList = sessions.data ?? [];
@@ -307,7 +313,9 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
               Disable two-factor authentication
             </h3>
             <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              Enter your password to disable 2FA. This will remove the extra security layer.
+              {profile.data?.hasPassword
+                ? "Enter your password to disable 2FA. This will remove the extra security layer."
+                : "Enter the 6-digit code from your authenticator app to disable 2FA."}
             </p>
             {error && (
               <p className="text-sm" style={{ color: "#991b1b" }}>
@@ -316,10 +324,12 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
             )}
             <div className="flex gap-2">
               <input
-                type="password"
+                type={profile.data?.hasPassword ? "password" : "text"}
+                inputMode={profile.data?.hasPassword ? undefined : "numeric"}
+                maxLength={profile.data?.hasPassword ? undefined : 6}
                 value={disablePassword}
                 onChange={(e) => setDisablePassword(e.target.value)}
-                placeholder="Your password"
+                placeholder={profile.data?.hasPassword ? "Your password" : "123456"}
                 className="text-sm px-3 py-1.5 rounded-md border w-48"
                 style={{ borderColor: "var(--color-border-default)" }}
               />

@@ -926,6 +926,20 @@ model ApiToken {
   @@map("api_tokens")
 }
 
+/// Idempotency ledger for inbound Stripe webhook events. Stripe retries
+/// delivery until it gets a 2xx, so a slow/duplicate delivery used to fire
+/// the side effects (PAST_DUE flip + payment-failed notification/email)
+/// multiple times. The route inserts the event id here first; a duplicate
+/// insert (P2002) means "already handled" → skip.
+model ProcessedWebhookEvent {
+  eventId     String   @id
+  type        String
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+  @@map("processed_webhook_events")
+}
+
 /// Small-asset upload handshake (presign → PUT body → confirm). Previously an
 /// in-memory Map: on serverless the presign and the PUT hit different lambdas,
 /// so valid uploads 404'd. Rows expire after 10 minutes (enforced on read,

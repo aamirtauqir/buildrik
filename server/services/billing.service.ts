@@ -2,13 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { UpgradeInput, CancelInput } from "@buildrik/shared/schemas/billing";
 
-const PRICE_MAP: Record<string, number> = {
-  PRO_MONTHLY: 2900,
-  PRO_YEARLY: 2300,
-  BUSINESS_MONTHLY: 7900,
-  BUSINESS_YEARLY: 6300,
-};
-
 async function getUsageCounts(workspaceId: string) {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -154,52 +147,22 @@ export async function listInvoices(
   return { data, total };
 }
 
-export async function upgradePlan(workspaceId: string, input: UpgradeInput) {
-  // Payments are not wired yet (Stripe pending). Without this gate any
-  // authenticated user can call billing.upgrade directly over tRPC and
-  // provision an ACTIVE paid plan backed by placeholder_* Stripe IDs —
-  // a free upgrade with no payment. Refuse until Stripe is configured.
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("PAYMENTS_NOT_CONFIGURED");
-  }
-
-  const existing = await prisma.subscription.findUnique({
-    where: { workspaceId },
-  });
-
-  if (existing) {
-    throw new Error("ALREADY_SUBSCRIBED");
-  }
-
-  const priceKey = `${input.planId}_${input.interval}`;
-  const price = PRICE_MAP[priceKey];
-
-  const [subscription] = await prisma.$transaction([
-    prisma.subscription.create({
-      data: {
-        workspaceId,
-        plan: input.planId,
-        status: "ACTIVE",
-        interval: input.interval,
-        price,
-        currency: "usd",
-        cancelAtPeriodEnd: false,
-        isGrandfathered: false,
-        stripeSubscriptionId: `placeholder_${workspaceId}_${Date.now()}`,
-        stripePriceId: `placeholder_price_${priceKey}`,
-        stripeCurrentPeriodStart: new Date(),
-        stripeCurrentPeriodEnd: new Date(
-          Date.now() + (input.interval === "YEARLY" ? 365 : 30) * 86400000,
-        ),
-      },
-    }),
-    prisma.workspace.update({
-      where: { id: workspaceId },
-      data: { plan: input.planId },
-    }),
-  ]);
-
-  return subscription;
+export async function upgradePlan(_workspaceId: string, _input: UpgradeInput) {
+  // HARD-DISABLED. This procedure receives only { planId, interval } — no
+  // proof of payment — so it can never legitimately grant a paid plan. The
+  // previous implementation gated on STRIPE_SECRET_KEY *presence* and then
+  // wrote placeholder_* Stripe IDs while flipping the plan to ACTIVE: the
+  // moment a key existed in prod, ANY authenticated user could self-grant a
+  // paid plan for free by calling billing.upgrade directly.
+  //
+  // Real upgrades must flow through Stripe Checkout: the client is sent to a
+  // hosted checkout session, and the plan is flipped to ACTIVE only by the
+  // verified `invoice.paid` / `customer.subscription.updated` webhook
+  // (handleInvoicePaid / handleSubscriptionUpdated in
+  // stripe-webhook.service.ts). Until that checkout-session creation is
+  // wired (needs the Stripe SDK), this path stays closed — no DB write, no
+  // self-grant surface.
+  throw new Error("PAYMENTS_NOT_CONFIGURED");
 }
 
 export async function cancelSubscription(

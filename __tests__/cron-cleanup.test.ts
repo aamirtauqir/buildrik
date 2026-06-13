@@ -13,6 +13,7 @@ vi.mock("@/lib/prisma", () => ({
     publishBuildJob: { findMany: vi.fn(), update: vi.fn() },
     rateLimitBucket: { deleteMany: vi.fn() },
     pendingUpload: { deleteMany: vi.fn() },
+    processedWebhookEvent: { deleteMany: vi.fn() },
     $transaction: vi.fn(async (ops: unknown[]) => ops),
   },
 }));

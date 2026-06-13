@@ -255,7 +255,7 @@ export async function confirm2FA(userId: string, code: string) {
   return { success: true };
 }
 
-export async function disable2FA(userId: string, password: string) {
+export async function disable2FA(userId: string, password: string, code?: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("USER_NOT_FOUND");
 
@@ -263,6 +263,18 @@ export async function disable2FA(userId: string, password: string) {
     const bcrypt = await import("bcryptjs");
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) throw new Error("WRONG_PASSWORD");
+  } else {
+    // OAuth-only account: no password to check, so the only proof-of-owner
+    // we can demand is a current TOTP code. Skipping verification entirely
+    // meant a hijacked session could silently strip 2FA.
+    if (!code) throw new Error("CODE_REQUIRED");
+    if (!user.twoFactorSecret) throw new Error("2FA_NOT_SETUP");
+    const { authenticator } = await import("otplib");
+    const { decryptSecret } = await import("@/server/services/auth.service");
+    const secret = user.twoFactorSecret.includes(":")
+      ? decryptSecret(user.twoFactorSecret)
+      : user.twoFactorSecret;
+    if (!authenticator.verify({ token: code, secret })) throw new Error("INVALID_CODE");
   }
 
   await prisma.user.update({

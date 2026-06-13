@@ -79,12 +79,15 @@ export const accountRouter = router({
       .input(z.object({ code: z.string().length(6) }))
       .mutation(({ ctx, input }) => confirm2FA(ctx.session.user.id, input.code)),
     disable: protectedProcedure
-      .input(z.object({ password: z.string().optional().default("") }))
+      .input(z.object({ password: z.string().optional().default(""), code: z.string().optional() }))
       .mutation(async ({ ctx, input }) => {
         try {
-          return await disable2FA(ctx.session.user.id, input.password);
+          return await disable2FA(ctx.session.user.id, input.password, input.code);
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "WRONG_PASSWORD") throw new TRPCError({ code: "UNAUTHORIZED", message: "Password is incorrect." });
+          if (e instanceof Error && e.message === "CODE_REQUIRED") throw new TRPCError({ code: "BAD_REQUEST", message: "Enter your 6-digit authenticator code to disable 2FA." });
+          if (e instanceof Error && e.message === "INVALID_CODE") throw new TRPCError({ code: "UNAUTHORIZED", message: "Authenticator code is incorrect." });
+          if (e instanceof Error && e.message === "2FA_NOT_SETUP") throw new TRPCError({ code: "BAD_REQUEST", message: "Two-factor authentication is not set up." });
           if (e instanceof Error && e.message === "USER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
           throw e;
         }

@@ -133,39 +133,22 @@ describe("Billing Service", () => {
       vi.unstubAllEnvs();
     });
 
-    it("creates subscription for free user", async () => {
+    it("refuses to self-grant even when STRIPE_SECRET_KEY is set (no placeholder write)", async () => {
+      // Regression guard for the audit's sharpest billing finding: the old
+      // gate keyed off key *presence*, so a key in prod let any user write a
+      // placeholder subscription and flip their plan to PRO for free. The
+      // procedure has no payment proof, so it must never grant — real
+      // upgrades arrive via the Stripe webhook only.
       const { upgradePlan } = await import(
         "@/server/services/billing.service"
       );
       vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_stub");
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null);
-      vi.mocked(prisma.subscription.create).mockResolvedValue({
-        id: "sub1",
-        plan: "PRO",
-        status: "ACTIVE",
-        interval: "MONTHLY",
-        price: 2900,
-      } as any);
-      const result = await upgradePlan("ws1", {
-        planId: "PRO",
-        interval: "MONTHLY",
-      });
-      expect(result.plan).toBe("PRO");
-      vi.unstubAllEnvs();
-    });
-
-    it("throws if already subscribed", async () => {
-      const { upgradePlan } = await import(
-        "@/server/services/billing.service"
-      );
-      vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_stub");
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        plan: "PRO",
-        status: "ACTIVE",
-      } as any);
       await expect(
         upgradePlan("ws1", { planId: "PRO", interval: "MONTHLY" }),
-      ).rejects.toThrow("ALREADY_SUBSCRIBED");
+      ).rejects.toThrow("PAYMENTS_NOT_CONFIGURED");
+      expect(prisma.subscription.create).not.toHaveBeenCalled();
+      expect(prisma.workspace.update).not.toHaveBeenCalled();
       vi.unstubAllEnvs();
     });
   });

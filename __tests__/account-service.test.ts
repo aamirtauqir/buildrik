@@ -115,6 +115,27 @@ describe("Account Service", () => {
     });
   });
 
+  describe("disable2FA", () => {
+    it("requires a TOTP code for OAuth-only users (no password to verify)", async () => {
+      const { disable2FA } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        id: "u1", passwordHash: null, twoFactorSecret: "v1:aa:bb:cc", twoFactorEnabled: true,
+      } as any);
+      // No code passed → must refuse before disabling (was a silent bypass).
+      await expect(disable2FA("u1", "")).rejects.toThrow("CODE_REQUIRED");
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+
+    it("rejects a wrong password for password users", async () => {
+      const { disable2FA } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        id: "u1", passwordHash: "$2a$10$invalidhashvalue", twoFactorEnabled: true,
+      } as any);
+      await expect(disable2FA("u1", "wrong-password")).rejects.toThrow("WRONG_PASSWORD");
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+  });
+
   describe("getLoginHistory", () => {
     it("returns last 10 login attempts", async () => {
       const { getLoginHistory } = await import("@/server/services/account.service");

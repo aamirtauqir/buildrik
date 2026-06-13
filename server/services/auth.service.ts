@@ -2,7 +2,8 @@ import type { PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
-import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from "crypto";
+import { createDecipheriv, createHash, randomBytes, randomUUID } from "crypto";
+import { encrypt, decrypt } from "@/lib/encryption";
 import { generateToken, validateToken, invalidateToken } from "./token.service";
 import { isAccountLocked, incrementFailedAttempts, resetFailedAttempts } from "./rate-limit.service";
 import { sendVerificationEmail, sendPasswordResetEmail, sendMagicLinkEmail } from "./email.service";
@@ -19,16 +20,21 @@ async function findMatchingBackupCode(plainCode: string, hashedCodes: string[]):
   return -1;
 }
 
+// 2FA secrets at rest use the dedicated ENCRYPTION_KEY (lib/encryption,
+// "v1:..." format). They were previously keyed off NEXTAUTH_SECRET, so
+// rotating the session-signing secret silently bricked every enrolled
+// authenticator. Legacy 3-part ciphertexts still decrypt via the old
+// derivation until those users re-enroll.
 function encryptSecret(plaintext: string): string {
-  const key = Buffer.from(process.env.NEXTAUTH_SECRET!.slice(0, 64), 'hex'); // 32 bytes from NEXTAUTH_SECRET
-  const iv = randomBytes(12);
-  const cipher = createCipheriv('aes-256-gcm', key, iv);
-  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
-  const tag = cipher.getAuthTag();
-  return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted.toString('hex')}`;
+  return encrypt(plaintext);
 }
 
 function decryptSecret(ciphertext: string): string {
+  if (ciphertext.startsWith("v1:")) return decrypt(ciphertext);
+  return decryptLegacySecret(ciphertext);
+}
+
+function decryptLegacySecret(ciphertext: string): string {
   const key = Buffer.from(process.env.NEXTAUTH_SECRET!.slice(0, 64), 'hex');
   const [ivHex, tagHex, encHex] = ciphertext.split(':');
   const tag = Buffer.from(tagHex, 'hex');
@@ -62,8 +68,9 @@ async function generateUniqueSlug(tx: TxClient, name: string): Promise<string> {
   if (!existing) return base;
 
   for (let i = 0; i < 3; i++) {
-    const suffix = Math.random().toString(36).slice(2, 6);
-    const candidate = `${base}-${suffix}`.slice(0, 35);
+    // CSPRNG suffix — Math.random() made the disambiguator guessable.
+    const suffix = randomBytes(3).toString("hex");
+    const candidate = `${base}-${suffix}`.slice(0, 37);
     const found = await tx.workspace.findUnique({ where: { slug: candidate } });
     if (!found) return candidate;
   }

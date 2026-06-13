@@ -26,12 +26,17 @@ vi.mock("@/server/services/permission.service", () => ({
   },
 }));
 
+const memberFindFirstMock = vi.fn();
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     workspaceIntegration: {
       findFirst: (...args: unknown[]) => findFirstIntegMock(...args),
       upsert: (...args: unknown[]) => upsertIntegMock(...args),
       delete: (...args: unknown[]) => deleteIntegMock(...args),
+    },
+    workspaceMember: {
+      findFirst: (...args: unknown[]) => memberFindFirstMock(...args),
     },
     auditLog: { create: (arg: unknown) => auditLogCreateMock(arg) },
   },
@@ -67,6 +72,9 @@ function makeCtx(userId: string | null) {
 describe("integrations.vercel.getConnection", () => {
   beforeEach(() => {
     findFirstIntegMock.mockReset();
+    memberFindFirstMock.mockReset();
+    // Default: caller is an active member of the workspace.
+    memberFindFirstMock.mockResolvedValue({ id: "m_1" });
   });
 
   it("returns connected:false when no row exists", async () => {
@@ -74,6 +82,14 @@ describe("integrations.vercel.getConnection", () => {
     const caller = vercelIntegrationsRouter.createCaller(makeCtx("u_1") as never);
     const result = await caller.getConnection({ workspaceId: "ws_1" });
     expect(result).toEqual({ connected: false });
+  });
+
+  it("forbids a non-member from reading connection status (IDOR guard)", async () => {
+    memberFindFirstMock.mockResolvedValueOnce(null);
+    const caller = vercelIntegrationsRouter.createCaller(makeCtx("intruder") as never);
+    await expect(caller.getConnection({ workspaceId: "ws_1" })).rejects.toThrow(/member/i);
+    // never reaches the integration lookup
+    expect(findFirstIntegMock).not.toHaveBeenCalled();
   });
 
   it("returns connected:true with team + vercelUserId (never token)", async () => {

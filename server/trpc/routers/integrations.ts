@@ -22,7 +22,18 @@ const PendingPayload = z.object({
 export const vercelIntegrationsRouter = router({
   getConnection: protectedProcedure
     .input(z.object({ workspaceId: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
+      // Membership gate — workspaceId is client-supplied; without this any
+      // authed user could read another workspace's Vercel connection status
+      // (teamId + vercelUserId leak, though not the token itself). Any active
+      // member may read status (VIEWER included); managing the connection
+      // (finishConnect/disconnect) still requires ADMIN below.
+      const member = await prisma.workspaceMember.findFirst({
+        where: { userId: ctx.session.user!.id!, workspaceId: input.workspaceId, status: "ACTIVE" },
+        select: { id: true },
+      });
+      if (!member) throw new TRPCError({ code: "FORBIDDEN", message: "Not a member of this workspace." });
+
       const row = await prisma.workspaceIntegration.findFirst({
         where: { workspaceId: input.workspaceId, provider: "vercel" },
       });
