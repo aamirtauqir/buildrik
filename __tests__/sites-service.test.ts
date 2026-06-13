@@ -26,12 +26,15 @@ vi.mock("@/lib/prisma", () => {
     page: {
       create: vi.fn().mockResolvedValue({}),
       createMany: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
     },
     shareLink: {
       updateMany: vi.fn(),
     },
     formBlock: {
       updateMany: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
+      createMany: vi.fn(),
     },
   };
   // $transaction has two call shapes:
@@ -226,6 +229,53 @@ describe("Sites Service", () => {
         siteIds: ["s1", "s2", "s3"],
       });
       expect(result.succeeded).toHaveLength(3);
+    });
+  });
+
+  describe("duplicateSite", () => {
+    it("copies all page fields and form blocks (no lossy drop) in one transaction", async () => {
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        id: "s1", name: "Orig", deletedAt: null, projectStyles: null, projectAssets: null, projectSettings: null,
+      } as never);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({ workspace: { plan: "PRO" } } as never);
+      vi.mocked(prisma.site.count).mockResolvedValue(1);
+      vi.mocked(prisma.site.findFirst).mockResolvedValue(null); // slug unique
+      vi.mocked(prisma.site.create).mockResolvedValue({ id: "s2", name: "Orig (Copy)" } as never);
+      // original pages with the fields that used to be dropped
+      vi.mocked(prisma.page.findMany)
+        .mockResolvedValueOnce([
+          { id: "p1", name: "Home", slug: "home", position: 0, blocks: [], isHomePage: true,
+            seoTitle: "t", seoDescription: "d", meta: { a: 1 }, settings: { b: 2 },
+            slugHistory: [{ fromSlug: "x", toSlug: "home" }], slugManuallySet: true, translations: { fr: {} } },
+        ] as never)
+        // re-query of new pages for form-block remap
+        .mockResolvedValueOnce([{ id: "np1", slug: "home" }] as never);
+      vi.mocked(prisma.formBlock.findMany).mockResolvedValue([
+        { id: "f1", siteId: "s1", pageId: "p1", blockId: "blk1", name: "Contact", fields: [],
+          submitButtonText: "Send", successMessage: "ok", notifyEmail: null, webhookUrl: null, isActive: true },
+      ] as never);
+      vi.mocked(prisma.page.createMany).mockResolvedValue({ count: 1 } as never);
+      vi.mocked(prisma.formBlock.createMany).mockResolvedValue({ count: 1 } as never);
+
+      const result = await duplicateSite("s1", "ws1", "u1");
+      expect(result.id).toBe("s2");
+
+      // page copy carries the previously-dropped fields
+      const pageData = vi.mocked(prisma.page.createMany).mock.calls[0][0].data[0];
+      expect(pageData.meta).toEqual({ a: 1 });
+      expect(pageData.settings).toEqual({ b: 2 });
+      expect(pageData.slugHistory).toEqual([{ fromSlug: "x", toSlug: "home" }]);
+      expect(pageData.slugManuallySet).toBe(true);
+      expect(pageData.translations).toEqual({ fr: {} });
+
+      // form block copied + remapped to the new site/page
+      const formData = vi.mocked(prisma.formBlock.createMany).mock.calls[0][0].data[0];
+      expect(formData.siteId).toBe("s2");
+      expect(formData.pageId).toBe("np1");
+      expect(formData.blockId).toBe("blk1");
+
+      // all writes rode a transaction
+      expect(prisma.$transaction).toHaveBeenCalled();
     });
   });
 

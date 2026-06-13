@@ -371,38 +371,79 @@ export async function duplicateSite(
     where: { siteId },
     orderBy: { position: "asc" },
   });
+  const originalForms = await prisma.formBlock.findMany({ where: { siteId } });
 
-  const newSite = await prisma.site.create({
-    data: {
-      name: copyName,
-      slug,
-      status: "DRAFT",
-      workspaceId,
-      createdBy: userId,
-      pages: originalPages.length,
-      projectStyles: (original.projectStyles as Prisma.InputJsonValue) ?? undefined,
-      projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
-      projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
-      lastEditedAt: new Date(),
-    },
-  });
-
-  if (originalPages.length > 0) {
-    await prisma.page.createMany({
-      data: originalPages.map((p) => ({
-        siteId: newSite.id,
-        name: p.name,
-        slug: p.slug,
-        position: p.position,
-        blocks: (p.blocks ?? []) as Prisma.InputJsonValue,
-        isHomePage: p.isHomePage,
-        seoTitle: p.seoTitle,
-        seoDescription: p.seoDescription,
-      })),
+  // Site + pages + form blocks must be copied atomically — a crash mid-copy
+  // previously left an orphan half-built site. The page copy also dropped
+  // meta/settings/slugHistory/slugManuallySet/translations and every
+  // FormBlock; all are carried now.
+  return prisma.$transaction(async (tx) => {
+    const newSite = await tx.site.create({
+      data: {
+        name: copyName,
+        slug,
+        status: "DRAFT",
+        workspaceId,
+        createdBy: userId,
+        pages: originalPages.length,
+        projectStyles: (original.projectStyles as Prisma.InputJsonValue) ?? undefined,
+        projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
+        projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
+        lastEditedAt: new Date(),
+      },
     });
-  }
 
-  return newSite;
+    if (originalPages.length > 0) {
+      await tx.page.createMany({
+        data: originalPages.map((p) => ({
+          siteId: newSite.id,
+          name: p.name,
+          slug: p.slug,
+          position: p.position,
+          blocks: (p.blocks ?? []) as Prisma.InputJsonValue,
+          isHomePage: p.isHomePage,
+          seoTitle: p.seoTitle,
+          seoDescription: p.seoDescription,
+          meta: (p.meta as Prisma.InputJsonValue) ?? undefined,
+          settings: (p.settings as Prisma.InputJsonValue) ?? undefined,
+          slugHistory: (p.slugHistory as Prisma.InputJsonValue) ?? undefined,
+          slugManuallySet: p.slugManuallySet,
+          translations: (p.translations as Prisma.InputJsonValue) ?? undefined,
+        })),
+      });
+    }
+
+    if (originalForms.length > 0) {
+      // FormBlocks reference siteId + pageId; remap to the copies. Pages are
+      // unique by (siteId, slug), so map old pageId → slug → new pageId.
+      const oldPageIdToSlug = new Map(originalPages.map((p) => [p.id, p.slug]));
+      const newPages = await tx.page.findMany({
+        where: { siteId: newSite.id },
+        select: { id: true, slug: true },
+      });
+      const slugToNewPageId = new Map(newPages.map((p) => [p.slug, p.id]));
+      await tx.formBlock.createMany({
+        data: originalForms.map((f) => {
+          const slugForForm = f.pageId ? oldPageIdToSlug.get(f.pageId) : undefined;
+          const newPageId = slugForForm ? slugToNewPageId.get(slugForForm) ?? null : null;
+          return {
+            siteId: newSite.id,
+            pageId: newPageId,
+            blockId: f.blockId,
+            name: f.name,
+            fields: f.fields as Prisma.InputJsonValue,
+            submitButtonText: f.submitButtonText,
+            successMessage: f.successMessage,
+            notifyEmail: f.notifyEmail,
+            webhookUrl: f.webhookUrl,
+            isActive: f.isActive,
+          };
+        }),
+      });
+    }
+
+    return newSite;
+  });
 }
 
 export async function archiveSite(siteId: string) {

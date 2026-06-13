@@ -6,6 +6,12 @@ export const dynamic = "force-dynamic";
 
 const TERMINAL_STATUSES = new Set(["COMPLETED", "FAILED", "CANCELLED"]);
 
+// Hard cap so a stranded job (stuck non-terminal) can't keep an SSE stream
+// polling the DB once a second forever. The worker's maxDuration is 300s and
+// the cleanup cron reaps stale jobs hourly; 10 min comfortably covers a real
+// publish. The client can reconnect if it needs to keep watching.
+const MAX_LIFETIME_MS = 10 * 60 * 1000;
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> },
@@ -52,9 +58,16 @@ export async function GET(
         return;
       }
 
-      // Poll every second until terminal state
+      // Poll every second until terminal state (or the lifetime cap).
+      const startedAt = Date.now();
       const interval = setInterval(async () => {
         try {
+          if (Date.now() - startedAt > MAX_LIFETIME_MS) {
+            send("timeout", { message: "Stream closed — reconnect to keep watching." });
+            clearInterval(interval);
+            controller.close();
+            return;
+          }
           const updated = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
           if (!updated) {
             clearInterval(interval);
