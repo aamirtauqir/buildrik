@@ -48,9 +48,10 @@ function toUsageItems(usage: {
   formSubmissions: { used: number; limit: number };
   redirects: { used: number; limit: number };
 }): UsageItem[] {
+  // Bandwidth omitted — there's no bandwidth-tracking pipeline yet, so a
+  // 0/limit gauge would be fake. Storage is now real (summed media bytes).
   return [
     { label: "Sites", used: usage.sites.used, limit: usage.sites.limit },
-    { label: "Bandwidth", used: usage.bandwidth.usedMB, limit: usage.bandwidth.limitMB, unit: "MB" },
     { label: "Team members", used: usage.teamMembers.used, limit: usage.teamMembers.limit },
     { label: "Custom domains", used: usage.domains.used, limit: usage.domains.limit },
     { label: "Storage", used: usage.storage.usedMB, limit: usage.storage.limitMB, unit: "MB" },
@@ -72,7 +73,6 @@ export default function BillingPage() {
   const { addToast } = useToast();
   const [showPlans, setShowPlans] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
-  const [switchInterval, setSwitchInterval] = useState<Interval | null>(null);
   const [invoicePage, setInvoicePage] = useState(1);
 
   const overviewQuery = trpc.billing.overview.useQuery();
@@ -93,15 +93,6 @@ export default function BillingPage() {
       addToast("success", "Subscription reactivated");
     },
     onError: (err) => addToast("error", "Reactivation failed", err.message),
-  });
-
-  const switchIntervalMutation = trpc.billing.switchInterval.useMutation({
-    onSuccess: () => {
-      overviewQuery.refetch();
-      setSwitchInterval(null);
-      addToast("success", "Billing interval switched successfully");
-    },
-    onError: (err) => addToast("error", "Switch failed", err.message),
   });
 
   const overview = overviewQuery.data;
@@ -177,8 +168,19 @@ export default function BillingPage() {
         )}
       </div>
 
-      {/* D) Dunning countdown */}
-      {isDunning && <div className="mt-4"><DunningBanner /></div>}
+      {/* D) Dunning countdown — grace end matches the billing-downgrade cron
+          (7 days after the period end). */}
+      {isDunning && (
+        <div className="mt-4">
+          <DunningBanner
+            graceEndsAt={
+              overview?.currentPeriodEnd
+                ? new Date(new Date(overview.currentPeriodEnd).getTime() + 7 * 24 * 60 * 60 * 1000)
+                : null
+            }
+          />
+        </div>
+      )}
 
       {/* B) Reactivation banner */}
       {cancelAtPeriodEnd && overview?.currentPeriodEnd && (
@@ -215,25 +217,30 @@ export default function BillingPage() {
               onChangePlan={() => setShowPlans(true)}
             />
 
-            {/* C) Interval switch */}
-            {planKey !== "FREE" && (
+            {/* C) Interval switch — hidden until real Stripe. The mutation
+                did a raw subscription.update({interval}) with no reprice /
+                proration (and bypassed the service), so flipping it on a real
+                subscription would desync billing. Re-enable with Stripe. */}
+
+            {/* Cancel subscription — opens CancelModal. Was unreachable
+                (nothing called setShowCancel). cancelSubscription is real
+                (sets cancelAtPeriodEnd; Reactivate undoes it). */}
+            {planKey !== "FREE" && !cancelAtPeriodEnd && (
               <div className="flex items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-white px-5 py-4">
                 <div>
                   <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
-                    Billing interval
+                    Cancel subscription
                   </p>
                   <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    Currently billed {currentInterval === "YEARLY" ? "annually" : "monthly"}
+                    Stays active until the end of your billing period
                   </p>
                 </div>
                 <button
-                  onClick={() =>
-                    setSwitchInterval(currentInterval === "MONTHLY" ? "YEARLY" : "MONTHLY")
-                  }
+                  onClick={() => setShowCancel(true)}
                   className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
-                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                 >
-                  Switch to {currentInterval === "MONTHLY" ? "Yearly" : "Monthly"}
+                  Cancel subscription
                 </button>
               </div>
             )}
@@ -269,36 +276,6 @@ export default function BillingPage() {
         />
       )}
 
-      {/* C) Interval switch confirmation modal */}
-      {switchInterval && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>
-              Switch to {PLAN_NAMES[planKey]} {switchInterval === "YEARLY" ? "Yearly" : "Monthly"}?
-            </h2>
-            <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              You&apos;ll be charged a prorated amount for the remainder of your current billing period.
-            </p>
-            <div className="mt-6 flex gap-3">
-              <button
-                onClick={() => setSwitchInterval(null)}
-                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => switchIntervalMutation.mutate({ interval: switchInterval })}
-                disabled={switchIntervalMutation.isPending}
-                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
-                {switchIntervalMutation.isPending ? "Switching..." : "Confirm Switch"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

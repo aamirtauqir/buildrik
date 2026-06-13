@@ -6,7 +6,11 @@ async function getUsageCounts(workspaceId: string) {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [sites, teamMembers, domains, aiCredits, formSubmissions, redirects] =
+  // MediaAsset.siteId is a bare string (no relation), so storage is summed by
+  // siteId ∈ the workspace's sites. Real figure — was hardcoded 0.
+  const siteIds = (await prisma.site.findMany({ where: { workspaceId }, select: { id: true } })).map((s) => s.id);
+
+  const [sites, teamMembers, domains, aiCredits, formSubmissions, redirects, storageAgg] =
     await Promise.all([
       prisma.site.count({ where: { workspaceId, deletedAt: null } }),
       prisma.workspaceMember.count({ where: { workspaceId } }),
@@ -18,9 +22,11 @@ async function getUsageCounts(workspaceId: string) {
         where: { formBlock: { site: { workspaceId } }, createdAt: { gte: startOfMonth } },
       }),
       prisma.redirect.count({ where: { site: { workspaceId } } }),
+      prisma.mediaAsset.aggregate({ _sum: { bytes: true }, where: { siteId: { in: siteIds } } }),
     ]);
 
-  return { sites, teamMembers, domains, aiCredits, formSubmissions, redirects };
+  const storageMB = Math.round((storageAgg._sum?.bytes ?? 0) / (1024 * 1024));
+  return { sites, teamMembers, domains, aiCredits, formSubmissions, redirects, storageMB };
 }
 
 function buildUsage(
@@ -30,8 +36,10 @@ function buildUsage(
   const limits = PLAN_LIMITS[plan];
   return {
     sites: { used: counts.sites, limit: limits.sites as number },
+    // bandwidth has no tracking pipeline yet (used stays 0); the UI hides its
+    // meter rather than show a fake 0/limit gauge.
     bandwidth: { usedMB: 0, limitMB: limits.bandwidthMB as number },
-    storage: { usedMB: 0, limitMB: limits.storageMB as number },
+    storage: { usedMB: counts.storageMB, limitMB: limits.storageMB as number },
     teamMembers: { used: counts.teamMembers, limit: limits.teamMembers as number },
     domains: { used: counts.domains, limit: limits.customDomains as number },
     aiCredits: { used: counts.aiCredits, limit: limits.aiGenerations as number },

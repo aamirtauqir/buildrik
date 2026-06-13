@@ -11,6 +11,7 @@ vi.mock("@/lib/prisma", () => ({
     aIGenerationJob: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
     redirect: { count: vi.fn() },
+    mediaAsset: { aggregate: vi.fn() },
     workspace: { findUnique: vi.fn(), update: vi.fn() },
     $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
   },
@@ -21,6 +22,10 @@ import { prisma } from "@/lib/prisma";
 describe("Billing Service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Storage usage path (added with real-storage fix): workspace site-ids
+    // + media bytes aggregate. Default empty so existing assertions hold.
+    vi.mocked(prisma.site.findMany).mockResolvedValue([] as never);
+    vi.mocked(prisma.mediaAsset.aggregate).mockResolvedValue({ _sum: { bytes: 0 } } as never);
   });
 
   describe("getBillingOverview", () => {

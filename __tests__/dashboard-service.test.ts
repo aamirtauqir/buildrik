@@ -9,6 +9,7 @@ vi.mock("@/lib/prisma", () => ({
     activityLog: { findMany: vi.fn() },
     siteAnalytics: { aggregate: vi.fn(), findMany: vi.fn() },
     aIGenerationJob: { count: vi.fn() },
+    mediaAsset: { aggregate: vi.fn() },
   },
 }));
 
@@ -140,6 +141,8 @@ describe("Dashboard Service", () => {
   describe("getWorkspaceHealth", () => {
     it("returns health metrics", async () => {
       vi.mocked(prisma.site.count).mockResolvedValue(2);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([{ id: "s1" }] as any);
+      vi.mocked(prisma.mediaAsset.aggregate).mockResolvedValue({ _sum: { bytes: 5 * 1024 * 1024 } } as any);
       vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
         workspace: { plan: "FREE" },
       } as any);
@@ -148,6 +151,7 @@ describe("Dashboard Service", () => {
       expect(health.sites.used).toBe(2);
       expect(health.sites.limit).toBe(3);
       expect(health.aiCredits.used).toBe(1);
+      expect(health.storage.usedMB).toBe(5); // real storage from media bytes
     });
   });
 });

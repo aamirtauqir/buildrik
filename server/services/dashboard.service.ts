@@ -338,7 +338,10 @@ export async function getWorkspaceHealth(
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [siteCount, membership, aiJobCount] = await Promise.all([
+  // MediaAsset.siteId is a bare string — sum storage by siteId ∈ workspace sites.
+  const siteIds = (await prisma.site.findMany({ where: { workspaceId }, select: { id: true } })).map((s) => s.id);
+
+  const [siteCount, membership, aiJobCount, storageAgg] = await Promise.all([
     prisma.site.count({ where: { workspaceId, deletedAt: null } }),
     prisma.workspaceMember.findFirst({
       where: { workspaceId, userId },
@@ -347,6 +350,7 @@ export async function getWorkspaceHealth(
     prisma.aIGenerationJob.count({
       where: { workspaceId, createdAt: { gte: startOfMonth } },
     }),
+    prisma.mediaAsset.aggregate({ _sum: { bytes: true }, where: { siteId: { in: siteIds } } }),
   ]);
 
   const plan = (membership?.workspace?.plan as PlanName) ?? "FREE";
@@ -359,7 +363,7 @@ export async function getWorkspaceHealth(
       limit: limits.sites as number,
     },
     storage: {
-      usedMB: 0,
+      usedMB: Math.round((storageAgg._sum?.bytes ?? 0) / (1024 * 1024)),
       limitMB: limits.storageMB as number,
     },
     aiCredits: {

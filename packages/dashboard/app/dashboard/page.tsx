@@ -98,7 +98,13 @@ export default function DashboardPage() {
       {/* Dunning Banner */}
       {isPastDue && (
         <div className="mb-6">
-          <DunningBanner />
+          <DunningBanner
+            graceEndsAt={
+              billingOverview.data?.currentPeriodEnd
+                ? new Date(new Date(billingOverview.data.currentPeriodEnd).getTime() + 7 * 24 * 60 * 60 * 1000)
+                : null
+            }
+          />
         </div>
       )}
 

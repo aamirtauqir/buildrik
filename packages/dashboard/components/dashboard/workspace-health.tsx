@@ -51,16 +51,12 @@ type WorkspaceHealthProps = {
 };
 
 export function WorkspaceHealth({ data }: WorkspaceHealthProps) {
+  // Bandwidth omitted — no bandwidth-tracking pipeline yet (would always
+  // render a fake 0/limit gauge). Storage is real (summed media bytes).
   const metrics = [
     { label: "Sites", used: data.sites.used, limit: data.sites.limit, unit: "" },
     { label: "Storage", used: data.storage.usedMB, limit: data.storage.limitMB, unit: " MB" },
     { label: "AI Credits", used: data.aiCredits.used, limit: data.aiCredits.limit, unit: "" },
-    {
-      label: "Bandwidth",
-      used: data.bandwidth.usedMB,
-      limit: data.bandwidth.limitMB,
-      unit: " MB",
-    },
   ];
 
   const hasUsage = metrics.some((m) => m.used > 0);
