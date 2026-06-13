@@ -57,6 +57,7 @@ export const updateSiteSettingsSchema = z.object({
   socialLinks: z.record(z.string()).nullable().optional(),
   publishedPassword: z.string().nullable().optional(),
   touchIcon: z.string().nullable().optional(),
+  favicon: z.string().nullable().optional(),
   cspPolicy: z.string().max(4096).nullable().optional(),
   hstsMaxAge: z.number().int().min(0).max(63072000).nullable().optional(),
   xFrameOptions: z.enum(["DENY", "SAMEORIGIN"]).nullable().optional(),

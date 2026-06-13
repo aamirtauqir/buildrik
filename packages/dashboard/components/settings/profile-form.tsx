@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { trpc } from "@lib/trpc/client";
 
 const LANGUAGES = [
   { value: "en", label: "English" },
@@ -55,20 +56,28 @@ interface ProfileFormProps {
     bio: string;
     language: string;
     timezone: string;
+    avatar: string | null;
   }) => void;
-  onAvatarUpload?: (file: File) => void;
-  onAvatarRemove?: () => void;
   saving?: boolean;
 }
 
-export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemove, saving }: ProfileFormProps) {
+export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
   const [fullName, setFullName] = useState(initialData?.fullName ?? "");
   const [displayName, setDisplayName] = useState(initialData?.displayName ?? "");
   const [bio, setBio] = useState(initialData?.bio ?? "");
   const [language, setLanguage] = useState(initialData?.language ?? "en");
   const [timezone, setTimezone] = useState(initialData?.timezone ?? "UTC");
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(initialData?.avatarUrl ?? null);
+  // avatarUrl = the persisted CDN URL we save; preview = transient data URL
+  // shown while the upload is in flight.
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(initialData?.avatarUrl ?? null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const presignMutation = trpc.upload.presign.useMutation();
+  const confirmMutation = trpc.upload.confirm.useMutation();
+
+  const avatarShown = preview ?? avatarUrl;
 
   const initials = (initialData?.initials ?? fullName)
     .split(" ")
@@ -79,31 +88,51 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
 
   const initialsColor = getInitialsColor(initialData?.initials ?? fullName);
 
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setAvatarPreview(url);
-    onAvatarUpload?.(file);
+    const reader = new FileReader();
+    reader.onload = () => setPreview(reader.result as string);
+    reader.readAsDataURL(file);
+    // Real upload: presign → PUT body → confirm. Previously only a transient
+    // createObjectURL blob was kept, so the avatar vanished on reload.
+    setUploading(true);
+    try {
+      const result = await presignMutation.mutateAsync({
+        fileName: file.name,
+        fileType: file.type,
+        context: "avatar",
+      });
+      await fetch(result.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const confirmed = await confirmMutation.mutateAsync({ fileId: result.fileId });
+      setAvatarUrl(confirmed.cdnUrl);
+    } finally {
+      setUploading(false);
+      setPreview(null);
+    }
   }
 
   function handleRemovePhoto() {
-    setAvatarPreview(null);
+    setAvatarUrl(null);
+    setPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    onAvatarRemove?.();
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSave?.({ fullName, displayName, bio, language, timezone });
+    onSave?.({ fullName, displayName, bio, language, timezone, avatar: avatarUrl });
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex items-center gap-5">
-        {avatarPreview ? (
+        {avatarShown ? (
           <img
-            src={avatarPreview}
+            src={avatarShown}
             alt="Avatar"
             className="w-20 h-20 rounded-full object-cover flex-shrink-0"
           />
@@ -120,12 +149,13 @@ export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemov
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="text-sm font-medium px-3 py-1.5 rounded-md border"
+              disabled={uploading}
+              className="text-sm font-medium px-3 py-1.5 rounded-md border disabled:opacity-60"
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
-              Upload photo
+              {uploading ? "Uploading…" : "Upload photo"}
             </button>
-            {avatarPreview && (
+            {avatarShown && (
               <button
                 type="button"
                 onClick={handleRemovePhoto}

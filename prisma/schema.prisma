@@ -188,6 +188,7 @@ model Site {
   metaTitleTemplate String?
   ogImage           String?
   touchIcon         String?
+  favicon           String?
   folderId          String?
   lastPublishedBy   String?
   projectStyles     Json?

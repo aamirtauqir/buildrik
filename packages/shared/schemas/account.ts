@@ -17,6 +17,9 @@ export const updateProfileSchema = z.object({
   bio: z.string().max(500).optional(),
   language: z.string().regex(BCP47_LANG, "Must be a BCP-47 language tag (e.g. en, en-US)").optional(),
   timezone: z.string().regex(IANA_TZ, "Must be an IANA timezone (e.g. America/New_York or UTC)").optional(),
+  // CDN URL from the upload flow, or null to clear. http(s) only — blob:/data:
+  // previews must never be persisted.
+  avatar: z.string().url().startsWith("http").nullable().optional(),
 });
 
 export const changeEmailSchema = z.object({

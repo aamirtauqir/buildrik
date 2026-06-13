@@ -25,6 +25,7 @@ interface SettingsTabProps {
     publishedPassword: string | null;
     hasPublishedPassword: boolean;
     touchIcon: string | null;
+    favicon: string | null;
     plan: string;
   };
   onSave: (data: Record<string, unknown>) => void;
@@ -48,7 +49,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
   // publishedPassword:null on every unrelated save, silently clearing it.
   const [passwordEnabled, setPasswordEnabled] = useState(site.hasPublishedPassword);
   const [password, setPassword] = useState("");
-  const [faviconPreview, setFaviconPreview] = useState<string | null>(null);
+  const [faviconPreview, setFaviconPreview] = useState<string | null>(site.favicon);
   const [touchIconPreview, setTouchIconPreview] = useState<string | null>(site.touchIcon);
   const faviconInputRef = useRef<HTMLInputElement>(null);
   const touchIconInputRef = useRef<HTMLInputElement>(null);
@@ -130,6 +131,9 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
       bodyCode,
       socialLinks: filteredSocial,
       touchIcon: touchIconPreview,
+      // favicon upload previously had no persistence target (no column) —
+      // it now rides the save like touchIcon.
+      favicon: faviconPreview,
     };
     if (!passwordEnabled) {
       if (site.hasPublishedPassword) data.publishedPassword = null; // explicit removal

@@ -70,6 +70,7 @@ export async function getSiteSettings(siteId: string) {
       socialLinks: true,
       publishedPassword: true,
       touchIcon: true,
+      favicon: true,
       cspPolicy: true,
       hstsMaxAge: true,
       xFrameOptions: true,
@@ -112,6 +113,7 @@ export async function updateSiteSettings(
     socialLinks?: Record<string, string> | null;
     publishedPassword?: string | null;
     touchIcon?: string | null;
+    favicon?: string | null;
     cspPolicy?: string | null;
     hstsMaxAge?: number | null;
     xFrameOptions?: "DENY" | "SAMEORIGIN" | null;

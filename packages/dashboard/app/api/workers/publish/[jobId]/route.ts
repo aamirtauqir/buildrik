@@ -233,6 +233,37 @@ function injectAnalyticsBeacon(html: string, siteId: string): string {
   return html + snippet;
 }
 
+function escapeAttr(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/**
+ * Inject favicon / apple-touch-icon / og:image into <head>. These were
+ * uploaded + stored on the Site row but never reached the deployed HTML
+ * (the editor's head builder only emits og:image, and only when the editor
+ * config carries it). Injecting server-side from the canonical columns
+ * guarantees the icons ship, and skips any tag the page already declares.
+ */
+function injectHeadTags(
+  html: string,
+  icons: { favicon: string | null; touchIcon: string | null; ogImage: string | null },
+): string {
+  const tags: string[] = [];
+  if (icons.favicon && !/<link[^>]+rel=["']?icon/i.test(html)) {
+    tags.push(`<link rel="icon" href="${escapeAttr(icons.favicon)}">`);
+  }
+  if (icons.touchIcon && !/<link[^>]+rel=["']?apple-touch-icon/i.test(html)) {
+    tags.push(`<link rel="apple-touch-icon" href="${escapeAttr(icons.touchIcon)}">`);
+  }
+  if (icons.ogImage && !/<meta[^>]+property=["']?og:image/i.test(html)) {
+    tags.push(`<meta property="og:image" content="${escapeAttr(icons.ogImage)}">`);
+  }
+  if (tags.length === 0) return html;
+  const block = tags.join("");
+  if (html.includes("</head>")) return html.replace("</head>", `${block}</head>`);
+  return block + html;
+}
+
 async function runVercelDeployJob(
   jobId: string,
   siteId: string,
@@ -241,7 +272,7 @@ async function runVercelDeployJob(
 ): Promise<string> {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { slug: true, name: true, publishedPassword: true },
+    select: { slug: true, name: true, publishedPassword: true, favicon: true, touchIcon: true, ogImage: true },
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
 
@@ -249,9 +280,10 @@ async function runVercelDeployJob(
   // protection. null = no/legacy password → clears protection on deploy.
   const passwordPlain = decryptPublishedPassword(site.publishedPassword);
 
+  const icons = { favicon: site.favicon, touchIcon: site.touchIcon, ogImage: site.ogImage };
   const files: VercelFile[] = pages.map((p) => ({
     file: p.path,
-    data: injectAnalyticsBeacon(p.html, siteId),
+    data: injectHeadTags(injectAnalyticsBeacon(p.html, siteId), icons),
   }));
 
   // Step 0 — Generating pages: editor already rendered HTML; just mark done.

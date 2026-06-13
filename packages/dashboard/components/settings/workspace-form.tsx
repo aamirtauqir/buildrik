@@ -1,6 +1,12 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { trpc } from "@lib/trpc/client";
+
+// Canonical cobalt accent (DESIGN.md). Must be a real hex — the workspace
+// update schema validates accentColor against /^#[0-9A-Fa-f]{6}$/, so the
+// old "var(--color-primary)" default failed validation on any unchanged save.
+const DEFAULT_ACCENT = "#2D6DFF";
 
 const LANGUAGES = [
   { value: "en", label: "English" },
@@ -81,8 +87,11 @@ export function WorkspaceForm({
   const [defaultLanguage, setDefaultLanguage] = useState(initialData?.defaultLanguage ?? "en");
   const [timezone, setTimezone] = useState(initialData?.timezone ?? "UTC");
   const [iconUrl, setIconUrl] = useState<string | null>(initialData?.iconUrl ?? null);
-  const [accentColor, setAccentColor] = useState(initialData?.accentColor ?? "var(--color-primary)");
-  const [hexInput, setHexInput] = useState(initialData?.accentColor ?? "var(--color-primary)");
+  const [iconUploading, setIconUploading] = useState(false);
+  const [accentColor, setAccentColor] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
+  const [hexInput, setHexInput] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
+  const presignMutation = trpc.upload.presign.useMutation();
+  const confirmMutation = trpc.upload.confirm.useMutation();
   const [defaultExpiration, setDefaultExpiration] = useState<string | null>(
     initialData?.defaultExpiration ?? null
   );
@@ -105,11 +114,29 @@ export function WorkspaceForm({
     }
   }
 
-  function handleIconSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleIconSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setIconUrl(url);
+    // Real upload (presign → PUT → confirm). Previously a transient
+    // createObjectURL blob was written straight to the DB, so the icon was a
+    // dead blob:http://localhost… URL after reload.
+    setIconUploading(true);
+    try {
+      const result = await presignMutation.mutateAsync({
+        fileName: file.name,
+        fileType: file.type,
+        context: "workspace_icon",
+      });
+      await fetch(result.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const confirmed = await confirmMutation.mutateAsync({ fileId: result.fileId });
+      setIconUrl(confirmed.cdnUrl);
+    } finally {
+      setIconUploading(false);
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -229,10 +256,13 @@ export function WorkspaceForm({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-16 h-16 rounded-lg border flex items-center justify-center cursor-pointer overflow-hidden"
+                disabled={iconUploading}
+                className="w-16 h-16 rounded-lg border flex items-center justify-center cursor-pointer overflow-hidden disabled:opacity-60"
                 style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
               >
-                {iconUrl ? (
+                {iconUploading ? (
+                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>…</span>
+                ) : iconUrl ? (
                   <img src={iconUrl} alt="Workspace icon" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>

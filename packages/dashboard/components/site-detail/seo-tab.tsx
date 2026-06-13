@@ -179,6 +179,9 @@ export function SeoTab({ site, onSaveSeo }: SeoTabProps) {
             metaTitle,
             metaDescription: metaDesc,
             metaTitleTemplate,
+            // The uploaded og:image was set into ogImagePreview but never
+            // included here, so every save silently dropped it.
+            ogImage: ogImagePreview,
           })
         }
         className="rounded-lg px-6 py-2 text-sm font-medium text-white"
