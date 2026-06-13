@@ -249,7 +249,7 @@ export function WorkspaceForm({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/png,image/svg+xml,image/jpeg"
+                accept="image/png,image/jpeg"
                 onChange={handleIconSelect}
                 className="hidden"
               />
@@ -271,7 +271,7 @@ export function WorkspaceForm({
                 )}
               </button>
               <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
-                PNG or SVG recommended.
+                PNG or JPG. Max 1 MB.
               </p>
             </div>
             <div>

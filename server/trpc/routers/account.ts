@@ -16,7 +16,7 @@ interface WorkspaceCtx {
   session: { user: any } | null;
 }
 import {
-  getProfile, updateProfile, changePassword, requestEmailChange, getActiveSessions, revokeSession,
+  getProfile, updateProfile, changePassword, setPassword, requestEmailChange, getActiveSessions, revokeSession,
   disconnectProvider, revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
@@ -24,7 +24,7 @@ import {
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion } from "@/server/services/workspace-settings.service";
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration, updateIntegration, sendIntegrationTestEvent } from "@/server/services/integrations.service";
-import { updateProfileSchema, changePasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
+import { updateProfileSchema, changePasswordSchema, setPasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
 import { type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
@@ -59,6 +59,15 @@ export const accountRouter = router({
     } catch (e: unknown) {
       if (e instanceof Error && e.message === "NO_PASSWORD") throw new TRPCError({ code: "BAD_REQUEST", message: "Account has no password set. Use social login." });
       if (e instanceof Error && e.message === "WRONG_PASSWORD") throw new TRPCError({ code: "UNAUTHORIZED", message: "Current password is incorrect." });
+      throw e;
+    }
+  }),
+  setPassword: protectedProcedure.input(setPasswordSchema).mutation(async ({ ctx, input }) => {
+    try {
+      await setPassword(ctx.session.user.id, input.newPassword);
+      return { ok: true };
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message === "PASSWORD_ALREADY_SET") throw new TRPCError({ code: "BAD_REQUEST", message: "A password is already set. Use Change password." });
       throw e;
     }
   }),

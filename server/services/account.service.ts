@@ -27,6 +27,29 @@ export async function changePassword(userId: string, currentPassword: string, ne
   }).catch(() => {});
 }
 
+// Set an INITIAL password for an OAuth-only account (no existing password).
+// changePassword can't do this — it requires the current password — so the
+// "Set a password" UI for social users was a no-op (onSetPassword unwired,
+// no procedure). Refuses if a password already exists (use changePassword).
+export async function setPassword(userId: string, newPassword: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { passwordHash: true } });
+  if (!user) throw new Error("USER_NOT_FOUND");
+  if (user.passwordHash) throw new Error("PASSWORD_ALREADY_SET");
+
+  const bcrypt = await import("bcryptjs");
+  const hash = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash: hash } });
+
+  createNotification({
+    userId,
+    type: "SECURITY_PASSWORD_CHANGED",
+    message: "A password was added to your account",
+    priority: "high",
+  }).catch(() => {});
+
+  return { success: true };
+}
+
 export async function requestEmailChange(userId: string, newEmail: string, password: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new Error("USER_NOT_FOUND");

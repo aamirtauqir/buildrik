@@ -169,12 +169,12 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/gif"
+            accept="image/jpeg,image/png"
             onChange={handleFileSelect}
             className="hidden"
           />
           <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
-            JPG, PNG or GIF. Max 2 MB.
+            JPG or PNG. Max 5 MB.
           </p>
         </div>
       </div>

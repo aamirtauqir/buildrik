@@ -10,13 +10,18 @@ export const DATE_RANGE_OPTIONS = [
   { value: "90d", label: "90 days" },
 ] as const;
 
-interface MetricCard { label: string; value: string | number; change?: number; }
-
 interface AnalyticsData {
   timeSeries: Array<{ date: string | Date; visitors: number; pageViews: number }>;
-  metrics?: MetricCard[];
-  trafficSources: Array<{ source: string; count: number; percentage?: number }>;
-  countries: Array<{ country: string; count: number; percentage?: number }>;
+  // service returns {source,count}/{country,count}/{device,count}; percentages
+  // are computed client-side (the service doesn't send them — they rendered
+  // "undefined%"). `metrics` was never returned by the service (dead block).
+  trafficSources: Array<{ source: string; count: number }>;
+  countries: Array<{ country: string; count: number }>;
+  devices?: Array<{ device: string; count: number }>;
+}
+
+function pct(count: number, total: number): number {
+  return total > 0 ? Math.round((count / total) * 100) : 0;
 }
 
 interface AnalyticsTabProps {
@@ -56,19 +61,6 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
 
       {!isLoading && data && data.timeSeries.length > 0 && (
         <>
-          {/* Metric Cards */}
-          {data.metrics && (
-            <div className="grid grid-cols-3 gap-4">
-              {data.metrics.map((m) => (
-                <div key={m.label} className="rounded-xl border bg-white p-4" style={{ borderColor: "var(--color-border-default)" }}>
-                  <p className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>{m.label}</p>
-                  <p className="mt-1 text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>{m.value}</p>
-                  {m.change !== undefined && <p className="mt-1 text-xs font-medium" style={{ color: m.change >= 0 ? "var(--color-success)" : "var(--color-primary)" }}>{m.change >= 0 ? "↑" : "↓"} {Math.abs(m.change)}%</p>}
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Chart placeholder */}
           <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
             <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Traffic Overview</h3>
@@ -80,26 +72,47 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
           </div>
 
           {/* Traffic Sources + Countries */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-              <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Traffic Sources</h3>
-              {data.trafficSources.map((s) => (
-                <div key={s.source} className="flex items-center justify-between py-2">
-                  <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{s.source}</span>
-                  <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{s.percentage}%</span>
+          {(() => {
+            const sourceTotal = data.trafficSources.reduce((a, s) => a + s.count, 0);
+            const countryTotal = data.countries.reduce((a, c) => a + c.count, 0);
+            const deviceTotal = (data.devices ?? []).reduce((a, d) => a + d.count, 0);
+            return (
+              <>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+                    <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Traffic Sources</h3>
+                    {data.trafficSources.map((s) => (
+                      <div key={s.source} className="flex items-center justify-between py-2">
+                        <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{s.source}</span>
+                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{pct(s.count, sourceTotal)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+                    <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Top Countries</h3>
+                    {data.countries.map((c) => (
+                      <div key={c.country} className="flex items-center justify-between py-2">
+                        <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{c.country}</span>
+                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{c.count} ({pct(c.count, countryTotal)}%)</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-            <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-              <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Top Countries</h3>
-              {data.countries.map((c) => (
-                <div key={c.country} className="flex items-center justify-between py-2">
-                  <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{c.country}</span>
-                  <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{c.count} ({c.percentage}%)</span>
-                </div>
-              ))}
-            </div>
-          </div>
+                {/* Devices — returned by the service but previously never rendered. */}
+                {data.devices && data.devices.length > 0 && (
+                  <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
+                    <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Devices</h3>
+                    {data.devices.map((d) => (
+                      <div key={d.device} className="flex items-center justify-between py-2">
+                        <span className="text-sm capitalize" style={{ color: "var(--color-text-primary)" }}>{d.device}</span>
+                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{d.count} ({pct(d.count, deviceTotal)}%)</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </>
       )}
 

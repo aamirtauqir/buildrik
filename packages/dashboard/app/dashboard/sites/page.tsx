@@ -91,6 +91,9 @@ export default function SitesPage() {
     hasTraffic,
   });
 
+  // Real archived count for the Archived tab badge (was hardcoded 0).
+  const archivedQuery = trpc.sites.list.useQuery({ page: 1, perPage: 1, status: "ARCHIVED" as const });
+
   const foldersQuery = trpc.sites.folders.list.useQuery();
 
   // Mutations
@@ -345,7 +348,7 @@ export default function SitesPage() {
             setPage(1);
           }}
           onCreateFolder={() => setCreateFolderOpen(true)}
-          archivedCount={0}
+          archivedCount={archivedQuery.data?.total ?? 0}
           showArchived={showArchived}
           onToggleArchived={() => {
             setShowArchived(!showArchived);

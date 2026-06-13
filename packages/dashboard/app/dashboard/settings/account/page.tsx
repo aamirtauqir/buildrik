@@ -14,6 +14,11 @@ export default function AccountPage() {
     onError: (err) => addToast("error", "Password change failed", err.message),
   });
 
+  const setPasswordMutation = trpc.account.setPassword.useMutation({
+    onSuccess: () => { profileQuery.refetch(); addToast("success", "Password set — you can now sign in with email"); },
+    onError: (err) => addToast("error", "Couldn't set password", err.message),
+  });
+
   const disconnectMutation = trpc.account.disconnectProvider.useMutation({
     onSuccess: () => { profileQuery.refetch(); addToast("success", "Account disconnected"); },
     onError: (err) => addToast("error", "Could not disconnect", err.message),
@@ -36,11 +41,12 @@ export default function AccountPage() {
       onChangePassword={(data) =>
         changePasswordMutation.mutate({ ...data, confirmPassword: data.newPassword })
       }
+      onSetPassword={(data) => setPasswordMutation.mutate({ newPassword: data.newPassword })}
       onConnectAccount={(provider) =>
         signIn(provider, { callbackUrl: "/dashboard/settings/account" })
       }
       onDisconnectAccount={(provider) => disconnectMutation.mutate({ provider })}
-      saving={changePasswordMutation.isPending || disconnectMutation.isPending}
+      saving={changePasswordMutation.isPending || setPasswordMutation.isPending || disconnectMutation.isPending}
     />
   );
 }

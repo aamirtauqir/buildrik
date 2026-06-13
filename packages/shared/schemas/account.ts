@@ -33,6 +33,11 @@ export const changePasswordSchema = z.object({
   confirmPassword: z.string(),
 }).refine((d) => d.newPassword === d.confirmPassword, { message: "Passwords don't match", path: ["confirmPassword"] });
 
+// Initial password for OAuth-only accounts (no current password to verify).
+export const setPasswordSchema = z.object({
+  newPassword: z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/).regex(/[!@#$%^&*()]/),
+});
+
 export const updateWorkspaceSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   slug: z.string().min(3).max(30).regex(URL_SLUG, "Must be a DNS-friendly slug").optional(),
