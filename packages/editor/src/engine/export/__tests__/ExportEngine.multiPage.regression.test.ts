@@ -98,6 +98,21 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
     expect(html).toContain("padding:16px");
   });
 
+  it("drops an inline style block carrying a dangerous CSS pattern (H1 defense-in-depth)", async () => {
+    const evilPage = {
+      id: "p1", name: "Home", slug: "home", isHome: true,
+      root: { id: "root", type: "container", tagName: "div", children: [
+        { id: "x", type: "container", tagName: "div", classes: [], styles: { width: "expression(alert(1))" }, children: [] },
+      ] },
+    };
+    const html = (await new ExportEngine(makeMockComposer({ exportPagesReturn: [evilPage] }))
+      .exportAllPages({ format: "html", minify: false }))
+      .files.find((f) => f.name === "index.html")!.content;
+    // the whole style block is dropped (not emitted) — element still renders
+    expect(html).not.toContain("expression(");
+    expect(html).toContain('data-buildrick-id="x"');
+  });
+
   it("falls back to getAllPages when exportPages is not exposed on older composer builds", async () => {
     const composer = makeMockComposer({ getAllPagesReturn: [freshPage] });
 

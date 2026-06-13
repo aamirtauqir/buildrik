@@ -65,3 +65,28 @@
 
 ## Verified-healthy (NOT flagged — core spines sound)
 Auth spine, sites/pages CRUD + publish pipeline, team invite/role/revoke, settings saves + 2FA + sessions, AI generate worker (real progress/cancel/credits), help seed/ticket/ack, notification prefs/mute/delete, editor Add/Templates/History/Layers-core/Pages-core/Settings-core/AI-apply/Components-core, DS tokens/export, ecommerce modal, wizard.
+
+---
+
+## GSTACK ENG REVIEW REPORT — deferred-feature build (2026-06-14)
+
+Post-build architecture/regression review of the 7-commit deferred-feature arc (G9, C2, D1+H1, G10, G11, B1). Reviewed shipped code (no plan file). Both suites green at review time (editor 5806, root 2879), tsc clean both packages.
+
+| Area | Verdict | Notes |
+|------|---------|-------|
+| H1 publish-styling | SHIP, 1 follow-up | inline base styles is the right interim fix; cascade follow-up scoped |
+| C2 interaction runtime | SHIP | self-contained, no user data in script body; CSP note |
+| B1 publish-unify | SHIP | single hook instance, re-entrancy guard intact; prop-depth is a smell not a bug |
+| G11 asset-versions | SHIP | additive slice sound; model-mismatch documented |
+
+### Findings
+- **F1 (LOW, security defense-in-depth) — FIXED in this review.** H1's `renderPageElement` inline-style emission used `stylesToString` directly, bypassing the `isSafeAttrValue("style", …)` filter `buildAttributeString` applies (drops `expression()`/`behavior:`/`-moz-binding`). Self-XSS only (user's own site) + import-time sanitizer exists, but a defense-in-depth regression. Now guarded + regression-tested.
+- **F2 (MEDIUM, already documented) — H1 cascade.** Inline base styles out-specificity the stylesheet's `@media [data-buildrick-id]` breakpoint overrides, so breakpoint-editor overrides are shadowed for properties also set at base. Correct interim (was fully-unstyled before); the class-based-base follow-up needs a real Vercel deploy to verify. Scoped correctly.
+- **F3 (LOW, future) — CSP.** H1 inline styles + C2's inline `<script>` assume published sites have no Content-Security-Policy. If Buildrik adds CSP to published sites later, the interaction runtime + any inline style attrs need a nonce/hash. Document at that time.
+- **F4 (LOW, UX) — G11 restore canvas refresh.** `restoreAssetVersion` updates the dashboard asset + the local item `src` via `onUpdate`, but canvas elements already referencing the old `src` may not repaint until reload. Minor; acceptable for the additive slice.
+- **F5 (LOW, page-weight) — H1 inline-style bloat.** Emitting full inline styles per element grows published HTML vs class-based CSS. The F2 cascade follow-up (class-based base) also fixes this; bundled.
+
+### VERDICT
+SHIP — production-safe for the common case (most sites use base styles via element.styles, few breakpoint-editor overrides). F1 fixed inline. F2 (cascade) + F3 (CSP) + F4/F5 are documented follow-ups, none blocking. The H1 cascade refinement is the one item that genuinely wants a live Vercel deploy before it can be called fully production-grade for breakpoint-heavy sites.
+
+NO UNRESOLVED DECISIONS

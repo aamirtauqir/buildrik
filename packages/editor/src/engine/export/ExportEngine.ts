@@ -34,6 +34,7 @@ import { SitemapGenerator } from "./SitemapGenerator";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./interactionRuntime";
+import { isSafeAttrValue } from "../../shared/utils/html/sanitization";
 
 // ============================================================================
 // MULTI-PAGE EXPORT TYPES
@@ -619,7 +620,14 @@ ${bodyContent}${interactionScript}
       attrParts.push(`class="${escapeHTML(element.classes.join(" "))}"`);
     }
     if (element.styles && Object.keys(element.styles).length > 0) {
-      attrParts.push(`style="${escapeHTML(stylesToString(element.styles))}"`);
+      const styleStr = stylesToString(element.styles);
+      // Defense-in-depth: mirror buildAttributeString — drop the inline style
+      // block if it carries a dangerous CSS pattern (expression(), behavior:,
+      // -moz-binding). The import-time sanitizer should already prevent these,
+      // but this path bypasses buildAttributeString so guard here too.
+      if (isSafeAttrValue("style", styleStr, "")) {
+        attrParts.push(`style="${escapeHTML(styleStr)}"`);
+      }
     }
 
     if (element.attributes) {
