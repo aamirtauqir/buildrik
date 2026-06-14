@@ -43,7 +43,7 @@
     <div class="note" style="margin-top:16px"><b>Why a ladder, not a flat toggle:</b> the four reach levels already exist in the engine but today they're invisible — the user discovers them by accident (change one, break twelve). Surfacing them as an ordered, counted picker turns Webflow's #1 confusion into an explicit, reversible choice. Narrowest-first = progressive disclosure; counts = recognition over recall.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Flow:</b><a href="00-signin.html">Sign in</a><a href="10-dashboard.html">Dashboard</a><a href="editor-spine-wireframe.html">Editor</a><a href="40-edit-scope.html">Edit scope</a><a href="41-scope-picker.html" class="here">Scope levels</a><a href="20-publish.html">Publish</a><a href="90-published.html">Live site</a></div>
+<div class="proto-nav"><b>Flow:</b><a href="00-signin.html">Sign in</a><a href="10-dashboard.html">Dashboard</a><a href="editor-spine-wireframe.html">Editor</a><a href="40-edit-scope.html">Edit scope</a><a href="41-scope-picker.html" class="here">Scope levels</a><a href="fix-styling-model.html">▶ One styling model (canonical)</a><a href="20-publish.html">Publish</a><a href="90-published.html">Live site</a></div>
 <script>
 document.querySelectorAll('.lvl').forEach(function(l){l.onclick=function(){document.querySelectorAll('.lvl').forEach(function(x){x.classList.remove('on');});l.classList.add('on');document.getElementById('reachNote').innerHTML='<b>Reach:</b> '+l.getAttribute('data-r');};});
 </script>
