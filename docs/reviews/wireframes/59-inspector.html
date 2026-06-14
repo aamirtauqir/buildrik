@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Inspector</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:1fr 300px;min-height:420px}
+  .cv{border-right:1px dashed var(--line);background:var(--bg-2);display:grid;place-items:center;padding:20px}
+  .insp{padding:0}
+  .scopebar{border-bottom:1px solid var(--line);background:var(--fill);padding:8px 12px;font-size:11.5px}
+  .sec{border-bottom:1px dashed var(--line)}
+  .sh{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;font-size:12px;font-weight:600;cursor:pointer}
+  .sb{padding:0 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .f{font-size:11px}.f .lbl{display:block;margin-bottom:3px}
+  .box-model{grid-column:1/3;border:1px dashed var(--line-d);border-radius:4px;padding:14px;text-align:center;font-size:10px;color:var(--ink-3);position:relative}
+  .device{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--line)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Inspector — right panel (behind spine)</b> · grounded in current ProInspector sections · solution: §6.5 scope banner pinned on top · responsive device scope · progressive sections (Simple shows few, Pro all)</div>
+  <div class="ed">
+    <div class="cv">
+      <div style="text-align:center"><div class="ph-img" style="height:70px;width:200px;margin-bottom:8px">▭ CTA button (selected)</div><div class="muted" style="font-size:11px">click an element → inspector reflects it</div></div>
+    </div>
+    <div class="insp">
+      <div class="scopebar">Editing: <b>CTA button</b> · <span class="muted">.btn-primary · 31 site-wide</span> <a href="40-edit-scope.html" style="text-decoration:underline;color:var(--ink-2)">scope</a></div>
+      <div class="device"><span class="chip on" style="font-size:10px">All</span><span class="chip" style="font-size:10px">Tablet</span><span class="chip" style="font-size:10px">Phone</span><span class="muted" style="font-size:9px;margin-left:auto;align-self:center">editing: All devices</span></div>
+
+      <div class="sec"><div class="sh">Layout <span class="muted">flex ▾</span></div><div class="sb"><div class="f"><span class="lbl">Display</span><div class="input">flex</div></div><div class="f"><span class="lbl">Direction</span><div class="input">row</div></div><div class="f"><span class="lbl">Justify</span><div class="input">center</div></div><div class="f"><span class="lbl">Align</span><div class="input">center</div></div></div></div>
+
+      <div class="sec"><div class="sh">Spacing</div><div class="sb"><div class="box-model">margin<div style="border:1px dashed var(--line-d);border-radius:3px;padding:10px;margin:6px">padding<div style="border:1px solid var(--line);padding:6px;margin-top:4px">content</div></div></div></div></div>
+
+      <div class="sec"><div class="sh">Typography</div><div class="sb"><div class="f"><span class="lbl">Font</span><div class="input">Inter</div></div><div class="f"><span class="lbl">Size</span><div class="input">16</div></div><div class="f"><span class="lbl">Weight</span><div class="input">600</div></div><div class="f"><span class="lbl">Color</span><div class="input">token ▾</div></div></div></div>
+
+      <div class="sec"><div class="sh">Fill &amp; border <span class="muted">↳ class-bound ⚠</span></div><div class="sb"><div class="f"><span class="lbl">Fill</span><div class="input">--color-accent</div></div><div class="f"><span class="lbl">Radius</span><div class="input">6</div></div></div></div>
+
+      <div class="sec"><div class="sh">Effects <span class="tag-new" style="font-size:8px">Pro</span></div><div class="sb"><div class="f"><span class="lbl">Shadow</span><div class="input">sm</div></div><div class="f"><span class="lbl">Opacity</span><div class="input">100%</div></div></div></div>
+
+      <div class="sec" style="border:none"><div class="sh">States <span class="muted">hover ▾</span></div></div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor:</b><a href="editor-spine-wireframe.html">Spine</a><a href="59-inspector.html" class="here">Inspector</a><a href="40-edit-scope.html">Edit scope</a><a href="51-layers.html">Layers</a><a href="56-media.html">Media</a><a href="20-publish.html">Publish</a></div>
+</body></html>

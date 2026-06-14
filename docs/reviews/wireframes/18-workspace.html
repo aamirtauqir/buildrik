@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Workspace settings</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:200px 1fr;min-height:440px}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
+  .sn{padding:7px 9px;border-radius:5px;color:var(--ink-2);cursor:pointer;font-size:12.5px}.sn:hover{background:var(--fill)}.sn.on{background:var(--ink);color:#fff;font-weight:600}
+  .mem{display:grid;grid-template-columns:1fr 120px 90px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Workspace settings (§5)</b> · grounded in current members/invite + workspace-transfer (G10) · boundary: workspace = account/team/billing scope (distinct from per-site Settings, screen 14)</div>
+  <div class="ed">
+    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
+      <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div>Acme Co ▾</div>
+      <div class="lbl" style="margin-bottom:6px">Workspace</div>
+      <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:14px">
+        <div class="sn">General</div><div class="sn on">Members</div><div class="sn">Transfer</div><a href="16-billing.html" class="sn" style="text-decoration:none">Billing</a><div class="sn">Profile &amp; account</div><div class="sn">Notifications</div>
+      </div>
+      <a href="10-dashboard.html" class="navi">← Back to dashboard</a>
+    </aside>
+    <main class="pad">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="h1" style="font-size:18px">Members</div><button class="btn btn-fill btn-strong">+ Invite member</button></div>
+      <div class="muted" style="font-size:11.5px;margin-bottom:14px">Roles map to the permission matrix (screen 62).</div>
+      <div class="box pad">
+        <div class="mem" style="color:var(--ink-3);font-size:10px;text-transform:uppercase"><span>Member</span><span>Role</span><span></span></div>
+        <div class="mem"><span><b>you@acme.com</b> <span class="muted">(you)</span></span><span class="tag-exists">Owner</span><span class="muted" style="font-size:10px">—</span></div>
+        <div class="mem"><span>sam@acme.com</span><span class="chip" style="font-size:10px;padding:1px 8px">Editor ▾</span><span class="muted" style="font-size:10.5px"><u>Remove</u></span></div>
+        <div class="mem" style="border-bottom:none"><span>jo@acme.com <span class="tag-new" style="font-size:8px">invited</span></span><span class="chip" style="font-size:10px;padding:1px 8px">Viewer ▾</span><span class="muted" style="font-size:10.5px"><u>Resend</u></span></div>
+      </div>
+      <div class="box pad" style="margin-top:14px;border-color:var(--ink)">
+        <div class="row" style="justify-content:space-between"><div><div class="h2">Transfer workspace <span class="tag-exists">G10</span></div><div class="muted" style="font-size:11px">Hand ownership to another member. Owner-only, two-step accept.</div></div><a href="70-confirm.html" class="btn">Transfer…</a></div>
+      </div>
+      <div class="note" style="margin-top:14px"><b>Workspace ≠ site (boundary):</b> account, team, billing, transfer live at workspace scope. A site's own ops (SEO/redirects/domain) are per-site (screen 14). Two clear scopes, no overlap.</div>
+    </main>
+  </div>
+</div>
+<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="18-workspace.html" class="here">Workspace</a><a href="14-site-settings.html">Site settings</a><a href="16-billing.html">Billing</a><a href="62-permissions.html">Roles</a><a href="70-confirm.html">Confirm</a></div>
+</body></html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Confirm actions</title><link rel="stylesheet" href="wf.css">
+<style>
+  .menu{position:absolute;border:1px solid var(--line);background:#fff;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.1);width:180px;font-size:12.5px;overflow:hidden}
+  .mi{padding:8px 12px;cursor:pointer}.mi:hover{background:var(--fill)}.mi.danger{color:var(--ink);border-top:1px dashed var(--line)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>Row actions ⋯ + destructive confirm</b> · the drill-in behind Sites ⋯ and danger-zone · solution: irreversible/financial ops need explicit confirm (type-to-confirm for delete) — owner-only per §8.7</div>
+  <div class="pad">
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">⋯ menu (open state)</div>
+        <div style="position:relative;height:200px;border:1px dashed var(--line);border-radius:6px;background:var(--bg-2)">
+          <div class="row" style="justify-content:space-between;padding:10px 12px;font-size:12.5px"><span><b>acme-main</b> · published</span><span class="btn" style="padding:2px 8px">⋯</span></div>
+          <div class="menu" style="top:36px;right:12px">
+            <div class="mi">↗ Open live site</div>
+            <div class="mi">✎ Edit in editor</div>
+            <div class="mi">⧉ Duplicate</div>
+            <div class="mi">→ Transfer to member</div>
+            <div class="mi">▸ Settings</div>
+            <div class="mi danger">🗑 Delete site…</div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:10px;font-size:10.5px">Non-destructive items act immediately. "Delete" + "Transfer" open a confirm (right) — never one-click.</div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Delete confirm (type-to-confirm)</div>
+        <div class="box pad" style="border:2px solid var(--ink)">
+          <span class="tag-new">IRREVERSIBLE</span>
+          <div class="h2" style="margin:8px 0 4px">Delete "acme-main"?</div>
+          <div class="muted" style="font-size:11.5px;margin-bottom:10px">This <b>unpublishes acme.com</b> and permanently removes the site, its pages, and history. Can't be undone.</div>
+          <div class="lbl">Type <code>acme-main</code> to confirm</div>
+          <div class="input" style="margin:5px 0 12px">acme-main</div>
+          <button class="btn btn-fill btn-strong" style="width:100%;margin-bottom:8px">Delete site permanently</button>
+          <a href="11-sites.html" class="btn" style="width:100%;text-align:center">Cancel</a>
+        </div>
+        <div class="note" style="margin-top:10px;font-size:10.5px"><b>Owner-only (§8.7):</b> editors/viewers don't see Delete/Transfer. Same modal pattern reused for workspace transfer (screen 18) with a member-picker instead of type-to-confirm.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="18-workspace.html">Workspace</a><a href="62-permissions.html">Roles</a><a href="70-confirm.html" class="here">Confirm</a></div>
+</body></html>

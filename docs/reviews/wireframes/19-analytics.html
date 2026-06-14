@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Analytics</title><link rel="stylesheet" href="wf.css"></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Site → Analytics tab (§5)</b> · honest state: analytics is roadmap-later · solution: a real <i>connect/empty</i> state now, not a fake dashboard — wire to GA/Plausible or Buildrik-native when it ships</div>
+  <div class="pad">
+    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="11-sites.html" style="color:var(--ink-2)">Sites</a> › acme-main</div>
+    <div class="row" style="border-bottom:1px dashed var(--line);margin-bottom:16px"><a href="12-site-detail.html" class="chip" style="border:none">Overview</a><a href="14-site-settings.html" class="chip" style="border:none">Pages</a><a href="15-domains.html" class="chip" style="border:none">Domains</a><span class="chip on" style="border-radius:4px 4px 0 0">Analytics</span><a href="14-site-settings.html" class="chip" style="border:none">Settings</a></div>
+
+    <div style="display:grid;place-items:center;min-height:280px;text-align:center">
+      <div style="max-width:420px">
+        <div class="ph-img" style="height:90px;margin-bottom:16px;opacity:.6">📈 traffic (sample)</div>
+        <div class="h1" style="margin-bottom:6px">Connect analytics</div>
+        <div class="muted" style="font-size:12.5px;margin-bottom:18px">See visitors, top pages, and referrers. Bring your own provider now; Buildrik-native analytics is on the roadmap.</div>
+        <div class="row" style="justify-content:center"><button class="btn btn-fill btn-strong">Connect Google Analytics</button><button class="btn btn-strong">Connect Plausible</button></div>
+        <div class="muted" style="font-size:10.5px;margin-top:10px">Adds the tracking snippet via site-wide custom code (Dashboard op) — no editor change needed.</div>
+      </div>
+    </div>
+    <div class="note"><b>Honesty over fake charts (§10):</b> shipping a placeholder dashboard with invented numbers erodes trust. The empty state names what's coming and gives a real action (connect a provider) that works today via site-wide head injection (screen 14).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="14-site-settings.html">Site settings</a><a href="15-domains.html">Domains</a><a href="19-analytics.html" class="here">Analytics</a><a href="16-billing.html">Billing</a></div>
+</body></html>
