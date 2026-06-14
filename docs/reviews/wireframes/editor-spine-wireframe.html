@@ -190,7 +190,7 @@
       <div class="rail-item" onclick="location.href='20-publish.html'">Pub<span class="lbl2">Publish</span></div>
       <button class="rail-more" id="railMore">More ▾</button>
       <div class="pro-group" id="proGroup">
-        <div class="grp-label">Pro</div>
+        <div class="grp-label">Advanced</div>
         <div class="rail-item" onclick="location.href='57-components.html'">Cmp<span class="lbl2">Components</span></div>
         <div class="rail-item" onclick="location.href='51-layers.html'">Lyr<span class="lbl2">Layers</span></div>
         <div class="rail-item" onclick="location.href='58-history.html'">Hist<span class="lbl2">History</span></div>
@@ -283,11 +283,11 @@
   <span class="close" id="legendClose">×</span>
   <h4>Wireframe — try the wired bits</h4>
   <ul>
-    <li>Top-right <b>Advanced</b> = Simple ↔ Pro density (rail + inspector reveal more; nothing deleted).</li>
+    <li>Top-right <b>Advanced</b> toggle = Simple ↔ Advanced density (rail + inspector reveal more; nothing deleted).</li>
     <li>Click <b>[ Button ]</b> on canvas → scope warns "all .btn-primary · 12". Click <b>Fill</b> → propagation choice.</li>
     <li>Click <b>[ Heading ]</b> → scope = this element only.</li>
     <li>Switch to <b>Phone</b> → "styling Phone" banner.</li>
-    <li>In Simple, rail <b>More</b> reveals Pro tabs.</li>
+    <li>In Simple, rail <b>More</b> reveals Advanced tabs.</li>
   </ul>
 </div>
 <div class="anno" id="anno"><span id="annoText"></span><button id="annoClose">×</button></div>
@@ -300,7 +300,7 @@
   document.getElementById('densityToggle').onclick=function(){
     var pro=app.getAttribute('data-density')==='pro';app.setAttribute('data-density',pro?'simple':'pro');
     document.getElementById('densityLabel').textContent=pro?'Advanced':'Simple view';
-    anno(pro?'<b>Simple</b> density — 6 visual sections, no CSS/classes. Hidden, not removed.':'<b>Pro</b> density — same engine, full surface revealed.');
+    anno(pro?'<b>Simple</b> density — 6 visual sections, no CSS/classes. Hidden, not removed.':'<b>Advanced</b> density — same engine, full surface revealed.');
   };
   document.getElementById('railMore').onclick=function(){document.getElementById('proGroup').classList.toggle('open');};
   document.querySelectorAll('#deviceSeg button').forEach(function(b){b.onclick=function(){
