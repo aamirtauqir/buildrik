@@ -42,7 +42,16 @@ Pro/agency users (who pay + gave feedback) keep getting lost because **the same 
 - **Killer feature: all of them** (reuse + white-label + multi-client + speed) → agencies want the full power tool.
 - **Switch trigger: yes, a specific ask exists** (the exact thing that would make someone move off Webflow/Framer → Buildrik). **← capture verbatim; this is the wedge + decides build order.**
 
-**Verdict: commit Pro/agency-first.** The bet is de-risked — paying agencies, 5+ consistent voices, a named switch trigger. Proceed to close the agency + dedup wireframe gaps, then a Pro-first build spec.
+**Verdict: commit Pro/agency-first.** The bet is de-risked — paying agencies, 5+ consistent voices, a named switch trigger.
 
-## Sequencing input still needed
-- The **exact switch-ask** (verbatim) — sets which agency feature ships first.
+## THE WEDGE (verbatim switch-ask): "you have good features but your product is not user-friendly"
+This reframes the whole redesign:
+- **It is NOT a feature-expansion.** The features exist + are good. Agencies are NOT primarily asking for reuse/white-label/multi-client — those are expansion, not the switch trigger.
+- **It IS a usability redesign.** Make the existing power *usable*. The "not user-friendly" = the 3 dups ("too many places"), editor overwhelm, and 3-ways styling confusion. Success metric "fewer how-do-I" was right all along.
+- **Build order CORRECTED:**
+  1. **FIRST — usability + dedup of the EXISTING Pro surface.** Kill the 3 dups (one home each), cut editor overwhelm, make ONE clear "change how this looks" model, tighten every flow. This is what wins the switch.
+  2. **SECOND — agency features** (reuse / multi-client / white-label) for expansion + bigger ACV, AFTER the tool feels good.
+- **Risk to avoid:** building shiny new agency features on top of an unfriendly base = makes it worse. Friendliness first.
+
+## Next: turn vague "not user-friendly" into concrete fixes
+"Not user-friendly" is real but vague. Convert it to a specific fix-list via a **heuristic usability audit of the LIVE app** (not the wireframes) — find the exact friction spots (clicks, labels, dead-ends, overwhelm, missing feedback), severity-rank them, and target them in the redesign. Then the wireframes become a usability-fix contract, Pro-first.
