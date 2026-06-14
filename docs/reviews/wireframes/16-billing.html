@@ -1,47 +1,60 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Billing</title><link rel="stylesheet" href="wf.css">
 <style>
-  .ed{display:grid;grid-template-columns:200px 1fr;min-height:440px}
+  .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
   .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
-  .meter{height:8px;background:var(--fill);border:1px solid var(--line);border-radius:3px;overflow:hidden}
-  .meter span{display:block;height:100%;background:var(--ink)}
-  .plan{border:1px solid var(--line);border-radius:6px;padding:14px}
-  .plan.pro{border:2px solid var(--ink)}
+  .meter{height:8px;background:var(--fill);border:1px solid var(--line);border-radius:3px;overflow:hidden}.meter span{display:block;height:100%;background:var(--ink)}
+  .plan{border:1px solid var(--line);border-radius:6px;padding:14px}.plan.pro{border:2px solid var(--ink)}
+  .inv{display:grid;grid-template-columns:1fr 90px 80px 60px;gap:10px;align-items:center;font-size:12px;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .dun{background:var(--ink);color:#fff;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .dun .btn{background:#fff;color:var(--ink);border-color:#fff;padding:4px 10px}
 </style></head>
 <body>
 <div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen">
-  <div class="topnote"><b>Billing — Dashboard (§8.8)</b> · the destination for every plan-limit interrupt (paywall, domain gate, AI credits) · solution: usage made visible before the wall; upgrade is one path, never a trap</div>
+  <div class="topnote"><b>Billing &amp; plan</b> · grounded in <code>billing.*</code> (overview/plans/usage/invoices/upgrade/cancel/reactivate/switchInterval) + dunning · the §8.8 gate target</div>
   <div class="ed">
     <aside style="border-right:1px dashed var(--line);padding:16px 12px">
       <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
-      <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div>Acme Co ▾</div>
       <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
         <a href="10-dashboard.html" class="navi">⌂ Home</a>
         <a href="11-sites.html" class="navi">▦ Sites</a>
+        <a href="c1-team.html" class="navi">👤 Team</a>
         <a href="15-domains.html" class="navi">◐ Domains</a>
-        <a href="17-media.html" class="navi">▤ Media</a>
         <a href="18-workspace.html" class="navi">⚙ Settings</a>
         <a href="16-billing.html" class="navi here">$ Billing</a>
       </nav>
     </aside>
     <main class="pad">
-      <div class="h1" style="margin-bottom:4px">Billing &amp; plan</div>
-      <div class="muted" style="font-size:12px;margin-bottom:16px">You're on <b>Free</b>. Here's what you're using.</div>
+      <div class="dun">⚠ <b>Payment past due.</b> Update your card within 7 days or the workspace auto-downgrades to Free. <span style="flex:1"></span><button class="btn">Update card</button></div>
+      <div class="row" style="justify-content:space-between;margin-bottom:14px"><div><div class="h1">Billing</div><div class="muted" style="font-size:12px">Pro · monthly · renews Jul 15 · <a href="#cancel" onclick="document.getElementById('cancelnote').style.display='block';return false" style="text-decoration:underline">cancel</a></div></div><div class="row"><span class="chip">Monthly</span><span class="chip">Yearly −20%</span></div></div>
 
       <div class="grid3" style="margin-bottom:16px">
-        <div class="box pad"><div class="lbl">Published sites</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">1 / 1</b><span class="tag-new" style="vertical-align:middle">at limit</span></div><div class="meter"><span style="width:100%"></span></div></div>
-        <div class="box pad"><div class="lbl">Custom domains</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">0 / 0</b><span class="muted" style="font-size:10px">Pro</span></div><div class="meter"><span style="width:0%"></span></div></div>
-        <div class="box pad"><div class="lbl">AI credits (mo)</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">18 / 25</b></div><div class="meter"><span style="width:72%"></span></div></div>
+        <div class="box pad"><div class="lbl">Published sites</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">8 / 25</b></div><div class="meter"><span style="width:32%"></span></div></div>
+        <div class="box pad"><div class="lbl">Team / domains</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">3/10 · 2/25</b></div><div class="meter"><span style="width:30%"></span></div></div>
+        <div class="box pad"><div class="lbl">Storage · AI credits</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">12GB · 18/25</b></div><div class="meter"><span style="width:50%"></span></div></div>
       </div>
 
-      <div class="grid2">
-        <div class="plan"><div class="row" style="justify-content:space-between"><b>Free</b><span class="tag-exists">current</span></div><div class="muted" style="font-size:11.5px;margin-top:8px">1 site · vercel.app URL · Buildrik badge · 25 AI credits/mo</div></div>
-        <div class="plan pro"><div class="row" style="justify-content:space-between"><b>Pro</b><span><b>$X</b><span class="muted" style="font-size:11px">/mo</span></span></div><div class="muted" style="font-size:11.5px;margin:8px 0 12px">Unlimited sites · custom domains · no badge · more AI</div><button class="btn btn-fill btn-strong" style="width:100%">Upgrade — continue to secure checkout ↗</button></div>
+      <div class="lbl" style="margin-bottom:6px">Plans</div>
+      <div class="grid3" style="margin-bottom:16px">
+        <div class="plan"><div class="row" style="justify-content:space-between"><b>Free</b><span class="muted">$0</span></div><div class="muted" style="font-size:11px;margin-top:8px">1 site · vercel.app · badge · 5 AI/day</div></div>
+        <div class="plan pro"><div class="row" style="justify-content:space-between"><b>Pro</b><span class="tag-exists">current</span></div><div class="muted" style="font-size:11px;margin:8px 0">25 sites · domains · no badge · 25 AI/day</div><div><b>$X</b><span class="muted" style="font-size:11px">/mo</span></div></div>
+        <div class="plan"><div class="row" style="justify-content:space-between"><b>Business</b><span><b>$Y</b><span class="muted" style="font-size:11px">/mo</span></span></div><div class="muted" style="font-size:11px;margin:8px 0">Unlimited · 100 AI/day · priority</div><button class="btn btn-fill" style="width:100%">Upgrade — checkout ↗</button></div>
       </div>
-      <div class="note" style="margin-top:14px"><b>Payment handled off-screen (safety):</b> card/payment details are entered in the provider's secure checkout, never in a Buildrik form. Wireframe shows the handoff, not a card field.</div>
-      <div class="note" style="margin-top:8px"><b>§8.8 contract:</b> this screen is what every gate points to — paywall (30), domain limit (15→here), AI-credit exhaustion. Usage bars make the limit legible <i>before</i> it's hit, so the wall is never a surprise.</div>
+
+      <div class="grid2" style="align-items:start">
+        <div class="box pad"><div class="lbl" style="margin-bottom:6px">Payment method</div><div class="row" style="justify-content:space-between;font-size:12px">💳 Visa ···· 4242 <button class="btn" style="padding:3px 9px">Update</button></div><div class="muted" style="font-size:10px;margin-top:6px">Card entered in secure checkout, never in a Buildrik form.</div></div>
+        <div class="box pad"><div class="lbl" style="margin-bottom:6px">Invoices</div>
+          <div class="inv" style="color:var(--ink-3);font-size:10px;text-transform:uppercase"><span>Date</span><span>Amount</span><span>Status</span><span></span></div>
+          <div class="inv"><span>Jun 15</span><span>$X</span><span class="tag-exists">Paid</span><span class="muted" style="font-size:10px">PDF</span></div>
+          <div class="inv"><span>May 15</span><span>$X</span><span class="tag-exists">Paid</span><span class="muted" style="font-size:10px">PDF</span></div>
+          <div class="inv" style="border:none"><span>Apr 15</span><span>$X</span><span class="tag-exists">Paid</span><span class="muted" style="font-size:10px">PDF</span></div>
+        </div>
+      </div>
+
+      <div class="note" id="cancelnote" style="margin-top:14px;display:none;border:2px solid var(--ink)"><b>Cancel subscription?</b> You'll keep Pro until Jul 15, then drop to Free (over-limit sites unpublish). <div class="row" style="margin-top:8px"><button class="btn">Keep Pro</button><button class="btn btn-fill">Cancel at period end</button></div><div class="muted" style="font-size:10px;margin-top:6px">Cancelled subs show a "Reactivate" button until the period ends.</div></div>
+      <div class="note" style="margin-top:14px;font-size:10.5px"><b>§8.8 + grounded:</b> dunning banner (7-day grace → auto-downgrade cron), monthly/yearly switch, invoices (PDF), cancel-at-period-end + reactivate. Every plan-limit gate (paywall 30, domain 15, AI b1) lands here. Stripe webhooks update plan; payment handled in checkout off-screen (safety).</div>
     </main>
   </div>
 </div>
-<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="14-site-settings.html">Site settings</a><a href="15-domains.html">Domains</a><a href="16-billing.html" class="here">Billing</a><a href="30-paywall.html">Paywall</a></div>
+<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html" class="here">Billing</a><a href="30-paywall.html">Paywall</a><a href="index.html">Map</a></div>
 </body></html>

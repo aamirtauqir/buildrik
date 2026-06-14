@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Setup</title><link rel="stylesheet" href="wf.css"></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow" style="max-width:480px">
+  <div class="topnote"><b>Onboarding — project setup</b> · grounded in <code>onboarding.setupProject</code> (<code>/onboarding/setup</code>) · after role-select, before first-run · names the workspace + seeds AI context</div>
+  <div class="pad">
+    <div class="row" style="gap:6px;justify-content:center;margin-bottom:16px"><span class="barline" style="height:5px;width:50px;background:var(--ink)"></span><span class="barline" style="height:5px;width:50px;background:var(--ink)"></span><span class="barline" style="height:5px;width:50px"></span></div>
+    <div class="h1" style="text-align:center;font-size:18px;margin-bottom:4px">Tell us about your workspace</div>
+    <div class="muted" style="text-align:center;font-size:12px;margin-bottom:18px">Helps us tailor templates + AI. Change anything later.</div>
+    <div class="lbl">Workspace name</div><div class="input" style="width:100%;margin:5px 0 12px">Acme Co</div>
+    <div class="lbl">What do you do?</div>
+    <div class="row" style="flex-wrap:wrap;margin:6px 0 14px"><span class="chip on">Agency / freelance</span><span class="chip">Business / startup</span><span class="chip">Creator / portfolio</span><span class="chip">Store</span><span class="chip">Nonprofit</span><span class="chip">Other</span></div>
+    <div class="lbl">Team size <span class="muted" style="font-size:10px">(optional)</span></div>
+    <div class="row" style="margin:6px 0 16px"><span class="chip on">Just me</span><span class="chip">2–10</span><span class="chip">11–50</span><span class="chip">50+</span></div>
+    <a href="13-first-run.html" class="btn btn-fill btn-strong" style="width:100%;text-align:center;margin-bottom:8px">Continue → build your first site</a>
+    <div class="row" style="justify-content:center"><a href="13-first-run.html" class="muted" style="font-size:11px;text-decoration:underline">Skip for now</a></div>
+    <div class="note" style="margin-top:16px;font-size:10.5px"><b>Where it feeds (grounded):</b> workspace name → <code>Workspace.name</code>; business type + team size seed AI generation context + which templates surface first. Combined with role (04) this is the full onboarding seed; then → first-run activation (13). Tracked in <code>OnboardingState</code>; skippable.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>On-ramp:</b><a href="00-signin.html">Sign in</a><a href="04-role-select.html">Role</a><a href="04b-setup.html" class="here">Setup</a><a href="13-first-run.html">First run</a><a href="01-new-site.html">New site</a><a href="e3-editor-onboarding.html">Editor tour</a><a href="index.html">Map</a></div>
+</body></html>
