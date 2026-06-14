@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Add panel</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 300px 1fr;min-height:400px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
+  .grp{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 6px}
+  .ins{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .it{border:1px solid var(--line);border-radius:5px;padding:9px;font-size:11.5px;display:flex;align-items:center;gap:7px;cursor:grab;background:#fff}
+  .it:hover{border-color:var(--ink-2)}.it .g{color:var(--ink-3)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Add panel (rail → Add)</b> · grounded in current blocks/elements insert · solution: sections-first for beginners (drop whole blocks), raw elements below — drag to canvas or click to insert at selection</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri"><span class="ic">✦</span>AI</div>
+      <div class="ri"><span class="ic">▦</span>Tmpl</div>
+      <div class="ri on"><span class="ic">+</span>Add</div>
+      <div class="ri"><span class="ic">▤</span>Pages</div>
+      <div class="ri"><span class="ic">▣</span>Media</div>
+    </div>
+    <div class="panel" style="border-right:1px dashed var(--line);padding:12px;overflow:auto">
+      <div class="input" style="margin-bottom:6px">⌕ search elements</div>
+      <div class="grp">Sections <span class="tag-new" style="vertical-align:middle">beginner-first</span></div>
+      <div class="ins"><div class="it"><span class="g">▭</span>Hero</div><div class="it"><span class="g">▦</span>Features</div><div class="it"><span class="g">≣</span>Pricing</div><div class="it"><span class="g">❝</span>Testimonial</div><div class="it"><span class="g">✉</span>CTA</div><div class="it"><span class="g">▤</span>Footer</div></div>
+      <div class="grp">Basic</div>
+      <div class="ins"><div class="it"><span class="g">T</span>Heading</div><div class="it"><span class="g">¶</span>Text</div><div class="it"><span class="g">▭</span>Button</div><div class="it"><span class="g">▦</span>Image</div><div class="it"><span class="g">⛓</span>Link</div><div class="it"><span class="g">―</span>Divider</div></div>
+      <div class="grp">Layout</div>
+      <div class="ins"><div class="it"><span class="g">▢</span>Section</div><div class="it"><span class="g">▣</span>Container</div><div class="it"><span class="g">▥</span>Grid</div><div class="it"><span class="g">▤</span>Columns</div></div>
+      <div class="grp">Media · Form · Advanced</div>
+      <div class="ins"><div class="it"><span class="g">▷</span>Video</div><div class="it"><span class="g">★</span>Icon</div><div class="it"><span class="g">⌨</span>Input</div><div class="it"><span class="g">▭</span>Form</div><div class="it"><span class="g">&lt;&gt;</span>Embed</div><div class="it"><span class="g">{ }</span>Code</div></div>
+    </div>
+    <div class="panel" style="border-right:none;background:var(--bg-2);display:grid;place-items:center">
+      <div style="text-align:center;max-width:300px">
+        <div class="ph-img" style="height:120px;border-style:dashed">⬇ drop zone — drag a block here</div>
+        <div class="note" style="margin-top:14px;text-align:left;font-size:10.5px"><b>Sections-first (solution):</b> beginners drop a whole "Hero" or "Features" block and edit copy — never assemble from raw divs. Raw layout/elements stay below for pros. Insert respects current selection (drops inside the selected container) and seeds real placeholder content, not empty boxes.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="editor-spine-wireframe.html">Spine</a><a href="50-pages.html">Pages</a><a href="51-layers.html">Layers</a><a href="52-add.html" class="here">Add</a><a href="53-settings.html">Settings</a><a href="40-edit-scope.html">Edit scope</a><a href="20-publish.html">Publish</a></div>
+</body></html>

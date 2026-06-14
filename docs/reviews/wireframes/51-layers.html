@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Layers panel</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 290px 1fr;min-height:400px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}
+  .ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
+  .ly{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:4px;font-size:12px;cursor:pointer;border:1px solid transparent}
+  .ly:hover{background:var(--fill)}.ly.on{background:var(--fill);border-color:var(--ink)}
+  .ly .tw{color:var(--ink-3);width:10px;font-size:9px}
+  .ly .ic{color:var(--ink-3);font-size:11px}
+  .ly .ctl{margin-left:auto;color:var(--ink-3);font-size:11px;display:flex;gap:7px}
+  .ly.dim{opacity:.45}
+  .d1{padding-left:8px}.d2{padding-left:24px}.d3{padding-left:40px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Layers panel (rail → Layers · Pro)</b> · grounded in current layers tree (hierarchy · select · visibility · lock · reorder) · solution: structure navigator — pairs with the scope banner so beginners see the tree they're editing</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri"><span class="ic">+</span>Add</div>
+      <div class="ri"><span class="ic">▤</span>Pages</div>
+      <div class="ri"><span class="ic">◳</span>Comp</div>
+      <div class="ri on"><span class="ic">≣</span>Layers</div>
+      <div class="ri"><span class="ic">⟲</span>Hist</div>
+    </div>
+    <div class="panel" style="border-right:1px dashed var(--line);padding:12px">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px"><b style="font-size:13px">Layers — Home</b><span class="muted" style="font-size:10px">drag to reorder</span></div>
+      <div class="ly"><span class="tw">▾</span><span class="ic">▭</span> Body <span class="ctl">👁 🔓</span></div>
+      <div class="ly d1"><span class="tw">▾</span><span class="ic">▤</span> Navbar <span class="ctl">👁 🔓</span></div>
+      <div class="ly d2"><span class="tw"></span><span class="ic">▦</span> Logo <span class="ctl">👁 🔓</span></div>
+      <div class="ly d2"><span class="tw"></span><span class="ic">≡</span> Nav links <span class="ctl">👁 🔓</span></div>
+      <div class="ly d1"><span class="tw">▾</span><span class="ic">▭</span> Hero section <span class="ctl">👁 🔓</span></div>
+      <div class="ly d2 on"><span class="tw"></span><span class="ic">T</span> Heading <span class="ctl">👁 🔓</span></div>
+      <div class="ly d2"><span class="tw"></span><span class="ic">T</span> Subtitle <span class="ctl">👁 🔓</span></div>
+      <div class="ly d2"><span class="tw"></span><span class="ic">▭</span> CTA button <span class="ctl">👁 🔒</span></div>
+      <div class="ly d1 dim"><span class="tw">▸</span><span class="ic">▦</span> Features grid <span class="ctl">🚫 🔓</span></div>
+      <div class="ly d1"><span class="tw">▸</span><span class="ic">▭</span> Footer <span class="ctl">👁 🔓</span></div>
+      <div class="note" style="margin-top:10px;font-size:10.5px">👁 hide · 🔒 lock · ▸ collapse · dim = hidden. Click selects on canvas (two-way).</div>
+    </div>
+    <div class="panel" style="border-right:none;background:var(--bg-2);display:grid;place-items:center">
+      <div style="text-align:center;max-width:280px">
+        <div class="ph-img" style="height:60px;margin-bottom:10px">canvas — Heading selected ▭</div>
+        <div class="box" style="padding:8px 10px;text-align:left;font-size:11px"><div class="lbl">Scope (§6.5)</div>Editing: <b>Heading</b> · just this element</div>
+        <div class="note" style="margin-top:12px;text-align:left;font-size:10.5px"><b>Layers ↔ scope:</b> selecting in the tree drives the same scope banner from screen 40. The tree shows <i>structure</i>; the banner shows <i>reach</i>. Together they answer "where am I" + "how wide".</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="editor-spine-wireframe.html">Spine</a><a href="50-pages.html">Pages</a><a href="51-layers.html" class="here">Layers</a><a href="52-add.html">Add</a><a href="53-settings.html">Settings</a><a href="40-edit-scope.html">Edit scope</a><a href="20-publish.html">Publish</a></div>
+</body></html>

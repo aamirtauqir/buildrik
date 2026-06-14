@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Settings panel</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 230px 1fr;min-height:400px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
+  .nav{font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+  .navi2{padding:7px 9px;border-radius:5px;color:var(--ink-2);cursor:pointer}.navi2:hover{background:var(--fill)}.navi2.on{background:var(--ink);color:#fff;font-weight:600}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Site Settings panel (rail → Settings · Pro)</b> · grounded in current project settings (SEO defaults · favicon · custom code) · boundary: editor settings = how the <i>site</i> is built/served; account/billing/domain live in Dashboard</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri"><span class="ic">▤</span>Pages</div>
+      <div class="ri"><span class="ic">◳</span>Comp</div>
+      <div class="ri"><span class="ic">≣</span>Layers</div>
+      <div class="ri"><span class="ic">⟲</span>Hist</div>
+      <div class="ri on"><span class="ic">⚙</span>Set</div>
+    </div>
+    <div class="panel" style="border-right:1px dashed var(--line);padding:12px">
+      <b style="font-size:13px;display:block;margin-bottom:10px">Site settings</b>
+      <div class="nav">
+        <div class="navi2 on">General</div>
+        <div class="navi2">SEO defaults</div>
+        <div class="navi2">Favicon &amp; share</div>
+        <div class="navi2">Custom code</div>
+        <div class="navi2">Redirects</div>
+        <div class="navi2">Fonts</div>
+      </div>
+      <div class="note" style="margin-top:14px;font-size:10px"><b>Not here:</b> custom domain, billing, workspace, publish target → Dashboard (boundary). This panel = build/serve config only.</div>
+    </div>
+    <div class="panel" style="border-right:none;padding:16px">
+      <div class="lbl" style="margin-bottom:10px">General</div>
+      <div class="lbl">Site name</div><div class="input" style="margin:5px 0 12px">Acme</div>
+      <div class="grid2" style="margin-bottom:12px">
+        <div><div class="lbl">Language</div><div class="input" style="margin-top:5px">English ▾</div></div>
+        <div><div class="lbl">Timezone</div><div class="input" style="margin-top:5px">UTC ▾</div></div>
+      </div>
+      <div class="box pad" style="padding:12px;margin-bottom:12px">
+        <div class="lbl" style="margin-bottom:6px">SEO defaults <span class="tag-exists">exists</span></div>
+        <div class="lbl">Title template</div><div class="input" style="margin:5px 0 8px">%page% — Acme</div>
+        <div class="lbl">Default description</div><div class="input" style="margin:5px 0 0;height:34px">Acme builds…</div>
+        <div class="muted" style="font-size:10px;margin-top:6px">Pages without their own SEO (screen 50) inherit these.</div>
+      </div>
+      <div class="box pad" style="padding:12px;margin-bottom:12px">
+        <div class="lbl" style="margin-bottom:6px">Custom code <span class="tag-exists">exists</span></div>
+        <div class="lbl">&lt;head&gt; injection</div><div class="input" style="margin:5px 0 0;height:40px;font-family:var(--mono)">&lt;!-- analytics, fonts… --&gt;</div>
+      </div>
+      <div class="row" style="justify-content:flex-end"><span class="saved muted" style="font-size:11px">Autosaved ✓</span></div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="editor-spine-wireframe.html">Spine</a><a href="50-pages.html">Pages</a><a href="51-layers.html">Layers</a><a href="52-add.html">Add</a><a href="53-settings.html" class="here">Settings</a><a href="40-edit-scope.html">Edit scope</a><a href="20-publish.html">Publish</a></div>
+</body></html>

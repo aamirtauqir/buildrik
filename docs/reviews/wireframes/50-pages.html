@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Pages panel</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 270px 1fr;min-height:400px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}
+  .ri.on{background:var(--ink);color:#fff}
+  .ri .ic{display:block;font-size:14px;color:inherit}
+  .panel{border-right:1px dashed var(--line);padding:12px}
+  .pg{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:5px;font-size:12.5px;cursor:pointer;border:1px solid transparent}
+  .pg:hover{background:var(--fill)} .pg.on{background:var(--fill);border-color:var(--line)}
+  .pg .meta{margin-left:auto;font-size:9px}
+  .sub{margin-left:18px;border-left:1px dashed var(--line);padding-left:6px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Pages panel (rail → Pages)</b> · grounded in current PagesManager (list · home · add · duplicate · per-page SEO · nesting) · solution: page = unit of the site; per-page status + SEO inline</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri"><span class="ic">✦</span>AI</div>
+      <div class="ri"><span class="ic">▦</span>Tmpl</div>
+      <div class="ri"><span class="ic">+</span>Add</div>
+      <div class="ri on"><span class="ic">▤</span>Pages</div>
+      <div class="ri"><span class="ic">▣</span>Media</div>
+    </div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px"><b style="font-size:13px">Pages</b><button class="btn" style="padding:5px 10px">+ Add page</button></div>
+      <div class="input" style="margin-bottom:10px">⌕ find page</div>
+      <div class="pg on"><span>⌂</span> Home <span class="meta tag-exists">home · live</span></div>
+      <div class="pg"><span>▸</span> About <span class="meta tag-exists">live</span></div>
+      <div class="pg"><span>▸</span> Services <span class="meta tag-exists">live</span></div>
+      <div class="sub">
+        <div class="pg"><span>▸</span> Web design <span class="meta tag-exists">live</span></div>
+        <div class="pg"><span>▸</span> Branding <span class="meta chip" style="font-size:9px;padding:1px 5px">draft</span></div>
+      </div>
+      <div class="pg"><span>▸</span> Contact <span class="meta tag-exists">live</span></div>
+      <div class="pg"><span>▸</span> 404 <span class="meta tag-new" style="font-size:9px">system</span></div>
+      <div class="note" style="margin-top:10px;font-size:10.5px">Drag to nest · right-click → duplicate / set as home / delete · draft pages skip publish.</div>
+    </div>
+    <div class="panel" style="border-right:none">
+      <div class="lbl" style="margin-bottom:8px">Page settings — Home</div>
+      <div class="lbl">Page name</div><div class="input" style="margin:5px 0 10px">Home</div>
+      <div class="lbl">URL slug</div><div class="input" style="margin:5px 0 10px">/ (home)</div>
+      <div class="box pad" style="padding:12px;margin-bottom:10px">
+        <div class="lbl" style="margin-bottom:6px">Page SEO <span class="tag-exists">exists</span></div>
+        <div class="lbl">Meta title</div><div class="input" style="margin:5px 0 8px">Acme — Home</div>
+        <div class="lbl">Meta description</div><div class="input" style="margin:5px 0 8px;height:38px">Acme builds…</div>
+        <div class="lbl">OG image</div><div class="ph-img" style="height:56px;margin-top:5px">▣ 1200×630</div>
+      </div>
+      <div class="note" style="font-size:10.5px"><b>Per-page, not global:</b> each page owns its slug + SEO. Site-wide SEO defaults live in Settings (rail → Settings); page values override the default.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="editor-spine-wireframe.html">Spine</a><a href="50-pages.html" class="here">Pages</a><a href="51-layers.html">Layers</a><a href="52-add.html">Add</a><a href="53-settings.html">Settings</a><a href="40-edit-scope.html">Edit scope</a><a href="20-publish.html">Publish</a></div>
+</body></html>
