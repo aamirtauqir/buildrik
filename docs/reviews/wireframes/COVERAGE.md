@@ -74,3 +74,10 @@ Wired: dashboard topbar (🔔→c2, ?→c3, avatar→b1) + Team nav; site-detail
 
 Deferred (genuinely not built in app / out of low-fi scope): ecommerce storefront UI (folder exists, minimal), granular per-field form-builder canvas (form *config* covered in d2 + editor Add), Stripe checkout internals (payment off-screen by design/safety).
 
+## ADDENDUM 2026-06-15 — Design system (was missing)
+The site's own DESIGN SYSTEM (`editor/design-system/` — DesignSystemTab) was uncovered. Added 3 screens:
+- ✅ ds1 design-system — Tokens section: 14 token kinds (color/type/spacing/radius/shadow/motion/border/opacity/z/breakpoint/grid/sizing/icon/imagery) as accordion cards, swatch+usage+lint+alias rows, Light/Dark color-mode toggle (darkValue per token), Simple/Advanced density, token detail drill-in (value + dark + WCAG). 4 workspace tabs (Tokens/Styles/Components/Export).
+- ✅ ds2 styles — 11 preset categories (button/card/form/link/badge/alert/tooltip/modal/nav/table/layout), variant tabs, BindingRow (cssProperty → kind-filtered TokenPicker). The layer between raw tokens and on-canvas elements.
+- ✅ ds3 ds-tools — StarterGallery (6 themes), AI generate (tokens/schema), DS lint issues, Migration progress (v0→vN), Review&Apply (+tab-guard), Export (CSS/Tailwind/JSON/Figma).
+Wired: spine rail "Design" → ds1. Index editor stage. Grounded in DesignSystemTab + token registry + presets + dark-mode trilogy + lint + starter/AI/migration modals.
+

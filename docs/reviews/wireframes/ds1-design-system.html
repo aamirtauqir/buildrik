@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Design system</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 320px 1fr;min-height:440px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;padding:2px}.seg button{border:none;background:none;font-size:10px;padding:3px 9px;border-radius:3px;cursor:pointer;color:var(--ink-2)}.seg button.on{background:var(--ink);color:#fff}
+  .kind{border:1px solid var(--line);border-radius:6px;margin-bottom:7px}
+  .kh{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;font-size:12px;font-weight:600;cursor:pointer}
+  .kh .c{font-size:10px;color:var(--ink-3);font-weight:400}
+  .trow{display:flex;align-items:center;gap:8px;padding:6px 11px;font-size:11.5px;border-top:1px dashed var(--line)}
+  .sw{width:18px;height:18px;border-radius:4px;border:1px solid var(--line)}
+  .use{margin-left:auto;font-size:9px;color:var(--ink-3)}
+  .warn{color:var(--ink);background:var(--fill);border-left:2px solid var(--ink)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Design system — Tokens (rail → Design)</b> · grounded in <code>DesignSystemTab</code> + token registry (14 kinds) · the site's own design tokens users customize · 4 sections: Tokens / Styles / Components / Export</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri"><span class="ic">+</span>Add</div>
+      <div class="ri"><span class="ic">▤</span>Pages</div>
+      <div class="ri"><span class="ic">◳</span>Comp</div>
+      <div class="ri on"><span class="ic">◧</span>Design</div>
+      <div class="ri"><span class="ic">≣</span>Layers</div>
+    </div>
+    <div class="panel" style="border-right:1px dashed var(--line);padding:12px;overflow:auto">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px"><b style="font-size:13px">Design</b><span class="tag-new" style="vertical-align:middle">2 unsaved</span></div>
+      <div class="row" style="margin-bottom:10px"><span class="chip on">Tokens</span><a href="ds2-styles.html" class="chip">Styles</a><a href="57-components.html" class="chip">Components</a><a href="ds3-ds-tools.html" class="chip">Export</a></div>
+      <div class="note warn" style="margin-bottom:10px;font-size:10.5px"><b>⚠ DS lint:</b> 2 banned-hue · 3 missing-dark · <a href="ds3-ds-tools.html" style="text-decoration:underline">Review all</a></div>
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <div class="seg"><button class="on">Light</button><button>Dark</button></div>
+        <div class="seg"><button>Simple</button><button class="on">Advanced</button></div>
+      </div>
+      <div class="input" style="margin-bottom:8px">⌕ search tokens · all / issues</div>
+
+      <div class="kind"><div class="kh">Color <span class="c">9 tokens · −</span></div>
+        <div class="trow"><span class="sw" style="background:#2D6DFF"></span> accent <span class="muted" style="font-family:var(--mono);font-size:9px">--color-accent</span><span class="use">31 uses</span></div>
+        <div class="trow"><span class="sw" style="background:#111"></span> ink <span class="use">88 uses</span></div>
+        <div class="trow warn"><span class="sw" style="background:#7a32d6"></span> brand-2 <span class="muted" style="font-size:9px">banned hue</span><span class="use">2 uses</span></div>
+        <div class="trow"><span class="sw" style="background:#fff;border:1px solid #ccc"></span> surface <span class="muted" style="font-size:9px">⚠ no dark</span><span class="use">40 uses</span></div>
+      </div>
+      <div class="kind"><div class="kh">Type <span class="c">font + 8 sizes · +</span></div></div>
+      <div class="kind"><div class="kh">Spacing <span class="c">12 steps · +</span></div></div>
+      <div class="kind"><div class="kh">Radius <span class="c">6 · +</span></div></div>
+      <div class="kind"><div class="kh">Shadow <span class="c">4 · +</span></div></div>
+      <div class="kind"><div class="kh">Motion <span class="c">2 · +</span></div></div>
+      <div class="muted" style="font-size:10px;text-align:center;margin-top:6px">+ Border · Opacity · Z-index · Breakpoint · Grid · Sizing · Icon · Imagery (14 kinds)</div>
+    </div>
+    <div class="panel" style="border-right:none;padding:14px">
+      <div class="lbl" style="margin-bottom:8px">Token detail — accent</div>
+      <div class="row" style="margin-bottom:12px"><div class="sw" style="width:48px;height:48px;background:#2D6DFF"></div><div><div style="font-family:var(--mono);font-size:11px">--color-accent</div><div class="muted" style="font-size:10px">cobalt · brand</div></div></div>
+      <div class="lbl">Light value</div><div class="input" style="margin:5px 0 10px">#2D6DFF</div>
+      <div class="lbl">Dark value <span class="tag-exists">dark mode</span></div><div class="input" style="margin:5px 0 10px">#5B8DFF</div>
+      <div class="box pad" style="padding:9px;margin-bottom:10px"><div class="lbl">Used by</div><div class="muted" style="font-size:11px;margin-top:4px">31 elements · btn-primary preset · 6 pages — change ripples everywhere bound (§6.5 token scope)</div></div>
+      <div class="row"><button class="btn">Add alias</button><button class="btn btn-fill">Apply</button></div>
+      <div class="note" style="margin-top:12px;font-size:10.5px"><b>Tokens = SSOT (grounded):</b> 14 kinds, accordion cards, per-token usage + lint + alias (Advanced shows IDs). Light/Dark gives each token a darkValue (dark-mode trilogy). Editing a token re-flows everything bound to it — the widest reach on the §6.5 ladder (41). WCAG contrast checker + fix-all on colors.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Design system:</b><a href="editor-spine-wireframe.html">Spine</a><a href="ds1-design-system.html" class="here">Tokens</a><a href="ds2-styles.html">Styles/presets</a><a href="ds3-ds-tools.html">DS tools</a><a href="41-scope-picker.html">Token scope</a><a href="57-components.html">Components</a><a href="index.html">Map</a></div>
+</body></html>
