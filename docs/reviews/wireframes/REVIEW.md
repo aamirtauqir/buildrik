@@ -42,3 +42,17 @@ Mechanical: ✅ no dead internal links, ✅ no orphan screens, editor-spine inte
 
 Fixed this pass (cheap defects in shipped screens): **C1, C2, F1, F4 (wiring), F6 (gate), P2 reach-count, P2 preview→publish, P2 visit→90.**
 Next batch (new screens): **F2 onboarding role-select, F5 dashboard ops (Settings/Domains/Billing), delete-confirm, §9 share states, §10 dashboard variants.**
+
+---
+
+## CLOSED — re-review + depth + P3 (2026-06-15)
+
+Prototype grew 22 → **44 screens + index**. Both agents re-run on the full set:
+- **Flow:** all 8 prior P1s confirmed closed end-to-end; "ship-ready as a flow spec". New P2-A (dashboard "Pages" tab boundary leak) + P2-B/C/D — all fixed.
+- **Coherence:** "no contradictions found". Only P1 = "Pro" overloaded (density vs plan) — fixed: density is now **Simple↔Advanced**, **Pro** reserved for the paid plan.
+
+All batches landed: on-ramp (00/04/13/01/02/03/03b) · editor (spine/40/41/50/50b/51/52/53/54/55/56/56b/57/58/59/59b) · behavior §8 (60/61/62/21) · ship/serve (20/22/30/90/91) · dashboard (10/11/12/14/15/16/17/18/19) · standards (70/71/80).
+
+**Integrity: ZERO dead links · ZERO `href="#"` · ZERO orphans.** Every drill-in resolves. 1 known limitation: editor-spine is self-contained (own styles, not wf.css) by design.
+
+Deferred (real features, out of wireframe scope): forms-builder config, ecommerce, localization UI.
