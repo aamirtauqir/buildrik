@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Stock photos</title><link rel="stylesheet" href="wf.css">
+<style>
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .st{border:1px solid var(--line);border-radius:5px;overflow:hidden;position:relative;cursor:pointer}.st:hover{border-color:var(--ink)}
+  .attr{position:absolute;bottom:0;left:0;right:0;background:rgba(43,43,43,.7);color:#fff;font-size:8px;padding:2px 5px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>Stock photo picker (rail → Media → Stock)</b> · grounded in current stock-modal media phase · solution: search a free library in-app, insert with attribution auto-added, optimize on insert</div>
+  <div class="pad">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px"><div class="h2">Stock photos</div><a href="56-media.html" class="btn" style="padding:4px 10px">✕ Close</a></div>
+    <div class="row" style="margin-bottom:6px"><div class="input" style="flex:1">⌕ workspace, team, desk…</div><button class="btn btn-fill">Search</button></div>
+    <div class="row" style="margin-bottom:12px"><span class="chip on">All</span><span class="chip">Horizontal</span><span class="chip">Vertical</span><span class="chip">Square</span><span class="muted" style="font-size:10px;margin-left:auto;align-self:center">free library · auto-attributed</span></div>
+    <div class="grid">
+      <div class="st"><div class="ph-img" style="height:80px">▦</div><div class="attr">© A. Photographer</div></div>
+      <div class="st"><div class="ph-img" style="height:80px">▦</div><div class="attr">© B. Shooter</div></div>
+      <div class="st"><div class="ph-img" style="height:80px">▦</div><div class="attr">© C. Lens</div></div>
+      <div class="st"><div class="ph-img" style="height:80px">▦</div><div class="attr">© D. Frame</div></div>
+      <div class="st"><div class="ph-img" style="height:80px">▦</div><div class="attr">© E. Shot</div></div>
+      <div class="st"><div class="ph-img" style="height:80px">▦</div><div class="attr">© F. Capture</div></div>
+      <div class="st"><div class="ph-img" style="height:80px">▦</div><div class="attr">© G. Studio</div></div>
+      <div class="st"><div class="ph-img" style="height:80px">▦</div><div class="attr">© H. Image</div></div>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-top:14px"><span class="muted" style="font-size:11px">Click a photo → adds to your Media library + inserts</span><a href="56-media.html" class="btn btn-fill">Insert selected →</a></div>
+    <div class="note" style="margin-top:14px"><b>In-app, attributed, optimized (grounded):</b> picking a stock photo copies it into your own Media library (so it survives if the source changes), auto-adds required attribution, and runs the same optimize pass as an upload. No leaving the editor to hunt for images.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="editor-spine-wireframe.html">Spine</a><a href="56-media.html">Media</a><a href="56b-stock.html" class="here">Stock</a><a href="52-add.html">Add</a><a href="59-inspector.html">Inspector</a><a href="20-publish.html">Publish</a></div>
+</body></html>
