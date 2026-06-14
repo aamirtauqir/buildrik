@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Save conflict</title><link rel="stylesheet" href="wf.css"></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>Save conflict / stale session (§8)</b> · grounded in current single-writer reality (multiplayer is demo-blocked — see collab codex review) · solution: detect a behind-copy, never silently overwrite</div>
+  <div class="pad">
+    <div class="box pad" style="border:2px solid var(--ink);max-width:460px;margin:0 auto">
+      <span class="tag-new">CONFLICT</span>
+      <div class="h1" style="font-size:18px;margin:8px 0 4px">This site changed somewhere else</div>
+      <div class="muted" style="font-size:12.5px;margin-bottom:14px">Your copy is <b>behind</b>. The site was saved from another tab or device 3 min ago. Saving now would overwrite those newer changes.</div>
+
+      <div class="grid2" style="margin-bottom:14px">
+        <div class="box pad" style="padding:10px"><div class="lbl">This tab</div><div style="font-size:11.5px;margin-top:4px">edited 12s ago</div><div class="muted" style="font-size:10px">3 unsynced changes</div></div>
+        <div class="box pad" style="padding:10px"><div class="lbl">Latest on server</div><div style="font-size:11.5px;margin-top:4px">saved 3 min ago</div><div class="muted" style="font-size:10px">from another session</div></div>
+      </div>
+
+      <button class="btn btn-fill btn-strong" style="width:100%;margin-bottom:8px">Reload the latest (discard my 3 changes)</button>
+      <button class="btn" style="width:100%;margin-bottom:8px">Keep mine — overwrite the server</button>
+      <div class="row" style="justify-content:center"><a href="60-save-states.html" class="muted" style="font-size:11px;text-decoration:underline">Download my version as a backup first</a></div>
+    </div>
+
+    <div class="note" style="margin-top:18px"><b>Honest scope:</b> real-time multiplayer merge is <b>not shipped</b> (the OT layer has known convergence bugs — flagged demo-only). So the model today is <b>single-writer with conflict detection</b>: we can't merge, but we must never silently clobber. The two-tab / stale-session case is the real, shippable risk — this screen handles exactly that. A true merge/diff view is deferred to the collab arc (eval Yjs).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>§8 behavior:</b><a href="editor-spine-wireframe.html">Editor</a><a href="60-save-states.html">Save states</a><a href="61-conflict.html" class="here">Conflict</a><a href="62-permissions.html">Permissions</a><a href="20-publish.html">Publish</a><a href="10-dashboard.html">Dashboard</a></div>
+</body></html>
