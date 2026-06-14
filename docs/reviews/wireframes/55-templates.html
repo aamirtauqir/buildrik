@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Templates panel</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 300px 1fr;min-height:400px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
+  .tg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .tc{border:1px solid var(--line);border-radius:5px;overflow:hidden;cursor:pointer}.tc:hover{border-color:var(--ink-2)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Templates panel (rail → Templates)</b> · grounded in current importHTMLToActivePage / section templates · solution: two scopes — whole-page templates vs drop-in section blocks (no full-site swap mid-build)</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri"><span class="ic">✦</span>AI</div>
+      <div class="ri on"><span class="ic">▦</span>Tmpl</div>
+      <div class="ri"><span class="ic">+</span>Add</div>
+      <div class="ri"><span class="ic">▤</span>Pages</div>
+      <div class="ri"><span class="ic">▣</span>Media</div>
+    </div>
+    <div class="panel" style="border-right:1px dashed var(--line);padding:12px">
+      <div class="row" style="margin-bottom:10px"><span class="chip on">Sections</span><span class="chip">Full pages</span></div>
+      <div class="input" style="margin-bottom:10px">⌕ search · category ▾</div>
+      <div class="tg">
+        <div class="tc"><div class="ph-img" style="height:64px">▭ Hero A</div></div>
+        <div class="tc"><div class="ph-img" style="height:64px">▭ Hero B</div></div>
+        <div class="tc"><div class="ph-img" style="height:64px">▦ Features</div></div>
+        <div class="tc"><div class="ph-img" style="height:64px">≣ Pricing</div></div>
+        <div class="tc"><div class="ph-img" style="height:64px">❝ Testimonials</div></div>
+        <div class="tc"><div class="ph-img" style="height:64px">✉ CTA</div></div>
+      </div>
+      <div class="note" style="margin-top:10px;font-size:10.5px">Click a section → inserts at the selected spot (like Add, but pre-designed). Full-page templates replace the <i>current page</i> only — confirm first.</div>
+    </div>
+    <div class="panel" style="border-right:none;background:var(--bg-2);display:grid;place-items:center">
+      <div style="text-align:center;max-width:290px">
+        <div class="ph-img" style="height:90px;border-style:dashed;margin-bottom:10px">⬇ insert pre-designed section</div>
+        <div class="note" style="text-align:left;font-size:10.5px"><b>Scopes kept distinct:</b> "Sections" = additive drop-ins (safe). "Full pages" = replace this page's content (guarded confirm — never silently wipes work). Distinct from the on-ramp gallery (screen 03), which is for <i>new</i> sites.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="editor-spine-wireframe.html">Spine</a><a href="54-ai.html">AI</a><a href="55-templates.html" class="here">Templates</a><a href="52-add.html">Add</a><a href="50-pages.html">Pages</a><a href="56-media.html">Media</a><a href="57-components.html">Components</a><a href="58-history.html">History</a></div>
+</body></html>

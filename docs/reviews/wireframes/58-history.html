@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · History panel</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 300px 1fr;min-height:400px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
+  .tl{position:relative;padding-left:18px}
+  .tl::before{content:"";position:absolute;left:5px;top:4px;bottom:4px;width:1px;background:var(--line)}
+  .ev{position:relative;padding:7px 0;font-size:12px;cursor:pointer}
+  .ev::before{content:"";position:absolute;left:-16px;top:11px;width:8px;height:8px;border-radius:50%;background:var(--ink-3);border:2px solid #fff}
+  .ev.on::before{background:var(--ink)}.ev.ck::before{background:#fff;border-color:var(--ink)}
+  .ev .t{color:var(--ink-3);font-size:10px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>History panel (rail → History · Pro)</b> · grounded in current version history (autosave snapshots · named checkpoints · restore) · solution: durable safety net beyond undo — restore any point, never lose a day's work</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri"><span class="ic">+</span>Add</div>
+      <div class="ri"><span class="ic">▤</span>Pages</div>
+      <div class="ri"><span class="ic">◳</span>Comp</div>
+      <div class="ri"><span class="ic">≣</span>Layers</div>
+      <div class="ri on"><span class="ic">⟲</span>Hist</div>
+    </div>
+    <div class="panel" style="border-right:1px dashed var(--line);padding:12px">
+      <div class="row" style="justify-content:space-between;margin-bottom:12px"><b style="font-size:13px">Version history</b><button class="btn" style="padding:5px 10px">+ Checkpoint</button></div>
+      <div class="tl">
+        <div class="ev on"><b>Now — working</b><div class="t">unsaved edits · autosaving</div></div>
+        <div class="ev ck"><b>★ Before AI rewrite</b><div class="t">checkpoint · 12 min ago</div></div>
+        <div class="ev">Autosave<div class="t">28 min ago</div></div>
+        <div class="ev ck"><b>★ Published v3</b><div class="t">checkpoint · 2 days ago</div></div>
+        <div class="ev">Autosave<div class="t">2 days ago</div></div>
+        <div class="ev">Autosave<div class="t">3 days ago</div></div>
+      </div>
+      <div class="note" style="margin-top:10px;font-size:10.5px">★ = named checkpoint (manual or auto-on-publish). Autosaves thin out over time; checkpoints kept.</div>
+    </div>
+    <div class="panel" style="border-right:none;padding:14px">
+      <div class="lbl" style="margin-bottom:8px">Preview — "Before AI rewrite"</div>
+      <div class="ph-img" style="height:110px;margin-bottom:10px">▦ snapshot 12 min ago</div>
+      <div class="row" style="margin-bottom:12px"><button class="btn btn-fill">Restore this version</button><button class="btn">Compare to now</button></div>
+      <div class="box pad" style="padding:9px"><div class="lbl">What changed since</div><div class="muted" style="font-size:11px;margin-top:4px">Hero heading · CTA label · 1 image swapped</div></div>
+      <div class="note" style="margin-top:12px;font-size:10.5px"><b>Restore is non-destructive:</b> restoring creates a new history entry (you can undo the restore). Distinct from undo (in-session) — history survives reloads, days, and publishes.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="editor-spine-wireframe.html">Spine</a><a href="54-ai.html">AI</a><a href="55-templates.html">Templates</a><a href="52-add.html">Add</a><a href="50-pages.html">Pages</a><a href="56-media.html">Media</a><a href="57-components.html">Components</a><a href="58-history.html" class="here">History</a></div>
+</body></html>
