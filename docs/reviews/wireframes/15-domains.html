@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Domains</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:200px 1fr;min-height:440px}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
+  .dom{display:grid;grid-template-columns:1fr 130px 90px 70px;gap:10px;align-items:center;padding:11px 12px;border-bottom:1px dashed var(--line);font-size:12.5px}
+  .dom.h{color:var(--ink-3);font-size:10px;text-transform:uppercase}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Domains — Dashboard (§3 ops)</b> · grounded in current Vercel domain integration · solution: one place to see every domain + status across sites; add → the §8.6 DNS journey</div>
+  <div class="ed">
+    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
+      <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
+      <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div>Acme Co ▾</div>
+      <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
+        <a href="10-dashboard.html" class="navi">⌂ Home</a>
+        <a href="11-sites.html" class="navi">▦ Sites</a>
+        <a href="15-domains.html" class="navi here">◐ Domains</a>
+        <a href="#" class="navi">▤ Media</a>
+        <a href="#" class="navi">⚙ Settings</a>
+        <a href="16-billing.html" class="navi">$ Billing</a>
+      </nav>
+    </aside>
+    <main class="pad">
+      <div class="row" style="justify-content:space-between;margin-bottom:14px"><div class="h1">Domains</div><a href="22-domain-pending.html" class="btn btn-fill btn-strong">+ Connect domain</a></div>
+      <div class="box">
+        <div class="dom h"><span>Domain</span><span>Site</span><span>Status</span><span></span></div>
+        <div class="dom"><span><b>acme.com</b><div class="muted" style="font-size:10px">+ www · primary</div></span><span>acme-main</span><span class="tag-exists">● Connected</span><span class="muted" style="font-size:10.5px">SSL ✓</span></div>
+        <div class="dom"><span><b>launch.acme.com</b></span><span>launch-lp</span><span class="tag-new">⏳ Pending</span><a href="22-domain-pending.html" class="muted" style="font-size:10.5px;text-decoration:underline">Verify</a></div>
+        <div class="dom" style="border-bottom:none"><span><b>blog.acme.com</b></span><span>old-blog</span><span class="chip" style="font-size:10px;padding:1px 7px">✕ Error</span><a href="22-domain-pending.html" class="muted" style="font-size:10.5px;text-decoration:underline">Fix DNS</a></div>
+      </div>
+      <div class="grid3" style="margin-top:14px">
+        <div class="box pad"><div class="lbl">Connected</div><div class="h2" style="margin-top:4px">1</div></div>
+        <div class="box pad"><div class="lbl">Pending</div><div class="h2" style="margin-top:4px">1</div></div>
+        <div class="box pad"><div class="lbl">Plan limit</div><div class="h2" style="margin-top:4px">3 <span class="muted" style="font-size:11px">/ Pro</span></div></div>
+      </div>
+      <div class="note" style="margin-top:16px"><b>Why dashboard, not editor:</b> domains are an ops task done once, often weeks after design — never mid-canvas. Each row's status is the same SSOT used on site cards. "Connect" + "Verify"/"Fix DNS" all route into the §8.6 domain journey (screen 22). Beyond the plan limit → the billing gate (screen 16).</div>
+    </main>
+  </div>
+</div>
+<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="14-site-settings.html">Site settings</a><a href="15-domains.html" class="here">Domains</a><a href="16-billing.html">Billing</a><a href="22-domain-pending.html">Domain journey</a></div>
+</body></html>

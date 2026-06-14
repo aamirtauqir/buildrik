@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Site settings (ops)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:200px 1fr;min-height:440px}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
+  .sec{font-size:12.5px;display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+  .sn{padding:7px 9px;border-radius:5px;color:var(--ink-2);cursor:pointer}.sn:hover{background:var(--fill)}.sn.on{background:var(--ink);color:#fff;font-weight:600}
+  .red{display:grid;grid-template-columns:1fr 24px 1fr 60px;gap:8px;align-items:center;font-size:11.5px;font-family:var(--mono);padding:7px 0;border-bottom:1px dashed var(--line)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Site Settings — Dashboard ops home (§3 boundary)</b> · publishing-infra done <i>between/after</i> design sessions · this is where the editor's "↗ opens Dashboard" deep-links (screen 53) land</div>
+  <div class="ed">
+    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
+      <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="11-sites.html" style="color:var(--ink-2)">Sites</a> › acme-main</div>
+      <div class="sec">
+        <div class="sn">Overview</div><div class="sn">Pages</div><div class="sn on">Settings</div><div class="sn">Domains</div><div class="sn">Analytics</div>
+      </div>
+      <div class="lbl" style="margin-bottom:6px">Settings sections</div>
+      <div class="sec">
+        <div class="sn">SEO defaults</div>
+        <div class="sn on">Redirects</div>
+        <div class="sn">Custom code &amp; headers</div>
+        <div class="sn">Analytics &amp; integrations</div>
+        <div class="sn">General</div>
+      </div>
+      <a href="editor-spine-wireframe.html" class="btn" style="width:100%;text-align:center">Edit site in editor →</a>
+    </aside>
+    <main class="pad">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="h1" style="font-size:18px">Redirects</div><button class="btn">+ Add redirect</button></div>
+      <div class="muted" style="font-size:11.5px;margin-bottom:14px">301/302 rules applied at the edge. A site-level ops task — that's why it lives here, not in the design canvas.</div>
+      <div class="box pad">
+        <div class="red" style="color:var(--ink-3);font-size:10px;text-transform:uppercase"><span>From</span><span></span><span>To</span><span>Type</span></div>
+        <div class="red"><span>/old-pricing</span><span>→</span><span>/pricing</span><span>301</span></div>
+        <div class="red"><span>/blog/*</span><span>→</span><span>/news/:splat</span><span>301</span></div>
+        <div class="red" style="border-bottom:none;color:var(--ink-3)"><span>/promo</span><span>→</span><span>/summer-sale</span><span>302</span></div>
+      </div>
+      <div class="grid2" style="margin-top:16px">
+        <div class="box pad"><div class="lbl">SEO defaults <span class="tag-exists">site-wide</span></div><div class="muted" style="font-size:11px;margin-top:5px">Title template, default description, OG. Editor shows the effective value read-only (boundary §3).</div></div>
+        <div class="box pad"><div class="lbl">Custom code &amp; headers</div><div class="muted" style="font-size:11px;margin-top:5px">Site-wide &lt;head&gt;, CSP/security headers. Per-page &lt;head&gt; stays in the editor.</div></div>
+      </div>
+      <div class="note" style="margin-top:16px"><b>Boundary, made real:</b> these are the four ops the editor (53) mirrors as "↗ opens Dashboard". Same setting, one home — the editor never edits them, it shows effective values + a deep-link. Closes the v1 "same setting in 3 places" problem with a <i>scope</i> split, not duplication.</div>
+    </main>
+  </div>
+</div>
+<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="14-site-settings.html" class="here">Site settings</a><a href="15-domains.html">Domains</a><a href="16-billing.html">Billing</a><a href="53-settings.html">Editor settings</a></div>
+</body></html>
