@@ -2,6 +2,8 @@
 
 The missing UX-spec layer under the two product-design review docs (`-ia-review.md`, `-solutions.md`). Built in the order a product designer actually works: **clarify the Problem and the User first, then the User Flow, then the Screen list + Information Architecture, then every screen's name and the elements inside it.** Grounded in the real product inventory + the decided solutions (progressive disclosure, Simple/Pro density, edit-scope cues §6.5, editor↔dashboard boundary, Template/AI-first onboarding). No invented features.
 
+> **v2 — incorporated an adversarial UX review (codex, senior-PD persona).** v1 was a *surface inventory* (screens-as-nouns); codex correctly flagged that a visual builder lives or dies on **state/transition choreography and unhappy paths**, which v1 hand-waved. v2 adds **§8 — State & Transition spec** (preview mode, save/autosave/conflict/recovery, page-switching with dirty state, editor↔dashboard bridges, AI-fail/resume, domain-pending journey, permission/read-only matrix, paywall/plan-limit interrupts), **§9 — Public/served-site screens** (the builder's output: published site, share, error pages — absent in v1), a **standard "every screen has these states" rule** (§10), and corrects the v1 "buildable as-is" claim. Codex verdict + per-finding resolution in the Addendum. The §1–§7 surface below is unchanged; the behavior layer is new.
+
 ---
 
 ## 1. THE PROBLEM (clear)
@@ -319,7 +321,7 @@ Concrete element lists. Core-flow screens detailed; long-tail (auth errors, each
 - **New to build** (small, high-leverage): the **Pro/Advanced density toggle** (topbar + server-state), the **"what am I editing" scope line + propagation warning + phone banner** (§6.5), the **"More" disclosure** on rail/inspector/settings, the **AI/Template-first** new-site default, read-only **mirror tabs** for dedup.
 - **Changed** (moved, not rebuilt): SEO/analytics/redirects/headers relocate to their one home per §4.3; AI moves to top of BUILD.
 
-So this is **re-organization + ~5 new affordances on an engine that already renders all of it** — not a rewrite.
+The *surface* (screens) is largely re-organization + ~5 new affordances. **But "buildable" was the wrong word in v1** (codex was right): the screens existing as nouns does NOT make the product buildable — the **behavior** (save, page-switch, preview, publish, AI-fail, domain-pending, permissions) is what a real builder lives on, and that is the §8 state layer below, most of which is genuinely new design work, not re-org.
 
 ---
 
@@ -328,3 +330,168 @@ So this is **re-organization + ~5 new affordances on an engine that already rend
 - Whether AI or Template is the *single* default new-site path (both on-ramps; which is the hero).
 - Site-default-SEO living in dashboard vs editor (decided dashboard per ops-scope, but it's the one boundary call worth watching a real user on).
 These are flagged, not silently decided.
+
+---
+
+## 8. STATE & TRANSITION SPEC (the behavior layer — what v1 missed)
+
+Screens are nouns; this is the verbs. A visual builder breaks on transitions, not missing panels. Each below names the states + the rule.
+
+### 8.1 Save / autosave / recovery / conflict
+```
+  states:  clean ─▶ dirty ─(debounce ~1.5s OR blur/structural change)▶ saving ─▶ saved
+                                                                          └─(fail)▶ save-error
+  - Autosave cadence: debounced ~1.5s after last edit + immediately on structural ops
+    (add/delete/move element, page switch, publish). Never lose >a few seconds of work.
+  - save-error state: persistent toast "Couldn't save — retrying" + retry button; queue edits
+    locally; never silently drop. (Engine already routes to dashboard saveProject — this is its UX.)
+  - Offline: detect → banner "Offline — changes saved locally, will sync"; on reconnect, flush.
+  - Crash/refresh recovery: on reopen, "Restore unsaved changes from <time>?" if local buffer newer.
+  - Unsaved-changes guard: closing tab / browser-back / leaving editor while saving → "Saving… leave anyway?"
+  - Two-tab / collab conflict: last-writer-wins is NOT safe with presence shown. Rule: lock-on-focus
+    per element OR a "this was changed by <name>, reload?" banner. (NOTE: the collab arc is
+    demo-only/production-blocked per project memory — so for now, SINGLE-editor: detect a second
+    session and warn "editing in another tab," don't pretend multiplayer works.)
+```
+
+### 8.2 Preview mode (was just a word in v1)
+```
+  - Entry: topbar "Preview" button (eye icon), next to Publish.
+  - Preview = full-site, interactive, at the current breakpoint, using the PUBLISHED render shell
+    (so it shows exactly what publish will produce — this is the trust step + would have caught H1).
+  - In preview: chrome hides; a thin "Preview — [device] — Exit" bar remains; links navigate
+    between pages live; forms are inert (or test-mode labelled).
+  - Exit: "Exit preview" returns to the exact element/selection the user left.
+  - Shareable preview = the existing /share/[token] (account-less), see §9.
+```
+
+### 8.3 Multi-page editing inside the editor
+```
+  - Page switch: Pages panel or topbar page dropdown → switch. Dirty state autosaves first (8.1),
+    no modal needed unless save-error.
+  - Set home page (star), duplicate page, delete page (guard if it's the home or linked-from).
+  - Cross-page links: link picker lists this site's pages (internal) vs external URL vs anchor.
+  - "Check the journey": preview (8.2) walks page→page so the user verifies navigation pre-publish.
+  - Nav element: editing the nav offers "link to a page" from the same picker → no broken links.
+```
+
+### 8.4 editor ↔ dashboard bridges (close the loop)
+```
+  - Editor always has an explicit exit: brand/logo or "← <Site name>" → returns to that site's
+    dashboard detail (NOT the generic dashboard — back to where they came from).
+  - After publish: success state offers BOTH "Copy URL / View site" AND "Connect a domain →"
+    (deep-links to dashboard Domains for THIS site).
+  - Resume: if domain verification is pending and the user returns, dashboard surfaces it
+    (site-detail banner "Domain pending — recheck") + a notification. The task is resumable, not lost.
+  - Mirror tabs (per solutions §11.5): a relocated tab shows "moved → open here", never a 404.
+```
+
+### 8.5 AI generation — full failure/resume choreography
+```
+  states: queued ─▶ generating(progress+logs) ─▶ done ─▶ editor(draft)
+                         ├─(timeout)▶ "taking longer than usual — keep waiting / cancel"
+                         ├─(hard fail)▶ error + Retry (prompt + inputs PRESERVED, editable) +
+                         │              "use a template instead" + "start blank" (work not lost)
+                         ├─(partial)▶ salvage: "we made 3 of 5 pages — open draft / retry the rest"
+                         └─(credits exhausted)▶ upgrade OR template/blank fallback (existing)
+  - Abandon + resume: leaving mid-generation → job continues server-side; dashboard shows
+    "Generating… / Draft ready" so they can come back.
+  - Re-run scope: "regenerate content only" / "regenerate images only" without rebuilding structure.
+```
+
+### 8.6 Domain connection — the real long-running journey (not "→ done")
+```
+  publish ─▶ live on <site>.buildrik subdomain IMMEDIATELY (don't block on custom domain)
+  add custom domain ─▶ DNS-records shown + copy buttons + per-provider help (Cloudflare/etc.)
+       ├─ pending ─▶ "Verifying… (can take up to 48h)" + auto-recheck (poll) + manual "Recheck now"
+       ├─ verified ─▶ SSL provisioning state ("Securing… ~minutes") → secured → primary
+       ├─ error ─▶ specific cause (record missing/typo) + fix guidance + recheck
+       └─ still-pending-tomorrow ─▶ user returns: same state, clear "what to do", support link
+  - The subdomain stays live the whole time; the custom domain is additive, never a publish blocker.
+```
+
+### 8.7 Permission / read-only matrix (collaboration is in the product)
+```
+  role     edit canvas   publish   site settings/ops   team/billing   share links
+  OWNER       ✓            ✓            ✓                  ✓              ✓
+  ADMIN       ✓            ✓            ✓                  ✓ (not billing) ✓
+  EDITOR      ✓            ✓ (or req)   limited            ✗              view
+  VIEWER      read-only    ✗            ✗                  ✗              ✗
+  - VIEWER/read-only editor state: canvas is inspectable but controls are disabled with
+    "View-only — ask an admin to edit" affordances, not hidden (so they understand why).
+  - transfer-pending: workspace controls locked for the outgoing owner where appropriate;
+    banner "Ownership transfer pending."
+  - permission-denied variants for settings/publish/access screens (not a blank or a crash).
+```
+
+### 8.8 Paywall / plan-limit interrupts (change the primary flows)
+```
+  Surface a clear, non-punitive limit state at each gate (not a dead button):
+  - Create site beyond plan limit ─▶ "You've used all N sites — upgrade or archive one"
+  - Invite beyond seat limit ─▶ seat-limit modal → upgrade
+  - Connect domain beyond limit ─▶ domain-limit → upgrade
+  - Media/storage limit ─▶ upload blocked with size context → upgrade/clear
+  - Redirects/custom-code/headers gated by plan ─▶ "Pro feature" inline, with upgrade
+  - Publish blocked by billing PAST_DUE/dunning ─▶ "Update payment to publish" (links billing)
+  Each interrupt: states the limit, the value of upgrading, and a non-dead-end alternative.
+```
+
+---
+
+## 9. PUBLIC / SERVED-SITE SCREENS (the builder's OUTPUT — absent in v1)
+
+Buildrik *serves websites*; those pages are part of the product surface and must be designed:
+- **Published site** — the live render (this is what H1 was breaking). Must match the canvas.
+- **Builder subdomain page** — `<site>.buildrik.app` while a custom domain propagates.
+- **Share view** (`/share/[token]`, account-less) — read-only or editable per plan; the preview-share.
+- **Password-protected share** — password gate before the shared site.
+- **Expired / revoked share** — "This link is no longer available."
+- **Unpublished / private site** — what a visitor sees if the site isn't live (not a raw 404).
+- **Hosted 404** (page not found on a published site) — branded, with link home; user-customisable later.
+- **Hosted 500 / maintenance** — when the served site errors.
+- **Domain-not-yet-connected** — visitor hits the custom domain mid-propagation.
+
+---
+
+## 10. STANDARD: every screen has these states (the v1 element lists were happy-path only)
+
+A build-ready screen spec defines all of: **default · empty · loading · error · permission-denied · (and for forms) validation.** Apply to every screen in §5. Notable v1 gaps to fill:
+- Template gallery: empty-search/no-results.
+- Media: upload-failure, processing/transcoding, quota-hit.
+- My Sites: zero-sites (role-based, partly exists), filtered-to-empty.
+- Site Detail / Settings: loading skeleton, permission-denied.
+- All inputs (site name/slug, domain, email): explicit validation rules + inline errors.
+- Editor on small screen: **editor is desktop-only** (per CLAUDE.md) → an explicit "open on a larger screen" state, not a broken layout. Dashboard IS responsive (mobile nav exists) — spec its mobile layout.
+
+---
+
+## 11. Pro-density discoverability — recovery for the dev who skipped onboarding (codex P2)
+- Role-select skip / a dev landing directly in an existing site (e.g. via invite) misses the density seed.
+- Recovery: the **auto-suggest** (solutions §5.2) fires the first time they reach for an advanced action ("add class," "edit code") → "Turn on Advanced controls?" — this is the safety net, not onboarding.
+- The topbar toggle gets a one-time spotlight/coachmark on first editor open for users who didn't set a role.
+
+---
+
+## Addendum — adversarial UX review (codex, senior-PD persona) + resolutions
+
+Ran codex as a brutal senior-PD adversary against v1 (10 P1 + 3 P2). Verdict was correct: v1 described the surface, not the behavior. All findings incorporated:
+
+| # | Codex finding | Resolution |
+|---|---------------|------------|
+| 1 | [P1] Naive to call it "buildable" — it's a surface inventory, builders break on state choreography | §6 corrected; §8 state layer added |
+| 2 | [P1] Preview is just a word, no mode/entry/exit | §8.2 — full preview mode (published shell, full-site, exit-to-selection) |
+| 3 | [P1] Save = a badge, not a flow (no autosave/offline/recovery/conflict) | §8.1 — full save/autosave/recovery/conflict + single-editor reality (collab is demo-only) |
+| 4 | [P1] Multi-page editing hand-waved | §8.3 — page switch + dirty state, home, cross-page links, journey check |
+| 5 | [P1] editor↔dashboard handoff not closed | §8.4 — explicit exit, post-publish bridge, resumable pending tasks, mirror tabs |
+| 6 | [P1] Domain = "connect → done" fantasy | §8.6 — subdomain-live-first, DNS help, recheck, SSL, still-pending-tomorrow |
+| 7 | [P1] AI failure thin | §8.5 — timeout/hard-fail/partial-salvage/resume/re-run scope, inputs preserved |
+| 8 | [P1] Permission/read-only states missing | §8.7 — role × capability matrix + read-only/denied/transfer-pending variants |
+| 9 | [P1] Public/served-site screens absent | §9 — published site, share, password, expired, private, hosted 404/500 |
+| 10 | [P1] Paywall/plan-limit interrupts missing | §8.8 — limit interrupt at every gate (create/invite/domain/storage/feature/dunning) |
+| 11 | [P2] Element lists happy-path only | §10 — "every screen has default/empty/loading/error/denied/validation" standard |
+| 12 | [P2] Pro-density discoverability weak | §11 — auto-suggest recovery + first-open coachmark |
+| 13 | [P2] Product-responsive unstated | §10 — editor desktop-only state; dashboard mobile to spec |
+
+Codex verdict (verbatim): *"This is not buildable as-is... the spec needs one more layer: explicit state/transition design for preview, page-switching, save/autosave/offline/conflict/recovery, editor↔dashboard exits and returns, AI fail/resume, domain pending/recheck, permission/read-only variants, public/share/error screens, and paywall/plan-limit interruptions. Until those are added, engineering can build shells, but not a trustworthy user flow."*
+
+My judgment: codex was right on every P1. v2 adds exactly that behavior layer (§8–§11). The doc now covers surface (§1–§7) AND behavior (§8–§11), and is build-ready — with the caveat that the collab/multiplayer conflict path stays single-editor until the dedicated OT/CRDT arc (project memory: multiplayer is demo-only/production-blocked), and the three §7 premises remain user-validation items, not assumptions.
