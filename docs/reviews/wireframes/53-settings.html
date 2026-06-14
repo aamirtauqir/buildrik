@@ -5,11 +5,13 @@
   .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
   .nav{font-size:12.5px;display:flex;flex-direction:column;gap:2px}
   .navi2{padding:7px 9px;border-radius:5px;color:var(--ink-2);cursor:pointer}.navi2:hover{background:var(--fill)}.navi2.on{background:var(--ink);color:#fff;font-weight:600}
+  .ops{display:block;border:1px dashed var(--line-d);border-radius:5px;padding:8px 9px;font-size:11.5px;color:var(--ink-2);text-decoration:none;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+  .ops:hover{background:var(--fill);border-color:var(--ink-2)}
 </style></head>
 <body>
 <div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen">
-  <div class="topnote"><b>Site Settings panel (rail → Settings · Pro)</b> · grounded in current project settings (SEO defaults · favicon · custom code) · boundary: editor settings = how the <i>site</i> is built/served; account/billing/domain live in Dashboard</div>
+  <div class="topnote"><b>Site Settings panel (rail → Settings · Pro)</b> · boundary §3: editor owns <i>content/page-scoped</i> config; <i>publishing-infra ops</i> (redirects, headers, site-wide custom code, site-default SEO) live in <b>Dashboard</b> — mirrored here as deep-links, never dead-ends</div>
   <div class="ed">
     <div class="rail">
       <div class="ri"><span class="ic">▤</span>Pages</div>
@@ -19,35 +21,32 @@
       <div class="ri on"><span class="ic">⚙</span>Set</div>
     </div>
     <div class="panel" style="border-right:1px dashed var(--line);padding:12px">
-      <b style="font-size:13px;display:block;margin-bottom:10px">Site settings</b>
-      <div class="nav">
-        <div class="navi2 on">General</div>
-        <div class="navi2">SEO defaults</div>
-        <div class="navi2">Favicon &amp; share</div>
-        <div class="navi2">Custom code</div>
-        <div class="navi2">Redirects</div>
+      <b style="font-size:13px;display:block;margin-bottom:10px">Settings</b>
+      <div class="lbl" style="margin-bottom:5px">In the editor (page/brand)</div>
+      <div class="nav" style="margin-bottom:12px">
+        <div class="navi2 on">Brand &amp; favicon</div>
         <div class="navi2">Fonts</div>
+        <div class="navi2">Language</div>
+        <div class="navi2">Per-page &lt;head&gt;</div>
       </div>
-      <div class="note" style="margin-top:14px;font-size:10px"><b>Not here:</b> custom domain, billing, workspace, publish target → Dashboard (boundary). This panel = build/serve config only.</div>
+      <div class="lbl" style="margin-bottom:5px">Site operations <span class="tag-new" style="vertical-align:middle">Dashboard</span></div>
+      <a class="ops" href="12-site-detail.html">SEO defaults <span>↗</span></a>
+      <a class="ops" href="12-site-detail.html">Custom code / headers <span>↗</span></a>
+      <a class="ops" href="12-site-detail.html">Redirects <span>↗</span></a>
+      <a class="ops" href="12-site-detail.html">Analytics &amp; integrations <span>↗</span></a>
+      <div class="note" style="margin-top:10px;font-size:10px"><b>Mirror, never 404:</b> ops moved to Dashboard still appear here as labeled deep-links (§11.5) — scent preserved, no broken muscle memory.</div>
     </div>
     <div class="panel" style="border-right:none;padding:16px">
-      <div class="lbl" style="margin-bottom:10px">General</div>
-      <div class="lbl">Site name</div><div class="input" style="margin:5px 0 12px">Acme</div>
-      <div class="grid2" style="margin-bottom:12px">
-        <div><div class="lbl">Language</div><div class="input" style="margin-top:5px">English ▾</div></div>
-        <div><div class="lbl">Timezone</div><div class="input" style="margin-top:5px">UTC ▾</div></div>
-      </div>
+      <div class="lbl" style="margin-bottom:10px">Brand &amp; favicon <span class="tag-exists" style="vertical-align:middle">exists</span></div>
+      <div class="lbl">Site name (display)</div><div class="input" style="margin:5px 0 12px">Acme</div>
+      <div class="lbl">Favicon</div><div class="row" style="margin:5px 0 12px"><div class="ph-img" style="width:44px;height:44px">▣</div><button class="btn">Upload</button></div>
+      <div class="lbl">Social share image (default OG)</div><div class="ph-img" style="height:56px;margin:5px 0 12px">▣ 1200×630</div>
       <div class="box pad" style="padding:12px;margin-bottom:12px">
-        <div class="lbl" style="margin-bottom:6px">SEO defaults <span class="tag-exists">exists</span></div>
-        <div class="lbl">Title template</div><div class="input" style="margin:5px 0 8px">%page% — Acme</div>
-        <div class="lbl">Default description</div><div class="input" style="margin:5px 0 0;height:34px">Acme builds…</div>
-        <div class="muted" style="font-size:10px;margin-top:6px">Pages without their own SEO (screen 50) inherit these.</div>
+        <div class="lbl" style="margin-bottom:6px">Per-page &lt;head&gt; snippet <span class="tag-exists">exists · page-scoped</span></div>
+        <div class="input" style="margin:5px 0 0;height:40px;font-family:var(--mono)">&lt;!-- this page only — site-wide code is a Dashboard op --&gt;</div>
+        <div class="muted" style="font-size:10px;margin-top:6px">Content-scoped (this page) stays in the editor. Site-wide injection → Dashboard.</div>
       </div>
-      <div class="box pad" style="padding:12px;margin-bottom:12px">
-        <div class="lbl" style="margin-bottom:6px">Custom code <span class="tag-exists">exists</span></div>
-        <div class="lbl">&lt;head&gt; injection</div><div class="input" style="margin:5px 0 0;height:40px;font-family:var(--mono)">&lt;!-- analytics, fonts… --&gt;</div>
-      </div>
-      <div class="row" style="justify-content:flex-end"><span class="saved muted" style="font-size:11px">Autosaved ✓</span></div>
+      <div class="row" style="justify-content:flex-end"><span class="muted" style="font-size:11px">Autosaved ✓</span></div>
     </div>
   </div>
 </div>

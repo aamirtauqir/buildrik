@@ -39,10 +39,10 @@
 
       <div class="warn" id="warn">
         <b>⚠ This style comes from a class.</b><br>
-        <span class="muted">.btn-primary is used by <b>12 elements</b> (this page) across <b>4 pages</b>. Changing Fill here will change all of them.</span>
+        <span class="muted">.btn-primary styles <b>12 elements</b> on this page · <b>31 across 4 pages</b>. Changing Fill here changes all 31.</span>
         <div class="row" style="margin-top:10px;justify-content:space-between">
           <button class="btn" id="justOne">Just this one</button>
-          <button class="btn btn-fill" id="all">Change all 12</button>
+          <button class="btn btn-fill" id="all">Change all 31</button>
         </div>
         <div class="muted" style="font-size:10px;margin-top:6px">“Just this one” detaches it (creates a local override you can revert).</div>
       </div>
@@ -57,11 +57,11 @@ document.querySelectorAll('.el').forEach(function(el){el.onclick=function(){
   document.querySelectorAll('.el').forEach(function(e){e.classList.remove('sel');});el.classList.add('sel');
   sel=el.getAttribute('data-name');scopeKind=el.getAttribute('data-scope');
   warn.classList.remove('show');btn.disabled=false;
-  if(scopeKind==='cls'){scope.className='scopebar cls';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">styled by class <b>.btn-primary</b> · 12 elements · 4 pages</span>';anno.innerHTML='<b>Class-bound.</b> Changing a style here can ripple to 12 elements. The banner warns before you do.';}
+  if(scopeKind==='cls'){scope.className='scopebar cls';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">styled by class <b>.btn-primary</b> · 12 on this page · 31 across 4 pages</span>';anno.innerHTML='<b>Class-bound.</b> Changing a style here can ripple to 31 elements site-wide. The banner warns before you do.';}
   else{scope.className='scopebar';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">just this element — changes affect nothing else</span>';anno.innerHTML='<b>Unique element.</b> Safe to edit — scope is just this one. No propagation risk.';}
 };});
 btn.onclick=function(){ if(scopeKind==='cls'){warn.classList.add('show');} else {document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Done.</b> Changed Fill on just this element.';} };
-document.getElementById('justOne').onclick=function(){warn.classList.remove('show');scope.className='scopebar';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">overridden · just this element · <u>revert to class</u></span>';document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Detached.</b> Localized override created — other 11 buttons untouched. Revertible.';};
-document.getElementById('all').onclick=function(){warn.classList.remove('show');document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Applied to all 12.</b> Intentional, confirmed — the class changed everywhere it’s used.';};
+document.getElementById('justOne').onclick=function(){warn.classList.remove('show');scope.className='scopebar';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">overridden · just this element · <u>revert to class</u></span>';document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Detached.</b> Localized override created — the other 30 buttons untouched. Revertible.';};
+document.getElementById('all').onclick=function(){warn.classList.remove('show');document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Applied to all 31.</b> Intentional, confirmed — the class changed everywhere it’s used.';};
 </script>
 </body></html>
