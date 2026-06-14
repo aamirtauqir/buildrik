@@ -36,7 +36,13 @@ Pro/agency users (who pay + gave feedback) keep getting lost because **the same 
 - Add explicit **dedup wireframes**: a single settings map + a single "change how this looks" model — show there is ONE home for each.
 - Then: turn the locked wireframes into a build spec, Pro-first.
 
-## Open questions to validate (cheap, before heavy build)
-- How many agencies actually gave this feedback — 1 friend, or several paying? (depth of signal)
-- Would they pay *more* for white-label + multi-client, or is it table-stakes?
-- Is "reuse across sites" the #1 agency unlock, or is white-label? (sequence the agency features by what closes a sale)
+## Validation — PASSED (2026-06-15)
+- **Signal size: 5+ agencies** gave the "too many places" feedback independently → real pattern, not one taste.
+- **Revenue: paying now.** Real money on the table → redesign protects + grows revenue, not a pre-PMF guess.
+- **Killer feature: all of them** (reuse + white-label + multi-client + speed) → agencies want the full power tool.
+- **Switch trigger: yes, a specific ask exists** (the exact thing that would make someone move off Webflow/Framer → Buildrik). **← capture verbatim; this is the wedge + decides build order.**
+
+**Verdict: commit Pro/agency-first.** The bet is de-risked — paying agencies, 5+ consistent voices, a named switch trigger. Proceed to close the agency + dedup wireframe gaps, then a Pro-first build spec.
+
+## Sequencing input still needed
+- The **exact switch-ask** (verbatim) — sets which agency feature ships first.
