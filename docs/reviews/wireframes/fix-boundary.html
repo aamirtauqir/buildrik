@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Editor ↔ Dashboard boundary map (USABILITY FIX)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .rule{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:14px 0}
+  .rule .side{padding:14px 16px}
+  .rule .side.author{border-right:1px solid var(--line)}
+  .rule .side h3{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .rule .side .who{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
+  .rule .side p{font-size:11.5px;color:var(--ink-2);margin-top:8px}
+  .rule .side ul{margin:8px 0 0;padding-left:0;list-style:none;font-size:11.5px}
+  .rule .side li{padding:3px 0 3px 14px;position:relative;color:var(--ink-2)}
+  .rule .side li::before{content:"›";position:absolute;left:0;color:var(--ink-3)}
+
+  table.map{width:100%;border-collapse:collapse;margin:6px 0 0;font-size:12px}
+  table.map th{text-align:left;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding:8px 10px;border-bottom:1px solid var(--line);background:var(--bg-2);vertical-align:bottom}
+  table.map td{padding:9px 10px;border-bottom:1px dashed var(--line);vertical-align:top}
+  table.map tr:hover td{background:var(--bg-2)}
+  .feat{font-weight:600;font-size:12px}
+  .feat .sub{display:block;font-weight:400;font-size:10.5px;color:var(--ink-3);margin-top:1px}
+  .home{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.04em;border-radius:3px;padding:2px 7px;white-space:nowrap}
+  .home.dash{background:var(--ink);color:#fff}
+  .home.editor{border:1px solid var(--ink);color:var(--ink)}
+  .home.split{border:1px dashed var(--ink);color:var(--ink)}
+  .mirror{font-size:11px;color:var(--ink-2)}
+  .mirror a{color:var(--ink);text-decoration:underline}
+  .mirror .from{color:var(--ink-3);font-size:10px;display:block;margin-bottom:1px}
+  .why{font-size:11px;color:var(--ink-2)}
+  .legend-row{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:var(--ink-2);margin:10px 0 0}
+  .legend-row span{display:flex;align-items:center;gap:6px}
+  .arrowcol{text-align:center;color:var(--ink-3);font-size:14px;width:34px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY · USABILITY FIX (A)</div>
+<div class="screen">
+  <div class="topnote"><b>Editor ↔ Dashboard boundary map</b> · fixes the "same thing in two places, no clear home" complaint · <b>one rule:</b> Editor = <i>make the page</i> (content + page-scoped config) · Dashboard = <i>run the business</i> (between/after design sessions) · every dup → one home + a <b>mirror, never 404</b> deep-link from the other side so muscle memory survives</div>
+
+  <div class="pad">
+
+    <!-- THE RULE -->
+    <div class="rule">
+      <div class="side author">
+        <h3>✎ EDITOR <span class="home editor">authors</span></h3>
+        <div class="who">make the page — open while designing</div>
+        <p>Anything that changes <b>what's on the page</b> or is <b>scoped to one page/element</b>. You're in here with a canvas in front of you.</p>
+        <ul>
+          <li>Page content, layout, components</li>
+          <li>Per-page SEO &amp; per-page <code>&lt;head&gt;</code></li>
+          <li>Brand: fonts, colors, favicon, default OG</li>
+          <li>Design tokens / styles</li>
+          <li>Media used <i>in</i> the page</li>
+          <li>Quick "publish this draft"</li>
+        </ul>
+      </div>
+      <div class="side">
+        <h3>⚙ DASHBOARD <span class="home dash">operates</span></h3>
+        <div class="who">run the business — open between sessions</div>
+        <p>Anything that <b>operates the live site</b> or the <b>account</b> — edge/publishing infra, money, people, traffic. No canvas needed.</p>
+        <ul>
+          <li>Domains, DNS, SSL</li>
+          <li>Site-wide SEO defaults &amp; redirects</li>
+          <li>Site-wide custom code / security headers</li>
+          <li>Analytics, form submissions inbox</li>
+          <li>Team / access / share links</li>
+          <li>Billing, plan, workspace settings</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="legend-row">
+      <span><span class="home editor">editor</span> single home = editor</span>
+      <span><span class="home dash">dashboard</span> single home = dashboard</span>
+      <span><span class="home split">split by scope</span> page-scope vs site-scope</span>
+      <span>↗ = mirror deep-link (read-only effective value + jump), never a dead-end</span>
+    </div>
+
+    <!-- THE DUP TABLE -->
+    <table class="map">
+      <thead>
+        <tr>
+          <th style="width:23%">Dup feature (today: both sides)</th>
+          <th style="width:34%">→ Single home</th>
+          <th class="arrowcol"></th>
+          <th style="width:43%">Mirror — never 404 (the other side keeps a deep-link)</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td class="feat">Site-wide SEO defaults<span class="sub">meta title template, default description, default OG, canonical, indexing</span></td>
+          <td><span class="home dash">DASHBOARD</span> <span class="why">site-wide infra; set once between sessions → <a href="d5-seo.html" style="color:var(--ink);text-decoration:underline">d5-seo.html</a></span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">In editor (53-settings):</span> shows <b>effective</b> value read-only + "Edit SEO defaults <a href="14-site-settings.html">↗ Dashboard</a>". Per-page title/desc/OG override <b>stays in editor</b> (Pages → <a href="50-pages.html">50-pages</a>).</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Per-page SEO<span class="sub">this page's title, description, OG, robots</span></td>
+          <td><span class="home editor">EDITOR</span> <span class="why">page-scoped content → <a href="50-pages.html" style="color:var(--ink);text-decoration:underline">50-pages.html</a></span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">In dashboard (d5-seo):</span> note "Per-page overrides live in the editor — <a href="50-pages.html">open Pages ↗</a>". Dashboard shows the default it inherits from.</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Custom code<span class="sub">&lt;head&gt; / &lt;body&gt; injection</span></td>
+          <td><span class="home split">SPLIT BY SCOPE</span> <span class="why">page-<code>&lt;head&gt;</code> = editor; site-wide = dashboard</span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">Editor (53-settings):</span> per-page <code>&lt;head&gt;</code> snippet only, labeled "this page". Site-wide code/headers → "<a href="14-site-settings.html">↗ Dashboard</a>". <span class="from" style="margin-top:4px">Dashboard:</span> owns site-wide <code>&lt;head&gt;/&lt;body&gt;</code> + CSP/security headers.</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Redirects<span class="sub">301 / 302 rules, 404 handling</span></td>
+          <td><span class="home dash">DASHBOARD</span> <span class="why">edge-level publishing op → <a href="d3-redirects.html" style="color:var(--ink);text-decoration:underline">d3-redirects.html</a></span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">In editor (53-settings):</span> "Redirects <a href="14-site-settings.html">↗ Dashboard</a>" deep-link in the Site-operations group. Editor no longer CRUDs redirects.</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Custom headers<span class="sub">CSP, HSTS, security policy</span></td>
+          <td><span class="home dash">DASHBOARD</span> <span class="why">site infra, not content → <a href="14-site-settings.html" style="color:var(--ink);text-decoration:underline">14-site-settings.html</a></span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">In editor (53-settings):</span> "Custom code / headers <a href="14-site-settings.html">↗ Dashboard</a>". Removed from the editor surface; mirror keeps the scent.</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Domains<span class="sub">connect domain, DNS verify, SSL</span></td>
+          <td><span class="home dash">DASHBOARD</span> <span class="why">DNS/SSL is an operations task → <a href="15-domains.html" style="color:var(--ink);text-decoration:underline">15-domains.html</a></span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">In editor (53-settings + Publish):</span> show live domain status read-only ("● acme.com · SSL active") + "Manage domain <a href="15-domains.html">↗ Dashboard</a>".</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Analytics<span class="sub">visitors, sources, devices, countries</span></td>
+          <td><span class="home dash">DASHBOARD</span> <span class="why">read-the-numbers, after publish → <a href="19-analytics.html" style="color:var(--ink);text-decoration:underline">19-analytics.html</a></span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">In editor:</span> the Analytics <i>screen</i> is removed from Settings; only the <b>integration toggle</b> (GA4/Plausible key — a page-output concern) stays. View traffic → "<a href="19-analytics.html">↗ Dashboard</a>".</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Forms<span class="sub">build the form vs read submissions</span></td>
+          <td><span class="home split">SPLIT BY SCOPE</span> <span class="why">build = editor; inbox = dashboard</span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">Editor:</span> drop &amp; configure the Form element (fields, action) — it's page content. <span class="from" style="margin-top:4px">Dashboard:</span> the submissions inbox + email/webhook routing → <a href="d2-forms.html">d2-forms.html</a>. Editor links "View submissions <a href="d2-forms.html">↗</a>".</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Publish<span class="sub">deploy the site live</span></td>
+          <td><span class="home split">SPLIT BY SCOPE</span> <span class="why">quick-publish = editor; pre-flight = dashboard</span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">Editor:</span> one "Publish" button for the in-flow draft → <a href="20-publish.html">20-publish</a>. <span class="from" style="margin-top:4px">Dashboard:</span> the full pre-flight (checks, domain/SSL gate, deploy history) is the operator path. Both hit the same job; not two systems.</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Access &amp; sharing<span class="sub">team members vs public share links</span></td>
+          <td><span class="home dash">DASHBOARD</span> <span class="why">people &amp; permissions = run-the-business → <a href="d4-share-access.html" style="color:var(--ink);text-decoration:underline">d4-share-access.html</a> · <a href="c1-team.html" style="color:var(--ink);text-decoration:underline">c1-team</a></span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">In editor (topbar):</span> "Share private preview" + "+ Invite" become deep-links → Dashboard access. Roles/share-link CRUD never lived in the editor; mirror gives a one-click jump.</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Localization<span class="sub">site languages, hreflang</span></td>
+          <td><span class="home editor">EDITOR</span> <span class="why">locale claim affects page output &amp; URLs → editor Settings · e2-locales</span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">In dashboard (workspace):</span> only the <b>default</b> language/timezone (account preference). Site-level locale set is authored in the editor; dashboard shows it read-only.</td>
+        </tr>
+
+        <tr>
+          <td class="feat">Site identity<span class="sub">site name, slug, favicon, social links</span></td>
+          <td><span class="home split">SPLIT BY SCOPE</span> <span class="why">brand assets = editor; slug/password = dashboard</span></td>
+          <td class="arrowcol">↗</td>
+          <td class="mirror"><span class="from">Editor:</span> brand &amp; favicon &amp; default OG (what visitors see — content). <span class="from" style="margin-top:4px">Dashboard:</span> URL slug, published-site password, danger-zone (rename/transfer/delete) → <a href="14-site-settings.html">14-site-settings</a>. One field, one owner — no double-edit.</td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="note"><b>The "mirror, never 404" contract:</b> when a feature's home moves to the other side, the original side keeps a <b>labeled deep-link in the same spot</b> — showing the effective value read-only where useful (e.g. domain status, SEO default). The control is gone; the <i>scent</i> and the <i>jump</i> stay. This is why agency users' muscle memory survives the move (§11.5). Implemented today on <a href="53-settings.html" style="color:var(--ink);text-decoration:underline">53-settings</a> as the four "↗ Dashboard" ops links.</div>
+      <div class="note"><b>Why a scope split, not deletion:</b> we don't remove power — we give each setting <b>exactly one editable home</b> chosen by the rule (page-scope → editor, site/operations → dashboard). The other side mirrors. This closes the v1 "same setting in 3 places" problem without taking any capability away. See the de-clutter fix (B) for how the editor surface itself goes calm: <a href="fix-editor-declutter.html" style="color:var(--ink);text-decoration:underline">fix-editor-declutter.html</a>.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="proto-nav"><b>Boundary fix:</b><a href="12-site-detail.html">Site detail</a><a href="14-site-settings.html">Site settings</a><a href="53-settings.html">Editor settings</a><a href="15-domains.html">Domains</a><a href="d5-seo.html">SEO</a><a href="editor-spine-wireframe.html">Editor</a><a href="index.html">Map</a></div>
+</body></html>
