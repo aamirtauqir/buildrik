@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Forms</title><link rel="stylesheet" href="wf.css">
+<style>
+  .vs{display:none}.vs.on{display:block}
+  .sub{display:grid;grid-template-columns:18px 1fr 120px 80px;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:5px;margin-bottom:6px;font-size:12.5px;cursor:pointer}
+  .sub.unread{border-left:3px solid var(--ink);font-weight:600}
+  .drawer{border:1px solid var(--line);border-radius:6px;padding:14px;background:var(--bg-2)}
+  .fld{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line);font-size:12px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Forms &amp; submissions</b> · grounded in <code>forms.*</code> (listBlocks/listSubmissions/update/delete/export) + <code>FormBlock</code>/<code>FormSubmission</code> · collect, triage, export</div>
+  <div class="pad">
+    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="12-site-detail.html" style="color:var(--ink-2)">acme-main</a> › Forms</div>
+    <div class="row" style="margin-bottom:14px"><button class="chip on" onclick="f('inbox',this)">Submissions</button><button class="chip" onclick="f('blocks',this)">Form blocks</button><span class="muted" style="font-size:10.5px;margin-left:auto;align-self:center">3 unread</span></div>
+
+    <div class="vs on" id="f_inbox">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <div class="row"><span class="chip on">All forms</span><span class="chip">Contact</span><span class="chip">Newsletter</span><span class="chip">Unread</span></div>
+        <button class="btn">⤓ Export CSV</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:14px">
+        <div>
+          <div class="sub unread" onclick="f('inbox')"><span>●</span><div>jane@buyer.com<div class="muted" style="font-size:10px;font-weight:400">Contact · "Interested in a quote…"</div></div><span class="muted">2h ago</span><span class="muted" style="font-size:10px">Contact</span></div>
+          <div class="sub unread"><span>●</span><div>mark@lead.io<div class="muted" style="font-size:10px;font-weight:400">Newsletter signup</div></div><span class="muted">5h ago</span><span class="muted" style="font-size:10px">Newsletter</span></div>
+          <div class="sub"><span></span><div>sara@co.com<div class="muted" style="font-size:10px">Contact · "Do you ship to EU?"</div></div><span class="muted">1d ago</span><span class="muted" style="font-size:10px">Contact</span></div>
+          <div class="sub"><span></span><div>spam@x.ru <span class="tag-new" style="font-size:8px">spam</span><div class="muted" style="font-size:10px">flagged</div></div><span class="muted">1d ago</span><span class="muted" style="font-size:10px">Contact</span></div>
+        </div>
+        <div class="drawer">
+          <div class="lbl" style="margin-bottom:8px">Submission detail</div>
+          <div class="fld"><span class="muted">Name</span><b>Jane Buyer</b></div>
+          <div class="fld"><span class="muted">Email</span><b>jane@buyer.com</b></div>
+          <div class="fld"><span class="muted">Message</span><span style="max-width:160px;text-align:right">Interested in a quote for 50 units…</span></div>
+          <div class="fld" style="border:none"><span class="muted">Source</span><span>/contact · mobile</span></div>
+          <div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn" style="padding:4px 9px">Mark read</button><button class="btn" style="padding:4px 9px">Archive</button><button class="btn" style="padding:4px 9px">Spam</button><button class="btn" style="padding:4px 9px">Delete</button></div>
+          <div class="muted" style="font-size:10px;margin-top:8px">Submissions land via the public endpoint <code>/api/public/forms/…</code> + notify email.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vs" id="f_blocks">
+      <div class="muted" style="font-size:11.5px;margin-bottom:10px">Form blocks live on pages (added in the editor). Configure where responses go here.</div>
+      <div class="box pad" style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><div><b style="font-size:13px">Contact form</b><div class="muted" style="font-size:11px">/contact · fields: name, email, message · 12 submissions</div></div><button class="btn">Configure</button></div></div>
+      <div class="box pad"><div class="row" style="justify-content:space-between"><div><b style="font-size:13px">Newsletter</b><div class="muted" style="font-size:11px">footer · fields: email · 48 submissions · → Mailchimp</div></div><button class="btn">Configure</button></div></div>
+      <div class="note" style="margin-top:12px;font-size:10.5px">Config = notify email, success message, webhook URL (→ Zapier/Mailchimp via integrations C4). Spam filtered; retention purge by cron.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Site:</b><a href="12-site-detail.html">Site detail</a><a href="d2-forms.html" class="here">Forms</a><a href="d3-redirects.html">Redirects</a><a href="d4-share-access.html">Share/access</a><a href="d5-seo.html">SEO</a><a href="c4-integrations.html">Integrations</a><a href="index.html">Map</a></div>
+<script>function f(x,b){['inbox','blocks'].forEach(function(k){document.getElementById('f_'+k).classList.toggle('on',k===x);});if(b){document.querySelectorAll('.row .chip').forEach(function(c){});b.parentNode.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}}</script>
+</body></html>

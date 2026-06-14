@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Redirects</title><link rel="stylesheet" href="wf.css">
+<style>.red{display:grid;grid-template-columns:1fr 22px 1fr 60px 56px;gap:8px;align-items:center;font-size:11.5px;font-family:var(--mono);padding:8px 0;border-bottom:1px dashed var(--line)}</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Redirects</b> · grounded in <code>siteDetail.redirects.*</code> (list/create/update/delete/import_csv/export_csv) · 301/302 at the edge · Dashboard ops (boundary §3)</div>
+  <div class="pad">
+    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="14-site-settings.html" style="color:var(--ink-2)">Site settings</a> › Redirects</div>
+    <div class="row" style="justify-content:space-between;margin-bottom:12px"><div class="h1" style="font-size:18px">Redirects</div><div class="row"><button class="btn">⤓ Export CSV</button><button class="btn">⤒ Import CSV</button><button class="btn btn-fill btn-strong">+ Add</button></div></div>
+    <div class="box pad" style="margin-bottom:12px">
+      <div class="red" style="color:var(--ink-3);font-size:10px;text-transform:uppercase"><span>From</span><span></span><span>To</span><span>Type</span><span></span></div>
+      <div class="red"><span>/old-pricing</span><span>→</span><span>/pricing</span><span>301</span><span class="btn" style="padding:2px 6px">⋯</span></div>
+      <div class="red"><span>/blog/*</span><span>→</span><span>/news/:splat</span><span>301</span><span class="btn" style="padding:2px 6px">⋯</span></div>
+      <div class="red"><span>/promo</span><span>→</span><span>/summer</span><span>302</span><span class="btn" style="padding:2px 6px">⋯</span></div>
+      <div class="red" style="border:none"><span>/team.html</span><span>→</span><span>/about</span><span>301</span><span class="btn" style="padding:2px 6px">⋯</span></div>
+    </div>
+    <div class="box pad" style="background:var(--fill)">
+      <div class="lbl" style="margin-bottom:6px">Add redirect</div>
+      <div class="row" style="flex-wrap:wrap"><div class="input" style="width:200px;font-family:var(--mono)">/from-path</div><span style="align-self:center">→</span><div class="input" style="width:200px;font-family:var(--mono)">/to-path</div><div class="input" style="width:80px">301 ▾</div><button class="btn btn-fill">Add</button></div>
+    </div>
+    <div class="grid3" style="margin-top:14px"><div class="box pad"><div class="lbl">Active</div><div class="h2" style="margin-top:4px">4</div></div><div class="box pad"><div class="lbl">Plan limit</div><div class="h2" style="margin-top:4px">4 / 50</div></div><div class="box pad"><div class="lbl">Auto (slug history)</div><div class="h2" style="margin-top:4px">2</div></div></div>
+    <div class="note" style="margin-top:14px;font-size:10.5px"><b>Why Dashboard, not editor (§3):</b> redirects are publishing-infra ops done between design sessions. Wildcards (<code>/*</code> + <code>:splat</code>) supported; CSV import/export for bulk; plan-limited row count. Renaming a page slug auto-creates a redirect (<code>SlugHistory</code>) so internal links never break.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Site:</b><a href="14-site-settings.html">Site settings</a><a href="d2-forms.html">Forms</a><a href="d3-redirects.html" class="here">Redirects</a><a href="d4-share-access.html">Share/access</a><a href="d5-seo.html">SEO</a><a href="index.html">Map</a></div>
+</body></html>

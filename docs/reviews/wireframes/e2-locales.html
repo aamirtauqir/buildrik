@@ -1,0 +1,29 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Locales</title><link rel="stylesheet" href="wf.css"></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Multi-language / translations</b> · grounded in <code>pages.getTranslation</code> / <code>setTranslation</code> + <code>Site.enabledLocales</code> · per-page locale variants</div>
+  <div class="pad">
+    <div class="row" style="justify-content:space-between;margin-bottom:14px">
+      <div class="row"><span class="muted" style="font-size:12px">Editing locale:</span><span class="chip on">English (default)</span><span class="chip">Español</span><span class="chip">Français</span><span class="btn" style="padding:3px 9px">+ Add language</span></div>
+      <span class="muted" style="font-size:11px">Home · /es/home</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="box">
+        <div class="row" style="justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px"><b>English (default)</b><span class="muted">source</span></div>
+        <div style="padding:16px"><div class="h2" style="text-align:center">Welcome to Acme</div><div class="muted" style="text-align:center;margin:8px 0">We build beautiful sites.</div><div class="row" style="justify-content:center"><span class="btn btn-fill">Get started</span></div></div>
+      </div>
+      <div class="box" style="border-color:var(--ink)">
+        <div class="row" style="justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px"><b>Español</b><span class="tag-new">translating</span></div>
+        <div style="padding:16px"><div class="input" style="text-align:center;margin-bottom:8px">Bienvenido a Acme</div><div class="input" style="text-align:center;margin-bottom:8px">Creamos sitios hermosos.</div><div class="row" style="justify-content:center"><span class="input" style="padding:6px 14px">Empezar</span></div></div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-top:12px">
+      <div class="row"><button class="btn">✦ Auto-translate with AI</button><span class="muted" style="font-size:10.5px;align-self:center">3 of 6 pages translated to Español</span></div>
+      <button class="btn btn-fill">Save translation</button>
+    </div>
+    <div class="note" style="margin-top:14px"><b>Side-by-side (grounded):</b> default-locale content lives on <code>Page.blocks</code>; other locales in <code>Page.translations</code> (locale-keyed). Structure/layout shared — only text + media swap per locale. URLs subdirectory-style (<code>/es/…</code>) per the locked localization decision. Published site serves the visitor's locale; falls back to default.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor:</b><a href="editor-spine-wireframe.html">Spine</a><a href="50-pages.html">Pages</a><a href="e1-interactions.html">Interactions</a><a href="e2-locales.html" class="here">Locales</a><a href="e4-export.html">Export</a><a href="index.html">Map</a></div>
+</body></html>

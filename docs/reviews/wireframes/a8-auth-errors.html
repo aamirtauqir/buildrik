@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Auth errors</title><link rel="stylesheet" href="wf.css">
+<style>.vs{display:none}.vs.on{display:block}.card{text-align:center;max-width:380px;margin:0 auto}</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow" style="max-width:520px">
+  <div class="topnote"><b>Auth error states (§10)</b> · grounded in <code>/auth/error/*</code> (11 real routes) · solution: every failure is a friendly recoverable screen — never a raw stack trace</div>
+  <div class="pad">
+    <div class="row" style="margin-bottom:16px;flex-wrap:wrap;gap:5px">
+      <button class="chip on" onclick="es('expired',this)">Expired link</button>
+      <button class="chip" onclick="es('invite',this)">Invite expired</button>
+      <button class="chip" onclick="es('session',this)">Session expired</button>
+      <button class="chip" onclick="es('2fa',this)">2FA locked</button>
+      <button class="chip" onclick="es('locked',this)">Account locked</button>
+      <button class="chip" onclick="es('rate',this)">Rate limited</button>
+      <button class="chip" onclick="es('denied',this)">Access denied</button>
+      <button class="chip" onclick="es('suspicious',this)">Suspicious</button>
+      <button class="chip" onclick="es('captcha',this)">CAPTCHA</button>
+      <button class="chip" onclick="es('disabled',this)">Disabled</button>
+      <button class="chip" onclick="es('social',this)">Social error</button>
+    </div>
+    <div class="box pad" style="min-height:190px;display:grid;place-items:center">
+      <div class="vs on card" id="e_expired"><div style="font-size:24px">⌛</div><div class="h2" style="margin:6px 0">Link expired</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">This sign-in / verify link is no longer valid.</div><a href="a3-password.html" class="btn btn-fill">Request a new link</a></div>
+      <div class="vs card" id="e_invite"><div style="font-size:24px">⌛</div><div class="h2" style="margin:6px 0">Invite expired</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">This workspace invite has expired. Ask the workspace owner to resend.</div><a href="00-signin.html" class="btn">Back to sign in</a></div>
+      <div class="vs card" id="e_session"><div style="font-size:24px">🕓</div><div class="h2" style="margin:6px 0">Session expired</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">You were signed out for inactivity.</div><a href="00-signin.html" class="btn btn-fill">Sign in again</a></div>
+      <div class="vs card" id="e_2fa"><div style="font-size:24px">🔒</div><div class="h2" style="margin:6px 0">2FA temporarily locked</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">Too many wrong codes. Try a backup code or wait 15 min.</div><a href="a4-2fa.html" class="btn">Use backup code</a></div>
+      <div class="vs card" id="e_locked"><div style="font-size:24px">🔒</div><div class="h2" style="margin:6px 0">Account locked</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">Too many failed sign-ins. Reset your password to unlock.</div><a href="a3-password.html" class="btn btn-fill">Reset password</a></div>
+      <div class="vs card" id="e_rate"><div style="font-size:24px">🐢</div><div class="h2" style="margin:6px 0">Too many requests</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">Slow down — try again in a minute.</div><a href="00-signin.html" class="btn">Back</a></div>
+      <div class="vs card" id="e_denied"><div style="font-size:24px">🚫</div><div class="h2" style="margin:6px 0">Access denied</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">You cancelled the sign-in authorization.</div><a href="00-signin.html" class="btn btn-fill">Try again</a></div>
+      <div class="vs card" id="e_suspicious"><div style="font-size:24px">⚠</div><div class="h2" style="margin:6px 0">Unusual activity</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">We paused sign-in to protect your account. Check your email to confirm it's you.</div><a href="a2-verify-email.html" class="btn">Verify it's me</a></div>
+      <div class="vs card" id="e_captcha"><div style="font-size:24px">🤖</div><div class="h2" style="margin:6px 0">Verification failed</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">Couldn't confirm you're human. Try again.</div><a href="00-signin.html" class="btn btn-fill">Retry</a></div>
+      <div class="vs card" id="e_disabled"><div style="font-size:24px">⛔</div><div class="h2" style="margin:6px 0">Account disabled</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">This account or workspace is disabled. Contact support.</div><a href="c3-help.html" class="btn">Contact support</a></div>
+      <div class="vs card" id="e_social"><div style="font-size:24px">✕</div><div class="h2" style="margin:6px 0">Sign-in provider error</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">Google/GitHub had a problem. Try again or use email.</div><a href="00-signin.html" class="btn btn-fill">Use email instead</a></div>
+    </div>
+    <div class="note" style="margin-top:14px;font-size:10.5px"><b>One pattern, 11 cases:</b> icon + plain-language cause + a single recovery action that actually moves forward (reset, resend, verify, support). No dead-ends, no error codes shoved at the user. Grounded in the real <code>/auth/error/*</code> routes.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Auth:</b><a href="00-signin.html">Sign in</a><a href="a1-signup.html">Sign up</a><a href="a2-verify-email.html">Verify email</a><a href="a3-password.html">Password</a><a href="a4-2fa.html">2FA</a><a href="a5-invite.html">Invite</a><a href="a8-auth-errors.html" class="here">Errors</a><a href="index.html">Map</a></div>
+<script>var E=['expired','invite','session','2fa','locked','rate','denied','suspicious','captcha','disabled','social'];function es(s,b){E.forEach(function(x){document.getElementById('e_'+x).classList.toggle('on',x===s);});document.querySelectorAll('.row .chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
+</body></html>

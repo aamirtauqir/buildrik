@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Verify email</title><link rel="stylesheet" href="wf.css">
+<style>.vs{display:none}.vs.on{display:block}</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow" style="max-width:420px">
+  <div class="topnote"><b>Verify email</b> · grounded in <code>auth.verifyEmail</code> / <code>resendVerification</code> + check-inbox · states below</div>
+  <div class="pad">
+    <div class="row" style="margin-bottom:14px;flex-wrap:wrap"><button class="chip on" onclick="vs('sent',this)">Check inbox</button><button class="chip" onclick="vs('verifying',this)">Verifying</button><button class="chip" onclick="vs('done',this)">Verified</button></div>
+
+    <div class="vs on" id="v_sent" style="text-align:center">
+      <div style="font-size:26px;margin-bottom:6px">✉</div>
+      <div class="h1" style="font-size:18px;margin-bottom:4px">Check your inbox</div>
+      <div class="muted" style="font-size:12px;margin-bottom:16px">Verification link sent to <code>you@company.com</code>. Click it to finish.</div>
+      <button class="btn" style="width:100%;margin-bottom:8px">Resend email <span class="muted" style="font-size:10px">(60s)</span></button>
+      <a href="a2-verify-email.html" class="muted" style="font-size:11px;text-decoration:underline">Wrong email? Change it</a>
+      <div class="note" style="margin-top:14px;text-align:left;font-size:10.5px">Shared "check-inbox" pattern also serves magic-link + password-reset. Resend throttled (timer). Link expired → A8 expired-link.</div>
+    </div>
+    <div class="vs" id="v_verifying" style="text-align:center">
+      <div class="barline m" style="height:12px;margin:30px 0"></div>
+      <div class="muted" style="font-size:12px">Verifying your link…</div>
+    </div>
+    <div class="vs" id="v_done" style="text-align:center">
+      <div style="font-size:26px;margin-bottom:6px">✓</div>
+      <div class="h1" style="font-size:18px;margin-bottom:4px">Email verified</div>
+      <div class="muted" style="font-size:12px;margin-bottom:16px">You're all set.</div>
+      <a href="04-role-select.html" class="btn btn-fill btn-strong" style="width:100%;text-align:center">Continue → role select</a>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Auth:</b><a href="00-signin.html">Sign in</a><a href="a1-signup.html">Sign up</a><a href="a2-verify-email.html" class="here">Verify email</a><a href="a3-password.html">Password</a><a href="a4-2fa.html">2FA</a><a href="a5-invite.html">Invite</a><a href="a8-auth-errors.html">Errors</a><a href="index.html">Map</a></div>
+<script>function vs(s,b){['sent','verifying','done'].forEach(function(x){document.getElementById('v_'+x).classList.toggle('on',x===s);});b.parentNode.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
+</body></html>

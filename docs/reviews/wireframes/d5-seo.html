@@ -1,0 +1,28 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · SEO</title><link rel="stylesheet" href="wf.css"></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>SEO — site defaults</b> · grounded in <code>siteDetail.settings</code> (metaTitle/Description/og/favicon/indexing) · site-wide defaults (Dashboard); per-page overrides live in editor Pages (50)</div>
+  <div class="pad">
+    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="14-site-settings.html" style="color:var(--ink-2)">Site settings</a> › SEO defaults</div>
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div class="lbl">Default meta title</div><div class="input" style="width:100%;margin:5px 0 4px">%page% — Acme</div><div class="muted" style="font-size:10px;margin-bottom:10px"><code>%page%</code> token inserts the page name</div>
+        <div class="lbl">Default description</div><div class="input" style="width:100%;height:46px;margin:5px 0 10px">Acme builds beautiful sites…</div>
+        <div class="lbl">Social share image (OG)</div><div class="ph-img" style="height:70px;margin:5px 0 10px">▣ 1200×630</div>
+        <div class="lbl">Canonical domain</div><div class="input" style="width:100%;margin:5px 0 10px">https://acme.com</div>
+        <div class="lbl">Favicon</div><div class="row" style="margin:5px 0 10px"><div class="ph-img" style="width:32px;height:32px">▣</div><button class="btn">Upload</button></div>
+        <div class="row" style="justify-content:space-between;border:1px solid var(--line);border-radius:5px;padding:9px 11px;font-size:12px">Allow search indexing <span class="tog" style="display:inline-block;width:34px;height:18px;border:1px solid var(--ink);border-radius:999px;background:var(--ink)"></span></div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:6px">Search result preview</div>
+        <div class="box pad" style="margin-bottom:12px"><div style="color:#1a5; font-size:11px">acme.com</div><div style="color:#1a0dab;font-size:14px">Acme — Home</div><div class="muted" style="font-size:11px">Acme builds beautiful sites in minutes…</div></div>
+        <div class="lbl" style="margin-bottom:6px">Social card preview</div>
+        <div class="box" style="overflow:hidden"><div class="ph-img" style="height:90px">▣ OG image</div><div class="pad" style="padding:8px"><b style="font-size:12px">Acme — Home</b><div class="muted" style="font-size:10.5px">acme.com</div></div></div>
+        <div class="note" style="margin-top:12px;font-size:10.5px"><b>Defaults + overrides:</b> these are the site-wide defaults. Any page can override its own title/description/OG in the editor (screen 50) — the editor shows the effective value. Indexing off = adds <code>noindex</code> + blocks from sitemap.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Site:</b><a href="12-site-detail.html">Site detail</a><a href="d2-forms.html">Forms</a><a href="d3-redirects.html">Redirects</a><a href="d4-share-access.html">Share/access</a><a href="d5-seo.html" class="here">SEO</a><a href="50-pages.html">Page SEO</a><a href="index.html">Map</a></div>
+</body></html>
