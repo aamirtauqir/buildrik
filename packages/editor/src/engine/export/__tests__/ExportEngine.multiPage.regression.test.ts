@@ -85,32 +85,63 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
       },
     };
     const composer = makeMockComposer({ exportPagesReturn: [styledPage] });
-    const html = (await new ExportEngine(composer).exportAllPages({ format: "html", minify: false }))
-      .files.find((f) => f.name === "index.html")!.content;
+    const result = await new ExportEngine(composer).exportAllPages({ format: "html", minify: false });
+    const html = result.files.find((f) => f.name === "index.html")!.content;
+    const css = result.files.find((f) => f.name === "styles.css")!.content;
 
+    // HTML carries the styling hooks: data-buildrick-id + class (per-element
+    // style class FIRST, then any user classes).
     expect(html).toContain('data-buildrick-id="root"');
     expect(html).toContain('data-buildrick-id="box"');
-    expect(html).toContain('class="bd-root"');
-    expect(html).toContain('class="card"');
-    // base inline styles carried (stylesToString: no space after colon)
-    expect(html).toContain("background-color:rgb(1,2,3)");
-    expect(html).toContain("color:rgb(9,9,9)");
-    expect(html).toContain("padding:16px");
+    expect(html).toContain('class="buildrick-root bd-root"');
+    expect(html).toContain('class="buildrick-box card"');
+    expect(html).not.toContain("style="); // base styles are class-based, NOT inline (cascade fix)
+    // Base styles live in styles.css as class rules (so @media overrides win).
+    // Non-minified format: `prop: value;` with a space after the colon.
+    expect(css).toContain(".buildrick-root");
+    expect(css).toContain("background-color: rgb(1,2,3)");
+    expect(css).toContain(".buildrick-box");
+    expect(css).toContain("color: rgb(9,9,9)");
+    expect(css).toContain("padding: 16px");
   });
 
-  it("drops an inline style block carrying a dangerous CSS pattern (H1 defense-in-depth)", async () => {
+  it("drops a base CSS rule carrying a dangerous CSS pattern (defense-in-depth)", async () => {
     const evilPage = {
       id: "p1", name: "Home", slug: "home", isHome: true,
       root: { id: "root", type: "container", tagName: "div", children: [
         { id: "x", type: "container", tagName: "div", classes: [], styles: { width: "expression(alert(1))" }, children: [] },
       ] },
     };
-    const html = (await new ExportEngine(makeMockComposer({ exportPagesReturn: [evilPage] }))
-      .exportAllPages({ format: "html", minify: false }))
-      .files.find((f) => f.name === "index.html")!.content;
-    // the whole style block is dropped (not emitted) — element still renders
-    expect(html).not.toContain("expression(");
+    const result = await new ExportEngine(makeMockComposer({ exportPagesReturn: [evilPage] }))
+      .exportAllPages({ format: "html", minify: false });
+    // The only styled element's rule is dropped → no .buildrick-x rule (styles.css
+    // may be absent entirely). The element still renders structurally.
+    const css = result.files.find((f) => f.name === "styles.css")?.content ?? "";
+    const html = result.files.find((f) => f.name === "index.html")!.content;
+    expect(css).not.toContain("expression(");
+    expect(css).not.toContain(".buildrick-x");
     expect(html).toContain('data-buildrick-id="x"');
+  });
+
+  it("cascade fix: a tablet override beats the base rule by source order (H1 follow-up)", async () => {
+    const composer = makeMockComposer({
+      exportPagesReturn: [{
+        id: "p1", name: "Home", slug: "home", isHome: true,
+        root: { id: "root", type: "container", tagName: "div", classes: [],
+          styles: { color: "rgb(1,1,1)" }, children: [] },
+      }],
+    });
+    // Mock a breakpoint override the StyleEngine would produce.
+    (composer as any).styles.generateResponsiveCSS = vi.fn().mockReturnValue(
+      '@media (max-width:1023px) {\n[data-buildrick-id="root"]{color:rgb(2,2,2)}\n}'
+    );
+    const css = (await new ExportEngine(composer).exportAllPages({ format: "html", minify: false }))
+      .files.find((f) => f.name === "styles.css")!.content;
+    // base class rule appears BEFORE the @media override → override wins (same specificity)
+    const baseIdx = css.indexOf(".buildrick-root");
+    const mediaIdx = css.indexOf("@media");
+    expect(baseIdx).toBeGreaterThanOrEqual(0);
+    expect(mediaIdx).toBeGreaterThan(baseIdx);
   });
 
   it("falls back to getAllPages when exportPages is not exposed on older composer builds", async () => {
@@ -134,8 +165,8 @@ describe("ExportEngine.exportAllPages — live tree contract", () => {
     const result = await engine.exportAllPages({ format: "html", minify: false });
 
     const indexHtml = result.files.find((f) => f.name === "index.html");
-    // H1: even the empty root now carries its data-buildrick-id styling hook.
-    expect(indexHtml!.content).toMatch(/<body>\s*<div data-buildrick-id="root"><\/div>\s*<\/body>/);
+    // H1: even the empty root carries its styling hooks (data-buildrick-id + class).
+    expect(indexHtml!.content).toMatch(/<body>\s*<div data-buildrick-id="root" class="buildrick-root"><\/div>\s*<\/body>/);
   });
 
   // Sprint 5 prep: Iter 19's fix only verified single-page (Home) end-to-end.
@@ -270,32 +301,30 @@ describe("ExportEngine.exportAllPages — interaction export (C2)", () => {
   });
 });
 
-// D1 (published half): per-breakpoint hide must reach the live site. The flag
-// rides on the element's inline style (--hide-<bp>:true via H1's emission), and
-// the export adds @media display:none rules keyed on that inline substring.
+// D1 (published half): per-breakpoint hide must reach the live site. Post-H1
+// cascade fix, the hide rule is class-based in styles.css (keyed on the
+// element's per-element class), NOT an inline-substring selector.
 describe("ExportEngine.exportAllPages — responsive visibility (D1)", () => {
-  it("emits @media display:none rules when an element is hidden on a breakpoint", async () => {
+  it("emits a class-based @media display:none rule when an element is hidden on a breakpoint", async () => {
     const page = {
       id: "p1", name: "Home", slug: "home", isHome: true,
       root: { id: "root", type: "container", tagName: "div", children: [
         { id: "promo", type: "container", tagName: "div", styles: { "--hide-mobile": "true" }, classes: [], children: [] },
       ] },
     };
-    const html = (await new ExportEngine(makeMockComposer({ exportPagesReturn: [page] }))
+    const css = (await new ExportEngine(makeMockComposer({ exportPagesReturn: [page] }))
       .exportAllPages({ format: "html", minify: false }))
-      .files.find((f) => f.name === "index.html")!.content;
+      .files.find((f) => f.name === "styles.css")!.content;
 
-    // flag reached the element inline (no space — stylesToString)
-    expect(html).toContain("--hide-mobile:true");
-    // and a media rule consumes it
-    expect(html).toContain("@media (max-width:767px)");
-    expect(html).toContain('[style*="--hide-mobile:true"]{display:none!important}');
+    // class-based hide rule, keyed on the element's per-element class
+    expect(css).toContain("@media (max-width:767px)");
+    expect(css).toContain(".buildrick-promo{display:none!important}");
   });
 
   it("omits the visibility CSS when no element is hidden", async () => {
-    const html = (await new ExportEngine(makeMockComposer({ exportPagesReturn: [freshPage] }))
-      .exportAllPages({ format: "html", minify: false }))
-      .files.find((f) => f.name === "index.html")!.content;
-    expect(html).not.toContain("--hide-");
+    const result = await new ExportEngine(makeMockComposer({ exportPagesReturn: [freshPage] }))
+      .exportAllPages({ format: "html", minify: false });
+    const css = result.files.find((f) => f.name === "styles.css")?.content ?? "";
+    expect(css).not.toContain("display:none!important");
   });
 });

@@ -272,6 +272,60 @@ export class ExportEngine {
   }
 
   /**
+   * Build class-based base CSS for the multi-page publish path.
+   *
+   * H1 cascade fix: base styles are emitted as `.${prefix}${id}` class rules
+   * (NOT inline on the element). That gives them the SAME specificity (0,0,1,0)
+   * as the StyleEngine breakpoint rules (`@media { [data-buildrick-id] {…} }`
+   * from generateResponsiveCSS), so when both set the same property the @media
+   * override wins by source order (base emitted first, breakpoints after).
+   * Inline base styles (the H1 interim) out-specificity the stylesheet and
+   * shadowed breakpoint overrides — this removes that.
+   *
+   * D1 visibility also moves here: per-breakpoint hide becomes a class-based
+   * `@media { .${prefix}${id} { display:none } }` rule instead of the inline
+   * `[style*="--hide-…"]` substring selector (which no longer works once the
+   * inline style attr is gone).
+   *
+   *   base rules         .buildrick-<id> { color:red }              (0,0,1,0)
+   *   breakpoint (later)  @media(...) { [data-buildrick-id] { … } }  (0,0,1,0) → wins
+   *   hide               @media(...) { .buildrick-<id>{display:none} } (!important)
+   */
+  private buildPublishBaseCss(pages: PageData[], minify: boolean): string {
+    const prefix = this.config.cssPrefix;
+    const HIDE_QUERIES: Record<string, string> = {
+      "--hide-mobile": "(max-width:767px)",
+      "--hide-tablet": "(min-width:768px) and (max-width:1023px)",
+      "--hide-desktop": "(min-width:1024px)",
+    };
+    const baseRules: string[] = [];
+    const hideRules: string[] = [];
+
+    const walk = (el: PageData["root"] | undefined): void => {
+      if (!el) return;
+      const styles = el.styles;
+      if (el.id && styles && Object.keys(styles).length > 0) {
+        const sel = `.${prefix}${el.id}`;
+        // Same defense-in-depth guard buildAttributeString applies — drop the
+        // whole rule if it carries a dangerous CSS pattern (F1 carried over).
+        if (isSafeAttrValue("style", stylesToString(styles), "")) {
+          const styleStr = stylesToCSS(styles, minify);
+          baseRules.push(minify ? `${sel}{${styleStr}}` : `${sel} {\n${styleStr}}\n`);
+        }
+        for (const [key, query] of Object.entries(HIDE_QUERIES)) {
+          if (styles[key] === "true") {
+            hideRules.push(`@media ${query}{${sel}{display:none!important}}`);
+          }
+        }
+      }
+      el.children?.forEach(walk);
+    };
+    for (const page of pages) walk(page.root);
+
+    return [...baseRules, ...hideRules].join(minify ? "" : "\n");
+  }
+
+  /**
    * Wrap content in full HTML document
    */
   private wrapInDocument(content: string, config: ExportConfig, embeddedCSS?: string): string {
@@ -397,10 +451,14 @@ export class ExportEngine {
       [];
     const files: MultiPageExportFile[] = [];
 
-    // Use generateResponsiveCSS for proper breakpoint ordering, or fall back to generateCSS
-    const css =
+    // CSS = class-based base styles FIRST, then StyleEngine breakpoint overrides.
+    // Order matters: base + breakpoint rules share specificity (0,0,1,0), so the
+    // @media override must come later to win at its viewport (H1 cascade fix).
+    const baseCss = this.buildPublishBaseCss(pages, !!options.minify);
+    const responsiveCss =
       this.composer.styles?.generateResponsiveCSS?.({ minify: options.minify }) ??
       this.generateCSS({ ...this.config, minify: options.minify });
+    const css = [baseCss, responsiveCss].filter(Boolean).join(options.minify ? "" : "\n\n");
 
     // CMS export options
     const cmsOptions: CMSExportOptions = {
@@ -479,20 +537,9 @@ export class ExportEngine {
       headParts.push('  <link rel="stylesheet" href="styles.css">');
     }
 
-    // D1: responsive visibility. Elements carry `--hide-<bp>:true` inline (via
-    // stylesToString, no space after the colon). On the live site the viewport
-    // IS the breakpoint, so real @media rules apply. Emitted only when a hide
-    // flag is present. Widths mirror shared/constants/breakpoints.ts
-    // (mobile ≤767, tablet 768–1023, desktop ≥1024).
-    if (/--hide-(mobile|tablet|desktop):true/.test(bodyContent)) {
-      headParts.push(
-        `  <style>\n` +
-          `@media (max-width:767px){[style*="--hide-mobile:true"]{display:none!important}}\n` +
-          `@media (min-width:768px) and (max-width:1023px){[style*="--hide-tablet:true"]{display:none!important}}\n` +
-          `@media (min-width:1024px){[style*="--hide-desktop:true"]{display:none!important}}\n` +
-          `  </style>`
-      );
-    }
+    // D1 responsive visibility now lives in the class-based styles.css
+    // (buildPublishBaseCss emits `@media { .${prefix}${id}{display:none} }`),
+    // matching the H1 cascade fix — no inline-substring hide block here.
 
     // User's global custom CSS (Settings → Advanced), emitted after the
     // stylesheet link so it can override generated styles.
@@ -609,26 +656,16 @@ ${bodyContent}${interactionScript}
     }
 
     // H1: published elements must carry their styling hooks. renderPageElement
-    // historically emitted only raw data.attributes, dropping the element's
-    // class, base inline styles, AND data-buildrick-id — so deployed sites
-    // rendered structurally but unstyled (base styles gone; the styles.css
-    // breakpoint rules keyed on [data-buildrick-id] matched nothing). Emit all
-    // three. `data-buildrick-id` is also what the StyleEngine breakpoint rules
-    // (generateResponsiveCSS) target, so they now apply on the live site.
+    // historically emitted only raw data.attributes, dropping class +
+    // data-buildrick-id, so deployed sites rendered unstyled. Emit both:
+    //  - `data-buildrick-id` → what the StyleEngine breakpoint rules target.
+    //  - `class="${prefix}${id} …userClasses"` → matches the class-based base
+    //    CSS from buildPublishBaseCss. Base styles are class-based (NOT inline)
+    //    so @media breakpoint overrides win by source order — see the cascade
+    //    note on buildPublishBaseCss.
     attrParts.push(`data-buildrick-id="${escapeHTML(element.id)}"`);
-    if (element.classes && element.classes.length > 0) {
-      attrParts.push(`class="${escapeHTML(element.classes.join(" "))}"`);
-    }
-    if (element.styles && Object.keys(element.styles).length > 0) {
-      const styleStr = stylesToString(element.styles);
-      // Defense-in-depth: mirror buildAttributeString — drop the inline style
-      // block if it carries a dangerous CSS pattern (expression(), behavior:,
-      // -moz-binding). The import-time sanitizer should already prevent these,
-      // but this path bypasses buildAttributeString so guard here too.
-      if (isSafeAttrValue("style", styleStr, "")) {
-        attrParts.push(`style="${escapeHTML(styleStr)}"`);
-      }
-    }
+    const classNames = [`${this.config.cssPrefix}${element.id}`, ...(element.classes ?? [])].join(" ");
+    attrParts.push(`class="${escapeHTML(classNames)}"`);
 
     if (element.attributes) {
       for (const [key, value] of Object.entries(element.attributes)) {
