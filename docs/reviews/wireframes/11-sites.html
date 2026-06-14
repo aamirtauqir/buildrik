@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Sites</title><link rel="stylesheet" href="wf.css">
+<style>.srow{display:grid;grid-template-columns:1fr 130px 110px 120px;gap:12px;align-items:center;padding:11px 14px;border-bottom:1px dashed var(--line);font-size:12.5px}.srow.h{color:var(--ink-3);font-size:10px;text-transform:uppercase;letter-spacing:.04em}</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen" style="display:grid;grid-template-columns:200px 1fr;min-height:440px">
+  <aside style="border-right:1px dashed var(--line);padding:16px 12px">
+    <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
+    <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div><div class="row" style="justify-content:space-between">Acme Co ▾</div></div>
+    <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
+      <a href="10-dashboard.html" class="navi">⌂ Home</a>
+      <a href="11-sites.html" class="navi here">▦ Sites</a>
+      <a href="#" class="navi">◐ Domains</a>
+      <a href="#" class="navi">▤ Media</a>
+      <a href="#" class="navi">⚙ Settings</a>
+      <a href="#" class="navi">$ Billing</a>
+    </nav>
+  </aside>
+  <main class="pad">
+    <div class="row" style="justify-content:space-between;margin-bottom:16px">
+      <div class="h1">Sites</div>
+      <div class="row"><div class="input" style="width:170px">⌕ search</div><a href="01-new-site.html" class="btn btn-fill btn-strong">+ New site</a></div>
+    </div>
+    <div class="box">
+      <div class="srow h"><span>Name</span><span>Status</span><span>Updated</span><span></span></div>
+      <div class="srow"><a href="12-site-detail.html"><b>acme-main</b><div class="muted" style="font-size:10.5px">acme.com</div></a><span class="tag-exists">● Published</span><span class="muted">2d ago</span><div class="row" style="justify-content:flex-end"><a href="editor-spine-wireframe.html" class="btn">Edit</a><span class="btn">⋯</span></div></div>
+      <div class="srow"><a href="12-site-detail.html"><b>launch-lp</b><div class="muted" style="font-size:10.5px">launch.acme.com</div></a><span class="tag-new">⏳ Domain pending</span><span class="muted">5h ago</span><div class="row" style="justify-content:flex-end"><a href="editor-spine-wireframe.html" class="btn">Edit</a><span class="btn">⋯</span></div></div>
+      <div class="srow"><a href="editor-spine-wireframe.html"><b>portfolio</b><div class="muted" style="font-size:10.5px">— not published</div></a><span class="chip">○ Draft</span><span class="muted">1w ago</span><div class="row" style="justify-content:flex-end"><a href="editor-spine-wireframe.html" class="btn">Edit</a><span class="btn">⋯</span></div></div>
+      <div class="srow" style="border-bottom:none"><a href="12-site-detail.html"><b>old-blog</b><div class="muted" style="font-size:10.5px">blog.acme.com</div></a><span class="tag-exists">● Published</span><span class="muted">1mo ago</span><div class="row" style="justify-content:flex-end"><a href="editor-spine-wireframe.html" class="btn">Edit</a><span class="btn">⋯</span></div></div>
+    </div>
+    <div class="note" style="margin-top:16px"><b>List = operate, not author (boundary):</b> row actions are business ops (Edit opens editor, ⋯ = duplicate / transfer / delete / settings). Status column is the same SSOT chip as the home cards. Per-row "Edit" is the only jump into the make-side.</div>
+  </main>
+</div>
+<div class="proto-nav"><b>Flow:</b><a href="10-dashboard.html">Dashboard</a><a href="11-sites.html" class="here">Sites</a><a href="01-new-site.html">New site</a><a href="editor-spine-wireframe.html">Editor</a><a href="20-publish.html">Publish</a><a href="22-domain-pending.html">Domain</a><a href="12-site-detail.html">Site detail</a></div>
+</body></html>

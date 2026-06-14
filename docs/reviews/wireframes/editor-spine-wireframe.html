@@ -171,8 +171,8 @@
     <span class="spacer"></span>
     <span class="saved">Saved</span>
     <button class="density-toggle" id="densityToggle"><span class="sw"></span><span id="densityLabel">Advanced</span></button>
-    <button class="tb-btn">Preview</button>
-    <button class="tb-btn" style="border-color:var(--ink);font-weight:600">Publish</button>
+    <button class="tb-btn" onclick="location.href='21-preview.html'">Preview</button>
+    <button class="tb-btn" style="border-color:var(--ink);font-weight:600" onclick="location.href='20-publish.html'">Publish</button>
   </div>
 
   <div class="body">
@@ -325,5 +325,18 @@
   document.getElementById('pwJustOne').onclick=function(){document.getElementById('propWarn').classList.remove('show');document.getElementById('scopeChip').style.display='none';anno('<b>Localized</b> — detached, changed just this one.');};
   document.getElementById('pwAll').onclick=function(){document.getElementById('propWarn').classList.remove('show');anno('Applied to all 12.');};
 </script>
+<div style="position:fixed;bottom:0;left:0;right:0;background:#2b2b2b;color:#bbb;font-size:11px;display:flex;gap:4px;align-items:center;padding:6px 12px;z-index:50;flex-wrap:wrap;font-family:var(--font)">
+  <b style="color:#fff;margin-right:6px">Flow:</b>
+  <a href="10-dashboard.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">Dashboard</a>
+  <a href="11-sites.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">Sites</a>
+  <a href="01-new-site.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">New site</a>
+  <a href="02-ai-wizard.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">AI wizard</a>
+  <a href="03-template-gallery.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">Templates</a>
+  <a href="editor-spine-wireframe.html" style="padding:3px 9px;border:1px solid #fff;border-radius:4px;background:#fff;color:#2b2b2b;font-weight:600;text-decoration:none">Editor</a>
+  <a href="21-preview.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">Preview</a>
+  <a href="20-publish.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">Publish</a>
+  <a href="22-domain-pending.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">Domain</a>
+  <a href="12-site-detail.html" style="padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none">Site detail</a>
+</div>
 </body>
 </html>

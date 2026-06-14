@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Site Detail</title><link rel="stylesheet" href="wf.css"></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen" style="display:grid;grid-template-columns:200px 1fr;min-height:440px">
+  <aside style="border-right:1px dashed var(--line);padding:16px 12px">
+    <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
+    <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div><div class="row" style="justify-content:space-between">Acme Co ▾</div></div>
+    <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
+      <a href="10-dashboard.html" class="navi">⌂ Home</a>
+      <a href="11-sites.html" class="navi here">▦ Sites</a>
+      <a href="#" class="navi">◐ Domains</a>
+      <a href="#" class="navi">▤ Media</a>
+      <a href="#" class="navi">⚙ Settings</a>
+      <a href="#" class="navi">$ Billing</a>
+    </nav>
+  </aside>
+  <main class="pad">
+    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="11-sites.html" style="color:var(--ink-2)">Sites</a> › acme-main</div>
+    <div class="row" style="justify-content:space-between;margin-bottom:14px">
+      <div class="row" style="gap:12px"><div class="ph-img" style="width:54px;height:40px">▦</div><div><div class="h1" style="font-size:18px">acme-main</div><span class="tag-exists">● Published</span></div></div>
+      <a href="editor-spine-wireframe.html" class="btn btn-fill btn-strong">Edit in editor →</a>
+    </div>
+
+    <div class="row" style="border-bottom:1px dashed var(--line);margin-bottom:16px"><span class="chip on" style="border-radius:4px 4px 0 0">Overview</span><span class="chip" style="border:none">Pages</span><span class="chip" style="border:none">Domains</span><span class="chip" style="border:none">Analytics</span><span class="chip" style="border:none">Settings</span></div>
+
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="box pad"><div class="lbl">Live URL</div><div class="row" style="justify-content:space-between;margin-top:6px"><code style="font-size:12px">acme.com</code><button class="btn">Visit ↗</button></div><div class="muted" style="font-size:10.5px;margin-top:6px">+ acme-main.vercel.app (fallback)</div></div>
+      <div class="box pad"><div class="lbl">Domain</div><div class="row" style="margin-top:6px"><span class="tag-exists">● Connected · SSL</span></div><a href="22-domain-pending.html" class="muted" style="font-size:10.5px;display:block;margin-top:6px;text-decoration:underline">Manage domain</a></div>
+    </div>
+    <div class="grid3" style="margin-bottom:16px">
+      <div class="box pad"><div class="lbl">Last published</div><div class="h2" style="margin-top:4px">2d ago</div></div>
+      <div class="box pad"><div class="lbl">Pages</div><div class="h2" style="margin-top:4px">6</div></div>
+      <div class="box pad"><div class="lbl">Visitors (30d)</div><div class="h2" style="margin-top:4px">— <span class="tag-new" style="vertical-align:middle">analytics later</span></div></div>
+    </div>
+
+    <div class="note"><b>Site detail = operate one site (boundary):</b> URLs, domain status, publish history, danger-zone (transfer/delete) — all the run-the-business surface. The single jump to author is "Edit in editor". No editing of page content happens here.</div>
+  </main>
+</div>
+<div class="proto-nav"><b>Flow:</b><a href="10-dashboard.html">Dashboard</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="editor-spine-wireframe.html">Editor</a><a href="20-publish.html">Publish</a><a href="22-domain-pending.html">Domain</a><a href="12-site-detail.html" class="here">Site detail</a></div>
+</body></html>

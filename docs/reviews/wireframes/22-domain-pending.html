@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Custom Domain</title><link rel="stylesheet" href="wf.css">
+<style>.dstate{display:none}.dstate.on{display:block}.dns{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);border-radius:4px}.dns .r{display:grid;grid-template-columns:60px 1fr 1fr;gap:8px;padding:8px 10px;border-bottom:1px dashed var(--line)}.dns .r:last-child{border-bottom:none}.dns .h{color:var(--ink-3);font-size:10px;text-transform:uppercase}</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>Custom domain journey (§8.6)</b> · the real beginner-killer = DNS · solution: enter → show exact records → pending state survives leaving → verified. Never a dead-end.</div>
+  <div class="pad">
+
+    <div class="dstate on" id="d_enter">
+      <div class="h1" style="margin-bottom:4px">Connect a domain</div>
+      <div class="muted" style="font-size:12px;margin-bottom:16px">Use a domain you already own.</div>
+      <div class="lbl">Domain</div>
+      <div class="row" style="margin:6px 0 16px"><div class="input" style="flex:1">yoursite.com</div><button class="btn btn-fill" onclick="ds('verify')">Connect →</button></div>
+      <div class="note">Don't own one yet? <u>Buy through us</u> <span class="tag-new">SOLUTION: optional, not blocking</span> — or keep the free <code>.vercel.app</code> URL and add a domain later.</div>
+    </div>
+
+    <div class="dstate" id="d_verify">
+      <div class="h1" style="margin-bottom:4px">Add these DNS records</div>
+      <div class="muted" style="font-size:12px;margin-bottom:14px">At your domain registrar (GoDaddy, Namecheap…), add:</div>
+      <div class="dns">
+        <div class="r h"><span>Type</span><span>Name</span><span>Value</span></div>
+        <div class="r"><span>A</span><span>@</span><span>76.76.21.21 ⧉</span></div>
+        <div class="r"><span>CNAME</span><span>www</span><span>cname.vercel-dns.com ⧉</span></div>
+      </div>
+      <div class="note" style="margin-top:14px"><b>Plain-language helper (SOLUTION):</b> "This points your domain at your site. Changes can take up to 24h. You can close this — we'll keep checking."</div>
+      <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn" onclick="ds('enter')">← Back</button><button class="btn btn-fill" onclick="ds('pending')">I've added them →</button></div>
+    </div>
+
+    <div class="dstate" id="d_pending">
+      <div class="h1" style="margin-bottom:4px">⏳ Verifying yoursite.com</div>
+      <div class="box pad" style="margin:12px 0">
+        <div class="row" style="justify-content:space-between"><span style="font-size:12.5px">DNS propagation</span><span class="tag-new">pending</span></div>
+        <div class="barline" style="height:8px;width:55%;margin-top:8px"></div>
+        <div class="muted" style="font-size:11px;margin-top:8px">Checked 2 min ago · auto-retries hourly · we'll email when live.</div>
+      </div>
+      <div class="note">State is durable (§8.6): leave the editor, the dashboard site card shows <b>“Domain pending”</b>; coming back resumes here, never a dead-end.</div>
+      <div class="row" style="justify-content:space-between;margin-top:16px"><a href="12-site-detail.html" class="btn">Leave — check later</a><button class="btn btn-fill" onclick="ds('live')">Simulate verified</button></div>
+    </div>
+
+    <div class="dstate" id="d_live">
+      <div class="h1" style="margin-bottom:4px">✓ yoursite.com is live</div>
+      <div class="box pad" style="margin:12px 0"><div class="row" style="justify-content:space-between"><code>https://yoursite.com</code><div class="row"><span class="tag-exists">SSL auto</span><button class="btn">Visit ↗</button></div></div></div>
+      <div class="row" style="justify-content:flex-end"><a href="12-site-detail.html" class="btn btn-fill">Done →</a></div>
+    </div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Flow:</b><a href="10-dashboard.html">Dashboard</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="editor-spine-wireframe.html">Editor</a><a href="21-preview.html">Preview</a><a href="20-publish.html">Publish</a><a href="22-domain-pending.html" class="here">Domain</a><a href="12-site-detail.html">Site detail</a></div>
+<script>function ds(s){['enter','verify','pending','live'].forEach(function(x){document.getElementById('d_'+x).classList.toggle('on',x===s);});}</script>
+</body></html>
