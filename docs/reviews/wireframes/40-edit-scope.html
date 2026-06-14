@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Edit scope</title><link rel="stylesheet" href="wf.css">
+<style>
+  .stage{display:grid;grid-template-columns:1fr 280px;min-height:380px}
+  .cv{border-right:1px dashed var(--line);padding:22px;background:var(--bg-2);position:relative}
+  .el{border:1px solid var(--line);background:#fff;border-radius:4px;padding:10px 14px;margin-bottom:10px;font-size:12.5px;cursor:pointer}
+  .el:hover{border-color:var(--ink-2)}
+  .el.sel{border:2px solid var(--ink);outline:2px solid var(--fill-2)}
+  .el .k{font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em}
+  .insp{padding:14px}
+  .scopebar{border:1px solid var(--ink);border-radius:5px;padding:8px 10px;font-size:11.5px;margin-bottom:12px;background:#fff}
+  .scopebar.cls{border-style:dashed;background:var(--fill)}
+  .prop{border:1px solid var(--line);border-radius:4px;padding:8px 0;margin-bottom:10px}
+  .prop .row{justify-content:space-between;padding:0 10px}
+  .warn{border:2px solid var(--ink);border-radius:5px;background:#fff;padding:10px;font-size:11.5px;margin-top:10px;display:none}
+  .warn.show{display:block}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Edit-scope clarity (§6.5)</b> — THE beginner-killer · grounded in current element/style/class engine · solution: persistent "what am I editing" banner + propagation choice before any class-wide change</div>
+  <div class="stage">
+    <div class="cv">
+      <div class="lbl" style="margin-bottom:8px">Canvas — click an element</div>
+      <div class="el" data-scope="one" data-name="Hero heading"><div class="k">Heading · unique</div>[ Welcome to Acme ]</div>
+      <div class="el" data-scope="cls" data-name="Primary button"><div class="k">Button · class .btn-primary</div>[ Get started ]</div>
+      <div class="el" data-scope="cls" data-name="Primary button"><div class="k">Button · class .btn-primary</div>[ Contact us ]</div>
+      <div class="el" data-scope="one" data-name="Body paragraph"><div class="k">Text · unique</div>[ paragraph of copy … ]</div>
+      <div class="note" style="position:absolute;bottom:12px;left:22px;right:22px" id="anno">Pick the unique heading vs a class-bound button — watch the scope banner change.</div>
+    </div>
+    <div class="insp">
+      <div class="lbl" style="margin-bottom:8px">Inspector</div>
+
+      <div class="scopebar" id="scope">Editing: <b>nothing selected</b></div>
+
+      <div class="prop">
+        <div class="row"><span class="lbl">Fill</span><span class="chip" id="fillChip">#2b2b2b</span></div>
+      </div>
+      <button class="btn btn-fill" style="width:100%" id="changeBtn" disabled>Change Fill →</button>
+
+      <div class="warn" id="warn">
+        <b>⚠ This style comes from a class.</b><br>
+        <span class="muted">.btn-primary is used by <b>12 elements</b> (this page) across <b>4 pages</b>. Changing Fill here will change all of them.</span>
+        <div class="row" style="margin-top:10px;justify-content:space-between">
+          <button class="btn" id="justOne">Just this one</button>
+          <button class="btn btn-fill" id="all">Change all 12</button>
+        </div>
+        <div class="muted" style="font-size:10px;margin-top:6px">“Just this one” detaches it (creates a local override you can revert).</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Flow:</b><a href="00-signin.html">Sign in</a><a href="10-dashboard.html">Dashboard</a><a href="editor-spine-wireframe.html">Editor</a><a href="40-edit-scope.html" class="here">Edit scope</a><a href="41-scope-picker.html">Scope levels</a><a href="20-publish.html">Publish</a><a href="90-published.html">Live site</a></div>
+<script>
+var sel=null, scopeKind=null;
+var scope=document.getElementById('scope'),warn=document.getElementById('warn'),anno=document.getElementById('anno'),btn=document.getElementById('changeBtn');
+document.querySelectorAll('.el').forEach(function(el){el.onclick=function(){
+  document.querySelectorAll('.el').forEach(function(e){e.classList.remove('sel');});el.classList.add('sel');
+  sel=el.getAttribute('data-name');scopeKind=el.getAttribute('data-scope');
+  warn.classList.remove('show');btn.disabled=false;
+  if(scopeKind==='cls'){scope.className='scopebar cls';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">styled by class <b>.btn-primary</b> · 12 elements · 4 pages</span>';anno.innerHTML='<b>Class-bound.</b> Changing a style here can ripple to 12 elements. The banner warns before you do.';}
+  else{scope.className='scopebar';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">just this element — changes affect nothing else</span>';anno.innerHTML='<b>Unique element.</b> Safe to edit — scope is just this one. No propagation risk.';}
+};});
+btn.onclick=function(){ if(scopeKind==='cls'){warn.classList.add('show');} else {document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Done.</b> Changed Fill on just this element.';} };
+document.getElementById('justOne').onclick=function(){warn.classList.remove('show');scope.className='scopebar';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">overridden · just this element · <u>revert to class</u></span>';document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Detached.</b> Localized override created — other 11 buttons untouched. Revertible.';};
+document.getElementById('all').onclick=function(){warn.classList.remove('show');document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Applied to all 12.</b> Intentional, confirmed — the class changed everywhere it’s used.';};
+</script>
+</body></html>

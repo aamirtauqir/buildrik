@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Scope levels</title><link rel="stylesheet" href="wf.css">
+<style>
+  .lvl{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:5px;padding:11px 12px;margin-bottom:8px;cursor:pointer}
+  .lvl:hover{border-color:var(--ink-2)}
+  .lvl.on{border:2px solid var(--ink);background:var(--fill)}
+  .lvl .dot{width:14px;height:14px;border:1px solid var(--ink-3);border-radius:50%}
+  .lvl.on .dot{border-color:var(--ink);background:var(--ink)}
+  .lvl .reach{font-size:10.5px;color:var(--ink-3)}
+  .ladder-rail{font-size:10px;color:var(--ink-3);writing-mode:vertical-rl;text-align:center}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>Scope-level picker (§6.5)</b> · grounded in current engine layers (element styles · classes · components · design tokens — all exist) · solution: choose reach <i>before</i> editing; recognition over recall, no surprise ripple</div>
+  <div class="pad">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="h2">Where should this change land?</div><span class="muted" style="font-size:11px">selected: <b>Get started</b> button</span></div>
+    <div class="muted" style="font-size:11.5px;margin-bottom:14px">Pick the scope — narrowest is safest. Reach counts are live.</div>
+
+    <div class="lvl on" data-r="Affects only the button you clicked.">
+      <div class="dot"></div>
+      <div><b style="font-size:12.5px">Just this element</b><div class="reach">1 element · safest · creates a local override</div></div>
+      <span class="tag-new">default</span>
+    </div>
+    <div class="lvl" data-r="Ripples to every element using .btn-primary across the whole site.">
+      <div class="dot"></div>
+      <div><b style="font-size:12.5px">This class — <code>.btn-primary</code></b><div class="reach">12 on this page · 31 across 4 pages</div></div>
+      <span class="tag-exists">exists</span>
+    </div>
+    <div class="lvl" data-r="Changes this component everywhere it's instanced — header/footer reuse it.">
+      <div class="dot"></div>
+      <div><b style="font-size:12.5px">This component — <code>CTA block</code></b><div class="reach">3 instances · 2 pages</div></div>
+      <span class="tag-exists">exists</span>
+    </div>
+    <div class="lvl" data-r="Re-points a design token — everything bound to it shifts (buttons, links, accents).">
+      <div class="dot"></div>
+      <div><b style="font-size:12.5px">Global token — <code>--color-accent</code></b><div class="reach">site-wide · 80+ bindings</div></div>
+      <span class="tag-exists">exists</span>
+    </div>
+
+    <div class="note" id="reachNote" style="margin:12px 0"><b>Reach:</b> Affects only the button you clicked.</div>
+    <div class="row" style="justify-content:flex-end"><a href="40-edit-scope.html" class="btn">← Back to demo</a><button class="btn btn-fill btn-strong">Edit at this scope →</button></div>
+
+    <div class="note" style="margin-top:16px"><b>Why a ladder, not a flat toggle:</b> the four reach levels already exist in the engine but today they're invisible — the user discovers them by accident (change one, break twelve). Surfacing them as an ordered, counted picker turns Webflow's #1 confusion into an explicit, reversible choice. Narrowest-first = progressive disclosure; counts = recognition over recall.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Flow:</b><a href="00-signin.html">Sign in</a><a href="10-dashboard.html">Dashboard</a><a href="editor-spine-wireframe.html">Editor</a><a href="40-edit-scope.html">Edit scope</a><a href="41-scope-picker.html" class="here">Scope levels</a><a href="20-publish.html">Publish</a><a href="90-published.html">Live site</a></div>
+<script>
+document.querySelectorAll('.lvl').forEach(function(l){l.onclick=function(){document.querySelectorAll('.lvl').forEach(function(x){x.classList.remove('on');});l.classList.add('on');document.getElementById('reachNote').innerHTML='<b>Reach:</b> '+l.getAttribute('data-r');};});
+</script>
+</body></html>
