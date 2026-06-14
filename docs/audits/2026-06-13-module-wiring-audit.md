@@ -129,3 +129,26 @@ Checked the new UI surfaces (G9 email section in account-tab, G10 transfer secti
 VERDICT: conformant. No design follow-ups.
 
 NO UNRESOLVED DECISIONS
+
+---
+
+## Follow-ups #3 — CSP + G11 full-fidelity (resolved 2026-06-14)
+
+### CSP (Content-Security-Policy) — actionable recipe, no code now
+Published sites have **no CSP today** (static Vercel), so there is nothing to fix — but H1's inline `<style>`-free output is class-based now, and C2 still injects ONE inline `<script>` (the interaction runtime). When/if Buildrik adds a CSP to published sites, do exactly this:
+- **Interaction runtime** (`interactionRuntime.ts` `buildInteractionRuntimeScript`): give the `<script>` a nonce — `<script nonce="${n}">` — and add `'nonce-${n}'` to `script-src`. Or precompute the script's sha256 and add `'sha256-…'` to `script-src`. The script body is static (no user data), so a content hash is stable + simplest.
+- **Inline styles**: none anymore — base + breakpoint + hide are all class-based in styles.css (`style-src 'self'` is enough). The only inline style risk would be a future regression re-introducing `style="…"` on published elements; the H1 cascade tests guard against that (`expect(html).not.toContain("style=")`).
+- No action until CSP is actually introduced. Recipe captured so it's a 20-minute change then.
+
+### G11 full-fidelity — DEFERRED by design (spec ready)
+Current state (shipped): the 3 asset-version procedures are LIVE — assetId threaded, Versions tab shows DB restore-points + Restore, edit/optimize record a `createAssetVersion` snapshot of the **pre-edit** original. The gap to full fidelity: the editor edits create *sibling files* and never replace in place, while the DB model is replace-with-history, and `useUploadState.upload` returns `boolean` (not the uploaded URL), so the **edited result** can't be recorded as a version.
+
+Ready-to-execute spec (when prioritized):
+1. `useUploadState.upload` → return the created asset(s) `{url, serverId}[]` instead of `boolean`. Update the 2 fire-and-forget callers (`MediaTab:169`, retry at `:163`) to ignore the richer return (truthiness still works).
+2. `useMediaState` → pass the richer return through.
+3. `MediaTab.handleEditImage` / `handleOptimized` → record `createAssetVersion({ assetId, url: <new uploaded url>, bytes, edits })` with the EDITED result (not the pre-edit original), so the Versions tab lists actual edited states and Restore rolls between them.
+4. Optionally switch edit-from-sibling to replace-in-place (bigger UX change; only if product wants single-asset history rather than sibling files).
+
+**Decision: DEFER.** This is a media-subsystem redesign with real regression surface for image version-history — a feature ~0 of the current ~2 users need. It directly contradicts this session's CEO review ("stop building deferred features at 2 users; concentrate on publish-fidelity + getting real users"). Backend + the additive read/snapshot slice stay intact; the spec above makes it a bounded task when a real user actually needs edit-history fidelity.
+
+NO UNRESOLVED DECISIONS
