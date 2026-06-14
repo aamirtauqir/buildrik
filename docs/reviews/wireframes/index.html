@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik — Wireframe Map</title><link rel="stylesheet" href="wf.css">
+<style>
+  .map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .card{border:1px solid var(--line);border-radius:6px;padding:11px;text-decoration:none;color:var(--ink);background:#fff;display:block}
+  .card:hover{border-color:var(--ink);background:var(--fill)}
+  .card .n{font-size:9px;color:var(--ink-3);font-family:var(--mono)}
+  .card .t{font-size:12.5px;font-weight:600;margin:3px 0}
+  .card .d{font-size:10.5px;color:var(--ink-2);line-height:1.3}
+  .stage{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin:20px 0 8px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Buildrik redesign — wireframe map</b> · 22 low-fi screens, grounded in current functionality × the 4 solution docs · grayscale, clickable, not final UI</div>
+  <div class="pad">
+    <div class="h1" style="margin-bottom:4px">The whole flow</div>
+    <div class="muted" style="font-size:12px;margin-bottom:6px">Click any screen. Each has its own bottom nav to keep walking. Tags inside: <span class="tag-exists">exists</span> = current functionality, <span class="tag-new">SOLUTION</span> = decided reorg.</div>
+
+    <div class="stage">1 · Entry &amp; on-ramp</div>
+    <div class="map">
+      <a class="card" href="00-signin.html"><div class="n">00</div><div class="t">Sign in</div><div class="d">Magic-link default · password + 2FA</div></a>
+      <a class="card" href="13-first-run.html"><div class="n">13</div><div class="t">First run (empty)</div><div class="d">0 sites → activation moment §10</div></a>
+      <a class="card" href="01-new-site.html"><div class="n">01</div><div class="t">New site</div><div class="d">Template / AI / Blank path picker</div></a>
+      <a class="card" href="02-ai-wizard.html"><div class="n">02</div><div class="t">AI wizard</div><div class="d">3-step + fail/salvage §8.5</div></a>
+      <a class="card" href="03-template-gallery.html"><div class="n">03</div><div class="t">Template gallery</div><div class="d">Real categories · preview→Use</div></a>
+    </div>
+
+    <div class="stage">2 · Editor (make-side)</div>
+    <div class="map">
+      <a class="card" href="editor-spine-wireframe.html"><div class="n">—</div><div class="t">Editor spine</div><div class="d">Density toggle · scope · device</div></a>
+      <a class="card" href="40-edit-scope.html"><div class="n">40</div><div class="t">Edit scope</div><div class="d">§6.5 propagation · the beginner-killer</div></a>
+      <a class="card" href="41-scope-picker.html"><div class="n">41</div><div class="t">Scope levels</div><div class="d">element/class/component/token reach</div></a>
+      <a class="card" href="50-pages.html"><div class="n">50</div><div class="t">Pages</div><div class="d">List · nesting · per-page SEO</div></a>
+      <a class="card" href="51-layers.html"><div class="n">51</div><div class="t">Layers</div><div class="d">Hierarchy tree ↔ scope banner</div></a>
+      <a class="card" href="52-add.html"><div class="n">52</div><div class="t">Add / insert</div><div class="d">Sections-first · raw elements below</div></a>
+      <a class="card" href="53-settings.html"><div class="n">53</div><div class="t">Site settings</div><div class="d">SEO defaults · custom code</div></a>
+    </div>
+
+    <div class="stage">3 · Behavior states (§8)</div>
+    <div class="map">
+      <a class="card" href="60-save-states.html"><div class="n">60</div><div class="t">Save lifecycle</div><div class="d">Saved/Saving/Offline/Failed</div></a>
+      <a class="card" href="61-conflict.html"><div class="n">61</div><div class="t">Save conflict</div><div class="d">Stale-session · never clobber</div></a>
+      <a class="card" href="62-permissions.html"><div class="n">62</div><div class="t">Permissions</div><div class="d">Role matrix · read-only editor</div></a>
+      <a class="card" href="21-preview.html"><div class="n">21</div><div class="t">Preview</div><div class="d">§8.2 visitor view · exit bar</div></a>
+    </div>
+
+    <div class="stage">4 · Ship &amp; serve</div>
+    <div class="map">
+      <a class="card" href="20-publish.html"><div class="n">20</div><div class="t">Publish</div><div class="d">Pre-flight→deploy→live/failed</div></a>
+      <a class="card" href="22-domain-pending.html"><div class="n">22</div><div class="t">Custom domain</div><div class="d">§8.6 enter→DNS→pending→live</div></a>
+      <a class="card" href="30-paywall.html"><div class="n">30</div><div class="t">Paywall</div><div class="d">§8 contextual gate · escape</div></a>
+      <a class="card" href="90-published.html"><div class="n">90</div><div class="t">Live site + 404</div><div class="d">§9 visitor output · badge</div></a>
+    </div>
+
+    <div class="stage">5 · Dashboard (operate-side)</div>
+    <div class="map">
+      <a class="card" href="10-dashboard.html"><div class="n">10</div><div class="t">Dashboard home</div><div class="d">One-home IA · status chips</div></a>
+      <a class="card" href="11-sites.html"><div class="n">11</div><div class="t">Sites list</div><div class="d">Status SSOT · row ops</div></a>
+      <a class="card" href="12-site-detail.html"><div class="n">12</div><div class="t">Site detail</div><div class="d">URLs/domain/history · Edit jump</div></a>
+    </div>
+
+    <div class="note" style="margin-top:22px"><b>Boundary spine:</b> Dashboard = run the business (sites, domains, billing, roles). Editor = make the thing (author pages, scope, publish). The single bridge is "Edit in editor" ⇄ Publish. <b>Source docs:</b> <code>docs/reviews/2026-06-14-*</code> (review · solutions · flow-screens-IA).</div>
+  </div>
+</div>
+</body></html>
