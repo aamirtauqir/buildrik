@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildrik — Editor Spine WIREFRAME (low-fi)</title>
+<style>
+  /* ---- WIREFRAME palette: grayscale only, no brand colour ---- */
+  :root{
+    --ink:#2b2b2b; --ink-2:#666; --ink-3:#9a9a9a;
+    --line:#c7c7c7; --line-d:#b0b0b0; --fill:#f3f3f3; --fill-2:#e9e9e9; --bg:#fff; --bg-2:#fafafa;
+    --sel:#2b2b2b; --note:#444;
+    --font:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --mono:ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);color:var(--ink);background:#e4e4e4;font-size:13px;line-height:1.4}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+  .wf-stamp{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:60;background:#2b2b2b;color:#fff;font-size:10px;letter-spacing:.1em;padding:3px 12px;border-radius:3px;font-weight:600;opacity:.85}
+
+  .box{border:1px solid var(--line);background:var(--bg)}
+  .dashed{border:1px dashed var(--line-d)}
+  .lbl{color:var(--ink-3);font-size:10px;letter-spacing:.04em;text-transform:uppercase}
+
+  .app{display:grid;grid-template-rows:46px 1fr;height:100vh;background:var(--bg);border:1px solid var(--line)}
+  .topbar{display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .body{display:grid;grid-template-columns:52px 210px 1fr 280px;min-height:0}
+
+  /* topbar wireframe */
+  .brand{display:flex;align-items:center;gap:7px;font-weight:600}
+  .brand .logo{width:20px;height:20px;border:1px solid var(--line);background:var(--fill);display:grid;place-items:center;font-size:11px}
+  .tb-divider{width:1px;height:20px;background:var(--line);margin:0 3px}
+  .tb-btn{padding:5px 9px;border:1px solid var(--line);background:var(--bg);border-radius:3px;color:var(--ink-2);font-size:12px}
+  .tb-btn:hover{background:var(--fill)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .seg button{padding:4px 9px;color:var(--ink-2);font-size:12px;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--ink);color:#fff}
+  .spacer{flex:1}
+  .saved{font-size:12px;color:var(--ink-2);display:flex;align-items:center;gap:5px}
+  .saved::before{content:"";width:7px;height:7px;border-radius:50%;border:1px solid var(--ink-2)}
+  .density-toggle{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border:1px solid var(--line-d);border-radius:999px;color:var(--ink);font-size:12px;font-weight:600}
+  .density-toggle .sw{width:28px;height:16px;border-radius:999px;border:1px solid var(--line-d);background:var(--fill);position:relative}
+  .density-toggle .sw::after{content:"";position:absolute;top:1px;left:1px;width:12px;height:12px;border-radius:50%;background:var(--ink-3);transition:.15s}
+  .app[data-density="pro"] .density-toggle{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .app[data-density="pro"] .density-toggle .sw{background:#555}
+  .app[data-density="pro"] .density-toggle .sw::after{left:14px;background:#fff}
+
+  /* rail wireframe */
+  .rail{border-right:1px solid var(--line);background:var(--bg-2);display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:3px;overflow:auto}
+  .grp-label{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:7px 0 1px}
+  .rail-item{width:38px;height:36px;border:1px solid var(--line);background:var(--bg);border-radius:4px;display:grid;place-items:center;color:var(--ink-2);position:relative;font-size:9px;text-align:center;line-height:1}
+  .rail-item:hover{background:var(--fill)}
+  .rail-item.on{border-color:var(--ink);border-width:2px;color:var(--ink);font-weight:600}
+  .rail-item .lbl2{position:absolute;left:44px;background:var(--ink);color:#fff;font-size:10px;padding:2px 6px;border-radius:3px;white-space:nowrap;opacity:0;pointer-events:none;z-index:5}
+  .rail-item:hover .lbl2{opacity:1}
+  .rail-more{font-size:9px;color:var(--ink-3);border:1px dashed var(--line-d);border-radius:4px;padding:4px 6px;margin-top:2px}
+  .app[data-density="pro"] .pro-group{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .app[data-density="simple"] .pro-group{display:none}
+  .app[data-density="simple"] .pro-group.open{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .app[data-density="pro"] .rail-more{display:none}
+
+  /* panel wireframe */
+  .panel{border-right:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;overflow:auto}
+  .panel-head{padding:10px 12px;border-bottom:1px solid var(--line);font-weight:600;background:var(--bg-2)}
+  .panel-body{padding:10px}
+  .search{width:100%;border:1px dashed var(--line-d);border-radius:3px;padding:7px 9px;color:var(--ink-3);margin-bottom:10px;background:var(--bg)}
+  .cat{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 5px}
+  .blocks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .block{border:1px solid var(--line);background:var(--fill);border-radius:3px;padding:14px 6px;text-align:center;color:var(--ink-2);font-size:11px}
+  .block:hover{border-color:var(--ink);background:var(--fill-2)}
+
+  /* canvas wireframe */
+  .canvas-wrap{background:#ececec;display:grid;place-items:start center;overflow:auto;padding:24px}
+  .device-tag{text-align:center;font-size:10px;color:var(--ink-3);margin-bottom:6px;letter-spacing:.05em}
+  .frame{background:#fff;border:1px solid var(--line);width:100%;max-width:880px;transition:max-width .2s;overflow:hidden;box-shadow:0 1px 0 var(--line)}
+  .app[data-device="tablet"] .frame{max-width:700px}
+  .app[data-device="phone"] .frame{max-width:360px}
+  .el{outline:1px dashed transparent;outline-offset:3px;cursor:pointer}
+  .el:hover{outline-color:var(--line-d)}
+  .el.sel{outline:2px dashed var(--sel);outline-offset:3px}
+  .site-hero{padding:48px 36px;text-align:center;border-bottom:1px dashed var(--line)}
+  .app[data-device="phone"] .site-hero{padding:30px 18px}
+  .ph-h1{display:inline-block;background:var(--fill);border:1px solid var(--line);padding:10px 18px;color:var(--ink-2);font-weight:600;font-size:18px;margin-bottom:12px}
+  .ph-p{display:block;background:var(--fill);border:1px solid var(--line);color:var(--ink-3);padding:8px;max-width:380px;margin:0 auto 16px;font-size:12px}
+  .ph-btn{display:inline-block;background:var(--fill-2);border:1px solid var(--line-d);padding:9px 18px;color:var(--ink);font-weight:600;font-size:12px;border-radius:3px}
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:28px 36px}
+  .app[data-device="phone"] .cards{grid-template-columns:1fr;padding:18px}
+  .card{border:1px solid var(--line);padding:14px}
+  .card .ph-bar{height:10px;background:var(--fill);border:1px solid var(--line);margin-bottom:7px}
+  .card .ph-bar.s{width:55%}
+  .card .ph-btn2{margin-top:10px;display:inline-block;background:var(--fill-2);border:1px solid var(--line-d);padding:5px 12px;font-size:11px;border-radius:3px;color:var(--ink)}
+
+  /* inspector wireframe */
+  .insp{border-left:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;overflow:auto}
+  .insp-scope{padding:9px 11px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .scope-eyebrow{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+  .scope-line{font-size:13px;font-weight:600;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .scope-chip{font-size:10px;font-weight:600;padding:2px 7px;border:1px solid var(--line-d);border-radius:999px;color:var(--ink-2);background:var(--fill)}
+  .scope-chip.wide{border-style:dashed;border-color:var(--ink);color:var(--ink)}
+  .bp-row{display:flex;gap:4px;margin-top:8px}
+  .app[data-density="simple"] .bp-row{display:none}
+  .pill{font-size:10px;padding:3px 7px;border:1px solid var(--line);border-radius:3px;color:var(--ink-3)}
+  .pill.on{border-color:var(--ink);color:var(--ink);font-weight:600}
+
+  .phone-banner{display:none;align-items:center;gap:7px;margin:9px 11px 0;padding:8px 9px;border:1px dashed var(--ink);color:var(--ink);font-size:11px;font-weight:600;background:var(--fill)}
+  .app[data-device="phone"] .phone-banner{display:flex}
+
+  .prop-warn{display:none;margin:9px 11px 0;padding:9px;border:1px dashed var(--ink);background:var(--fill)}
+  .prop-warn.show{display:block}
+  .prop-warn .t{font-size:12px;font-weight:600}
+  .prop-warn .row{display:flex;gap:6px;margin-top:8px}
+  .pw-a,.pw-b{flex:1;border:1px solid var(--ink);border-radius:3px;padding:6px;font-size:11px;font-weight:600;text-align:center;background:var(--bg)}
+  .pw-a{background:var(--ink);color:#fff}
+
+  .sec{border-bottom:1px solid var(--line)}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;font-weight:600;font-size:12px;cursor:pointer}
+  .sec-h .chev{color:var(--ink-3);font-size:10px}
+  .sec.collapsed .sec-h .chev{transform:rotate(-90deg);display:inline-block}
+  .sec.collapsed .sec-c{display:none}
+  .sec-c{padding:0 11px 11px}
+  .pro-only{display:none}
+  .app[data-density="pro"] .pro-only{display:block}
+  .field{display:flex;align-items:center;justify-content:space-between;margin:7px 0;gap:8px}
+  .field label{color:var(--ink-2);font-size:12px}
+  .gbox{border:1px solid var(--line);background:var(--fill);border-radius:3px;padding:5px 8px;font-size:11px;color:var(--ink-2);min-width:70px;text-align:center}
+  .gbox.sq{min-width:0;width:22px;height:22px;padding:0}
+  .num{width:54px;border:1px solid var(--line);border-radius:3px;padding:5px;font-size:11px;text-align:center;color:var(--ink-2);background:var(--bg)}
+  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;width:108px;margin-left:auto}
+  .pad input{border:1px solid var(--line);border-radius:3px;padding:4px;text-align:center;font-size:10px;width:100%;color:var(--ink-2)}
+  .pad .mid{display:grid;place-items:center;color:var(--ink-3);font-size:9px;border:1px dashed var(--line)}
+  .more-link{font-size:11px;color:var(--ink);text-decoration:underline;margin-top:6px;display:inline-block}
+  .device-vis{display:flex;gap:5px;margin-top:5px}
+  .dv{flex:1;border:1px solid var(--line);border-radius:3px;padding:6px;text-align:center;font-size:10px;color:var(--ink-2)}
+  .dv.hidden{border-style:dashed;color:var(--ink-3);text-decoration:line-through}
+  .edit-code{margin:auto 11px 12px;padding:9px;border:1px dashed var(--line-d);border-radius:3px;text-align:center;font-size:11px;color:var(--ink-2)}
+  .edit-code b{text-decoration:underline}
+  .app[data-density="pro"] .edit-code{display:none}
+  .css-box{font-family:var(--mono);font-size:10px;color:var(--ink-2);background:var(--fill);border:1px solid var(--line);border-radius:3px;padding:7px;white-space:pre}
+  .classchip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line-d);border-radius:3px;padding:3px 7px;font-size:11px;font-family:var(--mono);color:var(--ink-2);background:var(--fill)}
+
+  /* notes / legend (wireframe annotations) */
+  .legend{position:fixed;bottom:12px;right:12px;width:240px;background:#2b2b2b;color:#e0e0e0;font-size:11px;border-radius:5px;padding:11px 13px;z-index:40}
+  .legend h4{color:#fff;font-size:12px;margin-bottom:6px}
+  .legend li{margin:4px 0;list-style:none;padding-left:13px;position:relative}
+  .legend li::before{content:"›";position:absolute;left:0;color:#fff}
+  .legend .close{position:absolute;top:8px;right:10px;color:#999;cursor:pointer}
+  .anno{position:fixed;bottom:12px;left:12px;background:#2b2b2b;color:#fff;padding:8px 13px;border-radius:5px;font-size:12px;z-index:50;max-width:46vw;display:none}
+  .anno b{text-decoration:underline}
+  .anno button{color:#999;margin-left:8px}
+</style>
+</head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY · not final UI</div>
+
+<div class="app" id="app" data-density="simple" data-device="desktop">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="brand"><span class="logo">B</span> Buildrik <span class="lbl" style="font-weight:400">(logo)</span></div>
+    <span class="tb-divider"></span>
+    <button class="tb-btn">↶ undo</button>
+    <button class="tb-btn">↷ redo</button>
+    <span class="tb-divider"></span>
+    <button class="tb-btn">Home ▾</button>
+    <span class="tb-divider"></span>
+    <div class="seg" id="deviceSeg">
+      <button data-d="desktop" class="on">Desktop</button>
+      <button data-d="tablet">Tablet</button>
+      <button data-d="phone">Phone</button>
+    </div>
+    <span class="spacer"></span>
+    <span class="saved">Saved</span>
+    <button class="density-toggle" id="densityToggle"><span class="sw"></span><span id="densityLabel">Advanced</span></button>
+    <button class="tb-btn">Preview</button>
+    <button class="tb-btn" style="border-color:var(--ink);font-weight:600">Publish</button>
+  </div>
+
+  <div class="body">
+    <!-- RAIL -->
+    <div class="rail">
+      <div class="grp-label">Build</div>
+      <div class="rail-item">AI<span class="lbl2">AI — describe & generate</span></div>
+      <div class="rail-item">Tmpl<span class="lbl2">Templates</span></div>
+      <div class="rail-item on">Add<span class="lbl2">Add blocks</span></div>
+      <div class="rail-item">Page<span class="lbl2">Pages</span></div>
+      <div class="rail-item">Media<span class="lbl2">Media</span></div>
+      <div class="grp-label">Design</div>
+      <div class="rail-item">Tokens<span class="lbl2">Design tokens</span></div>
+      <div class="grp-label">Ship</div>
+      <div class="rail-item">Pub<span class="lbl2">Publish</span></div>
+      <button class="rail-more" id="railMore">More ▾</button>
+      <div class="pro-group" id="proGroup">
+        <div class="grp-label">Pro</div>
+        <div class="rail-item">Cmp<span class="lbl2">Components</span></div>
+        <div class="rail-item">Lyr<span class="lbl2">Layers</span></div>
+        <div class="rail-item">Hist<span class="lbl2">History</span></div>
+        <div class="rail-item">Set<span class="lbl2">Settings</span></div>
+      </div>
+    </div>
+
+    <!-- PANEL -->
+    <div class="panel">
+      <div class="panel-head">Add</div>
+      <div class="panel-body">
+        <div class="search">Search blocks…  /</div>
+        <div class="cat">Basic</div>
+        <div class="blocks"><div class="block">Heading</div><div class="block">Text</div><div class="block">Button</div><div class="block">Image</div></div>
+        <div class="cat">Layout</div>
+        <div class="blocks"><div class="block">Section</div><div class="block">Grid</div></div>
+      </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="canvas-wrap">
+      <div>
+        <div class="device-tag" id="deviceTag">DESKTOP · 1280</div>
+        <div class="frame">
+          <div class="site-hero">
+            <span class="el ph-h1" data-scope="this" data-name="this heading">[ Heading ]</span><br>
+            <span class="el ph-p" data-scope="this" data-name="this paragraph">[ paragraph text placeholder ]</span>
+            <span class="el ph-btn" data-scope="class" data-name="all .btn-primary" data-count="12">[ Button ]</span>
+          </div>
+          <div class="cards">
+            <div class="card"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-scope="class" data-name="all .btn-primary" data-count="12">[ btn ]</span></div>
+            <div class="card"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-scope="class" data-name="all .btn-primary" data-count="12">[ btn ]</span></div>
+            <div class="card"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-scope="class" data-name="all .btn-primary" data-count="12">[ btn ]</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSPECTOR -->
+    <div class="insp">
+      <div class="insp-scope">
+        <div class="scope-eyebrow">You are editing</div>
+        <div class="scope-line" id="scopeLine">this heading <span class="scope-chip" id="scopeChip" style="display:none"></span></div>
+        <div class="bp-row"><span class="pill on">Base</span><span class="pill">Tablet</span><span class="pill">Phone</span><span style="flex:1"></span><span class="pill">:hover</span><span class="pill">:focus</span></div>
+      </div>
+
+      <div class="phone-banner">▣ Styling the <b style="margin:0 3px">Phone</b> view — affects phones only.</div>
+
+      <div class="prop-warn" id="propWarn">
+        <div class="t">⚠ Changes <span id="pwCount">12</span> elements (all using <code>.btn-primary</code>)</div>
+        <div class="row"><div class="pw-b" id="pwJustOne">Just this one</div><div class="pw-a" id="pwAll">Change all 12</div></div>
+      </div>
+
+      <!-- SIMPLE sections -->
+      <div class="sec"><div class="sec-h">Style <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Fill</label><span class="gbox sq" id="fillSwatch">▢</span></div>
+        <div class="field"><label>Text color</label><span class="gbox sq">▢</span></div>
+        <div class="field"><label>Size</label><input class="num" value="auto"></div>
+      </div></div>
+      <div class="sec"><div class="sec-h">Text <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Font</label><span class="gbox">Font ▾</span></div>
+        <div class="field"><label>Weight</label><span class="gbox">Semibold ▾</span></div>
+        <div class="field"><label>Align</label><span class="gbox">Center ▾</span></div>
+        <a class="more-link">More ▾</a>
+      </div></div>
+      <div class="sec"><div class="sec-h">Spacing <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Padding</label><div class="pad"><input value=""><input value="11"><input value=""><div class="mid"></div><div class="mid">▢</div><div class="mid"></div><input value=""><input value="22"><input value=""></div></div>
+      </div></div>
+      <div class="sec collapsed"><div class="sec-h">Background <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>Color</label><span class="gbox sq">▢</span></div></div></div>
+      <div class="sec collapsed"><div class="sec-h">Border &amp; Corners <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>Radius</label><input class="num" value="8"></div></div></div>
+      <div class="sec"><div class="sec-h">Show on device <span class="chev">▾</span></div><div class="sec-c"><div class="device-vis"><div class="dv">Desktop</div><div class="dv">Tablet</div><div class="dv">Phone</div></div></div></div>
+
+      <!-- PRO-only -->
+      <div class="sec pro-only collapsed"><div class="sec-h">Layout (flex/grid) <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>Display</label><span class="gbox">flex ▾</span></div><div class="field"><label>Justify</label><span class="gbox">center ▾</span></div></div></div>
+      <div class="sec pro-only collapsed"><div class="sec-h">Effects <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>Opacity</label><input class="num" value="100"></div></div></div>
+      <div class="sec pro-only collapsed"><div class="sec-h">Interactions <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>On click</label><span class="gbox">Navigate ▾</span></div></div></div>
+      <div class="sec pro-only"><div class="sec-h">CSS Classes <span class="chev">▾</span></div><div class="sec-c"><span class="classchip">.btn-primary ×</span> <span class="classchip">+ class</span></div></div>
+      <div class="sec pro-only collapsed"><div class="sec-h">All CSS <span class="chev">▾</span></div><div class="sec-c"><div class="css-box">.btn-primary{
+  background:▢;
+  padding:11px 22px;
+  border-radius:8px;
+}</div></div></div>
+
+      <div class="edit-code">Need full control? <b>Edit code / Advanced →</b></div>
+    </div>
+  </div>
+</div>
+
+<div class="legend" id="legend">
+  <span class="close" id="legendClose">×</span>
+  <h4>Wireframe — try the wired bits</h4>
+  <ul>
+    <li>Top-right <b>Advanced</b> = Simple ↔ Pro density (rail + inspector reveal more; nothing deleted).</li>
+    <li>Click <b>[ Button ]</b> on canvas → scope warns "all .btn-primary · 12". Click <b>Fill</b> → propagation choice.</li>
+    <li>Click <b>[ Heading ]</b> → scope = this element only.</li>
+    <li>Switch to <b>Phone</b> → "styling Phone" banner.</li>
+    <li>In Simple, rail <b>More</b> reveals Pro tabs.</li>
+  </ul>
+</div>
+<div class="anno" id="anno"><span id="annoText"></span><button id="annoClose">×</button></div>
+
+<script>
+  var app=document.getElementById('app');
+  function anno(h){var a=document.getElementById('anno');document.getElementById('annoText').innerHTML=h;a.style.display='block';}
+  document.getElementById('annoClose').onclick=function(){document.getElementById('anno').style.display='none';};
+  document.getElementById('legendClose').onclick=function(){document.getElementById('legend').style.display='none';};
+  document.getElementById('densityToggle').onclick=function(){
+    var pro=app.getAttribute('data-density')==='pro';app.setAttribute('data-density',pro?'simple':'pro');
+    document.getElementById('densityLabel').textContent=pro?'Advanced':'Simple view';
+    anno(pro?'<b>Simple</b> density — 6 visual sections, no CSS/classes. Hidden, not removed.':'<b>Pro</b> density — same engine, full surface revealed.');
+  };
+  document.getElementById('railMore').onclick=function(){document.getElementById('proGroup').classList.toggle('open');};
+  document.querySelectorAll('#deviceSeg button').forEach(function(b){b.onclick=function(){
+    document.querySelectorAll('#deviceSeg button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+    var d=b.getAttribute('data-d');app.setAttribute('data-device',d);
+    document.getElementById('deviceTag').textContent=(d==='desktop'?'DESKTOP · 1280':d==='tablet'?'TABLET · 768':'PHONE · 375');
+    if(d==='phone')anno('<b>Phone view</b> — loud banner so a beginner never wonders why desktop didn\'t change.');
+  };});
+  document.querySelectorAll('.sec-h').forEach(function(h){h.onclick=function(){h.parentElement.classList.toggle('collapsed');};});
+  var selected=null;
+  document.querySelectorAll('.el').forEach(function(el){el.onclick=function(e){e.stopPropagation();
+    document.querySelectorAll('.el').forEach(function(x){x.classList.remove('sel');});el.classList.add('sel');selected=el;
+    document.getElementById('propWarn').classList.remove('show');
+    var chip=document.getElementById('scopeChip'),line=document.getElementById('scopeLine');
+    if(el.getAttribute('data-scope')==='class'){line.childNodes[0].nodeValue=el.getAttribute('data-name')+' ';chip.style.display='inline-block';chip.className='scope-chip wide';chip.textContent=el.getAttribute('data-count')+' elements';anno('Selected a <b>shared class</b> — editing changes <b>'+el.getAttribute('data-count')+'</b>. Try Fill →');}
+    else{line.childNodes[0].nodeValue=el.getAttribute('data-name')+' ';chip.style.display='none';anno('Selected <b>'+el.getAttribute('data-name')+'</b> — this element only. Safe.');}
+  };});
+  document.getElementById('fillSwatch').onclick=function(){
+    if(selected&&selected.getAttribute('data-scope')==='class'){var pw=document.getElementById('propWarn');document.getElementById('pwCount').textContent=selected.getAttribute('data-count');pw.classList.add('show');anno('<b>Propagation guard</b> — choose: localize to 1, or change all. (Webflow lacks this.)');}
+    else anno('Changed fill on this element only.');
+  };
+  document.getElementById('pwJustOne').onclick=function(){document.getElementById('propWarn').classList.remove('show');document.getElementById('scopeChip').style.display='none';anno('<b>Localized</b> — detached, changed just this one.');};
+  document.getElementById('pwAll').onclick=function(){document.getElementById('propWarn').classList.remove('show');anno('Applied to all 12.');};
+</script>
+</body>
+</html>
