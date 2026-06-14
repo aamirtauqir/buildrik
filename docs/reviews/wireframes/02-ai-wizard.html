@@ -34,13 +34,18 @@
       <div class="barline m" id="prog" style="height:14px;width:20%;transition:width .4s;margin-bottom:12px"></div>
       <div class="log" id="genlog">queued…</div>
       <div class="row" style="justify-content:space-between;margin-top:16px">
-        <button class="btn" onclick="fail()">⟳ Simulate failure</button>
+        <div class="row"><button class="btn" onclick="fail()">⟳ Sim failure</button><button class="btn" onclick="partial()">◑ Sim partial</button></div>
         <div class="row"><a href="10-dashboard.html" class="btn">Cancel — leave (keeps generating §8.5)</a><a href="editor-spine-wireframe.html" class="btn btn-fill">Open draft → Editor</a></div>
       </div>
       <div class="note" id="failnote" style="margin-top:14px;display:none">
         <b>⚠ Generation failed (§8.5).</b> Your inputs are preserved.
         <div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn" onclick="gen()">Retry (same prompt)</button><a href="03-template-gallery.html" class="btn">Use a template instead</a><a href="editor-spine-wireframe.html" class="btn">Start blank</a></div>
-        <div class="muted" style="margin-top:6px;font-size:10.5px">Partial salvage: "made 3 of 5 pages — open draft / retry the rest". Resume if you leave: dashboard shows "Draft ready".</div>
+        <div class="muted" style="margin-top:6px;font-size:10.5px">Resume if you leave: dashboard shows a "Generating · resume" card (screen 10).</div>
+      </div>
+      <div class="note" id="partnote" style="margin-top:14px;display:none;border-color:var(--ink)">
+        <b>◑ Made 3 of 5 pages (§8.5 partial salvage).</b> Home · About · Services are ready; Pricing + Contact failed.
+        <div class="row" style="margin-top:8px;flex-wrap:wrap"><a href="editor-spine-wireframe.html" class="btn btn-fill">Open the 3 pages →</a><button class="btn" onclick="gen()">Retry the missing 2</button></div>
+        <div class="muted" style="margin-top:6px;font-size:10.5px">Never all-or-nothing: partial work is kept and openable; only the failed pages retry.</div>
       </div>
     </div>
   </div>
@@ -49,6 +54,7 @@
 <script>
 function go(n){[1,2,3].forEach(function(i){document.getElementById('s'+i).classList.toggle('on',i===n);document.getElementById('t'+i).classList.toggle('on',i===n);});}
 var p;function gen(){document.getElementById('failnote').style.display='none';var prog=document.getElementById('prog'),log=document.getElementById('genlog');var steps=['queued…','✓ structure','✓ Home','✓ About','✓ Services','✓ images','done'];var i=0;clearInterval(p);prog.style.width='10%';p=setInterval(function(){i++;log.textContent=steps.slice(0,i+1).join('\n');prog.style.width=Math.min(100,10+i*15)+'%';if(i>=steps.length-1)clearInterval(p);},500);}
-function fail(){clearInterval(p);document.getElementById('genlog').textContent='queued…\n✓ structure\n✗ failed at page 3';document.getElementById('prog').style.width='45%';document.getElementById('failnote').style.display='block';}
+function fail(){clearInterval(p);document.getElementById('partnote').style.display='none';document.getElementById('genlog').textContent='queued…\n✓ structure\n✗ failed at page 3';document.getElementById('prog').style.width='45%';document.getElementById('failnote').style.display='block';}
+function partial(){clearInterval(p);document.getElementById('failnote').style.display='none';document.getElementById('genlog').textContent='queued…\n✓ structure\n✓ Home\n✓ About\n✓ Services\n✗ Pricing\n✗ Contact';document.getElementById('prog').style.width='70%';document.getElementById('partnote').style.display='block';}
 </script>
 </body></html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Inspector states & breakpoints</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:1fr 300px;min-height:400px}
+  .cv{border-right:1px dashed var(--line);background:var(--bg-2);display:grid;place-items:center;padding:20px}
+  .bar{padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px}
+  .seg{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:5px;padding:2px}
+  .seg button{font-size:10.5px;border:none;background:none;padding:3px 8px;border-radius:3px;cursor:pointer;color:var(--ink-2)}
+  .seg button.on{background:var(--ink);color:#fff}
+  .f{font-size:11px;padding:8px 12px;border-bottom:1px dashed var(--line);display:flex;justify-content:space-between;align-items:center}
+  .ovr{font-size:9px;border-radius:3px;padding:1px 5px}
+  .ovr.inh{border:1px solid var(--line);color:var(--ink-3)}
+  .ovr.set{background:var(--ink);color:#fff}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Inspector — states × breakpoints (§6.5 adjacent)</b> · grounded in current state/responsive engine · solution: make the <i>third</i> scope axis legible — you're editing [element] in [state] at [breakpoint]</div>
+  <div class="ed">
+    <div class="cv"><div style="text-align:center"><div class="btn btn-fill btn-strong" style="margin-bottom:8px">[ CTA — hover preview ]</div><div class="muted" style="font-size:11px">previewing :hover @ Phone</div></div></div>
+    <div>
+      <div class="bar">State <div class="seg" style="margin-top:5px"><button>Default</button><button class="on">Hover</button><button>Focus</button><button>Active</button><button>Disabled</button></div></div>
+      <div class="bar">Breakpoint <div class="seg" style="margin-top:5px"><button>Desktop</button><button>Tablet</button><button class="on">Phone</button></div><div class="muted" style="font-size:9px;margin-top:4px">editing: <b>Hover</b> · <b>Phone</b> — cascades up from Desktop</div></div>
+
+      <div class="f"><span>Fill</span><span><span class="ovr set">overridden</span> #1166ee</span></div>
+      <div class="f"><span>Text</span><span><span class="ovr inh">inherited</span> #fff</span></div>
+      <div class="f"><span>Scale</span><span><span class="ovr set">overridden</span> 1.03×</span></div>
+      <div class="f"><span>Font size</span><span><span class="ovr inh">from Desktop</span> 16</span></div>
+      <div class="f" style="border:none"><span>Shadow</span><span><span class="ovr inh">inherited</span> sm</span></div>
+
+      <div class="note" style="margin:12px;font-size:10.5px"><b>Three scope axes, one mental model:</b> §6.5 answers <i>which elements</i> (this / class / component); this panel answers <i>which state</i> (hover/focus) and <i>which breakpoint</i> (phone overrides desktop). Inherited vs overridden is shown per-property so you always know whether you're setting a base value or a narrow override — and can reset an override back to inherited.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor:</b><a href="editor-spine-wireframe.html">Spine</a><a href="59-inspector.html">Inspector</a><a href="59b-inspector-states.html" class="here">States × breakpoints</a><a href="40-edit-scope.html">Edit scope</a><a href="41-scope-picker.html">Scope levels</a></div>
+</body></html>

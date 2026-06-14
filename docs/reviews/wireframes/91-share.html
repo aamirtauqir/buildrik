@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Share link states</title><link rel="stylesheet" href="wf.css">
+<style>.vstate{display:none}.vstate.on{display:block}.urlbar{display:flex;align-items:center;gap:8px;background:var(--fill);border:1px solid var(--line);border-radius:6px;padding:6px 12px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);margin-bottom:0}</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Share-link states (§9)</b> · account-less preview via token (<code>/share/[token]</code>) · grounded in real share-token concept · solution: every share path has a graceful state — never a raw error</div>
+  <div class="pad" style="padding-bottom:8px">
+    <div class="row" style="margin-bottom:10px"><span class="chip on" onclick="vs('view',this)" style="cursor:pointer">Valid share</span><span class="chip" onclick="vs('pw',this)" style="cursor:pointer">Password-gated</span><span class="chip" onclick="vs('exp',this)" style="cursor:pointer">Expired / revoked</span></div>
+    <div class="urlbar">🔗 buildrik.site/share/a1b2c3<span style="flex:1"></span><span class="muted" style="font-size:10px">visitor, no account</span></div>
+  </div>
+
+  <div class="vstate on" id="v_view">
+    <div style="border:1px dashed var(--line);border-top:none">
+      <div class="row" style="justify-content:space-between;padding:7px 14px;background:var(--ink);color:#fff;font-size:11px"><span>◉ Shared preview — read-only</span><span style="opacity:.7">shared by acme · view-only</span></div>
+      <div style="padding:28px 24px;text-align:center;background:var(--paper)"><div class="h1" style="font-size:22px;margin-bottom:8px">[ Hero headline ]</div><div class="muted" style="margin-bottom:14px">[ subtitle ]</div><span class="btn btn-fill btn-strong">[ CTA ]</span></div>
+    </div>
+    <div class="pad"><div class="note"><b>Valid (§9):</b> a clean read-only render of the (possibly unpublished) site for feedback. No editor chrome, no account needed. Owner controls expiry + password from the site's Access settings.</div></div>
+  </div>
+
+  <div class="vstate" id="v_pw">
+    <div style="border:1px dashed var(--line);border-top:none;min-height:240px;display:grid;place-items:center;background:var(--bg-2)">
+      <div class="box pad" style="max-width:320px;text-align:center">
+        <div style="font-size:24px;margin-bottom:6px">🔒</div>
+        <div class="h2" style="margin-bottom:4px">This preview is password-protected</div>
+        <div class="muted" style="font-size:11.5px;margin-bottom:12px">Enter the password the owner shared with you.</div>
+        <div class="input" style="margin-bottom:10px">••••••••</div>
+        <button class="btn btn-fill btn-strong" style="width:100%">Unlock preview</button>
+      </div>
+    </div>
+    <div class="pad"><div class="note" style="font-size:10.5px"><b>Password-gated:</b> the password is entered by the visitor, verified server-side — never exposed in the URL or page. Wrong password = inline error, no lockout dead-end.</div></div>
+  </div>
+
+  <div class="vstate" id="v_exp">
+    <div style="border:1px dashed var(--line);border-top:none;min-height:240px;display:grid;place-items:center;background:var(--bg-2)">
+      <div style="max-width:340px;text-align:center">
+        <div style="font-size:24px;margin-bottom:6px">⌛</div>
+        <div class="h2" style="margin-bottom:4px">This share link has expired</div>
+        <div class="muted" style="font-size:11.5px">The owner's preview link is no longer active. Ask them for a fresh link.</div>
+      </div>
+    </div>
+    <div class="pad"><div class="note" style="font-size:10.5px"><b>Expired / revoked (§9):</b> a clear, friendly end-state — not a 404 or stack trace. Distinct from the published-site 404 (screen 90): this is a <i>preview</i> link that timed out or was turned off, so the message points back to the owner.</div></div>
+  </div>
+</div>
+<div class="proto-nav"><b>Public (§9):</b><a href="90-published.html">Live + 404</a><a href="91-share.html" class="here">Share states</a><a href="12-site-detail.html">Site detail</a><a href="21-preview.html">Owner preview</a><a href="index.html">Map</a></div>
+<script>function vs(s,b){['view','pw','exp'].forEach(function(x){document.getElementById('v_'+x).classList.toggle('on',x===s);});b.parentNode.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
+</body></html>

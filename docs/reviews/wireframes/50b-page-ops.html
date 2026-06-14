@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Page ops</title><link rel="stylesheet" href="wf.css">
+<style>
+  .menu{border:1px solid var(--line);background:#fff;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.1);width:190px;font-size:12.5px;overflow:hidden}
+  .mi{padding:8px 12px;cursor:pointer}.mi:hover{background:var(--fill)}.mi.danger{border-top:1px dashed var(--line)}.mi.off{color:var(--ink-3);cursor:not-allowed}
+  .lp{border:1px solid var(--line);border-radius:6px;width:260px;font-size:12px;overflow:hidden}
+  .lt{padding:8px 12px;border-bottom:1px dashed var(--line);cursor:pointer}.lt:hover{background:var(--fill)}.lt.on{background:var(--fill)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Page operations (§8.3)</b> · the drill-ins behind Pages (50) · solution: page context-menu + <b>delete-guard</b> (no orphan links / can't delete home) + cross-page link-picker (no broken links)</div>
+  <div class="pad">
+    <div class="grid3" style="align-items:start">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Right-click a page</div>
+        <div class="menu">
+          <div class="mi">✎ Rename</div>
+          <div class="mi">⧉ Duplicate</div>
+          <div class="mi">⌂ Set as home</div>
+          <div class="mi">▸ Page settings &amp; SEO</div>
+          <div class="mi">↗ Open in preview</div>
+          <div class="mi danger">🗑 Delete page…</div>
+        </div>
+        <div class="note" style="margin-top:10px;font-size:10.5px">Set-as-home swaps the ⌂ marker (50). Delete opens a guard (right) — never silent.</div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Delete guard</div>
+        <div class="box pad" style="border:2px solid var(--ink)">
+          <span class="tag-new">CHECK FIRST</span>
+          <div class="h2" style="margin:8px 0 4px">Delete "Services"?</div>
+          <div class="note" style="margin:8px 0"><b>⚠ Linked from 3 places.</b> Home nav, Footer, About page link here. Deleting leaves broken links.</div>
+          <div style="font-size:11px;color:var(--ink-2);margin-bottom:10px">Fix the links first, or delete and we'll flag the 3 broken links for you.</div>
+          <button class="btn" style="width:100%;margin-bottom:6px">Review the 3 links</button>
+          <button class="btn btn-fill" style="width:100%">Delete anyway (flag broken)</button>
+        </div>
+        <div class="note" style="margin-top:10px;font-size:10.5px">Home page: <b>Delete is disabled</b> — set another page as home first.</div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Link picker (no broken links)</div>
+        <div class="lp">
+          <div style="padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--ink-3)">Link this button to…</div>
+          <div class="lt on">📄 Page ▸ <b>Pricing</b> <span class="muted" style="font-size:10px">internal</span></div>
+          <div class="lt">🔗 External URL</div>
+          <div class="lt"># Section anchor (this page)</div>
+          <div class="lt">✉ Email / phone</div>
+          <div class="lt">⤓ File download</div>
+        </div>
+        <div class="note" style="margin-top:10px;font-size:10.5px"><b>Internal links bind to the page, not its URL (§8.3):</b> rename the page or change its slug → the link follows. No broken internal links, ever. External URLs validated on save.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor:</b><a href="editor-spine-wireframe.html">Spine</a><a href="50-pages.html">Pages</a><a href="50b-page-ops.html" class="here">Page ops</a><a href="59-inspector.html">Inspector</a><a href="70-confirm.html">Site confirm</a></div>
+</body></html>
