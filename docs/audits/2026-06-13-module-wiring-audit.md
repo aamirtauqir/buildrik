@@ -152,3 +152,22 @@ Ready-to-execute spec (when prioritized):
 **Decision: DEFER.** This is a media-subsystem redesign with real regression surface for image version-history — a feature ~0 of the current ~2 users need. It directly contradicts this session's CEO review ("stop building deferred features at 2 users; concentrate on publish-fidelity + getting real users"). Backend + the additive read/snapshot slice stay intact; the spec above makes it a bounded task when a real user actually needs edit-history fidelity.
 
 NO UNRESOLVED DECISIONS
+
+---
+
+## GSTACK CODEX REVIEW — deferred-feature build + H1 cascade (2026-06-14)
+
+Independent Codex review (read-only, high reasoning, 143k tokens) scoped to the high-risk export/publish/transfer files. 3 findings:
+
+| # | Sev | Finding | Resolution |
+|---|-----|---------|------------|
+| 1 | P1 | `data-buildrick-interactions` uses escapeHTML that doesn't escape `"` → malformed HTML | **FALSE POSITIVE.** Codex read `shared/utils/html/encoding.ts` escapeHTML (`[&<>]` only); ExportEngine imports escapeHTML from `./ExportHelpers` (line 25) which DOES escape `"`→`&quot;` + `'`→`&#39;`. Proven by the C2 test asserting `&quot;preset&quot;` (green). No malformed HTML. |
+| 2 | P2 | Publish lifecycle: failed/cancelled republish of a live site flips UI to "Draft" (derives from transient `uiState` only) | **FIXED.** AquibraStudio + PublishTab now derive live-state from durable `publishedUrl` (`uiState === "published" \|\| publishedUrl`). A failed republish keeps "Update Site" while the old deployment serves. Regression test added. Pre-existed in the Topbar; B1 + this fix correct both. |
+| 3 | P2 | Class/selector safety: imported HTML can carry arbitrary `data-buildrick-id`; used raw in `.${prefix}${id}` selector + class name → metachar IDs break/retarget rules | **DOCUMENTED (low-pri, pre-existing).** The single-page `extractStyles` already used `.${prefix}${id}` long before this change; buildPublishBaseCss extends the same pattern. Generated IDs are alphanumeric (`generateId()`); only imported foreign IDs could carry metachars. Correct fix is at the import boundary (sanitize foreign `data-buildrick-id`) — a separate hardening, not in this arc's scope. |
+
+Codex explicitly cleared: the base-before-breakpoint source order (the H1 cascade core) and the account-deletion ownership handoff against the Prisma schema.
+
+### GATE: PASS
+The lone P1 is a verified false positive (wrong escapeHTML). The lifecycle P2 is fixed + tested. The selector-safety P2 is a pre-existing low-pri hardening documented for the import boundary.
+
+NO UNRESOLVED DECISIONS

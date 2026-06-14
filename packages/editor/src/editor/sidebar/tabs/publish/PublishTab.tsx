@@ -209,8 +209,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   // Read-only view of the ONE canonical publish state machine (the same
   // instance the Topbar drives). No second state machine, no second toast.
   const isPublishing = publishJob?.uiState === "publishing";
-  const isPublished = publishJob?.uiState === "published" || !!isProjectPublished;
   const publishedUrl = publishJob?.publishedUrl ?? initialUrl ?? null;
+  // Live-state is durable: a deployment serving (publishedUrl) OR the loaded
+  // project was published. A failed/cancelled republish (uiState flips away
+  // from "published") must NOT make a still-live site read as Draft.
+  const isPublished = publishJob?.uiState === "published" || !!publishedUrl || !!isProjectPublished;
   const error = publishJob?.error ?? null;
   // The canonical handler resolves the site from the URL itself (and toasts if
   // it can't), so "publishing is wired" == the handler being present. This

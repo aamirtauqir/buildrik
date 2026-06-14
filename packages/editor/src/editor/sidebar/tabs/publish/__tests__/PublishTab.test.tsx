@@ -74,4 +74,14 @@ describe("PublishTab — canonical publish wiring (B1)", () => {
     expect(getByText("Update Site")).toBeTruthy();
     expect(container.textContent).toContain("x.vercel.app");
   });
+
+  // codex review P2: a FAILED republish of an already-live site must NOT read
+  // as Draft — live-state is durable (publishedUrl), not the transient job state.
+  it("stays 'published' (Update) after a failed republish while a deployment is still live", () => {
+    const { getByText, queryByText } = render(
+      <PublishTab composer={composer} publishJob={makeJob({ uiState: "failed", publishedUrl: "https://x.vercel.app", error: "deploy failed" })} onVercelPublish={vi.fn()} />
+    );
+    expect(getByText("Update Site")).toBeTruthy();
+    expect(queryByText("Publish Site")).toBeNull();
+  });
 });

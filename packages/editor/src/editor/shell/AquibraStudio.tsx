@@ -344,7 +344,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onSave={saveProject}
           onExportHTML={handleExportHTML}
           onVercelPublish={handleVercelPublish}
-          publishState={publishJob.uiState === "published" ? "published" : "draft"}
+          // Live-state is durable (a deployment is serving) = publishedUrl
+          // exists. uiState is transient job-state; a FAILED/CANCELLED
+          // *republish* of an already-live site must not flip the UI back to
+          // "draft" while the previous deployment is still up.
+          publishState={(publishJob.uiState === "published" || publishJob.publishedUrl) ? "published" : "draft"}
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
           addToast={addToast}
