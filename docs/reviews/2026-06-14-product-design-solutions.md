@@ -2,6 +2,8 @@
 
 Companion to `2026-06-14-product-design-ia-review.md`. The review *diagnosed*; this doc *decides*. Every open decision and design proposal from the review is resolved here with one recommended answer, the SaaS standard behind it, the reasoning, and the tradeoff. Written from a senior product-designer's seat (10+ yr, builder-tool space). Recommendations are opinionated defaults; all are reversible unless flagged as a one-way door in §12.
 
+> **v2 — incorporated an independent adversarial review (codex, senior-PD persona).** Changes from v1: (1) precedent claims corrected — progressive disclosure is the standard *principle*, but this is **not** literally "the Figma model" (Figma Dev Mode is a separate seat/interface); §1 rewritten. (2) **New §6.5 — Edit scope & causality**, the real beginner-killer in a visual builder (not control count). (3) D2 boundary refined — page/content-scoped → editor; site-ops/publishing infra → dashboard (§3). (4) D3 re-sequenced — inspector disclosure first (safe), but rail/settings disclosure only *after* IA dedup (§4). (5) AI moved to BUILD, not Pro (fixed a v1 contradiction). (6) single-metric replaced with a real instrument set (§13). (7) **New §11.5 — Migration**, critical at ~2 users. The codex verdict + each finding's resolution is in the Addendum at the end.
+
 ---
 
 ## 0. The lens — the SaaS/UX standards I'm deciding against
@@ -25,7 +27,12 @@ I'm not inventing taste. Every call below traces to an established principle:
 Why the hard binary is wrong:
 - **It forces a self-identification a beginner can't make.** A first-time user doesn't know if they're "Simple" or "Pro." Asking them to pick a mode is asking them to predict their own future skill. Most pick wrong, then feel either dumb (chose Pro, drowned) or limited (chose Simple, hit a wall).
 - **Tesler's Law says the complexity doesn't vanish — it hides behind a wall.** A hard Simple mode that *removes* the breakpoint pills and class editor means the moment a Simple user needs "make this smaller on phone," they hit a dead end and must consciously "become a Pro." That's a cliff, not a ramp.
-- **Industry has already converged on the answer, and it isn't a binary toggle:** Notion (blank-simple, slash-command reveals power), Linear (clean default, ⌘K for everything), Framer (canvas stays simple; advanced controls *appear contextually*), Figma (one *optional* Dev Mode escape hatch, off by default, role-seeded). None ships a "Beginner Mode / Pro Mode" radio button as its primary IA. Webflow is the cautionary tale — no progressive disclosure, everything always visible, famously steep, high churn.
+- **The *principle* (progressive disclosure, not a binary capability toggle) is genuinely industry-standard** — but cite it honestly, not by overclaiming a specific product's mechanism:
+  - **Framer** is the closest real analog: design-first canvas, direct manipulation, less class-management overhead than Webflow, advanced controls surfaced contextually rather than all-at-once. This is the strongest precedent for "calm by default."
+  - **Notion / Linear**: minimal default surface, power revealed on demand (slash commands / ⌘K) — precedent for disclosure + command-palette, not for a mode.
+  - **Figma Dev Mode** is *not* this model — it's a separate developer interface (its own seat type, inspect/handoff/code workflow, a true Design↔Dev mode switch). Don't claim "the Figma model"; the only borrow from Figma is "an *optional*, role-seeded escape hatch exists," not the density mechanism.
+  - **Webflow** is the cautionary tale — little progressive disclosure, class/breakpoint complexity exposed up front, famously steep.
+  - **Caveat (the honest version):** a visual builder's canvas is direct-manipulation, unlike a form-heavy SaaS — so "fewer panel controls" is *necessary but not sufficient*. The harder problem is edit scope/causality (see §6.5), which disclosure alone does not solve. The density model below is the right *starting* move, not the whole answer.
 
 **THE DECISION: a two-layer model — progressive disclosure as the default, plus one explicit "Pro" escape hatch.**
 
@@ -44,7 +51,7 @@ Why the hard binary is wrong:
       when the user repeatedly reaches for advanced controls.
 ```
 
-The difference from the review's proposal is decisive: **Pro is a density default, not a capability gate.** A Simple user is never blocked — they're just shown less by default and can always reach more. This is the Figma model, and it's the SaaS standard. Everything below assumes this revised model.
+The difference from the review's proposal is decisive: **Pro is a density default, not a capability gate.** A Simple user is never blocked — they're just shown less by default and can always reach more. This is the progressive-disclosure standard (Framer/Notion/Linear shape, *not* literally Figma's Dev-Mode mechanism). Everything below assumes this revised model — **paired with §6.5, without which density alone underdelivers.**
 
 This also fixes the review's own worry ("what happens when a Pro-built site is opened in Simple mode") — nothing breaks, because Simple never *removed* capability, it only collapsed density.
 
@@ -62,46 +69,51 @@ This also fixes the review's own worry ("what happens when a Pro-built site is o
 
 ## 3. Decision D2 — the editor ↔ dashboard boundary
 
-**RECOMMENDATION: adopt the boundary as a hard law, and dedup to it.**
+**RECOMMENDATION: adopt the boundary — but split on *content-scope vs operations-scope*, not a blunt "everything-about-this-site → editor" (v1 was too absolutist; the codex review was right here).**
 
-> **The law:** The **Editor** owns everything about *this site* (design, content, and the site's own config: SEO, forms config, analytics config, custom code, redirects, headers). The **Dashboard** owns everything about *the account and the business* (workspace, team, billing, plan, domains, cross-site management, and the *viewing* of analytics/forms data).
+> **The law (v2):** The **Editor** owns *content- and page-scoped* work — design, content, and config that belongs to a specific page or to what's on the canvas (per-page SEO, the form element's config, the AI/build surface). The **Dashboard** owns *site-operations and publishing-infrastructure* — things a user does *between* or *after* design sessions, often without touching the canvas: redirects, custom headers/CSP, site-wide SEO defaults, analytics ID setup, domains, the forms-submissions inbox, plus all account/workspace/team/billing.
 
-Mnemonic: **"Editor = make the thing. Dashboard = run the business."**
+Mnemonic (v2): **"Editor = author the page. Dashboard = operate the site + run the business."**
 
-- **Principle**: One-home IA + don't-context-switch-mid-task. A user in flow building a page should set that page's SEO without leaving for the dashboard. A user managing billing should never be in the canvas.
-- **The precise dedup** (resolving the review's 3-homes table):
+- **Principle**: One-home IA + *match the task's natural moment.* Per-page SEO is authored while you build that page → editor. A 301 redirect or a CSP header is an ops task done at the site level, often weeks later, never mid-design → dashboard. Forcing ops through a design surface (v1's mistake) is as wrong as forcing design through a settings form.
+- **The precise dedup (v2 — resolving the review's 3-homes table):**
 
-| Concept | DECISION |
+| Concept | DECISION (v2) |
 |---------|----------|
-| SEO | **Config in Editor** (site-default in Settings, per-page in the Pages drawer — a clean 2-level model). **Delete** the dashboard site-detail SEO tab (replace with a one-line "Edit SEO in editor →" link). |
-| Analytics | **Config in Editor** (set GA/Plausible IDs once). **View in Dashboard** (the data/charts). Remove analytics config from the Pages drawer. One config home, one view home. |
-| Custom code | **Editor only** (site-wide in Settings, per-page in drawer). Pro-density. |
-| Forms | **Config in Editor** (the form element's settings). **Submissions inbox in Dashboard** (it's an ops/business view, checked outside build flow). |
-| Site settings (name/slug/favicon) | **Editor** is the authoring home. Dashboard site-detail Settings becomes a thin read-only summary + "Edit in editor". |
-| Domains / Members / Billing | **Dashboard only.** Editor links out, clearly labelled "opens dashboard ↗". |
+| SEO — per page | **Editor** (Pages drawer → SEO), authored in build flow. |
+| SEO — site defaults | **Dashboard** site-settings (an ops default), with the editor showing the *effective* value read-only. |
+| Analytics | **Config in Dashboard** (ID setup is ops, done once). **View in Dashboard.** Editor shows status read-only. (v1 put config in editor — moved.) |
+| Custom code / Headers / Redirects | **Dashboard** (publishing-infra ops, Pro/advanced area). Per-page `<head>` snippets MAY stay in the page drawer (content-scoped). (v1 put these in editor — moved.) |
+| Forms | **Config in Editor** (the form element). **Submissions inbox in Dashboard.** |
+| Site settings (name/slug/favicon) | **Dashboard** site-settings is the ops home; editor shows favicon/name inline for convenience, writing back to the same store. |
+| Domains / Members / Billing | **Dashboard only.** Editor links out, labelled "opens dashboard ↗". |
 
-- **The nuance most people get wrong**: don't *delete* the dashboard SEO/Settings tabs outright — **replace them with read-only summaries that deep-link to the editor.** Users will still navigate there from muscle memory; a dead 404 or missing tab breaks scent worse than a redirect. Mirror, then point.
-- **Tradeoff**: a small amount of "view here, edit there" indirection for analytics/forms. Acceptable — it matches every analytics product (you configure the pixel in your site, you read the report in a dashboard).
+- **The nuance that still holds**: don't *delete* duplicated entry points — **mirror them read-only + deep-link** (see §11.5 Migration). A dead tab breaks scent worse than a redirect.
+- **Tradeoff**: page-vs-site SEO now has two homes by design (per-page in editor, defaults in dashboard) — but that's a *scope* distinction users understand (like CSS: element style vs site stylesheet), not the v1 problem of the *same* setting in 3 places. State the scope in the UI ("This page's SEO" vs "Site default SEO").
 
 ---
 
 ## 4. Decision D3 — build order
 
-**RECOMMENDATION: progressive-disclosure of the inspector FIRST, then the rail, then IA dedup, then the Pro toggle, then code merges.**
+**RECOMMENDATION (v2): inspector disclosure first, IA dedup SECOND (before any rail/settings hiding), then rail/settings disclosure, then the Pro toggle, then code merges.**
 
-This refines the review's "switch-first." The switch (Pro toggle) is actually *not* the first thing — progressive disclosure is, because it helps everyone immediately without anyone touching a setting.
+The v1 order ("inspector → rail → dedup") was wrong, and the codex review caught why: **hiding rail tabs / settings behind "More" *before* fixing the multi-home problem makes "where is X?" worse** — the user can't tell if a feature is hidden, moved, or dashboard-only. Disclosure of a *duplicated/mislocated* surface compounds confusion. Disclosure of a *single-home* surface (the inspector — it isn't duplicated anywhere) is safe to do first.
 
 ```
-  P1  Inspector progressive disclosure   <- biggest felt "easy" win, helps 100% of users, no mode needed
-  P2  Rail progressive disclosure        <- collapse 11 tabs to a calm default + "More"
-  P3  IA dedup (D2 boundary)             <- kills the "features make no sense" feeling
-  P4  The Pro density toggle + onboarding seed + auto-suggest
+  P1  Inspector progressive disclosure   <- SAFE first: inspector is single-home, not duplicated.
+                                            Biggest felt "easy" win, helps 100%, no mode needed.
+  P2  IA dedup to the D2 boundary        <- establish location-truth BEFORE hiding anything in
+                                            the rail/settings (mirror-don't-404 per §11.5).
+  P2b Edit-scope cues (§6.5)             <- ship alongside the inspector work; the real
+                                            beginner-killer, independent of density.
+  P3  Rail + settings progressive disclosure  <- only AFTER dedup, so "More" hides knowns, not unknowns.
+  P4  Pro density toggle + onboarding seed + auto-suggest
   P5  Merge duplicated code (Components V1/V2, media editor, create-component)
-  P6  Discoverability (command palette as universal finder)
+  P6  Command palette as universal finder
 ```
 
-- **Principle**: Sequence by *felt value per unit effort*, and ship things that need no user decision before things that do. Progressive disclosure (P1–P2) improves the product for every user the day it ships, with zero onboarding. The Pro toggle (P4) only matters once the disclosed defaults exist to toggle.
-- **Reasoning**: If you build the Pro toggle first (the review's instinct), you've built a switch with nothing meaningfully different on each side yet. Build the *two densities* first (via disclosure), then the toggle that picks your default density becomes trivial.
+- **Principle**: Ship things that need no user decision first (inspector disclosure, scope cues), and **never hide a thing until its location is true** (dedup before rail/settings "More").
+- **Reasoning**: building the Pro toggle first gives a switch with nothing different on each side. But equally, hiding the rail before dedup gives a "More" menu that hides moved/duplicated features — users read that as "the feature is gone." Establish one-home truth, *then* compress density.
 
 ---
 
@@ -154,19 +166,48 @@ Each section has a quiet **"More"** disclosure for its advanced properties. A pe
 
 ---
 
+## 6.5. Edit scope & causality — the REAL beginner-killer (the thing density alone doesn't fix)
+
+The single most important addition to this doc (surfaced by the adversarial review, and correct): **in a visual builder, beginners don't churn because there are too many controls — they churn because they can't tell *what* they're editing or *why* a change behaved the way it did.** Every edit has a hidden scope:
+
+```
+  am I changing...   this ELEMENT only?
+                     its CLASS  (→ every element with that class, site-wide)?
+                     the COMPONENT  (→ every instance)?
+                     this BREAKPOINT only  (→ phone but not desktop)?
+                     this PAGE  vs  the whole SITE?
+                     a design TOKEN  (→ everything bound to it)?
+```
+
+This is exactly where Webflow loses people: a beginner edits a heading, it changes on 14 other pages, and they have no idea why (they edited a *class*, not the *element*). Hiding controls does not fix this — it can make it *worse*, because the scope cues (the breakpoint pill, the "used on N elements" hint, the token-binding chip) are the very things a naive "Simple mode" would hide.
+
+The product already has the raw materials (the inventory found breakpoint-override indicators, pseudo-state pills, token-binding chips, "used on X other elements" hints) — but they're treated as Pro/advanced decoration, not as the beginner's safety rail. Invert that. Scope clarity is for **everyone**; it's the opposite of a Pro feature.
+
+**What to build (independent of, and as important as, the density work):**
+1. **A persistent "what am I editing" line** at the top of the inspector, in plain words: *"Editing this button"* vs *"Editing all `.btn-primary` (12 elements)"* vs *"Editing the Card component (all 8 uses)"*. Always visible, both densities. This is the #1 scope cue.
+2. **Propagation preview / warning before a wide change.** When an edit will affect more than the selected element (a class or component or token change), say so *before* it lands: *"This changes 12 elements. Just this one instead?"* with a one-click "detach / make it local." This is the safety net Webflow lacks.
+3. **Loud responsive-state cue.** When editing on a non-default breakpoint, the whole inspector should visibly signal *"You're styling the Phone view"* (tint/banner), so a beginner never wonders why their desktop didn't change. The override dots exist; make them a banner in Simple, not a subtle dot.
+4. **Inheritance messaging.** When a value is inherited (from base breakpoint, parent, or token) vs explicitly set here, show it ("inherited from Desktop" / "from token `--brand`"). Reset-to-inherited as a one-click.
+5. **Undo/revert that's obvious and forgiving.** Undo is in the topbar; also surface a per-edit "revert this change" and make the History timeline reachable when a beginner says "what did I just do." Learnability comes from cheap, visible reversal.
+
+- **Principle**: Tesler's Law again — the scope complexity is irreducible; the job is to *narrate* it for the beginner (cues + previews), not hide it. Recognition over recall (the user shouldn't have to *remember* they're in class-edit mode — the UI says so).
+- **Why this outranks the density work in importance** (though it ships in parallel): a calm 6-section inspector that still silently edits a class and breaks 14 pages is *worse* than a busy inspector that tells you what you're about to do. Clarity of consequence beats fewer controls.
+
+---
+
 ## 7. IA dedup — resolved structure
 
 Beyond §3's table, the concrete navigation model:
 
 **Editor rail, resolved into 3 honest zones with Simple/Pro density:**
 ```
-  BUILD (always visible)      Add · Templates · Pages · Media
+  BUILD (always visible)      AI · Templates · Add · Pages · Media
   DESIGN (always visible)     Design (tokens) · Inspector (right)
   SHIP (always visible)       Publish
   --- under "More" in Simple, inline in Pro ---
-  PRO                         AI · Components · Layers · History · Settings(plumbing)
+  PRO                         Components · Layers · History · Settings(advanced)
 ```
-- AI is debatable (see §8) — it may belong in BUILD for beginners as the "make it for me" path. Flag as the one rail call to A/B.
+- **AI lives in BUILD, not Pro** (v2 fix — v1 contradicted itself by listing AI under Pro while §8 calls it the beginner wedge). AI + Templates are the beginner's two "give me a starting point" paths and must be the *most* visible things in the rail, top of BUILD. This is the corrected, internally-consistent placement.
 
 **Dashboard nav, resolved:** keep the 5 (Dashboard / Sites / Team / Billing / Settings). It's already clean and SaaS-standard. The fix is *content dedup* (§3), not nav restructure. Don't churn the dashboard nav — it isn't the problem.
 
@@ -220,6 +261,19 @@ Both editor and dashboard already have ⌘K. **Make it the answer to "where is X
 
 ---
 
+## 11.5. Migration & disruption (critical at ~2 users — the codex review was right to flag this)
+
+With a tiny user base, **one confused existing user outweighs all the theory in this doc.** Every IA move (dedup, rail compression, settings relocation) must ship with a migration layer, not a hard cutover:
+
+- **Mirror, never 404.** Any tab/panel that moves leaves a stub at the old location: *"SEO defaults moved to Settings → site. Open →"*. Keep the stub for a defined grace period (e.g. 60 days), then remove.
+- **"Where did this go?" affordance.** When a feature relocates, the command palette must resolve the *old* name to the *new* location (search "redirects" → jumps to the dashboard ops page even after the move).
+- **Release notes / changelog in-app.** A small "what changed" note on next login for existing users. At 2 users you can literally tell them directly — do that too.
+- **Density rollout is itself a migration.** Existing users have learned today's full surface. Defaulting them to Simple density would *hide* things they already use. Rule: **existing users keep their current (full) density; only NEW signups default to Simple.** Migrate the learned user gently (offer Simple, don't impose it).
+- **Instrument the move (see §13)** so you can detect a spike in "couldn't find X" and roll back a specific relocation without reverting the whole arc.
+- **Reversibility**: feature-flag each phase; every relocation is behind a flag so a confused-user signal can flip it off in minutes.
+
+---
+
 ## 12. One-way doors — the only calls to sanity-check before building
 
 Most of this is reversible (two-way doors — ship, measure, adjust). These three are stickier and worth a conscious yes:
@@ -230,21 +284,54 @@ Most of this is reversible (two-way doors — ship, measure, adjust). These thre
 
 ---
 
-## 13. Sequenced roadmap + success metric
+## 13. Sequenced roadmap + how you'll actually know it worked
 
 ```
   P1  Inspector progressive disclosure (6 visual sections + "More" + code escape)
-  P2  Rail progressive disclosure (BUILD/DESIGN/SHIP visible, PRO under "More")
-  P3  IA dedup to the §3 boundary (mirror, don't 404)
+  P1b Edit-scope cues (§6.5): "what am I editing" line, propagation warning,
+      loud breakpoint banner, inheritance/reset, visible revert    <- ships with P1
+  P2  IA dedup to the §3 boundary (mirror-don't-404, §11.5)         <- BEFORE rail hiding
+  P3  Rail + settings progressive disclosure (after dedup)
   P4  Pro density toggle (server-side) + onboarding-role seed + auto-suggest
+      (existing users keep full density; only new signups default Simple — §11.5)
   P5  Merge duplicate code (Components V1/V2, media editor, create-component)
-  P6  Command palette as universal finder + surface hidden power features
+  P6  Command palette as universal finder (resolves old→new names) + power features
   (parallel) Onboarding: Template/AI as default new-site path
 ```
 
-**The one metric that proves it worked: activation rate** — % of new signups who publish a site that looks right within their first session. If progressive disclosure + template-first onboarding move that number, the redesign succeeded. Everything else (NPS, feature usage) is secondary at this stage.
+**Measurement — not one metric, an instrument set (the codex review was right that "activation" alone is too neat):**
+- **North star**: first-session publish rate — % of new signups who publish a site that looks right in session 1.
+- **Leading / diagnostic** (these tell you *why* the number moved, and catch regressions):
+  - time-to-first-successful-style-edit (did disclosure speed them up?)
+  - advanced-control reveal rate (how often Simple users reach for "More" / Pro — calibrates the default split)
+  - Pro-toggle adoption + the action that triggered the auto-suggest
+  - **"couldn't find X" signal** — search-with-no-result + rage-clicks on relocated areas (catches a bad dedup/relocation per §11.5)
+  - undo/revert spikes on a surface (a spike = users confused about an edit's *scope* → §6.5 is failing there)
+  - responsive-edit task completion (did the breakpoint banner work?)
+- **Why the set, not the single metric**: activation can rise for the wrong reason (e.g. you hid capability and beginners "succeed" at a thinner task), or stay flat while you fixed real confusion. The diagnostic metrics separate "reduced overwhelm" from "buried capability" — without them you're flying blind on whether disclosure helped or just hid.
+- Prerequisite: this assumes product analytics/event instrumentation exists. If it doesn't, **adding it is P0 — you cannot run this redesign without being able to see if it worked.**
 
 ---
 
-## VERDICT
-The review's diagnosis was right; its prescription needed one senior correction: **don't ship a hard Beginner/Pro wall — ship progressive disclosure (helps everyone, no mode) plus an opt-in Pro *density* default (helps the dev, seeded by onboarding).** That single reframe turns "two products bolted together" into "one product that meets each user where they are," which is the actual SaaS standard (Figma/Framer/Notion/Linear all do exactly this; Webflow's failure to is the warning). Build it inspector-first (felt value, zero user decision required), dedup the IA to one home per concept, and make Template/AI the on-ramp. No rewrite — it's disclosure + dedup + one density preference on an engine that already works.
+## VERDICT (v2)
+The review's diagnosis was right; v1's prescription needed two corrections, both made here. **(1) Don't ship a hard Beginner/Pro wall — ship progressive disclosure (helps everyone, no mode) plus an opt-in Pro *density* default (seeded by onboarding).** **(2) Density alone is necessary-but-not-sufficient for a *visual* builder — the real beginner-killer is edit scope/causality (§6.5): not "too many controls" but "what am I editing and why did it propagate." Scope clarity is for everyone, and outranks density in importance even though it ships in parallel.** Sequence: inspector disclosure + scope cues first, then dedup the IA (before hiding anything in the rail), then the density toggle, with a real migration layer (§11.5) because at ~2 users one confused user outweighs the theory. No rewrite — disclosure + scope-narration + dedup + one density preference on an engine that already works.
+
+---
+
+## Addendum — independent adversarial review (codex, senior-PD persona) + resolutions
+
+Ran codex as a brutal senior-PD adversary against v1. It surfaced 4 [P1] + 3 [P2]; most were valid and are now incorporated. Trail:
+
+| # | Codex finding | Verdict | Resolution in v2 |
+|---|---------------|---------|------------------|
+| 1 | [P1] Overclaimed precedent — "the Figma model / the SaaS standard." Figma Dev Mode is a separate seat/interface, not a denser inspector. | ACCEPTED | §1 rewritten: principle (progressive disclosure) separated from mechanism; Framer named as the real analog; Figma claim corrected. |
+| 2 | [P1] Biggest blind spot = edit scope & causality, not control count. Hiding controls can hide the model that explains propagation. | ACCEPTED (strongest catch) | New **§6.5** — scope cues, propagation warnings, breakpoint banner, inheritance/reset, visible revert. Reframed as for-everyone, outranking density. |
+| 3 | [P1] D2 too absolutist — pulling site-ops (redirects/headers/analytics/site-SEO) into the editor forces ops through a design surface. | ACCEPTED | §3 re-cut to content/page-scope → editor; site-ops/publishing-infra → dashboard. |
+| 4 | [P1] D3 order wrong — disclosure before dedup makes "where is X?" worse. | ACCEPTED (with nuance) | §4 re-sequenced: inspector disclosure first (single-home, safe), dedup before rail/settings hiding. |
+| 5 | [P2] D1 simple-first plausible-not-proven + AI contradiction (Pro in §7 vs beginner-wedge in §8). | PARTIALLY ACCEPTED | AI contradiction fixed (AI → BUILD, §7). D1 kept as the recommended default but explicitly labelled an assumption to validate (onboarding-role seed + metrics de-risk it). |
+| 6 | [P2] Single "activation" metric is theater. | ACCEPTED | §13 replaced with a north-star + diagnostic instrument set; flagged analytics as P0 prerequisite. |
+| 7 | [P2] No migration/disruption plan. | ACCEPTED | New **§11.5** — mirror-don't-404, grace period, existing-users-keep-full-density, per-phase flags. |
+
+Codex verdict (verbatim): *"the core direction is only half right. Rejecting a hard Beginner/Pro capability wall is the correct instinct. But this solutions doc overstates its precedent, picks too rigid an editor/dashboard boundary, and misses the real visual-builder problem: helping users understand the scope and consequences of their edits... I would not throw the direction away, but I would not ship from this doc as-is either; it needs a targeted rethink before it becomes roadmap."*
+
+My judgment: codex was right on all four P1s. The v2 above is that targeted rethink — direction kept (progressive disclosure + opt-in density), but precedent corrected, boundary re-cut on content-vs-ops, sequencing fixed (dedup before hiding), and the real visual-builder problem (edit scope/causality, §6.5) promoted to first-class. This doc is now roadmap-ready; the one remaining unproven premise is D1 (simple-first default), which the instrument set (§13) is designed to validate rather than assume.
