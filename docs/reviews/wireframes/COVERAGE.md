@@ -81,3 +81,11 @@ The site's own DESIGN SYSTEM (`editor/design-system/` — DesignSystemTab) was u
 - ✅ ds3 ds-tools — StarterGallery (6 themes), AI generate (tokens/schema), DS lint issues, Migration progress (v0→vN), Review&Apply (+tab-guard), Export (CSS/Tailwind/JSON/Figma).
 Wired: spine rail "Design" → ds1. Index editor stage. Grounded in DesignSystemTab + token registry + presets + dark-mode trilogy + lint + starter/AI/migration modals.
 
+## ADDENDUM 2026-06-15 — usability/dedup FIXES (the agency wedge) + reconciliation
+Agency switch-ask = "good features, not user-friendly" → 3 sub-agents (live-code audits) produced 4 canonical fix screens:
+- ✅ fix-boundary — editor↔dashboard: 12 dups → one home + mirror-never-404.
+- ✅ fix-settings-map — 9 settings dups → 4 scopes (account/workspace/site/editor) by blast-radius.
+- ✅ fix-styling-model — 5-layer overlap → ONE reach ladder (element→class→component→preset→token, narrowest wins, default-to-element, counted opt-ins).
+- ✅ fix-editor-declutter — calmer Pro editor (4-verb rail + progressive inspector + density + ⌘K), zero power removed.
+**Reconciliation pass:** aligned existing screens to the canonical fixes — 41 added Preset as 5th rung (4→5) + canonical link; ds2/57 reworded to "rung N of the one ladder"; d5/b1/c4 settings-scope labels (site-default home, AI-credits=workspace read-only mirror, analytics split); 53/14/59/spine cross-link the fix screens as canonical. Structural rebuilds of spine-rail (4-verb) + inspector (3-group) are SPEC'd by fix-editor-declutter for the rebuild phase, not re-drawn here. Integrity: zero dead links, zero orphans, zero href="#".
+
