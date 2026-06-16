@@ -119,11 +119,13 @@ User always starts at #1; climbing is an explicit, counted opt-in with a propaga
 
 ---
 
-## 9. Open / vetoable decisions (need your nod)
-- **§4 propagation default** = per-site controlled (push/pull). Veto → auto-live?
-- **§1 naming** = Brand / Theme / Style / Component / Library / Kit. Veto → keep "design system / tokens / presets"?
-- **§6 look-change default** = element-first. Veto → start with "apply a Style"?
-- **Component themability:** v1 = components are structure-only, all look comes from Theme tokens (no per-client structural variants). [REC: keep simple for v1] Veto → need structural variants per client?
+## 9. Decisions — RATIFIED 2026-06-17 (founder deferred to recommendations)
+All 4 [REC] calls accepted as-is:
+- **§4 propagation** = per-site controlled (push/pull). ✅
+- **§1 naming** = Brand / Theme / Style / Component / Library / Kit. ✅
+- **§6 look-change** = element-first (edit one → opt-in "apply to all" → climb). ✅
+- **Component themability** = v1 structure-only; all look via Theme tokens (no per-client structural variants). ✅
+Spec is LOCKED. Next = build spec (implementation contract) on request.
 
 ## 10. Out of scope (this spec)
 - vibcoder/editor-chrome redesign (internal UI — separate arc).
