@@ -14,7 +14,7 @@
   <div class="topnote"><b>Scope-level picker (§6.5)</b> · grounded in current engine layers (element styles · classes · components · design tokens — all exist) · solution: choose reach <i>before</i> editing; recognition over recall, no surprise ripple</div>
   <div class="pad">
     <div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="h2">Where should this change land?</div><span class="muted" style="font-size:11px">selected: <b>Get started</b> button</span></div>
-    <div class="muted" style="font-size:11.5px;margin-bottom:14px">Pick the scope — narrowest is safest. Reach counts are live.</div>
+    <div class="muted" style="font-size:11.5px;margin-bottom:14px"><b>Reach reference</b> (not a pre-pick). Editing on canvas <b>always defaults to "just this element"</b>; climbing a rung is an explicit, counted opt-in via the propagation guard (screen 40). This screen just shows what each rung reaches. Canonical model: <a href="fix-styling-model.html" style="text-decoration:underline">one styling model</a>.</div>
 
     <div class="lvl on" data-r="Affects only the button you clicked.">
       <div class="dot"></div>
@@ -43,7 +43,7 @@
     </div>
 
     <div class="note" id="reachNote" style="margin:12px 0"><b>Reach:</b> Affects only the button you clicked.</div>
-    <div class="row" style="justify-content:flex-end"><a href="40-edit-scope.html" class="btn">← Back to demo</a><button class="btn btn-fill btn-strong">Edit at this scope →</button></div>
+    <div class="row" style="justify-content:flex-end"><a href="fix-styling-model.html" class="btn">Canonical model →</a><a href="40-edit-scope.html" class="btn btn-fill btn-strong">See it live (propagation guard) →</a></div>
 
     <div class="note" style="margin-top:16px"><b>Why a ladder, not a flat toggle:</b> the five reach levels (element → class → component → preset → token, narrowest wins — see <a href="fix-styling-model.html" style="text-decoration:underline">the canonical styling model</a>) already exist in the engine but today they're invisible — the user discovers them by accident (change one, break twelve). Surfacing them as an ordered, counted picker turns Webflow's #1 confusion into an explicit, reversible choice. Narrowest-first = progressive disclosure; counts = recognition over recall.</div>
   </div>

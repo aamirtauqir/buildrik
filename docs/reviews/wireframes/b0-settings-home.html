@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Settings home</title><link rel="stylesheet" href="wf.css">
+<style>
+  .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
+  .scope{border:1px solid var(--line);border-radius:8px;padding:14px}
+  .scope h3{font-size:13px;margin-bottom:2px}
+  .scope .who{font-size:10.5px;color:var(--ink-3);margin-bottom:10px}
+  .lk{display:block;padding:6px 8px;border-radius:5px;font-size:12px;color:var(--ink-2);text-decoration:none}
+  .lk:hover{background:var(--fill);color:var(--ink)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Settings home — one home for everything (the dedup, made navigable)</b> · turns <a href="fix-settings-map.html" style="text-decoration:underline">the settings map</a> into the actual nav · answers "where does X live?" by scope: Account · Workspace · Site · Editor</div>
+  <div class="ed">
+    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
+      <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
+      <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div><div class="row" style="justify-content:space-between"><a href="a6-workspace-select.html" style="text-decoration:none;color:inherit" title="Switch workspace">Acme Co ▾</a></div></div>
+      <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
+        <a href="10-dashboard.html" class="navi">⌂ Home</a>
+        <a href="11-sites.html" class="navi">▦ Sites</a>
+        <a href="c1-team.html" class="navi">👤 Team</a>
+        <a href="15-domains.html" class="navi">◐ Domains</a>
+        <a href="17-media.html" class="navi">▤ Media</a>
+        <a href="b0-settings-home.html" class="navi here">⚙ Settings</a>
+        <a href="16-billing.html" class="navi">$ Billing</a>
+      </nav>
+    </aside>
+    <main class="pad">
+      <div class="row" style="justify-content:space-between;margin-bottom:4px"><div class="h1">Settings</div><a href="71-command-palette.html" class="input" style="width:220px;text-decoration:none">⌕ search any setting · ⌘K</a></div>
+      <div class="muted" style="font-size:12px;margin-bottom:16px">Every setting has <b>one home</b>, by scope. Not sure where something is? Search, or scan the scope that owns it.</div>
+      <div class="grid4">
+        <div class="scope">
+          <h3>Account</h3><div class="who">just you</div>
+          <a class="lk" href="b1-account-settings.html">Profile</a>
+          <a class="lk" href="b1-account-settings.html">Email &amp; password</a>
+          <a class="lk" href="b1-account-settings.html">Security · sessions · 2FA</a>
+          <a class="lk" href="b1-account-settings.html">Notifications</a>
+          <a class="lk" href="b1-account-settings.html">Connected accounts</a>
+        </div>
+        <div class="scope">
+          <h3>Workspace</h3><div class="who">the whole org / agency</div>
+          <a class="lk" href="18-workspace.html">General · brand · transfer</a>
+          <a class="lk" href="c1-team.html">Members &amp; roles</a>
+          <a class="lk" href="16-billing.html">Billing &amp; plan · AI credits</a>
+          <a class="lk" href="c4-integrations.html">Integrations</a>
+          <a class="lk" href="c5-api-tokens.html">API tokens</a>
+        </div>
+        <div class="scope">
+          <h3>Site</h3><div class="who">one site · pick from <a href="11-sites.html" style="text-decoration:underline">Sites</a></div>
+          <a class="lk" href="d5-seo.html">SEO defaults</a>
+          <a class="lk" href="15-domains.html">Domains</a>
+          <a class="lk" href="d3-redirects.html">Redirects · headers · code</a>
+          <a class="lk" href="d4-share-access.html">Share &amp; access</a>
+          <a class="lk" href="19-analytics.html">Analytics</a>
+        </div>
+        <div class="scope">
+          <h3>Editor / Design</h3><div class="who">page &amp; build-time · in the editor</div>
+          <a class="lk" href="ds1-design-system.html">Design system / tokens</a>
+          <a class="lk" href="50-pages.html">Per-page SEO</a>
+          <a class="lk" href="53-settings.html">Brand · favicon · fonts</a>
+          <a class="lk" href="53-settings.html">Per-page &lt;head&gt; code</a>
+          <a class="lk" href="editor-spine-wireframe.html">Open editor →</a>
+        </div>
+      </div>
+      <div class="note" style="margin-top:16px"><b>The fix, made real (agency wedge "where is X?"):</b> the scope a setting belongs to = its blast radius (just-me / the-org / one-site / the-pages-I-draw). Each setting appears in exactly ONE column. This screen is the navigable form of <a href="fix-settings-map.html" style="text-decoration:underline">fix-settings-map</a> — no more "site vs workspace vs account" hunting. Search resolves any setting by name (even old labels, §11.5).</div>
+    </main>
+  </div>
+</div>
+<div class="proto-nav"><b>Settings:</b><a href="10-dashboard.html">Dashboard</a><a href="b0-settings-home.html" class="here">Settings home</a><a href="b1-account-settings.html">Account</a><a href="18-workspace.html">Workspace</a><a href="14-site-settings.html">Site</a><a href="fix-settings-map.html">Settings map</a><a href="index.html">Map</a></div>
+</body></html>
