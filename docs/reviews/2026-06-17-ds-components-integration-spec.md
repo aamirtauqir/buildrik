@@ -63,7 +63,8 @@ When a shared Library item (a token, a Style, a component master) changes:
 
 ---
 
-## 5. How each piece works (mechanics, grounded)
+## 5. How each piece works — TARGET mechanics (current-state gap in §11)
+> ⚠️ This section describes the **target**. Codex review (2026-06-17) found several of these are NOT how the engine works today — see §11 before building. The mental model is validated; the implementation contract must be rewritten around current state.
 
 ### 5.1 Brand (tokens)
 - A token: `{ id, value, darkValue?, kind (14 kinds), aliasOf? }` (`engine/designSystem/types.ts`).
@@ -130,3 +131,31 @@ Spec is LOCKED. Next = build spec (implementation contract) on request.
 ## 10. Out of scope (this spec)
 - vibcoder/editor-chrome redesign (internal UI — separate arc).
 - The rebuild itself (this is the functional contract; build spec follows once §9 is confirmed).
+
+## 11. Reality check — current state vs target (Codex review 2026-06-17)
+Codex audited this spec against the live engine. **Mental model: validated ("keep it"). Feasibility: the spec was ahead of the code — revise before treating as a build contract.**
+
+**Accurate in the spec (exists today):**
+- Whole-value `{{token.x}}` resolution — `engine/designSystem/TokenBindingResolver.ts:23,42` (partial refs like gradients intentionally skipped).
+- Components have `masterTree`/`version`/`syncedVersion`/`isDetached`; sync is explicit, not silent — `engine/components/ComponentInstances.ts:204`, `shared/types/components.ts:38,119`.
+
+**Wrong / ahead of code (must build):**
+| Spec claim | Reality | Evidence |
+|---|---|---|
+| **Theme** = swappable per-site token map | Doesn't exist. Only `ThemeMode` light/dark + per-token `darkValue`. No theme entity, no DB tables. | `designSystem/types.ts:105,121,125`; `prisma/schema.prisma` (none) |
+| **Library workspace-shared** across sites | Tokens per-site (`projectSettings.designTokens` + localStorage); presets localStorage; components **IndexedDB per-project/browser**. All per-site/local. | `ComponentStorage.ts:15,45`; `TokenRegistryContext.tsx:114,197`; `StylePresetRegistryContext.tsx:51` |
+| **Styles/presets** = working class-based recipes ("edit Style → all update") | Registry + UI only; no render path compiling preset bindings → class CSS. **BUG: `designPresets` saved but never read back on load.** | `DesignSystemTab.tsx:229,405` |
+| **Per-instance edits preserved** | Only **style** overrides resolved at runtime; content/attribute not. `setContent` doesn't record an override. | `ComponentVariantResolver.ts:155,171`; `ElementStyles.ts:126`; `Element.ts:125` |
+| Override model settled | Inconsistent: positional paths in one file, legacy `/elements/{id}` + "TODO full implementation" in another. | `ComponentInstances.ts:117` vs `ComponentInstance.ts:33,68,222` |
+| "Pre-fill from DS styles" | Boolean flag only; no raw-style→token/preset conversion. | `components.ts:46`; `CreateComponentModal.tsx:55` |
+
+**Two live bugs found (worth fixing regardless):**
+1. `designPresets` persisted but never re-hydrated on project load (presets silently lost).
+2. Instance content edits aren't recorded as overrides (lost on master sync).
+
+**What must be built to make this spec real:**
+- **DB (Prisma):** workspace-level `library_tokens` / `library_presets` / `library_components` / `themes` / `theme_token_values` + per-site subscription + accepted-version tables. None exist today (`schema.prisma:119,166`).
+- **API (tRPC):** workspace Library CRUD + site subscribe/apply/review-push endpoints. Today only generic site project-payload save (`sites.service.ts:615,723`).
+- **Engine:** resolve a token from `library-token-id + site Theme override`; hydrate presets from server + compile bindings into real class rules; instantiate components from workspace definitions (not local IndexedDB); unify the override path model + record content/attribute overrides.
+
+**Disposition:** keep §0–§9 (vision + decisions) as the north star. Before a build spec, rewrite §5 mechanics around current state + sequence the §11 "must build" list. The agency rebrand/shared-Library is a real multi-layer arc (DB + API + engine), not a wiring change.
