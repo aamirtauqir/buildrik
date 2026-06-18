@@ -142,8 +142,26 @@ model Workspace {
   activityLogs    ActivityLog[]
   aiAdoptionEvents AiAdoptionEvent[]
   apiTokens       ApiToken[]
+  features        WorkspaceFeature[]
 
   @@map("workspaces")
+}
+
+// Per-workspace feature flags — DB-backed runtime kill-switch (eng-review 2026-06-19).
+// Keys: "agency_layer" (E2), "client_mode" (E4). Absent row = disabled (default-off).
+model WorkspaceFeature {
+  id          String   @id @default(cuid())
+  workspaceId String
+  key         String
+  enabled     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, key])
+  @@index([workspaceId])
+  @@map("workspace_features")
 }
 
 model AuditLog {
