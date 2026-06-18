@@ -21,6 +21,7 @@ export default defineConfig({
       "packages/shared/**/*.test.{ts,tsx}",
       "server/**/*.test.{ts,tsx}",
       "packages/dashboard/app/**/*.test.{ts,tsx}",
+      "packages/dashboard/components/**/*.test.{ts,tsx}",
     ],
     exclude: ["**/node_modules/**", ".worktrees/**"],
   },
