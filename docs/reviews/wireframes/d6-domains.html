@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · d6 — Site › Domains</title><link rel="stylesheet" href="wf.css">
+<style>
+  .body{padding:16px 20px;max-width:760px}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 6px}.grp:first-child{margin-top:0}
+  .drow{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid var(--line);border-radius:7px;margin-bottom:7px;background:#fff;font-size:12.5px}
+  .drow .l b{font-weight:600} .drow .l small{display:block;font-weight:400;font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .drow .act{display:flex;gap:6px} .drow .act a{font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:5px 10px}
+  .drow .act a:hover{border-color:var(--ink);color:var(--ink)}
+  .pill{font-size:9px;letter-spacing:.03em;border-radius:3px;padding:1px 6px}
+  .pill.ok{border:1px solid var(--line-d);color:var(--ink-3)} .pill.primary{background:var(--ink);color:#fff} .pill.warn{border:1px solid var(--ink);color:var(--ink);font-weight:600}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px}.note2 b{color:var(--ink)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · d6 · SITE DOMAINS</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Site › Domains — connect &amp; manage this site's domains.</b> The one place you <b>edit</b> a domain (set primary · add subdomain · SSL · remove). The workspace-wide <a href="15-domains.html" style="color:#fff;text-decoration:underline">Domains monitor</a> only shows status across all sites and links back here. One home to edit, one view to monitor.</div>
+  <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span></div>
+  <div class="stabs"><a href="12-site-detail.html">Overview</a><a href="d6-domains.html" class="on">Domains</a><a href="19-analytics.html">Traffic</a><a href="d2-forms.html">Forms inbox</a><a href="d4-share-access.html">Sharing</a><a href="14-site-settings.html">Publishing</a><a href="58-history.html">Versions</a></div>
+  <div class="body">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="h1">Domains</div><a href="22-domain-pending.html" class="btn btn-fill btn-strong">+ Connect a domain</a></div>
+    <div class="muted" style="font-size:11px;margin-bottom:12px">Domains for <b>acme-main</b>. Connecting opens the DNS journey; SSL is automatic once verified.</div>
+    <div class="grp">Connected</div>
+    <div class="drow"><div class="l"><b>acme.com</b> <span class="pill primary">primary</span> <span class="pill ok">SSL ✓</span><small>+ www.acme.com redirects here</small></div><div class="act"><a href="22-domain-pending.html">DNS</a><a href="70-confirm.html">Remove</a></div></div>
+    <div class="drow"><div class="l"><b>launch.acme.com</b> <span class="pill warn">⏳ pending</span><small>verify DNS to finish — TXT record added 1h ago</small></div><div class="act"><a href="22-domain-pending.html">Verify</a><a href="70-confirm.html">Remove</a></div></div>
+    <div class="grp">Default URL <span style="color:var(--ink-3)">— always works</span></div>
+    <div class="drow"><div class="l"><b>acme-main.buildrik.app</b><small>the free subdomain; can't be removed</small></div><div class="act"><a href="22-domain-pending.html">Set primary</a></div></div>
+    <div class="note2"><b>Edit here, monitor there.</b> This tab edits <b>this site's</b> domains. To scan every client's domain status at once, use <a href="15-domains.html" style="color:var(--ink-2)">Dashboard › Domains (monitor)</a> — its rows link back to each site's tab. Beyond the plan limit → <a href="16-billing.html" style="color:var(--ink-2)">Billing</a>.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Site › Domains:</b><a href="12-site-detail.html">Site detail</a><a href="15-domains.html">All-sites monitor</a><a href="22-domain-pending.html">DNS journey</a><a href="14-site-settings.html">Publishing</a><a href="index.html">Map</a></div>
+</body></html>

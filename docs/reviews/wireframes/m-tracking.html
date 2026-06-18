@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · M-tracking — analytics, the editor layer</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1000px}
+  .layers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin:8px 0 4px;align-items:stretch}
+  .ly{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff;position:relative}
+  .ly.mid{border-color:var(--ink);border-width:2px}
+  .ly + .ly{margin-left:22px}
+  .ly + .ly::before{content:"›";position:absolute;left:-17px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:16px}
+  .ly .pin{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;padding:1px 6px;display:inline-block;margin-bottom:5px}
+  .pin.ws{background:var(--ink-3);color:#fff}
+  .pin.edit{background:var(--ink);color:#fff}
+  .pin.dash{border:1px solid var(--ink);color:var(--ink)}
+  .ly .t{font-size:13px;font-weight:700}
+  .ly .d{font-size:11px;color:var(--ink-2);margin-top:4px;line-height:1.4}
+  .ly .who{font-size:9.5px;color:var(--ink-3);margin-top:7px;border-top:1px dashed var(--line);padding-top:6px}
+
+  .panel{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:6px;max-width:520px}
+  .ph{padding:9px 13px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:12.5px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .ph .crumb{font-size:10px;color:var(--ink-3);font-weight:400}
+  .pb{padding:13px}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12px;color:var(--ink-2)}
+  .row:last-child{border-bottom:none}
+  .row b{color:var(--ink)}
+  .gbox{border:1px solid var(--line);background:var(--fill);border-radius:4px;padding:5px 9px;font-size:11px;color:var(--ink-2)}
+  .conn{display:flex;align-items:center;gap:7px;font-size:11px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--ink)}
+  .toggle{width:30px;height:17px;border-radius:999px;border:1px solid var(--line-d);background:var(--fill);position:relative}
+  .toggle.on{background:var(--ink);border-color:var(--ink)}
+  .toggle::after{content:"";position:absolute;top:1px;left:1px;width:13px;height:13px;border-radius:50%;background:#fff}
+  .toggle.on::after{left:14px}
+  .fix{border:1px dashed var(--ink);border-radius:6px;padding:8px 11px;font-size:11px;color:var(--ink-2);margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+  .fix a{color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.45;margin-top:8px}
+  .note2 b{color:var(--ink)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · M-TRACKING · ANALYTICS 3-LAYER</div>
+<div class="screen">
+  <div class="topnote"><b>M-tracking — analytics done as 3 layers, not 2.</b> Codex's rework of call #3: analytics has three objects — <b>connect</b> (workspace) · <b>assign</b> (editor) · <b>view</b> (dashboard). This is the missing middle: <b>Editor › Site › Tracking</b> = pick which connected account this site reports to. Most users just see <b>"Analytics: connected ✓"</b>; the measurement-ID details are Designer/Admin only. No "Connect" button here — that lives once, at the workspace.</div>
+  <div class="wrap">
+
+    <div class="layers">
+      <div class="ly"><span class="pin ws">Workspace</span><div class="t">Connect</div><div class="d">Connect the GA/Plausible account ONCE for the agency. The provider auth + shared connections.</div><div class="who">Admin · <a href="c4-integrations.html" style="color:var(--ink-3)">Integrations ↗</a></div></div>
+      <div class="ly mid"><span class="pin edit">Editor › Site</span><div class="t">Assign (you are here)</div><div class="d">Pick which connected property this site reports to + consent/tracking behavior.</div><div class="who">Designer / Admin</div></div>
+      <div class="ly"><span class="pin dash">Dashboard</span><div class="t">View</div><div class="d">Reports, diagnostics. No connect buttons — only "Fix setup ↗" if broken.</div><div class="who">all roles 👁 · <a href="19-analytics.html" style="color:var(--ink-3)">Traffic ↗</a></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><span>Tracking</span><span class="crumb">Editor › Site › Tracking</span></div>
+      <div class="pb">
+        <div class="row"><span>Provider</span><span class="conn"><span class="dot"></span> Google Analytics <span style="color:var(--ink-3)">(workspace)</span></span></div>
+        <div class="row"><span>This site reports to</span><span class="gbox">acme-main · G-A1B2C3 ▾</span></div>
+        <div class="row"><span>Cookie consent banner</span><span class="toggle on"></span></div>
+        <div class="row"><span>Respect Do-Not-Track</span><span class="toggle on"></span></div>
+        <div class="row"><span>Anonymize IP</span><span class="toggle on"></span></div>
+        <div class="fix"><span>⚠ docs.cobalt.io has no property assigned — no data will show.</span><a href="c4-integrations.html">Fix provider ↗</a></div>
+      </div>
+    </div>
+
+    <div class="note2"><b>Why 3 layers fixes the mess:</b> today GA-connect appears in BOTH <code>19-analytics</code> AND <code>c4-integrations</code> AND the decision implied editor too = 3 doors for "set up analytics." Now: connect once (workspace), assign per-site (here), read in dashboard. A client (Viewer/Client-Editor) can VIEW traffic but never touches the measurement ID. The "no data" dashboard state deep-links to the layer that needs fixing instead of dead-ending.</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Tracking:</b><a href="m-tracking.html" style="border-color:#fff;background:#fff;color:#2b2b2b;font-weight:600">M-tracking</a><a href="m-ownership.html">Ownership</a><a href="m-editor.html">Editor</a><a href="19-analytics.html">Traffic (view)</a><a href="c4-integrations.html">Connect (workspace)</a><a href="s-account-states.html">Reconnect states</a><a href="index.html">Map</a></div>
+</body></html>

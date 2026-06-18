@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Three reaches, not five rungs</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:18px 20px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:18px 0 5px;letter-spacing:.02em}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+
+  /* the ONE question */
+  .ask{border:1px solid var(--ink);border-radius:7px;padding:14px 16px;background:var(--fill);margin:6px 0 4px}
+  .ask .q{font-size:14px;font-weight:600;margin-bottom:3px}
+  .ask .qs{font-size:11.5px;color:var(--ink-2)}
+
+  /* three reaches */
+  .reaches{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0 4px}
+  .reach{border:1px solid var(--line);border-radius:7px;padding:13px 14px;background:#fff;cursor:pointer;position:relative}
+  .reach:hover{border-color:var(--ink-2)}
+  .reach.on{border:2px solid var(--ink);background:var(--fill)}
+  .reach .pic{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .reach .nm{font-size:15px;font-weight:600;margin:3px 0 2px}
+  .reach .ans{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+  .reach .ans b{color:var(--ink)}
+  .reach .cnt{margin-top:8px;font-size:10px;color:var(--ink-3);border-top:1px dashed var(--line);padding-top:7px}
+  .reach .cnt b{color:var(--ink);font-size:13px;display:block}
+  .reach .def{position:absolute;top:10px;right:10px;font-size:8px;letter-spacing:.04em;background:var(--ink);color:#fff;border-radius:3px;padding:1px 6px}
+
+  .livenote{border:1px dashed var(--line-d);border-radius:6px;padding:10px 13px;font-size:12px;color:var(--ink-2);margin-top:4px;min-height:42px}
+  .livenote b{color:var(--ink)}
+
+  /* engine map */
+  .engine{display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-top:6px}
+  .engine .head{background:var(--fill);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line)}
+  .engine .head.r{border-left:1px solid var(--line)}
+  .engine .uw,.engine .ew{padding:11px 12px;border-bottom:1px solid var(--line)}
+  .engine .ew{border-left:1px solid var(--line);color:var(--ink-2);font-size:11.5px}
+  .engine .uw{font-weight:600;font-size:12.5px}
+  .engine .uw .s{display:block;font-weight:400;font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .engine .ew code{font-family:var(--mono);font-size:10.5px;background:var(--fill);border:1px solid var(--line);border-radius:3px;padding:1px 5px}
+  .engine .last .uw,.engine .last .ew{border-bottom:none}
+
+  .badrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .bcard{border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .bcard .h{padding:8px 12px;font-size:11.5px;font-weight:600;border-bottom:1px solid var(--line)}
+  .bcard.before .h{background:var(--bg-2);color:var(--ink-3)}
+  .bcard.after .h{background:var(--ink);color:#fff}
+  .bcard ul{list-style:none;padding:11px 13px;margin:0}
+  .bcard li{font-size:11.5px;color:var(--ink-2);padding:4px 0 4px 16px;position:relative;line-height:1.4}
+  .bcard li::before{content:"·";position:absolute;left:3px;color:var(--ink-3)}
+  .bcard li b{color:var(--ink)}
+  .bcard.before li.bad::before{content:"×";color:var(--ink)}
+</style></head>
+<body>
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#fafafa;color:#2b2b2b;font:600 11.5px/1.45 system-ui,sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #c7c7c7">↻ RECONCILED ROLE (2026-06-18): Keep the 3 reaches; shared-DS PUSH is a SEPARATE review flow (M-ds-push), not a 4th reach.</div>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="screen">
+  <div class="topnote"><b>Three reaches, not five rungs.</b> Supersedes <code>fix-styling-model</code> (codex: "if you need a full explainer screen to change a button color, the abstraction is leaking"). The engine still has 5 layers — <b>the user never sees them.</b> One plain-English question, <b>three answers</b>. Element / class / component / preset / token become <i>implementation</i>, picked for the user, not a curriculum the user must learn.</div>
+  <div class="wrap">
+
+    <div class="row" style="justify-content:space-between;align-items:flex-end;margin-bottom:2px">
+      <div class="h1">Change how this looks</div>
+      <span class="muted" style="font-size:11px">selected: <b>Get started</b> button</span>
+    </div>
+
+    <!-- THE ONE QUESTION -->
+    <div class="ask">
+      <div class="q">"Should this change anywhere else?"</div>
+      <div class="qs">That is the whole decision. The user answers in plain words; the editor maps the answer to the right engine layer silently.</div>
+    </div>
+
+    <!-- THREE REACHES -->
+    <div class="reaches" id="reaches">
+      <div class="reach on" data-r="item">
+        <span class="def">default</span>
+        <div class="pic">No, just here</div>
+        <div class="nm">This item</div>
+        <div class="ans">A one-off. Only this button changes. <b>Nothing else moves.</b></div>
+        <div class="cnt"><b>1</b>element</div>
+      </div>
+      <div class="reach" data-r="block">
+        <div class="pic">Yes, all like it</div>
+        <div class="nm">Reusable block</div>
+        <div class="ans">Everything like this stays in sync — <b>all primary buttons</b>, or this whole repeated card.</div>
+        <div class="cnt"><b>12</b>here · 31 site-wide</div>
+      </div>
+      <div class="reach" data-r="theme">
+        <div class="pic">Yes, it's the brand</div>
+        <div class="nm">Site theme</div>
+        <div class="ans">A brand value — <b>accent colour, font, radius.</b> Re-points the whole site at once.</div>
+        <div class="cnt"><b>site-wide</b>80+ uses</div>
+      </div>
+    </div>
+
+    <div class="livenote" id="livenote"><b>This item</b> selected. The change creates a local override and stops there. This is where 90% of edits should land — and where every selection starts, so a beginner can never break twelve things by accident.</div>
+
+    <div class="note" style="margin:12px 0 4px"><b>The rule:</b> every selection starts at <b>This item</b>. To go wider the user clicks a wider card — an explicit, counted choice with the blast-radius shown first. Going narrower (<b>"just this one"</b>) is always free, one click, no trap doors. There is no fourth thing to learn.</div>
+
+    <!-- ENGINE MAP: 3 words → 5 layers, hidden -->
+    <div class="sech">What happens underneath <span class="sub">— the 5 engine layers still exist; the user's 3 words route to them automatically. This table is for <i>us</i>, never shown in the editor.</span></div>
+    <div class="engine">
+      <div class="head">User picks (what they see)</div>
+      <div class="head r">Engine does (what they never see)</div>
+
+      <div class="uw">This item<span class="s">"just here"</span></div>
+      <div class="ew">Writes an <b>element override</b> (inline). Layer 1. Always wins the cascade, so the result is exactly what they expect.</div>
+
+      <div class="uw">Reusable block<span class="s">"all like it"</span></div>
+      <div class="ew">Editor picks for them: a <b>property</b> change → the <code>.class</code> rule (layer 2); a whole <b>repeated block</b> → the <code>component</code> master (layer 3). The user never chooses "class vs component."</div>
+
+      <div class="uw last">Site theme<span class="s">"it's the brand"</span></div>
+      <div class="ew last">Re-points a <code>token</code> (layer 5), via a named <code>preset</code> recipe (layer 4) when one exists. Surfaced as "brand accent / font / radius," not "variable binding."</div>
+    </div>
+
+    <!-- BEFORE / AFTER -->
+    <div class="sech">Why this beats the 5-rung ladder</div>
+    <div class="badrow">
+      <div class="bcard before">
+        <div class="h">fix-styling-model — 5 rungs (cosmetic)</div>
+        <ul>
+          <li class="bad">User must understand <b>element vs class vs component vs preset vs token</b> to change a button.</li>
+          <li class="bad">Needed a <b>whole explainer screen</b> + a decision table to be usable.</li>
+          <li class="bad">"Preset" and "Token" are engine words a no-code user has no model for.</li>
+          <li class="bad">Ordering the rungs didn't <b>remove a concept</b> — still five.</li>
+        </ul>
+      </div>
+      <div class="bcard after">
+        <div class="h">3 reaches — concepts removed, not reordered</div>
+        <ul>
+          <li><b>One question</b>, three plain answers. No engine vocabulary.</li>
+          <li>Class-vs-component is <b>decided by the editor</b> from what's selected.</li>
+          <li>Preset/token hide behind <b>"the brand"</b> — same power, no jargon.</li>
+          <li>Three words a beginner already owns: <b>this, all like it, the brand.</b></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Styling v2:</b><a href="m-editor.html" style="border-color:#fff;background:#fff;color:#2b2b2b;font-weight:600">▶ Editor 4-mode</a><a href="41-scope-picker.html">Old 5-rung (cosmetic)</a><a href="40-edit-scope.html">Edit scope guard</a><a href="59-inspector.html">Inspector</a><a href="index.html">Map</a></div>
+</body></html>

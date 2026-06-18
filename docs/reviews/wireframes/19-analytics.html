@@ -1,23 +1,37 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Analytics</title><link rel="stylesheet" href="wf.css"></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 19 — Traffic (reports + diagnostics)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:840px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px}
+  .crumb b{color:var(--ink-2)}
+  .stat{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+  .scard{border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:#fff}
+  .scard .n{font-size:20px;font-weight:700}
+  .scard .l{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .chart{border:1px solid var(--line);border-radius:8px;height:120px;background:repeating-linear-gradient(90deg,var(--bg-2),var(--bg-2) 1px,#fff 1px,#fff 40px);display:grid;place-items:center;color:var(--ink-3);font-size:11px;margin-bottom:12px}
+  .fix{border:1px dashed var(--ink);border-radius:8px;padding:11px 13px;font-size:12px;color:var(--ink-2);display:flex;align-items:center;justify-content:space-between;background:var(--fill)}
+  .fix b{color:var(--ink)} .fix a{color:var(--ink);text-decoration:underline}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px}
+  .note2 b{color:var(--ink)}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · 19 · TRAFFIC</div>
 <div class="screen">
-  <div class="topnote"><b>Site → Analytics tab (§5)</b> · honest state: analytics is roadmap-later · solution: a real <i>connect/empty</i> state now, not a fake dashboard — wire to GA/Plausible or Buildrik-native when it ships</div>
-  <div class="pad">
-    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="11-sites.html" style="color:var(--ink-2)">Sites</a> › acme-main</div>
-    <div class="row" style="border-bottom:1px dashed var(--line);margin-bottom:16px"><a href="12-site-detail.html" class="chip" style="border:none">Overview</a><a href="50-pages.html" class="chip" style="border:none">Pages&nbsp;↗</a><a href="15-domains.html" class="chip" style="border:none">Domains</a><span class="chip on" style="border-radius:4px 4px 0 0">Analytics</span><a href="14-site-settings.html" class="chip" style="border:none">Settings</a></div>
-
-    <div style="display:grid;place-items:center;min-height:280px;text-align:center">
-      <div style="max-width:420px">
-        <div class="ph-img" style="height:90px;margin-bottom:16px;opacity:.6">📈 traffic (sample)</div>
-        <div class="h1" style="margin-bottom:6px">Connect analytics</div>
-        <div class="muted" style="font-size:12.5px;margin-bottom:18px">See visitors, top pages, and referrers. Bring your own provider now; Buildrik-native analytics is on the roadmap.</div>
-        <div class="row" style="justify-content:center"><button class="btn btn-fill btn-strong">Connect Google Analytics</button><button class="btn btn-strong">Connect Plausible</button></div>
-        <div class="muted" style="font-size:10.5px;margin-top:10px">Adds the tracking snippet via site-wide custom code (Dashboard op) — no editor change needed.</div>
-      </div>
+  <div class="topnote"><b>Traffic — reports + diagnostics only.</b> Rebuilt: the old "Connect Google Analytics" buttons are GONE. Connecting a provider happens ONCE at the <a href="c4-integrations.html" style="color:#fff;text-decoration:underline">workspace</a>; assigning a property happens in <a href="m-tracking.html" style="color:#fff;text-decoration:underline">Editor › Tracking</a>. This screen only <b>views</b>. Analytics 3-layer, layer 3.</div>
+    <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span></div>
+  <div class="stabs"><a href="12-site-detail.html">Overview</a><a href="d6-domains.html">Domains</a><a href="19-analytics.html" class="on">Traffic</a><a href="d2-forms.html">Forms inbox</a><a href="d4-share-access.html">Sharing</a><a href="14-site-settings.html">Publishing</a><a href="58-history.html">Versions</a></div>
+  
+    <div class="crumb"><b>acme-main.com</b> › Traffic · last 30 days</div>
+    <div class="stat">
+      <div class="scard"><div class="n">12.4k</div><div class="l">Visitors</div></div>
+      <div class="scard"><div class="n">38.1k</div><div class="l">Page views</div></div>
+      <div class="scard"><div class="n">2m 14s</div><div class="l">Avg time</div></div>
+      <div class="scard"><div class="n">41%</div><div class="l">Bounce</div></div>
     </div>
-    <div class="note"><b>Honesty over fake charts (§10):</b> shipping a placeholder dashboard with invented numbers erodes trust. The empty state names what's coming and gives a real action (connect a provider) that works today via site-wide head injection (screen 14).</div>
+    <div class="chart">[ visitors over time ]</div>
+    <div class="fix"><span>⚠ <b>docs.cobalt.io</b> shows no data — no property assigned to this site.</span><a href="m-tracking.html">Fix setup ↗</a></div>
+    <div class="note2"><b>No connect button here by design.</b> A "no data" state never dead-ends — it deep-links to the layer that needs fixing (assign in Editor, or connect in Workspace). All roles can VIEW traffic; only Designer/Admin change the measurement ID (<a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>). Honest empty state — no fake charts when there's no data.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="14-site-settings.html">Site settings</a><a href="15-domains.html">Domains</a><a href="19-analytics.html" class="here">Analytics</a><a href="16-billing.html">Billing</a></div>
+<div style="margin:16px 18px 6px"><div style="font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px">States on this surface — traffic</div><div style="display:flex;gap:7px;flex-wrap:wrap;font-size:10.5px;color:var(--ink-2)"><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Loading &rarr; chart skeleton, no fake numbers</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Source needs reconnect &rarr; token expired, one-click fix</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">View-only role &rarr; reports yes, connect no</span></div><div style="font-size:10.5px;color:var(--ink-3);margin-top:6px">No-data + reconnect states → <a href="s-account-states.html">s-account-states</a> · <a href="m-tracking.html">tracking</a></div></div>
+<div class="proto-nav"><b>Traffic:</b><a href="m-tracking.html">Tracking (assign)</a><a href="c4-integrations.html">Connect (workspace)</a><a href="12-site-detail.html">Site detail</a><a href="m-ownership.html">Ownership</a><a href="s-account-states.html">States</a><a href="index.html">Map</a></div>
 </body></html>

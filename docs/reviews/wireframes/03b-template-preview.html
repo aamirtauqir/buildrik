@@ -1,30 +1,39 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Template preview</title><link rel="stylesheet" href="wf.css"></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 03b — Template preview</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:840px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .head .t{font-size:16px;font-weight:700} .head .t .src{font-size:9px;letter-spacing:.03em;text-transform:uppercase;background:var(--ink);color:#fff;border-radius:3px;padding:1px 6px;vertical-align:middle;margin-left:7px}
+  .use{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none}
+  .cols{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+  .preview{border:1px solid var(--line);border-radius:8px;height:220px;background:var(--bg-2);display:grid;place-items:center;color:var(--ink-3);font-size:11px}
+  .pages{border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:#fff}
+  .pages .ph{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:7px}
+  .pg{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);padding:5px 0;border-bottom:1px dashed var(--line)}
+  .pg:last-child{border:none}
+  .meta{border:1px dashed var(--line-d);border-radius:7px;padding:9px 12px;font-size:11px;color:var(--ink-2);margin-top:10px;background:var(--bg-2)}
+  .meta b{color:var(--ink)}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · 03b · TEMPLATE PREVIEW</div>
 <div class="screen">
-  <div class="topnote"><b>Template preview (§7)</b> · the step between gallery tile and editor · solution: recognition over recall — see the full thing + multi-page before committing, then "Use" seeds it</div>
-  <div class="barline" style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--ink);color:#fff;border-radius:0;margin-bottom:0">
-    <a href="03-template-gallery.html" style="color:#fff;font-size:12px;text-decoration:none">← Gallery</a>
-    <b style="font-size:13px">Consult Pro</b><span style="opacity:.6;font-size:11px">Business template</span>
-    <span style="flex:1"></span>
-    <span class="chip on" style="background:#fff">Desktop</span><span class="chip" style="color:#fff;border-color:#fff">Phone</span>
-    <a href="editor-spine-wireframe.html" class="btn btn-fill" style="background:#fff;color:var(--ink);margin-left:8px">Use this template →</a>
-  </div>
-  <div style="display:grid;grid-template-columns:120px 1fr;min-height:340px;border:1px dashed var(--line);border-top:none">
-    <div style="border-right:1px dashed var(--line);padding:10px;background:var(--bg-2)">
-      <div class="lbl" style="margin-bottom:6px">Pages (5)</div>
-      <div class="box" style="margin-bottom:6px"><div class="ph-img" style="height:40px;font-size:9px">Home</div></div>
-      <div class="box" style="margin-bottom:6px"><div class="ph-img" style="height:40px;font-size:9px">About</div></div>
-      <div class="box" style="margin-bottom:6px"><div class="ph-img" style="height:40px;font-size:9px">Services</div></div>
-      <div class="box" style="margin-bottom:6px"><div class="ph-img" style="height:40px;font-size:9px">Pricing</div></div>
-      <div class="box"><div class="ph-img" style="height:40px;font-size:9px">Contact</div></div>
-    </div>
-    <div style="padding:0;background:var(--paper);overflow:hidden">
-      <div class="row" style="justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--line)"><b>[ Logo ]</b><div class="row" style="gap:12px;font-size:12px;color:var(--ink-2)"><span>About</span><span>Services</span><span class="btn btn-fill" style="padding:4px 12px">Contact</span></div></div>
-      <div style="text-align:center;padding:36px 24px"><div class="h1" style="font-size:24px;margin-bottom:8px">[ Hero headline ]</div><div class="muted" style="margin-bottom:16px">[ subtitle ]</div><span class="btn btn-fill btn-strong">[ CTA ]</span><div class="grid3" style="margin-top:28px"><div class="ph-img" style="height:70px">▦</div><div class="ph-img" style="height:70px">▦</div><div class="ph-img" style="height:70px">▦</div></div></div>
+  <div class="topnote"><b>Template preview — see the page set + provenance before Use.</b> Rebuilt: shows every page the template includes AND whether it's a shared <b>house template</b> (so an agency knows it carries their theme). No surprises after "Use this".</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind</b> › New site › Templates › Northwind Consult</div>
+    <div class="head"><div class="t">Northwind Consult <span class="src">house</span></div><a class="use" href="m-editor.html">Use this →</a></div>
+    <div class="cols">
+      <div class="preview">[ live preview · scrollable ]</div>
+      <div class="pages">
+        <div class="ph">5 pages included</div>
+        <div class="pg"><span>Home</span><span class="muted" style="font-size:10px">hero · services · CTA</span></div>
+        <div class="pg"><span>Services</span><span class="muted" style="font-size:10px">grid</span></div>
+        <div class="pg"><span>Case studies</span><span class="muted" style="font-size:10px">list</span></div>
+        <div class="pg"><span>About</span><span class="muted" style="font-size:10px">team</span></div>
+        <div class="pg"><span>Contact</span><span class="muted" style="font-size:10px">form</span></div>
+        <div class="meta"><b>House template</b> — carries the <b>Northwind base</b> shared theme. Content is sample; it clears for a new client.</div>
+      </div>
     </div>
   </div>
-  <div class="pad"><div class="note"><b>Why a preview step (§7):</b> committing a 5-page template blind = regret + rework. Preview shows every page + responsive before "Use". "Use this template →" lands in the editor with all 5 pages + content seeded (not a blank shell). "← Gallery" keeps browsing — no commitment cost.</div></div>
 </div>
-<div class="proto-nav"><b>On-ramp:</b><a href="01-new-site.html">New site</a><a href="03-template-gallery.html">Gallery</a><a href="03b-template-preview.html" class="here">Preview</a><a href="editor-spine-wireframe.html">Editor</a><a href="02-ai-wizard.html">AI wizard</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Preview:</b><a href="03-template-gallery.html">Gallery</a><a href="m-editor.html">Use → Editor</a><a href="m-agency.html">House templates</a><a href="index.html">Map</a></div>
 </body></html>

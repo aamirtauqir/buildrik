@@ -89,3 +89,21 @@ Agency switch-ask = "good features, not user-friendly" → 3 sub-agents (live-co
 - ✅ fix-editor-declutter — calmer Pro editor (4-verb rail + progressive inspector + density + ⌘K), zero power removed.
 **Reconciliation pass:** aligned existing screens to the canonical fixes — 41 added Preset as 5th rung (4→5) + canonical link; ds2/57 reworded to "rung N of the one ladder"; d5/b1/c4 settings-scope labels (site-default home, AI-credits=workspace read-only mirror, analytics split); 53/14/59/spine cross-link the fix screens as canonical. Structural rebuilds of spine-rail (4-verb) + inspector (3-group) are SPEC'd by fix-editor-declutter for the rebuild phase, not re-drawn here. Integrity: zero dead links, zero orphans, zero href="#".
 
+## ADDENDUM 2026-06-18 — SCOPE-COMPLETENESS LAYER (codex CEO/real-app review)
+Codex scope-review verdict: the set was flow-/coherence-10/10 but **real-app-scope 6.5/10** — a state *philosophy* existed (80-states, m-states) but most feature screens were **happy-path only**. Fix = render every surface's empty/loading/error/failure/denied state. 6 new S-* state boards (mirror the m-states board pattern) + 2 inline extends:
+- ✅ **s-editor-states** — blank canvas / first-block / deleted-last-block · ✨AI generating/partial-salvage/failed/apply-conflict · image upload type/size/quota/processing fail · paste(sanitized) · keyboard map · undo session-boundary · small-screen/touch. (P0+P2)
+- ✅ **s-media-states** — empty / loading skeleton / no-results · upload unsupported/too-large/processing/quota · bulk partial · stock provider down · delete-in-use blast-radius. (P0)
+- ✅ **s-forms-states** — owner: inbox empty / routing-broken (stored-before-emailed) / export-failed · visitor: submit success / inline validation / spam-held / server-error (values kept). (P0)
+- ✅ **s-dashboard-states** — solo zero-sites home (re-homed from archived 13-first-run) · agency zero-clients · loading skeleton · failed-to-load · search no-results · scale/search/paginate at 38 clients. (P0)
+- ✅ **s-ship-states** — blocking pre-flight (errors block, warnings don't) · cancel-before-go-live · deploy-failed (old site stays live) · DNS-stuck→human escalation · restore-failed (no-op) · approve-then-publish-fail (stays approved) · approval queue empty. (P0+P2)
+- ✅ **s-account-states** — permission-denied page · last-admin guard · self-demotion confirm · pending-invite resend/revoke/expired · seat-limit · integration token-expired→reconnect · card-failed→grace→auto-downgrade. (P1)
+- ✅ **a8-auth-errors** extended 11→14: email-already-exists · invite-to-existing-account · wrong-credential (inline, anti-enumeration).
+- ✅ **d5-seo** extended: sitemap-submit-fail · robots-invalid · canonical-conflict · live-but-no-index.
+
+Wired: each board ← proto-nav of its source screens (m-editor, 56/17/56b, d2/53, m3/11/m-agency, 20/22/58/m-approval/73, c1/c4/16/m-roles/m-tracking/19) + index stage 3 "Behavior & state coverage" + cross-link each other. Integrity: zero dead links, zero orphans, 103 html screens.
+
+**Codex CEO/real-app verification (3 passes):** 6.5 → 8.8 → **10/10**.
+- Pass 1 (scope): real-app-scope 6.5/10 — state philosophy existed, feature screens happy-path only. P0/P1 gap list produced.
+- Pass 2 (after 6 boards + 2 extends): 8.8/10. All P0 closed. 4 items named for 10: (a) 13-first-run still promoted as active → archived to ⊘ (one canonical zero-state home = M3 + s-dashboard-states); (b) inline auth error on the real screen + 11/14 count drift → 00-signin s_err inline wrong-credential state (anti-enumeration, email kept) + index card "Auth errors (14)" + a8 topnote reworded; (c) loading/error/denied not instantiated on 4 ops surfaces → "States on this surface" strip on 12/14/19/53; (d) delete-in-use must review-before-delete → s-media delete locked until blast-radius reviewed, then type-to-confirm.
+- Pass 3 (after the 4 fixes): 9.8/10, sole remaining nit = s_err email placeholder mismatch (jane vs you) contradicting "email kept" → fixed (both you@company.com). → **real-app-scope 10/10.**
+

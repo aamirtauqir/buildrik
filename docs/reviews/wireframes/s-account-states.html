@@ -1,0 +1,111 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · S-account — permissions, team, integrations, billing failures</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .mock{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .mh{padding:7px 12px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .mh .tag{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border:1px dashed var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 6px}
+  .mb{padding:13px}
+  .empty{text-align:center;color:var(--ink-3);padding:16px 12px}
+  .empty .big{font-size:26px;line-height:1;margin-bottom:8px}
+  .empty .t{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .empty .d{font-size:11px;margin-top:5px;line-height:1.4}
+  .empty .acts{display:flex;gap:6px;justify-content:center;margin-top:11px;flex-wrap:wrap}
+  .empty .acts span{border:1px solid var(--line);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--ink-2)}
+  .empty .acts span.pri{border-color:var(--ink);color:#fff;background:var(--ink);font-weight:600}
+  .toast{border:1px solid var(--ink);border-radius:7px;padding:10px 12px;background:var(--fill);font-size:12px;display:flex;align-items:flex-start;gap:9px}
+  .toast .ic{font-size:15px}
+  .toast .tx{flex:1;color:var(--ink-2);line-height:1.4}
+  .toast .tx b{color:var(--ink)}
+  .toast .act{font-size:11px;color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .rowi{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ink-2);padding:7px 9px;border:1px solid var(--line);border-radius:6px;margin:5px 0;background:#fff}
+  .rowi .mut{color:var(--ink-3);font-size:10.5px}
+  .pill{font-size:9px;border:1px solid var(--line);border-radius:3px;padding:1px 6px;color:var(--ink-3)}
+  .tip{border:1px solid var(--line-d);border-radius:7px;padding:10px 12px;font-size:11.5px;color:var(--ink-2);line-height:1.45;background:#fff}
+  .tip b{color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:6px}.note2 b{color:var(--ink)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · S-ACCOUNT · FAILURE PATHS</div>
+<div class="screen">
+  <div class="topnote"><b>Business-surface states — permissions, team safety, integrations, billing failures.</b> Codex scope-review (2026-06-18): the business surfaces were happy-path. A real app guards against the dangerous edits (remove the last admin, demote yourself), recovers a broken integration (token expired), and survives a failed card without silently downgrading. Homes: <a href="m-roles.html" style="color:#fff;text-decoration:underline">roles</a> · <a href="c1-team.html" style="color:#fff;text-decoration:underline">team</a> · <a href="c4-integrations.html" style="color:#fff;text-decoration:underline">integrations</a> · <a href="16-billing.html" style="color:#fff;text-decoration:underline">billing</a>.</div>
+  <div class="wrap">
+
+    <!-- 1. PERMISSION DENIED + ROLE SAFETY -->
+    <div class="sech">1 · Permission boundaries &amp; the guards that prevent lock-out <span class="sub">a real app can't let you delete your own access</span></div>
+    <div class="cols3">
+      <div class="mock">
+        <div class="mh">Direct URL — denied <span class="tag">global page</span></div>
+        <div class="mb"><div class="empty" style="padding:12px 6px">
+          <div class="big">⊘</div><div class="t">You don't have access to this</div>
+          <div class="d">Billing is Admin-only. Ask a workspace admin, or go back.</div>
+          <div class="acts"><span class="pri">Back to home</span><span>Ask an admin</span></div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="mh">Last admin guard</div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⚠</span><span class="tx"><b>You're the only admin.</b> Removing or demoting yourself would lock the workspace. Make someone else an admin first.</span></div>
+          <div class="note2" style="margin-top:8px">Hard block, not a warning — there's always at least one admin.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Self-demotion</div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⚠</span><span class="tx"><b>Lower your own role?</b> You'll lose admin tools immediately and may not be able to undo it.</span><span class="act">Confirm</span></div>
+          <div class="note2" style="margin-top:8px">Allowed (if not last admin), but it's a confirmed door, not a slip.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TEAM: INVITES + SEAT LIMIT -->
+    <div class="sech">2 · Team — pending invites &amp; the seat limit <span class="sub">invites have a lifecycle; growth hits a plan ceiling</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Pending invites — resend / revoke <span class="tag">an invite isn't a member yet</span></div>
+        <div class="mb">
+          <div class="rowi"><span>dana@acme.com <span class="pill">Designer</span></span><span class="mut">invited 2d · Resend · Revoke</span></div>
+          <div class="rowi"><span>sam@acme.com <span class="pill">Client-Editor</span></span><span class="mut">invited 9d · <b style="color:var(--ink)">expired</b> · Resend</span></div>
+          <div class="note2">Pending ≠ active. Invites expire, can be resent or revoked, and don't take a seat until accepted.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Seat limit reached <span class="tag">growth meets the plan</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">▰</span><span class="tx"><b>All 5 seats are used.</b> Upgrade for more, or free a seat by removing a member.</span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span>Manage members</span><span class="pri">Upgrade ↗</span></div></div>
+          <div class="note2">The invite button is blocked with a reason + the fix — never a silent failure on Send.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. INTEGRATIONS + BILLING -->
+    <div class="sech">3 · Integrations reconnect &amp; billing failure aftermath <span class="sub">tokens expire; cards fail — neither should break quietly</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Integration — token expired <span class="tag">reconnect, don't just error</span></div>
+        <div class="mb">
+          <div class="rowi"><span>Vercel <span class="pill">deploys</span></span><span class="mut" style="color:var(--ink)">✓ connected</span></div>
+          <div class="rowi" style="border-color:var(--ink)"><span>Google Analytics <span class="pill">traffic</span></span><span class="mut" style="color:var(--ink)"><b>⚠ reconnect</b></span></div>
+          <div class="toast" style="margin-top:8px"><span class="ic">↻</span><span class="tx"><b>Google access expired</b> — traffic stopped updating 3 days ago. One click to reconnect.</span><span class="act">Reconnect</span></div>
+          <div class="note2">OAuth-fail, token-expired, and property-removed all land here: the broken one is flagged, traffic views deep-link to this fix (see <a href="m-tracking.html">tracking</a>), no fake numbers in the meantime.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Billing — card failed, before downgrade <span class="tag">grace, not a cliff</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⚠</span><span class="tx"><b>Your card was declined.</b> We'll retry over 7 days — your sites stay live. Update the card to avoid interruption.</span><span class="act">Update card</span></div>
+          <div class="rowi" style="margin-top:9px"><span>If unpaid after grace</span><span class="mut">→ auto-downgrade to Free, sites stay up, Pro features pause</span></div>
+          <div class="note2">Card-update-failed, invoice-processing, and downgrade-impact all show the <b>consequence + the recovery</b>. No surprise dead site. Payment entry stays on the provider — never typed here.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note2" style="margin-top:14px"><b>The rule on the business surfaces:</b> you can't lock yourself out, an invite has an honest lifecycle, a seat ceiling explains itself, an expired integration offers reconnect instead of fake data, and a failed card gives grace + a clear downgrade path — never a silent loss of access or a dead site.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Account states:</b><a href="c1-team.html">Team</a><a href="m-roles.html">Roles</a><a href="c4-integrations.html">Integrations</a><a href="16-billing.html">Billing</a><a href="30-paywall.html">Paywall</a><a href="index.html">Map</a></div>
+</body></html>

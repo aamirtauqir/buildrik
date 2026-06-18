@@ -1,54 +1,35 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Page ops</title><link rel="stylesheet" href="wf.css">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 50b — Page ops + slug redirect</title><link rel="stylesheet" href="wf.css">
 <style>
-  .menu{border:1px solid var(--line);background:#fff;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.1);width:190px;font-size:12.5px;overflow:hidden}
-  .mi{padding:8px 12px;cursor:pointer}.mi:hover{background:var(--fill)}.mi.danger{border-top:1px dashed var(--line)}.mi.off{color:var(--ink-3);cursor:not-allowed}
-  .lp{border:1px solid var(--line);border-radius:6px;width:260px;font-size:12px;overflow:hidden}
-  .lt{padding:8px 12px;border-bottom:1px dashed var(--line);cursor:pointer}.lt:hover{background:var(--fill)}.lt.on{background:var(--fill)}
+  .wrap{padding:16px 20px;max-width:560px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .field{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--line);border-radius:7px;margin-bottom:7px;font-size:12.5px;color:var(--ink-2)}
+  .field b{color:var(--ink)}
+  .field .v{font-family:var(--mono);font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:4px 9px}
+  .toast{border:1px solid var(--ink);border-radius:8px;padding:11px 13px;background:var(--fill);font-size:12px;display:flex;align-items:center;gap:10px;margin:10px 0}
+  .toast .ic{font-size:16px} .toast .tx{flex:1;color:var(--ink-2);line-height:1.4} .toast .tx b{color:var(--ink);font-family:var(--mono);font-size:11px}
+  .toast .act{font-size:11px;color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .menu{border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-top:10px}
+  .mi{padding:8px 12px;font-size:12px;color:var(--ink-2);border-bottom:1px dashed var(--line)}
+  .mi:last-child{border:none} .mi.danger{color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
 </style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · 50b · PAGE OPS</div>
 <div class="screen">
-  <div class="topnote"><b>Page operations (§8.3)</b> · the drill-ins behind Pages (50) · solution: page context-menu + <b>delete-guard</b> (no orphan links / can't delete home) + cross-page link-picker (no broken links)</div>
-  <div class="pad">
-    <div class="grid3" style="align-items:start">
-      <div>
-        <div class="lbl" style="margin-bottom:8px">Right-click a page</div>
-        <div class="menu">
-          <div class="mi">✎ Rename</div>
-          <div class="mi">⧉ Duplicate</div>
-          <div class="mi">⌂ Set as home</div>
-          <div class="mi">▸ Page settings &amp; SEO</div>
-          <div class="mi">↗ Open in preview</div>
-          <div class="mi danger">🗑 Delete page…</div>
-        </div>
-        <div class="note" style="margin-top:10px;font-size:10.5px">Set-as-home swaps the ⌂ marker (50). Delete opens a guard (right) — never silent.</div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:8px">Delete guard</div>
-        <div class="box pad" style="border:2px solid var(--ink)">
-          <span class="tag-new">CHECK FIRST</span>
-          <div class="h2" style="margin:8px 0 4px">Delete "Services"?</div>
-          <div class="note" style="margin:8px 0"><b>⚠ Linked from 3 places.</b> Home nav, Footer, About page link here. Deleting leaves broken links.</div>
-          <div style="font-size:11px;color:var(--ink-2);margin-bottom:10px">Fix the links first, or delete and we'll flag the 3 broken links for you.</div>
-          <button class="btn" style="width:100%;margin-bottom:6px">Review the 3 links</button>
-          <button class="btn btn-fill" style="width:100%">Delete anyway (flag broken)</button>
-        </div>
-        <div class="note" style="margin-top:10px;font-size:10.5px">Home page: <b>Delete is disabled</b> — set another page as home first.</div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:8px">Link picker (no broken links)</div>
-        <div class="lp">
-          <div style="padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--ink-3)">Link this button to…</div>
-          <div class="lt on">📄 Page ▸ <b>Pricing</b> <span class="muted" style="font-size:10px">internal</span></div>
-          <div class="lt">🔗 External URL</div>
-          <div class="lt"># Section anchor (this page)</div>
-          <div class="lt">✉ Email / phone</div>
-          <div class="lt">⤓ File download</div>
-        </div>
-        <div class="note" style="margin-top:10px;font-size:10.5px"><b>Internal links bind to the page, not its URL (§8.3):</b> rename the page or change its slug → the link follows. No broken internal links, ever. External URLs validated on save.</div>
-      </div>
+  <div class="topnote"><b>Page ops — with the slug-rename redirect outcome.</b> Rebuilt: renaming a slug now shows an explicit <b>"redirect created /old→/new"</b> outcome (editor IS a redirect writer). Plus the page menu + delete-guard. Designer/Admin only.</div>
+  <div class="wrap">
+    <div class="crumb"><b>acme-main</b> › Pages › Pricing</div>
+    <div class="field"><span><b>Title</b></span><span class="v">Pricing</span></div>
+    <div class="field"><span><b>Slug</b></span><span class="v">/pricing → /plans</span></div>
+    <div class="toast"><span class="ic">↪</span><span class="tx"><b>Redirect created: /pricing → /plans</b><br>Old links &amp; search results won't 404. Saved to Publishing › Redirects.</span><span class="act">Undo · Edit</span></div>
+    <div class="menu">
+      <div class="mi">Duplicate page</div>
+      <div class="mi">Set as homepage</div>
+      <div class="mi">Per-page search listing</div>
+      <div class="mi danger">Delete — <span style="color:var(--ink-3)">⚠ linked from 3 pages (guard)</span></div>
     </div>
+    <div class="note2"><b>The outcome shows where the slug changed</b>, not buried in a dashboard. Delete-guard warns about inbound links + offers a redirect. Redirect writes are Designer/Admin (<a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>); the full redirect list lives in <a href="d3-redirects.html" style="color:var(--ink-2)">Dashboard › Publishing</a>.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Editor:</b><a href="editor-spine-wireframe.html">Spine</a><a href="50-pages.html">Pages</a><a href="50b-page-ops.html" class="here">Page ops</a><a href="59-inspector.html">Inspector</a><a href="70-confirm.html">Site confirm</a></div>
+<div class="proto-nav"><b>Page ops:</b><a href="50-pages.html">Pages</a><a href="d3-redirects.html">Redirects</a><a href="m-states.html">States</a><a href="index.html">Map</a></div>
 </body></html>

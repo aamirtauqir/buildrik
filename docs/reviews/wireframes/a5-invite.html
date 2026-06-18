@@ -1,18 +1,37 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Accept invite</title><link rel="stylesheet" href="wf.css"></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · a5 — Invite (roles + white-label)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:520px}
+  .field{margin-bottom:12px}
+  .field label{font-size:11px;font-weight:600;color:var(--ink);display:block;margin-bottom:5px}
+  .field .in{border:1px dashed var(--line-d);border-radius:6px;padding:9px 11px;font-size:12px;color:var(--ink-3)}
+  .roles{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .rcard{border:1px solid var(--line);border-radius:6px;padding:9px 11px;cursor:pointer}
+  .rcard.on{border:2px solid var(--ink);background:var(--fill)}
+  .rcard .rn{font-size:12px;font-weight:600} .rcard .rd{font-size:10px;color:var(--ink-3);margin-top:2px}
+  .gbox{border:1px solid var(--line);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--ink-2)}
+  .wl{border:1px dashed var(--line-d);border-radius:6px;padding:9px 11px;font-size:11px;color:var(--ink-2);margin-top:6px;background:var(--bg-2)}
+  .wl b{color:var(--ink)}
+  .send{margin-top:14px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:7px;padding:10px;text-align:center;font-size:13px;font-weight:600}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
-<div class="screen screen-narrow" style="max-width:440px">
-  <div class="topnote"><b>Accept workspace invite</b> · grounded in <code>auth.getInviteDetails</code> / <code>acceptInvite</code> · email-bound token, 7-day expiry, optional site-level perms</div>
-  <div class="pad" style="text-align:center">
-    <div class="row" style="gap:8px;justify-content:center;margin-bottom:14px"><div class="ph-img" style="width:30px;height:30px;font-size:11px">B</div><b style="font-size:16px">Buildrik</b></div>
-    <div class="ph-img" style="width:56px;height:56px;border-radius:50%;margin:0 auto 12px">AC</div>
-    <div class="h1" style="font-size:18px;margin-bottom:4px">Join <b>Acme Co</b></div>
-    <div class="muted" style="font-size:12.5px;margin-bottom:14px"><b>sam@acme.com</b> invited you as an <span class="tag-exists">Editor</span>. You'll be able to edit + publish sites.</div>
-    <div class="box pad" style="text-align:left;font-size:11.5px;margin-bottom:14px"><div class="lbl" style="margin-bottom:4px">This invite grants</div>Workspace role: <b>Editor</b><br>Site access: <b>All sites</b> (or scoped to specific sites)<br><span class="muted" style="font-size:10px">Roles map to the permission matrix (screen 62).</span></div>
-    <a href="a4-2fa.html" class="btn btn-fill btn-strong" style="width:100%;text-align:center;margin-bottom:8px">Accept &amp; continue →</a>
-    <div class="row" style="justify-content:center;gap:14px"><a href="00-signin.html" class="muted" style="font-size:11px;text-decoration:underline">Decline</a><span class="muted" style="font-size:11px">expires in 6 days</span></div>
-    <div class="note" style="margin-top:16px;text-align:left;font-size:10.5px"><b>Email-bound (grounded IDOR guard):</b> token rejects if your signed-in email ≠ the invited address. No account yet → sign-up first, then auto-accept. Expired/revoked → A8 invite-expired. Accept creates the membership + (optional) per-site permissions in one transaction + notifies the inviter.</div>
+<div class="wf-stamp">WIREFRAME · a5 · INVITE</div>
+<div class="screen">
+  <div class="topnote"><b>Invite — new roles, per-site scope, white-label.</b> Rebuilt: old "Editor / All sites / Buildrik" invite becomes the 4-role model + per-site scope + the agency's brand on the invite. The role here = the permission boundary (<a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a>).</div>
+  <div class="wrap">
+    <div class="field"><label>Email</label><div class="in">client@acme.com</div></div>
+    <div class="field"><label>Role</label>
+      <div class="roles">
+        <div class="rcard on"><div class="rn">Client-Editor</div><div class="rd">edit content on assigned sites</div></div>
+        <div class="rcard"><div class="rn">Designer</div><div class="rd">full build access + publish</div></div>
+        <div class="rcard"><div class="rn">Viewer</div><div class="rd">read-only + comments</div></div>
+        <div class="rcard"><div class="rn">Admin</div><div class="rd">workspace + billing</div></div>
+      </div>
+    </div>
+    <div class="field"><label>Site access</label><div class="gbox">Acme sites only ▾ <span style="color:var(--ink-3);font-size:10px">(not all clients)</span></div></div>
+    <div class="field"><label>Edits need approval</label><div class="gbox">On — changes route to you before going live ▾</div></div>
+    <div class="wl"><b>White-label:</b> this client logs into <b>studio.northwind.com</b> and sees the Northwind brand — never "Buildrik".</div>
+    <a class="send" href="c1-team.html" style="display:block;text-decoration:none">Send invite</a>
   </div>
 </div>
-<div class="proto-nav"><b>Auth:</b><a href="00-signin.html">Sign in</a><a href="a1-signup.html">Sign up</a><a href="a5-invite.html" class="here">Invite</a><a href="a6-workspace-select.html">WS select</a><a href="a7-transfer-accept.html">Transfer</a><a href="62-permissions.html">Roles</a><a href="a8-auth-errors.html">Errors</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Invite:</b><a href="m-roles.html">Role matrix</a><a href="c1-team.html">Team</a><a href="m-approval.html">Approval</a><a href="m-agency.html">White-label</a><a href="index.html">Map</a></div>
 </body></html>

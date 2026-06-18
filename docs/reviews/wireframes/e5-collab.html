@@ -5,6 +5,7 @@
   .av{width:26px;height:26px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-size:10px;background:var(--ink-3);color:#fff;margin-left:-8px}
 </style></head>
 <body>
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#fafafa;color:#2b2b2b;font:600 11.5px/1.45 system-ui,sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #c7c7c7">↻ RECONCILED ROLE (2026-06-18): Presence/review ONLY; no production-ready multiplayer editing.</div>
 <div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen">
   <div class="topnote"><b>Live collaboration (presence)</b> · grounded in <code>CollabOperation</code> + <code>/api/sse/collab</code> · <b>⚠ DEMO-ONLY honesty:</b> real-time merge has known OT convergence bugs — presence/UI shown, multi-writer merge NOT production-ready</div>
@@ -20,5 +21,5 @@
     <div class="note" style="margin-top:12px;background:#fff;border:2px solid var(--ink)"><b>⚠ Honest status (memory: collab production-blocked):</b> presence (cursors, avatar stack, "who's editing" locks) is the safe, shippable layer. Real-time concurrent <i>merge</i> is NOT shipped — the OT layer has convergence bugs (last-write-wins, remote-clobbers-local). Until a dedicated OT/CRDT arc (eval Yjs), collab ships as: presence + single-writer with soft locks + the conflict screen (61). This wireframe documents the intended UI, not a working multiplayer guarantee.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Editor:</b><a href="editor-spine-wireframe.html">Spine</a><a href="61-conflict.html">Conflict</a><a href="62-permissions.html">Roles</a><a href="e5-collab.html" class="here">Collab</a><a href="d4-share-access.html">Share</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Editor:</b><a href="m-editor.html">Spine</a><a href="61-conflict.html">Conflict</a><a href="m-roles.html">Roles</a><a href="e5-collab.html" class="here">Collab</a><a href="d4-share-access.html">Share</a><a href="index.html">Map</a></div>
 </body></html>

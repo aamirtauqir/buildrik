@@ -1,67 +1,32 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Edit scope</title><link rel="stylesheet" href="wf.css">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 40 — Edit reach guard</title><link rel="stylesheet" href="wf.css">
 <style>
-  .stage{display:grid;grid-template-columns:1fr 280px;min-height:380px}
-  .cv{border-right:1px dashed var(--line);padding:22px;background:var(--bg-2);position:relative}
-  .el{border:1px solid var(--line);background:#fff;border-radius:4px;padding:10px 14px;margin-bottom:10px;font-size:12.5px;cursor:pointer}
-  .el:hover{border-color:var(--ink-2)}
-  .el.sel{border:2px solid var(--ink);outline:2px solid var(--fill-2)}
-  .el .k{font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em}
-  .insp{padding:14px}
-  .scopebar{border:1px solid var(--ink);border-radius:5px;padding:8px 10px;font-size:11.5px;margin-bottom:12px;background:#fff}
-  .scopebar.cls{border-style:dashed;background:var(--fill)}
-  .prop{border:1px solid var(--line);border-radius:4px;padding:8px 0;margin-bottom:10px}
-  .prop .row{justify-content:space-between;padding:0 10px}
-  .warn{border:2px solid var(--ink);border-radius:5px;background:#fff;padding:10px;font-size:11.5px;margin-top:10px;display:none}
-  .warn.show{display:block}
+  .wrap{padding:16px 20px;max-width:600px}
+  .warn{border:2px solid var(--ink);border-radius:9px;padding:15px 17px;background:var(--fill)}
+  .warn .t{font-size:14px;font-weight:700}
+  .warn .d{font-size:12px;color:var(--ink-2);margin-top:5px;line-height:1.45}
+  .warn .d b{color:var(--ink)}
+  .opts{display:flex;gap:9px;margin-top:13px}
+  .opt{flex:1;border:1px solid var(--ink);border-radius:7px;padding:10px;text-align:center;font-size:12px;font-weight:600;color:var(--ink);background:#fff}
+  .opt.pri{background:var(--ink);color:#fff}
+  .opt small{display:block;font-weight:400;font-size:10px;color:var(--ink-3);margin-top:3px}
+  .opt.pri small{color:#ccc}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:13px} .note2 b{color:var(--ink)}
 </style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · 40 · REACH GUARD</div>
 <div class="screen">
-  <div class="topnote"><b>Edit-scope clarity (§6.5)</b> — THE beginner-killer · grounded in current element/style/class engine · solution: persistent "what am I editing" banner + propagation choice before any class-wide change</div>
-  <div class="stage">
-    <div class="cv">
-      <div class="lbl" style="margin-bottom:8px">Canvas — click an element</div>
-      <div class="el" data-scope="one" data-name="Hero heading"><div class="k">Heading · unique</div>[ Welcome to Acme ]</div>
-      <div class="el" data-scope="cls" data-name="Primary button"><div class="k">Button · class .btn-primary</div>[ Get started ]</div>
-      <div class="el" data-scope="cls" data-name="Primary button"><div class="k">Button · class .btn-primary</div>[ Contact us ]</div>
-      <div class="el" data-scope="one" data-name="Body paragraph"><div class="k">Text · unique</div>[ paragraph of copy … ]</div>
-      <div class="note" style="position:absolute;bottom:12px;left:22px;right:22px" id="anno">Pick the unique heading vs a class-bound button — watch the scope banner change.</div>
-    </div>
-    <div class="insp">
-      <div class="lbl" style="margin-bottom:8px">Inspector</div>
-
-      <div class="scopebar" id="scope">Editing: <b>nothing selected</b></div>
-
-      <div class="prop">
-        <div class="row"><span class="lbl">Fill</span><span class="chip" id="fillChip">#2b2b2b</span></div>
-      </div>
-      <button class="btn btn-fill" style="width:100%" id="changeBtn" disabled>Change Fill →</button>
-
-      <div class="warn" id="warn">
-        <b>⚠ This style comes from a class.</b><br>
-        <span class="muted">.btn-primary styles <b>12 elements</b> on this page · <b>31 across 4 pages</b>. Changing Fill here changes all 31.</span>
-        <div class="row" style="margin-top:10px;justify-content:space-between">
-          <button class="btn" id="justOne">Just this one</button>
-          <button class="btn btn-fill" id="all">Change all 31</button>
-        </div>
-        <div class="muted" style="font-size:10px;margin-top:6px">“Just this one” detaches it (creates a local override you can revert).</div>
+  <div class="topnote"><b>The blast-radius guard — in 3-reach language.</b> Rebuilt: the old "change all 31" class-warning becomes the plain "All like this" reach. Fires when an edit would travel wider than the current item, so a beginner can never break many things by accident. Backs the picker in <a href="41-scope-picker.html" style="color:#fff;text-decoration:underline">41</a> / <a href="fix-styling-3reach.html" style="color:#fff;text-decoration:underline">fix-styling-3reach</a>.</div>
+  <div class="wrap">
+    <div class="warn">
+      <div class="t">This changes <b>12 buttons</b>, not one</div>
+      <div class="d">You're editing at <b>"All like this"</b> reach — every button like this on the site updates together (12 here, 31 site-wide). Want that, or just this one?</div>
+      <div class="opts">
+        <div class="opt">Just this one<small>This item · safe, local</small></div>
+        <div class="opt pri">Change all 12<small>All like this</small></div>
       </div>
     </div>
+    <div class="note2"><b>Reach, not engine.</b> No "detach from class" / "override" vocabulary — the user picks <b>This item</b> or <b>All like this</b>; the editor handles the layer. "Just this one" is always a free escape back to a local change. A site-wide brand change ("Site theme") shows its own count; a shared theme change across clients goes through the <a href="m-ds-push.html" style="color:var(--ink-2)">push review</a>.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Flow:</b><a href="00-signin.html">Sign in</a><a href="10-dashboard.html">Dashboard</a><a href="editor-spine-wireframe.html">Editor</a><a href="40-edit-scope.html" class="here">Edit scope</a><a href="41-scope-picker.html">Scope levels</a><a href="20-publish.html">Publish</a><a href="90-published.html">Live site</a></div>
-<script>
-var sel=null, scopeKind=null;
-var scope=document.getElementById('scope'),warn=document.getElementById('warn'),anno=document.getElementById('anno'),btn=document.getElementById('changeBtn');
-document.querySelectorAll('.el').forEach(function(el){el.onclick=function(){
-  document.querySelectorAll('.el').forEach(function(e){e.classList.remove('sel');});el.classList.add('sel');
-  sel=el.getAttribute('data-name');scopeKind=el.getAttribute('data-scope');
-  warn.classList.remove('show');btn.disabled=false;
-  if(scopeKind==='cls'){scope.className='scopebar cls';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">styled by class <b>.btn-primary</b> · 12 on this page · 31 across 4 pages</span>';anno.innerHTML='<b>Class-bound.</b> Changing a style here can ripple to 31 elements site-wide. The banner warns before you do.';}
-  else{scope.className='scopebar';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">just this element — changes affect nothing else</span>';anno.innerHTML='<b>Unique element.</b> Safe to edit — scope is just this one. No propagation risk.';}
-};});
-btn.onclick=function(){ if(scopeKind==='cls'){warn.classList.add('show');} else {document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Done.</b> Changed Fill on just this element.';} };
-document.getElementById('justOne').onclick=function(){warn.classList.remove('show');scope.className='scopebar';scope.innerHTML='Editing: <b>'+sel+'</b><br><span class="muted">overridden · just this element · <u>revert to class</u></span>';document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Detached.</b> Localized override created — the other 30 buttons untouched. Revertible.';};
-document.getElementById('all').onclick=function(){warn.classList.remove('show');document.getElementById('fillChip').textContent='#1166ee';anno.innerHTML='<b>Applied to all 31.</b> Intentional, confirmed — the class changed everywhere it’s used.';};
-</script>
+<div class="proto-nav"><b>Reach guard:</b><a href="41-scope-picker.html">Reach picker</a><a href="fix-styling-3reach.html">3-reach model</a><a href="m-editor.html">Inspector</a><a href="index.html">Map</a></div>
 </body></html>

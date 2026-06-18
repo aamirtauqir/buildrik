@@ -1,28 +1,49 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · SEO</title><link rel="stylesheet" href="wf.css"></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · d5 — Technical SEO (dashboard)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:820px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px}
+  .crumb b{color:var(--ink-2)}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 6px}
+  .grp:first-child{margin-top:4px}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border:1px solid var(--line);border-radius:7px;margin-bottom:7px;background:#fff;font-size:12.5px;color:var(--ink-2)}
+  .row b{color:var(--ink)}
+  .row .v{font-family:var(--mono);font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:4px 9px}
+  .toggle{width:30px;height:17px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);position:relative}
+  .toggle::after{content:"";position:absolute;top:1px;left:14px;width:13px;height:13px;border-radius:50%;background:#fff}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:2px}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+  th{background:var(--fill);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  .flag{font-size:9px;border-radius:3px;padding:1px 6px}
+  .flag.ok{border:1px solid var(--line-d);color:var(--ink-3)}
+  .flag.warn{border:1px solid var(--ink);color:var(--ink);font-weight:600}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px}
+  .note2 b{color:var(--ink)}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
-<div class="screen screen-narrow">
-  <div class="topnote"><b>SEO — site defaults</b> · grounded in <code>siteDetail.settings</code> (metaTitle/Description/og/favicon/indexing) · site-wide defaults (Dashboard); per-page overrides live in editor Pages (50)</div>
-  <div class="pad">
-    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="14-site-settings.html" style="color:var(--ink-2)">Site settings</a> › SEO defaults</div>
-    <div class="grid2" style="align-items:start">
-      <div>
-        <div class="lbl">Default meta title</div><div class="input" style="width:100%;margin:5px 0 4px">%page% — Acme</div><div class="muted" style="font-size:10px;margin-bottom:10px"><code>%page%</code> token inserts the page name</div>
-        <div class="lbl">Default description</div><div class="input" style="width:100%;height:46px;margin:5px 0 10px">Acme builds beautiful sites…</div>
-        <div class="lbl">Social share image (OG)</div><div class="ph-img" style="height:70px;margin:5px 0 10px">▣ 1200×630</div>
-        <div class="lbl">Canonical domain</div><div class="input" style="width:100%;margin:5px 0 10px">https://acme.com</div>
-        <div class="lbl">Favicon</div><div class="row" style="margin:5px 0 10px"><div class="ph-img" style="width:32px;height:32px">▣</div><button class="btn">Upload</button></div>
-        <div class="row" style="justify-content:space-between;border:1px solid var(--line);border-radius:5px;padding:9px 11px;font-size:12px">Allow search indexing <span class="tog" style="display:inline-block;width:34px;height:18px;border:1px solid var(--ink);border-radius:999px;background:var(--ink)"></span></div>
-      </div>
-      <div>
-        <div class="lbl" style="margin-bottom:6px">Search result preview</div>
-        <div class="box pad" style="margin-bottom:12px"><div style="color:#1a5; font-size:11px">acme.com</div><div style="color:#1a0dab;font-size:14px">Acme — Home</div><div class="muted" style="font-size:11px">Acme builds beautiful sites in minutes…</div></div>
-        <div class="lbl" style="margin-bottom:6px">Social card preview</div>
-        <div class="box" style="overflow:hidden"><div class="ph-img" style="height:90px">▣ OG image</div><div class="pad" style="padding:8px"><b style="font-size:12px">Acme — Home</b><div class="muted" style="font-size:10.5px">acme.com</div></div></div>
-        <div class="note" style="margin-top:12px;font-size:10.5px"><b>Defaults + overrides (one home each):</b> site-default SEO lives HERE (Dashboard); per-page SEO is owned in the editor (screen 50), which shows this default as a read-only effective value. Not a dup — a scope split, per <a href="fix-settings-map.html" style="text-decoration:underline">the settings map</a>. Indexing off = adds <code>noindex</code> + blocks from sitemap.</div>
-      </div>
-    </div>
+<div class="wf-stamp">WIREFRAME · d5 · TECHNICAL SEO</div>
+<div class="screen">
+  <div class="topnote"><b>Technical SEO — dashboard-owned.</b> Rebuilt: content SEO (titles/desc/OG per page) moved to the <a href="m-seo.html" style="color:#fff;text-decoration:underline">editor</a>. This screen keeps only the <b>technical/publishing-risk</b> policy — canonical, indexing, sitemap — for this one site. Writable by Designer/Admin (<a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a>).</div>
+    <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span></div>
+  <div class="stabs"><a href="12-site-detail.html">Overview</a><a href="d6-domains.html">Domains</a><a href="19-analytics.html">Traffic</a><a href="d2-forms.html">Forms inbox</a><a href="d4-share-access.html">Sharing</a><a href="14-site-settings.html" class="on">Publishing</a><a href="58-history.html">Versions</a></div>
+  
+    <div class="crumb"><b>acme-main.com</b> › SEO (technical)</div>
+
+    <div class="grp">Site-wide policy</div>
+    <div class="row"><span><b>Canonical domain</b> <span style="color:var(--ink-3);font-size:10px">strip www / force https</span></span><span class="v">https://acme-main.com</span></div>
+    <div class="row"><span><b>Search engine indexing</b></span><span class="toggle"></span></div>
+    <div class="row"><span><b>Sitemap.xml</b> <span style="color:var(--ink-3);font-size:10px">auto-generated, submitted</span></span><span class="v">42 URLs · live</span></div>
+    <div class="row"><span><b>robots.txt</b></span><span class="v">Edit ▾</span></div>
+
+    <div class="grp">When it breaks — failure states (codex 2026-06-18)</div>
+    <div class="row" style="border-color:var(--ink)"><span><b>Sitemap submit failed</b> <span style="color:var(--ink-3);font-size:10px">Google Search Console rejected it</span></span><span class="flag warn">Retry · See why</span></div>
+    <div class="row" style="border-color:var(--ink)"><span><b>robots.txt is invalid</b> <span style="color:var(--ink-3);font-size:10px">line 4 blocks your whole site</span></span><span class="flag warn">Fix · Revert</span></div>
+    <div class="row" style="border-color:var(--ink)"><span><b>Canonical conflict</b> <span style="color:var(--ink-3);font-size:10px">a page points its canonical off-site</span></span><span class="flag warn">Review 1 page</span></div>
+    <div class="row"><span><b>Indexing is OFF but the site is live</b> <span style="color:var(--ink-3);font-size:10px">search engines can't find it</span></span><span class="flag warn">Turn on indexing</span></div>
+    <div class="note2">Each technical-SEO write can fail or footgun — a rejected sitemap, a robots line that hides the whole site, a self-defeating canonical, or "live but no-index". The panel surfaces the consequence + the one-click fix or revert, never a silent bad-SEO state that tanks the client's traffic.</div>
+
+    <div class="note2" style="border:1px dashed var(--line-d);border-radius:6px;padding:8px 11px;margin-top:6px">Comparing every client's SEO health? That's a portfolio job — see <b>Dashboard › Home › SEO health</b> across all sites. <a href="m3-dashboard.html" style="color:var(--ink-2)">Open ↗</a></div>
+    <div class="note2"><b>Why dashboard, not editor:</b> canonical/indexing are publishing-risk policy. This tab is scoped to <b>this one site</b> (the breadcrumb above). Per-page titles &amp; descriptions stay in the editor where content is authored (<a href="m-seo.html" style="color:var(--ink-2)">M-seo</a>). Two homes by SEO type — content vs technical.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Site:</b><a href="12-site-detail.html">Site detail</a><a href="d2-forms.html">Forms</a><a href="d3-redirects.html">Redirects</a><a href="d4-share-access.html">Share/access</a><a href="d5-seo.html" class="here">SEO</a><a href="50-pages.html">Page SEO</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Technical SEO:</b><a href="m-seo.html">Content SEO (editor)</a><a href="14-site-settings.html">Publishing</a><a href="12-site-detail.html">Site detail</a><a href="m-ownership.html">Ownership</a><a href="index.html">Map</a></div>
 </body></html>

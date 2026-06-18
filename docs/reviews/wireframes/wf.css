@@ -43,3 +43,26 @@ button,a{font-family:inherit;cursor:pointer;color:inherit;text-decoration:none}
 .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}
 .navi:hover{background:var(--fill)}
 .navi.here{background:var(--ink);color:#fff;font-weight:600}
+/* canonical dashboard appbar — ONE stable top-nav across every dashboard screen */
+.dbar{display:flex;align-items:center;gap:12px;padding:9px 16px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+.dbar .ws{display:flex;align-items:center;gap:7px;font-weight:600;font-size:13px}
+.dbar .ws .logo{width:22px;height:22px;border:1px solid var(--line-d);border-radius:5px;background:var(--fill);display:grid;place-items:center;font-size:11px}
+.dbar .ws .sw{font-size:10px;color:var(--ink-3);border:1px solid var(--line);border-radius:4px;padding:2px 7px}
+.dbar .sp{flex:1}
+.dnav{display:flex;gap:3px}
+.dnav a{font-size:12.5px;color:var(--ink-2);padding:6px 12px;border-radius:6px}
+.dnav a:hover{background:var(--fill)}
+.dnav a.on{background:var(--ink);color:#fff;font-weight:600}
+.icn{width:26px;height:26px;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;font-size:12px;color:var(--ink-2)}
+.icn:hover{background:var(--fill)}
+/* workspace sub-tab bar (sits under the appbar when inside Workspace) */
+.subtabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--line);background:#fff;flex-wrap:wrap}
+.subtabs a{font-size:12px;color:var(--ink-2);padding:8px 11px;border-bottom:2px solid transparent}
+.subtabs a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+/* canonical site-detail shell — crumb header + 7-tab bar, shared across every site-ops screen */
+.scrumb{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--line);background:var(--bg-2);font-size:12px;color:var(--ink-3)}
+.scrumb b{color:var(--ink-2)} .scrumb .cur{color:var(--ink);font-weight:600}
+.stabs{display:flex;gap:2px;padding:0 14px;border-bottom:1px solid var(--line);background:#fff;flex-wrap:wrap}
+.stabs a{font-size:12px;color:var(--ink-2);padding:8px 11px;border-bottom:2px solid transparent}
+.stabs a:hover{color:var(--ink)}
+.stabs a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}

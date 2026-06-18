@@ -1,44 +1,52 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Site Detail</title><link rel="stylesheet" href="wf.css"></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 12 — Site detail (ops)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .appbar{display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .crumb{font-size:12px;color:var(--ink-3)}
+  .crumb b{color:var(--ink-2)}
+  .appbar .sp{flex:1}
+  .btn{font-size:12px;border:1px solid var(--ink);border-radius:6px;padding:7px 13px;font-weight:600;text-decoration:none}
+  .btn.edit{background:var(--ink);color:#fff}
+  .btn.ghost{color:var(--ink)}
+  .tabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg-2);flex-wrap:wrap}
+  .tabs a{font-size:12px;color:var(--ink-2);padding:8px 11px;text-decoration:none;border-bottom:2px solid transparent}
+  .tabs a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+  .body{padding:16px 20px;max-width:880px}
+  .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
+  .card{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:#fff}
+  .card .ct{font-size:11px;font-weight:600;color:var(--ink);letter-spacing:.02em;margin-bottom:8px}
+  .kv{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);padding:5px 0;border-bottom:1px dashed var(--line)}
+  .kv:last-child{border:none} .kv b{color:var(--ink)}
+  .chip{font-size:9px;border-radius:3px;padding:1px 6px;background:var(--ink);color:#fff}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px}
+  .note2 b{color:var(--ink)}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
-<div class="screen" style="display:grid;grid-template-columns:200px 1fr;min-height:440px">
-  <aside style="border-right:1px dashed var(--line);padding:16px 12px">
-    <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
-    <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div><div class="row" style="justify-content:space-between"><a href="a6-workspace-select.html" style="text-decoration:none;color:inherit" title="Switch workspace">Acme Co ▾</a></div></div>
-    <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
-      <a href="10-dashboard.html" class="navi">⌂ Home</a>
-      <a href="11-sites.html" class="navi here">▦ Sites</a>
-      <a href="c1-team.html" class="navi">👤 Team</a>
-      <a href="15-domains.html" class="navi">◐ Domains</a>
-      <a href="17-media.html" class="navi">▤ Media</a>
-      <a href="b0-settings-home.html" class="navi">⚙ Settings</a>
-      <a href="16-billing.html" class="navi">$ Billing</a>
-    </nav>
-  </aside>
-  <main class="pad">
-    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="11-sites.html" style="color:var(--ink-2)">Sites</a> › acme-main</div>
-    <div class="row" style="justify-content:space-between;margin-bottom:14px">
-      <div class="row" style="gap:12px"><div class="ph-img" style="width:54px;height:40px">▦</div><div><div class="h1" style="font-size:18px">acme-main</div><span class="tag-exists">● Published</span></div></div>
-      <a href="editor-spine-wireframe.html" class="btn btn-fill btn-strong">Edit in editor →</a>
+<div class="wf-stamp">WIREFRAME · 12 · SITE DETAIL</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Site detail — pure ops, retabbed.</b> Rebuilt: the old "Pages↗ / Settings / tool chips" that leaked editor-authoring are GONE. Tabs are now business-ops only. The one bridge into authoring is <b>Edit ↗</b>; the one bridge out is <b>Visit ↗</b>.</div>
+  <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span><span style="flex:1"></span><a class="btn ghost" href="90-published.html">Visit ↗</a><a class="btn edit" href="m-editor.html" style="margin-left:6px">Edit ↗</a></div>
+  <div class="stabs"><a href="12-site-detail.html" class="on">Overview</a><a href="d6-domains.html">Domains</a><a href="19-analytics.html">Traffic</a><a href="d2-forms.html">Forms inbox</a><a href="d4-share-access.html">Sharing</a><a href="14-site-settings.html">Publishing</a><a href="58-history.html">Versions</a></div>
+  <div class="body">
+    <div class="cols">
+      <div class="card">
+        <div class="ct">Overview</div>
+        <div class="kv"><span>Status</span><span><span class="chip">Live</span></span></div>
+        <div class="kv"><span>Primary domain</span><b>acme-main.com</b></div>
+        <div class="kv"><span>Last published</span><b>2h ago · by Designer</b></div>
+        <div class="kv"><span>Pages</span><b>5</b></div>
+        <div class="kv"><span>Shared theme</span><b>Northwind base <span style="color:var(--ink-3);font-weight:400">(local override)</span></b></div>
+      </div>
+      <div class="card">
+        <div class="ct">Quick ops</div>
+        <div class="kv"><span>Traffic (30d)</span><a href="19-analytics.html" style="color:var(--ink)">12.4k visitors ↗</a></div>
+        <div class="kv"><span>Form submissions</span><a href="d2-forms.html" style="color:var(--ink)">7 new ↗</a></div>
+        <div class="kv"><span>Domains</span><a href="d6-domains.html" style="color:var(--ink)">1 connected ↗</a></div>
+        <div class="kv"><span>Share preview</span><a href="d4-share-access.html" style="color:var(--ink)">create link ↗</a></div>
+      </div>
     </div>
-
-    <div class="row" style="border-bottom:1px dashed var(--line);margin-bottom:16px"><span class="chip on" style="border-radius:4px 4px 0 0">Overview</span><a href="50-pages.html" class="chip" style="border:none">Pages&nbsp;↗</a><a href="15-domains.html" class="chip" style="border:none">Domains</a><a href="19-analytics.html" class="chip" style="border:none">Analytics</a><a href="14-site-settings.html" class="chip" style="border:none">Settings</a></div>
-    <div class="muted" style="font-size:10px;margin:-10px 0 14px">↗ = opens the editor (authoring lives there, per boundary §3)</div>
-    <div class="row" style="margin-bottom:14px;flex-wrap:wrap"><span class="muted" style="font-size:11px">Site tools:</span><a href="d2-forms.html" class="chip">Forms</a><a href="d3-redirects.html" class="chip">Redirects</a><a href="d5-seo.html" class="chip">SEO</a><a href="d4-share-access.html" class="chip">Share links</a><a href="19-analytics.html" class="chip">Analytics</a></div>
-
-    <div class="grid2" style="margin-bottom:14px">
-      <div class="box pad"><div class="lbl">Live URL</div><div class="row" style="justify-content:space-between;margin-top:6px"><code style="font-size:12px">acme.com</code><a href="90-published.html" class="btn">Visit ↗</a></div><div class="row" style="justify-content:space-between;margin-top:6px"><span class="muted" style="font-size:10.5px">+ acme-main.vercel.app</span><a href="91-share.html" class="muted" style="font-size:10.5px;text-decoration:underline">Share private preview →</a></div></div>
-      <div class="box pad"><div class="lbl">Domain</div><div class="row" style="margin-top:6px"><span class="tag-exists">● Connected · SSL</span></div><a href="22-domain-pending.html" class="muted" style="font-size:10.5px;display:block;margin-top:6px;text-decoration:underline">Manage domain</a></div>
-    </div>
-    <div class="grid3" style="margin-bottom:16px">
-      <div class="box pad"><div class="lbl">Last published</div><div class="h2" style="margin-top:4px">2d ago</div></div>
-      <div class="box pad"><div class="lbl">Pages</div><div class="h2" style="margin-top:4px">6</div></div>
-      <div class="box pad"><div class="lbl">Visitors (30d)</div><div class="h2" style="margin-top:4px">— <span class="tag-new" style="vertical-align:middle">analytics later</span></div></div>
-    </div>
-
-    <div class="box pad" style="border-color:var(--ink);margin-bottom:14px"><div class="row" style="justify-content:space-between"><div><div class="h2">Danger zone</div><div class="muted" style="font-size:11px">Transfer ownership or permanently delete this site. Owner-only (§8.7).</div></div><a href="70-confirm.html" class="btn">Manage…</a></div></div>
-    <div class="note"><b>Site detail = operate one site (boundary):</b> URLs, domain status, publish history, danger-zone (transfer/delete) — all the run-the-business surface. The single jump to author is "Edit in editor". No editing of page content happens here.</div>
-  </main>
+    <div class="note2"><b>No authoring here.</b> Pages, SEO content, styles, code = <b>Edit ↗</b> (editor). Domains, traffic, forms inbox, sharing, publishing, versions = these tabs. The boundary is the object tree (<a href="m-ownership.html" style="color:var(--ink-2)">M-ownership</a>).</div>
+  </div>
 </div>
-<div class="proto-nav"><b>Flow:</b><a href="10-dashboard.html">Dashboard</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="editor-spine-wireframe.html">Editor</a><a href="20-publish.html">Publish</a><a href="22-domain-pending.html">Domain</a><a href="12-site-detail.html" class="here">Site detail</a></div>
+<div style="margin:16px 18px 6px"><div style="font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px">States on this surface — site detail</div><div style="display:flex;gap:7px;flex-wrap:wrap;font-size:10.5px;color:var(--ink-2)"><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Loading &rarr; skeleton of URLs / domain / history</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Couldn’t load this site &rarr; cause + Retry (data is safe)</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">No access (your role) &rarr; “ask an admin”</span></div><div style="font-size:10.5px;color:var(--ink-3);margin-top:6px">Full state coverage → <a href="s-dashboard-states.html">s-dashboard-states</a> · <a href="80-states.html">state standard</a></div></div>
+<div class="proto-nav"><b>Site detail:</b><a href="m3-dashboard.html">Dashboard</a><a href="m-editor.html">Edit ↗</a><a href="14-site-settings.html">Publishing</a><a href="19-analytics.html">Traffic</a><a href="index.html">Map</a></div>
 </body></html>

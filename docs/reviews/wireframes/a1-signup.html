@@ -14,7 +14,7 @@
     <a href="a2-verify-email.html" class="btn btn-fill btn-strong" style="width:100%;text-align:center;margin-bottom:10px">Create account →</a>
     <button class="btn" style="width:100%;margin-bottom:10px">Continue with Google</button>
     <div class="muted" style="text-align:center;font-size:11px">Already have an account? <a href="00-signin.html" style="text-decoration:underline;color:var(--ink-2)">Sign in</a></div>
-    <div class="note" style="margin-top:14px;font-size:10.5px"><b>Email-first (grounded):</b> <code>auth.checkEmail</code> is timing-safe (no enumeration) — known email → sign-in (00), new → this. New signup then routes to email-verify (A2) → role-select (04) → first-run (13). Agree to <a href="f2-system.html" style="text-decoration:underline">Terms/Privacy</a> on submit.</div>
+    <div class="note" style="margin-top:14px;font-size:10.5px"><b>Email-first (grounded):</b> <code>auth.checkEmail</code> is timing-safe (no enumeration) — known email → sign-in (00), new → this. New signup then routes to verify (A2) → setup (04/04b, solo vs agency) → Start (01). Agree to <a href="f2-system.html" style="text-decoration:underline">Terms/Privacy</a> on submit.</div>
   </div>
 </div>
 <div class="proto-nav"><b>Auth:</b><a href="00-signin.html">Sign in</a><a href="a1-signup.html" class="here">Sign up</a><a href="a2-verify-email.html">Verify email</a><a href="a3-password.html">Password</a><a href="a4-2fa.html">2FA</a><a href="a5-invite.html">Invite</a><a href="a8-auth-errors.html">Errors</a><a href="index.html">Map</a></div>

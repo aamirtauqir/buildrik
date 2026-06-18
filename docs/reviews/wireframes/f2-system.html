@@ -1,31 +1,32 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · System pages</title><link rel="stylesheet" href="wf.css">
-<style>.vs{display:none}.vs.on{display:block}.sk{height:9px;background:var(--fill-2);border-radius:3px;margin:6px 0}</style></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · f2 — System pages (white-label)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:880px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .sys{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .sh{padding:7px 11px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600}
+  .sb{padding:13px 11px;min-height:78px;text-align:center;color:var(--ink-3);font-size:11px}
+  .sb .logo{font-size:11px;font-weight:600;color:var(--ink-2);border:1px solid var(--line-d);border-radius:4px;padding:2px 8px;display:inline-block;margin-bottom:6px}
+  .sb .t{font-size:12px;font-weight:600;color:var(--ink-2)}
+  .wl{border:2px solid var(--ink);border-radius:8px;padding:12px 15px;background:var(--fill);margin-bottom:12px;font-size:12px;color:var(--ink-2);line-height:1.5}
+  .wl b{color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
-<div class="screen screen-narrow">
-  <div class="topnote"><b>System &amp; legal pages</b> · grounded in <code>/terms</code> <code>/privacy</code> <code>/maintenance</code> <code>/not-found</code> <code>error.tsx</code> + cookie-consent / offline-banner · the app's plumbing screens</div>
-  <div class="pad">
-    <div class="row" style="margin-bottom:16px;flex-wrap:wrap;gap:5px">
-      <button class="chip on" onclick="sv('terms',this)">Terms</button>
-      <button class="chip" onclick="sv('privacy',this)">Privacy</button>
-      <button class="chip" onclick="sv('cookie',this)">Cookie consent</button>
-      <button class="chip" onclick="sv('offline',this)">Offline</button>
-      <button class="chip" onclick="sv('404',this)">Dashboard 404</button>
-      <button class="chip" onclick="sv('error',this)">Error boundary</button>
-      <button class="chip" onclick="sv('maint',this)">Maintenance</button>
+<div class="wf-stamp">WIREFRAME · f2 · SYSTEM PAGES</div>
+<div class="screen">
+  <div class="topnote"><b>System / legal pages — white-labelled for clients.</b> Rebuilt: client-facing system, legal and maintenance shells carry the <b>agency's brand</b>, not "Buildrik". The platform's own system pages stay platform-branded.</div>
+  <div class="wrap">
+    <div class="wl"><b>White-label applies:</b> a client invited to <b>studio.northwind.com</b> who hits a maintenance / 404 / cookie / legal page sees <b>Northwind Studio</b> branding. Set once in <a href="18-workspace.html" style="color:var(--ink)">Workspace › Branding</a>.</div>
+    <div class="grid">
+      <div class="sys"><div class="sh">404 (client site)</div><div class="sb"><div class="logo">Northwind ▢</div><div class="t">Page not found</div><div>back to home</div></div></div>
+      <div class="sys"><div class="sh">Maintenance</div><div class="sb"><div class="logo">Northwind ▢</div><div class="t">Back soon</div><div>agency-branded</div></div></div>
+      <div class="sys"><div class="sh">Cookie consent</div><div class="sb"><div class="t">Decline / accept</div><div>privacy-first default</div></div></div>
+      <div class="sys"><div class="sh">Terms / Privacy</div><div class="sb"><div class="t">Legal shell</div><div>client or agency entity</div></div></div>
+      <div class="sys"><div class="sh">Offline</div><div class="sb"><div class="t">No connection</div><div>retry</div></div></div>
+      <div class="sys"><div class="sh">Dashboard 404</div><div class="sb"><div class="logo">Buildrik</div><div class="t">platform-branded</div><div>(not client-facing)</div></div></div>
     </div>
-    <div class="box pad" style="min-height:210px">
-      <div class="vs on" id="s_terms"><div class="h1" style="font-size:18px;margin-bottom:8px">Terms of Service</div><div class="muted" style="font-size:11px;margin-bottom:10px">Last updated 2026-06-15</div><div class="sk" style="width:90%"></div><div class="sk"></div><div class="sk" style="width:80%"></div><div class="sk" style="width:95%"></div><div class="muted" style="font-size:10.5px;margin-top:10px">Static legal page; linked from sign-up + footer.</div></div>
-      <div class="vs" id="s_privacy"><div class="h1" style="font-size:18px;margin-bottom:8px">Privacy Policy</div><div class="muted" style="font-size:11px;margin-bottom:10px">GDPR + data handling</div><div class="sk" style="width:88%"></div><div class="sk"></div><div class="sk" style="width:75%"></div><div class="muted" style="font-size:10.5px;margin-top:10px">Covers analytics IP anonymization, data export/delete (account danger zone B1).</div></div>
-      <div class="vs" id="s_cookie"><div style="display:grid;place-items:center;min-height:160px"><div class="box pad" style="max-width:380px;border:2px solid var(--ink)"><b style="font-size:13px">Cookies</b><div class="muted" style="font-size:11.5px;margin:6px 0 10px">We use essential cookies to run the app. Optional analytics cookies help us improve — your choice.</div><div class="row" style="justify-content:flex-end"><button class="btn">Decline non-essential</button><button class="btn btn-fill">Accept</button></div></div></div><div class="muted" style="font-size:10.5px;margin-top:8px">Privacy-first default = decline non-essential. Choice persisted.</div></div>
-      <div class="vs" id="s_offline"><div style="display:grid;place-items:center;min-height:160px;text-align:center"><div><div style="font-size:24px">📡</div><div class="h2" style="margin:6px 0">You're offline</div><div class="muted" style="font-size:11.5px;max-width:300px">Your edits are saved on this device and will sync when you reconnect. (See save-states 60.)</div></div></div></div>
-      <div class="vs" id="s_404"><div style="display:grid;place-items:center;min-height:160px;text-align:center"><div><div class="h1" style="font-size:36px">404</div><div class="muted" style="font-size:12px;margin-bottom:12px">This dashboard page doesn't exist.</div><a href="10-dashboard.html" class="btn btn-fill">Back to dashboard</a></div></div><div class="muted" style="font-size:10.5px;margin-top:8px">App-shell 404 (distinct from a published site's own 404, screen 90).</div></div>
-      <div class="vs" id="s_error"><div style="display:grid;place-items:center;min-height:160px;text-align:center"><div><div style="font-size:24px">⚠</div><div class="h2" style="margin:6px 0">Something went wrong</div><div class="muted" style="font-size:11.5px;max-width:320px;margin-bottom:12px">An unexpected error occurred. We've been notified. Your work is safe.</div><div class="row" style="justify-content:center"><button class="btn btn-fill">Reload</button><a href="c3-help.html" class="btn">Contact support</a></div></div></div></div>
-      <div class="vs" id="s_maint"><div style="display:grid;place-items:center;min-height:160px;text-align:center"><div><div style="font-size:24px">🛠</div><div class="h2" style="margin:6px 0">Down for maintenance</div><div class="muted" style="font-size:11.5px;max-width:320px">Buildrik is briefly offline for an upgrade. Published sites stay live — only the editor/dashboard pause. Back shortly.</div></div></div></div>
-    </div>
-    <div class="note" style="margin-top:14px;font-size:10.5px"><b>Plumbing, but real (grounded):</b> these ship with the app. Published <i>visitor</i> sites have their own 404/offline (90); these are the Buildrik app-shell versions. Maintenance keeps published sites serving (they're on Vercel, independent of the dashboard).</div>
+    <div class="note2"><b>Two brand contexts.</b> Anything a client sees = agency brand (white-label). The platform's own admin/error surfaces stay Buildrik-branded. Cookie banner defaults to decline-non-essential.</div>
   </div>
 </div>
-<div class="proto-nav"><b>System:</b><a href="00-signin.html">Sign in</a><a href="a8-auth-errors.html">Auth errors</a><a href="f2-system.html" class="here">System pages</a><a href="90-published.html">Site 404</a><a href="80-states.html">State standard</a><a href="index.html">Map</a></div>
-<script>var S=['terms','privacy','cookie','offline','404','error','maint'];function sv(x,b){S.forEach(function(k){document.getElementById('s_'+k).classList.toggle('on',k===x);});document.querySelectorAll('.row .chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
+<div class="proto-nav"><b>System:</b><a href="18-workspace.html">White-label</a><a href="m-agency.html">Agency</a><a href="90-published.html">Live site</a><a href="index.html">Map</a></div>
 </body></html>

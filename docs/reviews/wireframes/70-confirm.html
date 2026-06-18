@@ -1,44 +1,57 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Confirm actions</title><link rel="stylesheet" href="wf.css">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 70 — Destructive confirm (pattern)</title><link rel="stylesheet" href="wf.css">
 <style>
-  .menu{position:absolute;border:1px solid var(--line);background:#fff;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.1);width:180px;font-size:12.5px;overflow:hidden}
-  .mi{padding:8px 12px;cursor:pointer}.mi:hover{background:var(--fill)}.mi.danger{color:var(--ink);border-top:1px dashed var(--line)}
+  .wrap{padding:16px 20px;max-width:880px}
+  .lead{font-size:11.5px;color:var(--ink-2);margin-bottom:12px;line-height:1.5}.lead b{color:var(--ink)}
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .card{border:2px solid var(--ink);border-radius:9px;padding:13px 14px;background:#fff}
+  .card .tag{font-size:8.5px;letter-spacing:.04em;background:var(--ink);color:#fff;border-radius:3px;padding:1px 6px}
+  .card .h{font-size:13px;font-weight:700;margin:7px 0 4px}
+  .card .d{font-size:11px;color:var(--ink-2);line-height:1.4}
+  .card .typ{font-size:10px;color:var(--ink-3);margin-top:9px}
+  .card .in{border:1px dashed var(--line-d);border-radius:5px;padding:6px 9px;font-family:var(--mono);font-size:11px;color:var(--ink-2);margin:4px 0 9px;background:var(--bg-2)}
+  .card .go{display:block;text-align:center;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:6px;padding:7px;font-size:12px;font-weight:600;text-decoration:none}
+  .card .cancel{display:block;text-align:center;font-size:11px;color:var(--ink-2);margin-top:6px;text-decoration:none}
+  .card.transfer{border-style:solid}
+  .pick{border:1px solid var(--line);border-radius:5px;padding:6px 9px;font-size:11px;color:var(--ink-2);margin:4px 0 9px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:14px}.note2 b{color:var(--ink)}
 </style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
-<div class="screen screen-narrow">
-  <div class="topnote"><b>Row actions ⋯ + destructive confirm</b> · the drill-in behind Sites ⋯ and danger-zone · solution: irreversible/financial ops need explicit confirm (type-to-confirm for delete) — owner-only per §8.7</div>
-  <div class="pad">
-    <div class="grid2" style="align-items:start">
-      <div>
-        <div class="lbl" style="margin-bottom:8px">⋯ menu (open state)</div>
-        <div style="position:relative;height:200px;border:1px dashed var(--line);border-radius:6px;background:var(--bg-2)">
-          <div class="row" style="justify-content:space-between;padding:10px 12px;font-size:12.5px"><span><b>acme-main</b> · published</span><span class="btn" style="padding:2px 8px">⋯</span></div>
-          <div class="menu" style="top:36px;right:12px">
-            <div class="mi">↗ Open live site</div>
-            <div class="mi">✎ Edit in editor</div>
-            <div class="mi">⧉ Duplicate</div>
-            <div class="mi">→ Transfer to member</div>
-            <div class="mi">▸ Settings</div>
-            <div class="mi danger">🗑 Delete site…</div>
-          </div>
-        </div>
-        <div class="note" style="margin-top:10px;font-size:10.5px">Non-destructive items act immediately. "Delete" + "Transfer" open a confirm (right) — never one-click.</div>
+<div class="wf-stamp">WIREFRAME · 70 · DESTRUCTIVE CONFIRM</div>
+<div class="screen">
+  <div class="topnote"><b>Destructive confirm — one reusable pattern.</b> Every irreversible/financial action (delete site · delete account · transfer workspace) routes here; the screen <b>adapts to the target</b>. Delete = type-to-confirm; transfer = pick-recipient. Owner/Admin-only (§8.7, see <a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a>).</div>
+  <div class="wrap">
+    <div class="lead">The same modal pattern, parameterized by what you're confirming. Reached from: Sites ⋯, <a href="b1-account-settings.html" style="color:var(--ink-2)">account danger zone</a>, <a href="18-workspace.html" style="color:var(--ink-2)">workspace danger zone</a>.</div>
+    <div class="cards">
+      <div class="card">
+        <span class="tag">IRREVERSIBLE</span>
+        <div class="h">Delete a site</div>
+        <div class="d">Unpublishes the domain, removes pages + history. Can't be undone.</div>
+        <div class="typ">Type <code>acme-main</code> to confirm</div>
+        <div class="in">acme-main</div>
+        <a class="go" href="11-sites.html">Delete site permanently</a>
+        <a class="cancel" href="12-site-detail.html">Cancel</a>
       </div>
-      <div>
-        <div class="lbl" style="margin-bottom:8px">Delete confirm (type-to-confirm)</div>
-        <div class="box pad" style="border:2px solid var(--ink)">
-          <span class="tag-new">IRREVERSIBLE</span>
-          <div class="h2" style="margin:8px 0 4px">Delete "acme-main"?</div>
-          <div class="muted" style="font-size:11.5px;margin-bottom:10px">This <b>unpublishes acme.com</b> and permanently removes the site, its pages, and history. Can't be undone.</div>
-          <div class="lbl">Type <code>acme-main</code> to confirm</div>
-          <div class="input" style="margin:5px 0 12px">acme-main</div>
-          <button class="btn btn-fill btn-strong" style="width:100%;margin-bottom:8px">Delete site permanently</button>
-          <a href="javascript:history.back()" class="btn" style="width:100%;text-align:center">Cancel — back to where you opened it</a>
-        </div>
-        <div class="note" style="margin-top:10px;font-size:10.5px"><b>Owner-only (§8.7):</b> editors/viewers don't see Delete/Transfer. Same modal pattern reused for workspace transfer (screen 18) with a member-picker instead of type-to-confirm.</div>
+      <div class="card">
+        <span class="tag">IRREVERSIBLE</span>
+        <div class="h">Delete your account</div>
+        <div class="d">Removes your profile + access. 30-day grace, then permanent. Workspace data handled separately.</div>
+        <div class="typ">Type your email to confirm</div>
+        <div class="in">sara@northwind.com</div>
+        <a class="go" href="00-signin.html">Delete account</a>
+        <a class="cancel" href="b1-account-settings.html">Cancel</a>
+      </div>
+      <div class="card transfer">
+        <span class="tag">OWNERSHIP</span>
+        <div class="h">Transfer workspace</div>
+        <div class="d">Hands ownership to another Admin. They must accept (receives an invite).</div>
+        <div class="typ">Pick the new owner</div>
+        <div class="pick">imran@northwind.com ▾</div>
+        <a class="go" href="a7-transfer-accept.html">Send transfer →</a>
+        <a class="cancel" href="18-workspace.html">Cancel</a>
       </div>
     </div>
+    <div class="note2"><b>Owner/Admin-only.</b> Editors/Viewers never see Delete/Transfer (<a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>). Delete = type the exact name/email (no accidental clicks); transfer = pick a recipient who then accepts via <a href="a7-transfer-accept.html" style="color:var(--ink-2)">a7</a>. Billing actions (cancel plan) use the same confirm pattern.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="18-workspace.html">Workspace</a><a href="62-permissions.html">Roles</a><a href="70-confirm.html" class="here">Confirm</a></div>
+<div class="proto-nav"><b>Confirm:</b><a href="11-sites.html">Sites</a><a href="b1-account-settings.html">Account danger</a><a href="18-workspace.html">Workspace danger</a><a href="a7-transfer-accept.html">Transfer accept</a><a href="m-roles.html">Roles</a><a href="index.html">Map</a></div>
 </body></html>

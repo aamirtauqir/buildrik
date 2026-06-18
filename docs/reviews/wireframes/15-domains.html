@@ -9,27 +9,21 @@
 <div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen">
   <div class="topnote"><b>Domains — Dashboard (§3 ops)</b> · grounded in current Vercel domain integration · solution: one place to see every domain + status across sites; add → the §8.6 DNS journey</div>
+  <div class="dbar">
+    <div class="ws"><span class="logo">N</span> Northwind Studio <span class="sw">agency ▾</span></div>
+    <span class="sp"></span>
+    <div class="dnav"><a href="m3-dashboard.html">Home</a><a href="m-agency.html">Clients</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html">Billing</a></div>
+    <a class="icn" href="c2-notifications.html" title="Notifications">🔔</a><a class="icn" href="c3-help.html" title="Help">?</a><a class="icn" href="b1-account-settings.html" title="Account">N</a>
+  </div>
   <div class="ed">
-    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
-      <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
-      <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div><a href="a6-workspace-select.html" style="text-decoration:none;color:inherit" title="Switch workspace">Acme Co ▾</a></div>
-      <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
-        <a href="10-dashboard.html" class="navi">⌂ Home</a>
-        <a href="11-sites.html" class="navi">▦ Sites</a>
-      <a href="c1-team.html" class="navi">👤 Team</a>
-        <a href="15-domains.html" class="navi here">◐ Domains</a>
-        <a href="17-media.html" class="navi">▤ Media</a>
-        <a href="b0-settings-home.html" class="navi">⚙ Settings</a>
-        <a href="16-billing.html" class="navi">$ Billing</a>
-      </nav>
-    </aside>
-    <main class="pad">
-      <div class="row" style="justify-content:space-between;margin-bottom:14px"><div class="h1">Domains</div><a href="22-domain-pending.html" class="btn btn-fill btn-strong">+ Connect domain</a></div>
+    <main class="pad" style="grid-column:1/-1">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="h1">Domains <span class="muted" style="font-size:12px;font-weight:400">— all sites (monitor)</span></div><a href="22-domain-pending.html" class="btn btn-fill btn-strong">+ Connect domain</a></div>
+      <div class="muted" style="font-size:11px;margin-bottom:12px">Workspace-wide status only. To edit a domain, open it on its site: <b>Site detail › Domains</b>.</div>
       <div class="box">
         <div class="dom h"><span>Domain</span><span>Site</span><span>Status</span><span></span></div>
-        <div class="dom"><span><b>acme.com</b><div class="muted" style="font-size:10px">+ www · primary</div></span><span>acme-main</span><span class="tag-exists">● Connected</span><span class="muted" style="font-size:10.5px">SSL ✓</span></div>
-        <div class="dom"><span><b>launch.acme.com</b></span><span>launch-lp</span><span class="tag-new">⏳ Pending</span><a href="22-domain-pending.html" class="muted" style="font-size:10.5px;text-decoration:underline">Verify</a></div>
-        <div class="dom" style="border-bottom:none"><span><b>blog.acme.com</b></span><span>old-blog</span><span class="chip" style="font-size:10px;padding:1px 7px">✕ Error</span><a href="22-domain-pending.html" class="muted" style="font-size:10.5px;text-decoration:underline">Fix DNS</a></div>
+        <div class="dom"><span><b>acme.com</b><div class="muted" style="font-size:10px">+ www · primary</div></span><a href="d6-domains.html" style="color:var(--ink-2);text-decoration:underline">acme-main ↗</a><span class="tag-exists">● Connected</span><span class="muted" style="font-size:10.5px">SSL ✓</span></div>
+        <div class="dom"><span><b>launch.acme.com</b></span><a href="d6-domains.html" style="color:var(--ink-2);text-decoration:underline">launch-lp ↗</a><span class="tag-new">⏳ Pending</span><a href="22-domain-pending.html" class="muted" style="font-size:10.5px;text-decoration:underline">Verify</a></div>
+        <div class="dom" style="border-bottom:none"><span><b>blog.acme.com</b></span><a href="d6-domains.html" style="color:var(--ink-2);text-decoration:underline">old-blog ↗</a><span class="chip" style="font-size:10px;padding:1px 7px">✕ Error</span><a href="22-domain-pending.html" class="muted" style="font-size:10.5px;text-decoration:underline">Fix DNS</a></div>
       </div>
       <div class="grid3" style="margin-top:14px">
         <div class="box pad"><div class="lbl">Connected</div><div class="h2" style="margin-top:4px">1</div></div>
@@ -40,5 +34,5 @@
     </main>
   </div>
 </div>
-<div class="proto-nav"><b>Dashboard ops:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="14-site-settings.html">Site settings</a><a href="15-domains.html" class="here">Domains</a><a href="16-billing.html">Billing</a><a href="22-domain-pending.html">Domain journey</a></div>
+<div class="proto-nav"><b>Dashboard ops:</b><a href="m3-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="14-site-settings.html">Publishing</a><a href="15-domains.html" class="here">Domains</a><a href="16-billing.html">Billing</a><a href="22-domain-pending.html">Domain journey</a></div>
 </body></html>

@@ -1,9 +1,10 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Image editor</title><link rel="stylesheet" href="wf.css">
 <style>.vs{display:none}.vs.on{display:block}.tool{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--ink-2);cursor:pointer;padding:6px 8px;border-radius:5px}.tool:hover{background:var(--fill)}.tool.on{background:var(--ink);color:#fff}.tool .i{font-size:15px}</style></head>
 <body>
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#fafafa;color:#2b2b2b;font:600 11.5px/1.45 system-ui,sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #c7c7c7">↻ RECONCILED ROLE (2026-06-18): In-place asset subtool launched from the picker/library.</div>
 <div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen">
-  <div class="topnote"><b>Image editor · icon picker · version history</b> · grounded in media arc (image editor before/after, IconPickerModal, <code>MediaAssetVersion</code>) · the media sub-tools behind 56</div>
+  <div class="topnote"><b>Image editor · icon picker · version history</b> · grounded in media arc (image editor before/after, IconPickerModal, <code>MediaAssetVersion</code>) · the asset sub-tools behind 56</div>
   <div class="pad">
     <div class="row" style="margin-bottom:14px"><button class="chip on" onclick="m('edit',this)">Image editor</button><button class="chip" onclick="m('icon',this)">Icon picker</button><button class="chip" onclick="m('ver',this)">Version history</button></div>
 
@@ -56,6 +57,6 @@
     </div>
   </div>
 </div>
-<div class="proto-nav"><b>Media:</b><a href="56-media.html">Media</a><a href="56b-stock.html">Stock</a><a href="56c-image-editor.html" class="here">Image editor</a><a href="17-media.html">Dashboard media</a><a href="ds1-design-system.html">Icon tokens</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Assets:</b><a href="56-media.html">Assets</a><a href="56b-stock.html">Stock</a><a href="56c-image-editor.html" class="here">Image editor</a><a href="17-media.html">Dashboard Assets</a><a href="ds1-design-system.html">Icon tokens</a><a href="index.html">Map</a></div>
 <script>var M=['edit','icon','ver'];function m(x,b){M.forEach(function(k){document.getElementById('m_'+k).classList.toggle('on',k===x);});document.querySelectorAll('.row .chip').forEach(function(c){});b.parentNode.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
 </body></html>

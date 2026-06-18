@@ -1,41 +1,48 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Integrations</title><link rel="stylesheet" href="wf.css">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · c4 — Workspace integrations (connect)</title><link rel="stylesheet" href="wf.css">
 <style>
-  .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
-  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
-  .intg{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:6px;padding:12px;margin-bottom:8px}
+  .wrap{padding:16px 20px;max-width:800px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px}
+  .crumb b{color:var(--ink-2)}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 6px}
+  .grp:first-child{margin-top:4px}
+  .conn{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;background:#fff}
+  .conn .ic{width:32px;height:32px;border:1px solid var(--line-d);border-radius:7px;background:var(--fill);display:grid;place-items:center;font-size:13px;color:var(--ink-2)}
+  .conn .m{flex:1}
+  .conn .m .t{font-size:12.5px;font-weight:600}
+  .conn .m .d{font-size:10.5px;color:var(--ink-3);margin-top:1px}
+  .conn .st{font-size:10px;display:flex;align-items:center;gap:5px;color:var(--ink-2)}
+  .conn .st .dot{width:7px;height:7px;border-radius:50%;background:var(--ink)}
+  .btn{font-size:11px;border:1px solid var(--ink);border-radius:5px;padding:5px 11px;color:var(--ink);background:#fff;text-decoration:none}
+  .btn.conn-btn{background:var(--ink);color:#fff}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px}
+  .note2 b{color:var(--ink)} .note2 a{color:var(--ink-2)}
 </style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · c4 · WORKSPACE INTEGRATIONS</div>
 <div class="screen">
-  <div class="topnote"><b>Integrations</b> · grounded in <code>integrations.vercel.*</code> (OAuth) + <code>account.integrations.*</code> (generic webhooks) · per-workspace, ADMIN+ only</div>
-  <div class="ed">
-    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
-      <a href="18-workspace.html" class="muted" style="font-size:11px;text-decoration:none;display:block;margin-bottom:12px">← Workspace settings</a>
-      <div class="lbl" style="margin-bottom:6px">Settings</div>
-      <div style="display:flex;flex-direction:column;gap:2px;font-size:12.5px">
-        <a href="18-workspace.html" class="navi">General</a>
-        <a href="c1-team.html" class="navi">Members</a>
-        <a href="c4-integrations.html" class="navi here">Integrations</a>
-        <a href="c5-api-tokens.html" class="navi">API tokens</a>
-        <a href="16-billing.html" class="navi">Billing</a>
-      </div>
-    </aside>
-    <main class="pad">
-      <div class="h1" style="margin-bottom:4px">Integrations</div>
-      <div class="muted" style="font-size:12px;margin-bottom:16px">Connect Buildrik to the tools you already use.</div>
+  <div class="topnote"><b>Workspace integrations — connect providers ONCE.</b> Rebuilt: this is now <b>only</b> the connection layer (provider auth / shared accounts). The old "assign tracking to this site" mashup is gone — that's <a href="m-tracking.html" style="color:#fff;text-decoration:underline">Editor › Tracking</a> now. Admin-only. Analytics 3-layer, layer 1.</div>
+  <div class="dbar">
+    <div class="ws"><span class="logo">N</span> Northwind Studio <span class="sw">agency ▾</span></div>
+    <span class="sp"></span>
+    <div class="dnav"><a href="m3-dashboard.html">Home</a><a href="m-agency.html">Clients</a><a href="18-workspace.html" class="on">Workspace</a><a href="16-billing.html">Billing</a></div>
+    <a class="icn" href="c2-notifications.html" title="Notifications">🔔</a><a class="icn" href="c3-help.html" title="Help">?</a><a class="icn" href="b1-account-settings.html" title="Account">N</a>
+  </div>
+  <div class="subtabs"><a href="18-workspace.html">Branding</a><a href="ds1-design-system.html">Shared theme</a><a href="17-media.html">Assets</a><a href="c1-team.html">Team &amp; approvals</a><a href="c4-integrations.html" class="on">Integrations</a></div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind Studio</b> › Workspace › Integrations</div>
 
-      <div class="lbl" style="margin-bottom:6px">Deployment</div>
-      <div class="intg"><div class="ph-img" style="width:36px;height:36px">▲</div><div style="flex:1"><b style="font-size:13px">Vercel</b><div class="muted" style="font-size:11px">Deploy published sites · team <code>acme-team</code></div></div><span class="tag-exists">Connected</span><button class="btn" style="padding:4px 10px">Disconnect</button></div>
+    <div class="grp">Deploy</div>
+    <div class="conn"><div class="ic">▲</div><div class="m"><div class="t">Vercel</div><div class="d">publish target · per-workspace OAuth</div></div><span class="st"><span class="dot"></span> Connected</span></div>
 
-      <div class="lbl" style="margin:14px 0 6px">Analytics &amp; marketing <span class="muted" style="font-size:10px">(workspace connections · a per-site analytics tag is set on the site — see SEO/d5)</span></div>
-      <div class="intg"><div class="ph-img" style="width:36px;height:36px">GA</div><div style="flex:1"><b style="font-size:13px">Google Analytics</b><div class="muted" style="font-size:11px">Inject tracking ID site-wide</div></div><button class="btn" style="padding:4px 10px">Connect</button></div>
-      <div class="intg"><div class="ph-img" style="width:36px;height:36px">M</div><div style="flex:1"><b style="font-size:13px">Mailchimp</b><div class="muted" style="font-size:11px">Sync form submissions to a list</div></div><button class="btn" style="padding:4px 10px">Connect</button></div>
-      <div class="intg"><div class="ph-img" style="width:36px;height:36px">Z</div><div style="flex:1"><b style="font-size:13px">Zapier</b><div class="muted" style="font-size:11px">Webhook on form submit / publish</div></div><button class="btn" style="padding:4px 10px">Connect</button></div>
-      <div class="intg" style="margin-bottom:0"><div class="ph-img" style="width:36px;height:36px">S</div><div style="flex:1"><b style="font-size:13px">Slack</b><div class="muted" style="font-size:11px">Notify a channel on events · <button class="btn" style="padding:2px 7px">Test webhook</button></div></div><button class="btn" style="padding:4px 10px">Connect</button></div>
+    <div class="grp">Analytics providers <span style="color:var(--ink-3)">— connect the account; assign per-site in the editor</span></div>
+    <div class="conn"><div class="ic">◔</div><div class="m"><div class="t">Google Analytics</div><div class="d">account connected · used by 4 sites</div></div><span class="st"><span class="dot"></span> Connected</span></div>
+    <div class="conn"><div class="ic">◑</div><div class="m"><div class="t">Plausible</div><div class="d">privacy-first analytics</div></div><a class="btn conn-btn" href="c4-integrations.html">Connect</a></div>
 
-      <div class="note" style="margin-top:14px;font-size:10.5px"><b>Vercel = OAuth (grounded):</b> connect → authorize → team picker → encrypted token per workspace (AES-256-GCM). Disconnect revokes. Generic integrations = validated webhook URL + test event. Plan-limited count. OAuth errors (state-invalid/denied) surface inline.</div>
-    </main>
+    <div class="grp">Webhooks <span style="color:var(--ink-3)">— Pro, defer until a client needs one</span></div>
+    <div class="conn" style="opacity:.6"><div class="ic">⇄</div><div class="m"><div class="t">Mailchimp · Zapier · Slack</div><div class="d">generic outbound webhooks</div></div><a class="btn" href="c4-integrations.html">Add</a></div>
+
+    <div class="note2"><b>One connection, many sites.</b> Connect a provider here once; each site picks which property to report to in <a href="m-tracking.html" style="color:var(--ink-2)">Editor › Tracking</a>; reports read in <a href="19-analytics.html" style="color:var(--ink-2)">Dashboard › Traffic</a>. No "connect" button anywhere else — that was the 3-doors-for-analytics problem.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Settings:</b><a href="18-workspace.html">Workspace</a><a href="c1-team.html">Team</a><a href="c4-integrations.html" class="here">Integrations</a><a href="c5-api-tokens.html">API tokens</a><a href="16-billing.html">Billing</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Integrations:</b><a href="m-tracking.html">Tracking (assign)</a><a href="19-analytics.html">Traffic (view)</a><a href="18-workspace.html">Workspace</a><a href="m-ownership.html">Ownership</a><a href="s-account-states.html">States</a><a href="index.html">Map</a></div>
 </body></html>

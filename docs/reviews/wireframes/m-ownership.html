@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · M-ownership — one home per concept (decision map)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1160px}
+  .rule{border:2px solid var(--ink);border-radius:9px;padding:13px 17px;background:var(--fill);margin:8px 0 6px;font-size:13px;line-height:1.55}
+  .rule b{font-weight:700}
+  .rule code{font-family:var(--mono);font-size:11.5px;background:#fff;border:1px solid var(--line);border-radius:3px;padding:1px 5px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--ink-2);margin:8px 0 4px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .sw.edit{background:var(--ink)}
+  .sw.dash{background:#fff;border:1px solid var(--ink)}
+  .sw.ws{background:var(--ink-3)}
+  .sw.call{background:repeating-linear-gradient(45deg,var(--ink),var(--ink) 3px,#fff 3px,#fff 6px)}
+
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+
+  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:2px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--fill);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  td b{color:var(--ink)}
+  .home{font-weight:600;white-space:nowrap}
+  .home .pin{display:inline-block;font-size:8px;letter-spacing:.03em;border-radius:3px;padding:1px 5px;margin-right:4px;vertical-align:middle}
+  .pin.edit{background:var(--ink);color:#fff}
+  .pin.dash{border:1px solid var(--ink);color:var(--ink)}
+  .pin.ws{background:var(--ink-3);color:#fff}
+  .cut{color:var(--ink-3);text-decoration:line-through}
+  tr.call td{background:#faf7f0}
+  tr.call .home .pin.call{background:repeating-linear-gradient(45deg,var(--ink),var(--ink) 3px,#fff 3px,#fff 6px);color:var(--ink);border:1px solid var(--ink)}
+  .callflag{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);border:1px solid var(--ink);border-radius:3px;padding:1px 5px;font-weight:600;white-space:nowrap}
+
+  .why{font-size:11px;color:var(--ink-2);line-height:1.4}
+  .why b{color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.45}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · M-OWNERSHIP · DECISION MAP</div>
+<div class="screen">
+  <div class="topnote"><b>M-ownership — one home per concept (suggested map).</b> Codex's #1 fix: before any cut or merge, decide <b>who owns each contested concept</b>. This is my recommended call for every one, with the mirror rule. <b>Ratify or flip.</b> Rows shaded + flagged <span class="callflag">decided ✓</span> are genuine product decisions where my pick could reasonably go the other way — those are the ones to confirm first.</div>
+  <div class="wrap">
+
+    <div class="rule">
+      <b>The rule:</b> every concept has exactly <b>ONE authoring home</b> (where you WRITE it). It may appear elsewhere only as a <b>read-only mirror</b> with an <code>Edit in [home] ↗</code> link — never a second editable copy. Page-level things get one <b>override home</b> (the page drawer). <b>Mirror ≠ duplicate</b> (codex): <code>53-settings</code>'s "mirror, never 404" pattern is the thing to <i>spread</i>, not delete.
+    </div>
+    <div class="legend">
+      <span><span class="sw edit"></span> <b>Editor</b> = make the thing (Page/Section/Element + content config)</span>
+      <span><span class="sw dash"></span> <b>Dashboard</b> = run the business (Workspace/Client/Site ops)</span>
+      <span><span class="sw ws"></span> <b>Workspace</b> = agency-shared (cross-client)</span>
+      <span><span class="sw call"></span> founder call (my pick, flip if you disagree)</span>
+    </div>
+
+    <div class="sech">Core content + design (Editor owns)</div>
+    <table>
+      <tr><th style="width:13%">Concept</th><th style="width:21%">Authoring home (writes)</th><th style="width:17%">Override / 2nd home</th><th style="width:19%">Read-only mirror</th><th style="width:30%">My call &amp; what it kills</th></tr>
+
+      <tr class="call">
+        <td><b>SEO</b></td>
+        <td class="home"><span class="pin call">CALL</span> Split by type: Content → Editor · Technical → Dashboard <span class="callflag">refined ✓</span></td>
+        <td>Pages drawer › SEO (per-page content override)</td>
+        <td>Site-wide canonical · index · sitemap → Dashboard › Publishing (d5)</td>
+        <td class="why"><b>Split by SEO TYPE.</b> <b>Content SEO</b> (titles/desc/OG, per-page) is editor-owned — authored with the content. <b>Technical SEO</b> (canonical/index/sitemap) is dashboard-owned (<code>d5</code>). The dashboard never authors content SEO — it mirrors it read-only ("Edit in editor ↗"). See call #1.</td>
+      </tr>
+      <tr>
+        <td><b>Forms</b></td>
+        <td class="home"><span class="pin edit">EDIT</span> Editor › form block (config)</td>
+        <td>—</td>
+        <td>—</td>
+        <td class="why"><b>Two jobs, two homes (not a dupe):</b> author the form in the editor; the <b>submissions inbox</b> lives in Dashboard (next row). Kills the split form-config in <span class="cut">53</span>.</td>
+      </tr>
+      <tr>
+        <td><b>Custom code / &lt;head&gt;</b></td>
+        <td class="home"><span class="pin edit">EDIT</span> Editor › Site (Pro)</td>
+        <td>Pages drawer › &lt;head&gt; (per-page, Pro)</td>
+        <td>—</td>
+        <td class="why">Site-wide + per-page head code is authored with the site. Pro-only. One home + one override.</td>
+      </tr>
+      <tr>
+        <td><b>Styles / inspector</b></td>
+        <td class="home"><span class="pin edit">EDIT</span> Editor › Styles</td>
+        <td>3-reach: item / block / theme</td>
+        <td>—</td>
+        <td class="why">One styling model (the 3 reaches). Tokens/presets are the Pro depth of the same home. Kills ds2-as-separate-concept.</td>
+      </tr>
+      <tr>
+        <td><b>Components</b></td>
+        <td class="home"><span class="pin edit">EDIT</span> Editor › Insert (Pro)</td>
+        <td>Promote to shared → Workspace</td>
+        <td>—</td>
+        <td class="why">One impl (kill V1/V2 + 2 create modals). Site-local by default; "promote to shared" pushes it up to the Workspace library.</td>
+      </tr>
+      <tr>
+        <td><b>History / versions</b></td>
+        <td class="home"><span class="pin edit">EDIT</span> Undo → Editor topbar · <span class="pin dash">DASH</span> Versions → Dashboard</td>
+        <td>—</td>
+        <td>Dashboard site-detail "last edited"</td>
+        <td class="why"><b>Two time-models, two homes:</b> in-session <b>undo/redo</b> → editor topbar; published <b>versions + restore</b> → Dashboard › Versions (<code>58</code>). The old editor History <span class="cut">rail tab</span> is killed (folded into the topbar); 58 is repurposed as the dashboard Versions screen, not deleted.</td>
+      </tr>
+      <tr>
+        <td><b>AI</b></td>
+        <td class="home"><span class="pin edit">EDIT</span> One assistant — separate ✨ surface + ⌘K + Start</td>
+        <td>—</td>
+        <td>—</td>
+        <td class="why">One AI brain in a <b>distinct assistant surface</b> (the ✨ panel) that can edit the <b>whole design</b> — generate, restyle, rewrite, restructure. Reachable from the topbar, ⌘K, and Start. Kills the standalone AI <span class="cut">rail tab (54)</span> and the buried-in-Insert version — AI is its own thing, not a rail destination.</td>
+      </tr>
+    </table>
+
+    <div class="sech">Business + ops (Dashboard owns)</div>
+    <table>
+      <tr><th style="width:13%">Concept</th><th style="width:21%">Authoring home (writes)</th><th style="width:17%">Override / 2nd home</th><th style="width:19%">Read-only mirror</th><th style="width:30%">My call &amp; what it kills</th></tr>
+
+      <tr>
+        <td><b>Domains / DNS</b></td>
+        <td class="home"><span class="pin dash">DASH</span> Dashboard › Site detail</td>
+        <td>—</td>
+        <td>Editor deep-links out ("opens dashboard ↗")</td>
+        <td class="why">Business/ops, server-side. Editor never owns DNS. Already shipped (Vercel OAuth).</td>
+      </tr>
+      <tr>
+        <td><b>Analytics</b></td>
+        <td class="home"><span class="pin ws">WS</span> connect → Workspace · <span class="pin edit">EDIT</span> assign → Editor</td>
+        <td>view → Dashboard</td>
+        <td>—</td>
+        <td class="why"><b>Three layers (not two):</b> <b>connect</b> the GA/Plausible account ONCE → Workspace › Integrations; <b>assign</b> which property a site reports to → Editor › Tracking; <b>view</b> reports → Dashboard › Traffic. Kills the page-drawer config + the "<span class="cut">Analytics &amp; integrations</span>" combined label.</td>
+      </tr>
+      <tr>
+        <td><b>Analytics view · Forms inbox</b></td>
+        <td class="home"><span class="pin dash">DASH</span> Dashboard › Site detail › Traffic / Inbox</td>
+        <td>—</td>
+        <td>—</td>
+        <td class="why">Reading reports + collecting submissions = ops/business views. One home each. Honest-empty states kept.</td>
+      </tr>
+      <tr class="call">
+        <td><b>Redirects</b></td>
+        <td class="home"><span class="pin call">CALL</span> Dashboard › Site detail › Publishing <span class="callflag">decided ✓</span></td>
+        <td>—</td>
+        <td>—</td>
+        <td class="why"><b>Dashboard-owned</b> — redirects are URL routing at the host (delivery/ops), not page content. Kills the editor redirects surface + own screen. <i>Flip to Editor-Site-Pro if you think of redirects as part of authoring the site.</i></td>
+      </tr>
+      <tr>
+        <td><b>Publish</b></td>
+        <td class="home"><span class="pin edit">EDIT</span> Editor topbar (one button)</td>
+        <td>—</td>
+        <td>Dashboard shows status/history + "Republish via editor"</td>
+        <td class="why">One write action. Kills the <span class="cut">dashboard Publish</span> + <span class="cut">editor Publish tab</span> → status mirror only.</td>
+      </tr>
+      <tr>
+        <td><b>Domains/Billing/Plan/Credits</b></td>
+        <td class="home"><span class="pin dash">DASH</span> Dashboard › Workspace › Billing</td>
+        <td>—</td>
+        <td>Account page = read-only mirror</td>
+        <td class="why">Workspace-owned money surface. Account mirrors it read-only. Keep Stripe internals hidden until real.</td>
+      </tr>
+    </table>
+
+    <div class="sech">Agency-shared (Workspace owns — cross-client)</div>
+    <table>
+      <tr><th style="width:13%">Concept</th><th style="width:21%">Authoring home (writes)</th><th style="width:17%">Override / 2nd home</th><th style="width:19%">Read-only mirror</th><th style="width:30%">My call &amp; what it kills</th></tr>
+
+      <tr>
+        <td><b>Shared theme</b></td>
+        <td class="home"><span class="pin ws">WS</span> Workspace › Theme editor (own surface)</td>
+        <td>Per-site = synced OR local override (editor Styles)</td>
+        <td>Editor Styles shows "shared from workspace ◐"</td>
+        <td class="why"><b>Workspace owns the source; sites sync or override.</b> A hierarchy, not a dupe. The "push to N sites" change needs its own <b>review contract</b> (see <a href="m-agency.html" style="color:var(--ink)">M-agency</a> + audit finding A) — separate from per-element styling.</td>
+      </tr>
+      <tr>
+        <td><b>White-label branding</b></td>
+        <td class="home"><span class="pin ws">WS</span> Workspace › Branding</td>
+        <td>—</td>
+        <td>—</td>
+        <td class="why">What the agency's invited client sees. One workspace setting, applies to every client invite.</td>
+      </tr>
+      <tr>
+        <td><b>Integrations</b></td>
+        <td class="home"><span class="pin ws">WS</span> Workspace › Integrations (Vercel, webhooks)</td>
+        <td>—</td>
+        <td>—</td>
+        <td class="why"><b>Split from analytics:</b> workspace-level integrations (deploy, webhooks) ≠ per-site tracking IDs (those → Editor Site). Kills the "Analytics &amp; integrations" mashup.</td>
+      </tr>
+      <tr>
+        <td><b>Assets</b></td>
+        <td class="home"><span class="pin ws">WS</span> Workspace › Asset library (one store)</td>
+        <td>Editor = contextual insert/replace into same store</td>
+        <td>—</td>
+        <td class="why"><b>Assets — one store, two doors</b> (browse vs insert) — not a dupe. Rename dashboard "Media" → "Assets"; editor asset picker = a door into it. Kills the modal-vs-panel dual code path.</td>
+      </tr>
+    </table>
+
+    <div class="sech">Settings — the 4 scopes, each one home (kills "settings means 4 things")</div>
+    <table>
+      <tr><th style="width:18%">Scope</th><th style="width:22%">Home</th><th>What lives there</th></tr>
+      <tr><td><b>Personal</b></td><td class="home"><span class="pin dash">DASH</span> Dashboard › Personal</td><td>Account · profile · login/security · notifications · help</td></tr>
+      <tr><td><b>Workspace</b></td><td class="home"><span class="pin ws">WS</span> Dashboard › Workspace</td><td>Team · shared theme · branding · integrations · billing</td></tr>
+      <tr><td><b>Site (business)</b></td><td class="home"><span class="pin dash">DASH</span> Dashboard › Site detail</td><td>Domains · publishing/redirects · <b>technical SEO</b> (canonical/indexing/sitemap) · analytics reports · forms inbox · sharing</td></tr>
+      <tr><td><b>Site (content)</b></td><td class="home"><span class="pin edit">EDIT</span> Editor › Site</td><td><b>content SEO</b> (titles/desc/OG + patterns) · forms config · tracking property/ID · custom code (Pro)</td></tr>
+    </table>
+    <div class="note2" style="margin-top:6px"><b>Settings home (<code>b0</code>) becomes a directory, not an owner</b> — it's the nav INTO these 4 scopes (each card deep-links to the real home), never a place that edits. That's the mirror pattern, applied to settings.</div>
+
+    <div class="sech">The 4 calls — DECIDED + refined by codex adversarial review <span class="sub">3 hold with caveats, Analytics reworked</span></div>
+    <table>
+      <tr><th style="width:14%">Call</th><th style="width:11%">Verdict</th><th style="width:26%">Refined decision</th><th>Codex break it caught → fix folded in</th></tr>
+      <tr class="call"><td><b>1 · SEO</b></td><td><span class="callflag">holds +caveat</span></td><td class="home"><b>Split by SEO TYPE.</b> <span class="pin edit">EDIT</span> Content SEO (per-page title/desc/OG + patterns + overview). <span class="pin dash">DASH</span> Technical SEO (canonical domain, robots/indexing policy, sitemap, cross-site portfolio health)</td><td class="why">"Dashboard read-only" left <b>no write path for an agency fixing canonical/indexing across 30 sites</b>, and site-wide policy is publishing-risk, not authoring. So content SEO = editor; technical/portfolio SEO = dashboard, writable by privileged roles only.</td></tr>
+      <tr class="call"><td><b>2 · Redirects</b></td><td><span class="callflag">holds +caveat</span></td><td class="home"><span class="pin dash">DASH</span> Dashboard › Publishing for manual/bulk. <b>+ Editor slug-rename gets a first-class "redirect created /old→/new" outcome UI.</b> Admin/Designer-only (not just "Pro")</td><td class="why">Editor <b>already writes redirects</b> — a slug rename auto-creates one (<code>d3</code> SlugHistory). Pretending editor isn't a redirect writer is false; surface the outcome where the slug changes.</td></tr>
+      <tr class="call"><td><b>3 · Analytics</b></td><td><span class="callflag" style="border-color:var(--ink);background:#faf0f0">REWORKED</span></td><td class="home"><b>3 layers, not 2.</b> <span class="pin ws">WS</span> Workspace › Integrations = connect provider/account (Admin). <span class="pin edit">EDIT</span> Editor › Site › Tracking = pick property/measurement-ID + consent toggles. <span class="pin dash">DASH</span> Dashboard › Traffic = reports + diagnostics, <b>no connect buttons</b>, only "Fix setup ↗"</td><td class="why">Weakest call. "Split by job" was under-modeled — analytics has <b>three objects</b> (connection vs assignment vs reporting). Today GA-connect appears in BOTH <code>19-analytics</code> AND <code>c4-integrations</code> = 3 places. Reports can't be read-only if "no data" needs reconnect.</td></tr>
+      <tr class="call"><td><b>4 · View density</b></td><td><span class="callflag">holds +caveat</span></td><td class="home"><span class="pin edit">PREF</span> Preference, <b>scoped per-user-PER-SITE</b> (not one global toggle) + a <b>separate ROLE</b> for permissions. Every hidden/disabled control must say <b>why</b> (density vs permission)</td><td class="why">A designer wants Pro on their own sites, Simple when handing off a client. And if Simple hides what you're allowed to do → "missing feature" tickets; if it shows what your role forbids → "why disabled?" tickets. Density and permission must never be confused in the UI.</td></tr>
+    </table>
+    <div class="note" style="margin-top:8px"><b>NOT mechanical yet (codex corrected my overstatement).</b> These 4 force a <b>hidden 5th decision: a site capability matrix by role</b> — exactly which writes each role (Viewer / Client-Editor / Designer / Admin) can do for page-SEO · site-SEO · analytics · code · redirects · publish · domains · forms. The only existing matrix (<code>62-permissions</code>) is obsolete. That matrix is the real unblocker → see <a href="m-roles.html" style="color:var(--ink);font-weight:600">M-roles</a>. Then the shared theme change contract (audit finding A).</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Ownership:</b><a href="m-ownership.html" style="border-color:#fff;background:#fff;color:#2b2b2b;font-weight:600">M-ownership</a><a href="m0-spine.html">M0 spine</a><a href="m-agency.html">M-agency</a><a href="m-editor.html">M2/M1 editor</a><a href="../2026-06-17-product-ux-audit.md">UX audit</a><a href="index.html">Map</a></div>
+</body></html>

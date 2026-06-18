@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · S-ship — publish / domain / restore failures</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .mock{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .mh{padding:7px 12px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .mh .tag{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border:1px dashed var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 6px}
+  .mb{padding:13px}
+  .empty{text-align:center;color:var(--ink-3);padding:16px 12px}
+  .empty .big{font-size:26px;line-height:1;margin-bottom:8px}
+  .empty .t{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .empty .d{font-size:11px;margin-top:5px;line-height:1.4}
+  .empty .acts{display:flex;gap:6px;justify-content:center;margin-top:11px;flex-wrap:wrap}
+  .empty .acts span{border:1px solid var(--line);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--ink-2)}
+  .empty .acts span.pri{border-color:var(--ink);color:#fff;background:var(--ink);font-weight:600}
+  .toast{border:1px solid var(--ink);border-radius:7px;padding:10px 12px;background:var(--fill);font-size:12px;display:flex;align-items:flex-start;gap:9px}
+  .toast .ic{font-size:15px}
+  .toast .tx{flex:1;color:var(--ink-2);line-height:1.4}
+  .toast .tx b{color:var(--ink)}
+  .toast .act{font-size:11px;color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .chk{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink-2);padding:5px 0;border-bottom:1px dashed var(--line)}
+  .chk:last-child{border-bottom:none}
+  .chk .b{width:15px;text-align:center;color:var(--ink)}
+  .chk .bad{color:var(--ink);font-weight:700}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:6px}.note2 b{color:var(--ink)}
+  .steps{display:flex;gap:0;margin:4px 0 2px}
+  .steps .s{flex:1;text-align:center;font-size:10px;color:var(--ink-3);border-bottom:2px solid var(--line);padding-bottom:5px}
+  .steps .s.on{color:var(--ink);border-color:var(--ink);font-weight:600}
+  .steps .s.stuck{color:var(--ink);border-color:var(--ink);font-weight:600;border-bottom-style:dashed}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · S-SHIP · FAILURE PATHS</div>
+<div class="screen">
+  <div class="topnote"><b>Ship states — publish, domain, and restore, including the states that hurt.</b> Codex scope-review (2026-06-18): the lifecycle (<a href="73-lifecycle.html" style="color:#fff;text-decoration:underline">73</a>) stopped before the ugly cases. A real app must show a blocked pre-flight, a stuck DNS, a cancelled deploy, and a restore/approve that itself fails — because that's exactly when a client's live site is at risk. The happy steps are on <a href="20-publish.html" style="color:#fff;text-decoration:underline">20</a> · <a href="22-domain-pending.html" style="color:#fff;text-decoration:underline">22</a> · <a href="58-history.html" style="color:#fff;text-decoration:underline">58</a>.</div>
+  <div class="wrap">
+
+    <!-- 1. PREFLIGHT BLOCK + CANCEL -->
+    <div class="sech">1 · Before deploy — a blocking pre-flight &amp; a cancel mid-flight <span class="sub">don't ship a broken site, don't leave it half-shipped</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Pre-flight — hard blocker <span class="tag">can't publish yet</span></div>
+        <div class="mb">
+          <div class="chk"><span class="b">✓</span><span>SSL ready</span></div>
+          <div class="chk"><span class="b">✓</span><span>All pages have a title</span></div>
+          <div class="chk"><span class="b bad">✕</span><span><b>Home links to a deleted page</b> (/old-pricing)</span></div>
+          <div class="chk"><span class="b">⚠</span><span>2 images missing alt text <span style="color:var(--ink-3)">(warning, not a block)</span></span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span class="pri">Fix the broken link</span><span style="opacity:.5">Publish (blocked)</span></div></div>
+          <div class="note2"><b>Errors block, warnings don't.</b> The broken link is one click to the fix; alt-text just nags.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Cancel a deploy in progress <span class="tag">clean outcome, no half-state</span></div>
+        <div class="mb">
+          <div class="steps"><div class="s on">Build</div><div class="s on">Upload</div><div class="s">Go live</div></div>
+          <div class="toast" style="margin-top:10px"><span class="ic">⏹</span><span class="tx"><b>Deploy cancelled before go-live.</b> Your <u>current live site is unchanged</u> — visitors saw nothing. Re-publish when ready.</span></div>
+          <div class="note2">Cancel is only offered up to go-live; after go-live the path is a <b>rollback</b>, not a cancel.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. PUBLISH FAILED + DNS STUCK -->
+    <div class="sech">2 · When it fails — deploy failed &amp; DNS won't verify <span class="sub">a clear cause + a human escape hatch</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Deploy failed <span class="tag">old site still live</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⚠</span><span class="tx"><b>Publish failed at "Upload".</b> Your live site is still the previous version — visitors are unaffected.</span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span class="pri">Try again</span><span>See the log</span><span>Get help ↗</span></div></div>
+          <div class="note2">A failed publish <b>never takes down</b> the version already live. Retry is safe.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">DNS stuck — 48h, not verifying <span class="tag">escalate to a human</span></div>
+        <div class="mb">
+          <div class="steps"><div class="s on">Add domain</div><div class="s on">Set DNS</div><div class="s stuck">Verifying…</div></div>
+          <div class="toast" style="margin-top:10px"><span class="ic">◷</span><span class="tx"><b>Still not verified after 48h.</b> Usually a DNS record typo. We can re-check, show the exact records, or connect you to support.</span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span class="pri">Re-check now</span><span>Show records</span><span>Contact support</span></div></div>
+          <div class="note2">Pending is patient (<a href="22-domain-pending.html">22</a>), but it doesn't wait forever — past a threshold it offers a way to a human.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. RESTORE / ROLLBACK / APPROVAL -->
+    <div class="sech">3 · Restore, rollback-fail, and the approval queue <span class="sub">the safety net needs its own safety net</span></div>
+    <div class="cols3">
+      <div class="mock">
+        <div class="mh">Restore failed</div>
+        <div class="mb">
+          <div class="toast"><span class="ic">!</span><span class="tx"><b>Couldn't restore v12.</b> Your current live site is unchanged — nothing was overwritten.</span><span class="act">Retry</span></div>
+          <div class="note2" style="margin-top:8px">A failed restore is a no-op, never a half-restored site.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Approve → publish fails</div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⚠</span><span class="tx"><b>Approved, but the publish failed.</b> It stays <u>approved &amp; queued</u> — retry without re-approving.</span><span class="act">Retry</span></div>
+          <div class="note2" style="margin-top:8px">Approval isn't lost to a deploy error — the client doesn't re-review.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Approval queue — empty</div>
+        <div class="mb">
+          <div class="empty" style="padding:10px 6px">
+            <div class="big">✓</div><div class="t">Nothing waiting</div>
+            <div class="d">When a client sends an edit for review, it shows here.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note2" style="margin-top:14px"><b>The promise across ship:</b> a blocked pre-flight is fixable in one click, a cancel/fail/stuck never harms the version already live, a restore is all-or-nothing, and approval survives a deploy error. The live client site is never the thing that breaks. Full approval flow → <a href="m-approval.html">M-approval</a>.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Ship states:</b><a href="20-publish.html">Publish</a><a href="22-domain-pending.html">Domain</a><a href="58-history.html">Versions</a><a href="m-approval.html">Approval</a><a href="73-lifecycle.html">Lifecycle</a><a href="index.html">Map</a></div>
+</body></html>

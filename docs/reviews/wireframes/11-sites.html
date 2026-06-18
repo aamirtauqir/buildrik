@@ -1,35 +1,64 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Sites</title><link rel="stylesheet" href="wf.css">
-<style>.srow{display:grid;grid-template-columns:1fr 130px 110px 120px;gap:12px;align-items:center;padding:11px 14px;border-bottom:1px dashed var(--line);font-size:12.5px}.srow.h{color:var(--ink-3);font-size:10px;text-transform:uppercase;letter-spacing:.04em}</style></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 11 — Clients / Sites</title><link rel="stylesheet" href="wf.css">
+<style>
+  .appbar{display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .crumb{font-size:12px;color:var(--ink-3)} .crumb b{color:var(--ink-2)}
+  .appbar .sp{flex:1}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;font-size:11px}
+  .seg button{padding:5px 11px;color:var(--ink-2);background:#fff;border-right:1px solid var(--line);cursor:pointer}
+  .seg button:last-child{border:none} .seg button.on{background:var(--ink);color:#fff;font-weight:600}
+  .body{padding:16px 20px;max-width:920px}
+  .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .bar .filters{display:flex;gap:6px;font-size:11px}
+  .bar .filters span{border:1px solid var(--line);border-radius:5px;padding:4px 10px;color:var(--ink-2)}
+  .bar .new{font-size:11.5px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:6px;padding:6px 12px;font-weight:600;text-decoration:none}
+  .client{border:1px solid var(--line);border-radius:8px;margin-bottom:9px;overflow:hidden;background:#fff}
+  .ch{display:flex;align-items:center;gap:9px;padding:9px 13px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .ch .lg{width:24px;height:24px;border:1px solid var(--line-d);border-radius:5px;background:#fff;display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--ink-2)}
+  .ch .cn{font-size:12.5px;font-weight:600} .ch .cm{font-size:10px;color:var(--ink-3);margin-left:auto}
+  .srow{display:grid;grid-template-columns:24px 1fr 90px 110px 120px;gap:10px;align-items:center;padding:8px 14px;border-bottom:1px dashed var(--line);font-size:12px;color:var(--ink-2)}
+  .srow:last-child{border:none}
+  .srow .chk{width:14px;height:14px;border:1px solid var(--line-d);border-radius:3px}
+  .srow b{color:var(--ink)}
+  .chip{font-size:9px;border-radius:3px;padding:1px 6px} .chip.live{background:var(--ink);color:#fff} .chip.draft{border:1px solid var(--line-d);color:var(--ink-3)}
+  .dschip{font-size:8.5px;border-radius:3px;padding:1px 5px;border:1px solid var(--line-d);color:var(--ink-3)}
+  .srow a{color:var(--ink-2);text-decoration:none;font-size:11px}
+  .bulk{display:none;align-items:center;gap:10px;background:var(--ink);color:#fff;border-radius:7px;padding:8px 13px;font-size:12px;margin-bottom:10px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px} .note2 b{color:var(--ink)}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
-<div class="screen" style="display:grid;grid-template-columns:200px 1fr;min-height:440px">
-  <aside style="border-right:1px dashed var(--line);padding:16px 12px">
-    <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
-    <div class="box" style="padding:8px;margin-bottom:16px;font-size:11.5px"><div class="muted" style="font-size:10px">WORKSPACE</div><div class="row" style="justify-content:space-between"><a href="a6-workspace-select.html" style="text-decoration:none;color:inherit" title="Switch workspace">Acme Co ▾</a></div></div>
-    <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
-      <a href="10-dashboard.html" class="navi">⌂ Home</a>
-      <a href="11-sites.html" class="navi here">▦ Sites</a>
-      <a href="c1-team.html" class="navi">👤 Team</a>
-      <a href="15-domains.html" class="navi">◐ Domains</a>
-      <a href="17-media.html" class="navi">▤ Media</a>
-      <a href="b0-settings-home.html" class="navi">⚙ Settings</a>
-      <a href="16-billing.html" class="navi">$ Billing</a>
-    </nav>
-  </aside>
-  <main class="pad">
-    <div class="row" style="justify-content:space-between;margin-bottom:16px">
-      <div class="h1">Sites</div>
-      <div class="row"><a href="71-command-palette.html" class="input" style="width:170px;text-decoration:none;display:inline-block">⌕ search · ⌘K</a><a href="01-new-site.html" class="btn btn-fill btn-strong">+ New site</a></div>
+<div class="wf-stamp">WIREFRAME · 11 · CLIENTS / SITES</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Sites — now client-grouped + management.</b> Rebuilt: the old flat sites list becomes the agency operating surface — <b>grouped by client</b>, folders, bulk actions, duplicate-from-template. A solo builder sees a flat list (no Client grouping). Pairs with <a href="m-agency.html" style="color:#fff;text-decoration:underline">M-agency</a>.</div>
+  <div class="dbar">
+    <div class="ws"><span class="logo">N</span> Northwind Studio <span class="sw">agency ▾</span></div>
+    <span class="sp"></span>
+    <div class="dnav"><a href="m3-dashboard.html">Home</a><a href="m-agency.html" class="on">Clients</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html">Billing</a></div>
+    <a class="icn" href="c2-notifications.html" title="Notifications">🔔</a><a class="icn" href="c3-help.html" title="Help">?</a><a class="icn" href="b1-account-settings.html" title="Account">N</a>
+  </div>
+  <div class="appbar" style="background:#fff">
+    <span class="crumb"><b>Clients</b> › Sites</span>
+    <span class="sp"></span>
+    <span class="seg"><button class="on">By client</button><button>All sites</button><button>Folders</button></span>
+  </div>
+  <div class="body">
+    <div class="bar">
+      <div class="filters"><span>Status ▾</span><span>Client ▾</span><span>Shared theme ▾</span></div>
+      <a class="new" href="01-new-site.html">＋ New site / client · from house template ▾</a>
     </div>
-    <div class="box">
-      <div class="srow h"><span>Name</span><span>Status</span><span>Updated</span><span></span></div>
-      <div class="srow"><a href="12-site-detail.html"><b>acme-main</b><div class="muted" style="font-size:10.5px">acme.com</div></a><span class="tag-exists">● Published</span><span class="muted">2d ago</span><div class="row" style="justify-content:flex-end"><a href="editor-spine-wireframe.html" class="btn">Edit</a><a href="70-confirm.html" class="btn">⋯</a></div></div>
-      <div class="srow"><a href="12-site-detail.html"><b>launch-lp</b><div class="muted" style="font-size:10.5px">launch.acme.com</div></a><span class="tag-new">⏳ Domain pending</span><span class="muted">5h ago</span><div class="row" style="justify-content:flex-end"><a href="editor-spine-wireframe.html" class="btn">Edit</a><a href="70-confirm.html" class="btn">⋯</a></div></div>
-      <div class="srow"><a href="editor-spine-wireframe.html"><b>portfolio</b><div class="muted" style="font-size:10.5px">— not published</div></a><span class="chip">○ Draft</span><span class="muted">1w ago</span><div class="row" style="justify-content:flex-end"><a href="editor-spine-wireframe.html" class="btn">Edit</a><a href="70-confirm.html" class="btn">⋯</a></div></div>
-      <div class="srow" style="border-bottom:none"><a href="12-site-detail.html"><b>old-blog</b><div class="muted" style="font-size:10.5px">blog.acme.com</div></a><span class="tag-exists">● Published</span><span class="muted">1mo ago</span><div class="row" style="justify-content:flex-end"><a href="editor-spine-wireframe.html" class="btn">Edit</a><a href="70-confirm.html" class="btn">⋯</a></div></div>
+    <div class="bulk" id="bulk">3 selected · <span>Move to client ▾</span> <span>Duplicate</span> <span>Archive</span></div>
+
+    <div class="client">
+      <div class="ch"><span class="lg">A</span><span class="cn">Acme Co</span><span class="cm">2 sites · client@acme</span></div>
+      <div class="srow"><span class="chk"></span><span><b>acme-main.com</b></span><span><span class="chip live">live</span></span><span><span class="dschip">Theme override</span></span><span><a href="m-editor.html">Edit ↗</a> · <a href="12-site-detail.html">Site ops ↗</a> · <a href="70-confirm.html" style="color:var(--ink-2)">⋯ Delete</a></span></div>
+      <div class="srow"><span class="chk"></span><span><b>acme-careers</b></span><span><span class="chip draft">draft</span></span><span><span class="dschip">Theme synced</span></span><span><a href="m-editor.html">Edit ↗</a> · <a href="12-site-detail.html">Site ops ↗</a></span></div>
     </div>
-    <div class="note" style="margin-top:16px"><b>List = operate, not author (boundary):</b> row actions are business ops (Edit opens editor, ⋯ = duplicate / transfer / delete / settings). Status column is the same SSOT chip as the home cards. Per-row "Edit" is the only jump into the make-side.</div>
-  </main>
+    <div class="client">
+      <div class="ch"><span class="lg">C</span><span class="cn">Cobalt Labs</span><span class="cm">3 sites · not invited</span></div>
+      <div class="srow"><span class="chk"></span><span><b>cobalt.io</b></span><span><span class="chip live">live</span></span><span><span class="dschip">Theme synced</span></span><span><a href="m-editor.html">Edit ↗</a> · <a href="12-site-detail.html">Site ops ↗</a></span></div>
+      <div class="srow"><span class="chk"></span><span><b>docs.cobalt.io</b></span><span><span class="chip draft">draft</span></span><span><span class="dschip">Theme synced</span></span><span><a href="m-editor.html">Edit ↗</a> · <a href="12-site-detail.html">Site ops ↗</a></span></div>
+    </div>
+    <div class="note2"><b>Client = the agency grouping</b> (one home for multi-client, M-agency). Bulk = move/duplicate/archive across sites. "From house template" = the speed lever. Solo builders never see the Client layer — it collapses to a flat list. Folders are an alternate grouping in the same view, not a separate "advanced sites" screen.</div>
+  </div>
 </div>
-<div class="proto-nav"><b>Flow:</b><a href="10-dashboard.html">Dashboard</a><a href="11-sites.html" class="here">Sites</a><a href="01-new-site.html">New site</a><a href="editor-spine-wireframe.html">Editor</a><a href="20-publish.html">Publish</a><a href="22-domain-pending.html">Domain</a><a href="12-site-detail.html">Site detail</a></div>
+<div class="proto-nav"><b>Sites:</b><a href="m-agency.html">Agency / Clients</a><a href="m3-dashboard.html">Dashboard</a><a href="12-site-detail.html">Site detail</a><a href="m-editor.html">Edit ↗</a><a href="s-dashboard-states.html">States</a><a href="index.html">Map</a></div>
 </body></html>

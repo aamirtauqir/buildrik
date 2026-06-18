@@ -1,54 +1,47 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Settings panel</title><link rel="stylesheet" href="wf.css">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 53 — Editor › Site (content config)</title><link rel="stylesheet" href="wf.css">
 <style>
-  .ed{display:grid;grid-template-columns:52px 230px 1fr;min-height:400px}
-  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
-  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
-  .nav{font-size:12.5px;display:flex;flex-direction:column;gap:2px}
-  .navi2{padding:7px 9px;border-radius:5px;color:var(--ink-2);cursor:pointer}.navi2:hover{background:var(--fill)}.navi2.on{background:var(--ink);color:#fff;font-weight:600}
-  .ops{display:block;border:1px dashed var(--line-d);border-radius:5px;padding:8px 9px;font-size:11.5px;color:var(--ink-2);text-decoration:none;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-  .ops:hover{background:var(--fill);border-color:var(--ink-2)}
+  .wrap{padding:16px 20px;max-width:760px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:8px}
+  .crumb b{color:var(--ink-2)}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 6px}
+  .grp:first-child{margin-top:4px}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid var(--line);border-radius:7px;margin-bottom:7px;background:#fff}
+  .row:hover{border-color:var(--ink-2)}
+  .row .l{font-size:12.5px;font-weight:600}
+  .row .l small{display:block;font-weight:400;font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .row .r{font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:5px 11px;text-decoration:none}
+  .row.pro .l::after{content:"PRO";font-size:8px;letter-spacing:.04em;border:1px solid var(--ink);color:var(--ink);border-radius:3px;padding:1px 5px;margin-left:7px;vertical-align:middle}
+  .moved{border:1px dashed var(--line-d);border-radius:7px;padding:11px 13px;font-size:11.5px;color:var(--ink-2);background:var(--bg-2);margin-top:6px;line-height:1.5}
+  .moved b{color:var(--ink)}
+  .moved .mr{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line)}
+  .moved .mr:last-child{border:none}
+  .moved a{color:var(--ink-2)}
 </style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · 53 · EDITOR SITE</div>
 <div class="screen">
-  <div class="topnote"><b>Site Settings panel (rail → Settings · Advanced)</b> · boundary §3: editor owns <i>content/page-scoped</i> config; <i>publishing-infra ops</i> (redirects, headers, site-wide custom code, site-default SEO) live in <b>Dashboard</b> — mirrored here as deep-links, never dead-ends</div>
-  <div class="ed">
-    <div class="rail">
-      <div class="ri"><span class="ic">▤</span>Pages</div>
-      <div class="ri"><span class="ic">◳</span>Comp</div>
-      <div class="ri"><span class="ic">≣</span>Layers</div>
-      <div class="ri"><span class="ic">⟲</span>Hist</div>
-      <div class="ri on"><span class="ic">⚙</span>Set</div>
+  <div class="topnote"><b>Editor › Site — this site's content config.</b> Rebuilt to the solution (was the "Editor Settings" mashup). Only what's authored WITH the site lives here. Business ops (domains, billing, technical SEO, redirects, analytics reports) live in the <a href="m3-dashboard.html" style="color:#fff;text-decoration:underline">dashboard</a>. Maps to the <b>Site</b> rail item in <a href="m-editor.html" style="color:#fff;text-decoration:underline">M-editor</a>.</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind</b> › <b>Acme</b> › acme-main › Site</div>
+
+    <div class="grp">Content (Simple sees these)</div>
+    <div class="row"><div class="l">Search listing <small>site default title template · description · OG image</small></div><a class="r" href="m-seo.html">Edit ▾</a></div>
+    <div class="row"><div class="l">Tracking <small>assign which analytics property this site reports to</small></div><a class="r" href="m-tracking.html">Edit ▾</a></div>
+    <div class="row"><div class="l">Forms config <small>build the form · where responses go</small></div><a class="r" href="52-add.html">Edit ▾</a></div>
+
+    <div class="grp">Developer (Pro reveals)</div>
+    <div class="row pro"><div class="l">Custom code <small>scripts, meta, verification tags — site-wide + per-page</small></div><span class="r">Edit ▾</span></div>
+
+    <div class="grp">Not here — lives in the dashboard</div>
+    <div class="moved">
+      <div class="mr"><span><b>Technical SEO</b> (canonical · indexing · sitemap)</span><a href="d5-seo.html">Dashboard › Publishing ↗</a></div>
+      <div class="mr"><span><b>Redirects</b> (301/302 · bulk)</span><a href="d3-redirects.html">Dashboard › Publishing ↗</a></div>
+      <div class="mr"><span><b>Analytics reports</b></span><a href="19-analytics.html">Dashboard › Traffic ↗</a></div>
+      <div class="mr"><span><b>Domains · billing</b></span><a href="m3-dashboard.html">Dashboard ↗</a></div>
     </div>
-    <div class="panel" style="border-right:1px dashed var(--line);padding:12px">
-      <b style="font-size:13px;display:block;margin-bottom:10px">Settings</b>
-      <div class="lbl" style="margin-bottom:5px">In the editor (page/brand)</div>
-      <div class="nav" style="margin-bottom:12px">
-        <div class="navi2 on">Brand &amp; favicon</div>
-        <div class="navi2">Fonts</div>
-        <div class="navi2">Language</div>
-        <div class="navi2">Per-page &lt;head&gt;</div>
-      </div>
-      <div class="lbl" style="margin-bottom:5px">Site operations <span class="tag-new" style="vertical-align:middle">Dashboard</span></div>
-      <a class="ops" href="d5-seo.html">SEO defaults <span>↗</span></a>
-      <a class="ops" href="14-site-settings.html">Custom code / headers <span>↗</span></a>
-      <a class="ops" href="d3-redirects.html">Redirects <span>↗</span></a>
-      <a class="ops" href="19-analytics.html">Analytics &amp; integrations <span>↗</span></a>
-      <div class="note" style="margin-top:10px;font-size:10px"><b>Mirror, never 404:</b> ops moved to Dashboard still appear here as labeled deep-links (§11.5) — scent preserved, no broken muscle memory.</div>
-    </div>
-    <div class="panel" style="border-right:none;padding:16px">
-      <div class="lbl" style="margin-bottom:10px">Brand &amp; favicon <span class="tag-exists" style="vertical-align:middle">exists</span></div>
-      <div class="lbl">Site name (display)</div><div class="input" style="margin:5px 0 12px">Acme</div>
-      <div class="lbl">Favicon</div><div class="row" style="margin:5px 0 12px"><div class="ph-img" style="width:44px;height:44px">▣</div><button class="btn">Upload</button></div>
-      <div class="lbl">Social share image (default OG)</div><div class="ph-img" style="height:56px;margin:5px 0 12px">▣ 1200×630</div>
-      <div class="box pad" style="padding:12px;margin-bottom:12px">
-        <div class="lbl" style="margin-bottom:6px">Per-page &lt;head&gt; snippet <span class="tag-exists">exists · page-scoped</span></div>
-        <div class="input" style="margin:5px 0 0;height:40px;font-family:var(--mono)">&lt;!-- this page only — site-wide code is a Dashboard op --&gt;</div>
-        <div class="muted" style="font-size:10px;margin-top:6px">Content-scoped (this page) stays in the editor. Site-wide injection → Dashboard.</div>
-      </div>
-      <div class="row" style="justify-content:flex-end"><span class="muted" style="font-size:11px">Autosaved ✓</span></div>
-    </div>
+    <div class="muted" style="font-size:11px;margin-top:8px">A Client-Editor (per <a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>) sees Search listing + Forms only — Tracking + advanced styling are Designer/Admin. Hidden vs blocked is labelled (see <a href="m-states.html" style="color:var(--ink-2)">M-states</a>).</div>
   </div>
 </div>
-<div class="proto-nav"><b>Editor tabs:</b><a href="editor-spine-wireframe.html">Spine</a><a href="50-pages.html">Pages</a><a href="51-layers.html">Layers</a><a href="52-add.html">Add</a><a href="53-settings.html" class="here">Settings</a><a href="fix-boundary.html">▶ Boundary map</a><a href="fix-settings-map.html">Settings map</a><a href="40-edit-scope.html">Edit scope</a><a href="20-publish.html">Publish</a></div>
+<div style="margin:16px 18px 6px"><div style="font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px">States on this surface — editor › site</div><div style="display:flex;gap:7px;flex-wrap:wrap;font-size:10.5px;color:var(--ink-2)"><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Loading &rarr; skeleton fields</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Save failed &rarr; autosave retries, never silent</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Hidden (density) vs blocked (role) &rarr; named, see M-states</span></div><div style="font-size:10.5px;color:var(--ink-3);margin-top:6px">Field-level states → <a href="m-states.html">M-states</a> · <a href="s-forms-states.html">s-forms-states</a></div></div>
+<div class="proto-nav"><b>Site:</b><a href="m-editor.html">Editor</a><a href="m-seo.html">Search listing</a><a href="m-tracking.html">Tracking</a><a href="m-ownership.html">Ownership</a><a href="d5-seo.html">Technical SEO (dash)</a><a href="s-forms-states.html">Form states</a><a href="index.html">Map</a></div>
 </body></html>

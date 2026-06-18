@@ -1,6 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Publish</title><link rel="stylesheet" href="wf.css">
 <style>.pstate{display:none}.pstate.on{display:block}.chk{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink-2);padding:7px 0;border-bottom:1px dashed var(--line)}.chk .bx{width:16px;height:16px;border:1px solid var(--ink-3);border-radius:3px;text-align:center;line-height:14px;font-size:11px;color:var(--ink)}</style></head>
 <body>
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#fafafa;color:#2b2b2b;font:600 11.5px/1.45 system-ui,sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #c7c7c7">↻ RECONCILED ROLE (2026-06-18): Topbar publish flow; dashboard shows STATUS mirror only (not a destination).</div>
 <div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen screen-narrow">
   <div class="topnote"><b>Publish flow</b> · grounded in current PublishTab states (idle → publishing → published / failed; SEO readiness checks; publishedUrl durable; Update-vs-Publish label) · §8.6 domain-pending</div>
@@ -10,8 +11,8 @@
       <div class="h1" style="margin-bottom:4px">Publish site</div>
       <div class="muted" style="font-size:12px;margin-bottom:16px">Pre-flight check before going live.</div>
       <div class="box pad" style="margin-bottom:16px">
-        <div class="lbl" style="margin-bottom:6px">Readiness <span class="tag-exists">exists: SEO checks</span></div>
-        <div class="chk"><span class="bx">✓</span> SEO title set</div>
+        <div class="lbl" style="margin-bottom:6px">Readiness <span class="tag-exists">exists: search-listing checks</span></div>
+        <div class="chk"><span class="bx">✓</span> Search listing set</div>
         <div class="chk"><span class="bx">✓</span> Meta description added</div>
         <div class="chk"><span class="bx">✓</span> OG image present</div>
         <div class="chk" style="border-bottom:none;color:var(--ink-3)"><span class="bx">!</span> 1 page has no H1 <span class="tag-new" style="margin-left:auto">SOLUTION: soft-warn, not blocker</span></div>
@@ -53,7 +54,7 @@
 
   </div>
 </div>
-<div class="proto-nav"><b>Flow:</b><a href="10-dashboard.html">Dashboard</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="02-ai-wizard.html">AI wizard</a><a href="03-template-gallery.html">Templates</a><a href="editor-spine-wireframe.html">Editor</a><a href="20-publish.html" class="here">Publish</a><a href="21-preview.html">Preview</a><a href="22-domain-pending.html">Domain</a><a href="12-site-detail.html">Site detail</a></div>
+<div class="proto-nav"><b>Flow:</b><a href="m3-dashboard.html">Dashboard</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="02-ai-wizard.html">AI wizard</a><a href="03-template-gallery.html">Templates</a><a href="m-editor.html">Editor</a><a href="20-publish.html" class="here">Publish</a><a href="21-preview.html">Preview</a><a href="22-domain-pending.html">Domain</a><a href="12-site-detail.html">Site detail</a><a href="s-ship-states.html">Ship states</a></div>
 <script>
 function ps(s){['idle','deploy','done','failed'].forEach(function(x){document.getElementById('p_'+x).classList.toggle('on',x===s);});}
 var t;function dep(){var b=document.getElementById('pbar'),p=document.getElementById('ppct');var v=10;clearInterval(t);b.style.width='10%';p.textContent='10%';t=setInterval(function(){v+=18;if(v>=100){v=100;clearInterval(t);b.style.width='100%';p.textContent='100%';setTimeout(function(){ps('done');},400);return;}b.style.width=v+'%';p.textContent=v+'%';},450);}

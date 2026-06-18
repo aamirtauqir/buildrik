@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · S-media — asset library unhappy paths</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .mock{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .mh{padding:7px 12px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .mh .tag{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border:1px dashed var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 6px}
+  .mb{padding:13px}
+  .empty{text-align:center;color:var(--ink-3);padding:16px 12px}
+  .empty .big{font-size:26px;line-height:1;margin-bottom:8px}
+  .empty .t{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .empty .d{font-size:11px;margin-top:5px;line-height:1.4}
+  .empty .acts{display:flex;gap:6px;justify-content:center;margin-top:11px;flex-wrap:wrap}
+  .empty .acts span{border:1px solid var(--line);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--ink-2)}
+  .empty .acts span.pri{border-color:var(--ink);color:#fff;background:var(--ink);font-weight:600}
+  .toast{border:1px solid var(--ink);border-radius:7px;padding:10px 12px;background:var(--fill);font-size:12px;display:flex;align-items:flex-start;gap:9px}
+  .toast .ic{font-size:15px}
+  .toast .tx{flex:1;color:var(--ink-2);line-height:1.4}
+  .toast .tx b{color:var(--ink)}
+  .toast .act{font-size:11px;color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:4px}
+  .tile{border:1px solid var(--line);border-radius:5px;aspect-ratio:1;background:var(--bg-2)}
+  .tile.sk{background:linear-gradient(100deg,var(--bg-2) 30%,var(--fill) 50%,var(--bg-2) 70%)}
+  .tile.err{display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:15px;border-style:dashed}
+  .prog{height:7px;border:1px solid var(--line);border-radius:4px;background:var(--bg-2);overflow:hidden;margin:8px 0}
+  .prog i{display:block;height:100%;background:var(--ink);width:46%}
+  .tip{border:1px solid var(--line-d);border-radius:7px;padding:10px 12px;font-size:11.5px;color:var(--ink-2);line-height:1.45;background:#fff}
+  .tip b{color:var(--ink)}
+  .bar{height:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg-2);overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--ink);width:97%}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:6px}.note2 b{color:var(--ink)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · S-MEDIA · UNHAPPY PATHS</div>
+<div class="screen">
+  <div class="topnote"><b>Media states — the asset library's empty, loading, and failure paths.</b> Codex scope-review (2026-06-18): media could fail silently — a too-big file, a full quota, a dead stock fetch, a delete that strands a live page. One store, two doors (<a href="56-media.html" style="color:#fff;text-decoration:underline">editor picker</a> · <a href="17-media.html" style="color:#fff;text-decoration:underline">dashboard assets</a>) — so both doors render the same states.</div>
+  <div class="wrap">
+
+    <!-- 1. EMPTY + LOADING + NO RESULTS -->
+    <div class="sech">1 · Empty · loading · no results <span class="sub">the library before it's full, and search that finds nothing</span></div>
+    <div class="cols3">
+      <div class="mock">
+        <div class="mh">Empty library</div>
+        <div class="mb"><div class="empty" style="padding:12px 8px">
+          <div class="big">▤</div><div class="t">No assets yet</div>
+          <div class="d">Upload images, or pull a free stock photo.</div>
+          <div class="acts"><span class="pri">⤒ Upload</span><span>Stock ↗</span></div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="mh">Loading <span class="tag">skeleton</span></div>
+        <div class="mb"><div class="tiles"><div class="tile sk"></div><div class="tile sk"></div><div class="tile sk"></div><div class="tile sk"></div><div class="tile sk"></div><div class="tile sk"></div><div class="tile sk"></div><div class="tile sk"></div></div><div class="note2">Shape of the grid, not a spinner.</div></div>
+      </div>
+      <div class="mock">
+        <div class="mh">Search — no match</div>
+        <div class="mb"><div class="empty" style="padding:12px 8px">
+          <div class="big">⌕</div><div class="t">Nothing matches "hero-v3"</div>
+          <div class="d">Check the spelling, clear filters, or upload it.</div>
+          <div class="acts"><span>Clear filters</span><span class="pri">⤒ Upload</span></div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- 2. UPLOAD FAILURES -->
+    <div class="sech">2 · Upload — the five failures, each named <span class="sub">drag-drop, pick, and paste all funnel here</span></div>
+    <div class="cols3">
+      <div class="mock"><div class="mh">Unsupported type</div><div class="mb"><div class="toast"><span class="ic">⊘</span><span class="tx"><b>report.pdf isn't an image.</b> JPG, PNG, WebP, SVG, GIF.</span></div></div></div>
+      <div class="mock"><div class="mh">Too large</div><div class="mb"><div class="toast"><span class="ic">⚠</span><span class="tx"><b>22 MB &gt; 10 MB limit.</b> Shrink on upload?</span><span class="act">Shrink</span></div></div></div>
+      <div class="mock"><div class="mh">Processing failed</div><div class="mb"><div class="toast"><span class="ic">!</span><span class="tx"><b>Couldn't process this file</b> (it may be corrupt). Original not added.</span><span class="act">Retry</span></div></div></div>
+    </div>
+    <div class="cols" style="margin-top:12px">
+      <div class="mock">
+        <div class="mh">Quota full <span class="tag">blocks the upload, offers the fix</span></div>
+        <div class="mb">
+          <div class="krow" style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-2);margin-bottom:5px"><span>Storage</span><span style="font-family:var(--mono)">1.94 / 2.0 GB</span></div>
+          <div class="bar"><i></i></div>
+          <div class="toast" style="margin-top:10px"><span class="ic">▰</span><span class="tx"><b>Not enough room for this upload.</b> Remove unused assets, or upgrade the plan.</span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span>Find unused</span><span class="pri">Upgrade ↗</span></div></div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Bulk upload — partial <span class="tag">12 of 14 in</span></div>
+        <div class="mb">
+          <div class="prog"><i></i></div>
+          <div class="toast"><span class="ic">⤒</span><span class="tx"><b>12 uploaded · 2 failed</b> (1 too big, 1 wrong type). The 12 are in your library.</span><span class="act">See 2 ✕</span></div>
+          <div class="note2">Bulk never fails as a block — the good ones land, the bad ones list their reason.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. STOCK FETCH + DELETE-IN-USE -->
+    <div class="sech">3 · Stock fetch fail · delete-in-use guard <span class="sub">the two that lose work if mishandled</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Stock search — provider down <span class="tag">don't fake a grid</span></div>
+        <div class="mb">
+          <div class="empty" style="padding:12px 8px">
+            <div class="big">⌕</div><div class="t">Can't reach stock photos right now</div>
+            <div class="d">The photo provider didn't respond. Try again, or upload your own.</div>
+            <div class="acts"><span class="pri">Try again</span><span>⤒ Upload instead</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Delete an asset that's in use <span class="tag">destructive guard</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⚠</span><span class="tx"><b>"team-photo.jpg" is used on 3 pages.</b> Deleting it leaves broken images on those pages. <u>Review where it's used</u> before you can delete it.</span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span class="pri">Step 1 · Review the 3 pages</span><span style="opacity:.45">Delete (locked until reviewed)</span></div></div>
+          <div class="note2">Unused assets delete with a normal confirm. An <b>in-use</b> asset is a two-step destructive path: the delete control stays <b>disabled until the user opens the blast-radius list</b> — they can't skip seeing what breaks. Then the final delete goes through <a href="70-confirm.html">type-to-confirm</a>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note2" style="margin-top:14px"><b>The rule:</b> media never fails silently. Wrong file → named. Full quota → the fix offered. Stock down → no fake tiles. Delete-in-use → the blast radius shown first. Same on both doors.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Media states:</b><a href="56-media.html">Asset picker</a><a href="17-media.html">Dashboard assets</a><a href="56b-stock.html">Stock</a><a href="56c-image-editor.html">Image editor</a><a href="s-editor-states.html">Editor states</a><a href="index.html">Map</a></div>
+</body></html>

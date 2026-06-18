@@ -1,81 +1,28 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · DS tools</title><link rel="stylesheet" href="wf.css">
-<style>.vs{display:none}.vs.on{display:block}.starter{border:1px solid var(--line);border-radius:6px;overflow:hidden;cursor:pointer}.starter.on{border:2px solid var(--ink)}.grad{height:54px}</style></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · ds3 — DS tools (trimmed)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:820px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 6px} .grp:first-child{margin-top:0}
+  .tool{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;background:#fff}
+  .tool .ic{width:30px;height:30px;border:1px solid var(--line-d);border-radius:7px;background:var(--fill);display:grid;place-items:center;font-size:13px;color:var(--ink-2)}
+  .tool .m{flex:1} .tool .t{font-size:12.5px;font-weight:600} .tool .d{font-size:10.5px;color:var(--ink-3);margin-top:1px}
+  .tool .r{font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:5px 10px;text-decoration:none}
+  .cut{border:1px dashed var(--line-d);border-radius:8px;padding:11px 13px;font-size:11.5px;color:var(--ink-3);background:var(--bg-2);margin-top:6px;line-height:1.5}
+  .cut b{color:var(--ink-2)} .cut s{color:var(--ink-3)}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
-<div class="screen screen-narrow">
-  <div class="topnote"><b>Design-system tools</b> · grounded in DS chrome modals — StarterGallery / AIPrompt / DSLint / Migration / Review&amp;Apply / Export · the flows around the token editor</div>
-  <div class="pad">
-    <div class="row" style="margin-bottom:16px;flex-wrap:wrap;gap:5px">
-      <button class="chip on" onclick="t('starter',this)">Starter themes</button>
-      <button class="chip" onclick="t('ai',this)">AI generate</button>
-      <button class="chip" onclick="t('lint',this)">DS lint</button>
-      <button class="chip" onclick="t('migrate',this)">Migration</button>
-      <button class="chip" onclick="t('review',this)">Review &amp; apply</button>
-      <button class="chip" onclick="t('export',this)">Export</button>
-    </div>
-
-    <div class="vs on" id="t_starter">
-      <div class="h2" style="margin-bottom:4px">🎨 Browse starter themes</div>
-      <div class="muted" style="font-size:11.5px;margin-bottom:12px">Seed your token set from a ready palette — light + dark variants included.</div>
-      <div class="grid3">
-        <div class="starter on"><div class="grad" style="background:linear-gradient(135deg,#2D6DFF,#fff)"></div><div class="pad" style="padding:8px;font-size:11.5px"><b>Cobalt (default)</b> ✓</div></div>
-        <div class="starter"><div class="grad" style="background:linear-gradient(135deg,#111,#333)"></div><div class="pad" style="padding:8px;font-size:11.5px">Linear dark</div></div>
-        <div class="starter"><div class="grad" style="background:linear-gradient(135deg,#f5f5f0,#ddd)"></div><div class="pad" style="padding:8px;font-size:11.5px">Apple minimal</div></div>
-        <div class="starter"><div class="grad" style="background:linear-gradient(135deg,#635bff,#fff)"></div><div class="pad" style="padding:8px;font-size:11.5px">Stripe blue</div></div>
-        <div class="starter"><div class="grad" style="background:linear-gradient(135deg,#f4ead5,#fff)"></div><div class="pad" style="padding:8px;font-size:11.5px">Notion warm</div></div>
-        <div class="starter"><div class="grad" style="background:linear-gradient(135deg,#000,#fff)"></div><div class="pad" style="padding:8px;font-size:11.5px">Vercel mono</div></div>
-      </div>
-      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn">Skip</button><a href="ds1-design-system.html" class="btn btn-fill btn-strong">Apply theme</a></div>
-    </div>
-
-    <div class="vs" id="t_ai">
-      <div class="h2" style="margin-bottom:4px">✨ Generate with AI</div>
-      <div class="muted" style="font-size:11.5px;margin-bottom:12px">Describe the look + feel, or a component, and AI drafts tokens/schema.</div>
-      <div class="input" style="width:100%;height:60px;margin-bottom:10px">A warm, editorial brand — cream background, ink text, one coral accent, generous spacing, serif headings</div>
-      <button class="btn btn-fill btn-strong" style="width:100%;margin-bottom:10px">Generate →</button>
-      <div class="box pad" style="background:var(--fill)"><div class="lbl" style="margin-bottom:5px">Preview</div><div class="row" style="gap:6px;margin-bottom:6px"><span class="sw" style="width:20px;height:20px;border-radius:4px;background:#f4ead5;border:1px solid #ccc"></span><span class="sw" style="width:20px;height:20px;border-radius:4px;background:#1a1a1a"></span><span class="sw" style="width:20px;height:20px;border-radius:4px;background:#e8654f"></span></div><div class="muted" style="font-size:10.5px">6 colors · serif type scale · spacious — <a href="ds1-design-system.html" style="text-decoration:underline">Accept</a> · Discard · Retry</div></div>
-      <div class="muted" style="font-size:10px;margin-top:8px">Wired via <code>aiAssistService</code>; aborts in-flight on close. Honors banned-hue lint.</div>
-    </div>
-
-    <div class="vs" id="t_lint">
-      <div class="h2" style="margin-bottom:8px">⚠ Design-system lint</div>
-      <div class="note" style="margin-bottom:8px"><b>2 banned-hue</b> — brand-2 (#7a32d6 violet), accent-alt (#8b5cf6) violate the single-accent rule.</div>
-      <div class="note" style="margin-bottom:8px"><b>3 missing-dark</b> — surface, surface-2, border have no dark variant.</div>
-      <div class="note" style="margin-bottom:8px"><b>1 pure-black</b> — ink is #000 (use a near-black token).</div>
-      <div class="row" style="justify-content:flex-end"><button class="btn">Dismiss</button><a href="ds1-design-system.html" class="btn btn-fill">Fix in Tokens →</a></div>
-      <div class="muted" style="font-size:10px;margin-top:8px">Grounded in <code>lintState.getVisibleIssues</code> — amber warn / red error, live on <code>lint:changed</code>.</div>
-    </div>
-
-    <div class="vs" id="t_migrate">
-      <div class="h2" style="margin-bottom:8px">Upgrading your design system</div>
-      <div class="muted" style="font-size:11.5px;margin-bottom:10px">Your project uses an older token schema. Migrating to the latest — one-time.</div>
-      <div class="box pad">
-        <div class="row" style="font-size:12px;padding:5px 0;border-bottom:1px dashed var(--line)"><span>✓ v0 → v1 (alias graph)</span><span class="muted" style="margin-left:auto">done</span></div>
-        <div class="row" style="font-size:12px;padding:5px 0;border-bottom:1px dashed var(--line)"><span>↻ v1 → v2 (dark values)</span><span class="muted" style="margin-left:auto">running…</span></div>
-        <div class="row" style="font-size:12px;padding:5px 0"><span class="muted">v2 → v3 (presets)</span><span class="muted" style="margin-left:auto">queued</span></div>
-        <div class="barline" style="height:8px;width:60%;margin-top:8px"></div>
-      </div>
-      <div class="muted" style="font-size:10px;margin-top:8px">Fail → restore snapshot / retry / email export (safety). Runs on project load when schema &lt; current.</div>
-    </div>
-
-    <div class="vs" id="t_review">
-      <div class="h2" style="margin-bottom:8px">Review &amp; apply — 2 changes</div>
-      <div class="box pad" style="margin-bottom:8px">
-        <div class="row" style="font-size:11.5px;padding:5px 0;border-bottom:1px dashed var(--line)"><span class="sw" style="background:#2D6DFF"></span> accent <span class="muted">#1a5fff → #2D6DFF</span></div>
-        <div class="row" style="font-size:11.5px;padding:5px 0"><span>space-3 <span class="muted">12px → 16px</span> · affects 40 elements</span></div>
-      </div>
-      <div class="row" style="justify-content:flex-end"><button class="btn">Keep editing</button><a href="ds1-design-system.html" class="btn btn-fill btn-strong">Apply to site</a></div>
-      <div class="muted" style="font-size:10px;margin-top:8px">Tab-guard: switching sections while dirty → Keep / Discard / Save&amp;Switch.</div>
-    </div>
-
-    <div class="vs" id="t_export">
-      <div class="h2" style="margin-bottom:8px">Export tokens</div>
-      <div class="row" style="margin-bottom:10px"><span class="chip on">CSS variables</span><span class="chip">Tailwind config</span><span class="chip">JSON</span><span class="chip">Figma variables</span></div>
-      <div class="box pad" style="background:var(--fill);font-family:var(--mono);font-size:10.5px;margin-bottom:10px">:root {<br>&nbsp;&nbsp;--color-accent: #2D6DFF;<br>&nbsp;&nbsp;--space-3: 16px; …<br>}</div>
-      <div class="row" style="justify-content:space-between"><span class="muted" style="font-size:10.5px">14 kinds · 60 tokens · 9 dark variants · lossless</span><button class="btn btn-fill">⤓ Download</button></div>
-    </div>
+<div class="wf-stamp">WIREFRAME · ds3 · DS TOOLS</div>
+<div class="screen">
+  <div class="topnote"><b>DS tools — trimmed to the shared-theme loop.</b> Rebuilt: framework-author tooling (lint, migration, multi-format export) is CUT. Kept only what feeds the agency wedge — starter themes, AI token generation, review/apply, and the push entry. Attached to the workspace <a href="ds1-design-system.html" style="color:#fff;text-decoration:underline">shared theme</a>.</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind Studio</b> › Shared theme › Tools</div>
+    <div class="grp">Kept — the authoring loop</div>
+    <div class="tool"><div class="ic">▦</div><div class="m"><div class="t">Starter themes</div><div class="d">begin a workspace theme from a curated base</div></div><a class="r" href="ds3-ds-tools.html">Browse ▾</a></div>
+    <div class="tool"><div class="ic">✨</div><div class="m"><div class="t">AI generate tokens</div><div class="d">describe a brand → a token set (colors, type, radius)</div></div><a class="r" href="ds3-ds-tools.html">Generate ▾</a></div>
+    <div class="tool"><div class="ic">◐</div><div class="m"><div class="t">Review &amp; push</div><div class="d">diff the theme, resolve overrides, push to sites</div></div><a class="r" href="m-ds-push.html">Open ↗</a></div>
+    <div class="grp">Cut from the everyday builder</div>
+    <div class="cut"><b>Frozen (framework-author tooling, off the wedge):</b> <s>DS lint</s> · <s>v0→vN migration</s> · <s>multi-format export (CSS/Tailwind/JSON/Figma)</s>. These are tool-builder features, not agency-builder features — revisit only if a paying agency blocks on one.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Design system:</b><a href="editor-spine-wireframe.html">Spine</a><a href="ds1-design-system.html">Tokens</a><a href="ds2-styles.html">Styles</a><a href="ds3-ds-tools.html" class="here">DS tools</a><a href="e4-export.html">Site export</a><a href="index.html">Map</a></div>
-<script>var T=['starter','ai','lint','migrate','review','export'];function t(x,b){T.forEach(function(k){document.getElementById('t_'+k).classList.toggle('on',k===x);});document.querySelectorAll('.row .chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
+<div class="proto-nav"><b>DS tools:</b><a href="ds1-design-system.html">Shared theme</a><a href="m-ds-push.html">Push contract</a><a href="m-agency.html">Agency</a><a href="../2026-06-17-product-ux-audit.md">Audit (cut list)</a><a href="index.html">Map</a></div>
 </body></html>

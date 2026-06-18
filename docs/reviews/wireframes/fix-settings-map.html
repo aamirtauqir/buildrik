@@ -1,213 +1,23 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Settings map (dedup fix)</title><link rel="stylesheet" href="wf.css">
-<style>
-  /* 4-scope reference table — grayscale, low-fi */
-  .scopes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px}
-  .scope{border:1px solid var(--line);background:var(--bg)}
-  .scope-h{background:var(--ink);color:#fff;padding:8px 10px}
-  .scope-h .t{font-size:13px;font-weight:600}
-  .scope-h .who{font-size:10px;color:#cfcfcf;letter-spacing:.03em}
-  .scope-h .rule{font-size:9.5px;color:#bdbdbd;margin-top:4px;line-height:1.35}
-  .scope-b{padding:8px 9px}
-  .set{padding:6px 0;border-bottom:1px dashed var(--line);font-size:11.5px}
-  .set:last-child{border-bottom:none}
-  .set .n{font-weight:600;color:var(--ink)}
-  .set .src{display:block;color:var(--ink-3);font-size:9.5px;font-family:var(--mono);margin-top:2px}
-  .set .dl{display:block;color:var(--ink-2);font-size:9.5px;margin-top:3px;font-style:italic}
-  .home{font-size:8.5px;background:var(--ink);color:#fff;border-radius:3px;padding:1px 5px;letter-spacing:.04em;margin-left:4px;vertical-align:middle}
-  .grp{font-size:9px;color:var(--ink-3);letter-spacing:.07em;text-transform:uppercase;margin:10px 0 2px;font-weight:600}
-  .grp:first-child{margin-top:0}
-  /* dup-resolution table */
-  .dups{width:100%;border-collapse:collapse;margin-top:6px;font-size:11px}
-  .dups th{text-align:left;color:var(--ink-3);font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line-d);padding:5px 8px}
-  .dups td{border-bottom:1px dashed var(--line);padding:6px 8px;vertical-align:top}
-  .dups td:first-child{font-weight:600;white-space:nowrap}
-  .dups .was{color:var(--ink-3);font-family:var(--mono);font-size:10px}
-  .dups .now{color:var(--ink)}
-  .dups .now b{color:var(--ink)}
-  .pillk{display:inline-block;border:1px solid var(--line-d);border-radius:999px;padding:1px 7px;font-size:9.5px;color:var(--ink-2);background:var(--fill)}
-</style></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Settings map (superseded)</title><link rel="stylesheet" href="wf.css">
+<style>.wrap{padding:18px 22px;max-width:760px}.sup{border:2px solid var(--ink);border-radius:9px;padding:16px 18px;background:var(--fill)}.sup .t{font-size:15px;font-weight:700}.sup .d{font-size:12px;color:var(--ink-2);margin-top:6px;line-height:1.55}.sup .d b{color:var(--ink)}.sup .go{display:inline-block;margin-top:11px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:6px;padding:8px 14px;font-size:12.5px;font-weight:600;text-decoration:none}.map2{margin-top:12px;font-size:11.5px;color:var(--ink-2);line-height:1.7}.map2 b{color:var(--ink)}.map2 a{color:var(--ink-2)}</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · SUPERSEDED</div>
 <div class="screen">
-  <div class="topnote"><b>Settings map — the dedup fix.</b> Agency users said "good features, but I can't tell where a setting lives." Root cause: the same setting showed up in 2–3 places (Account vs Workspace vs Site vs Editor). This screen is the cure: <b>one home per setting</b>, sorted into 4 scopes. Everything else becomes a read-only "opens in X" deep-link — never a second editable copy. Grounded in <code>account.*</code> / <code>siteDetail.*</code> / <code>billing.*</code> tRPC + the editor Settings tab.</div>
-
-  <div class="pad">
-    <div class="h1" style="font-size:19px;margin-bottom:2px">Where does everything live?</div>
-    <div class="muted" style="font-size:11.5px;margin-bottom:14px">Scan down your scope. Each setting has exactly one editable home (<span class="home">HOME</span>). Italic lines are deep-links that <i>view</i> a value owned by another scope.</div>
-
-    <div class="scopes">
-
-      <!-- ACCOUNT -->
-      <div class="scope">
-        <div class="scope-h">
-          <div class="t">Account</div>
-          <div class="who">YOU · personal, one human</div>
-          <div class="rule">Rule: travels with the person across every workspace. Tied to <code>userId</code>.</div>
-        </div>
-        <div class="scope-b">
-          <div class="grp">Profile</div>
-          <div class="set"><span class="n">Name / avatar / bio</span><span class="home">HOME</span><span class="src">account.profile.update</span></div>
-          <div class="set"><span class="n">My language &amp; timezone</span><span class="home">HOME</span><span class="src">updateProfileSchema.language/timezone</span><span class="dl">≠ Workspace default · ≠ Site locale</span></div>
-          <div class="grp">Account &amp; login</div>
-          <div class="set"><span class="n">Email</span><span class="home">HOME</span><span class="src">account.changeEmail</span></div>
-          <div class="set"><span class="n">Password</span><span class="home">HOME</span><span class="src">account.changePassword / setPassword</span></div>
-          <div class="set"><span class="n">Connected accounts</span><span class="home">HOME</span><span class="src">account.disconnectProvider</span></div>
-          <div class="grp">Security</div>
-          <div class="set"><span class="n">Two-factor (2FA)</span><span class="home">HOME</span><span class="src">account.twoFactor.*</span></div>
-          <div class="set"><span class="n">Active sessions / sign-out</span><span class="home">HOME</span><span class="src">account.sessions.*</span></div>
-          <div class="set"><span class="n">Login history</span><span class="home">HOME</span><span class="src">account.loginHistory</span></div>
-          <div class="grp">Notifications</div>
-          <div class="set"><span class="n">My notification prefs</span><span class="home">HOME</span><span class="src">account.notifications.update</span><span class="dl">Categories cover WS/Site events; the <i>choice</i> is per-person</span></div>
-          <div class="grp">Danger</div>
-          <div class="set"><span class="n">Export my data / delete account</span><span class="home">HOME</span><span class="src">account.dangerZone.*</span></div>
-        </div>
-      </div>
-
-      <!-- WORKSPACE -->
-      <div class="scope">
-        <div class="scope-h">
-          <div class="t">Workspace</div>
-          <div class="who">THE AGENCY · the org, all sites</div>
-          <div class="rule">Rule: shared by everyone in the org; billed once; spans all sites. Tied to <code>workspaceId</code>.</div>
-        </div>
-        <div class="scope-b">
-          <div class="grp">Org identity</div>
-          <div class="set"><span class="n">Workspace name / slug / icon</span><span class="home">HOME</span><span class="src">account.workspace.update</span></div>
-          <div class="set"><span class="n">Org default language &amp; timezone</span><span class="home">HOME</span><span class="src">updateWorkspaceSchema.defaultLanguage/timezone</span><span class="dl">Seeds a new site's locale; not your personal one</span></div>
-          <div class="set"><span class="n">Workspace accent color</span><span class="home">HOME</span><span class="src">updateWorkspaceSchema.accentColor</span><span class="dl">Dashboard chrome only — NOT a site's brand</span></div>
-          <div class="grp">People</div>
-          <div class="set"><span class="n">Members / roles / invites</span><span class="home">HOME</span><span class="src">/dashboard/team (c1)</span></div>
-          <div class="set"><span class="n">Transfer ownership</span><span class="home">HOME</span><span class="src">account.workspace.transfer.*</span></div>
-          <div class="grp">Sharing defaults</div>
-          <div class="set"><span class="n">Default share expiry / require-pw / editor rights</span><span class="home">HOME</span><span class="src">account.workspace.sharing</span><span class="dl">Default for new links · per-site link &amp; per-site password live in Site</span></div>
-          <div class="grp">Billing &amp; usage</div>
-          <div class="set"><span class="n">Plan / interval / invoices</span><span class="home">HOME</span><span class="src">billing.* (16)</span></div>
-          <div class="set"><span class="n">AI credits pool &amp; usage</span><span class="home">HOME</span><span class="src">account.aiCredits (workspaceId-scoped)</span><span class="dl">Surfaced under Account "AI credits" as a read-only mirror</span></div>
-          <div class="grp">Org integrations</div>
-          <div class="set"><span class="n">Workspace webhooks (Slack / Zapier / MC)</span><span class="home">HOME</span><span class="src">account.integrations.* · /settings/integrations</span><span class="dl">Hosting/Vercel OAuth also lives here</span></div>
-          <div class="grp">Danger</div>
-          <div class="set"><span class="n">Delete workspace</span><span class="home">HOME</span><span class="src">account.workspace.delete (owner-only)</span></div>
-        </div>
-      </div>
-
-      <!-- SITE -->
-      <div class="scope">
-        <div class="scope-h">
-          <div class="t">Site</div>
-          <div class="who">ONE SITE · publishing infra</div>
-          <div class="rule">Rule: applies to one site's <i>deployment</i>, not its pages. Edge/ops config. Tied to <code>siteId</code>.</div>
-        </div>
-        <div class="scope-b">
-          <div class="grp">General</div>
-          <div class="set"><span class="n">Site name / slug</span><span class="home">HOME</span><span class="src">siteDetail.settings.update</span></div>
-          <div class="grp">Domains</div>
-          <div class="set"><span class="n">Custom domains / primary / SSL</span><span class="home">HOME</span><span class="src">siteDetail.domains.* (15)</span></div>
-          <div class="grp">SEO defaults (site-wide)</div>
-          <div class="set"><span class="n">Title template / default desc / OG image</span><span class="home">HOME</span><span class="src">metaTitleTemplate / metaDescription / ogImage (d5)</span><span class="dl">Editor shows the effective value read-only; per-page overrides live in Editor</span></div>
-          <div class="set"><span class="n">Favicon / touch icon</span><span class="home">HOME</span><span class="src">site favicon / touchIcon</span></div>
-          <div class="grp">Edge / plumbing</div>
-          <div class="set"><span class="n">Redirects (301 / 302)</span><span class="home">HOME</span><span class="src">siteDetail.redirects.* (d3)</span></div>
-          <div class="set"><span class="n">Site-wide custom code (&lt;head&gt; / &lt;body&gt;)</span><span class="home">HOME</span><span class="src">site headCode / bodyCode</span><span class="dl">Per-page &lt;head&gt; stays in Editor</span></div>
-          <div class="set"><span class="n">Security headers (CSP / HSTS / X-Frame)</span><span class="home">HOME</span><span class="src">cspPolicy / hstsMaxAge / xFrameOptions</span></div>
-          <div class="set"><span class="n">Site analytics tags (GA4 / Plausible / Pixel)</span><span class="home">HOME</span><span class="src">site analytics settings</span><span class="dl">Distinct from Workspace webhooks</span></div>
-          <div class="grp">Localization</div>
-          <div class="set"><span class="n">Enabled locales / default locale</span><span class="home">HOME</span><span class="src">enabledLocales / defaultLocale</span></div>
-          <div class="grp">Sharing / access</div>
-          <div class="set"><span class="n">Share links / published password</span><span class="home">HOME</span><span class="src">siteDetail.sharing.* · publishedPassword (d4)</span></div>
-        </div>
-      </div>
-
-      <!-- EDITOR / DESIGN -->
-      <div class="scope">
-        <div class="scope-h">
-          <div class="t">Editor / Design</div>
-          <div class="who">BUILD-TIME · page &amp; canvas</div>
-          <div class="rule">Rule: changes the <i>content you draw</i> — page-scoped or design-token-scoped. Lives in the editor canvas.</div>
-        </div>
-        <div class="scope-b">
-          <div class="grp">Design tokens (whole site)</div>
-          <div class="set"><span class="n">Brand color / type / spacing</span><span class="home">HOME</span><span class="src">Editor → Palette tab (design-system)</span><span class="dl">This is "the site's brand" — NOT Workspace accent color</span></div>
-          <div class="grp">Per-page content</div>
-          <div class="set"><span class="n">Per-page SEO override (title / desc)</span><span class="home">HOME</span><span class="src">Editor → page settings</span><span class="dl">Falls back to Site SEO defaults</span></div>
-          <div class="set"><span class="n">Per-page &lt;head&gt; snippet</span><span class="home">HOME</span><span class="src">Editor → page settings</span></div>
-          <div class="set"><span class="n">Forms / form-block config</span><span class="home">HOME</span><span class="src">Editor → Settings → Forms (FormsScreen)</span></div>
-          <div class="grp">Read-only mirrors (deep-link out)</div>
-          <div class="set"><span class="n">↗ Site SEO defaults</span><span class="src">opens Site → SEO (read-only effective value)</span></div>
-          <div class="set"><span class="n">↗ Redirects · Headers · Site custom code</span><span class="src">opens Site → Settings (Dashboard ops)</span></div>
-          <div class="set"><span class="n">↗ Domains</span><span class="src">opens Site → Domains</span></div>
-          <div class="set"><span class="n">↗ Members · Billing</span><span class="src">opens Workspace</span></div>
-        </div>
-      </div>
-
+  <div class="topnote"><b>Settings map — SUPERSEDED.</b> The early 4-scope settings map is replaced by the reconciled ownership model. This page no longer teaches the old homes (which put content SEO + analytics in the wrong place).</div>
+  <div class="wrap">
+    <div class="sup">
+      <div class="t">↗ See the canonical model</div>
+      <div class="d">Where every setting lives is now defined by <b>one rule</b>: each concept has one authoring home, split by <b>content (editor)</b> vs <b>business ops (dashboard)</b> vs <b>workspace (agency)</b>. The settings directory is <a href="b0-settings-home.html" style="color:var(--ink)">b0 · Settings home</a>.</div>
+      <a class="go" href="m-ownership.html">Open Ownership map →</a>
     </div>
-
-    <!-- SCOPING RULE -->
-    <div class="note" style="margin-top:18px">
-      <b>The scoping rule (one question decides the home):</b> "If this setting changed, what is the blast radius?"
-      <span class="pillk">just me → Account</span>
-      <span class="pillk">everyone in the org / billing → Workspace</span>
-      <span class="pillk">one site's deployment → Site</span>
-      <span class="pillk">the pages I draw → Editor/Design</span>.
-      <br><b>How dups were resolved:</b> every setting gets exactly <b>one editable HOME</b>. Where a second scope legitimately needs to <i>see</i> it, that scope shows a <b>read-only "↗ opens in X" deep-link</b>, never a second input. No setting is editable in two places — that was the whole "good features, not user-friendly" complaint.
+    <div class="map2">
+      <b>The corrections this old map got wrong:</b><br>
+      · <b>Content SEO</b> (title/desc/OG) → <a href="m-seo.html">Editor › Site</a> (was: dashboard).<br>
+      · <b>Technical SEO</b> (canonical/index/sitemap) → <a href="d5-seo.html">Dashboard › Delivery</a>.<br>
+      · <b>Analytics</b> → connect at <a href="c4-integrations.html">Workspace</a>, assign in <a href="m-tracking.html">Editor › Tracking</a>, view in <a href="19-analytics.html">Dashboard › Traffic</a> (3 layers, was: lumped).<br>
+      · <b>Redirects</b> → <a href="14-site-settings.html">Dashboard › Delivery</a>; <b>custom code</b> → <a href="53-settings.html">Editor › Site</a>.
     </div>
-
-    <!-- DUP RESOLUTION LEDGER -->
-    <div class="h2" style="margin-top:20px;margin-bottom:2px">Duplicates found &amp; how each was resolved</div>
-    <div class="muted" style="font-size:11px;margin-bottom:6px">The 9 collisions agency users hit — each now has a single home, the rest demoted to deep-links.</div>
-    <table class="dups">
-      <thead><tr><th>Setting (was in 2–3 places)</th><th>Where it used to live (ambiguous)</th><th>Resolution — one home</th></tr></thead>
-      <tbody>
-        <tr>
-          <td>Language &amp; timezone</td>
-          <td class="was">Account profile · Workspace default · Site locale</td>
-          <td class="now">Three <b>different</b> settings, badly named the same. Renamed: <b>Account</b>="my language", <b>Workspace</b>="org default (seeds new sites)", <b>Site</b>="enabled locales". No dup — disambiguated.</td>
-        </tr>
-        <tr>
-          <td>Brand / accent color</td>
-          <td class="was">Workspace accentColor · Editor Palette · Site favicon</td>
-          <td class="now"><b>Editor → Palette</b> owns the site's brand. Workspace accent = <i>dashboard chrome only</i>, relabeled so it stops masquerading as site brand.</td>
-        </tr>
-        <tr>
-          <td>Favicon</td>
-          <td class="was">Site settings · Editor General → Site Identity</td>
-          <td class="now"><b>Site</b> is home. Editor "Site Identity" row becomes an ↗ deep-link (already the pattern in BrandingSection).</td>
-        </tr>
-        <tr>
-          <td>SEO defaults (title template / OG)</td>
-          <td class="was">Dashboard SEO (d5) · Editor SEO screen · per-page</td>
-          <td class="now"><b>Site → SEO</b> owns site-wide defaults. Editor shows the <i>effective</i> value read-only + per-page <b>override</b> stays in Editor.</td>
-        </tr>
-        <tr>
-          <td>Redirects</td>
-          <td class="was">Dashboard site settings (14/d3) · Editor Settings plumbing</td>
-          <td class="now"><b>Site → Settings</b> (edge ops). Editor row = ↗ deep-link, never editable in canvas.</td>
-        </tr>
-        <tr>
-          <td>Custom code &amp; headers</td>
-          <td class="was">Site settings · Editor "Custom code / Headers" screens</td>
-          <td class="now"><b>Site</b> owns site-wide &lt;head&gt;/CSP. Editor keeps only <b>per-page</b> &lt;head&gt;; site-wide is ↗ deep-link.</td>
-        </tr>
-        <tr>
-          <td>Integrations / GA4</td>
-          <td class="was">Workspace webhooks · /settings/integrations (Vercel) · Editor Analytics (GA4)</td>
-          <td class="now">Split by purpose: <b>Workspace</b>=org webhooks + hosting OAuth; <b>Site</b>=analytics tags (GA4/Plausible/Pixel). Two homes, two purposes — no overlap.</td>
-        </tr>
-        <tr>
-          <td>AI credits</td>
-          <td class="was">Account "AI credits" page · workspaceId-scoped pool</td>
-          <td class="now">Pool is <b>Workspace</b> (it's billed there). Account page keeps a <i>read-only mirror</i> + "Upgrade" deep-link.</td>
-        </tr>
-        <tr>
-          <td>Sharing &amp; password</td>
-          <td class="was">Workspace sharing defaults · per-site published password / share links</td>
-          <td class="now"><b>Workspace</b>=defaults for new links; <b>Site</b>=this site's actual links &amp; password. Default vs instance — disambiguated.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="note" style="margin-top:14px"><b>Net effect:</b> the editor's existing "↗ opens Dashboard" boundary (§3, screens 14 / 53) is generalized into a full 4-scope map. Zero settings stay editable in two places; ambiguous same-named fields (language, brand color, sharing) are renamed by scope so users stop guessing.</div>
   </div>
 </div>
-
-<div class="proto-nav"><b>Settings map:</b><a href="14-site-settings.html">Site settings</a><a href="18-workspace.html">Workspace</a><a href="b1-account-settings.html">Account</a><a href="53-settings.html">Editor settings</a><a href="d5-seo.html">SEO</a><a href="d3-redirects.html">Redirects</a><a href="index.html">Index</a></div>
+<div class="proto-nav"><b>Superseded →</b><a href="m-ownership.html">Ownership map</a><a href="m-roles.html">Roles</a><a href="b0-settings-home.html">Settings home</a><a href="index.html">Map</a></div>
 </body></html>

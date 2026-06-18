@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · M-seo — how SEO works across many pages</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+
+  /* inheritance ladder */
+  .ladder{display:grid;grid-template-columns:150px 1fr;gap:12px;margin-top:6px}
+  .lv{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff;grid-column:2}
+  .lv.def{border-color:var(--ink);border-width:2px}
+  .lvname{grid-column:1;display:flex;flex-direction:column;justify-content:center;gap:3px}
+  .lvname b{font-size:13px}
+  .lvname .pin{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;padding:1px 6px;align-self:flex-start}
+  .pin.edit{background:var(--ink);color:#fff}
+  .pin.page{border:1px solid var(--ink);color:var(--ink)}
+  .pin.auto{border:1px dashed var(--line-d);color:var(--ink-3)}
+  .lvrow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-2);padding:3px 0;border-bottom:1px dashed var(--line)}
+  .lvrow:last-child{border-bottom:none}
+  .lvrow b{color:var(--ink)}
+  .lvrow .val{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+  .arrow{grid-column:1/-1;text-align:center;color:var(--ink-3);font-size:11px;margin:-4px 0}
+
+  /* overview table */
+  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:middle}
+  th{background:var(--fill);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  td .src{font-size:8.5px;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;padding:1px 5px;margin-left:5px}
+  .src.inh{border:1px dashed var(--line-d);color:var(--ink-3)}
+  .src.ovr{background:var(--ink);color:#fff}
+  .flag{font-size:9px;border-radius:3px;padding:1px 6px;white-space:nowrap}
+  .flag.ok{border:1px solid var(--line-d);color:var(--ink-3)}
+  .flag.warn{border:1px solid var(--ink);color:var(--ink);font-weight:600}
+  .noindex{font-size:9px;border:1px dashed var(--ink);border-radius:3px;padding:1px 5px;color:var(--ink)}
+  .muted2{font-size:10.5px;color:var(--ink-3)}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+  .card{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff}
+  .card .ct{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .card .cp{font-size:11.5px;color:var(--ink-2);margin-top:6px;line-height:1.45}
+  .card .cp b{color:var(--ink)}
+  .code{font-family:var(--mono);font-size:10.5px;background:var(--fill);border:1px solid var(--line);border-radius:4px;padding:7px 9px;margin-top:7px;white-space:pre-wrap;color:var(--ink-2)}
+  .pin2{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;padding:1px 6px}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · M-SEO · MANY-PAGE MODEL</div>
+<div class="screen">
+  <div class="topnote"><b>M-seo — how SEO works when a site has many pages.</b> The fix to a real gap: "SEO → Site + Pages drawer" doesn't scale to 50 pages. SEO is mostly <b>per-page</b> (every page needs its own title + description for Google). The model = <b>3 inheritance levels + one overview table</b>. <b>Content SEO</b> (titles/desc/OG, per-page) is editor-owned — authored with the content; <b>technical SEO</b> (canonical · index · sitemap) lives in the dashboard.</div>
+  <div class="wrap">
+
+    <!-- INHERITANCE -->
+    <div class="sech">1 · Three levels — a page inherits the site default until you override it <span class="sub">set defaults ONCE; tune the pages that matter</span></div>
+    <div class="ladder">
+      <div class="lvname"><span class="pin edit">Editor › Site</span><b>Site defaults</b><span class="muted2">set once, whole site</span></div>
+      <div class="lv def">
+        <div class="lvrow"><span>Title <b>template</b></span><span class="val">{Page title} · Acme</span></div>
+        <div class="lvrow"><span>Default description</span><span class="val">"Acme builds…"</span></div>
+        <div class="lvrow"><span>Default OG image</span><span class="val">acme-og.png</span></div>
+        <div class="lvrow"><span>Title template · default desc · default OG <small style="color:var(--ink-3)">(content defaults — editor)</small></span><span class="val">site-wide</span></div>
+        <div class="lvrow" style="color:var(--ink-3)"><span>Canonical domain · robots/indexing · sitemap · favicon</span><span class="val">→ Dashboard › Technical SEO</span></div>
+      </div>
+      <div class="arrow">▼ each page inherits these, shows the <b>effective</b> value, overrides only what it needs</div>
+      <div class="lvname"><span class="pin page">Pages drawer</span><b>Per-page SEO</b><span class="muted2">the bulk of real SEO</span></div>
+      <div class="lv">
+        <div class="lvrow"><span><b>Title</b> (override)</span><span class="val">Pricing · Acme</span></div>
+        <div class="lvrow"><span><b>Description</b> (override)</span><span class="val">"Simple plans…"</span></div>
+        <div class="lvrow"><span>Slug · custom OG · <b>per-page</b> canonical override</span><span class="val">/pricing</span></div>
+        <div class="lvrow"><span><b>This page:</b> index / noindex</span><span class="val">indexed</span></div>
+      </div>
+      <div class="muted2" style="font-size:10px;color:var(--ink-3);margin-top:4px">Per-page = an override for <i>one</i> page. The <b>site-wide</b> canonical domain · indexing policy · sitemap are technical SEO → <a href="d5-seo.html" style="color:var(--ink-3)">Dashboard › Publishing</a>, not here.</div>
+      <div class="arrow">▼ for dynamic pages (blog, products) you can't hand-write 200 — use a pattern</div>
+      <div class="lvname"><span class="pin edit">Collection</span><b>Pattern SEO</b><span class="muted2">dynamic pages</span></div>
+      <div class="lv">
+        <div class="lvrow"><span>Title pattern</span><span class="val">{post.title} · Acme Blog</span></div>
+        <div class="lvrow"><span>Description pattern</span><span class="val">{post.excerpt}</span></div>
+        <div class="lvrow"><span>OG</span><span class="val">{post.cover}</span></div>
+        <div class="lvrow"><span class="muted2">one pattern → every generated page filled automatically</span><span></span></div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:8px"><b>The rule:</b> a page's SEO = <b>its override if set, else the site default</b> (or the collection pattern for dynamic pages). The page drawer always shows the <b>effective</b> value with an "inherited" vs "custom" tag, so you know what Google will see without guessing.</div>
+
+    <!-- OVERVIEW TABLE — the many-pages answer -->
+    <div class="sech">2 · SEO overview — all pages at a glance <span class="sub">Editor › Pages › "SEO view" · the surface that makes 50 pages manageable</span></div>
+    <table>
+      <tr><th style="width:18%">Page</th><th style="width:30%">Title (effective)</th><th style="width:28%">Description</th><th style="width:10%">Index</th><th style="width:14%">Status</th></tr>
+      <tr><td><b>Home</b> <span class="muted2">/</span></td><td>Acme · Build sites fast <span class="src ovr">custom</span></td><td>"Acme builds sites…" <span class="src ovr">custom</span></td><td>✓</td><td><span class="flag ok">good</span></td></tr>
+      <tr><td><b>Pricing</b> <span class="muted2">/pricing</span></td><td>Pricing · Acme <span class="src ovr">custom</span></td><td>"Simple plans…" <span class="src ovr">custom</span></td><td>✓</td><td><span class="flag ok">good</span></td></tr>
+      <tr><td><b>About</b> <span class="muted2">/about</span></td><td>About · Acme <span class="src inh">inherited</span></td><td><span class="muted2">— missing —</span></td><td>✓</td><td><span class="flag warn">no description</span></td></tr>
+      <tr><td><b>Features</b> <span class="muted2">/features</span></td><td>Acme · Acme <span class="src inh">inherited</span></td><td>"Acme builds sites…" <span class="src inh">inherited</span></td><td>✓</td><td><span class="flag warn">title = duplicate</span></td></tr>
+      <tr><td><b>Thank-you</b> <span class="muted2">/thanks</span></td><td>Thanks · Acme <span class="src inh">inherited</span></td><td>"Acme builds…" <span class="src inh">inherited</span></td><td><span class="noindex">noindex</span></td><td><span class="flag ok">hidden (ok)</span></td></tr>
+      <tr><td colspan="5" class="muted2" style="text-align:center">… 45 more pages · <b>3 issues:</b> 1 missing description · 1 duplicate title · 0 missing titles</td></tr>
+    </table>
+    <div class="note" style="margin-top:8px"><b>Why this is the answer to "many pages":</b> you never hunt page-by-page. The overview table shows every page's <b>effective</b> SEO, flags <b>gaps</b> (missing/duplicate titles &amp; descriptions, accidental noindex), and lets you edit inline or jump to the page. Sort/filter by "has issues." This is one screen, not 50 drawers.</div>
+
+    <!-- WHERE IT LIVES + AI -->
+    <div class="sech">3 · Where it lives + where AI helps</div>
+    <div class="cols">
+      <div class="card">
+        <div class="ct">Homes (per ownership map) <span class="pin2 inh" style="border:1px dashed var(--line-d);color:var(--ink-3)">content: editor · technical: dashboard</span></div>
+        <div class="cp"><b>Site defaults</b> → Editor › Site › SEO. <b>Per-page</b> → Pages drawer › SEO (override). <b>Overview table</b> → Editor › Pages › "SEO view". <b>Pattern</b> → the collection's settings. Dashboard shows a <b>read-only SEO health mirror</b> ("3 issues · Edit in editor ↗") — never a second editor.</div>
+      </div>
+      <div class="card">
+        <div class="ct">AI does the boring part <span class="pin2" style="border:1px solid var(--ink);color:var(--ink)">Operate</span></div>
+        <div class="cp">The exact job AI should do for a non-technical user across many pages:</div>
+        <div class="code">"Generate SEO for all pages
+  missing a description"
+→ fills the 1 gap, drafts from
+  page content, you review + apply</div>
+        <div class="cp" style="margin-top:7px">Per the audit's AI redesign: AI's "Operate" job = generate page SEO / alt-text / fix duplicates. Scope label + affected count + preview before apply.</div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:14px"><b>Net:</b> SEO scales because it's <b>inherit-by-default + override-where-it-matters + one overview to find gaps + AI to fill the rest</b>. A 5-page site sets defaults once and is done; a 50-page site lives in the overview table; a 500-post blog uses one pattern. All three are the same content-SEO model, editor-owned (technical SEO = dashboard). Founder-call #1 (content SEO owner = Editor) still holds — this just shows it works at scale.</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>SEO model:</b><a href="m-ownership.html">Ownership map</a><a href="m-seo.html" style="border-color:#fff;background:#fff;color:#2b2b2b;font-weight:600">M-seo</a><a href="50-pages.html">Pages</a><a href="d5-seo.html">Technical SEO</a><a href="../2026-06-17-product-ux-audit.md">UX audit</a><a href="index.html">Map</a></div>
+</body></html>

@@ -3,7 +3,7 @@
 <body>
 <div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen screen-narrow" style="max-width:520px">
-  <div class="topnote"><b>Auth error states (§10)</b> · grounded in <code>/auth/error/*</code> (11 real routes) · solution: every failure is a friendly recoverable screen — never a raw stack trace</div>
+  <div class="topnote"><b>Auth error states (§10)</b> · 11 full-page errors grounded in <code>/auth/error/*</code> + 3 flow edges (exists · invite→existing · wrong-credential) = <b>14 cases</b> · solution: every failure is a friendly recoverable screen — never a raw stack trace</div>
   <div class="pad">
     <div class="row" style="margin-bottom:16px;flex-wrap:wrap;gap:5px">
       <button class="chip on" onclick="es('expired',this)">Expired link</button>
@@ -17,6 +17,9 @@
       <button class="chip" onclick="es('captcha',this)">CAPTCHA</button>
       <button class="chip" onclick="es('disabled',this)">Disabled</button>
       <button class="chip" onclick="es('social',this)">Social error</button>
+      <button class="chip" onclick="es('exists',this)">Email exists</button>
+      <button class="chip" onclick="es('joinexisting',this)">Invite → existing</button>
+      <button class="chip" onclick="es('wrongcred',this)">Wrong credential</button>
     </div>
     <div class="box pad" style="min-height:190px;display:grid;place-items:center">
       <div class="vs on card" id="e_expired"><div style="font-size:24px">⌛</div><div class="h2" style="margin:6px 0">Link expired</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">This sign-in / verify link is no longer valid.</div><a href="a3-password.html" class="btn btn-fill">Request a new link</a></div>
@@ -30,10 +33,13 @@
       <div class="vs card" id="e_captcha"><div style="font-size:24px">🤖</div><div class="h2" style="margin:6px 0">Verification failed</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">Couldn't confirm you're human. Try again.</div><a href="00-signin.html" class="btn btn-fill">Retry</a></div>
       <div class="vs card" id="e_disabled"><div style="font-size:24px">⛔</div><div class="h2" style="margin:6px 0">Account disabled</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">This account or workspace is disabled. Contact support.</div><a href="c3-help.html" class="btn">Contact support</a></div>
       <div class="vs card" id="e_social"><div style="font-size:24px">✕</div><div class="h2" style="margin:6px 0">Sign-in provider error</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">Google/GitHub had a problem. Try again or use email.</div><a href="00-signin.html" class="btn btn-fill">Use email instead</a></div>
+      <div class="vs card" id="e_exists"><div style="font-size:24px">✦</div><div class="h2" style="margin:6px 0">That email already has an account</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">No need to sign up again — sign in, or reset the password if you forgot it.</div><a href="00-signin.html" class="btn btn-fill">Sign in instead</a><a href="a3-password.html" class="btn" style="margin-top:6px">Reset password</a></div>
+      <div class="vs card" id="e_joinexisting"><div style="font-size:24px">↪</div><div class="h2" style="margin:6px 0">You already have an account</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">This invite is for an email you already use. Sign in and the workspace joins your account — no second account made.</div><a href="00-signin.html" class="btn btn-fill">Sign in &amp; join</a></div>
+      <div class="vs card" id="e_wrongcred"><div style="font-size:24px">!</div><div class="h2" style="margin:6px 0">Wrong email or password</div><div class="muted" style="font-size:11.5px;margin-bottom:12px">Shown <b>inline on the field</b>, never as a full page — what you typed stays. Same pattern for a wrong 2FA code or a used backup code. We don't say which field is wrong (anti-enumeration).</div><a href="00-signin.html" class="btn btn-fill">Back to sign in</a><a href="a3-password.html" class="btn" style="margin-top:6px">Forgot password</a></div>
     </div>
-    <div class="note" style="margin-top:14px;font-size:10.5px"><b>One pattern, 11 cases:</b> icon + plain-language cause + a single recovery action that actually moves forward (reset, resend, verify, support). No dead-ends, no error codes shoved at the user. Grounded in the real <code>/auth/error/*</code> routes.</div>
+    <div class="note" style="margin-top:14px;font-size:10.5px"><b>One pattern, 14 cases:</b> icon + plain-language cause + a single recovery action that actually moves forward (reset, resend, verify, sign-in, support). No dead-ends, no error codes shoved at the user. The last three are the real-app edges codex flagged: <b>email-already-exists</b> (don't make a duplicate), <b>invite to an existing account</b> (join, don't re-register), and <b>wrong credential</b> (inline on the field, anti-enumeration, typed data kept). Grounded in the real <code>/auth/error/*</code> routes.</div>
   </div>
 </div>
 <div class="proto-nav"><b>Auth:</b><a href="00-signin.html">Sign in</a><a href="a1-signup.html">Sign up</a><a href="a2-verify-email.html">Verify email</a><a href="a3-password.html">Password</a><a href="a4-2fa.html">2FA</a><a href="a5-invite.html">Invite</a><a href="a8-auth-errors.html" class="here">Errors</a><a href="index.html">Map</a></div>
-<script>var E=['expired','invite','session','2fa','locked','rate','denied','suspicious','captcha','disabled','social'];function es(s,b){E.forEach(function(x){document.getElementById('e_'+x).classList.toggle('on',x===s);});document.querySelectorAll('.row .chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
+<script>var E=['expired','invite','session','2fa','locked','rate','denied','suspicious','captcha','disabled','social','exists','joinexisting','wrongcred'];function es(s,b){E.forEach(function(x){document.getElementById('e_'+x).classList.toggle('on',x===s);});document.querySelectorAll('.row .chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
 </body></html>

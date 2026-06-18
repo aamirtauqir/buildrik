@@ -1,58 +1,55 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Inspector</title><link rel="stylesheet" href="wf.css">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 59 — Inspector</title><link rel="stylesheet" href="wf.css">
 <style>
-  .ed{display:grid;grid-template-columns:1fr 300px;min-height:440px}
-  .cv{border-right:1px dashed var(--line);background:var(--bg-2);display:grid;place-items:center;padding:20px}
-  .scopebar{border-bottom:1px solid var(--line);background:var(--fill);padding:8px 12px;font-size:11.5px}
-  .device{display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--line)}
-  .grp{border-bottom:1px dashed var(--line)}
-  .gh{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;font-size:12px;font-weight:700;cursor:pointer}
-  .gh .tw{color:var(--ink-3);font-size:10px}
-  .gb{padding:0 12px 12px}
-  .gb.closed{display:none}
-  .sub{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 4px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-  .f{font-size:11px}.f .lbl{display:block;margin-bottom:3px}
-  .ovr{border:1px solid var(--ink);border-radius:5px;background:#fff;padding:7px 9px;font-size:10.5px;margin-top:6px}
+  .wrap{padding:16px 20px;max-width:340px;margin:0 auto}
+  .insp{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
+  .scope{padding:10px 12px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .eye{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .sl{font-size:13px;font-weight:600;margin-top:2px}
+  .reach{display:flex;gap:4px;margin-top:8px}
+  .reach .r{flex:1;border:1px solid var(--line);border-radius:4px;padding:5px 3px;text-align:center;font-size:9.5px;color:var(--ink-3);line-height:1.2}
+  .reach .r b{display:block;font-size:10px;color:var(--ink-2)}
+  .reach .r.on{border-color:var(--ink);border-width:1.5px;background:var(--fill)} .reach .r.on b{color:var(--ink)}
+  .grp{font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);padding:8px 12px 2px;background:var(--bg-2);border-bottom:1px solid var(--line)}
+  .sec{padding:9px 12px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;display:flex;justify-content:space-between;color:var(--ink)}
+  .sec .chev{color:var(--ink-3);font-size:10px}
+  .field{display:flex;justify-content:space-between;align-items:center;padding:0 12px 8px;font-size:12px;color:var(--ink-2)}
+  .gbox{border:1px solid var(--line);background:var(--fill);border-radius:3px;padding:4px 8px;font-size:11px;color:var(--ink-2)}
+  .blocked{padding:8px 12px;font-size:10.5px;color:var(--ink-3);font-style:italic;background:var(--bg-2);border-bottom:1px solid var(--line)}
+  .locked{padding:8px 12px;font-size:10.5px;color:var(--ink-2);background:#fff;border-bottom:1px solid var(--line);border-left:3px solid var(--ink)}
+  .locked b{color:var(--ink)}
+  .dchip{font-size:8px;border:1px solid var(--line-d);color:var(--ink-3);border-radius:3px;padding:0 5px;letter-spacing:.03em;margin-left:6px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
 </style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · 59 · INSPECTOR</div>
 <div class="screen">
-  <div class="topnote"><b>Inspector — 3-group progressive (the declutter contract)</b> · canonical per <a href="fix-editor-declutter.html" style="text-decoration:underline">fix-editor-declutter</a> · 3 groups not 16 sections: <b>Common</b> open · <b>Layout &amp; box</b> + <b>Advanced</b> collapsed · Simple shows Common only</div>
-  <div class="ed">
-    <div class="cv">
-      <div style="text-align:center"><div class="ph-img" style="height:70px;width:200px;margin-bottom:8px">▭ CTA button (selected)</div><div class="muted" style="font-size:11px">click an element → inspector reflects it</div></div>
+  <div class="topnote"><b>Inspector — job-grouped, 3-reach, role/density reasons.</b> Rebuilt: old class-scope copy + "Advanced" density wording becomes the 3-reach picker (This item / All like this / Whole site) + every hidden/blocked control says WHY (density vs role). Canonical inspector in <a href="m-editor.html" style="color:#fff;text-decoration:underline">M-editor</a>.</div>
+  <div class="wrap">
+    <div class="insp">
+      <div class="scope">
+        <div class="eye">You are editing</div>
+        <div class="sl">Get started button</div>
+        <div class="reach"><div class="r on"><b>This item</b>just here</div><div class="r"><b>All like this</b>12 of them</div><div class="r"><b>Whole site</b>every page</div></div>
+      </div>
+      <div class="grp">Edit — grouped by job</div>
+      <div class="sec">Content <span class="chev">▾</span></div>
+      <div class="field"><span>Text</span><span class="gbox">Get started</span></div>
+      <div class="field"><span>Link</span><span class="gbox">/signup ▾</span></div>
+      <div class="sec">Layout <span class="chev">▾</span></div>
+      <div class="field"><span>Size · padding</span><span class="gbox">Auto ▾</span></div>
+      <div class="field"><span>Align</span><span class="gbox">Center ▾</span></div>
+      <div class="sec">Style <span class="chev">▾</span></div>
+      <div class="field"><span>Fill</span><span class="gbox" style="width:20px">▢</span></div>
+      <div class="field"><span>Text color · radius</span><span class="gbox" style="width:20px">▢</span></div>
+      <div class="grp">More controls</div>
+      <div class="sec">Responsive <span><span class="dchip">Pro</span> <span class="chev">▸</span></span></div>
+      <div class="sec">Behavior · interactions <span><span class="dchip">Pro</span> <span class="chev">▸</span></span></div>
+      <div class="sec" style="color:var(--ink-3)">Advanced styling <span style="font-size:8px;color:var(--ink-3)">Designer</span> <span class="chev">▸</span></div>
+      <div class="blocked">↳ <b>Hidden in the simplified view</b> — turn on full controls in settings (reversible, nothing deleted)</div>
+      <div class="locked">🔒 <b>Locked for your role</b> (Client-Editor) — advanced styling is set by a Designer. Ask an admin.</div>
     </div>
-    <div>
-      <div class="scopebar">Editing: <b>CTA button</b> · <span class="muted">.btn-primary · 31 site-wide</span> <a href="40-edit-scope.html" style="text-decoration:underline;color:var(--ink-2)">scope</a></div>
-      <div class="device"><span class="chip on" style="font-size:10px">All</span><span class="chip" style="font-size:10px">Tablet</span><span class="chip" style="font-size:10px">Phone</span><span class="muted" style="font-size:9px;margin-left:auto;align-self:center">editing: All · <a href="59b-inspector-states.html" style="text-decoration:underline">states ×bp</a></span></div>
-
-      <!-- GROUP 1: COMMON (open) — the 80% controls -->
-      <div class="grp">
-        <div class="gh">Common <span class="tw">▾</span></div>
-        <div class="gb">
-          <div class="sub">Fill &amp; text</div>
-          <div class="grid2"><div class="f"><span class="lbl">Fill</span><div class="input">--color-accent</div></div><div class="f"><span class="lbl">Text colour</span><div class="input">--on-accent</div></div></div>
-          <div class="ovr">↳ <b>Fill comes from class</b> <code>.btn-primary</code>. Editing here makes a local override. <a href="fix-styling-model.html" style="text-decoration:underline">reset to inherit</a> · or change all 31.</div>
-          <div class="sub">Type</div>
-          <div class="grid2"><div class="f"><span class="lbl">Font</span><div class="input">Inter</div></div><div class="f"><span class="lbl">Size</span><div class="input">16</div></div><div class="f"><span class="lbl">Weight</span><div class="input">600</div></div><div class="f"><span class="lbl">Align</span><div class="input">center</div></div></div>
-          <div class="sub">Spacing &amp; radius</div>
-          <div class="grid2"><div class="f"><span class="lbl">Padding</span><div class="input">--space-3</div></div><div class="f"><span class="lbl">Radius</span><div class="input">--radius-md</div></div></div>
-        </div>
-      </div>
-
-      <!-- GROUP 2: LAYOUT & BOX (collapsed) -->
-      <div class="grp">
-        <div class="gh">Layout &amp; box <span class="tw">▸</span></div>
-        <div class="gb closed"><div class="muted" style="font-size:10.5px;padding:4px 0">Display/flex · alignment · full box-model · size · position. Collapsed by default — open when you need it.</div></div>
-      </div>
-
-      <!-- GROUP 3: ADVANCED (collapsed) -->
-      <div class="grp" style="border:none">
-        <div class="gh">Advanced <span class="tag-new" style="font-size:8px;margin-left:auto;margin-right:6px">Advanced density</span><span class="tw">▸</span></div>
-        <div class="gb closed"><div class="muted" style="font-size:10.5px;padding:4px 0">Effects (shadow/opacity) · states (hover/focus/active) · interactions/animation · custom CSS. Hidden entirely in Simple density.</div></div>
-      </div>
-    </div>
+    <div class="note2"><b>Reach replaces engine scope.</b> No "detach / class / override" — you pick a reach, the editor maps it. For a Client-Editor, advanced styling is <i>blocked by role</i> ("ask an admin"), shown differently from <i>hidden by density</i> ("turn on full controls"). Density ≠ permission — see <a href="m-states.html" style="color:var(--ink-2)">M-states</a> · <a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Editor:</b><a href="editor-spine-wireframe.html">Spine</a><a href="59-inspector.html" class="here">Inspector</a><a href="59b-inspector-states.html">States × breakpoints</a><a href="40-edit-scope.html">Edit scope</a><a href="e1-interactions.html">Interactions</a><a href="fix-styling-model.html">▶ One styling model</a><a href="fix-editor-declutter.html">Calmer editor</a><a href="20-publish.html">Publish</a></div>
+<div class="proto-nav"><b>Inspector:</b><a href="m-editor.html">Editor</a><a href="fix-styling-3reach.html">3-reach</a><a href="59b-inspector-states.html">States × bp</a><a href="m-states.html">Why-disabled</a><a href="index.html">Map</a></div>
 </body></html>

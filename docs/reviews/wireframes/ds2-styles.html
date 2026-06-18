@@ -1,55 +1,37 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · DS Styles</title><link rel="stylesheet" href="wf.css">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · ds2 — Styles &amp; presets (folded)</title><link rel="stylesheet" href="wf.css">
 <style>
-  .ed{display:grid;grid-template-columns:52px 290px 1fr;min-height:440px}
-  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
-  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--ink);color:#fff}.ri .ic{display:block;font-size:14px}
-  .cat{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:5px;padding:9px 11px;font-size:12.5px;margin-bottom:6px;cursor:pointer}.cat:hover{border-color:var(--ink-2)}.cat.on{border-color:var(--ink);background:var(--fill)}
-  .bind{display:grid;grid-template-columns:1fr 12px 1fr;gap:8px;align-items:center;font-size:11.5px;padding:8px 0;border-bottom:1px dashed var(--line)}
-  .tokchip{border:1px solid var(--line-d);border-radius:4px;padding:3px 8px;display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-family:var(--mono);font-size:10px}
-  .sw{width:12px;height:12px;border-radius:3px;border:1px solid var(--line)}
-  .pop{position:absolute;border:1px solid var(--line);background:#fff;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.12);width:200px;font-size:11px;z-index:20}
-  .pi{padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:7px}.pi:hover{background:var(--fill)}
+  .wrap{padding:16px 20px;max-width:760px}
+  .map{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .card{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:#fff}
+  .card.edit{border-color:var(--ink)}
+  .card .pin{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;padding:1px 6px;display:inline-block;margin-bottom:6px}
+  .pin.edit{background:var(--ink);color:#fff} .pin.ws{background:var(--ink-3);color:#fff}
+  .card .t{font-size:13px;font-weight:700} .card .d{font-size:11.5px;color:var(--ink-2);margin-top:5px;line-height:1.45}
+  .card .d b{color:var(--ink)}
+  .card a{color:var(--ink);font-size:11px;text-decoration:none;display:inline-block;margin-top:8px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
 </style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · ds2 · STYLES &amp; PRESETS</div>
 <div class="screen">
-  <div class="topnote"><b>Design system — Styles / presets</b> · grounded in <code>StylesSection</code> + 11 preset categories · bind each CSS property of a preset to a token (BindingRow → TokenPicker)</div>
-  <div class="ed">
-    <div class="rail">
-      <div class="ri"><span class="ic">+</span>Add</div>
-      <div class="ri"><span class="ic">▤</span>Pages</div>
-      <div class="ri"><span class="ic">◳</span>Comp</div>
-      <div class="ri on"><span class="ic">◧</span>Design</div>
-      <div class="ri"><span class="ic">≣</span>Layers</div>
-    </div>
-    <div class="panel" style="border-right:1px dashed var(--line);padding:12px;overflow:auto">
-      <div class="row" style="margin-bottom:10px"><a href="ds1-design-system.html" class="chip">Tokens</a><span class="chip on">Styles</span><a href="57-components.html" class="chip">Components</a><a href="ds3-ds-tools.html" class="chip">Export</a></div>
-      <div class="lbl" style="margin-bottom:6px">Preset categories (11)</div>
-      <div class="cat on">Button <span class="muted" style="font-size:10px">3 variants ▸</span></div>
-      <div class="cat">Card <span class="muted" style="font-size:10px">2 ▸</span></div>
-      <div class="cat">Form input <span class="muted" style="font-size:10px">1 ▸</span></div>
-      <div class="cat">Link <span class="muted" style="font-size:10px">2 ▸</span></div>
-      <div class="cat">Badge <span class="muted" style="font-size:10px">2 ▸</span></div>
-      <div class="cat">Alert <span class="muted" style="font-size:10px">2 ▸</span></div>
-      <div class="muted" style="font-size:10px;text-align:center;margin-top:4px">+ Tooltip · Modal · Nav · Table · Layout</div>
-    </div>
-    <div class="panel" style="border-right:none;padding:14px;position:relative">
-      <div class="row" style="justify-content:space-between;margin-bottom:8px"><div class="h2">Button</div><div class="muted" style="font-family:var(--mono);font-size:10px">preset.button.primary</div></div>
-      <div class="row" style="margin-bottom:12px"><span class="chip on">Primary</span><span class="chip">Secondary</span><span class="chip">Ghost</span></div>
-      <div class="row" style="justify-content:center;margin-bottom:14px"><span class="btn btn-fill btn-strong">Preview button</span></div>
-      <div class="lbl" style="margin-bottom:4px">Bindings — CSS property → token</div>
-      <div class="bind"><span>background-color</span><span>→</span><span class="tokchip"><span class="sw" style="background:#2D6DFF"></span> --color-accent</span></div>
-      <div class="bind"><span>color</span><span>→</span><span class="tokchip"><span class="sw" style="background:#fff;border:1px solid #ccc"></span> --color-on-accent</span></div>
-      <div class="bind"><span>border-radius</span><span>→</span><span class="tokchip">--radius-md</span></div>
-      <div class="bind"><span>padding</span><span>→</span><span class="tokchip">--space-3</span></div>
-      <div class="bind" style="border:none"><span>font-size</span><span>→</span><span class="tokchip" style="border-color:var(--ink)">--text-sm ▾</span></div>
-      <div class="pop" style="right:14px;bottom:60px">
-        <div style="padding:6px 10px;border-bottom:1px solid var(--line);color:var(--ink-3)">Pick a size token</div>
-        <div class="pi">--text-xs</div><div class="pi" style="background:var(--fill)">--text-sm ✓</div><div class="pi">--text-base</div><div class="pi">--text-lg</div>
+  <div class="topnote"><b>Styles &amp; presets — folded into two homes, not a separate "DS" area.</b> Rebuilt: presets/tokens no longer live in a standalone Design-System tab. Everyday styling = the editor's <b>Styles</b> (3 reaches); the shared source = the workspace <b>shared theme</b>. One model, two homes.</div>
+  <div class="wrap">
+    <div class="map">
+      <div class="card edit">
+        <div class="pin edit">Editor › Styles</div>
+        <div class="t">Everyday styling</div>
+        <div class="d">Brand swatches &amp; fonts (Simple) → full <b>tokens &amp; presets</b> (Pro). You style by <b>reach</b> — This item / All like this / Site theme — not by picking a "preset layer." The 11 preset categories become the Pro depth of this one home.</div>
+        <a href="m-editor.html">Open Styles ↗</a>
       </div>
-      <div class="note" style="margin-top:12px;font-size:10.5px"><b>Presets bind to tokens, not raw values (grounded):</b> change a token (ds1) and every preset bound to it updates — and every element using the preset. The picker is kind-filtered (background-color → colors only, font-size → type only). A preset is <b>rung 4</b> of the one styling ladder (element → class → component → preset → token) — see <a href="fix-styling-model.html" style="text-decoration:underline">the canonical styling model</a>.</div>
+      <div class="card">
+        <div class="pin ws">Workspace › Shared theme</div>
+        <div class="t">The shared source</div>
+        <div class="d">The agency's one theme (tokens + presets) that client sites <b>sync or override</b>. Edited once, pushed via the <b>review contract</b>. This is where "preset = a named recipe bound to tokens" actually lives — as the workspace source, surfaced to users as "the brand."</div>
+        <a href="ds1-design-system.html">Open Shared theme ↗</a>
+      </div>
     </div>
+    <div class="note2"><b>Why fold it:</b> a separate "Styles/presets" concept was a third reuse system competing with components + the reach model. Now: reach handles per-element/block; shared theme handles brand; presets are implementation inside both. No standalone DS-styles destination.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Design system:</b><a href="editor-spine-wireframe.html">Spine</a><a href="ds1-design-system.html">Tokens</a><a href="ds2-styles.html" class="here">Styles/presets</a><a href="ds3-ds-tools.html">DS tools</a><a href="59-inspector.html">Inspector</a><a href="41-scope-picker.html">Scope</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Styles:</b><a href="m-editor.html">Editor Styles</a><a href="ds1-design-system.html">Shared theme</a><a href="fix-styling-3reach.html">3-reach</a><a href="m-ownership.html">Ownership</a><a href="index.html">Map</a></div>
 </body></html>

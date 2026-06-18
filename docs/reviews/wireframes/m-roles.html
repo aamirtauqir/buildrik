@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · M-roles — capability matrix by role (the 5th decision)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1080px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .roles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:6px 0 4px}
+  .role{border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:#fff}
+  .role .rn{font-size:13px;font-weight:700}
+  .role .rd{font-size:10.5px;color:var(--ink-2);margin-top:3px;line-height:1.4}
+  .role .seed{font-size:9px;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;padding:1px 6px;margin-top:7px;display:inline-block}
+  .seed.simple{background:var(--ink);color:#fff}
+  .seed.pro{border:1px solid var(--ink);color:var(--ink)}
+  .seed.none{border:1px dashed var(--line-d);color:var(--ink-3)}
+
+  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:2px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;vertical-align:middle}
+  th{background:var(--fill);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  td.cap{text-align:left;font-weight:600;color:var(--ink);white-space:nowrap}
+  td.cap small{display:block;font-weight:400;color:var(--ink-3);font-size:9.5px}
+  .grp{background:var(--bg-2);font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);text-align:left;font-weight:600}
+  .y{color:var(--ink);font-weight:700}
+  .v{color:var(--ink-3)}
+  .n{color:var(--line-d)}
+  .star{font-size:8px;vertical-align:super;color:var(--ink-2)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--ink-2);margin:8px 0}
+  .legend b{color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.45}
+  .note2 b{color:var(--ink)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · M-ROLES · CAPABILITY MATRIX</div>
+<div class="screen">
+  <div class="topnote"><b>M-roles — the capability matrix by role (the hidden 5th decision).</b> Codex: the 4 ownership calls force this — exactly which <b>writes</b> each role can do. Replaces the obsolete <code>62-permissions</code> (old Owner/Editor/Viewer). This is what makes the agency handoff safe and resolves "who can edit SEO / redirects / analytics." <b>Role = permission (set by the agency on invite). Density (Simple/Pro) = a separate preference.</b></div>
+  <div class="wrap">
+
+    <div class="sech">The 4 roles <span class="sub">set per-member, per-site, on the invite — independent of the Simple/Pro view setting</span></div>
+    <div class="roles">
+      <div class="role"><div class="rn">Viewer</div><div class="rd">Read-only. Sees the live/preview site + analytics. Comments only. The "show the client" role.</div><span class="seed none">density n/a</span></div>
+      <div class="role"><div class="rn">Client-Editor</div><div class="rd">The agency's client. Edits <b>content</b> on assigned sites — text, images, page SEO. The white-label handoff role.</div><span class="seed simple">defaults to Simple</span></div>
+      <div class="role"><div class="rn">Designer</div><div class="rd">Agency staff who builds. Full make-side + redirects + technical SEO + publish. Site-level, not the money/team.</div><span class="seed pro">defaults to Pro</span></div>
+      <div class="role"><div class="rn">Admin</div><div class="rd">Agency principal. Everything, including workspace: team, billing, white-label, integrations, shared theme. (Owner = Admin + transfer/delete.)</div><span class="seed pro">defaults to Pro</span></div>
+    </div>
+
+    <div class="legend"><span><b class="y">✓</b> can edit (write)</span><span><b class="v">👁</b> view only</span><span><b class="n">—</b> no access</span><span><span class="star">★</span> = with a caveat (see footnotes)</span></div>
+
+    <div class="sech">Site-level capabilities <span class="sub">resolves the ownership calls — who can write each concept</span></div>
+    <table>
+      <tr><th style="width:30%">Capability</th><th>Viewer</th><th>Client-Editor</th><th>Designer</th><th>Admin</th></tr>
+      <tr><td class="grp" colspan="5">Content (Editor)</td></tr>
+      <tr><td class="cap">Page content <small>text · images · layout</small></td><td class="v">👁</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Content SEO <small>page title · desc · OG · patterns</small></td><td class="v">👁</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Tracking — assign property <small>analytics measurement ID</small></td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Forms — config <small>build the form (editor block)</small></td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Structure / components / theme edit <small>sections, reusable blocks</small></td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Custom code / &lt;head&gt;</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Publish</td><td class="n">—</td><td class="y">✓<span class="star">1</span></td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="grp" colspan="5">Site ops (Dashboard)</td></tr>
+      <tr><td class="cap">Technical SEO <small>canonical · indexing · sitemap</small></td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Redirects <small>codex: Admin/Designer-only</small></td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Analytics — view reports</td><td class="v">👁</td><td class="v">👁</td><td class="v">👁</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Forms — inbox <small>read / export submissions</small></td><td class="n">—</td><td class="v">👁<span class="star">2</span></td><td class="v">👁</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Domains / DNS</td><td class="n">—</td><td class="n">—</td><td class="v">👁</td><td class="y">✓</td></tr>
+      <tr><td class="grp" colspan="5">Workspace (cross-client — Admin's world)</td></tr>
+      <tr><td class="cap">Shared theme <small>edit + push to N sites</small></td><td class="n">—</td><td class="n">—</td><td class="y">✓<span class="star">3</span></td><td class="y">✓</td></tr>
+      <tr><td class="cap">White-label branding</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Team / invites / roles</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Billing / plan / credits</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td></tr>
+      <tr><td class="cap">Integrations / provider connect</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td></tr>
+    </table>
+    <div class="note2" style="margin-top:8px">
+      <span class="star">1</span> <b>Client-Editor publish</b> — defaults ON for their own site, but the workspace can toggle "client edits need approval" (agency reviews before live). &nbsp;
+      <span class="star">2</span> Client sees <b>their own leads</b>, not export/routing. &nbsp;
+      <span class="star">3</span> Designer can edit + push the shared theme; a workspace setting can require Admin approval on a cross-client push (ties to the shared theme change contract).
+    </div>
+
+    <div class="sech">Two rules that make this not-confusing</div>
+    <div class="note"><b>1 · Density ≠ permission.</b> Simple/Pro changes how much surface SHOWS (preference, per-user-per-site). Role changes what you CAN DO (permission). A Designer can run Simple; a Client-Editor can't unlock Pro capabilities by flipping density. <b>2 · Every hidden or disabled control says WHY.</b> Greyed because of density → "Turn on full controls to see this." Greyed because of role → "Your role can't edit this — ask an admin." Never an unexplained disabled button. This is the single thing that stops the "missing feature" and "why is this disabled?" support tickets codex predicted.</div>
+
+    <div class="note" style="margin-top:8px"><b>This closes the loop:</b> ownership map (where each concept lives) × this matrix (who can write it) = a complete, safe IA. The last open piece is the <b>shared theme change contract</b> (footnote 3 + audit finding A) — the one workspace action that needs its own review surface.</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Roles:</b><a href="m-ownership.html">Ownership map</a><a href="m-roles.html" style="border-color:#fff;background:#fff;color:#2b2b2b;font-weight:600">M-roles</a><a href="m-seo.html">SEO model</a><a href="m-roles.html">old permissions</a><a href="../2026-06-17-product-ux-audit.md">UX audit</a><a href="s-account-states.html">States</a><a href="index.html">Map</a></div>
+</body></html>

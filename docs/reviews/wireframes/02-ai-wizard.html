@@ -1,60 +1,41 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · AI Wizard</title><link rel="stylesheet" href="wf.css">
-<style>.step{display:none}.step.on{display:block}.stepper{display:flex;gap:6px;margin-bottom:18px}.stepper .s{flex:1;text-align:center;font-size:11px;color:var(--ink-3);border-bottom:2px solid var(--line);padding-bottom:6px}.stepper .s.on{color:var(--ink);border-color:var(--ink);font-weight:600}.opt{border:1px solid var(--line);border-radius:4px;padding:10px;font-size:12px;color:var(--ink-2);cursor:pointer}.opt:hover,.opt.sel{border-color:var(--ink);color:var(--ink)}.log{font-family:var(--mono);font-size:11px;color:var(--ink-2);background:var(--fill);border:1px solid var(--line);border-radius:4px;padding:10px;white-space:pre-line}</style></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · 02 — AI: describe your site</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:16px 20px;max-width:620px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .q{font-size:14px;font-weight:700;margin-bottom:8px}
+  .goals{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+  .goal{border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--ink-2);cursor:pointer}
+  .goal.on{border:2px solid var(--ink);background:var(--fill);color:var(--ink);font-weight:600}
+  .prompt{border:1px dashed var(--line-d);border-radius:7px;padding:11px 13px;font-size:12px;color:var(--ink-3);min-height:54px;margin-bottom:10px}
+  .ds{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:7px;padding:9px 12px;font-size:11.5px;color:var(--ink-2);margin-bottom:12px;background:#fff}
+  .ds .sw{width:16px;height:16px;border:1px solid var(--line-d);border-radius:3px;background:var(--ink)}
+  .ds b{color:var(--ink)}
+  .build{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:7px;padding:11px;text-align:center;font-size:13px;font-weight:600}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
-<div class="screen screen-narrow">
-  <div class="topnote"><b>AI Wizard</b> · grounded in current 3-step generator (type → pages/tone/content/images → generation) · solution §8.5: full fail/timeout/partial-salvage/resume</div>
-  <div class="pad">
-    <div class="stepper"><div class="s on" id="t1">1 · Type</div><div class="s" id="t2">2 · Pages & tone</div><div class="s" id="t3">3 · Generate</div></div>
-
-    <div class="step on" id="s1">
-      <div class="h2" style="margin-bottom:8px">What kind of site?</div>
-      <div class="grid3">
-        <div class="opt sel">Business / service</div><div class="opt">Portfolio</div><div class="opt">Restaurant</div>
-        <div class="opt">Blog</div><div class="opt">Agency</div><div class="opt">Store</div>
-      </div>
-      <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn btn-fill" onclick="go(2)">Next →</button></div>
+<div class="wf-stamp">WIREFRAME · 02 · AI WIZARD</div>
+<div class="screen">
+  <div class="topnote"><b>Describe your site — goal-first, DS-aware.</b> Rebuilt: the old "what kind of site?" genre grid becomes a <b>goal</b> question (the AI needs the goal to write the right CTAs), and the draft is skinned with your <b>shared theme</b> — the agency wedge fused with AI. One assistant; this is its "Create" entry (<a href="../2026-06-17-product-ux-audit.md" style="color:#fff;text-decoration:underline">audit §5</a>).</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind</b> › New site › AI</div>
+    <div class="q">What do you want visitors to do?</div>
+    <div class="goals">
+      <div class="goal on">Contact me / book a call</div>
+      <div class="goal">Buy something</div>
+      <div class="goal">Learn about me / my work</div>
+      <div class="goal">Read my writing</div>
     </div>
-
-    <div class="step" id="s2">
-      <div class="h2" style="margin-bottom:8px">Pages, tone & content</div>
-      <div class="lbl">Suggested pages (editable)</div>
-      <div class="row" style="flex-wrap:wrap;margin:6px 0 14px"><span class="chip on">Home ✓</span><span class="chip on">About ✓</span><span class="chip on">Services ✓</span><span class="chip">Contact +</span><span class="chip">Pricing +</span></div>
-      <div class="lbl">Tone</div>
-      <div class="row" style="flex-wrap:wrap;margin:6px 0 14px"><span class="chip on">Professional</span><span class="chip">Bold</span><span class="chip">Casual</span><span class="chip">Minimal</span><span class="chip">Playful</span></div>
-      <div class="grid2">
-        <div><div class="lbl">Content</div><div class="row" style="margin-top:6px"><span class="chip on">Generate</span><span class="chip">Lorem</span><span class="chip">Empty</span></div></div>
-        <div><div class="lbl">Images</div><div class="row" style="margin-top:6px"><span class="chip on">Stock</span><span class="chip">Placeholder</span><span class="chip">None</span></div></div>
-      </div>
-      <div class="row" style="justify-content:space-between;margin-top:18px"><button class="btn" onclick="go(1)">← Back</button><button class="btn btn-fill" onclick="go(3);gen()">Generate →</button></div>
+    <div class="q">Describe it</div>
+    <div class="prompt">"A site for Acme, a B2B consultancy — services, case studies, and a contact form…"</div>
+    <div class="ds"><span class="sw"></span> Skin with <b>Northwind base</b> shared theme <span style="color:var(--ink-3);margin-left:auto">change ▾</span></div>
+    <a class="build" href="m-editor.html" style="display:block;text-decoration:none">Build my draft → opens editor</a>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px">
+      <a href="01-new-site.html" style="color:var(--ink-2)">← Cancel · back to Start</a>
+      <a href="m3-dashboard.html" style="color:var(--ink-2)">Leave — keeps generating in the background ↗</a>
     </div>
-
-    <div class="step" id="s3">
-      <div class="h2" style="margin-bottom:8px">Generating your site…</div>
-      <div class="barline m" id="prog" style="height:14px;width:20%;transition:width .4s;margin-bottom:12px"></div>
-      <div class="log" id="genlog">queued…</div>
-      <div class="row" style="justify-content:space-between;margin-top:16px">
-        <div class="row"><button class="btn" onclick="fail()">⟳ Sim failure</button><button class="btn" onclick="partial()">◑ Sim partial</button></div>
-        <div class="row"><a href="10-dashboard.html" class="btn">Cancel — leave (keeps generating §8.5)</a><a href="editor-spine-wireframe.html" class="btn btn-fill">Open draft → Editor</a></div>
-      </div>
-      <div class="note" id="failnote" style="margin-top:14px;display:none">
-        <b>⚠ Generation failed (§8.5).</b> Your inputs are preserved.
-        <div class="row" style="margin-top:8px;flex-wrap:wrap"><button class="btn" onclick="gen()">Retry (same prompt)</button><a href="03-template-gallery.html" class="btn">Use a template instead</a><a href="editor-spine-wireframe.html" class="btn">Start blank</a></div>
-        <div class="muted" style="margin-top:6px;font-size:10.5px">Resume if you leave: dashboard shows a "Generating · resume" card (screen 10).</div>
-      </div>
-      <div class="note" id="partnote" style="margin-top:14px;display:none;border-color:var(--ink)">
-        <b>◑ Made 3 of 5 pages (§8.5 partial salvage).</b> Home · About · Services are ready; Pricing + Contact failed.
-        <div class="row" style="margin-top:8px;flex-wrap:wrap"><a href="editor-spine-wireframe.html" class="btn btn-fill">Open the 3 pages →</a><button class="btn" onclick="gen()">Retry the missing 2</button></div>
-        <div class="muted" style="margin-top:6px;font-size:10.5px">Never all-or-nothing: partial work is kept and openable; only the failed pages retry.</div>
-      </div>
-    </div>
+    <div class="note2"><b>Then it hands off into the editor.</b> <b>Abandon/resume is a real path:</b> Cancel returns to Start (nothing saved); Leave keeps generating — a <b>"Draft generating… / ready"</b> card waits for you on the <a href="m3-dashboard.html" style="color:var(--ink-2)">dashboard</a> to resume. Failure handling: partial-salvage, retry-failed-pages. After generate, the draft opens in the editor seeded by your role's density (a client lands in Simple).</div>
   </div>
 </div>
-<div class="proto-nav"><b>Flow:</b><a href="10-dashboard.html">Dashboard</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="02-ai-wizard.html" class="here">AI wizard</a><a href="03-template-gallery.html">Templates</a><a href="editor-spine-wireframe.html">Editor</a><a href="20-publish.html">Publish</a><a href="12-site-detail.html">Site detail</a></div>
-<script>
-function go(n){[1,2,3].forEach(function(i){document.getElementById('s'+i).classList.toggle('on',i===n);document.getElementById('t'+i).classList.toggle('on',i===n);});}
-var p;function gen(){document.getElementById('failnote').style.display='none';var prog=document.getElementById('prog'),log=document.getElementById('genlog');var steps=['queued…','✓ structure','✓ Home','✓ About','✓ Services','✓ images','done'];var i=0;clearInterval(p);prog.style.width='10%';p=setInterval(function(){i++;log.textContent=steps.slice(0,i+1).join('\n');prog.style.width=Math.min(100,10+i*15)+'%';if(i>=steps.length-1)clearInterval(p);},500);}
-function fail(){clearInterval(p);document.getElementById('partnote').style.display='none';document.getElementById('genlog').textContent='queued…\n✓ structure\n✗ failed at page 3';document.getElementById('prog').style.width='45%';document.getElementById('failnote').style.display='block';}
-function partial(){clearInterval(p);document.getElementById('failnote').style.display='none';document.getElementById('genlog').textContent='queued…\n✓ structure\n✓ Home\n✓ About\n✓ Services\n✗ Pricing\n✗ Contact';document.getElementById('prog').style.width='70%';document.getElementById('partnote').style.display='block';}
-</script>
+<div class="proto-nav"><b>AI:</b><a href="01-new-site.html">Start</a><a href="m-editor.html">Editor handoff</a><a href="ds1-design-system.html">Shared theme</a><a href="../2026-06-17-product-ux-audit.md">AI redesign §5</a><a href="index.html">Map</a></div>
 </body></html>

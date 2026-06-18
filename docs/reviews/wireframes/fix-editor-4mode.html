@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildrik — Editor v2: FOUR MODES (low-fi)</title>
+<style>
+  :root{
+    --ink:#2b2b2b; --ink-2:#666; --ink-3:#9a9a9a;
+    --line:#c7c7c7; --line-d:#b0b0b0; --fill:#f3f3f3; --fill-2:#e9e9e9; --bg:#fff; --bg-2:#fafafa;
+    --sel:#2b2b2b;
+    --font:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --mono:ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);color:var(--ink);background:#e4e4e4;font-size:13px;line-height:1.4}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+  .wf-stamp{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:60;background:#2b2b2b;color:#fff;font-size:10px;letter-spacing:.1em;padding:3px 12px;border-radius:3px;font-weight:600;opacity:.85}
+  .lbl{color:var(--ink-3);font-size:10px;letter-spacing:.04em;text-transform:uppercase}
+
+  .topnote{background:#2b2b2b;color:#eee;font-size:12px;line-height:1.5;padding:9px 14px;}
+  .topnote b{color:#fff}
+  .topnote code{font-family:var(--mono);font-size:11px;color:#ccc}
+
+  .app{display:grid;grid-template-rows:46px 1fr;height:calc(100vh - 96px);background:var(--bg);border:1px solid var(--line)}
+  .topbar{display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  /* 4-mode rail is wider (labels), panel, canvas, inspector */
+  .body{display:grid;grid-template-columns:74px 208px 1fr 272px;min-height:0}
+
+  /* topbar — trimmed: exit · page · undo/history · device · saved · preview · publish */
+  .brand{display:flex;align-items:center;gap:7px;font-weight:600;text-decoration:none;color:inherit}
+  .brand .logo{width:20px;height:20px;border:1px solid var(--line);background:var(--fill);display:grid;place-items:center;font-size:11px}
+  .tb-divider{width:1px;height:20px;background:var(--line);margin:0 3px}
+  .tb-btn{padding:5px 9px;border:1px solid var(--line);background:var(--bg);border-radius:3px;color:var(--ink-2);font-size:12px}
+  .tb-btn:hover{background:var(--fill)}
+  .tb-btn.cmd{border-style:dashed;color:var(--ink);font-weight:600}
+  .kbd{font-family:var(--mono);font-size:10px;border:1px solid var(--line-d);border-radius:3px;padding:0 4px;color:var(--ink-2);background:var(--fill)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .seg button{padding:4px 9px;color:var(--ink-2);font-size:12px;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--ink);color:#fff}
+  .spacer{flex:1}
+  .saved{font-size:12px;color:var(--ink-2);display:flex;align-items:center;gap:5px;text-decoration:none}
+  .saved::before{content:"";width:7px;height:7px;border-radius:50%;border:1px solid var(--ink-2)}
+
+  /* RAIL — 4 modes, full labels, no glyph guessing */
+  .rail{border-right:1px solid var(--line);background:var(--bg-2);display:flex;flex-direction:column;align-items:stretch;padding:7px 6px;gap:4px}
+  .mode{border:1px solid var(--line);background:var(--bg);border-radius:5px;padding:9px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-2)}
+  .mode:hover{background:var(--fill)}
+  .mode.on{border-color:var(--ink);border-width:2px;color:var(--ink);font-weight:600;background:#fff}
+  .mode .gly{font-size:14px;line-height:1}
+  .mode .nm{font-size:10.5px}
+  .rail .foot{margin-top:auto;display:flex;flex-direction:column;gap:4px;align-items:center}
+  .rail .cmdk{font-size:9px;color:var(--ink-3);border:1px dashed var(--line-d);border-radius:4px;padding:5px 4px;text-align:center;width:100%}
+  .rail .cmdk b{color:var(--ink);display:block;font-size:11px}
+
+  /* PANEL */
+  .panel{border-right:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;overflow:auto}
+  .panel-head{padding:10px 12px;border-bottom:1px solid var(--line);font-weight:600;background:var(--bg-2);display:flex;align-items:center;justify-content:space-between}
+  .panel-head .sub{font-weight:400;font-size:10.5px;color:var(--ink-3)}
+  .panel-body{padding:10px;display:none}
+  .panel-body.on{display:block}
+  .search{width:100%;border:1px dashed var(--line-d);border-radius:3px;padding:7px 9px;color:var(--ink-3);margin-bottom:10px;background:var(--bg)}
+  .cat{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 5px;display:flex;justify-content:space-between}
+  .blocks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .block{border:1px solid var(--line);background:var(--fill);border-radius:3px;padding:13px 6px;text-align:center;color:var(--ink-2);font-size:11px}
+  .block:hover{border-color:var(--ink);background:var(--fill-2)}
+  .seg2{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:10px}
+  .seg2 button{flex:1;padding:5px;font-size:11px;color:var(--ink-2);border-right:1px solid var(--line)}
+  .seg2 button:last-child{border-right:none}
+  .seg2 button.on{background:var(--ink);color:#fff}
+  .listrow{display:flex;align-items:center;gap:7px;padding:7px 8px;border:1px solid var(--line);border-radius:3px;margin-bottom:5px;font-size:12px;color:var(--ink-2);background:var(--bg)}
+  .listrow:hover{border-color:var(--ink);color:var(--ink)}
+  .listrow.on{border-color:var(--ink);color:var(--ink);font-weight:600;background:var(--fill)}
+  .listrow .ix{width:14px;color:var(--ink-3);font-size:10px}
+  .listrow.nest{margin-left:16px}
+  .miniq{font-size:10px;color:var(--ink-3);margin:2px 0 8px}
+  .asset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .asset{border:1px solid var(--line);background:var(--fill);border-radius:3px;aspect-ratio:1.3;display:grid;place-items:center;color:var(--ink-3);font-size:10px}
+  .theme-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12px;color:var(--ink-2)}
+  .sw{width:18px;height:18px;border:1px solid var(--line-d);border-radius:3px;background:var(--fill)}
+
+  /* CANVAS */
+  .canvas-wrap{background:#ececec;display:grid;place-items:start center;overflow:auto;padding:22px}
+  .device-tag{text-align:center;font-size:10px;color:var(--ink-3);margin-bottom:6px;letter-spacing:.05em}
+  .frame{background:#fff;border:1px solid var(--line);width:100%;max-width:840px;overflow:hidden;box-shadow:0 1px 0 var(--line)}
+  .el{outline:1px dashed transparent;outline-offset:3px;cursor:pointer}
+  .el:hover{outline-color:var(--line-d)}
+  .el.sel{outline:2px dashed var(--sel);outline-offset:3px}
+  .site-hero{padding:46px 36px;text-align:center;border-bottom:1px dashed var(--line)}
+  .ph-h1{display:inline-block;background:var(--fill);border:1px solid var(--line);padding:10px 18px;color:var(--ink-2);font-weight:600;font-size:18px;margin-bottom:12px}
+  .ph-p{display:block;background:var(--fill);border:1px solid var(--line);color:var(--ink-3);padding:8px;max-width:380px;margin:0 auto 16px;font-size:12px}
+  .ph-btn{display:inline-block;background:var(--fill-2);border:1px solid var(--line-d);padding:9px 18px;color:var(--ink);font-weight:600;font-size:12px;border-radius:3px}
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:26px 36px}
+  .ccard{border:1px solid var(--line);padding:14px}
+  .ccard .ph-bar{height:10px;background:var(--fill);border:1px solid var(--line);margin-bottom:7px}
+  .ccard .ph-bar.s{width:55%}
+  .ph-btn2{margin-top:10px;display:inline-block;background:var(--fill-2);border:1px solid var(--line-d);padding:5px 12px;font-size:11px;border-radius:3px;color:var(--ink)}
+
+  /* INSPECTOR — with the 3-REACH picker (links to styling fix) */
+  .insp{border-left:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;overflow:auto}
+  .insp-scope{padding:9px 11px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .scope-eyebrow{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+  .scope-line{font-size:13px;font-weight:600;margin-top:2px}
+  .reach{display:flex;gap:4px;margin-top:8px}
+  .reach .r{flex:1;border:1px solid var(--line);border-radius:4px;padding:5px 4px;text-align:center;font-size:10px;color:var(--ink-3);line-height:1.25}
+  .reach .r b{display:block;font-size:10.5px;color:var(--ink-2)}
+  .reach .r.on{border-color:var(--ink);border-width:1.5px;background:var(--fill)}
+  .reach .r.on b{color:var(--ink)}
+  .reach-note{font-size:10px;color:var(--ink-3);margin:7px 11px 0;padding:0}
+  .reach-note b{color:var(--ink)}
+  .sec{border-bottom:1px solid var(--line)}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;font-weight:600;font-size:12px;cursor:pointer}
+  .sec-h .chev{color:var(--ink-3);font-size:10px}
+  .sec.collapsed .sec-c{display:none}
+  .sec.collapsed .sec-h .chev{transform:rotate(-90deg);display:inline-block}
+  .sec-c{padding:0 11px 11px}
+  .grp{font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);padding:8px 11px 2px;background:var(--bg-2);border-bottom:1px solid var(--line)}
+  .field{display:flex;align-items:center;justify-content:space-between;margin:7px 0;gap:8px}
+  .field label{color:var(--ink-2);font-size:12px}
+  .gbox{border:1px solid var(--line);background:var(--fill);border-radius:3px;padding:5px 8px;font-size:11px;color:var(--ink-2);min-width:64px;text-align:center}
+  .gbox.sq{min-width:0;width:22px;height:22px;padding:0}
+  .num{width:54px;border:1px solid var(--line);border-radius:3px;padding:5px;font-size:11px;text-align:center;color:var(--ink-2);background:var(--bg)}
+
+  /* count chips footer */
+  .countbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--bg-2);border-top:1px solid var(--line)}
+  .countpill{border:1px solid var(--line);border-radius:999px;padding:4px 11px;color:var(--ink-2);font-size:11px}
+  .countpill b{color:var(--ink)}
+  .countpill.win{border-color:var(--ink);color:var(--ink)}
+
+  .anno{position:fixed;bottom:50px;left:12px;background:#2b2b2b;color:#fff;padding:8px 13px;border-radius:5px;font-size:12px;z-index:50;max-width:46vw;display:none}
+  .anno b{text-decoration:underline}
+  .anno button{color:#999;margin-left:8px}
+
+  .proto-nav{background:#2b2b2b;color:#bbb;font-size:11px;display:flex;gap:6px;align-items:center;padding:7px 12px;flex-wrap:wrap}
+  .proto-nav b{color:#fff;margin-right:4px}
+  .proto-nav a{padding:3px 9px;border:1px solid #555;border-radius:4px;color:#ddd;text-decoration:none}
+  .proto-nav a.hot{border-color:#fff;background:#fff;color:#2b2b2b;font-weight:600}
+</style>
+</head>
+<body>
+<div data-recon-banner style="position:sticky;top:0;z-index:999;background:#2b2b2b;color:#fff;font:600 12px/1.4 system-ui,sans-serif;padding:7px 14px;text-align:center;border-bottom:2px solid #fff">↗ SUPERSEDED — reconciled into <a href="m-editor.html" style="color:#fff;text-decoration:underline">M-editor</a> (2026-06-18 solution set). Kept for history.</div>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY · EDITOR v2</div>
+
+<div class="topnote">
+  <b>Editor v2 — four modes, not eleven tabs.</b> Supersedes <code>editor-spine-wireframe</code> + <code>fix-editor-declutter</code> (codex: "grouping the clutter is not removing it"). The rail is now <b>4 real modes</b> — <b>Insert · Pages · Assets · Theme</b>. Cut as rail destinations: <b>Templates→Insert</b>, <b>Components→Insert</b>, <b>History→topbar menu</b>, <b>AI→⌘K</b>, <b>Settings→Pages panel + Dashboard</b>. One left panel, one inspector. Fewer concepts to hold — not just fewer pixels.
+</div>
+
+<div class="app" id="app" data-mode="insert" data-device="desktop">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <a class="brand" href="12-site-detail.html" title="Exit to site dashboard §8.4"><span class="logo">B</span> ← acme-main</a>
+    <span class="tb-divider"></span>
+    <button class="tb-btn">Home ▾</button>
+    <span class="tb-divider"></span>
+    <button class="tb-btn">↶</button>
+    <button class="tb-btn">↷</button>
+    <button class="tb-btn" id="histBtn" title="History moved here from the rail">⏱ History ▾</button>
+    <span class="tb-divider"></span>
+    <div class="seg" id="deviceSeg">
+      <button data-d="desktop" class="on">Desktop</button>
+      <button data-d="tablet">Tablet</button>
+      <button data-d="phone">Phone</button>
+    </div>
+    <span class="spacer"></span>
+    <button class="tb-btn cmd" id="cmdBtn">⌘K — AI &amp; find</button>
+    <a class="saved" href="60-save-states.html" title="save states §8">Saved</a>
+    <button class="tb-btn" onclick="location.href='21-preview.html'">Preview</button>
+    <button class="tb-btn" style="border-color:var(--ink);font-weight:600" onclick="location.href='20-publish.html'">Publish</button>
+  </div>
+
+  <div class="body">
+    <!-- RAIL: 4 MODES -->
+    <div class="rail">
+      <button class="mode on" data-mode="insert"><span class="gly">＋</span><span class="nm">Insert</span></button>
+      <button class="mode" data-mode="pages"><span class="gly">▤</span><span class="nm">Pages</span></button>
+      <button class="mode" data-mode="assets"><span class="gly">▦</span><span class="nm">Assets</span></button>
+      <button class="mode" data-mode="theme"><span class="gly">◐</span><span class="nm">Theme</span></button>
+      <div class="foot">
+        <div class="cmdk"><b>⌘K</b>everything else</div>
+      </div>
+    </div>
+
+    <!-- PANEL: one body per mode -->
+    <div class="panel">
+      <div class="panel-head"><span id="panelTitle">Insert</span><span class="sub" id="panelSub">blocks · templates · components</span></div>
+
+      <!-- INSERT (= old Add + Templates + Components) -->
+      <div class="panel-body on" data-body="insert">
+        <div class="search">Search to insert…  /</div>
+        <div class="seg2"><button class="on">Blocks</button><button>Templates</button><button>Components</button></div>
+        <div class="miniq">One place to put things on the page. Templates = full sections; Components = your saved reusable blocks.</div>
+        <div class="cat">Basic</div>
+        <div class="blocks"><div class="block">Heading</div><div class="block">Text</div><div class="block">Button</div><div class="block">Image</div></div>
+        <div class="cat">Layout</div>
+        <div class="blocks"><div class="block">Section</div><div class="block">Grid</div><div class="block">Columns</div><div class="block">Spacer</div></div>
+        <div class="cat">Sections <span>templates</span></div>
+        <div class="blocks"><div class="block">Hero</div><div class="block">Pricing</div><div class="block">FAQ</div><div class="block">CTA</div></div>
+      </div>
+
+      <!-- PAGES (= old Pages + Layers + page Settings) -->
+      <div class="panel-body" data-body="pages">
+        <div class="seg2" id="pagesSeg"><button class="on" data-v="list">Pages</button><button data-v="layers">Layers</button></div>
+        <div data-view="list">
+          <div class="listrow on"><span class="ix">●</span> Home</div>
+          <div class="listrow"><span class="ix">○</span> About</div>
+          <div class="listrow"><span class="ix">○</span> Pricing</div>
+          <div class="listrow nest"><span class="ix">○</span> Pricing / FAQ</div>
+          <div class="listrow"><span class="ix">○</span> Contact</div>
+          <div class="listrow" style="border-style:dashed;color:var(--ink-3)"><span class="ix">＋</span> New page</div>
+          <div class="miniq" style="margin-top:10px">Per-page settings (title, slug, <code>&lt;head&gt;</code>, SEO) live in the inspector when a page is selected — not a separate "Settings" mode.</div>
+        </div>
+        <div data-view="layers" style="display:none">
+          <div class="listrow"><span class="ix">▸</span> Header</div>
+          <div class="listrow on"><span class="ix">▾</span> Hero section</div>
+          <div class="listrow nest"><span class="ix">·</span> Heading</div>
+          <div class="listrow nest"><span class="ix">·</span> Paragraph</div>
+          <div class="listrow nest"><span class="ix">·</span> Button</div>
+          <div class="listrow"><span class="ix">▸</span> Cards</div>
+          <div class="listrow"><span class="ix">▸</span> Footer</div>
+        </div>
+      </div>
+
+      <!-- ASSETS (= old Media + Stock + image editor) -->
+      <div class="panel-body" data-body="assets">
+        <div class="search">Search assets…</div>
+        <div class="seg2"><button class="on">Library</button><button>Stock</button><button>Upload</button></div>
+        <div class="miniq">All media in one mode. Stock search + the image editor open from here — they were never separate destinations.</div>
+        <div class="asset-grid">
+          <div class="asset">img</div><div class="asset">img</div><div class="asset">img</div><div class="asset">img</div>
+          <div class="asset">img</div><div class="asset">svg</div>
+        </div>
+      </div>
+
+      <!-- THEME (= old Design system + Styles/presets/tokens, calmed) -->
+      <div class="panel-body" data-body="theme">
+        <div class="miniq">Site-wide look. This is "your brand," not a variables manager. The deep token/preset/lint tools sit behind <b>Advanced</b>, off the everyday path.</div>
+        <div class="cat">Brand</div>
+        <div class="theme-row">Accent <span class="sw"></span></div>
+        <div class="theme-row">Text <span class="sw"></span></div>
+        <div class="theme-row">Background <span class="sw"></span></div>
+        <div class="cat">Type</div>
+        <div class="theme-row">Heading font <span class="gbox">General Sans ▾</span></div>
+        <div class="theme-row">Body font <span class="gbox">Inter ▾</span></div>
+        <div class="cat">Shape</div>
+        <div class="theme-row">Corner radius <span class="num">8</span></div>
+        <div class="theme-row" style="border:none;color:var(--ink-3)">Advanced: tokens · presets · lint · export ▾</div>
+      </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="canvas-wrap">
+      <div>
+        <div class="device-tag" id="deviceTag">DESKTOP · 1280</div>
+        <div class="frame">
+          <div class="site-hero">
+            <span class="el ph-h1" data-name="this heading" data-reach="item">[ Heading ]</span><br>
+            <span class="el ph-p" data-name="this paragraph" data-reach="item">[ paragraph text placeholder ]</span>
+            <span class="el ph-btn" data-name="Get started button" data-reach="block" data-count="12">[ Button ]</span>
+          </div>
+          <div class="cards">
+            <div class="ccard"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-name="card button" data-reach="block" data-count="12">[ btn ]</span></div>
+            <div class="ccard"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-name="card button" data-reach="block" data-count="12">[ btn ]</span></div>
+            <div class="ccard"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-name="card button" data-reach="block" data-count="12">[ btn ]</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSPECTOR -->
+    <div class="insp">
+      <div class="insp-scope">
+        <div class="scope-eyebrow">You are editing</div>
+        <div class="scope-line" id="scopeLine">this heading</div>
+        <div class="reach" id="reachPicker">
+          <div class="r on" data-r="item"><b>This item</b>just here</div>
+          <div class="r" data-r="block"><b>Reusable block</b>all like it</div>
+          <div class="r" data-r="theme"><b>Site theme</b>brand-wide</div>
+        </div>
+        <div class="reach-note" id="reachNote"><b>This item</b> — a one-off change. Nothing else moves. The safe default for 90% of edits.</div>
+      </div>
+
+      <div class="grp">Common</div>
+      <div class="sec"><div class="sec-h">Style <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Fill</label><span class="gbox sq" id="fillSwatch">▢</span></div>
+        <div class="field"><label>Text color</label><span class="gbox sq">▢</span></div>
+        <div class="field"><label>Size</label><input class="num" value="auto"></div>
+      </div></div>
+      <div class="sec"><div class="sec-h">Text <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Font</label><span class="gbox">Inherit ▾</span></div>
+        <div class="field"><label>Weight</label><span class="gbox">Semibold ▾</span></div>
+        <div class="field"><label>Align</label><span class="gbox">Center ▾</span></div>
+      </div></div>
+      <div class="sec"><div class="sec-h">Spacing <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Padding</label><input class="num" value="11"></div>
+        <div class="field"><label>Margin</label><input class="num" value="22"></div>
+      </div></div>
+
+      <div class="grp">Layout &amp; box</div>
+      <div class="sec collapsed"><div class="sec-h">Layout · Size <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>Display</label><span class="gbox">block ▾</span></div></div></div>
+      <div class="sec collapsed"><div class="sec-h">Background · Border <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>Radius</label><input class="num" value="8"></div></div></div>
+
+      <div class="grp">Advanced <span style="text-transform:none;font-weight:400">· reveal</span></div>
+      <div class="sec collapsed"><div class="sec-h">Effects · Interactions <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>On click</label><span class="gbox">Navigate ▾</span></div><div class="field"><label>Opacity</label><input class="num" value="100"></div></div></div>
+      <div class="sec collapsed"><div class="sec-h">CSS classes · All CSS <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>Class</label><span class="gbox" style="font-family:var(--mono)">.btn-primary</span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="countbar">
+  <span class="countpill">Before — rail destinations: <b>11</b> (AI·Tmpl·Add·Page·Media·Cmp·Lyr·Hist·Design·Set·Pub)</span>
+  <span class="countpill win">After — modes: <b>4</b> (Insert·Pages·Assets·Theme)</span>
+  <span class="countpill">Before — styling layers exposed: <b>5</b></span>
+  <span class="countpill win">After — reaches: <b>3</b> (item·block·theme)</span>
+  <span class="countpill">AI · History · Settings — <b>off the rail</b>, into ⌘K / topbar / inspector</span>
+</div>
+
+<div class="anno" id="anno"><span id="annoText"></span><button id="annoClose">×</button></div>
+
+<div class="proto-nav">
+  <b>Editor v2:</b>
+  <a href="fix-styling-3reach.html" class="hot">▶ 3-reach styling</a>
+  <a href="editor-spine-wireframe.html">Old editor (11 tabs)</a>
+  <a href="fix-editor-declutter.html">Old fix (cosmetic)</a>
+  <a href="59-inspector.html">Inspector</a>
+  <a href="71-command-palette.html">⌘K</a>
+  <a href="fix-boundary.html">Boundary map</a>
+  <a href="index.html">Map</a>
+</div>
+
+<script>
+  var app=document.getElementById('app');
+  function anno(h){var a=document.getElementById('anno');document.getElementById('annoText').innerHTML=h;a.style.display='block';}
+  document.getElementById('annoClose').onclick=function(){document.getElementById('anno').style.display='none';};
+
+  var SUB={insert:'blocks · templates · components',pages:'page list · layers · per-page settings',assets:'media · stock · image editor',theme:'brand · type · shape (Advanced: tokens)'};
+  document.querySelectorAll('.mode').forEach(function(m){m.onclick=function(){
+    var mode=m.getAttribute('data-mode');
+    document.querySelectorAll('.mode').forEach(function(x){x.classList.remove('on');});m.classList.add('on');
+    app.setAttribute('data-mode',mode);
+    document.querySelectorAll('.panel-body').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-body')===mode);});
+    document.getElementById('panelTitle').textContent=mode.charAt(0).toUpperCase()+mode.slice(1);
+    document.getElementById('panelSub').textContent=SUB[mode];
+    anno('Mode <b>'+mode+'</b>. Four modes total — every old tab folded into one of them.');
+  };});
+
+  // Pages: list ↔ layers sub-toggle
+  document.querySelectorAll('#pagesSeg button').forEach(function(b){b.onclick=function(){
+    document.querySelectorAll('#pagesSeg button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+    var v=b.getAttribute('data-v');
+    document.querySelectorAll('[data-body="pages"] [data-view]').forEach(function(x){x.style.display=x.getAttribute('data-view')===v?'block':'none';});
+  };});
+
+  // device
+  document.querySelectorAll('#deviceSeg button').forEach(function(b){b.onclick=function(){
+    document.querySelectorAll('#deviceSeg button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+    var d=b.getAttribute('data-d');app.setAttribute('data-device',d);
+    document.getElementById('deviceTag').textContent=(d==='desktop'?'DESKTOP · 1280':d==='tablet'?'TABLET · 768':'PHONE · 375');
+  };});
+
+  // inspector sections
+  document.querySelectorAll('.sec-h').forEach(function(h){h.onclick=function(){h.parentElement.classList.toggle('collapsed');};});
+
+  // reach picker
+  var REACH={
+    item:'<b>This item</b> — a one-off change. Nothing else moves. The safe default for 90% of edits.',
+    block:'<b>Reusable block</b> — changes everything like this (12 here). The editor confirms the count before it commits. Class vs component is decided for you.',
+    theme:'<b>Site theme</b> — a brand-level change (accent, font, radius). Re-points the whole site. Lives in the Theme mode too.'
+  };
+  function setReach(r){
+    document.querySelectorAll('#reachPicker .r').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-r')===r);});
+    document.getElementById('reachNote').innerHTML=REACH[r];
+  }
+  document.querySelectorAll('#reachPicker .r').forEach(function(x){x.onclick=function(){setReach(x.getAttribute('data-r'));anno(REACH[x.getAttribute('data-r')]);};});
+
+  // canvas select → sets default reach by element
+  document.querySelectorAll('.el').forEach(function(el){el.onclick=function(e){e.stopPropagation();
+    document.querySelectorAll('.el').forEach(function(x){x.classList.remove('sel');});el.classList.add('sel');
+    document.getElementById('scopeLine').textContent=el.getAttribute('data-name');
+    var r=el.getAttribute('data-reach')||'item';
+    setReach(r);
+    if(r==='block')anno('Selected a <b>shared button</b> — default reach is still <b>This item</b> in the engine, but the picker shows "Reusable block · 12" is available. You climb on purpose, never by accident.');
+    else anno('Selected <b>'+el.getAttribute('data-name')+'</b> — reach defaults to <b>This item</b>. Safe.');
+    // selecting always lands on the narrowest safe reach
+    setReach('item');
+  };});
+
+  document.getElementById('fillSwatch').onclick=function(){
+    var on=document.querySelector('#reachPicker .r.on').getAttribute('data-r');
+    if(on==='block')anno('Changing Fill at <b>Reusable block</b> reach → "changes 12 elements". Confirm or drop to This item.');
+    else if(on==='theme')anno('Changing Fill at <b>Site theme</b> reach → re-points the brand accent site-wide.');
+    else anno('Changed Fill on <b>this item only</b>.');
+  };
+
+  document.getElementById('cmdBtn').onclick=function(){location.href='71-command-palette.html';};
+  document.getElementById('histBtn').onclick=function(){anno('In-canvas undo timeline (Pro). Site publish-versions live in the dashboard.');};
+</script>
+</body>
+</html>

@@ -1,50 +1,33 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Sites (advanced)</title><link rel="stylesheet" href="wf.css">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · d1 — Sites power tools (folded)</title><link rel="stylesheet" href="wf.css">
 <style>
-  .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
-  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
-  .scard{border:1px solid var(--line);border-radius:6px;overflow:hidden;position:relative}.scard.sel{border:2px solid var(--ink)}
-  .chk{position:absolute;top:6px;left:6px;width:16px;height:16px;border:1px solid var(--ink);border-radius:3px;background:#fff;text-align:center;font-size:11px;line-height:14px}
-  .bulkbar{position:sticky;top:0;background:var(--ink);color:#fff;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:12px}
-  .bulkbar .btn{background:#fff;color:var(--ink);border-color:#fff;padding:4px 9px}
+  .wrap{padding:16px 20px;max-width:760px}
+  .note{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:#fff;margin-bottom:10px}
+  .note .t{font-size:13px;font-weight:700}
+  .note .d{font-size:11.5px;color:var(--ink-2);margin-top:5px;line-height:1.5}
+  .note .d b{color:var(--ink)}
+  .feats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+  .feat{border:1px solid var(--line);border-radius:6px;padding:8px 11px;font-size:11.5px;color:var(--ink-2)}
+  .feat b{color:var(--ink)}
+  .go{display:inline-block;margin-top:10px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:6px;padding:8px 14px;font-size:12.5px;font-weight:600;text-decoration:none}
 </style></head>
 <body>
-<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
+<div class="wf-stamp">WIREFRAME · d1 · SITES POWER (FOLDED)</div>
 <div class="screen">
-  <div class="topnote"><b>Sites — power features</b> · grounded in <code>sites.list</code> filters + <code>sites.bulk</code> + <code>sites.folders.*</code> · folders, bulk actions, advanced filters, grid/list (extends 11)</div>
-  <div class="ed">
-    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
-      <div class="row" style="gap:8px;margin-bottom:18px"><div class="ph-img" style="width:26px;height:26px;font-size:10px">B</div><b style="font-size:13px">Buildrik</b></div>
-      <nav style="font-size:12.5px;display:flex;flex-direction:column;gap:2px">
-        <a href="10-dashboard.html" class="navi">⌂ Home</a>
-        <a href="11-sites.html" class="navi here">▦ Sites</a>
-        <a href="c1-team.html" class="navi">👤 Team</a>
-        <a href="15-domains.html" class="navi">◐ Domains</a>
-        <a href="16-billing.html" class="navi">$ Billing</a>
-      </nav>
-      <div class="lbl" style="margin:16px 0 6px">Folders <span class="muted" style="font-size:9px;text-transform:none">— organize sites <i>within</i> this workspace</span></div>
-      <div style="font-size:12px;display:flex;flex-direction:column;gap:3px">
-        <span class="chip on" style="text-align:left">All sites · 12</span>
-        <span class="chip" style="text-align:left">📁 Client work · 7</span>
-        <span class="chip" style="text-align:left">📁 Personal · 3</span>
-        <span class="chip" style="text-align:left">📁 Archived · 2</span>
-        <button class="btn" style="padding:3px 8px;margin-top:4px">+ New folder</button>
+  <div class="topnote"><b>"Advanced sites" folded into the one Clients/Sites view.</b> Rebuilt: there's no separate power-list screen. Folders, bulk actions, filters, and duplicate-from-template are states/controls inside <a href="11-sites.html" style="color:#fff;text-decoration:underline">11 · Clients/Sites</a> — one grouping primitive, not two.</div>
+  <div class="wrap">
+    <div class="note">
+      <div class="t">These power tools now live in Clients/Sites</div>
+      <div class="d">An agency managing 30 sites shouldn't switch between a "simple list" and an "advanced list." The <b>Client</b> grouping IS the org primitive; folders are an alternate grouping in the same view.</div>
+      <div class="feats">
+        <div class="feat"><b>Group by</b> client / folder</div>
+        <div class="feat"><b>Bulk</b> move · duplicate · archive</div>
+        <div class="feat"><b>Filter</b> status · client · shared-theme</div>
+        <div class="feat"><b>Duplicate</b> from house template</div>
       </div>
-    </aside>
-    <main class="pad">
-      <div class="bulkbar"><span><b>2 selected</b></span><span style="flex:1"></span><button class="btn">Publish</button><button class="btn">Archive</button><button class="btn">Move to folder</button><button class="btn">Delete</button><span style="cursor:pointer">✕</span></div>
-      <div class="row" style="justify-content:space-between;margin-bottom:12px">
-        <div class="row"><a href="71-command-palette.html" class="input" style="width:150px;text-decoration:none">⌕ search</a><span class="chip">Status ▾</span><span class="chip">Created by ▾</span><span class="chip">Has domain</span><span class="chip">More filters ▾</span></div>
-        <div class="row"><span class="chip on">▦ Grid</span><span class="chip">≣ List</span><span class="chip">Sort: Last edited ▾</span></div>
-      </div>
-      <div class="grid3">
-        <div class="scard sel"><span class="chk">✓</span><div class="ph-img" style="height:80px">▦</div><div class="pad" style="padding:9px"><b style="font-size:12.5px">acme-main</b><div class="row" style="justify-content:space-between;margin-top:4px"><span class="tag-exists">● Published</span></div></div></div>
-        <div class="scard sel"><span class="chk">✓</span><div class="ph-img" style="height:80px">▦</div><div class="pad" style="padding:9px"><b style="font-size:12.5px">launch-lp</b><div class="row" style="justify-content:space-between;margin-top:4px"><span class="tag-new">⏳ Domain</span></div></div></div>
-        <div class="scard"><span class="chk"></span><div class="ph-img" style="height:80px">▦</div><div class="pad" style="padding:9px"><b style="font-size:12.5px">portfolio</b><div class="row" style="justify-content:space-between;margin-top:4px"><span class="chip" style="font-size:9px">○ Draft</span></div></div></div>
-        <div class="scard"><span class="chk"></span><div class="ph-img" style="height:80px">▦</div><div class="pad" style="padding:9px"><b style="font-size:12.5px">old-blog</b><div class="row" style="justify-content:space-between;margin-top:4px"><span class="tag-exists">● Published</span></div></div></div>
-      </div>
-      <div class="note" style="margin-top:14px"><b>Power features (grounded):</b> shift+click range select (capped 100), bulk publish/unpublish/archive/delete/move (role-gated per action), folder organization, advanced filters (created-by/date/template/traffic/has-domain), grid↔list + sort persisted to <code>UserPreference</code>. The basic list is screen 11; this is the scaled-up state.</div>
-    </main>
+      <a class="go" href="11-sites.html">Open Clients / Sites →</a>
+    </div>
+    <div class="muted" style="font-size:11px">Solo builders get a flat list (no Client grouping); the same bulk/folder controls still apply.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Dashboard:</b><a href="10-dashboard.html">Home</a><a href="11-sites.html">Sites (basic)</a><a href="d1-sites-advanced.html" class="here">Sites (power)</a><a href="12-site-detail.html">Site detail</a><a href="70-confirm.html">Bulk confirm</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Sites power:</b><a href="11-sites.html">Clients / Sites</a><a href="m-agency.html">Agency</a><a href="12-site-detail.html">Site detail</a><a href="index.html">Map</a></div>
 </body></html>
