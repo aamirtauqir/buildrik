@@ -32,15 +32,17 @@
     <div class="crumb"><b>Northwind Studio</b> › Workspace › Integrations</div>
 
     <div class="grp">Deploy</div>
-    <div class="conn"><div class="ic">▲</div><div class="m"><div class="t">Vercel</div><div class="d">publish target · per-workspace OAuth</div></div><span class="st"><span class="dot"></span> Connected</span></div>
+    <div class="conn"><div class="ic">▲</div><div class="m"><div class="t">Vercel</div><div class="d">publish target · per-workspace OAuth · team: <b>Northwind</b></div></div><span class="st"><span class="dot"></span> Connected</span><a class="btn" href="c4b-vercel-team.html">Team ▾</a><a class="btn" href="70-confirm.html">Disconnect</a></div>
 
     <div class="grp">Analytics providers <span style="color:var(--ink-3)">— connect the account; assign per-site in the editor</span></div>
-    <div class="conn"><div class="ic">◔</div><div class="m"><div class="t">Google Analytics</div><div class="d">account connected · used by 4 sites</div></div><span class="st"><span class="dot"></span> Connected</span></div>
+    <div class="conn"><div class="ic">◔</div><div class="m"><div class="t">Google Analytics</div><div class="d">account connected · used by 4 sites</div></div><span class="st"><span class="dot"></span> Connected</span><a class="btn" href="c4-integrations.html">Test event</a><a class="btn" href="70-confirm.html">Disconnect</a></div>
     <div class="conn"><div class="ic">◑</div><div class="m"><div class="t">Plausible</div><div class="d">privacy-first analytics</div></div><a class="btn conn-btn" href="c4-integrations.html">Connect</a></div>
 
     <div class="grp">Webhooks <span style="color:var(--ink-3)">— Pro, defer until a client needs one</span></div>
     <div class="conn" style="opacity:.6"><div class="ic">⇄</div><div class="m"><div class="t">Mailchimp · Zapier · Slack</div><div class="d">generic outbound webhooks</div></div><a class="btn" href="c4-integrations.html">Add</a></div>
 
+    <div class="grp">Connection lifecycle <span style="color:var(--ink-3)">— every integration can fail / expire</span></div>
+    <div class="conn" style="border-color:var(--accent)"><div class="ic">↻</div><div class="m"><div class="t">When a token expires</div><div class="d">provider flagged · reports paused · one-click <b>Reconnect</b> · no fake data meanwhile</div></div><a class="btn conn-btn" href="s-account-states.html">See states ↗</a></div>
     <div class="note2"><b>One connection, many sites.</b> Connect a provider here once; each site picks which property to report to in <a href="m-tracking.html" style="color:var(--ink-2)">Editor › Tracking</a>; reports read in <a href="19-analytics.html" style="color:var(--ink-2)">Dashboard › Traffic</a>. No "connect" button anywhere else — that was the 3-doors-for-analytics problem.</div>
   </div>
 </div>

@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · c4b — Vercel team picker</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:560px;margin:0 auto}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px}.crumb b{color:var(--ink-2)}
+  .team{display:flex;align-items:center;gap:11px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:#fff;cursor:pointer}
+  .team.on{border:2px solid var(--ink);background:var(--fill)}
+  .team .rb{width:16px;height:16px;border:1px solid var(--line-d);border-radius:50%;flex:0 0 auto}
+  .team.on .rb{border:5px solid var(--ink)}
+  .team .lg{width:30px;height:30px;border:1px solid var(--line-d);border-radius:6px;background:var(--fill);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--ink-2)}
+  .team .m{flex:1}.team .m .t{font-size:13px;font-weight:600}.team .m .d{font-size:10.5px;color:var(--ink-3);margin-top:1px}
+  .team .badge{font-size:9px;border:1px solid var(--line-d);border-radius:3px;padding:1px 6px;color:var(--ink-3)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px;border:1px dashed var(--line-d);border-radius:7px;padding:9px 11px}.note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · c4b · VERCEL TEAM PICKER</div>
+<div class="screen screen-narrow" style="max-width:620px">
+  <div class="topnote"><b>Vercel team picker — the OAuth hop after connecting.</b> Real route <code>settings/integrations/vercel-team-picker</code>. After the per-workspace Vercel OAuth grant, pick <b>which Vercel team</b> this workspace's sites deploy to (a Vercel account can own several teams). One-time during connect; changeable later from <a href="c4-integrations.html" style="color:#fff;text-decoration:underline">Integrations</a>.</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind Studio</b> › Workspace › Integrations › <b>Vercel</b></div>
+    <div class="h1" style="margin-bottom:3px">Choose a Vercel team</div>
+    <div class="muted" style="font-size:12px;margin-bottom:14px">Connected as <b style="color:var(--ink-2)">sara@northwind.com</b>. Deploys from this workspace go to the team you pick.</div>
+
+    <div class="team on"><span class="rb"></span><span class="lg">N</span><div class="m"><div class="t">Northwind Studio</div><div class="d">Pro · 12 projects · sara is owner</div></div><span class="badge">recommended</span></div>
+    <div class="team"><span class="rb"></span><span class="lg">S</span><div class="m"><div class="t">Sara — Personal</div><div class="d">Hobby · 3 projects</div></div></div>
+    <div class="team"><span class="rb"></span><span class="lg">C</span><div class="m"><div class="t">Cobalt Labs (client)</div><div class="d">Pro · you're a member</div></div></div>
+
+    <div class="row" style="justify-content:flex-end;margin-top:14px;gap:8px">
+      <a class="btn" href="c4-integrations.html">Cancel</a>
+      <a class="btn btn-fill btn-strong" href="c4-integrations.html">Use this team →</a>
+    </div>
+    <div class="note2"><b>Why this step exists:</b> Vercel OAuth grants account access, not a single deploy target. Without choosing a team, "Publish" wouldn't know where to ship. Stored per-workspace (<code>WorkspaceIntegration</code>); a client's sites can even deploy to the client's own Vercel team.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Integrations:</b><a href="c4-integrations.html">Integrations</a><a href="20-publish.html">Publish (uses this)</a><a href="18-workspace.html">Workspace</a><a href="s-account-states.html">States</a><a href="index.html">Map</a></div>
+</body></html>
