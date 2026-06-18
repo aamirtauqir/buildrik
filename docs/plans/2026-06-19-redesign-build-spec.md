@@ -273,16 +273,41 @@ unblock everything) then **E3** (the visible editor win). E0 now includes the `W
 DB flag (per eng-review). Codex/ChatGPT-Plus daily cap currently hit — the optional codex
 quality-gate on this spec is deferred.
 
+## Design fidelity guardrails (added by design-review — cross-cutting acceptance)
+
+The 108-screen prototype is the codex-verified design target. To stop the build from
+silently dropping its quality, every epic's UI work must pass these DESIGN.md gates (run
+`pnpm --filter @buildrik/editor verify:ds` + `gate:ds`):
+
+- **Anti-slop (DESIGN.md §Anti-Slop, 12 rules):** no purple/violet/indigo; no 3-column
+  feature grid with icons in colored circles; no decorative blobs / wavy dividers; no emoji
+  as design elements; no colored left-border cards; no shadows on flat surfaces (only modals);
+  cards earn their existence. QA greps for these.
+- **NO BLACK (editor chrome):** zero `#000`/near-black surfaces; primary text caps at
+  slate-700 `#334155`; reach for `--accent` (cobalt) for emphasis, never black.
+- **Motion:** minimal-functional only — 100-150ms ease-out on bg/opacity/transform; no spring
+  physics, no scroll choreography, no entrance animations; honor `prefers-reduced-motion`.
+- **Viewport intent:** editor = **desktop-only** (the prototype's small-screen state offers
+  preview/approve, not editing); dashboard + auth = responsive; marketing = responsive, 44px
+  touch targets.
+- **Empty-state quality bar (E6):** typographic — 13px muted title + 12px body + one primary
+  action, no illustrations (not just "render something"). Match the prototype's `80-states`/
+  `s-*-states` warmth.
+- **Accessibility:** WCAG AA on all body text; keyboard nav (⌘K / ⌘Z / ⌘⇧Z / ⌘P + rail
+  shortcuts); ARIA landmarks on editor regions (topbar/rail/sidebar/canvas/inspector).
+- **Density:** 28/32/48 row scale, never 40; inspector = 32px comfortable (E3, Saqib pref).
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
 | CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | (redesign already CEO-reviewed upstream) |
 | Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | issues_open→folded | 6 findings (3 P1 from prior learnings), all folded into spec |
-| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | (prototype already 10/10 IA/friendliness) |
+| Design Review | `/plan-design-review` | UI/UX gaps | 1 | clean | spec 7/10→10/10 design-carrier; design-fidelity guardrails added (anti-slop, NO BLACK, motion, viewport, empty-state bar, a11y) |
 
-- **OUTSIDE VOICE:** codex/ChatGPT-Plus daily cap hit → skipped; self-adversarial pass run inline (surfaced the 3 prior-learning landmines: NEXT_PUBLIC build-time flags, UI-only security gate, command-layer-before-UI).
-- **Findings folded:** (1) flag/rollback → DB `WorkspaceFeature` (user decision); (2) E4 client-mode server-side gate; (3) E3 command-layer-before-rail + 32px density; (4) E2 `clientId` null-audit; (5) test plan added; (6) E0 DRY shared-token layer.
-- **VERDICT:** ENG CLEARED — spec hardened, ready to implement starting E0+E1. Run /plan-design-review only if E3 editor visuals drift from the prototype.
+- **OUTSIDE VOICE:** codex/ChatGPT-Plus daily cap hit → skipped on both passes; self-adversarial pass run inline (surfaced the 3 eng prior-learning landmines + the 6 missing design-fidelity gates).
+- **Eng findings folded:** (1) flag/rollback → DB `WorkspaceFeature` (user decision); (2) E4 client-mode server-side gate; (3) E3 command-layer-before-rail + 32px density; (4) E2 `clientId` null-audit; (5) test plan; (6) E0 DRY shared-token layer.
+- **Design findings folded:** mockups skipped (108 hi-fi prototype screens are the locked visual target); added cross-cutting Design fidelity guardrails so the build can't drop the prototype's quality (anti-slop/NO-BLACK/motion/viewport/empty-state/a11y/density), gated by `verify:ds`/`gate:ds`.
+- **VERDICT:** ENG + DESIGN CLEARED — spec hardened + design-fidelity-guarded, ready to implement starting E0+E1.
 
 NO UNRESOLVED DECISIONS
