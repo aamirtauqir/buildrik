@@ -43,6 +43,7 @@
 
     <div class="grp">Connection lifecycle <span style="color:var(--ink-3)">— every integration can fail / expire</span></div>
     <div class="conn" style="border-color:var(--ink)"><div class="ic">↻</div><div class="m"><div class="t">When a token expires</div><div class="d">provider flagged · reports paused · one-click <b>Reconnect</b> · no fake data meanwhile</div></div><a class="btn conn-btn" href="s-account-states.html">See states ↗</a></div>
+    <div class="conn" style="border-color:var(--ink)"><div class="ic">⚠</div><div class="m"><div class="t">OAuth callback failed</div><div class="d">invalid state or access denied (<code>?error=oauth_state_invalid / oauth_denied</code>) · nothing connected · safe to retry</div></div><a class="btn conn-btn" href="c4-integrations.html">Retry connect</a></div>
     <div class="note2"><b>One connection, many sites.</b> Connect a provider here once; each site picks which property to report to in <a href="m-tracking.html" style="color:var(--ink-2)">Editor › Tracking</a>; reports read in <a href="19-analytics.html" style="color:var(--ink-2)">Dashboard › Traffic</a>. No "connect" button anywhere else — that was the 3-doors-for-analytics problem.</div>
   </div>
 </div>
