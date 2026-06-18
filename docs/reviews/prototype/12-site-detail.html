@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 12 — Site detail (ops)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .appbar{display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .crumb{font-size:12px;color:var(--ink-3)}
+  .crumb b{color:var(--ink-2)}
+  .appbar .sp{flex:1}
+  .btn{font-size:12px;border:1px solid var(--ink);border-radius:6px;padding:7px 13px;font-weight:600;text-decoration:none}
+  .btn.edit{background:var(--accent);color:#fff}
+  .btn.ghost{color:var(--ink)}
+  .tabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg-2);flex-wrap:wrap}
+  .tabs a{font-size:12px;color:var(--ink-2);padding:8px 11px;text-decoration:none;border-bottom:2px solid transparent}
+  .tabs a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+  .body{padding:16px 20px;max-width:880px}
+  .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
+  .card{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:#fff}
+  .card .ct{font-size:11px;font-weight:600;color:var(--ink);letter-spacing:.02em;margin-bottom:8px}
+  .kv{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);padding:5px 0;border-bottom:1px dashed var(--line)}
+  .kv:last-child{border:none} .kv b{color:var(--ink)}
+  .chip{font-size:9px;border-radius:3px;padding:1px 6px;background:var(--accent);color:#fff}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px}
+  .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · 12 · SITE DETAIL</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Site detail — pure ops, retabbed.</b> Rebuilt: the old "Pages↗ / Settings / tool chips" that leaked editor-authoring are GONE. Tabs are now business-ops only. The one bridge into authoring is <b>Edit ↗</b>; the one bridge out is <b>Visit ↗</b>.</div>
+  <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span><span style="flex:1"></span><a class="btn ghost" href="90-published.html">Visit ↗</a><a class="btn edit" href="m-editor.html" style="margin-left:6px">Edit ↗</a></div>
+  <div class="stabs"><a href="12-site-detail.html" class="on">Overview</a><a href="d6-domains.html">Domains</a><a href="19-analytics.html">Traffic</a><a href="d2-forms.html">Forms inbox</a><a href="d4-share-access.html">Sharing</a><a href="14-site-settings.html">Publishing</a><a href="58-history.html">Versions</a></div>
+  <div class="body">
+    <div class="cols">
+      <div class="card">
+        <div class="ct">Overview</div>
+        <div class="kv"><span>Status</span><span><span class="chip">Live</span></span></div>
+        <div class="kv"><span>Primary domain</span><b>acme-main.com</b></div>
+        <div class="kv"><span>Last published</span><b>2h ago · by Designer</b></div>
+        <div class="kv"><span>Pages</span><b>5</b></div>
+        <div class="kv"><span>Shared theme</span><b>Northwind base <span style="color:var(--ink-3);font-weight:400">(local override)</span></b></div>
+      </div>
+      <div class="card">
+        <div class="ct">Quick ops</div>
+        <div class="kv"><span>Traffic (30d)</span><a href="19-analytics.html" style="color:var(--ink)">12.4k visitors ↗</a></div>
+        <div class="kv"><span>Form submissions</span><a href="d2-forms.html" style="color:var(--ink)">7 new ↗</a></div>
+        <div class="kv"><span>Domains</span><a href="d6-domains.html" style="color:var(--ink)">1 connected ↗</a></div>
+        <div class="kv"><span>Share preview</span><a href="d4-share-access.html" style="color:var(--ink)">create link ↗</a></div>
+      </div>
+    </div>
+    <div class="note2"><b>No authoring here.</b> Pages, SEO content, styles, code = <b>Edit ↗</b> (editor). Domains, traffic, forms inbox, sharing, publishing, versions = these tabs. The boundary is the object tree (<a href="m-ownership.html" style="color:var(--ink-2)">M-ownership</a>).</div>
+  </div>
+</div>
+<div style="margin:16px 18px 6px"><div style="font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px">States on this surface — site detail</div><div style="display:flex;gap:7px;flex-wrap:wrap;font-size:10.5px;color:var(--ink-2)"><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Loading &rarr; skeleton of URLs / domain / history</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Couldn’t load this site &rarr; cause + Retry (data is safe)</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">No access (your role) &rarr; “ask an admin”</span></div><div style="font-size:10.5px;color:var(--ink-3);margin-top:6px">Full state coverage → <a href="s-dashboard-states.html">s-dashboard-states</a> · <a href="80-states.html">state standard</a></div></div>
+<div class="proto-nav"><b>Site detail:</b><a href="m3-dashboard.html">Dashboard</a><a href="m-editor.html">Edit ↗</a><a href="14-site-settings.html">Publishing</a><a href="19-analytics.html">Traffic</a><a href="index.html">Map</a></div>
+</body></html>

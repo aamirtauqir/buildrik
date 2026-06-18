@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 58 — Site › Versions</title><link rel="stylesheet" href="pt.css">
+<style>
+  .appbar{display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .crumb{font-size:12px;color:var(--ink-3)} .crumb b{color:var(--ink-2)}
+  .tabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg-2);flex-wrap:wrap}
+  .tabs a{font-size:12px;color:var(--ink-2);padding:8px 11px;text-decoration:none;border-bottom:2px solid transparent}
+  .tabs a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+  .body{padding:16px 20px;max-width:760px}
+  .ver{display:flex;align-items:flex-start;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;background:#fff}
+  .ver.live{border-color:var(--accent)}
+  .ver .dot{width:9px;height:9px;border-radius:50%;background:var(--ink-3);margin-top:4px;flex-shrink:0}
+  .ver.live .dot{background:var(--accent)}
+  .ver .m{flex:1}
+  .ver .t{font-size:12.5px;font-weight:600}
+  .ver .t .chip{font-size:8.5px;letter-spacing:.03em;border-radius:3px;padding:1px 6px;margin-left:6px}
+  .chip.live{background:var(--accent);color:#fff} .chip.draft{border:1px solid var(--line-d);color:var(--ink-3)}
+  .ver .meta{font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .ver .act{display:flex;gap:6px}
+  .ver .act a{font-size:11px;border:1px solid var(--line);border-radius:5px;padding:5px 10px;color:var(--ink-2);text-decoration:none}
+  .ver .act a:hover{border-color:var(--accent);color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · 58 · SITE VERSIONS</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Site › Versions — published versions (ops).</b> The site-detail Versions tab: every <b>publish/deploy</b>, who shipped it, and one-click <b>restore</b>. This is the dashboard version-history (a real ops surface) — distinct from the editor's in-canvas undo timeline, which lives in the <a href="m-editor.html" style="color:#fff;text-decoration:underline">editor topbar</a>. One tab of <a href="12-site-detail.html" style="color:#fff;text-decoration:underline">Site detail</a>.</div>
+  <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span></div>
+  <div class="stabs"><a href="12-site-detail.html">Overview</a><a href="d6-domains.html">Domains</a><a href="19-analytics.html">Traffic</a><a href="d2-forms.html">Forms inbox</a><a href="d4-share-access.html">Sharing</a><a href="14-site-settings.html">Publishing</a><a href="58-history.html" class="on">Versions</a></div>
+  <div class="body">
+    <div class="ver live"><span class="dot"></span><div class="m"><div class="t">v14 <span class="chip live">live</span></div><div class="meta">published 2h ago · by Imran (Designer) · "new pricing page"</div></div><div class="act"><a href="90-published.html">Visit ↗</a></div></div>
+    <div class="ver"><span class="dot"></span><div class="m"><div class="t">v13</div><div class="meta">published yesterday · by Imran · "hero copy"</div></div><div class="act"><a href="21-preview.html">Preview</a><a href="20-publish.html">Restore (republish)</a></div></div>
+    <div class="ver"><span class="dot"></span><div class="m"><div class="t">v12</div><div class="meta">published 3 days ago · by client@acme (approved) · "team photos"</div></div><div class="act"><a href="21-preview.html">Preview</a><a href="20-publish.html">Restore (republish)</a></div></div>
+    <div class="ver"><span class="dot"></span><div class="m"><div class="t">v11 <span class="chip draft">rolled back from</span></div><div class="meta">published 5 days ago · by Imran · auto-restored after a bad deploy</div></div><div class="act"><a href="21-preview.html">Preview</a></div></div>
+    <div class="note2"><b>Versions = publishes, not keystrokes.</b> Restore re-publishes a past version via the <a href="20-publish.html" style="color:var(--ink-2)">publish flow</a> (with a confirm guard). Client-approved publishes show who approved (<a href="m-approval.html" style="color:var(--ink-2)">M-approval</a>). The editor's fine-grained undo/redo is a separate, in-canvas thing on the topbar — this is the shippable record.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Versions:</b><a href="12-site-detail.html">Site detail</a><a href="20-publish.html">Publish</a><a href="m-editor.html">Editor undo (topbar)</a><a href="m-ownership.html">Ownership</a><a href="s-ship-states.html">Ship states</a><a href="index.html">Map</a></div>
+</body></html>

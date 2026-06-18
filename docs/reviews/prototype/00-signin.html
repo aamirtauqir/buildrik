@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Sign in</title><link rel="stylesheet" href="pt.css">
+<style>.sstate{display:none}.sstate.on{display:block}</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen screen-narrow" style="max-width:420px">
+  <div class="topnote"><b>Sign in (entry)</b> · grounded in current NextAuth (magic-link + credentials + 2FA) · solution: magic-link is the default path, password secondary</div>
+  <div class="pad">
+    <div class="row" style="gap:8px;justify-content:center;margin-bottom:6px"><div class="ph-img" style="width:30px;height:30px;font-size:11px">B</div><b style="font-size:16px">Buildrik</b></div>
+
+    <div class="sstate on" id="s_in">
+      <div class="h1" style="text-align:center;font-size:18px;margin-bottom:4px">Welcome back</div>
+      <div class="muted" style="text-align:center;font-size:12px;margin-bottom:18px">Sign in to your workspace.</div>
+      <div class="lbl">Email</div>
+      <div class="input" style="width:100%;margin:6px 0 12px">you@company.com</div>
+      <button class="btn btn-fill btn-strong" style="width:100%;margin-bottom:10px" onclick="ss('sent')">Email me a magic link →</button>
+      <div class="row" style="justify-content:center;margin:8px 0"><span class="muted" style="font-size:11px">— or —</span></div>
+      <button class="btn" style="width:100%" onclick="ss('pw')">Sign in with password</button>
+      <div class="note" style="margin-top:16px">Magic-link default = no password to forget (recognition over recall). Password path stays for users who want it; 2FA prompt follows if enabled.<br><b>Invited client?</b> You'll see your agency's <b>branded</b> sign-in (their logo + domain, never "Buildrik") — see <a href="a9-invite-accept.html" style="color:var(--ink-2);text-decoration:underline">a9 · accept invite</a>.</div>
+    </div>
+
+    <div class="sstate" id="s_sent">
+      <div class="h1" style="text-align:center;font-size:18px;margin:8px 0 4px">✉ Check your email</div>
+      <div class="muted" style="text-align:center;font-size:12px;margin-bottom:16px">Sent a sign-in link to <code>you@company.com</code>. Expires in 15 min.</div>
+      <a href="a1-signup.html" class="btn btn-fill" style="width:100%;text-align:center;margin-bottom:8px">Create an account → sign up</a>
+      <button class="btn" style="width:100%" onclick="ss('in')">← Use a different email</button>
+    </div>
+
+    <div class="sstate" id="s_pw">
+      <div class="h1" style="text-align:center;font-size:18px;margin:8px 0 12px">Password sign-in</div>
+      <div class="lbl">Email</div><div class="input" style="width:100%;margin:6px 0 10px">you@company.com</div>
+      <div class="lbl">Password</div><div class="input" style="width:100%;margin:6px 0 12px">••••••••</div>
+      <a href="m3-dashboard.html" class="btn btn-fill btn-strong" style="width:100%;text-align:center;margin-bottom:8px">Sign in →</a>
+      <button class="btn" style="width:100%" onclick="ss('in')">← Back to magic link</button>
+      <div class="row" style="justify-content:center;margin-top:10px"><a class="muted" style="font-size:11px;text-decoration:underline;cursor:pointer" onclick="ss('err')">Preview: wrong password</a></div>
+      <div class="note" style="margin-top:14px">2FA: if enabled, a 6-digit code step inserts here before dashboard (real flow). Wireframe collapses it.</div>
+    </div>
+
+    <div class="sstate" id="s_err">
+      <div class="h1" style="text-align:center;font-size:18px;margin:8px 0 12px">Password sign-in</div>
+      <div class="lbl">Email</div><div class="input" style="width:100%;margin:6px 0 10px">you@company.com</div>
+      <div class="lbl">Password</div>
+      <div class="input" style="width:100%;margin:6px 0 4px;border-color:var(--accent);border-width:1.5px">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+      <div style="font-size:11px;color:var(--ink);margin:0 0 12px">&#8627; Wrong email or password. <a href="a3-password.html" style="color:var(--ink);text-decoration:underline">Forgot password?</a></div>
+      <a href="m3-dashboard.html" class="btn btn-fill btn-strong" style="width:100%;text-align:center;margin-bottom:8px">Sign in</a>
+      <button class="btn" style="width:100%" onclick="ss('in')">Back to magic link</button>
+      <div class="note" style="margin-top:14px"><b>Inline, on the field &mdash; never a full-page error.</b> What you typed stays. We don't say <i>which</i> of email/password is wrong (anti-enumeration). A wrong 2FA code and a used backup code follow the same inline pattern (<a href="a8-auth-errors.html">a8</a> documents all auth edges).</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Flow:</b><a href="00-signin.html" class="here">Sign in</a><a href="m3-dashboard.html">Dashboard</a><a href="m3-dashboard.html">First run</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="m-editor.html">Editor</a><a href="30-paywall.html">Paywall</a><a href="90-published.html">Live site</a></div>
+<script>function ss(s){['in','sent','pw','err'].forEach(function(x){document.getElementById('s_'+x).classList.toggle('on',x===s);});}</script>
+</body></html>

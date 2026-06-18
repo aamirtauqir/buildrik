@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · API tokens</title><link rel="stylesheet" href="pt.css">
+<style>
+  .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--accent);color:#fff;font-weight:600}
+  .tk{display:grid;grid-template-columns:1fr 130px 90px 60px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+  .modal{position:fixed;inset:0;background:rgba(43,43,43,.35);display:none;place-items:center;z-index:40}.modal.on{display:grid}.mbox{background:#fff;border:2px solid var(--ink);border-radius:8px;max-width:440px;width:90%;padding:18px}
+</style></head>
+<body data-surface="dashboard">
+<div data-recon-banner style="position:sticky;top:0;z-index:999;background:#334155;color:#fff;font:600 12px/1.4 "Inter Tight",sans-serif;padding:7px 14px;text-align:center;border-bottom:2px solid #fff">⊘ CUT from the solution set — no public API platform + no demand signal. Not part of the user-friendly product (UX audit).</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>API tokens</b> · grounded in <code>apiTokens.*</code> (create/list/revoke) · plaintext shown once, scoped, optional expiry</div>
+  <div class="ed">
+    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
+      <a href="18-workspace.html" class="muted" style="font-size:11px;text-decoration:none;display:block;margin-bottom:12px">← Workspace settings</a>
+      <div class="lbl" style="margin-bottom:6px">Settings</div>
+      <div style="display:flex;flex-direction:column;gap:2px;font-size:12.5px">
+        <a href="18-workspace.html" class="navi">General</a>
+        <a href="c1-team.html" class="navi">Members</a>
+        <a href="c4-integrations.html" class="navi">Integrations</a>
+        <a href="c5-api-tokens.html" class="navi here">API tokens</a>
+        <a href="16-billing.html" class="navi">Billing</a>
+      </div>
+    </aside>
+    <main class="pad">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="h1">API tokens</div><button class="btn btn-fill btn-strong" onclick="document.getElementById('nt').classList.add('on')">+ New token</button></div>
+      <div class="muted" style="font-size:12px;margin-bottom:14px">For scripting + CI. Scoped, revocable, never expire unless you set it.</div>
+      <div class="box pad">
+        <div class="tk" style="color:var(--ink-3);font-size:10px;text-transform:uppercase"><span>Name</span><span>Scopes</span><span>Last used</span><span></span></div>
+        <div class="tk"><span><b>CI deploy</b><div class="muted" style="font-size:10px;font-family:var(--mono)">brk_live_…a91f</div></span><span class="muted" style="font-size:10.5px">sites:write</span><span class="muted">2h ago</span><span class="btn" style="padding:2px 7px">Revoke</span></div>
+        <div class="tk" style="border-bottom:none"><span><b>Read-only export</b><div class="muted" style="font-size:10px;font-family:var(--mono)">brk_live_…3c7e</div></span><span class="muted" style="font-size:10.5px">sites:read</span><span class="muted">never</span><span class="btn" style="padding:2px 7px">Revoke</span></div>
+      </div>
+      <div class="note" style="margin-top:14px;font-size:10.5px"><b>Shown once (grounded):</b> on create, the plaintext token is returned a single time — copy it then; afterward only the prefix + last-4 are listed. Scopes gate operations (sites:read/write, pages:write…). Revoke keeps the row (audit) but kills access.</div>
+    </main>
+  </div>
+</div>
+<div class="modal" id="nt"><div class="mbox">
+  <div class="h2" style="margin-bottom:10px">New API token</div>
+  <div class="lbl">Name</div><div class="input" style="width:100%;margin:5px 0 10px">CI deploy</div>
+  <div class="lbl">Scopes</div><div class="row" style="margin:5px 0 10px;flex-wrap:wrap"><span class="chip on">sites:read</span><span class="chip on">sites:write</span><span class="chip">pages:write</span><span class="chip">media:write</span></div>
+  <div class="lbl">Expiry</div><div class="input" style="width:50%;margin:5px 0 12px">90 days ▾</div>
+  <div class="box pad" style="background:var(--fill);font-family:var(--mono);font-size:11px;margin-bottom:12px">brk_live_9f2a…copy now — won't be shown again</div>
+  <div class="row" style="justify-content:flex-end"><button class="btn" onclick="document.getElementById('nt').classList.remove('on')">Cancel</button><button class="btn btn-fill btn-strong" onclick="document.getElementById('nt').classList.remove('on')">Copy &amp; done</button></div>
+</div></div>
+<div class="proto-nav"><b>Settings:</b><a href="18-workspace.html">Workspace</a><a href="c1-team.html">Team</a><a href="c4-integrations.html">Integrations</a><a href="c5-api-tokens.html" class="here">API tokens</a><a href="16-billing.html">Billing</a><a href="index.html">Map</a></div>
+</body></html>

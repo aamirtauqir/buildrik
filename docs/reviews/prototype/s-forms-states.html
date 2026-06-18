@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · S-forms — forms &amp; submissions unhappy paths</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .mock{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .mh{padding:7px 12px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .mh .tag{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border:1px dashed var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 6px}
+  .mb{padding:13px}
+  .empty{text-align:center;color:var(--ink-3);padding:16px 12px}
+  .empty .big{font-size:26px;line-height:1;margin-bottom:8px}
+  .empty .t{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .empty .d{font-size:11px;margin-top:5px;line-height:1.4}
+  .empty .acts{display:flex;gap:6px;justify-content:center;margin-top:11px;flex-wrap:wrap}
+  .empty .acts span{border:1px solid var(--line);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--ink-2)}
+  .empty .acts span.pri{border-color:var(--accent);color:#fff;background:var(--accent);font-weight:600}
+  .toast{border:1px solid var(--ink);border-radius:7px;padding:10px 12px;background:var(--fill);font-size:12px;display:flex;align-items:flex-start;gap:9px}
+  .toast .ic{font-size:15px}
+  .toast .tx{flex:1;color:var(--ink-2);line-height:1.4}
+  .toast .tx b{color:var(--ink)}
+  .toast .act{font-size:11px;color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .fld{border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-size:11.5px;color:var(--ink-3);background:#fff;margin:5px 0}
+  .fld.bad{border-color:var(--accent);border-width:1.5px;color:var(--ink-2)}
+  .ferr{font-size:10.5px;color:var(--ink);margin:2px 0 6px}
+  .tip{border:1px solid var(--line-d);border-radius:7px;padding:10px 12px;font-size:11.5px;color:var(--ink-2);line-height:1.45;background:#fff}
+  .tip b{color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:6px}.note2 b{color:var(--ink)}
+  .splitlbl{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:2px 0 7px}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · S-FORMS · UNHAPPY PATHS</div>
+<div class="screen">
+  <div class="topnote"><b>Forms states — both sides: the agency's inbox and the visitor who submits.</b> Codex scope-review (2026-06-18): forms can <b>lose leads</b> with no modeled recovery. Two surfaces: the <b>owner inbox</b> (<a href="d2-forms.html" style="color:#fff;text-decoration:underline">d2</a>) and the <b>visitor submit</b> on the live site (<a href="90-published.html" style="color:#fff;text-decoration:underline">90</a>). A dropped submission is a lost customer — these states make sure that never happens quietly.</div>
+  <div class="wrap">
+
+    <!-- 1. OWNER INBOX STATES -->
+    <div class="sech">1 · Owner inbox — empty, routing broken, export failed <span class="sub">the agency side</span></div>
+    <div class="cols3">
+      <div class="mock">
+        <div class="mh">No submissions yet</div>
+        <div class="mb"><div class="empty" style="padding:12px 8px">
+          <div class="big">✉</div><div class="t">No submissions yet</div>
+          <div class="d">When someone fills a form on the live site, it lands here.</div>
+          <div class="acts"><span>Test the form ↗</span><span class="pri">Check it's live</span></div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="mh">Routing broken <span class="tag">leads still safe</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⚠</span><span class="tx"><b>Email delivery to ops@acme.com is failing.</b> 6 submissions are saved here, but the notification email bounced.</span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span class="pri">Fix the email</span><span>View the 6</span></div></div>
+          <div class="note2">Submissions are <b>stored first</b>, emailed second — a bad email never loses the lead.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Export failed</div>
+        <div class="mb">
+          <div class="toast"><span class="ic">!</span><span class="tx"><b>CSV export didn't finish.</b> Nothing changed — your submissions are intact.</span><span class="act">Retry</span></div>
+          <div class="note2" style="margin-top:9px">Export is read-only; a failed export never touches the data.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. VISITOR SUBMIT STATES -->
+    <div class="sech">2 · Visitor submit — success, validation, spam, server error <span class="sub">what the public sees on the live site</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Success <span class="tag">confirm, don't just clear</span></div>
+        <div class="mb">
+          <div class="splitlbl">Live site · after submit</div>
+          <div class="empty" style="padding:14px 8px">
+            <div class="big">✓</div><div class="t">Thanks — we got your message</div>
+            <div class="d">We'll reply to you at jane@email.com. <span style="color:var(--ink-3)">(Redirect or message — the owner picks in the editor.)</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Validation — inline, before send <span class="tag">never lose what they typed</span></div>
+        <div class="mb">
+          <div class="splitlbl">Live site · contact form</div>
+          <div class="fld">Name · Jane</div>
+          <div class="fld bad">Email · jane@</div>
+          <div class="ferr">↳ That email looks incomplete</div>
+          <div class="fld bad">Message · (empty)</div>
+          <div class="ferr">↳ Add a short message</div>
+          <div class="note2">Errors sit <b>on the fields</b>, the typed data stays. No full-page reset.</div>
+        </div>
+      </div>
+    </div>
+    <div class="cols" style="margin-top:12px">
+      <div class="mock">
+        <div class="mh">Spam blocked <span class="tag">quiet to humans</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⊘</span><span class="tx"><b>Flagged as spam, held — not delivered.</b> A real person sees nothing odd; the owner can review held items.</span><span class="act">Review held</span></div>
+          <div class="note2">Honeypot / rate-limit catch. False positives are recoverable from the inbox — never silently dropped.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Server error on submit <span class="tag">give them a path</span></div>
+        <div class="mb">
+          <div class="splitlbl">Live site · after pressing Send</div>
+          <div class="toast"><span class="ic">⚠</span><span class="tx"><b>Couldn't send right now.</b> Please try again — your message is still in the form.</span><span class="act">Try again</span></div>
+          <div class="note2">The form keeps its values; a failed POST never blanks the visitor's work or shows a raw 500.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note2" style="margin-top:14px"><b>The promise:</b> a submission is a customer. Stored before emailed, validated inline without data loss, spam held not dropped, errors recoverable on both sides. The form config itself lives in the <a href="m-editor.html">editor</a>; these are its run-states.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Forms states:</b><a href="d2-forms.html">Inbox</a><a href="53-settings.html">Form config</a><a href="m-editor.html">Editor</a><a href="90-published.html">Live site</a><a href="index.html">Map</a></div>
+</body></html>

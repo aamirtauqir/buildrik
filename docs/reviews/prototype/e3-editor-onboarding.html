@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · e3 — Editor onboarding</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:620px}
+  .branch{display:flex;gap:9px;margin-bottom:13px}
+  .b{flex:1;border:1px solid var(--line);border-radius:7px;padding:10px 12px}
+  .b.on{border:2px solid var(--ink);background:var(--fill)}
+  .b .t{font-size:12.5px;font-weight:600} .b .d{font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .ck{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .ci{display:flex;align-items:center;gap:9px;padding:9px 12px;border-bottom:1px dashed var(--line);font-size:12px;color:var(--ink-2)}
+  .ci:last-child{border:none}
+  .ci .box{width:15px;height:15px;border:1px solid var(--line-d);border-radius:3px;display:grid;place-items:center;font-size:9px}
+  .ci .box.done{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .ci.done{color:var(--ink-3);text-decoration:line-through}
+  .tip{border:1px dashed var(--line-d);border-radius:7px;padding:10px 12px;font-size:11.5px;color:var(--ink-2);background:var(--bg-2);margin-top:11px;line-height:1.5}
+  .tip b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · e3 · EDITOR ONBOARDING</div>
+<div class="screen">
+  <div class="topnote"><b>Editor onboarding — branched by who you are.</b> Rebuilt: the generic tour becomes two checklists (agency Designer vs handed-off Content editor), and it explains <b>density vs permission</b> up front so neither persona is confused.</div>
+  <div class="wrap">
+    <div class="branch">
+      <div class="b"><div class="t">Designer (agency)</div><div class="d">full build access · full controls</div></div>
+      <div class="b on"><div class="t">Content editor</div><div class="d">edit your content · fewer controls</div></div>
+    </div>
+    <div class="ck">
+      <div class="ci done"><span class="box done">✓</span> Click any text or image to edit it</div>
+      <div class="ci"><span class="box"></span> Change a color with the 3-reach picker (This item / All like this)</div>
+      <div class="ci"><span class="box"></span> Swap the hero image from the asset picker</div>
+      <div class="ci"><span class="box"></span> Send your changes for review</div>
+    </div>
+    <div class="tip"><b>Two things explained once:</b> Your <b>view</b> (fewer or full controls) = how much you see (a preference — your view starts with fewer controls). <b>Your role</b> = what you can change (a permission — you edit content; structure &amp; advanced styling are the agency's). If a control is greyed, it tells you which: "turn on full controls" or "ask an admin." (<a href="m-states.html" style="color:var(--ink-2)">M-states</a> · <a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>)</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Onboarding:</b><a href="m-editor.html">Editor</a><a href="m-roles.html">Roles</a><a href="m-states.html">Density vs role</a><a href="m-approval.html">Send for review</a><a href="index.html">Map</a></div>
+</body></html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · M0 — The spine (founder artifact)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:20px 22px;max-width:1060px;margin:0 auto}
+  .rule{border:2px solid var(--ink);border-radius:9px;padding:16px 20px;background:var(--fill);font-size:16px;line-height:1.5;text-align:center;margin:6px 0 4px}
+  .rule b{font-weight:700}
+  .rule .small{display:block;font-size:12px;color:var(--ink-2);margin-top:7px;font-weight:400}
+
+  .kicker{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin:26px 0 8px;text-align:center}
+
+  /* object tree with agency + boundary */
+  .tree{display:flex;align-items:stretch;justify-content:center;gap:0;flex-wrap:wrap;position:relative}
+  .tnode{flex:0 0 auto;min-width:118px;border:1px solid var(--line);border-radius:7px;padding:11px 13px;background:#fff;text-align:center;position:relative}
+  .tnode + .tnode{margin-left:26px}
+  .tnode + .tnode::before{content:"›";position:absolute;left:-19px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:17px}
+  .tnode .nm{font-size:13.5px;font-weight:700}
+  .tnode small{display:block;font-size:10px;color:var(--ink-3);margin-top:4px}
+  .tnode.agency{border-color:var(--accent);border-width:2px}
+  .tnode.agency .nm::after{content:" ★";font-size:10px}
+  .tnode.opt{border-style:dashed}
+  .boundary{display:flex;justify-content:center;margin:12px 0 2px}
+  .boundary .b{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-size:11px}
+  .boundary .b span{padding:6px 16px;color:var(--ink-2)}
+  .boundary .b .dash{background:var(--bg-2);border-right:1px solid var(--line);font-weight:600;color:var(--ink)}
+  .boundary .b .edit{font-weight:600;color:var(--ink)}
+
+  /* journey */
+  .journey{display:flex;align-items:center;justify-content:center;gap:0;margin:6px 0 2px}
+  .step{flex:0 0 auto;border:1px solid var(--line);border-radius:8px;padding:13px 26px;font-size:15px;font-weight:600;background:#fff;text-align:center;min-width:150px}
+  .step small{display:block;font-size:10.5px;color:var(--ink-3);font-weight:400;margin-top:3px}
+  .arw{font-size:20px;color:var(--ink);margin:0 12px}
+  .step.mid{border-color:var(--accent);border-width:2px}
+
+  /* one dedup example */
+  .ex{display:grid;grid-template-columns:1fr 44px 1fr;gap:0;align-items:center;margin:4px auto;max-width:760px}
+  .exbox{border:1px solid var(--line);border-radius:8px;padding:12px 15px}
+  .exbox.bad{background:var(--bg-2)}
+  .exbox .h{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+  .exbox.bad .h{color:var(--ink-3)}
+  .exbox .door{font-size:12px;color:var(--ink-2);padding:3px 0;border-bottom:1px dashed var(--line)}
+  .exbox .door:last-child{border-bottom:none}
+  .exbox .door.cut{text-decoration:line-through;color:var(--ink-3)}
+  .exbox.good{border-color:var(--accent);border-width:2px;background:#fff}
+  .exbox.good .home{font-size:13px;font-weight:600;padding:4px 0}
+  .exbox.good .home small{font-weight:400;color:var(--ink-2);font-size:11px}
+  .exarw{text-align:center;font-size:20px;color:var(--ink)}
+
+  /* agency homes mini */
+  .agencyrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:4px}
+  .acard{border:1px solid var(--line);border-radius:7px;padding:11px 12px;background:#fff}
+  .acard .at{font-size:12px;font-weight:600}
+  .acard .ah{font-size:10.5px;color:var(--ink-2);margin-top:4px;line-height:1.35}
+  .acard .ah b{color:var(--ink)}
+
+  .foot-switch{border:1px dashed var(--line-d);border-radius:7px;padding:11px 15px;margin-top:6px;font-size:12px;color:var(--ink-2);line-height:1.45;text-align:center}
+  .foot-switch b{color:var(--ink)}
+  .foot-switch .tg{display:inline-flex;border:1px solid var(--ink);border-radius:999px;overflow:hidden;font-size:11px;font-weight:600;vertical-align:middle;margin:0 4px}
+  .foot-switch .tg span{padding:3px 11px}
+  .foot-switch .tg .on{background:var(--accent);color:#fff}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · M0 · FOUNDER ARTIFACT</div>
+<div class="screen">
+  <div class="topnote"><b>M0 — the spine, in 30 seconds.</b> One rule, one tree, one journey, one example. The dense inventory + dedup table + dual-rail proof live in <a href="m0b-spec.html" style="color:#fff;text-decoration:underline">M0-spec</a> (engineer appendix). This page is what answers the founder's "is it connected, and where's the agency."</div>
+  <div class="wrap">
+
+    <!-- THE RULE -->
+    <div class="rule">
+      Every feature has <b>one home</b> on the tree. Every screen sits on <b>one journey</b>. You only see the depth you ask for.
+      <span class="small">The product never had this rule — that's why it felt overcrowded and scattered. This is the whole fix.</span>
+    </div>
+
+    <!-- THE TREE (with agency) -->
+    <div class="kicker">The tree — every feature attaches to exactly one node</div>
+    <div class="tree">
+      <div class="tnode agency"><div class="nm">Workspace</div><small>the agency / you</small></div>
+      <div class="tnode opt"><div class="nm">Client</div><small>agency only · solo skips</small></div>
+      <div class="tnode"><div class="nm">Site</div><small>one website</small></div>
+      <div class="tnode"><div class="nm">Page</div><small>SEO · slug</small></div>
+      <div class="tnode"><div class="nm">Section</div><small>templates</small></div>
+      <div class="tnode"><div class="nm">Element</div><small>style · text</small></div>
+    </div>
+    <div class="boundary">
+      <span class="b"><span class="dash">◄ Dashboard — run the business</span><span class="edit">Editor — make the thing ►</span></span>
+    </div>
+    <div class="muted" style="text-align:center;font-size:11px;margin-top:4px">Boundary = the tree itself. <b>Site business ops</b> (domains, analytics view, submissions) + Workspace + Client → Dashboard. <b>Site content &amp; config</b> (SEO, forms) + Page·Section·Element → Editor. ★ = the agency node v1 was missing.</div>
+
+    <!-- THE JOURNEY -->
+    <div class="kicker">The journey — one line, every user, every time</div>
+    <div class="journey">
+      <div class="step">Start<small>template · AI · blank</small></div>
+      <span class="arw">→</span>
+      <div class="step mid">Edit<small>see it · change it · publish-ready</small></div>
+      <span class="arw">→</span>
+      <div class="step">Publish<small>preview · domain · live</small></div>
+    </div>
+    <div class="muted" style="text-align:center;font-size:11px;margin-top:4px">The product is this line. "Modes" are gone — the rail is just the tools Edit needs, at the depth you asked for.</div>
+
+    <!-- ONE DEDUP EXAMPLE -->
+    <div class="kicker">One example — SEO had three doors, now it has one</div>
+    <div class="ex">
+      <div class="exbox bad">
+        <div class="h">Before — guess which door</div>
+        <div class="door cut">Dashboard › site › SEO tab</div>
+        <div class="door cut">Editor › Settings › SEO</div>
+        <div class="door cut">Editor › Pages drawer › SEO</div>
+      </div>
+      <div class="exarw">→</div>
+      <div class="exbox good">
+        <div class="h">After — one home + one override</div>
+        <div class="home">Editor › Site › SEO <small>(content: title/desc/OG + per-page)</small></div>
+        <div class="home">Dashboard › Technical SEO <small>(canonical · indexing · sitemap)</small></div>
+      </div>
+    </div>
+    <div class="muted" style="text-align:center;font-size:11px;margin-top:4px">Same rule applied to Analytics, Forms, Custom code, Publish — full list in <a href="m0b-spec.html" style="color:var(--ink-2);text-decoration:underline">M0-spec §dedup</a>.</div>
+
+    <!-- WHERE THE AGENCY LIVES -->
+    <div class="kicker">Where the agency lives — the 4 gaps, each one home (detail in M-agency)</div>
+    <div class="agencyrow">
+      <div class="acard"><div class="at">Shared theme</div><div class="ah">One DS at <b>Workspace</b>, pushed to every client site. Editor Theme → "publish to workspace."</div></div>
+      <div class="acard"><div class="at">Multi-client</div><div class="ah">Dashboard › <b>Clients</b> list → sites under each. One place to run 30 clients.</div></div>
+      <div class="acard"><div class="at">White-label</div><div class="ah">Workspace › <b>Branding</b> — what the agency's invited client sees. Agency brand, not Buildrik.</div></div>
+      <div class="acard"><div class="at">Speed</div><div class="ah"><b>Duplicate as template</b> — stand up client N+1 from client N in one action.</div></div>
+    </div>
+
+    <!-- DEPTH CONTROL (footnote, not a section) -->
+    <div class="foot-switch">
+      <b>How much shows (not the spine):</b> a per-user
+      <span class="tg"><span class="on">fewer</span><span>full</span></span>
+      controls setting — set in account settings, seeded by role. The agency works with <b>full controls</b>; a client gets the <b>calm, fewer-controls view</b> (same 4 tools, no jargon). The agency can preview it any time with <b>👁 Client view</b> in the editor. Reversible, hides-never-deletes.
+    </div>
+
+    <div class="muted" style="text-align:center;font-size:11px;margin-top:16px"><b>Next:</b> M-agency → M2 (Pro editor, canonical) → M1 (Simple client view) → M3 (dashboard) → M4 (the journey).</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>M-series:</b><a href="m0-spine.html" style="border-color:#fff;background:#fff;color:#334155;font-weight:600">M0 spine</a><a href="m0b-spec.html">M0-spec (dense)</a><a href="fix-styling-3reach.html">3-reach styling</a><a href="../2026-06-17-wireframe-rebuild-plan.md">Plan v2</a><a href="index.html">Map</a></div>
+</body></html>

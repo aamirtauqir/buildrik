@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 03 — Templates (public + house)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:880px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:8px} .crumb b{color:var(--ink-2)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;font-size:11px;margin-bottom:12px}
+  .seg button{padding:5px 12px;color:var(--ink-2);background:#fff;border-right:1px solid var(--line);cursor:pointer}
+  .seg button:last-child{border:none} .seg button.on{background:var(--accent);color:#fff;font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .tpl{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;text-decoration:none;color:inherit}
+  .tpl:hover{border-color:var(--accent)}
+  .tpl .thumb{height:96px;background:var(--bg-2);border-bottom:1px solid var(--line);display:grid;place-items:center;color:var(--ink-3);font-size:10px}
+  .tpl .b{padding:9px 11px}
+  .tpl .n{font-size:12.5px;font-weight:600}
+  .tpl .src{font-size:9px;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;padding:1px 5px}
+  .src.house{background:var(--accent);color:#fff} .src.pub{border:1px solid var(--line-d);color:var(--ink-3)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · 03 · TEMPLATES</div>
+<div class="screen">
+  <div class="topnote"><b>Templates — public + your house templates.</b> Rebuilt: a Start subflow that shows agency <b>house templates</b> (your saved builds) alongside public ones, each labelled by source. Picking a house template is the speed lever (<a href="m-agency.html" style="color:#fff;text-decoration:underline">M-agency</a>).</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind</b> › New site › Templates</div>
+    <div class="seg"><button class="on">All</button><button>House (yours)</button><button>Public</button><button>Business</button><button>Portfolio</button></div>
+    <div class="grid">
+      <a class="tpl" href="03b-template-preview.html"><div class="thumb">house · consultancy</div><div class="b"><div class="n">Northwind Consult <span class="src house">house</span></div></div></a>
+      <a class="tpl" href="03b-template-preview.html"><div class="thumb">house · cafe</div><div class="b"><div class="n">Northwind Cafe <span class="src house">house</span></div></div></a>
+      <a class="tpl" href="03b-template-preview.html"><div class="thumb">public · saas</div><div class="b"><div class="n">SaaS Landing <span class="src pub">public</span></div></div></a>
+      <a class="tpl" href="03b-template-preview.html"><div class="thumb">public · portfolio</div><div class="b"><div class="n">Portfolio Grid <span class="src pub">public</span></div></div></a>
+      <a class="tpl" href="03b-template-preview.html"><div class="thumb">public · restaurant</div><div class="b"><div class="n">Bistro <span class="src pub">public</span></div></div></a>
+      <a class="tpl" href="03b-template-preview.html"><div class="thumb">public · blog</div><div class="b"><div class="n">Writer <span class="src pub">public</span></div></div></a>
+    </div>
+    <div class="note2"><b>House templates = the agency edge.</b> Duplicate your best client build into a reusable template; new clients start there pre-skinned with the shared theme. Public templates are the beginner on-ramp. Preview every page before "Use".</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Templates:</b><a href="01-new-site.html">Start</a><a href="03b-template-preview.html">Preview</a><a href="m-agency.html">House templates</a><a href="index.html">Map</a></div>
+</body></html>

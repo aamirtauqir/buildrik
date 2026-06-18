@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="pt.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildrik — the canonical editor</title>
+<style>
+  :root{
+    --ink:#334155; --ink-2:#64748B; --ink-3:#94A3B8;
+    --line:#E2E8F0; --line-d:#CBD5E1; --fill:#F1F5F9; --fill-2:#E2E8F0; --bg:#fff; --bg-2:#F8FAFC;
+    --sel:#334155;
+    --font:"Inter Tight",sans-serif;
+    --mono:"Geist Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);color:var(--ink);background:#F1F5F9;font-size:13px;line-height:1.4}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+  .wf-stamp{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:60;background:#334155;color:#fff;font-size:10px;letter-spacing:.1em;padding:3px 12px;border-radius:3px;font-weight:600;opacity:.85}
+  .lbl{color:var(--ink-3);font-size:10px;letter-spacing:.04em;text-transform:uppercase}
+
+  .topnote{background:#334155;color:#F1F5F9;font-size:12px;line-height:1.5;padding:9px 14px}
+  .topnote b{color:#fff} .topnote code{font-family:var(--mono);font-size:11px;color:#ccc}
+
+  .app{display:grid;grid-template-rows:44px 1fr 28px;height:calc(100vh - 92px);background:var(--bg);border:1px solid var(--line)}
+  .topbar{display:flex;align-items:center;gap:7px;padding:0 11px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  /* bottom status bar — quiet utilities live here, out of the main chrome */
+  .statusbar{display:flex;align-items:center;gap:9px;padding:0 12px;border-top:1px solid var(--line);background:var(--bg-2);font-size:11px;color:var(--ink-3)}
+  .statusbar button{border:1px solid var(--line);background:var(--bg);border-radius:4px;padding:3px 9px;font-size:11px;color:var(--ink-2);cursor:pointer}
+  .statusbar button:hover{background:var(--fill);color:var(--ink)}
+  .statusbar button.on{border-color:var(--accent);color:var(--ink);font-weight:600}
+  .statusbar .sp{flex:1}
+  /* structure — a floating panel (z-index), opened from the status-bar icon. Never a fixed left panel. */
+  .structpop{position:fixed;left:12px;bottom:36px;width:244px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 22px rgba(0,0,0,.16);z-index:80;display:none;padding:8px}
+  .structpop.on{display:block}
+  .sp-head{font-size:11px;font-weight:600;padding:3px 6px 8px;border-bottom:1px solid var(--line);margin-bottom:5px;display:flex;flex-direction:column;gap:2px}
+  .sp-head .muted{font-weight:400;font-size:9px;color:var(--ink-3)}
+  .sp-row{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:5px;font-size:12px;color:var(--ink-2);cursor:pointer}
+  .sp-row:hover{background:var(--fill);color:var(--ink)}
+  .sp-row.on{background:var(--fill);color:var(--ink);font-weight:600}
+  .sp-row.nest{margin-left:16px}
+  .sp-row .ix{width:12px;color:var(--ink-3);font-size:10px}
+  .sp-note{font-size:9.5px;color:var(--ink-3);line-height:1.4;border-top:1px dashed var(--line);margin-top:5px;padding:6px 6px 2px}
+  .body{display:grid;grid-template-columns:66px 206px 1fr 274px;min-height:0}
+  .app[data-mode="simple"] .body{grid-template-columns:66px 206px 1fr 256px}
+
+  /* topbar */
+  .brand{width:24px;height:24px;border:1px solid var(--line);background:var(--fill);display:grid;place-items:center;font-size:11px;border-radius:5px;text-decoration:none;color:inherit;font-weight:600}
+  .crumb{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-3)}
+  .crumb b{color:var(--ink-2);font-weight:600}
+  .crumb .cur{color:var(--ink);font-weight:600}
+  .crumb .sep{color:var(--ink-3)}
+  .app[data-mode="simple"] .crumb .ag{display:none}
+  .tb-divider{width:1px;height:18px;background:var(--line);margin:0 2px}
+  .tb-btn{padding:4px 8px;border:1px solid var(--line);background:var(--bg);border-radius:3px;color:var(--ink-2);font-size:12px}
+  .tb-btn:hover{background:var(--fill)}
+  .tb-btn.pro-only{display:none}
+  .app[data-mode="pro"] .tb-btn.pro-only{display:inline-block}
+  .tb-btn.cmd{border-style:dashed;color:var(--ink);font-weight:600}
+  .tb-btn.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .seg button{padding:3px 8px;color:var(--ink-2);font-size:12px;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--accent);color:#fff}
+  .spacer{flex:1}
+  .saved{font-size:12px;color:var(--ink-2);display:flex;align-items:center;gap:5px;text-decoration:none}
+  .saved::before{content:"";width:7px;height:7px;border-radius:50%;border:1px solid var(--ink-2)}
+  /* AI assistant — a separate surface (not in the rail) */
+  .tb-btn.ai{border-color:var(--accent);color:var(--ink);font-weight:600;background:var(--fill)}
+  .aipanel{position:fixed;top:0;right:0;width:300px;height:100%;background:#fff;border-left:1px solid var(--line);box-shadow:-2px 0 14px rgba(0,0,0,.1);z-index:70;display:none;flex-direction:column}
+  .aipanel.on{display:flex}
+  .aip-head{padding:11px 14px;border-bottom:1px solid var(--line);font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center;background:var(--bg-2)}
+  .aip-head button{border:none;background:none;font-size:16px;cursor:pointer;color:var(--ink-3)}
+  .aip-body{padding:13px;overflow:auto}
+  .aip-sub{font-size:11px;color:var(--ink-2);margin-bottom:10px;line-height:1.4} .aip-sub b{color:var(--ink)}
+  .aip-prompt{border:1px dashed var(--line-d);border-radius:7px;padding:10px 12px;font-size:11.5px;color:var(--ink-3);min-height:46px;margin-bottom:12px}
+  .aip-cap{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:4px 0 6px}
+  .aip-row{border:1px solid var(--line);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--ink-2);margin-bottom:6px;cursor:pointer}
+  .aip-row:hover{border-color:var(--accent);color:var(--ink)} .aip-row b{color:var(--ink)}
+  .aip-note{font-size:10px;color:var(--ink-3);line-height:1.5;margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+
+  /* RAIL — always 4, Pro deepens */
+  .rail{border-right:1px solid var(--line);background:var(--bg-2);display:flex;flex-direction:column;align-items:stretch;padding:7px 6px;gap:4px}
+  .mode{border:1px solid var(--line);background:var(--bg);border-radius:5px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink-2);position:relative}
+  .mode:hover{background:var(--fill)}
+  .mode.on{border-color:var(--accent);border-width:2px;color:var(--ink);font-weight:600;background:#fff}
+  .mode .gly{font-size:14px;line-height:1}
+  .mode .nm{font-size:10.5px}
+  .mode .deep{position:absolute;top:3px;right:4px;font-size:7px;color:var(--ink-3)}
+  .app[data-mode="simple"] .mode .deep{display:none}
+  .rail .foot{margin-top:auto;font-size:8.5px;color:var(--ink-3);border:1px dashed var(--line-d);border-radius:4px;padding:5px 4px;text-align:center}
+  .rail .foot b{color:var(--ink);display:block;font-size:11px}
+
+  /* PANEL */
+  .panel{border-right:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;overflow:auto}
+  .panel-head{padding:9px 12px;border-bottom:1px solid var(--line);font-weight:600;background:var(--bg-2);display:flex;align-items:center;justify-content:space-between}
+  .panel-head .sub{font-weight:400;font-size:10px;color:var(--ink-3)}
+  .panel-body{padding:10px;display:none}
+  .panel-body.on{display:block}
+  .search{width:100%;border:1px dashed var(--line-d);border-radius:3px;padding:6px 9px;color:var(--ink-3);margin-bottom:9px;background:var(--bg)}
+  .seg2{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:10px}
+  .seg2 button{flex:1;padding:5px;font-size:11px;color:var(--ink-2);border-right:1px solid var(--line)}
+  .seg2 button:last-child{border-right:none}
+  .seg2 button.on{background:var(--accent);color:#fff}
+  .seg2 button.pro-only{display:none}
+  .app[data-mode="pro"] .seg2 button.pro-only{display:block}
+  .cat{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 5px;display:flex;justify-content:space-between}
+  .blocks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .block{border:1px solid var(--line);background:var(--fill);border-radius:3px;padding:12px 6px;text-align:center;color:var(--ink-2);font-size:11px}
+  .block:hover{border-color:var(--accent);background:var(--fill-2)}
+  .miniq{font-size:10px;color:var(--ink-3);margin:2px 0 8px;line-height:1.35}
+  .listrow{display:flex;align-items:center;gap:7px;padding:7px 8px;border:1px solid var(--line);border-radius:3px;margin-bottom:5px;font-size:12px;color:var(--ink-2);background:var(--bg)}
+  .listrow:hover{border-color:var(--accent);color:var(--ink)}
+  .listrow.on{border-color:var(--accent);color:var(--ink);font-weight:600;background:var(--fill)}
+  .listrow .ix{width:14px;color:var(--ink-3);font-size:10px}
+  .listrow.nest{margin-left:16px}
+  .prorow{display:none}
+  .app[data-mode="pro"] .prorow{display:flex}
+  .app[data-mode="pro"] .problock{display:block}
+  .problock{display:none}
+  .theme-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12px;color:var(--ink-2)}
+  .sw{width:18px;height:18px;border:1px solid var(--line-d);border-radius:3px;background:var(--fill)}
+  .asset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .asset{border:1px solid var(--line);background:var(--fill);border-radius:3px;aspect-ratio:1.3;display:grid;place-items:center;color:var(--ink-3);font-size:10px}
+
+  /* CANVAS */
+  .canvas-wrap{background:#ececec;display:grid;place-items:start center;overflow:auto;padding:20px}
+  .device-tag{text-align:center;font-size:10px;color:var(--ink-3);margin-bottom:6px;letter-spacing:.05em}
+  .frame{background:#fff;border:1px solid var(--line);width:100%;max-width:820px;overflow:hidden;box-shadow:0 1px 0 var(--line)}
+  .el{outline:1px dashed transparent;outline-offset:3px;cursor:pointer}
+  .el:hover{outline-color:var(--line-d)}
+  .el.sel{outline:2px dashed var(--sel);outline-offset:3px}
+  .site-hero{padding:44px 34px;text-align:center;border-bottom:1px dashed var(--line)}
+  .ph-h1{display:inline-block;background:var(--fill);border:1px solid var(--line);padding:10px 18px;color:var(--ink-2);font-weight:600;font-size:18px;margin-bottom:12px}
+  .ph-p{display:block;background:var(--fill);border:1px solid var(--line);color:var(--ink-3);padding:8px;max-width:380px;margin:0 auto 16px;font-size:12px}
+  .ph-btn{display:inline-block;background:var(--fill-2);border:1px solid var(--line-d);padding:9px 18px;color:var(--ink);font-weight:600;font-size:12px;border-radius:3px}
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:24px 34px}
+  .ccard{border:1px solid var(--line);padding:13px}
+  .ccard .ph-bar{height:10px;background:var(--fill);border:1px solid var(--line);margin-bottom:7px}
+  .ccard .ph-bar.s{width:55%}
+  .ph-btn2{margin-top:10px;display:inline-block;background:var(--fill-2);border:1px solid var(--line-d);padding:5px 12px;font-size:11px;border-radius:3px;color:var(--ink)}
+
+  /* INSPECTOR */
+  .insp{border-left:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;overflow:auto}
+  .insp-scope{padding:9px 11px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .scope-eyebrow{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+  .scope-line{font-size:13px;font-weight:600;margin-top:2px}
+  .reach{display:flex;gap:4px;margin-top:8px}
+  .reach .r{flex:1;border:1px solid var(--line);border-radius:4px;padding:5px 3px;text-align:center;font-size:9.5px;color:var(--ink-3);line-height:1.2}
+  .reach .r b{display:block;font-size:10px;color:var(--ink-2)}
+  .reach .r.on{border-color:var(--accent);border-width:1.5px;background:var(--fill)}
+  .reach .r.on b{color:var(--ink)}
+  .bp-row{display:none;gap:4px;margin-top:8px}
+  .app[data-mode="pro"] .bp-row{display:flex}
+  .pill{font-size:10px;padding:3px 7px;border:1px solid var(--line);border-radius:3px;color:var(--ink-3)}
+  .pill.on{border-color:var(--accent);color:var(--ink);font-weight:600}
+  .reach-note{font-size:10px;color:var(--ink-3);margin:7px 11px 0}
+  .reach-note b{color:var(--ink)}
+  .grp{font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);padding:8px 11px 2px;background:var(--bg-2);border-bottom:1px solid var(--line)}
+  .grp.pro-only{display:none}
+  .app[data-mode="pro"] .grp.pro-only{display:block}
+  .sec{border-bottom:1px solid var(--line)}
+  .sec.pro-only{display:none}
+  .app[data-mode="pro"] .sec.pro-only{display:block}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;font-weight:600;font-size:12px;cursor:pointer}
+  .sec-h .chev{color:var(--ink-3);font-size:10px}
+  .sec.collapsed .sec-c{display:none}
+  .sec.collapsed .sec-h .chev{transform:rotate(-90deg);display:inline-block}
+  .sec-c{padding:0 11px 11px}
+  .field{display:flex;align-items:center;justify-content:space-between;margin:7px 0;gap:8px}
+  .field label{color:var(--ink-2);font-size:12px}
+  .gbox{border:1px solid var(--line);background:var(--fill);border-radius:3px;padding:5px 8px;font-size:11px;color:var(--ink-2);min-width:60px;text-align:center}
+  .gbox.sq{min-width:0;width:22px;height:22px;padding:0}
+  .num{width:54px;border:1px solid var(--line);border-radius:3px;padding:5px;font-size:11px;text-align:center;color:var(--ink-2);background:var(--bg)}
+  .css-box{font-family:var(--mono);font-size:10px;color:var(--ink-2);background:var(--fill);border:1px solid var(--line);border-radius:3px;padding:7px;white-space:pre}
+  .classchip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line-d);border-radius:3px;padding:3px 7px;font-size:11px;font-family:var(--mono);color:var(--ink-2);background:var(--fill)}
+
+  .modecap{padding:8px 14px;background:var(--bg-2);border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-2)}
+  .modecap b{color:var(--ink)}
+
+  .anno{position:fixed;bottom:48px;left:12px;background:#334155;color:#fff;padding:8px 13px;border-radius:5px;font-size:12px;z-index:50;max-width:46vw;display:none}
+  .anno b{text-decoration:underline} .anno button{color:#999;margin-left:8px}
+
+  .proto-nav{background:#334155;color:#64748B;font-size:11px;display:flex;gap:6px;align-items:center;padding:7px 12px;flex-wrap:wrap}
+  .proto-nav b{color:#fff;margin-right:4px}
+  .proto-nav a{padding:3px 9px;border:1px solid #CBD5E1;border-radius:4px;color:#94A3B8;text-decoration:none}
+  .proto-nav a.hot{border-color:#fff;background:#fff;color:#334155;font-weight:600}
+</style>
+</head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · M-EDITOR · the canonical editor</div>
+
+<div class="topnote">
+  <b>M-editor — the canonical editor.</b> One calm surface. The rail is <b>4 structural tools</b> (Insert · Pages · Styles · Site) — never more. <b>Density</b> (how much depth shows) is a <b>per-user setting</b> seeded by role, set in account settings — <b>not a switch in the editor</b>, so the chrome never changes under you or your client. <b>AI is a separate assistant</b> (top-right ✨) that can edit the <b>whole design</b>, not just insert blocks. Page <b>structure</b> = the <b>⌗ icon in the bottom status bar</b> (opens a floating panel) + click-on-canvas. Never a fixed left panel the client must keep scanning.
+</div>
+
+<div class="app" id="app" data-mode="pro" data-rail="insert" data-device="desktop">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <a class="brand" href="m3-dashboard.html" title="Workspace home" id="brandHome">B</a>
+    <a class="tb-btn" href="12-site-detail.html" title="Exit to this site's dashboard" style="font-weight:600" id="exitBtn">‹ Exit</a>
+    <div class="crumb">
+      <b class="ag">Northwind</b><span class="sep ag">›</span><b class="ag">Acme</b><span class="sep ag">›</span><b>acme-main</b><span class="sep">›</span><span class="cur">Home ▾</span>
+    </div>
+    <span class="tb-divider"></span>
+    <button class="tb-btn">↶</button><button class="tb-btn">↷</button>
+    <button class="tb-btn pro-only" id="histBtn">↺ History ▾</button>
+    <span class="tb-divider"></span>
+    <div class="seg" id="deviceSeg"><button data-d="desktop" class="on">Desktop</button><button data-d="tablet">Tablet</button><button data-d="phone">Phone</button></div>
+    <span class="spacer"></span>
+    <button class="tb-btn ai" id="aiBtn">✨ Ask AI</button>
+    <span class="saved">Saved</span>
+    <button class="tb-btn" id="clientView" title="See exactly what the client's editor looks like">👁 Client view</button>
+    <button class="tb-btn" onclick="location.href='21-preview.html'">Preview</button>
+    <button class="tb-btn" id="pubBtn" style="border-color:var(--accent);font-weight:600" onclick="location.href='20-publish.html'">Publish</button>
+  </div>
+
+  <div class="body">
+    <!-- RAIL: always 4 -->
+    <div class="rail">
+      <button class="mode on" data-rail="insert"><span class="gly">＋</span><span class="nm">Insert</span></button>
+      <button class="mode" data-rail="pages"><span class="gly">▤</span><span class="nm">Pages</span></button>
+      <button class="mode" data-rail="styles"><span class="gly">◐</span><span class="nm">Styles</span></button>
+      <button class="mode" data-rail="site"><span class="gly">⚙</span><span class="nm">Site</span></button>
+      <div class="foot"><b>4</b>that's the whole rail</div>
+    </div>
+
+    <!-- PANEL -->
+    <div class="panel">
+      <div class="panel-head"><span id="panelTitle">Insert</span><span class="sub" id="panelSub">blocks · templates</span></div>
+
+      <!-- INSERT -->
+      <div class="panel-body on" data-body="insert">
+        <div class="search">Search to insert…  /</div>
+        <div class="seg2"><button class="on">Blocks</button><button>Templates</button></div>
+        <div class="miniq">Drag a block or template onto the page. <span class="problock">Your saved <b>Components</b> are below.</span> For AI, use <b>✨ Ask AI</b> (top-right).</div>
+        <div class="cat">Basic</div>
+        <div class="blocks"><div class="block">Heading</div><div class="block">Text</div><div class="block">Button</div><div class="block">Image</div></div>
+        <div class="cat">Sections <span>templates</span></div>
+        <div class="blocks"><div class="block">Hero</div><div class="block">Pricing</div><div class="block">FAQ</div><div class="block">CTA</div></div>
+        <div class="problock"><div class="cat">Your components</div>
+          <div class="blocks"><div class="block">Nav/primary</div><div class="block">Footer</div></div></div>
+      </div>
+
+      <!-- PAGES -->
+      <div class="panel-body" data-body="pages">
+        <div class="seg2" id="pagesSeg"><button class="on" data-v="list">Pages</button><button data-v="seo">Search</button></div>
+        <div data-view="list">
+          <div class="listrow on"><span class="ix">●</span> Home</div>
+          <div class="listrow"><span class="ix">○</span> About</div>
+          <div class="listrow"><span class="ix">○</span> Pricing</div>
+          <div class="listrow nest"><span class="ix">○</span> Pricing / FAQ</div>
+          <div class="listrow" style="border-style:dashed;color:var(--ink-3)"><span class="ix">＋</span> New page</div>
+          <div class="miniq" style="margin-top:9px">Per-page settings (title, slug, search listing, <span class="problock" style="display:inline">custom code</span>) open in the inspector when a page is selected. <b>Structure</b> = the <b>⌗ Structure</b> floating panel (bottom bar) + click-on-canvas. The breadcrumb shows where you are.</div>
+        </div>
+        <div data-view="seo" style="display:none">
+          <div class="cat">Search listing — per page <a href="m-seo.html" style="color:var(--ink-3)">full model ↗</a></div>
+          <div class="listrow"><span class="ix">●</span> Home <span style="margin-left:auto;font-size:9px;color:var(--ink-3)">✓ title·desc·OG</span></div>
+          <div class="listrow"><span class="ix">○</span> About <span style="margin-left:auto;font-size:9px;color:var(--ink-3)">⚠ no description</span></div>
+          <div class="listrow"><span class="ix">○</span> Pricing <span style="margin-left:auto;font-size:9px;color:var(--ink-3)">✓</span></div>
+          <div class="listrow"><span class="ix">○</span> Pricing / FAQ <span style="margin-left:auto;font-size:9px;color:var(--ink-3)">⚠ duplicate title</span></div>
+          <div class="miniq" style="margin-top:9px">Site defaults + per-page overrides, fixable in a row. Site-wide search settings (canonical · index · sitemap) live in the dashboard. <a href="m-seo.html" style="color:var(--ink-2)">SEO model ↗</a></div>
+        </div>
+      </div>
+
+      <!-- STYLES -->
+      <div class="panel-body" data-body="styles">
+        <div class="miniq">The site's look. <span class="problock" style="display:inline">Full controls reveal the token + preset editor; </span>the simple view shows swatches &amp; fonts.</div>
+        <div class="cat">Brand</div>
+        <div class="theme-row">Accent <span class="sw"></span></div>
+        <div class="theme-row">Text <span class="sw"></span></div>
+        <div class="theme-row">Background <span class="sw"></span></div>
+        <div class="cat">Type</div>
+        <div class="theme-row">Heading <span class="gbox">General Sans ▾</span></div>
+        <div class="theme-row">Body <span class="gbox">Inter ▾</span></div>
+        <div class="problock"><div class="cat">Tokens &amp; presets</div>
+          <div class="theme-row">Color tokens <span class="gbox" style="font-family:var(--mono)">14 ▾</span></div>
+          <div class="theme-row">Presets <span class="gbox">11 ▾</span></div>
+          <div class="theme-row" style="border:none;color:var(--ink-3)">Shared from workspace ◐ · <a href="m-agency.html" style="color:var(--ink-2)">push update</a></div></div>
+      </div>
+
+      <!-- SITE -->
+      <div class="panel-body" data-body="site">
+        <div class="miniq">Settings you author with the site. Domains, billing &amp; technical bits live in the <a href="m3-dashboard.html" style="color:var(--ink-2)">dashboard ↗</a>.</div>
+        <div class="theme-row">Search listing <span style="font-size:9px;color:var(--ink-3)">how this looks on Google</span> <span class="gbox" onclick="location.href='m-seo.html'" style="cursor:pointer">Edit ▾</span></div>
+        <div class="theme-row">Forms <span style="font-size:9px;color:var(--ink-3)">where submissions go</span> <span class="gbox">Edit ▾</span></div>
+        <div class="problock"><div class="cat">Designer only</div>
+          <div class="theme-row">Analytics tracking <span style="font-size:9px;color:var(--ink-3)">assign property</span> <span class="gbox" onclick="location.href='m-tracking.html'" style="cursor:pointer">Edit ▾</span></div>
+          <div class="theme-row">Custom code <span class="gbox">Edit ▾</span></div>
+          <div class="theme-row" style="color:var(--ink-3)">Technical SEO · Redirects <span style="font-size:9px">→ dashboard</span></div></div>
+      </div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="canvas-wrap">
+      <div>
+        <div class="device-tag" id="deviceTag">DESKTOP · 1280</div>
+        <div class="frame">
+          <div class="site-hero">
+            <span class="el ph-h1" data-name="this heading" data-reach="item">[ Heading ]</span><br>
+            <span class="el ph-p" data-name="this paragraph" data-reach="item">[ paragraph text placeholder ]</span>
+            <span class="el ph-btn" data-name="Get started button" data-reach="block" data-count="12">[ Button ]</span>
+          </div>
+          <div class="cards">
+            <div class="ccard"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-name="card button" data-reach="block" data-count="12">[ btn ]</span></div>
+            <div class="ccard"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-name="card button" data-reach="block" data-count="12">[ btn ]</span></div>
+            <div class="ccard"><div class="ph-bar"></div><div class="ph-bar s"></div><span class="el ph-btn2" data-name="card button" data-reach="block" data-count="12">[ btn ]</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSPECTOR -->
+    <div class="insp">
+      <div class="insp-scope">
+        <div class="scope-eyebrow">You are editing</div>
+        <div class="scope-line" id="scopeLine">this heading</div>
+        <div class="reach" id="reachPicker">
+          <div class="r on" data-r="item"><b>This item</b>just here</div>
+          <div class="r" data-r="block"><b>All like this</b>12 instances</div>
+          <div class="r" data-r="theme"><b>Whole site</b>every page</div>
+        </div>
+        <div class="reach-note" id="reachNote"><b>Just this</b> by default — nothing else moves. Widen only when you want to change all of them.</div>
+      </div>
+
+      <div class="grp">Edit</div>
+      <div class="sec"><div class="sec-h">Text <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Text</label><span class="gbox">Get started</span></div>
+        <div class="field"><label>Link</label><span class="gbox">/signup ▾</span></div></div></div>
+      <div class="sec"><div class="sec-h">Size &amp; spacing <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Size · padding</label><input class="num" value="11"></div>
+        <div class="field"><label>Align</label><span class="gbox">Center ▾</span></div></div></div>
+      <div class="sec"><div class="sec-h">Colors &amp; font <span class="chev">▾</span></div><div class="sec-c">
+        <div class="field"><label>Fill</label><span class="gbox sq" id="fillSwatch">▢</span></div>
+        <div class="field"><label>Text color</label><span class="gbox sq">▢</span></div>
+        <div class="field"><label>Font · weight</label><span class="gbox">Inherit ▾</span></div>
+        <div class="field"><label>Radius</label><input class="num" value="8"></div></div></div>
+
+      <!-- PRO buckets — same as canonical 59-inspector -->
+      <div class="grp pro-only">More controls</div>
+      <div class="sec pro-only collapsed"><div class="sec-h">Responsive <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>Show on phone</label><span class="gbox">Visible ▾</span></div><div class="field"><label>Display</label><span class="gbox">flex ▾</span></div></div></div>
+      <div class="sec pro-only collapsed"><div class="sec-h">Behavior · interactions <span class="chev">▾</span></div><div class="sec-c"><div class="field"><label>On click</label><span class="gbox">Navigate ▾</span></div><div class="field"><label>Opacity</label><input class="num" value="100"></div></div></div>
+      <div class="sec pro-only"><div class="sec-h">Advanced styling <span style="font-size:8px;color:var(--ink-3)">Designer</span> <span class="chev">▾</span></div><div class="sec-c"><span class="classchip">.btn-primary ×</span> <span class="classchip">+ class</span></div></div>
+    </div>
+  </div>
+  <!-- BOTTOM STATUS BAR — quiet utilities -->
+  <div class="statusbar">
+    <button id="structBtn">⌗ Page outline</button>
+    <span class="sp"></span>
+    <span>Editing: Home</span>
+  </div>
+</div>
+
+<!-- structure — floating panel (z-index), toggled from the status bar -->
+<div class="structpop" id="structpop">
+  <div class="sp-head">Page outline <span class="muted">click to jump · drag to reorder</span></div>
+  <div class="sp-row"><span class="ix">▸</span> Header</div>
+  <div class="sp-row on"><span class="ix">▾</span> Hero section</div>
+  <div class="sp-row nest"><span class="ix">·</span> Heading</div>
+  <div class="sp-row nest"><span class="ix">·</span> Button</div>
+  <div class="sp-row"><span class="ix">▸</span> Footer</div>
+  <div class="sp-note">Floating — opens from the ⌗ in the bottom bar, sits over the canvas, closes when you're done. Not a fixed left panel.</div>
+</div>
+
+<div class="modecap" id="modecap"><b>The canonical editor.</b> 4 structural tools in the rail (Insert · Pages · Styles · Site); how much shows is your <b>view setting</b> — fewer or full controls (role-seeded, changed in account settings — <b>not toggled here</b>). <b>AI</b> is the separate <b>✨ assistant</b> (top-right) that can edit the <b>whole design</b>. Structure = the <b>⌗ icon in the bottom bar</b> (a floating panel) + click-on-canvas. <span style="color:var(--ink-3)">This Designer/Admin view shows <b style="color:var(--ink)">Publish</b>; a <b style="color:var(--ink)">Content editor</b> with approval ON sees <b style="color:var(--ink)">"Send for review"</b> (<a href="m-approval.html" style="color:var(--ink-2)">M-approval</a>).</span></div>
+
+<!-- AI ASSISTANT — a separate surface, not a rail item -->
+<div class="aipanel" id="aipanel">
+  <div class="aip-head">✨ AI assistant <button id="aiClose">×</button></div>
+  <div class="aip-body">
+    <div class="aip-sub">Tell it what to change. It works on the <b>whole design</b>, not just one block.</div>
+    <div class="aip-prompt">"Restyle the site to our brand and rewrite the hero…"</div>
+    <div class="aip-cap">Try</div>
+    <div class="aip-row">✦ Restyle the whole site to our brand</div>
+    <div class="aip-row">✦ Write a new section from a brief</div>
+    <div class="aip-row">✦ Rewrite this page's copy</div>
+    <div class="aip-note">Every change is a <b>proposal</b> you preview, then accept or undo.</div>
+  </div>
+</div>
+
+<div class="anno" id="anno"><span id="annoText"></span><button id="annoClose">×</button></div>
+
+<div class="proto-nav">
+  <b>Editor:</b>
+  <a href="m0-spine.html">M0 spine</a>
+  <a href="m-agency.html">M-agency</a>
+  <a href="fix-styling-3reach.html" class="hot">3-reach styling</a>
+  <a href="71-command-palette.html">⌘K</a>
+  <a href="m-states.html">Micro-states</a>
+  <a href="s-editor-states.html">Editor states</a>
+  <a href="m0b-spec.html">M0-spec</a>
+  <a href="index.html">Map</a>
+</div>
+
+<script>
+  var app=document.getElementById('app');
+  function anno(h){var a=document.getElementById('anno');document.getElementById('annoText').innerHTML=h;a.style.display='block';}
+  document.getElementById('annoClose').onclick=function(){document.getElementById('anno').style.display='none';};
+
+  // preview the Client state — the agency's handoff check (uses existing simple-mode CSS)
+  var clientView=document.getElementById('clientView'), pubBtn=document.getElementById('pubBtn');
+  pubBtn.onclick=function(){location.href = app.getAttribute('data-mode')==='simple'?'m-approval.html':'20-publish.html';};
+  // invited clients land directly in client mode (a9-invite-accept opens ?view=client)
+  // a REAL client session = true client chrome: no agency escape-hatches (no "Exit client view",
+  // no agency workspace-home, no exit-to-site-ops). Distinct from the agency PREVIEW toggle below.
+  if(location.search.indexOf('view=client')>-1){
+    app.setAttribute('data-mode','simple');
+    pubBtn.textContent='Send for review';
+    clientView.style.display='none';
+    document.getElementById('brandHome').style.display='none';
+    document.getElementById('exitBtn').style.display='none';
+  }
+  clientView.onclick=function(){
+    var sim=app.getAttribute('data-mode')!=='simple';
+    app.setAttribute('data-mode', sim?'simple':'pro');
+    clientView.classList.toggle('on',sim);
+    clientView.textContent = sim?'👁 Exit client view':'👁 Client view';
+    pubBtn.textContent = sim?'Send for review':'Publish';
+    anno(sim?'<b>Previewing as Client.</b> Fewer controls, Designer-only items + history hidden, agency breadcrumb gone, and <b>Publish → Send for review</b>. Exactly what your client sees.':'<b>Back to your full view.</b>');
+  };
+
+  // AI assistant — a separate surface (opens the panel; not a rail item)
+  var aipanel=document.getElementById('aipanel');
+  document.getElementById('aiBtn').onclick=function(){aipanel.classList.add('on');};
+  document.getElementById('aiClose').onclick=function(){aipanel.classList.remove('on');};
+  document.querySelectorAll('.aip-row').forEach(function(r){r.onclick=function(){anno('<b>AI proposal:</b> '+r.textContent.replace(/^✦\s*/,'')+' — preview the change, then accept or undo. Whole-design edits supported.');};});
+
+  // structure — floating panel (z-index), toggled from the bottom status bar
+  var structpop=document.getElementById('structpop'), structBtn=document.getElementById('structBtn');
+  structBtn.onclick=function(e){e.stopPropagation();var open=structpop.classList.toggle('on');structBtn.classList.toggle('on',open);};
+  structpop.onclick=function(e){e.stopPropagation();};
+  document.addEventListener('click',function(){structpop.classList.remove('on');structBtn.classList.remove('on');});
+  document.querySelectorAll('.sp-row').forEach(function(r){r.onclick=function(){anno('Jumped to <b>'+r.textContent.trim()+'</b> on the canvas. Drag rows to reorder. Structure is a floating panel from the bottom bar — not a fixed left panel.');};});
+
+  var SUB={insert:'blocks · templates',pages:'pages · search',styles:'colors · fonts',site:'search · forms'};
+  document.querySelectorAll('.mode').forEach(function(m){m.onclick=function(){
+    var r=m.getAttribute('data-rail');
+    document.querySelectorAll('.mode').forEach(function(x){x.classList.remove('on');});m.classList.add('on');
+    app.setAttribute('data-rail',r);
+    document.querySelectorAll('.panel-body').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-body')===r);});
+    document.getElementById('panelTitle').textContent=r.charAt(0).toUpperCase()+r.slice(1);
+    document.getElementById('panelSub').textContent=SUB[r];
+  };});
+
+  document.querySelectorAll('#pagesSeg button').forEach(function(b){b.onclick=function(){
+    document.querySelectorAll('#pagesSeg button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+    var v=b.getAttribute('data-v');
+    document.querySelectorAll('[data-body="pages"] [data-view]').forEach(function(x){x.style.display=x.getAttribute('data-view')===v?'block':'none';});
+  };});
+
+  document.querySelectorAll('#deviceSeg button').forEach(function(b){b.onclick=function(){
+    document.querySelectorAll('#deviceSeg button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+    var d=b.getAttribute('data-d');app.setAttribute('data-device',d);
+    document.getElementById('deviceTag').textContent=(d==='desktop'?'DESKTOP · 1280':d==='tablet'?'TABLET · 768':'PHONE · 375');
+  };});
+
+  document.querySelectorAll('.sec-h').forEach(function(h){h.onclick=function(){h.parentElement.classList.toggle('collapsed');};});
+
+  var REACH={item:'<b>This item</b> — a one-off change. Nothing else moves.',block:'<b>All like this</b> — changes all 12 like this; confirms the count first. Class vs component decided for you.',theme:'<b>Whole site</b> — every page (accent/font/radius). Re-points the whole site.'};
+  function setReach(r){document.querySelectorAll('#reachPicker .r').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-r')===r);});document.getElementById('reachNote').innerHTML=REACH[r];}
+  document.querySelectorAll('#reachPicker .r').forEach(function(x){x.onclick=function(){setReach(x.getAttribute('data-r'));anno(REACH[x.getAttribute('data-r')]);};});
+
+  document.querySelectorAll('.el').forEach(function(el){el.onclick=function(e){e.stopPropagation();
+    document.querySelectorAll('.el').forEach(function(x){x.classList.remove('sel');});el.classList.add('sel');
+    document.getElementById('scopeLine').textContent=el.getAttribute('data-name');
+    setReach('item');
+    anno('Selected <b>'+el.getAttribute('data-name')+'</b> — reach defaults to This item. Safe.');
+  };});
+  document.getElementById('fillSwatch').onclick=function(){var on=document.querySelector('#reachPicker .r.on').getAttribute('data-r');anno(on==='item'?'Changed Fill on <b>this item only</b>.':on==='block'?'Fill at <b>All like this</b> → confirms "changes 12".':'Fill at <b>Whole site</b> → re-points brand accent.');};
+  document.getElementById('histBtn').onclick=function(){anno('<b>In-canvas history</b> — undo/redo timeline for this edit session (Pro, stays in the editor). Published <b>site versions</b> + restore live in the dashboard (Site detail › Versions).');};
+</script>
+</body>
+</html>

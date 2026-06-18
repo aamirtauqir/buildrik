@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Collaboration</title><link rel="stylesheet" href="pt.css">
+<style>
+  .stage{position:relative;border:1px dashed var(--line);min-height:320px;background:var(--bg-2)}
+  .cursor{position:absolute;font-size:10px;color:#fff;background:var(--accent);padding:1px 6px;border-radius:3px 8px 8px 8px}
+  .av{width:26px;height:26px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-size:10px;background:var(--ink-3);color:#fff;margin-left:-8px}
+</style></head>
+<body data-surface="editor">
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#F8FAFC;color:#334155;font:600 11.5px/1.45 "Inter Tight",sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #E2E8F0">↻ RECONCILED ROLE (2026-06-18): Presence/review ONLY; no production-ready multiplayer editing.</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>Live collaboration (presence)</b> · grounded in <code>CollabOperation</code> + <code>/api/sse/collab</code> · <b>⚠ DEMO-ONLY honesty:</b> real-time merge has known OT convergence bugs — presence/UI shown, multi-writer merge NOT production-ready</div>
+  <div class="pad">
+    <div class="row" style="justify-content:flex-end;margin-bottom:10px"><div class="row" style="gap:0"><span class="av">JD</span><span class="av" style="background:#777">SK</span><span class="av" style="background:#999">+2</span></div><button class="btn" style="margin-left:10px">Share to edit</button></div>
+    <div class="stage">
+      <div style="position:absolute;inset:20px;display:grid;place-items:center"><div class="ph-img" style="width:55%;height:60px;opacity:.4">shared canvas</div></div>
+      <div class="cursor" style="top:60px;left:120px">Jane (you)</div>
+      <div class="cursor" style="top:140px;left:300px;background:#777">Sam — editing heading</div>
+      <div style="position:absolute;top:135px;left:280px;width:120px;height:24px;border:2px solid #777;border-radius:3px;opacity:.6"></div>
+      <div class="cursor" style="top:210px;left:200px;background:#999">Kai — viewing</div>
+    </div>
+    <div class="note" style="margin-top:12px;background:#fff;border:2px solid var(--ink)"><b>⚠ Honest status (memory: collab production-blocked):</b> presence (cursors, avatar stack, "who's editing" locks) is the safe, shippable layer. Real-time concurrent <i>merge</i> is NOT shipped — the OT layer has convergence bugs (last-write-wins, remote-clobbers-local). Until a dedicated OT/CRDT arc (eval Yjs), collab ships as: presence + single-writer with soft locks + the conflict screen (61). This wireframe documents the intended UI, not a working multiplayer guarantee.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor:</b><a href="m-editor.html">Spine</a><a href="61-conflict.html">Conflict</a><a href="m-roles.html">Roles</a><a href="e5-collab.html" class="here">Collab</a><a href="d4-share-access.html">Share</a><a href="index.html">Map</a></div>
+</body></html>

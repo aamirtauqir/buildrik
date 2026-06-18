@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Sharing</title><link rel="stylesheet" href="pt.css">
+<style>.lk{display:grid;grid-template-columns:1fr 90px 70px 56px;gap:10px;align-items:center;font-size:12px;padding:9px 0;border-bottom:1px dashed var(--line)}</style></head>
+<body data-surface="dashboard">
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#F8FAFC;color:#334155;font:600 11.5px/1.45 "Inter Tight",sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #E2E8F0">↻ RECONCILED ROLE (2026-06-18): = Site-detail 'Sharing': preview links · password · expiry · access requests.</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>Sharing (owner side)</b> · grounded in <code>siteDetail.sharing.*</code> (list/create/revoke) + <code>ShareLink</code> · the management screen behind the public 91-share states</div>
+    <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span></div>
+  <div class="stabs"><a href="12-site-detail.html">Overview</a><a href="d6-domains.html">Domains</a><a href="19-analytics.html">Traffic</a><a href="d2-forms.html">Forms inbox</a><a href="d4-share-access.html" class="on">Sharing</a><a href="14-site-settings.html">Publishing</a><a href="58-history.html">Versions</a></div>
+  
+    <div class="muted" style="font-size:11px;margin-bottom:8px"><a href="12-site-detail.html" style="color:var(--ink-2)">acme-main</a> › Sharing</div>
+    <div class="row" style="justify-content:space-between;margin-bottom:12px"><div class="h1" style="font-size:18px">Share links</div><button class="btn btn-fill btn-strong">+ Create link</button></div>
+    <div class="muted" style="font-size:12px;margin-bottom:12px">Private preview links for an unpublished or work-in-progress site. Optional password + expiry.</div>
+
+    <div class="box pad" style="margin-bottom:14px">
+      <div class="lk" style="color:var(--ink-3);font-size:10px;text-transform:uppercase"><span>Link</span><span>Protection</span><span>Views</span><span></span></div>
+      <div class="lk"><span><b>Client review</b><div class="muted" style="font-size:10px;font-family:var(--mono)">/share/a1b2c3</div></span><span class="tag-exists">🔒 password</span><span class="muted">24</span><span class="btn" style="padding:2px 7px">Revoke</span></div>
+      <div class="lk"><span><b>Quick look</b><div class="muted" style="font-size:10px;font-family:var(--mono)">/share/x9y8z7</div></span><span class="muted" style="font-size:10.5px">open · exp 7d</span><span class="muted">3</span><span class="btn" style="padding:2px 7px">Revoke</span></div>
+      <div class="lk" style="border:none"><span style="color:var(--ink-3)"><b>Old draft</b><div class="muted" style="font-size:10px">expired</div></span><span class="muted" style="font-size:10.5px">expired</span><span class="muted">11</span><span class="btn" style="padding:2px 7px">Delete</span></div>
+    </div>
+
+    <div class="box pad" style="background:var(--fill)">
+      <div class="lbl" style="margin-bottom:8px">Create share link</div>
+      <div class="lbl">Name</div><div class="input" style="width:100%;margin:5px 0 8px">Client review</div>
+      <div class="grid2"><div><div class="lbl">Password</div><div class="row" style="margin-top:5px"><span class="tog" style="display:inline-block;width:34px;height:18px;border:1px solid var(--line-d);border-radius:999px"></span><span class="muted" style="font-size:11px;align-self:center">optional</span></div></div><div><div class="lbl">Expires</div><div class="input" style="margin-top:5px">7 days ▾</div></div></div>
+      <a class="btn btn-fill" href="d4-share-access.html" style="margin-top:10px;display:inline-block;text-decoration:none">Create &amp; copy link ✓</a>
+    </div>
+    <div class="note" style="margin-top:14px;font-size:10.5px"><b>Plan-gated (grounded):</b> max expiry + password support depend on plan; viewers can't create links unless the workspace allows it (<code>WSSharingSettings.allowEditors</code>). Visitor experience = screen 91 (valid / password / expired).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Site:</b><a href="12-site-detail.html">Site detail</a><a href="d2-forms.html">Forms</a><a href="d3-redirects.html">Redirects</a><a href="d4-share-access.html" class="here">Sharing</a><a href="91-share.html">Public view</a><a href="d5-seo.html">SEO</a><a href="index.html">Map</a></div>
+</body></html>

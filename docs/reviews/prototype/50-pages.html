@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 50 — Pages + search listings</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:920px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:8px}
+  .crumb b{color:var(--ink-2)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;font-size:11px;margin-bottom:10px}
+  .seg button{padding:5px 12px;color:var(--ink-2);background:#fff;border-right:1px solid var(--line);cursor:pointer}
+  .seg button:last-child{border:none}
+  .seg button.on{background:var(--accent);color:#fff;font-weight:600}
+  .listrow{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--line);border-radius:6px;margin-bottom:5px;font-size:12.5px;color:var(--ink-2)}
+  .listrow.on{border-color:var(--accent);font-weight:600;color:var(--ink);background:var(--fill)}
+  .listrow .ix{width:14px;color:var(--ink-3);font-size:10px}
+  .listrow.nest{margin-left:18px}
+  table{width:100%;border-collapse:collapse;font-size:11.5px}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:middle}
+  th{background:var(--fill);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  .src{font-size:8.5px;letter-spacing:.02em;text-transform:uppercase;border-radius:3px;padding:1px 5px;margin-left:5px}
+  .src.inh{border:1px dashed var(--line-d);color:var(--ink-3)} .src.ovr{background:var(--accent);color:#fff}
+  .flag{font-size:9px;border-radius:3px;padding:1px 6px} .flag.ok{border:1px solid var(--line-d);color:var(--ink-3)} .flag.warn{border:1px solid var(--ink);color:var(--ink);font-weight:600}
+  .noindex{font-size:9px;border:1px dashed var(--ink);border-radius:3px;padding:1px 5px;color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px}
+  .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · 50 · PAGES + SEO</div>
+<div class="screen">
+  <div class="topnote"><b>Pages — now with the search-listings table.</b> Rebuilt: the old single-page SEO form alone doesn't scale to 50 pages. The "SEO" view shows every page's <b>effective</b> title/description with inherited-vs-custom tags + gap flags. The many-page answer (<a href="m-seo.html" style="color:#fff;text-decoration:underline">M-seo</a>). Editor › Pages.</div>
+  <div class="wrap">
+    <div class="crumb"><b>acme-main</b> › Pages</div>
+    <div class="seg"><button>Pages</button><button class="on">Search listings</button></div>
+    <table>
+      <tr><th style="width:16%">Page</th><th style="width:30%">Title (effective)</th><th style="width:28%">Description</th><th style="width:9%">Index</th><th>Status</th></tr>
+      <tr><td><b>Home</b> <span class="muted" style="font-size:10px">/</span></td><td>Acme · Build sites fast <span class="src ovr">custom</span></td><td>"Acme builds sites…" <span class="src ovr">custom</span></td><td>✓</td><td><span class="flag ok">good</span></td></tr>
+      <tr><td><b>Pricing</b> <span class="muted" style="font-size:10px">/pricing</span></td><td>Pricing · Acme <span class="src ovr">custom</span></td><td>"Simple plans…" <span class="src ovr">custom</span></td><td>✓</td><td><span class="flag ok">good</span></td></tr>
+      <tr><td><b>About</b> <span class="muted" style="font-size:10px">/about</span></td><td>About · Acme <span class="src inh">site default</span></td><td><span class="muted" style="font-size:10px">— missing —</span></td><td>✓</td><td><span class="flag warn">no description</span></td></tr>
+      <tr><td><b>Features</b> <span class="muted" style="font-size:10px">/features</span></td><td>Acme · Acme <span class="src inh">site default</span></td><td>"Acme builds…" <span class="src inh">site default</span></td><td>✓</td><td><span class="flag warn">duplicate title</span></td></tr>
+      <tr><td><b>Thanks</b> <span class="muted" style="font-size:10px">/thanks</span></td><td>Thanks · Acme <span class="src inh">site default</span></td><td>site default</td><td><span class="noindex">hidden from Google</span></td><td><span class="flag ok">hidden ok</span></td></tr>
+      <tr><td colspan="5" class="muted" style="text-align:center;font-size:11px">2 issues: 1 missing description · 1 duplicate title · <a href="m-seo.html" style="color:var(--ink-2)">AI fill gaps ↗</a></td></tr>
+    </table>
+    <div class="note2"><b>Inherit by default, override where it matters.</b> Each page shows the value Google will see + whether it's site-default (inherited) or page-set (custom). Filter by "has issues." Per-page editing opens in the page's search-listing editor. Site title-template + technical SEO sit elsewhere (content→<a href="m-editor.html" style="color:var(--ink-2)">Editor Site</a>, technical→<a href="d5-seo.html" style="color:var(--ink-2)">Dashboard</a>).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Pages:</b><a href="m-editor.html">Editor</a><a href="m-seo.html">SEO model</a><a href="50b-page-ops.html">Page ops</a><a href="d5-seo.html">Technical SEO</a><a href="index.html">Map</a></div>
+</body></html>

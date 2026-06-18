@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik — Wireframe Map</title><link rel="stylesheet" href="pt.css">
+<style>
+  .map{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .card{border:1px solid var(--line);border-radius:6px;padding:11px;text-decoration:none;color:var(--ink);background:#fff;display:block}
+  .card:hover{border-color:var(--accent);background:var(--fill)}
+  .card .n{font-size:9px;color:var(--ink-3);font-family:var(--mono)}
+  .card .t{font-size:12.5px;font-weight:600;margin:3px 0}
+  .card .d{font-size:10.5px;color:var(--ink-2);line-height:1.3}
+  .stage{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin:20px 0 8px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>Buildrik redesign — wireframe map</b> · 100+ low-fi screens, grounded in current functionality × the 4 solution docs · grayscale, clickable, not final UI. <b>Scope-completeness layer (2026-06-18):</b> every feature now renders its empty / loading / error / failure states — see the <b>S-* state boards</b> in stage 3.</div>
+  <div class="pad">
+    <div class="h1" style="margin-bottom:4px">The whole flow</div>
+    <div class="muted" style="font-size:12px;margin-bottom:6px">Click any screen. Each has its own bottom nav to keep walking. Tags inside: <span class="tag-exists">exists</span> = current functionality, <span class="tag-new">SOLUTION</span> = decided reorg.</div>
+
+    <div class="stage" style="color:var(--ink);border-bottom-style:solid;border-color:var(--accent)">0 · REBUILD v2 — the spine (start here · 2026-06-17)</div>
+    <div class="muted" style="font-size:11px;margin-bottom:8px">Codex + CEO-lens converged: the old set maximized <i>coverage</i> → overcrowded; it missed the <b>agency layer</b>. v2 = one rule (one home per concept), one journey (Start→Edit→Publish), depth on demand (fewer/full controls). Plan: <a href="../2026-06-17-wireframe-rebuild-plan.md">rebuild-plan v2</a>.</div>
+    <div class="map">
+      <a class="card" href="m0-spine.html" style="border-color:var(--accent);border-width:2px"><div class="n">M0</div><div class="t">The spine</div><div class="d">Founder artifact · tree + journey + boundary · 30-sec scan</div></a>
+      <a class="card" href="m-agency.html" style="border-color:var(--accent)"><div class="n">M·ag</div><div class="t">Agency layer</div><div class="d">Clients · shared theme · white-label · speed</div></a>
+      <a class="card" href="m-editor.html" style="border-color:var(--accent)"><div class="n">M2/M1</div><div class="t">Editor</div><div class="d">4-tool rail · flip switch live · canonical</div></a>
+      <a class="card" href="m3-dashboard.html" style="border-color:var(--accent)"><div class="n">M3</div><div class="t">Dashboard home</div><div class="d">Run the business · the bridge</div></a>
+      <a class="card" href="m4-journey.html" style="border-color:var(--accent)"><div class="n">M4</div><div class="t">The journey</div><div class="d">Start → Edit → Publish · always oriented</div></a>
+      <a class="card" href="m-ownership.html" style="border-color:var(--accent);border-width:2px"><div class="n">M·own</div><div class="t">Ownership map</div><div class="d">One home per concept · codex #1 fix · 4 founder calls</div></a>
+      <a class="card" href="m-seo.html" style="border-color:var(--accent)"><div class="n">M·seo</div><div class="t">SEO at scale</div><div class="d">3 levels + overview table · many-page model</div></a>
+      <a class="card" href="m-roles.html" style="border-color:var(--accent);border-width:2px"><div class="n">M·role</div><div class="t">Role matrix</div><div class="d">Capability by role · 5th decision · density≠permission</div></a>
+      <a class="card" href="m-ds-push.html" style="border-color:var(--accent)"><div class="n">M·push</div><div class="t">Shared theme push</div><div class="d">Change contract · diff · override · per-site result</div></a>
+            <a class="card" href="m-states.html" style="border-color:var(--accent)"><div class="n">M·st8</div><div class="t">Undefined states</div><div class="d">inspector-empty · slug-redirect · zero-clients · nav · why-disabled</div></a>
+      <a class="card" href="m-tracking.html" style="border-color:var(--accent)"><div class="n">M·trk</div><div class="t">Tracking (analytics)</div><div class="d">3-layer: connect · assign · view</div></a>
+      <a class="card" href="m-approval.html" style="border-color:var(--accent)"><div class="n">M·apr</div><div class="t">Client approval</div><div class="d">edit → review diff → publish · white-label gate</div></a>
+      <a class="card" href="m-comments.html" style="border-color:var(--accent)"><div class="n">M·cm</div><div class="t">Client comment review</div><div class="d">Viewer pins changes on preview · no canvas access · agency resolves</div></a>
+      <a class="card" href="m0b-spec.html"><div class="n">spec</div><div class="t">M0-spec (dense)</div><div class="d">Full inventory · dedup table · rails</div></a>
+    </div>
+
+    <div class="stage">1 · Entry &amp; on-ramp</div>
+    <div class="map">
+      <a class="card" href="00-signin.html"><div class="n">00</div><div class="t">Sign in</div><div class="d">Magic-link default · password + 2FA</div></a>
+      <a class="card" href="04-role-select.html"><div class="n">04</div><div class="t">Role select</div><div class="d">Seeds your view (fewer/full) §5.2</div></a>
+      <a class="card" href="04b-setup.html"><div class="n">04b</div><div class="t">Project setup</div><div class="d">Workspace name · type · seeds AI</div></a>
+      <a class="card" href="01-new-site.html"><div class="n">01</div><div class="t">New site</div><div class="d">Template / AI / Blank path picker</div></a>
+      <a class="card" href="02-ai-wizard.html"><div class="n">02</div><div class="t">AI wizard</div><div class="d">3-step + fail/salvage §8.5</div></a>
+      <a class="card" href="03-template-gallery.html"><div class="n">03</div><div class="t">Template gallery</div><div class="d">Real categories · preview→Use</div></a>
+      <a class="card" href="03b-template-preview.html"><div class="n">03b</div><div class="t">Template preview</div><div class="d">See all pages before Use §7</div></a>
+    </div>
+
+    <div class="stage">2 · Editor (build the site)</div>
+    <div class="map">
+      <a class="card" href="40-edit-scope.html"><div class="n">40</div><div class="t">Edit scope</div><div class="d">§6.5 propagation · the beginner-killer</div></a>
+      <a class="card" href="41-scope-picker.html"><div class="n">41</div><div class="t">Reach picker</div><div class="d">3 reaches: item · block · theme</div></a>
+      <a class="card" href="fix-styling-3reach.html"><div class="n">3r</div><div class="t">3-reach styling model</div><div class="d">item · block · whole-site — the reach model</div></a>
+      <a class="card" href="50-pages.html"><div class="n">50</div><div class="t">Pages</div><div class="d">list · search listings · page override</div></a>
+      <a class="card" href="51-layers.html"><div class="n">51</div><div class="t">Structure</div><div class="d">⌗ floating panel (bottom bar)</div></a>
+      <a class="card" href="52-add.html"><div class="n">52</div><div class="t">Insert</div><div class="d">blocks · templates (AI = ✨ assistant)</div></a>
+      <a class="card" href="53-settings.html"><div class="n">53</div><div class="t">Editor › Site</div><div class="d">search listing · forms · tracking · code</div></a>
+      <a class="card" href="forms-config.html"><div class="n">fc</div><div class="t">Forms config</div><div class="d">fields · where responses go · after-submit · spam</div></a>
+      <a class="card" href="56-media.html"><div class="n">56</div><div class="t">Asset picker</div><div class="d">contextual · one store, two doors</div></a>
+      <a class="card" href="56b-stock.html"><div class="n">56b</div><div class="t">Stock photos</div><div class="d">In-app search · attributed</div></a>
+      <a class="card" href="56c-image-editor.html"><div class="n">56c</div><div class="t">Image editor</div><div class="d">Crop/adjust · icons · versions</div></a>
+      <a class="card" href="59-inspector.html"><div class="n">59</div><div class="t">Inspector</div><div class="d">3-group · 3-reach · role/density states</div></a>
+      <a class="card" href="59b-inspector-states.html"><div class="n">59b</div><div class="t">States × breakpoints</div><div class="d">Hover/focus · responsive override</div></a>
+      <a class="card" href="ds2-styles.html"><div class="n">ds2</div><div class="t">Styles / presets</div><div class="d">edited in editor · binds to shared theme</div></a>
+      <a class="card" href="50b-page-ops.html"><div class="n">50b</div><div class="t">Page ops</div><div class="d">Menu · delete-guard · link-picker</div></a>
+    </div>
+
+    <div class="stage">3 · Behavior &amp; state coverage (§8) — every feature's unhappy paths</div>
+    <div class="muted" style="font-size:11px;margin-bottom:8px">Codex scope-review (2026-06-18) raised real-app completeness from happy-path to production: the six <b>S-* boards</b> render the empty / loading / error / failure / denied state for each surface, instantiating the <a href="80-states.html">state standard</a>. No feature ships silent.</div>
+    <div class="map">
+      <a class="card" href="73-lifecycle.html" style="border-color:var(--accent)"><div class="n">73</div><div class="t">Lifecycle stateboard</div><div class="d">edit→review→publish→domain→live + conflict/restore, one board</div></a>
+      <a class="card" href="s-editor-states.html" style="border-color:var(--accent)"><div class="n">S·ed</div><div class="t">Editor states</div><div class="d">blank canvas · AI fail/partial/conflict · upload fail · paste/keys/undo/touch</div></a>
+      <a class="card" href="s-media-states.html" style="border-color:var(--accent)"><div class="n">S·md</div><div class="t">Media states</div><div class="d">empty · upload type/size/quota/processing · stock down · delete-in-use</div></a>
+      <a class="card" href="s-forms-states.html" style="border-color:var(--accent)"><div class="n">S·fm</div><div class="t">Forms states</div><div class="d">inbox empty · routing broken · visitor submit/validation/spam/error</div></a>
+      <a class="card" href="s-dashboard-states.html" style="border-color:var(--accent)"><div class="n">S·db</div><div class="t">Dashboard states</div><div class="d">zero-sites home · skeleton · search no-results · scale/paginate</div></a>
+      <a class="card" href="s-ship-states.html" style="border-color:var(--accent)"><div class="n">S·sh</div><div class="t">Ship states</div><div class="d">preflight block · DNS stuck · cancel · restore/rollback/approve fail</div></a>
+      <a class="card" href="s-account-states.html" style="border-color:var(--accent)"><div class="n">S·ac</div><div class="t">Account states</div><div class="d">permission denied · last-admin/seat guards · reconnect · card failed</div></a>
+      <a class="card" href="60-save-states.html"><div class="n">60</div><div class="t">Save lifecycle</div><div class="d">Saved/Saving/Offline/Failed</div></a>
+      <a class="card" href="61-conflict.html"><div class="n">61</div><div class="t">Save conflict</div><div class="d">Stale-session · never clobber</div></a>
+      <a class="card" href="21-preview.html"><div class="n">21</div><div class="t">Preview</div><div class="d">§8.2 visitor view · exit bar</div></a>
+    </div>
+
+    <div class="stage">4 · Ship &amp; serve</div>
+    <div class="map">
+      <a class="card" href="20-publish.html"><div class="n">20</div><div class="t">Publish</div><div class="d">Pre-flight→deploy→live/failed</div></a>
+      <a class="card" href="22-domain-pending.html"><div class="n">22</div><div class="t">Custom domain</div><div class="d">§8.6 enter→DNS→pending→live</div></a>
+      <a class="card" href="30-paywall.html"><div class="n">30</div><div class="t">Paywall</div><div class="d">§8 contextual gate · escape</div></a>
+      <a class="card" href="90-published.html"><div class="n">90</div><div class="t">Live site + 404</div><div class="d">§9 visitor output · badge</div></a>
+      <a class="card" href="91-share.html"><div class="n">91</div><div class="t">Share-link states</div><div class="d">§9 valid / password / expired</div></a>
+    </div>
+
+    <div class="stage">5 · Dashboard (run the business)</div>
+    <div class="map">
+      <a class="card" href="11-sites.html"><div class="n">11</div><div class="t">Sites list</div><div class="d">Status SSOT · row ops</div></a>
+      <a class="card" href="12-site-detail.html"><div class="n">12</div><div class="t">Site detail</div><div class="d">URLs/domain/history · Edit jump</div></a>
+      <a class="card" href="14-site-settings.html"><div class="n">14</div><div class="t">Site › Publishing</div><div class="d">redirects · technical SEO · diagnostics (ops)</div></a>
+      <a class="card" href="15-domains.html"><div class="n">15</div><div class="t">Domains</div><div class="d">All domains + status · connect</div></a>
+      <a class="card" href="16-billing.html"><div class="n">16</div><div class="t">Billing</div><div class="d">Plan/usage · gate target §8.8</div></a>
+      <a class="card" href="17-media.html"><div class="n">17</div><div class="t">Assets</div><div class="d">workspace · cross-site (one store)</div></a>
+      <a class="card" href="18-workspace.html"><div class="n">18</div><div class="t">Workspace</div><div class="d">team · shared theme · branding · billing</div></a>
+      <a class="card" href="ds1-design-system.html"><div class="n">ds1</div><div class="t">Shared theme</div><div class="d">workspace source object · synced/override (edit via editor Styles)</div></a>
+      <a class="card" href="ds3-ds-tools.html"><div class="n">ds3</div><div class="t">DS tools</div><div class="d">workspace · starter · AI · review/push</div></a>
+      <a class="card" href="58-history.html"><div class="n">58</div><div class="t">Site versions</div><div class="d">publish history · restore (dashboard, not editor undo)</div></a>
+      <a class="card" href="19-analytics.html"><div class="n">19</div><div class="t">Traffic (view)</div><div class="d">reports · diagnostics · no connect (connect=workspace)</div></a>
+    </div>
+
+    <div class="stage">6 · Standards &amp; patterns</div>
+    <div class="map">
+      <a class="card" href="80-states.html"><div class="n">80</div><div class="t">State standard §10</div><div class="d">Loading/empty/error/denied</div></a>
+      <a class="card" href="71-command-palette.html"><div class="n">71</div><div class="t">⌘K palette</div><div class="d">Finder + "where did X go" §11.5</div></a>
+      <a class="card" href="70-confirm.html"><div class="n">70</div><div class="t">⋯ + Confirm</div><div class="d">Delete/transfer · type-to-confirm</div></a>
+    </div>
+
+    <div class="stage">7 · Auth &amp; account (full)</div>
+    <div class="map">
+      <a class="card" href="a1-signup.html"><div class="n">a1</div><div class="t">Sign up</div><div class="d">Email-first · password strength</div></a>
+      <a class="card" href="a2-verify-email.html"><div class="n">a2</div><div class="t">Verify email</div><div class="d">Check-inbox / verifying / done</div></a>
+      <a class="card" href="a3-password.html"><div class="n">a3</div><div class="t">Password reset</div><div class="d">Forgot / reset / changed</div></a>
+      <a class="card" href="a4-2fa.html"><div class="n">a4</div><div class="t">Two-factor</div><div class="d">Code + backup codes</div></a>
+      <a class="card" href="a5-invite.html"><div class="n">a5</div><div class="t">Send invite</div><div class="d">4 roles · per-site · white-label</div></a>
+      <a class="card" href="a6-workspace-select.html"><div class="n">a6</div><div class="t">Workspace select</div><div class="d">Multi-workspace picker</div></a>
+      <a class="card" href="a7-transfer-accept.html"><div class="n">a7</div><div class="t">Transfer accept</div><div class="d">Ownership handover</div></a>
+      <a class="card" href="a8-auth-errors.html"><div class="n">a8</div><div class="t">Auth errors (14)</div><div class="d">Expired/locked/rate/denied + exists/invite/wrong-cred</div></a>
+      <a class="card" href="a9-invite-accept.html" style="border-color:var(--accent)"><div class="n">a9</div><div class="t">Accept invite (client)</div><div class="d">branded landing → accept → new/existing → client-view editor</div></a>
+      <a class="card" href="b0-settings-home.html"><div class="n">b0</div><div class="t">Settings home</div><div class="d">4-scope map as nav · one home each</div></a>
+      <a class="card" href="b1-account-settings.html"><div class="n">b1</div><div class="t">Account settings</div><div class="d">Profile/login/security/notif/AI/danger</div></a>
+    </div>
+
+    <div class="stage">8 · Team, support &amp; dev</div>
+    <div class="map">
+      <a class="card" href="c1-team.html"><div class="n">c1</div><div class="t">Team</div><div class="d">4 roles · per-site · approval</div></a>
+      <a class="card" href="c2-notifications.html"><div class="n">c2</div><div class="t">Notifications inbox</div><div class="d">Live · grouped · linked</div></a>
+      <a class="card" href="c3-help.html"><div class="n">c3</div><div class="t">Help &amp; support</div><div class="d">Articles + ticket</div></a>
+      <a class="card" href="c4-integrations.html"><div class="n">c4</div><div class="t">Integrations</div><div class="d">workspace providers · connect once</div></a>
+      <a class="card" href="c5-api-tokens.html"><div class="n">c5</div><div class="t">API tokens <span style="color:var(--ink-3)">·cut</span></div><div class="d">not in v1 (cut from scope)</div></a>
+    </div>
+
+    <div class="stage">9 · Site operations</div>
+    <div class="map">
+      <a class="card" href="d6-domains.html"><div class="n">d6</div><div class="t">Site › Domains</div><div class="d">per-site domains edit home (15 = all-sites monitor)</div></a>
+      <a class="card" href="d1-sites-advanced.html"><div class="n">d1</div><div class="t">Sites (power)</div><div class="d">Folders/bulk/filters</div></a>
+      <a class="card" href="d2-forms.html"><div class="n">d2</div><div class="t">Forms inbox</div><div class="d">submissions only (form config → editor)</div></a>
+      <a class="card" href="d3-redirects.html"><div class="n">d3</div><div class="t">Redirects</div><div class="d">301/302 · CSV · wildcards</div></a>
+      <a class="card" href="d4-share-access.html"><div class="n">d4</div><div class="t">Sharing</div><div class="d">Owner link mgmt · password/expiry</div></a>
+      <a class="card" href="d5-seo.html"><div class="n">d5</div><div class="t">Technical SEO</div><div class="d">canonical · indexing · sitemap (content SEO → editor)</div></a>
+    </div>
+
+    <div class="stage">10 · Editor advanced</div>
+    <div class="map">
+      <a class="card" href="e1-interactions.html"><div class="n">e1</div><div class="t">Interactions</div><div class="d">Triggers/actions/timeline</div></a>
+      <a class="card" href="e2-locales.html"><div class="n">e2</div><div class="t">Locales</div><div class="d">Per-page translations</div></a>
+      <a class="card" href="e3-editor-onboarding.html"><div class="n">e3</div><div class="t">Editor tour</div><div class="d">Coachmarks + task checklist</div></a>
+      <a class="card" href="e4-export.html"><div class="n">e4</div><div class="t">Export</div><div class="d">Static code/zip</div></a>
+      <a class="card" href="e5-collab.html"><div class="n">e5</div><div class="t">Collaboration</div><div class="d">Presence (demo-only honesty)</div></a>
+      <a class="card" href="e6-cms.html" style="border-color:var(--accent)"><div class="n">e6</div><div class="t">Collections / CMS</div><div class="d">dynamic pages · fields → entries → bound template · SEO pattern</div></a>
+      <a class="card" href="f2-system.html"><div class="n">f2</div><div class="t">System pages</div><div class="d">Terms/privacy/cookie/offline/404/maint</div></a>
+    </div>
+
+    <div class="stage" style="color:var(--ink-3)">⊘ Archive — superseded screens &amp; the fix-process (kept for history, NOT in v1)</div>
+    <div class="map">
+      <a class="card" href="editor-spine-wireframe.html"><div class="n">—</div><div class="t">Editor spine ·old</div><div class="d">→ m-editor</div></a>
+      <a class="card" href="54-ai.html"><div class="n">54</div><div class="t">AI panel ·old</div><div class="d">→ ✨ assistant</div></a>
+      <a class="card" href="55-templates.html"><div class="n">55</div><div class="t">Templates ·old</div><div class="d">→ Insert</div></a>
+      <a class="card" href="57-components.html"><div class="n">57</div><div class="t">Components ·old</div><div class="d">→ Insert</div></a>
+      <a class="card" href="62-permissions.html"><div class="n">62</div><div class="t">Permissions ·old</div><div class="d">→ M-roles</div></a>
+      <a class="card" href="10-dashboard.html"><div class="n">10</div><div class="t">Dashboard ·old</div><div class="d">→ M3</div></a>
+      <a class="card" href="13-first-run.html"><div class="n">13</div><div class="t">First run ·old</div><div class="d">0-sites moment → re-homed to M3 + s-dashboard-states</div></a>
+      <a class="card" href="fix-editor-4mode.html"><div class="n">v2a</div><div class="t">Editor — 4 modes <span style="color:var(--ink-3)">·superseded</span></div><div class="d">First 4-mode try → replaced by M2/M1 (m-editor)</div></a>
+      <a class="card" href="fix-boundary.html"><div class="n">fix</div><div class="t">Editor↔Dashboard map</div><div class="d">12 dups → one home + mirror</div></a>
+      <a class="card" href="fix-settings-map.html"><div class="n">fix</div><div class="t">Settings map</div><div class="d">9 dups → 4 scopes, one home each</div></a>
+      <a class="card" href="fix-styling-model.html"><div class="n">fix</div><div class="t">One styling model <span style="color:var(--ink-3)">·superseded</span></div><div class="d">5-rung ladder (cosmetic) → see v2</div></a>
+      <a class="card" href="fix-editor-declutter.html"><div class="n">fix</div><div class="t">Calmer Pro editor <span style="color:var(--ink-3)">·superseded</span></div><div class="d">Grouped 11 tabs (cosmetic) → see v2</div></a>
+    </div>
+    <div class="note" style="margin-top:8px"><b>v2 supersedes the earlier fix-* attempts.</b> Codex review (2026-06-17) judged the first round cosmetic — grouping the rail and ordering the ladder reduced pixels, not concepts. <b>v2 removes concepts:</b> editor rail 11 → <b>4 modes</b>, styling 5 layers → <b>3 reaches</b>. AI→⌘K, History→topbar, Settings→Pages+Dashboard. Open <a href="fix-editor-4mode.html" style="color:var(--ink)">Editor 4-mode</a> and click the modes.</div>
+
+    <div class="note" style="margin-top:22px"><b>Boundary spine:</b> Dashboard = run the business (sites, domains, billing, roles). Editor = make the thing (author pages, scope, publish). The single bridge is "Edit in editor" ⇄ Publish. <b>Source docs:</b> <code>docs/reviews/2026-06-14-*</code> (review · solutions · flow-screens-IA).</div>
+  </div>
+</div>
+</body></html>

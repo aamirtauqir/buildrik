@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · d1 — Sites power tools (folded)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:760px}
+  .note{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:#fff;margin-bottom:10px}
+  .note .t{font-size:13px;font-weight:700}
+  .note .d{font-size:11.5px;color:var(--ink-2);margin-top:5px;line-height:1.5}
+  .note .d b{color:var(--ink)}
+  .feats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+  .feat{border:1px solid var(--line);border-radius:6px;padding:8px 11px;font-size:11.5px;color:var(--ink-2)}
+  .feat b{color:var(--ink)}
+  .go{display:inline-block;margin-top:10px;border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:6px;padding:8px 14px;font-size:12.5px;font-weight:600;text-decoration:none}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · d1 · SITES POWER (FOLDED)</div>
+<div class="screen">
+  <div class="topnote"><b>"Advanced sites" folded into the one Clients/Sites view.</b> Rebuilt: there's no separate power-list screen. Folders, bulk actions, filters, and duplicate-from-template are states/controls inside <a href="11-sites.html" style="color:#fff;text-decoration:underline">11 · Clients/Sites</a> — one grouping primitive, not two.</div>
+  <div class="wrap">
+    <div class="note">
+      <div class="t">These power tools now live in Clients/Sites</div>
+      <div class="d">An agency managing 30 sites shouldn't switch between a "simple list" and an "advanced list." The <b>Client</b> grouping IS the org primitive; folders are an alternate grouping in the same view.</div>
+      <div class="feats">
+        <div class="feat"><b>Group by</b> client / folder</div>
+        <div class="feat"><b>Bulk</b> move · duplicate · archive</div>
+        <div class="feat"><b>Filter</b> status · client · shared-theme</div>
+        <div class="feat"><b>Duplicate</b> from house template</div>
+      </div>
+      <a class="go" href="11-sites.html">Open Clients / Sites →</a>
+    </div>
+    <div class="muted" style="font-size:11px">Solo builders get a flat list (no Client grouping); the same bulk/folder controls still apply.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Sites power:</b><a href="11-sites.html">Clients / Sites</a><a href="m-agency.html">Agency</a><a href="12-site-detail.html">Site detail</a><a href="index.html">Map</a></div>
+</body></html>

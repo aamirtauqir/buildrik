@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · M3 — dashboard home</title><link rel="stylesheet" href="pt.css">
+<style>
+  .appbar{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .ws{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px}
+  .ws .logo{width:22px;height:22px;border:1px solid var(--line-d);border-radius:5px;background:var(--fill);display:grid;place-items:center;font-size:11px}
+  .ws .switch{font-size:10px;color:var(--ink-3);border:1px solid var(--line);border-radius:4px;padding:2px 7px;margin-left:4px}
+  .crumb{font-size:12px;color:var(--ink-3)}
+  .crumb b{color:var(--ink-2)}
+  .appbar .sp{flex:1}
+  .topnav{display:flex;gap:4px}
+  .topnav a{font-size:12px;color:var(--ink-2);padding:5px 11px;border-radius:5px;text-decoration:none}
+  .topnav a.on{background:var(--accent);color:#fff;font-weight:600}
+  .topnav a:hover:not(.on){background:var(--fill)}
+  .appbar .icn{width:26px;height:26px;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;font-size:12px;color:var(--ink-2);text-decoration:none}
+
+  .body{padding:18px 22px;max-width:1100px;margin:0 auto}
+
+  /* start hero */
+  .start{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:12px;margin-bottom:8px}
+  .startcard{border:1px solid var(--line);border-radius:9px;padding:16px;background:#fff;text-decoration:none;color:inherit}
+  .startcard.lead{border:2px solid var(--ink);background:var(--fill)}
+  .startcard .k{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .startcard .t{font-size:15px;font-weight:700;margin-top:3px}
+  .startcard .d{font-size:11.5px;color:var(--ink-2);margin-top:4px;line-height:1.4}
+  .startcard:hover{border-color:var(--accent)}
+
+  .secrow{display:flex;align-items:center;justify-content:space-between;margin:20px 0 8px}
+  .secrow .st{font-size:13px;font-weight:600}
+  .secrow .sa{font-size:11.5px;color:var(--ink-2)}
+  .secrow .sa a{color:var(--ink-2)}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .scard{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden}
+  .scard .thumb{height:74px;background:var(--bg-2);border-bottom:1px solid var(--line);display:grid;place-items:center;color:var(--ink-3);font-size:10px}
+  .scard .sb{padding:10px 12px}
+  .scard .nm{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .scard .meta{font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .chip{font-size:9px;letter-spacing:.03em;border-radius:3px;padding:1px 6px}
+  .chip.live{background:var(--accent);color:#fff}
+  .chip.draft{border:1px solid var(--line-d);color:var(--ink-3)}
+  .scard .sf{display:flex;gap:6px;padding:0 12px 11px}
+  .sf a{flex:1;text-align:center;font-size:11px;border:1px solid var(--line);border-radius:5px;padding:6px;text-decoration:none;color:var(--ink-2)}
+  .sf a.edit{border-color:var(--accent);color:var(--ink);font-weight:600}
+  .sf a:hover{border-color:var(--accent);color:var(--ink)}
+
+  .boundary{display:flex;gap:12px;margin-top:20px}
+  .bcard{flex:1;border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fff}
+  .bcard .bt{font-size:12px;font-weight:600}
+  .bcard .bd{font-size:11px;color:var(--ink-2);margin-top:4px;line-height:1.4}
+  .bcard.this{border-color:var(--accent);border-width:2px}
+  .queue{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .qitem{border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:#fff;text-decoration:none;color:inherit;display:block;font-size:12.5px;font-weight:600}
+  .qitem:hover{border-color:var(--accent)}
+  .qitem.empty{border-style:dashed;color:var(--ink-3);font-weight:400}
+  .qitem .qn{display:inline-block;min-width:20px;text-align:center;background:var(--accent);color:#fff;border-radius:5px;font-size:11px;font-weight:700;padding:1px 6px;margin-right:6px}
+  .qitem small{display:block;color:var(--ink-3);font-size:10px;font-weight:400;margin-top:5px}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · M3 DASHBOARD</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>M3 — dashboard home.</b> The business side of the boundary — where the journey <i>starts</i> and where you <i>run</i> what you've shipped. Agency-aware (Clients in the nav); a solo builder sees Sites directly. The one bridge to the editor is "Edit ↗"; the one bridge out is "Visit ↗".</div>
+
+  <div class="dbar">
+    <div class="ws"><span class="logo">N</span> <span id="wsName">Northwind Studio</span> <span class="sw" id="wsKind">agency ▾</span></div>
+    <span class="crumb"><b>Workspace</b> › Home</span>
+    <span class="sp"></span>
+    <div class="dnav"><a href="m3-dashboard.html" class="on">Home</a><a href="m-agency.html" id="navClients">Clients</a><a href="11-sites.html" id="navSites" style="display:none">Sites</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html">Billing</a></div>
+    <a class="icn" href="c2-notifications.html" title="Notifications">🔔</a>
+    <a class="icn" href="c3-help.html" title="Help">?</a>
+    <a class="icn" href="b1-account-settings.html" title="Account">N</a>
+  </div>
+
+  <div class="body">
+
+    <!-- FIRST-RUN BRANCH — the home is not one screen; it renders by what you have -->
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink-3);border:1px dashed var(--line-d);border-radius:7px;padding:8px 11px;margin-bottom:14px">
+      <b style="color:var(--ink-2)">The home renders by state:</b>
+      <span class="frbtn on" onclick="fr('full')" style="cursor:pointer;border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:5px;padding:3px 9px">Returning (has work)</span>
+      <span class="frbtn" onclick="fr('solo')" style="cursor:pointer;border:1px solid var(--line);border-radius:5px;padding:3px 9px;color:var(--ink-2)">Solo · 0 sites</span>
+      <span class="frbtn" onclick="fr('agency')" style="cursor:pointer;border:1px solid var(--line);border-radius:5px;padding:3px 9px;color:var(--ink-2)">Agency · 0 clients</span>
+      <span style="color:var(--ink-3)">— first-run is first-class, not inferred. Full detail → <a href="s-dashboard-states.html" style="color:var(--ink-3)">s-dashboard-states</a></span>
+    </div>
+
+    <div id="fr_solo" style="display:none">
+      <div style="border:1px solid var(--line);border-radius:10px;padding:30px 20px;text-align:center;background:#fff;margin-bottom:8px">
+        <div style="font-size:30px">◳</div>
+        <div style="font-size:18px;font-weight:700;margin:8px 0 4px">Let's build your first site</div>
+        <div style="font-size:12px;color:var(--ink-2);margin-bottom:14px">Start from a template, describe it to AI, or open a blank canvas.</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <a href="02-ai-wizard.html" style="text-decoration:none;border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:6px;padding:9px 14px;font-size:12px;font-weight:600">✨ Describe a site</a>
+          <a href="03-template-gallery.html" style="text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:9px 14px;font-size:12px;color:var(--ink-2)">▦ Templates</a>
+          <a href="01-new-site.html" style="text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:9px 14px;font-size:12px;color:var(--ink-2)">＋ Blank</a>
+        </div>
+        <div style="font-size:10.5px;color:var(--ink-3);margin-top:12px">Solo nav: no "Clients" — just <b>Sites</b>. Agency layer appears when you add a client.</div>
+      </div>
+    </div>
+
+    <div id="fr_agency" style="display:none">
+      <div style="border:1px solid var(--line);border-radius:10px;padding:30px 20px;text-align:center;background:#fff;margin-bottom:8px">
+        <div style="font-size:30px">▦</div>
+        <div style="font-size:18px;font-weight:700;margin:8px 0 4px">No clients yet</div>
+        <div style="font-size:12px;color:var(--ink-2);margin-bottom:14px">Set up your agency, then stand up your first client.</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <a href="m-agency.html" style="text-decoration:none;border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:6px;padding:9px 14px;font-size:12px;font-weight:600">＋ Add first client</a>
+          <a href="c1-team.html" style="text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:9px 14px;font-size:12px;color:var(--ink-2)">Invite team</a>
+          <a href="ds1-design-system.html" style="text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:9px 14px;font-size:12px;color:var(--ink-2)">Set shared theme</a>
+        </div>
+        <div style="font-size:10.5px;color:var(--ink-3);margin-top:12px">"Duplicate as template" appears once you have one client to copy. Detail → <a href="m-states.html" style="color:var(--ink-3)">M-states</a>.</div>
+      </div>
+    </div>
+
+    <div id="fr_full">
+
+    <!-- NEEDS ATTENTION — the agency work queue, first thing on return visits -->
+    <div class="secrow"><div class="st">Needs attention</div><div class="sa">your agency queue · <a href="c2-notifications.html">all activity ↗</a></div></div>
+    <div class="queue">
+      <a class="qitem" href="m-approval.html"><span class="qn">2</span> Needs review <small>client edits waiting to publish</small></a>
+      <a class="qitem" href="m-ds-push.html"><span class="qn">1</span> Theme push failed <small>cobalt.io — retry the push</small></a>
+      <a class="qitem" href="m-tracking.html"><span class="qn">1</span> No analytics <small>docs.cobalt.io — assign property</small></a>
+      <a class="qitem" href="15-domains.html"><span class="qn">1</span> Domain pending <small>launch.acme.com — verify DNS</small></a>
+    </div>
+
+    <!-- START -->
+    <div class="secrow"><div class="st">Start something</div><div class="sa">Step 1 of the journey · <a href="m4-journey.html">see the flow</a></div></div>
+    <div class="start">
+      <a class="startcard lead" href="02-ai-wizard.html"><div class="k">Fastest</div><div class="t">✨ Describe a site — AI builds it</div><div class="d">Type what you want; get an editable draft in a minute. The strongest on-ramp for you and your clients.</div></a>
+      <a class="startcard" href="03-template-gallery.html"><div class="k">Curated</div><div class="t">Start from a template</div><div class="d">Pick a category, preview every page, make it yours.</div></a>
+      <a class="startcard" href="01-new-site.html"><div class="k">Agency</div><div class="t">New client from house template</div><div class="d">Duplicate your best build, clear content, rebrand. Client N+1 in minutes.</div></a>
+    </div>
+
+    <!-- RECENT WORK -->
+    <div class="secrow"><div class="st">Recent work</div><div class="sa"><a href="m-agency.html">All clients ↗</a> · <a href="11-sites.html">all sites ↗</a></div></div>
+    <div class="grid">
+      <div class="scard">
+        <div class="thumb">acme-main · preview</div>
+        <div class="sb"><div class="nm">acme-main.com <span class="chip live">live</span></div><div class="meta">Acme Co · edited 2h ago</div></div>
+        <div class="sf"><a class="edit" href="m-editor.html">Edit ↗</a><a href="90-published.html">Visit ↗</a><a href="12-site-detail.html">Site ops ↗</a></div>
+      </div>
+      <div class="scard">
+        <div class="thumb">bloomcafe · preview</div>
+        <div class="sb"><div class="nm">bloomcafe.com <span class="chip live">live</span></div><div class="meta">Bloom Cafe · edited yesterday</div></div>
+        <div class="sf"><a class="edit" href="m-editor.html">Edit ↗</a><a href="90-published.html">Visit ↗</a><a href="12-site-detail.html">Site ops ↗</a></div>
+      </div>
+      <div class="scard">
+        <div class="thumb">cobalt-redesign · ⏳ AI generating…</div>
+        <div class="sb"><div class="nm">cobalt-redesign <span class="chip draft">draft · AI 4/5 pages</span></div><div class="meta">Cobalt Labs · started 2m ago — resume when ready</div></div>
+        <div class="sf"><a class="edit" href="m-editor.html">Edit ↗</a><a href="21-preview.html">Preview</a><a href="12-site-detail.html">Site ops ↗</a></div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:20px"><b>Dashboard = run the business</b> (clients · domains · billing · analytics · submissions · shared theme · white-label) · <b>Editor = make the thing</b> (pages · content · SEO · styles), opened per-site via <b>Edit ↗</b>. The bridge is two arrows: Edit ↗ in, Visit ↗ out.</div>
+
+    </div><!-- /fr_full -->
+
+  </div>
+</div>
+<script>
+  function fr(s){
+    var full=document.getElementById('fr_full'),solo=document.getElementById('fr_solo'),ag=document.getElementById('fr_agency');
+    full.style.display = s==='full'?'block':'none';
+    solo.style.display = s==='solo'?'block':'none';
+    ag.style.display   = s==='agency'?'block':'none';
+    // solo collapses the agency chrome: no "Clients", show "Sites", no "agency" badge
+    var solview = s==='solo';
+    document.getElementById('navClients').style.display = solview?'none':'';
+    document.getElementById('navSites').style.display   = solview?'':'none';
+    document.getElementById('wsKind').textContent = solview?'workspace ▾':'agency ▾';
+    document.getElementById('wsName').textContent = solview?'My workspace':'Northwind Studio';
+    document.querySelectorAll('.frbtn').forEach(function(b){b.classList.remove('on');b.style.background='';b.style.color='var(--ink-2)';b.style.borderColor='var(--line)';});
+    var i = s==='full'?0:(s==='solo'?1:2);
+    var btn=document.querySelectorAll('.frbtn')[i];
+    btn.classList.add('on');btn.style.background='var(--ink)';btn.style.color='#fff';btn.style.borderColor='var(--ink)';
+  }
+</script>
+<div class="proto-nav"><b>Dashboard:</b><a href="m0-spine.html">M0 spine</a><a href="m-agency.html">M-agency</a><a href="m-editor.html">M2/M1 editor</a><a href="m4-journey.html">M4 journey</a><a href="m3-dashboard.html" style="border-color:#fff;background:#fff;color:#334155;font-weight:600">M3 dashboard</a><a href="s-dashboard-states.html">States</a><a href="index.html">Map</a></div>
+</body></html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · M-states — the undefined interactions, now defined</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .mock{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .mh{padding:7px 12px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .mh .tag{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border:1px dashed var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 6px}
+  .mb{padding:13px}
+  .empty{text-align:center;color:var(--ink-3);padding:18px 12px}
+  .empty .big{font-size:26px;line-height:1;margin-bottom:8px}
+  .empty .t{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .empty .d{font-size:11px;margin-top:5px;line-height:1.4}
+  .empty .acts{display:flex;gap:6px;justify-content:center;margin-top:11px;flex-wrap:wrap}
+  .empty .acts span{border:1px solid var(--line);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--ink-2)}
+  .empty .acts span.pri{border-color:var(--accent);color:#fff;background:var(--accent);font-weight:600}
+  .toast{border:1px solid var(--ink);border-radius:7px;padding:10px 12px;background:var(--fill);font-size:12px;display:flex;align-items:center;gap:9px}
+  .toast .ic{font-size:15px}
+  .toast .tx{flex:1;color:var(--ink-2);line-height:1.4}
+  .toast .tx b{color:var(--ink);font-family:var(--mono);font-size:11px}
+  .toast .act{font-size:11px;color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .navrow{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg-2);margin-bottom:7px;flex-wrap:wrap}
+  .navrow .chip{border:1px solid var(--line);border-radius:5px;padding:3px 9px;color:var(--ink-2);background:#fff}
+  .navrow .chip.on{background:var(--accent);color:#fff;font-weight:600}
+  .navrow .chip.hide{opacity:.4;text-decoration:line-through}
+  .navrow .lbl{font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+  .tip{border:1px solid var(--line-d);border-radius:7px;padding:10px 12px;font-size:11.5px;color:var(--ink-2);line-height:1.45;background:#fff}
+  .tip b{color:var(--ink)}
+  .disabled{border:1px solid var(--line);border-radius:5px;padding:6px 10px;font-size:11.5px;color:var(--ink-3);background:var(--bg-2);display:flex;align-items:center;justify-content:space-between;margin:5px 0}
+  .disabled .why{font-size:10px;color:var(--ink-3);font-style:italic}
+  .field{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-2);padding:5px 0;border-bottom:1px dashed var(--line)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.45;margin-top:6px}
+  .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · M-STATES · UNDEFINED INTERACTIONS</div>
+<div class="screen">
+  <div class="topnote"><b>M-states — the interactions the audit said would be "guessed during build", now defined.</b> Codex flagged these as build-blockers. Each is a small but load-bearing state: inspector-empty · slug-rename redirect outcome · zero-clients agency first-run · solo-vs-agency nav · role-disabled-vs-density-hidden. Replaces the old <code>80-states</code> for the solution set.</div>
+  <div class="wrap">
+
+    <!-- A. INSPECTOR EMPTY + B. SLUG REDIRECT -->
+    <div class="sech">1 · Two editor states every session hits</div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Inspector — nothing selected <span class="tag">every session starts here</span></div>
+        <div class="mb"><div class="empty">
+          <div class="big">⊹</div>
+          <div class="t">Nothing selected</div>
+          <div class="d">Click anything on the canvas to edit it.<br>Or start from the left:</div>
+          <div class="acts"><span class="pri">＋ Insert</span><span>▤ Pages</span><span>◐ Styles</span><span>⚙ Site</span></div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="mh">Slug renamed → redirect outcome <span class="tag">Pages / page settings</span></div>
+        <div class="mb">
+          <div class="field"><span>Slug</span><span style="font-family:var(--mono);font-size:11px">/pricing → /plans</span></div>
+          <div class="toast" style="margin-top:10px">
+            <span class="ic">↪</span>
+            <span class="tx"><b>Redirect created: /pricing → /plans</b><br>Old links won't 404. Saved to Publishing › Redirects.</span>
+            <span class="act">Undo · Edit</span>
+          </div>
+          <div class="note2">Editor IS a redirect writer (codex). The outcome shows <b>where the slug changed</b>, not buried in a dashboard. Designer/Admin only.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- C. ZERO-CLIENTS + D. SOLO VS AGENCY NAV -->
+    <div class="sech">2 · First-run + nav adapts to who you are</div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Agency, zero clients (day one) <span class="tag">new agency</span></div>
+        <div class="mb"><div class="empty">
+          <div class="big">▦</div>
+          <div class="t">No clients yet</div>
+          <div class="d">Set up your agency, then stand up your first client.</div>
+          <div class="acts"><span class="pri">＋ Add first client</span><span>Invite team</span><span>Set shared theme</span></div>
+          <div class="d" style="margin-top:9px;color:var(--ink-3)">"Duplicate" appears once you have one to copy.</div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="mh">Nav adapts: solo vs agency <span class="tag">density of nav</span></div>
+        <div class="mb">
+          <div class="lbl" style="font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px">Agency workspace</div>
+          <div class="navrow"><span class="chip on">Home</span><span class="chip">Clients</span><span class="chip">Workspace</span><span class="chip">Billing</span></div>
+          <div class="lbl" style="font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin:8px 0 4px">Solo workspace (no clients)</div>
+          <div class="navrow"><span class="chip on">Home</span><span class="chip">Sites</span><span class="chip hide">Clients</span><span class="chip">Workspace</span><span class="chip">Billing</span></div>
+          <div class="note2"><b>Solo collapses the agency layer:</b> "Clients" → "Sites", "Shared theme" hidden until there's a second site to share to. No empty agency chrome for a solo builder.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E. ROLE VS DENSITY -->
+    <div class="sech">3 · Why is this disabled? — density vs permission, never confused <span class="sub">the rule that kills the support tickets codex predicted</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Hidden by DENSITY (Simple)</div>
+        <div class="mb">
+          <div class="disabled"><span>All CSS · CSS classes</span><span class="why">hidden in Simple</span></div>
+          <div class="tip"><b>"Turn on full controls to see this."</b> A one-click reveal — you're allowed to use it, it's just folded away. Reversible preference.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Blocked by ROLE (Content editor)</div>
+        <div class="mb">
+          <div class="disabled" style="border-style:dashed"><span>Redirects · Custom code</span><span class="why">your role can't edit</span></div>
+          <div class="tip"><b>"Your role (Content editor) can't edit this — ask an admin."</b> A permission boundary, not a hidden control. Flipping density never unlocks it.</div>
+        </div>
+      </div>
+    </div>
+    <div class="note2" style="margin-top:8px"><b>The rule (from M-roles):</b> every disabled/hidden control names its cause — <b>density</b> (reversible, "turn on full controls") or <b>role</b> (permission, "ask an admin"). Never an unexplained grey button. This single discipline removes the "missing feature" and "why is this disabled?" ticket classes.</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>States:</b><a href="m-states.html" style="border-color:#fff;background:#fff;color:#334155;font-weight:600">M-states</a><a href="m-roles.html">Roles</a><a href="m-editor.html">Editor</a><a href="m-agency.html">Agency</a><a href="80-states.html">old states</a><a href="index.html">Map</a></div>
+</body></html>

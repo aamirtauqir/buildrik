@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Permissions</title><link rel="stylesheet" href="pt.css">
+<style>
+  .mx{width:100%;border-collapse:collapse;font-size:12px}
+  .mx th,.mx td{border:1px solid var(--line);padding:7px 10px;text-align:center}
+  .mx th:first-child,.mx td:first-child{text-align:left;color:var(--ink-2)}
+  .mx th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);background:var(--fill)}
+  .y{color:var(--ink);font-weight:600}.n{color:var(--ink-3)}
+</style></head>
+<body data-surface="dashboard">
+<div data-recon-banner style="position:sticky;top:0;z-index:999;background:#334155;color:#fff;font:600 12px/1.4 "Inter Tight",sans-serif;padding:7px 14px;text-align:center;border-bottom:2px solid #fff">↗ SUPERSEDED — reconciled into <a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a> (2026-06-18 solution set). Kept for history.</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>Permission matrix + read-only editor (§8)</b> · grounded in current workspace roles (owner/editor/viewer · invite · transfer G10) · solution: role gates the UI, not just the API — viewers get a coherent read-only editor, not broken buttons</div>
+  <div class="pad">
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Who can do what</div>
+        <table class="mx">
+          <tr><th>Capability</th><th>Owner</th><th>Editor</th><th>Viewer</th></tr>
+          <tr><td>View / preview</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+          <tr><td>Edit content &amp; design</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+          <tr><td>Publish / update live</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+          <tr><td>Manage domain</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td></tr>
+          <tr><td>Invite / remove members</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td></tr>
+          <tr><td>Billing</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td></tr>
+          <tr><td>Transfer / delete site</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td></tr>
+        </table>
+        <div class="note" style="margin-top:10px;font-size:10.5px"><b>Owner-only = irreversible/financial</b> (domain, billing, transfer, delete). Editor = the make-side. Viewer = look only. Mirrors the API authz already enforced server-side.</div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:8px">Viewer's editor — read-only state</div>
+        <div class="box" style="overflow:hidden">
+          <div class="row" style="justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--fill);font-size:11.5px"><span>◉ <b>View only</b> — you don't have edit access</span><button class="btn" style="padding:4px 10px">Request access</button></div>
+          <div style="padding:18px;background:var(--bg-2)">
+            <div class="ph-img" style="height:50px;margin-bottom:10px;opacity:.7">▭ nav</div>
+            <div class="h2" style="text-align:center;opacity:.7">[ Hero — not editable ]</div>
+            <div class="row" style="justify-content:center;margin-top:10px"><span class="btn" style="opacity:.5;pointer-events:none">[ CTA ]</span></div>
+          </div>
+          <div style="padding:8px 12px;border-top:1px solid var(--line);font-size:10.5px;color:var(--ink-3)">Inspector hidden · Publish hidden · Preview + device toggle stay active</div>
+        </div>
+        <div class="note" style="margin-top:10px;font-size:10.5px"><b>Coherent, not crippled (solution):</b> a viewer sees a clean read-only canvas + a clear "request access" path — not greyed buttons that error on click. The role decides what renders.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>§8 behavior:</b><a href="m-editor.html">Editor</a><a href="60-save-states.html">Save states</a><a href="61-conflict.html">Conflict</a><a href="62-permissions.html" class="here">Permissions</a><a href="20-publish.html">Publish</a><a href="m3-dashboard.html">Dashboard</a></div>
+</body></html>

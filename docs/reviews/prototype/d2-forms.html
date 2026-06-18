@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · d2 — Form submissions inbox</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:880px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .bar .f{display:flex;gap:6px;font-size:11px} .bar .f span{border:1px solid var(--line);border-radius:5px;padding:4px 10px;color:var(--ink-2)}
+  .bar .exp{font-size:11px;border:1px solid var(--ink);border-radius:5px;padding:5px 11px;color:var(--ink);text-decoration:none}
+  table{width:100%;border-collapse:collapse;font-size:11.5px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  th{background:var(--fill);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  tr.unread td{font-weight:600;color:var(--ink)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:5px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · d2 · FORMS INBOX</div>
+<div class="screen">
+  <div class="topnote"><b>Forms — submissions inbox only.</b> Rebuilt: the old "Form blocks / config" tab is gone — <b>building</b> a form happens in the editor (the form block); this dashboard screen only <b>collects, triages &amp; exports</b> the responses. Two jobs, two homes (<a href="m-ownership.html" style="color:#fff;text-decoration:underline">M-ownership</a>).</div>
+    <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span></div>
+  <div class="stabs"><a href="12-site-detail.html">Overview</a><a href="d6-domains.html">Domains</a><a href="19-analytics.html">Traffic</a><a href="d2-forms.html" class="on">Forms inbox</a><a href="d4-share-access.html">Sharing</a><a href="14-site-settings.html">Publishing</a><a href="58-history.html">Versions</a></div>
+  
+    <div class="crumb"><b>acme-main.com</b> › Forms inbox</div>
+    <div class="bar">
+      <div class="f"><span>All forms ▾</span><span>Unread (3)</span><span>Last 7 days</span></div>
+      <a class="exp" href="d2-forms.html">Export CSV</a>
+    </div>
+    <table>
+      <tr><th style="width:18%">Form</th><th style="width:22%">From</th><th>Message</th><th style="width:16%">When</th></tr>
+      <tr class="unread"><td><span class="dot"></span>Contact</td><td>jane@buyer.com</td><td>"Interested in a quote for…"</td><td>12m ago</td></tr>
+      <tr class="unread"><td><span class="dot"></span>Contact</td><td>mike@co.io</td><td>"Do you build Shopify…"</td><td>1h ago</td></tr>
+      <tr><td>Newsletter</td><td>sam@home.com</td><td>subscribed</td><td>3h ago</td></tr>
+      <tr><td>Contact</td><td>lee@firm.com</td><td>"Can we book a call…"</td><td>yesterday</td></tr>
+    </table>
+    <div class="note2"><b>Inbox, triage, export.</b> Where responses go (email · connected inbox · Mailchimp) is set in the editor's form-block config; routing happens via workspace integrations. Content editor sees their own client's leads (read); Admin manages/exports (<a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Forms:</b><a href="52-add.html">Form block (editor)</a><a href="12-site-detail.html">Site detail</a><a href="m-ownership.html">Ownership</a><a href="s-forms-states.html">States</a><a href="index.html">Map</a></div>
+</body></html>

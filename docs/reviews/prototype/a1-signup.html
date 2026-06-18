@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Sign up</title><link rel="stylesheet" href="pt.css"></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen screen-narrow" style="max-width:420px">
+  <div class="topnote"><b>Sign up</b> · grounded in <code>auth.signup</code> + <code>auth.checkEmail</code> (email-first) · solution: email-first → if new, this form; password strength shown</div>
+  <div class="pad">
+    <div class="row" style="gap:8px;justify-content:center;margin-bottom:10px"><div class="ph-img" style="width:30px;height:30px;font-size:11px">B</div><b style="font-size:16px">Buildrik</b></div>
+    <div class="h1" style="text-align:center;font-size:18px;margin-bottom:4px">Create your account</div>
+    <div class="muted" style="text-align:center;font-size:12px;margin-bottom:16px">you@company.com — let's set you up.</div>
+    <div class="lbl">Full name</div><div class="input" style="width:100%;margin:5px 0 10px">Jane Doe</div>
+    <div class="lbl">Email</div><div class="input" style="width:100%;margin:5px 0 10px">you@company.com</div>
+    <div class="lbl">Password</div><div class="input" style="width:100%;margin:5px 0 6px">••••••••••</div>
+    <div class="row" style="gap:4px;margin-bottom:14px"><span class="barline" style="height:5px;width:60px;background:var(--accent)"></span><span class="barline" style="height:5px;width:60px;background:var(--accent)"></span><span class="barline" style="height:5px;width:60px"></span><span class="muted" style="font-size:10px">strong</span></div>
+    <a href="a2-verify-email.html" class="btn btn-fill btn-strong" style="width:100%;text-align:center;margin-bottom:10px">Create account →</a>
+    <button class="btn" style="width:100%;margin-bottom:10px">Continue with Google</button>
+    <div class="muted" style="text-align:center;font-size:11px">Already have an account? <a href="00-signin.html" style="text-decoration:underline;color:var(--ink-2)">Sign in</a></div>
+    <div class="note" style="margin-top:14px;font-size:10.5px"><b>Email-first (grounded):</b> <code>auth.checkEmail</code> is timing-safe (no enumeration) — known email → sign-in (00), new → this. New signup then routes to verify (A2) → setup (04/04b, solo vs agency) → Start (01). Agree to <a href="f2-system.html" style="text-decoration:underline">Terms/Privacy</a> on submit.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Auth:</b><a href="00-signin.html">Sign in</a><a href="a1-signup.html" class="here">Sign up</a><a href="a2-verify-email.html">Verify email</a><a href="a3-password.html">Password</a><a href="a4-2fa.html">2FA</a><a href="a5-invite.html">Invite</a><a href="a8-auth-errors.html">Errors</a><a href="index.html">Map</a></div>
+</body></html>

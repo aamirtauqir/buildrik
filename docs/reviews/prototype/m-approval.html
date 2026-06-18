@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · M-approval — client edit → review → publish</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1060px}
+  .flow{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:stretch;margin-top:8px}
+  .step{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  .step.mid{border-color:var(--accent);border-width:2px}
+  .sh{padding:8px 12px;background:var(--bg-2);border-bottom:1px solid var(--line)}
+  .sh .who{font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+  .sh .t{font-size:13px;font-weight:700}
+  .sb{padding:12px;font-size:11.5px;color:var(--ink-2);line-height:1.45;flex:1}
+  .sb b{color:var(--ink)}
+  .arw{display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink)}
+  .card{border:1px solid var(--line);border-radius:6px;padding:9px 11px;margin-top:8px;background:var(--bg-2)}
+  .card .ct{font-size:11px;font-weight:600;color:var(--ink)}
+  .card .cd{font-size:10.5px;color:var(--ink-2);margin-top:3px}
+  .diffrow{font-size:10.5px;color:var(--ink-2);padding:3px 0;border-bottom:1px dashed var(--line);font-family:var(--mono)}
+  .diffrow:last-child{border-bottom:none}
+  .btns{display:flex;gap:6px;margin-top:9px}
+  .btn{flex:1;text-align:center;border:1px solid var(--ink);border-radius:5px;padding:6px;font-size:11px;font-weight:600;color:var(--ink)}
+  .btn.pri{background:var(--accent);color:#fff}
+  .toggle{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-2)}
+  .sw{width:28px;height:16px;border-radius:999px;border:1px solid var(--ink);background:var(--accent);position:relative}
+  .sw::after{content:"";position:absolute;top:1px;left:13px;width:12px;height:12px;border-radius:50%;background:#fff}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.45;margin-top:8px}
+  .note2 b{color:var(--ink)}
+  .opt{border:1px dashed var(--line-d);border-radius:7px;padding:10px 13px;margin-bottom:10px;font-size:11.5px;color:var(--ink-2);display:flex;align-items:center;justify-content:space-between}
+  .opt b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · M-APPROVAL · CLIENT PUBLISH GATE</div>
+<div class="screen">
+  <div class="topnote"><b>M-approval — the optional client review gate.</b> From the role matrix (M-roles, footnote 1): a Content editor can publish their own site, but the agency can flip on <b>"client edits need approval."</b> This is that flow — request → the agency reviews a diff → approve/reject → publish, with an audit trail. Only appears when the workspace enables it.</div>
+  <div class="wrap">
+
+    <div class="opt"><span>Workspace setting: <b>Client edits require approval before going live</b></span><span class="toggle"><span class="sw"></span> ON</span></div>
+
+    <div class="flow">
+      <!-- 1 client -->
+      <div class="step">
+        <div class="sh"><div class="who">Content editor (Simple)</div><div class="t">Edit &amp; request</div></div>
+        <div class="sb">Content editor edits content on their site. Instead of "Publish," they see <b>"Send for review."</b>
+          <div class="card"><div class="ct">2 changes ready</div><div class="cd">hero text · pricing image</div></div>
+          <div class="btns"><span class="btn pri">Send for review →</span></div>
+          <div style="font-size:10px;color:var(--ink-3);margin-top:7px">No production publish button for this role while approval is ON.</div>
+        </div>
+      </div>
+      <div class="arw">→</div>
+      <!-- 2 agency review -->
+      <div class="step mid">
+        <div class="sh"><div class="who">Designer / Admin</div><div class="t">Review the diff</div></div>
+        <div class="sb">Agency gets a notification (<a href="c2-notifications.html" style="color:var(--ink)">inbox</a>). Opens a content diff:
+          <div class="card">
+            <div class="diffrow">hero: "Welcome" → "Welcome to Acme"</div>
+            <div class="diffrow">img: hero.jpg → hero-new.jpg</div>
+          </div>
+          <div class="btns"><span class="btn">Reject + note</span><span class="btn pri">Approve &amp; publish</span></div>
+        </div>
+      </div>
+      <div class="arw">→</div>
+      <!-- 3 live + audit -->
+      <div class="step">
+        <div class="sh"><div class="who">System</div><div class="t">Live + audit trail</div></div>
+        <div class="sb">On approve → published to the client's domain. Both sides notified.
+          <div class="card"><div class="ct">✓ Published by Designer</div><div class="cd">client request · approved · live · logged in History</div></div>
+          On reject → bounces back to the client with the note; nothing goes live.
+        </div>
+      </div>
+    </div>
+
+    <div class="note2"><b>Why it matters:</b> white-label handoff means clients touch live sites. The agency needs a safety valve without taking the keys away — the client still works freely, the agency controls what ships. When the toggle is OFF, Content editor publishes directly (their own site) and this flow never appears. Ties to M-roles footnote 1 + the publish capability.</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Approval:</b><a href="m-approval.html" style="border-color:#fff;background:#fff;color:#334155;font-weight:600">M-approval</a><a href="m-roles.html">Roles</a><a href="m-agency.html">Agency</a><a href="c2-notifications.html">Notifications</a><a href="m-comments.html">Comment review</a><a href="s-ship-states.html">Ship states</a><a href="index.html">Map</a></div>
+</body></html>

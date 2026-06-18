@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 52 — Insert (one door)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:560px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:8px} .crumb b{color:var(--ink-2)}
+  .search{border:1px dashed var(--line-d);border-radius:6px;padding:9px 11px;color:var(--ink-3);margin-bottom:10px;font-size:12px}
+  .seg{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin-bottom:10px;font-size:11px}
+  .seg button{flex:1;padding:6px;color:var(--ink-2);background:#fff;border-right:1px solid var(--line);cursor:pointer}
+  .seg button:last-child{border:none} .seg button.on{background:var(--accent);color:#fff;font-weight:600}
+  .cat{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 5px;display:flex;justify-content:space-between}
+  .blocks{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .block{border:1px solid var(--line);background:var(--fill);border-radius:5px;padding:14px 6px;text-align:center;font-size:11.5px;color:var(--ink-2)}
+  .block:hover{border-color:var(--accent)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · 52 · INSERT</div>
+<div class="screen">
+  <div class="topnote"><b>Insert — one door to put things on the page.</b> Rebuilt: the old "Add" + "Templates" rail items merge into ONE Insert panel (blocks · templates · Pro: components). <b>AI is NOT here</b> — its the separate ✨ assistant (top-right). Insert = things you place; AI = the assistant that builds/edits. The first rail item in <a href="m-editor.html" style="color:#fff;text-decoration:underline">M-editor</a>.</div>
+  <div class="wrap">
+    <div class="crumb"><b>acme-main</b> › Insert</div>
+    <div class="search">Describe or search to insert…  /</div>
+    <div class="seg"><button class="on">Blocks</button><button>Templates</button><button>Components <span style="font-size:8px">PRO</span></button></div>
+    <div class="cat">Basic</div>
+    <div class="blocks"><div class="block">Heading</div><div class="block">Text</div><div class="block">Button</div><div class="block">Image</div></div>
+    <div class="cat">Layout</div>
+    <div class="blocks"><div class="block">Section</div><div class="block">Grid</div><div class="block">Columns</div><div class="block">Spacer</div></div>
+    <div class="cat">Sections <span>templates</span></div>
+    <div class="blocks"><div class="block">Hero</div><div class="block">Pricing</div><div class="block">FAQ</div><div class="block">CTA</div></div>
+    <div class="note2"><b>One entry point.</b> Blocks and templates only — pick or search. <b>AI is NOT here</b> — it lives separately (the ✨ assistant). Insert places things; AI builds/changes them. Templates = full sections; Components (Pro) = your saved reusable blocks. <b>Assets</b> opens contextually when you place an image, not from here.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Insert:</b><a href="m-editor.html">Editor</a><a href="m-editor.html">Templates</a><a href="m-editor.html">Components</a><a href="m-ownership.html">Ownership</a><a href="index.html">Map</a></div>
+</body></html>

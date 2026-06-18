@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · S-dashboard — home &amp; lists unhappy paths</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .mock{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .mh{padding:7px 12px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .mh .tag{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border:1px dashed var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 6px}
+  .mb{padding:13px}
+  .empty{text-align:center;color:var(--ink-3);padding:16px 12px}
+  .empty .big{font-size:26px;line-height:1;margin-bottom:8px}
+  .empty .t{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .empty .d{font-size:11px;margin-top:5px;line-height:1.4}
+  .empty .acts{display:flex;gap:6px;justify-content:center;margin-top:11px;flex-wrap:wrap}
+  .empty .acts span{border:1px solid var(--line);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--ink-2)}
+  .empty .acts span.pri{border-color:var(--accent);color:#fff;background:var(--accent);font-weight:600}
+  .toast{border:1px solid var(--ink);border-radius:7px;padding:10px 12px;background:var(--fill);font-size:12px;display:flex;align-items:flex-start;gap:9px}
+  .toast .ic{font-size:15px}
+  .toast .tx{flex:1;color:var(--ink-2);line-height:1.4}
+  .toast .tx b{color:var(--ink)}
+  .toast .act{font-size:11px;color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .sk{border:1px solid var(--line);border-radius:6px;height:38px;margin:6px 0;background:linear-gradient(100deg,var(--bg-2) 30%,var(--fill) 50%,var(--bg-2) 70%)}
+  .rowi{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ink-2);padding:7px 9px;border:1px solid var(--line);border-radius:6px;margin:5px 0;background:#fff}
+  .rowi .mut{color:var(--ink-3);font-size:10.5px}
+  .pager{display:flex;justify-content:space-between;align-items:center;margin-top:9px;font-size:11px;color:var(--ink-3)}
+  .pager .pp{display:flex;gap:5px}
+  .pager .pp span{border:1px solid var(--line);border-radius:5px;padding:3px 9px;color:var(--ink-2);background:#fff}
+  .pager .pp span.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:6px}.note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · S-DASHBOARD · UNHAPPY PATHS</div>
+<div class="screen">
+  <div class="topnote"><b>Dashboard states — the home and lists when they're empty, loading, searched, or scaled.</b> Codex scope-review (2026-06-18): the canonical home (<a href="m3-dashboard.html" style="color:#fff;text-decoration:underline">M3</a>) had no 0-sites state after <code>13-first-run</code> was archived, and the lists (<a href="11-sites.html" style="color:#fff;text-decoration:underline">sites</a> / <a href="m-agency.html" style="color:#fff;text-decoration:underline">clients</a>) had no loading / no-results / many-rows behavior. This is the dashboard's instantiation of the <a href="80-states.html" style="color:#fff;text-decoration:underline">state standard</a>.</div>
+  <div class="wrap">
+
+    <!-- 1. ZERO STATES (the activation moment) -->
+    <div class="sech">1 · Day one — zero sites (solo) and zero clients (agency) <span class="sub">the home is never a void</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Solo · zero sites <span class="tag">canonical first-run</span></div>
+        <div class="mb"><div class="empty" style="padding:16px 10px">
+          <div class="big">◳</div>
+          <div class="t">Let's build your first site</div>
+          <div class="d">Start from a template, describe it to AI, or open a blank canvas.</div>
+          <div class="acts"><span class="pri">＋ New site</span><span>▦ Templates</span><span>✨ Describe it</span></div>
+          <div class="d" style="margin-top:9px;color:var(--ink-3)">This is the old <code>13-first-run</code> moment, now living on the canonical home.</div>
+        </div></div>
+      </div>
+      <div class="mock">
+        <div class="mh">Agency · zero clients <span class="tag">see M-states</span></div>
+        <div class="mb"><div class="empty" style="padding:16px 10px">
+          <div class="big">▦</div>
+          <div class="t">No clients yet</div>
+          <div class="d">Set up the agency, then stand up your first client.</div>
+          <div class="acts"><span class="pri">＋ Add first client</span><span>Invite team</span><span>Shared theme</span></div>
+          <div class="d" style="margin-top:9px;color:var(--ink-3)">Detail + solo-vs-agency nav → <a href="m-states.html">M-states</a>.</div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- 2. LOADING + ERROR -->
+    <div class="sech">2 · Loading &amp; error — the list before it arrives, and when it can't <span class="sub">skeleton, not spinner; cause + retry, not a blank screen</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Loading <span class="tag">skeleton rows</span></div>
+        <div class="mb"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="note2">The shape of the sites list, so the page doesn't jump when data lands.</div></div>
+      </div>
+      <div class="mock">
+        <div class="mh">Failed to load <span class="tag">never a white screen</span></div>
+        <div class="mb">
+          <div class="empty" style="padding:14px 8px">
+            <div class="big">!</div><div class="t">Couldn't load your sites</div>
+            <div class="d">Something went wrong on our end. Your sites are safe — try again.</div>
+            <div class="acts"><span class="pri">Retry</span><span>Status ↗</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SEARCH + SCALE -->
+    <div class="sech">3 · Search no-results &amp; scale — 1 client vs 40 <span class="sub">an agency runs many; the list has to hold up</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Search — no match</div>
+        <div class="mb">
+          <div class="rowi" style="background:var(--bg-2)"><span>⌕ "northwind"</span><span class="mut">0 of 38</span></div>
+          <div class="empty" style="padding:12px 8px">
+            <div class="big">⌕</div><div class="t">No clients match "northwind"</div>
+            <div class="d">Try a different name, or clear the search.</div>
+            <div class="acts"><span>Clear</span><span class="pri">＋ Add client</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Many rows — search + paginate <span class="tag">40 clients</span></div>
+        <div class="mb">
+          <div class="rowi"><span>⌕ Search · Filter ▾ · Sort ▾</span><span class="mut">38 clients</span></div>
+          <div class="rowi"><span>Acme Co <span class="mut">· 4 sites</span></span><span class="mut">›</span></div>
+          <div class="rowi"><span>Borealis <span class="mut">· 2 sites</span></span><span class="mut">›</span></div>
+          <div class="rowi"><span>Cobalt Studio <span class="mut">· 7 sites</span></span><span class="mut">›</span></div>
+          <div class="pager"><span>Showing 1–20 of 38</span><div class="pp"><span class="on">1</span><span>2</span><span>›</span></div></div>
+          <div class="note2">Search + filter + sort + paging appear once a workspace crosses a handful — small workspaces stay clean.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note2" style="margin-top:14px"><b>The rule:</b> the home always offers the next action (never an empty void), lists show their skeleton then their data (never a jump), failures name the cause + a retry (never a white screen), and scale brings search/paging in only when it's earned.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Dashboard states:</b><a href="m3-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="m-agency.html">Clients</a><a href="80-states.html">State standard</a><a href="index.html">Map</a></div>
+</body></html>

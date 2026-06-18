@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · ds1 — Workspace shared theme</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:880px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .src{display:flex;align-items:center;gap:13px;border:2px solid var(--ink);border-radius:9px;padding:13px 16px;background:var(--fill);margin-bottom:14px}
+  .src .ic{width:36px;height:36px;border:1px solid var(--line-d);border-radius:8px;background:#fff;display:grid;place-items:center;font-size:15px}
+  .src .t{font-size:13px;font-weight:700} .src .d{font-size:11px;color:var(--ink-2);margin-top:2px}
+  .src .sp{flex:1}
+  .btn{border:1px solid var(--ink);border-radius:6px;padding:8px 13px;font-size:12px;font-weight:600;text-decoration:none}
+  .btn.pri{background:var(--accent);color:#fff} .btn.ghost{color:var(--ink);background:#fff}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 6px}
+  .tokrow{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid var(--line);border-radius:6px;margin-bottom:6px;font-size:12px;color:var(--ink-2)}
+  .sw{width:18px;height:18px;border:1px solid var(--line-d);border-radius:3px;background:var(--fill);display:inline-block;vertical-align:middle;margin-right:6px}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:2px}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+  th{background:var(--fill);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  .chip{font-size:8.5px;border-radius:3px;padding:1px 5px} .chip.sync{border:1px solid var(--line-d);color:var(--ink-3)} .chip.ovr{border:1px solid var(--ink);color:var(--ink);font-weight:600}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · ds1 · SHARED THEME</div>
+<div class="screen">
+  <div class="topnote"><b>Workspace shared theme — the source of truth.</b> Rebuilt: this is no longer a site-local "design system" tab. The agency edits ONE theme at the workspace; sites <b>sync</b> from it or hold a <b>local override</b>. Pushing changes goes through the <a href="m-ds-push.html" style="color:#fff;text-decoration:underline">review contract</a>. The everyday "swatches &amp; fonts" view lives in the editor's <b>Styles</b>; this is the Pro/agency source.</div>
+  <div class="dbar">
+    <div class="ws"><span class="logo">N</span> Northwind Studio <span class="sw">agency ▾</span></div>
+    <span class="sp"></span>
+    <div class="dnav"><a href="m3-dashboard.html">Home</a><a href="m-agency.html">Clients</a><a href="18-workspace.html" class="on">Workspace</a><a href="16-billing.html">Billing</a></div>
+    <a class="icn" href="c2-notifications.html" title="Notifications">🔔</a><a class="icn" href="c3-help.html" title="Help">?</a><a class="icn" href="b1-account-settings.html" title="Account">N</a>
+  </div>
+  <div class="subtabs"><a href="18-workspace.html">Branding</a><a href="ds1-design-system.html" class="on">Shared theme</a><a href="17-media.html">Assets</a><a href="c1-team.html">Team &amp; approvals</a><a href="c4-integrations.html">Integrations</a></div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind Studio</b> › Workspace › Shared theme</div>
+
+    <div class="src">
+      <div class="ic">◐</div>
+      <div><div class="t">"Northwind base"</div><div class="d">powers 6 of 7 sites · 1 local override (Acme)</div></div>
+      <span class="sp"></span>
+      <a class="btn ghost" href="m-editor.html">Edit theme (workspace · in editor Styles)</a>
+      <a class="btn pri" href="m-ds-push.html">Push to sites →</a>
+    </div>
+
+    <div class="grp">Brand tokens</div>
+    <div class="tokrow"><span><span class="sw"></span> Accent</span><span style="font-family:var(--mono)">#1A1A1A</span></div>
+    <div class="tokrow"><span><span class="sw"></span> Text</span><span style="font-family:var(--mono)">#334155</span></div>
+    <div class="tokrow"><span>Heading font</span><span>General Sans</span></div>
+    <div class="tokrow"><span>Corner radius</span><span style="font-family:var(--mono)">12px</span></div>
+    <div class="tokrow" style="color:var(--ink-3)"><span>Full tokens / presets <span style="font-size:9px">Pro</span></span><span>14 kinds ▾</span></div>
+
+    <div class="grp">Sites on this theme</div>
+    <table>
+      <tr><th>Site</th><th>Client</th><th>State</th></tr>
+      <tr><td><b>bloomcafe.com</b></td><td>Bloom</td><td><span class="chip sync">synced</span></td></tr>
+      <tr><td><b>cobalt.io</b></td><td>Cobalt</td><td><span class="chip sync">synced</span></td></tr>
+      <tr><td><b>acme-main.com</b></td><td>Acme</td><td><span class="chip ovr">local override</span></td></tr>
+    </table>
+    <div class="note2"><b>One source, sites mirror it.</b> A per-site tweak in the editor creates an override (kept on push unless the agency overwrites). Cut from here: DS lint / migration / multi-format export (framework-author tooling, see <a href="ds3-ds-tools.html" style="color:var(--ink-2)">ds3</a>). Kept: starter themes, AI token generation, review/apply, push.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Shared theme:</b><a href="m-agency.html">Agency</a><a href="m-ds-push.html">Push contract</a><a href="m-editor.html">Styles (editor)</a><a href="ds3-ds-tools.html">DS tools</a><a href="index.html">Map</a></div>
+</body></html>

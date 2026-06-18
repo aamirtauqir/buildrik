@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 02 — AI: describe your site</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:620px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .q{font-size:14px;font-weight:700;margin-bottom:8px}
+  .goals{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+  .goal{border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--ink-2);cursor:pointer}
+  .goal.on{border:2px solid var(--ink);background:var(--fill);color:var(--ink);font-weight:600}
+  .prompt{border:1px dashed var(--line-d);border-radius:7px;padding:11px 13px;font-size:12px;color:var(--ink-3);min-height:54px;margin-bottom:10px}
+  .ds{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:7px;padding:9px 12px;font-size:11.5px;color:var(--ink-2);margin-bottom:12px;background:#fff}
+  .ds .sw{width:16px;height:16px;border:1px solid var(--line-d);border-radius:3px;background:var(--accent)}
+  .ds b{color:var(--ink)}
+  .build{border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:7px;padding:11px;text-align:center;font-size:13px;font-weight:600}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · 02 · AI WIZARD</div>
+<div class="screen">
+  <div class="topnote"><b>Describe your site — goal-first, DS-aware.</b> Rebuilt: the old "what kind of site?" genre grid becomes a <b>goal</b> question (the AI needs the goal to write the right CTAs), and the draft is skinned with your <b>shared theme</b> — the agency wedge fused with AI. One assistant; this is its "Create" entry (<a href="../2026-06-17-product-ux-audit.md" style="color:#fff;text-decoration:underline">audit §5</a>).</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind</b> › New site › AI</div>
+    <div class="q">What do you want visitors to do?</div>
+    <div class="goals">
+      <div class="goal on">Contact me / book a call</div>
+      <div class="goal">Buy something</div>
+      <div class="goal">Learn about me / my work</div>
+      <div class="goal">Read my writing</div>
+    </div>
+    <div class="q">Describe it</div>
+    <div class="prompt">"A site for Acme, a B2B consultancy — services, case studies, and a contact form…"</div>
+    <div class="ds"><span class="sw"></span> Skin with <b>Northwind base</b> shared theme <span style="color:var(--ink-3);margin-left:auto">change ▾</span></div>
+    <a class="build" href="m-editor.html" style="display:block;text-decoration:none">Build my draft → opens editor</a>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px">
+      <a href="01-new-site.html" style="color:var(--ink-2)">← Cancel · back to Start</a>
+      <a href="m3-dashboard.html" style="color:var(--ink-2)">Leave — keeps generating in the background ↗</a>
+    </div>
+    <div class="note2"><b>Then it hands off into the editor.</b> <b>Abandon/resume is a real path:</b> Cancel returns to Start (nothing saved); Leave keeps generating — a <b>"Draft generating… / ready"</b> card waits for you on the <a href="m3-dashboard.html" style="color:var(--ink-2)">dashboard</a> to resume. Failure handling: partial-salvage, retry-failed-pages. After generate, the draft opens in the editor seeded by your role's density (a client lands in Simple).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>AI:</b><a href="01-new-site.html">Start</a><a href="m-editor.html">Editor handoff</a><a href="ds1-design-system.html">Shared theme</a><a href="../2026-06-17-product-ux-audit.md">AI redesign §5</a><a href="index.html">Map</a></div>
+</body></html>

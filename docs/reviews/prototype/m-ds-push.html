@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · M-ds-push — shared theme push contract</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1040px}
+  .marker{display:flex;align-items:center;gap:12px;border:2px solid var(--ink);border-radius:9px;padding:12px 16px;background:var(--fill);margin:6px 0 4px}
+  .marker .ic{width:34px;height:34px;border:1px solid var(--line-d);border-radius:8px;background:#fff;display:grid;place-items:center;font-size:15px}
+  .marker .t{font-size:13.5px;font-weight:700}
+  .marker .d{font-size:11.5px;color:var(--ink-2);margin-top:2px;line-height:1.4}
+  .marker .d b{color:var(--ink)}
+
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:18px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+
+  /* diff */
+  .diff{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .diff .dh{padding:7px 12px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+  .diff .dh.r{border-left:1px solid var(--line)}
+  .diff .drow{padding:8px 12px;border-bottom:1px dashed var(--line);font-size:12px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+  .diff .drow.r{border-left:1px solid var(--line)}
+  .diff .drow:last-of-type,.diff .drow.r:last-of-type{border-bottom:none}
+  .diff .drow b{color:var(--ink)}
+  .sw{width:16px;height:16px;border:1px solid var(--line-d);border-radius:3px;display:inline-block}
+  .sw.a{background:var(--fill-2)} .sw.b{background:var(--accent)}
+  .chg{font-family:var(--mono);font-size:10.5px}
+
+  /* sites table */
+  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:2px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:middle}
+  th{background:var(--fill);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  td b{color:var(--ink)}
+  .badge{font-size:9px;letter-spacing:.02em;border-radius:3px;padding:1px 6px;white-space:nowrap}
+  .badge.sync{border:1px solid var(--line-d);color:var(--ink-3)}
+  .badge.ovr{border:1px solid var(--ink);color:var(--ink);font-weight:600}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;font-size:10.5px}
+  .seg button{padding:3px 8px;color:var(--ink-2);background:#fff;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--accent);color:#fff;font-weight:600}
+  .res{font-size:11px;font-weight:600}
+  .res.ok{color:var(--ink)} .res.fail{color:var(--ink)} .res.wait{color:var(--ink-3)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+  .dot.ok{background:var(--accent)} .dot.fail{background:#fff;border:2px solid var(--ink)} .dot.wait{background:var(--fill-2);border:1px solid var(--line-d)}
+
+  .actionbar{display:flex;align-items:center;gap:12px;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .actionbar .sp{flex:1}
+  .role{font-size:11px;color:var(--ink-2)}
+  .role b{color:var(--ink)}
+  .btn{border:1px solid var(--ink);border-radius:6px;padding:9px 16px;font-size:12.5px;font-weight:600;background:var(--accent);color:#fff;cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .approval{font-size:10.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px}
+  .approval .chk{width:14px;height:14px;border:1px solid var(--line-d);border-radius:3px;display:inline-grid;place-items:center;font-size:9px}
+
+  /* progress overlay (after push) */
+  .pushing{display:none}
+  body[data-state="pushing"] .preflight{display:none}
+  body[data-state="pushing"] .pushing{display:block}
+  .resnote{font-size:11.5px;color:var(--ink-2);margin-top:10px;line-height:1.45;border:1px dashed var(--line-d);border-radius:7px;padding:10px 12px}
+  .resnote b{color:var(--ink)}
+</style></head>
+<body data-surface="editor" data-state="preflight">
+<div class="wf-stamp">PROTOTYPE · M-DS-PUSH · CHANGE CONTRACT</div>
+<div class="screen">
+  <div class="topnote"><b>M-ds-push — the shared theme push contract.</b> The missing surface (audit finding A · ownership-map footnote 3 · the wedge's biggest footgun). When an agency changes the <b>workspace shared theme</b>, it can hit many <b>live client sites</b> at once. This is NOT per-element styling and NOT a 4th reach — it's a <b>workspace action with its own review + apply flow</b>: marker → diff → per-site override resolution → confirmed push → per-site result.</div>
+  <div class="wrap">
+
+    <!-- MARKER -->
+    <div class="marker">
+      <div class="ic">◐</div>
+      <div>
+        <div class="t">You are editing the WORKSPACE shared theme — not one site</div>
+        <div class="d">"Northwind base". Changing it affects <b>every site that syncs it</b>. This is the one action where a change leaves the editor and touches <b>live client sites</b>. Review below before it goes out.</div>
+      </div>
+    </div>
+
+    <div class="preflight">
+      <!-- DIFF -->
+      <div class="sech">1 · What changed <span class="sub">the diff on the shared theme since the last push</span></div>
+      <div class="diff">
+        <div class="dh">Token / preset</div><div class="dh r">Change</div>
+        <div class="drow"><b>Accent color</b></div><div class="drow r"><span class="sw a"></span> <span class="chg">#2D6DFF</span> → <span class="sw b"></span> <span class="chg">#1A1A1A</span></div>
+        <div class="drow"><b>Heading font</b></div><div class="drow r"><span class="chg">Inter</span> → <span class="chg">General Sans</span></div>
+        <div class="drow"><b>Corner radius</b></div><div class="drow r"><span class="chg">8px</span> → <span class="chg">12px</span></div>
+        <div class="drow"><b>Button / primary preset</b></div><div class="drow r">inherits accent + radius above</div>
+      </div>
+      <div class="muted" style="font-size:11px;margin-top:5px">3 tokens · 1 preset changed → <b>~80 elements per site</b> re-style. Preview any site before applying.</div>
+
+      <!-- SITES + OVERRIDE RESOLUTION -->
+      <div class="sech">2 · Which sites, and what about local overrides <span class="sub">2 of 6 sites have a local override on a token you changed — resolve each</span></div>
+      <table>
+        <tr><th style="width:26%">Site (client)</th><th style="width:18%">Theme state</th><th style="width:30%">Conflict</th><th style="width:26%">On push</th></tr>
+        <tr><td><b>bloomcafe.com</b> <span class="muted" style="font-size:10px">Bloom</span></td><td><span class="badge sync">synced</span></td><td class="muted" style="font-size:11px">none</td><td><span class="res ok">apply update</span></td></tr>
+        <tr><td><b>cobalt.io</b> <span class="muted" style="font-size:10px">Cobalt</span></td><td><span class="badge sync">synced</span></td><td class="muted" style="font-size:11px">none</td><td><span class="res ok">apply update</span></td></tr>
+        <tr><td><b>docs.cobalt.io</b> <span class="muted" style="font-size:10px">Cobalt</span></td><td><span class="badge sync">synced</span></td><td class="muted" style="font-size:11px">none</td><td><span class="res ok">apply update</span></td></tr>
+        <tr><td><b>acme-main.com</b> <span class="muted" style="font-size:10px">Acme</span></td><td><span class="badge ovr">local override</span></td><td>accent locked to <span class="chg">#0A7</span></td><td><span class="seg"><button class="on">Keep override</button><button>Overwrite</button></span></td></tr>
+        <tr><td><b>acme-careers</b> <span class="muted" style="font-size:10px">Acme</span></td><td><span class="badge ovr">local override</span></td><td>radius locked to <span class="chg">4px</span></td><td><span class="seg"><button class="on">Keep override</button><button>Overwrite</button></span></td></tr>
+        <tr><td><b>northwind.com</b> <span class="muted" style="font-size:10px">internal</span></td><td><span class="badge sync">synced</span></td><td class="muted" style="font-size:11px">none</td><td><span class="res ok">apply update</span></td></tr>
+      </table>
+      <div class="note" style="margin-top:8px"><b>Default is SAFE:</b> sites with a local override <b>keep it</b> unless you explicitly choose Overwrite. No silent clobber — the exact thing that makes a shared theme push dangerous. The conflict column names <i>which</i> token collides, per site.</div>
+
+      <!-- ACTION -->
+      <div class="actionbar">
+        <span class="role">Pushing as <b>Designer</b> (can push).</span>
+        <label class="approval"><span class="chk">✓</span> Require Admin approval before going live</label>
+        <span class="sp"></span>
+        <button class="btn ghost">Preview a site</button>
+        <button class="btn" id="pushBtn">Push to 4 sites →</button>
+      </div>
+      <div class="muted" style="font-size:10.5px;margin-top:6px">4 sites get the update · 2 keep their override · 0 overwritten. (Counts update as you resolve conflicts.)</div>
+    </div>
+
+    <!-- AFTER PUSH: per-site progress + partial failure -->
+    <div class="pushing">
+      <div class="sech">Push result <span class="sub">per-site — not a single "done"</span></div>
+      <table>
+        <tr><th style="width:40%">Site</th><th style="width:30%">Result</th><th>Detail</th></tr>
+        <tr><td><b>bloomcafe.com</b></td><td><span class="dot ok"></span><span class="res ok">updated &amp; republished</span></td><td class="muted" style="font-size:11px">live</td></tr>
+        <tr><td><b>cobalt.io</b></td><td><span class="dot ok"></span><span class="res ok">updated &amp; republished</span></td><td class="muted" style="font-size:11px">live</td></tr>
+        <tr><td><b>docs.cobalt.io</b></td><td><span class="dot ok"></span><span class="res ok">updated</span></td><td class="muted" style="font-size:11px">draft — needs publish</td></tr>
+        <tr><td><b>northwind.com</b></td><td><span class="dot fail"></span><span class="res fail">failed — publish error</span></td><td><a href="20-publish.html" style="color:var(--ink)">Retry ↗</a> · domain DNS pending</td></tr>
+      </table>
+      <div class="resnote"><b>3 of 4 pushed, 1 failed</b> — northwind.com couldn't republish (DNS pending). The shared theme is updated everywhere; only the failed site's <i>live</i> deploy needs a retry. Acme's 2 overrides were kept, untouched. <b>Nothing was clobbered.</b> <button class="btn ghost" onclick="document.body.setAttribute('data-state','preflight')" style="margin-left:6px">← back to review</button></div>
+    </div>
+
+    <div class="note" style="margin-top:16px"><b>Why this closes the footgun:</b> the agency can finally answer <i>"if I change the shared theme, which of my clients' live sites change?"</i> — the table shows it, override conflicts are explicit and default to keep, the push reports per-site, and partial failure is a first-class state, not a silent half-apply. This is the surface that makes the #1 wedge (shared theme across clients) safe to ship.</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>theme push:</b><a href="a5-invite.html">Invite client</a><a href="m-approval.html">Approval</a><a href="m-agency.html">M-agency</a><a href="m-ds-push.html" style="border-color:#fff;background:#fff;color:#334155;font-weight:600">M-ds-push</a><a href="m-ownership.html">Ownership</a><a href="m-roles.html">Roles</a><a href="../2026-06-17-product-ux-audit.md">UX audit (finding A)</a><a href="index.html">Map</a></div>
+<script>
+  document.getElementById('pushBtn').onclick=function(){document.body.setAttribute('data-state','pushing');window.scrollTo(0,0);};
+</script>
+</body></html>

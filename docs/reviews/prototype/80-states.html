@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 80 — State standard (reconciled)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:920px}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .st{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .sh{padding:7px 11px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600}
+  .sb{padding:14px 11px;text-align:center;min-height:84px;display:flex;flex-direction:column;justify-content:center;color:var(--ink-3)}
+  .sb .big{font-size:20px;margin-bottom:5px}
+  .sb .t{font-size:12px;font-weight:600;color:var(--ink-2)}
+  .sb .d{font-size:10.5px;margin-top:3px;line-height:1.35}
+  .sb a{color:var(--ink);text-decoration:underline}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 7px}
+  .grp:first-child{margin-top:4px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · 80 · STATE STANDARD</div>
+<div class="screen">
+  <div class="topnote"><b>State standard — extended for the reconciled cases.</b> Rebuilt: the generic 5 states plus the new ones the solution introduces. The editor-specific micro-states (inspector-empty, slug-redirect, why-disabled) live in <a href="m-states.html" style="color:#fff;text-decoration:underline">M-states</a>; this is the product-wide standard.</div>
+  <div class="wrap">
+    <div class="grp">The base 4 (every list/page)</div>
+    <div class="grid">
+      <div class="st"><div class="sh">Loading</div><div class="sb"><div class="big">◌</div><div class="t">Skeleton</div><div class="d">shape of content, no spinner-only</div></div></div>
+      <div class="st"><div class="sh">Empty</div><div class="sb"><div class="big">＋</div><div class="t">Do the first thing</div><div class="d">one clear action, never a void</div></div></div>
+      <div class="st"><div class="sh">Error</div><div class="sb"><div class="big">!</div><div class="t">What + retry</div><div class="d">plain cause, a way out</div></div></div>
+      <div class="st"><div class="sh">Denied</div><div class="sb"><div class="big">⊘</div><div class="t">Role can't</div><div class="d">"ask an admin" — not a dead end</div></div></div>
+    </div>
+    <div class="grp">New — from the reconciliation</div>
+    <div class="grid">
+      <div class="st"><div class="sh">Role vs density</div><div class="sb"><div class="t">Hidden vs blocked</div><div class="d">"turn on full controls" or "ask admin" — <a href="m-states.html">M-states</a></div></div></div>
+      <div class="st"><div class="sh">Zero clients</div><div class="sb"><div class="t">New agency</div><div class="d">add first client + house template</div></div></div>
+      <div class="st"><div class="sh">No-data Traffic</div><div class="sb"><div class="t">Fix setup ↗</div><div class="d">deep-link to the broken layer, no fake chart</div></div></div>
+      <div class="st"><div class="sh">theme push partial-fail</div><div class="sb"><div class="t">4 of 6 pushed</div><div class="d">per-site result + retry — <a href="m-ds-push.html">M-ds-push</a></div></div></div>
+      <div class="st"><div class="sh">Save conflict</div><div class="sb"><div class="t">Stale session</div><div class="d">never clobber — <a href="61-conflict.html">61</a></div></div></div>
+      <div class="st"><div class="sh">Approval pending</div><div class="sb"><div class="t">Sent for review</div><div class="d">client edit awaiting agency — <a href="m-approval.html">M-approval</a></div></div></div>
+    </div>
+    <div class="note2"><b>Honest states everywhere.</b> No fake charts, no unexplained disabled buttons, no silent half-applies. Each state names the cause and the next step. This is the discipline that kills the support-ticket classes the audit predicted.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>States:</b><a href="m-states.html">Editor states</a><a href="m-ds-push.html">theme push fail</a><a href="m-approval.html">Approval</a><a href="m-roles.html">Roles</a><a href="index.html">Map</a></div>
+</body></html>

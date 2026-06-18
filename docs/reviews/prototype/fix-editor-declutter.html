@@ -1,0 +1,174 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Editor de-clutter for Pro/agency (USABILITY FIX)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .panelcard{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+  .panelcard.before{opacity:.92}
+  .pc-head{padding:9px 12px;border-bottom:1px solid var(--line);background:var(--bg-2);display:flex;align-items:center;justify-content:space-between}
+  .pc-head .t{font-size:12.5px;font-weight:600}
+  .pc-head .badge{font-size:9px;letter-spacing:.05em;text-transform:uppercase;border-radius:3px;padding:2px 7px}
+  .badge.bad{border:1px solid var(--line-d);color:var(--ink-3)}
+  .badge.good{background:var(--accent);color:#fff}
+
+  /* mini-editor diagram */
+  .mini{display:grid;grid-template-columns:30px 1fr;min-height:280px}
+  .mrail{border-right:1px solid var(--line);background:var(--bg-2);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;overflow:hidden}
+  .mrail .ic{width:22px;height:20px;border:1px solid var(--line);border-radius:3px;display:grid;place-items:center;font-size:8px;color:var(--ink-2);background:#fff}
+  .mrail .ic.on{border-color:var(--accent);border-width:1.5px;color:var(--ink);font-weight:600}
+  .mrail .gl{font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:5px}
+  .mrail .more{font-size:7.5px;color:var(--ink-3);border:1px dashed var(--line-d);border-radius:3px;padding:3px 4px;margin-top:3px;text-align:center}
+  .mbody{padding:0}
+  .mscope{padding:7px 10px;border-bottom:1px solid var(--line);background:var(--fill);font-size:10.5px}
+  .mscope b{font-weight:600}
+  .msec{border-bottom:1px dashed var(--line);padding:7px 10px;font-size:10.5px;display:flex;align-items:center;justify-content:space-between;color:var(--ink-2)}
+  .msec .chev{color:var(--ink-3);font-size:8px}
+  .msec.group{font-weight:600;color:var(--ink);background:#fff}
+  .msec.collapsed{color:var(--ink-3)}
+  .msec.adv{color:var(--ink-3);font-style:italic}
+  .msec .tag{font-size:8px;border:1px solid var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 5px}
+  .grouphead{font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);padding:8px 10px 2px}
+  .crowd{padding:5px 10px;font-size:10.5px;color:var(--ink-2);display:flex;align-items:center;justify-content:space-between;border-bottom:1px dashed var(--line)}
+  .crowd .chev{color:var(--ink-3);font-size:8px}
+
+  .countbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:11px}
+  .countpill{border:1px solid var(--line);border-radius:999px;padding:4px 11px;color:var(--ink-2)}
+  .countpill b{color:var(--ink)}
+  .countpill.win{border-color:var(--accent);color:var(--ink)}
+
+  .moves{margin-top:18px}
+  .move{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:11px 0;border-bottom:1px dashed var(--line);align-items:start}
+  .move .n{width:24px;height:24px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:600}
+  .move h4{font-size:12.5px;font-weight:600}
+  .move p{font-size:11.5px;color:var(--ink-2);margin-top:3px}
+  .move p b{color:var(--ink)}
+  .kbd{font-family:var(--mono);font-size:10px;border:1px solid var(--line-d);border-radius:3px;padding:1px 5px;color:var(--ink-2);background:var(--fill)}
+</style></head>
+<body data-surface="editor">
+<div data-recon-banner style="position:sticky;top:0;z-index:999;background:#334155;color:#fff;font:600 12px/1.4 "Inter Tight",sans-serif;padding:7px 14px;text-align:center;border-bottom:2px solid #fff">↗ SUPERSEDED — reconciled into <a href="m-editor.html" style="color:#fff;text-decoration:underline">M-editor</a> (2026-06-18 solution set). Kept for history.</div>
+<div class="wf-stamp">PROTOTYPE · USABILITY FIX (B)</div>
+<div class="screen">
+  <div class="topnote"><b>Editor de-clutter — Pro/agency</b> · fixes "too many panels at once, can't find the control" · <b>cut overwhelm WITHOUT removing power:</b> group the rail, progressively disclose the inspector, ship calm defaults · power stays one reveal away · Pro-first = the surface is quiet, the depth is reachable</div>
+
+  <div class="pad">
+
+    <!-- BEFORE / AFTER -->
+    <div class="cols">
+
+      <!-- BEFORE -->
+      <div class="panelcard before">
+        <div class="pc-head"><span class="t">Today — flat &amp; loud</span><span class="badge bad">before</span></div>
+        <div class="mini">
+          <div class="mrail">
+            <div class="ic">AI</div><div class="ic">Tm</div><div class="ic on">Ad</div><div class="ic">Md</div><div class="ic">Cmp</div>
+            <div class="ic">Ly</div><div class="ic">Pg</div>
+            <div class="ic">Ds</div><div class="ic">St</div><div class="ic">Pb</div><div class="ic">Hs</div>
+          </div>
+          <div class="mbody">
+            <div class="mscope">Editing: <b>CTA button</b> · .btn-primary · 31 site-wide</div>
+            <div class="crowd">Style / Element / Effects tabs <span class="chev">3 tabs</span></div>
+            <div class="msec">Quick actions</div>
+            <div class="msec">Layout</div>
+            <div class="msec">Size</div>
+            <div class="msec">Spacing</div>
+            <div class="msec">Flex</div>
+            <div class="msec">Grid</div>
+            <div class="msec">Typography</div>
+            <div class="msec">Background</div>
+            <div class="msec">Border</div>
+            <div class="msec">Corner radius</div>
+            <div class="msec">Effects</div>
+            <div class="msec">…+CSS classes, All-CSS, Animation, Interactions, Visibility</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AFTER -->
+      <div class="panelcard">
+        <div class="pc-head"><span class="t">Proposed — grouped &amp; calm</span><span class="badge good">after</span></div>
+        <div class="mini">
+          <div class="mrail">
+            <div class="gl">Make</div>
+            <div class="ic on">Ad</div><div class="ic">AI</div><div class="ic">Md</div>
+            <div class="gl">Page</div>
+            <div class="ic">Pg</div><div class="ic">Ly</div>
+            <div class="gl">Design</div>
+            <div class="ic">Ds</div>
+            <div class="more">More ▾<br>Tmpl·Cmp·Hist·Set</div>
+            <div class="gl">Ship</div>
+            <div class="ic">Pb</div>
+          </div>
+          <div class="mbody">
+            <div class="mscope"><b>You are editing</b><br>CTA button <span class="tag">.btn-primary · 31</span></div>
+            <div class="grouphead">Common</div>
+            <div class="msec group">Style <span class="chev">▾</span></div>
+            <div class="msec group">Text <span class="chev">▾</span></div>
+            <div class="msec group">Spacing <span class="chev">▾</span></div>
+            <div class="grouphead">Layout &amp; box</div>
+            <div class="msec collapsed">Layout · Size <span class="chev">▸</span></div>
+            <div class="msec collapsed">Background · Border <span class="chev">▸</span></div>
+            <div class="grouphead">Advanced <span class="tag" style="text-transform:none">reveal</span></div>
+            <div class="msec adv">Effects · Interactions <span class="chev">▸</span></div>
+            <div class="msec adv">CSS classes · All CSS <span class="chev">▸</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="countbar">
+      <span class="countpill">Before — rail buttons visible at once: <b>11 flat</b></span>
+      <span class="countpill win">After — rail: <b>7 grouped + “More”</b></span>
+      <span class="countpill">Before — inspector sections shown: <b>~16 stacked</b></span>
+      <span class="countpill win">After — open by default: <b>3</b> (Common), rest one click</span>
+      <span class="countpill">Before — simultaneous controls: <b>~55–70</b></span>
+      <span class="countpill win">After — calm surface, same engine: <b>nothing deleted</b></span>
+    </div>
+
+    <!-- THE FIVE MOVES -->
+    <div class="moves">
+      <div class="move">
+        <div class="n">1</div>
+        <div>
+          <h4>Group the rail into 4 verbs, fold the rest under “More”</h4>
+          <p>11 flat icons become <b>Make · Page · Design · Ship</b> (Add/AI/Media · Pages/Layers · Design · Publish). Power tabs — Templates, Components, History, Settings — live under a <b>More ▾</b> reveal, still one click, still ⌘K-reachable. Labels under the verbs, not opaque 2-letter glyphs. See the grouped rail on <a href="editor-spine-wireframe.html" style="color:var(--ink);text-decoration:underline">editor-spine-wireframe</a>.</p>
+        </div>
+      </div>
+      <div class="move">
+        <div class="n">2</div>
+        <div>
+          <h4>Progressive disclosure in the inspector — 3 groups, not 16 flat sections</h4>
+          <p>The 3 Style/Element/Effects tabs + 16 sections collapse into <b>Common</b> (Style, Text, Spacing — open by default), <b>Layout &amp; box</b> (collapsed), and <b>Advanced</b> (Effects, Interactions, CSS classes, All-CSS — collapsed, labeled “reveal”). Nothing is removed; the long scroll becomes a short, named stack. Grounded in <a href="59-inspector.html" style="color:var(--ink);text-decoration:underline">59-inspector</a>.</p>
+        </div>
+      </div>
+      <div class="move">
+        <div class="n">3</div>
+        <div>
+          <h4>Calm defaults — “Simple” opens few, “Advanced” reveals all (one toggle, persistent)</h4>
+          <p>The density toggle already exists. Make <b>Simple the calm default</b>: rail = the 4 verbs, inspector = Common only, no CSS box. Flip to <b>Advanced</b> once and it sticks for that user — Pro/agency gets the full surface revealed, never re-hidden. Same engine underneath; this is purely what shows first. Code box / All-CSS only appears in Advanced.</p>
+        </div>
+      </div>
+      <div class="move">
+        <div class="n">4</div>
+        <div>
+          <h4>Pin the scope banner — answer “what am I editing?” before any control</h4>
+          <p>The single biggest “can’t find / scared to touch” driver is not knowing whether a change hits one element or 31. Keep the <b>You are editing</b> banner pinned at the inspector top (element name + shared-class count), with the propagation guard on class-bound edits. Calm ≠ hiding consequences — it means making the consequence the first thing you see.</p>
+        </div>
+      </div>
+      <div class="move">
+        <div class="n">5</div>
+        <div>
+          <h4>One way in for power users — ⌘K to any control, no hunting the rail</h4>
+          <p>Grouping + folding means a Pro never loses speed: <span class="kbd">⌘K</span> jumps straight to any tab, section, or setting by name (“redirects”, “all CSS”, “components”). The calm surface is for scanning; the command palette is for muscle memory. So we can fold aggressively without slowing the expert. See <a href="71-command-palette.html" style="color:var(--ink);text-decoration:underline">71-command-palette</a>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:16px">
+      <div class="note"><b>Pro-first, not dumbed-down:</b> agencies said “good features, but not user-friendly” — the problem is <i>everything shouting at once</i>, not missing depth. Every move here is reveal-or-group, zero removal. The de-clutter pairs with the boundary fix: moving site-ops to the Dashboard (<a href="fix-boundary.html" style="color:var(--ink);text-decoration:underline">fix-boundary</a>) also empties ~6 screens out of the editor’s Settings tab, so the editor surface gets quieter on both axes.</p></div>
+      <div class="note"><b>What lands where:</b> the Settings tab shrinks to page/brand config only (brand, fonts, language, per-page <code>&lt;head&gt;</code>) — see <a href="53-settings.html" style="color:var(--ink);text-decoration:underline">53-settings</a>. Design tokens stay their own calm tab (<a href="ds1-design-system.html" style="color:var(--ink);text-decoration:underline">ds1-design-system</a>). Add stays sections-first for beginners (<a href="52-add.html" style="color:var(--ink);text-decoration:underline">52-add</a>). Result: a Pro editor that’s quiet to look at and deep to reach.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="proto-nav"><b>De-clutter fix:</b><a href="editor-spine-wireframe.html">Editor</a><a href="59-inspector.html">Inspector</a><a href="52-add.html">Add</a><a href="ds1-design-system.html">Design system</a><a href="index.html">Map</a></div>
+</body></html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 59 — Inspector</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:340px;margin:0 auto}
+  .insp{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
+  .scope{padding:10px 12px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .eye{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .sl{font-size:13px;font-weight:600;margin-top:2px}
+  .reach{display:flex;gap:4px;margin-top:8px}
+  .reach .r{flex:1;border:1px solid var(--line);border-radius:4px;padding:5px 3px;text-align:center;font-size:9.5px;color:var(--ink-3);line-height:1.2}
+  .reach .r b{display:block;font-size:10px;color:var(--ink-2)}
+  .reach .r.on{border-color:var(--accent);border-width:1.5px;background:var(--fill)} .reach .r.on b{color:var(--ink)}
+  .grp{font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);padding:8px 12px 2px;background:var(--bg-2);border-bottom:1px solid var(--line)}
+  .sec{padding:9px 12px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;display:flex;justify-content:space-between;color:var(--ink)}
+  .sec .chev{color:var(--ink-3);font-size:10px}
+  .field{display:flex;justify-content:space-between;align-items:center;padding:0 12px 8px;font-size:12px;color:var(--ink-2)}
+  .gbox{border:1px solid var(--line);background:var(--fill);border-radius:3px;padding:4px 8px;font-size:11px;color:var(--ink-2)}
+  .blocked{padding:8px 12px;font-size:10.5px;color:var(--ink-3);font-style:italic;background:var(--bg-2);border-bottom:1px solid var(--line)}
+  .locked{padding:8px 12px;font-size:10.5px;color:var(--ink-2);background:#fff;border-bottom:1px solid var(--line);border-left:3px solid var(--ink)}
+  .locked b{color:var(--ink)}
+  .dchip{font-size:8px;border:1px solid var(--line-d);color:var(--ink-3);border-radius:3px;padding:0 5px;letter-spacing:.03em;margin-left:6px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · 59 · INSPECTOR</div>
+<div class="screen">
+  <div class="topnote"><b>Inspector — job-grouped, 3-reach, role/density reasons.</b> Rebuilt: old class-scope copy + "Advanced" density wording becomes the 3-reach picker (This item / All like this / Whole site) + every hidden/blocked control says WHY (density vs role). Canonical inspector in <a href="m-editor.html" style="color:#fff;text-decoration:underline">M-editor</a>.</div>
+  <div class="wrap">
+    <div class="insp">
+      <div class="scope">
+        <div class="eye">You are editing</div>
+        <div class="sl">Get started button</div>
+        <div class="reach"><div class="r on"><b>This item</b>just here</div><div class="r"><b>All like this</b>12 of them</div><div class="r"><b>Whole site</b>every page</div></div>
+      </div>
+      <div class="grp">Edit — grouped by job</div>
+      <div class="sec">Content <span class="chev">▾</span></div>
+      <div class="field"><span>Text</span><span class="gbox">Get started</span></div>
+      <div class="field"><span>Link</span><span class="gbox">/signup ▾</span></div>
+      <div class="sec">Layout <span class="chev">▾</span></div>
+      <div class="field"><span>Size · padding</span><span class="gbox">Auto ▾</span></div>
+      <div class="field"><span>Align</span><span class="gbox">Center ▾</span></div>
+      <div class="sec">Style <span class="chev">▾</span></div>
+      <div class="field"><span>Fill</span><span class="gbox" style="width:20px">▢</span></div>
+      <div class="field"><span>Text color · radius</span><span class="gbox" style="width:20px">▢</span></div>
+      <div class="grp">More controls</div>
+      <div class="sec">Responsive <span><span class="dchip">Pro</span> <span class="chev">▸</span></span></div>
+      <div class="sec">Behavior · interactions <span><span class="dchip">Pro</span> <span class="chev">▸</span></span></div>
+      <div class="sec" style="color:var(--ink-3)">Advanced styling <span style="font-size:8px;color:var(--ink-3)">Designer</span> <span class="chev">▸</span></div>
+      <div class="blocked">↳ <b>Hidden in the simplified view</b> — turn on full controls in settings (reversible, nothing deleted)</div>
+      <div class="locked">🔒 <b>Locked for your role</b> (Content editor) — advanced styling is set by a Designer. Ask an admin.</div>
+    </div>
+    <div class="note2"><b>Reach replaces engine scope.</b> No "detach / class / override" — you pick a reach, the editor maps it. For a Content editor, advanced styling is <i>blocked by role</i> ("ask an admin"), shown differently from <i>hidden by density</i> ("turn on full controls"). Density ≠ permission — see <a href="m-states.html" style="color:var(--ink-2)">M-states</a> · <a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Inspector:</b><a href="m-editor.html">Editor</a><a href="fix-styling-3reach.html">3-reach</a><a href="59b-inspector-states.html">States × bp</a><a href="m-states.html">Why-disabled</a><a href="index.html">Map</a></div>
+</body></html>

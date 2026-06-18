@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Image editor</title><link rel="stylesheet" href="pt.css">
+<style>.vs{display:none}.vs.on{display:block}.tool{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--ink-2);cursor:pointer;padding:6px 8px;border-radius:5px}.tool:hover{background:var(--fill)}.tool.on{background:var(--accent);color:#fff}.tool .i{font-size:15px}</style></head>
+<body data-surface="editor">
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#F8FAFC;color:#334155;font:600 11.5px/1.45 "Inter Tight",sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #E2E8F0">↻ RECONCILED ROLE (2026-06-18): In-place asset subtool launched from the picker/library.</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>Image editor · icon picker · version history</b> · grounded in media arc (image editor before/after, IconPickerModal, <code>MediaAssetVersion</code>) · the asset sub-tools behind 56</div>
+  <div class="pad">
+    <div class="row" style="margin-bottom:14px"><button class="chip on" onclick="m('edit',this)">Image editor</button><button class="chip" onclick="m('icon',this)">Icon picker</button><button class="chip" onclick="m('ver',this)">Version history</button></div>
+
+    <div class="vs on" id="m_edit">
+      <div style="display:grid;grid-template-columns:64px 1fr 200px;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="tool on"><span class="i">⛶</span>Crop</div>
+          <div class="tool"><span class="i">↻</span>Rotate</div>
+          <div class="tool"><span class="i">⇋</span>Flip</div>
+          <div class="tool"><span class="i">◐</span>Adjust</div>
+          <div class="tool"><span class="i">✂</span>BG remove</div>
+          <div class="tool"><span class="i">▦</span>Filter</div>
+        </div>
+        <div class="ph-img" style="height:260px;position:relative">▦ image canvas<span class="chip" style="position:absolute;top:8px;left:8px;background:#fff;cursor:pointer">◑ hold: before / after</span></div>
+        <div>
+          <div class="lbl" style="margin-bottom:6px">Adjust</div>
+          <div style="font-size:11px">Brightness<div class="barline" style="height:6px;width:60%;margin:4px 0 8px"></div>Contrast<div class="barline" style="height:6px;width:50%;margin:4px 0 8px"></div>Saturation<div class="barline" style="height:6px;width:55%;margin:4px 0 8px"></div></div>
+          <div class="lbl" style="margin:8px 0 4px">Aspect</div>
+          <div class="row" style="flex-wrap:wrap"><span class="chip on">Free</span><span class="chip">1:1</span><span class="chip">16:9</span><span class="chip">4:3</span></div>
+          <div class="lbl" style="margin:10px 0 4px">Max dimension</div><div class="input">1600px</div>
+        </div>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:12px"><span class="muted" style="font-size:10.5px">Hold the chip to compare before/after. Edits are non-destructive (saved as a new version).</span><div class="row"><button class="btn">Reset</button><a href="56-media.html" class="btn btn-fill btn-strong">Save edit</a></div></div>
+    </div>
+
+    <div class="vs" id="m_icon">
+      <div class="h2" style="margin-bottom:4px">Icon picker</div>
+      <div class="muted" style="font-size:11.5px;margin-bottom:10px">Grounded in IconPickerModal · search a library, set stroke + size, insert.</div>
+      <div class="input" style="width:100%;margin-bottom:8px">⌕ search icons (arrow, cart, user…)</div>
+      <div class="row" style="margin-bottom:10px"><span class="muted" style="font-size:10.5px;align-self:center">Style:</span><span class="chip on">Outline</span><span class="chip">Solid</span><span class="muted" style="font-size:10.5px;align-self:center;margin-left:8px">Stroke:</span><span class="chip">1.5</span><span class="chip on">2</span><span class="muted" style="font-size:10.5px;align-self:center;margin-left:8px">Size:</span><span class="chip">sm</span><span class="chip on">md</span><span class="chip">lg</span></div>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:8px">
+        <div class="ph-img" style="height:42px">★</div><div class="ph-img" style="height:42px">→</div><div class="ph-img" style="height:42px">✓</div><div class="ph-img" style="height:42px">⚙</div><div class="ph-img" style="height:42px">♡</div><div class="ph-img" style="height:42px">⌂</div><div class="ph-img" style="height:42px">✉</div><div class="ph-img" style="height:42px">▶</div>
+        <div class="ph-img" style="height:42px">⬇</div><div class="ph-img" style="height:42px">🔍</div><div class="ph-img" style="height:42px">＋</div><div class="ph-img" style="height:42px">×</div><div class="ph-img" style="height:42px">☰</div><div class="ph-img" style="height:42px">⏱</div><div class="ph-img" style="height:42px">◷</div><div class="ph-img" style="height:42px">⚑</div>
+      </div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><a href="52-add.html" class="btn btn-fill">Insert icon</a></div>
+      <div class="muted" style="font-size:10px;margin-top:8px">Icons inherit the design-system icon tokens (style/stroke/size from ds1).</div>
+    </div>
+
+    <div class="vs" id="m_ver">
+      <div class="h2" style="margin-bottom:4px">Version history</div>
+      <div class="muted" style="font-size:11.5px;margin-bottom:10px">Grounded in <code>MediaAssetVersion</code> (tier-limited 5/25/100) · each edit = a restorable version.</div>
+      <div class="grid4">
+        <div class="box"><div class="ph-img" style="height:70px">▦ now</div><div class="pad" style="padding:7px;font-size:10.5px"><b>Current</b><div class="muted" style="font-size:9px">cropped + bright</div></div></div>
+        <div class="box"><div class="ph-img" style="height:70px">▦ v3</div><div class="pad" style="padding:7px;font-size:10.5px">2h ago<div class="muted" style="font-size:9px">rotated</div></div></div>
+        <div class="box"><div class="ph-img" style="height:70px">▦ v2</div><div class="pad" style="padding:7px;font-size:10.5px">1d ago<div class="muted" style="font-size:9px">filter</div></div></div>
+        <div class="box"><div class="ph-img" style="height:70px">▦ v1</div><div class="pad" style="padding:7px;font-size:10.5px">original<div class="muted" style="font-size:9px">upload</div></div></div>
+      </div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn">Compare</button><button class="btn btn-fill">Restore v1 (original)</button></div>
+      <div class="muted" style="font-size:10px;margin-top:8px">Restore is non-destructive (creates a new version). Plan caps the # kept.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Assets:</b><a href="56-media.html">Assets</a><a href="56b-stock.html">Stock</a><a href="56c-image-editor.html" class="here">Image editor</a><a href="17-media.html">Dashboard Assets</a><a href="ds1-design-system.html">Icon tokens</a><a href="index.html">Map</a></div>
+<script>var M=['edit','icon','ver'];function m(x,b){M.forEach(function(k){document.getElementById('m_'+k).classList.toggle('on',k===x);});document.querySelectorAll('.row .chip').forEach(function(c){});b.parentNode.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
+</body></html>

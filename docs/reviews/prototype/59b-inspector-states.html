@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 59b — States × breakpoints</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:600px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .pills{display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap}
+  .pill{font-size:11px;border:1px solid var(--line);border-radius:5px;padding:4px 10px;color:var(--ink-3)}
+  .pill.on{border-color:var(--accent);color:var(--ink);font-weight:600}
+  .lbl{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:12px 0 5px}
+  .banner{border:1px dashed var(--ink);border-radius:7px;padding:9px 12px;font-size:11.5px;color:var(--ink-2);background:var(--fill);margin:8px 0}
+  .banner b{color:var(--ink)}
+  .why{border:1px solid var(--line);border-radius:7px;padding:9px 12px;font-size:11.5px;color:var(--ink-2);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+  .why.blocked{border-style:dashed} .why .tag{font-size:9.5px;color:var(--ink-3);font-style:italic}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · 59b · STATES × BREAKPOINTS</div>
+<div class="screen">
+  <div class="topnote"><b>States &amp; breakpoints — Pro, and labelled by cause.</b> Rebuilt: keeps state (:hover/:focus) + responsive override editing, but every control that isn't available says <b>why</b> — hidden by density or blocked by role. These mechanics are Pro/Designer; a Simple-mode Content editor just sees "how it looks on phone."</div>
+  <div class="wrap">
+    <div class="crumb"><b>acme-main</b> › Get started button</div>
+    <div class="lbl">Breakpoint</div>
+    <div class="pills"><span class="pill on">Base</span><span class="pill">Tablet</span><span class="pill">Phone</span></div>
+    <div class="lbl">State</div>
+    <div class="pills"><span class="pill">Default</span><span class="pill on">:hover</span><span class="pill">:focus</span></div>
+    <div class="banner">▣ Editing the <b>:hover</b> state on <b>Tablet</b> — only affects tablet hover. Base stays untouched.</div>
+    <div class="lbl">Availability</div>
+    <div class="why">Breakpoint &amp; state overrides <span class="tag">Pro · revealed</span></div>
+    <div class="why blocked">Advanced styling <span class="tag">your role can't edit — ask an admin</span></div>
+    <div class="note2"><b>Hidden vs blocked, never confused.</b> In Simple these mechanics are <i>hidden</i> ("turn on full controls"); for a Content editor the advanced-styling bits are <i>blocked</i> ("ask an admin"). The phone banner keeps a beginner from wondering why desktop didn't change. Density ≠ permission (<a href="m-states.html" style="color:var(--ink-2)">M-states</a>).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>States×bp:</b><a href="59-inspector.html">Inspector</a><a href="m-editor.html">Editor</a><a href="m-states.html">Why-disabled</a><a href="m-roles.html">Roles</a><a href="index.html">Map</a></div>
+</body></html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Account settings</title><link rel="stylesheet" href="pt.css">
+<style>
+  .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--accent);color:#fff;font-weight:600}
+  .sn{padding:7px 9px;border-radius:5px;color:var(--ink-2);cursor:pointer;font-size:12.5px}.sn:hover{background:var(--fill)}.sn.on{background:var(--accent);color:#fff;font-weight:600}
+  .vs{display:none}.vs.on{display:block}
+  .sess{display:flex;align-items:center;gap:10px;border-bottom:1px dashed var(--line);padding:9px 0;font-size:12px}
+  .tog{width:34px;height:18px;border:1px solid var(--line-d);border-radius:999px;position:relative}.tog::after{content:"";position:absolute;width:14px;height:14px;background:var(--ink-3);border-radius:50%;top:1px;left:1px}.tog.on{background:var(--accent);border-color:var(--accent)}.tog.on::after{left:17px;background:#fff}
+</style></head>
+<body data-surface="dashboard">
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#F8FAFC;color:#334155;font:600 11.5px/1.45 "Inter Tight",sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #E2E8F0">↻ RECONCILED ROLE (2026-06-18): AI credits = read-only mirror; remove any workspace-owned writes from personal settings.</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>Account &amp; personal settings</b> · grounded in <code>account.*</code> tRPC + <code>/dashboard/settings/*</code> · sections mirror the real routes (account/security/notifications/ai/profile/danger)</div>
+  <div class="ed">
+    <aside style="border-right:1px dashed var(--line);padding:16px 12px">
+      <a href="m3-dashboard.html" class="muted" style="font-size:11px;text-decoration:none;display:block;margin-bottom:12px">← Dashboard</a>
+      <div class="lbl" style="margin-bottom:6px">Personal</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div class="sn" onclick="s('profile',this)">Profile</div>
+        <div class="sn on" onclick="s('account',this)">Account &amp; login</div>
+        <div class="sn" onclick="s('security',this)">Security</div>
+        <div class="sn" onclick="s('notif',this)">Notifications</div>
+        <div class="sn" onclick="s('ai',this)">AI credits</div>
+        <div class="sn" onclick="s('danger',this)" style="color:var(--ink)">Danger zone</div>
+      </div>
+    </aside>
+    <main class="pad">
+      <div class="vs" id="s_profile"><div class="h1" style="font-size:18px;margin-bottom:12px">Profile</div>
+        <div class="row" style="margin-bottom:12px"><div class="ph-img" style="width:56px;height:56px;border-radius:50%">JD</div><button class="btn">Change avatar</button></div>
+        <div class="lbl">Display name</div><div class="input" style="width:60%;margin:5px 0 10px">Jane Doe</div>
+        <div class="lbl">Bio</div><div class="input" style="width:100%;height:40px;margin:5px 0 10px">Designer · building things</div>
+        <div class="grid2" style="max-width:400px"><div><div class="lbl">Language</div><div class="input" style="margin-top:5px">English ▾</div></div><div><div class="lbl">Timezone</div><div class="input" style="margin-top:5px">UTC ▾</div></div></div>
+      </div>
+      <div class="vs on" id="s_account"><div class="h1" style="font-size:18px;margin-bottom:12px">Account &amp; login</div>
+        <div class="box pad" style="margin-bottom:12px"><div class="lbl">Email</div><div class="row" style="justify-content:space-between;margin-top:5px"><span style="font-size:13px">you@company.com</span><button class="btn">Change email</button></div><div class="muted" style="font-size:10px;margin-top:5px">Change sends a confirmation link to the new address (<code>account.changeEmail</code>).</div></div>
+        <div class="box pad" style="margin-bottom:12px"><div class="lbl">Password</div><div class="row" style="justify-content:space-between;margin-top:5px"><span class="muted" style="font-size:12px">••••••••</span><button class="btn">Change password</button></div></div>
+        <div class="box pad"><div class="lbl">Connected accounts</div>
+          <div class="row" style="justify-content:space-between;margin-top:8px;font-size:12px">Google <span class="tag-exists">Connected</span></div>
+          <div class="row" style="justify-content:space-between;margin-top:8px;font-size:12px">GitHub <button class="btn" style="padding:3px 9px">Connect</button></div>
+          <div class="muted" style="font-size:10px;margin-top:6px">Disconnect blocked if it's your only sign-in method (<code>disconnectProvider</code> guard).</div>
+        </div>
+      </div>
+      <div class="vs" id="s_security"><div class="h1" style="font-size:18px;margin-bottom:12px">Security</div>
+        <div class="box pad" style="margin-bottom:12px"><div class="row" style="justify-content:space-between"><div><b style="font-size:13px">Two-factor auth</b><div class="muted" style="font-size:11px">Authenticator app + 10 backup codes</div></div><div class="row"><span class="tag-exists">On</span><button class="btn">Manage</button></div></div><div class="muted" style="font-size:10px;margin-top:6px">Enable → QR + secret → confirm OTP → backup codes (<code>account.twoFactor.*</code>).</div></div>
+        <div class="box pad"><div class="lbl" style="margin-bottom:6px">Active sessions</div>
+          <div class="sess"><span>💻</span><div><b>MacBook · Chrome</b><div class="muted" style="font-size:10px">San Francisco · current</div></div><span class="tag-exists" style="margin-left:auto">this device</span></div>
+          <div class="sess"><span>📱</span><div><b>iPhone · Safari</b><div class="muted" style="font-size:10px">2 days ago</div></div><button class="btn" style="margin-left:auto;padding:3px 9px">Revoke</button></div>
+          <div class="sess" style="border:none"><span>💻</span><div><b>Windows · Edge</b><div class="muted" style="font-size:10px">1 week ago</div></div><button class="btn" style="margin-left:auto;padding:3px 9px">Revoke</button></div>
+          <button class="btn" style="margin-top:8px">Sign out all other devices</button>
+        </div>
+      </div>
+      <div class="vs" id="s_notif"><div class="h1" style="font-size:18px;margin-bottom:12px">Notifications</div>
+        <div class="muted" style="font-size:11.5px;margin-bottom:10px">Per category: in-app + email (instant / daily digest / off). Grounded in <code>NotificationPref</code>.</div>
+        <div class="box pad">
+          <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12px">Publish events <div class="row"><span class="tog on"></span><span class="input" style="padding:3px 8px;font-size:10px">Instant ▾</span></div></div>
+          <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12px">Team &amp; invites <div class="row"><span class="tog on"></span><span class="input" style="padding:3px 8px;font-size:10px">Instant ▾</span></div></div>
+          <div class="row" style="justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12px">Billing alerts <div class="row"><span class="tog on"></span><span class="input" style="padding:3px 8px;font-size:10px">Instant ▾</span></div></div>
+          <div class="row" style="justify-content:space-between;padding:8px 0;font-size:12px">Product news <div class="row"><span class="tog"></span><span class="input" style="padding:3px 8px;font-size:10px">Digest ▾</span></div></div>
+        </div>
+      </div>
+      <div class="vs" id="s_ai"><div class="h1" style="font-size:18px;margin-bottom:12px">AI credits</div>
+        <div class="box pad" style="margin-bottom:12px"><div class="row" style="justify-content:space-between"><b style="font-size:13px">This month</b><span>18 / 25 used</span></div><div class="barline" style="height:8px;width:72%;margin-top:8px"></div><div class="muted" style="font-size:10px;margin-top:6px"><b>Workspace pool, read-only here</b> (credits bill at the workspace — home is Billing, not your account). Free 5/day · Pro 25/day, resets daily. <a href="16-billing.html" style="text-decoration:underline">Manage</a>.</div></div>
+        <div class="box pad"><div class="lbl" style="margin-bottom:6px">Recent usage (<code>AIUsage</code>)</div>
+          <div class="row" style="justify-content:space-between;font-size:11.5px;padding:5px 0;border-bottom:1px dashed var(--line)">Today · page generate <span class="muted">3 credits</span></div>
+          <div class="row" style="justify-content:space-between;font-size:11.5px;padding:5px 0;border-bottom:1px dashed var(--line)">Today · in-canvas edit <span class="muted">1 credit</span></div>
+          <div class="row" style="justify-content:space-between;font-size:11.5px;padding:5px 0">Yesterday · alt-text ×4 <span class="muted">4 credits</span></div>
+        </div>
+      </div>
+      <div class="vs" id="s_danger"><div class="h1" style="font-size:18px;margin-bottom:12px">Danger zone</div>
+        <div class="box pad" style="margin-bottom:12px"><div class="row" style="justify-content:space-between"><div><b style="font-size:13px">Export your data</b><div class="muted" style="font-size:11px">GDPR export — emailed download link when ready.</div></div><button class="btn">Request export</button></div></div>
+        <div class="box pad" style="border-color:var(--accent)"><div class="row" style="justify-content:space-between"><div><b style="font-size:13px">Delete account</b><div class="muted" style="font-size:11px">30-day grace period, then permanent. Cancellable.</div></div><a href="70-confirm.html" class="btn">Delete account…</a></div></div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="proto-nav"><b>Settings:</b><a href="m3-dashboard.html">Dashboard</a><a href="b1-account-settings.html" class="here">Account</a><a href="18-workspace.html">Workspace</a><a href="c1-team.html">Team</a><a href="c4-integrations.html">Integrations</a><a href="16-billing.html">Billing</a><a href="index.html">Map</a></div>
+<script>function s(x,b){['profile','account','security','notif','ai','danger'].forEach(function(k){document.getElementById('s_'+k).classList.toggle('on',k===x);});document.querySelectorAll('.sn').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}</script>
+</body></html>

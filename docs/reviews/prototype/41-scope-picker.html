@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 41 — Reach picker (3 reaches)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:760px}
+  .q{font-size:15px;font-weight:600;margin-bottom:3px}
+  .qs{font-size:11.5px;color:var(--ink-2);margin-bottom:12px}
+  .reaches{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .reach{border:1px solid var(--line);border-radius:8px;padding:13px;background:#fff;position:relative;cursor:pointer}
+  .reach.on{border:2px solid var(--ink);background:var(--fill)}
+  .reach .pic{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+  .reach .nm{font-size:14px;font-weight:700;margin:3px 0 2px}
+  .reach .ans{font-size:11px;color:var(--ink-2);line-height:1.35}
+  .reach .cnt{margin-top:8px;font-size:10px;color:var(--ink-3);border-top:1px dashed var(--line);padding-top:6px}
+  .reach .cnt b{color:var(--ink);font-size:13px;display:block}
+  .reach .def{position:absolute;top:9px;right:9px;font-size:8px;background:var(--accent);color:#fff;border-radius:3px;padding:1px 5px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)} .note2 code{font-family:var(--mono);font-size:10.5px}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · 41 · REACH PICKER</div>
+<div class="screen">
+  <div class="topnote"><b>Reach picker — 3 plain answers.</b> Rebuilt: the old 5-rung ladder (element / class / component / preset / token) is gone from the UI. One question, three answers; the engine layers are picked silently. Full model: <a href="fix-styling-3reach.html" style="color:#fff;text-decoration:underline">fix-styling-3reach</a>.</div>
+  <div class="wrap">
+    <div class="q">Change how this looks</div>
+    <div class="qs">"Should this change anywhere else?" — that's the whole decision. selected: <b>Get started</b> button</div>
+    <div class="reaches">
+      <div class="reach on"><span class="def">default</span><div class="pic">No, just here</div><div class="nm">This item</div><div class="ans">A one-off. Nothing else moves.</div><div class="cnt"><b>1</b>element</div></div>
+      <div class="reach"><div class="pic">Yes, all like it</div><div class="nm">All like this</div><div class="ans">Every button like this stays in sync.</div><div class="cnt"><b>12</b>here · 31 site</div></div>
+      <div class="reach"><div class="pic">Yes, it's the brand</div><div class="nm">Whole site</div><div class="ans">Accent / font / radius, site-wide.</div><div class="cnt"><b>site-wide</b>80+ uses</div></div>
+    </div>
+    <div class="note2"><b>Every selection starts at "This item."</b> Climbing wider is an explicit, counted choice with the blast radius shown first; going narrower ("just this one") is always free. No <code>class</code> / <code>component</code> / <code>preset</code> / <code>token</code> vocabulary — the editor maps your answer to the right layer. <b>Shared theme "Whole site" across clients is a separate review flow</b> (<a href="m-ds-push.html" style="color:var(--ink-2)">M-ds-push</a>), not a 4th reach.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Reach:</b><a href="fix-styling-3reach.html">3-reach model</a><a href="m-editor.html">Inspector</a><a href="m-ds-push.html">Shared theme push</a><a href="40-edit-scope.html">Edit scope</a><a href="index.html">Map</a></div>
+</body></html>

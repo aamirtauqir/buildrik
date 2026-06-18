@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · S-editor — editor unhappy paths, now drawn</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .mock{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .mh{padding:7px 12px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .mh .tag{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border:1px dashed var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 6px}
+  .mb{padding:13px}
+  .empty{text-align:center;color:var(--ink-3);padding:16px 12px}
+  .empty .big{font-size:26px;line-height:1;margin-bottom:8px}
+  .empty .t{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .empty .d{font-size:11px;margin-top:5px;line-height:1.4}
+  .empty .acts{display:flex;gap:6px;justify-content:center;margin-top:11px;flex-wrap:wrap}
+  .empty .acts span{border:1px solid var(--line);border-radius:5px;padding:5px 10px;font-size:11px;color:var(--ink-2)}
+  .empty .acts span.pri{border-color:var(--accent);color:#fff;background:var(--accent);font-weight:600}
+  .toast{border:1px solid var(--ink);border-radius:7px;padding:10px 12px;background:var(--fill);font-size:12px;display:flex;align-items:flex-start;gap:9px}
+  .toast.err{border-style:solid}
+  .toast .ic{font-size:15px}
+  .toast .tx{flex:1;color:var(--ink-2);line-height:1.4}
+  .toast .tx b{color:var(--ink)}
+  .toast .act{font-size:11px;color:var(--ink);text-decoration:underline;white-space:nowrap}
+  .prog{height:7px;border:1px solid var(--line);border-radius:4px;background:var(--bg-2);overflow:hidden;margin:8px 0}
+  .prog i{display:block;height:100%;background:var(--accent);width:62%}
+  .tip{border:1px solid var(--line-d);border-radius:7px;padding:10px 12px;font-size:11.5px;color:var(--ink-2);line-height:1.45;background:#fff}
+  .tip b{color:var(--ink)}
+  .kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-family:var(--mono);font-size:10.5px;background:var(--bg-2);color:var(--ink-2)}
+  .krow{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ink-2);padding:5px 0;border-bottom:1px dashed var(--line)}
+  .krow:last-child{border-bottom:none}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:6px}.note2 b{color:var(--ink)}
+  .canvas{border:1px dashed var(--line-d);border-radius:7px;min-height:96px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink-3);background:var(--bg-2)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · S-EDITOR · UNHAPPY PATHS</div>
+<div class="screen">
+  <div class="topnote"><b>Editor states — the unhappy paths a real builder hits, now drawn.</b> Codex scope-review (2026-06-18): the editor was happy-path. These are the states every session actually reaches — blank canvas, AI that fails mid-run, an upload that's too big, a paste, a shortcut, an undo limit. Each names the cause + the way out. The micro-states (inspector-empty · slug-redirect · why-disabled) live in <a href="m-states.html" style="color:#fff;text-decoration:underline">M-states</a>; this is the canvas + AI + input layer.</div>
+  <div class="wrap">
+
+    <!-- 1. BLANK CANVAS -->
+    <div class="sech">1 · The blank page — first block &amp; deleted-last-block <span class="sub">a new page is not a void</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">New / empty page <span class="tag">first thing</span></div>
+        <div class="mb">
+          <div class="canvas"><div><div style="font-size:22px">＋</div><div style="font-size:12px;font-weight:600;color:var(--ink-2);margin-top:5px">Start this page</div><div style="font-size:10.5px;margin-top:3px">Drop a section, pick a template, or ask AI</div></div></div>
+          <div class="empty" style="padding-top:11px"><div class="acts"><span class="pri">＋ Insert section</span><span>▦ Use template</span><span>✨ Ask AI</span></div></div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Deleted the last block <span class="tag">don't strand the user</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">↺</span><span class="tx"><b>Section removed.</b> The page is empty again — re-add anything, or undo.</span><span class="act">Undo</span></div>
+          <div class="canvas" style="margin-top:9px"><div><div style="font-size:12px;font-weight:600;color:var(--ink-2)">Empty page</div><div style="font-size:10.5px;margin-top:3px">Same first-block actions return — never a dead canvas</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. AI ASSISTANT ASYNC -->
+    <div class="sech">2 · ✨ Ask AI — generating, partial salvage, failed, apply-conflict <span class="sub">AI is async; every async op shows progress + a fallback</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Generating <span class="tag">in progress</span></div>
+        <div class="mb">
+          <div class="krow"><span>Building 4 sections…</span><span style="font-family:var(--mono);font-size:10.5px">2 / 4</span></div>
+          <div class="prog"><i></i></div>
+          <div class="note2">Streams in as it builds. <b>Stop</b> keeps what's done — no all-or-nothing. <span style="color:var(--ink-3)">Designer/Content editor can keep editing the rest of the page while it runs.</span></div>
+          <div class="empty" style="padding:8px 0 0"><div class="acts"><span>⏹ Stop &amp; keep</span></div></div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Partial — 3 of 4 built, 1 failed <span class="tag">salvage, don't discard</span></div>
+        <div class="mb">
+          <div class="toast err"><span class="ic">!</span><span class="tx"><b>3 sections added. 1 couldn't generate</b> (the pricing table). The rest is on your page — nothing lost.</span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span class="pri">Retry the 1</span><span>Add it blank</span><span>Skip</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cols" style="margin-top:12px">
+      <div class="mock">
+        <div class="mh">Failed entirely <span class="tag">never a silent spinner</span></div>
+        <div class="mb">
+          <div class="toast err"><span class="ic">⚠</span><span class="tx"><b>AI is unavailable right now.</b> Your page is untouched. Try again, or build it yourself.<br><span style="font-size:10px;color:var(--ink-3)">If it keeps failing it may be your AI credits — check usage.</span></span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span class="pri">Try again</span><span>Insert manually</span><span>AI credits ↗</span></div></div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Apply-conflict — page changed under AI <span class="tag">single-writer safety</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">↪</span><span class="tx"><b>This page was saved elsewhere while AI worked.</b> Applying could overwrite newer edits — same rule as a save conflict.</span></div>
+          <div class="empty" style="padding:9px 0 0"><div class="acts"><span class="pri">Review changes</span><span>Keep both ↗</span></div></div>
+          <div class="note2">Routes to the <a href="61-conflict.html">save-conflict</a> model — AI never clobbers a newer save.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. IMAGE UPLOAD FAIL -->
+    <div class="sech">3 · Image / asset upload — the four ways it fails <span class="sub">drag-drop and pick both hit these</span></div>
+    <div class="cols3">
+      <div class="mock"><div class="mh">Wrong type</div><div class="mb"><div class="toast err"><span class="ic">⊘</span><span class="tx"><b>.mov isn't an image.</b> Use JPG, PNG, WebP, SVG, or GIF.</span></div></div></div>
+      <div class="mock"><div class="mh">Too large</div><div class="mb"><div class="toast err"><span class="ic">⚠</span><span class="tx"><b>14 MB is over the 10 MB limit.</b> Compress it, or we can shrink it on upload.</span><span class="act">Shrink</span></div></div></div>
+      <div class="mock"><div class="mh">Quota full</div><div class="mb"><div class="toast err"><span class="ic">▰</span><span class="tx"><b>Storage is full</b> (2 GB). Free space in Assets, or upgrade.</span><span class="act">Assets ↗</span></div></div></div>
+    </div>
+    <div class="note2" style="margin-top:10px">Processing failure (corrupt file / optimize step dies) shows the same shape: <b>what failed + retry</b>, original kept, never a broken thumbnail. Full media coverage → <a href="s-media-states.html">S-media states</a>.</div>
+
+    <!-- 4. INPUT: PASTE / KEYBOARD / UNDO / TOUCH -->
+    <div class="sech">4 · Power-user input — paste, shortcuts, undo limit, touch <span class="sub">the things a daily builder leans on</span></div>
+    <div class="cols">
+      <div class="mock">
+        <div class="mh">Paste — cleaned, not raw <span class="tag">from Word / Figma / a page</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">⎘</span><span class="tx"><b>Pasted as clean text.</b> Fonts &amp; colors from the source were dropped to match your theme. <u>Paste with formatting</u> if you meant to keep them.</span></div>
+          <div class="note2">Pasting an <b>image</b> uploads it to Assets; pasting a <b>link</b> offers "make a button / embed". Never injects raw foreign HTML (sanitized — same boundary as import).</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Keyboard — discoverable, not hidden <span class="tag">press ? or ⌘K</span></div>
+        <div class="mb">
+          <div class="krow"><span>Save</span><span><span class="kbd">⌘S</span> <span style="color:var(--ink-3)">(autosaves anyway)</span></span></div>
+          <div class="krow"><span>Undo / Redo</span><span><span class="kbd">⌘Z</span> <span class="kbd">⇧⌘Z</span></span></div>
+          <div class="krow"><span>Duplicate · Delete</span><span><span class="kbd">⌘D</span> <span class="kbd">⌫</span></span></div>
+          <div class="krow"><span>Command menu</span><span><span class="kbd">⌘K</span></span></div>
+          <div class="krow"><span>All shortcuts</span><span><span class="kbd">?</span></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cols" style="margin-top:12px">
+      <div class="mock">
+        <div class="mh">Undo — session boundary <span class="tag">honest about the limit</span></div>
+        <div class="mb">
+          <div class="toast"><span class="ic">↺</span><span class="tx"><b>You're at the start of this session's undo.</b> Earlier than this? Restore a published <u>version</u> from the dashboard.</span><span class="act">Versions ↗</span></div>
+          <div class="note2">In-session undo is unlimited within the session; across sessions you use restorable <a href="58-history.html">versions</a>. Two tools, named — no false promise of infinite undo.</div>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mh">Small screen / tablet <span class="tag">edit is desktop-first</span></div>
+        <div class="mb">
+          <div class="empty" style="padding:14px 10px">
+            <div class="big" style="font-size:22px">▢</div>
+            <div class="t">Best edited on a larger screen</div>
+            <div class="d">You can <b>preview &amp; approve</b> here. Full editing needs a desktop — the canvas tools need the room.</div>
+            <div class="acts" style="margin-top:10px"><span class="pri">Preview the site</span><span>Approve / send for review</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note2" style="margin-top:14px"><b>One discipline across all of it:</b> no silent spinner, no all-or-nothing AI, no broken thumbnail, no infinite-undo lie, no dead canvas. Every editor op states <b>what happened</b> and <b>the next move</b>.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor states:</b><a href="m-editor.html">Editor</a><a href="m-states.html">Micro-states</a><a href="52-add.html">Insert</a><a href="s-media-states.html">Media states</a><a href="71-command-palette.html">⌘K</a><a href="index.html">Map</a></div>
+</body></html>

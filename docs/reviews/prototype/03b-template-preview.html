@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 03b — Template preview</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:840px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:10px} .crumb b{color:var(--ink-2)}
+  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .head .t{font-size:16px;font-weight:700} .head .t .src{font-size:9px;letter-spacing:.03em;text-transform:uppercase;background:var(--accent);color:#fff;border-radius:3px;padding:1px 6px;vertical-align:middle;margin-left:7px}
+  .use{border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none}
+  .cols{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+  .preview{border:1px solid var(--line);border-radius:8px;height:220px;background:var(--bg-2);display:grid;place-items:center;color:var(--ink-3);font-size:11px}
+  .pages{border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:#fff}
+  .pages .ph{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:7px}
+  .pg{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);padding:5px 0;border-bottom:1px dashed var(--line)}
+  .pg:last-child{border:none}
+  .meta{border:1px dashed var(--line-d);border-radius:7px;padding:9px 12px;font-size:11px;color:var(--ink-2);margin-top:10px;background:var(--bg-2)}
+  .meta b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · 03b · TEMPLATE PREVIEW</div>
+<div class="screen">
+  <div class="topnote"><b>Template preview — see the page set + provenance before Use.</b> Rebuilt: shows every page the template includes AND whether it's a shared <b>house template</b> (so an agency knows it carries their theme). No surprises after "Use this".</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind</b> › New site › Templates › Northwind Consult</div>
+    <div class="head"><div class="t">Northwind Consult <span class="src">house</span></div><a class="use" href="m-editor.html">Use this →</a></div>
+    <div class="cols">
+      <div class="preview">[ live preview · scrollable ]</div>
+      <div class="pages">
+        <div class="ph">5 pages included</div>
+        <div class="pg"><span>Home</span><span class="muted" style="font-size:10px">hero · services · CTA</span></div>
+        <div class="pg"><span>Services</span><span class="muted" style="font-size:10px">grid</span></div>
+        <div class="pg"><span>Case studies</span><span class="muted" style="font-size:10px">list</span></div>
+        <div class="pg"><span>About</span><span class="muted" style="font-size:10px">team</span></div>
+        <div class="pg"><span>Contact</span><span class="muted" style="font-size:10px">form</span></div>
+        <div class="meta"><b>House template</b> — carries the <b>Northwind base</b> shared theme. Content is sample; it clears for a new client.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Preview:</b><a href="03-template-gallery.html">Gallery</a><a href="m-editor.html">Use → Editor</a><a href="m-agency.html">House templates</a><a href="index.html">Map</a></div>
+</body></html>

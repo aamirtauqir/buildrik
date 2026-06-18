@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · M4 — the one journey</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:18px 22px;max-width:1100px;margin:0 auto}
+  .flow{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;align-items:stretch;gap:0;margin-top:10px}
+  .stage{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+  .stage.mid{border-color:var(--accent);border-width:2px}
+  .sh{padding:10px 13px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .sh .n{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+  .sh .t{font-size:15px;font-weight:700}
+  .sh .t small{font-size:11px;color:var(--ink-2);font-weight:400}
+  /* mini screen */
+  .mini{margin:11px 13px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg)}
+  .mtop{height:18px;background:var(--bg-2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:4px;padding:0 7px}
+  .mtop .crumb{font-size:8px;color:var(--ink-3)}
+  .mtop .crumb b{color:var(--ink-2)}
+  .mbody{padding:11px;min-height:96px;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center}
+  .opt{border:1px solid var(--line);border-radius:4px;padding:7px 10px;font-size:11px;color:var(--ink-2);width:100%;text-align:center;background:var(--fill)}
+  .opt.on{border-color:var(--accent);color:var(--ink);font-weight:600;background:#fff}
+  .canvasmini{border:1px dashed var(--line-d);border-radius:4px;width:100%;padding:12px;text-align:center;color:var(--ink-3);font-size:10px}
+  .canvasmini .bar{height:8px;background:var(--fill);border:1px solid var(--line);margin:5px auto;width:70%}
+  .pubmini{border:1px solid var(--ink);border-radius:4px;width:100%;padding:9px;text-align:center;font-size:11px;font-weight:600;color:#fff;background:var(--accent)}
+  /* orientation chip */
+  .orient{margin:0 13px 11px;border:1px dashed var(--line-d);border-radius:6px;padding:8px 10px;background:var(--bg-2)}
+  .orient .ol{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+  .orient .ov{font-size:11.5px;color:var(--ink);font-weight:600;margin-top:2px}
+  .orient .od{font-size:10.5px;color:var(--ink-2);margin-top:3px;line-height:1.35}
+  .gap{display:flex;align-items:center;justify-content:center}
+  .gap span{font-size:24px;color:var(--ink)}
+  .lk{display:block;text-align:center;font-size:10.5px;color:var(--ink-2);text-decoration:underline;padding:0 13px 12px}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · M4 · THE JOURNEY</div>
+<div class="screen">
+  <div class="topnote"><b>M4 — the one journey.</b> The whole product is a single line: <b>Start → Edit → Publish</b>. No "modes," no dead ends. At every step the user can answer <b>where am I</b> (breadcrumb), <b>what changes</b> (you-are-editing), <b>what's next</b> (one obvious action). This is the "clean flow + always oriented" proof.</div>
+  <div class="wrap">
+
+    <div class="flow">
+
+      <!-- START -->
+      <div class="stage">
+        <div class="sh"><div class="n">Step 1</div><div class="t">Start <small>· pick a beginning</small></div></div>
+        <div class="mini">
+          <div class="mtop"><span class="crumb"><b>Northwind</b> › New site</span></div>
+          <div class="mbody">
+            <div class="opt on">✨ Describe it — AI builds a draft</div>
+            <div class="opt">Pick a template</div>
+            <div class="opt">Start blank</div>
+          </div>
+        </div>
+        <div class="orient">
+          <div class="ol">Where am I?</div>
+          <div class="ov">Workspace › New site</div>
+          <div class="od">One screen, three doors — never "Add vs Templates vs AI" confusion. AI is here for everyone, the strongest beginner wedge.</div>
+        </div>
+        <a class="lk" href="01-new-site.html">→ Start (AI · template · house · blank)</a>
+      </div>
+
+      <div class="gap"><span>→</span></div>
+
+      <!-- EDIT -->
+      <div class="stage mid">
+        <div class="sh"><div class="n">Step 2 · the heart</div><div class="t">Edit <small>· see it, change it</small></div></div>
+        <div class="mini">
+          <div class="mtop"><span class="crumb"><b>Northwind</b> › <b>Acme</b> › acme-main › Home</span></div>
+          <div class="mbody">
+            <div class="canvasmini">CANVAS<div class="bar"></div><div class="bar" style="width:45%"></div>[ Button ]·selected</div>
+          </div>
+        </div>
+        <div class="orient">
+          <div class="ol">What will this change?</div>
+          <div class="ov">Editing: Get started button · This item</div>
+          <div class="od">4-tool rail (Insert · Pages · Styles · Site), 3-reach blast radius, fewer or full controls. The fixed editor — M2/M1.</div>
+        </div>
+        <a class="lk" href="m-editor.html">→ Open the editor</a>
+      </div>
+
+      <div class="gap"><span>→</span></div>
+
+      <!-- PUBLISH -->
+      <div class="stage">
+        <div class="sh"><div class="n">Step 3</div><div class="t">Publish <small>· make it live</small></div></div>
+        <div class="mini">
+          <div class="mtop"><span class="crumb"><b>Northwind</b> › <b>Acme</b> › acme-main › Publish</span></div>
+          <div class="mbody">
+            <div class="canvasmini" style="border-style:solid">Pre-flight ✓ checks pass</div>
+            <div class="pubmini">Publish → acme-main.com</div>
+          </div>
+        </div>
+        <div class="orient">
+          <div class="ol">What's next?</div>
+          <div class="ov">Live · Visit ↗ · share link</div>
+          <div class="od">One Publish (topbar, not a rail tab). Pre-flight builds trust; success closes the loop to the live site.</div>
+        </div>
+        <a class="lk" href="20-publish.html">→ Publish flow</a>
+      </div>
+
+    </div>
+
+    <div class="note" style="margin-top:18px"><b>The loop:</b> Publish → back to Edit for the next change, or to the <a href="m3-dashboard.html" style="color:var(--ink)">dashboard</a> to start the next site/client. The same breadcrumb threads all three steps, so the user is never lost between them. <b>Agency variant:</b> the breadcrumb gains the Client node (Northwind › Acme › site); a solo builder's reads Workspace › site.</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Journey:</b><a href="m0-spine.html">M0 spine</a><a href="m-agency.html">M-agency</a><a href="m-editor.html">M2/M1 editor</a><a href="m3-dashboard.html">M3 dashboard</a><a href="m4-journey.html" style="border-color:#fff;background:#fff;color:#334155;font-weight:600">M4 journey</a><a href="index.html">Map</a></div>
+</body></html>

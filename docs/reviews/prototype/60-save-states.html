@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Save states</title><link rel="stylesheet" href="pt.css">
+<style>
+  .tb{display:flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid var(--line);border-radius:6px;background:#fff;margin-bottom:8px}
+  .ind{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
+  .ind .d{width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+  .case{border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-bottom:10px}
+  .case b{font-size:12.5px}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>Save / autosave lifecycle (§8)</b> · grounded in current autosave (BuildrikSyncProvider → tRPC) · solution: autosave is silent on the happy path, loud only when something's at risk</div>
+  <div class="pad">
+    <div class="lbl" style="margin-bottom:8px">Topbar indicator — click to step states</div>
+    <div class="tb"><span class="muted" style="font-size:11px">…editor topbar…</span><span style="flex:1"></span><span class="ind" id="ind"><span class="d"></span><span id="indtxt">Saved</span></span></div>
+    <div class="row" style="margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn" onclick="st('saved')">Saved</button>
+      <button class="btn" onclick="st('saving')">Saving…</button>
+      <button class="btn" onclick="st('offline')">Offline</button>
+      <button class="btn" onclick="st('recon')">Reconnecting</button>
+      <button class="btn" onclick="st('err')">Save failed</button>
+    </div>
+
+    <div class="case"><b>✓ Saved</b> <span class="tag-exists">exists</span><div class="muted" style="font-size:11.5px;margin-top:4px">Steady state. Quiet — no spinner, no nag. Timestamp on hover ("saved 12s ago").</div></div>
+    <div class="case"><b>↻ Saving…</b><div class="muted" style="font-size:11.5px;margin-top:4px">Debounced after edits. Brief, non-blocking — you keep editing.</div></div>
+    <div class="case"><b>⚠ Offline — changes queued</b> <span class="tag-new">SOLUTION</span><div class="muted" style="font-size:11.5px;margin-top:4px">Network dropped. Edits buffer locally; banner reassures "saved on this device, will sync when back". Never silently lose work.</div></div>
+    <div class="case"><b>↺ Reconnecting → flushing queue</b><div class="muted" style="font-size:11.5px;margin-top:4px">Auto-retry on reconnect; queued edits flush in order. Resolves to Saved.</div></div>
+    <div class="case"><b>✕ Save failed</b><div class="muted" style="font-size:11.5px;margin-top:4px">Server rejected (rare). Explicit "Retry" + "Download a backup" — work is recoverable, not a dead-end. Distinct from offline (this is a real error).</div></div>
+
+    <div class="note" style="margin-top:6px"><b>Principle:</b> the indicator earns attention only when work is at risk. Happy path = nearly invisible (Tesler's Law — the system carries the saving burden, not the user).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>§8 behavior:</b><a href="m-editor.html">Editor</a><a href="60-save-states.html" class="here">Save states</a><a href="61-conflict.html">Conflict</a><a href="m-roles.html">Permissions</a><a href="20-publish.html">Publish</a><a href="m3-dashboard.html">Dashboard</a></div>
+<script>
+var map={saved:['Saved','#7a7a7a'],saving:['Saving…','#94A3B8'],offline:['Offline · queued','#334155'],recon:['Reconnecting…','#94A3B8'],err:['Save failed','#334155']};
+function st(s){var m=map[s];document.getElementById('indtxt').textContent=m[0];document.querySelector('#ind .d').style.background=m[1];}
+</script>
+</body></html>

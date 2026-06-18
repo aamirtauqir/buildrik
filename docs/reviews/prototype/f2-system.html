@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · f2 — System pages (white-label)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:880px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .sys{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .sh{padding:7px 11px;background:var(--bg-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:600}
+  .sb{padding:13px 11px;min-height:78px;text-align:center;color:var(--ink-3);font-size:11px}
+  .sb .logo{font-size:11px;font-weight:600;color:var(--ink-2);border:1px solid var(--line-d);border-radius:4px;padding:2px 8px;display:inline-block;margin-bottom:6px}
+  .sb .t{font-size:12px;font-weight:600;color:var(--ink-2)}
+  .wl{border:2px solid var(--ink);border-radius:8px;padding:12px 15px;background:var(--fill);margin-bottom:12px;font-size:12px;color:var(--ink-2);line-height:1.5}
+  .wl b{color:var(--ink)}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · f2 · SYSTEM PAGES</div>
+<div class="screen">
+  <div class="topnote"><b>System / legal pages — white-labelled for clients.</b> Rebuilt: client-facing system, legal and maintenance shells carry the <b>agency's brand</b>, not "Buildrik". The platform's own system pages stay platform-branded.</div>
+  <div class="wrap">
+    <div class="wl"><b>White-label applies:</b> a client invited to <b>studio.northwind.com</b> who hits a maintenance / 404 / cookie / legal page sees <b>Northwind Studio</b> branding. Set once in <a href="18-workspace.html" style="color:var(--ink)">Workspace › Branding</a>.</div>
+    <div class="grid">
+      <div class="sys"><div class="sh">404 (client site)</div><div class="sb"><div class="logo">Northwind ▢</div><div class="t">Page not found</div><div>back to home</div></div></div>
+      <div class="sys"><div class="sh">Maintenance</div><div class="sb"><div class="logo">Northwind ▢</div><div class="t">Back soon</div><div>agency-branded</div></div></div>
+      <div class="sys"><div class="sh">Cookie consent</div><div class="sb"><div class="t">Decline / accept</div><div>privacy-first default</div></div></div>
+      <div class="sys"><div class="sh">Terms / Privacy</div><div class="sb"><div class="t">Legal shell</div><div>client or agency entity</div></div></div>
+      <div class="sys"><div class="sh">Offline</div><div class="sb"><div class="t">No connection</div><div>retry</div></div></div>
+      <div class="sys"><div class="sh">Dashboard 404</div><div class="sb"><div class="logo">Buildrik</div><div class="t">platform-branded</div><div>(not client-facing)</div></div></div>
+    </div>
+    <div class="note2"><b>Two brand contexts.</b> Anything a client sees = agency brand (white-label). The platform's own admin/error surfaces stay Buildrik-branded. Cookie banner defaults to decline-non-essential.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>System:</b><a href="18-workspace.html">White-label</a><a href="m-agency.html">Agency</a><a href="90-published.html">Live site</a><a href="index.html">Map</a></div>
+</body></html>

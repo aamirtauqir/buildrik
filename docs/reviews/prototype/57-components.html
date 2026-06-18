@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Components panel</title><link rel="stylesheet" href="pt.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 300px 1fr;min-height:400px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--accent);color:#fff}.ri .ic{display:block;font-size:14px}
+  .cp{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:5px;padding:9px;font-size:12px;cursor:pointer;margin-bottom:7px}.cp:hover{border-color:var(--ink-2)}
+  .cp .ct{margin-left:auto;font-size:10px;color:var(--ink-3)}
+</style></head>
+<body data-surface="editor">
+<div data-recon-banner style="position:sticky;top:0;z-index:999;background:#334155;color:#fff;font:600 12px/1.4 "Inter Tight",sans-serif;padding:7px 14px;text-align:center;border-bottom:2px solid #fff">↗ SUPERSEDED — reconciled into <a href="m-editor.html" style="color:#fff;text-decoration:underline">M-editor (Insert · Pro)</a> (2026-06-18 solution set). Kept for history.</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>Components panel (rail → Components · Advanced)</b> · grounded in current symbol/component system · solution: reusable instances — edit the component → all instances update (pairs with §6.5 scope: "this is a component reach")</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri"><span class="ic">+</span>Add</div>
+      <div class="ri"><span class="ic">▤</span>Pages</div>
+      <div class="ri on"><span class="ic">◳</span>Comp</div>
+      <div class="ri"><span class="ic">≣</span>Structure</div>
+      <div class="ri"><span class="ic">⟲</span>Hist</div>
+    </div>
+    <div class="panel" style="border-right:1px dashed var(--line);padding:12px">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px"><b style="font-size:13px">Components</b><button class="btn" style="padding:5px 10px">+ From selection</button></div>
+      <div class="input" style="margin-bottom:10px">⌕ search components</div>
+      <div class="cp"><span>▤</span> Navbar <span class="ct">4 instances</span></div>
+      <div class="cp"><span>✉</span> CTA block <span class="ct">3 instances · 2 pages</span></div>
+      <div class="cp"><span>▭</span> Footer <span class="ct">6 instances</span></div>
+      <div class="cp"><span>❝</span> Testimonial card <span class="ct">9 instances</span></div>
+      <div class="cp"><span>◰</span> Pricing tier <span class="ct">3 instances</span></div>
+      <div class="note" style="margin-top:10px;font-size:10.5px">Drag a component to canvas = new instance. "From selection" promotes the selected group into a reusable component.</div>
+    </div>
+    <div class="panel" style="border-right:none;padding:14px">
+      <div class="lbl" style="margin-bottom:8px">CTA block — component</div>
+      <div class="ph-img" style="height:80px;margin-bottom:10px">✉ master</div>
+      <div class="box pad" style="padding:9px;margin-bottom:10px">
+        <div class="lbl">Editing reach (§6.5)</div>
+        <div style="font-size:11.5px;margin-top:4px">Editing the <b>master</b> updates <b>3 instances</b> across 2 pages.</div>
+        <div class="muted" style="font-size:10px;margin-top:4px">Per-instance overrides stay local (like a detached class).</div>
+      </div>
+      <div class="row"><button class="btn">Edit master</button><button class="btn">Detach instance</button></div>
+      <div class="note" style="margin-top:12px;font-size:10.5px"><b>Same mental model as classes:</b> a component is <b>rung 3</b> on the one styling ladder (element → class → component → preset → token, narrowest wins — see <a href="fix-styling-model.html" style="text-decoration:underline">canonical model</a>). Edit-master = "change all instances"; detach = "just this one".</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="m-editor.html">Spine</a><a href="54-ai.html">AI</a><a href="55-templates.html">Templates</a><a href="52-add.html">Add</a><a href="50-pages.html">Pages</a><a href="56-media.html">Assets</a><a href="57-components.html" class="here">Components</a><a href="m-editor.html">History</a><a href="41-scope-picker.html">Scope</a></div>
+</body></html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 14 — Site › Publishing</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:0}
+  .appbar{display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .crumb{font-size:12px;color:var(--ink-3)}
+  .crumb b{color:var(--ink-2)}
+  .tabs{display:flex;gap:3px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .tabs a{font-size:12px;color:var(--ink-2);padding:8px 12px;text-decoration:none;border-bottom:2px solid transparent}
+  .tabs a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+  .body{padding:16px 20px;max-width:780px}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 6px}
+  .grp:first-child{margin-top:0}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border:1px solid var(--line);border-radius:7px;margin-bottom:7px;background:#fff;font-size:12.5px}
+  .row .l{font-weight:600} .row .l small{display:block;font-weight:400;font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .row .r{font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:5px 10px;text-decoration:none}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px}
+  .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · 14 · SITE PUBLISHING</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Site › Publishing — the ops side of a site.</b> Rebuilt (was the "Site Settings" SEO/code mashup). Publishing = how the site is served &amp; routed. Content config (SEO titles, forms, code) moved to the <a href="m-editor.html" style="color:#fff;text-decoration:underline">editor</a>. This is one tab of <a href="12-site-detail.html" style="color:#fff;text-decoration:underline">Site detail</a>.</div>
+  <div class="scrumb"><b>Northwind</b> › <b>Acme</b> › <span class="cur">acme-main</span></div>
+  <div class="stabs"><a href="12-site-detail.html">Overview</a><a href="d6-domains.html">Domains</a><a href="19-analytics.html">Traffic</a><a href="d2-forms.html">Forms inbox</a><a href="d4-share-access.html">Sharing</a><a href="14-site-settings.html" class="on">Publishing</a><a href="58-history.html">Versions</a></div>
+  <div class="body">
+    <div class="grp">Routing</div>
+    <div class="row"><div class="l">Redirects <small>301/302 · bulk import · auto from slug renames</small></div><a class="r" href="d3-redirects.html">Manage ▾</a></div>
+    <div class="grp">Technical SEO</div>
+    <div class="row"><div class="l">Canonical · indexing · sitemap · robots</div><a class="r" href="d5-seo.html">Manage ▾</a></div>
+    <div class="grp">Diagnostics</div>
+    <div class="row"><div class="l">Build / deploy health <small>last publish · SSL · framework</small></div><a class="r" href="20-publish.html">View ▾</a></div>
+    <div class="row"><div class="l">Traffic snapshot</div><a class="r" href="19-analytics.html">Open Traffic ↗</a></div>
+    <div class="note2"><b>Boundary held:</b> nothing here edits page content. Designer/Admin only (a Content editor never sees Publishing — <a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>). Content SEO + forms config live in the editor; this tab is pure server-side ops.</div>
+  </div>
+</div>
+<div style="margin:16px 18px 6px"><div style="font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px">States on this surface — publishing settings</div><div style="display:flex;gap:7px;flex-wrap:wrap;font-size:10.5px;color:var(--ink-2)"><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Loading &rarr; skeleton rows</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Save / load failed &rarr; cause + Retry, nothing applied</span><span style="border:1px solid var(--line);border-radius:5px;padding:3px 8px;background:#fff">Designer/Admin-only &rarr; “your role can’t edit this”</span></div><div style="font-size:10.5px;color:var(--ink-3);margin-top:6px">Permission + failure states → <a href="s-account-states.html">s-account-states</a> · <a href="s-ship-states.html">s-ship-states</a></div></div>
+<div class="proto-nav"><b>Publishing:</b><a href="12-site-detail.html">Site detail</a><a href="d3-redirects.html">Redirects</a><a href="d5-seo.html">Technical SEO</a><a href="m-ownership.html">Ownership</a><a href="index.html">Map</a></div>
+</body></html>

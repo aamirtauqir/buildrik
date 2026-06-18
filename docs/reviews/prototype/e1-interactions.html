@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Interactions</title><link rel="stylesheet" href="pt.css">
+<style>
+  .ed{display:grid;grid-template-columns:1fr 300px;min-height:420px}
+  .cv{border-right:1px dashed var(--line);background:var(--bg-2);display:grid;place-items:center}
+  .trig{border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:8px}
+  .step{display:flex;gap:8px;align-items:center;font-size:11.5px;padding:6px;border:1px dashed var(--line-d);border-radius:4px;margin-top:6px}
+  .tl{height:30px;border:1px solid var(--line);border-radius:4px;position:relative;background:var(--fill);margin-top:6px}
+  .tl .b{position:absolute;top:5px;height:20px;background:var(--ink-3);border-radius:3px}
+</style></head>
+<body data-surface="editor">
+<div data-recon-banner style="position:sticky;top:0;z-index:999;background:#334155;color:#fff;font:600 12px/1.4 "Inter Tight",sans-serif;padding:7px 14px;text-align:center;border-bottom:2px solid #fff">⊘ CUT from the solution set — half-dead engine, off the agency wedge. Not part of the user-friendly product (UX audit).</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>Interactions &amp; animation</b> · grounded in <code>editor/animation</code> + interaction engine · trigger → action; timeline for keyframes. Pro-density inspector section.</div>
+  <div class="ed">
+    <div class="cv"><div style="text-align:center"><div class="btn btn-fill btn-strong" style="margin-bottom:8px">[ animated CTA ]</div><div class="muted" style="font-size:11px">▷ preview interaction</div></div></div>
+    <div style="padding:12px;overflow:auto">
+      <div class="lbl" style="margin-bottom:8px">Interactions on: CTA button</div>
+      <div class="trig">
+        <div class="row" style="justify-content:space-between"><b style="font-size:12px">On hover</b><span class="muted" style="font-size:10px">trigger ▾</span></div>
+        <div class="step"><span>▸</span> Scale → 1.05 <span class="muted" style="margin-left:auto">200ms ease</span></div>
+        <div class="step"><span>▸</span> Fill → accent-dark <span class="muted" style="margin-left:auto">200ms</span></div>
+      </div>
+      <div class="trig">
+        <div class="row" style="justify-content:space-between"><b style="font-size:12px">On scroll into view</b><span class="muted" style="font-size:10px">trigger ▾</span></div>
+        <div class="step"><span>▸</span> Fade in + slide up <span class="muted" style="margin-left:auto">400ms</span></div>
+        <div class="tl"><div class="b" style="left:4%;width:50%"></div></div>
+      </div>
+      <div class="row" style="margin:6px 0 12px"><span class="chip">+ click</span><span class="chip">+ load</span><span class="chip">+ scroll</span><span class="chip">+ while-scrolling</span></div>
+      <div class="note" style="font-size:10.5px"><b>Triggers → actions (grounded):</b> click / hover / load / scroll-into-view / while-scrolling → animate, navigate, toggle, open-modal. Keyframe timeline for multi-step. Honors reduced-motion + the design system's "minimal motion" rule (DESIGN.md). Pro-density only — hidden in Simple.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor:</b><a href="m-editor.html">Spine</a><a href="59-inspector.html">Inspector</a><a href="e1-interactions.html" class="here">Interactions</a><a href="e2-locales.html">Locales</a><a href="m-editor.html">History</a><a href="index.html">Map</a></div>
+</body></html>

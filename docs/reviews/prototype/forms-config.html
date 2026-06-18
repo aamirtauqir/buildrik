@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Forms config — the real "where responses go" job</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:760px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:8px}.crumb b{color:var(--ink-2)}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 6px}
+  .grp:first-child{margin-top:4px}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid var(--line);border-radius:7px;margin-bottom:7px;background:#fff}
+  .row .l{font-size:12.5px;font-weight:600}
+  .row .l small{display:block;font-weight:400;font-size:10.5px;color:var(--ink-3);margin-top:2px}
+  .row .v{font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:5px 11px;font-family:var(--mono)}
+  .fld{display:flex;align-items:center;gap:9px;padding:8px 11px;border:1px solid var(--line);border-radius:6px;margin-bottom:6px;background:#fff;font-size:12px;color:var(--ink-2)}
+  .fld .h{font-size:11px;color:var(--ink-3);width:54px}
+  .fld .req{font-size:9px;border:1px solid var(--line-d);border-radius:3px;padding:1px 5px;color:var(--ink-3);margin-left:auto}
+  .toggle{width:30px;height:17px;border-radius:999px;border:1px solid var(--ink);background:var(--accent);position:relative;flex:0 0 auto}
+  .toggle::after{content:"";position:absolute;top:1px;left:14px;width:13px;height:13px;border-radius:50%;background:#fff}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:10px}.note2 b{color:var(--ink)}
+  .addfld{border:1px dashed var(--line-d);border-radius:6px;padding:8px 11px;font-size:11.5px;color:var(--ink-3);text-align:center}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · FORMS CONFIG</div>
+<div class="screen">
+  <div class="topnote"><b>Forms config — the real job, was mislinked to generic Insert.</b> Codex caught it: "Forms config" used to drop the user on the block picker. The actual job is <b>"set up the form and decide where responses go"</b> — fields, recipient, after-submit, spam. Editor-owned (authored with the page); the <b>inbox</b> of what comes in lives in the dashboard (<a href="d2-forms.html" style="color:#fff;text-decoration:underline">d2</a>). Run-states → <a href="s-forms-states.html" style="color:#fff;text-decoration:underline">s-forms-states</a>. <b>Designer/Admin surface</b> (per <a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a> — a Content editor edits the form's visible <b>text</b> on the canvas, not the recipient/integration here).</div>
+  <div class="wrap">
+    <div class="crumb"><b>Northwind</b> › <b>Acme</b> › acme-main › <b>Contact form</b></div>
+
+    <div class="grp">Fields — what the visitor fills</div>
+    <div class="fld"><span class="h">Text</span> Name <span class="req">required</span></div>
+    <div class="fld"><span class="h">Email</span> Email <span class="req">required</span></div>
+    <div class="fld"><span class="h">Long text</span> Message <span class="req">required</span></div>
+    <div class="addfld">＋ Add field (phone · dropdown · checkbox · file…)</div>
+
+    <div class="grp">Where responses go — the job</div>
+    <div class="row"><div class="l">Email responses to <small>who gets notified on every submission</small></div><span class="v">ops@acme.com</span></div>
+    <div class="row"><div class="l">Also send to an integration <small>Mailchimp · Zapier · webhook (optional)</small></div><a class="v" href="c4-integrations.html" style="text-decoration:none">Connect ▾</a></div>
+    <div class="row"><div class="l">Every submission is also saved <small>so a bad email never loses a lead</small></div><a class="v" href="d2-forms.html" style="text-decoration:none">→ Inbox</a></div>
+
+    <div class="grp">After submit — what the visitor sees</div>
+    <div class="row"><div class="l">On success <small>show a thank-you message, or redirect</small></div><span class="v">Message ▾</span></div>
+    <div class="row"><div class="l">Thank-you text <small>shown in place of the form</small></div><span class="v" style="font-family:inherit">"Thanks — we got your message"</span></div>
+
+    <div class="grp">Protection</div>
+    <div class="row"><div class="l">Spam protection <small>honeypot + rate-limit · held items reviewable in the inbox</small></div><span class="toggle"></span></div>
+
+    <div class="note2"><b>One home for the form's behavior.</b> Fields + recipient + after-submit + spam are all here, in the editor, next to the form you're building. What actually arrives — and recovery when delivery breaks — is the dashboard inbox (<a href="d2-forms.html">d2</a>) and the run-states board (<a href="s-forms-states.html">s-forms-states</a>). A <b>Content editor</b> can edit the form's text; recipient/integration changes are Designer/Admin (<a href="m-roles.html">M-roles</a>).</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Forms:</b><a href="m-editor.html">Editor</a><a href="53-settings.html">Editor › Site</a><a href="d2-forms.html">Inbox (dashboard)</a><a href="s-forms-states.html">Run-states</a><a href="52-add.html">Insert a form block</a><a href="index.html">Map</a></div>
+</body></html>

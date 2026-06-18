@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · AI panel</title><link rel="stylesheet" href="pt.css">
+<style>
+  .ed{display:grid;grid-template-columns:52px 300px 1fr;min-height:400px}
+  .rail{border-right:1px dashed var(--line);padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg-2)}
+  .ri{width:40px;text-align:center;font-size:8.5px;color:var(--ink-3);padding:6px 0;border-radius:5px;cursor:pointer}.ri.on{background:var(--accent);color:#fff}.ri .ic{display:block;font-size:14px}
+  .msg{border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12px;margin-bottom:8px}
+  .msg.you{background:var(--fill);margin-left:30px}
+  .act{display:flex;justify-content:space-between;align-items:center;border:1px dashed var(--line-d);border-radius:5px;padding:7px 9px;font-size:11.5px;margin-top:6px}
+</style></head>
+<body data-surface="editor">
+<div data-recon-banner style="position:sticky;top:0;z-index:999;background:#334155;color:#fff;font:600 12px/1.4 "Inter Tight",sans-serif;padding:7px 14px;text-align:center;border-bottom:2px solid #fff">↗ SUPERSEDED — reconciled into <a href="m-editor.html" style="color:#fff;text-decoration:underline">M-editor + M3 (AI entry points)</a> (2026-06-18 solution set). Kept for history.</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>AI panel (rail → AI)</b> · grounded in current AI assist (streamPrompt · propose-action → confirm → execute · set-token/set-image/alt-text) · solution: AI proposes, you confirm — privileged actions gated</div>
+  <div class="ed">
+    <div class="rail">
+      <div class="ri on"><span class="ic">✦</span>AI</div>
+      <div class="ri"><span class="ic">▦</span>Tmpl</div>
+      <div class="ri"><span class="ic">+</span>Add</div>
+      <div class="ri"><span class="ic">▤</span>Pages</div>
+      <div class="ri"><span class="ic">▣</span>Assets</div>
+    </div>
+    <div class="panel" style="border-right:1px dashed var(--line);padding:12px;display:flex;flex-direction:column">
+      <b style="font-size:13px;margin-bottom:10px">AI assist</b>
+      <div style="flex:1">
+        <div class="msg you">Make the hero headline punchier and change the button to say "Start free".</div>
+        <div class="msg">Here's what I'll change — confirm each:
+          <div class="act"><span>✎ Hero heading → "Build it in minutes"</span><button class="btn" style="padding:3px 9px">Apply</button></div>
+          <div class="act"><span>✎ CTA label → "Start free"</span><button class="btn" style="padding:3px 9px">Apply</button></div>
+          <div class="act" style="border-color:var(--accent)"><span>⚠ Publish the site <span class="tag-new">privileged</span></span><button class="btn btn-fill" style="padding:3px 9px">Confirm</button></div>
+        </div>
+      </div>
+      <div class="input" style="margin-top:8px">⌨ Ask AI to change something…</div>
+      <div class="muted" style="font-size:10px;margin-top:6px">18/25 credits this month · <a href="16-billing.html" style="color:var(--ink-2);text-decoration:underline">manage</a></div>
+    </div>
+    <div class="panel" style="border-right:none;background:var(--bg-2);display:grid;place-items:center">
+      <div style="text-align:center;max-width:290px">
+        <div class="ph-img" style="height:80px;margin-bottom:10px">canvas — proposed diff highlighted</div>
+        <div class="note" style="text-align:left;font-size:10.5px"><b>Propose → confirm → execute (grounded):</b> AI never silently mutates. Content edits apply on click; <b>privileged actions</b> (publish, delete, spend) require an explicit confirm — single-use grant, consumed on execute. Credit-exhaustion routes to billing (§8.8), never a dead-end.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Editor tabs:</b><a href="m-editor.html">Spine</a><a href="54-ai.html" class="here">AI</a><a href="55-templates.html">Templates</a><a href="52-add.html">Add</a><a href="50-pages.html">Pages</a><a href="56-media.html">Assets</a><a href="57-components.html">Components</a><a href="m-editor.html">History</a></div>
+</body></html>

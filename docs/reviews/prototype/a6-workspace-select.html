@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Choose workspace</title><link rel="stylesheet" href="pt.css">
+<style>.wsrow{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:6px;padding:11px;margin-bottom:8px;cursor:pointer;text-decoration:none;color:var(--ink)}.wsrow:hover{border-color:var(--accent)}</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen screen-narrow" style="max-width:420px">
+  <div class="topnote"><b>Choose workspace</b> · grounded in multi-workspace membership (<code>WorkspaceMember</code>) · shown post-login when a user belongs to 2+ workspaces</div>
+  <div class="pad">
+    <div class="h1" style="font-size:18px;margin-bottom:4px;text-align:center">Pick a workspace</div>
+    <div class="muted" style="font-size:12px;margin-bottom:16px;text-align:center">You're a member of a few. Last used first.</div>
+    <a href="m3-dashboard.html" class="wsrow"><div class="ph-img" style="width:32px;height:32px;font-size:10px">N</div><div><b style="font-size:13px">Northwind Studio</b><div class="muted" style="font-size:10.5px">Owner · agency · 4 clients · 7 sites</div></div><span style="margin-left:auto" class="muted">→</span></a>
+    <a href="m3-dashboard.html" class="wsrow"><div class="ph-img" style="width:32px;height:32px;font-size:10px">ST</div><div><b style="font-size:13px">Studio Lumen</b><div class="muted" style="font-size:10.5px">Editor · 12 sites</div></div><span style="margin-left:auto" class="muted">→</span></a>
+    <a href="m3-dashboard.html" class="wsrow"><div class="ph-img" style="width:32px;height:32px;font-size:10px">PF</div><div><b style="font-size:13px">Personal</b><div class="muted" style="font-size:10.5px">Owner · 1 site</div></div><span style="margin-left:auto" class="muted">→</span></a>
+    <a href="04b-setup.html" class="btn" style="width:100%;text-align:center;margin-top:6px">+ Create a new workspace</a>
+    <div class="note" style="margin-top:14px;font-size:10.5px"><b>A workspace = your agency</b> — it holds <b>many clients</b> (shared billing, team, theme, white-label). A solo builders workspace is just their own sites. Reachable any time from the topbar <b>Northwind Studio ▾</b> switcher on every dashboard screen. Organizing sites <i>within</i> a client = folders (screen d1). Skipped at login when you're in only one workspace.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Auth:</b><a href="00-signin.html">Sign in</a><a href="a4-2fa.html">2FA</a><a href="a6-workspace-select.html" class="here">WS select</a><a href="m3-dashboard.html">Dashboard</a><a href="a7-transfer-accept.html">Transfer</a><a href="a8-auth-errors.html">Errors</a><a href="index.html">Map</a></div>
+</body></html>

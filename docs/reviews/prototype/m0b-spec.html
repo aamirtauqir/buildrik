@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · M0-spec — dense IA appendix</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:1120px}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:20px 0 7px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+  .homes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .home{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .home .hh{padding:9px 13px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .home .hh .t{font-size:13px;font-weight:600}
+  .home .hh .s{font-size:10.5px;color:var(--ink-3)}
+  .home .hb{padding:10px 13px}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:9px 0 4px}
+  .grp:first-child{margin-top:0}
+  .feat{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:12px;color:var(--ink-2);border-bottom:1px dashed var(--line)}
+  .feat:last-child{border-bottom:none}
+  .feat .fn{flex:1}
+  .tag{font-size:8.5px;letter-spacing:.03em;border-radius:3px;padding:1px 6px;white-space:nowrap}
+  .tag.s{background:var(--accent);color:#fff}
+  .tag.p{border:1px solid var(--ink);color:var(--ink)}
+  .tag.view{border:1px dashed var(--line-d);color:var(--ink-3)}
+  .tag.ag{border:1px solid var(--ink);color:var(--ink);font-weight:600}
+  .ded{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px}
+  .ded th,.ded td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  .ded th{background:var(--fill);font-size:10px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  .ded td b{color:var(--ink)}
+  .ded .cut{color:var(--ink-3);text-decoration:line-through}
+  .rails{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+  .railcard{border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .railcard .rh{padding:8px 12px;font-size:11.5px;font-weight:600;border-bottom:1px solid var(--line)}
+  .railcard.simple .rh{background:var(--accent);color:#fff}
+  .railcard.pro .rh{background:var(--bg-2)}
+  .railcard ul{list-style:none;padding:9px 12px;margin:0;display:flex;flex-wrap:wrap;gap:6px}
+  .railcard li{border:1px solid var(--line);border-radius:4px;padding:4px 9px;font-size:11px;color:var(--ink-2);background:#fff}
+  .railcard li.add{border-color:var(--accent);color:var(--ink);font-weight:600}
+  .railcard .note2{padding:0 12px 10px;font-size:10.5px;color:var(--ink-3)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · M0-SPEC · APPENDIX</div>
+<div class="screen">
+  <div class="topnote"><b>M0-spec — the dense version (engineer appendix).</b> The founder-facing scan is <a href="m0-spine.html" style="color:#fff;text-decoration:underline">M0</a>; this carries the full feature inventory, the complete dedup table, and the Simple/Pro rail proof. Same rules, all the detail.</div>
+  <div class="wrap">
+
+    <div class="sech">Full home inventory <span class="sub">every real feature, its one home, its mode/scope tag</span></div>
+    <div class="homes">
+      <div class="home">
+        <div class="hh"><div class="t">Dashboard — run the business</div><div class="s">Workspace + Client + Site ops</div></div>
+        <div class="hb">
+          <div class="grp">Workspace (agency / you)</div>
+          <div class="feat"><span class="fn">Account · profile · login · security</span></div>
+          <div class="feat"><span class="fn">Team · members · roles · invites</span></div>
+          <div class="feat"><span class="fn">Billing · plan · usage · AI credits</span></div>
+          <div class="feat"><span class="fn">Shared theme</span><span class="tag ag">Agency</span></div>
+          <div class="feat"><span class="fn">White-label branding</span><span class="tag ag">Agency</span></div>
+          <div class="feat"><span class="fn">Notifications · help · API tokens</span></div>
+          <div class="grp">Client (agency grouping · solo skips)</div>
+          <div class="feat"><span class="fn">Clients list · sites per client</span><span class="tag ag">Agency</span></div>
+          <div class="feat"><span class="fn">Duplicate client/site as template</span><span class="tag ag">Agency</span></div>
+          <div class="grp">Site (ops)</div>
+          <div class="feat"><span class="fn">Sites list · folders</span></div>
+          <div class="feat"><span class="fn">Domains · DNS</span></div>
+          <div class="feat"><span class="fn">Analytics</span><span class="tag view">view only</span></div>
+          <div class="feat"><span class="fn">Form submissions inbox</span><span class="tag view">view only</span></div>
+          <div class="feat"><span class="fn">Integrations · webhooks</span><span class="tag p">Pro</span></div>
+        </div>
+      </div>
+      <div class="home">
+        <div class="hh"><div class="t">Editor — make the thing</div><div class="s">Page + Section + Element · rail gates by mode</div></div>
+        <div class="hb">
+          <div class="grp">Build (Simple sees these — the 4-item rail)</div>
+          <div class="feat"><span class="fn">Insert — blocks · templates</span><span class="tag s">Simple</span></div>
+          <div class="feat"><span class="fn">Pages · page settings (SEO/slug)</span><span class="tag s">Simple</span></div>
+          <div class="feat"><span class="fn">Styles — swatches &amp; fonts</span><span class="tag s">Simple</span></div>
+          <div class="feat"><span class="fn">Site — content SEO · tracking · forms config</span><span class="tag s">Simple</span></div>
+          <div class="feat"><span class="fn">Assets (contextual, not a rail item)</span><span class="tag s">Simple</span></div>
+          <div class="feat"><span class="fn">Publish (topbar, not a rail item)</span><span class="tag s">Simple</span></div>
+          <div class="grp">Power (Pro reveals depth)</div>
+          <div class="feat"><span class="fn">Components <span style="color:var(--ink-3)">(structure = on-canvas)</span></span><span class="tag p">Pro</span></div>
+          <div class="feat"><span class="fn">Styles — full tokens &amp; presets</span><span class="tag p">Pro</span></div>
+          <div class="feat"><span class="fn">Site — content SEO · tracking · custom code</span><span class="tag p">Pro</span></div>
+          <div class="feat"><span class="fn">History timeline · Interactions</span><span class="tag p">Pro</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sech">Full dedup table <span class="sub">concepts that had 2–3 doors → one authoring home (+ one override)</span></div>
+    <table class="ded">
+      <tr><th style="width:16%">Concept</th><th style="width:30%">One authoring home</th><th style="width:24%">Page-level override</th><th style="width:30%">Deleted duplicate (was scattered)</th></tr>
+      <tr><td><b>SEO</b></td><td><b>Content</b>: Editor › Site › SEO <span class="tag s">Simple</span> · <b>Technical</b>: Dashboard (canonical/indexing/sitemap)</td><td>Pages drawer › SEO (per-page)</td><td><span class="cut">3 scattered SEO tabs</span> → content=editor, technical=dashboard (<a href="m-seo.html" style="color:var(--ink-2)">M-seo</a>)</td></tr>
+      <tr><td><b>Analytics</b></td><td>3 layers: connect=Workspace · assign=Editor›Tracking · view=Dashboard</td><td>—</td><td><span class="cut">page-drawer config</span> + <span class="cut">connect-in-reports</span> → gone (<a href="m-tracking.html" style="color:var(--ink-2)">M-tracking</a>)</td></tr>
+      <tr><td><b>Forms</b></td><td>config: Editor (form block)</td><td>—</td><td>submissions: Dashboard inbox (one place, not split)</td></tr>
+      <tr><td><b>Custom code</b></td><td>Editor › Site <span class="tag p">Pro</span></td><td>Pages drawer › &lt;head&gt; <span class="tag p">Pro</span></td><td>—</td></tr>
+      <tr><td><b>Publish</b></td><td>Editor topbar (one button)</td><td>—</td><td><span class="cut">Dashboard Publish</span> + <span class="cut">editor Publish tab</span> → one</td></tr>
+      <tr><td><b>Shared theme</b></td><td>Workspace (shared) → site override <span class="tag ag">Agency</span></td><td>per-site override</td><td><span class="cut">per-site DS copies</span> → one shared source, pushed</td></tr>
+    </table>
+
+    <div class="sech">Simple vs Pro rail <span class="sub">a density SETTING (not an editor switch) governs how much shows — Simple = 4, Pro reveals depth</span></div>
+    <div class="rails">
+      <div class="railcard simple">
+        <div class="rh">Simple — the client view (4)</div>
+        <ul><li>Insert</li><li>Pages</li><li>Styles</li><li>Site</li></ul>
+        <div class="note2">4 rail items · 6 inspector sections · Publish in topbar · Assets contextual · no CSS, no tokens, no jargon.</div>
+      </div>
+      <div class="railcard pro">
+        <div class="rh">Pro — the agency's canonical editor (still 4)</div>
+        <ul><li>Insert <span class="add">+Components</span></li><li>Pages</li><li>Styles <span class="add">+Tokens/Presets</span></li><li>Site <span class="add">+Tracking/Code</span></li></ul>
+        <div class="note2">Same 4 rail items — Pro <b>deepens each</b>, never adds destinations. History → topbar; <b>AI → a separate ✨ assistant</b> (edits the whole design), also on ⌘K; page <b>structure</b> → ⌗ bottom-bar floating panel + click-on-canvas. 14 inspector sections + All CSS + classes + breakpoints. Density is a setting, not an in-editor switch.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Appendix:</b><a href="m0-spine.html">◄ back to M0</a><a href="m-agency.html">M-agency</a><a href="fix-styling-3reach.html">3-reach</a><a href="index.html">Map</a></div>
+</body></html>

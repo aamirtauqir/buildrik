@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · One styling model</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:18px 20px}
+  /* the ladder */
+  .ladder{display:grid;grid-template-columns:26px 1fr;gap:0;margin:14px 0 6px;position:relative}
+  .rail{grid-row:1/-1;grid-column:1;display:flex;flex-direction:column;align-items:center;color:var(--ink-3)}
+  .rail .cap{font-size:9px;letter-spacing:.06em;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);flex:1;display:grid;place-items:center}
+  .rail .arr{font-size:13px;line-height:1}
+  .rungs{grid-column:2}
+  .rung{display:grid;grid-template-columns:118px 1fr 96px;gap:12px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:11px 13px;margin-bottom:7px;background:var(--bg)}
+  .rung:hover{border-color:var(--ink-2)}
+  .rung.def{border:2px solid var(--ink);background:var(--fill)}
+  .rung .lh{display:flex;flex-direction:column;gap:2px}
+  .rung .lh b{font-size:12.5px}
+  .rung .lh .reach{font-size:9.5px;color:var(--ink-3);letter-spacing:.02em;text-transform:uppercase}
+  .rung .use{font-size:11px;color:var(--ink-2)}
+  .rung .use b{color:var(--ink)}
+  .rung .cnt{text-align:right;font-size:10px;color:var(--ink-3)}
+  .rung .cnt b{display:block;font-size:14px;color:var(--ink);font-weight:600}
+  .badge{display:inline-block;font-size:8.5px;letter-spacing:.04em;border-radius:3px;padding:1px 5px;vertical-align:middle}
+  .badge.def{background:var(--accent);color:#fff}
+  .badge.opt{border:1px solid var(--line-d);color:var(--ink-3)}
+  .badge.adv{border:1px solid var(--ink);color:var(--ink)}
+  /* decision aid */
+  .decide{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .q{border:1px solid var(--line);border-radius:6px;padding:11px 13px}
+  .q .qt{font-size:12px;font-weight:600;margin-bottom:7px}
+  .q .a{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--ink-2);padding:5px 0;border-top:1px dashed var(--line)}
+  .q .a .k{flex:0 0 92px;font-weight:600;color:var(--ink)}
+  /* overlap table */
+  .ovl{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}
+  .ovl th,.ovl td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  .ovl th{background:var(--fill);font-size:10px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  .ovl td.win b{color:var(--ink)}
+  .pill{display:inline-block;border:1px solid var(--line-d);border-radius:999px;padding:1px 8px;font-size:10px;color:var(--ink-2);background:var(--fill)}
+  .pill.def{border-color:var(--accent);color:var(--ink);font-weight:600;background:#fff}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:18px 0 4px;letter-spacing:.02em}
+  .sech .sub{font-weight:400;color:var(--ink-3)}
+</style></head>
+<body data-surface="editor">
+<div data-recon-banner style="position:sticky;top:0;z-index:999;background:#334155;color:#fff;font:600 12px/1.4 "Inter Tight",sans-serif;padding:7px 14px;text-align:center;border-bottom:2px solid #fff">⊘ CUT from the solution set — obsolete 5-rung explainer — see fix-styling-3reach. Not part of the user-friendly product (UX audit).</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>One styling model — the dedup fix</b> · agency feedback: "good features, not user-friendly." Root cause: <b>five overlapping ways</b> to change how something looks — element override · class · component · preset · token. Same visual change reachable 3+ ways, ripples surprise users. This screen makes them <b>ONE ordered ladder</b> with one default path.</div>
+  <div class="wrap">
+
+    <div class="row" style="justify-content:space-between;align-items:flex-end;margin-bottom:2px">
+      <div class="h1">"I want to change how this looks."</div>
+      <span class="muted" style="font-size:11px">selected: <b>Get started</b> button</span>
+    </div>
+    <div class="muted" style="font-size:11.5px;margin-bottom:6px">Pick by <b>reach</b> — how far the change travels. Narrowest is the default and the safest. Counts are live so you see the blast radius before you commit.</div>
+
+    <!-- THE LADDER (single answer) -->
+    <div class="sech">The reach ladder <span class="sub">— one ordered scale from narrowest to widest. The §6.5 ladder, now the only answer.</span></div>
+    <div class="ladder">
+      <div class="rail"><span class="arr">▲</span><span class="cap">narrower · safer · default</span><span class="arr">▼</span><span class="cap" style="flex:0;writing-mode:horizontal-tb;transform:none;padding:2px 0">wider · powerful</span></div>
+      <div class="rungs">
+
+        <div class="rung def">
+          <div class="lh"><b>1 · Element</b><span class="reach">reach: this one</span></div>
+          <div class="use"><b>Use when:</b> a one-off — only this button differs. Creates a local override; nothing else moves.</div>
+          <div class="cnt"><b>1</b>element <span class="badge def">default</span></div>
+        </div>
+
+        <div class="rung">
+          <div class="lh"><b>2 · Class</b><span class="reach">reach: every element with this class</span></div>
+          <div class="use"><b>Use when:</b> many elements should look identical and stay in sync — all primary buttons. Edit once, all follow.</div>
+          <div class="cnt"><b>12</b>here · 31 site <span class="badge opt">opt-in</span></div>
+        </div>
+
+        <div class="rung">
+          <div class="lh"><b>3 · Component</b><span class="reach">reach: every instance of this block</span></div>
+          <div class="use"><b>Use when:</b> a whole repeated <i>block</i> (CTA, card) must move together — structure + content, not just one property.</div>
+          <div class="cnt"><b>3</b>instances · 2 pages <span class="badge opt">opt-in</span></div>
+        </div>
+
+        <div class="rung">
+          <div class="lh"><b>4 · Preset</b><span class="reach">reach: every element using this style preset</span></div>
+          <div class="use"><b>Use when:</b> you maintain a named recipe — <code>button/primary</code> — that binds each property to a token. Restyle the recipe, not the elements.</div>
+          <div class="cnt"><b>button/primary</b>recipe <span class="badge adv">Advanced</span></div>
+        </div>
+
+        <div class="rung">
+          <div class="lh"><b>5 · Token</b><span class="reach">reach: everything bound to it, site-wide</span></div>
+          <div class="use"><b>Use when:</b> a brand-level decision — accent colour, radius scale. Widest reach: re-points one variable, the whole site shifts.</div>
+          <div class="cnt"><b>site-wide</b>80+ bindings <span class="badge adv">Advanced</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="note" style="margin:10px 0 4px"><b>The rule (one default, others opt-in):</b> editing <u>always lands on the narrowest rung — <b>Element</b> — unless you deliberately climb.</b> Today all five are reachable at once and the editor silently picks one, so changing one button breaks twelve. The fix: <b>one default path</b> (Element override), and every wider rung is an explicit, counted opt-in. Climb up = "make this reusable / push it wider"; the count tells you the blast radius first. <b>You can never pick the wrong layer by accident</b> — the wrong layers aren't even active until you ask for reach.</div>
+
+    <!-- DECISION AID: where does my change land? -->
+    <div class="sech">Where does my change land? <span class="sub">— answer in 5 seconds</span></div>
+    <div class="decide">
+      <div class="q">
+        <div class="qt">Ask one question: "should this also change <i>elsewhere</i>?"</div>
+        <div class="a"><span class="k">No, just here</span><span><b>→ Element</b> (rung 1). The default. Safe, local, revertible. Stop here for 90% of edits.</span></div>
+        <div class="a"><span class="k">Yes — others<br>like it</span><span><b>→ Class</b> (rung 2). The editor offers "apply to all N like this" with the live count.</span></div>
+        <div class="a"><span class="k">Yes — the<br>whole block</span><span><b>→ Component</b> (rung 3). Edit the master; instances follow. "Detach" drops one back to Element.</span></div>
+        <div class="a"><span class="k">Yes — it's a<br>brand value</span><span><b>→ Token</b> (rung 5), optionally via a <b>Preset</b> (rung 4) recipe. Pro territory, in the Design tab.</span></div>
+      </div>
+      <div class="q">
+        <div class="qt">How the UI keeps you on the right rung</div>
+        <div class="a"><span class="k">Scope banner</span><span>The inspector always shows <b>"Editing: this element"</b> pinned on top — you can read your current rung at a glance (<a href="59-inspector.html" style="text-decoration:underline;color:var(--ink-2)">inspector</a>).</span></div>
+        <div class="a"><span class="k">Climb is<br>explicit</span><span>To go wider you press <b>"Apply to all …"</b> / <b>"Edit component"</b> / <b>"Bind to token"</b> — never automatic. The count rides on the button.</span></div>
+        <div class="a"><span class="k">Confirm on<br>ripple</span><span>Any change with reach &gt; 1 shows <b>"changes N elements"</b> and a "just this one" escape before it commits (<a href="40-edit-scope.html" style="text-decoration:underline;color:var(--ink-2)">edit-scope</a>).</span></div>
+        <div class="a"><span class="k">Down is<br>always free</span><span><b>Detach</b> / "just this one" drops any element back to rung 1 as a local override. No trap doors.</span></div>
+      </div>
+    </div>
+
+    <!-- OVERLAP MAP: same change, multiple layers, who wins -->
+    <div class="sech">Why it confused people <span class="sub">— the same visual change was reachable through up to four layers, with silent cascade winners (grounded in current engine)</span></div>
+    <table class="ovl">
+      <tr><th style="width:24%">"Make this button blue"</th><th>Element</th><th>Class</th><th>Preset → Token</th><th>Component</th><th style="width:21%">Who wins today (silent)</th></tr>
+      <tr>
+        <td><b>background colour</b></td>
+        <td><span class="pill def">inline override</span></td>
+        <td><span class="pill">.btn-primary rule</span></td>
+        <td><span class="pill">binds → --color-accent</span></td>
+        <td><span class="pill">master style patch</span></td>
+        <td class="win"><b>Element override</b> beats class by CSS cascade — so a token/class edit silently does nothing here. <i>Confusing.</i></td>
+      </tr>
+      <tr>
+        <td><b>padding / radius</b></td>
+        <td><span class="pill def">inline override</span></td>
+        <td><span class="pill">.btn-lg rule</span></td>
+        <td><span class="pill">binds → --space / --radius</span></td>
+        <td><span class="pill">master patch</span></td>
+        <td class="win">Same trap — inline wins; the "global" edit appears broken.</td>
+      </tr>
+      <tr>
+        <td><b>a repeated CTA block</b></td>
+        <td><span class="pill">override one</span></td>
+        <td><span class="pill">—</span></td>
+        <td><span class="pill">—</span></td>
+        <td><span class="pill def">edit master</span></td>
+        <td class="win">If you style an instance then the master syncs, your edit can be <b>clobbered</b> unless you detached first.</td>
+      </tr>
+    </table>
+    <div class="note" style="margin-top:8px"><b>How the ladder resolves it:</b> the five layers don't change — they <i>stack in one fixed order</i> (Element → Class → Component → Preset → Token, narrow wins). The UI now (1) <b>defaults every edit to Element</b>, (2) <b>names the rung you're on</b> in the scope banner, (3) makes climbing wider an <b>explicit, counted opt-in</b>, and (4) when a narrower override would mask a wider edit, says so — <b>"this element overrides the class; reset to inherit?"</b> So there's exactly one path by default, the cascade is never silent, and Pro users still reach every layer — just legibly.</div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Styling model:</b><a href="40-edit-scope.html">Edit scope</a><a href="41-scope-picker.html">Scope levels</a><a href="59-inspector.html">Inspector</a><a href="59b-inspector-states.html">States × breakpoints</a><a href="ds1-design-system.html">Tokens</a><a href="ds2-styles.html">Styles/presets</a><a href="m-editor.html">Components</a><a href="index.html">Map</a></div>
+</body></html>

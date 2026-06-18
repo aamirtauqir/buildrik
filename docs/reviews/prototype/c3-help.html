@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Help</title><link rel="stylesheet" href="pt.css">
+<style>.vs{display:none}.vs.on{display:block}.cat{border:1px solid var(--line);border-radius:6px;padding:12px;cursor:pointer}.cat:hover{border-color:var(--accent)}.art{padding:9px 0;border-bottom:1px dashed var(--line);cursor:pointer;font-size:12.5px}.art:hover{color:var(--ink-2)}</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen screen-narrow">
+  <div class="topnote"><b>Help center + support</b> · grounded in <code>help.*</code> (categories/search/article/feedback/createTicket) · self-serve articles → ticket fallback</div>
+  <div class="pad">
+    <div class="row" style="margin-bottom:14px"><button class="chip on" onclick="h('home',this)">Browse</button><button class="chip" onclick="h('article',this)">Article</button><button class="chip" onclick="h('ticket',this)">Contact support</button></div>
+
+    <div class="vs on" id="h_home">
+      <div class="input" style="width:100%;margin-bottom:14px">⌕ Search help…</div>
+      <div class="grid3">
+        <div class="cat" onclick="h('article',null)"><b style="font-size:12.5px">Getting started</b><div class="muted" style="font-size:10.5px;margin-top:4px">12 articles</div></div>
+        <div class="cat"><b style="font-size:12.5px">Publishing &amp; domains</b><div class="muted" style="font-size:10.5px;margin-top:4px">9 articles</div></div>
+        <div class="cat"><b style="font-size:12.5px">Editor &amp; design</b><div class="muted" style="font-size:10.5px;margin-top:4px">18 articles</div></div>
+        <div class="cat"><b style="font-size:12.5px">Billing &amp; plans</b><div class="muted" style="font-size:10.5px;margin-top:4px">7 articles</div></div>
+        <div class="cat"><b style="font-size:12.5px">Team &amp; workspace</b><div class="muted" style="font-size:10.5px;margin-top:4px">6 articles</div></div>
+        <div class="cat"><b style="font-size:12.5px">Account &amp; security</b><div class="muted" style="font-size:10.5px;margin-top:4px">8 articles</div></div>
+      </div>
+      <div class="lbl" style="margin:16px 0 6px">Popular</div>
+      <div class="art">How do I connect a custom domain? →</div>
+      <div class="art">Why isn't my site publishing? →</div>
+      <div class="art" style="border:none">How does AI generation work? →</div>
+    </div>
+
+    <div class="vs" id="h_article">
+      <a href="c3-help.html" onclick="setTimeout(function(){h('home',document.querySelectorAll('.chip')[0]);},0)" class="muted" style="font-size:11px;text-decoration:underline">← Help</a>
+      <div class="h1" style="font-size:18px;margin:8px 0 6px">Connecting a custom domain</div>
+      <div class="muted" style="font-size:11px;margin-bottom:12px">Publishing &amp; domains · 3 min read</div>
+      <div class="barline" style="height:8px;width:90%;margin-bottom:6px"></div><div class="barline" style="height:8px;width:100%;margin-bottom:6px"></div><div class="barline" style="height:8px;width:70%;margin-bottom:14px"></div>
+      <div class="box pad" style="text-align:center"><div style="font-size:12px;margin-bottom:8px">Was this helpful?</div><div class="row" style="justify-content:center"><button class="btn">👍 Yes</button><button class="btn">👎 No</button></div></div>
+      <div class="muted" style="font-size:11px;margin-top:12px;text-align:center">Still stuck? <a href="c3-help.html" onclick="setTimeout(function(){h('ticket',document.querySelectorAll('.chip')[2]);},0)" style="text-decoration:underline">Contact support</a></div>
+    </div>
+
+    <div class="vs" id="h_ticket">
+      <div class="h1" style="font-size:18px;margin-bottom:10px">Contact support</div>
+      <div class="lbl">Subject</div><div class="input" style="width:100%;margin:5px 0 10px">Domain not verifying</div>
+      <div class="lbl">Category</div><div class="input" style="width:50%;margin:5px 0 10px">Publishing &amp; domains ▾</div>
+      <div class="lbl">Message</div><div class="input" style="width:100%;height:70px;margin:5px 0 10px">Describe what's happening…</div>
+      <a class="btn btn-fill btn-strong" href="c2-notifications.html" style="width:100%;display:block;text-align:center;text-decoration:none">Submit ticket → (tracked in notifications)</a>
+      <div class="muted" style="font-size:10.5px;margin-top:8px">Creates a <code>SupportTicket</code> (#auto-number) + confirmation email. We reply by email.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Settings:</b><a href="m3-dashboard.html">Dashboard</a><a href="c2-notifications.html">Notifications</a><a href="c3-help.html" class="here">Help</a><a href="c4-integrations.html">Integrations</a><a href="index.html">Map</a></div>
+<script>function h(x,b){['home','article','ticket'].forEach(function(k){document.getElementById('h_'+k).classList.toggle('on',k===x);});if(b){document.querySelectorAll('.row .chip').forEach(function(c){c.classList.remove('on');});b.classList.add('on');}}</script>
+</body></html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · e6 — Collections / CMS (dynamic pages)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:0;display:grid;grid-template-columns:200px 1fr;min-height:440px}
+  .side{border-right:1px solid var(--line);background:var(--bg-2);padding:12px 10px}
+  .side .h{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:6px 4px 7px}
+  .coll{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;font-size:12.5px;color:var(--ink-2);cursor:pointer;margin-bottom:3px}
+  .coll:hover{background:var(--fill)}
+  .coll.on{background:#fff;border:1px solid var(--ink);color:var(--ink);font-weight:600}
+  .coll .ct{font-size:10px;color:var(--ink-3)}
+  .coll.add{border:1px dashed var(--line-d);color:var(--ink-3);justify-content:center}
+  .main{padding:16px 20px}
+  .crumb{font-size:11px;color:var(--ink-3);margin-bottom:8px}.crumb b{color:var(--ink-2)}
+  .secrow{display:flex;align-items:center;justify-content:space-between;margin:6px 0 9px}
+  .secrow .t{font-size:15px;font-weight:700}
+  .secrow .a{font-size:11.5px;border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:6px;padding:6px 12px;text-decoration:none;font-weight:600}
+  .grp{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 6px}
+  .fields{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+  .field{border:1px solid var(--line);border-radius:5px;padding:4px 9px;font-size:11px;color:var(--ink-2);background:#fff}
+  .field .ty{color:var(--ink-3);font-size:9px}
+  .field.add{border-style:dashed;color:var(--ink-3)}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  th{background:var(--fill);font-size:9px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2)}
+  td b{color:var(--ink)} td a{color:var(--ink-2)}
+  .chip{font-size:9px;border-radius:3px;padding:1px 6px}.chip.live{background:var(--accent);color:#fff}.chip.draft{border:1px solid var(--line-d);color:var(--ink-3)}
+  .tplbox{border:2px solid var(--ink);border-radius:8px;padding:13px 15px;background:var(--fill);margin-top:6px}
+  .tplbox .tt{font-size:13px;font-weight:700}
+  .tplbox .td2{font-size:11.5px;color:var(--ink-2);margin-top:4px;line-height:1.45}.tplbox .td2 b{color:var(--ink)}
+  .tplbox a{color:var(--ink);font-weight:600;text-decoration:none}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px}.note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · e6 · COLLECTIONS / CMS</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Collections (CMS) — the dynamic-pages gap a Webflow/Framer competitor must fill.</b> Codex expansion (high-conviction): you can't hand-author 200 blog posts or products. A <b>collection</b> = one content type (fields), many <b>entries</b>, bound to <b>one dynamic page template</b> → many pages auto-generated. <a href="m-seo.html" style="color:#fff;text-decoration:underline">M-seo</a> already pointed here ("for dynamic pages, use a pattern"). Editor-owned (it authors pages); the inbox/ops stay in the dashboard.</div>
+  <div class="wrap">
+
+    <!-- collections list -->
+    <div class="side">
+      <div class="h">Collections</div>
+      <div class="coll on">Blog posts <span class="ct">12</span></div>
+      <div class="coll">Products <span class="ct">38</span></div>
+      <div class="coll">Team members <span class="ct">6</span></div>
+      <div class="coll">Case studies <span class="ct">9</span></div>
+      <div class="coll add">＋ New collection</div>
+      <div class="note2" style="margin:12px 4px 0">A collection becomes a <b>menu of fields</b> + a <b>URL pattern</b> (e.g. <code>/blog/[slug]</code>).</div>
+    </div>
+
+    <!-- selected collection -->
+    <div class="main">
+      <div class="crumb"><b>Acme</b> › acme-main › Collections › <b>Blog posts</b> · <code>/blog/[slug]</code></div>
+      <div class="secrow"><div class="t">Blog posts <span style="font-size:11px;color:var(--ink-3);font-weight:400">· 12 entries</span></div><a class="a" href="m-editor.html">＋ New post</a></div>
+
+      <div class="grp">Fields — the shape of every post</div>
+      <div class="fields">
+        <span class="field">Title <span class="ty">text</span></span>
+        <span class="field">Slug <span class="ty">url</span></span>
+        <span class="field">Cover <span class="ty">image</span></span>
+        <span class="field">Body <span class="ty">rich text</span></span>
+        <span class="field">Author <span class="ty">ref → Team</span></span>
+        <span class="field">Date <span class="ty">date</span></span>
+        <span class="field">Tags <span class="ty">multi</span></span>
+        <span class="field add">＋ Add field</span>
+      </div>
+
+      <div class="grp">Entries</div>
+      <table>
+        <tr><th>Title</th><th>Slug</th><th>Status</th><th>Updated</th><th></th></tr>
+        <tr><td><b>Launching v2</b></td><td>/blog/launching-v2</td><td><span class="chip live">live</span></td><td>2h ago</td><td><a href="m-editor.html">Edit ↗</a></td></tr>
+        <tr><td><b>Design tokens 101</b></td><td>/blog/design-tokens-101</td><td><span class="chip live">live</span></td><td>yesterday</td><td><a href="m-editor.html">Edit ↗</a></td></tr>
+        <tr><td><b>Our 2026 roadmap</b></td><td>/blog/2026-roadmap</td><td><span class="chip draft">draft</span></td><td>3d ago</td><td><a href="m-editor.html">Edit ↗</a></td></tr>
+      </table>
+
+      <div class="grp">One design, every entry</div>
+      <div class="tplbox">
+        <div class="tt">Dynamic page template → <a href="m-editor.html">design it in the editor ↗</a></div>
+        <div class="td2">Build the post layout <b>once</b>; bind elements to fields (heading→Title, image→Cover, body→Body). Every entry renders through it. Per-entry <b>SEO</b> (title/description) comes from the fields — the <a href="m-seo.html" style="color:var(--ink)">M-seo pattern level</a>, not hand-written 200×.</div>
+      </div>
+
+      <div class="note2"><b>Job-to-be-done:</b> "publish many similar pages without rebuilding each." Collections + a bound template + a field-driven SEO pattern do exactly that. A <b>Content editor</b> can add/edit entries (content); changing the <b>fields or template</b> is Designer/Admin (<a href="m-roles.html">M-roles</a>). Entries publish with the site.</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>CMS:</b><a href="m-editor.html">Editor (template)</a><a href="m-seo.html">SEO pattern</a><a href="50-pages.html">Static pages</a><a href="52-add.html">Insert (bind fields)</a><a href="index.html">Map</a></div>
+</body></html>

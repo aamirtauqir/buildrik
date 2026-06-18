@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · a5 — Invite (roles + white-label)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:520px}
+  .field{margin-bottom:12px}
+  .field label{font-size:11px;font-weight:600;color:var(--ink);display:block;margin-bottom:5px}
+  .field .in{border:1px dashed var(--line-d);border-radius:6px;padding:9px 11px;font-size:12px;color:var(--ink-3)}
+  .roles{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .rcard{border:1px solid var(--line);border-radius:6px;padding:9px 11px;cursor:pointer}
+  .rcard.on{border:2px solid var(--ink);background:var(--fill)}
+  .rcard .rn{font-size:12px;font-weight:600} .rcard .rd{font-size:10px;color:var(--ink-3);margin-top:2px}
+  .gbox{border:1px solid var(--line);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--ink-2)}
+  .wl{border:1px dashed var(--line-d);border-radius:6px;padding:9px 11px;font-size:11px;color:var(--ink-2);margin-top:6px;background:var(--bg-2)}
+  .wl b{color:var(--ink)}
+  .send{margin-top:14px;border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:7px;padding:10px;text-align:center;font-size:13px;font-weight:600}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · a5 · INVITE</div>
+<div class="screen">
+  <div class="topnote"><b>Invite — new roles, per-site scope, white-label.</b> Rebuilt: old "Editor / All sites / Buildrik" invite becomes the 4-role model + per-site scope + the agency's brand on the invite. The role here = the permission boundary (<a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a>).</div>
+  <div class="wrap">
+    <div class="field"><label>Email</label><div class="in">client@acme.com</div></div>
+    <div class="field"><label>Role</label>
+      <div class="roles">
+        <div class="rcard on"><div class="rn">Content editor</div><div class="rd">edit content on assigned sites · send for review</div></div>
+        <div class="rcard"><div class="rn">Designer</div><div class="rd">full build access + publish</div></div>
+        <div class="rcard"><div class="rn">Viewer</div><div class="rd">read-only + comments</div></div>
+        <div class="rcard"><div class="rn">Admin</div><div class="rd">workspace + billing</div></div>
+      </div>
+    </div>
+    <div class="field"><label>Site access</label><div class="gbox">Acme sites only ▾ <span style="color:var(--ink-3);font-size:10px">(not all clients)</span></div></div>
+    <div class="field"><label>Edits need approval</label><div class="gbox">On — changes route to you before going live ▾</div></div>
+    <div class="wl"><b>White-label:</b> this client logs into <b>studio.northwind.com</b> and sees the Northwind brand — never "Buildrik". <a href="a9-invite-accept.html" style="color:var(--ink);text-decoration:underline">Preview what the client receives →</a></div>
+    <a class="send" href="c1-team.html" style="display:block;text-decoration:none">Send invite</a>
+  </div>
+</div>
+<div class="proto-nav"><b>Invite:</b><a href="m-roles.html">Role matrix</a><a href="c1-team.html">Team</a><a href="m-approval.html">Approval</a><a href="m-agency.html">White-label</a><a href="index.html">Map</a></div>
+</body></html>

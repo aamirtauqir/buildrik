@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 70 — Destructive confirm (pattern)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:880px}
+  .lead{font-size:11.5px;color:var(--ink-2);margin-bottom:12px;line-height:1.5}.lead b{color:var(--ink)}
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .card{border:2px solid var(--ink);border-radius:9px;padding:13px 14px;background:#fff}
+  .card .tag{font-size:8.5px;letter-spacing:.04em;background:var(--accent);color:#fff;border-radius:3px;padding:1px 6px}
+  .card .h{font-size:13px;font-weight:700;margin:7px 0 4px}
+  .card .d{font-size:11px;color:var(--ink-2);line-height:1.4}
+  .card .typ{font-size:10px;color:var(--ink-3);margin-top:9px}
+  .card .in{border:1px dashed var(--line-d);border-radius:5px;padding:6px 9px;font-family:var(--mono);font-size:11px;color:var(--ink-2);margin:4px 0 9px;background:var(--bg-2)}
+  .card .go{display:block;text-align:center;border:1px solid var(--ink);background:var(--accent);color:#fff;border-radius:6px;padding:7px;font-size:12px;font-weight:600;text-decoration:none}
+  .card .cancel{display:block;text-align:center;font-size:11px;color:var(--ink-2);margin-top:6px;text-decoration:none}
+  .card.transfer{border-style:solid}
+  .pick{border:1px solid var(--line);border-radius:5px;padding:6px 9px;font-size:11px;color:var(--ink-2);margin:4px 0 9px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:14px}.note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · 70 · DESTRUCTIVE CONFIRM</div>
+<div class="screen">
+  <div class="topnote"><b>Destructive confirm — one reusable pattern.</b> Every irreversible/financial action (delete site · delete account · transfer workspace) routes here; the screen <b>adapts to the target</b>. Delete = type-to-confirm; transfer = pick-recipient. Owner/Admin-only (§8.7, see <a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a>).</div>
+  <div class="wrap">
+    <div class="lead">The same modal pattern, parameterized by what you're confirming. Reached from: Sites ⋯, <a href="b1-account-settings.html" style="color:var(--ink-2)">account danger zone</a>, <a href="18-workspace.html" style="color:var(--ink-2)">workspace danger zone</a>.</div>
+    <div class="cards">
+      <div class="card">
+        <span class="tag">IRREVERSIBLE</span>
+        <div class="h">Delete a site</div>
+        <div class="d">Unpublishes the domain, removes pages + history. Can't be undone.</div>
+        <div class="typ">Type <code>acme-main</code> to confirm</div>
+        <div class="in">acme-main</div>
+        <a class="go" href="11-sites.html">Delete site permanently</a>
+        <a class="cancel" href="12-site-detail.html">Cancel</a>
+      </div>
+      <div class="card">
+        <span class="tag">IRREVERSIBLE</span>
+        <div class="h">Delete your account</div>
+        <div class="d">Removes your profile + access. 30-day grace, then permanent. Workspace data handled separately.</div>
+        <div class="typ">Type your email to confirm</div>
+        <div class="in">sara@northwind.com</div>
+        <a class="go" href="00-signin.html">Delete account</a>
+        <a class="cancel" href="b1-account-settings.html">Cancel</a>
+      </div>
+      <div class="card transfer">
+        <span class="tag">OWNERSHIP</span>
+        <div class="h">Transfer workspace</div>
+        <div class="d">Hands ownership to another Admin. They must accept (receives an invite).</div>
+        <div class="typ">Pick the new owner</div>
+        <div class="pick">imran@northwind.com ▾</div>
+        <a class="go" href="a7-transfer-accept.html">Send transfer →</a>
+        <a class="cancel" href="18-workspace.html">Cancel</a>
+      </div>
+    </div>
+    <div class="note2"><b>Owner/Admin-only.</b> Editors/Viewers never see Delete/Transfer (<a href="m-roles.html" style="color:var(--ink-2)">M-roles</a>). Delete = type the exact name/email (no accidental clicks); transfer = pick a recipient who then accepts via <a href="a7-transfer-accept.html" style="color:var(--ink-2)">a7</a>. Billing actions (cancel plan) use the same confirm pattern.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Confirm:</b><a href="11-sites.html">Sites</a><a href="b1-account-settings.html">Account danger</a><a href="18-workspace.html">Workspace danger</a><a href="a7-transfer-accept.html">Transfer accept</a><a href="m-roles.html">Roles</a><a href="index.html">Map</a></div>
+</body></html>

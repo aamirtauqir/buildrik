@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · 73 — Lifecycle stateboard</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:18px 22px;max-width:1080px}
+  .lane{display:flex;align-items:stretch;flex-wrap:wrap;gap:0}
+  .st{flex:0 0 auto;min-width:150px;max-width:178px;border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:#fff;text-decoration:none;color:inherit;position:relative}
+  .st + .st{margin-left:30px}
+  .st + .st::before{content:"→";position:absolute;left:-22px;top:50%;transform:translateY(-50%);color:var(--ink);font-size:16px}
+  .st:hover{border-color:var(--accent)}
+  .st .k{font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+  .st .t{font-size:13px;font-weight:700;margin:3px 0 4px}
+  .st .d{font-size:10.5px;color:var(--ink-2);line-height:1.4}
+  .st .scr{font-size:9px;color:var(--ink-3);margin-top:6px;font-family:var(--mono)}
+  .st.live{border:2px solid var(--ink)}
+  .branch{border:1px dashed var(--line-d);border-radius:8px;padding:9px 12px;margin:14px 0;font-size:11.5px;color:var(--ink-2);background:var(--bg-2)}
+  .branch b{color:var(--ink)}
+  .sech{font-size:11px;font-weight:600;color:var(--ink);margin:22px 0 9px;letter-spacing:.02em;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:14px}.note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · 73 · LIFECYCLE STATEBOARD</div>
+<div class="screen">
+  <div class="topnote"><b>Lifecycle stateboard — one site, edit → live → restore, all the safety states in one view.</b> The states already exist as separate screens; this board proves they form one continuous, never-lose-work path. Each node links to its detail.</div>
+  <div class="wrap">
+
+    <div class="sech">The happy path</div>
+    <div class="lane">
+      <a class="st" href="m-editor.html"><div class="k">1 · Make</div><div class="t">Edit</div><div class="d">Author the page. Autosaves as you go.</div><div class="scr">m-editor</div></a>
+      <a class="st" href="60-save-states.html"><div class="k">2 · Saved</div><div class="t">Saved</div><div class="d">Saving · Saved · Offline · Failed — never silent.</div><div class="scr">60-save-states</div></a>
+      <a class="st" href="m-approval.html"><div class="k">3 · Review</div><div class="t">Send for review</div><div class="d">Client edits → the agency approves (if approval is on).</div><div class="scr">m-approval</div></a>
+      <a class="st" href="20-publish.html"><div class="k">4 · Ship</div><div class="t">Approve &amp; publish</div><div class="d">Pre-flight → deploy → live or failed.</div><div class="scr">20-publish</div></a>
+      <a class="st" href="22-domain-pending.html"><div class="k">5 · Domain</div><div class="t">Domain pending</div><div class="d">Connect → DNS → pending → verified.</div><div class="scr">22-domain-pending</div></a>
+      <a class="st live" href="90-published.html"><div class="k">6 · Live</div><div class="t">Live site</div><div class="d">The visitor output. Share it.</div><div class="scr">90-published</div></a>
+    </div>
+
+    <div class="branch"><b>↳ Branch — save conflict (rare, step 2).</b> If the site changed in another tab/device, we never silently overwrite: show <b>what's different</b>, default to <b>keep both (save mine as a copy)</b>, overwrite only behind a type-to-confirm. <a href="61-conflict.html" style="color:var(--ink-2)">Save conflict ↗</a></div>
+
+    <div class="branch"><b>↳ Branch — undo &amp; restore.</b> In-session <b>undo/redo</b> is the editor topbar (↺ History). Every <b>publish</b> is a restorable <b>version</b> on the dashboard — roll back a live site in one click (with a confirm). <a href="58-history.html" style="color:var(--ink-2)">Versions ↗</a></div>
+
+    <div class="branch"><b>↳ Branch — who can publish.</b> A <b>Designer/Admin</b> publishes directly. A <b>Content editor</b> with approval ON sees <b>"Send for review"</b> instead — the agency approves before it goes live. <a href="m-roles.html" style="color:var(--ink-2)">Roles ↗</a> · <a href="m-approval.html" style="color:var(--ink-2)">Approval ↗</a></div>
+
+    <div class="note2"><b>One promise: never lose work.</b> Autosave, conflict-keeps-both, approval gate, and restorable versions are the four safety nets across the whole path — no step can silently destroy a client's site.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Lifecycle:</b><a href="m-editor.html">Edit</a><a href="61-conflict.html">Conflict</a><a href="m-approval.html">Review</a><a href="20-publish.html">Publish</a><a href="22-domain-pending.html">Domain</a><a href="58-history.html">Versions</a><a href="s-ship-states.html">Ship states</a><a href="index.html">Map</a></div>
+</body></html>

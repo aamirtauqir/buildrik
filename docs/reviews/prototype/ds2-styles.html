@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · ds2 — Styles &amp; presets (folded)</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:16px 20px;max-width:760px}
+  .map{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .card{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:#fff}
+  .card.edit{border-color:var(--accent)}
+  .card .pin{font-size:8.5px;letter-spacing:.03em;text-transform:uppercase;border-radius:3px;padding:1px 6px;display:inline-block;margin-bottom:6px}
+  .pin.edit{background:var(--accent);color:#fff} .pin.ws{background:var(--ink-3);color:#fff}
+  .card .t{font-size:13px;font-weight:700} .card .d{font-size:11.5px;color:var(--ink-2);margin-top:5px;line-height:1.45}
+  .card .d b{color:var(--ink)}
+  .card a{color:var(--ink);font-size:11px;text-decoration:none;display:inline-block;margin-top:8px}
+  .note2{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:12px} .note2 b{color:var(--ink)}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · ds2 · STYLES &amp; PRESETS</div>
+<div class="screen">
+  <div class="topnote"><b>Styles &amp; presets — folded into two homes, not a separate "DS" area.</b> Rebuilt: presets/tokens no longer live in a standalone Design-System tab. Everyday styling = the editor's <b>Styles</b> (3 reaches); the shared source = the workspace <b>shared theme</b>. One model, two homes.</div>
+  <div class="wrap">
+    <div class="map">
+      <div class="card edit">
+        <div class="pin edit">Editor › Styles</div>
+        <div class="t">Everyday styling</div>
+        <div class="d">Brand swatches &amp; fonts (Simple) → full <b>tokens &amp; presets</b> (Pro). You style by <b>reach</b> — This item / All like this / Site theme — not by picking a "preset layer." The 11 preset categories become the Pro depth of this one home.</div>
+        <a href="m-editor.html">Open Styles ↗</a>
+      </div>
+      <div class="card">
+        <div class="pin ws">Workspace › Shared theme</div>
+        <div class="t">The shared source</div>
+        <div class="d">The agency's one theme (tokens + presets) that client sites <b>sync or override</b>. Edited once, pushed via the <b>review contract</b>. This is where "preset = a named recipe bound to tokens" actually lives — as the workspace source, surfaced to users as "the brand."</div>
+        <a href="ds1-design-system.html">Open Shared theme ↗</a>
+      </div>
+    </div>
+    <div class="note2"><b>Why fold it:</b> a separate "Styles/presets" concept was a third reuse system competing with components + the reach model. Now: reach handles per-element/block; shared theme handles brand; presets are implementation inside both. No standalone DS-styles destination.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Styles:</b><a href="m-editor.html">Editor Styles</a><a href="ds1-design-system.html">Shared theme</a><a href="fix-styling-3reach.html">3-reach</a><a href="m-ownership.html">Ownership</a><a href="index.html">Map</a></div>
+</body></html>

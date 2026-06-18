@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · M-agency — the agency layer</title><link rel="stylesheet" href="pt.css">
+<style>
+  .wrap{padding:0}
+  .appbar{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .ws{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px}
+  .ws .logo{width:22px;height:22px;border:1px solid var(--line-d);border-radius:5px;background:var(--fill);display:grid;place-items:center;font-size:11px}
+  .ws .switch{font-size:10px;color:var(--ink-3);border:1px solid var(--line);border-radius:4px;padding:2px 7px;margin-left:4px}
+  .crumb{font-size:12px;color:var(--ink-3)}
+  .crumb b{color:var(--ink-2)}
+  .appbar .sp{flex:1}
+  .topnav{display:flex;gap:4px}
+  .topnav a{font-size:12px;color:var(--ink-2);padding:5px 11px;border-radius:5px;text-decoration:none}
+  .topnav a.on{background:var(--accent);color:#fff;font-weight:600}
+  .topnav a:hover:not(.on){background:var(--fill)}
+
+  .body{padding:18px 22px;max-width:1120px;margin:0 auto}
+  .h1{font-size:18px;font-weight:700}
+  .sub{font-size:12px;color:var(--ink-2);margin-top:2px}
+
+  /* shared theme banner */
+  .dsbanner{display:flex;align-items:center;gap:14px;border:2px solid var(--ink);border-radius:9px;padding:13px 16px;background:var(--fill);margin:14px 0}
+  .dsbanner .ic{width:40px;height:40px;border:1px solid var(--line-d);border-radius:7px;background:#fff;display:grid;place-items:center;font-size:16px}
+  .dsbanner .t{font-size:13.5px;font-weight:600}
+  .dsbanner .d{font-size:11.5px;color:var(--ink-2);margin-top:2px;line-height:1.4}
+  .dsbanner .d b{color:var(--ink)}
+  .dsbanner .sp{flex:1}
+  .btn{border:1px solid var(--ink);border-radius:6px;padding:8px 14px;font-size:12px;font-weight:600;background:var(--accent);color:#fff}
+  .btn.ghost{background:#fff;color:var(--ink)}
+
+  /* clients */
+  .secrow{display:flex;align-items:center;justify-content:space-between;margin:20px 0 8px}
+  .secrow .st{font-size:13px;font-weight:600}
+  .secrow .sa{font-size:12px;color:var(--ink-2);border:1px dashed var(--line-d);border-radius:6px;padding:6px 12px}
+  .clients{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .client{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden}
+  .client .ch{display:flex;align-items:center;gap:9px;padding:11px 13px;border-bottom:1px solid var(--line)}
+  .client .clogo{width:30px;height:30px;border:1px solid var(--line-d);border-radius:6px;background:var(--fill);display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--ink-2)}
+  .client .cn{font-size:13px;font-weight:600}
+  .client .cmeta{font-size:10.5px;color:var(--ink-3)}
+  .client .cb{padding:10px 13px;display:flex;flex-direction:column;gap:7px}
+  .siteline{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink-2)}
+  .dot{width:7px;height:7px;border-radius:50%;border:1px solid var(--ink-2)}
+  .dot.live{background:var(--accent);border-color:var(--accent)}
+  .dschip{font-size:9px;letter-spacing:.03em;border-radius:3px;padding:1px 6px;margin-left:auto}
+  .dschip.synced{border:1px solid var(--ink);color:var(--ink)}
+  .dschip.override{border:1px dashed var(--line-d);color:var(--ink-3)}
+  .client .cf{display:flex;gap:6px;padding:0 13px 12px}
+  .cf a{flex:1;text-align:center;font-size:11px;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:6px;text-decoration:none}
+  .cf a:hover{border-color:var(--accent);color:var(--ink)}
+  .client.add{border-style:dashed;display:grid;place-items:center;min-height:150px;color:var(--ink-3);text-align:center;font-size:12px}
+  .client.add b{color:var(--ink);display:block;font-size:13px;margin-bottom:3px}
+
+  /* feature ledger */
+  .ledger{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px}
+  .lcard{border:1px solid var(--line);border-radius:8px;padding:13px 15px;background:#fff}
+  .lcard .lt{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .lcard .lt .pin{font-size:9px;letter-spacing:.03em;text-transform:uppercase;border:1px solid var(--line-d);border-radius:3px;padding:1px 6px;color:var(--ink-3)}
+  .lcard .lp{font-size:11.5px;color:var(--ink-2);margin-top:6px;line-height:1.45}
+  .lcard .lp b{color:var(--ink)}
+  .wl{display:flex;align-items:center;gap:10px;margin-top:9px;border:1px dashed var(--line-d);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--ink-2)}
+  .wl .prev{width:90px;height:26px;border:1px solid var(--line);border-radius:4px;background:var(--bg-2);display:grid;place-items:center;font-size:9px;color:var(--ink-3)}
+</style></head>
+<body data-surface="dashboard">
+<div class="wf-stamp">PROTOTYPE · M-AGENCY</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>M-agency — the layer v1 was missing.</b> The founder's paying customer. Answers the 4 named gaps: <b>shared theme · multi-client · white-label · speed</b>. New object node <b>Client</b> sits between Workspace and Site (solo builders never see it). This is the "where's the agency" artifact both reviews demanded.</div>
+
+  <!-- app chrome -->
+  <div class="dbar">
+    <div class="ws"><span class="logo">N</span> Northwind Studio <span class="sw">agency ▾</span></div>
+    <span class="crumb"><b>Workspace</b> › Clients</span>
+    <span class="sp"></span>
+    <div class="dnav"><a href="m3-dashboard.html">Home</a><a href="m-agency.html" class="on">Clients</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html">Billing</a></div>
+    <a class="icn" href="c2-notifications.html" title="Notifications" style="margin-left:8px">🔔</a><a class="icn" href="c3-help.html" title="Help">?</a><a class="icn" href="b1-account-settings.html" title="Account">N</a>
+  </div>
+
+  <div class="body">
+    <div class="h1">Clients</div>
+    <div class="sub">Northwind Studio · 4 clients · 7 sites · 1 shared theme</div>
+
+    <!-- SHARED DS — gap 1 -->
+    <div class="dsbanner">
+      <div class="ic">◐</div>
+      <div>
+        <div class="t">Shared theme — one source, every client</div>
+        <div class="d">"Northwind base" tokens + components power <b>6 of 7 sites</b>. Edit once in the Theme editor, <b>push to all</b>. 1 site (Acme) has a local override.</div>
+      </div>
+      <span class="sp"></span>
+      <button class="btn ghost" onclick="location.href='ds1-design-system.html'">Edit theme</button>
+      <button class="btn" onclick="location.href='m-ds-push.html'">Push update to 6 sites</button>
+    </div>
+
+    <!-- CLIENTS — gap 2 (multi-client) + gap 4 (speed via Add) -->
+    <div class="secrow">
+      <div class="st">All clients</div>
+      <a class="sa" href="01-new-site.html" style="text-decoration:none">＋ New client/site &nbsp;·&nbsp; from house template ▾ &nbsp;·&nbsp; duplicate a client <span style="color:var(--ink-3)">(creates a site)</span></a>
+    </div>
+    <!-- scale: search/sort appears as the agency grows past a handful (P1 — codex mental-model) -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:11px">
+      <div style="flex:1;border:1px dashed var(--line-d);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--ink-3)">⌕ Search clients &amp; sites… <span style="font-size:10px">(jump to any of 30+ clients — also ⌘K)</span></div>
+      <div style="border:1px solid var(--line);border-radius:6px;padding:8px 11px;font-size:11px;color:var(--ink-2)">Sort: recent ▾</div>
+      <div style="border:1px solid var(--line);border-radius:6px;padding:8px 11px;font-size:11px;color:var(--ink-2)">Filter ▾</div>
+    </div>
+    <div class="clients">
+      <div class="client">
+        <div class="ch"><div class="clogo">A</div><div><div class="cn">Acme Co</div><div class="cmeta">2 sites · invited: client@acme</div></div></div>
+        <div class="cb">
+          <div class="siteline"><span class="dot live"></span> acme-main.com <span class="dschip override">Theme override</span></div>
+          <div class="siteline"><span class="dot"></span> acme-careers <span class="dschip synced">Theme synced</span></div>
+        </div>
+        <div class="cf"><a href="11-sites.html">Open client ↗</a><a href="01-new-site.html">＋ Site</a><a href="a5-invite.html">✉ Invite</a><a href="c1-team.html">Access</a></div>
+      </div>
+      <div class="client">
+        <div class="ch"><div class="clogo">B</div><div><div class="cn">Bloom Cafe</div><div class="cmeta">1 site · invited: owner@bloom</div></div></div>
+        <div class="cb">
+          <div class="siteline"><span class="dot live"></span> bloomcafe.com <span class="dschip synced">Theme synced</span></div>
+        </div>
+        <div class="cf"><a href="11-sites.html">Open client ↗</a><a href="01-new-site.html">＋ Site</a><a href="a5-invite.html">✉ Invite</a><a href="c1-team.html">Access</a></div>
+      </div>
+      <div class="client">
+        <div class="ch"><div class="clogo">C</div><div><div class="cn">Cobalt Labs</div><div class="cmeta">3 sites · not yet invited</div></div></div>
+        <div class="cb">
+          <div class="siteline"><span class="dot live"></span> cobalt.io <span class="dschip synced">Theme synced</span></div>
+          <div class="siteline"><span class="dot"></span> docs.cobalt.io <span class="dschip synced">Theme synced</span></div>
+          <div class="siteline"><span class="dot"></span> +1 more</div>
+        </div>
+        <div class="cf"><a href="11-sites.html">Open client ↗</a><a href="01-new-site.html">＋ Site</a><a href="a5-invite.html">✉ Invite</a><a href="c1-team.html">Access</a></div>
+      </div>
+      <a class="client add" href="01-new-site.html" style="text-decoration:none;color:inherit"><div><b>＋ New client</b>from template, or duplicate<br>an existing client in one step</div></a>
+    </div>
+
+    <!-- WHITE-LABEL gap 3 + SPEED gap 4 detail -->
+    <div class="secrow"><div class="st">Agency capabilities</div></div>
+    <div class="ledger">
+      <div class="lcard">
+        <div class="lt">White-label <span class="pin">Workspace › Branding</span></div>
+        <div class="lp">What your <b>invited client sees</b> when they log into the editor — your logo, your colors, your domain. Not "Buildrik." One setting, applies to every client you invite.</div>
+        <div class="wl"><span class="prev">Northwind ▢</span> Client editor shows <b>your</b> brand · custom login domain · no Buildrik chrome</div>
+      </div>
+      <div class="lcard">
+        <div class="lt">Duplicate as template <span class="pin">Speed</span></div>
+        <div class="lp">Stand up <b>client N+1 from client N</b> in one action — pages, shared theme, settings copied; content cleared. Turn your best build into your house template. The agency's real "build fast."</div>
+        <div class="wl"><span class="prev">Cobalt ▸ new</span> copies structure + DS, clears content, ready to rebrand in minutes</div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:16px"><b>How this connects to the spine (M0):</b> <b>Client</b> is the new node between Workspace and Site. Shared theme lives at <b>Workspace</b> (pushed down). White-label + multi-client = <b>Workspace</b> ops (Dashboard). Duplicate = a Client/Site action. A solo builder's workspace has no clients — this whole layer collapses to today's Sites list. The agency pays for the across-client "one home" this gives.</div>
+  </div>
+</div>
+<div class="proto-nav"><b>Agency layer:</b><a href="m0-spine.html">M0 spine</a><a href="m-agency.html" style="border-color:#fff;background:#fff;color:#334155;font-weight:600">M-agency</a><a href="ds1-design-system.html">Shared theme</a><a href="18-workspace.html">Team/workspace</a><a href="11-sites.html">Sites</a><a href="s-dashboard-states.html">States</a><a href="index.html">Map</a></div>
+</body></html>

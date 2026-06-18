@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Billing</title><link rel="stylesheet" href="pt.css">
+<style>
+  .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--accent);color:#fff;font-weight:600}
+  .meter{height:8px;background:var(--fill);border:1px solid var(--line);border-radius:3px;overflow:hidden}.meter span{display:block;height:100%;background:var(--accent)}
+  .plan{border:1px solid var(--line);border-radius:6px;padding:14px}.plan.pro{border:2px solid var(--ink)}
+  .inv{display:grid;grid-template-columns:1fr 90px 80px 60px;gap:10px;align-items:center;font-size:12px;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .dun{background:var(--accent);color:#fff;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .dun .btn{background:#fff;color:var(--ink);border-color:#fff;padding:4px 10px}
+</style></head>
+<body data-surface="dashboard">
+<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#F8FAFC;color:#334155;font:600 11.5px/1.45 "Inter Tight",sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #E2E8F0">↻ RECONCILED ROLE (2026-06-18): Workspace-owned; account-level credits = READ-ONLY mirror only.</div>
+<div class="wf-stamp">PROTOTYPE</div>
+<div class="screen">
+  <div class="topnote"><b>Billing &amp; plan</b> · grounded in <code>billing.*</code> (overview/plans/usage/invoices/upgrade/cancel/reactivate/switchInterval) + dunning · the §8.8 gate target</div>
+  <div class="dbar">
+    <div class="ws"><span class="logo">N</span> Northwind Studio <span class="sw">agency ▾</span></div>
+    <span class="sp"></span>
+    <div class="dnav"><a href="m3-dashboard.html">Home</a><a href="m-agency.html">Clients</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html" class="on">Billing</a></div>
+    <a class="icn" href="c2-notifications.html" title="Notifications">🔔</a><a class="icn" href="c3-help.html" title="Help">?</a><a class="icn" href="b1-account-settings.html" title="Account">N</a>
+  </div>
+  <div class="ed">
+    <main class="pad" style="grid-column:1/-1">
+      <div class="dun">⚠ <b>Payment past due.</b> Update your card within 7 days or the workspace auto-downgrades to Free. <span style="flex:1"></span><button class="btn">Update card</button></div>
+      <div class="row" style="justify-content:space-between;margin-bottom:14px"><div><div class="h1">Billing</div><div class="muted" style="font-size:12px">Pro · monthly · renews Jul 15 · <a href="#cancel" onclick="document.getElementById('cancelnote').style.display='block';return false" style="text-decoration:underline">cancel</a></div></div><div class="row"><span class="chip">Monthly</span><span class="chip">Yearly −20%</span></div></div>
+
+      <div class="grid3" style="margin-bottom:16px">
+        <div class="box pad"><div class="lbl">Published sites</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">8 / 25</b></div><div class="meter"><span style="width:32%"></span></div></div>
+        <div class="box pad"><div class="lbl">Team / domains</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">3/10 · 2/25</b></div><div class="meter"><span style="width:30%"></span></div></div>
+        <div class="box pad"><div class="lbl">Storage · AI credits</div><div class="row" style="justify-content:space-between;margin:5px 0 6px"><b style="font-size:14px">12GB · 18/25</b></div><div class="meter"><span style="width:50%"></span></div></div>
+      </div>
+
+      <div class="lbl" style="margin-bottom:6px">Plans</div>
+      <div class="grid3" style="margin-bottom:16px">
+        <div class="plan"><div class="row" style="justify-content:space-between"><b>Free</b><span class="muted">$0</span></div><div class="muted" style="font-size:11px;margin-top:8px">1 site · vercel.app · badge · 5 AI/day</div></div>
+        <div class="plan pro"><div class="row" style="justify-content:space-between"><b>Pro</b><span class="tag-exists">current</span></div><div class="muted" style="font-size:11px;margin:8px 0">25 sites · domains · no badge · 25 AI/day</div><div><b>$X</b><span class="muted" style="font-size:11px">/mo</span></div></div>
+        <div class="plan"><div class="row" style="justify-content:space-between"><b>Business</b><span><b>$Y</b><span class="muted" style="font-size:11px">/mo</span></span></div><div class="muted" style="font-size:11px;margin:8px 0">Unlimited · 100 AI/day · priority</div><button class="btn btn-fill" style="width:100%">Upgrade — checkout ↗</button></div>
+      </div>
+
+      <div class="grid2" style="align-items:start">
+        <div class="box pad"><div class="lbl" style="margin-bottom:6px">Payment method</div><div class="row" style="justify-content:space-between;font-size:12px">💳 Visa ···· 4242 <button class="btn" style="padding:3px 9px">Update</button></div><div class="muted" style="font-size:10px;margin-top:6px">Card entered in secure checkout, never in a Buildrik form.</div></div>
+        <div class="box pad"><div class="lbl" style="margin-bottom:6px">Invoices</div>
+          <div class="inv" style="color:var(--ink-3);font-size:10px;text-transform:uppercase"><span>Date</span><span>Amount</span><span>Status</span><span></span></div>
+          <div class="inv"><span>Jun 15</span><span>$X</span><span class="tag-exists">Paid</span><span class="muted" style="font-size:10px">PDF</span></div>
+          <div class="inv"><span>May 15</span><span>$X</span><span class="tag-exists">Paid</span><span class="muted" style="font-size:10px">PDF</span></div>
+          <div class="inv" style="border:none"><span>Apr 15</span><span>$X</span><span class="tag-exists">Paid</span><span class="muted" style="font-size:10px">PDF</span></div>
+        </div>
+      </div>
+
+      <div class="note" id="cancelnote" style="margin-top:14px;display:none;border:2px solid var(--ink)"><b>Cancel subscription?</b> You'll keep Pro until Jul 15, then drop to Free (over-limit sites unpublish). <div class="row" style="margin-top:8px"><button class="btn">Keep Pro</button><button class="btn btn-fill">Cancel at period end</button></div><div class="muted" style="font-size:10px;margin-top:6px">Cancelled subs show a "Reactivate" button until the period ends.</div></div>
+      <div class="note" style="margin-top:14px;font-size:10.5px"><b>§8.8 + grounded:</b> dunning banner (7-day grace → auto-downgrade cron), monthly/yearly switch, invoices (PDF), cancel-at-period-end + reactivate. Every plan-limit gate (paywall 30, domain 15, AI b1) lands here. Stripe webhooks update plan; payment handled in checkout off-screen (safety).</div>
+    </main>
+  </div>
+</div>
+<div class="proto-nav"><b>Dashboard ops:</b><a href="m3-dashboard.html">Home</a><a href="11-sites.html">Sites</a><a href="12-site-detail.html">Site detail</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html" class="here">Billing</a><a href="30-paywall.html">Paywall</a><a href="s-account-states.html">States</a><a href="index.html">Map</a></div>
+</body></html>
