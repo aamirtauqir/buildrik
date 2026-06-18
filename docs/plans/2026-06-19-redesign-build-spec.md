@@ -147,6 +147,14 @@ editor toggle.
 | NEW footer status bar + `StructurePopover` | ⌗ floating page-outline (z-index), not a fixed left panel |
 | `UserPreference` model + account settings | density per-user (fewer/full), seeded by role; `?view=client` reads it |
 
+**Sequence (prior learning `media-command-layer-before-ui`, 10/10):** engine currently mutates
+elements directly in hooks/canvas — **stabilize the mutation/command contract FIRST**, then
+re-IA the rail on top of it (folding 11 tabs onto ad-hoc mutations risks inconsistent undo).
+**Density (prior learning `density-minimums-for-inspector`, 10/10):** inspector rows = 32px /
+comfortable (Saqib flagged 24-26px as too congested); comfortable wins over DESIGN.md compact.
+Add (6) to acceptance: undo unchanged through the command layer; (5) becomes a per-folded-tab
+integration parity test.
+
 **Acceptance:** (1) rail shows exactly 4 tools; (2) AI is a top-right assistant, not a rail
 tab; (3) structure opens from the footer ⌗ as a floating panel; (4) density is set in
 account settings, not toggled in the editor chrome; (5) all folded tabs' functions still
@@ -168,9 +176,14 @@ client-mode editor (`?view=client`, fewer controls, "Send for review") → appro
 
 **Acceptance:** (1) invited client lands on agency-branded sign-in (never Buildrik); (2)
 existing email joins, no duplicate account; (3) client lands in client-mode editor with no
-agency chrome; (4) "Send for review" routes to the approval queue; approve→publish.
-**Effort:** ~10h. **Risk:** white-label auth domain handling; approval state machine.
-**Dep:** E1, E2 (white-label), E3 (client-mode chrome).
+agency chrome; (4) "Send for review" routes to the approval queue; approve→publish;
+(5) **SERVER-SIDE GATE** — a Content-editor role POSTing `publish` (or any Designer-only
+mutation) directly gets 403 from tRPC, regardless of UI. `?view=client` hiding chrome is
+cosmetic only; SitePermission must enforce. **Effort:** ~10h. **Risk:** **UI-hiding is NOT a
+security gate** (prior learning `ui_disable_not_security_gate`, 10/10 — billing.upgrade stayed
+callable via direct POST) — every client-mode restriction needs a matching server precondition,
+exploit-tested directly, not just the button. White-label auth domain handling; approval state
+machine. **Dep:** E1, E2 (white-label), E3 (client-mode chrome).
 
 ## E5 — Editor↔dashboard boundary: one home per concept  [RE-IA]
 
@@ -213,13 +226,20 @@ screen, no fake data on disconnect. **Effort:** ~8h. **Risk:** low. **Dep:** E0.
 - Vercel OAuth + publish worker pipeline (shipped, working).
 - Existing auth/2FA/magic-link backend.
 
-## Rollback / migration strategy
+## Feature flags & rollback (eng-review decision 2026-06-19)
 
+**No runtime flag infra exists today.** NEXT_PUBLIC env vars are build-time baked (no 60s
+rollback — prior learning `flag_mechanism_next_public_is_buildtime`). Decision: build a small
+**DB-backed flag** for the two riskiest epics.
+
+- NEW `model WorkspaceFeature { workspaceId, key, enabled }` (E0). Keys: `agency_layer` (E2),
+  `client_mode` (E4). Server reads it per request; kill-switch = `UPDATE` one row (instant,
+  runtime). Ship E2/E4 dark; enable for one test workspace first, then roll forward.
 - E1 (role) + E2 (Client model) are the only **data migrations**. Each ships with: forward
   migration, verified backfill (no row loss), and a documented reverse SQL. Run
   `prisma migrate status` before/after; psql smoke per the migration-status learning.
-- All UI epics are revert-by-PR (or revert-commit on solo-to-main).
-- Feature-flag E2/E4 (agency + client-mode) so they can ship dark and enable per-workspace.
+- All UI-only epics are revert-by-commit on solo-to-main (rollback = redeploy, minutes — fine
+  for UI; the DB flag covers the data/behavior-risky E2/E4).
 
 ## Definition of done (program)
 
@@ -232,9 +252,37 @@ screen, no fake data on disconnect. **Effort:** ~8h. **Risk:** low. **Dep:** E0.
 7. Every surface has empty/loading/error/denied.
 8. Migrations applied + verified; do-not-touch areas unchanged; suites green.
 
+## Test plan (vitest — added by eng-review)
+
+| Epic | Critical test | Kind |
+|------|---------------|------|
+| E1 role | migration backfill leaves 0 orphan `EDITOR` rows; role enum end-to-end | unit + migration |
+| E2 client | solo site queries return correctly with `clientId=null` (audit every site query in `dashboard.ts`/`site-detail.service.ts`/`page.service.ts`/`share-link.service.ts`) | unit |
+| E2 flag | `WorkspaceFeature` toggle flips agency layer on/off per workspace at runtime | integration |
+| E4 client-mode | **CRITICAL [→E2E]** — Content-editor role POSTing `publish`/Designer-only mutation directly → 403 from tRPC, UI bypassed (exploit-test, not button) | E2E |
+| E3 rail | per-folded-tab integration parity: every old tab action still reachable; undo unchanged | integration |
+| E0 | dashboard CTAs red `#E42313`, editor cobalt `#2D6DFF`; no banned fonts; 4 state primitives render | unit/snapshot |
+
+Run `npm test` (vitest, root + `packages/editor`). Regressions (E1 role checks, E3 undo) are
+CRITICAL — write before the change.
+
 ## Next
 
 Build order E0 → E1 → (E2 ∥ E3) → E4/E5 → E6 → E7. Recommend starting with **E0+E1** (fast,
-unblock everything) then **E3** (the visible editor win). Run `/plan-eng-review` on this spec
-for architecture rigor before E2's data migration. Codex/ChatGPT-Plus daily cap currently
-hit — the optional codex quality-gate on this spec is deferred.
+unblock everything) then **E3** (the visible editor win). E0 now includes the `WorkspaceFeature`
+DB flag (per eng-review). Codex/ChatGPT-Plus daily cap currently hit — the optional codex
+quality-gate on this spec is deferred.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | (redesign already CEO-reviewed upstream) |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | issues_open→folded | 6 findings (3 P1 from prior learnings), all folded into spec |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | (prototype already 10/10 IA/friendliness) |
+
+- **OUTSIDE VOICE:** codex/ChatGPT-Plus daily cap hit → skipped; self-adversarial pass run inline (surfaced the 3 prior-learning landmines: NEXT_PUBLIC build-time flags, UI-only security gate, command-layer-before-UI).
+- **Findings folded:** (1) flag/rollback → DB `WorkspaceFeature` (user decision); (2) E4 client-mode server-side gate; (3) E3 command-layer-before-rail + 32px density; (4) E2 `clientId` null-audit; (5) test plan added; (6) E0 DRY shared-token layer.
+- **VERDICT:** ENG CLEARED — spec hardened, ready to implement starting E0+E1. Run /plan-design-review only if E3 editor visuals drift from the prototype.
+
+NO UNRESOLVED DECISIONS
