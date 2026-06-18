@@ -11,6 +11,23 @@ export const UserRole = {
   VIEWER: "VIEWER",
 } as const;
 
+// User-facing display labels for workspace roles. The stored enum value stays
+// EDITOR (JWT claims + ROLE_RANK in permission.service reference it); only the
+// label a user reads is "Content editor". SSOT for every role-label render site
+// (team table, invites, member detail, auth screens). Redesign build-spec E1:
+// "the role a client gets is named Content editor", "Client" only names the
+// company/account node — never a role.
+export const RoleLabel: Record<UserRoleType, string> = {
+  OWNER: "Owner",
+  ADMIN: "Admin",
+  EDITOR: "Content editor",
+  VIEWER: "Viewer",
+};
+
+export function roleLabel(role: string): string {
+  return RoleLabel[role as UserRoleType] ?? role;
+}
+
 export const SiteStatus = {
   DRAFT: "DRAFT",
   PUBLISHED: "PUBLISHED",

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@lib/utils";
+import { roleLabel } from "@lib/constants/enums";
 import { MemberActions, type MemberAction } from "./member-actions";
 
 type Role = "OWNER" | "ADMIN" | "EDITOR" | "VIEWER";
@@ -122,7 +123,7 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
           <div className="flex justify-between text-sm">
             <span style={{ color: "var(--color-text-secondary)" }}>Role</span>
             <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ backgroundColor: badge.bg, color: badge.color }}>
-              {member.role}
+              {roleLabel(member.role)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
@@ -326,7 +327,7 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
                       className="rounded-full px-2.5 py-1 text-xs font-semibold"
                       style={{ backgroundColor: badge.bg, color: badge.color }}
                     >
-                      {member.role}
+                      {roleLabel(member.role)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -373,7 +374,7 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
               Change role
             </h3>
             <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              {roleEditMember.fullName} — currently {roleEditMember.role}
+              {roleEditMember.fullName} — currently {roleLabel(roleEditMember.role)}
             </p>
             <div className="mt-4 space-y-2">
               {ASSIGNABLE_ROLES.map((role) => {
@@ -389,7 +390,7 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
                     className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
                     style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                   >
-                    <span>{role}</span>
+                    <span>{roleLabel(role)}</span>
                     {isCurrent && (
                       <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>current</span>
                     )}

@@ -10,6 +10,7 @@ import { AuthButton } from "@/components/auth/auth-button";
 import { AuthButtonSecondary } from "@/components/auth/auth-button-secondary";
 import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@lib/trpc/client";
+import { roleLabel } from "@lib/constants/enums";
 
 function InviteContent() {
   const router = useRouter();
@@ -75,7 +76,7 @@ function InviteContent() {
       <AuthIcon name="mail" color="blue" />
       <h1 className="text-auth-title font-semibold text-center">You&apos;ve been invited</h1>
       <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
-        Join <strong>{invite.workspaceName}</strong> as {invite.role}
+        Join <strong>{invite.workspaceName}</strong> as {roleLabel(invite.role)}
       </p>
       <p className="text-sm text-auth-text-muted text-center mt-1">
         Invited by {invite.inviterName}

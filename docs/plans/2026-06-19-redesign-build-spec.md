@@ -109,6 +109,21 @@ hardcode colors — grep + sweep. **Rollback:** revert token file.
 3h sweep. **Risk:** role string compared in many places — grep `'EDITOR'` exhaustively;
 **data migration is one-way** (add rollback SQL). **Dep:** none (do early).
 
+> **IMPLEMENTED 2026-06-19 (label-only, not value-rename).** Grounding changed the call:
+> the role model is a *ranked* enum `VIEWER(0) < EDITOR(1) < ADMIN(2) < OWNER(3)`
+> (`server/services/permission.service.ts`) **and the role is stored in the JWT** — renaming
+> the value would 401 every logged-in editor until re-login and needs a one-way data
+> migration. So the stored value stays `EDITOR`; a display SSOT (`RoleLabel`/`roleLabel()` in
+> `lib/constants/enums.ts`) renders **"Content editor"** at every user-facing site (members
+> table, member detail, role-change dialog, invite dropdown, pending invites, invite-accept
+> page, workspace-select). Same product outcome, zero session/migration risk. Acceptance (2)
+> already held (no role was ever labeled "Client"); (3) is N/A (no data change). **Designer is
+> a 4th role tier the real app doesn't have (it has Owner instead) — deferred to its own task;
+> adding it = new rank + new permission semantics, the exact blast E1 avoids.** Verified: 5/5
+> SSOT unit test (`lib/constants/__tests__/enums.test.ts`) + dashboard typecheck 0 errors +
+> grep sweep 0 remaining raw-role/"Editor" sites. Live team-table view to confirm during the
+> E2/E4 team flow (needs a seeded EDITOR member on screen).
+
 ## E2 — Agency layer: Client node, m-agency, white-label, shared-theme push  [NET-NEW + migration]
 
 **Goal:** introduce `Workspace › Client › Site`, the m-agency dashboard, client grouping,

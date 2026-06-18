@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@lib/utils";
+import { roleLabel } from "@lib/constants/enums";
 
 type Role = "ADMIN" | "EDITOR" | "VIEWER";
 
@@ -83,7 +84,7 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                     className="rounded-full px-2.5 py-1 text-xs font-semibold"
                     style={{ backgroundColor: badge.bg, color: badge.color }}
                   >
-                    {invite.role}
+                    {roleLabel(invite.role)}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>

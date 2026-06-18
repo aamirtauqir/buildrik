@@ -7,7 +7,7 @@ import { trpc } from "@lib/trpc/client";
 
 export const ROLE_OPTIONS = [
   { value: "ADMIN", label: "Admin", description: "Can manage everything except billing" },
-  { value: "EDITOR", label: "Editor", description: "Can edit sites they have access to" },
+  { value: "EDITOR", label: "Content editor", description: "Can edit content on sites they have access to" },
   { value: "VIEWER", label: "Viewer", description: "Can only view published sites" },
 ] as const;
 

@@ -18,8 +18,8 @@ const ROLE_CARDS = [
     Icon: ShieldCheck,
   },
   {
-    role: "Editor",
-    description: "Create and edit sites. Cannot publish or manage team.",
+    role: "Content editor",
+    description: "Create and edit site content. Cannot publish or manage team.",
     bg: "#F0FDF4",
     color: "var(--color-success)",
     Icon: Pencil,

@@ -5,7 +5,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 
 const workspaces = [
   { name: "Acme Corp", role: "Owner", members: "5 members" },
-  { name: "Design Studio", role: "Editor", members: "3 members" },
+  { name: "Design Studio", role: "Content editor", members: "3 members" },
   { name: "Freelance", role: "Owner", members: "1 member" },
 ];
 
