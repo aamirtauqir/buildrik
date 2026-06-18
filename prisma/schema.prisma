@@ -143,6 +143,7 @@ model Workspace {
   aiAdoptionEvents AiAdoptionEvent[]
   apiTokens       ApiToken[]
   features        WorkspaceFeature[]
+  clients         Client[]
 
   @@map("workspaces")
 }
@@ -208,6 +209,7 @@ model Site {
   touchIcon         String?
   favicon           String?
   folderId          String?
+  clientId          String?
   lastPublishedBy   String?
   projectStyles     Json?
   dsSchemaVersion   Int       @default(0)
@@ -226,6 +228,7 @@ model Site {
 
   workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   folder          Folder?           @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  client          Client?           @relation(fields: [clientId], references: [id], onDelete: SetNull)
   sitePages       Page[]
   domains         Domain[]
   shareLinks      ShareLink[]
@@ -240,6 +243,7 @@ model Site {
 
   @@index([workspaceId])
   @@index([workspaceId, status])
+  @@index([clientId])
   @@map("sites")
 }
 
@@ -296,6 +300,29 @@ model DnsRecord {
   domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
 
   @@map("dns_records")
+}
+
+// Agency layer (redesign E2). A Client is an agency's customer account that
+// groups Sites and carries white-label branding. Distinct from Folder (generic
+// site organization): a Client owns branding + drives the m-agency dashboard.
+// Sites with clientId = null are "solo" (no agency layer). Deleting a Client
+// orphans its sites (Site.clientId SetNull), never deletes them.
+model Client {
+  id           String   @id @default(cuid())
+  workspaceId  String
+  name         String
+  logoUrl      String?
+  brandColor   String?
+  customDomain String?
+  hideBuildrik Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sites     Site[]
+
+  @@index([workspaceId])
+  @@map("clients")
 }
 
 model Folder {
