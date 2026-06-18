@@ -107,3 +107,15 @@ Wired: each board ← proto-nav of its source screens (m-editor, 56/17/56b, d2/5
 - Pass 2 (after 6 boards + 2 extends): 8.8/10. All P0 closed. 4 items named for 10: (a) 13-first-run still promoted as active → archived to ⊘ (one canonical zero-state home = M3 + s-dashboard-states); (b) inline auth error on the real screen + 11/14 count drift → 00-signin s_err inline wrong-credential state (anti-enumeration, email kept) + index card "Auth errors (14)" + a8 topnote reworded; (c) loading/error/denied not instantiated on 4 ops surfaces → "States on this surface" strip on 12/14/19/53; (d) delete-in-use must review-before-delete → s-media delete locked until blast-radius reviewed, then type-to-confirm.
 - Pass 3 (after the 4 fixes): 9.8/10, sole remaining nit = s_err email placeholder mismatch (jane vs you) contradicting "email kept" → fixed (both you@company.com). → **real-app-scope 10/10.**
 
+## ADDENDUM 2026-06-18 — USER-MENTAL-MODEL + PM REVIEW (codex, friendliness/IA)
+New lens (not scope): is every part user-friendly, does the IA match how a user thinks, does each screen serve a real job? Codex walked 3 personas (solo / agency designer / invited client) chain-of-thought + PM job-to-be-done + tested every screen. Start: **user-friendly 7.6/10, IA 8.3/10**. Biggest mismatch: the set was complete on owner-side setup but the **invited client's first-run path was missing** (collaboration starts at a5-invite; the client's "accept→enter" had no screen).
+Fixes (Round 1 P0 + Round 2 P1 + screen-bugs + expansion):
+- **a9-invite-accept** (NEW) — the missing client first-run: branded landing (white-label kept) → accept → new/existing-account → into client-view editor. Wired from a5 (preview), a8, 00-signin.
+- **m3-dashboard** — first-run is now first-class: visible solo-0-sites / agency-0-clients branch toggle on the canonical home (was only inferable from s-dashboard-states).
+- **forms-config** (NEW) — the "where responses go" job had no home (53's CTA dropped on generic Insert). Real surface: fields · recipient · integration · after-submit · spam. 53 relinked.
+- **m-agency + 11-sites** — inline search/quick-jump (scale to 30+ clients) + "Invite client" entry at client scope (was only in c1-team).
+- **Client-Editor → Client** rename across 15 files (user language, not product-internal).
+- CTA/screen bugs: 20-publish "Add domain"→"Upgrade to add a custom domain"; 91-share "Unlock preview"→21-preview (was 90-published live site); 22-domain "Visit ↗"→90-published (was a pseudo-CTA); 00-signin branded-client note.
+- **Expansion** (codex high-conviction, PM/CEO lens): **e6-cms** (collections/dynamic pages — the Webflow-class gap m-seo pointed at) + **m-comments** (Viewer comment/annotation review — request edits without canvas access).
+Wired: 4 new cards in index + inbound from natural homes (m-seo→e6, m-approval/m-roles→m-comments). Integrity: 0 dead links, 0 orphans, 107 html. Re-codex to confirm friendliness/IA → target 10/10.
+

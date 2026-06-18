@@ -35,8 +35,8 @@
 
     <div class="sech">The 4 roles <span class="sub">set per-member, per-site, on the invite — independent of the Simple/Pro view setting</span></div>
     <div class="roles">
-      <div class="role"><div class="rn">Viewer</div><div class="rd">Read-only. Sees the live/preview site + analytics. Comments only. The "show the client" role.</div><span class="seed none">density n/a</span></div>
-      <div class="role"><div class="rn">Client-Editor</div><div class="rd">The agency's client. Edits <b>content</b> on assigned sites — text, images, page SEO. The white-label handoff role.</div><span class="seed simple">defaults to Simple</span></div>
+      <div class="role"><div class="rn">Viewer</div><div class="rd">Read-only. Sees the live/preview site + analytics. <a href="m-comments.html" style="color:var(--ink-2)">Comments only</a>. The "show the client" role.</div><span class="seed none">density n/a</span></div>
+      <div class="role"><div class="rn">Client</div><div class="rd">The agency's client. Edits <b>content</b> on assigned sites — text, images, page SEO. The white-label handoff role.</div><span class="seed simple">defaults to Simple</span></div>
       <div class="role"><div class="rn">Designer</div><div class="rd">Agency staff who builds. Full make-side + redirects + technical SEO + publish. Site-level, not the money/team.</div><span class="seed pro">defaults to Pro</span></div>
       <div class="role"><div class="rn">Admin</div><div class="rd">Agency principal. Everything, including workspace: team, billing, white-label, integrations, shared theme. (Owner = Admin + transfer/delete.)</div><span class="seed pro">defaults to Pro</span></div>
     </div>
@@ -45,7 +45,7 @@
 
     <div class="sech">Site-level capabilities <span class="sub">resolves the ownership calls — who can write each concept</span></div>
     <table>
-      <tr><th style="width:30%">Capability</th><th>Viewer</th><th>Client-Editor</th><th>Designer</th><th>Admin</th></tr>
+      <tr><th style="width:30%">Capability</th><th>Viewer</th><th>Client</th><th>Designer</th><th>Admin</th></tr>
       <tr><td class="grp" colspan="5">Content (Editor)</td></tr>
       <tr><td class="cap">Page content <small>text · images · layout</small></td><td class="v">👁</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
       <tr><td class="cap">Content SEO <small>page title · desc · OG · patterns</small></td><td class="v">👁</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
@@ -68,13 +68,13 @@
       <tr><td class="cap">Integrations / provider connect</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td></tr>
     </table>
     <div class="note2" style="margin-top:8px">
-      <span class="star">1</span> <b>Client-Editor publish</b> — defaults ON for their own site, but the workspace can toggle "client edits need approval" (agency reviews before live). &nbsp;
+      <span class="star">1</span> <b>Client publish</b> — defaults ON for their own site, but the workspace can toggle "client edits need approval" (agency reviews before live). &nbsp;
       <span class="star">2</span> Client sees <b>their own leads</b>, not export/routing. &nbsp;
       <span class="star">3</span> Designer can edit + push the shared theme; a workspace setting can require Admin approval on a cross-client push (ties to the shared theme change contract).
     </div>
 
     <div class="sech">Two rules that make this not-confusing</div>
-    <div class="note"><b>1 · Density ≠ permission.</b> Simple/Pro changes how much surface SHOWS (preference, per-user-per-site). Role changes what you CAN DO (permission). A Designer can run Simple; a Client-Editor can't unlock Pro capabilities by flipping density. <b>2 · Every hidden or disabled control says WHY.</b> Greyed because of density → "Turn on full controls to see this." Greyed because of role → "Your role can't edit this — ask an admin." Never an unexplained disabled button. This is the single thing that stops the "missing feature" and "why is this disabled?" support tickets codex predicted.</div>
+    <div class="note"><b>1 · Density ≠ permission.</b> Simple/Pro changes how much surface SHOWS (preference, per-user-per-site). Role changes what you CAN DO (permission). A Designer can run Simple; a Client can't unlock Pro capabilities by flipping density. <b>2 · Every hidden or disabled control says WHY.</b> Greyed because of density → "Turn on full controls to see this." Greyed because of role → "Your role can't edit this — ask an admin." Never an unexplained disabled button. This is the single thing that stops the "missing feature" and "why is this disabled?" support tickets codex predicted.</div>
 
     <div class="note" style="margin-top:8px"><b>This closes the loop:</b> ownership map (where each concept lives) × this matrix (who can write it) = a complete, safe IA. The last open piece is the <b>shared theme change contract</b> (footnote 3 + audit finding A) — the one workspace action that needs its own review surface.</div>
 

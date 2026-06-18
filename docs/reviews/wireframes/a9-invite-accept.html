@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · a9 — Accept invite (client first-run, branded)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .vs{display:none}.vs.on{display:block}
+  .wrap{padding:16px 20px;max-width:440px;margin:0 auto}
+  .brandbar{display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:4px}
+  .brandbar .logo{width:30px;height:30px;border:1.5px solid var(--ink);border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:700}
+  .brandbar .bn{font-size:15px;font-weight:700}
+  .wlnote{font-size:10px;color:var(--ink-3);text-align:center;margin-bottom:14px}
+  .invcard{border:1px solid var(--line);border-radius:9px;padding:15px;text-align:center;margin-bottom:14px}
+  .invcard .who{font-size:12px;color:var(--ink-2)}
+  .invcard .what{font-size:16px;font-weight:700;margin:6px 0 3px}
+  .invcard .scope{font-size:11px;color:var(--ink-3)}
+  .invcard .role{display:inline-block;border:1px solid var(--line);border-radius:5px;padding:3px 9px;font-size:11px;color:var(--ink-2);margin-top:9px}
+  .lbl{font-size:11px;font-weight:600;color:var(--ink);display:block;margin:10px 0 5px}
+  .in{border:1px dashed var(--line-d);border-radius:6px;padding:9px 11px;font-size:12px;color:var(--ink-3);margin-bottom:4px}
+  .pri{display:block;text-align:center;text-decoration:none;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:7px;padding:11px;font-size:13px;font-weight:600;margin-top:10px}
+  .ghost{display:block;text-align:center;text-decoration:none;border:1px solid var(--line);border-radius:7px;padding:9px;font-size:12px;color:var(--ink-2);margin-top:8px}
+  .alt{text-align:center;font-size:11px;color:var(--ink-3);margin:10px 0}
+  .alt a{color:var(--ink-2);text-decoration:underline;cursor:pointer}
+  .note2{font-size:10.5px;color:var(--ink-2);line-height:1.5;margin-top:14px;border:1px solid var(--line-d);border-radius:7px;padding:9px 11px}
+  .note2 b{color:var(--ink)}
+  .enter{text-align:center;padding:10px 8px}
+  .enter .big{font-size:26px}.enter .t{font-size:15px;font-weight:700;margin:6px 0 4px}.enter .d{font-size:11.5px;color:var(--ink-2)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · a9 · ACCEPT INVITE (CLIENT FIRST-RUN)</div>
+<div class="screen screen-narrow" style="max-width:520px">
+  <div class="topnote"><b>The invited client's first screen — branded, the half that was missing.</b> <a href="a5-invite.html" style="color:#fff;text-decoration:underline">a5</a> sends the invite; <b>this is where the client lands</b>. It wears the <b>agency's brand</b> (white-label promise kept — never "Buildrik"), accepts, makes-or-uses an account, and drops straight into the calm <b>Client view</b> editor. Closes the collaboration-starts-at-the-wrong-end gap.</div>
+  <div class="wrap">
+
+    <!-- STATE 1: branded landing -->
+    <div class="vs on" id="v_land">
+      <div class="brandbar"><div class="logo">N</div><div class="bn">Northwind Studio</div></div>
+      <div class="wlnote">studio.northwind.com · the client never sees "Buildrik"</div>
+      <div class="invcard">
+        <div class="who">Dana at Northwind invited you</div>
+        <div class="what">Edit the Acme website</div>
+        <div class="scope">You'll be able to update text &amp; images on <b>Acme's site</b>.</div>
+        <span class="role">Your access: Client · edit-and-send-for-review</span>
+      </div>
+      <a class="pri" onclick="iv('new')">Accept &amp; set up my account →</a>
+      <div class="alt">Already have a Northwind login? <a onclick="iv('existing')">Sign in &amp; join</a></div>
+      <div class="note2"><b>Honest scope on the invite:</b> the client sees exactly what they can touch (Acme's content) and what their access means (edits go to the agency for review, not straight live). No surprise permissions after they're in.</div>
+    </div>
+
+    <!-- STATE 2: new account -->
+    <div class="vs" id="v_new">
+      <div class="brandbar"><div class="logo">N</div><div class="bn">Northwind Studio</div></div>
+      <div class="wlnote">Setting up your access to Acme</div>
+      <span class="lbl">Your name</span><div class="in">Jane Cooper</div>
+      <span class="lbl">Email</span><div class="in">client@acme.com <span style="color:var(--ink-3)">· from the invite, locked</span></div>
+      <span class="lbl">Create a password</span><div class="in">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+      <a class="pri" onclick="iv('done')">Create account &amp; open Acme →</a>
+      <div class="alt"><a onclick="iv('land')">← Back</a></div>
+      <div class="note2">Magic-link is offered too (no password to remember). Account is scoped to <b>this workspace's brand</b>; one client login, not a Buildrik account.</div>
+    </div>
+
+    <!-- STATE 3: existing account -->
+    <div class="vs" id="v_existing">
+      <div class="brandbar"><div class="logo">N</div><div class="bn">Northwind Studio</div></div>
+      <div class="wlnote">You already have a login here</div>
+      <div class="invcard" style="text-align:left">
+        <div class="who" style="font-size:11.5px">This invite is for <b>client@acme.com</b> — an email you already use. Sign in and <b>Acme joins your account</b>. No second account, no duplicate login.</div>
+      </div>
+      <span class="lbl">Password</span><div class="in">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+      <a class="pri" onclick="iv('done')">Sign in &amp; join Acme →</a>
+      <div class="alt"><a href="a3-password.html">Forgot password?</a> · <a onclick="iv('land')">← Back</a></div>
+      <div class="note2">Same edge as <a href="a8-auth-errors.html">a8 · invite→existing</a>: we never make a duplicate account for an email that already belongs to someone here.</div>
+    </div>
+
+    <!-- STATE 4: enter editor (client view) -->
+    <div class="vs" id="v_done">
+      <div class="brandbar"><div class="logo">N</div><div class="bn">Northwind Studio</div></div>
+      <div class="enter">
+        <div class="big">✓</div>
+        <div class="t">You're in — welcome to Acme</div>
+        <div class="d">Opening the editor in <b>Client view</b>: fewer controls, no jargon, just edit and send for review.</div>
+      </div>
+      <a class="pri" href="m-editor.html">Open the Acme editor →</a>
+      <a class="ghost" href="m-approval.html">How "send for review" works</a>
+      <div class="note2">Drops the client straight into the <b>calm editor</b> (<a href="m-editor.html">👁 Client view</a>), not a dashboard full of agency tools. First job is obvious: change the text, press <b>Send for review</b>.</div>
+    </div>
+
+  </div>
+</div>
+<div class="proto-nav"><b>Client first-run:</b><a href="a5-invite.html">Invite (agency side)</a><a href="a9-invite-accept.html" class="here">Accept (client side)</a><a href="m-editor.html">Client-view editor</a><a href="m-approval.html">Send for review</a><a href="a8-auth-errors.html">Auth edges</a><a href="index.html">Map</a></div>
+<script>var V=['land','new','existing','done'];function iv(s){V.forEach(function(x){document.getElementById('v_'+x).classList.toggle('on',x===s);});window.scrollTo(0,0);}</script>
+</body></html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · M-comments — client review (comment, don't edit)</title><link rel="stylesheet" href="wf.css">
+<style>
+  .wrap{padding:0;display:grid;grid-template-columns:1fr 290px;min-height:460px}
+  .stage{position:relative;background:var(--bg-2);padding:18px;overflow:hidden}
+  .bar{display:flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border-radius:7px 7px 0 0;padding:8px 13px;font-size:11.5px}
+  .bar .sp{flex:1}
+  .bar .chip{border:1px solid #fff;border-radius:5px;padding:2px 8px;font-size:10.5px;opacity:.9}
+  .page{background:#fff;border:1px solid var(--line);border-top:none;border-radius:0 0 7px 7px;padding:22px 20px;position:relative;min-height:360px}
+  .ph{height:30px;background:var(--fill);border-radius:5px;margin-bottom:12px;width:55%}
+  .pp{height:11px;background:var(--bg-2);border-radius:4px;margin-bottom:7px}
+  .pp.s{width:78%} .pp.t{width:64%}
+  .pimg{height:120px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;margin:13px 0;display:grid;place-items:center;color:var(--ink-3);font-size:11px}
+  .pin{position:absolute;width:22px;height:22px;border-radius:50% 50% 50% 2px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .pin.open{outline:3px solid rgba(43,43,43,.18)}
+  .side{border-left:1px solid var(--line);background:#fff;display:flex;flex-direction:column}
+  .sh{padding:11px 13px;border-bottom:1px solid var(--line);background:var(--bg-2);font-weight:700;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  .sh .f{font-size:10px;color:var(--ink-3);font-weight:400}
+  .sb{padding:11px 13px;overflow:auto;flex:1}
+  .cmt{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:9px}
+  .cmt.on{border-color:var(--ink);border-width:1.5px}
+  .cmt .ch{display:flex;align-items:center;gap:7px;font-size:11px;margin-bottom:5px}
+  .cmt .av{width:18px;height:18px;border-radius:50%;background:var(--fill);border:1px solid var(--line-d);display:grid;place-items:center;font-size:9px;font-weight:700;color:var(--ink-2)}
+  .cmt .who{font-weight:600;font-size:11.5px} .cmt .when{color:var(--ink-3);font-size:10px;margin-left:auto}
+  .cmt .pinn{font-size:9px;border:1px solid var(--ink);color:var(--ink);border-radius:3px;padding:0 5px}
+  .cmt .tx{font-size:11.5px;color:var(--ink-2);line-height:1.45}
+  .cmt .acts{display:flex;gap:7px;margin-top:8px;font-size:10.5px}
+  .cmt .acts a{color:var(--ink-2);text-decoration:underline}
+  .cmt.done{opacity:.6}
+  .cmt.done .tx{text-decoration:line-through;color:var(--ink-3)}
+  .addc{border:1px dashed var(--line-d);border-radius:7px;padding:9px 11px;font-size:11px;color:var(--ink-3)}
+  .note2{font-size:10.5px;color:var(--ink-2);line-height:1.5;padding:10px 13px;border-top:1px solid var(--line)}.note2 b{color:var(--ink)}
+</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · M-COMMENTS · CLIENT REVIEW</div>
+<div class="screen" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Comment mode — the client requests changes without editing.</b> Codex expansion (high-conviction): not every client wants to touch the canvas. A <b>Viewer</b> (read-only + comments, per <a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a>) drops <b>pins</b> on the live preview — "change this headline", "wrong photo" — and the agency resolves them into edits. Lighter than co-editing, safer than email screenshots. Pairs with <a href="m-approval.html" style="color:#fff;text-decoration:underline">approval</a>.</div>
+  <div class="wrap">
+
+    <!-- preview with pins -->
+    <div class="stage">
+      <div class="bar">◉ Acme — preview &amp; comment <span class="sp"></span><span class="chip">read-only</span><span class="chip">3 open</span></div>
+      <div class="page">
+        <div class="pin open" style="top:30px;right:34px" onclick="oc(1)">1</div>
+        <div class="ph"></div>
+        <div class="pp s"></div><div class="pp t"></div><div class="pp s"></div>
+        <div class="pimg">hero image
+          <div class="pin" style="top:8px;left:10px" onclick="oc(2)">2</div>
+        </div>
+        <div class="pp s"></div><div class="pp"></div><div class="pp t"></div>
+        <div class="pin" style="bottom:40px;left:30px" onclick="oc(3)">3</div>
+        <div class="pp s"></div>
+      </div>
+    </div>
+
+    <!-- comment thread -->
+    <div class="side">
+      <div class="sh">Comments <span class="f">Open ▾ · 3 open · 1 done</span></div>
+      <div class="sb">
+        <div class="cmt on" id="c1">
+          <div class="ch"><span class="av">J</span><span class="who">Jane (Acme)</span><span class="pinn">pin 1</span><span class="when">2h</span></div>
+          <div class="tx">This headline should say "Trusted by 200+ teams", not "100+".</div>
+          <div class="acts"><a href="m-editor.html">Make the edit ↗</a><a>Reply</a><a>Resolve</a></div>
+        </div>
+        <div class="cmt" id="c2">
+          <div class="ch"><span class="av">J</span><span class="who">Jane (Acme)</span><span class="pinn">pin 2</span><span class="when">2h</span></div>
+          <div class="tx">Wrong hero photo — use the new team shot from the brand folder.</div>
+          <div class="acts"><a href="56-media.html">Open Assets ↗</a><a>Reply</a><a>Resolve</a></div>
+        </div>
+        <div class="cmt" id="c3">
+          <div class="ch"><span class="av">J</span><span class="who">Jane (Acme)</span><span class="pinn">pin 3</span><span class="when">1h</span></div>
+          <div class="tx">Can the pricing section move above the testimonials?</div>
+          <div class="acts"><a href="m-editor.html">Make the edit ↗</a><a>Reply</a><a>Resolve</a></div>
+        </div>
+        <div class="cmt done">
+          <div class="ch"><span class="av">D</span><span class="who">Dana (Northwind)</span><span class="when">done</span></div>
+          <div class="tx">Fixed the footer email link.</div>
+        </div>
+        <div class="addc">＋ Click anywhere on the preview to drop a comment…</div>
+      </div>
+      <div class="note2"><b>The loop:</b> client comments → agency edits → marks resolved → on publish the client sees their requests are live. A comment can become an <b>edit</b> (Designer) or route into the <a href="m-approval.html">approval</a> queue. No canvas access needed — the <b>Viewer</b> role only comments. Empty state: "No comments yet — click the preview to leave the first."</div>
+    </div>
+  </div>
+</div>
+<div class="proto-nav"><b>Client review:</b><a href="m-approval.html">Approval (edit→review)</a><a href="m-roles.html">Roles (Viewer)</a><a href="m-editor.html">Editor (resolve)</a><a href="21-preview.html">Preview</a><a href="a9-invite-accept.html">Client first-run</a><a href="index.html">Map</a></div>
+<script>function oc(n){[1,2,3].forEach(function(i){var c=document.getElementById('c'+i);if(c)c.classList.toggle('on',i===n);});document.querySelectorAll('.pin').forEach(function(p){p.classList.remove('open');});event.currentTarget.classList.add('open');}</script>
+</body></html>

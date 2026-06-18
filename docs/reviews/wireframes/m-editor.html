@@ -361,7 +361,7 @@
   <div class="sp-note">Floating — opens from the ⌗ in the bottom bar, sits over the canvas, closes when you're done. Not a fixed left panel.</div>
 </div>
 
-<div class="modecap" id="modecap"><b>The canonical editor.</b> 4 structural tools in the rail (Insert · Pages · Styles · Site); how much shows is your <b>view setting</b> — fewer or full controls (role-seeded, changed in account settings — <b>not toggled here</b>). <b>AI</b> is the separate <b>✨ assistant</b> (top-right) that can edit the <b>whole design</b>. Structure = the <b>⌗ icon in the bottom bar</b> (a floating panel) + click-on-canvas. <span style="color:var(--ink-3)">This Designer/Admin view shows <b style="color:var(--ink)">Publish</b>; a <b style="color:var(--ink)">Client-Editor</b> with approval ON sees <b style="color:var(--ink)">"Send for review"</b> (<a href="m-approval.html" style="color:var(--ink-2)">M-approval</a>).</span></div>
+<div class="modecap" id="modecap"><b>The canonical editor.</b> 4 structural tools in the rail (Insert · Pages · Styles · Site); how much shows is your <b>view setting</b> — fewer or full controls (role-seeded, changed in account settings — <b>not toggled here</b>). <b>AI</b> is the separate <b>✨ assistant</b> (top-right) that can edit the <b>whole design</b>. Structure = the <b>⌗ icon in the bottom bar</b> (a floating panel) + click-on-canvas. <span style="color:var(--ink-3)">This Designer/Admin view shows <b style="color:var(--ink)">Publish</b>; a <b style="color:var(--ink)">Client</b> with approval ON sees <b style="color:var(--ink)">"Send for review"</b> (<a href="m-approval.html" style="color:var(--ink-2)">M-approval</a>).</span></div>
 
 <!-- AI ASSISTANT — a separate surface, not a rail item -->
 <div class="aipanel" id="aipanel">
@@ -396,7 +396,7 @@
   function anno(h){var a=document.getElementById('anno');document.getElementById('annoText').innerHTML=h;a.style.display='block';}
   document.getElementById('annoClose').onclick=function(){document.getElementById('anno').style.display='none';};
 
-  // preview the Client-Editor state — the agency's handoff check (uses existing simple-mode CSS)
+  // preview the Client state — the agency's handoff check (uses existing simple-mode CSS)
   var clientView=document.getElementById('clientView'), pubBtn=document.getElementById('pubBtn');
   pubBtn.onclick=function(){location.href = app.getAttribute('data-mode')==='simple'?'m-approval.html':'20-publish.html';};
   clientView.onclick=function(){
@@ -405,7 +405,7 @@
     clientView.classList.toggle('on',sim);
     clientView.textContent = sim?'👁 Exit client view':'👁 Client view';
     pubBtn.textContent = sim?'Send for review':'Publish';
-    anno(sim?'<b>Previewing as Client-Editor.</b> Fewer controls, Designer-only items + history hidden, agency breadcrumb gone, and <b>Publish → Send for review</b>. Exactly what your client sees.':'<b>Back to your full view.</b>');
+    anno(sim?'<b>Previewing as Client.</b> Fewer controls, Designer-only items + history hidden, agency breadcrumb gone, and <b>Publish → Send for review</b>. Exactly what your client sees.':'<b>Back to your full view.</b>');
   };
 
   // AI assistant — a separate surface (opens the panel; not a rail item)
