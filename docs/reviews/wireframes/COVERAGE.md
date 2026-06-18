@@ -126,3 +126,5 @@ Wired: 4 new cards in index + inbound from natural homes (m-seo→e6, m-approval
 5. m-agency cards gained "Access"; 21-preview gained a "💬 Comment" entry to m-comments (Viewer's natural path).
 Integrity after Round 3: 0 dead links, 0 orphans, JS ids resolve, no residual role-label collision, 107 html.
 
+**Re-codex passes 3-7 → user-friendly 10/10 · IA 10/10 (LOCKED).** 7.6→9.0→9.3→9.5→9.8→**10/10**. Closed in order: real client-mode handoff (`?view=client` hides agency escape-hatches), solo-chrome swap on m3, full Client→**Content editor** role rename (≈30 spots across ~20 files; "Client" now = account/company node + white-label persona ONLY, never a permission peer), forms text-vs-config permission reconcile, m-agency "Access" + 21-preview "Comment" entry, analytics matrix view-only-for-all, m-roles "old permissions"→62-permissions, tracking "Assign a property" CTA. Final codex verdict: "no residual role-peer client, no dead-ends, no broken CTAs, no cross-screen contradictions — reads as 10/10." Commits 47045373→94788e9c.
+
