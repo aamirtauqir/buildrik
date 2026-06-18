@@ -17,7 +17,7 @@
 <body>
 <div class="wf-stamp">WIREFRAME · c1 · TEAM &amp; ROLES</div>
 <div class="screen">
-  <div class="topnote"><b>Team — the new 4-role model.</b> Rebuilt: old Owner/Editor/Viewer becomes <b>Viewer · Client · Designer · Admin</b> with <b>per-site assignment</b> + an approval toggle. Role = permission (separate from the Simple/full controls preference). The capability matrix is <a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a>.</div>
+  <div class="topnote"><b>Team — the new 4-role model.</b> Rebuilt: old Owner/Editor/Viewer becomes <b>Viewer · Content editor · Designer · Admin</b> with <b>per-site assignment</b> + an approval toggle. Role = permission (separate from the Simple/full controls preference). The capability matrix is <a href="m-roles.html" style="color:#fff;text-decoration:underline">M-roles</a>.</div>
   <div class="dbar">
     <div class="ws"><span class="logo">N</span> Northwind Studio <span class="sw">agency ▾</span></div>
     <span class="sp"></span>
@@ -32,8 +32,8 @@
       <tr><th style="width:26%">Member</th><th style="width:18%">Role</th><th style="width:26%">Site access</th><th>Edits need approval</th></tr>
       <tr><td><b>Sara</b> · you</td><td><span class="role adm">Admin</span></td><td class="scope">all clients + workspace</td><td>—</td></tr>
       <tr><td><b>Imran</b></td><td><span class="role">Designer</span></td><td class="scope">all client sites</td><td>—</td></tr>
-      <tr><td><b>client@acme</b></td><td><span class="role">Client</span></td><td class="scope">Acme sites only</td><td><span class="toggle"></span> on</td></tr>
-      <tr><td><b>owner@bloom</b></td><td><span class="role">Client</span></td><td class="scope">Bloom site only</td><td><span class="toggle"></span> on</td></tr>
+      <tr><td><b>client@acme</b></td><td><span class="role">Content editor</span></td><td class="scope">Acme sites only</td><td><span class="toggle"></span> on</td></tr>
+      <tr><td><b>owner@bloom</b></td><td><span class="role">Content editor</span></td><td class="scope">Bloom site only</td><td><span class="toggle"></span> on</td></tr>
       <tr><td><b>auditor@nw</b></td><td><span class="role">Viewer</span></td><td class="scope">cobalt.io (read)</td><td>—</td></tr>
     </table>
     <div class="note2"><b>Per-site, per-role.</b> A Client is scoped to their own client's sites and edits content only; "edits need approval" routes their changes through the <a href="m-approval.html" style="color:var(--ink-2)">review gate</a>. Designer = full build access across sites; Admin = workspace (billing/team/branding). Density (your view) is a separate per-user preference — not set here.</div>

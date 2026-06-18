@@ -196,8 +196,8 @@
 <div class="app" id="app" data-mode="pro" data-rail="insert" data-device="desktop">
   <!-- TOPBAR -->
   <div class="topbar">
-    <a class="brand" href="m3-dashboard.html" title="Workspace home">B</a>
-    <a class="tb-btn" href="12-site-detail.html" title="Exit to this site's dashboard" style="font-weight:600">‹ Exit</a>
+    <a class="brand" href="m3-dashboard.html" title="Workspace home" id="brandHome">B</a>
+    <a class="tb-btn" href="12-site-detail.html" title="Exit to this site's dashboard" style="font-weight:600" id="exitBtn">‹ Exit</a>
     <div class="crumb">
       <b class="ag">Northwind</b><span class="sep ag">›</span><b class="ag">Acme</b><span class="sep ag">›</span><b>acme-main</b><span class="sep">›</span><span class="cur">Home ▾</span>
     </div>
@@ -361,7 +361,7 @@
   <div class="sp-note">Floating — opens from the ⌗ in the bottom bar, sits over the canvas, closes when you're done. Not a fixed left panel.</div>
 </div>
 
-<div class="modecap" id="modecap"><b>The canonical editor.</b> 4 structural tools in the rail (Insert · Pages · Styles · Site); how much shows is your <b>view setting</b> — fewer or full controls (role-seeded, changed in account settings — <b>not toggled here</b>). <b>AI</b> is the separate <b>✨ assistant</b> (top-right) that can edit the <b>whole design</b>. Structure = the <b>⌗ icon in the bottom bar</b> (a floating panel) + click-on-canvas. <span style="color:var(--ink-3)">This Designer/Admin view shows <b style="color:var(--ink)">Publish</b>; a <b style="color:var(--ink)">Client</b> with approval ON sees <b style="color:var(--ink)">"Send for review"</b> (<a href="m-approval.html" style="color:var(--ink-2)">M-approval</a>).</span></div>
+<div class="modecap" id="modecap"><b>The canonical editor.</b> 4 structural tools in the rail (Insert · Pages · Styles · Site); how much shows is your <b>view setting</b> — fewer or full controls (role-seeded, changed in account settings — <b>not toggled here</b>). <b>AI</b> is the separate <b>✨ assistant</b> (top-right) that can edit the <b>whole design</b>. Structure = the <b>⌗ icon in the bottom bar</b> (a floating panel) + click-on-canvas. <span style="color:var(--ink-3)">This Designer/Admin view shows <b style="color:var(--ink)">Publish</b>; a <b style="color:var(--ink)">Content editor</b> with approval ON sees <b style="color:var(--ink)">"Send for review"</b> (<a href="m-approval.html" style="color:var(--ink-2)">M-approval</a>).</span></div>
 
 <!-- AI ASSISTANT — a separate surface, not a rail item -->
 <div class="aipanel" id="aipanel">
@@ -400,11 +400,14 @@
   var clientView=document.getElementById('clientView'), pubBtn=document.getElementById('pubBtn');
   pubBtn.onclick=function(){location.href = app.getAttribute('data-mode')==='simple'?'m-approval.html':'20-publish.html';};
   // invited clients land directly in client mode (a9-invite-accept opens ?view=client)
+  // a REAL client session = true client chrome: no agency escape-hatches (no "Exit client view",
+  // no agency workspace-home, no exit-to-site-ops). Distinct from the agency PREVIEW toggle below.
   if(location.search.indexOf('view=client')>-1){
     app.setAttribute('data-mode','simple');
-    clientView.classList.add('on');
-    clientView.textContent='👁 Exit client view';
     pubBtn.textContent='Send for review';
+    clientView.style.display='none';
+    document.getElementById('brandHome').style.display='none';
+    document.getElementById('exitBtn').style.display='none';
   }
   clientView.onclick=function(){
     var sim=app.getAttribute('data-mode')!=='simple';
