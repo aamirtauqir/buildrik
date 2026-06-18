@@ -61,10 +61,10 @@
   <div class="topnote" style="margin:0"><b>M3 — dashboard home.</b> The business side of the boundary — where the journey <i>starts</i> and where you <i>run</i> what you've shipped. Agency-aware (Clients in the nav); a solo builder sees Sites directly. The one bridge to the editor is "Edit ↗"; the one bridge out is "Visit ↗".</div>
 
   <div class="dbar">
-    <div class="ws"><span class="logo">N</span> Northwind Studio <span class="sw">agency ▾</span></div>
+    <div class="ws"><span class="logo">N</span> <span id="wsName">Northwind Studio</span> <span class="sw" id="wsKind">agency ▾</span></div>
     <span class="crumb"><b>Workspace</b> › Home</span>
     <span class="sp"></span>
-    <div class="dnav"><a href="m3-dashboard.html" class="on">Home</a><a href="m-agency.html">Clients</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html">Billing</a></div>
+    <div class="dnav"><a href="m3-dashboard.html" class="on">Home</a><a href="m-agency.html" id="navClients">Clients</a><a href="11-sites.html" id="navSites" style="display:none">Sites</a><a href="18-workspace.html">Workspace</a><a href="16-billing.html">Billing</a></div>
     <a class="icn" href="c2-notifications.html" title="Notifications">🔔</a>
     <a class="icn" href="c3-help.html" title="Help">?</a>
     <a class="icn" href="b1-account-settings.html" title="Account">N</a>
@@ -160,6 +160,12 @@
     full.style.display = s==='full'?'block':'none';
     solo.style.display = s==='solo'?'block':'none';
     ag.style.display   = s==='agency'?'block':'none';
+    // solo collapses the agency chrome: no "Clients", show "Sites", no "agency" badge
+    var solview = s==='solo';
+    document.getElementById('navClients').style.display = solview?'none':'';
+    document.getElementById('navSites').style.display   = solview?'':'none';
+    document.getElementById('wsKind').textContent = solview?'workspace ▾':'agency ▾';
+    document.getElementById('wsName').textContent = solview?'My workspace':'Northwind Studio';
     document.querySelectorAll('.frbtn').forEach(function(b){b.classList.remove('on');b.style.background='';b.style.color='var(--ink-2)';b.style.borderColor='var(--line)';});
     var i = s==='full'?0:(s==='solo'?1:2);
     var btn=document.querySelectorAll('.frbtn')[i];

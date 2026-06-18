@@ -117,5 +117,12 @@ Fixes (Round 1 P0 + Round 2 P1 + screen-bugs + expansion):
 - **Client-Editor → Client** rename across 15 files (user language, not product-internal).
 - CTA/screen bugs: 20-publish "Add domain"→"Upgrade to add a custom domain"; 91-share "Unlock preview"→21-preview (was 90-published live site); 22-domain "Visit ↗"→90-published (was a pseudo-CTA); 00-signin branded-client note.
 - **Expansion** (codex high-conviction, PM/CEO lens): **e6-cms** (collections/dynamic pages — the Webflow-class gap m-seo pointed at) + **m-comments** (Viewer comment/annotation review — request edits without canvas access).
-Wired: 4 new cards in index + inbound from natural homes (m-seo→e6, m-approval/m-roles→m-comments). Integrity: 0 dead links, 0 orphans, 107 html. Re-codex to confirm friendliness/IA → target 10/10.
+Wired: 4 new cards in index + inbound from natural homes (m-seo→e6, m-approval/m-roles→m-comments). Integrity: 0 dead links, 0 orphans, 107 html.
+**Re-codex pass 2: user-friendly 7.6→9.0, IA 8.3→8.8.** 5 named items for 10 → all closed (Round 3):
+1. a9 now opens real client mode — `m-editor.html?view=client` + m-editor init JS (data-mode=simple, Publish→Send for review). a8 invite→existing now routes to a9 (branded).
+2. m3 solo branch now swaps the appbar chrome (hide Clients/show Sites, "My workspace" not "agency ▾"), not just the body.
+3. **Client role vs Client company-node collision resolved**: role renamed **Client → Content editor** (capability-named like Webflow/Framer; company node stays "Client") across m-roles matrix+def+footnotes, a5 card, a9 pill, s-account pill, 53 prose.
+4. Forms permissions reconciled across 3 screens: m-roles split "Forms — edit text" (Content editor ✓) vs "Forms — config" (Designer/Admin); 53 + forms-config marked accordingly (Client edits text on canvas, config is Designer/Admin surface).
+5. m-agency cards gained "Access"; 21-preview gained a "💬 Comment" entry to m-comments (Viewer's natural path).
+Integrity after Round 3: 0 dead links, 0 orphans, JS ids resolve, no residual role-label collision, 107 html.
 

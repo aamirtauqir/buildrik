@@ -399,6 +399,13 @@
   // preview the Client state — the agency's handoff check (uses existing simple-mode CSS)
   var clientView=document.getElementById('clientView'), pubBtn=document.getElementById('pubBtn');
   pubBtn.onclick=function(){location.href = app.getAttribute('data-mode')==='simple'?'m-approval.html':'20-publish.html';};
+  // invited clients land directly in client mode (a9-invite-accept opens ?view=client)
+  if(location.search.indexOf('view=client')>-1){
+    app.setAttribute('data-mode','simple');
+    clientView.classList.add('on');
+    clientView.textContent='👁 Exit client view';
+    pubBtn.textContent='Send for review';
+  }
   clientView.onclick=function(){
     var sim=app.getAttribute('data-mode')!=='simple';
     app.setAttribute('data-mode', sim?'simple':'pro');
