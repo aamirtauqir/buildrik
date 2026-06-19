@@ -507,6 +507,7 @@ export async function saveProjectFromEditor(
   siteId: string,
   projectData: {
     version: string;
+    // (expectedLastEditedAt threaded as a separate arg below)
     pages: Array<{
       id: string;
       name: string;
@@ -525,7 +526,8 @@ export async function saveProjectFromEditor(
     metadata?: unknown;
     settings?: unknown;
     dsSchemaVersion?: number;
-  }
+  },
+  expectedLastEditedAt?: string,
 ) {
   // 2026-05-23: array-level cast — Zod's passthrough output type
   // (`objectOutputType<{...},...,"passthrough">`) for the `meta` field
@@ -554,7 +556,7 @@ export async function saveProjectFromEditor(
     assets: projectData.assets,
     settings: projectData.settings,
     dsSchemaVersion: projectData.dsSchemaVersion,
-  });
+  }, expectedLastEditedAt);
 }
 
 export async function bulkAction(
@@ -617,9 +619,21 @@ export async function bulkAction(
  * save, breaking applied-template state across reload. Persisting meta is
  * load-bearing for P2 + P9 (template version pinning + applied-template badge).
  */
-export async function saveProjectData(input: SaveProjectDataInput) {
+export async function saveProjectData(input: SaveProjectDataInput, expectedLastEditedAt?: string) {
   const site = await prisma.site.findUnique({ where: { id: input.siteId } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  // 61-conflict: optimistic concurrency. When the caller supplies the
+  // lastEditedAt it loaded and it no longer matches the row, another writer
+  // saved in between — reject rather than clobber. The server value is appended
+  // so the client can fetch + reload it. Skipped when expectedLastEditedAt is
+  // omitted (non-regressive) or when the site has never been edited.
+  if (expectedLastEditedAt && site.lastEditedAt) {
+    const current = site.lastEditedAt.toISOString();
+    if (current !== expectedLastEditedAt) {
+      throw new Error(`SAVE_CONFLICT:${current}`);
+    }
+  }
 
   const savedAt = new Date();
 

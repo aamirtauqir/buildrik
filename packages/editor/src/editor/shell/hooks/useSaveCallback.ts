@@ -21,7 +21,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { ToastInput } from "@/editor/shared/vibcoder/Toast";
 import type { SaveState } from "./useStudioState";
-import { getSiteIdFromUrl, saveProject } from "@/services/BuildrikSyncProvider";
+import { getSiteIdFromUrl, saveProject, SaveConflictError } from "@/services/BuildrikSyncProvider";
 
 export interface UseSaveCallbackOptions {
   composer: Composer | null;
@@ -80,6 +80,14 @@ export function useSaveCallback({
         });
       })
       .catch((err) => {
+        // 61-conflict: a behind-copy is handled by the conflict dialog (the
+        // registered handler in BuildrikSyncProvider already opened it). Don't
+        // also show a generic "save failed" toast or a Retry that would re-save
+        // over the newer copy — just clear the saving spinner.
+        if (err instanceof SaveConflictError) {
+          setSaveState((prev) => ({ ...prev, status: "idle" }));
+          return;
+        }
         const errorMessage = err?.message || "Unknown error";
         const userMessage = explainSaveError(errorMessage);
         setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));

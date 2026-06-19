@@ -39,6 +39,8 @@ import { StudioFooter } from "./StudioFooter";
 import { StudioHeader } from "./StudioHeader";
 import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
+import { ConflictModal } from "./modals/ConflictModal";
+import { SAVE_CONFLICT_EVENT, setBaselineLastEditedAt } from "@/services/BuildrikSyncProvider";
 
 import "../../themes/default.css";
 import "../../themes/ux-fixes.css";
@@ -237,6 +239,19 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setSaveState: state.setSaveState,
     setIsDirty: state.setIsDirty,
   });
+
+  // 61-conflict: a behind-copy save was rejected by the server. Listen on the
+  // window event; idempotent (keep the first) so repeated autosave conflicts
+  // don't stack dialogs while one is open.
+  const [conflict, setConflict] = React.useState<{ serverToken: string } | null>(null);
+  React.useEffect(() => {
+    const onConflict = (e: Event) => {
+      const token = (e as CustomEvent<{ serverLastEditedAt: string }>).detail?.serverLastEditedAt;
+      if (token) setConflict((c) => c ?? { serverToken: token });
+    };
+    window.addEventListener(SAVE_CONFLICT_EVENT, onConflict);
+    return () => window.removeEventListener(SAVE_CONFLICT_EVENT, onConflict);
+  }, []);
 
   // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
   useEditorShortcuts({ composer, modals, saveProject });
@@ -462,6 +477,32 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onCloseCMSRecords={modals.closeCMSRecords}
         showCommandPalette={modals.showCommandPalette}
         onCloseCommandPalette={modals.closeCommandPalette}
+      />
+
+      <ConflictModal
+        open={!!conflict}
+        onClose={() => setConflict(null)}
+        onReload={() => window.location.reload()}
+        onSaveBackup={() => {
+          // Download the local copy so nothing is lost, then take the latest.
+          try {
+            const blob = new Blob([JSON.stringify(composer.exportProject(), null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `buildrik-backup-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+          } finally {
+            window.location.reload();
+          }
+        }}
+        onOverwrite={() => {
+          // Adopt the server's version token so our next save matches + wins.
+          if (conflict) setBaselineLastEditedAt(conflict.serverToken);
+          setConflict(null);
+          saveProject();
+        }}
       />
 
       <footer

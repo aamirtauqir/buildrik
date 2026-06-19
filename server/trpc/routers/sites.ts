@@ -239,12 +239,19 @@ export const sitesRouter = router({
       }
 
       try {
-        return await saveProjectFromEditor(input.siteId, input.projectData);
+        return await saveProjectFromEditor(input.siteId, input.projectData, input.expectedLastEditedAt ?? undefined);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "SITE_NOT_FOUND")
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Site not found",
+          });
+        // 61-conflict: the site changed elsewhere since this editor loaded it.
+        // The serverLastEditedAt suffix lets the client offer "Reload latest".
+        if (e instanceof Error && e.message.startsWith("SAVE_CONFLICT"))
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: e.message,
           });
         throw e;
       }

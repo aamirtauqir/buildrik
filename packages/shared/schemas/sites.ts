@@ -180,6 +180,11 @@ export const saveProjectDataSchema = z.object({
  */
 export const editorSaveProjectSchema = z.object({
   siteId: z.string(),
+  // 61-conflict: optimistic-concurrency token. The editor sends the site's
+  // lastEditedAt it loaded (or last saved). If it no longer matches the server's,
+  // the copy is behind — the server rejects with CONFLICT instead of clobbering.
+  // Omitted (older callers / first save) = no check, so this is non-regressive.
+  expectedLastEditedAt: z.string().nullish(),
   projectData: z.object({
     version: z.string(),
     pages: z.array(

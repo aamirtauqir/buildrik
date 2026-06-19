@@ -387,3 +387,43 @@ describe("saveProjectData — canonical input-object signature", () => {
     ).rejects.toThrow("SITE_NOT_FOUND");
   });
 });
+
+describe("saveProjectData — 61-conflict optimistic concurrency", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    const { txPage, txSite, txFormBlock } = makeTx();
+    vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
+    );
+  });
+
+  const loaded = new Date("2026-06-19T10:00:00.000Z");
+
+  it("rejects a behind-copy when expectedLastEditedAt no longer matches", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      id: "site-1",
+      lastEditedAt: new Date("2026-06-19T10:05:00.000Z"), // someone else saved later
+    } as any);
+    await expect(
+      saveProjectData({ siteId: "site-1", pages: [] }, loaded.toISOString())
+    ).rejects.toThrow(/^SAVE_CONFLICT:/);
+  });
+
+  it("saves when expectedLastEditedAt matches the row", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      id: "site-1",
+      lastEditedAt: loaded,
+    } as any);
+    const result = await saveProjectData({ siteId: "site-1", pages: [] }, loaded.toISOString());
+    expect(result.success).toBe(true);
+  });
+
+  it("skips the check entirely when expectedLastEditedAt is omitted (non-regressive)", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      id: "site-1",
+      lastEditedAt: new Date("2026-06-19T10:05:00.000Z"),
+    } as any);
+    const result = await saveProjectData({ siteId: "site-1", pages: [] });
+    expect(result.success).toBe(true);
+  });
+});

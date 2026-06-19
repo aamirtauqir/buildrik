@@ -41,6 +41,37 @@ function getClient() {
   return _client;
 }
 
+// 61-conflict: the lastEditedAt this editor loaded / last successfully saved.
+// Sent with each save so the server can detect a behind-copy. Updated on every
+// successful save; the caller may force it (to the server's value) to overwrite.
+let _baselineLastEditedAt: string | null = null;
+
+/** Thrown by saveProject when the server rejects a behind-copy. Carries the
+ *  server's current lastEditedAt so the UI can offer "Reload latest". */
+export class SaveConflictError extends Error {
+  constructor(public serverLastEditedAt: string) {
+    super("SAVE_CONFLICT");
+    this.name = "SaveConflictError";
+  }
+}
+
+/** Force the baseline (e.g. after the user chooses "Overwrite"), so the next
+ *  save matches the server and wins. */
+export function setBaselineLastEditedAt(iso: string | null): void {
+  _baselineLastEditedAt = iso;
+}
+
+// Conflict signal — emitted on a window CustomEvent so BOTH manual save and
+// autosave surface the same dialog, decoupled from module-instance identity
+// (the editor's "emit events, UI subscribes" convention). The shell listens for
+// `buildrik:save-conflict`.
+export const SAVE_CONFLICT_EVENT = "buildrik:save-conflict";
+function emitSaveConflict(serverLastEditedAt: string): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(SAVE_CONFLICT_EVENT, { detail: { serverLastEditedAt } }));
+  }
+}
+
 const DEFAULT_ROOT: ElementData = {
   id: "root",
   type: "container",
@@ -197,6 +228,10 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
     // Capture the workspace plan so plan-gated editor UI reads the real tier.
     _editorPlanTier = mapDashboardPlan((settingsResult as { plan?: unknown } | null)?.plan);
 
+    // 61-conflict: record the load-time version as the save baseline.
+    const loadedLastEditedAt = (site as { lastEditedAt?: string | Date | null }).lastEditedAt;
+    _baselineLastEditedAt = loadedLastEditedAt ? new Date(loadedLastEditedAt).toISOString() : null;
+
     return {
       version: "1.0",
       pagesOrder: sortedPages.map((p) => p.id),
@@ -259,7 +294,12 @@ export async function saveProject(
   const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;
 
   const calls: Array<Promise<unknown>> = [
-    client.sites.saveProject.mutate({ siteId, projectData }),
+    client.sites.saveProject.mutate({
+      siteId,
+      projectData,
+      // 61-conflict: opt into behind-copy detection.
+      expectedLastEditedAt: _baselineLastEditedAt,
+    }),
   ];
   if (hasSiteColumnChanges) {
     calls.push(
@@ -267,8 +307,26 @@ export async function saveProject(
     );
   }
 
-  const [primaryResult] = await Promise.all(calls);
-  return primaryResult as { success: boolean; savedAt: Date };
+  let primaryResult: unknown;
+  try {
+    [primaryResult] = await Promise.all(calls);
+  } catch (err) {
+    // Translate the server's CONFLICT into a typed error the shell can catch to
+    // show the conflict dialog (rather than a generic save-failed toast).
+    const msg = err instanceof Error ? err.message : String(err);
+    const match = /SAVE_CONFLICT:(.+)$/.exec(msg);
+    if (match) {
+      const serverToken = match[1].trim();
+      emitSaveConflict(serverToken);
+      throw new SaveConflictError(serverToken);
+    }
+    throw err;
+  }
+
+  const result = primaryResult as { success: boolean; savedAt: Date };
+  // Advance the baseline so the editor's own next save isn't seen as a conflict.
+  _baselineLastEditedAt = new Date(result.savedAt).toISOString();
+  return result;
 }
 
 /**
