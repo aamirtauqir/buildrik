@@ -11,6 +11,7 @@ export default function SiteDomainsPage() {
   const { addToast } = useToast();
 
   const domainsQuery = trpc.siteDetail.domains.list.useQuery({ siteId });
+  const wsQuery = trpc.account.workspace.get.useQuery();
   const hasPending = domainsQuery.data?.some((d: { status: string }) => d.status === "PENDING");
 
   // Re-query with polling when there are pending domains
@@ -49,6 +50,7 @@ export default function SiteDomainsPage() {
   return (
     <DomainsTab
       domains={domainsQuery.data ?? []}
+      plan={wsQuery.data?.plan}
       onConnect={(domain) => connectMutation.mutate({ siteId, domain })}
       onRemove={(id) => removeMutation.mutate({ id })}
       onSetPrimary={(id) => setPrimaryMutation.mutate({ id, siteId })}

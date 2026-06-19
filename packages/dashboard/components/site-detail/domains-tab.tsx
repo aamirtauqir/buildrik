@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Globe, Shield, Trash2, Star, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { PaywallModal } from "@/components/billing/paywall-modal";
 
 interface DnsRecordEntry {
   id?: string;
@@ -28,6 +29,8 @@ interface DomainsTabProps {
   onRemove: (id: string) => void;
   onSetPrimary: (id: string) => void;
   hasPendingDomain?: boolean;
+  /** Workspace plan — FREE users get the paywall instead of connecting. */
+  plan?: string;
 }
 
 const PROVIDER_GUIDES = [
@@ -37,17 +40,31 @@ const PROVIDER_GUIDES = [
   { name: "Google Domains", url: "https://support.google.com/domains/answer/9211383" },
 ];
 
-export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary }: DomainsTabProps) {
+export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }: DomainsTabProps) {
   const [newDomain, setNewDomain] = useState("");
   const [expandedSsl, setExpandedSsl] = useState<string | null>(null);
+  const [paywall, setPaywall] = useState(false);
+  const isFree = plan === "FREE";
+
+  const handleConnect = () => {
+    if (isFree) { setPaywall(true); return; }
+    onConnect(newDomain);
+    setNewDomain("");
+  };
 
   return (
     <div className="space-y-6">
+      <PaywallModal
+        open={paywall}
+        onClose={() => setPaywall(false)}
+        feature="Connect a custom domain"
+        description="Custom domains with automatic SSL are part of Pro. Your site stays live on its buildrik.app address until you upgrade."
+      />
       <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
         <h3 className="mb-4 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Connect Domain</h3>
         <div className="flex gap-2">
           <input type="text" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="www.example.com" className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
-          <button onClick={() => { onConnect(newDomain); setNewDomain(""); }} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Connect</button>
+          <button onClick={handleConnect} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Connect</button>
         </div>
         <div className="mt-3">
           <p className="text-xs font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>DNS provider guides:</p>
