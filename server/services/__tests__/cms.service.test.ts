@@ -7,28 +7,32 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const colFindMany = vi.fn();
 const colFindFirst = vi.fn();
+const colFindUnique = vi.fn();
 const colCreate = vi.fn();
-const colUpdate = vi.fn();
+const colUpsert = vi.fn();
 const colDelete = vi.fn();
 const entFindMany = vi.fn();
 const entFindFirst = vi.fn();
+const entFindUnique = vi.fn();
 const entCreate = vi.fn();
-const entUpdate = vi.fn();
+const entUpsert = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     cmsCollection: {
       findMany: (...a: unknown[]) => colFindMany(...a),
       findFirst: (...a: unknown[]) => colFindFirst(...a),
+      findUnique: (...a: unknown[]) => colFindUnique(...a),
       create: (...a: unknown[]) => colCreate(...a),
-      update: (...a: unknown[]) => colUpdate(...a),
+      upsert: (...a: unknown[]) => colUpsert(...a),
       delete: (...a: unknown[]) => colDelete(...a),
     },
     cmsEntry: {
       findMany: (...a: unknown[]) => entFindMany(...a),
       findFirst: (...a: unknown[]) => entFindFirst(...a),
+      findUnique: (...a: unknown[]) => entFindUnique(...a),
       create: (...a: unknown[]) => entCreate(...a),
-      update: (...a: unknown[]) => entUpdate(...a),
+      upsert: (...a: unknown[]) => entUpsert(...a),
     },
   },
 }));
@@ -42,7 +46,7 @@ import {
 } from "@server/services/cms.service";
 
 beforeEach(() => {
-  [colFindMany, colFindFirst, colCreate, colUpdate, colDelete, entFindMany, entFindFirst, entCreate, entUpdate].forEach(
+  [colFindMany, colFindFirst, colFindUnique, colCreate, colUpsert, colDelete, entFindMany, entFindFirst, entFindUnique, entCreate, entUpsert].forEach(
     (m) => m.mockReset(),
   );
 });
@@ -61,12 +65,22 @@ describe("collections", () => {
     expect(colCreate.mock.calls[0][0].data).toMatchObject({ siteId: "s1", name: "Posts", slug: "posts" });
   });
 
-  it("upsert with id refuses a collection from another site (NOT_FOUND, no update)", async () => {
-    colFindFirst.mockResolvedValueOnce(null);
+  it("upsert with id refuses a collection already owned by another site (no write)", async () => {
+    colFindUnique.mockResolvedValueOnce({ siteId: "other-site" });
     await expect(
-      upsertCollection("s1", { id: "other", siteId: "s1", name: "x", slug: "x", fields: [] }),
+      upsertCollection("s1", { id: "x", siteId: "s1", name: "x", slug: "x", fields: [] }),
     ).rejects.toBeInstanceOf(CmsError);
-    expect(colUpdate).not.toHaveBeenCalled();
+    expect(colUpsert).not.toHaveBeenCalled();
+  });
+
+  it("upsert with id creates-if-missing (engine id → DB id on first sync)", async () => {
+    colFindUnique.mockResolvedValueOnce(null);
+    colUpsert.mockResolvedValueOnce({ id: "eng-1" });
+    await upsertCollection("s1", { id: "eng-1", siteId: "s1", name: "Posts", slug: "posts", fields: [] });
+    expect(colUpsert.mock.calls[0][0]).toMatchObject({
+      where: { id: "eng-1" },
+      create: expect.objectContaining({ id: "eng-1", siteId: "s1" }),
+    });
   });
 });
 
@@ -84,12 +98,12 @@ describe("entries cross-site guard", () => {
     expect(entCreate.mock.calls[0][0].data).toMatchObject({ collectionId: "c1" });
   });
 
-  it("upsertEntry with id refuses an entry from another site", async () => {
-    colFindFirst.mockResolvedValueOnce({ id: "c1" }); // collection in site
-    entFindFirst.mockResolvedValueOnce(null); // but the entry isn't
+  it("upsertEntry with id refuses an entry already under another site", async () => {
+    colFindFirst.mockResolvedValueOnce({ id: "c1" }); // target collection in site
+    entFindUnique.mockResolvedValueOnce({ collection: { siteId: "other-site" } });
     await expect(
-      upsertEntry("s1", { id: "other-entry", siteId: "s1", collectionId: "c1", data: {} }),
+      upsertEntry("s1", { id: "e-x", siteId: "s1", collectionId: "c1", data: {} }),
     ).rejects.toBeInstanceOf(CmsError);
-    expect(entUpdate).not.toHaveBeenCalled();
+    expect(entUpsert).not.toHaveBeenCalled();
   });
 });

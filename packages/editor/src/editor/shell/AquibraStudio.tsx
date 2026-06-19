@@ -25,6 +25,7 @@ import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { PageWizard } from "../wizard/PageWizard";
 import { OnboardingMount } from "../onboarding/OnboardingMount";
+import { useCmsSync } from "./hooks/useCmsSync";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
@@ -182,6 +183,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // 4 composer-driven side-effects (wizard hide, COMPONENT_CREATE_REQUESTED,
   // SHOW_IN_LAYERS, overlay-defaults init) extracted into useEditorEventListeners
   // — D2 stage 3.
+  // E7: mirror local CMS changes to the server (best-effort).
+  useCmsSync(composer);
+
   useEditorEventListeners({
     composer,
     modals,

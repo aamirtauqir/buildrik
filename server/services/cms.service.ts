@@ -41,9 +41,16 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
     fields: input.fields as unknown as Prisma.InputJsonValue,
   };
   if (input.id) {
-    const owned = await prisma.cmsCollection.findFirst({ where: { id: input.id, siteId }, select: { id: true } });
-    if (!owned) throw new CmsError("NOT_FOUND", "Collection not found");
-    return prisma.cmsCollection.update({ where: { id: input.id }, data });
+    // Upsert by the editor-supplied id (engine collection id = DB id, so the
+    // first sync creates and later syncs update). Reject only a real cross-site
+    // collision — a row with this id already owned by a DIFFERENT site.
+    const existing = await prisma.cmsCollection.findUnique({ where: { id: input.id }, select: { siteId: true } });
+    if (existing && existing.siteId !== siteId) throw new CmsError("NOT_FOUND", "Collection not found");
+    return prisma.cmsCollection.upsert({
+      where: { id: input.id },
+      create: { id: input.id, siteId, ...data },
+      update: data,
+    });
   }
   return prisma.cmsCollection.create({ data: { siteId, ...data } });
 }
@@ -76,12 +83,16 @@ export async function upsertEntry(siteId: string, input: UpsertEntryInput) {
     ...(input.status ? { status: input.status } : {}),
   };
   if (input.id) {
-    const owned = await prisma.cmsEntry.findFirst({
-      where: { id: input.id, collection: { siteId } },
-      select: { id: true },
+    const existing = await prisma.cmsEntry.findUnique({
+      where: { id: input.id },
+      select: { collection: { select: { siteId: true } } },
     });
-    if (!owned) throw new CmsError("NOT_FOUND", "Entry not found");
-    return prisma.cmsEntry.update({ where: { id: input.id }, data });
+    if (existing && existing.collection.siteId !== siteId) throw new CmsError("NOT_FOUND", "Entry not found");
+    return prisma.cmsEntry.upsert({
+      where: { id: input.id },
+      create: { id: input.id, collectionId: input.collectionId, ...data },
+      update: data,
+    });
   }
   return prisma.cmsEntry.create({ data: { collectionId: input.collectionId, ...data } });
 }
