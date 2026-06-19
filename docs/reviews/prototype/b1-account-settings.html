@@ -1,15 +1,14 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Account settings</title><link rel="stylesheet" href="pt.css">
 <style>
   .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
-  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--accent);color:#fff;font-weight:600}
-  .sn{padding:7px 9px;border-radius:5px;color:var(--ink-2);cursor:pointer;font-size:12.5px}.sn:hover{background:var(--fill)}.sn.on{background:var(--accent);color:#fff;font-weight:600}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
+  .sn{padding:7px 9px;border-radius:5px;color:var(--ink-2);cursor:pointer;font-size:12.5px}.sn:hover{background:var(--fill)}.sn.on{background:var(--ink);color:#fff;font-weight:600}
   .vs{display:none}.vs.on{display:block}
   .sess{display:flex;align-items:center;gap:10px;border-bottom:1px dashed var(--line);padding:9px 0;font-size:12px}
-  .tog{width:34px;height:18px;border:1px solid var(--line-d);border-radius:999px;position:relative}.tog::after{content:"";position:absolute;width:14px;height:14px;background:var(--ink-3);border-radius:50%;top:1px;left:1px}.tog.on{background:var(--accent);border-color:var(--accent)}.tog.on::after{left:17px;background:#fff}
+  .tog{width:34px;height:18px;border:1px solid var(--line-d);border-radius:999px;position:relative}.tog::after{content:"";position:absolute;width:14px;height:14px;background:var(--ink-3);border-radius:50%;top:1px;left:1px}.tog.on{background:var(--ink);border-color:var(--ink)}.tog.on::after{left:17px;background:#fff}
 </style></head>
-<body data-surface="dashboard">
-<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#F8FAFC;color:#334155;font:600 11.5px/1.45 "Inter Tight",sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #E2E8F0">↻ RECONCILED ROLE (2026-06-18): AI credits = read-only mirror; remove any workspace-owned writes from personal settings.</div>
-<div class="wf-stamp">PROTOTYPE</div>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen">
   <div class="topnote"><b>Account &amp; personal settings</b> · grounded in <code>account.*</code> tRPC + <code>/dashboard/settings/*</code> · sections mirror the real routes (account/security/notifications/ai/profile/danger)</div>
   <div class="ed">
@@ -79,7 +78,7 @@
           <div class="row" style="justify-content:space-between;font-size:11.5px;padding:4px 0;border-bottom:1px dashed var(--line)"><span>export-2026-06-12.zip</span><a class="muted" style="text-decoration:underline">Download ↓</a></div>
           <div class="row" style="justify-content:space-between;font-size:11.5px;padding:4px 0"><span>export-2026-06-19.zip</span><span class="muted">processing…</span></div>
         </div>
-        <div class="box pad" style="border-color:var(--accent)"><div class="row" style="justify-content:space-between"><div><b style="font-size:13px">Delete account</b><div class="muted" style="font-size:11px">30-day grace period, then permanent. Cancellable.</div></div><a href="70-confirm.html" class="btn">Delete account…</a></div>
+        <div class="box pad" style="border-color:var(--ink)"><div class="row" style="justify-content:space-between"><div><b style="font-size:13px">Delete account</b><div class="muted" style="font-size:11px">30-day grace period, then permanent. Cancellable.</div></div><a href="70-confirm.html" class="btn">Delete account…</a></div>
           <div class="muted" style="font-size:10px;margin-top:7px">⚠ Blocked while you're the <b>sole admin of a workspace</b> (transfer or delete it first) or have an <b>active subscription</b> (cancel billing first).</div></div>
       </div>
     </main>

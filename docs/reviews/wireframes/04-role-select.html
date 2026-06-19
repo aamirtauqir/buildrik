@@ -1,38 +1,31 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Role select</title><link rel="stylesheet" href="wf.css"></head>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WF · Starting view</title><link rel="stylesheet" href="wf.css"></head>
 <body>
-<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#fafafa;color:#2b2b2b;font:600 11.5px/1.45 system-ui,sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #c7c7c7">↻ RECONCILED ROLE (2026-06-18): Sets your VIEW (fewer / full controls), NOT permission. Permissions = invite ROLE (see M-roles).</div>
 <div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen screen-narrow">
-  <div class="topnote"><b>Onboarding — role select (§5.2)</b> · the screen that <b>seeds your view (fewer vs full controls)</b> · solution: density is a default, NOT a capability gate — changeable anytime from the editor</div>
+  <div class="topnote"><b>Onboarding — starting view</b> · seeds DENSITY only (Simple ↔ Pro). Density is a reversible preference, never a permission. Team permissions come from the invite ROLE (see <b>m-roles</b>).</div>
   <div class="pad" style="text-align:center">
-    <div class="h1" style="margin-bottom:4px">What brings you here?</div>
-    <div class="muted" style="font-size:12.5px;margin-bottom:20px">Sets your starting view. You can change it anytime in settings — nothing is locked.</div>
+    <div class="h1" style="margin-bottom:4px">How much do you want to see?</div>
+    <div class="muted" style="font-size:12.5px;margin-bottom:20px">Pick a starting view. Flip it anytime in the editor or your account — nothing here is locked, and it changes nothing about what you're allowed to do.</div>
 
-    <div class="grid3" style="text-align:left">
-      <a href="04b-setup.html" class="box pad" style="text-decoration:none">
-        <div class="ph-img" style="height:54px;margin-bottom:10px">◐ build</div>
-        <div class="h2">Building my own site</div>
-        <div class="muted" style="font-size:11px;margin-top:4px">Portfolio, side project, personal.</div>
-        <div class="tag-exists" style="margin-top:8px;display:inline-block">→ fewer controls</div>
+    <div class="row" style="gap:14px;align-items:stretch;text-align:left">
+      <a href="04b-setup.html" class="box pad" style="flex:1;text-decoration:none">
+        <div class="ph-img" style="height:54px;margin-bottom:10px">◐ Simple</div>
+        <div class="h2">Simple view</div>
+        <div class="muted" style="font-size:11px;margin-top:4px">Swatches, fonts, blocks. The everyday controls, nothing noisy.</div>
+        <div class="tag-exists" style="margin-top:8px;display:inline-block">default</div>
       </a>
-      <a href="04b-setup.html" class="box pad" style="text-decoration:none">
-        <div class="ph-img" style="height:54px;margin-bottom:10px">$ business</div>
-        <div class="h2">Running a business</div>
-        <div class="muted" style="font-size:11px;margin-top:4px">Company site, landing pages, store.</div>
-        <div class="tag-exists" style="margin-top:8px;display:inline-block">→ fewer controls</div>
-      </a>
-      <a href="04b-setup.html" class="box pad" style="text-decoration:none;border-color:var(--ink);border-width:2px">
-        <div class="ph-img" style="height:54px;margin-bottom:10px">⌗ design</div>
-        <div class="h2">Designer / developer</div>
-        <div class="muted" style="font-size:11px;margin-top:4px">Want full control — classes, tokens, code.</div>
-        <div class="tag-new" style="margin-top:8px;display:inline-block">→ full controls</div>
+      <a href="04b-setup.html" class="box pad" style="flex:1;text-decoration:none;border-color:var(--ink);border-width:2px">
+        <div class="ph-img" style="height:54px;margin-bottom:10px">⌗ Pro</div>
+        <div class="h2">Pro view</div>
+        <div class="muted" style="font-size:11px;margin-top:4px">Adds classes, tokens, layers, custom code. Every control on screen.</div>
+        <div class="tag-new" style="margin-top:8px;display:inline-block">full controls</div>
       </a>
     </div>
 
-    <a href="01-new-site.html" class="muted" style="display:inline-block;margin-top:18px;font-size:11.5px;text-decoration:underline">Skip — I'll decide later (defaults to the simplified view)</a>
+    <a href="01-new-site.html" class="muted" style="display:inline-block;margin-top:18px;font-size:11.5px;text-decoration:underline">Skip — start in Simple (you can switch to Pro in one click)</a>
 
-    <div class="note" style="margin-top:18px;text-align:left"><b>Why this is the hinge (§5.2):</b> the fewer-vs-full-controls view needs a seed. Role → starting view; a "Designer/developer" starts with full controls. Crucially this only sets the <i>default reveal</i> — every capability is reachable in both, via the editor's view setting (screen: spine). No dead-end, no re-onboarding to "unlock".</div>
+    <div class="note" style="margin-top:18px;text-align:left"><b>Why two controls, not one (m-ownership #4):</b> this card sets <i>density</i> — how much surface shows — and it is reversible at any time from the editor topbar or Account. It is <b>not</b> a capability gate: every feature is reachable in both views. What you're <i>allowed</i> to change (content only vs structure vs theme vs settings) is a separate thing — your <b>role</b>, set when you're invited (Viewer · Content editor · Designer · Admin). A client handed the Simple view is not the same as a client restricted to content-only; those are two independent settings.</div>
   </div>
 </div>
-<div class="proto-nav"><b>Flow:</b><a href="00-signin.html">Sign in</a><a href="04-role-select.html" class="here">Role select</a><a href="m3-dashboard.html">First run</a><a href="01-new-site.html">New site</a><a href="m-editor.html">Editor</a><a href="m3-dashboard.html">Dashboard</a><a href="index.html">Map</a></div>
+<div class="proto-nav"><b>Flow:</b><a href="00-signin.html">Sign in</a><a href="04-role-select.html" class="here">Starting view</a><a href="m3-dashboard.html">First run</a><a href="01-new-site.html">New site</a><a href="m-editor.html">Editor</a><a href="m-roles.html">Roles</a><a href="index.html">Map</a></div>
 </body></html>

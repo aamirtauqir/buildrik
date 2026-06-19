@@ -78,4 +78,19 @@ Codex found ~34/49 FIX screens had STALE bodies (banner on top of old UI). **All
 - On-ramp/business: 01→one Start · 02→goal-first AI · 03/03b→house templates · 04b→solo/agency branch · 18→workspace shell · c1→4 roles · a5→role invite · c2→reconciled notifs · d1→folded into Clients · d2→submissions inbox · e3→branched onboarding · f2→white-label shells.
 Codex re-verify: 10/10 sampled rebuilds PASS, "genuinely rebuilt not re-bannered", 9/10 quality. Zero dead links. 15 FIX screens codex judged already-OK keep their RECONCILED banner; 17 SUPERSEDED/CUT keep theirs (correct).
 
+## FINAL PASS (2026-06-19) — test harness + last 2 stale rebuilds → set complete
+The "remaining polish" (line 72) closed. Added a repeatable mechanical gate `wf-test.mjs`
+(dead-link check + stylesheet wiring + banner census + thin-active-screen signal) — runs over
+both `wireframes/` and `prototype/`, **PASS at 0 dead links, full filename parity**.
+Codex judgment pass on the 12 active RECONCILED screens: 10 verdict DONE, **2 STALE rebuilt**:
+- `04-role-select` — was a 3-way *role* pick re-collapsing preference+permission; rebuilt as a
+  2-way **density** choice (Simple/Pro view), reversible, explicitly NOT a permission, role
+  called out as a separate invite-time setting.
+- `20-publish` — was a standalone publish destination; rebuilt as the **editor-topbar** publish
+  popover with the dashboard framed status/history-only (never triggers a deploy).
+Banner finalized: the 10 codex-DONE screens had their now-true RECONCILED banner dropped (set
+reads as final). 12 changed screens propagated to the hi-fi prototype (`wf.css`→`pt.css`,
+`WF ·`→`Buildrik ·`). Remaining banners = 16 SUPERSEDED tombstones + 4 CUT markers (c5/e1/e2/e4)
++ 2 fix-doc notes — all intentional. **Active-screen reconciliation 100% resolved.**
+
 ## (was) batch-3 plan: real edits to M-series canon — `m-editor` (tracking + role/density why-states + slug-redirect outcome), `m-seo` (strip technical SEO), `m0-spine`/`m0b-spec` (SEO content/technical split, analytics 3-layer, dashboard redirects), `m3` (Shared theme + Asset library + Personal nav), `m4` (post-publish + solo/agency). Then 6 missing screens (tracking · slug-redirect · zero-clients · inspector-empty · solo/agency nav · client-approval) · index rebuild · final codex full-set verify.

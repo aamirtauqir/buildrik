@@ -1,12 +1,25 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Publish</title><link rel="stylesheet" href="pt.css">
-<style>.pstate{display:none}.pstate.on{display:block}.chk{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink-2);padding:7px 0;border-bottom:1px dashed var(--line)}.chk .bx{width:16px;height:16px;border:1px solid var(--ink-3);border-radius:3px;text-align:center;line-height:14px;font-size:11px;color:var(--ink)}</style></head>
-<body data-surface="dashboard">
-<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#F8FAFC;color:#334155;font:600 11.5px/1.45 "Inter Tight",sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #E2E8F0">↻ RECONCILED ROLE (2026-06-18): Topbar publish flow; dashboard shows STATUS mirror only (not a destination).</div>
-<div class="wf-stamp">PROTOTYPE</div>
+<style>.pstate{display:none}.pstate.on{display:block}.chk{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink-2);padding:7px 0;border-bottom:1px dashed var(--line)}.chk .bx{width:16px;height:16px;border:1px solid var(--ink-3);border-radius:3px;text-align:center;line-height:14px;font-size:11px;color:var(--ink)}
+.etop{display:flex;align-items:center;gap:10px;background:var(--paper-2,#f4f4f5);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12px}
+.pop{max-width:430px;margin:0 0 0 auto;border:1px solid var(--ink-3);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.13);background:#fff;position:relative}
+.pop:before{content:"";position:absolute;top:-7px;right:26px;width:12px;height:12px;background:#fff;border-left:1px solid var(--ink-3);border-top:1px solid var(--ink-3);transform:rotate(45deg)}</style></head>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen screen-narrow">
-  <div class="topnote"><b>Publish flow</b> · grounded in current PublishTab states (idle → publishing → published / failed; SEO readiness checks; publishedUrl durable; Update-vs-Publish label) · §8.6 domain-pending</div>
+  <div class="topnote"><b>Publish — editor topbar action</b> · publishing happens <b>in the editor</b> from the topbar Publish button (the popover below). The dashboard never triggers a deploy; it only <b>mirrors status + version history</b> (12-site-detail › Delivery). Same <code>uiState</code> machine drives topbar + the dashboard mirror — no second machine.</div>
   <div class="pad">
 
+    <!-- editor topbar context: this popover hangs off the Publish button, it is not a destination -->
+    <div class="etop" style="margin-bottom:0">
+      <span class="muted">◧ Editor</span>
+      <span class="muted" style="font-size:11px">acme-main · Home</span>
+      <span style="margin-left:auto" class="muted" style="font-size:11px">Saved · just now</span>
+      <a href="21-preview.html" class="btn" style="font-size:11px">Preview</a>
+      <button class="btn btn-fill btn-strong" style="font-size:11px">Publish ▾</button>
+    </div>
+    <div class="muted" style="font-size:10px;text-align:right;margin:4px 2px 12px">▲ the Publish button lives in the editor topbar — this panel drops from it</div>
+
+    <div class="pop pad">
     <div class="pstate on" id="p_idle">
       <div class="h1" style="margin-bottom:4px">Publish site</div>
       <div class="muted" style="font-size:12px;margin-bottom:16px">Pre-flight check before going live.</div>
@@ -28,7 +41,7 @@
       <div class="barline m" id="pbar" style="height:14px;width:10%;transition:width .4s;margin-bottom:8px"></div>
       <div class="muted" id="ppct" style="font-family:var(--mono);font-size:12px">10%</div>
       <div class="row" style="justify-content:space-between;margin-top:18px"><button class="btn" onclick="ps('idle')">Cancel</button><button class="btn" onclick="ps('failed')">⟳ Simulate failure</button></div>
-      <div class="note" style="margin-top:14px">Canonical state machine (B1): same <code>uiState</code> drives Topbar + sidebar — no second machine. Progress is real deploy %.</div>
+      <div class="note" style="margin-top:14px">Canonical state machine (B1): same <code>uiState</code> drives the editor topbar AND the dashboard status mirror — no second machine. Progress is real deploy %.</div>
     </div>
 
     <div class="pstate" id="p_done">
@@ -51,10 +64,16 @@
       </div>
       <div class="row" style="justify-content:space-between"><button class="btn">View log</button><button class="btn btn-fill" onclick="ps('deploy');dep()">Retry</button></div>
     </div>
+    </div>
+
+    <div class="box pad" style="margin-top:16px;background:var(--paper-2,#f6f6f7)">
+      <div class="lbl" style="margin-bottom:4px">On the dashboard you only <b>watch</b>, never publish</div>
+      <div class="muted" style="font-size:11.5px">Status, deploy log, and version history live read-only at <a href="12-site-detail.html">Site detail › Delivery</a> and <a href="58-history.html">› Versions</a> (restore a past deploy). The deploy is always triggered here, in the editor.</div>
+    </div>
 
   </div>
 </div>
-<div class="proto-nav"><b>Flow:</b><a href="m3-dashboard.html">Dashboard</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="02-ai-wizard.html">AI wizard</a><a href="03-template-gallery.html">Templates</a><a href="m-editor.html">Editor</a><a href="20-publish.html" class="here">Publish</a><a href="21-preview.html">Preview</a><a href="22-domain-pending.html">Domain</a><a href="12-site-detail.html">Site detail</a><a href="s-ship-states.html">Ship states</a></div>
+<div class="proto-nav"><b>Flow:</b><a href="m3-dashboard.html">Dashboard</a><a href="11-sites.html">Sites</a><a href="01-new-site.html">New site</a><a href="02-ai-wizard.html">AI wizard</a><a href="03-template-gallery.html">Templates</a><a href="m-editor.html">Editor</a><a href="20-publish.html" class="here">Publish</a><a href="21-preview.html">Preview</a><a href="22-domain-pending.html">Domain</a><a href="12-site-detail.html">Site detail</a></div>
 <script>
 function ps(s){['idle','deploy','done','failed'].forEach(function(x){document.getElementById('p_'+x).classList.toggle('on',x===s);});}
 var t;function dep(){var b=document.getElementById('pbar'),p=document.getElementById('ppct');var v=10;clearInterval(t);b.style.width='10%';p.textContent='10%';t=setInterval(function(){v+=18;if(v>=100){v=100;clearInterval(t);b.style.width='100%';p.textContent='100%';setTimeout(function(){ps('done');},400);return;}b.style.width=v+'%';p.textContent=v+'%';},450);}

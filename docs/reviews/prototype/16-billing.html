@@ -1,16 +1,15 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · Billing</title><link rel="stylesheet" href="pt.css">
 <style>
   .ed{display:grid;grid-template-columns:200px 1fr;min-height:460px}
-  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--accent);color:#fff;font-weight:600}
-  .meter{height:8px;background:var(--fill);border:1px solid var(--line);border-radius:3px;overflow:hidden}.meter span{display:block;height:100%;background:var(--accent)}
+  .navi{display:block;padding:6px 8px;border-radius:4px;color:var(--ink-2)}.navi:hover{background:var(--fill)}.navi.here{background:var(--ink);color:#fff;font-weight:600}
+  .meter{height:8px;background:var(--fill);border:1px solid var(--line);border-radius:3px;overflow:hidden}.meter span{display:block;height:100%;background:var(--ink)}
   .plan{border:1px solid var(--line);border-radius:6px;padding:14px}.plan.pro{border:2px solid var(--ink)}
   .inv{display:grid;grid-template-columns:1fr 90px 80px 60px;gap:10px;align-items:center;font-size:12px;padding:8px 0;border-bottom:1px dashed var(--line)}
-  .dun{background:var(--accent);color:#fff;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .dun{background:var(--ink);color:#fff;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
   .dun .btn{background:#fff;color:var(--ink);border-color:#fff;padding:4px 10px}
 </style></head>
-<body data-surface="dashboard">
-<div data-recon-banner style="position:sticky;top:0;z-index:998;background:#F8FAFC;color:#334155;font:600 11.5px/1.45 "Inter Tight",sans-serif;padding:6px 14px;text-align:center;border-bottom:1px solid #E2E8F0">↻ RECONCILED ROLE (2026-06-18): Workspace-owned; account-level credits = READ-ONLY mirror only.</div>
-<div class="wf-stamp">PROTOTYPE</div>
+<body>
+<div class="wf-stamp">WIREFRAME · LOW FIDELITY</div>
 <div class="screen">
   <div class="topnote"><b>Billing &amp; plan</b> · grounded in <code>billing.*</code> (overview/plans/usage/invoices/upgrade/cancel/reactivate/switchInterval) + dunning · the §8.8 gate target</div>
   <div class="dbar">
