@@ -64,40 +64,55 @@ export function ReachScopeStrip({ composer, selectedElement }: ReachScopeStripPr
     setConfirming(false);
   };
 
-  const activePill: React.CSSProperties = {
-    fontSize: 11,
-    padding: "3px 8px",
+  const cardBase: React.CSSProperties = {
+    flex: "1 1 0",
+    minWidth: 0,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 1,
+    padding: "6px 8px",
+    height: "auto",
     borderRadius: 6,
-    background: "var(--bd-accent, #2D6DFF)",
-    color: "#fff",
-    whiteSpace: "nowrap",
+    border: "1px solid var(--bd-border, #e5e7eb)",
+    background: "transparent",
+    textAlign: "left",
+    lineHeight: 1.2,
   };
+  const cardActive: React.CSSProperties = {
+    ...cardBase,
+    borderColor: "var(--bd-accent, #2D6DFF)",
+    background: "var(--bd-accent-soft, #EFF4FF)",
+  };
+  const cardTop: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: "var(--bd-text, #374151)" };
+  const cardSub: React.CSSProperties = { fontSize: 10, color: "var(--bd-text-muted, #9ca3af)" };
 
   return (
-    <div style={{ padding: "8px 12px", borderBottom: "1px solid var(--bd-border, #e5e7eb)" }}>
-      <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--bd-text-muted, #9ca3af)", marginBottom: 5 }}>
-        Reach
-      </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
-        <span style={activePill}>This element</span>
+    <div style={{ padding: "10px 12px", borderBottom: "1px solid var(--bd-border, #e5e7eb)" }}>
+      <div style={{ display: "flex", gap: 6 }}>
+        <Button variant="bare" size="sm" style={cardActive} title="Just this element">
+          <span style={{ ...cardTop, color: "var(--bd-accent, #2D6DFF)" }}>This item</span>
+          <span style={cardSub}>just here</span>
+        </Button>
         <Button
-          variant="ghost"
+          variant="bare"
           size="sm"
+          style={cardBase}
           disabled={peers.length === 0}
           onClick={() => setConfirming(true)}
-          title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Apply this element's styles to all ${peers.length} ${typeLabel}s`}
+          title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Apply to all ${peers.length} ${typeLabel}s`}
         >
-          All {typeLabel}s · {peers.length}
+          <span style={cardTop}>All like this</span>
+          <span style={cardSub}>{peers.length} {peers.length === 1 ? "instance" : "instances"}</span>
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setSiteHint((s) => !s)}
-          title="Site-wide colors & fonts live in the Styles tab"
-        >
-          Whole site
+        <Button variant="bare" size="sm" style={cardBase} onClick={() => setSiteHint((s) => !s)} title="Site-wide colors & fonts">
+          <span style={cardTop}>Whole site</span>
+          <span style={cardSub}>every page</span>
         </Button>
       </div>
+      <p style={{ margin: "6px 0 0", fontSize: 10, color: "var(--bd-text-muted, #9ca3af)" }}>
+        <strong style={{ color: "var(--bd-text-muted, #6b7280)" }}>Just this</strong> by default — nothing else moves. Widen only to change all of them.
+      </p>
 
       {siteHint && (
         <p style={{ margin: "8px 0 0", fontSize: 11, color: "var(--bd-text-muted, #6b7280)" }}>

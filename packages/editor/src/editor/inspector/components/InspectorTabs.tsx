@@ -18,10 +18,12 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { TabName } from "../hooks/useInspectorState";
 
+// Relabeled from the old CSS-axis names (Style / Element / Effects) to plain
+// job language so the inspector reads by intent, not implementation.
 const TAB_IDS = ["style", "element", "effects"] as const;
 const TAB_LABELS: Record<TabName, string> = {
-  style: "Style",
-  element: "Element",
+  style: "Look",
+  element: "Layout",
   effects: "Effects",
 };
 

@@ -338,16 +338,16 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           </Button>
         </div>
       )}
-      {/* 40/41/59 — reach (This element / All like this / Whole site) */}
-      <ReachScopeStrip composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} />
-      {/* Figma-style element header */}
+      {/* 59-inspector: "YOU ARE EDITING / this <element>" — human framing, not a
+          DOM/CSS inspector header. The technical tag.class meta is dropped from
+          the primary view (it still lives in the selection breadcrumb above). */}
       <div className="bdi-ehdr">
         <div className="bdi-eic" aria-hidden="true">
           <ElementIcon size="sm" />
         </div>
         <div className="bdi-ename">
-          <div className="bdi-n">{elementLabel}</div>
-          <div className="bdi-t">{metaPrimary}</div>
+          <div className="bdi-t" style={{ textTransform: "uppercase", letterSpacing: "0.04em", fontSize: 10 }}>You are editing</div>
+          <div className="bdi-n">this {(elementLabel || "element").toLowerCase()}</div>
         </div>
         <div className="bdi-eact">
           <BindingPopover
@@ -373,8 +373,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           elementLabel={elementLabel}
         />
       </div>
-      {/* Tabs — D6 Stage 2 (audit-remediation 2026-05-08): tablist +
-          arrow-key navigation live in ./components/InspectorTabs.tsx. */}
+      {/* 40/41/59 — the 3-reach picker, the inspector's primary decision: This
+          item / All like this / Whole site. Sits right under "You are editing". */}
+      <ReachScopeStrip composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} />
+      {/* Tabs — relabeled to job groups (Look / Layout / Effects) so the body
+          reads by user intent, not CSS axis. */}
       <InspectorTabs activeTab={activeTab} onChange={setActiveTab} />
       {/* Breakpoint + state strip (mock pattern: pill + states + size right) */}
       <div className="bdi-bpr">
