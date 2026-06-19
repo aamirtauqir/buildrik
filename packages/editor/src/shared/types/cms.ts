@@ -57,6 +57,12 @@ export interface CMSCollection {
   icon?: string;
   fields: CMSField[];
   displayField?: string; // Field to use as display name
+  // Dynamic-page binding (redesign E7). Set pageSlugPattern to generate one
+  // published page per entry; {fieldSlug} placeholders resolve against the entry.
+  pageSlugPattern?: string;
+  pageSeoTitle?: string;
+  pageSeoDescription?: string;
+  pageTemplatePath?: string;
   createdAt: string;
   updatedAt: string;
 }

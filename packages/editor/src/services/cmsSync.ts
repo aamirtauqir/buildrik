@@ -36,6 +36,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
     const remote = (await client().cms.collections.list.query({ siteId })) as Array<{
       id: string; name: string; slug: string; description: string | null; icon: string | null;
       displayField: string | null; fields: unknown; createdAt: Date | string; updatedAt: Date | string;
+      pageSlugPattern: string | null; pageSeoTitle: string | null; pageSeoDescription: string | null; pageTemplatePath: string | null;
     }>;
     if (!remote.length) return;
     const localIds = new Set((await Storage.loadCollections()).map((c) => c.id));
@@ -46,6 +47,10 @@ export async function hydrateCmsFromServer(): Promise<void> {
         description: rc.description ?? undefined, icon: rc.icon ?? undefined,
         displayField: rc.displayField ?? undefined,
         fields: (rc.fields as CMSField[]) ?? [],
+        pageSlugPattern: rc.pageSlugPattern ?? undefined,
+        pageSeoTitle: rc.pageSeoTitle ?? undefined,
+        pageSeoDescription: rc.pageSeoDescription ?? undefined,
+        pageTemplatePath: rc.pageTemplatePath ?? undefined,
         createdAt: iso(rc.createdAt), updatedAt: iso(rc.updatedAt),
       };
       await Storage.saveCollection(collection);
@@ -79,6 +84,10 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
       icon: c.icon ?? null,
       displayField: c.displayField ?? null,
       fields: c.fields as unknown as never,
+      pageSlugPattern: c.pageSlugPattern ?? null,
+      pageSeoTitle: c.pageSeoTitle ?? null,
+      pageSeoDescription: c.pageSeoDescription ?? null,
+      pageTemplatePath: c.pageTemplatePath ?? null,
     });
   } catch (e) {
     // eslint-disable-next-line no-console
