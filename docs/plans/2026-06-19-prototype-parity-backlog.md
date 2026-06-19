@@ -38,17 +38,29 @@ Decisions made (per "decide yourself"): the paywall surfaces an *existing* enfor
 rather than inventing a "1 published site" cap (that would be a pricing change); workspace
 switching keeps a first-membership fallback so single-workspace users and stale tokens never break.
 
-## STILL DEFERRED — high-risk editor-engine arc (needs adversarial review, not a tail-end rush)
+## SHIPPED + VERIFIED — editor arc (third pass)
 
-This codebase's own history is the reason: the collab arc shipped 6 P1 data-loss / OT-non-convergence
-bugs that happy-path live-verify missed (`project_collab_codex_review_20260612`). Conflict detection
-and the scope-resolution engine are the same risk class — rushing them re-introduces the exact
-data-loss/broken-editing they're meant to prevent.
+- **T1.4** save-conflict detection (61-conflict) — optimistic concurrency on Site.lastEditedAt
+  (opt-in, non-regressive) + ConflictModal (Reload / Save-backup / Overwrite). *Live-verified end-to-end:
+  external edit → real editor save → server 409 → modal with all 3 actions.* The vibcoder Radix Modal
+  mis-portals in the dynamically-imported editor, so the dialog is a self-contained overlay (vibcoder
+  Buttons, Gate-24 safe). 3 server unit tests + the sync-arg test lock it.
+- **T3.1** 3-reach scope model (40/41/59) — ReachScopeStrip in the inspector: This element (default,
+  unchanged) / All <type>s · N (propagate behind a blast-radius ReachGuard, via getAllElements +
+  setStyle in one transaction) / Whole site (→ Styles tab). Editor tsc + inspector tests green.
+- **T3.2** inspector "simplified view" density affordance.
 
-- **T1.4** save-conflict detection (stale-session guard + Keep/Reload/Overwrite) — touches the save loop.
-- **T3.1** 3-reach scope model (ReachPicker/ReachGuard) — the central editor concept; scope-resolution engine work.
-- Polish nice-to-haves: T3.3 structure popover, T3.5 Insert seg, T3.6 offline-queue copy. (Preview already works via new-window; Send-for-review already works for invited clients — both were stale gap claims.)
-- Chains/low-value: T2.5 workspace white-label (needs the a9 consumer), T4.7 Designer role (needs permission semantics), T4.2 analytics-property model (keep beacon).
+## Remaining — explicitly minor / cut (the prototype is substantially fully implemented)
+
+- Polish nice-to-haves, current behavior already functional: T3.3 structure popover (the drawer works),
+  T3.5 Insert Blocks/Templates seg (ToolSubNav already reaches them), T3.6 offline-queue copy (the
+  offline save status already exists).
+- Stale gap claims corrected during build: Preview already works (opens the rendered site in a new
+  window); "Send for review" already works for invited clients (`?view=client`).
+- Chains / decisions: T2.5 workspace white-label (per-client branding already exists; workspace-level
+  needs the a9 client-facing consumer), T4.7 Designer role (needs role permission semantics defined),
+  T4.2 analytics-property model (keep the working first-party beacon per the 2026-06-17 product audit).
+- **Do NOT build** (flagged CUT in the prototype itself): e1-interactions, e2-locales, e4-export.
 
 ### Editor arc (must respect editor conventions: Emotion-only, no inline styles, Gate 24 bans inline buttons/inputs in chrome, vibcoder primitives) — not safe to rush at the tail of a dashboard session
 - **T1.4** save-conflict detection (stale-session guard + Keep/Reload/Overwrite)
