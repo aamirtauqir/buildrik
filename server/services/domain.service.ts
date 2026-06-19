@@ -15,6 +15,35 @@ export async function listDomains(siteId: string) {
   });
 }
 
+export interface WorkspaceDomainRow {
+  id: string;
+  domain: string;
+  status: string;
+  sslStatus: string;
+  isPrimary: boolean;
+  siteId: string;
+  siteName: string;
+}
+
+// Cross-site domains monitor (prototype 15-domains): every custom domain in the
+// workspace with its site, status, and SSL — the agency "all domains at once" view.
+export async function listWorkspaceDomains(workspaceId: string): Promise<WorkspaceDomainRow[]> {
+  const rows = await prisma.domain.findMany({
+    where: { site: { workspaceId, deletedAt: null } },
+    orderBy: [{ status: "asc" }, { domain: "asc" }],
+    select: {
+      id: true,
+      domain: true,
+      status: true,
+      sslStatus: true,
+      isPrimary: true,
+      siteId: true,
+      site: { select: { name: true } },
+    },
+  });
+  return rows.map(({ site, ...r }) => ({ ...r, siteName: site.name }));
+}
+
 export async function connectDomain(siteId: string, domain: string) {
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true, slug: true, deletedAt: true } });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");

@@ -7,7 +7,8 @@ import { getSiteOverview } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
-import { listDomains, connectDomain, removeDomain, setPrimaryDomain } from "@/server/services/domain.service";
+import { listDomains, connectDomain, removeDomain, setPrimaryDomain, listWorkspaceDomains } from "@/server/services/domain.service";
+import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
 import { getSiteAnalytics } from "@/server/services/analytics.service";
 import { updateSiteSettingsSchema, createRedirectSchema, connectDomainSchema, createShareLinkSchema, siteAnalyticsQuerySchema } from "@buildrik/shared/schemas/site-detail";
@@ -199,6 +200,12 @@ export const siteDetailRouter = router({
         }
         return listDomains(input.siteId);
       }),
+
+    // Cross-site monitor: every domain in the caller's workspace.
+    listForWorkspace: protectedProcedure.query(async ({ ctx }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      return listWorkspaceDomains(workspaceId);
+    }),
 
     connect: protectedProcedure
       .input(connectDomainSchema)
