@@ -240,11 +240,33 @@ model Site {
   slugHistory     SlugHistory[]
   publishJobs     PublishBuildJob[]
   analyticsEvents AnalyticsEvent[]
+  reviewRequests  ReviewRequest[]
 
   @@index([workspaceId])
   @@index([workspaceId, status])
   @@index([clientId])
   @@map("sites")
+}
+
+// Invited-client review workflow (redesign E4). A content editor "sends for
+// review" instead of publishing; an admin approves or asks for changes. One
+// PENDING request per site at a time (the service enforces it). Deleting a site
+// removes its review history.
+model ReviewRequest {
+  id            String    @id @default(cuid())
+  siteId        String
+  requestedById String
+  status        String    @default("PENDING") // PENDING | APPROVED | CHANGES_REQUESTED
+  note          String?
+  resolvedById  String?
+  resolvedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, status])
+  @@map("review_requests")
 }
 
 model Page {

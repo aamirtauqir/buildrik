@@ -17,3 +17,4 @@ export * from "./upload";
 export * from "./media";
 export * from "./feature-flags";
 export * from "./clients";
+export * from "./reviews";
