@@ -214,6 +214,10 @@ model Site {
   metaDescription   String?
   metaTitleTemplate String?
   ogImage           String?
+  // Technical SEO (d5): canonical host, search-index opt-out, custom robots.txt.
+  canonicalUrl      String?
+  allowIndexing     Boolean   @default(true)
+  robotsTxt         String?
   touchIcon         String?
   favicon           String?
   folderId          String?

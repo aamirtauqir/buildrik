@@ -65,6 +65,9 @@ export async function getSiteSettings(siteId: string) {
       metaDescription: true,
       metaTitleTemplate: true,
       ogImage: true,
+      canonicalUrl: true,
+      allowIndexing: true,
+      robotsTxt: true,
       headCode: true,
       bodyCode: true,
       socialLinks: true,
@@ -108,6 +111,9 @@ export async function updateSiteSettings(
     metaDescription?: string | null;
     metaTitleTemplate?: string | null;
     ogImage?: string | null;
+    canonicalUrl?: string | null;
+    allowIndexing?: boolean;
+    robotsTxt?: string | null;
     headCode?: string | null;
     bodyCode?: string | null;
     socialLinks?: Record<string, string> | null;

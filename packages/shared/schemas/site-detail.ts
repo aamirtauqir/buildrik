@@ -52,6 +52,10 @@ export const updateSiteSettingsSchema = z.object({
   metaDescription: z.string().max(160).nullable().optional(),
   metaTitleTemplate: z.string().nullable().optional(),
   ogImage: z.string().url().nullable().optional(),
+  // Technical SEO (d5)
+  canonicalUrl: z.string().max(255).nullable().optional(),
+  allowIndexing: z.boolean().optional(),
+  robotsTxt: z.string().max(4096).nullable().optional(),
   headCode: z.string().max(10240).nullable().optional(),
   bodyCode: z.string().max(10240).nullable().optional(),
   socialLinks: z.record(z.string()).nullable().optional(),

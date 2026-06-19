@@ -10,8 +10,8 @@ export const SITE_DETAIL_TABS = [
   { label: "SEO", segment: "seo" },
   { label: "Domains", segment: "domains" },
   { label: "Redirects", segment: "redirects" },
-  { label: "Access", segment: "access" },
-  { label: "Analytics", segment: "analytics" },
+  { label: "Sharing", segment: "access" },
+  { label: "Traffic", segment: "analytics" },
 ] as const;
 
 function getTabHref(base: string, segment: string) {
