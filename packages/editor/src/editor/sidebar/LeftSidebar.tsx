@@ -12,7 +12,7 @@ import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId, TabZone, RailTool } from "../rail/tabsConfig";
-import { getTabWidth, getTabConfig, getTabsByZone, getRailTools } from "../rail/tabsConfig";
+import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
@@ -217,6 +217,57 @@ function FourToolRail({
               </TooltipContent>
             </TooltipPortal>
           </Tooltip>
+        );
+      })}
+    </div>
+  );
+}
+
+// E3 composite sub-nav: in 4-tool mode, a tool that folds >1 tab (Insert: Add/
+// Templates/Components/Media; Site: Settings/Publish/History) shows a sub-tab row
+// at the top of its panel so every folded tab keeps its reach (acceptance #5).
+// Pages/Styles fold a single tab → no sub-nav. vibcoder Button keeps Gate 24 clean.
+function ToolSubNav({
+  activeTab,
+  onSubTabChange,
+}: {
+  activeTab: GroupedTabId;
+  onSubTabChange: (id: GroupedTabId) => void;
+}) {
+  const tool = getTabConfig(activeTab)?.tool;
+  const subs = tool ? getTabsByTool(tool) : [];
+  if (subs.length <= 1) return null;
+  return (
+    <div
+      role="tablist"
+      aria-label="Section"
+      style={{
+        display: "flex",
+        gap: 2,
+        padding: "6px 8px",
+        borderBottom: "1px solid var(--bd-border, var(--color-border-default, #e5e7eb))",
+      }}
+    >
+      {subs.map((t) => {
+        const active = t.id === activeTab;
+        return (
+          <Button
+            key={t.id}
+            variant="bare"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onSubTabChange(t.id)}
+            style={{
+              fontSize: 12,
+              fontWeight: active ? 600 : 500,
+              padding: "4px 10px",
+              borderRadius: 6,
+              color: active ? "var(--bd-accent, #2D6DFF)" : "var(--bd-text-secondary, #64748b)",
+              background: active ? "var(--bd-accent-subtle, rgba(45,109,255,0.08))" : "transparent",
+            }}
+          >
+            {t.label}
+          </Button>
         );
       })}
     </div>
@@ -475,6 +526,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
             Tabs without a PanelHeader (Layers, Add) can be closed by re-clicking
             the active rail icon, which now toggles drawerOpen. */}
         <div ref={panelContentRef} className="ls-panel-content ls-panel-content--no-padding" tabIndex={-1}>
+          {useFourToolRail && <ToolSubNav activeTab={activeTab} onSubTabChange={handleBtnClick} />}
           <InspectorErrorBoundary
             key={errorKey}
             fallback={<SidebarErrorFallback onRetry={() => setErrorKey((k) => k + 1)} />}
