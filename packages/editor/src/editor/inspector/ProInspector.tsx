@@ -121,6 +121,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     composer,
   });
 
+  // E3 per-user density (acceptance #4). ?view=client seeds "fewer"; ?density=fewer
+  // forces it; otherwise "full". (The persisted UserPreference.editorDensity is
+  // threaded in by the editor host as this URL param.)
+  const inspectorDensity: "full" | "fewer" = React.useMemo(() => {
+    if (typeof window === "undefined") return "full";
+    const q = new URLSearchParams(window.location.search);
+    return q.get("view") === "client" || q.get("density") === "fewer" ? "fewer" : "full";
+  }, []);
+
   const advancedPropsMap = React.useMemo(() => buildAdvancedPropsMapFromRegistry(), []);
   const advancedState = useAdvancedSettings({
     advancedPropsMap,
@@ -428,6 +437,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               onOpenMediaLibrary={onOpenMediaLibrary}
               onOpenIconPicker={onOpenIconPicker}
               devMode={devMode}
+              density={inspectorDensity}
             />
             {activeTab === "style" && selectedElement && (
               <VariantSection

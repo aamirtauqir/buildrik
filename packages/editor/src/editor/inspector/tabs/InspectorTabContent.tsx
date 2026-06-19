@@ -73,6 +73,10 @@ export interface InspectorTabContentProps {
     s: (i: IconConfig) => void
   ) => void;
   devMode: boolean;
+  /** E3 per-user density. "fewer" (content editors / ?view=client) trims the
+   *  inspector to its primary + secondary sections, hiding tertiary (advanced)
+   *  ones; "full" shows everything. Row heights are unaffected (density learning). */
+  density?: "full" | "fewer";
 }
 
 // ============================================================================
@@ -95,6 +99,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     onOpenMediaLibrary,
     onOpenIconPicker,
     devMode,
+    density = "full",
   } = props;
 
   const profile = getProfileFor(selectedElement.type);
@@ -161,10 +166,14 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     tabId,
   ]);
 
+  // E3 density: "fewer" keeps only primary + secondary sections (visible index
+  // < 3 = the two non-tertiary tiers below), hiding the advanced/tertiary ones.
+  const renderIds = density === "fewer" ? visibleIds.slice(0, 3) : visibleIds;
+
   // ── Phase 2: render visible sections with tier derived from visible index ──
   return (
     <>
-      {visibleIds.map((id, visibleIdx) => {
+      {renderIds.map((id, visibleIdx) => {
         const entry = SECTION_REGISTRY[id];
         const stateKey = `${selectedElement.type}:${id}`;
         const tier: SectionTier =
