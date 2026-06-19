@@ -14,12 +14,16 @@ import {
   syncCollectionDelete,
   syncEntryUpsert,
   syncEntryDelete,
+  hydrateCmsFromServer,
 } from "../../../services/cmsSync";
 
 export function useCmsSync(composer: Composer | null): void {
   React.useEffect(() => {
     if (!composer) return;
     const cm = composer.cms.collections;
+
+    // Pull any server-side collections into local storage (cross-device).
+    void hydrateCmsFromServer();
 
     const onColUpsert = (c: CMSCollection) => void syncCollectionUpsert(c);
     const onColDelete = (id: string) => void syncCollectionDelete(id);

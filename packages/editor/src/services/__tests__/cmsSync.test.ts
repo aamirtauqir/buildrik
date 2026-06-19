@@ -8,23 +8,36 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const colUpsert = vi.fn();
 const entUpsert = vi.fn();
+const colListQuery = vi.fn();
+const entListQuery = vi.fn();
 
 vi.mock("../api-client", () => ({
   getBuildrikClient: () => ({
     cms: {
-      collections: { upsert: { mutate: colUpsert }, delete: { mutate: vi.fn() } },
-      entries: { upsert: { mutate: entUpsert }, delete: { mutate: vi.fn() } },
+      collections: { upsert: { mutate: colUpsert }, delete: { mutate: vi.fn() }, list: { query: colListQuery } },
+      entries: { upsert: { mutate: entUpsert }, delete: { mutate: vi.fn() }, list: { query: entListQuery } },
     },
   }),
 }));
 vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000" }));
 
-import { syncCollectionUpsert, syncEntryUpsert } from "../cmsSync";
+const loadCollections = vi.fn();
+const saveCollection = vi.fn();
+const saveContentItem = vi.fn();
+vi.mock("../../engine/cms/CollectionStorage", () => ({
+  isStorageAvailable: () => true,
+  loadCollections: (...a: unknown[]) => loadCollections(...a),
+  saveCollection: (...a: unknown[]) => saveCollection(...a),
+  saveContentItem: (...a: unknown[]) => saveContentItem(...a),
+}));
+
+import { syncCollectionUpsert, syncEntryUpsert, hydrateCmsFromServer } from "../cmsSync";
 
 beforeEach(() => {
   window.history.replaceState({}, "", "/edit/site-123");
-  colUpsert.mockReset();
-  entUpsert.mockReset();
+  [colUpsert, entUpsert, colListQuery, entListQuery, loadCollections, saveCollection, saveContentItem].forEach((m) =>
+    m.mockReset(),
+  );
 });
 
 describe("cmsSync", () => {
@@ -55,5 +68,30 @@ describe("cmsSync", () => {
     window.history.replaceState({}, "", "/dashboard");
     await syncCollectionUpsert({ id: "c1", name: "X", slug: "x", fields: [], createdAt: "", updatedAt: "" } as never);
     expect(colUpsert).not.toHaveBeenCalled();
+  });
+});
+
+describe("hydrateCmsFromServer", () => {
+  it("writes server collections + entries to local storage, skipping ids already local", async () => {
+    colListQuery.mockResolvedValueOnce([
+      { id: "srv-new", name: "Posts", slug: "posts", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(0) },
+      { id: "local-1", name: "Pages", slug: "pages", description: null, icon: null, displayField: null, fields: [], createdAt: new Date(0), updatedAt: new Date(0) },
+    ]);
+    loadCollections.mockResolvedValueOnce([{ id: "local-1" }]); // already local → skip
+    entListQuery.mockResolvedValueOnce([
+      { id: "e1", data: { t: 1 }, status: "PUBLISHED", createdAt: new Date(0), updatedAt: new Date(0) },
+    ]);
+    await hydrateCmsFromServer();
+    // only the non-local collection is written
+    expect(saveCollection).toHaveBeenCalledTimes(1);
+    expect(saveCollection.mock.calls[0][0]).toMatchObject({ id: "srv-new", slug: "posts" });
+    // its entry, with status mapped back to engine casing
+    expect(saveContentItem.mock.calls[0][0]).toMatchObject({ id: "e1", collectionId: "srv-new", status: "published" });
+  });
+
+  it("no-ops when the server has no collections", async () => {
+    colListQuery.mockResolvedValueOnce([]);
+    await hydrateCmsFromServer();
+    expect(saveCollection).not.toHaveBeenCalled();
   });
 });
