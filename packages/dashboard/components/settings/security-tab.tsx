@@ -405,7 +405,17 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                   </td>
                 </tr>
               )}
-              {!sessions.isLoading && sessionList.length === 0 && (
+              {sessions.isError && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-error)" }}>
+                    Couldn&apos;t load sessions.{" "}
+                    <button onClick={() => sessions.refetch()} className="font-medium underline" style={{ color: "var(--color-primary)" }}>
+                      Retry
+                    </button>
+                  </td>
+                </tr>
+              )}
+              {!sessions.isLoading && !sessions.isError && sessionList.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
                     No active sessions found.
@@ -490,7 +500,17 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                   </td>
                 </tr>
               )}
-              {!loginHistory.isLoading && historyList.length === 0 && (
+              {loginHistory.isError && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-error)" }}>
+                    Couldn&apos;t load login history.{" "}
+                    <button onClick={() => loginHistory.refetch()} className="font-medium underline" style={{ color: "var(--color-primary)" }}>
+                      Retry
+                    </button>
+                  </td>
+                </tr>
+              )}
+              {!loginHistory.isLoading && !loginHistory.isError && historyList.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-4 py-6 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
                     No login history yet.

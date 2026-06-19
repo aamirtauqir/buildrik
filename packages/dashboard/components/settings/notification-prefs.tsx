@@ -1,6 +1,7 @@
 "use client";
 
 import { trpc } from "@lib/trpc/client";
+import { ErrorState } from "@/components/states";
 
 export const NOTIFICATION_CATEGORIES = [
   "Site Updates",
@@ -36,7 +37,7 @@ const LOCK_ICON = (
 );
 
 export function NotificationPrefs() {
-  const { data: prefs, isLoading } = trpc.account.notifications.list.useQuery(undefined, {
+  const { data: prefs, isLoading, isError, refetch } = trpc.account.notifications.list.useQuery(undefined, {
     select: (data) =>
       data.length > 0
         ? data.map((d) => ({
@@ -79,6 +80,16 @@ export function NotificationPrefs() {
 
   if (isLoading) {
     return <div className="h-40 flex items-center justify-center text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading preferences...</div>;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title="Couldn't load notification preferences"
+        description="Something went wrong on our end."
+        onRetry={() => refetch()}
+      />
+    );
   }
 
   return (
