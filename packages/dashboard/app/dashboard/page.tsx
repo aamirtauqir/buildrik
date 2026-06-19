@@ -10,6 +10,7 @@ import { WorkspaceHealth } from "@/components/dashboard/workspace-health";
 import { EmptyState, type EmptyStateVariant } from "@/components/dashboard/empty-state";
 import { DunningBanner } from "@/components/dashboard/dunning-banner";
 import { DashboardChecklist } from "@/components/onboarding/dashboard-checklist";
+import { ErrorState } from "@/components/states";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -35,6 +36,7 @@ export default function DashboardPage() {
   const showChecklist = onboardingState.data && !onboardingState.data.completed && !onboardingState.data.dismissed;
 
   const isLoading = stats.isLoading || recentSites.isLoading;
+  const isError = stats.isError || recentSites.isError;
   const isEmpty = stats.data?.totalSites === 0;
 
   // Determine empty state variant based on role
@@ -88,6 +90,28 @@ export default function DashboardPage() {
         <div className="mt-6 grid grid-cols-3 gap-6">
           <div className="col-span-2 h-48 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           <div className="h-48 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        </div>
+      </div>
+    );
+  }
+
+  // Without this, a failed stats query left data undefined → an all-zeros
+  // dashboard rendered as if the workspace were genuinely empty.
+  if (isError) {
+    return (
+      <div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Dashboard</h1>
+        </div>
+        <div className="mt-6">
+          <ErrorState
+            title="Couldn't load your dashboard"
+            description="Something went wrong on our end. Refresh to try again."
+            onRetry={() => {
+              stats.refetch();
+              recentSites.refetch();
+            }}
+          />
         </div>
       </div>
     );
