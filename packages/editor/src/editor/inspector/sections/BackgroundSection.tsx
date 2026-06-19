@@ -92,7 +92,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
 
   return (
     <Section
-      title="Background"
+      title="Colors"
       icon="Palette"
       preview={preview}
       action={addAction}
