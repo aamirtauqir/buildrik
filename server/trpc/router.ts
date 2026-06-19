@@ -19,6 +19,7 @@ import { apiTokensRouter } from "./routers/api-tokens";
 import { vercelIntegrationsRouter } from "./routers/integrations";
 import { actionsRouter } from "./routers/actions";
 import { featuresRouter } from "./routers/features";
+import { clientsRouter } from "./routers/clients";
 
 export const appRouter = router({
   auth: authRouter,
@@ -41,6 +42,7 @@ export const appRouter = router({
   integrations: router({ vercel: vercelIntegrationsRouter }),
   actions: actionsRouter,
   features: featuresRouter,
+  clients: clientsRouter,
 });
 
 export type AppRouter = typeof appRouter;

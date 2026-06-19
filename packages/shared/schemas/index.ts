@@ -16,3 +16,4 @@ export * from "./templates";
 export * from "./upload";
 export * from "./media";
 export * from "./feature-flags";
+export * from "./clients";
