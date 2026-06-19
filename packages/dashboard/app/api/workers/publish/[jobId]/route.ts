@@ -264,6 +264,28 @@ function injectHeadTags(
   return block + html;
 }
 
+/**
+ * Technical SEO (d5) — inject canonical link + robots meta into <head> from the
+ * Site's canonical columns. allowIndexing=false emits noindex,nofollow (the
+ * staging opt-out). Skips any tag the page already declares.
+ */
+function injectSeoTags(
+  html: string,
+  seo: { canonicalUrl: string | null; allowIndexing: boolean },
+): string {
+  const tags: string[] = [];
+  if (seo.canonicalUrl && !/<link[^>]+rel=["']?canonical/i.test(html)) {
+    tags.push(`<link rel="canonical" href="${escapeAttr(seo.canonicalUrl)}">`);
+  }
+  if (!seo.allowIndexing && !/<meta[^>]+name=["']?robots/i.test(html)) {
+    tags.push(`<meta name="robots" content="noindex,nofollow">`);
+  }
+  if (tags.length === 0) return html;
+  const block = tags.join("");
+  if (html.includes("</head>")) return html.replace("</head>", `${block}</head>`);
+  return block + html;
+}
+
 async function runVercelDeployJob(
   jobId: string,
   siteId: string,
@@ -272,7 +294,7 @@ async function runVercelDeployJob(
 ): Promise<string> {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { slug: true, name: true, publishedPassword: true, favicon: true, touchIcon: true, ogImage: true },
+    select: { slug: true, name: true, publishedPassword: true, favicon: true, touchIcon: true, ogImage: true, canonicalUrl: true, allowIndexing: true, robotsTxt: true },
   });
   if (!site) throw new Error("SITE_NOT_FOUND");
 
@@ -281,10 +303,20 @@ async function runVercelDeployJob(
   const passwordPlain = decryptPublishedPassword(site.publishedPassword);
 
   const icons = { favicon: site.favicon, touchIcon: site.touchIcon, ogImage: site.ogImage };
+  const seo = { canonicalUrl: site.canonicalUrl, allowIndexing: site.allowIndexing };
   const files: VercelFile[] = pages.map((p) => ({
     file: p.path,
-    data: injectHeadTags(injectAnalyticsBeacon(p.html, siteId), icons),
+    data: injectSeoTags(injectHeadTags(injectAnalyticsBeacon(p.html, siteId), icons), seo),
   }));
+
+  // Technical SEO (d5): ship robots.txt — the site's custom rules if set, else a
+  // sensible default driven by the indexing toggle.
+  files.push({
+    file: "robots.txt",
+    data: site.robotsTxt?.trim()
+      ? site.robotsTxt
+      : `User-agent: *\n${site.allowIndexing ? "Allow: /" : "Disallow: /"}\n`,
+  });
 
   // Step 0 — Generating pages: editor already rendered HTML; just mark done.
   await checkCancelled(jobId);
