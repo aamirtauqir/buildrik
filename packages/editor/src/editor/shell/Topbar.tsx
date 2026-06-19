@@ -28,6 +28,7 @@ import {
   TopbarStatus,
   TopbarStatusDot,
 } from "@/editor/shared/vibcoder";
+import { Sparkles } from "lucide-react";
 import type { Issue } from "./hooks/useStudioState";
 import { CommandPalette } from "./modals/CommandPalette";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
@@ -241,8 +242,13 @@ export const Topbar: React.FC<TopbarProps> = ({
   onHelp,
   onExportHTML,
   onDeviceChange,
+  onOpenAI,
 }) => {
   const publishEnabled = isFeatureEnabled("publish");
+  // E3: in 4-tool mode AI leaves the rail, so the topbar carries the ✨ trigger.
+  const fourToolRail =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("rail") === "4";
   const [cmdOpen, setCmdOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -405,6 +411,23 @@ export const Topbar: React.FC<TopbarProps> = ({
           <TopbarStatusDot />
           {renderSavedLabel()}
         </TopbarStatus>
+
+        {/* E3 — ✨ Ask AI (4-tool mode: AI is a topbar assistant, not a rail tab) */}
+        {fourToolRail && onOpenAI && (
+          <TopbarGroup>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="secondary" size="sm" onClick={onOpenAI} aria-label="Ask AI">
+                  <Sparkles size={14} style={{ marginRight: 4 }} />
+                  Ask AI
+                </Button>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>AI assistant</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          </TopbarGroup>
+        )}
 
         {/* Cell 7 — Collab presence + offline indicator + Invite */}
         <TopbarGroup>
