@@ -29,6 +29,22 @@ export type TabPattern = "card-drill-in" | "standalone";
 export type TabMode = "panel" | "fullpage";
 export type TabZone = "creation" | "structure" | "config";
 
+/**
+ * E3 target IA — the 11 panel tabs collapse to 4 structural rail tools, plus two
+ * non-rail homes. This field is the SSOT for that mapping: it records each tab's
+ * new home WITHOUT changing today's rail (the `zone`-driven render is untouched),
+ * so the rail rebuild lands on an explicit, tested map — "map every tab to its
+ * new home first; re-route UI, never delete engine features" (spec E3).
+ *
+ *   insert    — add / build content: elements, sections, templates, components, media
+ *   pages     — page management
+ *   styles    — global design tokens (colors, fonts, spacing)
+ *   site      — site config, publish, version history
+ *   assistant — AI moves to a top-right ✨ panel, not a rail tab
+ *   structure — layers/outline moves to a footer ⌗ floating popover
+ */
+export type RailTool = "insert" | "pages" | "styles" | "site" | "assistant" | "structure";
+
 /** Sidebar panel definition — purely about the panel content. */
 export interface GroupedTabConfig {
   id: GroupedTabId;
@@ -54,6 +70,8 @@ export interface GroupedTabConfig {
   panelWidth?: number;
   /** Which rail zone this tab appears in. undefined = no rail button (design, publish). */
   zone?: TabZone;
+  /** E3 target home — which of the 4 rail tools (or assistant/structure) this tab folds into. */
+  tool: RailTool;
 }
 
 // ─── Sidebar Tab Data ─────────────────────────────────────────────────────────
@@ -62,6 +80,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   // ── CREATION: content creation tools ───────────────────────────────────────
   {
     id: "add",
+    tool: "insert",
     iconName: "Plus",
     label: "Add",
     ariaLabel: "Add elements and sections to your page",
@@ -74,6 +93,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "ai",
+    tool: "assistant",
     iconName: "Sparkles",
     label: "AI",
     ariaLabel: "AI assistant — chat with Claude to edit elements",
@@ -86,6 +106,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "templates",
+    tool: "insert",
     iconName: "LayoutGrid",
     label: "Templates",
     ariaLabel: "Browse page and section templates",
@@ -102,6 +123,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "assets",
+    tool: "insert",
     iconName: "Image",
     label: "Media",
     ariaLabel: "Upload and manage images, videos, and fonts",
@@ -115,6 +137,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   // ── STRUCTURE: page organization ───────────────────────────────────────────
   {
     id: "layers",
+    tool: "structure",
     iconName: "Layers",
     label: "Layers",
     ariaLabel: "View and reorder page structure",
@@ -127,6 +150,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "pages",
+    tool: "pages",
     iconName: "File",
     label: "Pages",
     ariaLabel: "Manage all pages in your site",
@@ -139,6 +163,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "components",
+    tool: "insert",
     iconName: "Box",
     label: "Components",
     ariaLabel: "Create and use reusable components",
@@ -160,6 +185,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   // ── CONFIG: site configuration ─────────────────────────────────────────────
   {
     id: "design",
+    tool: "styles",
     iconName: "Palette",
     label: "Design",
     ariaLabel: "Global colors, fonts, spacing tokens",
@@ -172,6 +198,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "settings",
+    tool: "site",
     iconName: "Settings",
     label: "Settings",
     ariaLabel: "Site config, SEO, export, publish",
@@ -189,6 +216,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "publish",
+    tool: "site",
     iconName: "Rocket",
     label: "Publish",
     ariaLabel: "Publish and deploy your site",
@@ -205,6 +233,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
   },
   {
     id: "history",
+    tool: "site",
     iconName: "Timer",
     label: "History",
     ariaLabel: "Version history and edit activity",
@@ -239,4 +268,13 @@ export function getTabConfig(tabId: GroupedTabId): GroupedTabConfig | undefined 
 /** Get all tabs that belong to a specific rail zone */
 export function getTabsByZone(zone: TabZone): GroupedTabConfig[] {
   return GROUPED_TABS_CONFIG.filter((t) => t.zone === zone);
+}
+
+/** The 4 structural rail tools, in rail order (E3 target). assistant + structure
+ *  are deliberately excluded — they live in the topbar (✨) and footer (⌗). */
+export const RAIL_TOOLS: readonly RailTool[] = ["insert", "pages", "styles", "site"] as const;
+
+/** Get all panel tabs that fold into a given E3 tool/home. */
+export function getTabsByTool(tool: RailTool): GroupedTabConfig[] {
+  return GROUPED_TABS_CONFIG.filter((t) => t.tool === tool);
 }
