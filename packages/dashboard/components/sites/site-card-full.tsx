@@ -12,7 +12,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 interface SiteCardFullProps {
-  site: { id: string; name: string; slug: string; status: string; thumbnail: string | null; pages: number; lastEditedAt: Date; publishedUrl: string | null; visitors30d: number; createdBy: string; domain: string | null };
+  site: { id: string; name: string; slug: string; status: string; thumbnail: string | null; pages: number; lastEditedAt: Date; publishedUrl: string | null; visitors30d: number; createdBy: string; domain: string | null; themeLocked?: boolean };
   selected: boolean;
   onSelect: (id: string, event?: React.MouseEvent) => void;
   onAction: (action: string, siteId: string) => void;
@@ -49,7 +49,15 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
             <h3 className="truncate text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{site.name}</h3>
             <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: statusColor.bg, color: statusColor.text }}>{site.status.toLowerCase()}</span>
           </div>
-          <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p>
+          <div className="mt-1 flex items-center gap-2">
+            <p className="truncate text-xs" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p>
+            {site.themeLocked && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--color-bg-subtle)] px-1.5 py-0.5 text-[10px] font-medium" style={{ color: "var(--color-text-secondary)" }} title="This site overrides the shared theme">
+                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: "#EAB308" }} />
+                Local theme
+              </span>
+            )}
+          </div>
           <div className="mt-2 flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
             <span className="flex items-center gap-1"><FileText className="h-3 w-3" />{site.pages} pages</span>
             <span className="flex items-center gap-1"><Users className="h-3 w-3" />{formatVisitors(site.visitors30d)} visitors</span>

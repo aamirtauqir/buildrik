@@ -97,6 +97,7 @@ export async function listSites(
         template: true,
         folderId: true,
         clientId: true,
+        themeLocked: true,
         domains: { take: 1, select: { domain: true, isPrimary: true } },
         analytics: {
           where: { date: { gte: new Date(Date.now() - 30 * 86400000) } },
@@ -123,6 +124,7 @@ export async function listSites(
       template: site.template,
       folderId: site.folderId,
       clientId: site.clientId,
+      themeLocked: site.themeLocked,
       domain,
       visitors30d,
     };
