@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Globe, Briefcase, Users, CreditCard, Settings, ArrowUpRight } from "lucide-react";
+import { LayoutDashboard, Globe, Briefcase, ClipboardCheck, MessageSquare, Users, CreditCard, Settings, ArrowUpRight } from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 
@@ -20,11 +20,11 @@ export const SIDEBAR_NAV_ITEMS = [
   { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ] as const;
 
-const iconMap = { LayoutDashboard, Globe, Briefcase, Users, CreditCard, Settings } as const;
+const iconMap = { LayoutDashboard, Globe, Briefcase, ClipboardCheck, MessageSquare, Users, CreditCard, Settings } as const;
 
-// Nav items including the agency "Clients" entry, surfaced only when the
+// Agency nav (Clients · Reviews · Comments) is surfaced only when the
 // agency_layer flag is on (ships dark for solo workspaces — no empty agency
-// chrome). Inserted after "My Sites" so the hierarchy reads Sites › Clients.
+// chrome). Inserted after "My Sites" so the hierarchy reads Sites › agency tools.
 function useNavItems(): ReadonlyArray<{ label: string; href: string; icon: string }> {
   const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
   if (!features.data?.agency_layer) return SIDEBAR_NAV_ITEMS;
@@ -32,6 +32,8 @@ function useNavItems(): ReadonlyArray<{ label: string; href: string; icon: strin
     SIDEBAR_NAV_ITEMS[0],
     SIDEBAR_NAV_ITEMS[1],
     { label: "Clients", href: "/dashboard/clients", icon: "Briefcase" },
+    { label: "Reviews", href: "/dashboard/reviews", icon: "ClipboardCheck" },
+    { label: "Comments", href: "/dashboard/comments", icon: "MessageSquare" },
     ...SIDEBAR_NAV_ITEMS.slice(2),
   ];
 }
