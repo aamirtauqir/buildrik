@@ -10,6 +10,7 @@ import { WorkspaceHealth } from "@/components/dashboard/workspace-health";
 import { EmptyState, type EmptyStateVariant } from "@/components/dashboard/empty-state";
 import { DunningBanner } from "@/components/dashboard/dunning-banner";
 import { DashboardChecklist } from "@/components/onboarding/dashboard-checklist";
+import { NeedsAttention } from "@/components/dashboard/needs-attention";
 import { ErrorState } from "@/components/states";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -173,6 +174,8 @@ export default function DashboardPage() {
           <Plus className="h-4 w-4" />New Site
         </Link>
       </div>
+
+      <NeedsAttention />
 
       {emptyVariant ? (
         <div className="mt-8">

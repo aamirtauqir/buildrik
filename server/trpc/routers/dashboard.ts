@@ -14,6 +14,7 @@ import {
   getActivityFeed,
   getWorkspaceHealth,
   getQuickActions,
+  getAttentionQueue,
 } from "@/server/services/dashboard.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
@@ -36,6 +37,11 @@ export const dashboardRouter = router({
   recentSites: protectedProcedure.query(async ({ ctx }) => {
     const member = await getWorkspaceMember(ctx);
     return getRecentSites(member.workspaceId);
+  }),
+
+  attentionQueue: protectedProcedure.query(async ({ ctx }) => {
+    const member = await getWorkspaceMember(ctx);
+    return getAttentionQueue(member.workspaceId);
   }),
 
   activity: protectedProcedure

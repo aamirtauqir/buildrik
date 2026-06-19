@@ -376,3 +376,35 @@ export async function getWorkspaceHealth(
     },
   };
 }
+
+// m3 dashboard "Needs attention" agency work queue. Aggregates the cross-site
+// signals that should pull an agency operator back in: edits awaiting review,
+// open client comments, domains still verifying, and recent failed publishes.
+// Returns only non-zero items so the UI can hide the whole block when clear.
+export interface AttentionItem {
+  type: "reviews" | "comments" | "domains" | "publish_failed";
+  label: string;
+  count: number;
+  href: string;
+}
+
+export async function getAttentionQueue(workspaceId: string): Promise<AttentionItem[]> {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const [pendingReviews, openComments, pendingDomains, failedPublishes] = await Promise.all([
+    prisma.reviewRequest.count({ where: { site: { workspaceId }, status: "PENDING" } }),
+    prisma.comment.count({ where: { site: { workspaceId }, status: "OPEN" } }),
+    prisma.domain.count({ where: { site: { workspaceId }, status: "PENDING" } }),
+    prisma.publishBuildJob.count({ where: { workspaceId, status: "FAILED", createdAt: { gte: sevenDaysAgo } } }),
+  ]);
+
+  const items: AttentionItem[] = [];
+  if (pendingReviews > 0)
+    items.push({ type: "reviews", label: pendingReviews === 1 ? "edit needs review" : "edits need review", count: pendingReviews, href: "/dashboard/reviews" });
+  if (openComments > 0)
+    items.push({ type: "comments", label: openComments === 1 ? "open comment" : "open comments", count: openComments, href: "/dashboard/comments" });
+  if (pendingDomains > 0)
+    items.push({ type: "domains", label: pendingDomains === 1 ? "domain verifying" : "domains verifying", count: pendingDomains, href: "/dashboard/domains" });
+  if (failedPublishes > 0)
+    items.push({ type: "publish_failed", label: failedPublishes === 1 ? "publish failed" : "publishes failed", count: failedPublishes, href: "/dashboard/sites" });
+  return items;
+}
