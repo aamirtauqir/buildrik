@@ -292,15 +292,20 @@ export const Topbar: React.FC<TopbarProps> = ({
     .join(" · ");
 
   const savedVariant: "ok" | "saving" | "warn" | "error" =
-    saveStatus === "saving"
-      ? "saving"
-      : saveStatus === "error"
-        ? "error"
-        : isDirty || !lastSavedAt
-          ? "warn"
-          : "ok";
+    isOffline
+      ? "warn"
+      : saveStatus === "saving"
+        ? "saving"
+        : saveStatus === "error"
+          ? "error"
+          : isDirty || !lastSavedAt
+            ? "warn"
+            : "ok";
 
   const renderSavedLabel = (): React.ReactNode => {
+    // 60-save-states: offline takes precedence — reassure that edits are kept
+    // locally and will sync, so a dropped connection never reads as data loss.
+    if (isOffline) return "Offline — changes queued, will sync";
     if (saveStatus === "saving") return "Saving…";
     if (saveStatus === "error") return "Save failed";
     if (isDirty) return "Unsaved";

@@ -240,6 +240,17 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setIsDirty: state.setIsDirty,
   });
 
+  // 60-save-states: track connectivity so the topbar can reassure "changes
+  // queued, will sync" instead of looking like a failed/lost save.
+  const [isOffline, setIsOffline] = React.useState(() => typeof navigator !== "undefined" && !navigator.onLine);
+  React.useEffect(() => {
+    const on = () => setIsOffline(false);
+    const off = () => setIsOffline(true);
+    window.addEventListener("online", on);
+    window.addEventListener("offline", off);
+    return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); };
+  }, []);
+
   // 61-conflict: a behind-copy save was rejected by the server. Listen on the
   // window event; idempotent (keep the first) so repeated autosave conflicts
   // don't stack dialogs while one is open.
@@ -307,6 +318,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           canRedo={state.canRedo}
           saveStatus={state.saveState.status}
           isDirty={state.isDirty}
+          isOffline={isOffline}
           lastSaved={state.saveState.lastSavedAt ? new Date(state.saveState.lastSavedAt) : null}
           lastSavedAt={state.saveState.lastSavedAt}
           previewLoading={modals.previewLoading}

@@ -41,6 +41,8 @@ export interface StudioHeaderProps {
   saveStatus: "idle" | "saving" | "error";
   /** Has unsaved changes */
   isDirty: boolean;
+  /** Network offline — edits are queued locally (60-save-states). */
+  isOffline?: boolean;
   /** Last saved timestamp */
   lastSaved: Date | null;
   /** Last saved as timestamp number */
@@ -120,6 +122,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   canRedo,
   saveStatus,
   isDirty,
+  isOffline,
   lastSaved,
   lastSavedAt,
   previewLoading,
@@ -254,6 +257,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       canUndo={canUndo}
       canRedo={canRedo}
       saveStatus={saveStatus}
+      isOffline={isOffline}
       isDirty={isDirty}
       lastSavedAt={computedLastSavedAt}
       previewLoading={previewLoading}
