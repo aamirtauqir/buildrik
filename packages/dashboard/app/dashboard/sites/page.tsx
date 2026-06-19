@@ -12,6 +12,7 @@ import { CreateSiteModal } from "@/components/sites/create-site-modal";
 import { RenameModal } from "@/components/sites/rename-modal";
 import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
 import { TransferModal } from "@/components/sites/transfer-modal";
+import { ErrorState } from "@/components/states";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -397,8 +398,20 @@ export default function SitesPage() {
         </div>
       )}
 
+      {/* Error — was falling through to the "No sites yet" empty state, which
+          mislead users into "create your first site" when the query had failed. */}
+      {!sitesQuery.isLoading && sitesQuery.isError && (
+        <div className="mt-6">
+          <ErrorState
+            title="Couldn't load your sites"
+            description="Something went wrong on our end. Your sites are safe."
+            onRetry={() => sitesQuery.refetch()}
+          />
+        </div>
+      )}
+
       {/* Content */}
-      {!sitesQuery.isLoading && sites.length === 0 && (search || status || createdBy || dateRange || templateUsed || hasCustomDomain !== undefined || hasTraffic) && (
+      {!sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && (search || status || createdBy || dateRange || templateUsed || hasCustomDomain !== undefined || hasTraffic) && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <Search className="h-10 w-10 mb-4" style={{ color: "var(--color-text-muted)" }} />
           <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>No sites found</h3>
@@ -408,7 +421,7 @@ export default function SitesPage() {
         </div>
       )}
 
-      {!sitesQuery.isLoading && sites.length === 0 && !search && !status && !createdBy && !dateRange && !templateUsed && hasCustomDomain === undefined && !hasTraffic && (
+      {!sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && !search && !status && !createdBy && !dateRange && !templateUsed && hasCustomDomain === undefined && !hasTraffic && (
         <div
           className="mt-8 flex flex-col items-center rounded-xl border-2 border-dashed py-16 text-center"
           style={{ borderColor: "var(--color-border-default)" }}

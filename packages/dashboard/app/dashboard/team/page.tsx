@@ -9,6 +9,7 @@ import { MembersTable } from "@/components/team/members-table";
 import { InviteModal } from "@/components/team/invite-modal";
 import { PendingInvites } from "@/components/team/pending-invites";
 import { TeamEmptyState } from "@/components/team/team-empty-state";
+import { ErrorState } from "@/components/states";
 import { UserPlus } from "lucide-react";
 
 export default function TeamPage() {
@@ -92,6 +93,7 @@ export default function TeamPage() {
   );
 
   const isLoading = statsQuery.isLoading || membersQuery.isLoading;
+  const isError = statsQuery.isError || membersQuery.isError;
   const isEmpty = (statsQuery.data?.total ?? 0) <= 1;
   const currentUserId = session?.user?.id ?? "";
 
@@ -103,6 +105,26 @@ export default function TeamPage() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Without this, a failed stats/list query left data undefined → isEmpty true →
+  // the "invite your first member" empty state showed on a real error.
+  if (isError) {
+    return (
+      <div>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Team</h1>
+        <div className="mt-6">
+          <ErrorState
+            title="Couldn't load your team"
+            description="Something went wrong on our end."
+            onRetry={() => {
+              statsQuery.refetch();
+              membersQuery.refetch();
+            }}
+          />
         </div>
       </div>
     );
