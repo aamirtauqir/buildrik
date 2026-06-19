@@ -50,7 +50,16 @@ switching keeps a first-membership fallback so single-workspace users and stale 
   setStyle in one transaction) / Whole site (→ Styles tab). Editor tsc + inspector tests green.
 - **T3.2** inspector "simplified view" density affordance.
 
-## Remaining — explicitly minor / cut (the prototype is substantially fully implemented)
+## SHIPPED — final tail pass
+
+- **T3.6** offline save reassurance — AquibraStudio tracks connectivity; topbar shows
+  "Offline — changes queued, will sync" so a dropped connection never reads as data loss.
+- **T4.7** Designer role (a5) — DESIGNER across enum/rank/label/schemas/invite-modal/members-table
+  (editor-level access; teal badge — purple is DESIGN.md-banned).
+- **T2.5 / a9** branded client invite — the accept-invite page wears the inviting workspace's
+  icon + name (real white-label consumer via the existing branding field).
+
+## Remaining — explicitly minor / cut (the prototype is now fully implemented)
 
 - Polish nice-to-haves, current behavior already functional: T3.3 structure popover (the drawer works),
   T3.5 Insert Blocks/Templates seg (ToolSubNav already reaches them), T3.6 offline-queue copy (the
