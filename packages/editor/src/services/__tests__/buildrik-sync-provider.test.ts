@@ -129,6 +129,9 @@ describe("saveProject", () => {
     expect(mocks.saveProjectMutate).toHaveBeenCalledWith({
       siteId: "site-1",
       projectData,
+      // 61-conflict: the optimistic-concurrency token rides along (null until a
+      // project has been loaded/saved in this session).
+      expectedLastEditedAt: null,
     });
   });
 });
