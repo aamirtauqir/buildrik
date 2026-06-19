@@ -857,6 +857,11 @@ model UserPreference {
   analyticsRange String  @default("7d")
   theme          String  @default("light")
   locale         String?
+  // Editor control density (redesign E3): "full" = every inspector control,
+  // "fewer" = the trimmed client/content set. Per-user, not an editor toggle;
+  // ?view=client seeds "fewer". Inspector rows stay >=32px regardless (density
+  // learning) — this gates control COUNT, not row height.
+  editorDensity  String  @default("full")
 
   @@map("user_preferences")
 }

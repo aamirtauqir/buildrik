@@ -83,6 +83,7 @@ export const updatePreferencesSchema = z.object({
   analyticsRange: z.enum(["7d", "30d", "90d"]).optional(),
   theme: z.enum(["light"]).optional(),
   locale: z.string().optional(),
+  editorDensity: z.enum(["full", "fewer"]).optional(),
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
