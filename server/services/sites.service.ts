@@ -47,7 +47,7 @@ export async function listSites(
   workspaceId: string,
   filters: ListSitesInput
 ) {
-  const { page, perPage, status, sort, search, folderId, createdBy, dateRange, templateUsed, hasCustomDomain, hasTraffic } = filters;
+  const { page, perPage, status, sort, search, folderId, clientId, createdBy, dateRange, templateUsed, hasCustomDomain, hasTraffic } = filters;
   const skip = (page - 1) * perPage;
 
   const where: Record<string, unknown> = {
@@ -58,6 +58,7 @@ export async function listSites(
   if (status) where.status = status;
   if (search) where.name = { contains: search, mode: "insensitive" };
   if (folderId !== undefined) where.folderId = folderId;
+  if (clientId !== undefined) where.clientId = clientId;
   if (createdBy) where.createdBy = createdBy;
   if (dateRange) {
     const days = dateRange === "7d" ? 7 : dateRange === "30d" ? 30 : 90;
@@ -95,6 +96,7 @@ export async function listSites(
         createdBy: true,
         template: true,
         folderId: true,
+        clientId: true,
         domains: { take: 1, select: { domain: true, isPrimary: true } },
         analytics: {
           where: { date: { gte: new Date(Date.now() - 30 * 86400000) } },
@@ -120,6 +122,7 @@ export async function listSites(
       createdBy: site.createdBy,
       template: site.template,
       folderId: site.folderId,
+      clientId: site.clientId,
       domain,
       visitors30d,
     };

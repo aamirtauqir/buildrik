@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Briefcase, Plus, Pencil, Trash2, X } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
@@ -236,10 +237,12 @@ export function ClientsView() {
                   </button>
                 </div>
               </div>
-              <h3 className="mt-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{c.name}</h3>
-              <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                {c.siteCount} {c.siteCount === 1 ? "site" : "sites"}
-              </p>
+              <Link href={`/dashboard/clients/${c.id}`} className="mt-3 block">
+                <h3 className="text-sm font-semibold hover:underline" style={{ color: "var(--color-text-primary)" }}>{c.name}</h3>
+                <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                  {c.siteCount} {c.siteCount === 1 ? "site" : "sites"}
+                </p>
+              </Link>
             </div>
           ))}
         </div>

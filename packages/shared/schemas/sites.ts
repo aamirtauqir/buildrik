@@ -25,6 +25,8 @@ export const listSitesSchema = z.object({
     .default("lastEdited"),
   search: z.string().optional(),
   folderId: z.string().nullable().optional(),
+  // Agency layer (E2): filter to one client's sites; null = unassigned (solo) sites.
+  clientId: z.string().nullable().optional(),
   createdBy: z.string().optional(),
   dateRange: z.enum(["7d", "30d", "90d"]).optional(),
   templateUsed: z.string().optional(),

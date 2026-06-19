@@ -11,6 +11,8 @@ const clientFindFirst = vi.fn();
 const clientCreate = vi.fn();
 const clientUpdate = vi.fn();
 const clientDelete = vi.fn();
+const siteFindFirst = vi.fn();
+const siteUpdate = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -21,20 +23,26 @@ vi.mock("@/lib/prisma", () => ({
       update: (...a: unknown[]) => clientUpdate(...a),
       delete: (...a: unknown[]) => clientDelete(...a),
     },
+    site: {
+      findFirst: (...a: unknown[]) => siteFindFirst(...a),
+      update: (...a: unknown[]) => siteUpdate(...a),
+    },
   },
 }));
 
 import {
   listClients,
+  getClient,
   createClient,
   updateClient,
   deleteClient,
+  assignSite,
   ClientError,
 } from "@server/services/clients.service";
 
 beforeEach(() => {
-  [clientFindMany, clientFindFirst, clientCreate, clientUpdate, clientDelete].forEach((m) =>
-    m.mockReset(),
+  [clientFindMany, clientFindFirst, clientCreate, clientUpdate, clientDelete, siteFindFirst, siteUpdate].forEach(
+    (m) => m.mockReset(),
   );
 });
 
@@ -82,5 +90,51 @@ describe("updateClient / deleteClient IDOR guard", () => {
     clientFindFirst.mockResolvedValueOnce(null);
     await expect(deleteClient("ws-1", "other-ws-client")).rejects.toBeInstanceOf(ClientError);
     expect(clientDelete).not.toHaveBeenCalled();
+  });
+});
+
+describe("getClient", () => {
+  it("returns the workspace-scoped client with siteCount", async () => {
+    clientFindFirst.mockResolvedValueOnce({
+      id: "c1", name: "Acme", logoUrl: null, brandColor: null, customDomain: null, hideBuildrik: false, _count: { sites: 5 },
+    });
+    await expect(getClient("ws-1", "c1")).resolves.toMatchObject({ id: "c1", siteCount: 5 });
+    expect(clientFindFirst.mock.calls[0][0].where).toEqual({ id: "c1", workspaceId: "ws-1" });
+  });
+
+  it("throws NOT_FOUND for a client outside the workspace", async () => {
+    clientFindFirst.mockResolvedValueOnce(null);
+    await expect(getClient("ws-1", "nope")).rejects.toBeInstanceOf(ClientError);
+  });
+});
+
+describe("assignSite", () => {
+  it("assigns a workspace site to a workspace client", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    clientFindFirst.mockResolvedValueOnce({ id: "c1" }); // assertInWorkspace
+    siteUpdate.mockResolvedValueOnce({});
+    await assignSite("ws-1", "s1", "c1");
+    expect(siteUpdate).toHaveBeenCalledWith({ where: { id: "s1" }, data: { clientId: "c1" } });
+  });
+
+  it("unassigns (clientId null) without checking a client", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    siteUpdate.mockResolvedValueOnce({});
+    await assignSite("ws-1", "s1", null);
+    expect(clientFindFirst).not.toHaveBeenCalled();
+    expect(siteUpdate).toHaveBeenCalledWith({ where: { id: "s1" }, data: { clientId: null } });
+  });
+
+  it("refuses a site from another workspace (NOT_FOUND, no update)", async () => {
+    siteFindFirst.mockResolvedValueOnce(null);
+    await expect(assignSite("ws-1", "other-site", "c1")).rejects.toBeInstanceOf(ClientError);
+    expect(siteUpdate).not.toHaveBeenCalled();
+  });
+
+  it("refuses assigning to a client from another workspace (NOT_FOUND, no update)", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    clientFindFirst.mockResolvedValueOnce(null); // assertInWorkspace fails
+    await expect(assignSite("ws-1", "s1", "other-client")).rejects.toBeInstanceOf(ClientError);
+    expect(siteUpdate).not.toHaveBeenCalled();
   });
 });

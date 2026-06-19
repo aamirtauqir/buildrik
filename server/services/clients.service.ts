@@ -98,3 +98,44 @@ export async function deleteClient(
   await assertInWorkspace(workspaceId, id);
   await prisma.client.delete({ where: { id } });
 }
+
+/** One client with its live site count, workspace-scoped (drives the drill-in page). */
+export async function getClient(
+  workspaceId: string,
+  id: string,
+): Promise<ClientWithCount> {
+  const c = await prisma.client.findFirst({
+    where: { id, workspaceId },
+    select: {
+      id: true,
+      name: true,
+      logoUrl: true,
+      brandColor: true,
+      customDomain: true,
+      hideBuildrik: true,
+      _count: { select: { sites: true } },
+    },
+  });
+  if (!c) throw new ClientError("NOT_FOUND", "Client not found");
+  const { _count, ...rest } = c;
+  return { ...rest, siteCount: _count.sites };
+}
+
+/**
+ * Assign a site to a client (or null to unassign). Both the site and the target
+ * client must live in the caller's workspace — a site can never be pulled into
+ * another workspace's client, nor an out-of-workspace site assigned here.
+ */
+export async function assignSite(
+  workspaceId: string,
+  siteId: string,
+  clientId: string | null,
+): Promise<void> {
+  const site = await prisma.site.findFirst({
+    where: { id: siteId, workspaceId },
+    select: { id: true },
+  });
+  if (!site) throw new ClientError("NOT_FOUND", "Site not found");
+  if (clientId) await assertInWorkspace(workspaceId, clientId);
+  await prisma.site.update({ where: { id: siteId }, data: { clientId } });
+}

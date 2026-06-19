@@ -9,9 +9,11 @@ import {
 } from "@/server/services/permission.service";
 import {
   listClients,
+  getClient,
   createClient,
   updateClient,
   deleteClient,
+  assignSite,
   ClientError,
 } from "@/server/services/clients.service";
 import {
@@ -58,6 +60,19 @@ export const clientsRouter = router({
     return listClients(workspaceId);
   }),
 
+  // Single client for the drill-in page. Flag-gated; any member may read.
+  get: protectedProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
+      try {
+        return await getClient(workspaceId, input.id);
+      } catch (e) {
+        translateClientError(e);
+      }
+    }),
+
   create: protectedProcedure
     .input(createClientInput)
     .mutation(async ({ ctx, input }) => {
@@ -65,6 +80,21 @@ export const clientsRouter = router({
       await requireAgencyLayer(workspaceId);
       await requireAdmin(ctx, workspaceId);
       return createClient(workspaceId, input);
+    }),
+
+  // Assign a site to this client, or null to unassign. Admin-gated.
+  assignSite: protectedProcedure
+    .input(z.object({ siteId: z.string().min(1), clientId: z.string().min(1).nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
+      await requireAdmin(ctx, workspaceId);
+      try {
+        await assignSite(workspaceId, input.siteId, input.clientId);
+        return { ok: true as const };
+      } catch (e) {
+        translateClientError(e);
+      }
     }),
 
   update: protectedProcedure
