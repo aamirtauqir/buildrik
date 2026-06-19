@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Palette, UploadCloud, Lock, Unlock } from "lucide-react";
+import { Palette, UploadCloud, Lock, Unlock, Check, X, AlertTriangle } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { LoadingSkeleton, ErrorState, DeniedState, StateEmpty } from "@/components/states";
+
+type PushResultRow = { siteId: string; name: string; status: "pushed" | "skipped-locked" | "failed"; error?: string };
 
 function timeAgo(d: Date | string): string {
   const diff = Date.now() - new Date(d).getTime();
@@ -19,6 +21,8 @@ function timeAgo(d: Date | string): string {
 export function ThemeManager() {
   const { addToast } = useToast();
   const [source, setSource] = useState("");
+  const [confirming, setConfirming] = useState(false);
+  const [pushResults, setPushResults] = useState<PushResultRow[] | null>(null);
 
   // Both reads are agency-gated server-side; FORBIDDEN = flag off for this workspace.
   const sharedQuery = trpc.theme.getShared.useQuery(undefined, { retry: false });
@@ -44,16 +48,14 @@ export function ThemeManager() {
 
   const pushMut = trpc.theme.push.useMutation({
     onSuccess: (res) => {
+      setConfirming(false);
+      setPushResults((res ?? []) as PushResultRow[]);
       const pushed = res?.filter((r) => r.status === "pushed").length ?? 0;
-      const skipped = res?.filter((r) => r.status === "skipped-locked").length ?? 0;
       const failed = res?.filter((r) => r.status === "failed").length ?? 0;
-      const parts = [`${pushed} pushed`];
-      if (skipped) parts.push(`${skipped} locked`);
-      if (failed) parts.push(`${failed} failed`);
-      addToast(failed ? "error" : "success", `Theme push: ${parts.join(", ")}`);
+      addToast(failed ? "error" : "success", `Theme push: ${pushed} updated${failed ? `, ${failed} failed` : ""}`);
       targetsQuery.refetch();
     },
-    onError: (e) => addToast("error", "Couldn't push theme", e.message),
+    onError: (e) => { setConfirming(false); addToast("error", "Couldn't push theme", e.message); },
   });
 
   const forbidden =
@@ -61,6 +63,8 @@ export function ThemeManager() {
   const theme = sharedQuery.data;
   const targets = targetsQuery.data ?? [];
   const busy = captureMut.isPending || pushMut.isPending;
+  const followingCount = targets.filter((s) => !s.themeLocked).length;
+  const lockedCount = targets.length - followingCount;
 
   return (
     <div>
@@ -97,15 +101,74 @@ export function ThemeManager() {
                 </span>
               </div>
               <button
-                onClick={() => pushMut.mutate({})}
-                disabled={!theme || busy || targets.length === 0}
+                onClick={() => { setPushResults(null); setConfirming(true); }}
+                disabled={!theme || busy || followingCount === 0}
                 className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 <UploadCloud className="h-3.5 w-3.5" />
-                Push to all sites
+                Push to sites
               </button>
             </div>
+
+            {/* Pre-push impact preview — no silent clobber. */}
+            {confirming && (
+              <div className="mt-4 rounded-lg border p-3" style={{ borderColor: "var(--color-primary)", backgroundColor: "var(--color-bg-subtle)" }}>
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--color-primary)" }} />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                      Re-style {followingCount} following site{followingCount === 1 ? "" : "s"}?
+                    </p>
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      Every following site adopts this theme&apos;s tokens.
+                      {lockedCount > 0 && ` ${lockedCount} locked site${lockedCount === 1 ? "" : "s"} keep their own and won't change.`}
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <button
+                        onClick={() => pushMut.mutate({})}
+                        disabled={pushMut.isPending}
+                        className="rounded-md px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                        style={{ backgroundColor: "var(--color-primary)" }}
+                      >
+                        {pushMut.isPending ? "Pushing…" : `Push to ${followingCount} site${followingCount === 1 ? "" : "s"}`}
+                      </button>
+                      <button
+                        onClick={() => setConfirming(false)}
+                        className="rounded-md border px-3 py-1.5 text-xs font-medium"
+                        style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Per-site push result table. */}
+            {pushResults && pushResults.length > 0 && (
+              <div className="mt-4 overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
+                <div className="flex items-center justify-between border-b px-3 py-2" style={{ borderColor: "var(--color-border-default)" }}>
+                  <span className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>Push result</span>
+                  <button onClick={() => setPushResults(null)} className="text-neutral-400 hover:text-neutral-600"><X className="h-3.5 w-3.5" /></button>
+                </div>
+                <ul>
+                  {pushResults.map((r) => (
+                    <li key={r.siteId} className="flex items-center justify-between border-b px-3 py-1.5 text-xs last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
+                      <span style={{ color: "var(--color-text-primary)" }}>{r.name}</span>
+                      {r.status === "pushed" ? (
+                        <span className="inline-flex items-center gap-1 text-[var(--color-success)]"><Check className="h-3 w-3" /> Updated</span>
+                      ) : r.status === "skipped-locked" ? (
+                        <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Locked — kept own</span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-red-600" title={r.error}><AlertTriangle className="h-3 w-3" /> Failed</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="mt-4 flex items-center gap-2">
               <select
