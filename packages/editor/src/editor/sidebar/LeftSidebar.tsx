@@ -11,8 +11,8 @@ import * as React from "react";
 import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
-import type { GroupedTabId, TabZone } from "../rail/tabsConfig";
-import { getTabWidth, getTabConfig, getTabsByZone } from "../rail/tabsConfig";
+import type { GroupedTabId, TabZone, RailTool } from "../rail/tabsConfig";
+import { getTabWidth, getTabConfig, getTabsByZone, getRailTools } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
@@ -164,6 +164,66 @@ function RailZone({
 }
 
 // ============================================
+// E3 — 4-tool rail (flag-gated: ?rail=4)
+// ============================================
+// Each tool button opens its PRIMARY folded panel; the remaining folded tabs
+// (templates/components/media under Insert; publish/history under Site) reach
+// their panels via the composite sub-nav — built next. Default rail (11 buttons)
+// is unchanged, so this is additive + reversible.
+const TOOL_PRIMARY_TAB: Record<RailTool, GroupedTabId> = {
+  insert: "add",
+  pages: "pages",
+  styles: "design",
+  site: "settings",
+  assistant: "ai",
+  structure: "layers",
+};
+
+function FourToolRail({
+  activeTab,
+  drawerOpen,
+  onBtnClick,
+}: {
+  activeTab: GroupedTabId;
+  drawerOpen: boolean;
+  onBtnClick: (tabId: GroupedTabId) => void;
+}) {
+  const activeTool = getTabConfig(activeTab)?.tool;
+  return (
+    <div className="ls-zone">
+      {getRailTools().map(({ tool, meta }) => {
+        const Icon = ICON_MAP[meta.iconName];
+        if (!Icon) return null;
+        const isSelected = tool === activeTool;
+        const isVisibleActive = isSelected && drawerOpen;
+        return (
+          <Tooltip key={tool}>
+            <TooltipTrigger asChild>
+              <Button
+                className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
+                onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
+                role="tab"
+                aria-selected={isVisibleActive}
+                aria-label={meta.ariaLabel}
+                data-tool={tool}
+              >
+                {isVisibleActive && <div className="ls-btn-bar" />}
+                <Icon size={20} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent side="right" sideOffset={8}>
+                {meta.label}
+              </TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
+        );
+      })}
+    </div>
+  );
+}
+
+// ============================================
 // LeftSidebar Component
 // ============================================
 
@@ -284,6 +344,14 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   // Global keyboard shortcuts (A, T, Z, etc.)
   useSidebarKeyboard(safeTabChange);
 
+  // E3 4-tool rail opt-in (?rail=4) — read once; default is the 11-button rail.
+  const useFourToolRail = React.useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("rail") === "4",
+    [],
+  );
+
   // Component creation handler
   const handleCreateComponent = React.useCallback(() => {
     if (!composer) return;
@@ -373,18 +441,26 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
         <div className="ls-divider" />
 
-        {ZONES.map((zone, i) => (
-          <React.Fragment key={zone}>
-            <RailZone
-              zone={zone}
-              activeTab={activeTab}
-              drawerOpen={drawerOpen}
-              onBtnClick={handleBtnClick}
-              dirtyTabIds={settingsDirty ? SETTINGS_DIRTY_SET : EMPTY_SET}
-            />
-            {i < ZONES.length - 1 && <div className="ls-divider" />}
-          </React.Fragment>
-        ))}
+        {useFourToolRail ? (
+          <FourToolRail
+            activeTab={activeTab}
+            drawerOpen={drawerOpen}
+            onBtnClick={handleBtnClick}
+          />
+        ) : (
+          ZONES.map((zone, i) => (
+            <React.Fragment key={zone}>
+              <RailZone
+                zone={zone}
+                activeTab={activeTab}
+                drawerOpen={drawerOpen}
+                onBtnClick={handleBtnClick}
+                dirtyTabIds={settingsDirty ? SETTINGS_DIRTY_SET : EMPTY_SET}
+              />
+              {i < ZONES.length - 1 && <div className="ls-divider" />}
+            </React.Fragment>
+          ))
+        )}
 
         <div className="ls-spacer" />
       </nav>
