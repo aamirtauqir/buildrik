@@ -45,6 +45,36 @@ export async function listComments(siteId: string, status?: "OPEN" | "RESOLVED")
   });
 }
 
+export interface WorkspaceCommentRow {
+  id: string;
+  siteId: string;
+  siteName: string;
+  body: string;
+  status: string;
+  createdAt: Date;
+}
+
+/** All comments across a workspace's sites (newest first) — the agency triage
+ *  view. Scoped via site.workspaceId so it never leaks another workspace's. */
+export async function listWorkspaceComments(
+  workspaceId: string,
+  status?: "OPEN" | "RESOLVED",
+): Promise<WorkspaceCommentRow[]> {
+  const rows = await prisma.comment.findMany({
+    where: { site: { workspaceId }, ...(status ? { status } : {}) },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      siteId: true,
+      body: true,
+      status: true,
+      createdAt: true,
+      site: { select: { name: true } },
+    },
+  });
+  return rows.map(({ site, ...c }) => ({ ...c, siteName: site.name }));
+}
+
 export async function resolveComment(
   siteId: string,
   id: string,

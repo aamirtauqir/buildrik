@@ -1,13 +1,17 @@
+import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../trpc";
+import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import {
   assertSiteAccess,
   checkSiteRole,
+  checkWorkspaceRole,
   PermissionError,
 } from "@/server/services/permission.service";
 import {
   createComment,
   listComments,
+  listWorkspaceComments,
   resolveComment,
   CommentError,
 } from "@/server/services/comment.service";
@@ -44,6 +48,19 @@ export const commentsRouter = router({
         translatePermission(e);
       }
       return listComments(input.siteId, input.status);
+    }),
+
+  // Agency triage view — every comment across the workspace's sites. Admin-gated.
+  workspaceList: protectedProcedure
+    .input(z.object({ status: z.enum(["OPEN", "RESOLVED"]).optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      try {
+        await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
+      } catch (e) {
+        translatePermission(e);
+      }
+      return listWorkspaceComments(workspaceId, input?.status);
     }),
 
   // Resolving/reopening is an editorial action — the agency, not the commenter.

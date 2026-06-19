@@ -7,8 +7,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const assertAccessMock = vi.fn();
 const checkSiteRoleMock = vi.fn();
+const checkWorkspaceRoleMock = vi.fn();
 const createMock = vi.fn();
 const listMock = vi.fn();
+const wsListMock = vi.fn();
 const resolveMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
@@ -19,9 +21,13 @@ vi.mock("@/server/services/api-token.service", () => ({
 vi.mock("next/headers", () => ({
   cookies: () => Promise.resolve({ get: () => undefined, delete: vi.fn() }),
 }));
+vi.mock("@/server/trpc/workspace-ctx", () => ({
+  resolveWorkspaceId: vi.fn().mockResolvedValue("ws_1"),
+}));
 vi.mock("@/server/services/permission.service", () => ({
   assertSiteAccess: (...a: unknown[]) => assertAccessMock(...a),
   checkSiteRole: (...a: unknown[]) => checkSiteRoleMock(...a),
+  checkWorkspaceRole: (...a: unknown[]) => checkWorkspaceRoleMock(...a),
   PermissionError: class PermissionError extends Error {
     code: string;
     constructor(code: string, msg?: string) {
@@ -33,6 +39,7 @@ vi.mock("@/server/services/permission.service", () => ({
 vi.mock("@/server/services/comment.service", () => ({
   createComment: (...a: unknown[]) => createMock(...a),
   listComments: (...a: unknown[]) => listMock(...a),
+  listWorkspaceComments: (...a: unknown[]) => wsListMock(...a),
   resolveComment: (...a: unknown[]) => resolveMock(...a),
   CommentError: class CommentError extends Error {
     code: string;
@@ -52,7 +59,9 @@ function makeCtx() {
 }
 
 beforeEach(() => {
-  [assertAccessMock, checkSiteRoleMock, createMock, listMock, resolveMock].forEach((m) => m.mockReset());
+  [assertAccessMock, checkSiteRoleMock, checkWorkspaceRoleMock, createMock, listMock, wsListMock, resolveMock].forEach(
+    (m) => m.mockReset(),
+  );
 });
 
 describe("comments router", () => {
@@ -84,5 +93,20 @@ describe("comments router", () => {
     const caller = commentsRouter.createCaller(makeCtx() as never);
     await expect(caller.resolve({ id: "c1", siteId: "s1", status: "RESOLVED" })).resolves.toMatchObject({ status: "RESOLVED" });
     expect(resolveMock).toHaveBeenCalledWith("s1", "c1", "RESOLVED", "u_1");
+  });
+
+  it("workspaceList is Admin-gated and never queries if denied", async () => {
+    checkWorkspaceRoleMock.mockRejectedValueOnce(new PermissionError("FORBIDDEN", "needs ADMIN"));
+    const caller = commentsRouter.createCaller(makeCtx() as never);
+    await expect(caller.workspaceList()).rejects.toThrow(/ADMIN/i);
+    expect(wsListMock).not.toHaveBeenCalled();
+  });
+
+  it("workspaceList returns the triage list for an admin", async () => {
+    checkWorkspaceRoleMock.mockResolvedValueOnce(undefined);
+    wsListMock.mockResolvedValueOnce([{ id: "c1", siteName: "Acme", body: "fix", status: "OPEN" }]);
+    const caller = commentsRouter.createCaller(makeCtx() as never);
+    await expect(caller.workspaceList({ status: "OPEN" })).resolves.toMatchObject([{ id: "c1", siteName: "Acme" }]);
+    expect(wsListMock).toHaveBeenCalledWith("ws_1", "OPEN");
   });
 });
