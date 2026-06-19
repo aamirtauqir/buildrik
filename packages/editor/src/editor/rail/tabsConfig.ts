@@ -278,3 +278,34 @@ export const RAIL_TOOLS: readonly RailTool[] = ["insert", "pages", "styles", "si
 export function getTabsByTool(tool: RailTool): GroupedTabConfig[] {
   return GROUPED_TABS_CONFIG.filter((t) => t.tool === tool);
 }
+
+export type RailToolPlacement = "rail" | "topbar" | "footer";
+
+export interface RailToolMeta {
+  label: string;
+  iconName: string;
+  ariaLabel: string;
+  /** Where the entry-point lives: the 4 tools in the left rail, AI in the
+   *  topbar (✨), structure in the footer (⌗). */
+  placement: RailToolPlacement;
+}
+
+/**
+ * Render SSOT for the E3 rail. The rail rebuild reads this — it does NOT
+ * re-derive labels/icons. Keeps the 4-tool rail, the topbar assistant, and the
+ * footer structure popover describing themselves from one place. Pure data; no
+ * behaviour wired yet (the live rail still renders from GROUPED_TABS_CONFIG).
+ */
+export const RAIL_TOOL_META: Record<RailTool, RailToolMeta> = {
+  insert: { label: "Insert", iconName: "Plus", ariaLabel: "Insert elements, sections, templates, components, and media", placement: "rail" },
+  pages: { label: "Pages", iconName: "File", ariaLabel: "Manage the pages in your site", placement: "rail" },
+  styles: { label: "Styles", iconName: "Palette", ariaLabel: "Global colors, fonts, and spacing", placement: "rail" },
+  site: { label: "Site", iconName: "Settings", ariaLabel: "Site settings, publish, and version history", placement: "rail" },
+  assistant: { label: "Ask AI", iconName: "Sparkles", ariaLabel: "AI assistant", placement: "topbar" },
+  structure: { label: "Structure", iconName: "Layers", ariaLabel: "Page structure outline", placement: "footer" },
+};
+
+/** The 4 rail tools, in order, each paired with its render metadata. */
+export function getRailTools(): Array<{ tool: RailTool; meta: RailToolMeta }> {
+  return RAIL_TOOLS.map((tool) => ({ tool, meta: RAIL_TOOL_META[tool] }));
+}

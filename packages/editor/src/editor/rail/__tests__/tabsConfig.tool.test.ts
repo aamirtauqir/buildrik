@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   GROUPED_TABS_CONFIG,
   RAIL_TOOLS,
+  RAIL_TOOL_META,
   getTabsByTool,
+  getRailTools,
   type RailTool,
 } from "../tabsConfig";
 
@@ -58,5 +60,29 @@ describe("tabsConfig — E3 tool mapping", () => {
       "components",
       "templates",
     ]);
+  });
+});
+
+describe("tabsConfig — E3 rail render meta", () => {
+  it("every tool has render meta with a label + icon", () => {
+    for (const tab of GROUPED_TABS_CONFIG) {
+      const meta = RAIL_TOOL_META[tab.tool];
+      expect(meta, `no meta for tool "${tab.tool}"`).toBeTruthy();
+      expect(meta.label).toBeTruthy();
+      expect(meta.iconName).toBeTruthy();
+    }
+  });
+
+  it("the 4 rail tools render in the rail; AI in topbar, structure in footer", () => {
+    expect(getRailTools().map((r) => r.tool)).toEqual(["insert", "pages", "styles", "site"]);
+    for (const { meta } of getRailTools()) {
+      expect(meta.placement).toBe("rail");
+    }
+    expect(RAIL_TOOL_META.assistant.placement).toBe("topbar");
+    expect(RAIL_TOOL_META.structure.placement).toBe("footer");
+  });
+
+  it("exposes the canonical 4 rail labels", () => {
+    expect(getRailTools().map((r) => r.meta.label)).toEqual(["Insert", "Pages", "Styles", "Site"]);
   });
 });
