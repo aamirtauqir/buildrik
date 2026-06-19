@@ -286,6 +286,24 @@ function injectSeoTags(
   return block + html;
 }
 
+/**
+ * Free-plan badge (90-published): a small fixed "Made with Buildrik" pill linking
+ * back to the marketing site. Injected only on FREE; paid plans ship clean.
+ * Self-contained inline styles so it never depends on the page's CSS.
+ */
+function injectBadge(html: string, show: boolean): string {
+  if (!show) return html;
+  const badge =
+    `<a href="https://buildrik.com?ref=badge" target="_blank" rel="noopener" ` +
+    `style="position:fixed;bottom:12px;right:12px;z-index:2147483647;` +
+    `display:inline-flex;align-items:center;gap:6px;padding:6px 10px;` +
+    `background:#111;color:#fff;font:500 12px/1 -apple-system,system-ui,sans-serif;` +
+    `border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.2)">` +
+    `Made with Buildrik</a>`;
+  if (html.includes("</body>")) return html.replace("</body>", `${badge}</body>`);
+  return html + badge;
+}
+
 async function runVercelDeployJob(
   jobId: string,
   siteId: string,
@@ -302,11 +320,16 @@ async function runVercelDeployJob(
   // protection. null = no/legacy password → clears protection on deploy.
   const passwordPlain = decryptPublishedPassword(site.publishedPassword);
 
+  // Free-plan "Made with Buildrik" badge (90-published): injected on FREE,
+  // removed on paid plans. Read the workspace plan once for the whole deploy.
+  const ws = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } });
+  const showBadge = (ws?.plan ?? "FREE") === "FREE";
+
   const icons = { favicon: site.favicon, touchIcon: site.touchIcon, ogImage: site.ogImage };
   const seo = { canonicalUrl: site.canonicalUrl, allowIndexing: site.allowIndexing };
   const files: VercelFile[] = pages.map((p) => ({
     file: p.path,
-    data: injectSeoTags(injectHeadTags(injectAnalyticsBeacon(p.html, siteId), icons), seo),
+    data: injectBadge(injectSeoTags(injectHeadTags(injectAnalyticsBeacon(p.html, siteId), icons), seo), showBadge),
   }));
 
   // Technical SEO (d5): ship robots.txt — the site's custom rules if set, else a
