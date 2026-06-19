@@ -4,6 +4,8 @@ import type { UserRoleType } from "@/lib/constants/enums";
 const ROLE_RANK: Record<UserRoleType, number> = {
   VIEWER: 0,
   EDITOR: 1,
+  // a5-invite: Designer has the same site-edit access as a Content editor.
+  DESIGNER: 1,
   ADMIN: 2,
   OWNER: 3,
 };

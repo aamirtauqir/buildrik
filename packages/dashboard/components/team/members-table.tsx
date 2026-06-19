@@ -5,7 +5,7 @@ import { cn } from "@lib/utils";
 import { roleLabel } from "@lib/constants/enums";
 import { MemberActions, type MemberAction } from "./member-actions";
 
-type Role = "OWNER" | "ADMIN" | "EDITOR" | "VIEWER";
+type Role = "OWNER" | "ADMIN" | "EDITOR" | "DESIGNER" | "VIEWER";
 type Status = "ACTIVE" | "PENDING" | "SUSPENDED";
 
 export interface Member {
@@ -28,6 +28,7 @@ const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
   OWNER: { bg: "#FEF2F2", color: "var(--color-primary)" },
   ADMIN: { bg: "#EFF6FF", color: "#3B82F6" },
   EDITOR: { bg: "#F0FDF4", color: "var(--color-success)" },
+  DESIGNER: { bg: "#F0FDFA", color: "#0D9488" },
   VIEWER: { bg: "#F3F4F6", color: "var(--color-text-secondary)" },
 };
 
@@ -159,7 +160,7 @@ interface MembersTableProps {
   onChangeRole?: (memberId: string, role: string) => void;
 }
 
-const ASSIGNABLE_ROLES: Role[] = ["ADMIN", "EDITOR", "VIEWER"];
+const ASSIGNABLE_ROLES: Role[] = ["ADMIN", "EDITOR", "DESIGNER", "VIEWER"];
 
 export function MembersTable({ members, currentUserId, onAction, onChangeRole }: MembersTableProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set());

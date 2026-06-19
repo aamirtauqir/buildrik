@@ -2,14 +2,14 @@ import { z } from "zod";
 
 export const inviteMembersSchema = z.object({
   emails: z.array(z.string().email()).min(1).max(10),
-  role: z.enum(["ADMIN", "EDITOR", "VIEWER"]),
+  role: z.enum(["ADMIN", "EDITOR", "DESIGNER", "VIEWER"]),
   siteIds: z.array(z.string()).optional(),
   message: z.string().max(500).optional(),
 });
 
 export const changeRoleSchema = z.object({
   memberId: z.string(),
-  role: z.enum(["ADMIN", "EDITOR", "VIEWER"]),
+  role: z.enum(["ADMIN", "EDITOR", "DESIGNER", "VIEWER"]),
 });
 
 export const listMembersSchema = z.object({

@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 
 describe("Team Components", () => {
-  it("exports ROLE_OPTIONS with 3 roles", async () => {
+  it("exports ROLE_OPTIONS with 4 roles (incl. Designer)", async () => {
     const mod = await import("@/components/team/invite-modal");
-    expect(mod.ROLE_OPTIONS).toHaveLength(3);
+    expect(mod.ROLE_OPTIONS).toHaveLength(4);
     const values = mod.ROLE_OPTIONS.map((r: { value: string }) => r.value);
-    expect(values).toEqual(["ADMIN", "EDITOR", "VIEWER"]);
+    expect(values).toEqual(["ADMIN", "EDITOR", "DESIGNER", "VIEWER"]);
   });
 
   it("exports MEMBER_ACTIONS with correct items", async () => {

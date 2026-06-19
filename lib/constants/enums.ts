@@ -8,6 +8,10 @@ export const UserRole = {
   OWNER: "OWNER",
   ADMIN: "ADMIN",
   EDITOR: "EDITOR",
+  // a5-invite: Designer = site-edit access like a Content editor (same rank),
+  // distinguished as a design-focused role. A finer design-only-vs-content
+  // capability split would need a capability model beyond the linear rank.
+  DESIGNER: "DESIGNER",
   VIEWER: "VIEWER",
 } as const;
 
@@ -21,6 +25,7 @@ export const RoleLabel: Record<UserRoleType, string> = {
   OWNER: "Owner",
   ADMIN: "Admin",
   EDITOR: "Content editor",
+  DESIGNER: "Designer",
   VIEWER: "Viewer",
 };
 
