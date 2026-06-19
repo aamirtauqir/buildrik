@@ -34,21 +34,22 @@ interface ResultItem {
 }
 
 const SETTINGS_ITEMS: ResultItem[] = [
-  { id: "s-profile", label: "Profile", description: "Edit your profile", href: "/dashboard/settings/profile", scope: "settings" },
+  { id: "s-profile", label: "Profile", description: "Edit your profile", href: "/dashboard/settings", scope: "settings" },
   { id: "s-account", label: "Account", description: "Account preferences", href: "/dashboard/settings/account", scope: "settings" },
   { id: "s-security", label: "Security", description: "Password & 2FA", href: "/dashboard/settings/security", scope: "settings" },
   { id: "s-notifications", label: "Notifications", description: "Notification preferences", href: "/dashboard/settings/notifications", scope: "settings" },
   { id: "s-workspace", label: "Workspace", description: "Workspace settings", href: "/dashboard/settings/workspace", scope: "settings" },
   { id: "s-integrations", label: "Integrations", description: "Connected services", href: "/dashboard/settings/integrations", scope: "settings" },
   { id: "s-ai", label: "AI & Credits", description: "AI usage and credits", href: "/dashboard/settings/ai", scope: "settings" },
-  { id: "s-danger", label: "Danger Zone", description: "Delete workspace", href: "/dashboard/settings/danger-zone", scope: "settings" },
+  { id: "s-tokens", label: "API Tokens", description: "Tokens for scripting & CI", href: "/dashboard/settings/api-tokens", scope: "settings" },
+  { id: "s-danger", label: "Danger Zone", description: "Delete workspace", href: "/dashboard/settings/danger", scope: "settings" },
 ];
 
 const ACTION_ITEMS: ResultItem[] = [
   { id: "a-create-site", label: "Create Site", description: "Start a new site", href: "/dashboard/sites/new", scope: "actions" },
   { id: "a-invite", label: "Invite Member", description: "Add a team member", href: "/dashboard/team?invite=true", scope: "actions" },
   { id: "a-ai", label: "Generate with AI", description: "AI-powered generation", href: "/dashboard/sites/new?ai=true", scope: "actions" },
-  { id: "a-domain", label: "Connect Domain", description: "Link a custom domain", href: "/dashboard/settings/domains", scope: "actions" },
+  { id: "a-domain", label: "Connect Domain", description: "Link a custom domain", href: "/dashboard/domains", scope: "actions" },
 ];
 
 const SCOPE_ICONS: Record<string, typeof Globe> = {

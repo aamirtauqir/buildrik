@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Globe, Briefcase, ClipboardCheck, MessageSquare, Palette, Users, CreditCard, Settings, ArrowUpRight } from "lucide-react";
+import { LayoutDashboard, Globe, Briefcase, ClipboardCheck, MessageSquare, Palette, Users, CreditCard, Settings, ArrowUpRight, Image as ImageIcon } from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 
@@ -15,12 +15,13 @@ const PLAN_LABELS: Record<string, string> = {
 export const SIDEBAR_NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
   { label: "My Sites", href: "/dashboard/sites", icon: "Globe" },
+  { label: "Media", href: "/dashboard/media", icon: "Image" },
   { label: "Team", href: "/dashboard/team", icon: "Users" },
   { label: "Billing", href: "/dashboard/billing", icon: "CreditCard" },
   { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ] as const;
 
-const iconMap = { LayoutDashboard, Globe, Briefcase, ClipboardCheck, MessageSquare, Palette, Users, CreditCard, Settings } as const;
+const iconMap = { LayoutDashboard, Globe, Briefcase, ClipboardCheck, MessageSquare, Palette, Users, CreditCard, Settings, Image: ImageIcon } as const;
 
 // Agency nav (Clients · Reviews · Comments) is surfaced only when the
 // agency_layer flag is on (ships dark for solo workspaces — no empty agency

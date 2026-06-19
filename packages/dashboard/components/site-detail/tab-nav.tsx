@@ -9,6 +9,7 @@ export const SITE_DETAIL_TABS = [
   { label: "Settings", segment: "settings" },
   { label: "SEO", segment: "seo" },
   { label: "Domains", segment: "domains" },
+  { label: "Redirects", segment: "redirects" },
   { label: "Access", segment: "access" },
   { label: "Analytics", segment: "analytics" },
 ] as const;

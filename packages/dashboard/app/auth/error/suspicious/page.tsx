@@ -54,7 +54,7 @@ export default function SuspiciousPage() {
       <div className="h-3" />
 
       <Link
-        href="#"
+        href="/auth/forgot-password"
         className="text-red-500 hover:underline text-center block text-auth-link"
       >
         This wasn&apos;t me

@@ -11,6 +11,7 @@ const SETTINGS_TABS = [
   { label: "Notifications", href: "/dashboard/settings/notifications" },
   { label: "Workspace", href: "/dashboard/settings/workspace" },
   { label: "Integrations", href: "/dashboard/settings/integrations" },
+  { label: "API Tokens", href: "/dashboard/settings/api-tokens" },
   { label: "AI & Credits", href: "/dashboard/settings/ai" },
   { label: "Danger Zone", href: "/dashboard/settings/danger" },
 ] as const;
