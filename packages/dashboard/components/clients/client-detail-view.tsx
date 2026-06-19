@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Globe, Plus, Palette, X } from "lucide-react";
+import { ArrowLeft, Globe, Plus, Palette, UserPlus, X } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
@@ -103,6 +103,71 @@ function SiteRow({ name, status, right }: { name: string; status: string; right:
   );
 }
 
+// Invite a content editor scoped to THIS client. Reuses the workspace invite
+// (role EDITOR + siteIds = the client's sites) — so the invitee can edit exactly
+// this client's sites, nothing else. No new backend: site-level access already
+// flows from the invite's siteIds on accept.
+function InviteEditorDialog({
+  clientName,
+  siteCount,
+  saving,
+  onClose,
+  onSubmit,
+}: {
+  clientName: string;
+  siteCount: number;
+  saving: boolean;
+  onClose: () => void;
+  onSubmit: (email: string, message: string) => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const valid = /.+@.+\..+/.test(email.trim());
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
+      <div className="w-[440px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Invite a content editor</h2>
+          <button onClick={onClose} aria-label="Close"><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
+        </div>
+        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          They&apos;ll join as a <strong>Content editor</strong> with access to {clientName}&apos;s{" "}
+          {siteCount} {siteCount === 1 ? "site" : "sites"} — and nothing else.
+        </p>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="name@client.com"
+          className="mt-4 w-full rounded-lg border px-3 py-2 text-sm"
+          style={{ borderColor: "var(--color-border-default)" }}
+          autoFocus
+        />
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Add a note (optional)"
+          rows={2}
+          className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+          style={{ borderColor: "var(--color-border-default)" }}
+        />
+        <div className="mt-5 flex justify-end gap-2">
+          <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
+          <button
+            onClick={() => valid && onSubmit(email.trim(), message.trim())}
+            disabled={!valid || saving || siteCount === 0}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            style={{ backgroundColor: "var(--color-primary)" }}
+            title={siteCount === 0 ? "Assign at least one site first" : undefined}
+          >
+            {saving ? "Sending…" : "Send invite"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ClientDetailView({ clientId }: { clientId: string }) {
   const { addToast } = useToast();
   const featuresQuery = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
@@ -115,6 +180,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
   );
   const [picking, setPicking] = useState(false);
   const [editingBranding, setEditingBranding] = useState(false);
+  const [inviting, setInviting] = useState(false);
   const unassignedQuery = trpc.sites.list.useQuery(
     { clientId: null, perPage: 50 },
     { enabled: agencyEnabled && picking },
@@ -127,6 +193,14 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
       clientQuery.refetch();
     },
     onError: (err) => addToast("error", "Couldn't save branding", err.message),
+  });
+
+  const inviteMut = trpc.team.invite.useMutation({
+    onSuccess: () => {
+      addToast("success", "Invite sent");
+      setInviting(false);
+    },
+    onError: (err) => addToast("error", "Couldn't send invite", err.message),
   });
 
   const assignMut = trpc.clients.assignSite.useMutation({
@@ -201,6 +275,14 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
             Branding
           </button>
           <button
+            onClick={() => setInviting(true)}
+            className="flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-sm font-medium"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+          >
+            <UserPlus className="h-4 w-4" />
+            Invite editor
+          </button>
+          <button
             onClick={() => setPicking(true)}
             className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
@@ -241,6 +323,23 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
             />
           ))}
         </div>
+      )}
+
+      {inviting && client && (
+        <InviteEditorDialog
+          clientName={client.name}
+          siteCount={sites.length}
+          saving={inviteMut.isPending}
+          onClose={() => setInviting(false)}
+          onSubmit={(email, message) =>
+            inviteMut.mutate({
+              emails: [email],
+              role: "EDITOR",
+              siteIds: sites.map((s) => s.id),
+              message: message || undefined,
+            })
+          }
+        />
       )}
 
       {editingBranding && client && (
