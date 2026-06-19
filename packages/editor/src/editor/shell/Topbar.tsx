@@ -30,6 +30,7 @@ import {
 } from "@/editor/shared/vibcoder";
 import { Sparkles } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
+import { submitForReview } from "../../services/ReviewService";
 import type { Issue } from "./hooks/useStudioState";
 import { CommandPalette } from "./modals/CommandPalette";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
@@ -247,7 +248,19 @@ export const Topbar: React.FC<TopbarProps> = ({
 }) => {
   const publishEnabled = isFeatureEnabled("publish");
   // E3: in 4-tool mode AI leaves the rail, so the topbar carries the ✨ trigger.
-  const fourToolRail = getEditorViewMode().fourToolRail;
+  const viewMode = getEditorViewMode();
+  const fourToolRail = viewMode.fourToolRail;
+  // E4: an invited content editor sends for review instead of publishing.
+  const [reviewState, setReviewState] = React.useState<"idle" | "sending" | "sent" | "error">("idle");
+  const sendForReview = React.useCallback(async () => {
+    setReviewState("sending");
+    try {
+      await submitForReview();
+      setReviewState("sent");
+    } catch {
+      setReviewState("error");
+    }
+  }, []);
   const [cmdOpen, setCmdOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -491,7 +504,30 @@ export const Topbar: React.FC<TopbarProps> = ({
             </TooltipPortal>
           </Tooltip>
 
-          {publishEnabled ? (
+          {viewMode.clientView ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={sendForReview}
+                  disabled={reviewState === "sending" || reviewState === "sent"}
+                  aria-label="Send for review"
+                >
+                  {reviewState === "sending"
+                    ? "Sending…"
+                    : reviewState === "sent"
+                      ? "Sent for review ✓"
+                      : reviewState === "error"
+                        ? "Retry send"
+                        : "Send for review"}
+                </Button>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>An admin will review your changes before they go live</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          ) : publishEnabled ? (
             <div style={{ position: "relative" }}>
               <PublishDropdown
                 publishState={publishState}

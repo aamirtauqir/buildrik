@@ -35,3 +35,10 @@ export function createBuildrikApiClient(baseUrl: string) {
 }
 
 export type BuildrikApiClient = ReturnType<typeof createBuildrikApiClient>;
+
+// Lazy singleton for editor→dashboard tRPC calls (one client per editor session).
+let _client: BuildrikApiClient | null = null;
+export function getBuildrikClient(baseUrl: string): BuildrikApiClient {
+  if (!_client) _client = createBuildrikApiClient(baseUrl);
+  return _client;
+}
