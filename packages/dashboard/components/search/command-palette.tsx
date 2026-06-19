@@ -12,6 +12,7 @@ import {
   Zap,
   HelpCircle,
   Clock,
+  CornerUpRight,
 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
@@ -52,6 +53,23 @@ const ACTION_ITEMS: ResultItem[] = [
   { id: "a-domain", label: "Connect Domain", description: "Link a custom domain", href: "/dashboard/domains", scope: "actions" },
 ];
 
+// 71-command-palette "where did X go": the reconciled IA moved several concepts
+// to new homes. Searching an old name resolves to its destination so nobody has
+// to relearn the map. `aliases` are the old/searched terms; `label` is the
+// new home, `description` says where it moved.
+interface MovedItem extends ResultItem {
+  aliases: string[];
+}
+const MOVED_ITEMS: MovedItem[] = [
+  { id: "m-traffic", label: "Traffic", description: "Moved → Site › Analytics", href: "/dashboard/sites", scope: "moved", aliases: ["traffic", "analytics", "visitors", "stats"] },
+  { id: "m-shared-theme", label: "Shared theme", description: "Moved → Workspace › Shared theme", href: "/dashboard/theme", scope: "moved", aliases: ["shared theme", "design system", "theme", "tokens", "ds"] },
+  { id: "m-assets", label: "Assets", description: "Moved → Media", href: "/dashboard/media", scope: "moved", aliases: ["assets", "media", "images", "files", "uploads"] },
+  { id: "m-redirects", label: "Redirects", description: "Moved → Site › Redirects", href: "/dashboard/sites", scope: "moved", aliases: ["redirects", "url forwarding", "301", "302"] },
+  { id: "m-domains", label: "Domains", description: "Moved → Domains (all sites)", href: "/dashboard/domains", scope: "moved", aliases: ["domains", "dns", "custom domain"] },
+  { id: "m-tokens", label: "API tokens", description: "Moved → Settings › API Tokens", href: "/dashboard/settings/api-tokens", scope: "moved", aliases: ["api tokens", "tokens", "ci", "api key"] },
+  { id: "m-reviews", label: "Reviews", description: "Approve client edits", href: "/dashboard/reviews", scope: "moved", aliases: ["reviews", "approval", "approve", "publishing"] },
+];
+
 const SCOPE_ICONS: Record<string, typeof Globe> = {
   sites: Globe,
   pages: FileText,
@@ -60,6 +78,7 @@ const SCOPE_ICONS: Record<string, typeof Globe> = {
   actions: Zap,
   help: HelpCircle,
   recent: Clock,
+  moved: CornerUpRight,
 };
 
 export const SEARCH_SCOPES = [
@@ -248,6 +267,18 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       );
       if (filtered.length > 0) {
         groups.push({ scope: "settings", label: "Settings", items: filtered });
+      }
+    }
+
+    // Moved — "where did X go" aliases resolve old names to their new homes.
+    if (scope === null) {
+      const moved = MOVED_ITEMS.filter(
+        (item) =>
+          item.label.toLowerCase().includes(lowerTerm) ||
+          item.aliases.some((a) => a.includes(lowerTerm) || lowerTerm.includes(a)),
+      );
+      if (moved.length > 0) {
+        groups.push({ scope: "moved", label: "Moved", items: moved });
       }
     }
 
