@@ -243,6 +243,12 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   const [creating, setCreating] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  // E7 dynamic-page binding: generate one published page per entry.
+  const [genPages, setGenPages] = React.useState(false);
+  const [pageSlug, setPageSlug] = React.useState("/{slug}");
+  const [pageTemplate, setPageTemplate] = React.useState("");
+  const [pageSeoTitle, setPageSeoTitle] = React.useState("");
+  const [pageSeoDesc, setPageSeoDesc] = React.useState("");
 
   // Reset state when modal closes
   React.useEffect(() => {
@@ -319,6 +325,16 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         });
       }
 
+      // E7: persist the dynamic-page binding so publish generates one page per entry.
+      if (genPages && pageSlug.trim() && collections.updateCollection) {
+        await collections.updateCollection(collection.id, {
+          pageSlugPattern: pageSlug.trim(),
+          pageTemplatePath: pageTemplate.trim() || undefined,
+          pageSeoTitle: pageSeoTitle.trim() || undefined,
+          pageSeoDescription: pageSeoDesc.trim() || undefined,
+        });
+      }
+
       // Only after a confirmed create.
       setSuccess(true);
       setTimeout(() => {
@@ -329,7 +345,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
     } finally {
       setCreating(false);
     }
-  }, [canProceed, composer, name, description, fields, onClose]);
+  }, [canProceed, composer, name, description, fields, onClose, genPages, pageSlug, pageTemplate, pageSeoTitle, pageSeoDesc]);
 
   const footer = (
     <div style={s.footer}>
@@ -536,6 +552,26 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                 </Button>
               </div>
             ))}
+          </div>
+
+          {/* E7 — dynamic-page binding */}
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--buildrick-border, #2a2a2a)" }}>
+            <Button
+              type="button"
+              variant={genPages ? "primary" : "secondary"}
+              onClick={() => setGenPages((v) => !v)}
+              style={{ fontSize: 12 }}
+            >
+              {genPages ? "✓ " : ""}Generate a page per entry
+            </Button>
+            {genPages && (
+              <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+                <Input type="text" placeholder="Slug pattern — /blog/{slug}" value={pageSlug} onChange={(e) => setPageSlug(e.target.value)} />
+                <Input type="text" placeholder="Template page path — blog/_template/index.html" value={pageTemplate} onChange={(e) => setPageTemplate(e.target.value)} />
+                <Input type="text" placeholder="SEO title — {title} — Blog" value={pageSeoTitle} onChange={(e) => setPageSeoTitle(e.target.value)} />
+                <Input type="text" placeholder="SEO description — Read about {title}" value={pageSeoDesc} onChange={(e) => setPageSeoDesc(e.target.value)} />
+              </div>
+            )}
           </div>
 
           {error && (
