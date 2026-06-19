@@ -13,6 +13,7 @@ import {
   upsertEntry,
   deleteEntry,
   resolveDynamicPages,
+  generateDynamicPages,
   CmsError,
 } from "@/server/services/cms.service";
 import {
@@ -23,6 +24,7 @@ import {
   listEntriesInput,
   deleteEntryInput,
   dynamicPagesInput,
+  generateDynamicPagesInput,
 } from "@buildrik/shared/schemas/cms";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,6 +82,17 @@ export const cmsRouter = router({
     await requireRead(ctx, input.siteId);
     try {
       return await resolveDynamicPages(input.siteId, input.collectionId);
+    } catch (e) {
+      translateCms(e);
+    }
+  }),
+  // Render the dynamic pages to HTML files (publish-pipeline consumer). The
+  // editor passes the template page's exported HTML; the publish worker deploys
+  // the returned files. Read-gated (pure render, no mutation).
+  generateDynamicPages: protectedProcedure.input(generateDynamicPagesInput).mutation(async ({ ctx, input }) => {
+    await requireRead(ctx, input.siteId);
+    try {
+      return await generateDynamicPages(input.siteId, input.collectionId, input.templateHtml);
     } catch (e) {
       translateCms(e);
     }

@@ -43,6 +43,7 @@ import {
   listEntries,
   upsertEntry,
   resolveDynamicPages,
+  generateDynamicPages,
   CmsError,
 } from "@server/services/cms.service";
 
@@ -138,5 +139,23 @@ describe("resolveDynamicPages", () => {
   it("throws NOT_FOUND for a collection outside the site", async () => {
     colFindFirst.mockResolvedValueOnce(null);
     await expect(resolveDynamicPages("s1", "nope")).rejects.toBeInstanceOf(CmsError);
+  });
+});
+
+describe("generateDynamicPages", () => {
+  it("renders one HTML file per published entry, substituting + escaping + injecting SEO at the slug", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: "desc {title}" });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello & World" } }]);
+    const out = await generateDynamicPages("s1", "c1", "<html><head></head><body><h1>{title}</h1></body></html>");
+    expect(out).toHaveLength(1);
+    expect(out[0].path).toBe("blog/hello-world/index.html");
+    expect(out[0].content).toContain("<h1>Hello &amp; World</h1>"); // substituted + escaped
+    expect(out[0].content).toContain("<title>Hello &amp; World</title>"); // SEO injected into <head>
+    expect(out[0].content).toContain('content="desc Hello &amp; World"');
+  });
+
+  it("returns [] for a non-page collection", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: null });
+    await expect(generateDynamicPages("s1", "c1", "<html></html>")).resolves.toEqual([]);
   });
 });

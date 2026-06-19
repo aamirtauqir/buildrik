@@ -37,6 +37,12 @@ export const listCollectionsInput = z.object({ siteId: z.string().min(1) });
 
 export const dynamicPagesInput = z.object({ siteId: z.string().min(1), collectionId: z.string().min(1) });
 
+export const generateDynamicPagesInput = z.object({
+  siteId: z.string().min(1),
+  collectionId: z.string().min(1),
+  templateHtml: z.string().max(2_000_000),
+});
+
 export const deleteCollectionInput = z.object({ siteId: z.string().min(1), id: z.string().min(1) });
 
 export const upsertEntryInput = z.object({

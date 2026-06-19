@@ -125,11 +125,20 @@ function applyPattern(pattern: string, data: Record<string, unknown>, asSlug: bo
   });
 }
 
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export interface DynamicPage {
   entryId: string;
   slug: string;
   seoTitle: string;
   seoDescription: string;
+}
+
+export interface GeneratedPage {
+  path: string;
+  content: string;
 }
 
 /**
@@ -162,5 +171,48 @@ export async function resolveDynamicPages(
       seoTitle: col.pageSeoTitle ? applyPattern(col.pageSeoTitle, data, false) : "",
       seoDescription: col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "",
     };
+  });
+}
+
+/**
+ * The publish-pipeline consumer: render one HTML file per PUBLISHED entry from a
+ * template (the designated template page's exported HTML). {fieldSlug} markers in
+ * the template are replaced with the entry's values (HTML-escaped), the resolved
+ * pattern SEO is injected into <head>, and the file is emitted at the resolved
+ * slug. Returns the file list the publish worker deploys. Non-page collections
+ * yield []. (The editor supplies templateHtml from the page bound to this
+ * collection; the deploy of these files is verified at publish time.)
+ */
+export async function generateDynamicPages(
+  siteId: string,
+  collectionId: string,
+  templateHtml: string,
+): Promise<GeneratedPage[]> {
+  const col = await prisma.cmsCollection.findFirst({
+    where: { id: collectionId, siteId },
+    select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true },
+  });
+  if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
+  if (!col.pageSlugPattern) return [];
+  const entries = await prisma.cmsEntry.findMany({
+    where: { collectionId, status: "PUBLISHED" },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, data: true },
+  });
+  return entries.map((e) => {
+    const data = (e.data as Record<string, unknown>) ?? {};
+    const slug = applyPattern(col.pageSlugPattern as string, data, true);
+    const seoTitle = col.pageSeoTitle ? applyPattern(col.pageSeoTitle, data, false) : "";
+    const seoDescription = col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "";
+    let html = templateHtml.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
+      const v = data[key];
+      return v == null ? "" : escapeHtml(String(v));
+    });
+    const seoTags =
+      `<title>${escapeHtml(seoTitle)}</title>` +
+      (seoDescription ? `<meta name="description" content="${escapeHtml(seoDescription)}">` : "");
+    html = html.includes("</head>") ? html.replace("</head>", `${seoTags}</head>`) : seoTags + html;
+    const cleanSlug = slug.replace(/^\/+|\/+$/g, "") || "index";
+    return { path: `${cleanSlug}/index.html`, content: html };
   });
 }
