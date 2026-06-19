@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Globe, Users, CreditCard, Settings, ArrowUpRight } from "lucide-react";
+import { LayoutDashboard, Globe, Briefcase, Users, CreditCard, Settings, ArrowUpRight } from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 
@@ -20,7 +20,21 @@ export const SIDEBAR_NAV_ITEMS = [
   { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
 ] as const;
 
-const iconMap = { LayoutDashboard, Globe, Users, CreditCard, Settings } as const;
+const iconMap = { LayoutDashboard, Globe, Briefcase, Users, CreditCard, Settings } as const;
+
+// Nav items including the agency "Clients" entry, surfaced only when the
+// agency_layer flag is on (ships dark for solo workspaces — no empty agency
+// chrome). Inserted after "My Sites" so the hierarchy reads Sites › Clients.
+function useNavItems(): ReadonlyArray<{ label: string; href: string; icon: string }> {
+  const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
+  if (!features.data?.agency_layer) return SIDEBAR_NAV_ITEMS;
+  return [
+    SIDEBAR_NAV_ITEMS[0],
+    SIDEBAR_NAV_ITEMS[1],
+    { label: "Clients", href: "/dashboard/clients", icon: "Briefcase" },
+    ...SIDEBAR_NAV_ITEMS.slice(2),
+  ];
+}
 
 function isActiveRoute(pathname: string, href: string): boolean {
   if (href === "/dashboard") return pathname === "/dashboard";
@@ -29,10 +43,11 @@ function isActiveRoute(pathname: string, href: string): boolean {
 
 function MobileTabBar() {
   const pathname = usePathname();
+  const navItems = useNavItems();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 flex h-14 items-center justify-around border-t bg-white lg:hidden" style={{ borderColor: "var(--color-border-default)" }}>
-      {SIDEBAR_NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const active = isActiveRoute(pathname, item.href);
         const Icon = iconMap[item.icon as keyof typeof iconMap];
         return (
@@ -55,6 +70,7 @@ function MobileTabBar() {
 
 export function Sidebar() {
   const pathname = usePathname();
+  const navItems = useNavItems();
   const health = trpc.dashboard.health.useQuery(undefined, {
     staleTime: 60_000,
   });
@@ -73,7 +89,7 @@ export function Sidebar() {
         </div>
         <nav className="flex-1 px-3 py-2">
           <ul className="space-y-1">
-            {SIDEBAR_NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const active = isActiveRoute(pathname, item.href);
               const Icon = iconMap[item.icon as keyof typeof iconMap];
               return (
