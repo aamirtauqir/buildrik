@@ -5,6 +5,7 @@ import { trpc } from "@lib/trpc/client";
 import { HelpCenter } from "@/components/help/help-center";
 import { ArticleList } from "@/components/help/article-list";
 import { TicketForm } from "@/components/help/ticket-form";
+import { ErrorState } from "@/components/states";
 
 type View = "home" | "search" | "category" | "ticket";
 
@@ -76,6 +77,8 @@ export default function HelpPage() {
               <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
             ))}
           </div>
+        ) : categoryResults.isError ? (
+          <ErrorState title="Couldn't load articles" onRetry={() => categoryResults.refetch()} />
         ) : (
           <ArticleList articles={categoryResults.data ?? []} />
         )}
@@ -111,6 +114,8 @@ export default function HelpPage() {
               <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
             ))}
           </div>
+        ) : searchResults.isError ? (
+          <ErrorState title="Couldn't run your search" onRetry={() => searchResults.refetch()} />
         ) : (
           <ArticleList articles={searchResults.data ?? []} />
         )}

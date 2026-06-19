@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { ErrorState } from "@/components/states";
 import { PlanCard } from "@/components/billing/plan-card";
 import { PlanComparison } from "@/components/billing/plan-comparison";
 import { UsageBars } from "@/components/billing/usage-bars";
@@ -110,6 +111,21 @@ export default function BillingPage() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-32 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (overviewQuery.isError) {
+    return (
+      <div>
+        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Billing</h1>
+        <div className="mt-6">
+          <ErrorState
+            title="Couldn't load billing"
+            description="Something went wrong on our end. Your subscription is unaffected."
+            onRetry={() => overviewQuery.refetch()}
+          />
         </div>
       </div>
     );
