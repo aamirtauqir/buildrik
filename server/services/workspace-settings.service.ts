@@ -8,6 +8,35 @@ export async function getWorkspaceSettings(workspaceId: string) {
   });
 }
 
+// a6-workspace-select: every workspace the user actively belongs to, with their
+// role + member count, for the post-login chooser. Newest membership first.
+export async function listUserWorkspaces(userId: string) {
+  const memberships = await prisma.workspaceMember.findMany({
+    where: { userId, status: "ACTIVE" },
+    orderBy: { joinedAt: "desc" },
+    select: {
+      role: true,
+      workspace: {
+        select: {
+          id: true,
+          name: true,
+          iconUrl: true,
+          plan: true,
+          _count: { select: { members: true } },
+        },
+      },
+    },
+  });
+  return memberships.map((m) => ({
+    id: m.workspace.id,
+    name: m.workspace.name,
+    iconUrl: m.workspace.iconUrl,
+    plan: m.workspace.plan,
+    role: m.role,
+    memberCount: m.workspace._count.members,
+  }));
+}
+
 export async function updateWorkspaceSettings(workspaceId: string, data: UpdateWorkspaceInput) {
   return prisma.workspace.update({
     where: { id: workspaceId },

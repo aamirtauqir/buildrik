@@ -20,10 +20,18 @@ import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceMember(ctx: WorkspaceCtx) {
   if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
-  const member = await ctx.prisma.workspaceMember.findFirst({
-    where: { userId: ctx.session.user.id },
-    select: { workspaceId: true, role: true },
-  });
+  const userId = ctx.session.user.id;
+  // Honor the session's active workspace (set on switch) when it's a valid
+  // ACTIVE membership; else fall back to the first membership.
+  const activeId = ctx.session.user.workspaceId as string | null | undefined;
+  const member =
+    (await ctx.prisma.workspaceMember.findFirst({
+      where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId },
+      select: { workspaceId: true, role: true },
+    })) ??
+    (activeId
+      ? await ctx.prisma.workspaceMember.findFirst({ where: { userId }, select: { workspaceId: true, role: true } })
+      : null);
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return member;
 }

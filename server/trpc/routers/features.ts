@@ -14,10 +14,18 @@ interface SessionCtx {
 // Resolve the actor's workspace (scopes every flag op to it — IDOR guard).
 async function requireWorkspace(ctx: SessionCtx): Promise<string> {
   if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
-  const member = await prisma.workspaceMember.findFirst({
-    where: { userId: ctx.session.user.id },
-    select: { workspaceId: true },
-  });
+  const userId = ctx.session.user.id;
+  // Honor the session's active workspace (set on switch) when it's a valid
+  // ACTIVE membership; else fall back to the first membership.
+  const activeId = ctx.session.user.workspaceId as string | null | undefined;
+  const member =
+    (await prisma.workspaceMember.findFirst({
+      where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId },
+      select: { workspaceId: true },
+    })) ??
+    (activeId
+      ? await prisma.workspaceMember.findFirst({ where: { userId }, select: { workspaceId: true } })
+      : null);
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return member.workspaceId;
 }

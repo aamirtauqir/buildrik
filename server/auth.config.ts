@@ -115,7 +115,7 @@ export const authConfig: NextAuthConfig = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       // First call (sign-in) — populate from `user`. Subsequent calls reuse
       // whatever is already on the token, so we only hit the DB once per
       // login cycle. Workspace lookup is cheap (indexed FK) but doing it on
@@ -127,6 +127,22 @@ export const authConfig: NextAuthConfig = {
           select: { workspaceId: true },
         });
         token.workspaceId = member?.workspaceId ?? null;
+      }
+      // Workspace switch — the client calls update({ workspaceId }). Validate it
+      // is one of the user's ACTIVE memberships before trusting it, so the token
+      // can never point at a workspace the user doesn't belong to (IDOR guard).
+      if (
+        trigger === "update" &&
+        session &&
+        typeof (session as { workspaceId?: unknown }).workspaceId === "string" &&
+        typeof token.userId === "string"
+      ) {
+        const targetId = (session as { workspaceId: string }).workspaceId;
+        const valid = await prisma.workspaceMember.findFirst({
+          where: { userId: token.userId, workspaceId: targetId, status: "ACTIVE" },
+          select: { workspaceId: true },
+        });
+        if (valid) token.workspaceId = valid.workspaceId;
       }
       return token;
     },

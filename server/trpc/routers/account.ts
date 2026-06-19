@@ -21,7 +21,7 @@ import {
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
-import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion } from "@/server/services/workspace-settings.service";
+import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion, listUserWorkspaces } from "@/server/services/workspace-settings.service";
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration, updateIntegration, sendIntegrationTestEvent } from "@/server/services/integrations.service";
 import { updateProfileSchema, changePasswordSchema, setPasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
@@ -29,10 +29,17 @@ import { type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
   if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+  const userId = ctx.session.user.id;
+  // Honor the active workspace from the session (set on switch), but only if it
+  // is still one of the user's ACTIVE memberships — never trust it blindly.
+  // Fall back to the first membership for single-workspace users / stale tokens.
+  const activeId = ctx.session.user.workspaceId as string | null | undefined;
   const member = await ctx.prisma.workspaceMember.findFirst({
-    where: { userId: ctx.session.user.id },
+    where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId },
     include: { workspace: { select: { plan: true } } },
-  });
+  }) ?? (activeId
+    ? await ctx.prisma.workspaceMember.findFirst({ where: { userId }, include: { workspace: { select: { plan: true } } } })
+    : null);
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return { workspaceId: member.workspaceId, plan: member.workspace.plan as PlanName };
 }
@@ -122,6 +129,10 @@ export const accountRouter = router({
     get: protectedProcedure.query(async ({ ctx }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
       return getWorkspaceSettings(workspaceId);
+    }),
+    // a6-workspace-select: the user's own workspaces, for the chooser.
+    listMine: protectedProcedure.query(async ({ ctx }) => {
+      return listUserWorkspaces(ctx.session.user.id);
     }),
     update: protectedProcedure.input(updateWorkspaceSchema).mutation(async ({ ctx, input }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
