@@ -8,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { ListTree } from "lucide-react";
 import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
 
@@ -28,6 +29,9 @@ export interface StudioFooterProps {
   onZoomChange?: (zoom: number) => void;
   syncConnected?: boolean;
   selectedElement: { id: string; type: string; tagName?: string } | null;
+  /** E3: opens the page-structure (layers) outline. In 4-tool mode the footer ⌗
+   *  is the only home for structure (it leaves the rail). */
+  onOpenStructure?: () => void;
 }
 
 const zoomBtnStyle: React.CSSProperties = {
@@ -55,7 +59,11 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
   onZoomChange,
   syncConnected = true,
   selectedElement,
+  onOpenStructure,
 }) => {
+  const fourToolRail =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("rail") === "4";
   const breadcrumb = selectedElement
     ? `body › ${selectedElement.tagName ?? selectedElement.type}`
     : "body";
@@ -84,6 +92,24 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
 
   return (
     <>
+      {fourToolRail && onOpenStructure && (
+        <Button
+          variant="bare"
+          onClick={onOpenStructure}
+          aria-label="Page structure"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            padding: "2px 6px",
+            color: "var(--buildrick-text-muted)",
+            fontSize: 12,
+          }}
+        >
+          <ListTree size={14} />
+          Structure
+        </Button>
+      )}
       <span
         style={{
           display: "inline-flex",

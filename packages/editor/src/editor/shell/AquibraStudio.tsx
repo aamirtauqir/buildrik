@@ -477,6 +477,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // Drive the connection pill from the real save state — it was
           // hardcoded "Connected · main" regardless of save failures.
           syncConnected={state.saveState.status !== "error"}
+          onOpenStructure={() => state.setLeftPanelTab("layers")}
         />
       </footer>
 
