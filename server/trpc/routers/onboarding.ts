@@ -28,7 +28,7 @@ export const onboardingRouter = router({
     .input(selectRoleSchema)
     .mutation(async ({ ctx, input }) => {
       try {
-        return await selectRole(ctx.session.user.id, input.role);
+        return await selectRole(ctx.session.user.id, input.density);
       } catch {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to save role" });
       }

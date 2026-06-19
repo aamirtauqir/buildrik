@@ -8,6 +8,7 @@ import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/u
 export default function OnboardingSetupPage() {
   const router = useRouter();
   const unified = useUnifiedEditorFlag();
+  const setFeature = trpc.features.set.useMutation();
   const createSite = trpc.sites.create.useMutation({
     onSuccess: (site) => {
       const href = getEditorHref(site.id, unified);
@@ -33,7 +34,15 @@ export default function OnboardingSetupPage() {
 
   return (
     <OnboardingProjectSetup
-      onContinue={(data) => setupProject.mutate(data)}
+      onContinue={({ projectName, method, workspaceType }) => {
+        // "An agency or team" turns on the agency layer (Clients · Reviews ·
+        // Comments · Shared theme nav). Fire-and-forget; project setup proceeds
+        // regardless so a flag hiccup never blocks onboarding.
+        if (workspaceType === "agency") {
+          setFeature.mutate({ key: "agency_layer", enabled: true });
+        }
+        setupProject.mutate({ projectName, method });
+      }}
       onBack={() => router.push("/onboarding/role")}
       loading={setupProject.isPending || createSite.isPending}
     />

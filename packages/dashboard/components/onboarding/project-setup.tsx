@@ -29,11 +29,12 @@ export const CREATION_METHODS = [
 ] as const;
 
 type MethodValue = (typeof CREATION_METHODS)[number]["value"];
+type WorkspaceType = "solo" | "agency";
 
 const iconMap = { Sparkles, LayoutTemplate, File } as const;
 
 interface OnboardingProjectSetupProps {
-  onContinue: (data: { projectName: string; method: MethodValue }) => void;
+  onContinue: (data: { projectName: string; method: MethodValue; workspaceType: WorkspaceType }) => void;
   onBack: () => void;
   loading?: boolean;
 }
@@ -41,6 +42,7 @@ interface OnboardingProjectSetupProps {
 export function OnboardingProjectSetup({ onContinue, onBack, loading }: OnboardingProjectSetupProps) {
   const [projectName, setProjectName] = useState("");
   const [method, setMethod] = useState<MethodValue | null>(null);
+  const [workspaceType, setWorkspaceType] = useState<WorkspaceType>("solo");
 
   const isValid = projectName.trim().length >= 2 && projectName.trim().length <= 100 && method !== null;
 
@@ -61,6 +63,34 @@ export function OnboardingProjectSetup({ onContinue, onBack, loading }: Onboardi
         <p className="text-sm text-[var(--color-text-secondary)] text-center mb-8">
           Give it a name and choose how you want to start.
         </p>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1.5">
+            Who&apos;s this workspace for?
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            {([
+              { value: "solo", label: "Just me", sub: "One or a few of my own sites" },
+              { value: "agency", label: "An agency or team", sub: "Build for multiple clients" },
+            ] as const).map((opt) => {
+              const isSelected = workspaceType === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setWorkspaceType(opt.value)}
+                  className={cn(
+                    "rounded-xl border-2 px-4 py-3 text-left transition-all",
+                    isSelected ? "border-[var(--color-primary)] bg-red-50" : "border-[var(--color-border-default)] bg-white hover:border-[#C0C0C0]"
+                  )}
+                >
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)]">{opt.label}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">{opt.sub}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <div className="mb-6">
           <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1.5">
@@ -129,7 +159,7 @@ export function OnboardingProjectSetup({ onContinue, onBack, loading }: Onboardi
 
         <button
           onClick={() =>
-            isValid && onContinue({ projectName: projectName.trim(), method: method! })
+            isValid && onContinue({ projectName: projectName.trim(), method: method!, workspaceType })
           }
           disabled={!isValid || loading}
           className={cn(

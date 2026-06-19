@@ -8,6 +8,9 @@ vi.mock("@/lib/prisma", () => ({
       update: vi.fn(),
       upsert: vi.fn(),
     },
+    userPreference: {
+      upsert: vi.fn(),
+    },
     site: {
       findFirst: vi.fn(),
     },
@@ -100,16 +103,23 @@ describe("Onboarding Service", () => {
   });
 
   describe("selectRole", () => {
-    it("updates role and advances step to PROJECT_SETUP", async () => {
-      const updated = { ...mockState, role: "FREELANCER", step: "PROJECT_SETUP" };
+    it("seeds editor density preference and advances step to PROJECT_SETUP", async () => {
+      const updated = { ...mockState, role: "fewer", step: "PROJECT_SETUP" };
+      vi.mocked(prisma.userPreference.upsert).mockResolvedValue({} as any);
       vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
-      const result = await selectRole("user_1", "FREELANCER");
-      expect(result.role).toBe("FREELANCER");
+      const result = await selectRole("user_1", "fewer");
       expect(result.step).toBe("PROJECT_SETUP");
+      expect(prisma.userPreference.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: "user_1" },
+          create: { userId: "user_1", editorDensity: "fewer" },
+          update: { editorDensity: "fewer" },
+        })
+      );
       expect(prisma.onboardingState.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { userId: "user_1" },
-          data: expect.objectContaining({ role: "FREELANCER", step: "PROJECT_SETUP" }),
+          data: expect.objectContaining({ role: "fewer", step: "PROJECT_SETUP" }),
         })
       );
     });

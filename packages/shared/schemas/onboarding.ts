@@ -12,8 +12,10 @@ export const onboardingStateSchema = z.object({
   tourCompleted: z.boolean(),
 });
 
+// 04-role-select (redesign): seeds editor control DENSITY, a reversible
+// preference — never a permission. "fewer" = Simple, "full" = Advanced.
 export const selectRoleSchema = z.object({
-  role: z.enum(["FREELANCER", "SMALL_TEAM", "AGENCY"]),
+  density: z.enum(["full", "fewer"]),
 });
 
 export const setupProjectSchema = z.object({

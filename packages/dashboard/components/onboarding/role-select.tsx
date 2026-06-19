@@ -1,60 +1,56 @@
 "use client";
 
 import { useState } from "react";
-import { User, Users, Building2 } from "lucide-react";
+import { Feather, SlidersHorizontal } from "lucide-react";
 import { cn } from "@lib/utils";
 
-export const ONBOARDING_ROLES = [
+// 04-role-select: this seeds editor control DENSITY — a reversible preference,
+// never a permission. Simple = "fewer" controls, Advanced = "full" controls.
+export const ONBOARDING_DENSITIES = [
   {
-    value: "FREELANCER",
-    label: "Freelancer",
-    description: "Independent professional",
-    icon: "User",
+    value: "fewer",
+    label: "Simple",
+    description: "The essentials, nothing more. Best for getting started fast.",
+    icon: "Feather",
   },
   {
-    value: "SMALL_TEAM",
-    label: "Small Team",
-    description: "2-10 people",
-    icon: "Users",
-  },
-  {
-    value: "AGENCY",
-    label: "Agency",
-    description: "Client work at scale",
-    icon: "Building2",
+    value: "full",
+    label: "Advanced",
+    description: "Every control on screen. Best if you know your way around.",
+    icon: "SlidersHorizontal",
   },
 ] as const;
 
-type RoleValue = (typeof ONBOARDING_ROLES)[number]["value"];
+type DensityValue = (typeof ONBOARDING_DENSITIES)[number]["value"];
 
-const iconMap = { User, Users, Building2 } as const;
+const iconMap = { Feather, SlidersHorizontal } as const;
 
 interface OnboardingRoleSelectProps {
-  onContinue: (role: RoleValue) => void;
+  onContinue: (density: DensityValue) => void;
   loading?: boolean;
 }
 
 export function OnboardingRoleSelect({ onContinue, loading }: OnboardingRoleSelectProps) {
-  const [selected, setSelected] = useState<RoleValue | null>(null);
+  const [selected, setSelected] = useState<DensityValue | null>(null);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="w-full max-w-md px-4">
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2 text-center font-[family-name:var(--font-space-grotesk)]">
-          How will you use Buildrik?
+          How much do you want to see?
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)] text-center mb-8">
-          This helps us personalise your experience.
+          Pick a starting view. It&apos;s a preference, not a limit — switch any time.
         </p>
 
-        <div className="space-y-3 mb-8">
-          {ONBOARDING_ROLES.map((role) => {
-            const Icon = iconMap[role.icon as keyof typeof iconMap];
-            const isSelected = selected === role.value;
+        <div className="space-y-3 mb-6">
+          {ONBOARDING_DENSITIES.map((d) => {
+            const Icon = iconMap[d.icon as keyof typeof iconMap];
+            const isSelected = selected === d.value;
             return (
               <button
-                key={role.value}
-                onClick={() => setSelected(role.value)}
+                key={d.value}
+                onClick={() => setSelected(d.value)}
                 className={cn(
                   "w-full flex items-center gap-4 rounded-xl border-2 px-5 py-4 text-left transition-all",
                   isSelected
@@ -73,8 +69,8 @@ export function OnboardingRoleSelect({ onContinue, loading }: OnboardingRoleSele
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[var(--color-text-primary)]">{role.label}</p>
-                  <p className="text-xs text-[var(--color-text-secondary)]">{role.description}</p>
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)]">{d.label}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">{d.description}</p>
                 </div>
               </button>
             );
@@ -92,6 +88,13 @@ export function OnboardingRoleSelect({ onContinue, loading }: OnboardingRoleSele
           )}
         >
           {loading ? "Saving…" : "Continue"}
+        </button>
+        <button
+          onClick={() => onContinue("fewer")}
+          disabled={loading}
+          className="mt-3 w-full text-center text-sm text-[var(--color-text-secondary)] hover:underline disabled:opacity-50"
+        >
+          Skip — start Simple
         </button>
       </div>
     </div>

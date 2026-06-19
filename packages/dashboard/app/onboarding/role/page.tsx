@@ -12,7 +12,7 @@ export default function OnboardingRolePage() {
 
   return (
     <OnboardingRoleSelect
-      onContinue={(role) => selectRole.mutate({ role })}
+      onContinue={(density) => selectRole.mutate({ density })}
       loading={selectRole.isPending}
     />
   );

@@ -1,18 +1,16 @@
 import { describe, it, expect } from "vitest";
 
 describe("Onboarding Components", () => {
-  describe("ONBOARDING_ROLES", () => {
-    it("has 3 roles: Freelancer, Small Team, Agency", async () => {
+  describe("ONBOARDING_DENSITIES", () => {
+    it("offers Simple (fewer) and Advanced (full) density — a preference, not a permission", async () => {
       const mod = await import("@/components/onboarding/role-select");
-      expect(mod.ONBOARDING_ROLES).toHaveLength(3);
-      const values = mod.ONBOARDING_ROLES.map((r: { value: string }) => r.value);
-      expect(values).toContain("FREELANCER");
-      expect(values).toContain("SMALL_TEAM");
-      expect(values).toContain("AGENCY");
-      const labels = mod.ONBOARDING_ROLES.map((r: { label: string }) => r.label);
-      expect(labels).toContain("Freelancer");
-      expect(labels).toContain("Small Team");
-      expect(labels).toContain("Agency");
+      expect(mod.ONBOARDING_DENSITIES).toHaveLength(2);
+      const values = mod.ONBOARDING_DENSITIES.map((d: { value: string }) => d.value);
+      expect(values).toContain("fewer");
+      expect(values).toContain("full");
+      const labels = mod.ONBOARDING_DENSITIES.map((d: { label: string }) => d.label);
+      expect(labels).toContain("Simple");
+      expect(labels).toContain("Advanced");
     });
   });
 

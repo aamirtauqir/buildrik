@@ -57,10 +57,18 @@ export async function getOnboardingState(userId: string) {
   return existing;
 }
 
-export async function selectRole(userId: string, role: string) {
+// 04-role-select now seeds the editor density preference (Simple/Advanced)
+// and advances the step. Density is a reversible preference, persisted on
+// UserPreference so the editor host threads it in as ?density.
+export async function selectRole(userId: string, density: "full" | "fewer") {
+  await prisma.userPreference.upsert({
+    where: { userId },
+    create: { userId, editorDensity: density },
+    update: { editorDensity: density },
+  });
   return prisma.onboardingState.update({
     where: { userId },
-    data: { role, step: "PROJECT_SETUP" },
+    data: { role: density, step: "PROJECT_SETUP" },
   });
 }
 
