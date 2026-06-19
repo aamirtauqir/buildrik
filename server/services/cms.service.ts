@@ -42,6 +42,7 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
     pageSlugPattern: input.pageSlugPattern ?? null,
     pageSeoTitle: input.pageSeoTitle ?? null,
     pageSeoDescription: input.pageSeoDescription ?? null,
+    pageTemplatePath: input.pageTemplatePath ?? null,
   };
   if (input.id) {
     // Upsert by the editor-supplied id (engine collection id = DB id, so the
@@ -215,4 +216,31 @@ export async function generateDynamicPages(
     const cleanSlug = slug.replace(/^\/+|\/+$/g, "") || "index";
     return { path: `${cleanSlug}/index.html`, content: html };
   });
+}
+
+/**
+ * Publish-pipeline step: expand a publish page-set with the dynamic pages each
+ * page-generating collection produces. SAFE NO-OP for the common case — a site
+ * with no page-generating collection gets its pages back unchanged, so existing
+ * publishes are untouched. For each collection that has both a slug pattern and a
+ * pageTemplatePath present in the payload, it renders one page per entry from
+ * that template and appends them. Called by startPublish before the job persists.
+ */
+export async function appendDynamicPagesToPublish(
+  siteId: string,
+  pages: Array<{ path: string; html: string }>,
+): Promise<Array<{ path: string; html: string }>> {
+  const cols = await prisma.cmsCollection.findMany({
+    where: { siteId, pageSlugPattern: { not: null }, pageTemplatePath: { not: null } },
+    select: { id: true, pageTemplatePath: true },
+  });
+  if (cols.length === 0) return pages;
+  const result = [...pages];
+  for (const col of cols) {
+    const template = pages.find((p) => p.path === col.pageTemplatePath);
+    if (!template) continue;
+    const generated = await generateDynamicPages(siteId, col.id, template.html);
+    for (const g of generated) result.push({ path: g.path, html: g.content });
+  }
+  return result;
 }

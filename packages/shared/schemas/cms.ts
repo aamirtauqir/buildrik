@@ -30,6 +30,7 @@ export const upsertCollectionInput = z.object({
   pageSlugPattern: z.string().max(200).nullable().optional(),
   pageSeoTitle: z.string().max(200).nullable().optional(),
   pageSeoDescription: z.string().max(400).nullable().optional(),
+  pageTemplatePath: z.string().max(500).nullable().optional(),
 });
 export type UpsertCollectionInput = z.infer<typeof upsertCollectionInput>;
 

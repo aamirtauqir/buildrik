@@ -270,6 +270,9 @@ model CmsCollection {
   pageSlugPattern    String?
   pageSeoTitle       String?
   pageSeoDescription String?
+  // The publish-payload path of the page that templates each entry (e.g.
+  // "blog/_template/index.html"). The publish step renders it per entry.
+  pageTemplatePath   String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

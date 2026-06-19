@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { PrePublishChecksResult, PublishPage } from "@buildrik/shared/schemas/publish";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
+import { appendDynamicPagesToPublish } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
 import {
   createVercelDeployment,
@@ -170,6 +171,11 @@ export async function startPublish(
   // that races past the precheck above lands here and the create throws
   // P2002 — we translate that to ALREADY_PUBLISHING so callers see the
   // same error either way.
+  // Expand the page-set with CMS dynamic pages (one per entry of a page-generating
+  // collection). No-op for sites without such a collection — existing publishes
+  // are unaffected.
+  const finalPages = pages ? await appendDynamicPagesToPublish(siteId, pages) : pages;
+
   let job;
   try {
     job = await prisma.publishBuildJob.create({
@@ -179,7 +185,7 @@ export async function startPublish(
         status: "QUEUED",
         progress: 0,
         steps: [],
-        log: pages ? { pages } : undefined,
+        log: finalPages ? { pages: finalPages } : undefined,
       },
     });
   } catch (err) {

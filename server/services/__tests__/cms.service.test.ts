@@ -44,6 +44,7 @@ import {
   upsertEntry,
   resolveDynamicPages,
   generateDynamicPages,
+  appendDynamicPagesToPublish,
   CmsError,
 } from "@server/services/cms.service";
 
@@ -157,5 +158,28 @@ describe("generateDynamicPages", () => {
   it("returns [] for a non-page collection", async () => {
     colFindFirst.mockResolvedValueOnce({ pageSlugPattern: null });
     await expect(generateDynamicPages("s1", "c1", "<html></html>")).resolves.toEqual([]);
+  });
+});
+
+describe("appendDynamicPagesToPublish", () => {
+  it("is a no-op when the site has no page-generating collection", async () => {
+    colFindMany.mockResolvedValueOnce([]);
+    const pages = [{ path: "index.html", html: "<html></html>" }];
+    await expect(appendDynamicPagesToPublish("s1", pages)).resolves.toBe(pages);
+  });
+
+  it("appends one generated page per entry, rendered from the matching template", async () => {
+    colFindMany.mockResolvedValueOnce([{ id: "c1", pageTemplatePath: "blog/_t/index.html" }]);
+    // generateDynamicPages internals:
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: "/blog/{title}", pageSeoTitle: "{title}", pageSeoDescription: null });
+    entFindMany.mockResolvedValueOnce([{ id: "e1", data: { title: "Hello World" } }]);
+    const pages = [
+      { path: "index.html", html: "<html></html>" },
+      { path: "blog/_t/index.html", html: "<html><head></head><body>{title}</body></html>" },
+    ];
+    const out = await appendDynamicPagesToPublish("s1", pages);
+    expect(out).toHaveLength(3); // 2 original + 1 generated
+    expect(out[2]).toMatchObject({ path: "blog/hello-world/index.html" });
+    expect(out[2].html).toContain("<body>Hello World</body>");
   });
 });
