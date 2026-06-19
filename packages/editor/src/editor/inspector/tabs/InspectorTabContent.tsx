@@ -44,6 +44,9 @@ import {
   type TabId,
 } from "../sections/registry";
 import type { SectionTier } from "../shared/controls";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { HelperText } from "@/editor/shared/vibcoder/HelperText";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 // ============================================================================
 // TYPES
@@ -209,6 +212,29 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
         };
         return <React.Fragment key={id}>{entry.render(ctx)}</React.Fragment>;
       })}
+
+      {/* E3 density: when "fewer" hides advanced sections, say so and offer a
+          reversible way back to full controls — density is a preference, never
+          a permission (so this is a "hidden", not a "locked", affordance). */}
+      {density === "fewer" && visibleIds.length > renderIds.length && (
+        <Stack gap="sm" separator>
+          <HelperText>
+            Simplified view — {visibleIds.length - renderIds.length} more control
+            {visibleIds.length - renderIds.length === 1 ? "" : "s"} hidden. It&apos;s a preference, not a limit.
+          </HelperText>
+          <Button
+            variant="bare"
+            size="sm"
+            onClick={() => {
+              const url = new URL(window.location.href);
+              url.searchParams.set("density", "full");
+              window.location.assign(url.toString());
+            }}
+          >
+            Show all controls
+          </Button>
+        </Stack>
+      )}
     </>
   );
 };
