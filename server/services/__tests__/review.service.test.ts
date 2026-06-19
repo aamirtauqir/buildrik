@@ -38,7 +38,7 @@ describe("submitReview", () => {
     create.mockResolvedValueOnce({ id: "r1" });
     await submitReview("s1", "u1", "ready");
     expect(create).toHaveBeenCalledWith({
-      data: { siteId: "s1", requestedById: "u1", note: "ready", status: "PENDING" },
+      data: { siteId: "s1", requestedById: "u1", note: "ready", changeSummary: null, status: "PENDING" },
     });
   });
 
@@ -47,7 +47,7 @@ describe("submitReview", () => {
     update.mockResolvedValueOnce({ id: "r-open" });
     await submitReview("s1", "u1", "again");
     expect(create).not.toHaveBeenCalled();
-    expect(update).toHaveBeenCalledWith({ where: { id: "r-open" }, data: { note: "again", requestedById: "u1" } });
+    expect(update).toHaveBeenCalledWith({ where: { id: "r-open" }, data: { note: "again", changeSummary: null, requestedById: "u1" } });
   });
 });
 

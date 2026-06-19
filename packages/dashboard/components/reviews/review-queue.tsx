@@ -74,6 +74,11 @@ export function ReviewQueue() {
                   <span className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{r.siteName}</span>
                   <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{timeAgo(r.createdAt)}</span>
                 </div>
+                {r.changeSummary && (
+                  <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-md bg-[var(--color-bg-subtle)] px-2 py-1 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
+                    <span className="text-[var(--color-primary)]">Changed:</span> {r.changeSummary}
+                  </p>
+                )}
                 {r.note && (
                   <p className="mt-1.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>{r.note}</p>
                 )}

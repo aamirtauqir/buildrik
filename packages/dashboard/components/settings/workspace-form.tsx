@@ -40,6 +40,7 @@ interface WorkspaceFormProps {
     timezone?: string;
     iconUrl?: string | null;
     accentColor?: string;
+    editsRequireApproval?: boolean;
     defaultExpiration?: string | null;
     requirePw?: boolean;
     allowEditors?: boolean;
@@ -52,6 +53,7 @@ interface WorkspaceFormProps {
     timezone: string;
     iconUrl: string | null;
     accentColor: string;
+    editsRequireApproval: boolean;
   }) => void;
   onSaveSharing?: (data: {
     defaultExpiration: string | null;
@@ -90,6 +92,7 @@ export function WorkspaceForm({
   const [iconUploading, setIconUploading] = useState(false);
   const [accentColor, setAccentColor] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
   const [hexInput, setHexInput] = useState(initialData?.accentColor ?? DEFAULT_ACCENT);
+  const [editsRequireApproval, setEditsRequireApproval] = useState(initialData?.editsRequireApproval ?? false);
   const presignMutation = trpc.upload.presign.useMutation();
   const confirmMutation = trpc.upload.confirm.useMutation();
   const [defaultExpiration, setDefaultExpiration] = useState<string | null>(
@@ -141,7 +144,7 @@ export function WorkspaceForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSave?.({ name, slug, defaultLanguage, timezone, iconUrl, accentColor });
+    onSave?.({ name, slug, defaultLanguage, timezone, iconUrl, accentColor, editsRequireApproval });
   }
 
   function handleSharingSubmit(e: React.FormEvent) {
@@ -311,6 +314,34 @@ export function WorkspaceForm({
                 </p>
               )}
             </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
+            Collaboration
+          </h3>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                Edits need approval before publishing
+              </p>
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                Content editors send changes for review instead of publishing directly. An admin approves to go live.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEditsRequireApproval(!editsRequireApproval)}
+              className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0"
+              style={{ backgroundColor: editsRequireApproval ? "var(--color-primary)" : "var(--color-border-default)" }}
+              aria-pressed={editsRequireApproval}
+            >
+              <span
+                className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
+                style={{ transform: editsRequireApproval ? "translateX(18px)" : "translateX(2px)" }}
+              />
+            </button>
           </div>
         </div>
 

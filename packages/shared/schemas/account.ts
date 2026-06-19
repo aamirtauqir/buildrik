@@ -45,6 +45,8 @@ export const updateWorkspaceSchema = z.object({
   timezone: z.string().regex(IANA_TZ, "Must be an IANA timezone").optional(),
   iconUrl: z.string().url().nullable().optional(),
   accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color").optional(),
+  // m-approval: workspace-wide gate — edits go through review before publish.
+  editsRequireApproval: z.boolean().optional(),
 });
 
 export const workspaceSharingSettingsSchema = z.object({

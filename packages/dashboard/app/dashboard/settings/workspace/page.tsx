@@ -141,6 +141,7 @@ export default function WorkspacePage() {
           timezone: ws.timezone ?? undefined,
           iconUrl: ws.iconUrl,
           accentColor: ws.accentColor ?? undefined,
+          editsRequireApproval: ws.editsRequireApproval ?? false,
           defaultExpiration: ws.sharingSettings?.defaultExpiration ?? null,
           requirePw: ws.sharingSettings?.requirePw ?? false,
           allowEditors: ws.sharingSettings?.allowEditors ?? false,

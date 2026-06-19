@@ -134,6 +134,9 @@ model Workspace {
   // Site.projectStyles). Null until first captured.
   sharedTheme         Json?
   sharedThemeUpdatedAt DateTime?
+  // m-approval: when on, content editors send edits for review instead of
+  // publishing directly; an Admin approves to publish. Default off (solo flow).
+  editsRequireApproval Boolean  @default(false)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
@@ -341,6 +344,9 @@ model ReviewRequest {
   requestedById String
   status        String    @default("PENDING") // PENDING | APPROVED | CHANGES_REQUESTED
   note          String?
+  // m-approval: human-readable summary of what changed in this submission
+  // (e.g. "hero copy, 2 images"), shown to the reviewer as a lightweight diff.
+  changeSummary String?
   resolvedById  String?
   resolvedAt    DateTime?
   createdAt     DateTime  @default(now())

@@ -27,6 +27,7 @@ export async function submitReview(
   siteId: string,
   requestedById: string,
   note?: string,
+  changeSummary?: string,
 ) {
   const open = await prisma.reviewRequest.findFirst({
     where: { siteId, status: "PENDING" },
@@ -35,11 +36,11 @@ export async function submitReview(
   if (open) {
     return prisma.reviewRequest.update({
       where: { id: open.id },
-      data: { note: note ?? null, requestedById },
+      data: { note: note ?? null, changeSummary: changeSummary ?? null, requestedById },
     });
   }
   return prisma.reviewRequest.create({
-    data: { siteId, requestedById, note: note ?? null, status: "PENDING" },
+    data: { siteId, requestedById, note: note ?? null, changeSummary: changeSummary ?? null, status: "PENDING" },
   });
 }
 
@@ -50,6 +51,7 @@ export interface ReviewRow {
   requestedById: string;
   status: string;
   note: string | null;
+  changeSummary: string | null;
   resolvedById: string | null;
   resolvedAt: Date | null;
   createdAt: Date;
@@ -69,6 +71,7 @@ export async function listReviews(
       requestedById: true,
       status: true,
       note: true,
+      changeSummary: true,
       resolvedById: true,
       resolvedAt: true,
       createdAt: true,

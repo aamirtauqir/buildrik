@@ -48,7 +48,7 @@ export const reviewsRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      return submitReview(input.siteId, ctx.session.user.id, input.note);
+      return submitReview(input.siteId, ctx.session.user.id, input.note, input.changeSummary);
     }),
 
   // Admins see the review queue + resolve it.
