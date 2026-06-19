@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Bell } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { NotificationItem } from "./notification-item";
+import { StateEmpty, LoadingSkeleton, ErrorState } from "@/components/states";
 import type { NotificationData } from "@buildrik/shared/schemas/notifications";
 
 export const NOTIFICATION_TABS = [
@@ -18,7 +19,7 @@ export function NotificationPage() {
   const [activeTab, setActiveTab] = useState<TabFilter>("all");
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
-  const { data, isLoading } = trpc.notifications.listGrouped.useQuery({
+  const { data, isLoading, isError, refetch } = trpc.notifications.listGrouped.useQuery({
     filter: activeTab,
   });
   const utils = trpc.useUtils();
@@ -104,17 +105,29 @@ export function NotificationPage() {
         ))}
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
-        {isLoading ? (
-          <p className="px-4 py-8 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>Loading...</p>
-        ) : groups.length === 0 ? (
-          <div className="flex flex-col items-center py-16">
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No notifications</p>
-            <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              You&apos;re all caught up!
-            </p>
-          </div>
-        ) : (
+      {isLoading ? (
+        <div className="mt-4">
+          <LoadingSkeleton rows={4} variant="list" />
+        </div>
+      ) : isError ? (
+        <div className="mt-4">
+          <ErrorState
+            title="Couldn't load notifications"
+            description="Something went wrong on our end."
+            onRetry={() => refetch()}
+          />
+        </div>
+      ) : groups.length === 0 ? (
+        <div className="mt-4">
+          <StateEmpty
+            icon={<Bell className="h-7 w-7" />}
+            title="No notifications"
+            description="You're all caught up!"
+          />
+        </div>
+      ) : (
+        <div className="mt-4 overflow-hidden rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
+          {(
           groups.map((group) => {
             const lead = toNotificationData(group.notifications[0]);
             const isExpanded = expandedGroups.has(group.id);
@@ -166,8 +179,9 @@ export function NotificationPage() {
               </div>
             );
           })
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
