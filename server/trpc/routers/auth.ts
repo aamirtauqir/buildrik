@@ -202,7 +202,9 @@ export const authRouter = router({
     .query(async ({ input, ctx }) => {
       const invite = await ctx.prisma.invite.findUnique({
         where: { token: input.token },
-        include: { workspace: { select: { name: true } } },
+        // a9-invite: include the workspace icon so the invite can wear the
+        // inviting agency's brand, not Buildrik's.
+        include: { workspace: { select: { name: true, iconUrl: true } } },
       });
       if (!invite) {
         return { found: false as const };
@@ -214,6 +216,7 @@ export const authRouter = router({
       return {
         found: true as const,
         workspaceName: invite.workspace.name,
+        workspaceIconUrl: invite.workspace.iconUrl,
         inviterName: inviter?.fullName ?? "A team member",
         role: invite.role,
         expired: invite.status !== "PENDING" || invite.expiresAt < new Date(),

@@ -72,15 +72,31 @@ function InviteContent() {
 
   return (
     <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="mail" color="blue" />
-      <h1 className="text-auth-title font-semibold text-center">You&apos;ve been invited</h1>
+      {/* a9-invite: wear the inviting workspace's brand when it has one. */}
+      {invite.workspaceIconUrl ? (
+        <div className="flex flex-col items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={invite.workspaceIconUrl} alt={invite.workspaceName} className="h-12 w-12 rounded-lg object-cover" />
+          <p className="mt-2 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{invite.workspaceName}</p>
+        </div>
+      ) : (
+        <>
+          <AuthLogo />
+          <AuthIcon name="mail" color="blue" />
+        </>
+      )}
+      <h1 className="text-auth-title font-semibold text-center mt-2">You&apos;ve been invited</h1>
       <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
         Join <strong>{invite.workspaceName}</strong> as {roleLabel(invite.role)}
       </p>
       <p className="text-sm text-auth-text-muted text-center mt-1">
         Invited by {invite.inviterName}
       </p>
+      {(invite.role === "EDITOR" || invite.role === "DESIGNER") && (
+        <p className="text-xs text-auth-text-muted text-center mt-2">
+          You&apos;ll be able to edit the sites you&apos;re given access to.
+        </p>
+      )}
       <div className="h-6" />
       {error && (
         <>
