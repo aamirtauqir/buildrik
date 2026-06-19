@@ -16,6 +16,7 @@ import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInsta
 import { StatePills } from "./components/StatePills";
 import type { Composer } from "../../engine";
 import { BREAKPOINTS, isValidBreakpoint } from "../../shared/constants/breakpoints";
+import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
@@ -121,14 +122,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     composer,
   });
 
-  // E3 per-user density (acceptance #4). ?view=client seeds "fewer"; ?density=fewer
-  // forces it; otherwise "full". (The persisted UserPreference.editorDensity is
-  // threaded in by the editor host as this URL param.)
-  const inspectorDensity: "full" | "fewer" = React.useMemo(() => {
-    if (typeof window === "undefined") return "full";
-    const q = new URLSearchParams(window.location.search);
-    return q.get("view") === "client" || q.get("density") === "fewer" ? "fewer" : "full";
-  }, []);
+  // E3 per-user density (acceptance #4) — from the shared editor view-mode SSOT.
+  const inspectorDensity = React.useMemo(() => getEditorViewMode().density, []);
 
   const advancedPropsMap = React.useMemo(() => buildAdvancedPropsMapFromRegistry(), []);
   const advancedState = useAdvancedSettings({

@@ -9,6 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { ListTree } from "lucide-react";
+import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
 
@@ -61,9 +62,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
   selectedElement,
   onOpenStructure,
 }) => {
-  const fourToolRail =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("rail") === "4";
+  const fourToolRail = getEditorViewMode().fourToolRail;
   const breadcrumb = selectedElement
     ? `body › ${selectedElement.tagName ?? selectedElement.type}`
     : "body";

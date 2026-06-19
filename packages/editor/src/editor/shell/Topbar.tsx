@@ -29,6 +29,7 @@ import {
   TopbarStatusDot,
 } from "@/editor/shared/vibcoder";
 import { Sparkles } from "lucide-react";
+import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { Issue } from "./hooks/useStudioState";
 import { CommandPalette } from "./modals/CommandPalette";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
@@ -246,9 +247,7 @@ export const Topbar: React.FC<TopbarProps> = ({
 }) => {
   const publishEnabled = isFeatureEnabled("publish");
   // E3: in 4-tool mode AI leaves the rail, so the topbar carries the ✨ trigger.
-  const fourToolRail =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("rail") === "4";
+  const fourToolRail = getEditorViewMode().fourToolRail;
   const [cmdOpen, setCmdOpen] = React.useState(false);
 
   React.useEffect(() => {

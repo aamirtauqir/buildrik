@@ -13,6 +13,7 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId, TabZone, RailTool } from "../rail/tabsConfig";
 import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool } from "../rail/tabsConfig";
+import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
@@ -395,13 +396,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   // Global keyboard shortcuts (A, T, Z, etc.)
   useSidebarKeyboard(safeTabChange);
 
-  // E3 4-tool rail opt-in (?rail=4) — read once; default is the 11-button rail.
-  const useFourToolRail = React.useMemo(
-    () =>
-      typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).get("rail") === "4",
-    [],
-  );
+  // E3 4-tool rail opt-in (?rail=4 or ?view=client) — read once; default 11-button.
+  const useFourToolRail = React.useMemo(() => getEditorViewMode().fourToolRail, []);
 
   // Component creation handler
   const handleCreateComponent = React.useCallback(() => {
