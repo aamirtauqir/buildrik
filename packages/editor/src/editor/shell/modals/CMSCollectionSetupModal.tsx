@@ -263,6 +263,11 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         setCreating(false);
         setSuccess(false);
         setError(null);
+        setGenPages(false);
+        setPageSlug("/{slug}");
+        setPageTemplate("");
+        setPageSeoTitle("");
+        setPageSeoDesc("");
       }, 300);
       return () => clearTimeout(t);
     }
