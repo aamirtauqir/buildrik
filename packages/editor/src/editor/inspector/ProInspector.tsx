@@ -12,6 +12,7 @@ import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
 import { InspectorTabs } from "./components/InspectorTabs";
+import { ReachScopeStrip } from "./components/ReachScopeStrip";
 import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
 import { StatePills } from "./components/StatePills";
 import type { Composer } from "../../engine";
@@ -337,6 +338,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           </Button>
         </div>
       )}
+      {/* 40/41/59 — reach (This element / All like this / Whole site) */}
+      <ReachScopeStrip composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} />
       {/* Figma-style element header */}
       <div className="bdi-ehdr">
         <div className="bdi-eic" aria-hidden="true">
