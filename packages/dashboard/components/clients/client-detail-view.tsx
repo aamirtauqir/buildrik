@@ -2,10 +2,82 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Globe, Plus, X } from "lucide-react";
+import { ArrowLeft, Globe, Plus, Palette, X } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
+
+interface Branding {
+  logoUrl: string | null;
+  brandColor: string | null;
+  customDomain: string | null;
+  hideBuildrik: boolean;
+}
+
+// Empty text fields must persist as null (not ""), or the Zod url()/hex checks
+// on the update payload reject them.
+const orNull = (v: string) => (v.trim() === "" ? null : v.trim());
+
+function BrandingDialog({
+  initial,
+  saving,
+  onClose,
+  onSave,
+}: {
+  initial: Branding;
+  saving: boolean;
+  onClose: () => void;
+  onSave: (b: Branding) => void;
+}) {
+  const [logoUrl, setLogoUrl] = useState(initial.logoUrl ?? "");
+  const [brandColor, setBrandColor] = useState(initial.brandColor ?? "#E42313");
+  const [customDomain, setCustomDomain] = useState(initial.customDomain ?? "");
+  const [hideBuildrik, setHideBuildrik] = useState(initial.hideBuildrik);
+  const field = "mt-1 w-full rounded-lg border px-3 py-2 text-sm";
+  const label = "text-xs font-semibold";
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
+      <div className="w-[460px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>White-label branding</h2>
+          <button onClick={onClose} aria-label="Close"><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
+        </div>
+        <div className="mt-4 space-y-3">
+          <div>
+            <label className={label} style={{ color: "var(--color-text-secondary)" }}>Brand color</label>
+            <div className="mt-1 flex items-center gap-2">
+              <input type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="h-9 w-12 rounded border" style={{ borderColor: "var(--color-border-default)" }} aria-label="Brand color" />
+              <input type="text" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
+            </div>
+          </div>
+          <div>
+            <label className={label} style={{ color: "var(--color-text-secondary)" }}>Logo URL</label>
+            <input type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} className={field} style={{ borderColor: "var(--color-border-default)" }} />
+          </div>
+          <div>
+            <label className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
+            <input type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} className={field} style={{ borderColor: "var(--color-border-default)" }} />
+          </div>
+          <label className="flex items-center gap-2 pt-1 text-sm" style={{ color: "var(--color-text-primary)" }}>
+            <input type="checkbox" checked={hideBuildrik} onChange={(e) => setHideBuildrik(e.target.checked)} className="accent-[var(--color-primary)]" />
+            Hide Buildrik branding for this client
+          </label>
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
+          <button
+            onClick={() => onSave({ logoUrl: orNull(logoUrl), brandColor: orNull(brandColor), customDomain: orNull(customDomain), hideBuildrik })}
+            disabled={saving}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            {saving ? "Saving…" : "Save branding"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const STATUS_COLOR: Record<string, string> = {
   PUBLISHED: "var(--color-success)",
@@ -42,10 +114,20 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
     { enabled: agencyEnabled },
   );
   const [picking, setPicking] = useState(false);
+  const [editingBranding, setEditingBranding] = useState(false);
   const unassignedQuery = trpc.sites.list.useQuery(
     { clientId: null, perPage: 50 },
     { enabled: agencyEnabled && picking },
   );
+
+  const updateMut = trpc.clients.update.useMutation({
+    onSuccess: () => {
+      addToast("success", "Branding saved");
+      setEditingBranding(false);
+      clientQuery.refetch();
+    },
+    onError: (err) => addToast("error", "Couldn't save branding", err.message),
+  });
 
   const assignMut = trpc.clients.assignSite.useMutation({
     onSuccess: () => {
@@ -109,14 +191,24 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => setPicking(true)}
-          className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: "var(--color-primary)" }}
-        >
-          <Plus className="h-4 w-4" />
-          Assign sites
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setEditingBranding(true)}
+            className="flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-sm font-medium"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+          >
+            <Palette className="h-4 w-4" />
+            Branding
+          </button>
+          <button
+            onClick={() => setPicking(true)}
+            className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            <Plus className="h-4 w-4" />
+            Assign sites
+          </button>
+        </div>
       </header>
 
       {sitesQuery.isLoading ? (
@@ -149,6 +241,15 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
             />
           ))}
         </div>
+      )}
+
+      {editingBranding && client && (
+        <BrandingDialog
+          initial={{ logoUrl: client.logoUrl, brandColor: client.brandColor, customDomain: client.customDomain, hideBuildrik: client.hideBuildrik }}
+          saving={updateMut.isPending}
+          onClose={() => setEditingBranding(false)}
+          onSave={(b) => updateMut.mutate({ id: clientId, ...b })}
+        />
       )}
 
       {picking && (
