@@ -129,6 +129,11 @@ model Workspace {
   deletedAt           DateTime?
   iconUrl             String?
   accentColor         String?
+  // E2-T5b shared theme: a captured snapshot of one site's design tokens that
+  // the agency pushes to its client sites. Opaque Json (same shape as
+  // Site.projectStyles). Null until first captured.
+  sharedTheme         Json?
+  sharedThemeUpdatedAt DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
@@ -213,6 +218,9 @@ model Site {
   lastPublishedBy   String?
   projectStyles     Json?
   dsSchemaVersion   Int       @default(0)
+  // E2-T5b per-site override: when true, the agency shared-theme push skips
+  // this site (it keeps its own tokens). Default false = follows the shared theme.
+  themeLocked       Boolean   @default(false)
   projectAssets     Json?
   projectSettings   Json?
   cspPolicy         String?
