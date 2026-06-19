@@ -264,6 +264,12 @@ model CmsCollection {
   icon         String?
   displayField String?
   fields       Json     @default("[]")
+  // Dynamic-page binding (redesign E7): when pageSlugPattern is set, this
+  // collection generates one published page per entry. Patterns use {fieldSlug}
+  // placeholders resolved against each entry's data (pattern SEO).
+  pageSlugPattern    String?
+  pageSeoTitle       String?
+  pageSeoDescription String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

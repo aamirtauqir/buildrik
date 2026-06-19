@@ -12,6 +12,7 @@ import {
   listEntries,
   upsertEntry,
   deleteEntry,
+  resolveDynamicPages,
   CmsError,
 } from "@/server/services/cms.service";
 import {
@@ -21,6 +22,7 @@ import {
   upsertEntryInput,
   listEntriesInput,
   deleteEntryInput,
+  dynamicPagesInput,
 } from "@buildrik/shared/schemas/cms";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,6 +73,16 @@ export const cmsRouter = router({
         translateCms(e);
       }
     }),
+  }),
+  // The published pages a page-generating collection produces (slug + pattern SEO
+  // per entry). Read-only resolution; the publish pipeline turns these into HTML.
+  dynamicPages: protectedProcedure.input(dynamicPagesInput).query(async ({ ctx, input }) => {
+    await requireRead(ctx, input.siteId);
+    try {
+      return await resolveDynamicPages(input.siteId, input.collectionId);
+    } catch (e) {
+      translateCms(e);
+    }
   }),
   entries: router({
     list: protectedProcedure.input(listEntriesInput).query(async ({ ctx, input }) => {

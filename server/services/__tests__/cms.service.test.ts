@@ -42,6 +42,7 @@ import {
   upsertCollection,
   listEntries,
   upsertEntry,
+  resolveDynamicPages,
   CmsError,
 } from "@server/services/cms.service";
 
@@ -105,5 +106,37 @@ describe("entries cross-site guard", () => {
       upsertEntry("s1", { id: "e-x", siteId: "s1", collectionId: "c1", data: {} }),
     ).rejects.toBeInstanceOf(CmsError);
     expect(entUpsert).not.toHaveBeenCalled();
+  });
+});
+
+describe("resolveDynamicPages", () => {
+  it("returns [] for a collection that doesn't generate pages", async () => {
+    colFindFirst.mockResolvedValueOnce({ pageSlugPattern: null, pageSeoTitle: null, pageSeoDescription: null });
+    await expect(resolveDynamicPages("s1", "c1")).resolves.toEqual([]);
+    expect(entFindMany).not.toHaveBeenCalled();
+  });
+
+  it("resolves slug (slugified) + pattern SEO per published entry", async () => {
+    colFindFirst.mockResolvedValueOnce({
+      pageSlugPattern: "/blog/{title}",
+      pageSeoTitle: "{title} — Acme Blog",
+      pageSeoDescription: "Read about {title}.",
+    });
+    entFindMany.mockResolvedValueOnce([
+      { id: "e1", data: { title: "Hello World" } },
+      { id: "e2", data: { title: "Ship It!" } },
+    ]);
+    const pages = await resolveDynamicPages("s1", "c1");
+    expect(pages).toEqual([
+      { entryId: "e1", slug: "/blog/hello-world", seoTitle: "Hello World — Acme Blog", seoDescription: "Read about Hello World." },
+      { entryId: "e2", slug: "/blog/ship-it", seoTitle: "Ship It! — Acme Blog", seoDescription: "Read about Ship It!." },
+    ]);
+    // only PUBLISHED entries are turned into pages
+    expect(entFindMany.mock.calls[0][0].where).toMatchObject({ collectionId: "c1", status: "PUBLISHED" });
+  });
+
+  it("throws NOT_FOUND for a collection outside the site", async () => {
+    colFindFirst.mockResolvedValueOnce(null);
+    await expect(resolveDynamicPages("s1", "nope")).rejects.toBeInstanceOf(CmsError);
   });
 });

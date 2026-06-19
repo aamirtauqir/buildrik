@@ -39,6 +39,9 @@ export async function upsertCollection(siteId: string, input: UpsertCollectionIn
     icon: input.icon ?? null,
     displayField: input.displayField ?? null,
     fields: input.fields as unknown as Prisma.InputJsonValue,
+    pageSlugPattern: input.pageSlugPattern ?? null,
+    pageSeoTitle: input.pageSeoTitle ?? null,
+    pageSeoDescription: input.pageSeoDescription ?? null,
   };
   if (input.id) {
     // Upsert by the editor-supplied id (engine collection id = DB id, so the
@@ -104,4 +107,60 @@ export async function deleteEntry(siteId: string, id: string): Promise<void> {
   });
   if (!owned) throw new CmsError("NOT_FOUND", "Entry not found");
   await prisma.cmsEntry.delete({ where: { id } });
+}
+
+// ── Dynamic pages (E7) ──────────────────────────────────────────────────────
+
+function slugify(s: string): string {
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+// Replace {fieldSlug} placeholders with each entry's values. slug patterns
+// slugify the substituted value; SEO patterns keep it human-readable.
+function applyPattern(pattern: string, data: Record<string, unknown>, asSlug: boolean): string {
+  return pattern.replace(/\{([a-zA-Z0-9_-]+)\}/g, (_m, key: string) => {
+    const v = data[key];
+    const s = v == null ? "" : String(v);
+    return asSlug ? slugify(s) : s;
+  });
+}
+
+export interface DynamicPage {
+  entryId: string;
+  slug: string;
+  seoTitle: string;
+  seoDescription: string;
+}
+
+/**
+ * Resolve the published pages a page-generating collection produces — one per
+ * PUBLISHED entry, with its slug + pattern SEO computed from the entry's data.
+ * This is the data the publish pipeline turns into HTML; returning it lets the
+ * dashboard preview the generated pages without a deploy. Non-page collections
+ * (no pageSlugPattern) yield [].
+ */
+export async function resolveDynamicPages(
+  siteId: string,
+  collectionId: string,
+): Promise<DynamicPage[]> {
+  const col = await prisma.cmsCollection.findFirst({
+    where: { id: collectionId, siteId },
+    select: { pageSlugPattern: true, pageSeoTitle: true, pageSeoDescription: true },
+  });
+  if (!col) throw new CmsError("NOT_FOUND", "Collection not found");
+  if (!col.pageSlugPattern) return [];
+  const entries = await prisma.cmsEntry.findMany({
+    where: { collectionId, status: "PUBLISHED" },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, data: true },
+  });
+  return entries.map((e) => {
+    const data = (e.data as Record<string, unknown>) ?? {};
+    return {
+      entryId: e.id,
+      slug: applyPattern(col.pageSlugPattern as string, data, true),
+      seoTitle: col.pageSeoTitle ? applyPattern(col.pageSeoTitle, data, false) : "",
+      seoDescription: col.pageSeoDescription ? applyPattern(col.pageSeoDescription, data, false) : "",
+    };
+  });
 }

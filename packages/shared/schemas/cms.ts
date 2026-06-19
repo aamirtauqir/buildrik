@@ -25,10 +25,17 @@ export const upsertCollectionInput = z.object({
   icon: z.string().nullable().optional(),
   displayField: z.string().nullable().optional(),
   fields: z.array(cmsField).default([]),
+  // Dynamic-page binding + pattern SEO (set pageSlugPattern to generate one page
+  // per entry; {fieldSlug} placeholders resolve against each entry's data).
+  pageSlugPattern: z.string().max(200).nullable().optional(),
+  pageSeoTitle: z.string().max(200).nullable().optional(),
+  pageSeoDescription: z.string().max(400).nullable().optional(),
 });
 export type UpsertCollectionInput = z.infer<typeof upsertCollectionInput>;
 
 export const listCollectionsInput = z.object({ siteId: z.string().min(1) });
+
+export const dynamicPagesInput = z.object({ siteId: z.string().min(1), collectionId: z.string().min(1) });
 
 export const deleteCollectionInput = z.object({ siteId: z.string().min(1), id: z.string().min(1) });
 
