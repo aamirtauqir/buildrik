@@ -241,11 +241,37 @@ model Site {
   publishJobs     PublishBuildJob[]
   analyticsEvents AnalyticsEvent[]
   reviewRequests  ReviewRequest[]
+  comments        Comment[]
 
   @@index([workspaceId])
   @@index([workspaceId, status])
   @@index([clientId])
   @@map("sites")
+}
+
+// Client comment review (redesign E7). A viewer/client pins a change-request on
+// the preview (x/y + optional element selector) without canvas access; the
+// agency resolves it. Pin coordinates are page-relative fractions (0..1) so they
+// survive viewport changes. Deleting a site removes its comments.
+model Comment {
+  id             String    @id @default(cuid())
+  siteId         String
+  pageId         String?
+  authorId       String
+  body           String
+  x              Float?
+  y              Float?
+  targetSelector String?
+  status         String    @default("OPEN") // OPEN | RESOLVED
+  resolvedById   String?
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, status])
+  @@map("comments")
 }
 
 // Invited-client review workflow (redesign E4). A content editor "sends for
