@@ -242,11 +242,51 @@ model Site {
   analyticsEvents AnalyticsEvent[]
   reviewRequests  ReviewRequest[]
   comments        Comment[]
+  cmsCollections  CmsCollection[]
 
   @@index([workspaceId])
   @@index([workspaceId, status])
   @@index([clientId])
   @@map("sites")
+}
+
+// CMS server persistence (redesign E7). The editor's CMS already works locally
+// (IndexedDB via engine CollectionManager); these models move it server-side so
+// collections + entries sync across devices/users and survive. `fields` is the
+// CMSField[] array (engine src/shared/types/cms.ts), `data` is an entry's
+// field-value map — both Json so the editor can round-trip its own shapes.
+model CmsCollection {
+  id           String   @id @default(cuid())
+  siteId       String
+  name         String
+  slug         String
+  description  String?
+  icon         String?
+  displayField String?
+  fields       Json     @default("[]")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  site    Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  entries CmsEntry[]
+
+  @@unique([siteId, slug])
+  @@index([siteId])
+  @@map("cms_collections")
+}
+
+model CmsEntry {
+  id           String   @id @default(cuid())
+  collectionId String
+  data         Json     @default("{}")
+  status       String   @default("DRAFT") // DRAFT | PUBLISHED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  collection CmsCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId, status])
+  @@map("cms_entries")
 }
 
 // Client comment review (redesign E7). A viewer/client pins a change-request on

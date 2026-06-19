@@ -22,6 +22,7 @@ import { featuresRouter } from "./routers/features";
 import { clientsRouter } from "./routers/clients";
 import { reviewsRouter } from "./routers/reviews";
 import { commentsRouter } from "./routers/comments";
+import { cmsRouter } from "./routers/cms";
 
 export const appRouter = router({
   auth: authRouter,
@@ -47,6 +48,7 @@ export const appRouter = router({
   clients: clientsRouter,
   reviews: reviewsRouter,
   comments: commentsRouter,
+  cms: cmsRouter,
 });
 
 export type AppRouter = typeof appRouter;
