@@ -177,6 +177,21 @@ reachable (no feature loss). **Effort:** ~16h (the biggest RE-IA). **Risk:** fol
 without dropping capability — map every current tab action to its new home first; **do not
 delete** engine features, only re-route UI. **Dep:** E0.
 
+> **PROGRESS / unblock 2026-06-19.** Step 1 done in code: the 11→4 home map is locked in the
+> rail SSOT (`tabsConfig.ts`: `RailTool` field + `RAIL_TOOLS` + `RAIL_TOOL_META` + getters,
+> 8 tests) and the per-user density data layer shipped (`UserPreference.editorDensity`). **Live-
+> verify path FOUND:** the unified editor renders inside the dashboard at
+> `localhost:3000/edit/<siteId>` (Next.js, port 3000) — so the rail rebuild can be visually +
+> undo-verified with the same browser tooling used for the dashboard, *without* the standalone
+> Vite editor (`:5050`) that `packages/editor/CLAUDE.md` reserves for `/browse`. Confirmed live:
+> editor mounts, the 11-button rail renders + is interactive (clicking sets active tab, drawer
+> responds). **Risk re-assessed DOWN:** regrouping rail *buttons* doesn't change panel mutation
+> paths — the folded panels (Add/Templates/Design/Settings/…) keep calling the Composer exactly
+> as today, so undo is not endangered by the re-IA; the engine "command-layer" concern only bites
+> if folding introduces *new* ad-hoc mutations, which simple re-routing avoids. Remaining (the
+> ~16h): Insert + Site **composite panels** (sub-nav over the folded tabs), ✨ topbar AI, footer
+> ⌗ structure popover, density consumer in the inspector — build each against the live editor.
+
 ## E4 — Invited-client flow: branded accept + client-mode editor + approval  [RE-IA + new]
 
 **Goal:** the missing client first-run — branded landing (a9) → accept (new/existing) →
