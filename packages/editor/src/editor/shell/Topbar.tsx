@@ -331,23 +331,24 @@ export const Topbar: React.FC<TopbarProps> = ({
   return (
     <>
       <VibcoderTopbar>
-        {/* Cell 1 — Brand group (mark + label + chevron) */}
+        {/* Cell 1 — Exit + brand mark (m-editor: '‹ Exit' back to the dashboard,
+            not a 'Buildrik' studio brand). */}
         <div className="bd-topbar__brand-group">
           <a
             href={`${dashboardUrl}/dashboard/sites`}
             className="bd-topbar__brand-mark"
-            aria-label="Back to Dashboard"
+            aria-label="Exit to Dashboard"
           >
             B
           </a>
-          <TopbarBrand>Buildrik</TopbarBrand>
-          <IconButton
-            size="xs"
-            aria-label="Switch project"
-            onClick={() => window.open(`${dashboardUrl}/dashboard/sites`, "_blank", "noopener,noreferrer")}
+          <a
+            href={`${dashboardUrl}/dashboard/sites`}
+            className="bd-topbar__exit"
+            aria-label="Exit to Dashboard"
+            style={{ fontSize: 13, color: "var(--bd-text-muted, #6b7280)", textDecoration: "none", whiteSpace: "nowrap" }}
           >
-            <IconChevDown />
-          </IconButton>
+            ‹ Exit
+          </a>
         </div>
 
         {/* Cell 2 — Undo / Redo / History */}
@@ -404,7 +405,7 @@ export const Topbar: React.FC<TopbarProps> = ({
         ) : (
           <div className="bd-topbar__title">
             <span>{projectName}</span>
-            <span className="bd-topbar__title-slash">/</span>
+            <span className="bd-topbar__title-slash">›</span>
             <span className="bd-topbar__title-page">{pageName}</span>
             <IconChevDown />
           </div>
@@ -488,6 +489,30 @@ export const Topbar: React.FC<TopbarProps> = ({
             </TooltipTrigger>
             <TooltipPortal>
               <TooltipContent>Command palette <TooltipKbd>⌘K</TooltipKbd></TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
+
+          {/* m-editor: Client view — see the editor as an invited client does
+              (4-tool rail + simplified inspector). Toggles ?view=client. */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const url = new URL(window.location.href);
+                  if (viewMode.clientView) url.searchParams.delete("view");
+                  else url.searchParams.set("view", "client");
+                  window.location.assign(url.toString());
+                }}
+                aria-label={viewMode.clientView ? "Exit client view" : "Client view"}
+                aria-pressed={viewMode.clientView}
+              >
+                {viewMode.clientView ? "Exit client view" : "Client view"}
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{viewMode.clientView ? "Back to the full editor" : "See it as your client does"}</TooltipContent>
             </TooltipPortal>
           </Tooltip>
 
