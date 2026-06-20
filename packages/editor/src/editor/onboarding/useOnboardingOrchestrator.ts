@@ -115,12 +115,12 @@ export function useOnboardingOrchestrator(): OnboardingOrchestratorState {
   const [phase, setPhase] = useState<OnboardingPhase>(loadInitialPhase);
   const [steps, setSteps] = useState<OnboardingStep[]>(loadInitialSteps);
   const [achievement, setAchievement] = useState<AchievementPromptState | null>(null);
-  // Start minimized if the user has already seen the welcome (any step completed).
-  // On a brand-new visit completedCount === 0, so the checklist stays hidden behind
-  // the WelcomeModal; after the user dismisses the welcome the checklist appears minimized.
-  const [isMinimized, setIsMinimized] = useState(
-    () => loadInitialSteps().filter((s) => s.completed).length > 0
-  );
+  // Redesign P6 (calm first load): the checklist always starts as a minimized pill,
+  // never the full bottom-right panel. New users meet the WelcomeModal first; the
+  // pill is then one small, expandable nudge that doesn't fight the canvas. Users
+  // open it on demand via the pill (restore). Previously a brand-new visit started
+  // EXPANDED — three onboarding surfaces competing on first paint.
+  const [isMinimized, setIsMinimized] = useState(true);
 
   // Start expanded on the first incomplete step
   const [activeStepId, setActiveStepId] = useState<string | null>(() => {
