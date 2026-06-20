@@ -14,6 +14,7 @@ import { PresenceIndicators } from "../collaboration";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Users } from "lucide-react";
 import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
+import { EVENTS } from "../../shared/constants";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { Topbar } from "./Topbar";
@@ -249,9 +250,32 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   // Compute lastSavedAt from lastSaved Date if not provided
   const computedLastSavedAt = lastSavedAt ?? (lastSaved ? lastSaved.getTime() : undefined);
 
+  // Redesign P5: real topbar breadcrumb. Read the live site name + active page
+  // name from the composer (populated by loadProject → importProject) instead of
+  // the "My project › Home" placeholders. Reactive to project load + page switch.
+  // selectedElement is a dep so a page rename committed via the inspector re-reads.
+  const [crumb, setCrumb] = React.useState<{ projectName?: string; pageName?: string }>({});
+  React.useEffect(() => {
+    if (!composer) return;
+    const read = () =>
+      setCrumb({
+        projectName: composer.getProjectMetadata?.()?.name || undefined,
+        pageName: composer.elements?.getActivePage?.()?.name || undefined,
+      });
+    read();
+    composer.on(EVENTS.PROJECT_LOADED, read);
+    composer.on(EVENTS.PAGE_CHANGED, read);
+    return () => {
+      composer.off(EVENTS.PROJECT_LOADED, read);
+      composer.off(EVENTS.PAGE_CHANGED, read);
+    };
+  }, [composer, selectedElement]);
+
   return (
     <Topbar
       composer={composer}
+      projectName={crumb.projectName}
+      pageName={crumb.pageName}
       device={device}
       zoom={zoom}
       canUndo={canUndo}
