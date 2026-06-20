@@ -1,6 +1,15 @@
 # Editor redesign plan — match the m-editor wireframe, surface by surface
 
-**Status:** ready to execute · **Owner:** solo · **Updated:** 2026-06-20
+**Status:** ✅ COMPLETE (all 6 phases shipped 2026-06-20) · **Owner:** solo · **Updated:** 2026-06-20
+
+> **Done 2026-06-20** — Phases 1–6 all shipped to `main` + live-verified in the browser:
+> P1 `4dc95682` (offline≠"Save failed") · P2 `c09b0802`+`9e826a17` (clean resting canvas + drop parent-highlight) ·
+> P3 `43bc6a07` (hide DOM jargon, plain labels, reach copy) · P5 `4be2d9f3` (real `site › page` breadcrumb) ·
+> P6 `27f38be1` (calm first load — onboarding pill) · P4 `791d5761` (Insert) `f5a798cc` (Pages search-listings)
+> `f5f35590` (Structure popover) `0becdfc7` (Styles shared-theme home).
+> **Deferred follow-ups** (noted in commits): Insert Blocks/Templates IA merge; a wide SEO view for the Pages
+> table (the 5-col table scrolls in the 340px rail); full editor-side `sharedTheme` sync (currently a link-out);
+> inspector body job-grouping (P3 finding 3 — `Look/Layout/Effects` is the interim).
 
 ## What this is
 The editor's features are strong but the *product design* still reads as old/incoherent (founder call + [codex review](../reviews/) + heuristic audit, 2026-06-20). This plan turns "redesign the whole editor" into a safe, ordered sequence of single-surface passes that each end green.
