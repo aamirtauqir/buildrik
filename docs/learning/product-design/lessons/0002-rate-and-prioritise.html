@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 2 — Rate &amp; prioritise (three real findings)</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 2 · ~9 minutes</p>
+  <h1>Naming was step one. Now: rate, then rank.</h1>
+  <p class="lede">In Lesson 1 you learned to turn "feels weird" into a <strong>named</strong> finding. A list of named problems is still just a list. The skill that turns a list into a <strong>plan</strong> is rating each one (severity) and then ranking them (what to fix first). I did that on your real editor below — three findings I left on the table after today's redesign.</p>
+
+  <div class="callout">
+    <strong>The one move this lesson teaches</strong><br>
+    <em>severity = <strong>how often</strong> × <strong>how much it hurts</strong> × <strong>does it block recovery</strong>. Then rank by severity — and break ties by effort.</em>
+  </div>
+
+  <h2>How to put a number on it</h2>
+  <p>Severity isn't a vibe. It's three questions, multiplied:</p>
+  <table>
+    <tr><th>Ask</th><th>Low → High</th></tr>
+    <tr><td><strong>Frequency</strong> — how many users hit it, how often?</td><td>rare edge case → every user, every session</td></tr>
+    <tr><td><strong>Impact</strong> — how bad when they hit it?</td><td>mild annoyance → loses work / wrong outcome</td></tr>
+    <tr><td><strong>Persistence</strong> — can they get past it, or are they stuck?</td><td>shrug and move on → blocked, no way back</td></tr>
+  </table>
+  <div class="panel">
+    <span class="sev sev-0">0</span> not a problem ·
+    <span class="sev sev-1">1</span> cosmetic ·
+    <span class="sev sev-2">2</span> minor (fix soon) ·
+    <span class="sev sev-3">3</span> major (fix) ·
+    <span class="sev sev-4">4</span> catastrophe (fix before anything else)
+  </div>
+  <p class="fine">Rule of thumb: high on all three = 4. High frequency but low impact = 2. Low frequency but blocks recovery = still a 3.</p>
+
+  <h2>Three findings from your editor — rated with the <em>why</em></h2>
+
+  <div class="panel panel--accent">
+    <strong>Finding A — Topbar, any site.</strong> The breadcrumb reads <code>Demo AI Site › Home</code> — site and page, but <strong>no agency or client</strong> above it.
+    <br>· <span class="chip">Match the real world</span> + <span class="chip">Visibility of system status</span>
+    <br>· <span class="sev sev-2">2</span> — <em>why:</em> frequency is <strong>high</strong> (every editor load), impact is <strong>high for an agency</strong> (you manage many clients; you can't tell <em>whose</em> site you're editing), but persistence is low (the canvas content usually reminds you). High×High×Low → a solid <strong>2</strong>, and it climbs to <strong>3</strong> the day someone edits the wrong client's site.
+    <br>· <strong>Fix:</strong> widen the breadcrumb to <code>Agency › Client › Site › Page</code> when that data is loaded.
+  </div>
+
+  <div class="panel panel--accent">
+    <strong>Finding B — Topbar, solo draft.</strong> <code>+ Invite</code> sits as a first-class button next to <code>Ask AI</code>, on a site with one editor and no content yet.
+    <br>· <span class="chip">Aesthetic &amp; minimalist design</span>
+    <br>· <span class="sev sev-1">1</span> — <em>why:</em> frequency high (always visible), but impact is <strong>low</strong> (it's just visual noise, harms nothing) and persistence is none (ignore it). High×Low×None → a <strong>1</strong>. Real, but cosmetic.
+    <br>· <strong>Fix:</strong> demote Invite into an overflow / secondary spot until there's a reason to collaborate.
+  </div>
+
+  <div class="panel panel--accent">
+    <strong>Finding C — Canvas, first load.</strong> A small <code>0 / 7 done</code> pill floats bottom-right. It never says <em>done what</em>.
+    <br>· <span class="chip">Recognition rather than recall</span>
+    <br>· <span class="sev sev-2">2</span> — <em>why:</em> frequency high (every new user), impact medium (they must <em>recall/guess</em> it's the setup checklist instead of <em>recognising</em> it), persistence low (clicking reveals it). High×Medium×Low → <strong>2</strong>.
+    <br>· <strong>Fix:</strong> label it — <code>Setup · 0/7</code> — or a one-line tooltip on hover.
+  </div>
+
+  <h2>Now rank them — and notice the tie-break</h2>
+  <p>Two of these are severity 2 (A and C) and one is a 1 (B). Severity-first says A and C beat B. But A and C tie — so break the tie by <strong>effort</strong>:</p>
+  <table>
+    <tr><th>#</th><th>Finding</th><th>Sev</th><th>Effort</th></tr>
+    <tr><td>1</td><td>C — label the <code>0/7</code> pill</td><td><span class="sev sev-2">2</span></td><td>tiny (one string)</td></tr>
+    <tr><td>2</td><td>A — agency › client breadcrumb</td><td><span class="sev sev-2">2</span></td><td>bigger (needs the data wired in)</td></tr>
+    <tr><td>3</td><td>B — demote <code>+ Invite</code></td><td><span class="sev sev-1">1</span></td><td>small</td></tr>
+  </table>
+  <p>A cheap severity-2 beats an expensive severity-2. That's the whole game: <strong>severity sets the order, effort breaks ties.</strong> Never let a 5-minute fix wait behind a 2-day one of the same severity.</p>
+
+  <h2>The new tool: "expected result in one line"</h2>
+  <p>You said features "have no expected result." Here's the test. For any control, write the one line a user would expect <em>before</em> they click:</p>
+  <div class="panel">
+    <em>Click <code>0 / 7 done</code> → I expect: <strong>"the setup checklist opens."</strong></em><br>
+    <em>Click <code>+ Invite</code> → I expect: <strong>"a box to add a teammate's email."</strong></em>
+  </div>
+  <p>If you <strong>can't</strong> write that line, or the real result doesn't match it — that's your finding, already half-named. Run this on five controls in your editor and you'll have five findings before lunch.</p>
+
+  <h2>Your turn — rate and rank</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Every user, every session (high frequency), but they just ignore it and nothing breaks (low impact, no block). High × Low × None = cosmetic = 1.">
+      <p class="q-stem">An icon button is always visible but does nothing harmful and is easy to ignore. What severity?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>1 — cosmetic</button>
+        <button class="q-opt">3 — major</button>
+        <button class="q-opt">4 — catastrophe</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Same severity → the tie-breaker is effort. The one-string fix ships now; the data-wiring one waits. Cheap beats expensive at equal severity.">
+      <p class="q-stem">Two findings are both severity 2. One is a one-word label change; one needs new data plumbing. Which first?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>The label change — cheap beats expensive at equal severity</button>
+        <button class="q-opt">The data plumbing — bigger work is more important</button>
+        <button class="q-opt">Neither — wait until both are ready</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Rare to hit, but when hit there's no way back — persistence is maxed. Low frequency × High impact × Blocks recovery still lands at 3, not 1.">
+      <p class="q-stem">A bug is rare, but when it happens the user loses unsaved work with no undo. Severity?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>3 — major, because it blocks recovery</button>
+        <button class="q-opt">1 — it's rare, so cosmetic</button>
+        <button class="q-opt">0 — not a real problem</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Do this before Lesson 3</h2>
+  <p>Open the editor, pick one panel, and run "expected result in one line" on three of its controls. For each mismatch, write the 5-part finding (<a href="0001-audit-your-editor.html">Lesson 1</a>) and put a severity on it (this lesson). Bring me the three — Lesson 3 turns a rated list into a fix sequence and catches the trap where two findings are really one root cause.</p>
+
+  <p class="source">Primary source: <a href="https://www.nngroup.com/articles/how-to-rate-the-severity-of-usability-problems/" target="_blank" rel="noopener">NN/g — How to Rate the Severity of Usability Problems</a>. Reference: <a href="../reference/heuristics-cheatsheet.html">heuristics cheat-sheet</a>.</p>
+  <p class="fine">Stuck on a rating? I'm your teacher — ask me to argue the severity with you. That argument <em>is</em> the skill.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

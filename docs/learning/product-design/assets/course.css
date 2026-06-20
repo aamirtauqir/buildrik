@@ -56,6 +56,8 @@ hr { border: 0; border-top: 1px solid var(--rule); margin: 36px 0; }
 }
 .panel--accent { border-color: var(--accent); background: var(--accent-soft); }
 .callout { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; margin: 18px 0; color: var(--muted); }
+/* Primary-source footer line every lesson ends on */
+.source { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 0.9em; color: var(--muted); }
 
 /* The reusable "principle" chip */
 .chip {

@@ -13,9 +13,10 @@
 ## Course shape
 - Spine = NN/g 10 heuristics + severity + the audit loop. Reference: `reference/heuristics-cheatsheet.html`.
 - L1 (done): teach the naming muscle via a quiz on the learner's own complaints. Assignment = write 3 findings on one editor task.
-- L2 (next): rate + prioritise their 3 findings by severity; introduce "expected result in one line" per feature.
+- L2 (done): rate + prioritise. Built as a WORKED example — 3 real, fresh editor findings (breadcrumb no agency›client #2 sev2 · +Invite first-class #8 sev1 · "0/7 done" pill unlabelled #6 sev2), each rated with the why (freq×impact×persistence), then ranked (severity sets order, effort breaks ties). Introduced "expected result in one line". `lessons/0002-rate-and-prioritise.html`.
+- L3 (next): rated list → fix sequence + the "two findings = one root cause" trap (de-dup before sequencing).
 - Later: consistency/IA coherence ("features have no relation"), the anti-AI-slop checklist (density, hierarchy, decoration).
 
 ## Open loops
-- Waiting on the learner's 3 findings from the L1 assignment → drives L2.
-- No learning record yet — write one once they demonstrate they can name a violation correctly (quiz pass + a real finding).
+- L2 assignment out: run "expected result in one line" on 3 controls of one panel → 3 rated findings → drives L3.
+- Learning record written (0001) — the teaching METHOD for this learner: worked examples on the real app, not homework-gated lessons (drive-don't-quiz).
