@@ -26,6 +26,7 @@ import { TabFrame } from "@/shared/extensions/TabFrame";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
+import { SearchListingsTable } from "./components/SearchListingsTable";
 import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
@@ -76,6 +77,11 @@ export const PagesTab: React.FC<PagesTabProps> = ({
 
   // ⌘K command palette
   const [paletteOpen, setPaletteOpen] = React.useState(false);
+
+  // Redesign P4 (50-pages): the panel has two views — the page tree ("Pages")
+  // and the whole-site search-listings table ("Search listings"). Default to the
+  // tree; the table is the SEO-at-a-glance view that scales past a few pages.
+  const [view, setView] = React.useState<"pages" | "listings">("pages");
 
   // Settings drawer — resolve the active page from the id stored in usePages
   const settingsPage = p.settingsPageId
@@ -207,6 +213,47 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         </TabFrame.Body>
       ) : (
         <TabFrame.Body noScroll>
+          {/* View segment — page tree vs whole-site search-listings (50-pages) */}
+          <div
+            role="tablist"
+            aria-label="Pages view"
+            style={{
+              display: "inline-flex",
+              margin: "8px 12px 0",
+              border: "1px solid var(--bd-border, #e5e7eb)",
+              borderRadius: 5,
+              overflow: "hidden",
+              alignSelf: "flex-start",
+            }}
+          >
+            {([["pages", "Pages"], ["listings", "Search listings"]] as const).map(([v, label], i) => {
+              const on = view === v;
+              return (
+                <Button
+                  key={v}
+                  variant="bare"
+                  size="sm"
+                  role="tab"
+                  aria-selected={on}
+                  onClick={() => setView(v)}
+                  style={{
+                    padding: "4px 12px",
+                    fontSize: 11,
+                    fontWeight: on ? 600 : 400,
+                    borderRadius: 0,
+                    borderRight: i === 0 ? "1px solid var(--bd-border, #e5e7eb)" : undefined,
+                    background: on ? "var(--bd-accent, #2D6DFF)" : "transparent",
+                    color: on ? "#fff" : "var(--bd-fg-muted, #6b7280)",
+                  }}
+                >
+                  {label}
+                </Button>
+              );
+            })}
+          </div>
+          {view === "listings" ? (
+            <SearchListingsTable pages={p.pages} onEditPage={p.openSettings} />
+          ) : (
           <PageList
             pages={p.pages}
             renamingPageId={p.renamingPageId}
@@ -238,6 +285,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onMovePageToFolder={f.movePageToFolder}
             onRemovePageFromFolder={f.removePageFromFolder}
           />
+          )}
         </TabFrame.Body>
       )}
       {/* Context menu (portal) */}
