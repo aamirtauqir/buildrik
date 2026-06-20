@@ -36,6 +36,7 @@ import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
 import { StudioFooter } from "./StudioFooter";
+import { StructurePopover } from "./StructurePopover";
 import { StudioHeader } from "./StudioHeader";
 import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
@@ -255,6 +256,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // window event; idempotent (keep the first) so repeated autosave conflicts
   // don't stack dialogs while one is open.
   const [conflict, setConflict] = React.useState<{ serverToken: string } | null>(null);
+
+  // Redesign P4 (51-layers): the footer ⌗ opens the structure tree as a floating
+  // popover over the canvas, not the left drawer. Open-only trigger; close via the
+  // popover's X / Esc / outside-click.
+  const [structureOpen, setStructureOpen] = React.useState(false);
   React.useEffect(() => {
     const onConflict = (e: Event) => {
       const token = (e as CustomEvent<{ serverLastEditedAt: string }>).detail?.serverLastEditedAt;
@@ -534,9 +540,16 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // Drive the connection pill from the real save state — it was
           // hardcoded "Connected · main" regardless of save failures.
           syncConnected={state.saveState.status !== "error"}
-          onOpenStructure={() => state.setLeftPanelTab("layers")}
+          onOpenStructure={() => setStructureOpen(true)}
         />
       </footer>
+
+      <StructurePopover
+        open={structureOpen}
+        onClose={() => setStructureOpen(false)}
+        composer={composer}
+        selectedElement={selectedElement}
+      />
 
       <UpgradeModal />
 
