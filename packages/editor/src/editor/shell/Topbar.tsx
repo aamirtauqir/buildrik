@@ -23,12 +23,13 @@ import {
   TooltipContent,
   TooltipKbd,
   Topbar as VibcoderTopbar,
-  TopbarBrand,
   TopbarGroup,
   TopbarStatus,
   TopbarStatusDot,
 } from "@/editor/shared/vibcoder";
-import { Sparkles } from "lucide-react";
+import { Menu, MenuItem } from "@/editor/shared/vibcoder/Menu";
+import { useClickOutside } from "@/shared/hooks";
+import { Sparkles, MoreHorizontal } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import { submitForReview } from "../../services/ReviewService";
 import type { Issue } from "./hooks/useStudioState";
@@ -110,34 +111,10 @@ const IconWide = () => (
     <path d="M8 19h8 M12 15v4" />
   </Stroke>
 );
-const IconChevDown = () => (
-  <Stroke size={12}>
-    <path d="M6 9l6 6 6-6" />
-  </Stroke>
-);
-const IconKbd = () => (
-  <Stroke>
-    <rect x="2" y="6" width="20" height="12" rx="2" />
-    <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
-  </Stroke>
-);
 const IconWarn = () => (
   <Stroke w={2.5} size={12}>
     <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
     <line x1="12" y1="9" x2="12" y2="13" />
-    <line x1="12" y1="17" x2="12.01" y2="17" />
-  </Stroke>
-);
-const IconUser = () => (
-  <Stroke>
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </Stroke>
-);
-const IconHelpCircle = () => (
-  <Stroke>
-    <circle cx="12" cy="12" r="10" />
-    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
     <line x1="12" y1="17" x2="12.01" y2="17" />
   </Stroke>
 );
@@ -264,6 +241,13 @@ export const Topbar: React.FC<TopbarProps> = ({
   }, []);
   const [cmdOpen, setCmdOpen] = React.useState(false);
 
+  // Redesign: the "Status + Ship" zone keeps only the common actions; the rare
+  // ones (Invite, command palette, Preview-as-client, Help, Account) live in a
+  // ⋯ overflow menu. Same handlers — only their home moved.
+  const [moreOpen, setMoreOpen] = React.useState(false);
+  const moreRef = React.useRef<HTMLDivElement | null>(null);
+  useClickOutside(moreRef, () => setMoreOpen(false), { enabled: moreOpen });
+
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -336,66 +320,74 @@ export const Topbar: React.FC<TopbarProps> = ({
   return (
     <>
       <VibcoderTopbar>
-        {/* Cell 1 — Exit + brand mark (m-editor: '‹ Exit' back to the dashboard,
-            not a 'Buildrik' studio brand). */}
-        <div className="bd-topbar__brand-group">
-          <a
-            href={`${dashboardUrl}/dashboard/sites`}
-            className="bd-topbar__brand-mark"
-            aria-label="Exit to Dashboard"
-          >
-            B
-          </a>
-          <a
-            href={`${dashboardUrl}/dashboard/sites`}
-            className="bd-topbar__exit"
-            aria-label="Exit to Dashboard"
-            style={{ fontSize: 13, color: "var(--bd-text-muted, #6b7280)", textDecoration: "none", whiteSpace: "nowrap" }}
-          >
-            ‹ Exit
-          </a>
+        {/* ZONE 1 — Navigate: leave the editor + step back through history.
+            Redesign: the site/page breadcrumb left the topbar (it lives in the
+            bottom status bar now); the topbar is three labelled zones. */}
+        <div className="bd-topbar__zone bd-topbar__zone--left">
+          <div className="bd-topbar__brand-group">
+            <a
+              href={`${dashboardUrl}/dashboard/sites`}
+              className="bd-topbar__brand-mark"
+              aria-label="Exit to Dashboard"
+            >
+              B
+            </a>
+            <a
+              href={`${dashboardUrl}/dashboard/sites`}
+              className="bd-topbar__exit"
+              aria-label="Exit to Dashboard"
+              style={{ fontSize: 13, color: "var(--bd-text-muted, #6b7280)", textDecoration: "none", whiteSpace: "nowrap" }}
+            >
+              ‹ Exit
+            </a>
+          </div>
+          <Divider orientation="vertical" />
+          <TopbarGroup>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton onClick={onUndo} disabled={!canUndo} aria-label="Undo">
+                  <IconUndo />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>Undo <TooltipKbd>⌘Z</TooltipKbd></TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton onClick={onRedo} disabled={!canRedo} aria-label="Redo">
+                  <IconRedo />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>Redo <TooltipKbd>⌘⇧Z</TooltipKbd></TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton onClick={onOpenHistory} aria-label="History">
+                  <IconHistory />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>History</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          </TopbarGroup>
         </div>
 
-        {/* Cell 2 — Undo / Redo / History */}
-        <TopbarGroup>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton onClick={onUndo} disabled={!canUndo} aria-label="Undo">
-                <IconUndo />
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Undo <TooltipKbd>⌘Z</TooltipKbd></TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton onClick={onRedo} disabled={!canRedo} aria-label="Redo">
-                <IconRedo />
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Redo <TooltipKbd>⌘⇧Z</TooltipKbd></TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton onClick={onOpenHistory} aria-label="History">
-                <IconHistory />
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>History</TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-        </TopbarGroup>
+        {/* ZONE 2 — View: device/breakpoint switcher, centered (1fr column). */}
+        <BreakpointSwitcher
+          value={device as "wide" | "desktop" | "tablet" | "mobile"}
+          onChange={(d) => onDeviceChange?.(d)}
+          includeWide
+          glyphs={bpGlyphs}
+        />
 
-        {/* Cell 3 — Divider */}
-        <Divider orientation="vertical" />
-
-        {/* Cell 4 — Title (centered, 1fr) — switches to issue pill when issues > 0 */}
-        {issues.length > 0 ? (
-          <div className="bd-topbar__title bd-topbar__title--issues">
+        {/* ZONE 3 — Status + Ship: live status, the AI helper, Preview, and the one
+            hero action (Publish). Rare actions live in the ⋯ overflow. */}
+        <div className="bd-topbar__zone bd-topbar__zone--right">
+          {issues.length > 0 && (
             <Button
               variant="ghost"
               size="sm"
@@ -406,40 +398,29 @@ export const Topbar: React.FC<TopbarProps> = ({
               <IconWarn />
               {issueLabel}
             </Button>
-          </div>
-        ) : (
-          <div className="bd-topbar__title">
-            <span>{projectName}</span>
-            <span className="bd-topbar__title-slash">›</span>
-            <span className="bd-topbar__title-page">{pageName}</span>
-            <IconChevDown />
-          </div>
-        )}
+          )}
 
-        {/* Cell 5 — Breakpoint switcher (4 cells: wide/desktop/tablet/mobile) */}
-        <BreakpointSwitcher
-          value={device as "wide" | "desktop" | "tablet" | "mobile"}
-          onChange={(d) => onDeviceChange?.(d)}
-          includeWide
-          glyphs={bpGlyphs}
-        />
+          {collaborationSlot}
+          {isOffline && (
+            <span className="bd-topbar__offline" aria-label="Offline">
+              <span className="bd-topbar__offline-dot" />
+              Offline
+            </span>
+          )}
 
-        {/* Cell 6 — Status pill */}
-        <TopbarStatus
-          className={`bd-topbar__status--${savedVariant}`}
-          onClick={isStatusInteractive ? onSave : undefined}
-          role={isStatusInteractive ? "button" : undefined}
-          tabIndex={isStatusInteractive ? 0 : undefined}
-        >
-          <TopbarStatusDot />
-          {renderSavedLabel()}
-        </TopbarStatus>
+          {/* Status pill — one truth (saved / saving / offline / reconnecting) */}
+          <TopbarStatus
+            className={`bd-topbar__status--${savedVariant}`}
+            onClick={isStatusInteractive ? onSave : undefined}
+            role={isStatusInteractive ? "button" : undefined}
+            tabIndex={isStatusInteractive ? 0 : undefined}
+          >
+            <TopbarStatusDot />
+            {renderSavedLabel()}
+          </TopbarStatus>
 
-        {/* E3 — ✨ Ask AI. Design constitution #5: the one filled/hero button is the
-            product's purpose (Publish). AI is a helper, so it's an icon, not a labelled
-            button competing with Publish. Same onOpenAI wire — only the look changed. */}
-        {fourToolRail && onOpenAI && (
-          <TopbarGroup>
+          {/* ✨ Ask AI — icon helper (constitution #5: Publish is the hero, not AI). */}
+          {fourToolRail && onOpenAI && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <IconButton onClick={onOpenAI} aria-label="Ask AI">
@@ -450,78 +431,9 @@ export const Topbar: React.FC<TopbarProps> = ({
                 <TooltipContent>Ask AI</TooltipContent>
               </TooltipPortal>
             </Tooltip>
-          </TopbarGroup>
-        )}
-
-        {/* Cell 7 — Collab presence + offline indicator + Invite */}
-        <TopbarGroup>
-          {collaborationSlot}
-          {isOffline && (
-            <span className="bd-topbar__offline" aria-label="Offline">
-              <span className="bd-topbar__offline-dot" />
-              Offline
-            </span>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() =>
-                  window.open(
-                    `${dashboardUrl}/dashboard/team`,
-                    "_blank",
-                    "noopener,noreferrer"
-                  )
-                }
-                aria-label="Invite team"
-              >
-                + Invite
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Manage team</TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-        </TopbarGroup>
 
-        {/* Cell 8 — Right actions: Cmd / Preview / Publish / Help / Account */}
-        <TopbarGroup>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton onClick={() => setCmdOpen(true)} aria-label="Command palette">
-                <IconKbd />
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Command palette <TooltipKbd>⌘K</TooltipKbd></TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-
-          {/* m-editor: Client view — see the editor as an invited client does
-              (4-tool rail + simplified inspector). Toggles ?view=client. */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  const url = new URL(window.location.href);
-                  if (viewMode.clientView) url.searchParams.delete("view");
-                  else url.searchParams.set("view", "client");
-                  window.location.assign(url.toString());
-                }}
-                aria-label={viewMode.clientView ? "Exit client view" : "Client view"}
-                aria-pressed={viewMode.clientView}
-              >
-                {viewMode.clientView ? "Exit client view" : "Client view"}
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>{viewMode.clientView ? "Back to the full editor" : "See it as your client does"}</TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-
+          {/* Preview */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -612,37 +524,71 @@ export const Topbar: React.FC<TopbarProps> = ({
             </Tooltip>
           )}
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton onClick={onHelp} aria-label="Help">
-                <IconHelpCircle />
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Help</TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                onClick={() =>
-                  window.open(
-                    `${dashboardUrl}/dashboard/settings/account`,
-                    "_blank",
-                    "noopener,noreferrer"
-                  )
-                }
-                aria-label="Account settings"
-              >
-                <IconUser />
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Account settings</TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-        </TopbarGroup>
+          {/* ⋯ overflow — rare actions off the hot path: Invite, command palette,
+              Preview-as-client, Help, Account. Same handlers, new home. */}
+          <div ref={moreRef} style={{ position: "relative" }}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton
+                  onClick={() => setMoreOpen((o) => !o)}
+                  aria-label="More options"
+                  aria-expanded={moreOpen}
+                >
+                  <MoreHorizontal size={16} />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>More</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+            {moreOpen && (
+              <Menu style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 1000, minWidth: 200 }}>
+                <MenuItem
+                  onClick={() => {
+                    window.open(`${dashboardUrl}/dashboard/team`, "_blank", "noopener,noreferrer");
+                    setMoreOpen(false);
+                  }}
+                >
+                  Invite teammates
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setCmdOpen(true);
+                    setMoreOpen(false);
+                  }}
+                >
+                  Command palette ⌘K
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    const url = new URL(window.location.href);
+                    if (viewMode.clientView) url.searchParams.delete("view");
+                    else url.searchParams.set("view", "client");
+                    window.location.assign(url.toString());
+                  }}
+                >
+                  {viewMode.clientView ? "Exit client view" : "Preview as client"}
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    onHelp?.();
+                    setMoreOpen(false);
+                  }}
+                >
+                  Help &amp; shortcuts
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    window.open(`${dashboardUrl}/dashboard/settings/account`, "_blank", "noopener,noreferrer");
+                    setMoreOpen(false);
+                  }}
+                >
+                  Account settings
+                </MenuItem>
+              </Menu>
+            )}
+          </div>
+        </div>
       </VibcoderTopbar>
       {cmdOpen && <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} />}
     </>

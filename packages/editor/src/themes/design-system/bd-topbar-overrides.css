@@ -39,8 +39,24 @@
     gap: var(--buildrick-space-3);
 
     display: grid;
-    grid-template-columns: auto auto auto 1fr auto auto auto auto;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
+  }
+
+  /* Three labelled zones (Navigate · View · Status+Ship). The middle child
+     (the breakpoint switcher) sits in the 1fr column and self-centers; the
+     right zone hugs the right edge. */
+  .bd-topbar__zone {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--buildrick-space-2);
+    min-width: 0;
+  }
+  .bd-topbar__zone--right {
+    justify-self: end;
+  }
+  .bd-topbar > :nth-child(2) {
+    justify-self: center;
   }
 
   /* ────────────────────────────────────────────────────────────────────
