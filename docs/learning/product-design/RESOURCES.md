@@ -13,6 +13,18 @@
 - [Heuristic Evaluation Workbook (PDF) — NN/G](https://media.nngroup.com/media/articles/attachments/Heuristic_Evaluation_Workbook_1_Fillable.pdf)
   A fillable template for capturing findings. Use for: your first real audit pass on the editor.
 
+### The pro frontier (added 2026-06-21 — user research, measurement, product judgment)
+- [Steve Krug — *Rocket Surgery Made Easy*](https://sensible.com/rocket-surgery-made-easy/) **START HERE for research.**
+  Do-it-yourself usability testing for non-experts and solo founders. A morning a month, 3 users, no lab. The single highest-leverage habit in product design — and the one the course deferred until now.
+- [Steve Krug — *Don't Make Me Think*](https://sensible.com/dont-make-me-think/)
+  The classic on web/app usability. Short, funny, foundational. Use for: the "self-evident" bar every screen should clear.
+- [Rob Fitzpatrick — *The Mom Test*](https://www.momtestbook.com/)
+  How to talk to users so they tell you the truth instead of being nice. Essential for a founder who'll interview their own agency customers.
+- [Marty Cagan — *Inspired*](https://www.svpg.com/inspired-how-to-create-products-customers-love/)
+  How modern product teams decide what to build (and what to kill). Use for: prioritisation — shipping the smallest thing that solves the real pain.
+- [Jobs To Be Done — intro (Christensen, "milkshake")](https://www.youtube.com/watch?v=sfGtw2C95Ms)
+  The "people hire a product to do a job" lens. Use for: Habit 1 — starting from the user's job, not the UI.
+
 ## Wisdom (Communities)
 
 - [r/userexperience](https://reddit.com/r/userexperience) and [r/UI_Design](https://reddit.com/r/UI_Design)

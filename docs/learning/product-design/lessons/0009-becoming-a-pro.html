@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 9 — Becoming a pro (the three habits beyond craft)</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 9 · capstone · ~9 minutes</p>
+  <h1>You have the craft. Three habits make it pro.</h1>
+  <p class="lede">You asked the biggest question: how to become a good builder-with-AI ("vibcoder") and design like a professional. The honest answer: you already built the craft this session — auditing, naming, rating, placing, handing off, designing every state, building without breaking, verifying. What separates a competent maker from a pro isn't more craft. It's three habits the craft doesn't include — and they all point the same direction: <strong>away from your own taste, toward the real user.</strong></p>
+
+  <div class="callout">
+    <strong>The three pro habits</strong><br>
+    1. <em>User-first</em> — start from who/what-job/where-stuck, not from the UI.<br>
+    2. <em>Research</em> — watch ~5 real users; let what they trip on drive the work.<br>
+    3. <em>Measure</em> — define what "better" means, then check it actually moved.
+  </div>
+
+  <h2>First, name what you already have</h2>
+  <p>Everything below sits on a foundation you built in eight lessons:</p>
+  <table>
+    <tr><th>You can already…</th><th>from</th></tr>
+    <tr><td>Turn "feels weird" into a named, rated finding</td><td><a href="0001-audit-your-editor.html">L1</a>–<a href="0002-rate-and-prioritise.html">L2</a></td></tr>
+    <tr><td>Decide placement &amp; prominence by principle, not taste</td><td><a href="0003-what-goes-where.html">L3</a>, <a href="0005-the-topbar-is-a-bouncer.html">L5</a></td></tr>
+    <tr><td>Hand a build to AI without it misreading you</td><td><a href="0004-design-to-build-handoff.html">L4</a></td></tr>
+    <tr><td>Write the rules down so a whole product stays coherent</td><td><a href="0006-name-it-write-it-down.html">L6</a> + the <a href="../reference/buildrik-design-principles.html">constitution</a></td></tr>
+    <tr><td>Design every state, then build &amp; verify without breaking</td><td><a href="0007-design-every-state.html">L7</a>–<a href="0008-build-without-breaking.html">L8</a></td></tr>
+  </table>
+  <p>That's real craft. Most people who say "I do product design" can't do half of it. But craft applied to your <em>own guesses</em> just produces confident wrong answers. The three habits aim it at the truth.</p>
+
+  <h2>Habit 1 — Start from the user, not the screen</h2>
+  <p>An amateur opens Figma and asks "what should the topbar look like." A pro asks three questions first: <strong>who is this person, what job are they trying to get done, and where do they get stuck?</strong> The UI is the <em>last</em> step, derived from the answer — not the first. This is "Jobs To Be Done": people don't want a topbar, they want to ship a client's site without fear. Design the topbar <em>from that job.</em></p>
+  <div class="panel panel--accent">
+    Your topbar redesign was already quietly user-first: "an agency manages many clients → they could edit the wrong one → keep the client name visible." That sentence is a job + a fear. Notice you reached the right design <em>because</em> you started from the user's situation, not from "make it pretty." Do that on purpose, every time.
+  </div>
+
+  <h2>Habit 2 — Watch five real users (the highest-leverage habit there is)</h2>
+  <p>This is the one you've been deferring, and it's the single biggest lever in all of product design. You don't need a lab or a budget. Steve Krug's method: give <strong>five</strong> real people (an actual agency operator, a friend who builds sites) one real task — "publish this page" — and <em>watch them try, in silence.</em> Where they hesitate, misclick, or say "wait, what does this do?" — that's a finding no amount of expert auditing reliably catches. Five users surface ~85% of the serious problems.</p>
+  <p>Expert audits (what you learned) find what <em>violates rules</em>. User tests find what <em>actually confuses humans</em>. You need both; you've only been doing the first.</p>
+
+  <h2>Habit 3 — Measure: did it actually get better?</h2>
+  <p>Before a change, write one sentence: "this is better if ___." After, check it. Sometimes it's a number (more sites published, fewer support questions); sometimes it's a re-test ("now 4 of 5 users find Publish without help, before it was 1 of 5"). Without this, you can't tell improvement from motion. A pro closes the loop; an amateur ships and assumes.</p>
+
+  <h2>So — how to become a good "vibcoder"</h2>
+  <p>Building with AI well is exactly the PM + designer split you've been practising:</p>
+  <ul style="font-size:14px;line-height:1.8;color:var(--ink-2);padding-left:22px">
+    <li><strong>Direct it like a PM</strong> — give the AI the <a href="0004-design-to-build-handoff.html">4-part handoff</a> (what/where/don't-break/done) and the <em>why</em> (the user's job), not "make it nice."</li>
+    <li><strong>Judge it like a designer</strong> — hold its output against the <a href="../reference/buildrik-design-principles.html">constitution</a> and the <a href="../reference/states-checklist.html">states checklist</a>. Reject slop; demand every state; verify with the <a href="../reference/definition-of-done.html">five rungs</a>.</li>
+  </ul>
+  <p>The AI is a fast, tireless junior who has no taste and never says no. <em>You</em> are the taste and the no. That's the whole job.</p>
+
+  <h2>Your turn — the pro reflex</h2>
+  <div class="quiz">
+    <div class="q" data-explain="A pro starts from the user's job and where they get stuck, then derives the UI. Starting from 'what should it look like' is the amateur move that produces confident guesses.">
+      <p class="q-stem">A new screen is needed. What does a pro do first?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Name the user, their job, and where they get stuck</button>
+        <button class="q-opt">Sketch what the screen should look like first</button>
+        <button class="q-opt">Pick the colours and components to use first</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Watching ~5 real users attempt a real task surfaces the confusions expert audits miss — the single highest-leverage habit, and the one most often skipped by solo makers.">
+      <p class="q-stem">Your audit found 12 issues. What's the highest-leverage next move?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Watch five real users attempt one real task</button>
+        <button class="q-opt">Audit the same screens a second time alone</button>
+        <button class="q-opt">Fix all twelve before showing anyone else</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="The AI has speed but no taste and never refuses — so the human must supply the judgment and the 'no.' That's the core of directing AI well.">
+      <p class="q-stem">What does a good vibcoder supply that the AI cannot?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Taste and the 'no' — judgment against principles</button>
+        <button class="q-opt">Faster typing and more lines of code</button>
+        <button class="q-opt">More features added to every single screen</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>How to improve Buildrik from here</h2>
+  <p>Run the same five-step loop on every surface — but order the work by <em>user pain</em>, not by what annoys you. Concretely: pick the core task (publish a client's site), watch five people do it, write the rated findings, fix the worst by the loop, re-test. The <a href="../reference/the-path.html">roadmap</a> lays out where you are and the next steps.</p>
+
+  <p class="source">Primary sources (the pro frontier): <a href="https://sensible.com/rocket-surgery-made-easy/" target="_blank" rel="noopener">Steve Krug — <em>Rocket Surgery Made Easy</em></a> (do-it-yourself usability testing for non-experts — start here) &amp; <a href="https://www.momtestbook.com/" target="_blank" rel="noopener">Rob Fitzpatrick — <em>The Mom Test</em></a> (how to talk to users without fooling yourself). For product judgment: <a href="https://www.svpg.com/inspired-how-to-create-products-customers-love/" target="_blank" rel="noopener">Marty Cagan — <em>Inspired</em></a>. Full list: <a href="../RESOURCES.md">RESOURCES</a>.</p>
+  <p class="fine">Ready to do your first user test? Ask me — we'll script the task, pick who to watch, and turn what they trip on into rated findings together.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

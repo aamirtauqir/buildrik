@@ -31,7 +31,9 @@
 - **Constitution** (`reference/buildrik-design-principles.html`, 13 principles) = the spine. **States checklist** (`reference/states-checklist.html`) = the completeness companion. Lessons 1–7 build to these. Method = principle-driven design; deliverable per surface = a complete prototype (all states) built via the 5-step loop.
 
 ## Mission status
-- Mission has likely SHARPENED (learning-record 0003): "learn product design to fix incoherence" → "build + apply a living design language (the constitution) to make the whole editor coherent." **Confirm with the learner before editing MISSION.md.**
+- **MISSION UPDATED 2026-06-21** (learning-record 0004): now "become a pro product builder & designer (vibcoder)" — user research + measurement + prioritisation moved INTO scope (the "pro frontier"). Capstone L9 (`lessons/0009-becoming-a-pro.html`) + roadmap (`reference/the-path.html`) written. Confirm wording with the learner if they push back; otherwise proceed.
+- **L10 / NEXT (highest leverage):** run the learner's FIRST 5-user usability test on the core job ("an agency operator publishes a client's site") — script the task, pick 5 watchers, observe silently, turn stumbles into rated findings. This activates Habit 2 (research), the biggest lever. Steve Krug "Rocket Surgery Made Easy" is the method.
+- Course now: 9 lessons + 6 references (constitution, states-checklist, definition-of-done, heuristics-cheatsheet, the-path) + 4 learning records.
 
 ## Product facts surfaced (for honesty in lessons)
 - Real-time collaboration is DEMO-ONLY / not shippable (6 P1 distributed-systems bugs, prior codex review 2026-06-12). Do not promote it to prime UI. Design the presence spot but gate the feature.
