@@ -87,7 +87,9 @@ describe("useSaveCallback", () => {
     );
   });
 
-  it("on rejection, sets error state + maps network error", async () => {
+  it("on a network/offline error, queues calmly — no 'Save failed'", async () => {
+    // 60-save-states: a connection failure is not a lost save. The edit stays
+    // local and syncs on reconnect, so the user sees a calm 'queued' nudge.
     opts.saveProject.mockRejectedValueOnce(new Error("fetch failed: network"));
     const { result } = renderHook(() =>
       useSaveCallback({
@@ -102,18 +104,19 @@ describe("useSaveCallback", () => {
       await flushMicrotasks();
     });
 
-    expect(opts.setIsDirty).not.toHaveBeenCalled();
     expect(opts.addToast).toHaveBeenCalledWith(
       expect.objectContaining({
-        tone: "error",
-        title: "Save failed",
-        description: expect.stringContaining("Network error"),
+        tone: "info",
+        title: "Offline — changes queued",
       }),
+    );
+    // never the scary failed toast for a network error
+    expect(opts.addToast).not.toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Save failed" }),
     );
   });
 
   it.each([
-    ["fetch failed", "Network error"],
     ["storage quota exceeded", "Storage full"],
     ["permission denied", "Permission denied"],
     ["request timeout", "Request timed out"],

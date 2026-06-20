@@ -228,6 +228,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   publishLoading = false,
   publishedUrl = null,
   isOffline = false,
+  syncStatus,
   previewLoading = false,
   device = "desktop",
   saveStatus = "idle",
@@ -291,8 +292,13 @@ export const Topbar: React.FC<TopbarProps> = ({
     .filter(Boolean)
     .join(" · ");
 
+  // 60-save-states: "offline" = the browser is offline OR the dashboard sync is
+  // disconnected. Either way edits are kept locally and queued, so this must
+  // never read as a failed/lost save — it overrides the error state.
+  const offline = isOffline || syncStatus === "offline";
+
   const savedVariant: "ok" | "saving" | "warn" | "error" =
-    isOffline
+    offline
       ? "warn"
       : saveStatus === "saving"
         ? "saving"
@@ -303,9 +309,8 @@ export const Topbar: React.FC<TopbarProps> = ({
             : "ok";
 
   const renderSavedLabel = (): React.ReactNode => {
-    // 60-save-states: offline takes precedence — reassure that edits are kept
-    // locally and will sync, so a dropped connection never reads as data loss.
-    if (isOffline) return "Offline — changes queued, will sync";
+    // Offline takes precedence — a dropped connection never reads as data loss.
+    if (offline) return "Offline — changes queued, will sync";
     if (saveStatus === "saving") return "Saving…";
     if (saveStatus === "error") return "Save failed";
     if (isDirty) return "Unsaved";

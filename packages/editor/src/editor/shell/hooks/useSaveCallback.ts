@@ -89,6 +89,22 @@ export function useSaveCallback({
           return;
         }
         const errorMessage = err?.message || "Unknown error";
+        // 60-save-states: a network/connection failure is NOT a lost save — the
+        // edit stays in the local project and syncs on reconnect. Don't show the
+        // scary "Save failed" + Retry; clear the spinner (the topbar's offline
+        // indicator already says "changes queued") and nudge once, calmly.
+        const isNetwork =
+          (typeof navigator !== "undefined" && !navigator.onLine) ||
+          /network|fetch|offline|failed to fetch|connection/i.test(errorMessage);
+        if (isNetwork) {
+          setSaveState((prev) => ({ ...prev, status: "idle" }));
+          addToast({
+            title: "Offline — changes queued",
+            description: "Your edits are saved on this device and will sync when you're back.",
+            tone: "info",
+          });
+          return;
+        }
         const userMessage = explainSaveError(errorMessage);
         setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
         addToast({
