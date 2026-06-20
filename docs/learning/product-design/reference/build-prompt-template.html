@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build-prompt template — direct the AI</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .tmpl{background:var(--bg-2,#f9fafb);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:10px 0;font-size:12.5px;line-height:1.6;white-space:pre-wrap;font-family:var(--bd-mono,ui-monospace,SFMono-Regular,Menlo,monospace);color:var(--ink)}
+  .tmpl b{color:var(--accent)}
+  .slot{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Build-prompt template · for directing AI ("vibcoder")</p>
+  <h1>The prompt the AI can't misread.</h1>
+  <p class="lede">A build-prompt is the <a href="../lessons/0004-design-to-build-handoff.html">4-part handoff</a> + a verify clause, phrased so an AI (or a human) builds the right thing and can't claim "done" without proving it. Use it for every roadmap phase. One rule comes first, before any of the four parts:</p>
+
+  <div class="panel panel--accent">
+    <strong>Rule 0 — make the AI CHECK before it builds.</strong> Tell it to read the current code and confirm what already exists, not assume. Half of "the AI built the wrong thing" is the AI inventing something that was already there. (Example: Buildrik's collab flag <em>already existed</em> — a prompt that said "add a flag" would have been wrong. The right prompt says "audit that all collab UI respects the existing flag.")
+  </div>
+
+  <h2>The template — fill the five slots</h2>
+  <div class="tmpl"><b>CONTEXT</b> — one line: why this, and "check the current code first; don't assume."
+
+<b>WHAT</b> — the change, concretely. The behaviour/UI you want. Numbered steps if several.
+
+<b>WHERE</b> — the files / area to touch (and which existing thing to reuse).
+
+<b>DON'T-BREAK</b> — the rules + what must keep working (design system, the engine, existing handlers, named features).
+
+<b>DONE</b> — the checkable acceptance: how you'll both agree it's finished.
+
+<b>VERIFY</b> — "climb all 5 rungs (types · tests · walk states in browser · click actions · check DONE). Don't claim done until verified."</div>
+
+  <h2>What YOU add (the inputs only you have)</h2>
+  <ul style="font-size:13.5px;line-height:1.8;color:var(--ink-2);padding-left:22px">
+    <li><strong>The why / user pain</strong> — the real reason (from your <a href="../../reviews/user-feedback-fixplan-20260621.md">user feedback</a>), so the AI optimises for the right thing.</li>
+    <li><strong>The acceptance</strong> — what "done" looks like to <em>you</em>. The AI can't know your bar; state it.</li>
+    <li><strong>The constraints it can't infer</strong> — "don't ship collab," "cobalt only," "don't touch the engine." Pull these from the <a href="buildrik-design-principles.html">constitution</a> + project rules.</li>
+  </ul>
+  <p>Notice: you rarely add <em>code</em> or <em>tools</em> up front. You add <em>information</em> — the why, the bar, the limits. The AI supplies the typing.</p>
+
+  <h2>Worked example — Phase 0 (gate collaboration)</h2>
+  <div class="tmpl"><b>CONTEXT</b> — Recovery roadmap Phase 0: hide what's broken. Check the code first — FEATURE_COLLAB already exists; this is an audit, not a new flag.
+
+<b>WHAT</b> — 1) Audit every collab UI (topbar presence/collaborationSlot, PresenceIndicators, ConnectionQualityIndicator, the Collaborate/Invite CTA, any collab panel) and ensure ALL are gated behind isFeatureEnabled("collab") (OFF by default); fix any that leak when off. 2) Sweep for any "coming soon"/placeholder/broken/dead control and hide each.
+
+<b>WHERE</b> — packages/editor/src/editor/ (shell/Topbar, shell/StudioHeader, collaboration/*); flag in shared/utils/featureFlags.ts + runtimeEnv FEATURE_COLLAB.
+
+<b>DON'T-BREAK</b> — don't delete collab code, only gate it. Keep the flag + vibcoder primitives. Don't touch the engine. Don't break the just-restructured topbar.
+
+<b>DONE</b> — with FEATURE_COLLAB off, no collab UI shows anywhere; no broken/"coming soon" control visible; tsc clean; editor tests pass; live-verified in the browser.
+
+<b>VERIFY</b> — climb all 5 rungs; don't claim done until verified.</div>
+
+  <h2>How to "start it as a goal"</h2>
+  <p>Paste the prompt as a message, or use <code>/goal</code> with a one-line completion condition so the agent keeps working until it's truly done: <em>"/goal Phase 0 complete — all collab + broken UI hidden behind flags, tsc + tests green, browser-verified."</em> The goal's stop-hook blocks finishing until that holds — which forces the verify.</p>
+
+  <p class="source">Built on the <a href="../lessons/0004-design-to-build-handoff.html">handoff (L4)</a> + the <a href="definition-of-done.html">5-rung Definition of Done</a>. The full plan it serves: the <a href="../../reviews/buildrik-recovery-roadmap-20260621.md">recovery roadmap</a>.</p>
+  <p class="fine">Want me to run this exact Phase-0 prompt? Paste it, or say "do Phase 0" — I'll audit the gating, hide the broken, and climb the rungs.</p>
+</main>
+</body>
+</html>

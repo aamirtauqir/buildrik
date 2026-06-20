@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 11 — Write a goal the AI can't misread</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 11 · ~6 minutes</p>
+  <h1>Direct the AI: a goal it can't misread, and can't fake "done".</h1>
+  <p class="lede">You asked the practical question — to start Phase 0, how do I do it, what do I add, what prompt do I write? This is the vibcoder skill made real: a build-prompt is the <a href="0004-design-to-build-handoff.html">handoff</a> plus a verify clause, written so the AI builds the right thing <em>and</em> can't claim it's done without proving it. Two ideas make the difference.</p>
+
+  <div class="callout">
+    <strong>Two things amateurs leave out of an AI prompt</strong><br>
+    1. <em>"Check the code first"</em> — so the AI doesn't reinvent what already exists.<br>
+    2. <em>"Verify before you claim done"</em> — so "done" means proven, not asserted.
+  </div>
+
+  <h2>Idea 1 — make it CHECK before it builds</h2>
+  <p>The most common way an AI "builds the wrong thing" isn't bad code — it's building something that already existed, or missing something already there. Half of bad output is a wrong assumption. So the first line of any build-prompt: <em>"read the current code and confirm what exists; don't assume."</em></p>
+  <div class="panel panel--accent">
+    Phase 0 is the perfect example. Collaboration <em>already had</em> a feature flag (<code>FEATURE_COLLAB</code>, off by default). A naive prompt — "add a flag to hide collab" — would send the AI to build a second flag and miss the real job: <em>auditing that every collab UI surface respects the flag that already exists.</em> "Check first" turns a wrong build into the right one.
+  </div>
+
+  <h2>Idea 2 — what YOU add is information, not code</h2>
+  <p>You don't usually hand the AI new tools or code up front. You hand it three things only you have:</p>
+  <table>
+    <tr><th>You supply</th><th>Because the AI can't know…</th></tr>
+    <tr><td>The <strong>why</strong> (the user pain)</td><td>…what to optimise for. "Users can't tell success from error" → it builds feedback, not decoration.</td></tr>
+    <tr><td>The <strong>acceptance</strong> (your bar)</td><td>…when <em>you'd</em> call it done. State the checklist.</td></tr>
+    <tr><td>The <strong>constraints</strong></td><td>…the unwritten rules: "don't ship collab," "cobalt only," "don't touch the engine."</td></tr>
+  </table>
+
+  <h2>The shape — five slots + a verify line</h2>
+  <p><strong>CONTEXT</strong> (why + check-first) · <strong>WHAT</strong> · <strong>WHERE</strong> · <strong>DON'T-BREAK</strong> · <strong>DONE</strong> · <strong>VERIFY</strong> ("climb all 5 rungs; don't claim done until verified"). The full fill-in-the-blanks version, with the Phase-0 prompt written out, is the <a href="../reference/build-prompt-template.html">build-prompt template</a> — keep it open and reuse it for every phase.</p>
+
+  <h2>Starting it "as a goal"</h2>
+  <p>Paste the prompt, or use <code>/goal</code> with a one-line completion condition: <em>"Phase 0 complete — collab + broken UI hidden behind flags, tsc + tests green, browser-verified."</em> The goal's stop-hook won't let the work end until that condition holds — which forces the verify step you'd otherwise be tempted to skip. The goal is your "don't let me declare victory early" guardrail.</p>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Telling the AI to read the current code first prevents the most common failure: reinventing something that already exists or missing it. Assumption is the enemy.">
+      <p class="q-stem">What's the single most useful first line of a build-prompt?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Read the current code first; don't assume</button>
+        <button class="q-opt">Make it look modern and clean please</button>
+        <button class="q-opt">Use the newest library you can find here</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="The human supplies information the AI can't infer — the why, the acceptance bar, the constraints — not new code. The AI brings the typing; you bring the judgment.">
+      <p class="q-stem">In a good AI build-prompt, what does the human mainly add?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Information — the why, the bar, the constraints</button>
+        <button class="q-opt">Code — write most of the change yourself first</button>
+        <button class="q-opt">Tools — install new libraries for the AI to use</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="A goal's completion condition + stop-hook keeps the agent working until the work is proven done — it's the guardrail against declaring victory before verifying.">
+      <p class="q-stem">Why phrase the task as a /goal with a completion condition?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>It blocks finishing until the work is verified done</button>
+        <button class="q-opt">It makes the AI write the code much faster</button>
+        <button class="q-opt">It lets you skip writing the acceptance criteria</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Every phase of the <a href="../../reviews/buildrik-recovery-roadmap-20260621.md">recovery roadmap</a> gets its own build-prompt from the <a href="../reference/build-prompt-template.html">template</a>: check-first, the four parts, verify. You direct; the AI types; the goal guards against fake "done."</p>
+
+  <p class="source">Built on the <a href="0004-design-to-build-handoff.html">handoff (L4)</a> + <a href="0008-build-without-breaking.html">verification (L8)</a>. Reusable: the <a href="../reference/build-prompt-template.html">build-prompt template</a>.</p>
+  <p class="fine">Ready? Paste the Phase-0 prompt, or just say "do Phase 0" and I'll run it — audit the gating, hide the broken, and climb the rungs out loud.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>
