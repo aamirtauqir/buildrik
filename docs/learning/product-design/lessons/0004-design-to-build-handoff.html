@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 4 — From design to build (the handoff)</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 4 · ~7 minutes</p>
+  <h1>Design one thing. Then tell the builder exactly what to build.</h1>
+  <p class="lede">You asked the right workflow question: "can we design each thing, then build it — and what do I tell the coder?" Yes. That's how professionals work: <strong>decide the design, write a tight handoff, build it, move to the next surface.</strong> The skill that's easy to skip is the handoff — turning a decision into an instruction a builder can execute without guessing.</p>
+
+  <div class="callout">
+    <strong>A build instruction has four parts</strong><br>
+    <em>1. WHAT (the design) · 2. WHERE (which file) · 3. DON'T-BREAK (the rules) · 4. DONE (how you'll know)</em>
+  </div>
+
+  <h2>Why each part exists</h2>
+  <table>
+    <tr><th>Part</th><th>What it answers</th><th>If you skip it…</th></tr>
+    <tr><td><strong>WHAT</strong></td><td>The exact layout / behaviour you decided</td><td>The builder invents its own design — back to "AI-designed"</td></tr>
+    <tr><td><strong>WHERE</strong></td><td>The file / component to change</td><td>Hours lost hunting, or the wrong thing gets edited</td></tr>
+    <tr><td><strong>DON'T-BREAK</strong></td><td>The project's rules + what must keep working</td><td>It builds, but violates the design system or breaks a feature</td></tr>
+    <tr><td><strong>DONE</strong></td><td>How you'll both agree it's finished</td><td>Endless "is it right yet?" with no answer</td></tr>
+  </table>
+
+  <h2>The skip that hurts most: DON'T-BREAK</h2>
+  <p>The first three are obvious; the fourth is what separates a spec from a wish. Your "vibcoder" isn't a generic coder — it's <strong>your codebase's component library + its rules</strong>. So "build it with vibcoder" really means: <em>use the existing buttons, keep the one accent colour, don't touch the engine, keep the keyboard shortcuts wired.</em> Naming those up front is what stops a build that "works" but quietly breaks the system.</p>
+
+  <div class="panel panel--accent">
+    Today's topbar handoff, in one breath: <span class="chip">WHAT</span> three zones + a ⋯ overflow, Publish as the only blue button · <span class="chip">WHERE</span> <code>Topbar.tsx</code>, keep every existing handler · <span class="chip">DON'T-BREAK</span> vibcoder buttons only, cobalt only, engine untouched, shortcuts kept · <span class="chip">DONE</span> three groups visible, tsc clean, tests green.
+    <span class="fine">Full version: <code>docs/reviews/audit-mockups/topbar-build-spec.md</code> — written to be pasted straight to a build session.</span>
+  </div>
+
+  <h2>The loop, in order</h2>
+  <ol style="font-size:14px;line-height:1.8;color:var(--ink-2);padding-left:22px">
+    <li><strong>Inventory</strong> — list everything currently on the surface (the topbar had ~16 controls; the list <em>is</em> the density problem, made visible).</li>
+    <li><strong>Decide</strong> — apply one rule to keep / move / hide each item (you did this: Publish stays loud, breadcrumb leaves, rare things go to ⋯).</li>
+    <li><strong>Handoff</strong> — write the 4-part spec.</li>
+    <li><strong>Build</strong> — one surface, then verify against DONE.</li>
+    <li><strong>Next surface</strong> — repeat. Never redesign everything at once.</li>
+  </ol>
+
+  <h2>Your turn — spot the missing part</h2>
+  <div class="quiz">
+    <div class="q" data-explain="It says what and where, but never the project's rules — so the builder might use a raw button or a second accent colour and quietly break the design system. The missing part is DON'T-BREAK.">
+      <p class="q-stem">A spec says "make a blue Save button, in Topbar.tsx." Which part is missing?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>DON'T-BREAK — the rules and constraints</button>
+        <button class="q-opt">WHAT — the design is described</button>
+        <button class="q-opt">WHERE — the file is given</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Without a finish line, you get endless 'is it right now?' loops. DONE — a checkable list — is what lets you both agree it's complete.">
+      <p class="q-stem">A spec has no way to tell when the work is complete. Which part is missing?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>DONE — the agreed finish line</button>
+        <button class="q-opt">WHAT — the design is described</button>
+        <button class="q-opt">WHERE — the file is given</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Listing everything on a surface makes the clutter undeniable — 16 items in one bar is the density problem in plain sight. Inventory always comes before deciding.">
+      <p class="q-stem">Before deciding what stays in a cluttered bar, the first step is to…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Inventory — list every control that's there</button>
+        <button class="q-opt">Rebuild — start fresh from a blank bar</button>
+        <button class="q-opt">Decorate — add spacing and colour first</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Every surface we redesign now follows the same five steps: inventory → decide → 4-part handoff → build → verify. You make the design calls (<a href="0003-what-goes-where.html">Lesson 3</a>); the handoff turns them into something a builder can't misread.</p>
+
+  <p class="source">Primary source: <a href="https://www.nngroup.com/articles/design-handoff/" target="_blank" rel="noopener">NN/g — Design Handoffs</a>. Reference: <a href="../reference/heuristics-cheatsheet.html">heuristics cheat-sheet</a>.</p>
+  <p class="fine">Want me to be the builder? I can take any 4-part spec and implement it — or you hand it to another session. Ask me to build the topbar spec whenever you're ready.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

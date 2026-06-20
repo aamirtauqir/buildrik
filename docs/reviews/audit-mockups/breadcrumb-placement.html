@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where does the breadcrumb go?</title>
+<style>
+  :root{
+    --ink:#0F1729; --ink-2:#475467; --ink-3:#98A2B3;
+    --line:#EAECF0; --line-2:#D0D5DD; --bg:#FFFFFF; --bg-2:#F9FAFB; --bg-3:#F2F4F7;
+    --accent:#2D6DFF; --ok:#12B76A; --warn:#F79009;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg-3);color:var(--ink);padding:36px 32px;-webkit-font-smoothing:antialiased}
+  .stage{max-width:1180px;margin:0 auto}
+  h1{font-size:21px;font-weight:680;letter-spacing:-0.02em;margin-bottom:6px}
+  .sub{font-size:13.5px;color:var(--ink-2);margin-bottom:24px;line-height:1.55;max-width:780px}
+  .opt{margin:22px 0}
+  .opt h2{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+  .tag{font-size:10px;font-weight:700;border-radius:5px;padding:2px 8px;letter-spacing:.03em}
+  .tag.win{background:#ECFDF3;color:#067647;border:1px solid #ABEFC6}
+  .tag.meh{background:var(--bg-3);color:var(--ink-3);border:1px solid var(--line-2)}
+  .tag.bad{background:#FEF3F2;color:#B42318;border:1px solid #FECDCA}
+  .why{font-size:12.5px;color:var(--ink-2);margin-top:7px;line-height:1.5}
+  .why b{color:var(--ink)}
+
+  .bar{height:50px;background:var(--bg);border:1px solid var(--line);border-radius:11px;display:flex;align-items:center;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:0 8px}
+  .zone{display:flex;align-items:center;gap:5px;padding:0 11px;height:100%}
+  .spacer{flex:1}
+  .vr{width:1px;height:22px;background:var(--line)}
+  .exit{display:flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:7px;color:var(--ink-2);font:550 12.5px var(--font);background:transparent;border:0}
+  .ico{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;color:var(--ink-2);background:transparent;border:0}
+  .ico svg{width:16px;height:16px}
+  .crumb{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-3);font-weight:500;white-space:nowrap}
+  .crumb .here{color:var(--ink);font-weight:620}
+  .crumb .sep{color:var(--line-2)}
+  .seg{display:flex;background:var(--bg-3);border-radius:7px;padding:3px}
+  .seg .ico{width:28px;height:24px;border-radius:5px}
+  .seg .ico.on{background:var(--bg);color:var(--accent);box-shadow:0 1px 2px rgba(16,24,40,.08)}
+  .status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);font-weight:500}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+  .btn{height:32px;border-radius:8px;font:600 12.5px var(--font);display:flex;align-items:center;gap:6px;padding:0 12px;border:1px solid transparent}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--line-2)}
+  .btn svg{width:15px;height:15px}
+  .collide{outline:2px dashed var(--warn);outline-offset:3px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <h1>One question, three placements — which reads right?</h1>
+  <p class="sub">Two rules decide it. <b>(1) You read "where am I" first</b> — so it wants to be early (left). <b>(2) The right corner is the most reachable spot, reserved for the one hero action</b> — Publish. Watch what happens to each option.</p>
+
+  <!-- LEFT -->
+  <div class="opt">
+    <h2>A · Breadcrumb LEFT &nbsp;<span class="tag win">reads first · no clash</span></h2>
+    <div class="bar">
+      <div class="zone">
+        <button class="exit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Exit</button>
+        <div class="vr"></div>
+        <div class="crumb"><span>Acme</span><span class="sep">/</span><span>acme-main</span><span class="sep">/</span><span class="here">Home ▾</span></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="zone"><div class="seg"><button class="ico on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></button><button class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></button><button class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/></svg></button></div></div>
+      <div class="vr"></div>
+      <div class="zone"><span class="status"><span class="dot"></span>Saved</span><button class="btn ghost">Preview</button><button class="btn primary">↑ Publish</button></div>
+    </div>
+    <p class="why"><b>Where am I</b> sits with <b>Exit</b> — both are "location / navigation", read first. The center stays calm. Publish owns the right corner alone. <b>This is the convention</b> (Figma, Notion, Webflow all anchor location top-left).</p>
+  </div>
+
+  <!-- CENTER -->
+  <div class="opt">
+    <h2>B · Breadcrumb CENTER &nbsp;<span class="tag meh">balanced, but floats</span></h2>
+    <div class="bar">
+      <div class="zone"><button class="exit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Exit</button><div class="vr"></div><button class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a4 4 0 0 1 0 8h-1"/></svg></button><button class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a4 4 0 0 0 0 8h1"/></svg></button></div>
+      <div class="spacer"></div>
+      <div class="crumb"><span>Acme</span><span class="sep">/</span><span>acme-main</span><span class="sep">/</span><span class="here">Home ▾</span></div>
+      <div class="zone" style="margin-left:10px"><div class="seg"><button class="ico on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></button></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status"><span class="dot"></span>Saved</span><button class="btn primary">↑ Publish</button></div>
+    </div>
+    <p class="why">Symmetric, but the location <b>floats with nothing to anchor to</b> — your eye hunts for it. Works for single-doc tools (Framer), weaker when the path matters (which client?).</p>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="opt">
+    <h2>C · Breadcrumb RIGHT &nbsp;<span class="tag bad">clashes with Publish</span></h2>
+    <div class="bar">
+      <div class="zone"><button class="exit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Exit</button><div class="vr"></div><button class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a4 4 0 0 1 0 8h-1"/></svg></button></div>
+      <div class="spacer"></div>
+      <div class="zone collide"><div class="crumb"><span>Acme</span><span class="sep">/</span><span>acme-main</span><span class="sep">/</span><span class="here">Home ▾</span></div><span class="status" style="margin-left:8px"><span class="dot"></span>Saved</span><button class="btn primary">↑ Publish</button></div>
+    </div>
+    <p class="why">Now <b>location + status + the hero action</b> all crowd the same corner (dashed box). You read "what to do" <b>before</b> "where am I" — backwards. And Publish loses its breathing room. The right corner can't hold both the most-important <i>action</i> and the most-important <i>orientation</i>.</p>
+  </div>
+
+  <p class="sub" style="margin-top:6px"><b>My honest lean: A (left).</b> But you're the one looking — if right still feels better to you, tell me <i>what</i> it fixes that A doesn't, and we'll score it together.</p>
+</div>
+</body>
+</html>

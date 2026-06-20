@@ -15,8 +15,9 @@
 - L1 (done): teach the naming muscle via a quiz on the learner's own complaints. Assignment = write 3 findings on one editor task.
 - L2 (done): rate + prioritise. Built as a WORKED example — 3 real, fresh editor findings (breadcrumb no agency›client #2 sev2 · +Invite first-class #8 sev1 · "0/7 done" pill unlabelled #6 sev2), each rated with the why (freq×impact×persistence), then ranked (severity sets order, effort breaks ties). Introduced "expected result in one line". `lessons/0002-rate-and-prioritise.html`.
 - L3 (done): "What goes where" — prominence = frequency × importance + the loudest button = the product's purpose. Built from the learner's OWN two objections to a topbar mockup (breadcrumb depth + Publish vs Ask AI as hero). `lessons/0003-what-goes-where.html`.
-- L4 (next): consistency / the shared "panel shell" idea — why one skeleton across surfaces beats four bespoke panels (ties to the live audit's root cause). Keep grounding in the learner's own critiques.
-- Later: the anti-AI-slop checklist (density, hierarchy, decoration); IA coherence.
+- L4 (done): "From design to build — the handoff." The 4-part spec (WHAT / WHERE / DON'T-BREAK / DONE) + the loop (inventory → decide → handoff → build → next). Driven by the learner's own workflow question ("design each thing then build — what do I tell the coder?"). `lessons/0004-design-to-build-handoff.html`. Real artifact produced: `docs/reviews/audit-mockups/topbar-build-spec.md`.
+- L5 (next): consistency / the shared "panel shell" idea — why one skeleton beats four bespoke panels (the audit's root cause). Or: BUILD the topbar spec together as a worked design→build example.
+- Later: anti-AI-slop checklist (density, hierarchy, decoration); IA coherence.
 
 ## Open loops
 - A live UX audit is in progress in the project root: `ux-audit-20260621.md` (Sections A–D done; E/F/G/H pending). The redesign work feeds the lessons.
