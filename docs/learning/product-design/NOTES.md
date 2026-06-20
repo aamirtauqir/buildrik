@@ -14,9 +14,11 @@
 - Spine = NN/g 10 heuristics + severity + the audit loop. Reference: `reference/heuristics-cheatsheet.html`.
 - L1 (done): teach the naming muscle via a quiz on the learner's own complaints. Assignment = write 3 findings on one editor task.
 - L2 (done): rate + prioritise. Built as a WORKED example — 3 real, fresh editor findings (breadcrumb no agency›client #2 sev2 · +Invite first-class #8 sev1 · "0/7 done" pill unlabelled #6 sev2), each rated with the why (freq×impact×persistence), then ranked (severity sets order, effort breaks ties). Introduced "expected result in one line". `lessons/0002-rate-and-prioritise.html`.
-- L3 (next): rated list → fix sequence + the "two findings = one root cause" trap (de-dup before sequencing).
-- Later: consistency/IA coherence ("features have no relation"), the anti-AI-slop checklist (density, hierarchy, decoration).
+- L3 (done): "What goes where" — prominence = frequency × importance + the loudest button = the product's purpose. Built from the learner's OWN two objections to a topbar mockup (breadcrumb depth + Publish vs Ask AI as hero). `lessons/0003-what-goes-where.html`.
+- L4 (next): consistency / the shared "panel shell" idea — why one skeleton across surfaces beats four bespoke panels (ties to the live audit's root cause). Keep grounding in the learner's own critiques.
+- Later: the anti-AI-slop checklist (density, hierarchy, decoration); IA coherence.
 
 ## Open loops
-- L2 assignment out: run "expected result in one line" on 3 controls of one panel → 3 rated findings → drives L3.
-- Learning record written (0001) — the teaching METHOD for this learner: worked examples on the real app, not homework-gated lessons (drive-don't-quiz).
+- A live UX audit is in progress in the project root: `ux-audit-20260621.md` (Sections A–D done; E/F/G/H pending). The redesign work feeds the lessons.
+- The learner now critiques designs first (caught a real error in my mockup — see learning-record 0002). Shift to: show a design → learner critiques → compare → lesson from their critique.
+- Records: 0001 (worked-examples method) + 0002 (learner reached applied judgment — milestone).

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 3 — What goes where (and how big)</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 3 · ~6 minutes</p>
+  <h1>What goes where — and how loud.</h1>
+  <p class="lede">You looked at a topbar and asked two designer questions on your own: "should the whole <code>Northwind / Acme / acme-main / Home</code> path be here?" and "should Publish be in the topbar, or somewhere else?" Both questions have the same answer underneath — two small rules that decide placement and prominence for <em>every</em> control in a product.</p>
+
+  <div class="callout">
+    <strong>The two rules</strong><br>
+    1. <em>Prominence = how often it changes/is used × how much it matters.</em><br>
+    2. <em>The single loudest button = the product's purpose.</em>
+  </div>
+
+  <h2>Rule 1 — Prominence = frequency × importance</h2>
+  <p>Every control competes for the user's eye. You decide who wins by asking two things about it: <strong>how often</strong> does the user touch or change it, and <strong>how much</strong> does it matter when they do? Multiply. High × high → loud and central. Low × low → tucked away or one click deep.</p>
+  <p>Your breadcrumb, scored:</p>
+  <table>
+    <tr><th>Part</th><th>Changes often?</th><th>Matters?</th><th>Verdict</th></tr>
+    <tr><td><strong>Northwind</strong> (agency)</td><td>Never — it's always you</td><td>Low while editing</td><td>Drop from the line → ▾ menu</td></tr>
+    <tr><td><strong>Acme</strong> (client)</td><td>Sometimes</td><td><strong>High</strong> — wrong client = real damage</td><td>Keep</td></tr>
+    <tr><td><strong>acme-main</strong> (site)</td><td>Sometimes</td><td>Medium</td><td>Keep</td></tr>
+    <tr><td><strong>Home</strong> (page)</td><td><strong>Often</strong></td><td>Medium</td><td>Keep — and make it the bold one</td></tr>
+  </table>
+  <p>So the four-level path became <code>Acme → acme-main → Home</code>. You didn't shorten it to "look cleaner" — you removed the one part that scored low on both axes. That's the difference between tidying and designing.</p>
+
+  <h2>Rule 2 — The loudest button is the product's purpose</h2>
+  <p>A screen usually has exactly one <em>primary</em> button — filled, coloured, the thing your eye hits first. That button should name the single reason the product exists. To find it, finish this sentence: "this tool exists so the user can ___."</p>
+  <div class="panel panel--accent">
+    A website builder exists so the user can <strong>publish a site</strong>. → The hero button is <span class="chip">Publish</span>, top-right.<br>
+    <span class="fine">In the first mockup I made <strong>Ask AI</strong> the blue hero. Wrong — AI is a helper, not the purpose. You caught it. Publish is now the hero; Ask AI shrank to a quiet icon.</span>
+  </div>
+  <p>This is why "should Publish be in the topbar?" answers itself: the most important action lives where it's most reachable and most prominent. Burying it in a menu would hide the one thing the whole tool is for.</p>
+
+  <h2>Your turn — score before you place</h2>
+  <div class="quiz">
+    <div class="q" data-explain="A spreadsheet app exists so the user can edit data in cells. That's the purpose — so the cell grid and its primary action win the spotlight, not the share button.">
+      <p class="q-stem">A spreadsheet app's topbar has Share, Print, and a cell editor. Which deserves the loudest treatment?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>The cell editing — that's the product's purpose</button>
+        <button class="q-opt">The Share button — collaboration is modern</button>
+        <button class="q-opt">The Print button — output is the goal</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="It never changes during a session and rarely matters in the moment — low frequency × low importance. Tuck it behind a menu, don't spend prime topbar space on it.">
+      <p class="q-stem">A label never changes mid-session and rarely matters while working. Where does it go?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Tucked away — one click deep, not on the bar</button>
+        <button class="q-opt">Front and center — every label deserves space</button>
+        <button class="q-opt">Bottom right corner — same as everything else</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Wrong-client edits cause real damage (high importance) even if you only switch sometimes — so the client name stays visible. Importance can carry a thing even when frequency is low.">
+      <p class="q-stem">Switching clients is rare, but editing the wrong client's site is costly. The client name should be…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Visible — importance keeps it on screen</button>
+        <button class="q-opt">Hidden — rare actions don't earn space</button>
+        <button class="q-opt">Removed — fewer items is always better</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Next time any control feels like it's in the wrong place or the wrong size, don't argue taste — <strong>score it</strong>: how often × how much. And for any screen, point at the one loudest button and check it names the product's purpose. If it doesn't, that's your finding (<a href="0001-audit-your-editor.html">Lesson 1</a>), already half-fixed.</p>
+
+  <p class="source">Primary source: <a href="https://www.nngroup.com/articles/visual-hierarchy-ux-definition/" target="_blank" rel="noopener">NN/g — Visual Hierarchy in UX</a>. Reference: <a href="../reference/heuristics-cheatsheet.html">heuristics cheat-sheet</a>.</p>
+  <p class="fine">Disagree with a placement call? Argue it with me — bring the screen and we'll score it together. That argument is the skill.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>
