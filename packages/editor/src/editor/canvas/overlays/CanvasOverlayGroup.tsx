@@ -33,7 +33,6 @@ import { AlignmentToolbar } from "../toolbars";
 import {
   SelectionBoxOverlay,
   ElementHoverOverlay,
-  ParentHighlight,
   DropFeedbackOverlay,
   RulersOverlay,
   GuidesOverlay,
@@ -220,14 +219,10 @@ export function CanvasOverlayGroup({
         />
       )}
 
-      {/* Parent highlight (when hovering or selected) */}
-      {canvasRef.current && selectedId && (
-        <ParentHighlight
-          composer={composer}
-          childElementId={selectedId}
-          canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
-        />
-      )}
+      {/* Redesign P2 (sev 2): the parent context lives in the bottom breadcrumb
+          (Canvas › Container › …) + the toolbar's parent button + Alt+↑. The
+          persistent blue parent-region highlight + "Parent: …" badge was a third,
+          redundant chrome layer that re-cluttered the canvas on every select. */}
 
       {/* Marquee selection tool */}
       {marquee && <div style={getMarqueeStyles(marquee)} />}

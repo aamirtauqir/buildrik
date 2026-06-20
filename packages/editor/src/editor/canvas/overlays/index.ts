@@ -21,8 +21,6 @@ export { RemoteCursorsOverlay } from "./RemoteCursorsOverlay";
 // Canvas UX enhancements
 export { SelectionLabel } from "./SelectionLabel";
 export type { SelectionLabelProps } from "./SelectionLabel";
-export { ParentHighlight } from "./ParentHighlight";
-export type { ParentHighlightProps } from "./ParentHighlight";
 export { CanvasBreadcrumb } from "./CanvasBreadcrumb";
 export type { CanvasBreadcrumbProps } from "./CanvasBreadcrumb";
 export { SmartGuidesOverlay } from "./SmartGuidesOverlay";

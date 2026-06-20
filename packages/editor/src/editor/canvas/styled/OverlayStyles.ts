@@ -143,42 +143,6 @@ export const GridPattern = styled.div<{ gridSize?: number }>`
 `;
 
 // ============================================================================
-// PARENT HIGHLIGHT
-// ============================================================================
-
-export const ParentHighlightBox = styled.div<{ isLocked?: boolean }>`
-  position: absolute;
-  border: 1px dashed var(--bd-accent-alpha-30);
-  border-radius: ${radius.sm}px;
-  background: var(--bd-accent-subtle);
-  pointer-events: none;
-  ${cssFragments.transition}
-
-  ${(props) =>
-    props.isLocked &&
-    css`
-      border-color: ${colors.status.warning};
-      opacity: 0.5;
-    `}
-`;
-
-export const ParentHighlightBadge = styled.div`
-  position: absolute;
-  top: -20px;
-  left: 0;
-  display: flex;
-  align-items: center;
-  gap: ${spacing.xs}px;
-  padding: 2px ${spacing.md}px;
-  background: ${colors.primary.alpha15};
-  border-radius: ${radius.sm}px;
-  font-size: 12px;
-  color: var(--bd-accent);
-  font-weight: 500;
-  white-space: nowrap;
-`;
-
-// ============================================================================
 // GUIDE LINE
 // ============================================================================
 
