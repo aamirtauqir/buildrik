@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 10 — Fix the spine, hide the rest</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 10 · ~7 minutes</p>
+  <h1>To make a product feel finished — fast — fix the spine and hide the rest.</h1>
+  <p class="lede">Users called the product "shit" and said "make another version." You asked the right next question: how do I fix the existing one, fast? The answer isn't speed at fixing everything — it's <strong>choosing what to fix and what to hide</strong>. A product feels finished when its one core journey works perfectly and nothing broken is visible. That's reachable in weeks, not a rewrite in months.</p>
+
+  <div class="callout">
+    <strong>Three moves, in order</strong><br>
+    1. <em>Hide</em> what's half-baked (instant credibility).<br>
+    2. <em>Tell the user what's happening</em> on every action (kills "feels broken").<br>
+    3. <em>Walk the one core journey</em> until it's flawless (the spine).
+  </div>
+
+  <h2>Why "fix everything" is the trap</h2>
+  <p>Faced with 50 problems, the instinct is to fix all 50. That's "boiling the ocean" — slow, and nothing ships, so the product stays broken the whole time. The opposite works: a product where the <em>spine</em> is perfect and the half-baked is <em>hidden</em> reads as finished, even with ten features gated off. Webflow didn't ship every feature on day one — it shipped a flawless core and hid the rest behind "coming soon… elsewhere." Judgment concentrates on the few paths people actually walk.</p>
+
+  <h2>Move 1 — Hide before you fix</h2>
+  <p>The fastest credibility you can buy: make nothing broken <em>visible</em>. A broken or "coming soon" feature on screen does more damage than a missing one — it trains users that the product can't be trusted. Gating it off is usually a one-line flag, not a rebuild. Your collaboration feature is the textbook case: it's demo-only, so hide it until it's real (<a href="../reference/buildrik-design-principles.html">constitution #3</a>). The "broken features" complaint can largely vanish in a day.</p>
+
+  <h2>Move 2 — Tell the user what happened, every time</h2>
+  <p>"I never know if it errored or succeeded" was your users' core complaint, and it's the single biggest reason a <em>working</em> product feels broken. The fix is one consistent feedback pattern — every action shows <strong>in-progress → success, or error→recover</strong> — applied to <em>every</em> action. This is repetition, not invention, which is exactly where AI is fast. One pattern, many places.</p>
+
+  <h2>Move 3 — Walk the one core journey until it's flawless</h2>
+  <p>Pick the single journey your product exists for — for Buildrik, "build and publish a client's site." Walk it end to end <em>as a real user</em>. The moment you hit anything silent, confusing, or broken, fix it, then walk again from the top. Repeat until you reach the end with zero friction. This "walk-and-fix loop" is how your own V1 shipped. Perfect the spine; defer the limbs.</p>
+  <div class="panel panel--accent">
+    The reframe that saves you months: <strong>your product isn't shit — it's half-wired.</strong> The expensive half (the backend) exists. What's missing is the cheap half: showing states and finishing the wiring. A rewrite throws away the working half and repeats the same mistakes. These three moves finish the cheap half in the right order. Full plan: <a href="../../reviews/buildrik-recovery-roadmap-20260621.md">the recovery roadmap</a>.
+  </div>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="A visibly broken or 'coming soon' feature damages trust more than a missing one — hiding it is the fastest credibility gain, usually a one-line flag.">
+      <p class="q-stem">A feature is half-built and clearly broken. The fastest fix for the product's reputation is to…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Hide it until it actually works</button>
+        <button class="q-opt">Rush to finish it before anything else</button>
+        <button class="q-opt">Leave it with a "coming soon" label</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Perfecting the one journey users judge you on — the spine — earns most of the perceived quality. Fixing all surfaces at once is the slow 'boil the ocean' trap.">
+      <p class="q-stem">With limited time, where do you spend it to feel finished fastest?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Perfect the single core journey end to end</button>
+        <button class="q-opt">A little polish spread across every screen</button>
+        <button class="q-opt">Rebuild the whole thing from a clean slate</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="A working product feels broken when it stays silent — adding consistent in-progress/success/error feedback to every action is the biggest single perception fix.">
+      <p class="q-stem">Users say "it feels broken" but the actions actually work. The highest-impact fix is…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Show success/error/loading on every action</button>
+        <button class="q-opt">Redesign the colours and the typography</button>
+        <button class="q-opt">Add more features so it feels complete</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>The <a href="../../reviews/buildrik-recovery-roadmap-20260621.md">recovery roadmap</a> sequences these moves into phases with effort and done-criteria. Start at Phase 0 (hide collab + half-baked) → Phase 1 (feedback everywhere) → Phase 2 (walk the spine). That's the ~2-week flip from "broken" to "solid" — no rewrite.</p>
+
+  <p class="source">Primary source: <a href="https://sensible.com/rocket-surgery-made-easy/" target="_blank" rel="noopener">Steve Krug — Rocket Surgery Made Easy</a> (test the one task) + the "boil the ocean" anti-pattern. Your own validated method: the V1 walk-and-fix loop. Plan: <a href="../../reviews/buildrik-recovery-roadmap-20260621.md">recovery roadmap</a>.</p>
+  <p class="fine">Want to start? Ask me to begin Phase 0 (gate collaboration) or Phase 1 (the feedback layer) — I'll do it on the real code, verified.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

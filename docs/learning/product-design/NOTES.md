@@ -32,8 +32,10 @@
 
 ## Mission status
 - **MISSION UPDATED 2026-06-21** (learning-record 0004): now "become a pro product builder & designer (vibcoder)" — user research + measurement + prioritisation moved INTO scope (the "pro frontier"). Capstone L9 (`lessons/0009-becoming-a-pro.html`) + roadmap (`reference/the-path.html`) written. Confirm wording with the learner if they push back; otherwise proceed.
-- **L10 / NEXT (highest leverage):** run the learner's FIRST 5-user usability test on the core job ("an agency operator publishes a client's site") — script the task, pick 5 watchers, observe silently, turn stumbles into rated findings. This activates Habit 2 (research), the biggest lever. Steve Krug "Rocket Surgery Made Easy" is the method.
-- Course now: 9 lessons + 6 references (constitution, states-checklist, definition-of-done, heuristics-cheatsheet, the-path) + 4 learning records.
+- **RESEARCH DONE (learner ran it):** real users gave harsh feedback — not easy/user-friendly, no error/success feedback in processes, "broken features" (collab), "backend exists but not integrated with frontend", "it's shit / make another version." Turned into `docs/reviews/user-feedback-fixplan-20260621.md` (UF-1..4 rated). Key diagnosis: **product is HALF-WIRED, not broken** — backend exists, frontend missing states + integration. NOT a rewrite.
+- L10 (done): "Fix the spine, hide the rest" — the recovery method (hide half-baked → feedback everywhere → walk the core loop). `lessons/0010-fix-the-spine-hide-the-rest.html`. Full plan: `docs/reviews/buildrik-recovery-roadmap-20260621.md` (Phase 0 gate-broken → 1 feedback layer → 2 walk core loop → 3 wire/hide ghosts → 4 re-test → 5 redesign by pain).
+- **NEXT ACTION (recommend):** Phase 0 — gate collaboration (constitution #3; cheap, instant credibility) → then Phase 1 feedback layer (extend the existing `addToast`/save-status pattern to every action). Both are real code work the learner asked to do "fast."
+- Course now: 10 lessons + 7 references (constitution, states-checklist, definition-of-done, heuristics-cheatsheet, the-path) + 4 learning records. Mission = become a pro product builder; current arc = recover Buildrik from user feedback via the roadmap.
 
 ## Product facts surfaced (for honesty in lessons)
 - Real-time collaboration is DEMO-ONLY / not shippable (6 P1 distributed-systems bugs, prior codex review 2026-06-12). Do not promote it to prime UI. Design the presence spot but gate the feature.
