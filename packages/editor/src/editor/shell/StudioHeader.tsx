@@ -319,23 +319,26 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       onOpenIssues={onOpenIssues}
       onHelp={onOpenShortcuts}
       collaborationSlot={
-        hasTransport ? (
-          <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
-        ) : isFeatureEnabled("collab") ? (
-          // Collaboration is DEMO-ONLY (last-write-wins, 6 known P1s). The
-          // CTA is gated behind VITE_FEATURE_COLLAB so it isn't exposed as
-          // production-ready until a real OT/CRDT arc lands. An already-live
-          // session (hasTransport) still shows presence.
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleStartCollab}
-            aria-label="Start collaboration session"
-            title="Start a real-time collaboration session (beta)"
-          >
-            <Users size={14} />
-            <span style={{ marginLeft: 4 }}>Collaborate</span>
-          </Button>
+        // Recovery Phase 0: collaboration is DEMO-ONLY (last-write-wins, 6 known
+        // P1s) and is the #1 reason the product read as "broken" in user testing.
+        // Gate the ENTIRE collab slot behind VITE_FEATURE_COLLAB — when the flag is
+        // off, NOTHING collab shows, even if a session somehow connected (the old
+        // code leaked presence on hasTransport regardless of the flag).
+        isFeatureEnabled("collab") ? (
+          hasTransport ? (
+            <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleStartCollab}
+              aria-label="Start collaboration session"
+              title="Start a real-time collaboration session (beta)"
+            >
+              <Users size={14} />
+              <span style={{ marginLeft: 4 }}>Collaborate</span>
+            </Button>
+          )
         ) : null
       }
     />
