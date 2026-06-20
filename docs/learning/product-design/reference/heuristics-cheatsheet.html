@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference — UX Heuristics & Audit Cheat Sheet</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · keep this open while you audit</p>
+  <h1>The 10 heuristics, severity, and the audit loop</h1>
+  <p class="lede">Your vocabulary for turning "this feels weird" into a named, prioritised, fixable finding. Source of truth: <a href="https://www.nngroup.com/articles/ten-usability-heuristics/">Nielsen Norman Group</a>.</p>
+
+  <h2>The 10 usability heuristics</h2>
+  <p>Every screen is judged against these. When something feels off, it almost always violates one. The Buildrik column is where you've already felt it.</p>
+  <table>
+    <thead><tr><th>#</th><th>Heuristic</th><th>Plain meaning</th><th>Felt in Buildrik as…</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><strong>Visibility of system status</strong></td><td>Always tell the user what's happening, fast.</td><td>"No expected result" — I click and nothing confirms it worked.</td></tr>
+      <tr><td>2</td><td><strong>Match the real world</strong></td><td>Speak the user's language, not internal jargon.</td><td>"Typography / div.h2" instead of "Text" — engineer words, not client words.</td></tr>
+      <tr><td>3</td><td><strong>User control & freedom</strong></td><td>Clear exits, undo, cancel — no traps.</td><td>No obvious way out of a mode; actions feel one-way.</td></tr>
+      <tr><td>4</td><td><strong>Consistency & standards</strong></td><td>Same word / action = same meaning everywhere.</td><td>"Features have no relation" — each one looks and behaves differently.</td></tr>
+      <tr><td>5</td><td><strong>Error prevention</strong></td><td>Stop the mistake before it happens.</td><td>An edit silently changes 12 things you didn't mean to.</td></tr>
+      <tr><td>6</td><td><strong>Recognition rather than recall</strong></td><td>Show the options; don't make me remember them.</td><td>"User doesn't understand what a feature does" — I must remember, not see.</td></tr>
+      <tr><td>7</td><td><strong>Flexibility & efficiency</strong></td><td>Shortcuts for experts, simple path for novices.</td><td>One density for everyone; power users and clients get the same wall.</td></tr>
+      <tr><td>8</td><td><strong>Aesthetic & minimalist design</strong></td><td>Cut anything irrelevant; it drowns the relevant.</td><td>"Density issue / AI slop" — too much on screen, no hierarchy.</td></tr>
+      <tr><td>9</td><td><strong>Recognise, diagnose, recover from errors</strong></td><td>Plain-language errors that say how to fix it.</td><td>A red toast with a code, no next step.</td></tr>
+      <tr><td>10</td><td><strong>Help & documentation</strong></td><td>Best if not needed; if needed, in-context.</td><td>I open a panel and have to guess what it's for.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Severity — what to fix first</h2>
+  <p>A finding without a severity is a to-do you'll never prioritise. Rate every one 0–4. Severity = <strong>frequency × impact × persistence</strong> (how often, how much it hurts, does it keep hurting).</p>
+  <table>
+    <thead><tr><th>Rating</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><span class="sev sev-0">0</span></td><td>Not actually a problem.</td></tr>
+      <tr><td><span class="sev sev-1">1</span></td><td>Cosmetic — fix only if you have spare time.</td></tr>
+      <tr><td><span class="sev sev-2">2</span></td><td>Minor — low priority.</td></tr>
+      <tr><td><span class="sev sev-3">3</span></td><td>Major — important, high priority.</td></tr>
+      <tr><td><span class="sev sev-4">4</span></td><td>Catastrophe — must fix before shipping.</td></tr>
+    </tbody>
+  </table>
+  <p class="fine">Source: <a href="https://www.nngroup.com/articles/how-to-rate-the-severity-of-usability-problems/">NN/G — Severity Ratings for Usability Problems</a>.</p>
+
+  <h2>The audit loop (5 steps)</h2>
+  <ol>
+    <li><strong>Pick one screen + one task.</strong> e.g. "Editor inspector — change a heading's colour." Not the whole app.</li>
+    <li><strong>Walk the task slowly.</strong> One observation per line. Don't fix yet — just notice every place you hesitate, get surprised, or can't tell what happened.</li>
+    <li><strong>Name the heuristic.</strong> For each observation, cite which of the 10 it breaks. If you can't name one, it may not be a real problem.</li>
+    <li><strong>Rate severity 0–4.</strong> Be honest. Most "feels weird" lands at 2–3.</li>
+    <li><strong>Sort by severity, fix the 4s and 3s first.</strong> Re-walk the task to confirm the fix.</li>
+  </ol>
+  <p class="fine">Method source: <a href="https://www.nngroup.com/articles/how-to-conduct-a-heuristic-evaluation/">NN/G — How to Conduct a Heuristic Evaluation</a>.</p>
+
+  <div class="ask"><strong>Teacher on call.</strong> Stuck mapping a Buildrik annoyance to a heuristic? Paste a screenshot and ask me — that's exactly the muscle we're building.</div>
+
+  <div class="nav">
+    <span><a href="../lessons/0001-audit-your-editor.html">→ Lesson 1: Audit your own editor</a></span>
+    <span><a href="../MISSION.md">Mission</a></span>
+  </div>
+</main>
+</body>
+</html>

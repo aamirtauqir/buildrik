@@ -1,0 +1,105 @@
+/* Buildrik Product-Design course — shared stylesheet.
+   Tufte-ish: generous margins, real reading measure, restrained palette.
+   Single accent = cobalt #2D6DFF (matches the product, no purple per DESIGN.md). */
+
+:root {
+  --ink: #1a1a1a;
+  --muted: #6b7280;
+  --faint: #9ca3af;
+  --rule: #e5e7eb;
+  --bg: #fbfbfa;
+  --panel: #ffffff;
+  --accent: #2D6DFF;
+  --accent-soft: #EFF4FF;
+  --good: #0D9488;
+  --warn: #B45309;
+  --bad: #DC2626;
+  --maxw: 720px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.65 "Inter Tight", Inter, -apple-system, system-ui, sans-serif;
+  padding: 48px 24px 120px;
+}
+
+main { max-width: var(--maxw); margin: 0 auto; }
+
+/* Eyebrow + title block */
+.eyebrow {
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600; margin: 0 0 6px;
+}
+h1 { font: 700 32px/1.2 "General Sans", Inter, sans-serif; margin: 0 0 8px; letter-spacing: -0.01em; }
+h2 { font: 600 22px/1.3 "General Sans", Inter, sans-serif; margin: 40px 0 10px; }
+h3 { font: 600 16px/1.4 Inter, sans-serif; margin: 28px 0 6px; }
+.lede { font-size: 19px; color: var(--muted); margin: 0 0 8px; }
+
+p { margin: 0 0 14px; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+a:hover { border-bottom-color: var(--accent); }
+strong { font-weight: 600; }
+small, .fine { font-size: 13px; color: var(--faint); }
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 36px 0; }
+
+/* Cards / panels */
+.panel {
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 18px 20px; margin: 18px 0;
+}
+.panel--accent { border-color: var(--accent); background: var(--accent-soft); }
+.callout { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; margin: 18px 0; color: var(--muted); }
+
+/* The reusable "principle" chip */
+.chip {
+  display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px;
+  border-radius: 999px; background: var(--accent-soft); color: var(--accent);
+  white-space: nowrap;
+}
+.chip--good { background: #F0FDFA; color: var(--good); }
+.chip--bad { background: #FEF2F2; color: var(--bad); }
+
+/* Severity dots */
+.sev { font-weight: 700; }
+.sev-0 { color: var(--faint); } .sev-1 { color: var(--muted); }
+.sev-2 { color: var(--warn); } .sev-3 { color: #EA580C; } .sev-4 { color: var(--bad); }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--faint); font-weight: 600; }
+
+/* Quiz widget */
+.quiz { margin: 16px 0; }
+.q { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; margin: 12px 0; }
+.q-stem { font-weight: 600; margin: 0 0 12px; }
+.q-opts { display: grid; gap: 8px; }
+.q-opt {
+  text-align: left; font: inherit; cursor: pointer; padding: 10px 12px;
+  border: 1px solid var(--rule); border-radius: 8px; background: #fff; color: var(--ink);
+  transition: border-color .12s, background .12s;
+}
+.q-opt:hover { border-color: var(--accent); }
+.q-opt.correct { border-color: var(--good); background: #F0FDFA; }
+.q-opt.wrong { border-color: var(--bad); background: #FEF2F2; }
+.q-fb { margin: 10px 0 0; font-size: 14px; color: var(--muted); min-height: 1px; }
+.q-fb.show { padding-top: 8px; border-top: 1px dashed var(--rule); }
+
+/* Footer nav */
+.nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 14px; }
+.ask { margin-top: 28px; background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; font-size: 15px; color: var(--ink); }
+.ask strong { color: var(--accent); }
+
+@media print {
+  body { background: #fff; padding: 0; font-size: 12pt; }
+  .q-opt:hover { border-color: var(--rule); }
+  .nav, .ask { display: none; }
+  a { color: var(--ink); border: 0; }
+}

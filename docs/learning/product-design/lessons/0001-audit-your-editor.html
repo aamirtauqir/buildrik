@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 1 — Audit your own editor</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 1 · ~8 minutes</p>
+  <h1>Audit first. Here's the one skill it needs.</h1>
+  <p class="lede">You asked: "do we audit first?" Yes. But an audit isn't an opinion ("this feels weird") — it's a list of <strong>named, rated</strong> problems. This lesson gives you the naming muscle, on your own editor.</p>
+
+  <div class="callout">
+    The win by the end: you can take one real annoyance in Buildrik and turn it into a finding like —
+    <em>"Inspector says <strong>Typography / div.h2</strong> → violates <span class="chip">Match the real world</span> → severity 3 → fix: rename to 'Text'."</em>
+    That sentence is fixable. "It feels weird" is not.
+  </div>
+
+  <h2>Why "feels weird" fails you</h2>
+  <p>When a screen is off, your brain feels it but can't act on it. The feeling has to become a <em>cause</em>. The fastest way to find the cause is to check the screen against 10 known rules — the <a href="https://www.nngroup.com/articles/ten-usability-heuristics/">usability heuristics</a>. Almost every "weird" maps to one of them. That's the whole trick: <strong>stop describing the symptom, name the violated rule.</strong></p>
+  <p>Your message already listed the symptoms. Here's the translation:</p>
+  <table>
+    <thead><tr><th>You said</th><th>It's actually…</th></tr></thead>
+    <tbody>
+      <tr><td>"density issue, too much"</td><td><span class="chip">Aesthetic &amp; minimalist design</span></td></tr>
+      <tr><td>"features have no relation"</td><td><span class="chip">Consistency &amp; standards</span></td></tr>
+      <tr><td>"user doesn't get what a feature does"</td><td><span class="chip">Recognition rather than recall</span></td></tr>
+      <tr><td>"action has no expected result"</td><td><span class="chip">Visibility of system status</span></td></tr>
+    </tbody>
+  </table>
+
+  <h2>A finding has 5 parts</h2>
+  <p>This is the format you'll write every audit line in. Memorise the shape, not the words:</p>
+  <div class="panel">
+    <strong>Screen + task</strong> · <strong>what you observed</strong> · <span class="chip">heuristic broken</span> · <span class="sev sev-3">severity 0–4</span> · <strong>the fix</strong>
+  </div>
+  <p>Worked example from the old Buildrik inspector (before today's redesign):</p>
+  <div class="panel panel--accent">
+    <strong>Editor inspector, selecting a heading</strong> · the panel showed <code>div / h2</code> and a "Typography" section · <span class="chip">Match the real world</span> (CSS jargon, not a client's words) · <span class="sev sev-3">3</span> · rename to "this heading" + "Text". <span class="fine">(This is exactly the fix we shipped today — now you can see *why* it was a 3, not a taste call.)</span>
+  </div>
+
+  <h2>Your turn — name the violation</h2>
+  <p>Pick the heuristic each real Buildrik moment breaks. Click an answer; you'll get the why immediately. Recall it from the table above — don't peek.</p>
+
+  <div class="quiz">
+    <div class="q" data-explain="The user clicks Publish and the screen gives no progress, no 'done', no live URL — so they can't tell the outcome of their action.">
+      <p class="q-stem">A user clicks "Publish" and nothing on screen changes for several seconds. Which rule breaks?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Visibility of system status</button>
+        <button class="q-opt">Aesthetic and minimalism</button>
+        <button class="q-opt">Recognition over recall</button>
+        <button class="q-opt">Consistency and standards</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+
+    <div class="q" data-explain="The inspector dumps 40 controls at once with no grouping or hierarchy — relevant controls drown in irrelevant ones. That is the minimalism rule, not a 'make it pretty' problem.">
+      <p class="q-stem">The inspector shows 40 controls at once with no hierarchy. Which rule breaks?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Aesthetic and minimalism</button>
+        <button class="q-opt">Visibility of system status</button>
+        <button class="q-opt">User control and freedom</button>
+        <button class="q-opt">Error prevention and guards</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+
+    <div class="q" data-explain="Each panel uses different words and layouts for the same idea, so the user re-learns every feature. Same concept should look and act the same everywhere.">
+      <p class="q-stem">Every panel names and lays out the same idea differently. Which rule breaks?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Consistency and standards</button>
+        <button class="q-opt">Help and documentation</button>
+        <button class="q-opt">Flexibility and efficiency</button>
+        <button class="q-opt">Visibility of system status</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+
+    <div class="q" data-explain="The user has to remember what an unlabelled icon or panel does instead of seeing it. Make options visible; don't tax memory.">
+      <p class="q-stem">A user must remember what an unlabelled panel does. Which rule breaks?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Recognition rather than recall</button>
+        <button class="q-opt">Match with the world</button>
+        <button class="q-opt">Consistency and standards</button>
+        <button class="q-opt">Error prevention guards</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>The assignment</h2>
+  <p>Open the editor (<code>localhost:3000/edit/:id</code>). Pick <strong>one task</strong> — say "change a button's colour." Walk it slowly and write <strong>3 findings</strong> in the 5-part format above. Don't fix anything yet. Bring them back to me and we'll rate + prioritise them together — that's Lesson 2.</p>
+
+  <div class="panel">
+    <h3 style="margin-top:0">Read this next (primary source)</h3>
+    <p style="margin:0"><a href="https://www.nngroup.com/articles/ten-usability-heuristics/">10 Usability Heuristics for User Interface Design — Jakob Nielsen, NN/G.</a> 15 minutes. The single highest-trust source for everything in this course. Read it once; you'll re-use it forever.</p>
+  </div>
+
+  <div class="ask"><strong>I'm your teacher — ask me anything.</strong> Unsure which heuristic a Buildrik screen breaks? Paste the screenshot. Disagree with a quiz answer? Argue it — that's how the concept sticks.</div>
+
+  <div class="nav">
+    <span><a href="../reference/heuristics-cheatsheet.html">📋 Cheat sheet (10 heuristics + severity)</a></span>
+    <span><a href="../MISSION.md">Mission</a></span>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>
