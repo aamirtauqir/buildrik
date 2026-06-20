@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 6 — Name it, write it down</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 6 · ~6 minutes</p>
+  <h1>You built a method. Here's its name — and how to make it scale.</h1>
+  <p class="lede">You asked three questions at once: what do we call this thinking, can it be better, and can it design the whole editor? They have one answer. What you've been doing has a name, the upgrade is to write it down, and writing it down is exactly what lets it cover every surface.</p>
+
+  <div class="callout">
+    <strong>The name</strong><br>
+    A small set of stated rules = <em>design principles</em>. Applying them consistently everywhere = a <em>design system / design language</em>. Deciding by rule instead of by taste = <em>principle-driven design</em>.
+  </div>
+
+  <h2>Taste vs principle — the whole difference</h2>
+  <p>"AI-designed" and "properly designed" aren't about talent. The difference is <strong>where the decision comes from</strong>. Taste says "this looks better." A principle says "Publish is the hero because the loudest button is the product's purpose." One you can't defend or repeat; the other you can hand to anyone and get the same answer. A product feels coherent when every decision came from the same short list of rules.</p>
+
+  <h2>The upgrade: write the rules into one page</h2>
+  <p>Through five lessons, your principles were scattered — one here, one there. Scattered rules can't keep a product consistent, because no one can hold them all at once (not you, not a builder, not a future teammate). The upgrade is to collect them into a single page everyone shares:</p>
+  <div class="panel panel--accent">
+    Your twelve rules now live in one place: <a href="../reference/buildrik-design-principles.html"><strong>the Buildrik Design Constitution</strong></a>. Every future decision cites a number from it. Every builder ("vibcoder") gets handed it. When two people disagree, they point at a rule, not at an opinion. <span class="fine">That single page <em>is</em> the "shared skeleton" your editor was missing — at the level of thinking, not just code.</span>
+  </div>
+
+  <h2>Why this scales to the whole editor</h2>
+  <p>This is the part that answers "can we design all of it this way?" — yes, and it's the only way that produces consistency. A design system isn't a pile of screens; it's <strong>a few rules applied many times</strong>. The same twelve principles that fixed the topbar will fix the rail, the inspector, the panels — and because they're the <em>same</em> rules, the surfaces will finally match. Consistency isn't something you add at the end; it's what falls out automatically when every surface obeys one constitution.</p>
+
+  <h2>Your turn — taste or principle?</h2>
+  <div class="quiz">
+    <div class="q" data-explain="It names a rule anyone can apply and get the same result — that's a principle. 'Looks cleaner' would be taste; 'the loudest button is the purpose' is a principle.">
+      <p class="q-stem">"Publish is blue because the loudest button names the product's purpose." This is…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>A principle — a rule anyone can repeat</button>
+        <button class="q-opt">Taste — it's just a personal preference here</button>
+        <button class="q-opt">A guess — there's no way to know really</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Consistency comes from applying the SAME few rules to every surface. A pile of individually-nice screens with different rules is exactly what feels incoherent.">
+      <p class="q-stem">What actually makes a whole product feel consistent?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>The same few rules applied to every surface</button>
+        <button class="q-opt">Each screen polished to look nice alone</button>
+        <button class="q-opt">More designers reviewing every screen twice</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Writing the rules in one shared page is what lets anyone — you, a builder, a teammate — apply them the same way. Scattered rules can't hold a product together.">
+      <p class="q-stem">The single biggest upgrade to a young design method is to…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Write the rules into one shared page</button>
+        <button class="q-opt">Add many more rules to cover everything</button>
+        <button class="q-opt">Keep the rules in your head for speed</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>From here, the <a href="reference/buildrik-design-principles.html">constitution</a> leads. Every surface we redesign runs the <a href="0004-design-to-build-handoff.html">five-step loop</a> and settles each call by citing a principle. The editor gets coherent not because we polish harder, but because everything obeys the same twelve rules.</p>
+
+  <p class="source">Primary source: <a href="https://www.nngroup.com/articles/design-principles/" target="_blank" rel="noopener">NN/g — Design Principles: Definition and Examples</a>. Your living reference: <a href="../reference/buildrik-design-principles.html">the Buildrik Design Constitution</a>.</p>
+  <p class="fine">A design language is never finished. Bring me a surface, we run the loop, and if a new rule emerges we add it to the constitution — together.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

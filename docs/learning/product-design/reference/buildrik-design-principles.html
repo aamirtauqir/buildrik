@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buildrik — Design Principles (the constitution)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .prin{border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:10px 0;page-break-inside:avoid}
+  .prin h3{font-size:15px;margin:0 0 4px;display:flex;gap:9px;align-items:baseline}
+  .prin .n{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+  .prin .rule{font-size:13.5px;color:var(--ink);font-weight:550;margin:0 0 5px}
+  .prin .use{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
+  .prin .test{font-size:11.5px;color:var(--accent);margin:6px 0 0;font-weight:600}
+  .grp{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:24px 0 4px}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Buildrik Design Constitution · v1</p>
+  <h1>The principles every editor decision follows.</h1>
+  <p class="lede">This is the small set of rules that turn "design" from taste into a system. Any control, any panel, any new feature gets decided by running it against these — not by what looks nice. Hand this to any builder ("vibcoder"): same rules, every surface, = a coherent editor. <strong>When two of us disagree, we don't argue taste — we cite the principle.</strong></p>
+
+  <p class="grp">Words &amp; honesty</p>
+
+  <div class="prin">
+    <h3><span class="n">1</span> Match the real world</h3>
+    <p class="rule">Use the user's words, never the code's.</p>
+    <p class="use">"Heading", not "h2". "Text", not "Typography / div". Labels are written for a client, not an engineer.</p>
+    <p class="test">Test: would a non-technical client understand this word?</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">2</span> One status, one truth</h3>
+    <p class="rule">Two parts of the UI must never disagree about the same fact.</p>
+    <p class="use">The topbar can't say "Save failed" while the footer says "Offline". One source, one message.</p>
+    <p class="test">Test: does any other part of the screen contradict this?</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">3</span> Don't promote what isn't ready</h3>
+    <p class="rule">A broken or demo-only feature never gets prime space.</p>
+    <p class="use">Real-time collab is demo-only → design the presence slot, but gate it until it's solid.</p>
+    <p class="test">Test: would I be happy if a client used this exactly as shown today?</p>
+  </div>
+
+  <p class="grp">Hierarchy — what's loud, what's quiet</p>
+
+  <div class="prin">
+    <h3><span class="n">4</span> Prominence = frequency × importance</h3>
+    <p class="rule">Loud = used often AND matters. Quiet or hidden = rarely both.</p>
+    <p class="use">Agency name (never changes) left the breadcrumb; the page name (changes often) got bold.</p>
+    <p class="test">Test: score it — how often × how much. Low on both → tuck it away.</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">5</span> The loudest button is the product's purpose</h3>
+    <p class="rule">Exactly one primary (filled, cobalt) button per surface — and it names why the tool exists.</p>
+    <p class="use">A website builder exists to publish → Publish is the hero, not Ask AI.</p>
+    <p class="test">Test: finish "this tool exists so the user can ___" — that's the hero.</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">6</span> Calm by default — content is the hero</h3>
+    <p class="rule">The thing the user is making (the canvas) is the most prominent; chrome stays quiet until needed.</p>
+    <p class="use">No blueprint outlines at rest; selection chrome appears only on the selected element.</p>
+    <p class="test">Test: at rest, does the eye land on the work or on the toolbar?</p>
+  </div>
+
+  <p class="grp">Restraint — the discipline that prevents clutter</p>
+
+  <div class="prin">
+    <h3><span class="n">7</span> Earns its way in — default no</h3>
+    <p class="rule">Prime space (the topbar) rejects by default. A control must pass: ready? · global? · always-needed?</p>
+    <p class="use">Invite, ⌘K, Help, Account all failed "always-needed" → they live in the ⋯ overflow.</p>
+    <p class="test">Test: all three yes? In. Any no? Panel or overflow.</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">8</span> Subtract before you add</h3>
+    <p class="rule">When tempted to add, first ask what can move out.</p>
+    <p class="use">16 scattered topbar controls → 3 zones + ⋯. The fix for density is fewer things, not tidier things.</p>
+    <p class="test">Test: what did I remove to make room for this?</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">9</span> Tuck the rare — progressive disclosure</h3>
+    <p class="rule">Show the common; hide the rare one click deep (⋯, "More", a dropdown).</p>
+    <p class="use">Advanced inspector controls collapse under "More settings"; Client-view folds into Preview ▾.</p>
+    <p class="test">Test: do most users need this most of the time? No → tuck it.</p>
+  </div>
+
+  <p class="grp">Consistency — the same, everywhere</p>
+
+  <div class="prin">
+    <h3><span class="n">10</span> Group by intent</h3>
+    <p class="rule">Things that share a job sit together, separated from other jobs by a divider or a label.</p>
+    <p class="use">Topbar = Navigate │ View │ Status+Ship. Rail = Make the page / Make it yours.</p>
+    <p class="test">Test: can I name the job each group does in one word?</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">11</span> One canonical name per thing</h3>
+    <p class="rule">A thing has exactly one name, used on every surface.</p>
+    <p class="use">A heading is "Heading" in the toolbar, breadcrumb, and inspector — never four different names.</p>
+    <p class="test">Test: does this thing have a different label anywhere else?</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">12</span> One shared skeleton</h3>
+    <p class="rule">Every panel uses the same frame: Header → (optional) nav → grouped body. Only the content differs.</p>
+    <p class="use">Insert, Pages, Styles, Settings should feel like one family, not four apps. This is the cure for "it feels AI-designed."</p>
+    <p class="test">Test: could I swap this panel's header/padding for another panel's and notice no difference? Good.</p>
+  </div>
+
+  <h2>How to use this</h2>
+  <p>Designing any surface? Run the <a href="../lessons/0004-design-to-build-handoff.html">five-step loop</a> — inventory → decide (cite a principle for each call) → 4-part handoff → build → next — and let these twelve rules settle every decision. Disagreement is resolved by pointing at a number, not by opinion. As you learn more, principles get sharpened, added, or retired — but always written here first, so the whole editor moves together.</p>
+
+  <p class="source">This constitution distils five lessons (<a href="../lessons/0001-audit-your-editor.html">1</a>–<a href="../lessons/0005-the-topbar-is-a-bouncer.html">5</a>) into one page. Grounding source: <a href="https://www.nngroup.com/articles/ten-usability-heuristics/" target="_blank" rel="noopener">NN/g 10 Usability Heuristics</a>. Inspiration for "design principles as a constitution": <a href="https://www.designsystems.com/" target="_blank" rel="noopener">designsystems.com</a>.</p>
+  <p class="fine">Think a principle is wrong, or missing? Tell me — we revise the constitution together. That's how a design language stays alive.</p>
+</main>
+</body>
+</html>
