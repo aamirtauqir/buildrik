@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>States checklist — design the whole set</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .grp{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:22px 0 6px}
+  .st{display:flex;gap:11px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--bg-3,#f2f4f7)}
+  .st .box{flex:none;width:14px;height:14px;border:1.5px solid var(--rule);border-radius:3px;margin-top:2px}
+  .st .name{font-weight:600;font-size:13.5px;color:var(--ink);min-width:120px}
+  .st .desc{font-size:12.5px;color:var(--muted);line-height:1.45}
+  .must{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:var(--accent-soft,#EFF4FF);color:var(--accent);border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+  @media print{ .st .box{border-color:#999} }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · States checklist · companion to <a href="buildrik-design-principles.html">Principle #13</a></p>
+  <h1>A surface isn't done until every state is designed.</h1>
+  <p class="lede">The happy path — full of content, nothing loading, nothing wrong — is about 10% of the work. The other 90% is what users actually hit: empty, loading, error, offline, too-long. Run any control, panel, or screen through this list. The four marked <span class="must">must</span> are the ones amateurs skip and pros never do.</p>
+
+  <p class="grp">Interaction states (any clickable thing)</p>
+  <div class="st"><span class="box"></span><span class="name">Default</span><span class="desc">At rest, nothing happening. The "resting" look you usually design first.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Hover</span><span class="desc">Pointer over it — signals "this is clickable".</span></div>
+  <div class="st"><span class="box"></span><span class="name">Focus</span><span class="desc">Reached by keyboard (Tab). A visible ring — required for accessibility.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Active / pressed</span><span class="desc">The moment of clicking — brief feedback that the press registered.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Disabled</span><span class="desc">Can't be used right now — and ideally a hint why.</span></div>
+
+  <p class="grp">Data states (anything that shows content)</p>
+  <div class="st"><span class="box"></span><span class="name">Empty <span class="must">must</span></span><span class="desc">No content yet. The most important teaching moment: say what this is, why it's empty, and what to do next.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Loading <span class="must">must</span></span><span class="desc">Fetching / working. Skeleton or spinner — never a frozen blank.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Full / has content</span><span class="desc">The normal populated view.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Edge: too-long / too-many <span class="must">must</span></span><span class="desc">A 60-char title, 200 pages. Does it truncate cleanly, wrap, or break the layout?</span></div>
+
+  <p class="grp">Outcome states (after an action)</p>
+  <div class="st"><span class="box"></span><span class="name">Success</span><span class="desc">It worked — a calm confirmation ("Saved", "Published").</span></div>
+  <div class="st"><span class="box"></span><span class="name">Error / failed <span class="must">must</span></span><span class="desc">It broke. Say what happened, in plain words, and how to recover — never a dead end.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Warning</span><span class="desc">Allowed but risky — confirm before the irreversible.</span></div>
+
+  <p class="grp">App / mode states (Buildrik-specific)</p>
+  <div class="st"><span class="box"></span><span class="name">Saving… / Saved</span><span class="desc">In-progress vs done. (See principle #2 — one status, one truth.)</span></div>
+  <div class="st"><span class="box"></span><span class="name">Offline / Reconnecting</span><span class="desc">Connection dropped → "changes queued", not "Save failed".</span></div>
+  <div class="st"><span class="box"></span><span class="name">Publishing… / Published / Failed</span><span class="desc">The publish lifecycle — the hero action needs every step shown.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Selected / locked / hidden</span><span class="desc">Editor element states on the canvas.</span></div>
+  <div class="st"><span class="box"></span><span class="name">Preview-as-client / collab-active</span><span class="desc">Mode changes — gated until the feature is ready (principle #3).</span></div>
+
+  <h2>The completeness test (3 questions)</h2>
+  <p>Before calling any surface "done", answer these out loud:</p>
+  <ol style="font-size:14px;line-height:1.9;color:var(--ink-2);padding-left:22px">
+    <li><strong>Empty:</strong> what does a brand-new user see before any content exists?</li>
+    <li><strong>Wrong:</strong> what happens when the action fails or the connection drops?</li>
+    <li><strong>Too much:</strong> what happens at 10× the content — long names, many items?</li>
+  </ol>
+  <p>If you can't answer all three, the prototype isn't complete — it's just the happy path. A "complete prototype" of a surface is that surface drawn in every state above.</p>
+
+  <p class="source">Primary source: <a href="https://www.nngroup.com/articles/empty-state-interface-design/" target="_blank" rel="noopener">NN/g — Empty States</a>; on the discipline broadly, the classic idea that "designing the empty, error, and loading states is most of the work." Back to <a href="buildrik-design-principles.html">the constitution</a>.</p>
+  <p class="fine">Designing a surface? Ask me to walk it state-by-state — we'll catch the ones that are easy to forget.</p>
+</main>
+</body>
+</html>

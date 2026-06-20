@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 7 — Design every state</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 7 · ~7 minutes</p>
+  <h1>The happy path is 10% of the design.</h1>
+  <p class="lede">You spotted the two things that separate a real designer from a hobbyist: a design isn't one picture, it's a <strong>set of states</strong> — and a dozen principles can't cover everything, because rules grow with the situation. Both are exactly right. Here's how pros handle each.</p>
+
+  <div class="callout">
+    <strong>Two truths you just named</strong><br>
+    1. A surface is done only when <em>every state</em> is designed — empty, loading, error, edge — not just the full, idle, happy one.<br>
+    2. Principles stay few and general; <em>situation-specific rules grow below them</em> as patterns.
+  </div>
+
+  <h2>Truth 1 — design the whole set of states</h2>
+  <p>When you drew the topbar at "Saved", you drew one frame of a film. The same bar also has to exist as <code>Saving…</code>, <code>Offline — queued</code>, <code>Reconnecting</code>, <code>Publishing…</code>, <code>Published ✓</code>, and <code>Publish failed</code> — plus hover, focus, disabled. A "complete prototype" is the surface drawn in <em>all</em> of them.</p>
+  <p>Amateurs design the state that looks good in a portfolio: full of content, nothing wrong. Users mostly meet the other states — the empty list on day one, the spinner on slow wifi, the red error when it breaks. Those are where products win or lose trust.</p>
+  <div class="panel panel--accent">
+    The four that get skipped, and never should: <span class="chip">Empty</span> <span class="chip">Loading</span> <span class="chip">Error</span> <span class="chip">Too-much (edge)</span>. Your new <a href="../reference/states-checklist.html">states checklist</a> lists them all, and the 3-question completeness test: <em>what does empty look like? what does wrong look like? what does 10× content look like?</em> Can't answer all three → it's not done.
+  </div>
+
+  <h2>Truth 2 — principles stay few; patterns grow</h2>
+  <p>You said: "twelve won't be enough — more rules will come, depending on the situation." Correct — but the new rules don't pile onto the principle list. They live one level down. A healthy design system has four layers:</p>
+  <table>
+    <tr><th>Layer</th><th>What</th><th>How many</th></tr>
+    <tr><td><strong>Principles</strong></td><td>General truths ("subtract before you add")</td><td>Few — kept small on purpose</td></tr>
+    <tr><td><strong>Patterns</strong></td><td>Reusable answers to recurring situations ("how we do an empty state", "how we confirm a delete")</td><td>Grow freely</td></tr>
+    <tr><td><strong>Components</strong></td><td>The real buttons, cards, inputs</td><td>Many</td></tr>
+    <tr><td><strong>Tokens</strong></td><td>Colour, spacing, type values</td><td>A handful</td></tr>
+  </table>
+  <p>So the "situation-dependent" rules your instinct predicted are real — they're <strong>patterns</strong>. Keeping principles few is what stops the constitution from becoming the same cluttered mess we're fixing in the UI. Add a pattern when a situation recurs; touch a principle only rarely.</p>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="The empty state — what a brand-new user sees before any content — is the one most often skipped and most important. Designing it is part of 'done', not an extra.">
+      <p class="q-stem">Which state do amateurs skip most, that pros treat as essential?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>The empty state — day one, no content yet</button>
+        <button class="q-opt">The default state — full and idle look</button>
+        <button class="q-opt">The hover state — pointer over a button</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="A recurring situational solution is a pattern — it lives below the principles, which stay few and general. Piling it onto the principle list would bloat the very thing meant to stay small.">
+      <p class="q-stem">You invent a reusable rule for "how every delete is confirmed." Where does it belong?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>A pattern — one level below the principles</button>
+        <button class="q-opt">A principle — add it to the main twelve list</button>
+        <button class="q-opt">A token — a colour or spacing value file</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="If empty, error, and 10×-content aren't answered, you've only drawn the happy path — the prototype isn't complete. Completeness is measured by states covered, not by how nice the main view looks.">
+      <p class="q-stem">A surface looks beautiful when full and idle, but you can't say what its error looks like. It is…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Not done — only the happy path is drawn</button>
+        <button class="q-opt">Done — the main view looks polished enough</button>
+        <button class="q-opt">Almost — error states are optional really</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>From now, "design a surface" means: design it <em>in every state</em> (<a href="../reference/states-checklist.html">checklist</a>), deciding each by a <a href="../reference/buildrik-design-principles.html">principle</a>, and writing recurring situational answers as patterns — not as new principles. The topbar's next job is exactly this: take the resting design and draw its Saving / Offline / Publishing / Failed states before we call it complete.</p>
+
+  <p class="source">Primary source: <a href="https://www.nngroup.com/articles/empty-state-interface-design/" target="_blank" rel="noopener">NN/g — Empty States</a>; on system layers: <a href="https://atomicdesign.bradfrost.com/" target="_blank" rel="noopener">Brad Frost — Atomic Design</a>. References: <a href="../reference/states-checklist.html">states checklist</a> · <a href="../reference/buildrik-design-principles.html">constitution</a>.</p>
+  <p class="fine">Pick any surface and ask me to "walk its states" — I'll list every one it needs and we design the missing ones together.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>
