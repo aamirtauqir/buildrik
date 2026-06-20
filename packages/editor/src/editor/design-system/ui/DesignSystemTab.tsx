@@ -13,6 +13,7 @@ import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
 import { useToast } from "@/editor/shared/vibcoder";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { DEFAULT_TOKENS } from "../constants";
 import {
   useColorRegistry,
@@ -495,6 +496,36 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           <DraftChip state={isDirty ? "dirty" : "saved"} count={totalDirty} />
         </div>
       </PanelHeader>
+
+      {/* Redesign P4 (ds2): two homes for styling. Everyday styling = these tokens
+          (the 3-reach editor). The brand source = the workspace shared theme, which
+          lives dashboard-side and client sites sync from or override. Surface that
+          relationship + a link out, instead of pretending the DS tab is the only home. */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 12px",
+          borderBottom: "1px solid var(--bd-border)",
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--bd-fg)" }}>Brand &amp; shared theme</div>
+          <div style={{ fontSize: 10, color: "var(--bd-fg-muted)", lineHeight: 1.4 }}>
+            Everyday styling lives here. The brand syncs from your workspace shared theme.
+          </div>
+        </div>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => window.open(`${DASHBOARD_URL}/dashboard/theme`, "_blank", "noopener")}
+          title="Open the workspace shared theme"
+          style={{ whiteSpace: "nowrap", flexShrink: 0 }}
+        >
+          Open Shared theme ↗
+        </Button>
+      </div>
 
       {/* Toolbar row — modes + AI + Export. Moved out of PanelHeader actions
           so the 320px DS panel doesn't overflow (title was wrapping under
