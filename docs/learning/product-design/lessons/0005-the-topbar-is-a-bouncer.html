@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 5 — The topbar is a bouncer</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 5 · ~7 minutes</p>
+  <h1>The topbar is a bouncer. Default answer: no.</h1>
+  <p class="lede">You asked "what else can we add to the topbar?" — and that's the exact instinct that builds a cluttered product. A designer flips the question: not "what can I add" but "does this <em>earn</em> a place here?" The topbar is your most expensive real estate. Treat it like a bouncer who says no by default, and makes every feature earn its way in.</p>
+
+  <div class="callout">
+    <strong>The earns-its-way-in test</strong> — three questions, all must be yes:<br>
+    <em>1. Is it production-ready? · 2. Is it global (whole project, not one element/panel)? · 3. Is it always-needed or at-a-glance status?</em><br>
+    Any "no" → it lives in a panel or the ⋯ overflow, not the topbar.
+  </div>
+
+  <h2>Why "default no" is the whole game</h2>
+  <p>Adding feels productive; subtracting feels like loss. So products drift toward clutter — every team adds, nobody removes, and you get 16 controls in one bar (yours did). The only defence is a standing rule that the bar <strong>rejects</strong> by default. Then density can't creep, because nothing gets in without passing the test.</p>
+
+  <h2>The trap inside your own question: collaboration</h2>
+  <p>"We have collaboration — it should be in the topbar." Half-right, and the half that's wrong is the important half:</p>
+  <table>
+    <tr><th>Part of the feature</th><th>Test result</th><th>Where</th></tr>
+    <tr><td><strong>Presence</strong> (who's editing now)</td><td>global ✅ · at-a-glance ✅ · ready ⚠️</td><td>Topbar top-right — <em>once it's ready</em></td></tr>
+    <tr><td><strong>Invite / Share</strong></td><td>rare ❌ on question 3</td><td>⋯ overflow</td></tr>
+    <tr><td><strong>Comments</strong></td><td>not always-needed ❌</td><td>A panel, shown in review mode</td></tr>
+  </table>
+  <div class="panel panel--accent">
+    The decisive question was #1 — <strong>ready?</strong> Buildrik's real-time collaboration is currently demo-only (a prior review found six serious bugs and said "don't ship multiplayer"). <strong>You never give prime real estate to a feature that doesn't work yet.</strong> Design the spot for presence; keep the feature gated until it's solid. A bar full of half-working promises is worse than an honest, smaller bar.
+  </div>
+
+  <h2>The deeper rule: subtraction beats addition</h2>
+  <p>Your original complaint was "too dense, AI-designed." The cure is not a better arrangement of more things — it's <strong>fewer things</strong>. Every time you're tempted to add, first ask what you can move out (to a panel, to ⋯, to the bottom bar). A great editor isn't the one with the most buttons in reach; it's the one where the few buttons in reach are the right ones.</p>
+
+  <h2>Your turn — run the test</h2>
+  <div class="quiz">
+    <div class="q" data-explain="It's not production-ready (question 1 fails). You design the space for it but keep it gated — never promote a broken feature to prime real estate.">
+      <p class="q-stem">A feature is global and always-useful, but it's still buggy and not shippable. Topbar?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>No — gate it until it's actually ready</button>
+        <button class="q-opt">Yes — it's global, that's enough</button>
+        <button class="q-opt">Yes — shipping it raises awareness</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Inviting a teammate is rare — it fails the 'always-needed' question. Rare actions belong in the overflow, not at top level.">
+      <p class="q-stem">"Invite a teammate" is global and ready, but you do it rarely. Where does it go?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>The ⋯ overflow — rare actions don't earn space</button>
+        <button class="q-opt">The topbar — collaboration is important</button>
+        <button class="q-opt">The canvas — next to the content</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="The right reflex when adding is to first remove something — subtraction keeps the bar honest. Asking 'what can move out' is the discipline that prevents clutter.">
+      <p class="q-stem">You feel the urge to add a button to a full bar. The first move is to…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Ask what can move out before adding anything</button>
+        <button class="q-opt">Make every existing button a bit smaller</button>
+        <button class="q-opt">Add it and revisit the spacing later on</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>From now on, every "should X go here?" runs the three-question test out loud. Most features fail it — and that failure is the product staying clean. When something passes, it goes through the build handoff (<a href="0004-design-to-build-handoff.html">Lesson 4</a>). When it fails, it gets a proper home in a panel.</p>
+
+  <p class="source">Primary source: <a href="https://www.nngroup.com/articles/principle-of-least-effort/" target="_blank" rel="noopener">NN/g — Minimize Cognitive Load</a> &amp; the classic "less is more" of <a href="https://www.nngroup.com/articles/progressive-disclosure/" target="_blank" rel="noopener">Progressive Disclosure</a>. Reference: <a href="../reference/heuristics-cheatsheet.html">heuristics cheat-sheet</a>.</p>
+  <p class="fine">Got a feature you're sure belongs in the topbar? Bring it — we'll run the three questions together and see if it really earns the spot.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

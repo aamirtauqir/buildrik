@@ -18,6 +18,11 @@ Regroup the topbar into three zones separated by thin vertical dividers, plus a 
 - **RIGHT — Status + Ship:** `● Saved` (quiet status text, not a button) · `✨` Ask AI (icon-only) · `Preview ▾` (ghost button; the dropdown contains "Preview as: Me / Client" — this absorbs the old Client-view toggle) · **`Publish`** (the ONLY filled/cobalt primary button — it is the hero) · `⋯` overflow.
 - **`⋯` overflow menu contains:** Invite / Share, Command palette (⌘K), Help, Account. These are infrequent — they do not deserve top-level space.
 
+**Collaboration (added after review):**
+- **Presence** (avatars of who's editing) → reserve a slot top-right, left of `● Saved`. **Gate it** behind the collab feature flag — real-time collab is currently demo-only (6 P1 bugs, prior review; do not promote a broken feature). Render the slot only when a session is genuinely live + safe.
+- **Invite / Share** → `⋯` overflow (rare action).
+- **Comments** → a panel in review mode, not the topbar.
+
 **Leaves the topbar entirely:**
 - The site/page **breadcrumb** → moves to the **bottom status bar** (one breadcrumb only; see editor-chrome.html mockup).
 - The red "Issues" pill → that is the **Next.js dev overlay** (nextjs-portal shadow root), not our chrome — leave it, it does not ship.
