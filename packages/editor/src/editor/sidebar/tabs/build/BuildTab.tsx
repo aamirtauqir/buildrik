@@ -63,7 +63,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) =>
 
   return (
     <TabFrame className="bld-container">
-      <TabFrame.Header title="Add" subtitle={blocksSubtitle} />
+      <TabFrame.Header title="Insert" subtitle={blocksSubtitle} />
 
       <div className="bld-content">
         <div
@@ -79,7 +79,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) =>
             id="bld-search-input"
             value={tab.searchQuery}
             onChange={tab.setSearchQuery}
-            placeholder="Search blocks"
+            placeholder="Describe or search to insert…  /"
             debounceMs={150}
             kbdHint="⌘K"
           />
