@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topbar — final design (all requirements)</title>
+<style>
+  :root{
+    --ink:#0F1729; --ink-2:#475467; --ink-3:#98A2B3;
+    --line:#EAECF0; --line-2:#D0D5DD; --bg:#FFFFFF; --bg-2:#F9FAFB; --bg-3:#F2F4F7;
+    --accent:#2D6DFF; --accent-soft:#EFF4FF; --ok:#12B76A; --warn:#F79009;
+    --av1:#2D6DFF; --av2:#16B364; /* avatar identity colors — on-brand, no purple */
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg-3);color:var(--ink);padding:36px 32px;-webkit-font-smoothing:antialiased}
+  .stage{max-width:1240px;margin:0 auto}
+  h1{font-size:22px;font-weight:680;letter-spacing:-0.02em;margin-bottom:6px}
+  .sub{font-size:13.5px;color:var(--ink-2);margin-bottom:24px;line-height:1.55;max-width:840px}
+
+  .bar{height:54px;background:var(--bg);border:1px solid var(--line);border-radius:13px;display:flex;align-items:center;box-shadow:0 1px 2px rgba(16,24,40,.05),0 4px 14px rgba(16,24,40,.05);padding:0 8px}
+  .zone{display:flex;align-items:center;gap:5px;padding:0 12px;height:100%}
+  .spacer{flex:1}
+  .vr{width:1px;height:24px;background:var(--line)}
+  .zlabel{position:absolute;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-top:64px}
+
+  .exit{display:flex;align-items:center;gap:6px;height:32px;padding:0 11px;border-radius:8px;color:var(--ink-2);font:550 13px var(--font);background:transparent;border:0;cursor:pointer}
+  .exit:hover{background:var(--bg-2)}
+  .ico{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--ink-2);background:transparent;border:0;cursor:pointer}
+  .ico:hover{background:var(--bg-2)}
+  .ico svg{width:17px;height:17px}
+  .seg{display:flex;background:var(--bg-3);border-radius:8px;padding:3px}
+  .seg .ico{width:32px;height:26px;border-radius:6px}
+  .seg .ico.on{background:var(--bg);color:var(--accent);box-shadow:0 1px 2px rgba(16,24,40,.08)}
+
+  .presence{display:flex;align-items:center}
+  .av{width:26px;height:26px;border-radius:50%;border:2px solid var(--bg);display:grid;place-items:center;color:#fff;font:600 11px var(--font);margin-left:-7px}
+  .av:first-child{margin-left:0}
+  .av.more{background:var(--bg-3);color:var(--ink-2);border-color:var(--bg)}
+
+  .status{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);font-weight:500}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+  .btn{height:34px;border-radius:8px;font:600 13px var(--font);display:flex;align-items:center;gap:7px;padding:0 13px;border:1px solid transparent;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(45,109,255,.3)}
+  .btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--line-2)}
+  .btn.ghost:hover{background:var(--bg-2)}
+  .btn .cv{width:14px;height:14px;opacity:.6}
+  .btn svg{width:16px;height:16px}
+
+  /* annotation cards */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:46px}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+  .card h3{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+  .card .row{font-size:13px;color:var(--ink);padding:5px 0;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bg-3)}
+  .card .row:last-child{border:0}
+  .card .row .k{color:var(--ink-3)}
+  .card .row.on{color:var(--accent);font-weight:600}
+  .gate{font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:#FFFAEB;color:#B54708;border:1px solid #FEDF89;border-radius:4px;padding:1px 6px}
+
+  .note{margin-top:18px;font-size:12.5px;color:var(--ink-2);line-height:1.6;background:var(--bg);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:13px 16px}
+  .note b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="stage">
+  <h1>Topbar — the final design, every decision in</h1>
+  <p class="sub">Three zones: <b>Navigate</b> · <b>View</b> · <b>Status&nbsp;+&nbsp;Ship</b>. Publish is the only filled button — it's what the tool exists for. Breadcrumb left for the bottom bar. Collaboration shows as presence avatars (gated until the feature is solid). Everything rare lives in the ⋯ menu. Nothing is hidden — the three drop-downs are spelled out below the bar.</p>
+
+  <div style="position:relative">
+  <div class="bar">
+    <!-- NAVIGATE -->
+    <div class="zone">
+      <button class="exit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>Exit</button>
+      <div class="vr"></div>
+      <button class="ico" title="Undo (⌘Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a4 4 0 0 1 0 8h-1"/></svg></button>
+      <button class="ico" title="Redo (⌘⇧Z)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a4 4 0 0 0 0 8h1"/></svg></button>
+      <button class="ico" title="History"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+    </div>
+    <div class="vr"></div>
+
+    <!-- VIEW -->
+    <div class="zone"><div class="seg">
+      <button class="ico on" title="Desktop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/></svg></button>
+      <button class="ico" title="Tablet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></button>
+      <button class="ico" title="Mobile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/></svg></button>
+    </div></div>
+
+    <div class="spacer"></div>
+
+    <!-- STATUS + SHIP -->
+    <div class="zone">
+      <div class="presence" title="Who's editing (gated until collab is ready)">
+        <span class="av" style="background:var(--av1)">SA</span>
+        <span class="av" style="background:var(--av2)">Rk</span>
+        <span class="av more">+2</span>
+      </div>
+      <div class="vr"></div>
+      <span class="status"><span class="dot"></span>Saved</span>
+      <button class="ico" title="Ask AI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15l-1.9-4.1L5.5 9l4.6-1.4z"/></svg></button>
+      <button class="btn ghost" title="Preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Preview<svg class="cv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button class="btn primary" title="Publish — make it live"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Publish</button>
+      <button class="ico" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+    </div>
+  </div>
+  <span class="zlabel" style="left:14px">Navigate</span>
+  <span class="zlabel" style="left:240px">View</span>
+  <span class="zlabel" style="right:14px">Status + Ship</span>
+  </div>
+
+  <!-- the three hidden surfaces, spelled out -->
+  <div class="cards">
+    <div class="card">
+      <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#98A2B3" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> Preview ▾</h3>
+      <div class="row k">Preview as:</div>
+      <div class="row on">• Me (full editor view)</div>
+      <div class="row">• Client (what they see) <span class="k" style="font-size:11px">← old "Client view"</span></div>
+    </div>
+    <div class="card">
+      <h3>⋯ More</h3>
+      <div class="row">Invite / Share</div>
+      <div class="row">Command palette <span class="k">⌘K</span></div>
+      <div class="row">Help &amp; shortcuts</div>
+      <div class="row">Account</div>
+    </div>
+    <div class="card">
+      <h3>Presence <span class="gate">gated</span></h3>
+      <div class="row"><span class="av" style="background:var(--av1);width:22px;height:22px;margin:0">SA</span> Saqib (you)</div>
+      <div class="row"><span class="av" style="background:var(--av2);width:22px;height:22px;margin:0">Rk</span> Rukhsana</div>
+      <div class="row k" style="font-size:11.5px">Shows only when real-time collab is production-ready. Until then: hidden.</div>
+    </div>
+  </div>
+
+  <div class="note"><b>Every requirement, in:</b> breadcrumb → bottom bar · Publish = the one blue hero · Ask AI = icon · Client-view folded into Preview · collaboration = presence avatars top-right, <b>gated</b> until the feature is solid · Invite, ⌘K, Help, Account → ⋯. Sixteen scattered controls became three zones + one ⋯, and nothing important got buried — the drop-downs above prove it.</div>
+</div>
+</body>
+</html>
