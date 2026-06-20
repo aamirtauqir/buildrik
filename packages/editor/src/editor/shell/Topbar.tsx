@@ -435,18 +435,19 @@ export const Topbar: React.FC<TopbarProps> = ({
           {renderSavedLabel()}
         </TopbarStatus>
 
-        {/* E3 — ✨ Ask AI (4-tool mode: AI is a topbar assistant, not a rail tab) */}
+        {/* E3 — ✨ Ask AI. Design constitution #5: the one filled/hero button is the
+            product's purpose (Publish). AI is a helper, so it's an icon, not a labelled
+            button competing with Publish. Same onOpenAI wire — only the look changed. */}
         {fourToolRail && onOpenAI && (
           <TopbarGroup>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="secondary" size="sm" onClick={onOpenAI} aria-label="Ask AI">
-                  <Sparkles size={14} style={{ marginRight: 4 }} />
-                  Ask AI
-                </Button>
+                <IconButton onClick={onOpenAI} aria-label="Ask AI">
+                  <Sparkles size={16} />
+                </IconButton>
               </TooltipTrigger>
               <TooltipPortal>
-                <TooltipContent>AI assistant</TooltipContent>
+                <TooltipContent>Ask AI</TooltipContent>
               </TooltipPortal>
             </Tooltip>
           </TopbarGroup>
