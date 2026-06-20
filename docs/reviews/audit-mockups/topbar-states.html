@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topbar — every state (complete prototype)</title>
+<style>
+  :root{
+    --ink:#0F1729; --ink-2:#475467; --ink-3:#98A2B3;
+    --line:#EAECF0; --line-2:#D0D5DD; --bg:#FFFFFF; --bg-2:#F9FAFB; --bg-3:#F2F4F7;
+    --accent:#2D6DFF; --ok:#12B76A; --warn:#F79009; --err:#D92D20;
+    --okbg:#ECFDF3; --warnbg:#FFFAEB; --errbg:#FEF3F2;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg-3);color:var(--ink);padding:34px 28px;-webkit-font-smoothing:antialiased}
+  .stage{max-width:1180px;margin:0 auto}
+  h1{font-size:21px;font-weight:680;letter-spacing:-.02em;margin-bottom:5px}
+  .sub{font-size:13px;color:var(--ink-2);margin-bottom:22px;line-height:1.5;max-width:780px}
+  .grp{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin:22px 0 8px}
+
+  .row{margin-bottom:11px}
+  .cap{display:flex;align-items:baseline;gap:9px;margin-bottom:5px}
+  .cap b{font-size:12.5px;color:var(--ink)}
+  .cap span{font-size:11.5px;color:var(--ink-2)}
+  .tag{font-size:8.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border-radius:4px;padding:1px 6px}
+  .tag.ok{background:var(--okbg);color:#067647} .tag.warn{background:var(--warnbg);color:#B54708} .tag.err{background:var(--errbg);color:#B42318} .tag.n{background:var(--bg-3);color:var(--ink-3)}
+
+  .bar{height:48px;background:var(--bg);border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;padding:0 8px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .zone{display:flex;align-items:center;gap:5px;padding:0 10px;height:100%}
+  .spacer{flex:1}
+  .vr{width:1px;height:20px;background:var(--line)}
+  .exit{display:flex;align-items:center;gap:5px;height:28px;padding:0 9px;border-radius:7px;color:var(--ink-2);font:550 12px var(--font);background:transparent;border:0}
+  .ico{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--ink-2);background:transparent;border:0}
+  .ico.dis{color:var(--line-2);pointer-events:none}
+  .ico svg{width:15px;height:15px}
+  .seg{display:flex;background:var(--bg-3);border-radius:6px;padding:2px}
+  .seg .ico{width:26px;height:22px;border-radius:4px}
+  .seg .ico.on{background:var(--bg);color:var(--accent);box-shadow:0 1px 2px rgba(16,24,40,.08)}
+
+  .av{width:23px;height:23px;border-radius:50%;border:2px solid var(--bg);display:grid;place-items:center;color:#fff;font:600 10px var(--font);margin-left:-7px}
+  .av:first-child{margin-left:0}
+  .av.more{background:var(--bg-3);color:var(--ink-2)}
+
+  .status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;white-space:nowrap}
+  .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .status.saved{color:var(--ink-2)} .status.saved .dot{background:var(--ok)}
+  .status.busy{color:var(--ink-2)}
+  .status.off{color:#B54708} .status.off .dot{background:var(--warn)}
+  .status.pub{color:#067647} .status.pub .dot{background:var(--ok)}
+  .spin{width:13px;height:13px;border:2px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;flex:none}
+  .spin.warn{border-top-color:var(--warn)}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  .btn{height:31px;border-radius:8px;font:600 12px var(--font);display:flex;align-items:center;gap:6px;padding:0 12px;border:1px solid transparent;white-space:nowrap}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary.busy{opacity:.8}
+  .btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--line-2)}
+  .btn.err{background:var(--err);color:#fff}
+  .btn svg{width:14px;height:14px}
+  .link{font-size:11.5px;color:var(--accent);font-weight:600;display:flex;align-items:center;gap:3px}
+  .spin.w{border-top-color:#fff;border-color:rgba(255,255,255,.4)}
+
+  .note{font-size:11.5px;color:var(--ink-2);margin-top:4px;line-height:1.5}
+  .note code{background:var(--bg-3);padding:1px 5px;border-radius:4px;font-size:11px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <h1>Topbar — the complete prototype (every state)</h1>
+  <p class="sub">Not one picture — the whole set. Two clusters carry the states: the <b>status</b> (saved / saving / offline / reconnecting) and the <b>Publish lifecycle</b> (publish → publishing → published → failed). Plus collaboration on/off and disabled controls. This is what "#13 — design every state" looks like for one surface.</p>
+
+  <!-- helper macro is just repeated markup; left zone is identical each row -->
+
+  <p class="grp">Status states — the one-truth cluster (principle #2)</p>
+
+  <div class="row">
+    <div class="cap"><b>1 · Saved</b> <span>— resting, work persisted</span> <span class="tag ok">default</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico">↶</span><span class="ico">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status saved"><span class="dot"></span>Saved</span><span class="ico">✨</span><button class="btn ghost">Preview ▾</button><button class="btn primary">↑ Publish</button><span class="ico">⋯</span></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="cap"><b>2 · Saving…</b> <span>— write in flight</span> <span class="tag n">loading</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico">↶</span><span class="ico">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status busy"><span class="spin"></span>Saving…</span><span class="ico">✨</span><button class="btn ghost">Preview ▾</button><button class="btn primary">↑ Publish</button><span class="ico">⋯</span></div>
+    </div>
+    <p class="note">Spinner replaces the dot. Same spot — never a second status appearing elsewhere.</p>
+  </div>
+
+  <div class="row">
+    <div class="cap"><b>3 · Offline</b> <span>— connection dropped, edits queued</span> <span class="tag warn">error/recover</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico">↶</span><span class="ico">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status off"><span class="dot"></span>Offline — changes queued</span><span class="ico">✨</span><button class="btn ghost">Preview ▾</button><button class="btn primary">↑ Publish</button><span class="ico">⋯</span></div>
+    </div>
+    <p class="note">Amber, calm wording — <b>never</b> "Save failed". Edits are safe + queued (principle #2 one truth).</p>
+  </div>
+
+  <div class="row">
+    <div class="cap"><b>4 · Reconnecting…</b> <span>— coming back, flushing the queue</span> <span class="tag n">loading</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico">↶</span><span class="ico">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status busy"><span class="spin warn"></span>Reconnecting…</span><span class="ico">✨</span><button class="btn ghost">Preview ▾</button><button class="btn primary">↑ Publish</button><span class="ico">⋯</span></div>
+    </div>
+    <p class="note">Bridges Offline → Saved, so the change isn't jarring (the missing step we flagged earlier).</p>
+  </div>
+
+  <p class="grp">Publish lifecycle — the hero action's states (principle #5)</p>
+
+  <div class="row">
+    <div class="cap"><b>5 · Publishing…</b> <span>— deploy in progress</span> <span class="tag n">loading</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico">↶</span><span class="ico">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status saved"><span class="dot"></span>Saved</span><span class="ico">✨</span><button class="btn ghost">Preview ▾</button><button class="btn primary busy"><span class="spin w"></span>Publishing…</button><span class="ico">⋯</span></div>
+    </div>
+    <p class="note">The hero shows its own progress — you never wonder if the click worked.</p>
+  </div>
+
+  <div class="row">
+    <div class="cap"><b>6 · Published ✓</b> <span>— it's live</span> <span class="tag ok">success</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico">↶</span><span class="ico">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status pub"><span class="dot"></span>Published · just now</span><span class="link">View live ↗</span><div class="vr"></div><button class="btn ghost">Preview ▾</button><button class="btn primary">↑ Publish</button><span class="ico">⋯</span></div>
+    </div>
+    <p class="note">Status confirms "Published · just now" + a <code>View live ↗</code> link. Button returns to "Publish" for the next change.</p>
+  </div>
+
+  <div class="row">
+    <div class="cap"><b>7 · Publish failed</b> <span>— deploy errored</span> <span class="tag err">error/recover</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico">↶</span><span class="ico">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status off"><span class="dot" style="background:var(--err)"></span>Publish failed</span><span class="ico">✨</span><button class="btn ghost">Preview ▾</button><button class="btn err">↻ Retry</button><span class="ico">⋯</span></div>
+    </div>
+    <p class="note">Red, names the failure, and the action becomes <b>Retry</b> — a way forward, never a dead end (principle: recover from errors).</p>
+  </div>
+
+  <p class="grp">Mode + interaction states</p>
+
+  <div class="row">
+    <div class="cap"><b>8 · Collaboration active</b> <span>— others editing (gated until ready)</span> <span class="tag n">mode</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico">↶</span><span class="ico">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="av" style="background:var(--accent)">SA</span><span class="av" style="background:var(--ok)">Rk</span><span class="av more">+2</span><div class="vr"></div><span class="status saved"><span class="dot"></span>Saved</span><button class="btn ghost">Preview ▾</button><button class="btn primary">↑ Publish</button><span class="ico">⋯</span></div>
+    </div>
+    <p class="note">Presence avatars appear left of status — only when collab is genuinely live (principle #3, don't promote broken features).</p>
+  </div>
+
+  <div class="row">
+    <div class="cap"><b>9 · Disabled — nothing to undo</b> <span>— fresh project</span> <span class="tag n">disabled</span></div>
+    <div class="bar">
+      <div class="zone"><button class="exit">‹ Exit</button><div class="vr"></div><span class="ico dis">↶</span><span class="ico dis">↷</span><span class="ico">⟲</span></div>
+      <div class="zone"><div class="seg"><span class="ico on">🖥</span><span class="ico">▯</span><span class="ico">▢</span></div></div>
+      <div class="spacer"></div>
+      <div class="zone"><span class="status saved"><span class="dot"></span>Saved</span><span class="ico">✨</span><button class="btn ghost">Preview ▾</button><button class="btn primary">↑ Publish</button><span class="ico">⋯</span></div>
+    </div>
+    <p class="note">Undo / Redo greyed when there's no history — they tell the truth about what's possible.</p>
+  </div>
+
+  <p class="sub" style="margin-top:18px"><b>That's the complete topbar.</b> Nine states, each decided by a principle, each from the <a href="../../learning/product-design/reference/states-checklist.html">states checklist</a>. Now it's safe to build — because we know exactly what to build for every situation, not just the happy one.</p>
+</div>
+</body>
+</html>
