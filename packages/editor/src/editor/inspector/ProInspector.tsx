@@ -301,8 +301,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
         {elementLabel} selected
       </div>
-      {/* Selection breadcrumb — always visible when element selected */}
-      {breadcrumbPath.length > 0 && (
+      {/* Selection breadcrumb (tag.class DOM path) — engineer jargon. Redesign P3
+          (sev 3): show it only in full density. In the client / content-editor view
+          ("fewer") the human "You are editing" header below is the only header, and
+          parent nav stays on the canvas breadcrumb + Alt+↑. */}
+      {inspectorDensity === "full" && breadcrumbPath.length > 0 && (
         <div className="bdi-ssel">
           <div className="bdi-crumb" title={breadcrumbPath.map((p) => p.label).join(" / ")}>
             {breadcrumbPath.map((p, i) => (

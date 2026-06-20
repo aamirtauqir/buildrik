@@ -131,7 +131,7 @@ function renderTab(opts: {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("InspectorTabContent — per-element-type reshaping", () => {
-  it("text element's style tab shows Typography before Size", () => {
+  it("text element's style tab shows Text before Size", () => {
     renderTab({
       tabId: "style",
       elementType: "text",
@@ -148,11 +148,11 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
         } as unknown as CssContext["inspectorContext"],
       },
     });
-    const typography = screen.getByRole("button", { name: /Typography section/i });
+    const text = screen.getByRole("button", { name: /Text section/i });
     const size = screen.getByRole("button", { name: /Size section/i });
-    // Typography appears before Size in DOM order.
+    // Text (typography) appears before Size in DOM order.
     expect(
-      typography.compareDocumentPosition(size) & Node.DOCUMENT_POSITION_FOLLOWING
+      text.compareDocumentPosition(size) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
   });
 

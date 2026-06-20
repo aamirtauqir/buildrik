@@ -196,13 +196,13 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
           <div style={{ position: "relative" }}>
             <MixedValueIndicator prop="gap" mixedKeys={mixedKeys} />
             <InputWithUnit
-              label="Row Gap"
+              label="Row gap"
               value={styles["row-gap"] || ""}
               onChange={(v) => onChange("row-gap", v)}
             />
           </div>
           <InputWithUnit
-            label="Col Gap"
+            label="Column gap"
             value={styles["column-gap"] || ""}
             onChange={(v) => onChange("column-gap", v)}
           />

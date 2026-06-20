@@ -201,7 +201,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         <MixedValueIndicator prop="line-height" mixedKeys={mixedKeys} />
         <div style={{ flex: 1 }}>
           <InputWithUnit
-            label="Line H"
+            label="Line height"
             value={styles["line-height"] || ""}
             onChange={(v) => onChange("line-height", v)}
             units={["px", "em", "%", "normal"]}
@@ -220,7 +220,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="letter-spacing" mixedKeys={mixedKeys} />
         <InputWithUnit
-          label="Letter Sp"
+          label="Letter spacing"
           value={styles["letter-spacing"] || ""}
           onChange={(v) => onChange("letter-spacing", v)}
           units={["px", "em", "normal"]}

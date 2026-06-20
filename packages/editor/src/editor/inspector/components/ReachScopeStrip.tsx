@@ -46,6 +46,9 @@ export function ReachScopeStrip({ composer, selectedElement }: ReachScopeStripPr
   }, [composer, selectedElement.id, selectedElement.type]);
 
   const typeLabel = selectedElement.type || "element";
+  // "N other paragraph(s)" — pluralize only the noun, and always say "other" so
+  // it's clear the selected item isn't being re-counted (peers already excludes it).
+  const othersLabel = `${peers.length} other ${peers.length === 1 ? typeLabel : `${typeLabel}s`}`;
 
   const propagate = () => {
     const src = composer?.elements?.getElement?.(selectedElement.id);
@@ -100,7 +103,7 @@ export function ReachScopeStrip({ composer, selectedElement }: ReachScopeStripPr
           style={cardBase}
           disabled={peers.length === 0}
           onClick={() => setConfirming(true)}
-          title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Apply to all ${peers.length} ${typeLabel}s`}
+          title={peers.length === 0 ? `No other ${typeLabel}s on this page` : `Apply to ${othersLabel}`}
         >
           <span style={cardTop}>All like this</span>
           <span style={cardSub}>{peers.length} {peers.length === 1 ? "instance" : "instances"}</span>
@@ -123,7 +126,7 @@ export function ReachScopeStrip({ composer, selectedElement }: ReachScopeStripPr
       {confirming && (
         <div style={{ marginTop: 8, padding: 8, borderRadius: 6, background: "var(--bd-surface-2, #f9fafb)", border: "1px solid var(--bd-border, #e5e7eb)" }}>
           <p style={{ margin: "0 0 6px", fontSize: 11, color: "var(--bd-text, #374151)" }}>
-            Apply this element&apos;s styles to all <strong>{peers.length}</strong> {typeLabel}s? This changes more than the selected item.
+            Apply this element&apos;s styles to the <strong>{othersLabel}</strong> on this page? This changes more than the selected item.
           </p>
           <div style={{ display: "flex", gap: 6 }}>
             <Button variant="primary" size="sm" onClick={propagate}>Apply to {peers.length}</Button>
