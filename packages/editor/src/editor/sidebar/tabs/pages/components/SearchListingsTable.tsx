@@ -4,11 +4,16 @@
  * answers "what Google will show for each page" across the whole site at once —
  * the single-page SEO form doesn't scale past a handful of pages.
  *
- * Each row shows the EFFECTIVE title/description (page-set override vs inherited
+ * Each card shows the EFFECTIVE title/description (page-set override vs inherited
  * site default), whether the page is indexed, and a computed status flag
  * (good / no description / duplicate title / hidden ok). Read-only summary;
- * clicking a row opens that page's settings to edit. All values are derived
+ * clicking a card opens that page's settings to edit. All values are derived
  * from the live PageItem list — no new engine state.
+ *
+ * Layout: a stacked card per page (not a 5-column table) so the whole listing
+ * reads top-to-bottom inside the ~340px rail without horizontal scroll. The
+ * prototype's wide table is the same columns in a wide surface; this is the
+ * rail-appropriate form.
  *
  * @license BSD-3-Clause
  */
@@ -71,25 +76,6 @@ function buildRows(pages: PageItem[]): Row[] {
   });
 }
 
-const th: React.CSSProperties = {
-  border: "1px solid var(--bd-border, #e5e7eb)",
-  padding: "6px 9px",
-  textAlign: "left",
-  background: "var(--bd-bg-subtle, #f9fafb)",
-  fontSize: 9.5,
-  letterSpacing: "0.03em",
-  textTransform: "uppercase",
-  color: "var(--bd-fg-muted, #6b7280)",
-  fontWeight: 600,
-};
-const td: React.CSSProperties = {
-  border: "1px solid var(--bd-border, #e5e7eb)",
-  padding: "6px 9px",
-  textAlign: "left",
-  verticalAlign: "middle",
-  fontSize: 11.5,
-  color: "var(--bd-fg, #374151)",
-};
 const srcBase: React.CSSProperties = {
   fontSize: 8.5,
   letterSpacing: "0.02em",
@@ -98,6 +84,15 @@ const srcBase: React.CSSProperties = {
   padding: "1px 5px",
   marginLeft: 5,
   whiteSpace: "nowrap",
+  flexShrink: 0,
+};
+const fieldLabel: React.CSSProperties = {
+  fontSize: 9,
+  letterSpacing: "0.03em",
+  textTransform: "uppercase",
+  color: "var(--bd-fg-muted, #9ca3af)",
+  width: 34,
+  flexShrink: 0,
 };
 
 function SourceTag({ source }: { source: Source }) {
@@ -129,80 +124,73 @@ function FlagPill({ flag }: { flag: Flag }) {
   );
 }
 
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "baseline", gap: 6, minWidth: 0 }}>
+      <span style={fieldLabel}>{label}</span>
+      <span style={{ fontSize: 11, color: "var(--bd-fg, #374151)", minWidth: 0, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
 export function SearchListingsTable({ pages, onEditPage }: SearchListingsTableProps) {
   const rows = React.useMemo(() => buildRows(pages), [pages]);
   const issues = rows.filter((r) => r.flag.tone === "warn");
 
   return (
-    <div style={{ padding: "10px 12px", overflow: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ ...th, width: "20%" }}>Page</th>
-            <th style={{ ...th, width: "30%" }}>Title (effective)</th>
-            <th style={{ ...th, width: "30%" }}>Description</th>
-            <th style={{ ...th, width: "9%" }}>Index</th>
-            <th style={th}>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr
-              key={r.page.id}
-              onClick={() => onEditPage(r.page.id)}
-              style={{ cursor: "pointer" }}
-              title={`Edit ${r.page.name}'s search listing`}
-            >
-              <td style={td}>
-                <strong>{r.page.name}</strong>{" "}
-                <span style={{ fontSize: 10, color: "var(--bd-fg-muted, #9ca3af)" }}>{r.path}</span>
-              </td>
-              <td style={td}>
-                {r.title}
-                <SourceTag source={r.titleSource} />
-              </td>
-              <td style={td}>
-                {r.description ? (
-                  <>
-                    {r.description}
-                    <SourceTag source={r.descriptionSource} />
-                  </>
-                ) : (
-                  <span style={{ fontSize: 10, color: "var(--bd-fg-muted, #9ca3af)" }}>— missing —</span>
-                )}
-              </td>
-              <td style={td}>
-                {r.indexed ? (
-                  "✓"
-                ) : (
-                  <span
-                    style={{
-                      fontSize: 9,
-                      border: "1px dashed var(--bd-fg, #374151)",
-                      borderRadius: 3,
-                      padding: "1px 5px",
-                      color: "var(--bd-fg, #374151)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    hidden from Google
-                  </span>
-                )}
-              </td>
-              <td style={td}>
-                <FlagPill flag={r.flag} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p style={{ margin: "8px 2px 0", fontSize: 11, color: "var(--bd-fg-muted, #6b7280)", lineHeight: 1.5 }}>
+    <div style={{ padding: "8px 10px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+      {rows.map((r) => (
+        <div
+          key={r.page.id}
+          onClick={() => onEditPage(r.page.id)}
+          title={`Edit ${r.page.name}'s search listing`}
+          style={{
+            cursor: "pointer",
+            border: "1px solid var(--bd-border, #e5e7eb)",
+            borderRadius: 6,
+            padding: "7px 9px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <strong style={{ fontSize: 12, color: "var(--bd-fg, #111827)" }}>{r.page.name}</strong>
+            <span style={{ fontSize: 10, color: "var(--bd-fg-muted, #9ca3af)" }}>{r.path}</span>
+            <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5 }}>
+              {!r.indexed && (
+                <span style={{ fontSize: 9, color: "var(--bd-fg-muted, #9ca3af)", whiteSpace: "nowrap" }}>
+                  hidden from Google
+                </span>
+              )}
+              <FlagPill flag={r.flag} />
+            </span>
+          </div>
+          <FieldRow label="Title">
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</span>
+            <SourceTag source={r.titleSource} />
+          </FieldRow>
+          <FieldRow label="Desc">
+            {r.description ? (
+              <>
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{r.description}</span>
+                <SourceTag source={r.descriptionSource} />
+              </>
+            ) : (
+              <span style={{ color: "var(--bd-fg-muted, #9ca3af)" }}>— missing —</span>
+            )}
+          </FieldRow>
+        </div>
+      ))}
+      <p style={{ margin: "4px 2px 0", fontSize: 11, color: "var(--bd-fg-muted, #6b7280)", lineHeight: 1.5 }}>
         {issues.length === 0 ? (
           <>All pages have a title &amp; description Google can use.</>
         ) : (
           <>
             <strong style={{ color: "var(--bd-fg, #374151)" }}>{issues.length}</strong>{" "}
-            {issues.length === 1 ? "page needs" : "pages need"} attention — click a row to fix its search listing.
+            {issues.length === 1 ? "page needs" : "pages need"} attention — click a card to fix its search listing.
           </>
         )}
       </p>
