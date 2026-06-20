@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Definition of Done — the verification ladder</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .rung{display:flex;gap:13px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--bg-3,#f2f4f7)}
+  .rung .n{flex:none;width:26px;height:26px;border-radius:7px;background:var(--accent-soft,#EFF4FF);color:var(--accent);font-weight:700;display:grid;place-items:center;font-size:13px}
+  .rung .body{flex:1}
+  .rung .t{font-weight:600;font-size:14px;color:var(--ink);margin-bottom:2px}
+  .rung .d{font-size:12.5px;color:var(--muted);line-height:1.5}
+  .rung code{background:var(--bg-3);padding:1px 6px;border-radius:4px;font-size:12px}
+  .conf{font-size:11px;color:var(--accent);font-weight:600;margin-top:3px}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Definition of Done · companion to the <a href="states-checklist.html">states checklist</a></p>
+  <h1>"100% right" isn't a feeling. It's a ladder you climb.</h1>
+  <p class="lede">You can never <em>prove</em> software is perfect — you build <strong>confidence</strong> in layers. Each rung catches a different kind of mistake. Climb them in order; only the top rung counts as done. The golden rule that makes all of this safe: <strong>a UI redesign re-lays-out, it never re-wires.</strong> Move the boxes, keep the wires — then verify the wires still carry current.</p>
+
+  <div class="rung"><div class="n">1</div><div class="body"><div class="t">Types — <code>npx tsc --noEmit</code></div><div class="d">Catches broken wiring shapes: a button calling a handler that doesn't exist, a prop of the wrong type. If it compiles, the connections at least <em>fit</em>.</div><div class="conf">Confidence: the wires are plugged into the right shaped sockets.</div></div></div>
+
+  <div class="rung"><div class="n">2</div><div class="body"><div class="t">Tests — <code>npx vitest run [the touched area]</code></div><div class="d">The existing tests describe how the thing should behave. If they still pass after your change, you didn't break the behaviour they cover.</div><div class="conf">Confidence: known behaviours still hold.</div></div></div>
+
+  <div class="rung"><div class="n">3</div><div class="body"><div class="t">Walk every state — in the real app</div><div class="d">Open it and reproduce each state from the <a href="states-checklist.html">states checklist</a>: empty, loading, error, and the app states (here: Saved → Saving → Offline → Reconnecting → Publishing → Published → Failed). Each must look right.</div><div class="conf">Confidence: it's complete, not just the happy path.</div></div></div>
+
+  <div class="rung"><div class="n">4</div><div class="body"><div class="t">Click every action — does it actually do the thing?</div><div class="d">Press Undo → did the canvas undo? Click Publish → did it really publish? This proves the wires carry current — that re-laying-out didn't quietly disconnect a handler.</div><div class="conf">Confidence: the logic still fires from the new layout.</div></div></div>
+
+  <div class="rung"><div class="n">5</div><div class="body"><div class="t">Acceptance — tick the spec's DONE list</div><div class="d">Every build spec ends with a DONE section (the four-part handoff). Read it line by line against the result. All ticked → done. Any unticked → not done, no matter how good it looks.</div><div class="conf">Confidence: it matches what we agreed to build.</div></div></div>
+
+  <h2>The one rule that prevents most breakage</h2>
+  <div class="panel panel--accent">
+    <strong>Presentation ≠ logic.</strong> A good UI component is "dumb": it receives state + callbacks as <em>props</em> and only renders + calls them. The real logic lives outside it. So a redesign that touches only <em>layout and style</em> — never <em>which handler a button calls or where its data comes from</em> — <strong>cannot</strong> break business logic, because it never touches the logic. Verify it didn't anyway (rung 4), but by construction it shouldn't.
+  </div>
+
+  <h2>So, "is it 100% right?"</h2>
+  <p>Answer honestly: "all five rungs pass." That's the most truthful "yes" software allows. Skipping rungs is how a change that <em>looks</em> done ships a broken Publish button. Climb all five, every time.</p>
+
+  <p class="source">Primary source: <a href="https://martinfowler.com/bliki/TestPyramid.html" target="_blank" rel="noopener">Martin Fowler — Test Pyramid</a>; on dumb vs smart components: <a href="https://www.patterns.dev/react/presentational-container-pattern/" target="_blank" rel="noopener">Presentational &amp; Container pattern</a>. Companions: <a href="states-checklist.html">states checklist</a> · <a href="buildrik-design-principles.html">constitution</a>.</p>
+  <p class="fine">Want me to climb the ladder out loud while building? Ask — I'll show each rung passing (or failing, and what I do about it).</p>
+</main>
+</body>
+</html>

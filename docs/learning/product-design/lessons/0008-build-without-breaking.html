@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 8 — Build without breaking, and know it's right</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 8 · ~7 minutes</p>
+  <h1>Move the boxes. Keep the wires. Then check the current still flows.</h1>
+  <p class="lede">You asked the three questions every redesign-to-build has to answer: how do we implement it, how do we do it without breaking the working logic, and how do we know it's actually right. There's one idea behind the first two, and a ladder behind the third.</p>
+
+  <div class="callout">
+    <strong>The build, in two ideas</strong><br>
+    1. A redesign <em>re-lays-out, it never re-wires</em> — because presentation and logic are separate.<br>
+    2. "100% right" isn't a feeling — it's a <em>ladder of checks</em>, climbed in order.
+  </div>
+
+  <h2>Idea 1 — presentation is separate from logic</h2>
+  <p>Your topbar already has all its behaviour: undo runs the engine's undo, Publish kicks off a deploy, the save status comes from the real save state. That behaviour is the <strong>logic</strong>, and it lives <em>outside</em> the topbar. The topbar itself is "dumb" — it's handed the state and the callbacks as <strong>props</strong>, and all it does is draw them and call them when clicked.</p>
+  <p>That separation is what makes a redesign safe. When you regroup the topbar into three zones, you move buttons around and restyle them — but each button keeps calling the exact same handler it always did. You change <em>where it is and how it looks</em>, never <em>what it does or where its data comes from</em>.</p>
+  <div class="panel panel--accent">
+    <strong>Move the boxes, keep the wires.</strong> A change that touches only layout and style <em>cannot</em> break the business logic — because it never touches the logic. That's not luck; it's the payoff of building dumb presentation components in the first place.
+  </div>
+
+  <h2>Idea 2 — climb the verification ladder</h2>
+  <p>You can't <em>prove</em> software is perfect. You build confidence one rung at a time, each rung catching a different mistake:</p>
+  <table>
+    <tr><th>Rung</th><th>Catches</th></tr>
+    <tr><td><strong>1 · Types</strong> (<code>tsc</code>)</td><td>A wire plugged into the wrong-shaped socket</td></tr>
+    <tr><td><strong>2 · Tests</strong></td><td>A known behaviour that stopped working</td></tr>
+    <tr><td><strong>3 · Walk every state</strong></td><td>A state you forgot to draw (empty, error, offline…)</td></tr>
+    <tr><td><strong>4 · Click every action</strong></td><td>A wire that quietly came loose in the move</td></tr>
+    <tr><td><strong>5 · Acceptance</strong></td><td>Anything that doesn't match what we agreed to build</td></tr>
+  </table>
+  <p>Done = <strong>all five pass</strong>. Skipping the bottom rungs is how a change that <em>looks</em> finished ships a dead Publish button. The full ladder is your new <a href="../reference/definition-of-done.html">Definition of Done</a>.</p>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Changing only layout and style — never which handler fires — is what keeps logic safe. The component stays dumb; the wires are untouched, so the behaviour can't break.">
+      <p class="q-stem">How does a redesign avoid breaking the working logic?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>It re-lays-out only — never changes the wiring</button>
+        <button class="q-opt">It rewrites the handlers more carefully too</button>
+        <button class="q-opt">It tests the logic again from total scratch</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Clicking the real button proves the handler still fires from the new layout — types and tests can't fully prove a wire didn't come loose in the move. Rung 4 catches it.">
+      <p class="q-stem">Which check proves a button's wire didn't come loose after moving it?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Clicking it in the real app and seeing it work</button>
+        <button class="q-opt">The type-check passing without any errors</button>
+        <button class="q-opt">The layout looking correct in a screenshot</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="'100% right' means every rung of the ladder passed — types, tests, states, actions, acceptance. It's a checklist outcome, never a gut feeling about how it looks.">
+      <p class="q-stem">"Is it 100% right?" is best answered by…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>All five verification rungs have passed</button>
+        <button class="q-opt">It looks polished and feels finished now</button>
+        <button class="q-opt">The main happy-path view works on screen</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Every build from here: re-lay-out (don't re-wire), then climb the five rungs. The topbar is the first one to take all the way — its design is complete (<a href="../../reviews/audit-mockups/topbar-states.html">every state</a>), so building it is now a layout job verified against a checklist, not a guess.</p>
+
+  <p class="source">Primary source: <a href="https://martinfowler.com/bliki/TestPyramid.html" target="_blank" rel="noopener">Martin Fowler — Test Pyramid</a>. References: <a href="../reference/definition-of-done.html">Definition of Done</a> · <a href="../reference/buildrik-design-principles.html">constitution</a>.</p>
+  <p class="fine">Ready to build the topbar? Ask me to do it — I'll move the boxes, keep the wires, and climb the ladder out loud so you see each check pass.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>
