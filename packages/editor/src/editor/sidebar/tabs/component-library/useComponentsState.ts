@@ -23,7 +23,7 @@ export interface RenameDialogState {
 }
 export interface PendingToastState {
   message: string;
-  variant: "info" | "warning" | "error";
+  variant: "info" | "warning" | "error" | "success";
 }
 export interface VariantPickerState {
   id: string;
@@ -241,8 +241,21 @@ export function useComponentsState({
         const activePage = composer.elements.getActivePage();
         if (activePage?.root) parentId = activePage.root.id;
       }
-      if (parentId) {
+      if (!parentId) {
+        // No selection and no active page root — there's nowhere to drop it.
+        // Previously this silently no-opped: the user clicked "insert" and
+        // nothing happened, with no message.
+        setPendingToast({
+          message: "Open a page first to add this component.",
+          variant: "warning",
+        });
+        return;
+      }
+      try {
         await composer.components.instantiateComponent(componentId, parentId);
+        setPendingToast({ message: "Component added to canvas", variant: "success" });
+      } catch {
+        setPendingToast({ message: "Couldn't add component. Try again.", variant: "error" });
       }
     },
     [composer]
@@ -264,8 +277,13 @@ export function useComponentsState({
   // Actual delete after confirmation
   const confirmDeleteAction = React.useCallback(async () => {
     if (!composer || !confirmDelete) return;
-    await composer.components.deleteComponent(confirmDelete.id);
-    setSelectedId(null);
+    try {
+      await composer.components.deleteComponent(confirmDelete.id);
+      setSelectedId(null);
+      // Success toast is owned by ComponentsTab's onConfirm — don't double it.
+    } catch {
+      setPendingToast({ message: "Couldn't delete component.", variant: "error" });
+    }
     setConfirmDelete(null);
   }, [composer, confirmDelete, setSelectedId]);
 
@@ -276,7 +294,12 @@ export function useComponentsState({
     async (componentId: string) => {
       if (!composer) return;
       setOpenMenuId(null);
-      await composer.components.duplicateComponent(componentId);
+      try {
+        await composer.components.duplicateComponent(componentId);
+        setPendingToast({ message: "Component duplicated", variant: "success" });
+      } catch {
+        setPendingToast({ message: "Couldn't duplicate component.", variant: "error" });
+      }
     },
     [composer]
   );
@@ -299,7 +322,12 @@ export function useComponentsState({
     async (newName: string) => {
       if (!composer || !renameTarget) return;
       if (newName.trim() && newName !== renameTarget.currentName) {
-        await composer.components.updateComponent(renameTarget.id, { name: newName.trim() });
+        try {
+          await composer.components.updateComponent(renameTarget.id, { name: newName.trim() });
+          setPendingToast({ message: "Component renamed", variant: "success" });
+        } catch {
+          setPendingToast({ message: "Couldn't rename component.", variant: "error" });
+        }
       }
       setRenameTarget(null);
     },

@@ -47,8 +47,16 @@ export function useCanvasToolbarActions({
 
   const handleToolbarDuplicate = React.useCallback(() => {
     if (!composer || !selectedId) return;
-    composer.elements.duplicateElement?.(selectedId);
-  }, [composer, selectedId]);
+    const created = composer.elements.duplicateElement?.(selectedId);
+    if (created) {
+      addToast({
+        description: "Element duplicated",
+        tone: "info",
+        duration: 2000,
+        action: { label: "Undo", onClick: () => composer.history.undo() },
+      });
+    }
+  }, [composer, selectedId, addToast]);
 
   const handleToolbarDelete = React.useCallback(() => {
     if (!composer || !selectedId) return;
