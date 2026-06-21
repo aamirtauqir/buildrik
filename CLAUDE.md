@@ -162,6 +162,7 @@ Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packa
 | `VERCEL_OAUTH_CLIENT_ID` | OAuth integration public client id (from vercel.com/integrations/console) | Yes for Vercel OAuth flow |
 | `VERCEL_OAUTH_CLIENT_SECRET` | OAuth integration secret | Yes for Vercel OAuth flow |
 | `VERCEL_OAUTH_REDIRECT_URI` | Callback URL registered with Vercel (e.g. `https://app.buildrik.com/api/integrations/vercel/callback` in prod, `http://localhost:3000/api/integrations/vercel/callback` in dev) | Yes for Vercel OAuth flow |
+| `NEXT_PUBLIC_UNIFIED_EDITOR` | Graduates the in-Next editor at `/edit/:id`. When unset/`false`, the dashboard "Edit" link falls back to the legacy `NEXT_PUBLIC_EDITOR_URL` (`localhost:5050/?siteId=`) standalone demo, which is dev-only and doesn't load real projects. Set `true` in dev (`.env.local`) and in prod (Vercel env) so editing actually opens the working editor. | Yes — without it, "Edit site" points at the dead demo |
 
 `.env.local` (gitignored, repo root) holds dev values. Production values live in Vercel project env settings. Never commit secrets.
 

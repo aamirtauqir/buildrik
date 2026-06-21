@@ -13,7 +13,27 @@ function timeAgo(date: Date): string {
   return `${days}d ago`;
 }
 
-function EntryRow({ entry }: { entry: ActivityEntry }) {
+/**
+ * Collapse consecutive identical entries (same actor + same text) into one
+ * row carrying a repeat count. Without this the feed reads as a wall of
+ * "Saqib Updated 2 settings" repeated dozens of times — repetition the user
+ * has to scroll past with no added information.
+ */
+export function collapseEntries(entries: ActivityEntry[]): Array<{ entry: ActivityEntry; count: number }> {
+  const out: Array<{ entry: ActivityEntry; count: number }> = [];
+  for (const entry of entries) {
+    const last = out[out.length - 1];
+    const sameAs =
+      last &&
+      last.entry.actorName === entry.actorName &&
+      (last.entry.description ?? last.entry.action) === (entry.description ?? entry.action);
+    if (sameAs) last.count += 1;
+    else out.push({ entry, count: 1 });
+  }
+  return out;
+}
+
+function EntryRow({ entry, count }: { entry: ActivityEntry; count: number }) {
   return (
     <li className="flex items-start gap-3">
       {entry.actorAvatar ? (
@@ -31,6 +51,11 @@ function EntryRow({ entry }: { entry: ActivityEntry }) {
             <span className="font-medium">{entry.actorName} </span>
           )}
           {entry.description ?? entry.action}
+          {count > 1 && (
+            <span className="ml-1.5 text-xs font-medium text-[var(--color-text-muted)]">
+              ×{count}
+            </span>
+          )}
         </p>
         <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">{timeAgo(entry.createdAt)}</p>
       </div>
@@ -62,8 +87,8 @@ export function ActivityFeed({ feed }: ActivityFeedProps) {
               {group.label}
             </p>
             <ul className="space-y-3">
-              {group.entries.map((entry) => (
-                <EntryRow key={entry.id} entry={entry} />
+              {collapseEntries(group.entries).map(({ entry, count }) => (
+                <EntryRow key={entry.id} entry={entry} count={count} />
               ))}
             </ul>
           </div>
