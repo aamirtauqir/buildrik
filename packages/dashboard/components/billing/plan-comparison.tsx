@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@lib/utils";
+import { PLAN_LIMITS } from "@lib/constants/plan-limits";
 
 export const PLAN_FEATURES = [
   { label: "Sites", free: "3", pro: "15", business: "50" },
@@ -20,10 +21,12 @@ export const PLAN_FEATURES = [
 
 type PlanKey = "FREE" | "PRO" | "BUSINESS";
 
+// Prices derive from the single source of truth (PLAN_LIMITS), not hardcoded —
+// the UI used to show 19/49 while entitlements priced 29/79 (codex P2).
 const PLAN_PRICES: Record<PlanKey, { monthly: number; yearly: number }> = {
-  FREE: { monthly: 0, yearly: 0 },
-  PRO: { monthly: 19, yearly: 15 },
-  BUSINESS: { monthly: 49, yearly: 39 },
+  FREE: { monthly: Number(PLAN_LIMITS.FREE.priceMonthly), yearly: Number(PLAN_LIMITS.FREE.priceYearly) },
+  PRO: { monthly: Number(PLAN_LIMITS.PRO.priceMonthly), yearly: Number(PLAN_LIMITS.PRO.priceYearly) },
+  BUSINESS: { monthly: Number(PLAN_LIMITS.BUSINESS.priceMonthly), yearly: Number(PLAN_LIMITS.BUSINESS.priceYearly) },
 };
 
 const PLAN_BADGE: Record<PlanKey, { bg: string; color: string; label: string }> = {

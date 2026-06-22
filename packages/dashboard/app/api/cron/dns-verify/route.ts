@@ -19,23 +19,48 @@ export async function GET(req: NextRequest) {
 
   let verified = 0;
 
+  // Normalize for comparison: trim, drop a trailing dot, lowercase.
+  const norm = (s: string) => s.trim().replace(/\.$/, "").toLowerCase();
+
+  // Vercel verification records store `host` as an absolute FQDN (e.g.
+  // `_vercel.example.com`); the default CNAME records use relative `@`/`www`.
+  const toFqdn = (host: string, domain: string) => {
+    const h = norm(host);
+    if (h === "@" || h === "") return norm(domain);
+    if (h === norm(domain) || h.endsWith(`.${norm(domain)}`)) return h;
+    return `${h}.${norm(domain)}`;
+  };
+
   for (const record of unverified) {
-    if (record.type !== "CNAME") continue;
+    const fqdn = toFqdn(record.host, record.domain.domain);
+    const expected = norm(record.value);
 
-    const hostname =
-      record.host === "@"
-        ? record.domain.domain
-        : `${record.host}.${record.domain.domain}`;
-
-    let results: string[];
+    let matched = false;
     try {
-      results = await dns.resolve(hostname, "CNAME");
+      // Match the actual DNS answer against THIS record's expected value
+      // (was hardcoded to the dead host `sites.buildrik.app`), per record type.
+      switch (record.type.toUpperCase()) {
+        case "CNAME":
+          matched = (await dns.resolveCname(fqdn)).some((r) => norm(r) === expected);
+          break;
+        case "A":
+          matched = (await dns.resolve4(fqdn)).some((r) => norm(r) === expected);
+          break;
+        case "AAAA":
+          matched = (await dns.resolve6(fqdn)).some((r) => norm(r) === expected);
+          break;
+        case "TXT":
+          matched = (await dns.resolveTxt(fqdn)).some((chunks) => norm(chunks.join("")) === expected);
+          break;
+        default:
+          continue; // unsupported record type — leave unverified
+      }
     } catch {
       // DNS resolution failures (ENOTFOUND, ENODATA, SERVFAIL) are expected during propagation
       continue;
     }
 
-    if (results.some((r) => r === "sites.buildrik.app")) {
+    if (matched) {
       await prisma.dnsRecord.update({
         where: { id: record.id },
         data: { verified: true },

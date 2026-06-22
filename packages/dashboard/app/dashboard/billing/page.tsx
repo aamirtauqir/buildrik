@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
+import { PLAN_LIMITS } from "@lib/constants/plan-limits";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { ErrorState } from "@/components/states";
 import { PlanCard } from "@/components/billing/plan-card";
@@ -23,9 +24,11 @@ const PLAN_NAMES: Record<string, string> = {
   BUSINESS: "Business",
 };
 
+// Single source of truth: PLAN_LIMITS. Was hardcoded 19/49 while entitlements
+// priced 29/79 (codex P2 — 3-way price drift).
 const PLAN_PRICES: Record<string, { monthly: number; yearly: number }> = {
-  PRO: { monthly: 19, yearly: 15 },
-  BUSINESS: { monthly: 49, yearly: 39 },
+  PRO: { monthly: Number(PLAN_LIMITS.PRO.priceMonthly), yearly: Number(PLAN_LIMITS.PRO.priceYearly) },
+  BUSINESS: { monthly: Number(PLAN_LIMITS.BUSINESS.priceMonthly), yearly: Number(PLAN_LIMITS.BUSINESS.priceYearly) },
 };
 
 const PLAN_FEATURES_MAP: Record<string, string[]> = {
