@@ -26,6 +26,7 @@ import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { PageWizard } from "../wizard/PageWizard";
 import { OnboardingMount } from "../onboarding/OnboardingMount";
 import { useCmsSync } from "./hooks/useCmsSync";
+import { useVersionSync } from "./hooks/useVersionSync";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
@@ -188,6 +189,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // — D2 stage 3.
   // E7: mirror local CMS changes to the server (best-effort + retryable toast on failure).
   useCmsSync(composer, addToast);
+
+  // #3/26: mirror version history to the server + hydrate on open (best-effort).
+  useVersionSync(composer, addToast);
 
   useEditorEventListeners({
     composer,

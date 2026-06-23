@@ -258,6 +258,7 @@ model Site {
   reviewRequests  ReviewRequest[]
   comments        Comment[]
   cmsCollections  CmsCollection[]
+  versions        SiteVersion[]
 
   @@index([workspaceId])
   @@index([workspaceId, status])
@@ -872,6 +873,30 @@ model TemplateVersion {
   @@unique([templateId, semver])
   @@index([templateId, createdAt])
   @@map("template_versions")
+}
+
+/// Version history, server-backed (#3/26, 2026-06-24). The editor's
+/// VersionTimelineManager still owns the local IndexedDB cache; this mirrors
+/// each named/auto version so history is shared per-site and survives a new
+/// device / cache clear (REQUIRED before real-time collab, where per-browser
+/// histories would diverge). `payload` is the full engine NamedVersion (incl.
+/// the project snapshot); list endpoints return metadata columns only so a
+/// 50-version list never ships 50 snapshots.
+model SiteVersion {
+  id        String   @id @default(cuid())
+  siteId    String
+  versionId String // engine NamedVersion.id — canonical match for dedupe/restore
+  name      String
+  isAuto    Boolean  @default(false)
+  payload   Json
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, versionId])
+  @@index([siteId, createdAt])
+  @@map("site_versions")
 }
 
 model AIGenerationJob {
