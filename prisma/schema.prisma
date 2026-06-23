@@ -152,6 +152,7 @@ model Workspace {
   apiTokens       ApiToken[]
   features        WorkspaceFeature[]
   clients         Client[]
+  userTemplates   UserTemplate[]
 
   @@map("workspaces")
 }
@@ -921,6 +922,32 @@ model SiteComponent {
   @@unique([siteId, componentId])
   @@index([siteId, updatedAt])
   @@map("site_components")
+}
+
+/// User "My Templates" (save-as-template), server-backed (#13/25, 2026-06-24).
+/// The editor's handleSaveTemplate writes the local cache (localStorage
+/// MY_TEMPLATES); this mirrors each so saved templates are shared across the
+/// agency's sites + survive device/cache loss. Workspace-scoped (an agency's
+/// reusable library), resolved from the editing site's workspace.
+model UserTemplate {
+  id          String   @id @default(cuid())
+  workspaceId String
+  templateId  String // editor's "user-<ts>" id — canonical dedupe key
+  name        String
+  category    String?
+  description String?
+  html        String
+  css         String?
+  thumbnail   String?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, templateId])
+  @@index([workspaceId, updatedAt])
+  @@map("user_templates")
 }
 
 model AIGenerationJob {

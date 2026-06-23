@@ -28,6 +28,7 @@ import { OnboardingMount } from "../onboarding/OnboardingMount";
 import { useCmsSync } from "./hooks/useCmsSync";
 import { useVersionSync } from "./hooks/useVersionSync";
 import { useComponentSync } from "./hooks/useComponentSync";
+import { hydrateUserTemplatesFromServer } from "@/services/templateSync";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
@@ -196,6 +197,11 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // #4/27: mirror component masters to the server + hydrate on open (best-effort).
   useComponentSync(composer, addToast);
+
+  // #13/25: pull server "My Templates" into the local cache on open (best-effort).
+  React.useEffect(() => {
+    if (composer) void hydrateUserTemplatesFromServer();
+  }, [composer]);
 
   useEditorEventListeners({
     composer,

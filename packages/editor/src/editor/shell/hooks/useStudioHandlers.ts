@@ -14,6 +14,7 @@ import { STORAGE_KEYS } from "../../../shared/constants/config";
 import type { BlockData } from "../../../shared/types";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { applyTemplate } from "../../../templates/templateActions";
+import { mirrorUserTemplate } from "../../../services/templateSync";
 import type { Template } from "../../../templates/TemplateLibrary";
 import type { AIContext } from "./useStudioModals";
 import type { ToastInput } from "@/editor/shared/vibcoder";
@@ -208,6 +209,9 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
         const myTemplates = saved ? JSON.parse(saved) : [];
         myTemplates.unshift(newTemplate);
         localStorage.setItem(STORAGE_KEYS.MY_TEMPLATES, JSON.stringify(myTemplates));
+        // #13/25: mirror to the server (workspace-scoped) so the template is
+        // shared across the agency's sites + survives device loss. Best-effort.
+        void mirrorUserTemplate(newTemplate);
         addToast({
           title: "Template saved",
           description: `${data.name} saved to My Templates`,

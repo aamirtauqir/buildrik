@@ -26,6 +26,7 @@ import { cmsRouter } from "./routers/cms";
 import { themeRouter } from "./routers/theme";
 import { siteVersionsRouter } from "./routers/site-version";
 import { siteComponentsRouter } from "./routers/site-component";
+import { userTemplatesRouter } from "./routers/user-template";
 
 export const appRouter = router({
   auth: authRouter,
@@ -55,6 +56,7 @@ export const appRouter = router({
   theme: themeRouter,
   siteVersions: siteVersionsRouter,
   siteComponents: siteComponentsRouter,
+  userTemplates: userTemplatesRouter,
 });
 
 export type AppRouter = typeof appRouter;
