@@ -17,6 +17,8 @@
  */
 
 import type { StockPhoto, StockVideo } from "../../engine/media/MediaManager";
+import { getBuildrikClient } from "../api-client";
+import { DASHBOARD_URL } from "../../shared/utils/runtimeEnv";
 
 export type StockOrientation = "landscape" | "portrait" | "squarish" | undefined;
 export type StockColor = string | undefined;
@@ -46,30 +48,52 @@ export interface StockService {
 }
 
 /**
- * Set to true once a real provider (Unsplash / Pexels / Pixabay) is wired
- * up — either by replacing the stub below or swapping to the dashboard
- * tRPC `media.searchStock` route. UI consumers should gate "Browse stock"
- * surfaces on this flag so users see a "not configured" banner instead of
- * empty results that look like "no matches."
+ * #24 (2026-06-24): the provider is now wired via the dashboard tRPC
+ * `media.searchStockPhotos` / `searchStockVideos` proxy (keys stay server-side).
+ * `true` means the UI shows the stock browser; the server returns `[]` when its
+ * provider keys (UNSPLASH_ACCESS_KEY / PEXELS_API_KEY) are unset, which the
+ * existing "no results" empty state handles.
  */
-export const IS_STOCK_CONFIGURED = false;
+export const IS_STOCK_CONFIGURED = true;
+
+function client() {
+  return getBuildrikClient(DASHBOARD_URL);
+}
 
 /**
- * Empty stub. Returns `[]` for every query. Keeps the UI functional —
- * empty-state messaging is already designed ("No results, try stock search").
- *
- * Honors `extras.signal` so consumer-side AbortController contracts hold:
- * an aborted call rejects with the standard AbortError so `try/catch +
- * isAborted` patterns work in both stub and live providers.
+ * Live stock search via the server proxy. Honors `extras.signal` (passed to the
+ * tRPC query so an aborted request rejects with AbortError, preserving the
+ * stale-response-discard contract). Any non-abort error falls back to `[]` so a
+ * provider/network hiccup degrades to the empty state, never a thrown UI.
  */
 export const stockService: StockService = {
-  async searchPhotos(_query, _page, _orientation, _color, extras) {
+  async searchPhotos(query, page, orientation, color, extras) {
     if (extras?.signal?.aborted) throw makeAbortError();
-    return [];
+    if (!query.trim()) return [];
+    try {
+      const res = await client().media.searchStockPhotos.query(
+        { query, page, orientation: orientation ?? null, color: color ?? null },
+        { signal: extras?.signal }
+      );
+      return res as StockPhoto[];
+    } catch {
+      if (extras?.signal?.aborted) throw makeAbortError();
+      return [];
+    }
   },
-  async searchVideos(_query, _page, _orientation, extras) {
+  async searchVideos(query, page, _orientation, extras) {
     if (extras?.signal?.aborted) throw makeAbortError();
-    return [];
+    if (!query.trim()) return [];
+    try {
+      const res = await client().media.searchStockVideos.query(
+        { query, page },
+        { signal: extras?.signal }
+      );
+      return res as StockVideo[];
+    } catch {
+      if (extras?.signal?.aborted) throw makeAbortError();
+      return [];
+    }
   },
 };
 

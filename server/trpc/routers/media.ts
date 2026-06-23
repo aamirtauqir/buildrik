@@ -19,6 +19,8 @@ import {
   updateAsset,
 } from "@/server/services/media.service";
 import { applyAltTextToAsset } from "@/server/services/alt-text.service";
+import { z } from "zod";
+import { searchStockPhotos, searchStockVideos } from "@/server/services/stock.service";
 import {
   checkStorageQuotaSchema,
   createAssetSchema,
@@ -290,5 +292,27 @@ export const mediaRouter = router({
     .input(checkStorageQuotaSchema)
     .query(async ({ ctx }) => {
       return checkStorageQuota(ctx.session.user.id);
+    }),
+
+  // ─── Stock media search (#24) ───────────────────────────────────────────
+  // Server-proxied so provider keys (UNSPLASH_ACCESS_KEY / PEXELS_API_KEY)
+  // never reach the client. Returns [] when unconfigured (prior stub behavior).
+  searchStockPhotos: protectedProcedure
+    .input(
+      z.object({
+        query: z.string(),
+        page: z.number().int().min(1).default(1),
+        orientation: z.enum(["landscape", "portrait", "squarish"]).nullable().optional(),
+        color: z.string().nullable().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      return searchStockPhotos(input.query, input.page, input.orientation ?? null, input.color ?? null);
+    }),
+
+  searchStockVideos: protectedProcedure
+    .input(z.object({ query: z.string(), page: z.number().int().min(1).default(1) }))
+    .query(async ({ input }) => {
+      return searchStockVideos(input.query, input.page);
     }),
 });
