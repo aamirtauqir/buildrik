@@ -7,6 +7,7 @@
  */
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import type { ToastInput } from "@/editor/shared/vibcoder/Toast";
 import { EVENTS } from "../../../shared/constants/events";
 import type { CMSCollection, CMSContentItem } from "../../../shared/types/cms";
 import {
@@ -15,15 +16,47 @@ import {
   syncEntryUpsert,
   syncEntryDelete,
   hydrateCmsFromServer,
+  onCmsSyncError,
+  retryCmsSync,
 } from "../../../services/cmsSync";
 
-export function useCmsSync(composer: Composer | null): void {
+export function useCmsSync(
+  composer: Composer | null,
+  addToast?: (input: ToastInput) => string
+): void {
   React.useEffect(() => {
     if (!composer) return;
     const cm = composer.cms.collections;
 
     // Pull any server-side collections into local storage (cross-device).
     void hydrateCmsFromServer();
+
+    // #5/#6 (2026-06-24): CMS server-sync failures used to be logged + dropped
+    // silently — the user thought their content was saved everywhere. Surface a
+    // single retryable toast when a mirror fails (coalesced so a burst of
+    // failures doesn't spam). Retry re-flushes the whole queue.
+    let toastShown = false;
+    const unsubscribe = addToast
+      ? onCmsSyncError(({ pending }) => {
+          if (toastShown || pending === 0) return;
+          toastShown = true;
+          addToast({
+            title: "Some content changes didn't sync",
+            description:
+              `${pending} CMS change${pending === 1 ? "" : "s"} are saved on this device but ` +
+              `not yet on the server. They'll retry automatically when you're back online.`,
+            tone: "error",
+            duration: Infinity,
+            action: {
+              label: "Retry now",
+              onClick: () => {
+                toastShown = false;
+                void retryCmsSync();
+              },
+            },
+          });
+        })
+      : undefined;
 
     const onColUpsert = (c: CMSCollection) => void syncCollectionUpsert(c);
     const onColDelete = (id: string) => void syncCollectionDelete(id);
@@ -48,6 +81,7 @@ export function useCmsSync(composer: Composer | null): void {
       cm.off(EVENTS.CMS_CONTENT_PUBLISHED, onEntryUpsert);
       cm.off(EVENTS.CMS_CONTENT_UNPUBLISHED, onEntryUpsert);
       cm.off(EVENTS.CMS_CONTENT_DELETED, onEntryDelete);
+      unsubscribe?.();
     };
-  }, [composer]);
+  }, [composer, addToast]);
 }

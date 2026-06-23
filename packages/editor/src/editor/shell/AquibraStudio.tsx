@@ -186,8 +186,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // 4 composer-driven side-effects (wizard hide, COMPONENT_CREATE_REQUESTED,
   // SHOW_IN_LAYERS, overlay-defaults init) extracted into useEditorEventListeners
   // — D2 stage 3.
-  // E7: mirror local CMS changes to the server (best-effort).
-  useCmsSync(composer);
+  // E7: mirror local CMS changes to the server (best-effort + retryable toast on failure).
+  useCmsSync(composer, addToast);
 
   useEditorEventListeners({
     composer,

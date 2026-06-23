@@ -5,8 +5,10 @@
  * syncs across devices/users.
  *
  * BEST-EFFORT BY DESIGN: the local IndexedDB write has already happened when
- * these fire, so a failed network/auth call must never throw into the engine —
- * it's logged and dropped. The engine stays pure (it emits; the editor persists).
+ * these fire, so a failed network/auth call must never throw into the engine.
+ * A failure is QUEUED for retry + broadcast via onCmsSyncError so the editor
+ * can surface a retryable toast (no longer a silent drop — #5/#6). The engine
+ * stays pure (it emits; the editor persists).
  *
  * @license BSD-3-Clause
  */
@@ -21,6 +23,79 @@ function client() {
 }
 
 const iso = (d: Date | string): string => (typeof d === "string" ? d : d.toISOString());
+
+// ── E7 reliability (#5/#6, 2026-06-24): stop the silent drop ────────────────
+// The local IndexedDB write already happened when a sync fires, so a failed
+// server mirror must never throw into the engine. But the old "console.warn +
+// drop" left the user believing the CMS edit was saved everywhere when it
+// wasn't. We now queue the failed op (latest-wins per target), notify
+// subscribers so the editor surfaces a retryable toast, and auto-retry on
+// reconnect. Still never throws.
+type QueuedCmsOp =
+  | { kind: "collectionUpsert"; collection: CMSCollection }
+  | { kind: "collectionDelete"; id: string }
+  | { kind: "entryUpsert"; item: CMSContentItem }
+  | { kind: "entryDelete"; id: string };
+
+const syncQueue = new Map<string, QueuedCmsOp>();
+const errorSubscribers = new Set<(info: CmsSyncErrorInfo) => void>();
+
+export interface CmsSyncErrorInfo {
+  /** Number of CMS changes still not mirrored to the server. */
+  pending: number;
+}
+
+/** Subscribe to CMS sync failures. Returns an unsubscribe fn. */
+export function onCmsSyncError(cb: (info: CmsSyncErrorInfo) => void): () => void {
+  errorSubscribers.add(cb);
+  return () => {
+    errorSubscribers.delete(cb);
+  };
+}
+
+/** How many CMS changes are queued for retry (not yet on the server). */
+export function getCmsSyncPendingCount(): number {
+  return syncQueue.size;
+}
+
+function notifyError(): void {
+  const info: CmsSyncErrorInfo = { pending: syncQueue.size };
+  errorSubscribers.forEach((cb) => {
+    try {
+      cb(info);
+    } catch {
+      // A subscriber throwing must not break the sync layer.
+    }
+  });
+}
+
+/**
+ * Re-attempt every queued CMS op. Each op's own sync fn removes it from the
+ * queue on success or re-queues on failure, so a partial reconnect makes
+ * partial progress. Best-effort; never throws.
+ */
+export async function retryCmsSync(): Promise<void> {
+  for (const op of Array.from(syncQueue.values())) {
+    switch (op.kind) {
+      case "collectionUpsert":
+        await syncCollectionUpsert(op.collection);
+        break;
+      case "collectionDelete":
+        await syncCollectionDelete(op.id);
+        break;
+      case "entryUpsert":
+        await syncEntryUpsert(op.item);
+        break;
+      case "entryDelete":
+        await syncEntryDelete(op.id);
+        break;
+    }
+  }
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("online", () => void retryCmsSync());
+}
 
 /**
  * Cross-device load (E7): pull server collections + entries into the engine's
@@ -74,6 +149,7 @@ export async function hydrateCmsFromServer(): Promise<void> {
 export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
+  const key = `collectionUpsert:${c.id}`;
   try {
     await client().cms.collections.upsert.mutate({
       id: c.id,
@@ -89,26 +165,37 @@ export async function syncCollectionUpsert(c: CMSCollection): Promise<void> {
       pageSeoDescription: c.pageSeoDescription ?? null,
       pageTemplatePath: c.pageTemplatePath ?? null,
     });
+    syncQueue.delete(key);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.warn("[cms-sync] collection upsert failed (kept locally)", e);
+    console.warn("[cms-sync] collection upsert failed (kept locally, queued)", e);
+    syncQueue.set(key, { kind: "collectionUpsert", collection: c });
+    notifyError();
   }
 }
 
 export async function syncCollectionDelete(id: string): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
+  const key = `collectionDelete:${id}`;
+  // A pending upsert for the same collection is now moot — deletion wins, so
+  // drop it to avoid resurrecting a deleted collection on retry.
+  syncQueue.delete(`collectionUpsert:${id}`);
   try {
     await client().cms.collections.delete.mutate({ siteId, id });
+    syncQueue.delete(key);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.warn("[cms-sync] collection delete failed", e);
+    console.warn("[cms-sync] collection delete failed (queued)", e);
+    syncQueue.set(key, { kind: "collectionDelete", id });
+    notifyError();
   }
 }
 
 export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
+  const key = `entryUpsert:${item.id}`;
   try {
     await client().cms.entries.upsert.mutate({
       id: item.id,
@@ -117,19 +204,27 @@ export async function syncEntryUpsert(item: CMSContentItem): Promise<void> {
       data: item.data,
       status: item.status === "published" ? "PUBLISHED" : "DRAFT",
     });
+    syncQueue.delete(key);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.warn("[cms-sync] entry upsert failed (kept locally)", e);
+    console.warn("[cms-sync] entry upsert failed (kept locally, queued)", e);
+    syncQueue.set(key, { kind: "entryUpsert", item });
+    notifyError();
   }
 }
 
 export async function syncEntryDelete(id: string): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
+  const key = `entryDelete:${id}`;
+  syncQueue.delete(`entryUpsert:${id}`);
   try {
     await client().cms.entries.delete.mutate({ siteId, id });
+    syncQueue.delete(key);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.warn("[cms-sync] entry delete failed", e);
+    console.warn("[cms-sync] entry delete failed (queued)", e);
+    syncQueue.set(key, { kind: "entryDelete", id });
+    notifyError();
   }
 }

@@ -31,7 +31,14 @@ vi.mock("../../engine/cms/CollectionStorage", () => ({
   saveContentItem: (...a: unknown[]) => saveContentItem(...a),
 }));
 
-import { syncCollectionUpsert, syncEntryUpsert, hydrateCmsFromServer } from "../cmsSync";
+import {
+  syncCollectionUpsert,
+  syncEntryUpsert,
+  hydrateCmsFromServer,
+  onCmsSyncError,
+  retryCmsSync,
+  getCmsSyncPendingCount,
+} from "../cmsSync";
 
 beforeEach(() => {
   window.history.replaceState({}, "", "/edit/site-123");
@@ -68,6 +75,50 @@ describe("cmsSync", () => {
     window.history.replaceState({}, "", "/dashboard");
     await syncCollectionUpsert({ id: "c1", name: "X", slug: "x", fields: [], createdAt: "", updatedAt: "" } as never);
     expect(colUpsert).not.toHaveBeenCalled();
+  });
+});
+
+describe("cmsSync retry queue (#5/#6 — no silent drop)", () => {
+  const drain = async () => {
+    // Flush any leftover queued ops from prior tests with succeeding mutates,
+    // so each test starts from an empty queue (module-level shared state).
+    colUpsert.mockResolvedValue(undefined);
+    entUpsert.mockResolvedValue(undefined);
+    await retryCmsSync();
+  };
+
+  it("queues a failed upsert + notifies subscribers, then clears on a successful retry", async () => {
+    await drain();
+    const events: number[] = [];
+    const off = onCmsSyncError(({ pending }) => events.push(pending));
+
+    colUpsert.mockRejectedValueOnce(new Error("network down"));
+    await syncCollectionUpsert({
+      id: "cq", name: "Q", slug: "q", fields: [], createdAt: "", updatedAt: "",
+    } as never);
+
+    expect(getCmsSyncPendingCount()).toBe(1);
+    expect(events).toEqual([1]); // subscriber heard the failure — not silent
+
+    // colUpsert now resolves (set in drain's mockResolvedValue); retry flushes.
+    await retryCmsSync();
+    expect(getCmsSyncPendingCount()).toBe(0);
+    off();
+  });
+
+  it("does NOT notify on a successful sync", async () => {
+    await drain();
+    const events: number[] = [];
+    const off = onCmsSyncError(({ pending }) => events.push(pending));
+
+    colUpsert.mockResolvedValue(undefined);
+    await syncCollectionUpsert({
+      id: "ok", name: "OK", slug: "ok", fields: [], createdAt: "", updatedAt: "",
+    } as never);
+
+    expect(events).toEqual([]);
+    expect(getCmsSyncPendingCount()).toBe(0);
+    off();
   });
 });
 
