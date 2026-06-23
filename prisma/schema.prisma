@@ -259,6 +259,7 @@ model Site {
   comments        Comment[]
   cmsCollections  CmsCollection[]
   versions        SiteVersion[]
+  components      SiteComponent[]
 
   @@index([workspaceId])
   @@index([workspaceId, status])
@@ -897,6 +898,29 @@ model SiteVersion {
   @@unique([siteId, versionId])
   @@index([siteId, createdAt])
   @@map("site_versions")
+}
+
+/// Reusable component masters, server-backed (#4/27, 2026-06-24). The editor's
+/// ComponentManager keeps the local IndexedDB cache (`aquibra-components`); this
+/// mirrors each master so a saved component is shared across the agency's client
+/// sites + survives device/cache loss (the agency-reuse wedge, and required
+/// before collab where per-browser libraries would diverge). `payload` is the
+/// full engine ComponentDefinition.
+model SiteComponent {
+  id          String   @id @default(cuid())
+  siteId      String
+  componentId String // engine ComponentDefinition.id — canonical dedupe key
+  name        String
+  payload     Json
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, componentId])
+  @@index([siteId, updatedAt])
+  @@map("site_components")
 }
 
 model AIGenerationJob {

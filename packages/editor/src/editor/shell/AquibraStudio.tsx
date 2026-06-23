@@ -27,6 +27,7 @@ import { PageWizard } from "../wizard/PageWizard";
 import { OnboardingMount } from "../onboarding/OnboardingMount";
 import { useCmsSync } from "./hooks/useCmsSync";
 import { useVersionSync } from "./hooks/useVersionSync";
+import { useComponentSync } from "./hooks/useComponentSync";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
@@ -192,6 +193,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // #3/26: mirror version history to the server + hydrate on open (best-effort).
   useVersionSync(composer, addToast);
+
+  // #4/27: mirror component masters to the server + hydrate on open (best-effort).
+  useComponentSync(composer, addToast);
 
   useEditorEventListeners({
     composer,
