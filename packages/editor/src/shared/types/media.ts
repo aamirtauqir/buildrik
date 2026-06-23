@@ -229,6 +229,27 @@ export interface RemoteAssetSync {
    * moves the asset to root. Returns true on success.
    */
   moveAsset(serverId: string, folderId: string | null): Promise<boolean>;
+
+  /**
+   * S-tier wire (2026-06-24): mirror asset metadata edits (name → server
+   * `filename`, altText) server-side. folderId moves stay on moveAsset().
+   * Previously these edits were local-IndexedDB-only — they never reached
+   * the server `media.updateAsset` route, so a renamed asset / hand-written
+   * alt text was lost on a new device. Returns true on success; false is
+   * tolerated (local stays ahead until the next edit / full sync).
+   */
+  updateAsset(
+    serverId: string,
+    patch: { filename?: string; altText?: string | null }
+  ): Promise<boolean>;
+
+  /**
+   * S-tier wire (2026-06-24): rename a folder server-side. The local folder
+   * id IS the server CUID once synced (canonical-id-swap — same contract as
+   * createFolder/deleteFolder). Previously rename was local-only, so library
+   * organization diverged per browser. Returns true on success or 404.
+   */
+  renameFolder(serverId: string, name: string): Promise<boolean>;
 }
 
 /**

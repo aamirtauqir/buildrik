@@ -979,6 +979,26 @@ export class MediaManager extends MediaEventEmitter {
       // next move or full sync. Phase B5 (deferred) would add a queue.
     }
 
+    // S-tier wire (2026-06-24): mirror name / alt-text edits server-side.
+    // These were local-IndexedDB-only before — `media.updateAsset` existed
+    // but nothing called it, so renames / hand-written alt text never
+    // persisted across devices. Guarded on serverId (asset is synced) and
+    // an actual name/altText change in this update (folderId keeps its own
+    // moveAsset path above).
+    if (
+      this.remoteSync &&
+      asset.serverId &&
+      ((Object.prototype.hasOwnProperty.call(updates, "name") && asset.name !== updated.name) ||
+        (Object.prototype.hasOwnProperty.call(updates, "altText") &&
+          asset.altText !== updated.altText))
+    ) {
+      await this.remoteSync.updateAsset(asset.serverId, {
+        filename: updated.name,
+        altText: updated.altText ?? null,
+      });
+      // Failure tolerated — local ahead until next edit / full sync.
+    }
+
     this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, changes: updates });
     return updated;
   }
@@ -1225,6 +1245,17 @@ export class MediaManager extends MediaEventEmitter {
     };
     this.state.folders[idx] = updated;
     await this.storage.saveFolder(updated);
+
+    // S-tier wire (2026-06-24): mirror the rename server-side. Was local-only
+    // before, so folder names diverged per browser. The local folder id is
+    // the server CUID once synced (same canonical-id-swap as delete/create);
+    // skip folders still localOnly (no server row yet — the create-retry
+    // queue carries the latest name when it lands).
+    if (this.remoteSync && !updated.localOnly) {
+      await this.remoteSync.renameFolder(id, trimmed);
+      // Failure tolerated — local rename stays ahead until next sync.
+    }
+
     this.emit(MEDIA_EVENTS.FOLDER_UPDATED, updated);
   }
 

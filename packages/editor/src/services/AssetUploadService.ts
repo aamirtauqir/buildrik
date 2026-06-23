@@ -211,5 +211,34 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
         return false;
       }
     },
+
+    async updateAsset(serverId, patch) {
+      try {
+        await getClient().media.updateAsset.mutate({
+          assetId: serverId,
+          // Only send keys the caller actually changed — the schema marks
+          // every field optional, so an omitted key leaves the server row
+          // untouched rather than nulling it.
+          ...(patch.filename !== undefined ? { filename: patch.filename } : {}),
+          ...(patch.altText !== undefined ? { altText: patch.altText } : {}),
+        });
+        return true;
+      } catch {
+        // Auth / network / validation — local stays ahead, caller tolerates.
+        return false;
+      }
+    },
+
+    async renameFolder(serverId, name) {
+      try {
+        await getClient().media.renameFolder.mutate({ folderId: serverId, name });
+        return true;
+      } catch (err) {
+        // 404 = folder already gone server-side, treat as success.
+        const message = err instanceof Error ? err.message : String(err);
+        if (message.includes("NOT_FOUND") || message.includes("not found")) return true;
+        return false;
+      }
+    },
   };
 }
