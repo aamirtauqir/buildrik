@@ -65,6 +65,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
   const [subsLoading, setSubsLoading] = React.useState(false);
   const [subsError, setSubsError] = React.useState<string | null>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
+  const [exporting, setExporting] = React.useState(false);
 
   // Reset form selection when the site changes — keeping a stale formBlockId
   // from the previous site sends `{ siteId: new, formBlockId: oldSiteForm }`
@@ -167,6 +168,40 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
     }
   };
 
+  // #22 S-tier wire (2026-06-24): the server `forms.exportSubmissions` query
+  // existed but no UI called it. Pull the CSV for the selected form (full
+  // dataset, not the current page) and trigger a browser download.
+  const handleExport = async () => {
+    if (!projectId) return;
+    setSubsError(null);
+    setExporting(true);
+    try {
+      const csv = await getClient().forms.exportSubmissions.query({
+        siteId: projectId,
+        formBlockId: selectedFormId || undefined,
+        format: "csv",
+      });
+      if (!csv) {
+        setSubsError("No submissions to export.");
+        return;
+      }
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const formName = forms.find((f) => f.id === selectedFormId)?.name ?? "submissions";
+      a.href = url;
+      a.download = `${formName.replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}-submissions.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setSubsError(e instanceof Error ? e.message : "Failed to export submissions.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (!projectId) {
     return (
       <Screen>
@@ -240,6 +275,17 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
       </Section>
 
       <Section title={`Submissions${submissions ? ` (${submissions.total})` : ""}`}>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            onClick={handleExport}
+            disabled={exporting || subsLoading || !submissions || submissions.total === 0}
+          >
+            {exporting ? "Exporting…" : "Export CSV"}
+          </Button>
+        </div>
         {subsLoading && <div style={emptyStyles}>Loading…</div>}
         {!subsLoading && subsError && (
           <div role="alert" style={errorStyles}>{subsError}</div>
