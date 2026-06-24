@@ -2,7 +2,7 @@ import { type NextRequest } from "next/server";
 import { auth } from "@server/auth";
 import { prisma } from "@lib/prisma";
 import { checkSiteRole } from "@server/services/permission.service";
-import { getCollabOpsSince, latestCollabSeq } from "@server/services/collab.service";
+import { getCollabOpsSince, latestCollabSeq, hasResyncGap } from "@server/services/collab.service";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +35,14 @@ export async function GET(
       // Tell the client the current head so it can detect gaps.
       try {
         send("hello", { seq: await latestCollabSeq(siteId) });
+        // A returning client whose last-seen op was pruned must full-reload, not
+        // replay a partial gap (which would silently corrupt its state). Signal
+        // resync and stop — the client reconnects with since=0 after reloading.
+        if (await hasResyncGap(siteId, lastSeq)) {
+          send("resync", { reason: "ops-pruned" });
+          controller.close();
+          return;
+        }
       } catch {
         controller.close();
         return;
