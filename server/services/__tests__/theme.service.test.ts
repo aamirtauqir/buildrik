@@ -16,6 +16,10 @@ const snapFindMany = vi.fn();
 const snapFindFirst = vi.fn();
 const snapDelete = vi.fn();
 const snapDeleteMany = vi.fn();
+const presetUpsert = vi.fn();
+const presetFindMany = vi.fn();
+const presetFindFirst = vi.fn();
+const presetDeleteMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -37,6 +41,12 @@ vi.mock("@/lib/prisma", () => ({
       delete: (...a: unknown[]) => snapDelete(...a),
       deleteMany: (...a: unknown[]) => snapDeleteMany(...a),
     },
+    workspacePreset: {
+      upsert: (...a: unknown[]) => presetUpsert(...a),
+      findMany: (...a: unknown[]) => presetFindMany(...a),
+      findFirst: (...a: unknown[]) => presetFindFirst(...a),
+      deleteMany: (...a: unknown[]) => presetDeleteMany(...a),
+    },
   },
 }));
 
@@ -48,11 +58,14 @@ import {
   previewSharedThemePush,
   rollbackSiteTheme,
   listSiteThemeSnapshots,
+  saveWorkspacePreset,
+  applyWorkspacePreset,
+  deleteWorkspacePreset,
   ThemeError,
 } from "@server/services/theme.service";
 
 beforeEach(() => {
-  [wsFindUnique, wsUpdate, siteFindFirst, siteFindMany, siteUpdate, snapCreate, snapFindMany, snapFindFirst, snapDelete, snapDeleteMany].forEach(
+  [wsFindUnique, wsUpdate, siteFindFirst, siteFindMany, siteUpdate, snapCreate, snapFindMany, snapFindFirst, snapDelete, snapDeleteMany, presetUpsert, presetFindMany, presetFindFirst, presetDeleteMany].forEach(
     (m) => m.mockReset(),
   );
   snapCreate.mockResolvedValue({ id: "snap" });
@@ -217,5 +230,43 @@ describe("listSiteThemeSnapshots (D2)", () => {
     const res = await listSiteThemeSnapshots("w1", "s1");
     expect(res).toHaveLength(1);
     expect(snapFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1" });
+  });
+});
+
+describe("workspace presets (D4)", () => {
+  it("saveWorkspacePreset refuses a source site outside the workspace", async () => {
+    siteFindFirst.mockResolvedValueOnce(null);
+    await expect(saveWorkspacePreset("w1", "Brand A", "other")).rejects.toMatchObject({ code: "NOT_FOUND" });
+    expect(presetUpsert).not.toHaveBeenCalled();
+  });
+
+  it("saveWorkspacePreset upserts the site's tokens under the name", async () => {
+    siteFindFirst.mockResolvedValueOnce({ projectStyles: [{ id: "t", v: 1 }] });
+    presetUpsert.mockResolvedValueOnce({});
+    const res = await saveWorkspacePreset("w1", "Brand A", "s1", "u1");
+    expect(res).toEqual({ name: "Brand A" });
+    expect(presetUpsert.mock.calls[0][0].where).toEqual({ workspaceId_name: { workspaceId: "w1", name: "Brand A" } });
+    expect(presetUpsert.mock.calls[0][0].create).toMatchObject({ workspaceId: "w1", name: "Brand A", createdBy: "u1" });
+  });
+
+  it("applyWorkspacePreset copies a preset's tokens into the shared theme", async () => {
+    presetFindFirst.mockResolvedValueOnce({ styles: [{ id: "t", v: 2 }] });
+    wsUpdate.mockResolvedValueOnce({});
+    await applyWorkspacePreset("w1", "p1");
+    expect(presetFindFirst.mock.calls[0][0].where).toEqual({ id: "p1", workspaceId: "w1" });
+    expect(wsUpdate.mock.calls[0][0].data.sharedTheme).toEqual([{ id: "t", v: 2 }]);
+  });
+
+  it("applyWorkspacePreset throws NOT_FOUND for a missing preset", async () => {
+    presetFindFirst.mockResolvedValueOnce(null);
+    await expect(applyWorkspacePreset("w1", "ghost")).rejects.toMatchObject({ code: "NOT_FOUND" });
+    expect(wsUpdate).not.toHaveBeenCalled();
+  });
+
+  it("deleteWorkspacePreset is workspace-scoped + no-op safe", async () => {
+    presetDeleteMany.mockResolvedValueOnce({ count: 0 });
+    const res = await deleteWorkspacePreset("w1", "p1");
+    expect(res).toEqual({ ok: true });
+    expect(presetDeleteMany.mock.calls[0][0].where).toEqual({ id: "p1", workspaceId: "w1" });
   });
 });

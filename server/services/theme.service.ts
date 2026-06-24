@@ -286,3 +286,73 @@ export async function listSiteThemeSnapshots(
     select: { id: true, createdAt: true },
   });
 }
+
+/**
+ * D4: save a site's current tokens as a NAMED agency brand preset. Unlike the
+ * single Workspace.sharedTheme, an agency keeps a library of presets (one per
+ * client brand). Upsert by name. Workspace-scoped (source site must be in ws).
+ */
+export async function saveWorkspacePreset(
+  workspaceId: string,
+  name: string,
+  sourceSiteId: string,
+  createdBy?: string | null,
+): Promise<{ name: string }> {
+  const site = await prisma.site.findFirst({
+    where: { id: sourceSiteId, workspaceId },
+    select: { projectStyles: true },
+  });
+  if (!site) throw new ThemeError("NOT_FOUND", "Source site not found");
+  const styles =
+    site.projectStyles == null ? Prisma.DbNull : (site.projectStyles as Prisma.InputJsonValue);
+  await prisma.workspacePreset.upsert({
+    where: { workspaceId_name: { workspaceId, name } },
+    create: { workspaceId, name, styles, createdBy: createdBy ?? null },
+    update: { styles },
+  });
+  return { name };
+}
+
+/** D4: the agency's brand preset library (newest first). */
+export async function listWorkspacePresets(
+  workspaceId: string,
+): Promise<Array<{ id: string; name: string; updatedAt: Date }>> {
+  return prisma.workspacePreset.findMany({
+    where: { workspaceId },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, name: true, updatedAt: true },
+  });
+}
+
+/** D4: remove a preset. Workspace-scoped; missing is a no-op. */
+export async function deleteWorkspacePreset(
+  workspaceId: string,
+  presetId: string,
+): Promise<{ ok: true }> {
+  await prisma.workspacePreset.deleteMany({ where: { id: presetId, workspaceId } });
+  return { ok: true } as const;
+}
+
+/**
+ * D4: make a preset the active shared theme (then the agency pushes it via D1).
+ * Workspace-scoped.
+ */
+export async function applyWorkspacePreset(
+  workspaceId: string,
+  presetId: string,
+): Promise<{ updatedAt: Date }> {
+  const preset = await prisma.workspacePreset.findFirst({
+    where: { id: presetId, workspaceId },
+    select: { styles: true },
+  });
+  if (!preset) throw new ThemeError("NOT_FOUND", "Preset not found");
+  const updatedAt = new Date();
+  await prisma.workspace.update({
+    where: { id: workspaceId },
+    data: {
+      sharedTheme: preset.styles == null ? Prisma.DbNull : (preset.styles as Prisma.InputJsonValue),
+      sharedThemeUpdatedAt: updatedAt,
+    },
+  });
+  return { updatedAt };
+}

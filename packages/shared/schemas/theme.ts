@@ -40,3 +40,15 @@ export const siteThemeSnapshotInput = z.object({
   siteId: z.string().min(1),
 });
 export type SiteThemeSnapshotInput = z.infer<typeof siteThemeSnapshotInput>;
+
+// D4: save a named brand preset from a site's tokens / reference one by id.
+export const saveWorkspacePresetInput = z.object({
+  name: z.string().min(1).max(60),
+  sourceSiteId: z.string().min(1),
+});
+export type SaveWorkspacePresetInput = z.infer<typeof saveWorkspacePresetInput>;
+
+export const workspacePresetIdInput = z.object({
+  presetId: z.string().min(1),
+});
+export type WorkspacePresetIdInput = z.infer<typeof workspacePresetIdInput>;

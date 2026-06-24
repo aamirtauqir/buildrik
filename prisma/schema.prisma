@@ -154,8 +154,29 @@ model Workspace {
   clients         Client[]
   userTemplates   UserTemplate[]
   themeSnapshots  SiteThemeSnapshot[]
+  themePresets    WorkspacePreset[]
 
   @@map("workspaces")
+}
+
+// D4 (brand presets): an agency's named brand presets — captured token sets they
+// can apply as the shared theme and push. Built-in starter presets live in the
+// editor (STARTER_DS_REGISTRY); this is the agency's OWN multi-brand library
+// (the single Workspace.sharedTheme only holds one).
+model WorkspacePreset {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  styles      Json?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId, updatedAt])
+  @@map("workspace_presets")
 }
 
 // Per-workspace feature flags — DB-backed runtime kill-switch (eng-review 2026-06-19).

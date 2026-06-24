@@ -15,6 +15,10 @@ import {
   previewSharedThemePush,
   rollbackSiteTheme,
   listSiteThemeSnapshots,
+  saveWorkspacePreset,
+  listWorkspacePresets,
+  deleteWorkspacePreset,
+  applyWorkspacePreset,
   ThemeError,
 } from "@/server/services/theme.service";
 import {
@@ -23,6 +27,8 @@ import {
   setSiteThemeLockInput,
   previewSharedThemeInput,
   siteThemeSnapshotInput,
+  saveWorkspacePresetInput,
+  workspacePresetIdInput,
 } from "@buildrik/shared/schemas/theme";
 
 // Shared-theme push is part of the agency layer — gated behind the E0
@@ -156,4 +162,45 @@ export const themeRouter = router({
         translateThemeError(e);
       }
     }),
+
+  // D4: the agency's named brand preset library.
+  presets: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
+      return listWorkspacePresets(workspaceId);
+    }),
+    save: protectedProcedure
+      .input(saveWorkspacePresetInput)
+      .mutation(async ({ ctx, input }) => {
+        const workspaceId = await resolveWorkspaceId(ctx);
+        await requireAgencyLayer(workspaceId);
+        await requireAdmin(ctx, workspaceId);
+        try {
+          return await saveWorkspacePreset(workspaceId, input.name, input.sourceSiteId, ctx.session.user.id);
+        } catch (e) {
+          translateThemeError(e);
+        }
+      }),
+    delete: protectedProcedure
+      .input(workspacePresetIdInput)
+      .mutation(async ({ ctx, input }) => {
+        const workspaceId = await resolveWorkspaceId(ctx);
+        await requireAgencyLayer(workspaceId);
+        await requireAdmin(ctx, workspaceId);
+        return deleteWorkspacePreset(workspaceId, input.presetId);
+      }),
+    apply: protectedProcedure
+      .input(workspacePresetIdInput)
+      .mutation(async ({ ctx, input }) => {
+        const workspaceId = await resolveWorkspaceId(ctx);
+        await requireAgencyLayer(workspaceId);
+        await requireAdmin(ctx, workspaceId);
+        try {
+          return await applyWorkspacePreset(workspaceId, input.presetId);
+        } catch (e) {
+          translateThemeError(e);
+        }
+      }),
+  }),
 });
