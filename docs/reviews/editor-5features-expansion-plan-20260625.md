@@ -184,8 +184,8 @@ This plan moves Buildrik from "single-site builder with broken reuse" to "agency
 - ✅ **F3 SHIPPED** (`501cbfa3`) — checkWorkspaceRole(ADMIN) wired into update/sharing/cancelDelete; +4 tests.
 - ✅ **op-log prereq SHIPPED** (`69a5fe9d`) — deterministic prune + resync-gap + SSE resync event; +6 tests.
 - ✅ **F2 safe half SHIPPED** (`4c7c8ce5`) — gallery seeded with 4 real multi-page templates (kills empty-gallery sin); verified via `tsx prisma/seed.ts`.
-- ⏸️ **F2 destructive half DEFERRED** — collapsing editor SITE_TEMPLATES (HTML, different domain) into the DB model + rewiring TemplatesTab. Hard-to-reverse on the revenue-critical site-create path; both reviewers flagged regression risk; needs supervised additive migration + smoke test. NOT done blind.
-- ⏸️ **F1b DEFERRED** (per plan) — stable slotKey for reorder/insert survival; phase 2, only if needed.
+- ❌ **F2 destructive half WON'T DO** (informed decision 2026-06-25) — reading templateSync.ts + the architecture proved the 3 "systems" are 3 different lifecycles: DB site-scaffolds (site-create), static built-in snippets (client-side, correctly no-network), server-synced user snippets. Merging static built-ins onto the server adds failure modes for zero user benefit. All 3 reviews + the code agree; user accepted "keep 3 separate". The gallery-empty sin (the real problem) is fixed by F2-seed.
+- ⏸️ **F1b DEFERRED** (per approved plan) — stable slotKey for reorder/insert survival; phase 2, only if needed.
 Verification: editor tsc 0 · override-sync 14/14 · server suites 19/19 (collab 10 + authz 4 + dns 5).
 
 ## Implementation Tasks
