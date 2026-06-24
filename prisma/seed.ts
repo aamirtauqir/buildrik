@@ -47,6 +47,153 @@ async function main() {
   console.log(`Seeded user ${QA_EMAIL} / ${QA_PASSWORD}`);
 
   await seedHelpArticles();
+  await seedTemplates();
+}
+
+// The Template gallery (templates.list → listTemplates(isActive)) was wired but
+// never seeded, so the gallery was empty out-of-box — the editor-5features design
+// review's #1 sin ("No items found" instead of real starter templates). These are
+// real multi-page scaffolds in the canonical Page.blocks shape (a buildrick-page-root
+// container wrapping <section> nodes — same shape the AI worker emits), so picking
+// one creates a valid, non-broken site. Idempotent by slug. This is the safe,
+// additive half of F2; collapsing the editor's hardcoded SITE_TEMPLATES into this
+// model + rewiring TemplatesTab to read the server is the destructive half, left
+// for a supervised migration (both reviewers flagged regression risk to useTemplate).
+
+type SeedSection = { type: string; html: string };
+
+/** Build a valid Page.blocks root from HTML sections (mirrors the AI worker). */
+function pageBlocks(sections: SeedSection[]) {
+  return {
+    id: "root",
+    type: "container",
+    tagName: "div",
+    classes: ["buildrick-page-root"],
+    children: sections.map((sec, i) => ({
+      id: `seed-${sec.type}-${i}`,
+      type: "container",
+      tagName: "section",
+      classes: [`section-${sec.type}`],
+      content: sec.html,
+      children: [],
+    })),
+  };
+}
+
+type SeedPage = { name: string; slug: string; isHomePage?: boolean; sections: SeedSection[] };
+type SeedTemplate = {
+  slug: string;
+  name: string;
+  category: string;
+  description: string;
+  difficulty: string;
+  pages: SeedPage[];
+};
+
+const SEED_TEMPLATES: SeedTemplate[] = [
+  {
+    slug: "studio-portfolio",
+    name: "Studio Portfolio",
+    category: "PORTFOLIO",
+    difficulty: "BEGINNER",
+    description: "A clean multi-page portfolio for designers, studios, and freelancers.",
+    pages: [
+      { name: "Home", slug: "home", isHomePage: true, sections: [
+        { type: "hero", html: "<h1>Work that speaks for itself</h1><p>Selected projects from a studio that cares about the details.</p><a href='/work'>View work</a>" },
+        { type: "featured", html: "<h2>Featured</h2><p>Three recent projects, hand-picked.</p>" },
+        { type: "cta", html: "<h2>Have a project in mind?</h2><a href='/contact'>Start a conversation</a>" },
+      ] },
+      { name: "Work", slug: "work", sections: [
+        { type: "gallery", html: "<h1>Work</h1><p>A selection of recent engagements.</p>" },
+      ] },
+      { name: "About", slug: "about", sections: [
+        { type: "about", html: "<h1>About</h1><p>We are a small team focused on thoughtful, durable design.</p>" },
+      ] },
+      { name: "Contact", slug: "contact", sections: [
+        { type: "contact", html: "<h1>Contact</h1><p>Tell us about your project.</p>" },
+      ] },
+    ],
+  },
+  {
+    slug: "local-business",
+    name: "Local Business",
+    category: "BUSINESS",
+    difficulty: "BEGINNER",
+    description: "A straightforward site for a local service business: home, services, and contact.",
+    pages: [
+      { name: "Home", slug: "home", isHomePage: true, sections: [
+        { type: "hero", html: "<h1>Trusted service in your neighborhood</h1><p>Reliable, friendly, and on time.</p><a href='/contact'>Get a quote</a>" },
+        { type: "services", html: "<h2>What we do</h2><p>A short list of the services you offer.</p>" },
+        { type: "proof", html: "<h2>What customers say</h2><p>Add a couple of short testimonials here.</p>" },
+      ] },
+      { name: "Services", slug: "services", sections: [
+        { type: "services", html: "<h1>Services</h1><p>Describe each service and what's included.</p>" },
+      ] },
+      { name: "Contact", slug: "contact", sections: [
+        { type: "contact", html: "<h1>Get in touch</h1><p>Phone, email, and hours.</p>" },
+      ] },
+    ],
+  },
+  {
+    slug: "agency",
+    name: "Agency",
+    category: "AGENCY",
+    difficulty: "INTERMEDIATE",
+    description: "A multi-page agency site with services and case studies, built for client work.",
+    pages: [
+      { name: "Home", slug: "home", isHomePage: true, sections: [
+        { type: "hero", html: "<h1>We build brands that grow</h1><p>Strategy, design, and delivery under one roof.</p><a href='/contact'>Work with us</a>" },
+        { type: "services", html: "<h2>Capabilities</h2><p>Branding, web, and campaigns.</p>" },
+        { type: "clients", html: "<h2>Selected clients</h2><p>Add client logos or names here.</p>" },
+      ] },
+      { name: "Services", slug: "services", sections: [
+        { type: "services", html: "<h1>Services</h1><p>Outline your engagement model and offerings.</p>" },
+      ] },
+      { name: "Case Studies", slug: "case-studies", sections: [
+        { type: "work", html: "<h1>Case studies</h1><p>Show the results you delivered for clients.</p>" },
+      ] },
+      { name: "Contact", slug: "contact", sections: [
+        { type: "contact", html: "<h1>Start a project</h1><p>Tell us about your goals.</p>" },
+      ] },
+    ],
+  },
+  {
+    slug: "bistro",
+    name: "Bistro",
+    category: "RESTAURANT",
+    difficulty: "BEGINNER",
+    description: "A warm restaurant site with a menu and reservations.",
+    pages: [
+      { name: "Home", slug: "home", isHomePage: true, sections: [
+        { type: "hero", html: "<h1>Seasonal food, made with care</h1><p>Open for lunch and dinner.</p><a href='/reservations'>Reserve a table</a>" },
+        { type: "highlights", html: "<h2>This week</h2><p>Feature a few seasonal dishes.</p>" },
+      ] },
+      { name: "Menu", slug: "menu", sections: [
+        { type: "menu", html: "<h1>Menu</h1><p>List your courses and prices.</p>" },
+      ] },
+      { name: "Reservations", slug: "reservations", sections: [
+        { type: "contact", html: "<h1>Reservations</h1><p>Hours, location, and booking details.</p>" },
+      ] },
+    ],
+  },
+];
+
+async function seedTemplates() {
+  for (const t of SEED_TEMPLATES) {
+    const pages = t.pages.map((p, i) => ({
+      name: p.name,
+      slug: p.slug,
+      position: i,
+      isHomePage: p.isHomePage ?? i === 0,
+      blocks: pageBlocks(p.sections),
+    }));
+    await prisma.template.upsert({
+      where: { slug: t.slug },
+      update: { name: t.name, category: t.category, description: t.description, difficulty: t.difficulty, pages, isActive: true },
+      create: { slug: t.slug, name: t.name, category: t.category, description: t.description, difficulty: t.difficulty, pages, isActive: true },
+    });
+  }
+  console.log(`Seeded ${SEED_TEMPLATES.length} starter templates`);
 }
 
 // Help center was wired end-to-end (search, category tiles, [slug] pages,
