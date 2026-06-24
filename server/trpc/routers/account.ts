@@ -22,6 +22,7 @@ import {
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion, listUserWorkspaces } from "@/server/services/workspace-settings.service";
+import { checkWorkspaceRole } from "@/server/services/permission.service";
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration, updateIntegration, sendIntegrationTestEvent } from "@/server/services/integrations.service";
 import { updateProfileSchema, changePasswordSchema, setPasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
@@ -136,10 +137,14 @@ export const accountRouter = router({
     }),
     update: protectedProcedure.input(updateWorkspaceSchema).mutation(async ({ ctx, input }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
+      // F3: workspace settings are admin-scoped. checkWorkspaceRole already exists;
+      // these mutations just weren't calling it — any ACTIVE member could edit.
+      await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
       return updateWorkspaceSettings(workspaceId, input);
     }),
     sharing: protectedProcedure.input(workspaceSharingSettingsSchema).mutation(async ({ ctx, input }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
+      await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
       return updateSharingSettings(workspaceId, input);
     }),
     delete: protectedProcedure
@@ -153,6 +158,7 @@ export const accountRouter = router({
       }),
     cancelDelete: protectedProcedure.mutation(async ({ ctx }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
+      await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
       return cancelWorkspaceDeletion(workspaceId);
     }),
     transfer: router({
