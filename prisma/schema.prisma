@@ -153,6 +153,7 @@ model Workspace {
   features        WorkspaceFeature[]
   clients         Client[]
   userTemplates   UserTemplate[]
+  themeSnapshots  SiteThemeSnapshot[]
 
   @@map("workspaces")
 }
@@ -261,11 +262,31 @@ model Site {
   cmsCollections  CmsCollection[]
   versions        SiteVersion[]
   components      SiteComponent[]
+  themeSnapshots  SiteThemeSnapshot[]
 
   @@index([workspaceId])
   @@index([workspaceId, status])
   @@index([clientId])
   @@map("sites")
+}
+
+// D2 (theme rollback): a site's projectStyles snapshot taken right before a
+// shared-theme push overwrites it. Lets the agency roll a bad push back. Bounded
+// per site by a retention cap in theme.service (oldest pruned on capture).
+model SiteThemeSnapshot {
+  id                  String   @id @default(cuid())
+  siteId              String
+  workspaceId         String
+  prevStyles          Json?
+  prevDsSchemaVersion Int
+  createdAt           DateTime @default(now())
+
+  site      Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, createdAt])
+  @@index([workspaceId])
+  @@map("site_theme_snapshots")
 }
 
 // CMS server persistence (redesign E7). The editor's CMS already works locally

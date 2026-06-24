@@ -28,3 +28,15 @@ export const setSiteThemeLockInput = z.object({
   locked: z.boolean(),
 });
 export type SetSiteThemeLockInput = z.infer<typeof setSiteThemeLockInput>;
+
+// D1: dry-run preview of a push (same target shape as push).
+export const previewSharedThemeInput = z.object({
+  siteIds: z.array(z.string().min(1)).min(1).optional(),
+});
+export type PreviewSharedThemeInput = z.infer<typeof previewSharedThemeInput>;
+
+// D2: roll a single site back to its pre-push tokens / list its snapshots.
+export const siteThemeSnapshotInput = z.object({
+  siteId: z.string().min(1),
+});
+export type SiteThemeSnapshotInput = z.infer<typeof siteThemeSnapshotInput>;

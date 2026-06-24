@@ -11,9 +11,16 @@ const wsUpdate = vi.fn();
 const siteFindFirst = vi.fn();
 const siteFindMany = vi.fn();
 const siteUpdate = vi.fn();
+const snapCreate = vi.fn();
+const snapFindMany = vi.fn();
+const snapFindFirst = vi.fn();
+const snapDelete = vi.fn();
+const snapDeleteMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    // $transaction runs the op array; mocked ops are already-resolved values.
+    $transaction: (ops: unknown[]) => Promise.all(ops as Promise<unknown>[]),
     workspace: {
       findUnique: (...a: unknown[]) => wsFindUnique(...a),
       update: (...a: unknown[]) => wsUpdate(...a),
@@ -23,6 +30,13 @@ vi.mock("@/lib/prisma", () => ({
       findMany: (...a: unknown[]) => siteFindMany(...a),
       update: (...a: unknown[]) => siteUpdate(...a),
     },
+    siteThemeSnapshot: {
+      create: (...a: unknown[]) => snapCreate(...a),
+      findMany: (...a: unknown[]) => snapFindMany(...a),
+      findFirst: (...a: unknown[]) => snapFindFirst(...a),
+      delete: (...a: unknown[]) => snapDelete(...a),
+      deleteMany: (...a: unknown[]) => snapDeleteMany(...a),
+    },
   },
 }));
 
@@ -31,11 +45,18 @@ import {
   captureSharedTheme,
   pushSharedTheme,
   setSiteThemeLock,
+  previewSharedThemePush,
+  rollbackSiteTheme,
+  listSiteThemeSnapshots,
   ThemeError,
 } from "@server/services/theme.service";
 
 beforeEach(() => {
-  [wsFindUnique, wsUpdate, siteFindFirst, siteFindMany, siteUpdate].forEach((m) => m.mockReset());
+  [wsFindUnique, wsUpdate, siteFindFirst, siteFindMany, siteUpdate, snapCreate, snapFindMany, snapFindFirst, snapDelete, snapDeleteMany].forEach(
+    (m) => m.mockReset(),
+  );
+  snapCreate.mockResolvedValue({ id: "snap" });
+  snapFindMany.mockResolvedValue([]); // pruneSnapshots: under cap → no-op
 });
 
 describe("getSharedTheme", () => {
@@ -114,5 +135,87 @@ describe("setSiteThemeLock", () => {
     siteFindFirst.mockResolvedValueOnce(null);
     await expect(setSiteThemeLock("w1", "x", true)).rejects.toBeInstanceOf(ThemeError);
     expect(siteUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe("pushSharedTheme — D2 snapshot", () => {
+  it("snapshots each unlocked site's current tokens before overwriting", async () => {
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "t" }], sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "locked", name: "L", themeLocked: true, dsSchemaVersion: 5, projectStyles: [{ old: 1 }] },
+      { id: "ok", name: "Ok", themeLocked: false, dsSchemaVersion: 2, projectStyles: [{ old: 2 }] },
+    ]);
+    siteUpdate.mockResolvedValue({});
+    await pushSharedTheme("w1");
+    // locked site is NOT snapshotted (never overwritten); unlocked is.
+    expect(snapCreate).toHaveBeenCalledOnce();
+    expect(snapCreate.mock.calls[0][0].data).toMatchObject({
+      siteId: "ok",
+      workspaceId: "w1",
+      prevStyles: [{ old: 2 }],
+      prevDsSchemaVersion: 2,
+    });
+  });
+});
+
+describe("previewSharedThemePush (D1)", () => {
+  it("throws NO_THEME when nothing captured", async () => {
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: null, sharedThemeUpdatedAt: null });
+    await expect(previewSharedThemePush("w1")).rejects.toMatchObject({ code: "NO_THEME" });
+  });
+
+  it("flags willChange per site and marks locked sites skipped, writing nothing", async () => {
+    wsFindUnique.mockResolvedValueOnce({ sharedTheme: [{ id: "t", v: "new" }], sharedThemeUpdatedAt: new Date() });
+    siteFindMany.mockResolvedValueOnce([
+      { id: "same", name: "Same", themeLocked: false, projectStyles: [{ id: "t", v: "new" }] },
+      { id: "diff", name: "Diff", themeLocked: false, projectStyles: [{ id: "t", v: "old" }] },
+      { id: "lock", name: "Lock", themeLocked: true, projectStyles: [{ id: "t", v: "old" }] },
+    ]);
+    const res = await previewSharedThemePush("w1");
+    expect(res).toEqual([
+      { siteId: "same", name: "Same", status: "would-push", willChange: false },
+      { siteId: "diff", name: "Diff", status: "would-push", willChange: true },
+      { siteId: "lock", name: "Lock", status: "skipped-locked", willChange: false },
+    ]);
+    expect(siteUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe("rollbackSiteTheme (D2)", () => {
+  it("refuses a site outside the workspace", async () => {
+    siteFindFirst.mockResolvedValueOnce(null);
+    await expect(rollbackSiteTheme("w1", "x")).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  it("throws NO_THEME when there is no snapshot to roll back to", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4 });
+    snapFindFirst.mockResolvedValueOnce(null);
+    await expect(rollbackSiteTheme("w1", "s1")).rejects.toMatchObject({ code: "NO_THEME" });
+  });
+
+  it("restores prev tokens, bumps version, consumes the snapshot", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1", dsSchemaVersion: 4 });
+    snapFindFirst.mockResolvedValueOnce({ id: "snap1", prevStyles: [{ was: 1 }], createdAt: new Date("2026-06-20T00:00:00Z") });
+    siteUpdate.mockResolvedValue({});
+    snapDelete.mockResolvedValue({});
+    const res = await rollbackSiteTheme("w1", "s1");
+    expect(siteUpdate.mock.calls[0][0].data).toMatchObject({ projectStyles: [{ was: 1 }], dsSchemaVersion: 5 });
+    expect(snapDelete.mock.calls[0][0].where).toEqual({ id: "snap1" });
+    expect(res.rolledBackTo).toBeInstanceOf(Date);
+  });
+});
+
+describe("listSiteThemeSnapshots (D2)", () => {
+  it("refuses a site outside the workspace", async () => {
+    siteFindFirst.mockResolvedValueOnce(null);
+    await expect(listSiteThemeSnapshots("w1", "x")).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  it("returns the history newest-first, scoped to the workspace", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    snapFindMany.mockResolvedValueOnce([{ id: "a", createdAt: new Date() }]);
+    const res = await listSiteThemeSnapshots("w1", "s1");
+    expect(res).toHaveLength(1);
+    expect(snapFindMany.mock.calls[0][0].where).toEqual({ siteId: "s1", workspaceId: "w1" });
   });
 });

@@ -45,6 +45,17 @@ export interface PushResult {
   error?: string;
 }
 
+// D2: how many pre-push snapshots to keep per site (oldest pruned on capture).
+const SNAPSHOT_RETENTION = 10;
+
+export interface PushPreview {
+  siteId: string;
+  name: string;
+  status: "would-push" | "skipped-locked";
+  /** True when the shared theme differs from the site's current tokens. */
+  willChange: boolean;
+}
+
 /** The workspace shared theme, or null if none captured yet. */
 export async function getSharedTheme(workspaceId: string): Promise<SharedTheme | null> {
   const ws = await prisma.workspace.findUnique({
@@ -130,7 +141,7 @@ export async function pushSharedTheme(
       deletedAt: null,
       ...(siteIds ? { id: { in: siteIds } } : {}),
     },
-    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true },
+    select: { id: true, name: true, themeLocked: true, dsSchemaVersion: true, projectStyles: true },
   });
 
   const styles = theme.styles as Prisma.InputJsonValue;
@@ -143,14 +154,31 @@ export async function pushSharedTheme(
       continue;
     }
     try {
-      await prisma.site.update({
-        where: { id: site.id },
-        data: {
-          projectStyles: styles,
-          dsSchemaVersion: site.dsSchemaVersion + 1,
-          lastEditedAt: savedAt,
-        },
-      });
+      // D2: snapshot the site's CURRENT tokens before the push overwrites them,
+      // atomically with the overwrite, so a bad push can be rolled back. Push was
+      // previously a wholesale overwrite with no prior-value capture.
+      await prisma.$transaction([
+        prisma.siteThemeSnapshot.create({
+          data: {
+            siteId: site.id,
+            workspaceId,
+            prevStyles:
+              site.projectStyles == null
+                ? Prisma.DbNull
+                : (site.projectStyles as Prisma.InputJsonValue),
+            prevDsSchemaVersion: site.dsSchemaVersion,
+          },
+        }),
+        prisma.site.update({
+          where: { id: site.id },
+          data: {
+            projectStyles: styles,
+            dsSchemaVersion: site.dsSchemaVersion + 1,
+            lastEditedAt: savedAt,
+          },
+        }),
+      ]);
+      await pruneSnapshots(site.id);
       results.push({ siteId: site.id, name: site.name, status: "pushed" });
     } catch (e) {
       results.push({
@@ -162,4 +190,99 @@ export async function pushSharedTheme(
     }
   }
   return results;
+}
+
+/** Keep only the newest SNAPSHOT_RETENTION snapshots per site (best-effort). */
+async function pruneSnapshots(siteId: string): Promise<void> {
+  const keep = await prisma.siteThemeSnapshot.findMany({
+    where: { siteId },
+    orderBy: { createdAt: "desc" },
+    take: SNAPSHOT_RETENTION,
+    select: { id: true },
+  });
+  if (keep.length < SNAPSHOT_RETENTION) return;
+  await prisma.siteThemeSnapshot
+    .deleteMany({ where: { siteId, id: { notIn: keep.map((s) => s.id) } } })
+    .catch(() => {});
+}
+
+/**
+ * D1: dry-run a push. Returns, per target, whether the shared theme would change
+ * the site's tokens — so the UI can show the blast radius (and per-site opt-out)
+ * BEFORE committing. Reads only; never writes.
+ */
+export async function previewSharedThemePush(
+  workspaceId: string,
+  siteIds?: string[],
+): Promise<PushPreview[]> {
+  const theme = await getSharedTheme(workspaceId);
+  if (!theme) {
+    throw new ThemeError("NO_THEME", "No shared theme has been captured for this workspace");
+  }
+  const targets = await prisma.site.findMany({
+    where: { workspaceId, deletedAt: null, ...(siteIds ? { id: { in: siteIds } } : {}) },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, themeLocked: true, projectStyles: true },
+  });
+  const after = JSON.stringify(theme.styles ?? null);
+  return targets.map((site) => {
+    if (site.themeLocked) {
+      return { siteId: site.id, name: site.name, status: "skipped-locked" as const, willChange: false };
+    }
+    const before = JSON.stringify(site.projectStyles ?? null);
+    return { siteId: site.id, name: site.name, status: "would-push" as const, willChange: before !== after };
+  });
+}
+
+/**
+ * D2: roll a site back to its tokens from before the most recent push. Consumes
+ * that snapshot (rollback pops the latest push) and bumps dsSchemaVersion so an
+ * open editor reloads. Workspace-scoped (IDOR guard).
+ */
+export async function rollbackSiteTheme(
+  workspaceId: string,
+  siteId: string,
+): Promise<{ rolledBackTo: Date }> {
+  const site = await prisma.site.findFirst({
+    where: { id: siteId, workspaceId },
+    select: { id: true, dsSchemaVersion: true },
+  });
+  if (!site) throw new ThemeError("NOT_FOUND", "Site not found");
+
+  const snap = await prisma.siteThemeSnapshot.findFirst({
+    where: { siteId, workspaceId },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!snap) throw new ThemeError("NO_THEME", "No theme snapshot to roll back to");
+
+  await prisma.$transaction([
+    prisma.site.update({
+      where: { id: siteId },
+      data: {
+        projectStyles:
+          snap.prevStyles == null ? Prisma.DbNull : (snap.prevStyles as Prisma.InputJsonValue),
+        dsSchemaVersion: site.dsSchemaVersion + 1,
+        lastEditedAt: new Date(),
+      },
+    }),
+    prisma.siteThemeSnapshot.delete({ where: { id: snap.id } }),
+  ]);
+  return { rolledBackTo: snap.createdAt };
+}
+
+/** D2: a site's rollback history (newest first). Workspace-scoped. */
+export async function listSiteThemeSnapshots(
+  workspaceId: string,
+  siteId: string,
+): Promise<Array<{ id: string; createdAt: Date }>> {
+  const site = await prisma.site.findFirst({
+    where: { id: siteId, workspaceId },
+    select: { id: true },
+  });
+  if (!site) throw new ThemeError("NOT_FOUND", "Site not found");
+  return prisma.siteThemeSnapshot.findMany({
+    where: { siteId, workspaceId },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, createdAt: true },
+  });
 }

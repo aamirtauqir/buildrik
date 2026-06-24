@@ -12,12 +12,17 @@ import {
   listThemeTargets,
   setSiteThemeLock,
   pushSharedTheme,
+  previewSharedThemePush,
+  rollbackSiteTheme,
+  listSiteThemeSnapshots,
   ThemeError,
 } from "@/server/services/theme.service";
 import {
   captureSharedThemeInput,
   pushSharedThemeInput,
   setSiteThemeLockInput,
+  previewSharedThemeInput,
+  siteThemeSnapshotInput,
 } from "@buildrik/shared/schemas/theme";
 
 // Shared-theme push is part of the agency layer — gated behind the E0
@@ -106,6 +111,47 @@ export const themeRouter = router({
       await requireAdmin(ctx, workspaceId);
       try {
         return await pushSharedTheme(workspaceId, input.siteIds);
+      } catch (e) {
+        translateThemeError(e);
+      }
+    }),
+
+  // D1: dry-run preview — per-site whether the push would change tokens. Read-only.
+  previewPush: protectedProcedure
+    .input(previewSharedThemeInput)
+    .mutation(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
+      await requireAdmin(ctx, workspaceId);
+      try {
+        return await previewSharedThemePush(workspaceId, input.siteIds);
+      } catch (e) {
+        translateThemeError(e);
+      }
+    }),
+
+  // D2: roll a site back to its pre-push tokens. Admin-gated.
+  rollback: protectedProcedure
+    .input(siteThemeSnapshotInput)
+    .mutation(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
+      await requireAdmin(ctx, workspaceId);
+      try {
+        return await rollbackSiteTheme(workspaceId, input.siteId);
+      } catch (e) {
+        translateThemeError(e);
+      }
+    }),
+
+  // D2: a site's rollback history.
+  snapshots: protectedProcedure
+    .input(siteThemeSnapshotInput)
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
+      try {
+        return await listSiteThemeSnapshots(workspaceId, input.siteId);
       } catch (e) {
         translateThemeError(e);
       }
