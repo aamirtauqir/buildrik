@@ -799,11 +799,15 @@ model Template {
   pages       Json
   usageCount  Int      @default(0)
   isActive    Boolean  @default(true)
+  // T4 (clone-as-template): null = global built-in (seeded gallery); set = private
+  // to one agency workspace (cloned from one of their sites — never shown to others).
+  workspaceId String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   versions TemplateVersion[]
 
+  @@index([workspaceId])
   @@map("templates")
 }
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { listTemplates, getTemplate, useTemplate } from "@/server/services/template.service";
+import { listTemplates, getTemplate, useTemplate, cloneSiteAsTemplate, TemplateError } from "@/server/services/template.service";
 import { createGenerationJob, getJobStatus, cancelJob } from "@/server/services/ai-generation.service";
 import { listTemplatesSchema, generateSiteSchema } from "@buildrik/shared/schemas/templates";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
@@ -9,7 +9,20 @@ import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ct
 export const templatesRouter = router({
   list: protectedProcedure
     .input(listTemplatesSchema)
-    .query(async ({ input }) => listTemplates(input)),
+    .query(async ({ ctx, input }) => listTemplates(input, await getWorkspaceId(ctx))),
+
+  // T4: clone one of the agency's sites into a workspace-private template.
+  cloneFromSite: protectedProcedure
+    .input(z.object({ siteId: z.string(), name: z.string().min(2).max(100), category: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const workspaceId = await getWorkspaceId(ctx);
+      try {
+        return await cloneSiteAsTemplate(workspaceId, input.siteId, input.name, input.category);
+      } catch (e: unknown) {
+        if (e instanceof TemplateError) throw new TRPCError({ code: "NOT_FOUND", message: e.message });
+        throw e;
+      }
+    }),
 
   get: protectedProcedure
     .input(z.object({ id: z.string() }))

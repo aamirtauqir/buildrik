@@ -35,11 +35,16 @@ async function generateUniqueSlug(
   return `${base}-${Date.now()}`;
 }
 
-export async function listTemplates(input: ListTemplatesInput) {
+export async function listTemplates(input: ListTemplatesInput, workspaceId?: string) {
   const { category, page, perPage, sort } = input;
   const skip = (page - 1) * perPage;
 
-  const where: Record<string, unknown> = { isActive: true };
+  // Gallery = global built-ins (workspaceId null) + the caller's own cloned
+  // templates (T4). A workspace never sees another agency's private clones.
+  const where: Record<string, unknown> = {
+    isActive: true,
+    OR: workspaceId ? [{ workspaceId: null }, { workspaceId }] : [{ workspaceId: null }],
+  };
   if (category !== "ALL") {
     where.category = category;
   }
@@ -139,4 +144,69 @@ export async function useTemplate(
   });
 
   return site;
+}
+
+export class TemplateError extends Error {
+  constructor(public code: "SITE_NOT_FOUND", message: string) {
+    super(message);
+    this.name = "TemplateError";
+  }
+}
+
+/** Template.slug is GLOBALLY unique — dedupe against all templates, not per-workspace. */
+async function uniqueTemplateSlug(name: string): Promise<string> {
+  const base = slugify(name) || "template";
+  let candidate = base;
+  for (let i = 0; i < 50; i++) {
+    const existing = await prisma.template.findUnique({ where: { slug: candidate }, select: { id: true } });
+    if (!existing) return candidate;
+    candidate = `${base}-${i + 2}`;
+  }
+  return `${base}-${Date.now().toString(36)}`;
+}
+
+/**
+ * T4 (clone-as-template): turn one of the agency's sites into a reusable template,
+ * private to their workspace. Copies the site's pages (structure + blocks) into a
+ * new Template row tagged with workspaceId, so it shows in their gallery alongside
+ * the built-ins but never to other agencies. IDOR-guarded (site must be in ws).
+ */
+export async function cloneSiteAsTemplate(
+  workspaceId: string,
+  siteId: string,
+  name: string,
+  category?: string,
+): Promise<{ templateId: string; slug: string; pageCount: number }> {
+  const site = await prisma.site.findFirst({
+    where: { id: siteId, workspaceId, deletedAt: null },
+    select: { id: true },
+  });
+  if (!site) throw new TemplateError("SITE_NOT_FOUND", "Site not found in this workspace");
+
+  const pages = await prisma.page.findMany({
+    where: { siteId },
+    orderBy: { position: "asc" },
+    select: { name: true, slug: true, position: true, isHomePage: true, blocks: true },
+  });
+
+  const slug = await uniqueTemplateSlug(name);
+  const tpl = await prisma.template.create({
+    data: {
+      name,
+      slug,
+      category: category ?? "BUSINESS",
+      description: `Cloned from a workspace site`,
+      workspaceId,
+      isActive: true,
+      pages: pages.map((p) => ({
+        name: p.name,
+        slug: p.slug,
+        position: p.position,
+        isHomePage: p.isHomePage,
+        blocks: (p.blocks ?? []) as Prisma.InputJsonValue,
+      })) as Prisma.InputJsonValue,
+    },
+    select: { id: true },
+  });
+  return { templateId: tpl.id, slug, pageCount: pages.length };
 }
