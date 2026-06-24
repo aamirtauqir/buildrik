@@ -16,7 +16,7 @@ import type {
 import { devError } from "../../shared/utils/devLogger";
 import { deepClone } from "../../shared/utils/helpers";
 import type { Composer } from "../Composer";
-import { ComponentInstanceUtils } from "./ComponentInstance";
+import { applyOverridesToTree, ComponentInstanceUtils } from "./ComponentInstance";
 import {
   findInstanceContainingElement,
   getElementPathWithinInstance,
@@ -231,6 +231,22 @@ export async function syncInstance(
     parent.removeChild(element);
 
     const clonedData = cloneWithNewIds(component.masterTree);
+
+    // F1a core fix: re-apply the instance's stored overrides onto the freshly
+    // cloned master tree BEFORE it mounts. Without this, syncInstance carried
+    // `instance.overrides` via spread but never applied them, so every manual
+    // customization reverted to master on each propagate. Overrides are keyed by
+    // position path, so they re-target correctly as long as the master structure
+    // is unchanged. Orphaned overrides (master element removed) are dropped and
+    // reported, never silently lost.
+    const { applied, dropped } = applyOverridesToTree(clonedData, instance.overrides);
+    if (dropped > 0) {
+      devError(
+        "ComponentManager",
+        `Sync dropped ${dropped} override(s) for instance ${elementId} (master element removed)`
+      );
+    }
+
     const newElement = composer.elements.pasteElement(clonedData, parent, index);
     if (!newElement) throw new Error("Failed to re-instantiate during sync");
 
@@ -253,6 +269,8 @@ export async function syncInstance(
       componentId: instance.componentId,
       previousVersion,
       newVersion: component.version,
+      overridesPreserved: applied,
+      overridesDropped: dropped,
     });
 
     composer.markDirty();

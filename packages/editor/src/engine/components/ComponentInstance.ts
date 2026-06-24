@@ -16,7 +16,7 @@ import type {
 } from "../../shared/types/components";
 import { deepClone } from "../../shared/utils/helpers";
 import type { Composer } from "../Composer";
-import { createPatch, applyPatch, type Patch } from "../utils/JsonPatch";
+import { createPatch, type Patch } from "../utils/JsonPatch";
 
 // ============================================
 // Override Path Helpers
@@ -46,6 +46,112 @@ function parsePath(path: string): {
     type: typeMap[category] ?? "style",
     property: property ?? "",
   };
+}
+
+// ============================================
+// Canonical Override Application (position-path scheme)
+// ============================================
+//
+// Overrides are stored by the canonical POSITION-PATH scheme written by
+// recordInstanceOverride (ComponentInstances.ts) and read by
+// getOverridesForElement (ComponentVariantResolver.ts):
+//
+//   #/<elementPath>/<type>/<property>
+//   elementPath = "" (root) | "children[0].children[1]" (dot-joined indices)
+//   type        = style | content | attribute | trait
+//
+// Position-based addressing survives a master re-clone (new element IDs) as
+// long as the master structure is unchanged — which is the F1a target case
+// (master edited without reorder/insert). Reorder/insert survival is F1b
+// (stable slotKey) and out of scope here.
+
+/** Parse a canonical `#/<elementPath>/<type>/<property>` override path. */
+function parseCanonicalOverridePath(
+  path: string
+): { elementPath: string; type: OverrideType; property: string } | null {
+  if (!path.startsWith("#/")) return null;
+  const parts = path.slice(2).split("/");
+  if (parts.length < 2) return null;
+  const property = parts.pop() as string;
+  const typeToken = parts.pop() as string;
+  if (
+    typeToken !== "style" &&
+    typeToken !== "content" &&
+    typeToken !== "attribute" &&
+    typeToken !== "trait"
+  ) {
+    return null;
+  }
+  return { elementPath: parts.join("/"), type: typeToken, property };
+}
+
+/** Walk a tree by an elementPath ("children[0].children[1]") to the target node. */
+function resolveNodeByElementPath(tree: ElementData, elementPath: string): ElementData | null {
+  if (!elementPath) return tree;
+  let node: ElementData = tree;
+  for (const seg of elementPath.split(".")) {
+    const m = seg.match(/^children\[(\d+)\]$/);
+    if (!m) return null;
+    const child = node.children?.[Number(m[1])];
+    if (!child) return null;
+    node = child;
+  }
+  return node;
+}
+
+/** Write one override value into the correct bucket of an ElementData node. */
+function applyOverrideToNode(
+  node: ElementData,
+  type: OverrideType,
+  property: string,
+  value: unknown
+): void {
+  switch (type) {
+    case "style":
+      node.styles = { ...(node.styles ?? {}), [property]: value as string };
+      break;
+    case "content":
+      node.content = value as string;
+      break;
+    case "attribute":
+      node.attributes = { ...(node.attributes ?? {}), [property]: value as string };
+      break;
+    case "trait": {
+      const trait = node.traits?.find((t) => t.name === property);
+      if (trait) trait.value = value as typeof trait.value;
+      break;
+    }
+  }
+}
+
+/**
+ * Re-apply an instance's stored overrides onto a (freshly cloned) element tree,
+ * in place. Returns how many applied vs. dropped (orphaned — the master element
+ * the override targeted no longer exists at that position). Dropping is surfaced,
+ * never silent (F1a #2). This is the SSOT override-application path used by both
+ * sync (re-clone) and detach.
+ */
+export function applyOverridesToTree(
+  tree: ElementData,
+  overrides: Patch
+): { applied: number; dropped: number } {
+  let applied = 0;
+  let dropped = 0;
+  for (const op of overrides) {
+    const parsed = parseCanonicalOverridePath(op.path);
+    if (!parsed) {
+      dropped++;
+      continue;
+    }
+    const node = resolveNodeByElementPath(tree, parsed.elementPath);
+    if (!node) {
+      dropped++;
+      continue;
+    }
+    applyOverrideToNode(node, parsed.type, parsed.property, (op as { value?: unknown }).value);
+    applied++;
+  }
+  return { applied, dropped };
 }
 
 // ============================================
@@ -235,12 +341,16 @@ export class ComponentInstanceUtils {
    * Build the final element tree by applying overrides to master
    */
   buildInstanceTree(masterTree: ElementData, instance: ComponentInstance): ElementData {
+    const tree = deepClone(masterTree);
     if (instance.overrides.length === 0) {
-      return deepClone(masterTree);
+      return tree;
     }
-
-    // Apply the overrides patch to the master tree
-    return applyPatch(masterTree, instance.overrides);
+    // Apply overrides via the canonical position-path scheme the overrides are
+    // actually stored in (`#/<elementPath>/<type>/<property>`). The previous
+    // applyPatch() path treated them as JSON-Patch pointers (`/children/...`),
+    // which never matched — detach silently dropped every override (F1a #1/C).
+    applyOverridesToTree(tree, instance.overrides);
+    return tree;
   }
 
   // ============================================
