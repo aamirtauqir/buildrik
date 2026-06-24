@@ -77,21 +77,24 @@ export async function mirrorComponentDelete(componentId: string): Promise<void> 
  * editor open. ADDITIVE — only componentIds not already local are written, so a
  * local unsynced master is never clobbered. Best-effort; never throws.
  */
-export async function hydrateComponentsFromServer(): Promise<void> {
+export async function hydrateComponentsFromServer(): Promise<number> {
   const siteId = currentSiteId();
-  if (!siteId) return;
+  if (!siteId) return 0;
+  let added = 0;
   try {
     const remote = await client().siteComponents.list.query({ siteId });
-    if (!remote.length) return;
+    if (!remote.length) return 0;
     const localIds = new Set((await loadComponents(siteId)).map((c) => c.id));
     for (const r of remote) {
       if (localIds.has(r.componentId)) continue;
       const payload = await client().siteComponents.get.query({ siteId, componentId: r.componentId });
       if (!payload) continue;
       await saveComponent(payload as ComponentDefinition, siteId);
+      added++;
     }
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[component-sync] hydrate from server failed", e);
   }
+  return added;
 }

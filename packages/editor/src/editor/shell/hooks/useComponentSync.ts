@@ -21,6 +21,7 @@ import {
   hydrateComponentsFromServer,
   onComponentSyncError,
 } from "../../../services/componentSync";
+import { currentSiteId } from "../../../services/ReviewService";
 
 export function useComponentSync(
   composer: Composer | null,
@@ -29,8 +30,16 @@ export function useComponentSync(
   React.useEffect(() => {
     if (!composer) return;
 
-    // Pull any server-side components into the local cache (cross-device).
-    void hydrateComponentsFromServer();
+    // Pull any server-side components into the local cache (cross-device). The
+    // ComponentManager already loaded IndexedDB at init (before hydrate writes),
+    // so when hydrate adds server items, re-read the store + emit the list-updated
+    // event (setProjectId) so the panel shows them WITHOUT a second reload.
+    void hydrateComponentsFromServer().then((added) => {
+      if (added > 0) {
+        const sid = currentSiteId();
+        if (sid) void composer.components.setProjectId(sid);
+      }
+    });
 
     const onUpsert = (p: ComponentCreatedPayload | ComponentUpdatedPayload) =>
       void mirrorComponentUpsert(p.component);

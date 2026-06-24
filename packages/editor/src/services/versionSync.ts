@@ -81,12 +81,13 @@ export async function mirrorVersionDelete(versionId: string): Promise<void> {
  * local unsynced version is never clobbered. They surface on the next version-
  * list read. Best-effort; never throws.
  */
-export async function hydrateVersionsFromServer(): Promise<void> {
+export async function hydrateVersionsFromServer(): Promise<number> {
   const siteId = currentSiteId();
-  if (!siteId) return;
+  if (!siteId) return 0;
+  let added = 0;
   try {
     const remote = await client().siteVersions.list.query({ siteId });
-    if (!remote.length) return;
+    if (!remote.length) return 0;
     const localIds = new Set((await loadVersions(siteId)).map((v) => v.id));
     for (const r of remote) {
       if (localIds.has(r.versionId)) continue;
@@ -95,9 +96,11 @@ export async function hydrateVersionsFromServer(): Promise<void> {
       // Force projectId to this site so loadVersions(siteId) finds it regardless
       // of what the originating device stored.
       await saveVersion({ ...(payload as NamedVersion), projectId: siteId });
+      added++;
     }
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[version-sync] hydrate from server failed", e);
   }
+  return added;
 }

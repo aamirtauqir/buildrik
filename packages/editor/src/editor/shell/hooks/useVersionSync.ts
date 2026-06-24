@@ -20,6 +20,7 @@ import {
   hydrateVersionsFromServer,
   onVersionSyncError,
 } from "../../../services/versionSync";
+import { currentSiteId } from "../../../services/ReviewService";
 
 export function useVersionSync(
   composer: Composer | null,
@@ -28,8 +29,16 @@ export function useVersionSync(
   React.useEffect(() => {
     if (!composer) return;
 
-    // Pull any server-side versions into the local cache (cross-device).
-    void hydrateVersionsFromServer();
+    // Pull any server-side versions into the local cache (cross-device). The
+    // VersionTimelineManager already loaded IndexedDB at init (before hydrate
+    // writes), so when hydrate adds server versions, re-read the store + emit
+    // the list-updated event (setProjectId) so they show WITHOUT a 2nd reload.
+    void hydrateVersionsFromServer().then((added) => {
+      if (added > 0) {
+        const sid = currentSiteId();
+        if (sid) void composer.versions.setProjectId(sid);
+      }
+    });
 
     const onCreated = (p: VersionCreatedPayload) => void mirrorVersionCreate(p.version, p.isAuto);
     const onDeleted = (p: VersionDeletedPayload) => void mirrorVersionDelete(p.versionId);
