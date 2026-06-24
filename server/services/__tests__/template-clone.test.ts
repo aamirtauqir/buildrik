@@ -73,4 +73,25 @@ describe("listTemplates workspace scope (T4)", () => {
     await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular" });
     expect(tplCount.mock.calls[0][0].where.OR).toEqual([{ workspaceId: null }]);
   });
+
+  it("T2 search filters name+description (AND-ed with the workspace scope)", async () => {
+    tplCount.mockResolvedValueOnce(0);
+    tplFindMany.mockResolvedValueOnce([]);
+    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular", search: "  bistro  " }, "w1");
+    const where = tplCount.mock.calls[0][0].where;
+    expect(where.OR).toEqual([{ workspaceId: null }, { workspaceId: "w1" }]); // scope kept
+    expect(where.AND).toEqual([
+      { OR: [
+        { name: { contains: "bistro", mode: "insensitive" } },
+        { description: { contains: "bistro", mode: "insensitive" } },
+      ] },
+    ]);
+  });
+
+  it("blank search is ignored (no AND filter added)", async () => {
+    tplCount.mockResolvedValueOnce(0);
+    tplFindMany.mockResolvedValueOnce([]);
+    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular", search: "   " }, "w1");
+    expect(tplCount.mock.calls[0][0].where.AND).toBeUndefined();
+  });
 });

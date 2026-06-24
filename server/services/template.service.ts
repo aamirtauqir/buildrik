@@ -36,7 +36,7 @@ async function generateUniqueSlug(
 }
 
 export async function listTemplates(input: ListTemplatesInput, workspaceId?: string) {
-  const { category, page, perPage, sort } = input;
+  const { category, page, perPage, sort, search } = input;
   const skip = (page - 1) * perPage;
 
   // Gallery = global built-ins (workspaceId null) + the caller's own cloned
@@ -47,6 +47,19 @@ export async function listTemplates(input: ListTemplatesInput, workspaceId?: str
   };
   if (category !== "ALL") {
     where.category = category;
+  }
+  // T2: free-text search over name + description (case-insensitive). AND-ed with
+  // the workspace OR-scope above so search never leaks other agencies' templates.
+  const term = search?.trim();
+  if (term) {
+    where.AND = [
+      {
+        OR: [
+          { name: { contains: term, mode: "insensitive" } },
+          { description: { contains: term, mode: "insensitive" } },
+        ],
+      },
+    ];
   }
 
   const orderBy = SORT_MAP[sort] ?? SORT_MAP.popular;
