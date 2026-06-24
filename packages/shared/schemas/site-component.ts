@@ -21,6 +21,8 @@ export const upsertSiteComponentSchema = z.object({
 export const listSiteComponentsSchema = z.object({ siteId: z.string() });
 export const getSiteComponentSchema = z.object({ siteId: z.string(), componentId: z.string() });
 export const deleteSiteComponentSchema = z.object({ siteId: z.string(), componentId: z.string() });
+// C1/C3: blast-radius for a component master (which sites carry it).
+export const componentUsageSchema = z.object({ componentId: z.string() });
 
 export type UpsertSiteComponentInput = z.infer<typeof upsertSiteComponentSchema>;
 export type ListSiteComponentsInput = z.infer<typeof listSiteComponentsSchema>;

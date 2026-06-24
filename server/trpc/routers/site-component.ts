@@ -11,14 +11,18 @@ import {
   listSiteComponents,
   getSiteComponent,
   deleteSiteComponent,
+  listWorkspaceComponents,
+  getComponentUsage,
 } from "@/server/services/site-component.service";
 import {
   upsertSiteComponentSchema,
   listSiteComponentsSchema,
   getSiteComponentSchema,
   deleteSiteComponentSchema,
+  componentUsageSchema,
 } from "@buildrik/shared/schemas/site-component";
 import { guardSiteAccess as guardSite } from "@/server/trpc/guards";
+import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 
 export const siteComponentsRouter = router({
   upsert: protectedProcedure
@@ -47,5 +51,20 @@ export const siteComponentsRouter = router({
     .mutation(async ({ ctx, input }) => {
       await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
       return deleteSiteComponent(input.siteId, input.componentId);
+    }),
+
+  // C1: the component browser — every master across the agency's workspace with
+  // its "used on N sites" count. Workspace from the session (IDOR-safe).
+  workspaceList: protectedProcedure.query(async ({ ctx }) => {
+    const workspaceId = await resolveWorkspaceId(ctx);
+    return listWorkspaceComponents(workspaceId);
+  }),
+
+  // C1 jump-to + C3 blast-radius: which sites carry a given master.
+  usage: protectedProcedure
+    .input(componentUsageSchema)
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      return getComponentUsage(workspaceId, input.componentId);
     }),
 });

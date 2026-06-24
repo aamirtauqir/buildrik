@@ -55,3 +55,66 @@ export async function deleteSiteComponent(
   await prisma.siteComponent.deleteMany({ where: { siteId, componentId } });
   return { ok: true };
 }
+
+/**
+ * C1: the component browser. Every distinct component master across the agency's
+ * workspace, with how many sites carry it ("used on N sites"). A master shared
+ * across sites is one SiteComponent row per site (unique [siteId, componentId]),
+ * so the row count per componentId == the site count. Workspace-scoped (the
+ * caller's workspace is supplied from the session, never client input).
+ */
+export async function listWorkspaceComponents(
+  workspaceId: string
+): Promise<Array<{ componentId: string; name: string; siteCount: number; updatedAt: Date }>> {
+  const rows = await prisma.siteComponent.findMany({
+    where: { site: { workspaceId, deletedAt: null } },
+    select: { componentId: true, name: true, updatedAt: true },
+  });
+  const byId = new Map<
+    string,
+    { componentId: string; name: string; siteCount: number; updatedAt: Date }
+  >();
+  for (const r of rows) {
+    const e = byId.get(r.componentId);
+    if (e) {
+      e.siteCount++;
+      if (r.updatedAt > e.updatedAt) {
+        e.updatedAt = r.updatedAt;
+        e.name = r.name;
+      }
+    } else {
+      byId.set(r.componentId, {
+        componentId: r.componentId,
+        name: r.name,
+        siteCount: 1,
+        updatedAt: r.updatedAt,
+      });
+    }
+  }
+  return Array.from(byId.values()).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+}
+
+/**
+ * C1 jump-to + C3 blast-radius: which sites in the workspace carry a given
+ * component master. Powers "used on N sites" with a drill-down, and "editing this
+ * master affects these N sites — preview before propagate". Workspace-scoped.
+ */
+export async function getComponentUsage(
+  workspaceId: string,
+  componentId: string
+): Promise<{
+  componentId: string;
+  siteCount: number;
+  sites: Array<{ siteId: string; siteName: string; updatedAt: Date }>;
+}> {
+  const rows = await prisma.siteComponent.findMany({
+    where: { componentId, site: { workspaceId, deletedAt: null } },
+    orderBy: { updatedAt: "desc" },
+    select: { siteId: true, updatedAt: true, site: { select: { name: true } } },
+  });
+  return {
+    componentId,
+    siteCount: rows.length,
+    sites: rows.map((r) => ({ siteId: r.siteId, siteName: r.site.name, updatedAt: r.updatedAt })),
+  };
+}
