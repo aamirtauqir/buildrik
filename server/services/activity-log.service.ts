@@ -83,3 +83,49 @@ export async function recordForSite(input: RecordForSiteInput) {
     console.error("[activity-log] recordForSite failed:", err);
   }
 }
+
+/**
+ * W4: the workspace-wide audit log — every recorded action, newest first,
+ * paginated, with actor names resolved and optional action/actor filters.
+ * (getTeamActivity is the limit-5 team-only feed for the dashboard widget;
+ * this is the full, filterable audit trail for accountability.)
+ */
+export async function listWorkspaceActivity(
+  workspaceId: string,
+  opts: { page?: number; perPage?: number; action?: string; actorId?: string } = {},
+): Promise<{
+  data: Array<{ id: string; action: string; actorId: string | null; actorName: string | null; siteId: string | null; targetType: string | null; targetId: string | null; description: string | null; createdAt: Date }>;
+  total: number;
+  page: number;
+  totalPages: number;
+}> {
+  const page = Math.max(1, opts.page ?? 1);
+  const perPage = Math.min(50, Math.max(1, opts.perPage ?? 20));
+  const where: Record<string, unknown> = { workspaceId };
+  if (opts.action) where.action = opts.action;
+  if (opts.actorId) where.actorId = opts.actorId;
+
+  const [total, logs] = await Promise.all([
+    prisma.activityLog.count({ where }),
+    prisma.activityLog.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * perPage,
+      take: perPage,
+      select: { id: true, action: true, actorId: true, siteId: true, targetType: true, targetId: true, description: true, createdAt: true },
+    }),
+  ]);
+
+  const actorIds = [...new Set(logs.map((l) => l.actorId).filter(Boolean))] as string[];
+  const actors = actorIds.length
+    ? await prisma.user.findMany({ where: { id: { in: actorIds } }, select: { id: true, fullName: true } })
+    : [];
+  const actorMap = new Map(actors.map((a) => [a.id, a.fullName]));
+
+  return {
+    data: logs.map((l) => ({ ...l, actorName: (l.actorId && actorMap.get(l.actorId)) ?? null })),
+    total,
+    page,
+    totalPages: Math.ceil(total / perPage) || 1,
+  };
+}

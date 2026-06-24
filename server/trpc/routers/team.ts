@@ -15,7 +15,7 @@ import {
 import { inviteMembersSchema, listMembersSchema, changeRoleSchema } from "@buildrik/shared/schemas/team";
 import { type PlanName } from "@/lib/constants/plan-limits";
 import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
-import { record as recordActivity } from "@/server/services/activity-log.service";
+import { record as recordActivity, listWorkspaceActivity } from "@/server/services/activity-log.service";
 
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
   if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -49,6 +49,21 @@ export const teamRouter = router({
     const { workspaceId } = await getWorkspaceCtx(ctx);
     return listMembers(workspaceId, input);
   }),
+  // W4: the workspace-wide audit log (full, filterable, paginated). Audit trails
+  // are sensitive — ADMIN/OWNER only.
+  auditLog: protectedProcedure
+    .input(
+      z.object({
+        page: z.number().min(1).optional(),
+        perPage: z.number().min(1).max(50).optional(),
+        action: z.string().optional(),
+        actorId: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { workspaceId } = await requireAdmin(ctx);
+      return listWorkspaceActivity(workspaceId, input);
+    }),
   invite: protectedProcedure.input(inviteMembersSchema).mutation(async ({ ctx, input }) => {
     const { workspaceId, plan } = await requireAdmin(ctx);
     try {
