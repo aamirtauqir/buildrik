@@ -188,6 +188,21 @@ This plan moves Buildrik from "single-site builder with broken reuse" to "agency
 - ⏸️ **F1b DEFERRED** (per approved plan) — stable slotKey for reorder/insert survival; phase 2, only if needed.
 Verification: editor tsc 0 · override-sync 14/14 · server suites 19/19 (collab 10 + authz 4 + dns 5).
 
+## Build status — Phase 1 backends (2026-06-25, autonomous build)
+All 10 Phase-1 items' server/logic shipped + automated-verified (tsc + unit/integration). UI wiring rides these and needs a browser /qa pass.
+- ✅ **D2** theme snapshot + rollback (`69fe715f`) — SiteThemeSnapshot model + snapshot-on-push + rollback/list.
+- ✅ **D1** push diff-preview (`69fe715f`) — `previewSharedThemePush` dry-run (per-site willChange + opt-out).
+- ✅ **W1** create additional workspace, plan-gated (`9107bb24`) — free=1, paid=multi.
+- ✅ **W2** roles + invite — ALREADY shipped (`team.service` + `team.ts`, admin-gated, Invite model). No new work.
+- ✅ **C1** component browser usage (`c6ae723f`) — `listWorkspaceComponents` "used on N sites".
+- ✅ **C3** safe-update blast-radius (`c6ae723f`) — `getComponentUsage` (shared with C1/D1).
+- ✅ **T3** agency curated library — ALREADY shipped (`user-template.service`, workspace-scoped). No new work.
+- ✅ **T4** clone-as-template (`56ca911b`) — workspace-private Template (additive `workspaceId`); gallery scoped.
+- ✅ **T2** gallery search + categories (`a44ad764` + pre-existing) — free-text search; preview render = UI.
+- ✅ **T1** save-selection-as-block — backend = existing `user-template` HTML store; T1 is an editor-UI affordance.
+Verification: dashboard tsc 0 · editor tsc 0 · 49/49 across 7 suites (theme 16, W1 4, C1/C3 4, T4/T2 6, + Phase-0 19).
+REMAINING (frontend, needs browser /qa): blast-radius modal (C3/D1), component browser UI (C1), rollback button (D2), multi-workspace switcher (W1), role/invite UI (W2), gallery preview+search box (T2), save-as-block affordance (T1). All ride the verified backends above.
+
 ## Implementation Tasks
 Synthesized from this review. P1 = blocks the phase; checkbox as you ship. Effort: human → CC-compressed.
 
