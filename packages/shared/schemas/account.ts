@@ -49,6 +49,11 @@ export const updateWorkspaceSchema = z.object({
   editsRequireApproval: z.boolean().optional(),
 });
 
+// W1: create an additional workspace (plan-gated server-side).
+export const createWorkspaceSchema = z.object({
+  name: z.string().min(2).max(60),
+});
+
 export const workspaceSharingSettingsSchema = z.object({
   defaultExpiration: z.string().nullable().optional(),
   requirePw: z.boolean().optional(),

@@ -1,6 +1,60 @@
 import { prisma } from "@/lib/prisma";
 import type { UpdateWorkspaceInput } from "@buildrik/shared/schemas/account";
 
+/** Thrown when a free user tries to create a 2nd workspace (W1 plan gate). */
+export class WorkspaceLimitError extends Error {
+  code = "WORKSPACE_LIMIT" as const;
+  constructor() {
+    super("Free plan is limited to one workspace. Upgrade to create more.");
+    this.name = "WorkspaceLimitError";
+  }
+}
+
+async function uniqueWorkspaceSlug(name: string): Promise<string> {
+  const base =
+    name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "workspace";
+  let slug = base;
+  for (let i = 1; i < 100; i++) {
+    const existing = await prisma.workspace.findUnique({ where: { slug }, select: { id: true } });
+    if (!existing) return slug;
+    slug = `${base}-${i}`;
+  }
+  return `${base}-${Date.now().toString(36)}`;
+}
+
+/**
+ * W1: create an ADDITIONAL workspace for an existing user. Plan-gated — free
+ * users get exactly one workspace (the signup one); creating more requires a paid
+ * plan on a workspace the user owns (multi-workspace is the Pro/agency feature,
+ * and it closes the per-workspace free site-cap bypass the eng review flagged).
+ * No onboardingState row here — that's per-user and already exists from signup.
+ */
+export async function createWorkspace(
+  userId: string,
+  name: string,
+): Promise<{ workspaceId: string; name: string; slug: string }> {
+  const owned = await prisma.workspaceMember.findMany({
+    where: { userId, role: "OWNER", status: "ACTIVE" },
+    select: { workspace: { select: { plan: true } } },
+  });
+  const hasPaid = owned.some(
+    (m) => m.workspace.plan === "PRO" || m.workspace.plan === "BUSINESS",
+  );
+  if (owned.length >= 1 && !hasPaid) {
+    throw new WorkspaceLimitError();
+  }
+
+  const slug = await uniqueWorkspaceSlug(name);
+  const ws = await prisma.$transaction(async (tx) => {
+    const created = await tx.workspace.create({ data: { name, slug, ownerId: userId } });
+    await tx.workspaceMember.create({
+      data: { userId, workspaceId: created.id, role: "OWNER" },
+    });
+    return created;
+  });
+  return { workspaceId: ws.id, name, slug };
+}
+
 export async function getWorkspaceSettings(workspaceId: string) {
   return prisma.workspace.findUnique({
     where: { id: workspaceId },

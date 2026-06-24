@@ -21,11 +21,11 @@ import {
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
-import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion, listUserWorkspaces } from "@/server/services/workspace-settings.service";
+import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion, listUserWorkspaces, createWorkspace, WorkspaceLimitError } from "@/server/services/workspace-settings.service";
 import { checkWorkspaceRole } from "@/server/services/permission.service";
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration, updateIntegration, sendIntegrationTestEvent } from "@/server/services/integrations.service";
-import { updateProfileSchema, changePasswordSchema, setPasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
+import { updateProfileSchema, changePasswordSchema, setPasswordSchema, changeEmailSchema, updateWorkspaceSchema, createWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema, deleteAccountSchema } from "@buildrik/shared/schemas/account";
 import { type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
@@ -134,6 +134,17 @@ export const accountRouter = router({
     // a6-workspace-select: the user's own workspaces, for the chooser.
     listMine: protectedProcedure.query(async ({ ctx }) => {
       return listUserWorkspaces(ctx.session.user.id);
+    }),
+    // W1: create an additional workspace. Plan-gated (free = 1 workspace).
+    create: protectedProcedure.input(createWorkspaceSchema).mutation(async ({ ctx, input }) => {
+      try {
+        return await createWorkspace(ctx.session.user.id, input.name);
+      } catch (e) {
+        if (e instanceof WorkspaceLimitError) {
+          throw new TRPCError({ code: "FORBIDDEN", message: e.message });
+        }
+        throw e;
+      }
     }),
     update: protectedProcedure.input(updateWorkspaceSchema).mutation(async ({ ctx, input }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
