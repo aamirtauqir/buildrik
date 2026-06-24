@@ -221,7 +221,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               display: "inline-flex",
               margin: "8px 12px 0",
               border: "1px solid var(--bd-border, #e5e7eb)",
-              borderRadius: 5,
+              borderRadius: 4,
               overflow: "hidden",
               alignSelf: "flex-start",
             }}

@@ -30,7 +30,9 @@ function BrandingDialog({
   onSave: (b: Branding) => void;
 }) {
   const [logoUrl, setLogoUrl] = useState(initial.logoUrl ?? "");
-  const [brandColor, setBrandColor] = useState(initial.brandColor ?? "#E42313");
+  // Default unset (not Buildrik's red) — a client's brand color is theirs to pick;
+  // render falls back to var(--color-primary) until set.
+  const [brandColor, setBrandColor] = useState(initial.brandColor ?? "");
   const [customDomain, setCustomDomain] = useState(initial.customDomain ?? "");
   const [hideBuildrik, setHideBuildrik] = useState(initial.hideBuildrik);
   const field = "mt-1 w-full rounded-lg border px-3 py-2 text-sm";

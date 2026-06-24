@@ -32,7 +32,7 @@
         "path": "src/themes/components/organisms/topbar.css",
         "line": 27,
         "severity": "important",
-        "message": "Selector \".bd-topbar__brand\" defined in 2 files: src/themes/components/organisms/topbar.css:27, src/themes/design-system/bd-topbar-overrides.css:70",
+        "message": "Selector \".bd-topbar__brand\" defined in 2 files: src/themes/components/organisms/topbar.css:27, src/themes/design-system/bd-topbar-overrides.css:86",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       }
     ]

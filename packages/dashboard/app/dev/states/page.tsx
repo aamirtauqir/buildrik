@@ -10,7 +10,7 @@ import {
 
 /**
  * Dev-only gallery for the E0 state primitives (E6 consumes these per-surface).
- * Visual check: red #E42313 accent on primary actions, Inter Tight, slate chrome,
+ * Visual check: red var(--color-primary) accent on primary actions, Inter Tight, slate chrome,
  * skeleton (no spinner), DESIGN.md-correct empty/error/denied. Route: /dev/states.
  */
 export default function StatesGalleryPage() {
@@ -21,7 +21,7 @@ export default function StatesGalleryPage() {
           State primitives (E0)
         </h1>
         <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-          Dashboard accent should be red <code>#E42313</code>, font Inter Tight.
+          Dashboard accent should be red <code>var(--color-primary)</code>, font Inter Tight.
         </p>
       </header>
 

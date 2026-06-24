@@ -19,7 +19,6 @@
     "packages/editor/src/editor/canvas/overlays/CanvasOverlayGroup.tsx",
     "packages/editor/src/editor/canvas/overlays/GridOverlay.tsx",
     "packages/editor/src/editor/canvas/overlays/MultiSelectBadge.tsx",
-    "packages/editor/src/editor/canvas/overlays/ParentHighlight.tsx",
     "packages/editor/src/editor/canvas/overlays/RemoteCursorsOverlay.tsx",
     "packages/editor/src/editor/canvas/overlays/RulersOverlay.tsx",
     "packages/editor/src/editor/canvas/overlays/SpacingLabels.tsx",

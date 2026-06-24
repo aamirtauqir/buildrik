@@ -209,6 +209,7 @@
   --bd-fg-warn: var(--buildrick-warning);
   --bd-text: var(--buildrick-text-primary);
   --bd-text-muted: var(--buildrick-text-muted);
+  --bd-text-secondary: var(--buildrick-text-secondary);
   --bd-text-subtle: var(--buildrick-text-muted);
 
   /* Semantic-status synonyms */

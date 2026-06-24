@@ -297,7 +297,7 @@ function injectBadge(html: string, show: boolean): string {
     `<a href="https://buildrik.com?ref=badge" target="_blank" rel="noopener" ` +
     `style="position:fixed;bottom:12px;right:12px;z-index:2147483647;` +
     `display:inline-flex;align-items:center;gap:6px;padding:6px 10px;` +
-    `background:#111;color:#fff;font:500 12px/1 -apple-system,system-ui,sans-serif;` +
+    `background:#111;color:#fff;font:500 12px/1 sans-serif;` +
     `border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.2)">` +
     `Made with Buildrik</a>`;
   if (html.includes("</body>")) return html.replace("</body>", `${badge}</body>`);
