@@ -46,9 +46,9 @@ vi.mock("@buildrik/shared/schemas/account", () => {
   const any = z.any();
   return {
     updateProfileSchema: any, changePasswordSchema: any, setPasswordSchema: any,
-    changeEmailSchema: any, updateWorkspaceSchema: any, workspaceSharingSettingsSchema: any,
-    addIntegrationSchema: any, notificationPrefSchema: any, updatePreferencesSchema: any,
-    deleteAccountSchema: any,
+    changeEmailSchema: any, updateWorkspaceSchema: any, createWorkspaceSchema: any,
+    workspaceSharingSettingsSchema: any, addIntegrationSchema: any, notificationPrefSchema: any,
+    updatePreferencesSchema: any, deleteAccountSchema: any,
   };
 });
 
