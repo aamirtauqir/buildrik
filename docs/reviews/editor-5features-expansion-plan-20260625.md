@@ -203,6 +203,16 @@ All 10 Phase-1 items' server/logic shipped + automated-verified (tsc + unit/inte
 Verification: dashboard tsc 0 · editor tsc 0 · 49/49 across 7 suites (theme 16, W1 4, C1/C3 4, T4/T2 6, + Phase-0 19).
 REMAINING (frontend, needs browser /qa): blast-radius modal (C3/D1), component browser UI (C1), rollback button (D2), multi-workspace switcher (W1), role/invite UI (W2), gallery preview+search box (T2), save-as-block affordance (T1). All ride the verified backends above.
 
+## Build status — Phase 2 (2026-06-25, autonomous build)
+4 of 6 shipped + verified; 2 held for review (concrete code-evidenced risk).
+- ✅ **W4** workspace audit log (`a332fc1e`) — `listWorkspaceActivity` paginated/filterable, ADMIN-gated. +3 tests.
+- ✅ **D4** agency brand presets (`98cdcb62`) — `WorkspacePreset` model; save/list/delete/apply. +5 tests.
+- ✅ **C2** master variant authoring (`7898215b`) — ComponentManager set-properties/add/update/remove variant. +6 tests.
+- ✅ **D3** visual token-binding — ALREADY existed (engine `TokenBindingResolver` + `PresetBindingRow`/`TokenUsageChip` UI + tests). No new work.
+- ⏸️ **C4 nested components HELD** — needs the inner master to stay LINKED (not flattened by `cloneWithNewIds`), i.e. a change to the EXACT component-sync hot path just fixed in F1a. Blind = regression risk to the override-survival fix. Do with a regression-guarded approach + review.
+- ⏸️ **W3 client portal HELD** — needs an EXTERNAL client to comment (ShareLink is read-only; comments require workspace membership). That's external write-auth = security-sensitive (threat-model + review before wiring an unauthenticated write endpoint).
+Verification: dashboard tsc 0 · editor tsc 0 · Phase-2 suites green (W4 3, D4 5, C2 6; theme total 21, components total 12).
+
 ## Implementation Tasks
 Synthesized from this review. P1 = blocks the phase; checkbox as you ship. Effort: human → CC-compressed.
 
