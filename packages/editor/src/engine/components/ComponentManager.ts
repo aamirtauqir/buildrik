@@ -16,6 +16,7 @@ import type {
   ComponentDefinition,
   ComponentInstance,
   ComponentManagerConfig,
+  ComponentVariant,
   VariantProperty,
   OverrideType,
 } from "../../shared/types/components";
@@ -249,6 +250,70 @@ export class ComponentManager {
       await syncAllInstances(this.composer, this.maps, id);
     }
 
+    return true;
+  }
+
+  // ============================================
+  // C2: Variant authoring (master-level CRUD)
+  // ============================================
+  // The engine already resolves variant styles at render (ComponentVariantResolver)
+  // and lets an instance SELECT a variant (updateInstanceVariant). C2 adds the
+  // missing half: authoring the variants + variant-properties ON the master.
+  // All persist via saveComponent and emit COMPONENT_UPDATED so open UIs refresh.
+
+  private async persistComponentEdit(
+    component: ComponentDefinition,
+    changedFields: string[],
+  ): Promise<void> {
+    component.updatedAt = Date.now();
+    await saveComponent(component, this.projectId);
+    this.composer.emit(EVENTS.COMPONENT_UPDATED, { component, changedFields });
+    this.composer.emit(EVENTS.COMPONENT_LIST_UPDATED, { components: this.getAllComponents() });
+  }
+
+  /** Define the variant axes (e.g. Size: [S,M,L], State: [Default,Hover]). */
+  async setVariantProperties(componentId: string, properties: VariantProperty[]): Promise<boolean> {
+    const component = this.components.get(componentId);
+    if (!component) return false;
+    component.variantProperties = properties;
+    await this.persistComponentEdit(component, ["variantProperties"]);
+    return true;
+  }
+
+  /** Add a variant (a property-value combination + its overrides) to a master. */
+  async addVariant(componentId: string, variant: ComponentVariant): Promise<boolean> {
+    const component = this.components.get(componentId);
+    if (!component) return false;
+    const variants = component.variants ?? [];
+    if (variants.some((v) => v.id === variant.id)) return false; // dup id
+    component.variants = [...variants, variant];
+    await this.persistComponentEdit(component, ["variants"]);
+    return true;
+  }
+
+  /** Patch an existing variant in place (name, propertyValues, overrides, ...). */
+  async updateVariant(
+    componentId: string,
+    variantId: string,
+    patch: Partial<Omit<ComponentVariant, "id">>,
+  ): Promise<boolean> {
+    const component = this.components.get(componentId);
+    if (!component?.variants) return false;
+    const idx = component.variants.findIndex((v) => v.id === variantId);
+    if (idx === -1) return false;
+    component.variants[idx] = { ...component.variants[idx], ...patch, id: variantId };
+    await this.persistComponentEdit(component, ["variants"]);
+    return true;
+  }
+
+  /** Remove a variant. Returns false if the master or variant is absent. */
+  async removeVariant(componentId: string, variantId: string): Promise<boolean> {
+    const component = this.components.get(componentId);
+    if (!component?.variants) return false;
+    const next = component.variants.filter((v) => v.id !== variantId);
+    if (next.length === component.variants.length) return false; // nothing removed
+    component.variants = next;
+    await this.persistComponentEdit(component, ["variants"]);
     return true;
   }
 
