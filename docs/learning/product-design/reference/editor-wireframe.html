@@ -90,6 +90,7 @@
     <a href="#inline-text">33 · Inline text edit</a>
     <a href="#image-editor">34 · Image editor</a>
     <a href="#stock">35 · Stock browser</a>
+    <a href="#icon-picker">35a · Icon picker</a>
     <a href="#ds-push">36 · Shared DS push ★</a>
     <a href="#custom-css">37 · Custom CSS</a>
     <a href="#my-templates">38 · My Templates</a>
@@ -472,37 +473,45 @@
   <section class="screen" id="inspector-full">
     <h2>12 · Inspector — full section list <span class="tag-list">right panel · J4 (covers Interactions + Animations)</span></h2>
     <p class="meta"><b>Job:</b> "Element ki har property control karo — bina dhoonde." · <b>Numayan:</b> active tab ke sections · <b>Dheema:</b> rare sections (advanced).</p>
-    <p class="mods"><b>Modules (3 tabs):</b> <b>Look</b> = Fill·Text·Border·Effects · <b>Layout</b> = Size·Spacing·Flex/Grid·Position·Visibility · <b>Advanced</b> = Variant·Interactions·Animation·Link·CSS-classes·Custom-CSS·Responsive.</p>
+    <p class="mods"><b>Modules (3 tabs):</b> <b>Look</b> = Fill·Text·Border·Shadow · <b>Layout</b> = Size·Spacing·Flex/Grid·Position·Visibility·Link·CSS-classes·Custom-CSS · <b>Effects</b> = Interactions·Animation. Source: <code>InspectorTabs.tsx</code> (tabs Look/Layout/Effects — not "Advanced").</p>
     <div class="wf">
       <div class="wf-row" style="gap:12px;align-items:flex-start;flex-wrap:wrap">
         <div class="wf-frame" style="max-width:230px">
           <div style="padding:10px">
-            <div class="wf-row" style="border-bottom:1px solid var(--wf-line);padding-bottom:6px"><span class="wf-pill wf-pill--on">Look</span><span class="wf-pill">Layout</span><span class="wf-pill">Adv</span><span class="wf-tag">1</span></div>
+            <div class="wf-row" style="border-bottom:1px solid var(--wf-line);padding-bottom:6px"><span class="wf-pill wf-pill--on">Look</span><span class="wf-pill">Layout</span><span class="wf-pill">Effects</span><span class="wf-tag">1</span></div>
             <div class="wf-stack" style="margin-top:8px">
               <div class="wf-box" style="padding:7px"><div class="wf-row wf-row--between"><div class="wf-label">Fill</div><span class="wf-icon"></span></div></div>
               <div class="wf-box" style="padding:7px"><div class="wf-label">Text</div></div>
               <div class="wf-box" style="padding:7px"><div class="wf-label">Border</div></div>
-              <div class="wf-box" style="padding:7px"><div class="wf-label">Effects</div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-label">Shadow</div></div>
             </div>
           </div>
         </div>
-        <div class="wf-frame" style="max-width:230px">
+        <div class="wf-frame" style="max-width:255px">
           <div style="padding:10px">
-            <div class="wf-row" style="border-bottom:1px solid var(--wf-line);padding-bottom:6px"><span class="wf-pill">Look</span><span class="wf-pill">Layout</span><span class="wf-pill wf-pill--on">Adv</span><span class="wf-tag">2</span></div>
+            <div class="wf-row" style="border-bottom:1px solid var(--wf-line);padding-bottom:6px"><span class="wf-pill">Look</span><span class="wf-pill">Layout</span><span class="wf-pill wf-pill--on">Effects</span><span class="wf-tag">2</span></div>
             <div class="wf-stack" style="margin-top:8px">
-              <div class="wf-box" style="padding:7px"><div class="wf-label">⚡ Interactions (13 triggers)</div></div>
-              <div class="wf-box" style="padding:7px"><div class="wf-label">▶ Animation</div></div>
-              <div class="wf-box" style="padding:7px"><div class="wf-label">🔗 Link</div></div>
-              <div class="wf-box" style="padding:7px"><div class="wf-label">CSS classes</div></div>
-              <div class="wf-box wf-box--ghost" style="padding:7px;border-style:dashed"><div class="wf-label">{} Custom CSS · Pro</div></div>
+              <div class="wf-box wf-box--2" style="padding:7px;border-color:var(--wf-ink)">
+                <div class="wf-label">⚡ Interactions</div>
+                <div class="wf-box" style="margin-top:6px;padding:6px"><span class="tag-list">When ▾ · click · hover · focus · blur · page-load · scroll-in · scroll-out</span></div>
+                <div class="wf-box" style="margin-top:4px;padding:6px"><span class="tag-list">Then ▾ · action + target</span></div>
+                <span class="tag-list" style="margin-top:4px;display:inline-block">7 triggers (not 13) <span class="wf-tag">3</span></span>
+              </div>
+              <div class="wf-box wf-box--2" style="padding:7px;margin-top:6px;border-color:var(--wf-ink)">
+                <div class="wf-label">▶ Animation</div>
+                <div class="wf-box" style="margin-top:6px;padding:6px"><span class="tag-list">Preset ▾ · fade · slide · bounce</span></div>
+                <div class="wf-row" style="margin-top:4px;gap:6px"><span class="wf-box wf-grow" style="padding:5px"><span class="tag-list">duration</span></span><span class="wf-box wf-grow" style="padding:5px"><span class="tag-list">delay</span></span></div>
+                <span class="tag-list" style="margin-top:4px;display:inline-block;color:var(--bad)">🟡 native ScrollTrigger removed</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <p class="tag-list" style="margin-top:6px">Layout tab also holds Link · CSS-classes · {} Custom-CSS (Pro, dev-only — see <a href="#custom-css">§37</a>).</p>
       <ol class="wf-why">
-        <li><span class="wf-tag">1</span><strong>Job-named tabs, not CSS-named.</strong> "Look / Layout / Advanced" — designer-speak ("typography/box-model") nahi (#1). Aam sections (Fill/Text) Look mein saamne.</li>
-        <li><span class="wf-tag">2</span><strong>Interactions + Animations = Advanced tab.</strong> Powerful par rare → teesre tab mein, frame ke andar dock (#15 · #9). Custom CSS Pro-gated, sabse neeche dashed.</li>
-        <li><strong>Frame fixed.</strong> Header→reach→tabs→sections order har element same; naye property-types neeche sections mein dock, frame nahi badalta (#15).</li>
+        <li><span class="wf-tag">1</span><strong>Job-named tabs, not CSS-named.</strong> Real tabs = <strong>Look / Layout / Effects</strong> (<code>InspectorTabs.tsx</code>) — designer-speak nahi (#1). Earlier draft said "Advanced"; corrected.</li>
+        <li><span class="wf-tag">2</span><strong>Interactions + Animation get real treatment.</strong> Not one-line rows — each is a module: Interactions = When→Then (trigger→action), Animation = preset + timing. Both live in the <strong>Effects</strong> tab (#15 · #9).</li>
+        <li><span class="wf-tag">3</span><strong>Honest counts.</strong> 7 real triggers (click·hover·focus·blur·page-load·scroll-in·scroll-out), not "13" (<code>interactions/types.ts</code>). Animation is preset CSS — native GSAP ScrollTrigger removed (🟡), flagged not faked (#3).</li>
       </ol>
     </div>
   </section>
@@ -1013,9 +1022,9 @@
 
   <!-- 32 CANVAS CONTROLS -->
   <section class="screen" id="canvas-controls">
-    <h2>32 · Canvas controls <span class="tag-list">on-canvas overlay · ✅ (≠ canvas toolbar §0)</span></h2>
+    <h2>32 · Canvas controls <span class="tag-list">on-canvas overlay · ✅ select/resize/drag/group · ⚠️ edit-scope picker NOT built</span></h2>
     <p class="meta"><b>Job:</b> "Element select / resize / move / group." · <b>Numayan:</b> selection + handles · <b>Dheema:</b> group, scope.</p>
-    <p class="mods"><b>Modules:</b> selection box + corner resize handles · drag-move (✛) · group/ungroup · <b>edit-scope picker</b> (this element vs component master) · multi-select · appears only on select (#6).</p>
+    <p class="mods"><b>Modules:</b> selection box + corner resize handles · drag-move (✛) · group/ungroup · multi-select · appears only on select (#6). <em>An on-canvas edit-scope picker (instance vs master) is drawn as a target but NOT built — see #3.</em></p>
     <div class="wf">
       <div class="wf-frame" style="max-width:380px">
         <div style="padding:16px">
@@ -1027,15 +1036,15 @@
             <span class="wf-pill" style="position:absolute;bottom:-9px;left:-9px;padding:0 4px">▢</span>
             <span class="tag-list" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">✛ drag</span>
             <div class="wf-line w-50"></div>
-            <div class="wf-row" style="position:absolute;top:-30px;left:0;gap:6px"><span class="wf-pill">Group</span><span class="wf-pill wf-pill--solid">This element ▾ <span class="wf-tag">3</span></span></div>
+            <div class="wf-row" style="position:absolute;top:-30px;left:0;gap:6px"><span class="wf-pill">Group</span><span class="wf-pill" style="border-style:dashed;opacity:.55">This element ▾ ⚠️ not built <span class="wf-tag">3</span></span></div>
           </div>
-          <div class="wf-row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">states →</span><span class="wf-pill">single <span class="wf-tag">2</span></span><span class="wf-pill">multi (2)</span><span class="wf-pill" style="opacity:.7">instance → edit master?</span></div>
+          <div class="wf-row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">states →</span><span class="wf-pill">single <span class="wf-tag">2</span></span><span class="wf-pill">multi (2)</span><span class="wf-pill" style="border-style:dashed;opacity:.5">instance → edit master? ⚠️ target</span></div>
         </div>
       </div>
       <ol class="wf-why">
         <li><span class="wf-tag">1</span><strong>Chrome only on select.</strong> Rest pe canvas saaf (#6 calm); handles + toolbar tabhi jab element chuna — content hero.</li>
         <li><span class="wf-tag">2</span><strong>Single + multi drawn.</strong> Single · multi-select (2) — dono states visible (#13). Controls element ke upar (#16).</li>
-        <li><span class="wf-tag">3</span><strong>Edit-scope picker = safety.</strong> "This element ▾" vs "Edit master" — component instance galti se master change na ho (#5 error-prevention). Yeh CMS/components (§10–11) ka on-canvas guard.</li>
+        <li><span class="wf-tag">3</span><strong>⚠️ Edit-scope picker = target, NOT built.</strong> Drawn as the safety guard ("This element ▾" vs "Edit master") so an instance edit doesn't clobber its master (#5). Reality: no on-canvas instance/master picker exists — the only <code>scope</code> code is the AI-scope chip (<code>ai/ScopeChip.tsx</code>), a different concept. So today nothing guards canvas instance edits; this stays a redesign target (#3 honesty).</li>
       </ol>
     </div>
   </section>
@@ -1103,6 +1112,29 @@
         <li><span class="wf-tag">1</span><strong>Now shipped (was stub).</strong> Pehle <code>[]</code> return (🔵) → ab Unsplash/Pexels wired (✅), par env-gated. Grid real results dikha sakta.</li>
         <li><span class="wf-tag">2</span><strong>No-key gate honest.</strong> Key na ho → setup prompt, fake/empty grid nahi (#3). Yeh exactly woh trap jo redesign theek karta — stub ko hero space nahi (purana #3).</li>
         <li><span class="wf-tag">3</span><strong>Loading + empty drawn.</strong> Searching… + no-results — network states visible (#13).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 35a ICON PICKER -->
+  <section class="screen" id="icon-picker">
+    <h2>35a · Icon picker <span class="tag-list">Media/Insert modal · ✅ (local icon set)</span></h2>
+    <p class="meta"><b>Job:</b> "Ek icon dhoondo + canvas par daalo." · <b>Numayan:</b> search + grid · <b>Dheema:</b> categories.</p>
+    <p class="mods"><b>Modules:</b> search box · icon grid (local set) · click → insert into canvas. Modal, opened from Media / Insert. Source: <code>IconPickerModal.tsx</code> (hardcoded-local, no API key).</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:320px">
+        <div style="padding:12px">
+          <div class="wf-box wf-box--2" style="padding:7px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><span class="wf-label" style="color:var(--muted)">Search icons… <span class="wf-tag">1</span></span><span class="tag-list">⌕</span></div></div>
+          <div class="wf-row" style="margin-top:8px;gap:6px;flex-wrap:wrap">
+            <span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span>
+            <span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span>
+          </div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:6px;border-style:dashed;text-align:center"><span class="tag-list"><span class="wf-tag">2</span>no match → "No icons found"</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Search-first.</strong> Icon set bada → recall nahi, search se filter (#1). Click = insert, ek step.</li>
+        <li><span class="wf-tag">2</span><strong>Local set, no key.</strong> Icons hardcoded-local (works offline, no API) — empty-search state drawn (#13). Earlier draft mein yeh surface gayab thi; ab Media modals (§34 image · §35 stock) ke saath.</li>
       </ol>
     </div>
   </section>
