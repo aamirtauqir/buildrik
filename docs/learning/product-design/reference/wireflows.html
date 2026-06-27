@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buildrik — Wireflows (job journeys, not a panel list)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<link rel="stylesheet" href="../assets/wireframe.css">
+<style>
+  :root{--maxw:1180px}
+  .sub{color:var(--muted);font-size:15px;margin:-2px 0 14px}
+  .why-this{border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:14px 0 24px;font-size:14px}
+  .why-this b{color:var(--accent)}
+
+  /* one job journey */
+  .flow{border:1px solid var(--rule);border-radius:12px;padding:18px 18px 12px;margin:26px 0}
+  .flow > h2{font-size:18px;margin:0 0 2px;display:flex;align-items:baseline;gap:10px}
+  .flow > h2 .jn{font:700 13px/1 var(--wf-mono);color:#fff;background:var(--accent);border-radius:999px;padding:4px 9px}
+  .flow .jmeta{font-size:13px;color:var(--muted);margin:0 0 14px}
+  .flow .jmeta b{color:#52525b}
+
+  /* the left-to-right storyboard */
+  .track{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:2px 0 12px}
+  .step{flex:0 0 232px;display:flex;flex-direction:column}
+  .arrow{flex:0 0 30px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:22px;font-weight:700}
+  .step-n{font-size:12px;font-weight:700;color:#3f3f46;margin:0 0 6px;display:flex;align-items:center;gap:7px;min-height:30px}
+  .step-n .sb{font:700 11px/1 var(--wf-mono);color:#fff;background:#3f3f46;border-radius:999px;width:18px;height:18px;display:inline-grid;place-items:center;flex:0 0 auto}
+  .step-n.is-hero .sb{background:var(--accent)}
+  .step-cap{font-size:12.5px;line-height:1.5;color:#52525b;margin-top:9px}
+  .step-cap b{color:var(--accent);font-weight:650}
+  .step-cap .ref{color:var(--faint);font-family:var(--wf-mono);font-size:11px}
+
+  /* the mini editor snapshot inside each step */
+  .step-frame{border:1.5px solid var(--wf-ink);border-radius:7px;background:#fff;overflow:hidden;height:158px}
+  .mini{display:grid;grid-template-rows:15px 1fr;height:100%;font-family:var(--wf-mono);font-size:8px;color:var(--wf-ink)}
+  .mini__bar{border-bottom:1px solid var(--wf-line);display:flex;align-items:center;gap:3px;padding:0 5px;background:#fff}
+  .mp{height:8px;border:1px solid var(--wf-line);border-radius:999px;background:var(--wf-fill);width:20px}
+  .mp--solid{background:var(--wf-solid);border-color:var(--wf-solid);width:30px}
+  .mp--ghost{background:transparent}
+  .g{flex:1 1 auto}
+  .mini__body{display:grid;grid-template-columns:20px 1fr 40px;min-height:0}
+  .mini__rail{border-right:1px solid var(--wf-line);display:flex;flex-direction:column;align-items:center;gap:5px;padding:5px 0;background:var(--wf-fill)}
+  .rd{width:11px;height:11px;border:1px solid var(--wf-line);border-radius:3px;background:#fff}
+  .rd--on{background:var(--wf-solid);border-color:var(--wf-solid)}
+  .mini__mid{min-width:0;display:flex;flex-direction:column}
+  .mini__insp{border-left:1px solid var(--wf-line);padding:5px 4px;display:flex;flex-direction:column;gap:4px;background:#fff}
+  .ln{height:5px;border-radius:2px;background:var(--wf-line)}
+  .ln--ink{background:var(--wf-ink)}
+  .ln--blue{background:var(--accent)}
+  .hot{box-shadow:inset 0 0 0 2px var(--accent);border-radius:3px}
+  .tag-mini{position:absolute;font:700 9px/1 var(--wf-mono);color:#fff;background:var(--accent);border-radius:999px;padding:2px 5px}
+
+  .flow-why{font-size:13px;color:#52525b;margin:8px 0 0;padding-top:10px;border-top:1px solid var(--rule)}
+  .flow-why b{color:var(--ink)}
+  .coming{border:1px dashed var(--rule);border-radius:10px;padding:16px;margin:24px 0;color:var(--muted);font-size:14px}
+  .coming b{color:var(--ink)}
+  @media(max-width:620px){.track{padding-bottom:16px}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Wireflows · job journeys · 2026-06-26</p>
+  <h1>The editor as journeys, not a list of panels.</h1>
+  <p class="sub">Job-to-be-done first: each screen earns its place inside a <em>journey the user moves through</em>, left to right. Panels (Insert, Inspector, Pages…) are the <em>blocks</em> a flow uses — not the top-level spine.</p>
+
+  <div class="why-this">
+    <b>The journey is the unit.</b> Each screen earns its place inside a flow the user moves through — not as a standalone panel. The 41 per-surface specs live in the <a href="editor-wireframe.html">surface appendix</a>; they're the <em>blocks</em> these journeys pass through, not the top-level structure. Read the flows first; drop into a §N when you need a panel's detail.
+  </div>
+
+  <!-- ============================================================ FLOW 1 -->
+  <div class="flow">
+    <h2><span class="jn">J1</span> Make a page</h2>
+    <p class="jmeta"><b>User:</b> agency builder, empty page. <b>Done when:</b> a real section is on the canvas, styled, saved. <b>The job pulls toward one thing:</b> get <em>content</em> onto an empty canvas fast — so every step's hero is "the next move," and the chrome stays quiet until the user needs it.</p>
+
+    <div class="track">
+
+      <!-- step 1 -->
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Editor khulta</div>
+        <div class="step-frame">
+          <div class="mini">
+            <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--ghost"></span><span class="mp mp--solid"></span></div>
+            <div class="mini__body">
+              <div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+              <div class="mini__mid" style="align-items:center;justify-content:center;color:var(--faint)">
+                <div class="hot" style="border:1px dashed var(--accent);padding:8px 12px;text-align:center;color:var(--accent);font-weight:700">＋<br>add section</div>
+              </div>
+              <div class="mini__insp" style="opacity:.4"></div>
+            </div>
+          </div>
+        </div>
+        <div class="step-cap"><b>Karta:</b> <code>/edit/:id</code> kholta. <b>Dikhta:</b> khaali canvas + ek hi prompt "add section". Baaki sab dheema — pehla kaam saaf. <span class="ref">→ <a href="editor-wireframe.html#shell">§0 shell</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 2 -->
+      <div class="step">
+        <div class="step-n"><span class="sb">2</span> Insert se section chunta</div>
+        <div class="step-frame">
+          <div class="mini">
+            <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--ghost"></span><span class="mp mp--solid"></span></div>
+            <div class="mini__body">
+              <div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+              <div class="mini__mid hot" style="padding:5px;gap:4px;display:flex;flex-direction:column;background:var(--wf-fill)">
+                <div class="ln ln--ink" style="width:55%"></div>
+                <div style="height:24px;border:1px solid var(--wf-line);border-radius:3px;background:#fff"></div>
+                <div style="height:24px;border:1.5px solid var(--accent);border-radius:3px;background:#fff;position:relative"><span class="tag-mini" style="right:3px;top:3px">grab</span></div>
+                <div style="height:24px;border:1px solid var(--wf-line);border-radius:3px;background:#fff"></div>
+              </div>
+              <div class="mini__insp" style="opacity:.4"></div>
+            </div>
+          </div>
+        </div>
+        <div class="step-cap"><b>Karta:</b> rail #1 Insert → drawer khulta → "Hero" section pakadta. <b>Dikhta:</b> sections ki list, ek grab ho rahi. <span class="ref">→ <a href="editor-wireframe.html#insert">§1 Insert</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 3 -->
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Canvas pe girta</div>
+        <div class="step-frame">
+          <div class="mini">
+            <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--ghost"></span><span class="mp mp--solid"></span></div>
+            <div class="mini__body">
+              <div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+              <div class="mini__mid hot" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+                <div class="ln ln--ink" style="width:60%;height:7px"></div>
+                <div style="height:34px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div>
+                <div class="ln" style="width:90%"></div><div class="ln" style="width:70%"></div>
+              </div>
+              <div class="mini__insp" style="opacity:.4"></div>
+            </div>
+          </div>
+        </div>
+        <div class="step-cap"><b>Karta:</b> chhodta. <b>Dikhta:</b> Hero canvas pe aa gaya — heading + image + text. Khaali se content. <span class="ref">→ <a href="editor-wireframe.html#canvas-controls">§30 canvas</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 4 -->
+      <div class="step">
+        <div class="step-n"><span class="sb">4</span> Text seedha likhta</div>
+        <div class="step-frame">
+          <div class="mini">
+            <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--ghost"></span><span class="mp mp--solid"></span></div>
+            <div class="mini__body">
+              <div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+              <div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+                <div class="hot" style="position:relative;padding:2px"><div style="position:absolute;top:-13px;left:0;display:flex;gap:2px"><span style="font:700 7px/1 var(--wf-mono);background:var(--accent);color:#fff;padding:2px 3px;border-radius:2px">B</span><span style="font:700 7px/1 var(--wf-mono);background:#fff;border:1px solid var(--wf-line);padding:2px 3px;border-radius:2px">✨</span></div><div class="ln ln--ink" style="width:65%;height:7px"></div></div>
+                <div style="height:34px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div>
+                <div class="ln" style="width:90%"></div>
+              </div>
+              <div class="mini__insp" style="opacity:.4"></div>
+            </div>
+          </div>
+        </div>
+        <div class="step-cap"><b>Karta:</b> heading pe click → type karta (canvas pe, jagah pe). <b>Dikhta:</b> cursor + floating B/I/✨ bar. <span class="ref">→ <a href="editor-wireframe.html#inline-text">§31 inline-text</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 5 -->
+      <div class="step">
+        <div class="step-n"><span class="sb">5</span> Inspector se style</div>
+        <div class="step-frame">
+          <div class="mini">
+            <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--ghost"></span><span class="mp mp--solid"></span></div>
+            <div class="mini__body">
+              <div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+              <div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+                <div style="border:1.5px solid var(--accent);border-radius:3px;padding:3px"><div class="ln ln--ink" style="width:65%;height:7px"></div></div>
+                <div style="height:30px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div>
+              </div>
+              <div class="mini__insp hot" style="opacity:1">
+                <div class="ln ln--blue" style="width:80%"></div>
+                <div class="ln" style="width:60%"></div>
+                <div class="ln" style="width:90%"></div>
+                <div class="ln" style="width:50%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step-cap"><b>Karta:</b> element selected → inspector mein color/size badalta. <b>Dikhta:</b> "You are editing this" + controls. <span class="ref">→ <a href="editor-wireframe.html#inspector">§5 inspector</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 6 -->
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">6</span> Save + preview</div>
+        <div class="step-frame">
+          <div class="mini">
+            <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">● saved</span><span class="mp mp--ghost hot" style="width:30px;border-color:var(--accent)"></span></div>
+            <div class="mini__body" style="grid-template-columns:20px 1fr">
+              <div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+              <div class="mini__mid" style="padding:7px;gap:4px;display:flex;flex-direction:column;background:#fff">
+                <div class="ln ln--ink" style="width:55%;height:7px"></div>
+                <div style="height:36px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div>
+                <div class="ln" style="width:88%"></div><div class="ln" style="width:66%"></div>
+                <div style="width:34px;height:11px;background:var(--wf-solid);border-radius:3px;margin-top:2px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step-cap"><b>Karta:</b> kuch nahi — auto-save. Preview ▸ daba ke client-view dekhta. <b>Dikhta:</b> "saved" + saaf page. Page ban gaya. <span class="ref">→ <a href="editor-wireframe.html#preview">§15 preview</a></span></div>
+      </div>
+
+    </div>
+
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> job ("page banao") ne <em>sequence</em> decide ki — pehla step "add" (khaali → content), aakhri "preview/save" (kaam done). Panels (Insert §1, Canvas §32, Inline-text §33, Inspector §5, Preview §15) flow ke <em>andar</em> aaye, blocks ki tarah — top-level spine ki tarah nahi. Yehi "job-first, THEN blocks" (L17): job sequence chalata, panels uske blocks.</p>
+  </div>
+
+  <!-- ============================================================ FLOW 2 -->
+  <div class="flow">
+    <h2><span class="jn">J2</span> Make it on-brand</h2>
+    <p class="jmeta"><b>User:</b> builder who changed one thing and wants it everywhere. <b>Done when:</b> a change is consistent across the whole site. <b>The job pulls toward:</b> change once, apply widely — so the hero of every step is <em>reach</em> (this → all → site), the cure for inconsistent "AI-slop" pages.</p>
+    <div class="track">
+
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Ek element badalta</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd"></span><span class="rd"></span><span class="rd"></span><span class="rd rd--on"></span></div>
+            <div class="mini__mid" style="padding:6px"><div style="width:40px;height:13px;background:var(--wf-solid);border:1.5px solid var(--accent);border-radius:3px"></div></div>
+            <div class="mini__insp hot"><div class="ln ln--blue" style="width:80%"></div><div class="ln" style="width:55%"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> ek button ka color badalta. <b>Dikhta:</b> sirf <em>yeh</em> element badla. <span class="ref">→ <a href="editor-wireframe.html#inspector">§5 inspector</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">2</span> "All like this" reach</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd"></span><span class="rd"></span><span class="rd"></span><span class="rd rd--on"></span></div>
+            <div class="mini__mid" style="padding:6px;gap:6px;display:flex;flex-direction:column"><div style="width:40px;height:11px;background:var(--accent);border-radius:3px"></div><div style="width:40px;height:11px;background:var(--accent);border-radius:3px"></div><div style="width:40px;height:11px;background:var(--accent);border-radius:3px"></div></div>
+            <div class="mini__insp"><div class="hot" style="display:flex;flex-direction:column;gap:2px"><span style="font:700 6px/1 var(--wf-mono);background:#fff;border:1px solid var(--wf-line);border-radius:2px;padding:2px;text-align:center">This</span><span style="font:700 6px/1 var(--wf-mono);background:var(--accent);color:#fff;border-radius:2px;padding:2px;text-align:center">All like</span><span style="font:700 6px/1 var(--wf-mono);background:#fff;border:1px solid var(--wf-line);border-radius:2px;padding:2px;text-align:center">Site</span></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> reach "All like this" pe badhata. <b>Dikhta:</b> saare buttons ek saath badle — recognition, na ki "selector specificity." <span class="ref">→ <a href="editor-wireframe.html#inspector-full">§12 inspector-full</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Brand: site token</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd"></span><span class="rd"></span><span class="rd"></span><span class="rd rd--on"></span></div>
+            <div class="mini__mid hot" style="padding:6px;display:flex;gap:4px;flex-wrap:wrap;align-content:flex-start"><span style="width:14px;height:14px;border-radius:3px;background:var(--accent);outline:2px solid var(--accent);outline-offset:1px"></span><span style="width:14px;height:14px;border-radius:3px;background:#3f3f46"></span><span style="width:14px;height:14px;border-radius:3px;background:var(--wf-line)"></span><div class="ln" style="width:90%;margin-top:3px"></div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> Design/Brand panel → accent token khud badalta. <b>Dikhta:</b> ek jagah = sabka source. <span class="ref">→ <a href="editor-wireframe.html#design">§4 Brand</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">4</span> Poori site ripple</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd"></span><span class="rd"></span><span class="rd"></span><span class="rd rd--on"></span></div>
+            <div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column"><div class="ln ln--blue" style="width:55%;height:7px"></div><div style="height:18px;border:1px solid var(--accent);border-radius:3px"></div><div class="ln ln--blue" style="width:70%"></div><div style="width:28px;height:10px;background:var(--accent);border-radius:3px"></div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> kuch nahi. <b>Dikhta:</b> token change har jagah ripple — headings, links, CTA sab naye accent pe. <span class="ref">→ <a href="editor-wireframe.html#design">§4 Brand</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">5</span> Consistent preview</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">✓</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;gap:5px;display:flex;flex-direction:column"><div class="ln ln--blue" style="width:50%;height:7px"></div><div style="height:24px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div><div class="ln" style="width:85%"></div><div style="width:30px;height:11px;background:var(--accent);border-radius:3px"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> preview. <b>Dikhta:</b> poori site ek brand pe — yeh "AI-slop" ka ilaaj (consistency). <span class="ref">→ <a href="editor-wireframe.html#preview">§15 preview</a></span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> job ("ek baar badlo, har jagah lago") ne reach ko hero banaya — this → all → site. Brand-merge (tokens+styles+components, §4) flow ke andar ek block; consistency ka source. Yehi dedup/"one home" lever, sequence mein dikhta.</p>
+  </div>
+
+  <!-- ============================================================ FLOW 3 -->
+  <div class="flow">
+    <h2><span class="jn">J3</span> Structure content (CMS)</h2>
+    <p class="jmeta"><b>User:</b> builder with many similar pages (blog, products). <b>Done when:</b> one template feeds many records into many live pages. <b>The job pulls toward:</b> define once, repeat with data — so the spine is collection → record → bind → generate.</p>
+    <div class="track">
+
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Collection banata</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+            <div class="mini__mid hot" style="padding:6px;gap:4px;display:flex;flex-direction:column"><div class="ln ln--ink" style="width:50%"></div><div style="border:1px dashed var(--accent);border-radius:3px;padding:4px;text-align:center;color:var(--accent);font:700 7px/1 var(--wf-mono)">＋ Blog</div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> CMS → "+ New collection" → "Blog". <b>Dikhta:</b> khaali collection, progressive. <span class="ref">→ <a href="editor-wireframe.html#cms">§10 CMS</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">2</span> Fields add</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+            <div class="mini__mid hot" style="padding:6px;gap:4px;display:flex;flex-direction:column"><div style="display:flex;gap:3px;align-items:center"><span class="rd" style="width:8px;height:8px"></span><div class="ln" style="width:50%"></div></div><div style="display:flex;gap:3px;align-items:center"><span class="rd" style="width:8px;height:8px"></span><div class="ln" style="width:40%"></div></div><div style="display:flex;gap:3px;align-items:center"><span class="rd" style="width:8px;height:8px"></span><div class="ln" style="width:60%"></div></div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> fields banata: title · image · body. <b>Dikhta:</b> collection ka shape. <span class="ref">→ <a href="editor-wireframe.html#cms">§10 CMS</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Records bharta</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+            <div class="mini__mid hot" style="padding:5px;gap:3px;display:flex;flex-direction:column"><div style="height:13px;border:1px solid var(--wf-line);border-radius:2px;background:#fff"></div><div style="height:13px;border:1px solid var(--wf-line);border-radius:2px;background:#fff"></div><div style="height:13px;border:1px solid var(--wf-line);border-radius:2px;background:#fff"></div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> 3 posts add karta. <b>Dikhta:</b> records ki list. <span class="ref">→ <a href="editor-wireframe.html#cms">§10 CMS</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">4</span> Element pe bind</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+            <div class="mini__mid" style="padding:6px"><div style="border:1.5px solid var(--accent);border-radius:3px;padding:3px;position:relative"><div class="ln ln--ink" style="width:60%;height:7px"></div><div style="position:absolute;bottom:-11px;left:0;font:700 6px/1 var(--wf-mono);background:var(--accent);color:#fff;padding:2px 3px;border-radius:2px">= post.title</div></div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> heading ko field se bind karta ("= post.title"). <b>Dikhta:</b> ek element, data ka. <span class="ref">→ <a href="editor-wireframe.html#components">§11 components</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">5</span> Dynamic pages</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">×3</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:7px;position:relative"><div style="border:1px solid var(--wf-line);border-radius:3px;height:40px;background:#fff"></div><div style="border:1px solid var(--wf-line);border-radius:3px;height:40px;background:#fff;position:absolute;top:11px;left:11px;right:3px"></div><div style="border:1.5px solid var(--accent);border-radius:3px;height:40px;background:#fff;position:absolute;top:15px;left:15px;right:6px"><div class="ln ln--blue" style="width:50%;margin:5px"></div></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> kuch nahi. <b>Dikhta:</b> ek template → 3 live pages, har post ka apna. <span class="ref">→ <a href="editor-wireframe.html#cms">§10 CMS</a></span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> job ("define once, repeat with data") = collection→record→bind→generate. Yeh asal CMS *flow* hai — na ki sirf "CMS panel" ka spec. Entry-point (rail progressive) + bind affordance flow mein resolve hote.</p>
+  </div>
+
+  <!-- ============================================================ FLOW 4 -->
+  <div class="flow">
+    <h2><span class="jn">J4</span> Get sign-off <span style="font:600 11px/1 var(--wf-mono);color:var(--accent);align-self:center">★ agency loop</span></h2>
+    <p class="jmeta"><b>User:</b> agency sending work to a client. <b>Done when:</b> client feedback is captured, resolved, and re-shared — without leaving the tool. <b>The job pulls toward:</b> a round-trip (send → comment → resolve → resend), the agency's core differentiator.</p>
+    <div class="track">
+
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Preview as client</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:center"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">client view</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;gap:5px;display:flex;flex-direction:column"><div class="ln ln--ink" style="width:50%;height:7px"></div><div style="height:26px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div><div class="ln" style="width:85%"></div><div class="ln" style="width:65%"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> Preview ▸ "as client" kholta. <b>Dikhta:</b> saaf page, koi editor-chrome nahi. <span class="ref">→ <a href="editor-wireframe.html#preview">§15 preview</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">2</span> Request review → send</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:7px;gap:5px;display:flex;flex-direction:column"><div class="ln ln--ink" style="width:45%"></div><div class="ln" style="width:80%"></div><div class="ln" style="width:60%"></div><div style="width:46px;height:13px;background:var(--wf-solid);border-radius:3px;margin-top:2px"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> change-summary likhta → Send. <b>Dikhta:</b> client ko link + email jaata (woh missing trigger). <span class="ref">→ <a href="editor-wireframe.html#request-review">§16 request-review</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Client comment pins</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:center"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">client · comment</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;position:relative"><div style="height:26px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div><span style="position:absolute;top:6px;left:40px;width:13px;height:13px;background:var(--accent);color:#fff;border-radius:999px;font:700 8px/13px var(--wf-mono);text-align:center">1</span><span style="position:absolute;top:34px;left:18px;width:13px;height:13px;background:var(--accent);color:#fff;border-radius:999px;font:700 8px/13px var(--wf-mono);text-align:center">2</span></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> client page pe pins lagata, likhta. <b>Dikhta:</b> canvas pe comment dots + threads. <span class="ref">→ <a href="editor-wireframe.html#comments">§17 comments</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">4</span> Agency resolve</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr 44px"><div class="mini__mid" style="padding:8px;position:relative"><div style="height:26px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div><span style="position:absolute;top:6px;left:40px;width:13px;height:13px;background:var(--wf-line);color:#fff;border-radius:999px;font:700 8px/13px var(--wf-mono);text-align:center">✓</span></div><div class="mini__insp hot"><div class="ln" style="width:90%"></div><div style="width:30px;height:9px;background:var(--accent);border-radius:2px"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> comment fix karta → Resolve. <b>Dikhta:</b> pin ✓ ho jaata, thread band. <span class="ref">→ <a href="editor-wireframe.html#comments">§17 comments</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">5</span> Re-share / approved</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">approved</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;gap:5px;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font:700 13px/1 var(--wf-mono);color:var(--accent)">✓</span><div class="ln" style="width:60%"></div><div style="width:44px;height:12px;background:var(--wf-solid);border-radius:3px"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> resolved → dobara share / approve. <b>Dikhta:</b> loop band — koi dead-end nahi. <span class="ref">→ <a href="editor-wireframe.html#share">§18 share</a></span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> sign-off ek <em>round-trip</em> hai, alag screens nahi — send→comment→resolve→resend. Yeh agency differentiator; isiliye iska flow poora hona zaroori (sirf "comments panel" spec kaafi nahi). ⚠️ Reality-check (2026-06-28): comments + share-gate dono DASHBOARD mein shipped (share = real bcrypt gate) — editor mein abhi nahi. Redesign = round-trip ko editor ke andar laana.</p>
+  </div>
+
+  <!-- ============================================================ FLOW 5 -->
+  <div class="flow">
+    <h2><span class="jn">J5</span> Ship it</h2>
+    <p class="jmeta"><b>User:</b> builder ready to go live. <b>Done when:</b> the site is published at a real URL, recoverable if wrong. <b>The job pulls toward one button:</b> Publish is the hero; SEO/domain are the setup before it, status + restore are the safety after.</p>
+    <div class="track">
+
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> SEO set</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid hot" style="padding:7px;gap:4px;display:flex;flex-direction:column"><div class="ln ln--ink" style="width:40%"></div><div style="height:11px;border:1px solid var(--wf-line);border-radius:2px"></div><div class="ln ln--blue" style="width:55%;height:4px"></div><div class="ln" style="width:75%;height:4px;background:#0D9488"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> title + description likhta. <b>Dikhta:</b> live Google search-preview + char-count. <span class="ref">→ <a href="editor-wireframe.html#seo">§19 SEO</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">2</span> Domain connect</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:7px;gap:4px;display:flex;flex-direction:column"><div style="display:flex;justify-content:space-between;align-items:center"><div class="ln" style="width:45%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--accent)">✓</span></div><div style="display:flex;justify-content:space-between;align-items:center"><div class="ln" style="width:35%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--muted)">◐</span></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> apna domain connect karta (CNAME copy). <b>Dikhta:</b> verifying → verified states. <span class="ref">→ <a href="editor-wireframe.html#domains">§21 domains</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">3</span> Publish (the hero)</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid hot" style="width:34px;box-shadow:0 0 0 2px var(--accent)"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;gap:5px;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="width:54px;height:18px;background:var(--wf-solid);border-radius:4px;box-shadow:0 0 0 2px var(--accent);outline-offset:2px"></div><div class="ln" style="width:40%"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> Publish dabata. <b>Dikhta:</b> ek hi dark button — yeh tool ka maqsad (#5). <span class="ref">→ <a href="editor-wireframe.html#publish-flow">§14 publish-flow</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">4</span> Building → live</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">● live</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;gap:5px;display:flex;flex-direction:column;justify-content:center"><div style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:var(--accent)"></span><div class="ln" style="width:40%"></div></div><div style="height:11px;border:1px solid var(--accent);border-radius:3px;background:var(--wf-fill)"></div><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">site.com ↗</span></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> rukta. <b>Dikhta:</b> Building… → ● Live + clickable URL. (fail → retry state). <span class="ref">→ <a href="editor-wireframe.html#publish-flow">§14 publish-flow</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">5</span> Restore safety net</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 8px/1 var(--wf-mono)">⏱</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:3px;display:flex;flex-direction:column"><div style="display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--wf-ink);border-radius:2px;padding:2px 4px"><div class="ln" style="width:40%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--accent)">●</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px"><div class="ln" style="width:35%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--muted)">↺</span></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> galti hui to history (⌗/⏱) → Restore. <b>Dikhta:</b> cloud-backed versions, wapas la sakta. <span class="ref">→ <a href="editor-wireframe.html#version-history">§23 version-history</a></span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> ship ek arc hai — setup (SEO/domain) → ek hero (Publish) → safety (status + restore). Publish topbar mein hero rehta (infrequent par the goal, #5/#16). Honesty: redirects/domains backend-gaps badge tak honest.</p>
+  </div>
+
+  <div class="coming">
+    <b>5 flows = top-level structure.</b> Yeh user ki journeys hain — spine. Har step ke neeche <span class="ref">→ §N</span> uske <a href="editor-wireframe.html">surface spec (§0–§38)</a> ko point karta: woh specs ab <em>flows ke blocks</em> hain, top-level list nahi.
+  </div>
+
+  <p class="source">Method: <a href="../lessons/0017-wireframe-job-first-then-blocks.html">L17 job-first then blocks</a> · grouping by <a href="buildrik-design-principles.html">#10 intent / #14 one home</a>. The journey is the unit, not the screen.</p>
+</main>
+</body>
+</html>

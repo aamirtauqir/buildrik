@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buildrik Editor — complete low-fi wireframe</title>
+<link rel="stylesheet" href="../assets/course.css">
+<link rel="stylesheet" href="../assets/wireframe.css">
+<style>
+  :root{--maxw:920px}
+  .sub{color:var(--muted);font-size:15px;margin:-2px 0 6px}
+  .index{display:grid;grid-template-columns:1fr 1fr;gap:6px 22px;margin:14px 0 8px;font-size:14px}
+  .index a{display:block;padding:3px 0;border-bottom:0}
+  .index a::before{content:"›  ";color:var(--faint)}
+  .screen{border-top:1px solid var(--rule);margin-top:40px;padding-top:8px}
+  .meta{font-size:14px;color:var(--ink);margin:6px 0 2px}
+  .meta b{color:#52525b}
+  .mods{font-size:13.5px;color:var(--muted);margin:0 0 4px}
+  .tag-list{font-size:12px;color:var(--faint);font-family:var(--wf-mono)}
+  .legendbar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--rule);z-index:5}
+  code{font-family:var(--wf-mono);font-size:.88em;background:#f4f4f5;padding:1px 5px;border-radius:4px}
+  .pillrow{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+  /* why-notes: block paragraphs (override the grid that scattered text + tag across cells) */
+  .wf-why{margin:16px 0 4px;max-width:680px}
+  .wf-why li{display:block;position:relative;padding-left:30px;font-size:14.5px;line-height:1.55;margin-bottom:11px}
+  .wf-why li .wf-tag{position:absolute;left:0;top:1px}
+  .wf .mods{max-width:760px}
+  @media(max-width:620px){.index{grid-template-columns:1fr}.wf-shell__body{grid-template-columns:32px 84px 1fr 0}}
+  @media print{.legendbar{position:static}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Surface appendix · 2026-06-25</p>
+  <h1>Editor surface specs — the appendix.</h1>
+  <p class="lede">Per-surface specs: every editor panel, drawn low-fi (Screen → Job → Modules → Wireframe → Why), grounded in the real shipped shell (<code>AquibraStudio.tsx</code>). Use this as a <em>reference dictionary</em> — the <strong>blocks</strong> the journeys are built from.</p>
+  <div style="border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:11px 15px;margin:10px 0 14px;font-size:14px">
+    <strong style="color:var(--accent)">Start with the journeys, not this list.</strong> The top-level structure is the 5 job journeys in <a href="wireflows.html"><strong>wireflows.html</strong></a> — the sequences the user moves through (Make a page · On-brand · Content · Sign-off · Ship). This page is the <strong>appendix</strong> those flows reference: each flow step points to a §N here for the panel's detail.
+  </div>
+
+  <div style="border:1px solid var(--rule);border-left:3px solid var(--bad);border-radius:8px;padding:11px 15px;margin:0 0 14px;font-size:13px">
+    <strong style="color:var(--bad)">⚠️ Tags reconciled to shipped code — 2026-06-28.</strong> A code audit cross-checked every ✅/🟡/🔵 against <code>packages/editor/src</code>. Where a tag was false or inverted it now reads <strong>⚠️</strong> with the real state. Live-rail truth: <code>Insert · Pages · Styles · Site</code> (Media / Templates / Components fold under Insert) — <em>not</em> the drawn <code>Insert · Media · Pages · Design</code>. Four surfaces — <strong>Share, Comments, Shared-DS-push, Domains</strong> — ship in the <strong>dashboard</strong>, not the editor.
+  </div>
+
+  <div class="legendbar">
+    <div class="wf-legend" style="margin:0">
+      <span><span class="sw" style="background:var(--wf-fill);border:1px solid var(--wf-line)"></span> box</span>
+      <span><span class="sw" style="background:var(--wf-solid)"></span> hero / most-prominent</span>
+      <span><span class="sw" style="background:var(--wf-fill-2);border:1px solid var(--wf-ink)"></span> selected / active</span>
+      <span><span class="sw" style="background:var(--wf-ghost);border:1px dashed var(--wf-line)"></span> empty</span>
+      <span><span class="sw wf-img" style="min-height:0;height:14px"></span> image</span>
+      <span><span class="wf-tag" style="width:14px;height:14px;font-size:9px">n</span> → "why" note</span>
+    </div>
+  </div>
+
+  <div class="index">
+    <a href="#shell">0 · The shell (the spine)</a>
+    <a href="#insert">1 · Insert panel (rail #1)</a>
+    <a href="#media">2 · Media panel (under Insert ⚠️)</a>
+    <a href="#pages">3 · Pages panel (rail #2)</a>
+    <a href="#design">4 · Design / Brand (rail #3 "Styles")</a>
+    <a href="#inspector">5 · Inspector — element selected</a>
+    <a href="#inspector-empty">6 · Inspector — nothing selected</a>
+    <a href="#topbar">7 · Topbar — the 3 zones</a>
+    <a href="#footer">8 · Footer — the status strip</a>
+    <a href="#states">9 · States (empty / loading / error)</a>
+    <a href="#cms">10 · CMS</a>
+    <a href="#components">11 · Components</a>
+    <a href="#inspector-full">12 · Inspector — full sections</a>
+    <a href="#forms">13 · Forms</a>
+    <a href="#publish-flow">14 · Publish flow</a>
+    <a href="#preview">15 · Preview (as client)</a>
+    <a href="#request-review">16 · Request review</a>
+    <a href="#comments">17 · Comments</a>
+    <a href="#share">18 · Share link + password</a>
+    <a href="#seo">20 · Per-page SEO</a>
+    <a href="#site-settings">21 · Site settings</a>
+    <a href="#domains">22 · Custom domains</a>
+    <a href="#redirects">23 · Redirects</a>
+    <a href="#version-history">24 · Version history</a>
+    <a href="#ai-assistant">25 · AI Assistant</a>
+    <a href="#propose-action">26 · AI Propose-action</a>
+    <a href="#inline-ai">27 · Inline AI</a>
+    <a href="#command-palette">29 · Command palette</a>
+    <a href="#onboarding">30 · Onboarding</a>
+    <a href="#layers">31 · Layers</a>
+    <a href="#canvas-controls">32 · Canvas controls</a>
+    <a href="#inline-text">33 · Inline text edit</a>
+    <a href="#image-editor">34 · Image editor</a>
+    <a href="#stock">35 · Stock browser</a>
+    <a href="#ds-push">36 · Shared DS push ★</a>
+    <a href="#custom-css">37 · Custom CSS</a>
+    <a href="#my-templates">38 · My Templates</a>
+    <a href="#why">39 · Decisions &amp; open ties</a>
+  </div>
+
+  <p class="sub">Method recap: <strong>1 Screen</strong> (naam·user·platform) → <strong>2 Job</strong> (ek kaam; numayan vs dheema) → <strong>3 Modules</strong> (blocks) → <strong>4 Wireframe</strong> (grey, grid) → <strong>5 Why</strong> (har faisla).</p>
+
+  <!-- ============================================================ 0 SHELL -->
+  <section class="screen" id="shell">
+    <h2>0 · The shell — the spine <span class="tag-list">⚠️ live rail: Insert · Pages · Styles · Site (not Insert·Media·Pages·Design)</span></h2>
+    <p class="meta"><b>Screen:</b> Editor (<code>/edit/:id</code>) · <b>User:</b> agency builder, one site · <b>Platform:</b> Desktop.</p>
+    <p class="meta"><b>Job:</b> "Is page ko banao aur publish karo." · <b>Numayan:</b> canvas + Publish · <b>Dheema:</b> rail, status, footer.</p>
+    <p class="mods"><b>Modules:</b> Topbar (site-wide actions) · Rail (jobs) · Drawer (active panel) · Canvas (workspace) · Inspector (selection) · Footer (status).</p>
+
+    <div class="wf">
+      <div class="wf-frame">
+        <div class="wf-shell" style="height:420px">
+          <div class="wf-shell__bar">
+            <span class="wf-tag">1</span><span class="wf-label">‹ Exit</span>
+            <span class="wf-grow"></span>
+            <span class="wf-pill">● saved</span><span class="wf-pill">✨ AI</span><span class="wf-pill">Preview</span><span class="wf-pill">Share</span>
+            <span class="wf-pill wf-pill--solid">Publish</span><span class="wf-tag">2</span><span class="wf-label">⋯</span>
+          </div>
+          <div class="wf-shell__body" style="grid-template-columns:60px 148px 1fr 148px">
+            <div class="wf-shell__rail">
+              <div class="wf-railitem wf-railitem--on"><span class="wf-slot wf-slot--on">＋</span><small>Insert</small></div><span class="wf-tag">3</span>
+              <div class="wf-railitem"><span class="wf-slot">▣</span><small>Media</small></div>
+              <div class="wf-railitem"><span class="wf-slot">▤</span><small>Pages</small></div>
+              <div class="wf-railitem"><span class="wf-slot">◑</span><small>Design</small></div>
+            </div>
+            <div class="wf-shell__drawer">
+              <div class="wf-drawer-title">Insert <span class="wf-collapse">«</span></div>
+              <div class="wf-stack" style="margin-top:6px">
+                <div class="wf-box" style="padding:6px"><div class="wf-line w-90"></div></div>
+                <div class="wf-row"><div class="wf-box wf-grow" style="padding:8px"><div class="wf-line w-60"></div></div><div class="wf-box wf-grow" style="padding:8px"><div class="wf-line w-60"></div></div></div>
+                <div class="wf-row"><div class="wf-box wf-grow" style="padding:8px"><div class="wf-line w-60"></div></div><div class="wf-box wf-grow" style="padding:8px"><div class="wf-line w-60"></div></div></div>
+              </div>
+            </div>
+            <div class="wf-shell__canvas" style="padding:0">
+              <div style="background:var(--wf-fill);border-bottom:1px solid var(--wf-line);display:flex;align-items:center;gap:6px;padding:5px 10px"><span class="wf-tag">4</span><span class="wf-pill">↶</span><span class="wf-pill">↷</span><span class="wf-pill">⏱</span><span class="wf-grow" style="text-align:center"><span class="wf-pill wf-pill--on">▭</span><span class="wf-pill">▢</span><span class="wf-pill">▯</span></span><span class="wf-pill">− 100% +</span></div>
+              <div style="padding:14px">
+                <span class="wf-label">canvas — the workspace</span>
+                <div class="wf-box" style="margin-top:8px;background:#fff;border:1px solid var(--wf-line);min-height:185px;padding:14px">
+                  <div class="wf-row wf-row--between"><div class="wf-line w-25 wf-line--ink"></div><div class="wf-row"><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-pill">menu</span></div></div>
+                  <div class="wf-img" style="height:66px;margin-top:12px"></div>
+                  <div class="wf-box wf-box--plain" style="margin-top:12px"><div class="wf-line w-90"></div><div class="wf-line w-75" style="margin-top:7px"></div><div class="wf-line w-60" style="margin-top:7px"></div></div>
+                  <div class="wf-pill wf-pill--solid" style="margin-top:12px">CTA</div>
+                </div>
+              </div>
+            </div>
+            <div class="wf-shell__insp">
+              <span class="wf-label">You are editing…</span><span class="wf-tag">5</span>
+              <div class="wf-row" style="margin-top:6px"><span class="wf-icon"></span><div class="wf-line w-60"></div></div>
+              <div class="pillrow"><span class="wf-pill wf-pill--on">This</span><span class="wf-pill">All like</span><span class="wf-pill">Site</span></div>
+              <div class="wf-row" style="margin-top:4px"><span class="wf-pill">Look</span><span class="wf-pill">Layout</span><span class="wf-pill">Adv</span></div>
+              <div class="wf-box" style="margin-top:8px;padding:6px"><div class="wf-line w-90"></div><div class="wf-line w-50" style="margin-top:6px"></div></div>
+              <div class="wf-box" style="margin-top:6px;padding:6px"><div class="wf-line w-75"></div></div>
+            </div>
+          </div>
+          <div class="wf-shell__foot"><span class="wf-tag">6</span>⌗ Structure · ● Connected·main · body › section › button · 1280×800 · v2.14</div>
+        </div>
+      </div>
+      <p class="wf-frame__caption">grid: rail 48 · drawer 0–280 · canvas 1fr · inspector 0–280 · topbar 56 · footer 40</p>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Topbar = rare/global only.</strong> Exit · Share · Publish · ⋯ — sab infrequent. Undo/redo + breakpoints yahan se hata ke <em>canvas toolbar</em> mein gaye (#16 tools near the work). Topbar saaf.</li>
+        <li><span class="wf-tag">2</span><strong>Publish = the only dark box.</strong> Ek screen, ek hero (#5). ✨AI &amp; Preview outline (helpers, not the goal). ⋯ rare/global ko chhupata hai (#9).</li>
+        <li><span class="wf-tag">3</span><strong>Rail = locked spine, 4 slots — icon + label.</strong> Insert·Media·Pages·Design, Insert #1 hamesha. <em>Label icon ke neeche</em> → "ye kya tha?" khatam (#1 recognition). Naya feature panel ke <em>andar</em> dock (#15) — naya rail icon nahi.</li>
+        <li><span class="wf-tag">4</span><strong>Canvas toolbar hugs the canvas.</strong> Undo/redo · history (⏱) · device-switch (center — yeh canvas ka <em>lens</em> hai) · zoom — frequent canvas-ops kaam ke kareeb (#16, Fitts). Canvas khud sabse zyada area (#4), calm center (#6): dot-grid.</li>
+        <li><span class="wf-tag">5</span><strong>Inspector right, sirf on-selection.</strong> "You are editing <em>this</em>" + 3-reach (This / All like / Site) = plain language (#1), na ki "selector specificity."</li>
+        <li><span class="wf-tag">6</span><strong>Footer = whisper.</strong> Zaroori par primary nahi: sync · breadcrumb · zoom · version. Sabse dheema (#4 inverse). ⌗ Structure = Layers ka ghar (footer popover).</li>
+      </ol>
+
+      <p class="meta" style="margin-top:22px"><b>Left-side decision (locked 2026-06-25):</b> <strong>icon rail + drawer</strong> (two columns, Webflow density model) — <em>not</em> a single Framer-style panel. Drawer collapse hone par sirf 48px rail bachti → canvas full. Builder ko pro-density chahiye, isliye yeh chuna. Within that structure, 3 fixes lagaye: <strong>(1)</strong> label icon ke neeche (#1) · <strong>(2)</strong> drawer collapsible (#9·#6) · <strong>(3)</strong> drawer title hamesha upar (#2).</p>
+
+      <p class="wf-frame__caption" style="margin-top:14px">Collapsed state — active icon dobara click → drawer band → canvas saans leta hai</p>
+      <div class="wf-frame">
+        <div class="wf-shell" style="height:180px">
+          <div class="wf-shell__bar"><span class="wf-label">‹ Exit</span><span class="wf-grow" style="text-align:center"><span class="wf-pill">▭ ▢ ▯</span></span><span class="wf-pill wf-pill--solid">Publish</span></div>
+          <div class="wf-shell__body" style="grid-template-columns:60px 1fr 148px">
+            <div class="wf-shell__rail">
+              <div class="wf-railitem"><span class="wf-slot">＋</span><small>Insert</small></div>
+              <div class="wf-railitem"><span class="wf-slot">▣</span><small>Media</small></div>
+              <div class="wf-railitem"><span class="wf-slot">▤</span><small>Pages</small></div>
+              <div class="wf-railitem"><span class="wf-slot">◑</span><small>Design</small></div>
+            </div>
+            <div class="wf-shell__canvas"><span class="wf-label">canvas — full width</span>
+              <div class="wf-img" style="height:54px;margin-top:8px"></div>
+              <div class="wf-box wf-box--plain" style="margin-top:8px"><div class="wf-line w-90"></div><div class="wf-line w-75" style="margin-top:6px"></div></div>
+            </div>
+            <div class="wf-shell__insp"><span class="wf-label">Inspector</span><div class="wf-box" style="margin-top:8px;padding:6px"><div class="wf-line w-75"></div></div></div>
+          </div>
+          <div class="wf-shell__foot">⌗ Structure · ● Connected · 100%</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 1 INSERT -->
+  <section class="screen" id="insert">
+    <h2>1 · Insert panel <span class="tag-list">rail slot #1</span></h2>
+    <p class="meta"><b>Job:</b> "Page par ek element/section daalo." · <b>Numayan:</b> element grid + search · <b>Dheema:</b> categories.</p>
+    <p class="mods"><b>Modules:</b> Search · sub-tabs (Elements / Sections / Components — #15 dock) · category list · element-card grid.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:300px">
+        <div style="padding:10px">
+          <div class="wf-row wf-row--between"><span class="wf-label">Insert</span><span class="wf-icon"></span></div>
+          <div class="wf-box" style="margin-top:8px;padding:6px"><div class="wf-row"><span class="wf-label">⌕</span><div class="wf-line w-75"></div></div></div>
+          <div class="pillrow" style="margin-top:8px"><span class="wf-pill wf-pill--on">Elements</span><span class="wf-pill">Sections</span><span class="wf-pill">Components</span><span class="wf-tag">1</span></div>
+          <div class="wf-row" style="gap:6px;margin-top:8px;flex-wrap:wrap">
+            <div class="wf-box" style="width:48%;align-items:center;padding:10px 6px"><span class="wf-icon wf-icon--solid"></span><div class="wf-line w-60" style="margin-top:6px"></div></div>
+            <div class="wf-box" style="width:48%;align-items:center;padding:10px 6px"><span class="wf-icon"></span><div class="wf-line w-60" style="margin-top:6px"></div></div>
+            <div class="wf-box" style="width:48%;align-items:center;padding:10px 6px"><span class="wf-icon"></span><div class="wf-line w-60" style="margin-top:6px"></div></div>
+            <div class="wf-box" style="width:48%;align-items:center;padding:10px 6px"><span class="wf-icon"></span><div class="wf-line w-60" style="margin-top:6px"></div></div>
+            <div class="wf-box" style="width:48%;align-items:center;padding:10px 6px"><span class="wf-icon"></span><div class="wf-line w-60" style="margin-top:6px"></div></div>
+            <div class="wf-box" style="width:48%;align-items:center;padding:10px 6px"><span class="wf-icon"></span><div class="wf-line w-60" style="margin-top:6px"></div></div>
+          </div>
+          <p class="tag-list" style="margin-top:8px">drag a card → canvas, or click to insert</p>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Sub-tabs, not new rail icons.</strong> Elements / Sections / Components teen alag jobs lagte hain par <em>ek</em> intent = "kuch add karo." Insert ke andar dock (#15) → rail 4-slot rehti hai. (Open tie: Components apna slot le sakta hai — neeche §10.)</li>
+        <li>Search top, kyunki 100+ blocks mein dhoondhna sabse aam pehla move. Recognition over recall (#1).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================================================ 2 MEDIA -->
+  <section class="screen" id="media">
+    <h2>2 · Media panel <span class="tag-list">⚠️ under Insert sub-nav — not its own rail slot</span></h2>
+    <p class="meta"><b>Job:</b> "Image/video dhoondo ya upload karo." · <b>Numayan:</b> upload + asset grid · <b>Dheema:</b> folders, filters.</p>
+    <p class="mods"><b>Modules:</b> Upload zone · folder breadcrumb · filter · asset-thumb grid · (detail drawer on click).</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:320px">
+        <div style="padding:10px">
+          <div class="wf-row wf-row--between"><span class="wf-label">Media</span><span class="wf-pill">Folders ▾</span></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;align-items:center;padding:14px;border-style:dashed"><span class="wf-tag">1</span><div class="wf-line w-50" style="margin-top:6px"></div><div class="tag-list" style="margin-top:4px">drop / upload</div></div>
+          <div class="wf-row" style="margin-top:8px"><span class="wf-label">my-site /</span><div class="wf-grow"></div><span class="wf-pill">All ▾</span></div>
+          <div class="wf-row" style="gap:6px;margin-top:8px;flex-wrap:wrap">
+            <div class="wf-img" style="width:31%;height:54px"></div><div class="wf-img" style="width:31%;height:54px"></div><div class="wf-img" style="width:31%;height:54px"></div>
+            <div class="wf-img" style="width:31%;height:54px"></div><div class="wf-img" style="width:31%;height:54px"></div><div class="wf-img" style="width:31%;height:54px"></div>
+          </div>
+          <p class="tag-list" style="margin-top:8px"><span class="wf-tag">2</span> Stock photos/videos → opens Stock browser (§35) — now shipped, env-gated</p>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Upload zone numayan, top.</strong> "Apni tasveer laao" sabse aam kaam — bड़ा, dashed drop-target, recognition (#1).</li>
+        <li><span class="wf-tag">2</span><strong>Stock ab shipped.</strong> Pehle stub (<code>[]</code>) tha → tab gate kiya tha. Ab Unsplash/Pexels wired (env-gated) → Media se Stock browser khulta (§35) with a no-key gate, hidden nahi (#3 — slot ban gaya jab feature real hui).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================================================ 3 PAGES -->
+  <section class="screen" id="pages">
+    <h2>3 · Pages panel <span class="tag-list">rail slot #2 (live)</span></h2>
+    <p class="meta"><b>Job:</b> "Doosre page par jaao / page manage karo." · <b>Numayan:</b> page list + New · <b>Dheema:</b> per-page menu.</p>
+    <p class="mods"><b>Modules:</b> "+ New page" · page list (home ★, current highlighted, reorder ⠿) · row menu (rename/duplicate/delete/set-home).</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:300px">
+        <div style="padding:10px">
+          <div class="wf-row wf-row--between"><span class="wf-label">Pages</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>+ New</span></div>
+          <div class="wf-stack" style="margin-top:8px">
+            <div class="wf-box wf-box--2" style="padding:8px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-label">★</span><div class="wf-line w-60"></div></div><span class="wf-label">⋯</span></div></div>
+            <div class="wf-box" style="padding:8px"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-label">⠿</span><div class="wf-line w-50"></div></div><span class="wf-label">⋯</span></div></div>
+            <div class="wf-box" style="padding:8px"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-label">⠿</span><div class="wf-line w-40"></div></div><span class="wf-label">⋯</span></div></div>
+            <div class="wf-box" style="padding:8px"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-label">⠿</span><div class="wf-line w-50"></div></div><span class="wf-label">⋯</span></div></div>
+          </div>
+          <p class="tag-list" style="margin-top:8px"><span class="wf-tag">2</span> Layers tree → footer ⌗ (open tie)</p>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>"+ New page" hero of this panel.</strong> Panel-level prominence: yeh is panel ka primary kaam (#5 ek hero, panel-scope). Baaki rows uniform.</li>
+        <li><span class="wf-tag">2</span><strong>Layers footer mein, Pages mein nahi.</strong> Layers = current page ka structure (frequent, micro); Pages = across pages (macro). Alag altitude → alag ghar. Footer ⌗ popover (#14). <em>Open tie:</em> kuch builders Layers ko Pages ke andar chahte — use test (§10).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================================================ 4 DESIGN -->
+  <section class="screen" id="design">
+    <h2>4 · Design / Brand panel <span class="tag-list">rail slot #3 "Styles" (live) · the J4 merge</span></h2>
+    <p class="meta"><b>Job:</b> "Site ko on-brand banao — system level." · <b>Numayan:</b> color + type tokens · <b>Dheema:</b> spacing, components.</p>
+    <p class="mods"><b>Modules:</b> Colors (swatches) · Typography (type scale) · Spacing · Components (master list). <em>3 purane surfaces (tokens·styles·DS-tools) → ek "Brand" area.</em></p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:320px">
+        <div style="padding:10px">
+          <span class="wf-label">Brand · the system</span><span class="wf-tag">1</span>
+          <div class="wf-box" style="margin-top:8px;padding:8px"><div class="wf-label">Colors</div>
+            <div class="wf-row" style="gap:6px;margin-top:6px"><span class="wf-icon wf-icon--solid"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon"></span><span class="wf-icon" style="border-style:dashed">+</span></div></div>
+          <div class="wf-box" style="margin-top:8px;padding:8px"><div class="wf-label">Typography</div>
+            <div class="wf-stack" style="margin-top:6px"><div class="wf-line w-90 wf-line--ink" style="height:11px"></div><div class="wf-line w-75" style="height:9px"></div><div class="wf-line w-60" style="height:7px"></div></div></div>
+          <div class="wf-box" style="margin-top:8px;padding:8px"><div class="wf-label">Spacing scale</div><div class="wf-row" style="gap:4px;margin-top:6px;align-items:flex-end"><span class="wf-box" style="width:8px;height:8px;padding:0"></span><span class="wf-box" style="width:8px;height:14px;padding:0"></span><span class="wf-box" style="width:8px;height:20px;padding:0"></span><span class="wf-box" style="width:8px;height:28px;padding:0"></span></div></div>
+          <div class="wf-box" style="margin-top:8px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-label">Components</div><span class="wf-label">→</span></div></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Two altitudes, two homes.</strong> <em>Inspector</em> (right) = "<u>this</u> element." <em>Brand</em> (this panel) = "the <u>system</u> — sab elements ke rules." Inhe na milao — #14 (har feature ek ghar) + #9 (system ek click andar).</li>
+        <li><strong>3 → 1 merge.</strong> Pehle tokens, styles, DS-tools alag the (ek hi job ke teen darwaze). Ab ek "Brand." "Kahan rakhun?" ka jawab fixed (#14).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===================================================== 5 INSPECTOR -->
+  <section class="screen" id="inspector">
+    <h2>5 · Inspector — element selected <span class="tag-list">right panel · always-present frame</span></h2>
+    <p class="meta"><b>Job:</b> "Is selected cheez ki shakal badlo." · <b>Numayan:</b> property sections · <b>Dheema:</b> breakpoint/state pills.</p>
+    <p class="mods"><b>Modules:</b> selection breadcrumb · "You are editing this ___" · 3-reach strip · Look/Layout/Advanced tabs · breakpoint + state pills · section stack.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:280px">
+        <div style="padding:10px">
+          <div class="wf-row" style="font-size:10px;color:#a1a1aa"><span class="wf-label">div › section.hero › button</span><span class="wf-grow"></span><span class="wf-icon" style="width:16px;height:16px">⌖</span></div>
+          <div class="wf-box wf-box--2" style="margin-top:8px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-icon"></span><div class="wf-col" style="gap:3px"><div class="tag-list">You are editing</div><div class="wf-line w-60 wf-line--ink"></div></div></div><span class="wf-label">⋯</span></div></div>
+          <div class="pillrow" style="margin-top:8px"><span class="wf-pill wf-pill--on">This item</span><span class="wf-pill">All like this</span><span class="wf-pill">Whole site</span><span class="wf-tag">1</span></div>
+          <div class="wf-row" style="margin-top:6px;border-bottom:1px solid var(--wf-line);padding-bottom:6px"><span class="wf-pill wf-pill--on">Look</span><span class="wf-pill">Layout</span><span class="wf-pill">Advanced</span></div>
+          <div class="wf-row wf-row--between" style="margin-top:8px"><span class="wf-pill">▢ Desktop</span><span class="wf-pill">Hover ▾</span><span class="wf-tag">2</span></div>
+          <div class="wf-box" style="margin-top:8px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-label">Fill</div><span class="wf-icon"></span></div></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-label">Text</div><div class="wf-line w-75" style="margin-top:6px"></div></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-label">Radius</div><div class="wf-line w-30"></div></div></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-label">Shadow / effects</div></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>3-reach in plain words.</strong> "This item / All like this / Whole site" — designer-speak (element / class / global) ko user-speak mein badla (#1 match the real world). Galat reach = #1 sabse bड़ी galti.</li>
+        <li><span class="wf-tag">2</span><strong>Breakpoint + state pills saath.</strong> Responsive + hover/focus ek hi jagah, sections ke upar — taake user ko yaad rahe woh kis context ko edit kar raha hai (override indicator = visibility of system status, #2).</li>
+        <li><strong>Frame fixed (#15).</strong> Header → reach → tabs → body — yeh order har element ke liye same. Naye property-types neeche sections mein dock hote hain, frame nahi badalta.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===================================================== 6 INSPECTOR EMPTY -->
+  <section class="screen" id="inspector-empty">
+    <h2>6 · Inspector — nothing selected <span class="tag-list">empty state (#13)</span></h2>
+    <p class="meta"><b>Job:</b> "Samjho ab kya karna hai." · <b>Numayan:</b> ek seedhi hidayat · <b>Dheema:</b> kuch nahi.</p>
+    <p class="mods"><b>Modules:</b> centered icon · one-line instruction · (optional) 2–3 quick tips.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:280px">
+        <div style="padding:10px;min-height:200px;display:grid;place-items:center;text-align:center">
+          <div>
+            <span class="wf-icon" style="width:34px;height:34px;margin:0 auto"></span>
+            <div class="wf-line w-90" style="margin:12px auto 0"></div>
+            <div class="wf-line w-60" style="margin:7px auto 0"></div>
+            <p class="tag-list" style="margin-top:12px">"Canvas par kuch select karo<br>use edit karne ke liye"</p>
+            <span class="wf-tag" style="margin-top:6px">1</span>
+          </div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Empty ≠ blank.</strong> Khaali panel "toot gaya?" lagta hai. Ek line jo <em>agla kaam</em> bataaye (#13 design every state · #2 system status). Happy path sirf ~10% — yeh baqi 90% ka hissa.</li>
+        <li><strong>Koi fake content nahi.</strong> Placeholder sirf hidayat deta hai, jhoothe rows nahi (#3).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===================================================== 7 TOPBAR -->
+  <section class="screen" id="topbar">
+    <h2>7 · Topbar — slim, rare/global only <span class="tag-list">revised 2026-06-26 · #16 · ⚠️ slim layout = target; live topbar still carries undo/redo + breakpoints</span></h2>
+    <p class="meta"><b>Job:</b> "Poori site par ek <em>rare</em> action lo (publish/share/exit)." · <b>Numayan:</b> Publish · <b>Dheema:</b> status.</p>
+    <p class="mods"><b>Modules:</b> Exit ‹ │ (empty middle) │ status · ✨AI · Preview · Share · <b>Publish</b> · ⋯. <em>Undo/redo · history · breakpoints shipped-topbar se hata ke → canvas toolbar (#16, §0).</em></p>
+    <div class="wf">
+      <div class="wf-frame">
+        <div class="wf-shell__bar" style="height:44px">
+          <span class="wf-label">‹ Exit</span><span class="wf-tag">1</span>
+          <span class="wf-grow"></span>
+          <span class="wf-pill">● saved</span><span class="wf-pill">✨ AI</span><span class="wf-pill">Preview</span><span class="wf-pill">Share</span><span class="wf-pill wf-pill--solid">Publish</span><span class="wf-label">⋯</span><span class="wf-tag">2</span>
+        </div>
+      </div>
+      <p class="wf-frame__caption">auto 1fr auto — middle now empty (breakpoints left for the canvas toolbar)</p>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Left = Exit only.</strong> Sirf "bahar niklo." Undo/redo yahan se gaye — frequent canvas-op → canvas toolbar (#16). Topbar ab saaf.</li>
+        <li><span class="wf-tag">2</span><strong>Right = rare/global ship.</strong> status → ✨AI (helper) → Preview → Share → <strong>Publish</strong> (rare-but-important hero, #5) → ⋯ (Invite/⌘K/Help/Account, #9). Bouncer ab sakht (#8 + #16): frequent canvas-op? → topbar mein NAHI.</li>
+      </ol>
+      <p class="mods" style="margin-top:8px">↺ <b>Re-lay-out note:</b> shipped topbar mein undo/redo + breakpoints abhi maujood hain — yeh change unhe canvas toolbar mein <em>move</em> karega (handlers same, sirf buttons shift — L8 "move the boxes, keep the wires").</p>
+    </div>
+  </section>
+
+  <!-- ===================================================== 8 FOOTER -->
+  <section class="screen" id="footer">
+    <h2>8 · Footer — the status strip</h2>
+    <p class="meta"><b>Job:</b> "Jaanlo kahan ho aur sab theek hai." · <b>Numayan:</b> kuch nahi (whisper) · <b>Dheema:</b> sab.</p>
+    <p class="mods"><b>Modules:</b> ⌗ Structure (Layers popover) · sync dot · breadcrumb · device dims · version.</p>
+    <div class="wf">
+      <div class="wf-frame">
+        <div class="wf-shell__foot" style="height:32px"><span class="wf-pill">⌗ Structure</span><span class="wf-tag">1</span>● Connected·main<span class="wf-grow"></span>body › section › button<span class="wf-tag">2</span><span class="wf-grow"></span>1280×800 · v2.14<span class="wf-tag">3</span></div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>⌗ Structure = Layers ka ghar.</strong> Layers frequent par micro — footer popover, rail slot waste nahi karta (#15 dock · #14 one home).</li>
+        <li><span class="wf-tag">2</span><strong>Breadcrumb = "you are here".</strong> Selection ka DOM-path; orientation (#2). Topbar se utha ke yahan — wahan site-actions ke liye jagah chahiye thi.</li>
+        <li><span class="wf-tag">3</span><strong>Version/dims dheeme dahine.</strong> Zoom canvas toolbar mein gaya (#16). Baqi — sync · breadcrumb · dims · version — utility, kam contrast, kona (#4 inverse).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===================================================== 9 STATES -->
+  <section class="screen" id="states">
+    <h2>9 · States — empty / loading / error <span class="tag-list">patterns, applied inside surfaces (#13)</span></h2>
+    <p class="sub">Yeh alag screens nahi — yeh har panel ke <em>andar</em> lagne wale patterns hain. Happy path ~10%; baqi 90% yahan. (Users ki #1 shikayat: "no feedback in processes" — yahi us ka ilaaj.)</p>
+    <div class="wf">
+      <div class="wf-row" style="gap:14px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1 1 180px">
+          <div class="wf-frame" style="height:150px"><div style="padding:10px;height:100%;display:grid;place-items:center;text-align:center"><div><span class="wf-icon" style="width:28px;height:28px;margin:0 auto"></span><div class="wf-line w-75" style="margin:10px auto 0"></div><div class="wf-pill wf-pill--solid" style="margin-top:10px">+ Add first</div></div></div></div>
+          <p class="wf-frame__caption">Empty — name what's missing + the one action to fix it</p>
+        </div>
+        <div style="flex:1 1 180px">
+          <div class="wf-frame" style="height:150px"><div style="padding:10px"><div class="wf-stack"><div class="wf-line w-90"></div><div class="wf-line w-75"></div><div class="wf-line w-60"></div><div class="wf-line w-75"></div><div class="wf-line w-40"></div></div><p class="tag-list" style="margin-top:10px">skeleton — same shape as the real content</p></div></div>
+          <p class="wf-frame__caption">Loading — skeleton, not a spinner; shows what's coming</p>
+        </div>
+        <div style="flex:1 1 180px">
+          <div class="wf-frame" style="height:150px"><div style="padding:10px"><div class="wf-box" style="border-color:var(--wf-ink);background:var(--wf-fill-2)"><div class="wf-line w-90"></div><div class="wf-row" style="margin-top:8px"><span class="wf-pill wf-pill--solid">Retry</span><span class="wf-pill">Dismiss</span></div></div><p class="tag-list" style="margin-top:10px">"Save fail hua. Dobara koshish?"</p></div></div>
+          <p class="wf-frame__caption">Error — plain cause + a way out (retry), never silent</p>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><strong>Empty</strong> = batao kya nahi hai + ek action (#13). <strong>Loading</strong> = skeleton (asli shape) → "kuch aa raha hai" (#2). <strong>Error</strong> = saaf wajah + raasta (#1 + #9-error-prevention's cousin); kabhi <em>chup</em> mat raho — wahi product "shit" feel karwata hai.</li>
+        <li>Topbar status pill = saving / saved · Nm ago / failed / offline-queued — har action ka feedback (#2). Yeh aap ki recovery Phase-1 "feedback layer" hai.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 10 CMS -->
+  <section class="screen" id="cms">
+    <h2>10 · CMS <span class="tag-list">⚠️ modal-driven today (not the drawn rail panel) · J3</span></h2>
+    <p class="meta"><b>Job:</b> "Content ko collection mein rakho, phir page se bind karo." · <b>Numayan:</b> records table · <b>Dheema:</b> field schema, binding.</p>
+    <p class="mods"><b>Modules:</b> Collections list (+New) · Records table (rows + Add) · Field schema · Binding (element→field) · dynamic-page badge.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:560px">
+        <div style="display:grid;grid-template-columns:130px 1fr;min-height:200px">
+          <div style="border-right:1px solid var(--wf-line);padding:10px">
+            <div class="wf-drawer-title">CMS <span class="wf-collapse">+</span></div>
+            <div class="wf-stack" style="margin-top:4px">
+              <div class="wf-box wf-box--2" style="padding:7px;border-color:var(--wf-ink)"><div class="wf-line w-75"></div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-line w-60"></div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-line w-50"></div></div>
+              <div class="wf-box wf-box--ghost" style="padding:7px;border-style:dashed"><div class="wf-line w-40"></div></div>
+            </div>
+          </div>
+          <div style="padding:10px">
+            <div class="wf-row wf-row--between"><span class="wf-label">Blog · 12 records</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>+ Add record</span></div>
+            <div class="wf-box wf-box--2" style="margin-top:8px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-30"></div><div class="wf-line w-25"></div></div></div>
+            <div class="wf-box" style="margin-top:4px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-30"></div><div class="wf-line w-25"></div></div></div>
+            <div class="wf-box" style="margin-top:4px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-30"></div><div class="wf-line w-25"></div></div></div>
+            <div class="wf-row" style="margin-top:10px;gap:6px"><span class="wf-pill">⛓ Bind to element</span><span class="wf-tag">2</span><span class="wf-pill">↺ Dynamic page</span></div>
+          </div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>"+ Add record" = panel hero.</strong> Collection mein content dalna sabse aam kaam → ek dark button (#5, panel-scope). Records table sabse zyada area (#4).</li>
+        <li><span class="wf-tag">2</span><strong>Binding alag, niche.</strong> "Element ko field se jodo" advanced step hai — table ke baad, alag chip (#9 progressive). Plain word "Bind", "schema" nahi (#1).</li>
+        <li><strong>Empty state (dashed):</strong> koi collection nahi → "Create your first collection" (#13). Server-sync 🟡 → har save par status (#2, recovery P1).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 11 COMPONENTS -->
+  <section class="screen" id="components">
+    <h2>11 · Components <span class="tag-list">inside Insert/Brand · J4</span></h2>
+    <p class="meta"><b>Job:</b> "Reusable block banao aur dobara use karo." · <b>Numayan:</b> component library · <b>Dheema:</b> variant/detach controls.</p>
+    <p class="mods"><b>Modules:</b> Library grid (master thumbs) · Create-component · selected-instance strip (variant ▾ · detach · edit master) · "local-only ⚠" badge.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:300px">
+        <div style="padding:10px">
+          <div class="wf-row wf-row--between"><span class="wf-label">Components</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>+ Create</span></div>
+          <div class="wf-row" style="gap:6px;margin-top:8px;flex-wrap:wrap">
+            <div class="wf-box" style="width:47%;align-items:center;padding:10px 6px"><div class="wf-img" style="width:100%;height:34px"></div><div class="wf-line w-60" style="margin-top:6px"></div></div>
+            <div class="wf-box" style="width:47%;align-items:center;padding:10px 6px"><div class="wf-img" style="width:100%;height:34px"></div><div class="wf-line w-60" style="margin-top:6px"></div></div>
+            <div class="wf-box" style="width:47%;align-items:center;padding:10px 6px"><div class="wf-img" style="width:100%;height:34px"></div><div class="wf-line w-60" style="margin-top:6px"></div></div>
+            <div class="wf-box wf-box--ghost" style="width:47%;align-items:center;padding:10px 6px;border-style:dashed"><div class="wf-line w-40"></div></div>
+          </div>
+          <div class="wf-box wf-box--2" style="margin-top:10px;padding:8px;border-color:var(--wf-ink)"><span class="wf-label">Selected instance</span><span class="wf-pill" style="margin-left:6px">local-only ⚠</span><span class="wf-tag">2</span>
+            <div class="wf-row" style="margin-top:6px;gap:6px"><span class="wf-pill wf-pill--on">Variant ▾</span><span class="wf-pill">Detach</span><span class="wf-pill">Edit master</span></div>
+          </div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Grid + Create.</strong> Master library browse karna primary → thumb grid (#1 recognition). Create = panel hero.</li>
+        <li><span class="wf-tag">2</span><strong>Instance controls sirf jab select.</strong> Variant/detach/edit-master tab dikhein jab canvas par instance chuna ho (#9). Master server-backed (ab shipped) — par overrides 🟡, "local-only ⚠" badge tak fix na ho (#3 honesty interim).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 12 INSPECTOR FULL -->
+  <section class="screen" id="inspector-full">
+    <h2>12 · Inspector — full section list <span class="tag-list">right panel · J4 (covers Interactions + Animations)</span></h2>
+    <p class="meta"><b>Job:</b> "Element ki har property control karo — bina dhoonde." · <b>Numayan:</b> active tab ke sections · <b>Dheema:</b> rare sections (advanced).</p>
+    <p class="mods"><b>Modules (3 tabs):</b> <b>Look</b> = Fill·Text·Border·Effects · <b>Layout</b> = Size·Spacing·Flex/Grid·Position·Visibility · <b>Advanced</b> = Variant·Interactions·Animation·Link·CSS-classes·Custom-CSS·Responsive.</p>
+    <div class="wf">
+      <div class="wf-row" style="gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div class="wf-frame" style="max-width:230px">
+          <div style="padding:10px">
+            <div class="wf-row" style="border-bottom:1px solid var(--wf-line);padding-bottom:6px"><span class="wf-pill wf-pill--on">Look</span><span class="wf-pill">Layout</span><span class="wf-pill">Adv</span><span class="wf-tag">1</span></div>
+            <div class="wf-stack" style="margin-top:8px">
+              <div class="wf-box" style="padding:7px"><div class="wf-row wf-row--between"><div class="wf-label">Fill</div><span class="wf-icon"></span></div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-label">Text</div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-label">Border</div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-label">Effects</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-frame" style="max-width:230px">
+          <div style="padding:10px">
+            <div class="wf-row" style="border-bottom:1px solid var(--wf-line);padding-bottom:6px"><span class="wf-pill">Look</span><span class="wf-pill">Layout</span><span class="wf-pill wf-pill--on">Adv</span><span class="wf-tag">2</span></div>
+            <div class="wf-stack" style="margin-top:8px">
+              <div class="wf-box" style="padding:7px"><div class="wf-label">⚡ Interactions (13 triggers)</div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-label">▶ Animation</div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-label">🔗 Link</div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-label">CSS classes</div></div>
+              <div class="wf-box wf-box--ghost" style="padding:7px;border-style:dashed"><div class="wf-label">{} Custom CSS · Pro</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Job-named tabs, not CSS-named.</strong> "Look / Layout / Advanced" — designer-speak ("typography/box-model") nahi (#1). Aam sections (Fill/Text) Look mein saamne.</li>
+        <li><span class="wf-tag">2</span><strong>Interactions + Animations = Advanced tab.</strong> Powerful par rare → teesre tab mein, frame ke andar dock (#15 · #9). Custom CSS Pro-gated, sabse neeche dashed.</li>
+        <li><strong>Frame fixed.</strong> Header→reach→tabs→sections order har element same; naye property-types neeche sections mein dock, frame nahi badalta (#15).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 13 FORMS -->
+  <section class="screen" id="forms">
+    <h2>13 · Forms <span class="tag-list">inspector config + submissions · J6</span></h2>
+    <p class="meta"><b>Job:</b> "Form banao, fir leads dekho." · <b>Numayan:</b> fields + submissions · <b>Dheema:</b> validation, export.</p>
+    <p class="mods"><b>Modules:</b> Field list (add/reorder) · field config (label/type/required) · action (email/redirect) · Submissions table + Export CSV.</p>
+    <div class="wf">
+      <div class="wf-row" style="gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1 1 200px">
+          <p class="wf-frame__caption">Build — fields (inspector)</p>
+          <div class="wf-frame"><div style="padding:10px">
+            <div class="wf-label">Form fields</div>
+            <div class="wf-stack" style="margin-top:6px">
+              <div class="wf-box" style="padding:7px"><div class="wf-row wf-row--between"><div class="wf-line w-50"></div><span class="wf-label">⠿ required</span></div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-row wf-row--between"><div class="wf-line w-40"></div><span class="wf-label">⠿</span></div></div>
+              <div class="wf-box wf-box--ghost" style="padding:7px;border-style:dashed"><div class="wf-line w-30"></div></div>
+            </div>
+            <div class="wf-box wf-box--2" style="margin-top:8px;padding:7px"><span class="wf-label">On submit ▾</span><span class="wf-tag">1</span><div class="wf-line w-60" style="margin-top:5px"></div></div>
+            <div class="wf-box wf-box--2" style="margin-top:6px;padding:6px;border-color:var(--wf-ink)"><span class="tag-list">⚠ invalid: "Email required" · ✓ success: "Thanks!" — states drawn</span></div>
+          </div></div>
+        </div>
+        <div style="flex:1 1 220px">
+          <p class="wf-frame__caption">Run — submissions (leads)</p>
+          <div class="wf-frame"><div style="padding:10px">
+            <div class="wf-row wf-row--between"><span class="wf-label">23 submissions</span><span class="wf-pill"><span class="wf-tag">2</span>⤓ Export CSV</span></div>
+            <div class="wf-box wf-box--2" style="margin-top:8px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-40"></div><div class="wf-line w-15"></div></div></div>
+            <div class="wf-box" style="margin-top:4px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-40"></div><div class="wf-line w-15"></div></div></div>
+            <div class="wf-box" style="margin-top:4px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-40"></div><div class="wf-line w-15"></div></div></div>
+          </div></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>"On submit" decided up front.</strong> Form banate waqt action (email/redirect) = part of the build, guess nahi (#5 the form's purpose). Real submit ab persist hota (no fake success).</li>
+        <li><span class="wf-tag">2</span><strong>Export CSV saamne.</strong> Agency leads client ko deti hai → export ek click (route ab shipped). Submissions = real customer data, status ✅.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 14 PUBLISH FLOW -->
+  <section class="screen" id="publish-flow">
+    <h2>14 · Publish flow <span class="tag-list">topbar hero → flow · J6</span></h2>
+    <p class="meta"><b>Job:</b> "Site live karo — bina dar ke." · <b>Numayan:</b> the live URL · <b>Dheema:</b> options.</p>
+    <p class="mods"><b>Modules (4 states):</b> Confirm (pages/domain) → Building (progress) → Live (URL + visit) → Failed (cause + retry). A <em>flow</em>, not one panel (#13 every state).</p>
+    <div class="wf">
+      <div class="wf-row" style="gap:10px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1 1 150px"><div class="wf-frame" style="height:140px"><div style="padding:10px"><div class="wf-label">Publish?</div><div class="wf-box" style="margin-top:8px;padding:6px"><div class="wf-line w-75"></div></div><div class="wf-pill" style="margin-top:6px">✓ 4 pages · domain ▾</div><div class="wf-pill wf-pill--solid" style="margin-top:8px"><span class="wf-tag">1</span>Publish now</div></div></div><p class="wf-frame__caption">1 Confirm</p></div>
+        <div style="flex:1 1 150px"><div class="wf-frame" style="height:140px"><div style="padding:10px;display:grid;place-items:center;height:100%;text-align:center"><div><span class="wf-icon" style="width:26px;height:26px;margin:0 auto"></span><div class="wf-line w-75" style="margin:10px auto 0"></div><div class="wf-box wf-box--2" style="margin-top:8px;height:8px;padding:0"><div style="width:55%;height:100%;background:var(--wf-solid);border-radius:4px"></div></div><div class="tag-list" style="margin-top:6px">building… <span class="wf-tag">2</span></div></div></div></div><p class="wf-frame__caption">2 Building</p></div>
+        <div style="flex:1 1 150px"><div class="wf-frame" style="height:140px"><div style="padding:10px;display:grid;place-items:center;height:100%;text-align:center"><div><div class="wf-label">● Live</div><div class="wf-box" style="margin:8px 0;padding:6px"><div class="wf-line w-90"></div></div><div class="wf-pill wf-pill--solid"><span class="wf-tag">3</span>Visit site ↗</div><div class="tag-list" style="margin-top:6px">site.vercel.app</div></div></div></div><p class="wf-frame__caption">3 Live</p></div>
+        <div style="flex:1 1 150px"><div class="wf-frame" style="height:140px"><div style="padding:10px"><div class="wf-box wf-box--2" style="border-color:var(--wf-ink)"><div class="wf-line w-90"></div><div class="tag-list" style="margin-top:6px">build failed — log ↗</div><div class="wf-row" style="margin-top:8px"><span class="wf-pill wf-pill--solid">Retry</span><span class="wf-pill">View log</span><span class="wf-tag">4</span></div></div></div></div><p class="wf-frame__caption">4 Failed</p></div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Confirm, not instant.</strong> Publish irreversible-ish → ek hateli ka confirm (pages + domain) (#5 hero + error-prevention). Single dark button.</li>
+        <li><span class="wf-tag">2</span><strong>Building = visible progress.</strong> Chup mat raho — progress bar + "building…" (#2 system status). Yeh users ki "no feedback" shikayat ka direct ilaaj.</li>
+        <li><span class="wf-tag">3</span><strong>Live = the URL is the hero.</strong> Kaam ka nateeja = live link + Visit. Wahi sabse numayan (#4).</li>
+        <li><span class="wf-tag">4</span><strong>Failed = cause + retry.</strong> Saaf wajah + log + Retry — kabhi silent fail nahi (#1 · #13).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 15 PREVIEW -->
+  <section class="screen" id="preview">
+    <h2>15 · Preview (as client) <span class="tag-list">topbar → overlay · J5 · ⚠️ live = new browser window, no in-app overlay/preview-bar yet</span></h2>
+    <p class="meta"><b>Job:</b> "Site client ki nazar se dekho — editor chrome ke baghair." · <b>Numayan:</b> the page · <b>Dheema:</b> preview controls.</p>
+    <p class="mods"><b>Modules:</b> thin preview bar (Exit · device · "Viewing as: Client ▾") · clean rendered page (no rail/inspector/canvas-toolbar).</p>
+    <div class="wf">
+      <div class="wf-frame">
+        <div style="display:grid;grid-template-rows:28px 1fr;height:230px">
+          <div style="background:var(--wf-fill);border-bottom:1px solid var(--wf-ink);display:flex;align-items:center;gap:8px;padding:0 10px;font-size:11px"><span class="wf-tag">1</span><span class="wf-label">← Exit preview</span><span class="wf-grow" style="text-align:center"><span class="wf-pill wf-pill--on">▭</span><span class="wf-pill">▢</span><span class="wf-pill">▯</span></span><span class="wf-pill wf-pill--on">Viewing as: Client ▾</span><span class="wf-tag">2</span></div>
+          <div style="padding:16px;background:#fff;overflow:hidden">
+            <div class="wf-row wf-row--between"><div class="wf-line w-25 wf-line--ink"></div><div class="wf-row"><div class="wf-line w-15"></div><div class="wf-line w-15"></div><span class="wf-pill">Menu</span></div></div>
+            <div class="wf-img" style="height:74px;margin-top:14px"></div>
+            <div class="wf-box wf-box--plain" style="margin-top:12px"><div class="wf-line w-90"></div><div class="wf-line w-60" style="margin-top:7px"></div></div>
+            <div class="wf-pill wf-pill--solid" style="margin-top:12px">Get started</div>
+          </div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>No editor chrome.</strong> Preview = sach mein woh jo client dekhega — rail/inspector/canvas-toolbar sab gaya. Sirf ek patli exit bar (#1 match the real world).</li>
+        <li><span class="wf-tag">2</span><strong>"Viewing as: Client".</strong> Saaf batao kis nazar se dekh rahe ho (#2 system status) — client-only sanitized view (drafts/admin hidden). Yeh agency wedge ka core.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 16 REQUEST REVIEW -->
+  <section class="screen" id="request-review">
+    <h2>16 · Request review <span class="tag-list">topbar ship dropdown · J5</span></h2>
+    <p class="meta"><b>Job:</b> "Client ko review ke liye bhejo + notify ho." · <b>Numayan:</b> Send button · <b>Dheema:</b> change summary.</p>
+    <p class="mods"><b>Modules:</b> what-changed summary · recipient (client ▾) · message · Send · then status "Sent · awaiting review".</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:320px">
+        <div style="padding:12px">
+          <div class="wf-drawer-title">Send for review</div>
+          <div class="wf-box wf-box--2" style="margin-top:8px;padding:8px"><div class="wf-label">What changed <span class="wf-tag">1</span></div><div class="wf-stack" style="margin-top:5px"><div class="wf-line w-90"></div><div class="wf-line w-75"></div><div class="wf-line w-60"></div></div></div>
+          <div class="wf-row" style="margin-top:8px;gap:6px"><span class="wf-label">To:</span><span class="wf-pill wf-pill--on wf-grow">Client — acme.co ▾</span></div>
+          <div class="wf-box" style="margin-top:8px;padding:8px"><div class="wf-label">Message (optional)</div><div class="wf-line w-75" style="margin-top:6px"></div></div>
+          <div class="wf-row wf-row--between" style="margin-top:10px"><span class="tag-list">✉ client ko email jaayega <span class="wf-tag">2</span></span><span class="wf-pill wf-pill--solid">Send for review</span></div>
+          <div style="border-top:1px dashed var(--wf-line);margin-top:10px;padding-top:8px"><span class="wf-pill wf-pill--on">● Sent · awaiting review</span><div class="tag-list" style="margin-top:5px">client ko ✉ gaya · review-queue mein dikha — loop closed</div></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Change summary auto-bhara.</strong> Client ko "kya badla" bina poochhe dikhe (#1 + recognition). Agency ko dobara likhna na pade.</li>
+        <li><span class="wf-tag">2</span><strong>Notify trigger = the missing piece.</strong> Aaj review silent jaata (no email) — yeh redesign explicitly "✉ client ko email" dikhata (#2: silence is the bug). Status 🟡 → wire the notify.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 17 COMMENTS -->
+  <section class="screen" id="comments">
+    <h2>17 · Comments <span class="tag-list">⚠️ NOT in editor — real impl = dashboard iframe overlay on published site · J5</span></h2>
+    <p class="meta"><b>Job:</b> "Page par theek us jagah feedback do/dekho." · <b>Numayan:</b> pinned thread · <b>Dheema:</b> resolved pins.</p>
+    <p class="mods"><b>Modules:</b> comment-mode toggle · pinned dots (x/y) · thread popover (author · text · reply · Resolve ✓) · resolved filter.</p>
+    <div class="wf">
+      <div class="wf-frame">
+        <div style="display:grid;grid-template-rows:26px 1fr;height:220px">
+          <div style="background:var(--wf-fill);border-bottom:1px solid var(--wf-line);display:flex;align-items:center;gap:8px;padding:0 10px;font-size:11px"><span class="wf-pill wf-pill--on">💬 Comment mode</span><span class="wf-tag">1</span><span class="wf-grow"></span><span class="wf-pill">Show resolved</span></div>
+          <div style="position:relative;padding:16px;background:#fff">
+            <div class="wf-img" style="height:60px"></div>
+            <div class="wf-box wf-box--plain" style="margin-top:10px"><div class="wf-line w-75"></div><div class="wf-line w-50" style="margin-top:6px"></div></div>
+            <span class="wf-pill wf-pill--solid" style="position:absolute;top:18px;left:120px;padding:2px 7px">1</span>
+            <span class="wf-pill wf-pill--solid" style="position:absolute;top:86px;left:60px;padding:2px 7px">2</span>
+            <div class="wf-box wf-box--2" style="position:absolute;top:34px;left:150px;width:150px;padding:8px;border-color:var(--wf-ink)"><div class="wf-row"><span class="wf-icon" style="width:16px;height:16px"></span><div class="wf-line w-50"></div></div><div class="wf-line w-90" style="margin-top:6px"></div><div class="wf-row wf-row--between" style="margin-top:8px"><span class="wf-pill" style="padding:2px 7px">Reply</span><span class="wf-pill" style="padding:2px 7px">Resolve ✓</span><span class="wf-tag">2</span></div></div>
+          </div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Comment mode = explicit.</strong> Toggle on → click anywhere to pin. Edit ke saath galti se mix na ho (#5 one mode at a time, #9). Same-origin overlay (path A) — isliye yeh kaam karega, cross-origin published site par nahi.</li>
+        <li><span class="wf-tag">2</span><strong>Resolve closes the loop.</strong> Har pin ek thread; Resolve ✓ = done. Agency dekh sake kya bचा (#2). Yeh woh client-side jo aaj <em>missing</em> hai.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 18 SHARE LINK -->
+  <section class="screen" id="share">
+    <h2>18 · Share link + password <span class="tag-list">⚠️ absent in editor — real bcrypt gate ships in dashboard · J5</span></h2>
+    <p class="meta"><b>Job:</b> "Ek link banao jisse client (bina login) dekh sake." · <b>Numayan:</b> link + copy · <b>Dheema:</b> password, expiry.</p>
+    <p class="mods"><b>Modules:</b> link + Copy · password toggle + field · expiry ▾ · access note · honesty badge.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:320px">
+        <div style="padding:12px">
+          <div class="wf-drawer-title">Share a review link</div>
+          <div class="wf-row" style="margin-top:8px;gap:6px"><div class="wf-box wf-grow" style="padding:8px"><div class="wf-line w-90"></div></div><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>Copy</span></div>
+          <div class="wf-row wf-row--between" style="margin-top:10px"><span class="wf-label">🔒 Password protect</span><span class="wf-pill wf-pill--on">on ●</span></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-line w-50"></div></div>
+          <div class="wf-row wf-row--between" style="margin-top:10px"><span class="wf-label">Expires</span><span class="wf-pill">7 days ▾</span></div>
+          <p class="tag-list" style="margin-top:10px"><span class="wf-tag">2</span> "Anyone with link + password → read-only preview"</p>
+          <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:6px;border-style:dashed"><span class="tag-list">⚠️ correction: dashboard mein real bcrypt password-gate SHIPPED (rate-limited, httpOnly cookie). Gap = editor ki ship-dropdown se Share missing.</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Copy = the hero.</strong> Link banane ka maqsad = bhejna → Copy sabse numayan (#5). Link box pehle, baqi options niche (#9).</li>
+        <li><span class="wf-tag">2</span><strong>Access plain-language.</strong> "Anyone with link + password, read-only" — token/scope jargon nahi (#1). ⚠️ Correction: gate aaj REAL hai (dashboard bcrypt) — sirf editor ki ship-dropdown se Share UI absent. Redesign = isay editor mein laana (#3).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 20 SEO -->
+  <section class="screen" id="seo">
+    <h2>20 · Per-page SEO <span class="tag-list">inspector / settings · J6</span></h2>
+    <p class="meta"><b>Job:</b> "Is page ka Google + social preview set karo." · <b>Numayan:</b> title + description · <b>Dheema:</b> slug, OG image.</p>
+    <p class="mods"><b>Modules:</b> page title · meta description (char count) · slug · OG/social image · live search-result preview · ✨ write-with-AI.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:320px">
+        <div style="padding:12px">
+          <div class="wf-drawer-title">Page SEO</div>
+          <div class="wf-box" style="margin-top:8px;padding:8px"><div class="wf-row wf-row--between"><span class="wf-label">Title</span><span class="wf-pill"><span class="wf-tag">1</span>✨ AI</span></div><div class="wf-line w-90" style="margin-top:6px"></div></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-row wf-row--between"><span class="wf-label">Description</span><span class="tag-list">128/160 <span class="wf-tag">2</span></span></div><div class="wf-line w-90" style="margin-top:6px"></div><div class="wf-line w-60" style="margin-top:5px"></div></div>
+          <div class="wf-row" style="margin-top:6px;gap:6px"><div class="wf-box wf-grow" style="padding:7px"><span class="wf-label">Slug /about</span></div><div class="wf-img" style="width:46px;height:34px"></div></div>
+          <div class="wf-box wf-box--2" style="margin-top:10px;padding:8px;border-color:var(--wf-ink)"><span class="wf-label">Search preview <span class="wf-tag">3</span></span><div class="wf-line w-50" style="margin-top:6px;height:7px;background:#1a73e8"></div><div class="wf-line w-40" style="margin-top:4px;height:6px;background:#0D9488"></div><div class="wf-line w-90" style="margin-top:5px"></div></div>
+          <div class="wf-row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">edge states →</span><span class="wf-pill" style="color:var(--bad)">172/160 ⚠ too long</span><span class="wf-pill" style="border-style:dashed;opacity:.65">✨ needs key</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Write-with-AI inline.</strong> SEO copy likhna ghissa kaam → AI button field ke saath (helper, not hero). Needs key → no-key state drawn (degrade, don't block · #3 + #13).</li>
+        <li><span class="wf-tag">2</span><strong>Char count live.</strong> Google ~160 char cut karta — count + warning over-limit (#2 + #13 edge state). "meta description" jargon, par label saaf rakha.</li>
+        <li><span class="wf-tag">3</span><strong>Live search preview.</strong> User dekhe Google par kaisa lagega — feedback loop (#2). Yehi #1 "match the real world."</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 21 SITE SETTINGS -->
+  <section class="screen" id="site-settings">
+    <h2>21 · Site settings <span class="tag-list">one home (was 3) · J6</span></h2>
+    <p class="meta"><b>Job:</b> "Site-wide config ek jagah." · <b>Numayan:</b> active section form · <b>Dheema:</b> rare sections.</p>
+    <p class="mods"><b>Modules:</b> section nav (General · SEO defaults · Social · Custom code · Security · Localization) + active-section form. <em>3 purane homes (editor tab · dashboard · hub) → ek.</em></p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:480px">
+        <div style="display:grid;grid-template-columns:130px 1fr;min-height:180px">
+          <div style="border-right:1px solid var(--wf-line);padding:10px">
+            <div class="wf-stack">
+              <div class="wf-box wf-box--2" style="padding:6px;border-color:var(--wf-ink)"><div class="wf-line w-60"></div></div>
+              <div class="wf-box" style="padding:6px"><div class="wf-line w-50"></div></div>
+              <div class="wf-box" style="padding:6px"><div class="wf-line w-40"></div></div>
+              <div class="wf-box" style="padding:6px"><div class="wf-line w-50"></div></div>
+              <div class="wf-box" style="padding:6px"><div class="wf-line w-40"></div></div>
+              <div class="wf-box" style="padding:6px"><div class="wf-line w-50"></div></div>
+            </div>
+            <span class="wf-tag" style="margin-top:6px">1</span>
+          </div>
+          <div style="padding:12px">
+            <span class="wf-label">General</span>
+            <div class="wf-box" style="margin-top:8px;padding:8px"><span class="wf-label">Site name</span><div class="wf-line w-75" style="margin-top:6px"></div></div>
+            <div class="wf-box" style="margin-top:6px;padding:8px"><span class="wf-label">Favicon</span><div class="wf-row" style="margin-top:6px"><div class="wf-img" style="width:30px;height:30px"></div></div></div>
+            <div class="wf-row wf-row--between" style="margin-top:10px"><span class="tag-list">auto-saved <span class="wf-tag">2</span></span><span class="wf-pill wf-pill--on">● Saved</span></div>
+          </div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Section nav = the spine of settings.</strong> Left list fixed (6 sections: General · SEO defaults · Social · Custom code · Security · Localization); har section ek form. Rare (Security · Localization) neeche (#9). Localization <em>settings</em> wired + save — runtime abhi single-locale, so woh caveat locale-feature pe lagti, is panel pe nahi (#3 honesty, not a fake gate).</li>
+        <li><span class="wf-tag">2</span><strong>Auto-save, not a Save button.</strong> Settings forms auto-save + status pill (#2) — kahin "save dabana bhool gaya" na ho. One home (#14): editor-tab + hub duplicates dissolved.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 22 DOMAINS -->
+  <section class="screen" id="domains">
+    <h2>22 · Custom domains <span class="tag-list">settings (dashboard) · J6 · 🟡 verify untested live</span></h2>
+    <p class="meta"><b>Job:</b> "Apna domain connect + verify karo." · <b>Numayan:</b> connect + status · <b>Dheema:</b> DNS records.</p>
+    <p class="mods"><b>Modules:</b> domain list · + Connect · per-domain status (pending/verified/primary) · DNS records to add (CNAME) · set-primary.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:340px">
+        <div style="padding:12px">
+          <div class="wf-row wf-row--between"><span class="wf-drawer-title" style="border:0;padding:0;margin:0">Domains</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>+ Connect</span></div>
+          <div class="wf-box wf-box--2" style="margin-top:8px;padding:8px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><div class="wf-line w-50"></div><span class="wf-pill wf-pill--on">✓ Primary</span></div></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-line w-40"></div><span class="wf-row" style="gap:6px"><span class="wf-pill">✓ Verified</span><span class="wf-pill">Set primary <span class="wf-tag">2</span></span></span></div></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-line w-40"></div><span class="wf-pill">◐ Verifying…</span></div>
+            <div class="wf-box wf-box--2" style="margin-top:6px;padding:6px"><span class="tag-list">CNAME → cname.vercel-dns.com · copy</span></div></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-line w-40"></div><span class="wf-pill" style="color:var(--bad)">✗ Failed · retry</span></div></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:6px;border-style:dashed"><span class="tag-list"><span class="wf-tag">3</span>⚠ 🟡 live DNS-verify untested end-to-end</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Connect = the hero.</strong> Domain jodna primary kaam → dark button. Baaki list rows.</li>
+        <li><span class="wf-tag">2</span><strong>Every state + set-primary.</strong> Primary · verified-secondary (→ <em>Set primary</em>) · verifying · failed(retry) — DNS slow + flaky hota, har state chahiye (#13 + #2). Set-primary verified secondary par hi dikhta (flow band nahi hota jab multiple domains). Copy-able CNAME (recognition #1).</li>
+        <li><span class="wf-tag">3</span><strong>Honest badge.</strong> Code-fix laga par live-verify pending → badge, jhoot nahi (#3).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 23 REDIRECTS -->
+  <section class="screen" id="redirects">
+    <h2>23 · Redirects <span class="tag-list">settings · J6 · 🟡 stored-not-deployed</span></h2>
+    <p class="meta"><b>Job:</b> "Purane URL ko naye pe bhejo." · <b>Numayan:</b> rule list + add · <b>Dheema:</b> type 301/302.</p>
+    <p class="mods"><b>Modules:</b> rule table (from → to · type) · + Add redirect · honesty badge.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:380px">
+        <div style="padding:12px">
+          <div class="wf-row wf-row--between"><span class="wf-drawer-title" style="border:0;padding:0;margin:0">Redirects</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>+ Add</span></div>
+          <div class="wf-box wf-box--2" style="margin-top:8px;padding:6px"><div class="wf-row"><div class="wf-line w-40"></div><span class="wf-label">→</span><div class="wf-line w-40"></div><span class="wf-pill" style="padding:1px 6px">301</span></div></div>
+          <div class="wf-box" style="margin-top:4px;padding:6px"><div class="wf-row"><div class="wf-line w-40"></div><span class="wf-label">→</span><div class="wf-line w-40"></div><span class="wf-pill" style="padding:1px 6px">302</span></div></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:7px;border-style:dashed;text-align:center"><span class="tag-list"><span class="wf-tag">3</span>empty: "No redirects yet — + Add your first"</span></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:7px;border-style:dashed"><span class="tag-list"><span class="wf-tag">2</span>⚠ 🟡 rules stored but NOT live yet — "saved, will work after fix" (don't fake)</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>from → to, plain.</strong> Ek rule = "yahan se → wahan." 301/302 chip (default 301). Add = hero.</li>
+        <li><span class="wf-tag">2</span><strong>Honest about the gap.</strong> Backend rules store karta par deploy output mein inject nahi hote → live kaam nahi karte. Badge sach bole (#3) — warna user trust toot-ta hai jab redirect chalta nahi.</li>
+        <li><span class="wf-tag">3</span><strong>Empty state drawn.</strong> Zero rules → prompt "+ Add your first", na ki khaali box (#13). List surfaces ka pehla state empty hota.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 24 VERSION HISTORY -->
+  <section class="screen" id="version-history">
+    <h2>24 · Version history <span class="tag-list">footer ⌗ / history panel · substrate · 🟡→✅ now server-backed</span></h2>
+    <p class="meta"><b>Job:</b> "Purani version dekho / wapas lao." · <b>Numayan:</b> timeline + restore · <b>Dheema:</b> rename, compare.</p>
+    <p class="mods"><b>Modules:</b> version timeline (timestamp · named · current marker) · restore · compare · empty state.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:320px">
+        <div style="padding:12px">
+          <div class="wf-drawer-title">History</div>
+          <div class="wf-stack" style="margin-top:8px">
+            <div class="wf-box wf-box--2" style="padding:8px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><div><div class="wf-line w-50"></div><div class="tag-list" style="margin-top:3px">now · current <span class="wf-tag">1</span></div></div><span class="wf-pill wf-pill--on">●</span></div></div>
+            <div class="wf-box wf-box--2" style="padding:8px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><div class="wf-row" style="gap:6px"><span class="wf-pill wf-pill--on" style="padding:0 5px">☑</span><div><div class="wf-line w-40"></div><div class="tag-list" style="margin-top:3px">2h ago · "before redesign" · selected</div></div></div><span class="wf-pill">Restore <span class="wf-tag">2</span></span></div></div>
+            <div class="wf-box wf-box--2" style="padding:8px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><div class="wf-row" style="gap:6px"><span class="wf-pill wf-pill--on" style="padding:0 5px">☑</span><div><div class="wf-line w-40"></div><div class="tag-list" style="margin-top:3px">yesterday · selected</div></div></div><span class="wf-pill">Restore</span></div></div>
+          </div>
+          <div class="wf-row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><span class="wf-pill wf-pill--solid">Compare 2</span><span class="tag-list">2 selected → diff</span><span class="tag-list"><span class="wf-tag">3</span>cloud-backed ✓</span></div>
+          <div class="wf-box" style="margin-top:8px;padding:7px"><span class="tag-list"><span class="wf-tag">4</span>restore → confirm: "Replace current with this version?" · ✓ Restore · ✗ Cancel</span></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:4px;padding:6px;border-style:dashed;text-align:center"><span class="tag-list">empty: "No versions yet — they save as you work"</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Current clearly marked.</strong> "Now · current" + dot → user jaane kahan hai (#2 orientation). Timeline newest-first.</li>
+        <li><span class="wf-tag">2</span><strong>Restore per row, named.</strong> Har version ka apna Restore; named versions ("before redesign") recognition (#1). Restore = confirm (irreversible-ish, #5/error-prevention).</li>
+        <li><span class="wf-tag">3</span><strong>"cloud-backed ✓" now true.</strong> Pehle IndexedDB-only (data-loss on new device); ab server model shipped → badge sach bol sakti (#3).</li>
+        <li><span class="wf-tag">4</span><strong>Restore confirms; Compare needs 2.</strong> Restore current ko replace karta (semi-destructive) → confirm dialog drawn (#5 error-prevention, shared pattern). Compare 2 versions select karne par chalu — bare button nahi, selection state + empty state dono drawn (#13).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 25 AI ASSISTANT -->
+  <section class="screen" id="ai-assistant">
+    <h2>25 · AI Assistant <span class="tag-list">topbar ✨ → right drawer · cross-cutting · 🟡 partial — topbar ✨ = simple bar; rich chat/plan lives in rail AI tab; quota meter orphan · needs key</span></h2>
+    <p class="meta"><b>Job:</b> "AI se site banwao / badlo — baat karke." · <b>Numayan:</b> chat thread + input · <b>Dheema:</b> quota, plan-mode.</p>
+    <p class="mods"><b>Modules:</b> chat thread (user/AI) · prompt input + send · edit-commands (AI site pe act kare) · plan mode (multi-step) · quota meter · needs-key empty state · thinking/streaming state.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:300px">
+        <div style="padding:12px">
+          <div class="wf-row wf-row--between"><span class="wf-row" style="gap:6px"><span class="wf-drawer-title" style="border:0;padding:0;margin:0">✨ AI</span><span class="wf-pill" style="padding:0 6px"><span class="wf-tag">4</span>Chat · Plan ▾</span></span><span class="wf-row" style="gap:5px"><span class="wf-pill" style="opacity:.7">🟡 live-unverified</span><span class="wf-pill"><span class="wf-tag">1</span>◔ 42/100</span></span></div>
+          <div class="wf-stack" style="margin-top:8px">
+            <div class="wf-box" style="padding:8px;margin-left:36px"><div class="wf-line w-90"></div><div class="wf-line w-60" style="margin-top:4px"></div></div>
+            <div class="wf-box wf-box--2" style="padding:8px;margin-right:24px;border-color:var(--wf-ink)"><div class="tag-list">✨ AI <span class="wf-tag">2</span></div><div class="wf-line w-90" style="margin-top:5px"></div><div class="wf-line w-75" style="margin-top:4px"></div><div class="tag-list" style="margin-top:5px;color:var(--muted)">● ● ●  thinking… (streaming)</div></div>
+            <div class="wf-box" style="padding:6px;margin-right:24px"><span class="tag-list">✓ edit-command applied: "hero heading changed"</span></div>
+          </div>
+          <div class="wf-box" style="margin-top:10px;padding:8px"><div class="wf-row wf-row--between"><span class="wf-label" style="color:var(--muted)">Ask or describe a change…</span><span class="wf-pill wf-pill--solid">↑</span></div></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:7px;border-style:dashed;text-align:center"><span class="tag-list"><span class="wf-tag">3</span>no key → "Add an AI key in Settings to turn this on"</span></div>
+          <div class="wf-row" style="margin-top:6px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">states →</span><span class="wf-pill" style="color:var(--bad)">⚠ error · retry</span><span class="wf-pill" style="opacity:.7">quota out → upgrade</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Quota gets a home.</strong> <code>ai.getQuotaStatus</code> orphan tha (route ready, no UI → deferred "needs a home in the AI panel"). Yeh redesign woh ghar hai — meter header mein, taaki silent quota-hit na ho (#2 honesty/feedback).</li>
+        <li><span class="wf-tag">2</span><strong>States drawn, not listed.</strong> thinking/streaming (● ● ●) · error·retry · quota-out · no-key — sab chips ban ke drawn, sirf prose mein nahi (#13). Yeh learning-record 0014 ka sabaq: "pass" line woh hi claim kare jo draw hai.</li>
+        <li><span class="wf-tag">3</span><strong>Honest gate, graceful.</strong> Runtime live-unverified → 🟡 badge header mein + needs-key → no-key state setup pe bhejta, "broken" nahi (#3). AI helper hai → drawer (topbar ✨ se), rail slot nahi (#5 · #8).</li>
+        <li><span class="wf-tag">4</span><strong>Doer, not just chatter.</strong> Edit-commands (AI site pe act kare → "✓ applied" chip in thread) + Plan mode (header toggle, multi-step) — assistant chat se aage. Dono drawn, capability list backed.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 26 PROPOSE-ACTION -->
+  <section class="screen" id="propose-action">
+    <h2>26 · AI Propose-action <span class="tag-list">propose → confirm → execute · ✅ wired · ADMIN-gated</span></h2>
+    <p class="meta"><b>Job:</b> "AI ka change pehle dekho, phir lago — auto nahi." · <b>Numayan:</b> proposal + Confirm/Reject · <b>Dheema:</b> token, gate.</p>
+    <p class="mods"><b>Modules:</b> proposal card (kya badlega) · target highlight on canvas · Confirm · Reject · ADMIN-gate badge · single-use token (ek hi apply) · executing/done states.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:420px">
+        <div style="padding:12px">
+          <div class="wf-box" style="padding:14px"><div class="wf-box wf-box--2" style="padding:8px;border-color:var(--wf-ink);border-style:dashed"><div class="wf-line w-50"></div><span class="tag-list"><span class="wf-tag">2</span>target highlighted</span></div><div class="wf-line w-75" style="margin-top:8px"></div></div>
+          <div class="wf-box wf-box--2" style="margin-top:10px;padding:10px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><span class="wf-label">✨ AI wants to change this <span class="wf-tag">1</span></span><span class="wf-pill" style="opacity:.7">ADMIN <span class="wf-tag">3</span></span></div>
+            <div class="wf-line w-90" style="margin-top:6px"></div><div class="wf-line w-60" style="margin-top:4px"></div>
+            <div class="wf-row" style="margin-top:8px;gap:6px"><span class="wf-pill wf-pill--solid">Confirm</span><span class="wf-pill">Reject</span><span class="tag-list" style="margin-left:auto"><span class="wf-tag">4</span>1-use token</span></div></div>
+          <div class="wf-row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">after confirm →</span><span class="wf-pill" style="opacity:.7">◐ executing…</span><span class="wf-pill wf-pill--on">✓ applied</span><span class="wf-pill" style="color:var(--bad)">✗ rejected</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Propose, never auto-mutate.</strong> AI ka change pehle card mein → user dekhe → Confirm tab lage. Trust ka core (#5 / error-prevention). Auto-apply = data-loss risk.</li>
+        <li><span class="wf-tag">2</span><strong>Show the target.</strong> Kaunsa element badlega woh canvas pe highlight → user scope samjhe (#2 · recognition #1).</li>
+        <li><span class="wf-tag">3</span><strong>ADMIN-gate honest.</strong> Abhi ADMIN-only (GA nahi) → badge dikhao, fake-GA mat karo (#3). Live-proven flow (impl caveat: annotation overlay click-block → js path).</li>
+        <li><span class="wf-tag">4</span><strong>Single-use token.</strong> Ek proposal = ek apply; double-apply nahi (safety). States: proposed · confirming · executing · done · rejected (#13).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 27 INLINE AI -->
+  <section class="screen" id="inline-ai">
+    <h2>27 · Inline AI <span class="tag-list">✨ at point-of-work · #16 · 🟡 alt-text leg shipped; selected-text ✨ Rewrite/Tone bar absent</span></h2>
+    <p class="meta"><b>Job:</b> "Jahan kaam ho raha wahin AI — selection / field / image pe." · <b>Numayan:</b> ✨ on the thing · <b>Dheema:</b> tone/length options.</p>
+    <p class="mods"><b>Modules:</b> selected-text ✨ bar (Rewrite · Shorten · Tone) · result popover + Accept/↻ · image "✨ Alt text" (Haiku). Same ✨ idiom as the SEO-field ✨ already drawn in §20 — inline AI is one idiom across surfaces, shown here on selection + image.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:380px">
+        <div style="padding:12px">
+          <div class="wf-box wf-box--2" style="padding:10px;border-color:var(--wf-ink)"><div class="wf-line w-90"></div><div class="wf-line w-75" style="margin-top:4px"></div>
+            <div class="wf-row" style="margin-top:8px;gap:6px"><span class="wf-pill wf-pill--solid">✨ <span class="wf-tag">1</span></span><span class="wf-pill">Rewrite</span><span class="wf-pill">Shorten</span><span class="wf-pill">Tone ▾</span></div></div>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><div class="tag-list">✨ suggestion <span class="wf-tag">2</span></div><div class="wf-line w-90" style="margin-top:5px"></div><div class="wf-row" style="margin-top:6px;gap:6px"><span class="wf-pill wf-pill--solid">Accept</span><span class="wf-pill">↻ Regenerate</span></div></div>
+          <div class="wf-row" style="margin-top:6px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">states →</span><span class="wf-pill" style="opacity:.7">◐ generating…</span><span class="wf-pill" style="color:var(--bad)">⚠ failed · retry</span></div>
+          <div class="wf-row" style="margin-top:10px;gap:6px"><div class="wf-img" style="width:46px;height:34px"></div><div class="wf-box wf-grow" style="padding:7px"><span class="tag-list"><span class="wf-tag">3</span>✨ Alt text → "auto-described"</span></div></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>AI hugs the work (#16).</strong> Selection pe floating ✨ bar — element ke paas, panel tak jaana nahi. Frequency + locality = inline (L20 ka AI roop). Topbar ✨ = full chat; inline ✨ = is element pe.</li>
+        <li><span class="wf-tag">2</span><strong>Result = Accept / Regenerate.</strong> AI output suggestion hai, faisla nahi → Accept ya ↻ (#5 user-in-control). Loading · result · error states (#13).</li>
+        <li><span class="wf-tag">3</span><strong>One ✨ idiom, everywhere.</strong> Selection · image alt-text · SEO field — same ✨ trigger, same Accept/↻ (#11 one name · #12 one shape). Plain verbs "Rewrite/Shorten", LLM-jargon nahi (#1). Needs-key degrade (#3).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 29 COMMAND PALETTE -->
+  <section class="screen" id="command-palette">
+    <h2>29 · Command palette <span class="tag-list">⌘⇧P overlay · from topbar ⋯ · ✅ (⚠️ 2-3 separate palettes, not one unified overlay)</span></h2>
+    <p class="meta"><b>Job:</b> "Koi bhi action — type karke jump." · <b>Numayan:</b> search + results · <b>Dheema:</b> shortcuts.</p>
+    <p class="mods"><b>Modules:</b> search input · grouped results (pages · actions · elements) · keyboard nav · recents · no-match empty state.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:340px">
+        <div style="padding:12px">
+          <div class="wf-box wf-box--2" style="padding:8px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><span class="wf-label" style="color:var(--muted)">Type a command… <span class="wf-tag">1</span></span><span class="tag-list">⌘⇧P</span></div></div>
+          <div class="wf-stack" style="margin-top:8px">
+            <div class="tag-list" style="color:var(--muted)">Actions</div>
+            <div class="wf-box wf-box--2" style="padding:6px;border-color:var(--wf-ink)"><div class="wf-row" style="gap:6px"><span class="wf-icon"></span><div class="wf-line w-60"></div></div></div>
+            <div class="wf-box" style="padding:6px"><div class="wf-row" style="gap:6px"><span class="wf-icon"></span><div class="wf-line w-50"></div></div></div>
+            <div class="tag-list" style="color:var(--muted);margin-top:4px">Pages <span class="wf-tag">2</span></div>
+            <div class="wf-box" style="padding:6px"><div class="wf-row" style="gap:6px"><span class="wf-icon"></span><div class="wf-line w-40"></div></div></div>
+          </div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:7px;border-style:dashed;text-align:center"><span class="tag-list"><span class="wf-tag">3</span>no match → "Nothing found for that"</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Keyboard-first, prime space free.</strong> ⌘⇧P se khulta — power-user shortcut, topbar mein button nahi (#7 earns-its-way: rare-ish → overlay/⋯, not the bar).</li>
+        <li><span class="wf-tag">2</span><strong>Grouped by intent.</strong> Actions · Pages · Elements alag (#10) — plain action names, code-jargon nahi (#1).</li>
+        <li><span class="wf-tag">3</span><strong>No-match drawn.</strong> Khaali search ka apna state (#13) — silence "ttoota" lagta.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 30 ONBOARDING -->
+  <section class="screen" id="onboarding">
+    <h2>30 · Onboarding checklist <span class="tag-list">dismissible card · ✅ completeStep</span></h2>
+    <p class="meta"><b>Job:</b> "Pehli baar — kahan se shuru." · <b>Numayan:</b> next step · <b>Dheema:</b> done steps, dismiss.</p>
+    <p class="mods"><b>Modules:</b> step list (done/todo) · progress · dismiss × · completeStep persist · all-done collapse.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:280px">
+        <div style="padding:12px">
+          <div class="wf-row wf-row--between"><span class="wf-drawer-title" style="border:0;padding:0;margin:0">Get started</span><span class="wf-row" style="gap:6px"><span class="tag-list">1/3 <span class="wf-tag">2</span></span><span class="wf-pill">× <span class="wf-tag">3</span></span></span></div>
+          <div class="wf-stack" style="margin-top:8px">
+            <div class="wf-box" style="padding:7px"><div class="wf-row" style="gap:6px"><span class="wf-pill wf-pill--on" style="padding:0 5px">✓</span><div class="wf-line w-60" style="opacity:.5"></div></div></div>
+            <div class="wf-box wf-box--2" style="padding:7px;border-color:var(--wf-ink)"><div class="wf-row" style="gap:6px"><span class="wf-pill" style="padding:0 5px">○</span><div class="wf-line w-75"></div></div><span class="tag-list" style="margin-top:3px"><span class="wf-tag">1</span>next step highlighted</span></div>
+            <div class="wf-box" style="padding:7px"><div class="wf-row" style="gap:6px"><span class="wf-pill" style="padding:0 5px">○</span><div class="wf-line w-50"></div></div></div>
+          </div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:6px;border-style:dashed;text-align:center"><span class="tag-list">all done → card collapses</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>One next step, loud.</strong> Agla step highlighted, baaki quiet — orientation (#2), overwhelm nahi.</li>
+        <li><span class="wf-tag">2</span><strong>Progress visible.</strong> 1/3 → feedback (#2). completeStep persist (route ready).</li>
+        <li><span class="wf-tag">3</span><strong>Dismissible, self-tucking.</strong> × se band; all-done pe khud collapse — naye user ko help, purane ko nahi nagging (#3 · #9).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 31 LAYERS -->
+  <section class="screen" id="layers">
+    <h2>31 · Layers <span class="tag-list">footer ⌗ popover · ✅</span></h2>
+    <p class="meta"><b>Job:</b> "Page structure dekho / select / hide / reorder." · <b>Numayan:</b> tree · <b>Dheema:</b> lock, rename.</p>
+    <p class="mods"><b>Modules:</b> nested tree · select (syncs canvas) · hide/lock toggle · rename · drag-reorder · expand/collapse · empty state.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:280px">
+        <div style="padding:12px">
+          <div class="wf-drawer-title">⌗ Layers</div>
+          <div class="wf-stack" style="margin-top:8px">
+            <div class="wf-box" style="padding:6px"><div class="wf-row wf-row--between"><div class="wf-row" style="gap:6px"><span class="wf-icon"></span><div class="wf-line w-40"></div></div><span class="tag-list">👁 🔒</span></div></div>
+            <div class="wf-box wf-box--2" style="padding:6px;margin-left:14px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><div class="wf-row" style="gap:6px"><span class="tag-list" style="cursor:grab">⠿</span><span class="wf-icon"></span><span class="wf-box wf-box--2" style="padding:1px 6px;border-color:var(--wf-ink)"><span class="tag-list">renaming|</span></span><span class="tag-list">✎</span></div><span class="tag-list"><span class="wf-tag">2</span>selected · rename</span></div></div>
+            <div class="wf-box" style="padding:6px;margin-left:14px"><div class="wf-row wf-row--between"><div class="wf-row" style="gap:6px"><span class="tag-list" style="cursor:grab">⠿</span><span class="wf-icon"></span><div class="wf-line w-30" style="opacity:.5"></div></div><span class="tag-list"><span class="wf-tag">3</span>👁̶ hidden</span></div></div>
+            <div class="wf-box" style="padding:6px"><div class="wf-row" style="gap:6px"><span class="wf-icon"></span><div class="wf-line w-40"></div></div></div>
+          </div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:6px;border-style:dashed;text-align:center"><span class="tag-list">empty: "Add elements to see them here"</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Footer ⌗, not a rail slot.</strong> Frequent par micro — rail slot over-promote karta (#14 · #9). Popover canvas ke paas, dismissable.</li>
+        <li><span class="wf-tag">2</span><strong>Tree ↔ canvas synced.</strong> Layer select = canvas select (one truth, #2). User-named, code-name nahi (#1).</li>
+        <li><span class="wf-tag">3</span><strong>Hide/lock states drawn.</strong> 👁̶ hidden + 🔒 lock + selected — visible states (#13), prose nahi.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 32 CANVAS CONTROLS -->
+  <section class="screen" id="canvas-controls">
+    <h2>32 · Canvas controls <span class="tag-list">on-canvas overlay · ✅ (≠ canvas toolbar §0)</span></h2>
+    <p class="meta"><b>Job:</b> "Element select / resize / move / group." · <b>Numayan:</b> selection + handles · <b>Dheema:</b> group, scope.</p>
+    <p class="mods"><b>Modules:</b> selection box + corner resize handles · drag-move (✛) · group/ungroup · <b>edit-scope picker</b> (this element vs component master) · multi-select · appears only on select (#6).</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:380px">
+        <div style="padding:16px">
+          <div class="wf-box wf-box--2" style="padding:22px;border-color:var(--wf-ink);position:relative">
+            <span class="wf-tag" style="position:absolute;top:-8px;left:-8px">1</span>
+            <span class="wf-pill" style="position:absolute;top:-9px;left:-9px;padding:0 4px">▢</span>
+            <span class="wf-pill" style="position:absolute;top:-9px;right:-9px;padding:0 4px">▢</span>
+            <span class="wf-pill" style="position:absolute;bottom:-9px;right:-9px;padding:0 4px">▢</span>
+            <span class="wf-pill" style="position:absolute;bottom:-9px;left:-9px;padding:0 4px">▢</span>
+            <span class="tag-list" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">✛ drag</span>
+            <div class="wf-line w-50"></div>
+            <div class="wf-row" style="position:absolute;top:-30px;left:0;gap:6px"><span class="wf-pill">Group</span><span class="wf-pill wf-pill--solid">This element ▾ <span class="wf-tag">3</span></span></div>
+          </div>
+          <div class="wf-row" style="margin-top:10px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">states →</span><span class="wf-pill">single <span class="wf-tag">2</span></span><span class="wf-pill">multi (2)</span><span class="wf-pill" style="opacity:.7">instance → edit master?</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Chrome only on select.</strong> Rest pe canvas saaf (#6 calm); handles + toolbar tabhi jab element chuna — content hero.</li>
+        <li><span class="wf-tag">2</span><strong>Single + multi drawn.</strong> Single · multi-select (2) — dono states visible (#13). Controls element ke upar (#16).</li>
+        <li><span class="wf-tag">3</span><strong>Edit-scope picker = safety.</strong> "This element ▾" vs "Edit master" — component instance galti se master change na ho (#5 error-prevention). Yeh CMS/components (§10–11) ka on-canvas guard.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 33 INLINE TEXT EDIT -->
+  <section class="screen" id="inline-text">
+    <h2>33 · Inline text edit <span class="tag-list">on-canvas · ✅</span></h2>
+    <p class="meta"><b>Job:</b> "Text seedha canvas pe likho / format." · <b>Numayan:</b> cursor + format bar · <b>Dheema:</b> link, heading level.</p>
+    <p class="mods"><b>Modules:</b> contentEditable cursor · floating format bar (B · I · link · heading ▾) · ✨ inline AI (→ §27) · link popover.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:360px">
+        <div style="padding:16px">
+          <div class="wf-box wf-box--2" style="padding:14px;border-color:var(--wf-ink);position:relative">
+            <div class="wf-row" style="position:absolute;top:-30px;left:0;gap:4px"><span class="wf-pill wf-pill--solid">B</span><span class="wf-pill">I</span><span class="wf-pill">🔗 <span class="wf-tag">2</span></span><span class="wf-pill">H1 ▾</span><span class="wf-pill">✨ <span class="wf-tag">3</span></span></div>
+            <div class="wf-line w-90"></div><div class="wf-line w-75" style="margin-top:5px"></div><span class="tag-list" style="margin-top:4px;display:inline-block"><span class="wf-tag">1</span>| cursor — typing in place</span>
+          </div>
+          <div class="wf-box" style="margin-top:10px;padding:7px;max-width:200px"><span class="tag-list">link popover: URL ___ · Apply</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Type where you see (#1).</strong> No separate "text field" — direct manipulation, canvas pe hi cursor. WYSIWYG ka core.</li>
+        <li><span class="wf-tag">2</span><strong>Format bar hugs the text (#16).</strong> B/I/link/heading text ke upar float — same idiom har jagah (#11/#12). Link → popover state drawn (#13).</li>
+        <li><span class="wf-tag">3</span><strong>✨ inline AI right here.</strong> Rewrite/shorten wahin (→ §27) — same ✨, ek idiom.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 34 IMAGE EDITOR -->
+  <section class="screen" id="image-editor">
+    <h2>34 · Image editor <span class="tag-list">Media modal · ✅</span></h2>
+    <p class="meta"><b>Job:</b> "Image crop / resize — bina tool chhode." · <b>Numayan:</b> crop frame · <b>Dheema:</b> versions.</p>
+    <p class="mods"><b>Modules:</b> preview · crop frame · aspect presets (1:1 · 16:9 · free) · resize · version history (non-destructive) · Save · saving state.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:420px">
+        <div style="padding:12px">
+          <div class="wf-row wf-row--between"><span class="wf-drawer-title" style="border:0;padding:0;margin:0">Edit image</span><span class="wf-pill">×</span></div>
+          <div class="wf-img" style="width:100%;height:120px;margin-top:8px;position:relative"><span class="wf-box wf-box--2" style="position:absolute;inset:18px;border-color:var(--wf-ink);border-style:dashed;background:transparent"></span><span class="wf-tag" style="position:absolute;top:4px;left:4px">1</span></div>
+          <div class="wf-row" style="margin-top:8px;gap:6px"><span class="wf-pill wf-pill--on">1:1</span><span class="wf-pill">16:9</span><span class="wf-pill">Free <span class="wf-tag">2</span></span></div>
+          <div class="wf-row wf-row--between" style="margin-top:10px"><span class="tag-list"><span class="wf-tag">3</span>↺ versions · saving…</span><span class="wf-pill wf-pill--solid">Save</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Edit in place, no round-trip.</strong> Crop/resize Media modal mein — Photoshop nahi chahiye (retention, #6 stay-in-flow).</li>
+        <li><span class="wf-tag">2</span><strong>Aspect presets drawn.</strong> 1:1/16:9/free chips — common ratios one tap (#1 recognition). Selected state shown.</li>
+        <li><span class="wf-tag">3</span><strong>Non-destructive + saving state.</strong> Versions (original safe) + saving… feedback (#13 · #5). Save = hero.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 35 STOCK BROWSER -->
+  <section class="screen" id="stock">
+    <h2>35 · Stock browser <span class="tag-list">inside Media · ✅ env-gated (⚠️ no-key prompt = dead code; keys server-env only, no Settings entry)</span></h2>
+    <p class="meta"><b>Job:</b> "Stock photo/video search + insert." · <b>Numayan:</b> search + grid · <b>Dheema:</b> source toggle.</p>
+    <p class="mods"><b>Modules:</b> search · results grid · source (Unsplash/Pexels) · insert · <b>no-key gate</b> (env) · empty · loading. (Icons/fonts = local, always work — separate.)</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:340px">
+        <div style="padding:12px">
+          <div class="wf-box wf-box--2" style="padding:7px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><span class="wf-label" style="color:var(--muted)">Search stock…</span><span class="tag-list">Unsplash ▾</span></div></div>
+          <div class="wf-row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><div class="wf-box wf-box--2" style="padding:0;border-color:var(--wf-ink);position:relative"><div class="wf-img" style="width:62px;height:46px"></div><span class="wf-pill wf-pill--solid" style="position:absolute;bottom:3px;right:3px;padding:0 5px">Insert <span class="wf-tag">1</span></span></div><div class="wf-img" style="width:62px;height:46px"></div><div class="wf-img" style="width:62px;height:46px"></div><div class="wf-img" style="width:62px;height:46px"></div></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:7px;border-style:dashed;text-align:center"><span class="tag-list"><span class="wf-tag">2</span>⚠️ drawn no-key prompt is DEAD CODE — keys are server-env only (no Settings entry); absent key → empty "no results"</span></div>
+          <div class="wf-row" style="margin-top:6px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">states →</span><span class="wf-pill" style="opacity:.7">◐ searching…</span><span class="wf-pill">empty: no results</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Now shipped (was stub).</strong> Pehle <code>[]</code> return (🔵) → ab Unsplash/Pexels wired (✅), par env-gated. Grid real results dikha sakta.</li>
+        <li><span class="wf-tag">2</span><strong>No-key gate honest.</strong> Key na ho → setup prompt, fake/empty grid nahi (#3). Yeh exactly woh trap jo redesign theek karta — stub ko hero space nahi (purana #3).</li>
+        <li><span class="wf-tag">3</span><strong>Loading + empty drawn.</strong> Searching… + no-results — network states visible (#13).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 36 SHARED DS PUSH -->
+  <section class="screen" id="ds-push">
+    <h2>36 · Shared DS push <span class="tag-list">Brand action · ✅ (ships in dashboard, not editor) · the agency wedge ★</span></h2>
+    <p class="meta"><b>Job:</b> "Agency apni brand/DS ko client sites pe push kare." · <b>Numayan:</b> Push + targets · <b>Dheema:</b> what-changes.</p>
+    <p class="mods"><b>Modules:</b> source brand · target client-site list (multi-select) · <b>blast-radius confirm (N sites)</b> · what-changes preview · Push · per-site result · partial-fail state.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:360px">
+        <div style="padding:12px">
+          <div class="wf-drawer-title">Push brand to client sites <span class="wf-tag">1</span></div>
+          <div class="wf-stack" style="margin-top:8px">
+            <div class="wf-box wf-box--2" style="padding:6px;border-color:var(--wf-ink)"><div class="wf-row" style="gap:6px"><span class="wf-pill wf-pill--on" style="padding:0 5px">☑</span><div class="wf-line w-50"></div></div></div>
+            <div class="wf-box wf-box--2" style="padding:6px;border-color:var(--wf-ink)"><div class="wf-row" style="gap:6px"><span class="wf-pill wf-pill--on" style="padding:0 5px">☑</span><div class="wf-line w-40"></div></div></div>
+            <div class="wf-box" style="padding:6px"><div class="wf-row" style="gap:6px"><span class="wf-pill" style="padding:0 5px">☐</span><div class="wf-line w-45"></div></div></div>
+          </div>
+          <div class="wf-box" style="margin-top:8px;padding:7px"><span class="tag-list"><span class="wf-tag">2</span>⚠ 2 sites will update — tokens + components overwrite</span></div>
+          <div class="wf-row wf-row--between" style="margin-top:8px"><span class="tag-list"><span class="wf-tag">3</span>pushing… · ✓2 · ✗1 retry</span><span class="wf-pill wf-pill--solid">Push to 2</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>This is the wedge.</strong> Ek brand → kai client sites, ek click. Agency-first differentiator (Webflow/Framer ke against). Lives as a Brand action (#14), not buried.</li>
+        <li><span class="wf-tag">2</span><strong>Blast-radius confirm.</strong> "2 sites will update + kya overwrite" — cross-client blast pehle dikhao, phir Push (#5 error-prevention). UX-audit ne yahi gap pakda: bina warning multi-site change khatarnaak.</li>
+        <li><span class="wf-tag">3</span><strong>Per-site result + partial-fail.</strong> pushing… → ✓2 ✗1 retry — har site ka apna outcome (#2 · #13), ek site fail = sab fail nahi.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 37 CUSTOM CSS -->
+  <section class="screen" id="custom-css">
+    <h2>37 · Custom CSS / code <span class="tag-list">⚠️ NOT shipped — dev-only dead code (devMode=false, never renders prod); no Pro gate</span></h2>
+    <p class="meta"><b>Job:</b> "Power user apna CSS daale (per-element)." · <b>Numayan:</b> code box · <b>Dheema:</b> Pro-gate.</p>
+    <p class="mods"><b>Modules:</b> code input · target/selector scope · Pro-gate (lock + upgrade) · Apply · invalid-CSS error · applied state.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:320px">
+        <div style="padding:12px">
+          <div class="wf-row wf-row--between"><span class="wf-label">Custom CSS <span class="wf-tag">1</span></span><span class="wf-pill" style="opacity:.7">PRO 🔒 <span class="wf-tag">2</span></span></div>
+          <div class="wf-box wf-box--2" style="margin-top:8px;padding:8px;border-color:var(--wf-ink)"><div class="wf-line w-75"></div><div class="wf-line w-60" style="margin-top:4px"></div><div class="wf-line w-50" style="margin-top:4px"></div></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:6px;border-style:dashed;text-align:center"><span class="tag-list"><span class="wf-tag">3</span>locked → "Upgrade to Pro to add code"</span></div>
+          <div class="wf-row wf-row--between" style="margin-top:8px"><span class="wf-pill" style="color:var(--bad)">⚠ invalid CSS</span><span class="wf-pill wf-pill--solid">Apply</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Tucked in advanced.</strong> Rare/power feature → inspector "advanced", default screen pe nahi (#9). "Custom CSS" plain naam (#1).</li>
+        <li><span class="wf-tag">2</span><strong>Pro-gate honest.</strong> Free pe lock + upgrade prompt — fake-enabled nahi (#3). Gate state drawn.</li>
+        <li><span class="wf-tag">3</span><strong>Invalid-CSS error drawn.</strong> Galat code → error, silent fail nahi (#13 · #2).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 38 MY TEMPLATES -->
+  <section class="screen" id="my-templates">
+    <h2>38 · My Templates <span class="tag-list">inside Insert/Pages · 🟡→✅ server-backed</span></h2>
+    <p class="meta"><b>Job:</b> "Apna template save / dobara use." · <b>Numayan:</b> saved grid · <b>Dheema:</b> save-as.</p>
+    <p class="mods"><b>Modules:</b> save-current-as-template · my-templates grid · recents · apply · empty state · (now server-backed = cross-device).</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:340px">
+        <div style="padding:12px">
+          <div class="wf-row wf-row--between"><span class="wf-drawer-title" style="border:0;padding:0;margin:0">My Templates</span><span class="wf-pill wf-pill--solid">+ Save current <span class="wf-tag">1</span></span></div>
+          <div class="wf-row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><div class="wf-box wf-box--2" style="width:90px;border-color:var(--wf-ink)"><div class="wf-img" style="width:100%;height:54px"></div><div class="wf-line w-60" style="margin:5px"></div></div><div class="wf-box" style="width:90px"><div class="wf-img" style="width:100%;height:54px"></div><div class="wf-line w-50" style="margin:5px"></div></div><span class="wf-tag">2</span></div>
+          <div class="tag-list" style="color:var(--muted);margin-top:8px">Recents <span class="wf-tag">3</span></div>
+          <div class="wf-row" style="margin-top:4px;gap:6px"><div class="wf-box" style="padding:5px"><div class="wf-row" style="gap:5px"><span class="wf-icon"></span><div class="wf-line w-40"></div></div></div><div class="wf-box" style="padding:5px"><div class="wf-row" style="gap:5px"><span class="wf-icon"></span><div class="wf-line w-30"></div></div></div></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:7px;border-style:dashed;text-align:center"><span class="tag-list">empty: "No saved templates yet — Save current to start"</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>One home: Insert/Pages.</strong> Apne templates wahin jahan se insert/page banta (#14) — alag jagah nahi.</li>
+        <li><span class="wf-tag">2</span><strong>Cross-device now.</strong> Pehle localStorage-only (🟡, device-locked) → ab server-backed (✅). Honesty resolved — grid har device pe same.</li>
+        <li><span class="wf-tag">3</span><strong>Recents + empty drawn.</strong> Recents row (jaldi dobara use) + zero-saved empty "save current to start" (#13) — dono states visible, khaali grid nahi.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===================================================== 39 WHY + TIES -->
+  <section class="screen" id="why">
+    <h2>39 · Decisions &amp; open ties</h2>
+    <table>
+      <thead><tr><th>Decision</th><th>Why</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td>Rail = 4 locked slots (Insert·Media·Pages·Design)</td><td>Spine fixed → muscle memory + add features without breaking layout</td><td>#15 · #14</td></tr>
+        <tr><td>Left = icon rail + drawer (2 columns), labels + collapsible</td><td>Pro/Webflow density (chosen over single panel); labels fix recognition; collapse frees the canvas</td><td>#1 · #9 · #6</td></tr>
+        <tr><td>Publish = the only dark box</td><td>One screen, one purpose; eye goes to the goal</td><td>#5 · #4</td></tr>
+        <tr><td>AI = topbar ✨ icon, not a rail slot</td><td>AI is a helper across jobs, not the job; don't crown it</td><td>#5 · #8</td></tr>
+        <tr><td>AI has 3 shapes: assistant (drawer) · propose-action · inline ✨</td><td>Full chat docks right; risky edits go through propose→confirm→execute; quick edits hug the element (#16)</td><td>#16 · #5 · #3</td></tr>
+        <tr><td>AI never auto-mutates — propose → confirm → execute</td><td>ADMIN-gated + single-use token; user always confirms before a change lands (trust, no data-loss)</td><td>#5 · #3 · #13</td></tr>
+        <tr><td>ai.getQuotaStatus orphan homed in the AI drawer header</td><td>Route was ready but had no UI (deferred "needs a home") → meter avoids silent quota hits</td><td>#2 · #3</td></tr>
+        <tr><td>Frequent canvas-ops → canvas toolbar (undo/redo · history · breakpoints · zoom)</td><td>Tools near the work; topbar reserved for rare/global; far reach = effort (Fitts)</td><td>#16 · #4</td></tr>
+        <tr><td>Layers → footer ⌗ popover</td><td>Frequent but micro; rail slot would over-promote it</td><td>#14 · #9</td></tr>
+        <tr><td>Shared DS push = a Brand action (the agency wedge)</td><td>One brand → many client sites in one click; the differentiator vs Webflow/Framer — surfaced, not buried</td><td>#14 · product</td></tr>
+        <tr><td>DS push shows a blast-radius confirm ("N sites will update")</td><td>Cross-client overwrite is irreversible-ish; show scope before the push (UX-audit gap)</td><td>#5 · #13</td></tr>
+        <tr><td>Canvas selection has an edit-scope picker (element vs master)</td><td>Stops accidental edits to a component master from an instance</td><td>#5 · #14</td></tr>
+        <tr><td>Stubs/gated stay honest: Stock no-key · Custom-CSS Pro-lock · My-Templates now server-backed</td><td>A gated/empty feature shows its real state, never a fake-working control</td><td>#3 · #13</td></tr>
+        <tr><td>Brand merges tokens+styles+components</td><td>One job ("the system") had three doors → one home</td><td>#14</td></tr>
+        <tr><td>Inspector vs Brand = two altitudes</td><td>"This element" ≠ "the system"; never the same panel</td><td>#14 · #9</td></tr>
+        <tr><td>AI-create-site / billing-upgrade / runtime-locale = hidden</td><td>Backend still stub/throws — never show a fake control. (Stock graduated: 🔵→✅ shipped + env-gated → now drawn with a no-key gate, §35, not hidden.)</td><td>#3</td></tr>
+        <tr><td>Export HTML = cut</td><td>Takes the user out of the product (anti-retention)</td><td>product judgment</td></tr>
+        <tr><td>Every panel has empty/loading/error</td><td>Happy path is ~10%; silence reads as broken</td><td>#13 · #2</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Open ties — test, don't debate (L15)</h3>
+    <ul style="font-size:14.5px;line-height:1.7">
+      <li><strong>Media: own rail slot vs an Insert sub-tab.</strong> Drawn here as its own slot. If the 5-user walk shows media is almost always reached <em>while inserting</em>, fold it into Insert and free a slot.</li>
+      <li><strong>Layers: footer ⌗ vs inside Pages.</strong> Drawn in the footer. If users keep hunting for structure, promote it into the Pages panel.</li>
+      <li><strong>Components: Insert sub-tab vs own slot.</strong> Drawn as an Insert sub-tab. Heavy component users may need it one click closer.</li>
+      <li><strong>Presence slot (collab):</strong> a spot is reserved in the topbar Status zone, but the feature stays <em>gated</em> — demo-only, 6 P1 bugs. Design the slot, ship it dark (#3).</li>
+    </ul>
+    <div class="callout">Yeh ties guess se nahi, <strong>use</strong> se toot-ti hain. Isi liye yeh low-fi hai: 5 minute mein badal sakte ho. Decide → draw → <a href="../lessons/0015-youre-not-stuck-youre-in-the-gap.html">walk with 3–5 users</a> → fix what trips.</div>
+
+    <p class="source">Grounded in: real shell (<code>AquibraStudio.tsx</code> · <code>Topbar.tsx</code> · <code>ProInspector.tsx</code> · <code>StudioFooter.tsx</code> · <code>tabsConfig.ts</code>) + <a href="ia-home-map.html">home-map</a> + the <a href="buildrik-design-principles.html">constitution</a>. Method: <a href="../lessons/0017-wireframe-job-first-then-blocks.html">Lesson 17</a>. Builder handoff: har screen ko L4 4-part spec (WHAT/WHERE/DON'T-BREAK/DONE) ke saath nikaalo. Kuch atke — poocho.</p>
+    <div class="nav">
+      <a href="../lessons/0017-wireframe-job-first-then-blocks.html">← Lesson 17 · the method</a>
+      <a href="buildrik-design-principles.html">The constitution →</a>
+    </div>
+  </section>
+</main>
+</body>
+</html>
