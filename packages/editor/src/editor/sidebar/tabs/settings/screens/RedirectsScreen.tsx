@@ -153,6 +153,12 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
 
   return (
     <Screen>
+      <div role="status" style={noticeStyles}>
+        <strong style={{ fontWeight: 600 }}>Saved, not yet live.</strong>{" "}
+        Redirect rules are stored but aren't served on your published site yet —
+        visitors hitting the old URL won't be forwarded until deployment wiring
+        ships. Your rules are safe and will apply automatically once it's live.
+      </div>
       <Section
         title="Add redirect"
         desc="Send visitors from an old URL to a new one. 301 (permanent) preserves SEO; 302 (temporary) signals a short-term move."
@@ -238,6 +244,18 @@ const emptyStyles: React.CSSProperties = {
   color: "var(--bd-fg-muted)",
   background: "var(--bd-bg-sub)",
   border: "1px dashed var(--bd-border-default)",
+  borderRadius: 6,
+};
+
+const noticeStyles: React.CSSProperties = {
+  marginBottom: 12,
+  padding: "10px 12px",
+  fontSize: 12,
+  lineHeight: 1.5,
+  color: "var(--bd-fg-secondary)",
+  background: "var(--bd-bg-sub)",
+  border: "1px solid var(--bd-border-default)",
+  borderLeft: "3px solid var(--bd-accent)",
   borderRadius: 6,
 };
 
