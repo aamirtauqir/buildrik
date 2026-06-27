@@ -75,6 +75,8 @@
     <a href="#share">18 · Share link + password</a>
     <a href="#seo">20 · Per-page SEO</a>
     <a href="#site-settings">21 · Site settings</a>
+    <a href="#settings-analytics">21a · Analytics</a>
+    <a href="#settings-integrations">21b · Integrations</a>
     <a href="#domains">22 · Custom domains</a>
     <a href="#redirects">23 · Redirects</a>
     <a href="#version-history">24 · Version history</a>
@@ -685,34 +687,97 @@
 
   <!-- 21 SITE SETTINGS -->
   <section class="screen" id="site-settings">
-    <h2>21 · Site settings <span class="tag-list">one home (was 3) · J6</span></h2>
+    <h2>21 · Site settings <span class="tag-list">one home · 10 sections / 3 groups · J6</span></h2>
     <p class="meta"><b>Job:</b> "Site-wide config ek jagah." · <b>Numayan:</b> active section form · <b>Dheema:</b> rare sections.</p>
-    <p class="mods"><b>Modules:</b> section nav (General · SEO defaults · Social · Custom code · Security · Localization) + active-section form. <em>3 purane homes (editor tab · dashboard · hub) → ek.</em></p>
+    <p class="mods"><b>Modules:</b> grouped section nav — <em>Site</em> (General · Branding · SEO) · <em>Distribution</em> (Analytics · Localization) · <em>Plumbing</em> (Custom code · Redirects · Headers · Forms · Integrations) + cross-links (Domains · Members · Billing) + active-section form. <em>3 purane homes (editor tab · dashboard · hub) → ek.</em> Source: <code>SettingsTab.tsx:74-85</code>.</p>
     <div class="wf">
       <div class="wf-frame" style="max-width:480px">
-        <div style="display:grid;grid-template-columns:130px 1fr;min-height:180px">
+        <div style="display:grid;grid-template-columns:150px 1fr;min-height:210px">
           <div style="border-right:1px solid var(--wf-line);padding:10px">
-            <div class="wf-stack">
-              <div class="wf-box wf-box--2" style="padding:6px;border-color:var(--wf-ink)"><div class="wf-line w-60"></div></div>
-              <div class="wf-box" style="padding:6px"><div class="wf-line w-50"></div></div>
-              <div class="wf-box" style="padding:6px"><div class="wf-line w-40"></div></div>
-              <div class="wf-box" style="padding:6px"><div class="wf-line w-50"></div></div>
-              <div class="wf-box" style="padding:6px"><div class="wf-line w-40"></div></div>
-              <div class="wf-box" style="padding:6px"><div class="wf-line w-50"></div></div>
+            <div class="tag-list" style="color:var(--muted);font-size:9px">SITE <span class="wf-tag">1</span></div>
+            <div class="wf-stack" style="margin-top:3px">
+              <div class="wf-box wf-box--2" style="padding:5px;border-color:var(--wf-ink)"><div class="wf-line w-60"></div></div>
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-50"></div></div>
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-40"></div></div>
             </div>
-            <span class="wf-tag" style="margin-top:6px">1</span>
+            <div class="tag-list" style="color:var(--muted);font-size:9px;margin-top:6px">DISTRIBUTION <span class="wf-tag">2</span></div>
+            <div class="wf-stack" style="margin-top:3px">
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-55"></div></div>
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-45"></div></div>
+            </div>
+            <div class="tag-list" style="color:var(--muted);font-size:9px;margin-top:6px">PLUMBING</div>
+            <div class="wf-stack" style="margin-top:3px">
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-50"></div></div>
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-45"></div></div>
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-40"></div></div>
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-40"></div></div>
+              <div class="wf-box" style="padding:5px"><div class="wf-line w-55"></div></div>
+            </div>
+            <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:5px;border-style:dashed"><span class="tag-list" style="font-size:9px">↗ Domains · Members · Billing <span class="wf-tag">3</span></span></div>
           </div>
           <div style="padding:12px">
             <span class="wf-label">General</span>
             <div class="wf-box" style="margin-top:8px;padding:8px"><span class="wf-label">Site name</span><div class="wf-line w-75" style="margin-top:6px"></div></div>
             <div class="wf-box" style="margin-top:6px;padding:8px"><span class="wf-label">Favicon</span><div class="wf-row" style="margin-top:6px"><div class="wf-img" style="width:30px;height:30px"></div></div></div>
-            <div class="wf-row wf-row--between" style="margin-top:10px"><span class="tag-list">auto-saved <span class="wf-tag">2</span></span><span class="wf-pill wf-pill--on">● Saved</span></div>
+            <div class="wf-row wf-row--between" style="margin-top:10px"><span class="tag-list">auto-saved <span class="wf-tag">4</span></span><span class="wf-pill wf-pill--on">● Saved</span></div>
           </div>
         </div>
       </div>
       <ol class="wf-why">
-        <li><span class="wf-tag">1</span><strong>Section nav = the spine of settings.</strong> Left list fixed (6 sections: General · SEO defaults · Social · Custom code · Security · Localization); har section ek form. Rare (Security · Localization) neeche (#9). Localization <em>settings</em> wired + save — runtime abhi single-locale, so woh caveat locale-feature pe lagti, is panel pe nahi (#3 honesty, not a fake gate).</li>
-        <li><span class="wf-tag">2</span><strong>Auto-save, not a Save button.</strong> Settings forms auto-save + status pill (#2) — kahin "save dabana bhool gaya" na ho. One home (#14): editor-tab + hub duplicates dissolved.</li>
+        <li><span class="wf-tag">1</span><strong>Grouped section nav = the spine.</strong> Real nav = 10 sections in 3 groups (Site · Distribution · Plumbing), not a flat 6. Active = form; rare sections sink in their group (#9). Source: <code>SettingsTab.tsx:74-85</code>.</li>
+        <li><span class="wf-tag">2</span><strong>Analytics + Integrations are real sections</strong> — drawn separately at <a href="#settings-analytics">§21a</a> + <a href="#settings-integrations">§21b</a>. Earlier draft missed both and invented a standalone "Social" (it lives under SEO/General). Localization <em>settings</em> wired + save; runtime single-locale caveat sits on the locale feature, not this panel (#3 honesty).</li>
+        <li><span class="wf-tag">3</span><strong>Cross-links, not in-tab.</strong> Domains (§22) · Members · Billing jump to their own homes — same panel, but clearly leave (#1).</li>
+        <li><span class="wf-tag">4</span><strong>Auto-save, not a Save button.</strong> Composer-backed screens flush live; server-backed (Redirects · Headers · Localization) use a savebar handler. Status pill so "save dabana bhool gaya" na ho (#2). One home (#14): editor-tab + hub duplicates dissolved.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 21a ANALYTICS -->
+  <section class="screen" id="settings-analytics">
+    <h2>21a · Analytics <span class="tag-list">settings → distribution · J6 · ✅ injected on publish</span></h2>
+    <p class="meta"><b>Job:</b> "Tracking IDs paste karo, toggle on." · <b>Numayan:</b> GA + Pixel IDs · <b>Dheema:</b> cookie banner.</p>
+    <p class="mods"><b>Modules:</b> Google Analytics (GA4 ID + enable) · Meta Pixel (15-16-digit ID + enable) · Cookie Consent (show banner). Source: <code>AnalyticsScreen.tsx</code> → injected via <code>engine/export/AnalyticsInjector.ts</code> at publish.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:340px">
+        <div style="padding:12px">
+          <span class="wf-label">Google Analytics <span class="wf-tag">1</span></span>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><span class="wf-label">GA4 ID</span><div class="wf-box wf-box--2" style="margin-top:6px;padding:6px;border-color:var(--wf-ink)"><span class="tag-list">G-XXXXXXXXXX</span></div></div>
+          <div class="wf-row wf-row--between" style="margin-top:6px"><span class="tag-list">Enable Google Analytics</span><span class="wf-pill wf-pill--on">● on</span></div>
+          <span class="wf-label" style="margin-top:12px;display:block">Meta Pixel <span class="wf-tag">2</span></span>
+          <div class="wf-box" style="margin-top:6px;padding:8px"><span class="wf-label">Pixel ID</span><div class="wf-box wf-box--2" style="margin-top:6px;padding:6px;border-color:var(--wf-ink)"><span class="tag-list">123456789012345</span></div></div>
+          <div class="wf-row" style="margin-top:6px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">edge →</span><span class="wf-pill" style="color:var(--bad)">⚠ not 15-16 digits</span><span class="wf-pill">● off</span></div>
+          <div class="wf-row wf-row--between" style="margin-top:12px"><span class="tag-list">Cookie Consent — show banner <span class="wf-tag">3</span></span><span class="wf-pill wf-pill--on">● on</span></div>
+          <div class="wf-row wf-row--between" style="margin-top:10px"><span class="tag-list">auto-saved</span><span class="wf-pill wf-pill--on">● Saved</span></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>Paste-and-toggle, the common job.</strong> GA4 ID box + one enable switch — recognition over recall (#1). Validates the <code>G-</code> shape inline.</li>
+        <li><span class="wf-tag">2</span><strong>Pixel with honest validation.</strong> 15-16-digit guard drawn as an edge state (#13) — wrong length → inline error, not a silent fail.</li>
+        <li><span class="wf-tag">3</span><strong>Cookie banner lives with the trackers.</strong> The consent toggle sits beside what it gates — tools near the work (#16). IDs inject into the published HTML at export; nothing runs in the editor itself.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 21b INTEGRATIONS -->
+  <section class="screen" id="settings-integrations">
+    <h2>21b · Integrations <span class="tag-list">settings → plumbing · J6 · 🔵 catalog only (Coming Soon)</span></h2>
+    <p class="meta"><b>Job:</b> "Third-party service jodo." · <b>Numayan:</b> category cards · <b>Dheema:</b> setup docs.</p>
+    <p class="mods"><b>Modules:</b> hint (needs publish first) · category groups — Forms (Formspree · Netlify) · Payments (Stripe) · Email (Mailchimp · ConvertKit) · Automation (Zapier) · each card → "Coming Soon" badge + Learn More (docs). Source: <code>IntegrationsScreen.tsx</code> + <code>INTEGRATION_CATALOG</code>.</p>
+    <div class="wf">
+      <div class="wf-frame" style="max-width:360px">
+        <div style="padding:12px">
+          <div class="wf-box wf-box--ghost" style="padding:6px;border-style:dashed"><span class="tag-list"><span class="wf-tag">1</span>Connect third-party services — publish your site first</span></div>
+          <div class="tag-list" style="color:var(--muted);font-size:9px;margin-top:10px">FORMS</div>
+          <div class="wf-box" style="margin-top:4px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-line w-40"></div><span class="wf-row" style="gap:6px"><span class="wf-pill" style="opacity:.7">Coming Soon <span class="wf-tag">2</span></span><span class="wf-pill">Learn more</span></span></div></div>
+          <div class="wf-box" style="margin-top:4px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-line w-45"></div><span class="wf-row" style="gap:6px"><span class="wf-pill" style="opacity:.7">Coming Soon</span><span class="wf-pill">Learn more</span></span></div></div>
+          <div class="tag-list" style="color:var(--muted);font-size:9px;margin-top:8px">PAYMENTS · EMAIL · AUTOMATION <span class="wf-tag">3</span></div>
+          <div class="wf-box" style="margin-top:4px;padding:8px"><div class="wf-row wf-row--between"><div class="wf-line w-50"></div><span class="tag-list">Stripe · Mailchimp · ConvertKit · Zapier</span></div></div>
+        </div>
+      </div>
+      <ol class="wf-why">
+        <li><span class="wf-tag">1</span><strong>State the prerequisite up front.</strong> "Publish first" hint at the top — sets expectation before the user hits a dead end (#3 honesty).</li>
+        <li><span class="wf-tag">2</span><strong>"Coming Soon", not a fake Connect.</strong> Real catalog has no connect API yet → cards show an honest badge + Learn-More to external setup docs, never a button that lies (#3 · no-fake-control).</li>
+        <li><span class="wf-tag">3</span><strong>Grouped by job.</strong> Forms · Payments · Email · Automation — user scans by what they need, not by vendor (#1).</li>
       </ol>
     </div>
   </section>
