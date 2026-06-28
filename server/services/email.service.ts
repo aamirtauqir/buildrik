@@ -20,6 +20,8 @@ import WsTransferInvite from "@/emails/ws-transfer-invite";
 import FormSubmission from "@/emails/form-submission";
 import SiteTransferred from "@/emails/site-transferred";
 import TicketReceived from "@/emails/ticket-received";
+import ReviewRequested from "@/emails/review-requested";
+import ReviewResolved from "@/emails/review-resolved";
 
 let _transport: nodemailer.Transporter | null = null;
 function getTransport() {
@@ -155,4 +157,24 @@ export async function sendFormSubmissionEmail(
 export async function sendSiteTransferredEmail(to: string, fromName: string, siteName: string, siteId: string) {
   const html = await render(SiteTransferred({ fromName, siteName, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
   await sendEmail(to, `Site "${siteName}" transferred to you — Buildrik`, html);
+}
+
+export async function sendReviewRequestedEmail(
+  to: string,
+  opts: { siteName: string; requesterName: string; note?: string; changeSummary?: string }
+) {
+  const html = await render(ReviewRequested({ ...opts, reviewsUrl: `${BASE_URL}/dashboard/reviews` }));
+  await sendEmail(to, `${opts.requesterName} sent "${opts.siteName}" for review — Buildrik`, html);
+}
+
+export async function sendReviewResolvedEmail(
+  to: string,
+  opts: { siteName: string; approved: boolean; resolverName: string; note?: string; siteId: string }
+) {
+  const { siteId, ...rest } = opts;
+  const html = await render(ReviewResolved({ ...rest, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
+  const subject = opts.approved
+    ? `"${opts.siteName}" was approved — Buildrik`
+    : `Changes requested on "${opts.siteName}" — Buildrik`;
+  await sendEmail(to, subject, html);
 }

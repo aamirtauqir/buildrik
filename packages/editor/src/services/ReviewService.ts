@@ -17,8 +17,8 @@ export function currentSiteId(): string | null {
   return new URLSearchParams(window.location.search).get("siteId");
 }
 
-export async function submitForReview(note?: string): Promise<void> {
+export async function submitForReview(note?: string, changeSummary?: string): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) throw new Error("No site to send for review");
-  await getBuildrikClient(DASHBOARD_URL).reviews.submit.mutate({ siteId, note });
+  await getBuildrikClient(DASHBOARD_URL).reviews.submit.mutate({ siteId, note, changeSummary });
 }

@@ -28,6 +28,8 @@ import {
   TopbarStatusDot,
 } from "@/editor/shared/vibcoder";
 import { Menu, MenuItem } from "@/editor/shared/vibcoder/Menu";
+import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { useClickOutside } from "@/shared/hooks";
 import { Sparkles, MoreHorizontal } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
@@ -230,15 +232,21 @@ export const Topbar: React.FC<TopbarProps> = ({
   const fourToolRail = viewMode.fourToolRail;
   // E4: an invited content editor sends for review instead of publishing.
   const [reviewState, setReviewState] = React.useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [reviewOpen, setReviewOpen] = React.useState(false);
+  const [reviewNote, setReviewNote] = React.useState("");
+  const [reviewSummary, setReviewSummary] = React.useState("");
+  const reviewRef = React.useRef<HTMLDivElement | null>(null);
+  useClickOutside(reviewRef, () => setReviewOpen(false), { enabled: reviewOpen });
   const sendForReview = React.useCallback(async () => {
     setReviewState("sending");
     try {
-      await submitForReview();
+      await submitForReview(reviewNote.trim() || undefined, reviewSummary.trim() || undefined);
       setReviewState("sent");
+      setReviewOpen(false);
     } catch {
       setReviewState("error");
     }
-  }, []);
+  }, [reviewNote, reviewSummary]);
   const [cmdOpen, setCmdOpen] = React.useState(false);
 
   // Redesign: the "Status + Ship" zone keeps only the common actions; the rare
@@ -453,28 +461,72 @@ export const Topbar: React.FC<TopbarProps> = ({
           </Tooltip>
 
           {viewMode.clientView ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={sendForReview}
-                  disabled={reviewState === "sending" || reviewState === "sent"}
+            <div style={{ position: "relative" }} ref={reviewRef}>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => (reviewState === "sent" ? undefined : setReviewOpen((v) => !v))}
+                disabled={reviewState === "sending" || reviewState === "sent"}
+                aria-label="Send for review"
+              >
+                {reviewState === "sending"
+                  ? "Sending…"
+                  : reviewState === "sent"
+                    ? "Sent for review ✓"
+                    : reviewState === "error"
+                      ? "Retry send"
+                      : "Send for review"}
+              </Button>
+              {reviewOpen && reviewState !== "sent" ? (
+                <div
+                  role="dialog"
                   aria-label="Send for review"
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 6px)",
+                    right: 0,
+                    width: 280,
+                    background: "var(--bd-surface)",
+                    border: "1px solid var(--bd-border)",
+                    borderRadius: 8,
+                    boxShadow: "var(--bd-shadow-md, 0 8px 24px rgba(0,0,0,.12))",
+                    padding: 12,
+                    zIndex: 50,
+                  }}
                 >
-                  {reviewState === "sending"
-                    ? "Sending…"
-                    : reviewState === "sent"
-                      ? "Sent for review ✓"
-                      : reviewState === "error"
-                        ? "Retry send"
-                        : "Send for review"}
-                </Button>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>An admin will review your changes before they go live</TooltipContent>
-              </TooltipPortal>
-            </Tooltip>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--bd-fg)", marginBottom: 8 }}>
+                    Send for review
+                  </div>
+                  <Input
+                    value={reviewSummary}
+                    onChange={(e) => setReviewSummary(e.target.value)}
+                    placeholder="What changed? (e.g. hero copy, 2 images)"
+                    maxLength={500}
+                    style={{ marginBottom: 8 }}
+                  />
+                  <Textarea
+                    value={reviewNote}
+                    onChange={(e) => setReviewNote(e.target.value)}
+                    placeholder="Note to the reviewer (optional)"
+                    maxLength={500}
+                    rows={3}
+                  />
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8 }}>
+                    <Button variant="ghost" size="sm" onClick={() => setReviewOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button variant="primary" size="sm" busy={reviewState === "sending"} onClick={sendForReview}>
+                      Send
+                    </Button>
+                  </div>
+                  {reviewState === "error" ? (
+                    <div style={{ fontSize: 11, color: "var(--bd-danger)", marginTop: 6 }}>
+                      Couldn&apos;t send — try again.
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
           ) : publishEnabled ? (
             <div style={{ position: "relative" }}>
               <PublishDropdown
