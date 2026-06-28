@@ -190,7 +190,7 @@ export const themeRouter = router({
         await requireAdmin(ctx, workspaceId);
         return deleteWorkspacePreset(workspaceId, input.presetId);
       }),
-    apply: protectedProcedure
+    applyPreset: protectedProcedure
       .input(workspacePresetIdInput)
       .mutation(async ({ ctx, input }) => {
         const workspaceId = await resolveWorkspaceId(ctx);
