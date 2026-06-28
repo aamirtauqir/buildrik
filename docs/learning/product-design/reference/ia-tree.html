@@ -3,30 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Buildrik IA — the home map, drawn</title>
+<title>Buildrik IA — the build board</title>
 <link rel="stylesheet" href="../assets/course.css">
 <link rel="stylesheet" href="../assets/wireframe.css">
 <style>
   :root{
-    --maxw:1040px;
+    --maxw:1280px;
     --v-keep:#15803D; --v-keep-bg:#F0FDF4; --v-keep-bd:#BBF7D0;
     --v-fix:#B45309;  --v-fix-bg:#FFFBEB;  --v-fix-bd:#FDE68A;
     --v-merge:#2D6DFF;--v-merge-bg:#EFF4FF;--v-merge-bd:#C7D8FF;
     --v-hide:#71717A; --v-hide-bg:#F4F4F5; --v-hide-bd:#E4E4E7;
     --v-cut:#DC2626;  --v-cut-bg:#FEF2F2;  --v-cut-bd:#FECACA;
+    --p0:#2D6DFF; --p1:#B45309; --p2:#71717A;
   }
   main{max-width:var(--maxw)}
   .sub{color:var(--muted);font-size:15px;margin:-2px 0 14px}
-  .legendbar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--rule);z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:var(--wf-mono);font-size:12px}
+  .legendbar{position:sticky;top:0;background:var(--bg);padding:9px 0;border-bottom:1px solid var(--rule);z-index:5;display:flex;flex-wrap:wrap;gap:9px 12px;align-items:center;font-family:var(--wf-mono);font-size:11.5px}
+  .legendbar .grp{display:flex;gap:6px;align-items:center}
   code{font-family:var(--wf-mono);font-size:.88em;background:#f4f4f5;padding:1px 5px;border-radius:4px}
 
   /* verdict chips */
-  .v{display:inline-block;font-family:var(--wf-mono);font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;border:1px solid;margin-right:7px;vertical-align:middle;min-width:42px;text-align:center}
+  .v{display:inline-block;font-family:var(--wf-mono);font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px;border:1px solid;text-align:center;min-width:40px}
   .v-keep{color:var(--v-keep);background:var(--v-keep-bg);border-color:var(--v-keep-bd)}
   .v-fix{color:var(--v-fix);background:var(--v-fix-bg);border-color:var(--v-fix-bd)}
   .v-merge{color:var(--v-merge);background:var(--v-merge-bg);border-color:var(--v-merge-bd)}
   .v-hide{color:var(--v-hide);background:var(--v-hide-bg);border-color:var(--v-hide-bd)}
   .v-cut{color:var(--v-cut);background:var(--v-cut-bg);border-color:var(--v-cut-bd)}
+
+  /* priority badges */
+  .p{display:inline-block;font-family:var(--wf-mono);font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:5px;border:1px solid;text-align:center;min-width:24px}
+  .p-p0{color:#fff;background:var(--p0);border-color:var(--p0)}
+  .p-p1{color:var(--p1);background:#FFFBEB;border-color:#FDE68A}
+  .p-p2{color:var(--p2);background:#F4F4F5;border-color:#E4E4E7}
+  .slice{display:inline-block;font-family:var(--wf-mono);font-size:10px;font-weight:700;color:var(--p0);border:1px solid var(--p0);border-radius:5px;padding:0 4px;margin-left:4px}
 
   /* the two nav skeletons — the spine */
   .spine{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:14px 0 8px}
@@ -40,53 +49,68 @@
   .tree .kid b{color:var(--ink);font-weight:600}
   .tree .bar{color:var(--faint)}
 
-  /* job lanes */
-  .jobs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
-  @media(max-width:760px){.jobs{grid-template-columns:1fr}}
-  .job{border:1px solid var(--rule);border-radius:10px;padding:14px 16px;background:#fff}
-  .job.full{grid-column:1 / -1}
+  /* first-slice wedge path */
+  .slicepath{border:1.5px solid var(--p0);border-radius:10px;padding:14px 16px;margin:14px 0 6px;background:#F5F9FF}
+  .slicepath h3{margin:0 0 4px;font-size:15px;color:var(--p0)}
+  .slicepath .flow{font-family:var(--wf-mono);font-size:12.5px;line-height:1.9;color:var(--ink);margin:6px 0 0}
+  .slicepath .flow b{color:var(--p0)}
+  .slicepath .arr{color:var(--p0);font-weight:700;padding:0 5px}
+
+  /* build-board tables */
+  .job{border:1px solid var(--rule);border-radius:10px;padding:14px 16px;background:#fff;margin-top:16px}
   .job h2{font-size:16px;margin:0 0 2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .job .job-sub{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+  .job .job-sub{font-size:12.5px;color:var(--muted);margin:0 0 4px}
+  .donemeans{font-size:12.5px;margin:0 0 10px;color:var(--ink);border-left:3px solid var(--v-keep);padding-left:9px}
+  .donemeans b{color:var(--v-keep);font-family:var(--wf-mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
   .home{font-family:var(--wf-mono);font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px}
   .home.editor{color:#2D6DFF;background:#EFF4FF;border:1px solid #C7D8FF}
   .home.dash{color:#7C2D12;background:#FFF7ED;border:1px solid #FED7AA}
   .home.both{color:#3F3F46;background:#F4F4F5;border:1px solid #E4E4E7}
-  ul.feat{list-style:none;margin:0;padding:0}
-  ul.feat li{padding:6px 0;border-bottom:1px solid #f1f1f3;font-size:13.5px;line-height:1.5}
-  ul.feat li:last-child{border-bottom:0}
-  ul.feat .note{display:block;font-size:12px;color:var(--muted);margin-top:2px;padding-left:49px}
-  .ai-strip{border:1px dashed var(--rule);border-radius:10px;padding:12px 16px;margin-top:16px;background:#fafafa}
 
-  .counts{display:flex;flex-wrap:wrap;gap:18px;margin:16px 0;font-size:14px}
+  .btwrap{overflow-x:auto}
+  table.bt{width:100%;border-collapse:collapse;font-size:12px;line-height:1.4}
+  table.bt th{text-align:left;font-family:var(--wf-mono);font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;padding:4px 8px;border-bottom:1.5px solid var(--rule);white-space:nowrap}
+  table.bt td{padding:6px 8px;border-bottom:1px solid #f1f1f3;vertical-align:top}
+  table.bt tr:last-child td{border-bottom:0}
+  table.bt tr.slice-row td{background:#FAFCFF}
+  .fname{font-size:12.5px;color:var(--ink);font-weight:500}
+  .fnote{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+  .mono{font-family:var(--wf-mono);font-size:11px;color:var(--ink)}
+  .mono-dim{font-family:var(--wf-mono);font-size:11px;color:var(--muted)}
+  td.c{white-space:nowrap}
+
+  .ai-strip{border:1px dashed var(--p0);border-radius:10px;padding:8px 16px 14px;margin-top:16px;background:#fafcff}
+
+  /* bottom summary */
+  .counts{display:flex;flex-wrap:wrap;gap:18px;margin:16px 0 4px;font-size:14px}
   .counts b{font-family:var(--wf-mono)}
   .cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:8px}
-  @media(max-width:760px){.cols{grid-template-columns:1fr}}
+  @media(max-width:860px){.cols{grid-template-columns:1fr}}
   .cols .card{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;background:#fff;font-size:13px}
+  .cols .card.cut{border-color:var(--v-cut-bd);background:var(--v-cut-bg)}
   .cols .card h4{margin:0 0 6px;font-size:13.5px}
-  .cols .card ol,.cols .card ul{margin:0;padding-left:18px;line-height:1.65}
+  .cols .card ol,.cols .card ul{margin:0;padding-left:18px;line-height:1.6}
   .pass{color:var(--v-keep);font-weight:600}
 </style>
 </head>
 <body>
 <main>
-  <p class="eyebrow">Reference · Information Architecture · drawn from the 2026-06-23 home-map run</p>
-  <h1>Buildrik IA — every feature, one home.</h1>
-  <p class="sub">The visual of <code>ia-home-map-20260623.md</code>: ~100 features regrouped from <strong>17 backend clusters → 6 user jobs</strong>, each given one home (Editor / Dashboard) and a verdict. The spine that falls out = the dashboard sidebar + the editor rail.</p>
+  <p class="eyebrow">Reference · Information Architecture · build board · from the 2026-06-23 home-map run</p>
+  <h1>Buildrik IA — the build board.</h1>
+  <p class="sub">Not just where every feature lives — <strong>what to ship first, in what order, with what acceptance bar.</strong> ~100 features from <strong>17 backend clusters → 6 user jobs</strong>, each with a home, a verdict, a <strong>priority</strong> (P0/P1/P2), an entry point, the states it must cover, the data it needs, who uses it, and what it depends on. Pick a row → you can build the screen.</p>
 
   <div class="legendbar">
-    <span>verdicts →</span>
-    <span class="v v-keep">keep</span> works, leave it
-    <span class="v v-fix">fix</span> wired-but-broken
-    <span class="v v-merge">merge</span> dedup → one home
-    <span class="v v-hide">hide</span> until backend real (#3)
-    <span class="v v-cut">cut</span> remove
+    <span class="grp"><span>verdict:</span> <span class="v v-keep">keep</span> <span class="v v-fix">fix</span> <span class="v v-merge">merge</span> <span class="v v-hide">hide</span> <span class="v v-cut">cut</span></span>
+    <span class="grp"><span>priority:</span> <span class="p p-p0">P0</span> first-slice blocker · <span class="p p-p1">P1</span> next · <span class="p p-p2">P2</span> defer · <span class="slice">◆ slice</span> on the wedge path</span>
+    <span class="grp"><span>states:</span> <code>E</code> empty <code>L</code> loading <code>X</code> error <code>S</code> success <code>D</code> denied <code>A</code> async</span>
+    <span class="grp"><span>owner:</span> <code>D</code> dashboard <code>E</code> editor <code>S</code> server</span>
   </div>
 
-  <p class="sub" style="margin-top:14px"><strong>Scope test (decides every home):</strong> one site's content → <strong>Editor</strong>; across sites / the business → <strong>Dashboard</strong>.</p>
+  <p class="sub" style="margin-top:14px"><strong>Scope test (decides every home):</strong> one site's content → <strong>Editor</strong>; across sites / the business → <strong>Dashboard</strong>. <strong>Priority test:</strong> on the agency wedge proof-path → <strong>P0</strong>; earns revenue/trust right after → <strong>P1</strong>; everything else → <strong>P2 (defer)</strong>.</p>
 
   <!-- ============ THE SPINE: two nav skeletons ============ -->
   <h2 style="margin-top:26px">The spine — the nav skeleton this produces</h2>
-  <p class="sub">17 top-level clusters collapsed to <strong>5 (dashboard) + 4 (editor rail)</strong>. This is the IA's output: where every job lives, one click from the top.</p>
+  <p class="sub">17 top-level clusters collapsed to <strong>5 (dashboard) + 4 (editor rail)</strong>. Where every job lives, one click from the top.</p>
   <div class="spine">
     <div class="rail">
       <h3>Dashboard <span class="home dash">across the business</span></h3>
@@ -112,146 +136,222 @@
       </div>
     </div>
   </div>
-  <p class="sub" style="margin-top:6px">Live editor rail today = <code>Insert · Pages · Styles · Site</code> (same 4-slot spine, different labels). The fix is <em>what's grouped inside</em>, not the count.</p>
+
+  <!-- ============ FIRST SLICE ============ -->
+  <div class="slicepath">
+    <h3>◆ First slice — the agency wedge, end to end</h3>
+    <p class="sub" style="margin:0;font-size:13px">Ship this one vertical before anything else. It proves the whole differentiator: <strong>capture a design → push it to client sites → get sign-off → publish.</strong> Every <span class="p p-p0">P0</span> row below is on this path; everything else waits.</p>
+    <p class="flow"><b>Clients</b> <span class="arr">→</span> <b>Sites</b> <span class="arr">→</span> <b>New site</b> <span class="arr">→</span> <b>Canvas + Pages + Text</b> <span class="arr">→</span> <b>Inspector</b> <span class="arr">→</span> <b>Brand (DS merged)</b> <span class="arr">→</span> <b>Shared DS push</b> <span class="arr">→</span> <b>Preview-as-client</b> <span class="arr">→</span> <b>Client review + approval</b> <span class="arr">→</span> <b>Publish</b> <span class="arr">→</span> <b>Live site</b></p>
+  </div>
 
   <!-- ============ THE 6 JOBS ============ -->
-  <h2 style="margin-top:30px">The 6 jobs — every feature placed</h2>
-  <p class="sub">Regrouped by the agency operator's actual jobs, not the system's modules.</p>
+  <h2 style="margin-top:26px">The 6 jobs — every feature, build-specced</h2>
+  <p class="sub">Regrouped by the agency operator's actual jobs, not the system's modules. Each table is a build queue: sort by Pri, build P0 first.</p>
 
-  <div class="jobs">
-    <!-- J1 -->
-    <section class="job">
-      <h2>J1 · Run the business <span class="home dash">Dashboard</span></h2>
-      <p class="job-sub">Across sites / the whole account. Tucked deep; rare but matters.</p>
-      <ul class="feat">
-        <li><span class="v v-keep">keep</span> Account — profile · avatar · email · password · 2FA<span class="note">avatar = URL passthrough, no upload (minor fix)</span></li>
-        <li><span class="v v-keep">keep</span> API tokens <span class="note">advanced; deepest tuck</span></li>
-        <li><span class="v v-keep">keep</span> Workspace settings · switch · delete<span class="note">works; settings update has no OWNER/ADMIN check (weak authz) — backend hardening, not a UI fix</span></li>
-        <li><span class="v v-hide">hide</span> Create additional workspace <span class="note">no backend outside signup/OAuth</span></li>
-        <li><span class="v v-fix">fix</span> Team — list · invite · roles · revoke<span class="note">resendInvite extends expiry but sends no email (silent)</span></li>
-        <li><span class="v v-keep">keep</span> Invite accept / decline · Ownership transfer · Roles &amp; permissions</li>
-        <li><span class="v v-keep">keep</span> <b>Clients — CRUD + assign (agency)</b><span class="note">the wedge — works but flag OFF → turn ON</span></li>
-        <li><span class="v v-keep">keep</span> Notifications center <span class="note">SSE 5s · top-bar bell</span></li>
-        <li><span class="v v-keep">keep</span> Integrations (Vercel OAuth) · Billing · usage · invoices</li>
-        <li><span class="v v-hide">hide</span> Upgrade / paywall / payment <span class="note">upgradePlan throws PAYMENTS_NOT_CONFIGURED</span></li>
-        <li><span class="v v-keep">keep</span> Help / support</li>
-      </ul>
-    </section>
+  <!-- J1 -->
+  <section class="job">
+    <h2>J1 · Run the business <span class="home dash">Dashboard</span></h2>
+    <p class="donemeans"><b>Done means</b> an agency owner can create a client, invite a teammate with the right role, and connect Vercel — without touching code.</p>
+    <div class="btwrap"><table class="bt">
+      <colgroup><col style="width:23%"><col style="width:6%"><col style="width:7%"><col style="width:5%"><col style="width:13%"><col style="width:9%"><col style="width:16%"><col style="width:8%"><col style="width:13%"></colgroup>
+      <thead><tr><th>Feature</th><th>V</th><th>Pri</th><th>Own</th><th>Entry</th><th>States</th><th>Data (entities; mutations)</th><th>Roles</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr class="slice-row"><td><span class="fname">Clients — CRUD + assign (agency)</span><span class="fnote">the wedge — works but flag OFF → turn ON</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">D·S</td><td class="mono-dim">sidebar › Clients</td><td class="mono">E L X S D</td><td class="mono-dim">client; create/assign()</td><td class="mono-dim">own·mem</td><td class="mono-dim">feature flag ON</td></tr>
+        <tr><td><span class="fname">Team — list · invite · roles · revoke</span><span class="fnote">resendInvite extends expiry but sends no email (silent)</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">Settings › Team</td><td class="mono">E L X S D</td><td class="mono-dim">member,invite; invite/revoke/role()</td><td class="mono-dim">own·mem</td><td class="mono-dim">email send</td></tr>
+        <tr><td><span class="fname">Invite accept/decline · ownership transfer · roles</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">invite link / Team</td><td class="mono">L X S D</td><td class="mono-dim">invite,member; accept/transfer()</td><td class="mono-dim">own·cli</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Workspace settings · switch · delete</span><span class="fnote">works; update has no OWNER/ADMIN check (weak authz) — backend hardening</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">Settings › Workspace</td><td class="mono">L X S D</td><td class="mono-dim">workspace; update/delete()</td><td class="mono-dim">own·mem</td><td class="mono-dim">authz gate (missing)</td></tr>
+        <tr><td><span class="fname">Integrations (Vercel OAuth) · Billing · usage · invoices</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">Settings › Integrations</td><td class="mono">L X S</td><td class="mono-dim">integration,invoice; connect()</td><td class="mono-dim">own</td><td class="mono-dim">Vercel OAuth</td></tr>
+        <tr><td><span class="fname">Notifications center</span><span class="fnote">SSE 5s · top-bar bell</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">D·S</td><td class="mono-dim">top bell</td><td class="mono">E L S</td><td class="mono-dim">notification; markRead()</td><td class="mono-dim">all</td><td class="mono-dim">SSE</td></tr>
+        <tr><td><span class="fname">Account — profile · avatar · email · password · 2FA</span><span class="fnote">avatar = URL passthrough, no upload (minor fix)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">D·S</td><td class="mono-dim">Account ▾</td><td class="mono">E L X S</td><td class="mono-dim">user; updateProfile()</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">API tokens</span><span class="fnote">advanced; deepest tuck</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">D·S</td><td class="mono-dim">Settings › API</td><td class="mono">L X S</td><td class="mono-dim">apiToken; create/revoke()</td><td class="mono-dim">own</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Help / support</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">D</td><td class="mono-dim">Settings › Help</td><td class="mono">S</td><td class="mono-dim">—</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Create additional workspace</span><span class="fnote">no backend outside signup/OAuth</span></td><td><span class="v v-hide">hide</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono-dim">—</td><td class="mono-dim">(none yet)</td><td class="mono-dim">—</td><td class="mono-dim">—</td><td class="mono-dim">own</td><td class="mono-dim">no backend</td></tr>
+        <tr><td><span class="fname">Upgrade / paywall / payment</span><span class="fnote">upgradePlan throws PAYMENTS_NOT_CONFIGURED</span></td><td><span class="v v-hide">hide</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono-dim">—</td><td class="mono-dim">Billing</td><td class="mono-dim">—</td><td class="mono-dim">—</td><td class="mono-dim">own</td><td class="mono-dim">payments backend</td></tr>
+      </tbody>
+    </table></div>
+  </section>
 
-    <!-- J2 -->
-    <section class="job">
-      <h2>J2 · Start a site <span class="home dash">Dashboard</span></h2>
-      <p class="job-sub">The dashboard landing + the on-ramp into a site.</p>
-      <ul class="feat">
-        <li><span class="v v-keep">keep</span> Sites list · detail · advanced (filter/sort/bulk)<span class="note">bulk "publish" = status flip, not real deploy; bulk move/export no backend</span></li>
-        <li><span class="v v-fix">fix</span> Dashboard home — activity · quick actions · health<span class="note">feed under-fed (rename/dup/archive write no log); bandwidth health fake</span></li>
-        <li><span class="v v-keep">keep</span> New site — blank / template</li>
-        <li><span class="v v-fix">fix</span> New site — <b>AI</b><span class="note">backend wired: createGenerationJob → AIGenerationJob → worker writes real Site+Page (ai-generation.service.ts); needs AI provider key</span></li>
-        <li><span class="v v-keep">keep</span> Template gallery + preview<span class="note">seed.ts seeds NO templates → needs seed data or real empty-state</span></li>
-        <li><span class="v v-keep">keep</span> First-run / getting-started</li>
-      </ul>
-    </section>
+  <!-- J2 -->
+  <section class="job">
+    <h2>J2 · Start a site <span class="home dash">Dashboard</span></h2>
+    <p class="donemeans"><b>Done means</b> a new agency user lands, sees their client's sites, and opens a blank site in the editor in under a minute.</p>
+    <div class="btwrap"><table class="bt">
+      <colgroup><col style="width:23%"><col style="width:6%"><col style="width:7%"><col style="width:5%"><col style="width:13%"><col style="width:9%"><col style="width:16%"><col style="width:8%"><col style="width:13%"></colgroup>
+      <thead><tr><th>Feature</th><th>V</th><th>Pri</th><th>Own</th><th>Entry</th><th>States</th><th>Data (entities; mutations)</th><th>Roles</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr class="slice-row"><td><span class="fname">Sites list · detail · advanced (filter/sort/bulk)</span><span class="fnote">bulk "publish" = status flip, not real deploy; bulk move/export no backend</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">D·S</td><td class="mono-dim">sidebar › Sites</td><td class="mono">E L X S D</td><td class="mono-dim">site; rename/dup/archive()</td><td class="mono-dim">own·mem</td><td class="mono-dim">Clients</td></tr>
+        <tr class="slice-row"><td><span class="fname">New site — blank / template</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">D·S</td><td class="mono-dim">Sites › New</td><td class="mono">L X S</td><td class="mono-dim">site,page; createSite()</td><td class="mono-dim">own·mem</td><td class="mono-dim">Sites</td></tr>
+        <tr><td><span class="fname">New site — AI</span><span class="fnote">backend wired: createGenerationJob → worker writes real Site+Page; needs AI key</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">S·D</td><td class="mono-dim">Sites › New › AI</td><td class="mono">L X S A</td><td class="mono-dim">aiGenerationJob,site; createGenerationJob()</td><td class="mono-dim">own·mem</td><td class="mono-dim">AI provider key</td></tr>
+        <tr><td><span class="fname">Template gallery + preview</span><span class="fnote">seed.ts seeds NO templates → needs seed data or real empty-state</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">D·S</td><td class="mono-dim">Sites › New › Template</td><td class="mono">E L X S</td><td class="mono-dim">template; —</td><td class="mono-dim">own·mem</td><td class="mono-dim">seed data</td></tr>
+        <tr><td><span class="fname">Dashboard home — activity · quick actions · health</span><span class="fnote">feed under-fed (rename/dup/archive write no log); bandwidth health fake</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">D·S</td><td class="mono-dim">sidebar › Home</td><td class="mono">E L S</td><td class="mono-dim">activity,site; —</td><td class="mono-dim">all</td><td class="mono-dim">activity log</td></tr>
+        <tr><td><span class="fname">First-run / getting-started</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">D</td><td class="mono-dim">first login</td><td class="mono">E S</td><td class="mono-dim">—</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+      </tbody>
+    </table></div>
+  </section>
 
-    <!-- J3 -->
-    <section class="job">
-      <h2>J3 · Build the page <span class="home editor">Editor</span></h2>
-      <p class="job-sub">Inside one site, content on the canvas. The product's calm center (#6).</p>
-      <ul class="feat">
-        <li><span class="v v-keep">keep</span> Canvas — add · select · resize · drag · group</li>
-        <li><span class="v v-keep">keep</span> Add elements / sections panel · Layers tree · Edit-scope picker</li>
-        <li><span class="v v-keep">keep</span> Pages manager + page ops (CRUD/reorder/home)</li>
-        <li><span class="v v-keep">keep</span> <b>4-mode editor (Build / AI / Design / Settings)</b><span class="note">this IS the editor's top-level rail</span></li>
-        <li><span class="v v-keep">keep</span> Command palette (⌘K) · Onboarding checklist</li>
-        <li><span class="v v-keep">keep</span> Text / heading / links / rich content</li>
-        <li><span class="v v-keep">keep</span> Interactions (13 triggers, 7 wired) + animations<span class="note">CSS-preset animations; GSAP native ScrollTrigger removed → IntersectionObserver</span></li>
-        <li><span class="v v-fix">fix</span> CMS — collections · records · binding · dynamic pages<span class="note">server-sync lossy → add feedback + reconcile</span></li>
-        <li><span class="v v-merge">merge</span> Media library <span class="note">editor AND dashboard → editor is home; dashboard read-only</span></li>
-        <li><span class="v v-keep">keep</span> Stock photos / videos <span class="note">Unsplash/Pexels wired server-side (stock.service.ts); returns [] until UNSPLASH/PEXELS keys set — env-gated, not a stub</span></li>
-        <li><span class="v v-keep">keep</span> Stock icons / fonts · Image editor (crop/version)</li>
-        <li><span class="v v-keep">keep</span> Editor templates tab ("insert section")<span class="note">rename — different job from the gallery</span></li>
-        <li><span class="v v-fix">fix</span> Save-as / "My Templates"<span class="note">localStorage only → no cross-device</span></li>
-        <li><span class="v v-keep">keep</span> Undo / redo <span class="note">RAM-only, lost on reload (backend fix later)</span></li>
-        <li><span class="v v-fix">fix</span> Version history (named / restore / compare)<span class="note">IndexedDB only → silent data-loss on cache-clear / new device</span></li>
-      </ul>
-    </section>
+  <!-- J3 -->
+  <section class="job">
+    <h2>J3 · Build the page <span class="home editor">Editor</span></h2>
+    <p class="donemeans"><b>Done means</b> a builder assembles a multi-page site on the canvas and never loses work between sessions.</p>
+    <div class="btwrap"><table class="bt">
+      <colgroup><col style="width:23%"><col style="width:6%"><col style="width:7%"><col style="width:5%"><col style="width:13%"><col style="width:9%"><col style="width:16%"><col style="width:8%"><col style="width:13%"></colgroup>
+      <thead><tr><th>Feature</th><th>V</th><th>Pri</th><th>Own</th><th>Entry</th><th>States</th><th>Data (entities; mutations)</th><th>Roles</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr class="slice-row"><td><span class="fname">Canvas — add · select · resize · drag · group</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">editor canvas</td><td class="mono">E S</td><td class="mono-dim">element tree (engine)</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr class="slice-row"><td><span class="fname">Add elements / sections · Layers · Edit-scope picker</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">Build rail</td><td class="mono">E S</td><td class="mono-dim">element; add()</td><td class="mono-dim">all</td><td class="mono-dim">canvas</td></tr>
+        <tr class="slice-row"><td><span class="fname">Pages manager + page ops (CRUD/reorder/home)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E·S</td><td class="mono-dim">Build › Pages</td><td class="mono">E L X S</td><td class="mono-dim">page; CRUD/reorder()</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr class="slice-row"><td><span class="fname">Text / heading / links / rich content</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">canvas insert</td><td class="mono">S</td><td class="mono-dim">element</td><td class="mono-dim">all</td><td class="mono-dim">canvas</td></tr>
+        <tr><td><span class="fname">4-mode editor (Build / AI / Design / Settings)</span><span class="fnote">this IS the editor's top-level rail</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">editor rail</td><td class="mono">S</td><td class="mono-dim">—</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">CMS — collections · records · binding · dynamic pages</span><span class="fnote">server-sync lossy; only 5 of 14 field types creatable; records stuck draft</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S</td><td class="mono-dim">Build › Content</td><td class="mono">E L X S A</td><td class="mono-dim">collection,item; CRUD/publish()</td><td class="mono-dim">all</td><td class="mono-dim">publish toggle</td></tr>
+        <tr><td><span class="fname">Media library</span><span class="fnote">editor AND dashboard → editor is home; dashboard read-only</span></td><td><span class="v v-merge">merge</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S</td><td class="mono-dim">Build › Media</td><td class="mono">E L X S</td><td class="mono-dim">asset; upload()</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Undo / redo</span><span class="fnote">RAM-only, lost on reload (backend fix later)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E</td><td class="mono-dim">⌘Z / ⌘⇧Z</td><td class="mono">S</td><td class="mono-dim">history (RAM)</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Version history (named / restore / compare)</span><span class="fnote">IndexedDB only → silent data-loss on cache-clear / new device</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S</td><td class="mono-dim">Build › History</td><td class="mono">E L X S</td><td class="mono-dim">version (IndexedDB)</td><td class="mono-dim">all</td><td class="mono-dim">server persistence</td></tr>
+        <tr><td><span class="fname">Interactions (13 triggers, 7 wired) + animations</span><span class="fnote">CSS-preset animations; GSAP native ScrollTrigger removed → IntersectionObserver</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">E</td><td class="mono-dim">Inspector › Effects</td><td class="mono">S</td><td class="mono-dim">interaction,animation</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Command palette (⌘K) · Onboarding checklist</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">E</td><td class="mono-dim">⌘K</td><td class="mono">S</td><td class="mono-dim">—</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Stock icons / fonts · Image editor (crop/version)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">E</td><td class="mono-dim">Media</td><td class="mono">E L S</td><td class="mono-dim">asset,icon</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Editor templates tab ("insert section")</span><span class="fnote">rename — different job from the gallery</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">E</td><td class="mono-dim">Build › Insert</td><td class="mono">E L S</td><td class="mono-dim">template</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Stock photos / videos</span><span class="fnote">Unsplash/Pexels wired server-side; returns [] until keys set — env-gated, not a stub</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">S</td><td class="mono-dim">Media › Stock</td><td class="mono">E L X S</td><td class="mono-dim">stock(search)</td><td class="mono-dim">all</td><td class="mono-dim">UNSPLASH/PEXELS key</td></tr>
+        <tr><td><span class="fname">Save-as / "My Templates"</span><span class="fnote">localStorage only → no cross-device</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">E</td><td class="mono-dim">section ⋯</td><td class="mono">L X S</td><td class="mono-dim">localStorage only</td><td class="mono-dim">all</td><td class="mono-dim">server persistence</td></tr>
+      </tbody>
+    </table></div>
+  </section>
 
-    <!-- J4 -->
-    <section class="job">
-      <h2>J4 · Make it on-brand <span class="home editor">Editor</span></h2>
-      <p class="job-sub">Inside one site, making it consistent. Where "AI slop" gets cured.</p>
-      <ul class="feat">
-        <li><span class="v v-keep">keep</span> Inspector — type · spacing · layout · size · bg · effects · responsive</li>
-        <li><span class="v v-keep">keep</span> Styling reach / model (3-reach)</li>
-        <li><span class="v v-merge">merge</span> <b>Design system (tokens) + Styles + DS tools</b><span class="note">3 surfaces for one job → one "Brand" area</span></li>
-        <li><span class="v v-fix">fix</span> Components — create · instance · variants · detach<span class="note">masters IndexedDB-only (data-loss); per-instance overrides revert on master-sync</span></li>
-        <li><span class="v v-keep">keep</span> Shared DS push (agency → clients)<span class="note">the wedge</span></li>
-        <li><span class="v v-keep">keep</span> Custom CSS / code injection <span class="note">Pro-gated · tuck (advanced)</span></li>
-      </ul>
-    </section>
+  <!-- J4 -->
+  <section class="job">
+    <h2>J4 · Make it on-brand <span class="home editor">Editor</span></h2>
+    <p class="donemeans"><b>Done means</b> a brand change made once propagates to every selected client site, on-brand, in one action.</p>
+    <div class="btwrap"><table class="bt">
+      <colgroup><col style="width:23%"><col style="width:6%"><col style="width:7%"><col style="width:5%"><col style="width:13%"><col style="width:9%"><col style="width:16%"><col style="width:8%"><col style="width:13%"></colgroup>
+      <thead><tr><th>Feature</th><th>V</th><th>Pri</th><th>Own</th><th>Entry</th><th>States</th><th>Data (entities; mutations)</th><th>Roles</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr class="slice-row"><td><span class="fname">Inspector — type · spacing · layout · size · bg · effects · responsive</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">right panel</td><td class="mono">S</td><td class="mono-dim">element styles</td><td class="mono-dim">all</td><td class="mono-dim">canvas selection</td></tr>
+        <tr class="slice-row"><td><span class="fname">Design system (tokens) + Styles + DS tools</span><span class="fnote">3 surfaces for one job → one "Brand" area</span></td><td><span class="v v-merge">merge</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E·S</td><td class="mono-dim">Design › Brand</td><td class="mono">E L X S</td><td class="mono-dim">token,style; update()</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr class="slice-row"><td><span class="fname">Shared DS push (agency → clients)</span><span class="fnote">the wedge</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">S·D</td><td class="mono-dim">Brand › Push</td><td class="mono">L X S A D</td><td class="mono-dim">theme,site; pushTheme()</td><td class="mono-dim">own·mem</td><td class="mono-dim">client-site link · DS merge</td></tr>
+        <tr><td><span class="fname">Styling reach / model (3-reach)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E</td><td class="mono-dim">Inspector</td><td class="mono">S</td><td class="mono-dim">—</td><td class="mono-dim">all</td><td class="mono-dim">inspector</td></tr>
+        <tr><td><span class="fname">Components — create · instance · variants · detach</span><span class="fnote">masters IndexedDB-only (data-loss); per-instance overrides revert on master-sync</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S</td><td class="mono-dim">Design › Components</td><td class="mono">E L X S</td><td class="mono-dim">component (IndexedDB)</td><td class="mono-dim">all</td><td class="mono-dim">server persistence</td></tr>
+        <tr><td><span class="fname">Custom CSS / code injection</span><span class="fnote">Pro-gated · dead in prod (#37, devMode hardcoded false)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">E</td><td class="mono-dim">Inspector › Custom CSS</td><td class="mono">S</td><td class="mono-dim">css string</td><td class="mono-dim">own</td><td class="mono-dim">unhide devMode gate</td></tr>
+      </tbody>
+    </table></div>
+  </section>
 
-    <!-- J5 -->
-    <section class="job">
-      <h2>J5 · Get sign-off <span class="home both">Editor + Dashboard</span></h2>
-      <p class="job-sub">The agency↔client loop — the differentiator. The client half was broken.</p>
-      <ul class="feat">
-        <li><span class="v v-keep">keep</span> Preview / preview-as-client <span class="note">client-only sanitized (editor)</span></li>
-        <li><span class="v v-fix">fix</span> Client review — request (editor) + queue (dashboard)<span class="note">agency side wired; both-way notify + editor note shipped (dd910dc4); resolve/approve is admin-side in the dashboard queue — external-client (share-link) approve NOT built</span></li>
-        <li><span class="v v-fix">fix</span> Comments <span class="note">service works; client overlay = dashboard iframe on the published site, not the in-editor canvas</span></li>
-        <li><span class="v v-fix">fix</span> Share link + password <span class="note">token isn't a real gate yet (decorative)</span></li>
-        <li><span class="v v-keep">keep</span> Client approval flow <span class="note">folds into the review queue</span></li>
-      </ul>
-    </section>
+  <!-- J5 -->
+  <section class="job">
+    <h2>J5 · Get sign-off <span class="home both">Editor + Dashboard</span></h2>
+    <p class="donemeans"><b>Done means</b> a client opens a gated link, leaves feedback, and approves — and the agency sees the status flip without a phone call.</p>
+    <div class="btwrap"><table class="bt">
+      <colgroup><col style="width:23%"><col style="width:6%"><col style="width:7%"><col style="width:5%"><col style="width:13%"><col style="width:9%"><col style="width:16%"><col style="width:8%"><col style="width:13%"></colgroup>
+      <thead><tr><th>Feature</th><th>V</th><th>Pri</th><th>Own</th><th>Entry</th><th>States</th><th>Data (entities; mutations)</th><th>Roles</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr class="slice-row"><td><span class="fname">Preview / preview-as-client</span><span class="fnote">client-only sanitized (editor)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E·S</td><td class="mono-dim">topbar › Preview</td><td class="mono">L S</td><td class="mono-dim">sanitized render</td><td class="mono-dim">all·cli</td><td class="mono-dim">—</td></tr>
+        <tr class="slice-row"><td><span class="fname">Client review — request (editor) + queue (dashboard)</span><span class="fnote">both-way notify + editor note shipped (dd910dc4); resolve admin-side; external-client approve NOT built</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E·D·S</td><td class="mono-dim">topbar › Send for review</td><td class="mono">E L X S A</td><td class="mono-dim">reviewRequest; submit/resolve()</td><td class="mono-dim">own·mem·cli</td><td class="mono-dim">notify email · share gate</td></tr>
+        <tr class="slice-row"><td><span class="fname">Client approval flow</span><span class="fnote">folds into the review queue</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">D·S</td><td class="mono-dim">dash Reviews queue</td><td class="mono">L X S</td><td class="mono-dim">reviewRequest.status</td><td class="mono-dim">own·mem</td><td class="mono-dim">client review</td></tr>
+        <tr><td><span class="fname">Share link + password</span><span class="fnote">real bcrypt gate in dashboard (5/min)</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">dash › Share</td><td class="mono">L X S D</td><td class="mono-dim">shareToken; create()</td><td class="mono-dim">own·cli</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Comments</span><span class="fnote">service works; client overlay = dashboard iframe on published site, not in-editor canvas</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">dashboard iframe overlay</td><td class="mono">E L X S</td><td class="mono-dim">comment; create/resolve()</td><td class="mono-dim">mem·cli</td><td class="mono-dim">review preview</td></tr>
+      </tbody>
+    </table></div>
+  </section>
 
-    <!-- J6 -->
-    <section class="job">
-      <h2>J6 · Ship &amp; run it <span class="home both">Editor + Dashboard</span></h2>
-      <p class="job-sub">Publish one site (editor hero); manage many across the dashboard.</p>
-      <ul class="feat">
-        <li><span class="v v-keep">keep</span> Publish flow + lifecycle states <span class="note">the hero action (#5)</span></li>
-        <li><span class="v v-keep">keep</span> Published-site view · Per-page SEO</li>
-        <li><span class="v v-fix">fix</span> Custom domains — connect · verify · primary<span class="note">dns-verify cron matches a dead host → never verifies</span></li>
-        <li><span class="v v-fix">fix</span> Published-site password <span class="note">402/403 swallowed on Hobby Vercel → doesn't gate</span></li>
-        <li><span class="v v-merge">merge</span> Site-level SEO defaults <span class="note">fold into site settings (one SEO home)</span></li>
-        <li><span class="v v-merge">merge</span> Site settings (general/SEO/social/code/security)<span class="note">3 homes → one: dashboard site-detail</span></li>
-        <li><span class="v v-fix">fix</span> Forms — builder + config + submissions<span class="note">submissions wired; form-block config has no server write path</span></li>
-        <li><span class="v v-fix">fix</span> Analytics (visitors/sources/devices/time)<span class="note">avgSession hardcoded 0; hourly degrades to daily</span></li>
-        <li><span class="v v-fix">fix</span> Redirects <span class="note">DB-correct but never injected into deploy → don't work live</span></li>
-        <li><span class="v v-cut">cut</span> Export (HTML) <span class="note">anti-retention — takes the user out of the product</span></li>
-        <li><span class="v v-hide">hide</span> Localization / locales <span class="note">engine is locale-unaware</span></li>
-        <li><span class="v v-hide">hide</span> Real-time collaboration <span class="note">OT engine demo-only, 6 P1 bugs, flag off</span></li>
-      </ul>
-    </section>
-  </div>
+  <!-- J6 -->
+  <section class="job">
+    <h2>J6 · Ship &amp; run it <span class="home both">Editor + Dashboard</span></h2>
+    <p class="donemeans"><b>Done means</b> an agency clicks Publish and the client's site is live on its own domain, with redirects and SEO intact.</p>
+    <div class="btwrap"><table class="bt">
+      <colgroup><col style="width:23%"><col style="width:6%"><col style="width:7%"><col style="width:5%"><col style="width:13%"><col style="width:9%"><col style="width:16%"><col style="width:8%"><col style="width:13%"></colgroup>
+      <thead><tr><th>Feature</th><th>V</th><th>Pri</th><th>Own</th><th>Entry</th><th>States</th><th>Data (entities; mutations)</th><th>Roles</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr class="slice-row"><td><span class="fname">Publish flow + lifecycle states</span><span class="fnote">the hero action (#5)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E·S·D</td><td class="mono-dim">topbar › Publish</td><td class="mono">L X S A</td><td class="mono-dim">site,deployment; publish()</td><td class="mono-dim">own·mem</td><td class="mono-dim">Vercel</td></tr>
+        <tr class="slice-row"><td><span class="fname">Published-site view · Per-page SEO</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E·S</td><td class="mono-dim">live URL / Settings › SEO</td><td class="mono">L X S</td><td class="mono-dim">page.seo</td><td class="mono-dim">all</td><td class="mono-dim">publish</td></tr>
+        <tr><td><span class="fname">Custom domains — connect · verify · primary</span><span class="fnote">dns-verify cron matches a dead host → never verifies</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">dash › Domains</td><td class="mono">L X S A D</td><td class="mono-dim">domain; verify()</td><td class="mono-dim">own</td><td class="mono-dim">fix verify host</td></tr>
+        <tr><td><span class="fname">Published-site password</span><span class="fnote">402/403 swallowed on Hobby Vercel → doesn't gate</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">S</td><td class="mono-dim">Settings › Security</td><td class="mono">L X S D</td><td class="mono-dim">site.password</td><td class="mono-dim">own</td><td class="mono-dim">Vercel plan</td></tr>
+        <tr><td><span class="fname">Site settings (general/SEO/social/code/security)</span><span class="fnote">3 homes → one: dashboard site-detail</span></td><td><span class="v v-merge">merge</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">dash site-detail</td><td class="mono">L X S</td><td class="mono-dim">site; update()</td><td class="mono-dim">own·mem</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Site-level SEO defaults</span><span class="fnote">fold into site settings (one SEO home)</span></td><td><span class="v v-merge">merge</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">D·S</td><td class="mono-dim">Settings › SEO</td><td class="mono">L S</td><td class="mono-dim">site.seo</td><td class="mono-dim">own·mem</td><td class="mono-dim">site settings</td></tr>
+        <tr><td><span class="fname">Forms — builder + config + submissions</span><span class="fnote">submissions wired; form-block config has no server write path</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S·D</td><td class="mono-dim">Build › Forms / dash</td><td class="mono">E L X S A</td><td class="mono-dim">form,submission; submit()</td><td class="mono-dim">all·cli</td><td class="mono-dim">form-config write path</td></tr>
+        <tr><td><span class="fname">Redirects</span><span class="fnote">DB-correct but never injected into deploy → don't work live</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">S</td><td class="mono-dim">Settings › Redirects</td><td class="mono">E L X S</td><td class="mono-dim">redirect; CRUD()</td><td class="mono-dim">own</td><td class="mono-dim">deploy injection</td></tr>
+        <tr><td><span class="fname">Analytics (visitors/sources/devices/time)</span><span class="fnote">avgSession hardcoded 0; hourly degrades to daily</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">D·S</td><td class="mono-dim">dash › Analytics</td><td class="mono">E L X S</td><td class="mono-dim">analyticsEvent</td><td class="mono-dim">own·mem</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Export (HTML)</span><span class="fnote">anti-retention — takes the user out of the product</span></td><td><span class="v v-cut">cut</span></td><td class="c">—</td><td class="mono-dim">—</td><td class="mono-dim">(remove)</td><td class="mono-dim">—</td><td class="mono-dim">—</td><td class="mono-dim">—</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Localization / locales</span><span class="fnote">engine is locale-unaware</span></td><td><span class="v v-hide">hide</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono-dim">—</td><td class="mono-dim">(none)</td><td class="mono-dim">—</td><td class="mono-dim">—</td><td class="mono-dim">—</td><td class="mono-dim">engine i18n</td></tr>
+        <tr><td><span class="fname">Real-time collaboration</span><span class="fnote">OT engine demo-only, 6 P1 bugs, flag off</span></td><td><span class="v v-hide">hide</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono-dim">—</td><td class="mono-dim">(none)</td><td class="mono-dim">—</td><td class="mono-dim">—</td><td class="mono-dim">—</td><td class="mono-dim">OT/CRDT engine</td></tr>
+      </tbody>
+    </table></div>
+  </section>
 
   <!-- AI cross-cutting -->
   <div class="ai-strip">
-    <h2 style="font-size:16px;margin:0 0 4px">AI — a cross-cutting capability, not a cluster</h2>
-    <p class="job-sub" style="margin-bottom:10px">AI is <em>not a place</em> — it shows up inside jobs.</p>
-    <ul class="feat">
-      <li><span class="v v-keep">keep</span> AI assistant (chat / edit-commands / plan) <span class="note">J3/J4 editor "AI" mode · needs provider key</span></li>
-      <li><span class="v v-keep">keep</span> AI propose-action (propose→confirm→execute) <span class="note">J6 · fully wired, ADMIN-gated, single-use token</span></li>
-      <li><span class="v v-keep">keep</span> AI SEO "write title" <span class="note">J6 · needs OPENAI_API_KEY (guard)</span></li>
-      <li><span class="v v-keep">keep</span> AI alt-text <span class="note">J3 media · Claude Haiku</span></li>
-      <li><span class="v v-fix">fix</span> AI site generation <span class="note">J2 · backend wired (ai-generation.service.ts + worker); needs AI provider key</span></li>
-    </ul>
+    <h2 style="font-size:16px;margin:8px 0 2px">AI — a cross-cutting capability, not a cluster</h2>
+    <p class="job-sub" style="margin-bottom:8px">AI is <em>not a place</em> — it shows up inside jobs. None on the P0 first slice; the wedge proves without AI.</p>
+    <div class="btwrap"><table class="bt">
+      <colgroup><col style="width:23%"><col style="width:6%"><col style="width:7%"><col style="width:5%"><col style="width:13%"><col style="width:9%"><col style="width:16%"><col style="width:8%"><col style="width:13%"></colgroup>
+      <thead><tr><th>Capability</th><th>V</th><th>Pri</th><th>Own</th><th>Lives in</th><th>States</th><th>Data</th><th>Roles</th><th>Depends on</th></tr></thead>
+      <tbody>
+        <tr><td><span class="fname">AI assistant (chat / edit-commands / plan)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S</td><td class="mono-dim">J3/J4 editor AI mode</td><td class="mono">L X S A</td><td class="mono-dim">aiMessage; stream()</td><td class="mono-dim">all</td><td class="mono-dim">provider key</td></tr>
+        <tr><td><span class="fname">AI propose-action (propose→confirm→execute)</span><span class="fnote">fully wired, ADMIN-gated, single-use token</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S</td><td class="mono-dim">J6 editor AI</td><td class="mono">L X S A D</td><td class="mono-dim">proposal,token; propose/execute()</td><td class="mono-dim">own·mem</td><td class="mono-dim">provider key</td></tr>
+        <tr><td><span class="fname">AI site generation</span><span class="fnote">backend wired (ai-generation.service.ts + worker); needs AI key</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">S·D</td><td class="mono-dim">J2 New site › AI</td><td class="mono">L X S A</td><td class="mono-dim">aiGenerationJob</td><td class="mono-dim">own·mem</td><td class="mono-dim">provider key</td></tr>
+        <tr><td><span class="fname">AI SEO "write title"</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">S</td><td class="mono-dim">J6 Settings › SEO</td><td class="mono">L X S</td><td class="mono-dim">—</td><td class="mono-dim">own·mem</td><td class="mono-dim">OPENAI_API_KEY</td></tr>
+        <tr><td><span class="fname">AI alt-text</span><span class="fnote">Claude Haiku</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p2">P2</span></td><td class="mono">S</td><td class="mono-dim">J3 media</td><td class="mono">L X S</td><td class="mono-dim">asset.alt</td><td class="mono-dim">all</td><td class="mono-dim">provider key</td></tr>
+      </tbody>
+    </table></div>
   </div>
 
   <!-- Substrate -->
-  <p class="sub" style="margin-top:18px"><strong>Substrate — NOT nav items:</strong> the auth front-door (sign-in/up · verify · 2FA) is a gate <em>before</em> the 6 jobs; every <code>*-states</code> surface (empty / loading / error / conflict / save) is a <strong>pattern applied inside</strong> features (#13), not a destination. Don't give these homes.</p>
+  <p class="sub" style="margin-top:18px"><strong>Substrate — NOT nav items, NOT rows:</strong> the auth front-door (sign-in/up · verify · 2FA) is a gate <em>before</em> the 6 jobs; every <code>*-states</code> surface (empty / loading / error / conflict / save) is a <strong>pattern applied inside</strong> features (#13) — that's what the <strong>States</strong> column above captures per node. Don't give these their own home.</p>
 
-  <!-- counts + resolution lists -->
-  <h2 style="margin-top:28px">The verdict, counted</h2>
-  <p class="sub">The 60 rows drawn above (each row = one feature or tight cluster, covering ~100 underlying features), by verdict. AI-create-site + Stock photos/videos graduated out of "hide" since the 2026-06-23 source run — their backends shipped (<code>ai-generation.service.ts</code>, <code>stock.service.ts</code>).</p>
+  <!-- ============ BOTTOM SUMMARY ============ -->
+  <h2 style="margin-top:28px">Build order, counted</h2>
+  <p class="sub">The 60 rows above, split two ways: by verdict (is it real?) and by priority (when do we build it?).</p>
   <div class="counts">
+    <span>verdict →</span>
     <span><b style="color:var(--v-keep)">35</b> keep</span>
     <span><b style="color:var(--v-fix)">16</b> fix</span>
     <span><b style="color:var(--v-merge)">4</b> merge</span>
     <span><b style="color:var(--v-hide)">4</b> hide</span>
     <span><b style="color:var(--v-cut)">1</b> cut</span>
+  </div>
+  <div class="counts" style="margin-top:0">
+    <span>priority →</span>
+    <span><b style="color:var(--p0)">16</b> P0 (first slice)</span>
+    <span><b style="color:var(--p1)">22</b> P1 (next)</span>
+    <span><b style="color:var(--p2)">21</b> P2 (defer)</span>
     <span>·</span>
     <span>top-level nav: <b>17 → 5 + 4</b></span>
   </div>
+
   <div class="cols">
+    <div class="card">
+      <h4>◆ Phase 1 — the first slice (P0)</h4>
+      <p style="margin:0 0 6px;color:var(--muted);font-size:12px">Ship this and the agency wedge is proven. Nothing else ships before it.</p>
+      <ul>
+        <li>Clients · Sites · New site</li>
+        <li>Canvas · Add/Layers · Pages · Text · 4-mode rail</li>
+        <li>Inspector · Brand (DS merged) · <strong>Shared DS push</strong></li>
+        <li>Preview-as-client · Client review · Approval</li>
+        <li>Publish · Published-site view</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Phase 2 — trust &amp; completion (P1)</h4>
+      <p style="margin:0 0 6px;color:var(--muted);font-size:12px">Right after the slice works — earns revenue and retention.</p>
+      <ul>
+        <li>Team · invites · workspace · integrations/billing</li>
+        <li>CMS · Media · Components · Version history · Undo</li>
+        <li>Share gate · Comments</li>
+        <li>Domains · published-password · site settings · forms · redirects</li>
+        <li>AI assistant · propose-action · site-gen</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Not in v1 — deferred (P2)</h4>
+      <p style="margin:0 0 6px;color:var(--muted);font-size:12px">The cost-control device. Every "keep" here is real but waits.</p>
+      <ul>
+        <li>Account · API tokens · Notifications · Help</li>
+        <li>Dashboard home · Template gallery · First-run</li>
+        <li>Interactions · ⌘K · Stock · Image editor · Save-as · insert-section</li>
+        <li>Custom CSS · Analytics · AI SEO/alt-text</li>
+        <li class="mono-dim" style="margin-top:4px">+ hidden: collab · localization · billing-upgrade · extra-workspace · (Export = cut)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="cols" style="margin-top:14px">
     <div class="card">
       <h4>Dedup → one home each</h4>
       <ol>
@@ -262,28 +362,31 @@
         <li>Settings hub → drop the catch-all</li>
         <li>Templates → not a dupe (rename to disambiguate)</li>
       </ol>
-      <p style="margin:8px 0 0;color:var(--muted)">6 decisions · 4 are merge-verdict chips above; 2 are drop/rename.</p>
+      <p style="margin:8px 0 0;color:var(--muted)">6 decisions · 4 are merge-verdict rows; 2 are drop/rename.</p>
     </div>
     <div class="card">
-      <h4>Hide until backend real (#3)</h4>
-      <ul>
-        <li>Real-time collab · Billing upgrade/paywall</li>
-        <li>Localization · Extra-workspace create</li>
-      </ul>
-      <p style="margin:8px 0 0;color:var(--muted)">Design the slot, gate the feature. (AI-create-site + Stock left this list — backends shipped. Export HTML is <strong>cut</strong>, not hidden.)</p>
+      <h4>How to read a row → build it</h4>
+      <ol>
+        <li><strong>Pri</strong> says when (P0 first).</li>
+        <li><strong>Entry</strong> says where it opens from.</li>
+        <li><strong>States</strong> says which screens to draw (E/L/X/S/D/A).</li>
+        <li><strong>Data</strong> says the entities + mutations to wire.</li>
+        <li><strong>Roles</strong> + <strong>Deps</strong> say who sees it and what must exist first.</li>
+        <li><strong>Done means</strong> (per job) is the acceptance bar.</li>
+      </ol>
     </div>
     <div class="card">
       <h4>Completeness check</h4>
       <ol>
-        <li>Every feature has exactly one home? <span class="pass">✓</span></li>
-        <li>Every group names a user job, not a backend module? <span class="pass">✓</span></li>
+        <li>Every feature has one home? <span class="pass">✓</span></li>
+        <li>Every group names a job, not a module? <span class="pass">✓</span></li>
         <li>Top-level ~5–6, not 17? <span class="pass">✓ (5 + 4)</span></li>
+        <li>Every row has a priority + acceptance? <span class="pass">✓</span></li>
       </ol>
-      <p style="margin:8px 0 0">Structure now matches how the user thinks — "where does this go?" has a fixed answer.</p>
     </div>
   </div>
 
-  <p class="sub" style="margin-top:22px">Grounded in: <code>ia-home-map-20260623.md</code> (the run) · <code>feature-backend-map.md</code> (7-agent backend audit, real <code>file:line</code>) · constitution <strong>#14 — every feature has one home</strong>. The <span class="v v-fix">fix</span> column is the live build worklist. Visual companion to <a href="ia-home-map.html">ia-home-map.html</a> (method + seed) and <a href="editor-wireframe.html">editor-wireframe.html</a> (the per-surface drawings).</p>
+  <p class="sub" style="margin-top:22px">Grounded in: <code>ia-home-map-20260623.md</code> (the run) · <code>feature-backend-map.md</code> (7-agent backend audit, real <code>file:line</code>) · code verified 2026-06-29 (AI-gen + Stock shipped past the source doc). Verdict column = is-it-real; priority column = when-to-build. The <span class="v v-fix">fix</span> rows + <span class="p p-p0">P0</span> slice are the live worklist. Companion to <a href="ia-home-map.html">ia-home-map.html</a> (method) and <a href="editor-wireframe.html">editor-wireframe.html</a> (per-surface drawings).</p>
 </main>
 </body>
 </html>
