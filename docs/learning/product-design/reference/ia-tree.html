@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buildrik IA — the home map, drawn</title>
+<link rel="stylesheet" href="../assets/course.css">
+<link rel="stylesheet" href="../assets/wireframe.css">
+<style>
+  :root{
+    --maxw:1040px;
+    --v-keep:#15803D; --v-keep-bg:#F0FDF4; --v-keep-bd:#BBF7D0;
+    --v-fix:#B45309;  --v-fix-bg:#FFFBEB;  --v-fix-bd:#FDE68A;
+    --v-merge:#2D6DFF;--v-merge-bg:#EFF4FF;--v-merge-bd:#C7D8FF;
+    --v-hide:#71717A; --v-hide-bg:#F4F4F5; --v-hide-bd:#E4E4E7;
+    --v-cut:#DC2626;  --v-cut-bg:#FEF2F2;  --v-cut-bd:#FECACA;
+  }
+  main{max-width:var(--maxw)}
+  .sub{color:var(--muted);font-size:15px;margin:-2px 0 14px}
+  .legendbar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--rule);z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-family:var(--wf-mono);font-size:12px}
+  code{font-family:var(--wf-mono);font-size:.88em;background:#f4f4f5;padding:1px 5px;border-radius:4px}
+
+  /* verdict chips */
+  .v{display:inline-block;font-family:var(--wf-mono);font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;border:1px solid;margin-right:7px;vertical-align:middle;min-width:42px;text-align:center}
+  .v-keep{color:var(--v-keep);background:var(--v-keep-bg);border-color:var(--v-keep-bd)}
+  .v-fix{color:var(--v-fix);background:var(--v-fix-bg);border-color:var(--v-fix-bd)}
+  .v-merge{color:var(--v-merge);background:var(--v-merge-bg);border-color:var(--v-merge-bd)}
+  .v-hide{color:var(--v-hide);background:var(--v-hide-bg);border-color:var(--v-hide-bd)}
+  .v-cut{color:var(--v-cut);background:var(--v-cut-bg);border-color:var(--v-cut-bd)}
+
+  /* the two nav skeletons — the spine */
+  .spine{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:14px 0 8px}
+  @media(max-width:760px){.spine{grid-template-columns:1fr}}
+  .rail{border:1px solid var(--rule);border-radius:10px;padding:14px 16px;background:#fff}
+  .rail h3{margin:0 0 4px;font-size:15px}
+  .rail .scope{font-size:12px;color:var(--muted);margin:0 0 10px}
+  .tree{font-family:var(--wf-mono);font-size:13px;line-height:1.85}
+  .tree .top{font-weight:600;color:var(--ink)}
+  .tree .kid{color:var(--muted);padding-left:6px}
+  .tree .kid b{color:var(--ink);font-weight:600}
+  .tree .bar{color:var(--faint)}
+
+  /* job lanes */
+  .jobs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:760px){.jobs{grid-template-columns:1fr}}
+  .job{border:1px solid var(--rule);border-radius:10px;padding:14px 16px;background:#fff}
+  .job.full{grid-column:1 / -1}
+  .job h2{font-size:16px;margin:0 0 2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .job .job-sub{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+  .home{font-family:var(--wf-mono);font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px}
+  .home.editor{color:#2D6DFF;background:#EFF4FF;border:1px solid #C7D8FF}
+  .home.dash{color:#7C2D12;background:#FFF7ED;border:1px solid #FED7AA}
+  .home.both{color:#3F3F46;background:#F4F4F5;border:1px solid #E4E4E7}
+  ul.feat{list-style:none;margin:0;padding:0}
+  ul.feat li{padding:6px 0;border-bottom:1px solid #f1f1f3;font-size:13.5px;line-height:1.5}
+  ul.feat li:last-child{border-bottom:0}
+  ul.feat .note{display:block;font-size:12px;color:var(--muted);margin-top:2px;padding-left:49px}
+  .ai-strip{border:1px dashed var(--rule);border-radius:10px;padding:12px 16px;margin-top:16px;background:#fafafa}
+
+  .counts{display:flex;flex-wrap:wrap;gap:18px;margin:16px 0;font-size:14px}
+  .counts b{font-family:var(--wf-mono)}
+  .cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:8px}
+  @media(max-width:760px){.cols{grid-template-columns:1fr}}
+  .cols .card{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;background:#fff;font-size:13px}
+  .cols .card h4{margin:0 0 6px;font-size:13.5px}
+  .cols .card ol,.cols .card ul{margin:0;padding-left:18px;line-height:1.65}
+  .pass{color:var(--v-keep);font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Information Architecture · drawn from the 2026-06-23 home-map run</p>
+  <h1>Buildrik IA — every feature, one home.</h1>
+  <p class="sub">The visual of <code>ia-home-map-20260623.md</code>: ~100 features regrouped from <strong>17 backend clusters → 6 user jobs</strong>, each given one home (Editor / Dashboard) and a verdict. The spine that falls out = the dashboard sidebar + the editor rail.</p>
+
+  <div class="legendbar">
+    <span>verdicts →</span>
+    <span class="v v-keep">keep</span> works, leave it
+    <span class="v v-fix">fix</span> wired-but-broken
+    <span class="v v-merge">merge</span> dedup → one home
+    <span class="v v-hide">hide</span> until backend real (#3)
+    <span class="v v-cut">cut</span> remove
+  </div>
+
+  <p class="sub" style="margin-top:14px"><strong>Scope test (decides every home):</strong> one site's content → <strong>Editor</strong>; across sites / the business → <strong>Dashboard</strong>.</p>
+
+  <!-- ============ THE SPINE: two nav skeletons ============ -->
+  <h2 style="margin-top:26px">The spine — the nav skeleton this produces</h2>
+  <p class="sub">17 top-level clusters collapsed to <strong>5 (dashboard) + 4 (editor rail)</strong>. This is the IA's output: where every job lives, one click from the top.</p>
+  <div class="spine">
+    <div class="rail">
+      <h3>Dashboard <span class="home dash">across the business</span></h3>
+      <p class="scope">~5 top-level (was 17). Billing-upgrade + extra-workspace hidden until real.</p>
+      <div class="tree">
+        <div class="top">[top] Workspace switcher · 🔔 Notifications · Account ▾</div>
+        <div class="kid"><span class="bar">├</span> <b>Home</b> — sites overview + activity feed</div>
+        <div class="kid"><span class="bar">├</span> <b>Sites</b> — list · detail · folders</div>
+        <div class="kid"><span class="bar">├</span> <b>Clients</b> — agency multi-client <span class="v v-fix" style="margin-left:4px">flag ON</span></div>
+        <div class="kid"><span class="bar">├</span> <b>Team</b> — members · invites · roles</div>
+        <div class="kid"><span class="bar">└</span> <b>Settings</b> — workspace · integrations · billing · API tokens · help</div>
+      </div>
+    </div>
+    <div class="rail">
+      <h3>Editor <span class="home editor">inside one site</span></h3>
+      <p class="scope">The existing 4-mode rail, regrouped. CMS rides Pages as a Content view; collab/locale/export/stock = gone.</p>
+      <div class="tree">
+        <div class="top">[topbar] Exit ‹ breadcrumb · Preview · Publish (hero) · Review/Share · ⋯</div>
+        <div class="kid"><span class="bar">├</span> <b>Build</b> — add · pages · layers · CMS content · media · insert-section</div>
+        <div class="kid"><span class="bar">├</span> <b>Design</b> — inspector · Brand (tokens + styles + components, MERGED)</div>
+        <div class="kid"><span class="bar">├</span> <b>AI</b> — assistant</div>
+        <div class="kid"><span class="bar">└</span> <b>Settings</b> — page settings · SEO · domains · forms · publish history</div>
+      </div>
+    </div>
+  </div>
+  <p class="sub" style="margin-top:6px">Live editor rail today = <code>Insert · Pages · Styles · Site</code> (same 4-slot spine, different labels). The fix is <em>what's grouped inside</em>, not the count.</p>
+
+  <!-- ============ THE 6 JOBS ============ -->
+  <h2 style="margin-top:30px">The 6 jobs — every feature placed</h2>
+  <p class="sub">Regrouped by the agency operator's actual jobs, not the system's modules.</p>
+
+  <div class="jobs">
+    <!-- J1 -->
+    <section class="job">
+      <h2>J1 · Run the business <span class="home dash">Dashboard</span></h2>
+      <p class="job-sub">Across sites / the whole account. Tucked deep; rare but matters.</p>
+      <ul class="feat">
+        <li><span class="v v-keep">keep</span> Account — profile · avatar · email · password · 2FA<span class="note">avatar = URL passthrough, no upload (minor fix)</span></li>
+        <li><span class="v v-keep">keep</span> API tokens <span class="note">advanced; deepest tuck</span></li>
+        <li><span class="v v-fix">fix</span> Workspace settings · switch · delete<span class="note">settings update has no OWNER/ADMIN check (weak authz)</span></li>
+        <li><span class="v v-hide">hide</span> Create additional workspace <span class="note">no backend outside signup/OAuth</span></li>
+        <li><span class="v v-fix">fix</span> Team — list · invite · roles · revoke<span class="note">resendInvite extends expiry but sends no email (silent)</span></li>
+        <li><span class="v v-keep">keep</span> Invite accept / decline · Ownership transfer · Roles &amp; permissions</li>
+        <li><span class="v v-keep">keep</span> <b>Clients — CRUD + assign (agency)</b><span class="note">the wedge — works but flag OFF → turn ON</span></li>
+        <li><span class="v v-keep">keep</span> Notifications center <span class="note">SSE 5s · top-bar bell</span></li>
+        <li><span class="v v-keep">keep</span> Integrations (Vercel OAuth) · Billing · usage · invoices</li>
+        <li><span class="v v-hide">hide</span> Upgrade / paywall / payment <span class="note">upgradePlan throws PAYMENTS_NOT_CONFIGURED</span></li>
+        <li><span class="v v-keep">keep</span> Help / support</li>
+      </ul>
+    </section>
+
+    <!-- J2 -->
+    <section class="job">
+      <h2>J2 · Start a site <span class="home dash">Dashboard</span></h2>
+      <p class="job-sub">The dashboard landing + the on-ramp into a site.</p>
+      <ul class="feat">
+        <li><span class="v v-keep">keep</span> Sites list · detail · advanced (filter/sort/bulk)<span class="note">bulk "publish" = status flip, not real deploy; bulk move/export no backend</span></li>
+        <li><span class="v v-fix">fix</span> Dashboard home — activity · quick actions · health<span class="note">feed under-fed (rename/dup/archive write no log); bandwidth health fake</span></li>
+        <li><span class="v v-keep">keep</span> New site — blank / template</li>
+        <li><span class="v v-hide">hide</span> New site — <b>AI</b><span class="note">no AI branch → silently makes a blank 1-page site (#3)</span></li>
+        <li><span class="v v-keep">keep</span> Template gallery + preview<span class="note">seed.ts seeds NO templates → needs seed data or real empty-state</span></li>
+        <li><span class="v v-keep">keep</span> First-run / getting-started</li>
+      </ul>
+    </section>
+
+    <!-- J3 -->
+    <section class="job">
+      <h2>J3 · Build the page <span class="home editor">Editor</span></h2>
+      <p class="job-sub">Inside one site, content on the canvas. The product's calm center (#6).</p>
+      <ul class="feat">
+        <li><span class="v v-keep">keep</span> Canvas — add · select · resize · drag · group</li>
+        <li><span class="v v-keep">keep</span> Add elements / sections panel · Layers tree · Edit-scope picker</li>
+        <li><span class="v v-keep">keep</span> Pages manager + page ops (CRUD/reorder/home)</li>
+        <li><span class="v v-keep">keep</span> <b>4-mode editor (Build / AI / Design / Settings)</b><span class="note">this IS the editor's top-level rail</span></li>
+        <li><span class="v v-keep">keep</span> Command palette (⌘K) · Onboarding checklist</li>
+        <li><span class="v v-keep">keep</span> Text / heading / links / rich content</li>
+        <li><span class="v v-fix">fix</span> Interactions (7 triggers) + animations<span class="note">GSAP native ScrollTrigger removed → IntersectionObserver</span></li>
+        <li><span class="v v-fix">fix</span> CMS — collections · records · binding · dynamic pages<span class="note">server-sync lossy → add feedback + reconcile</span></li>
+        <li><span class="v v-merge">merge</span> Media library <span class="note">editor AND dashboard → editor is home; dashboard read-only</span></li>
+        <li><span class="v v-hide">hide</span> Stock photos / videos <span class="note">STUB — returns [] (IS_STOCK_CONFIGURED=false)</span></li>
+        <li><span class="v v-keep">keep</span> Stock icons / fonts · Image editor (crop/version)</li>
+        <li><span class="v v-keep">keep</span> Editor templates tab ("insert section")<span class="note">rename — different job from the gallery</span></li>
+        <li><span class="v v-fix">fix</span> Save-as / "My Templates"<span class="note">localStorage only → no cross-device</span></li>
+        <li><span class="v v-keep">keep</span> Undo / redo <span class="note">RAM-only, lost on reload (backend fix later)</span></li>
+        <li><span class="v v-fix">fix</span> Version history (named / restore / compare)<span class="note">IndexedDB only → silent data-loss on cache-clear / new device</span></li>
+      </ul>
+    </section>
+
+    <!-- J4 -->
+    <section class="job">
+      <h2>J4 · Make it on-brand <span class="home editor">Editor</span></h2>
+      <p class="job-sub">Inside one site, making it consistent. Where "AI slop" gets cured.</p>
+      <ul class="feat">
+        <li><span class="v v-keep">keep</span> Inspector — type · spacing · layout · size · bg · effects · responsive</li>
+        <li><span class="v v-keep">keep</span> Styling reach / model (3-reach)</li>
+        <li><span class="v v-merge">merge</span> <b>Design system (tokens) + Styles + DS tools</b><span class="note">3 surfaces for one job → one "Brand" area</span></li>
+        <li><span class="v v-fix">fix</span> Components — create · instance · variants · detach<span class="note">masters IndexedDB-only (data-loss); per-instance overrides revert on master-sync</span></li>
+        <li><span class="v v-keep">keep</span> Shared DS push (agency → clients)<span class="note">the wedge</span></li>
+        <li><span class="v v-keep">keep</span> Custom CSS / code injection <span class="note">Pro-gated · tuck (advanced)</span></li>
+      </ul>
+    </section>
+
+    <!-- J5 -->
+    <section class="job">
+      <h2>J5 · Get sign-off <span class="home both">Editor + Dashboard</span></h2>
+      <p class="job-sub">The agency↔client loop — the differentiator. The client half was broken.</p>
+      <ul class="feat">
+        <li><span class="v v-keep">keep</span> Preview / preview-as-client <span class="note">client-only sanitized (editor)</span></li>
+        <li><span class="v v-fix">fix</span> Client review — request (editor) + queue (dashboard)<span class="note">agency side wired; notify + client approve shipped 2026-06-28 (dd910dc4)</span></li>
+        <li><span class="v v-fix">fix</span> Comments <span class="note">service works; client overlay = same-origin review preview (v1)</span></li>
+        <li><span class="v v-fix">fix</span> Share link + password <span class="note">token isn't a real gate yet (decorative)</span></li>
+        <li><span class="v v-keep">keep</span> Client approval flow <span class="note">folds into the review queue</span></li>
+      </ul>
+    </section>
+
+    <!-- J6 -->
+    <section class="job">
+      <h2>J6 · Ship &amp; run it <span class="home both">Editor + Dashboard</span></h2>
+      <p class="job-sub">Publish one site (editor hero); manage many across the dashboard.</p>
+      <ul class="feat">
+        <li><span class="v v-keep">keep</span> Publish flow + lifecycle states <span class="note">the hero action (#5)</span></li>
+        <li><span class="v v-keep">keep</span> Published-site view · Per-page SEO</li>
+        <li><span class="v v-fix">fix</span> Custom domains — connect · verify · primary<span class="note">dns-verify cron matches a dead host → never verifies</span></li>
+        <li><span class="v v-fix">fix</span> Published-site password <span class="note">402/403 swallowed on Hobby Vercel → doesn't gate</span></li>
+        <li><span class="v v-merge">merge</span> Site-level SEO defaults <span class="note">fold into site settings (one SEO home)</span></li>
+        <li><span class="v v-merge">merge</span> Site settings (general/SEO/social/code/security)<span class="note">3 homes → one: dashboard site-detail</span></li>
+        <li><span class="v v-fix">fix</span> Forms — builder + config + submissions<span class="note">submissions wired; form-block config has no server write path</span></li>
+        <li><span class="v v-fix">fix</span> Analytics (visitors/sources/devices/time)<span class="note">avgSession hardcoded 0; hourly degrades to daily</span></li>
+        <li><span class="v v-fix">fix</span> Redirects <span class="note">DB-correct but never injected into deploy → don't work live</span></li>
+        <li><span class="v v-cut">cut</span> Export (HTML) <span class="note">anti-retention — takes the user out of the product</span></li>
+        <li><span class="v v-hide">hide</span> Localization / locales <span class="note">engine is locale-unaware</span></li>
+        <li><span class="v v-hide">hide</span> Real-time collaboration <span class="note">OT engine demo-only, 6 P1 bugs, flag off</span></li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- AI cross-cutting -->
+  <div class="ai-strip">
+    <h2 style="font-size:16px;margin:0 0 4px">AI — a cross-cutting capability, not a cluster</h2>
+    <p class="job-sub" style="margin-bottom:10px">AI is <em>not a place</em> — it shows up inside jobs.</p>
+    <ul class="feat">
+      <li><span class="v v-keep">keep</span> AI assistant (chat / edit-commands / plan) <span class="note">J3/J4 editor "AI" mode · needs provider key</span></li>
+      <li><span class="v v-keep">keep</span> AI propose-action (propose→confirm→execute) <span class="note">J6 · fully wired, ADMIN-gated, single-use token</span></li>
+      <li><span class="v v-fix">fix</span> AI SEO "write title" <span class="note">J6 · needs OPENAI_API_KEY (guard)</span></li>
+      <li><span class="v v-keep">keep</span> AI alt-text <span class="note">J3 media · Claude Haiku</span></li>
+      <li><span class="v v-hide">hide</span> AI site generation <span class="note">J2 · no real branch</span></li>
+    </ul>
+  </div>
+
+  <!-- Substrate -->
+  <p class="sub" style="margin-top:18px"><strong>Substrate — NOT nav items:</strong> the auth front-door (sign-in/up · verify · 2FA) is a gate <em>before</em> the 6 jobs; every <code>*-states</code> surface (empty / loading / error / conflict / save) is a <strong>pattern applied inside</strong> features (#13), not a destination. Don't give these homes.</p>
+
+  <!-- counts + resolution lists -->
+  <h2 style="margin-top:28px">The verdict, counted</h2>
+  <div class="counts">
+    <span><b style="color:var(--v-keep)">~55</b> keep</span>
+    <span><b style="color:var(--v-fix)">~16</b> fix</span>
+    <span><b style="color:var(--v-merge)">6</b> merge (dedup)</span>
+    <span><b style="color:var(--v-hide)">8</b> hide</span>
+    <span><b style="color:var(--v-cut)">1</b> cut</span>
+    <span>·</span>
+    <span>top-level nav: <b>17 → 5 + 4</b></span>
+  </div>
+  <div class="cols">
+    <div class="card">
+      <h4>Dedup → one home each</h4>
+      <ol>
+        <li>Site settings ×3 → dashboard site-detail</li>
+        <li>Media ×2 → editor (dashboard read-only)</li>
+        <li>SEO ×2 → per-page editor + defaults in settings</li>
+        <li>Design system ×3 → one "Brand" area</li>
+        <li>Settings hub → drop the catch-all</li>
+        <li>Templates → not a dupe (rename to disambiguate)</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>Hide until backend real (#3)</h4>
+      <ul>
+        <li>AI create-site · Stock photos/videos</li>
+        <li>Real-time collab · Billing upgrade/paywall</li>
+        <li>Localization · Extra-workspace create</li>
+        <li>Data-export</li>
+      </ul>
+      <p style="margin:8px 0 0;color:var(--muted)">Design the slot, gate the feature.</p>
+    </div>
+    <div class="card">
+      <h4>Completeness check</h4>
+      <ol>
+        <li>Every feature has exactly one home? <span class="pass">✓</span></li>
+        <li>Every group names a user job, not a backend module? <span class="pass">✓</span></li>
+        <li>Top-level ~5–6, not 17? <span class="pass">✓ (5 + 4)</span></li>
+      </ol>
+      <p style="margin:8px 0 0">Structure now matches how the user thinks — "where does this go?" has a fixed answer.</p>
+    </div>
+  </div>
+
+  <p class="sub" style="margin-top:22px">Grounded in: <code>ia-home-map-20260623.md</code> (the run) · <code>feature-backend-map.md</code> (7-agent backend audit, real <code>file:line</code>) · constitution <strong>#14 — every feature has one home</strong>. The <span class="v v-fix">fix</span> column is the live build worklist. Visual companion to <a href="ia-home-map.html">ia-home-map.html</a> (method + seed) and <a href="editor-wireframe.html">editor-wireframe.html</a> (the per-surface drawings).</p>
+</main>
+</body>
+</html>
