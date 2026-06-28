@@ -102,13 +102,13 @@
     </div>
     <div class="rail">
       <h3>Editor <span class="home editor">inside one site</span></h3>
-      <p class="scope">The existing 4-mode rail, regrouped. CMS rides Pages as a Content view; collab/locale/export/stock = gone.</p>
+      <p class="scope">The existing 4-mode rail, regrouped. CMS rides Pages as a Content view; collab/locale/export = gone (stock stays — env-gated). Share + domains are dashboard-homed.</p>
       <div class="tree">
-        <div class="top">[topbar] Exit ‹ breadcrumb · Preview · Publish (hero) · Review/Share · ⋯</div>
+        <div class="top">[topbar] Exit ‹ breadcrumb · Preview · Publish (hero) · Send for review · ⋯</div>
         <div class="kid"><span class="bar">├</span> <b>Build</b> — add · pages · layers · CMS content · media · insert-section</div>
         <div class="kid"><span class="bar">├</span> <b>Design</b> — inspector · Brand (tokens + styles + components, MERGED)</div>
         <div class="kid"><span class="bar">├</span> <b>AI</b> — assistant</div>
-        <div class="kid"><span class="bar">└</span> <b>Settings</b> — page settings · SEO · domains · forms · publish history</div>
+        <div class="kid"><span class="bar">└</span> <b>Settings</b> — page settings · SEO · forms · publish history</div>
       </div>
     </div>
   </div>
@@ -126,7 +126,7 @@
       <ul class="feat">
         <li><span class="v v-keep">keep</span> Account — profile · avatar · email · password · 2FA<span class="note">avatar = URL passthrough, no upload (minor fix)</span></li>
         <li><span class="v v-keep">keep</span> API tokens <span class="note">advanced; deepest tuck</span></li>
-        <li><span class="v v-fix">fix</span> Workspace settings · switch · delete<span class="note">settings update has no OWNER/ADMIN check (weak authz)</span></li>
+        <li><span class="v v-keep">keep</span> Workspace settings · switch · delete<span class="note">works; settings update has no OWNER/ADMIN check (weak authz) — backend hardening, not a UI fix</span></li>
         <li><span class="v v-hide">hide</span> Create additional workspace <span class="note">no backend outside signup/OAuth</span></li>
         <li><span class="v v-fix">fix</span> Team — list · invite · roles · revoke<span class="note">resendInvite extends expiry but sends no email (silent)</span></li>
         <li><span class="v v-keep">keep</span> Invite accept / decline · Ownership transfer · Roles &amp; permissions</li>
@@ -146,7 +146,7 @@
         <li><span class="v v-keep">keep</span> Sites list · detail · advanced (filter/sort/bulk)<span class="note">bulk "publish" = status flip, not real deploy; bulk move/export no backend</span></li>
         <li><span class="v v-fix">fix</span> Dashboard home — activity · quick actions · health<span class="note">feed under-fed (rename/dup/archive write no log); bandwidth health fake</span></li>
         <li><span class="v v-keep">keep</span> New site — blank / template</li>
-        <li><span class="v v-hide">hide</span> New site — <b>AI</b><span class="note">no AI branch → silently makes a blank 1-page site (#3)</span></li>
+        <li><span class="v v-fix">fix</span> New site — <b>AI</b><span class="note">backend wired: createGenerationJob → AIGenerationJob → worker writes real Site+Page (ai-generation.service.ts); needs AI provider key</span></li>
         <li><span class="v v-keep">keep</span> Template gallery + preview<span class="note">seed.ts seeds NO templates → needs seed data or real empty-state</span></li>
         <li><span class="v v-keep">keep</span> First-run / getting-started</li>
       </ul>
@@ -163,10 +163,10 @@
         <li><span class="v v-keep">keep</span> <b>4-mode editor (Build / AI / Design / Settings)</b><span class="note">this IS the editor's top-level rail</span></li>
         <li><span class="v v-keep">keep</span> Command palette (⌘K) · Onboarding checklist</li>
         <li><span class="v v-keep">keep</span> Text / heading / links / rich content</li>
-        <li><span class="v v-fix">fix</span> Interactions (7 triggers) + animations<span class="note">GSAP native ScrollTrigger removed → IntersectionObserver</span></li>
+        <li><span class="v v-keep">keep</span> Interactions (13 triggers, 7 wired) + animations<span class="note">CSS-preset animations; GSAP native ScrollTrigger removed → IntersectionObserver</span></li>
         <li><span class="v v-fix">fix</span> CMS — collections · records · binding · dynamic pages<span class="note">server-sync lossy → add feedback + reconcile</span></li>
         <li><span class="v v-merge">merge</span> Media library <span class="note">editor AND dashboard → editor is home; dashboard read-only</span></li>
-        <li><span class="v v-hide">hide</span> Stock photos / videos <span class="note">STUB — returns [] (IS_STOCK_CONFIGURED=false)</span></li>
+        <li><span class="v v-keep">keep</span> Stock photos / videos <span class="note">Unsplash/Pexels wired server-side (stock.service.ts); returns [] until UNSPLASH/PEXELS keys set — env-gated, not a stub</span></li>
         <li><span class="v v-keep">keep</span> Stock icons / fonts · Image editor (crop/version)</li>
         <li><span class="v v-keep">keep</span> Editor templates tab ("insert section")<span class="note">rename — different job from the gallery</span></li>
         <li><span class="v v-fix">fix</span> Save-as / "My Templates"<span class="note">localStorage only → no cross-device</span></li>
@@ -195,8 +195,8 @@
       <p class="job-sub">The agency↔client loop — the differentiator. The client half was broken.</p>
       <ul class="feat">
         <li><span class="v v-keep">keep</span> Preview / preview-as-client <span class="note">client-only sanitized (editor)</span></li>
-        <li><span class="v v-fix">fix</span> Client review — request (editor) + queue (dashboard)<span class="note">agency side wired; notify + client approve shipped 2026-06-28 (dd910dc4)</span></li>
-        <li><span class="v v-fix">fix</span> Comments <span class="note">service works; client overlay = same-origin review preview (v1)</span></li>
+        <li><span class="v v-fix">fix</span> Client review — request (editor) + queue (dashboard)<span class="note">agency side wired; both-way notify + editor note shipped (dd910dc4); resolve/approve is admin-side in the dashboard queue — external-client (share-link) approve NOT built</span></li>
+        <li><span class="v v-fix">fix</span> Comments <span class="note">service works; client overlay = dashboard iframe on the published site, not the in-editor canvas</span></li>
         <li><span class="v v-fix">fix</span> Share link + password <span class="note">token isn't a real gate yet (decorative)</span></li>
         <li><span class="v v-keep">keep</span> Client approval flow <span class="note">folds into the review queue</span></li>
       </ul>
@@ -230,9 +230,9 @@
     <ul class="feat">
       <li><span class="v v-keep">keep</span> AI assistant (chat / edit-commands / plan) <span class="note">J3/J4 editor "AI" mode · needs provider key</span></li>
       <li><span class="v v-keep">keep</span> AI propose-action (propose→confirm→execute) <span class="note">J6 · fully wired, ADMIN-gated, single-use token</span></li>
-      <li><span class="v v-fix">fix</span> AI SEO "write title" <span class="note">J6 · needs OPENAI_API_KEY (guard)</span></li>
+      <li><span class="v v-keep">keep</span> AI SEO "write title" <span class="note">J6 · needs OPENAI_API_KEY (guard)</span></li>
       <li><span class="v v-keep">keep</span> AI alt-text <span class="note">J3 media · Claude Haiku</span></li>
-      <li><span class="v v-hide">hide</span> AI site generation <span class="note">J2 · no real branch</span></li>
+      <li><span class="v v-fix">fix</span> AI site generation <span class="note">J2 · backend wired (ai-generation.service.ts + worker); needs AI provider key</span></li>
     </ul>
   </div>
 
@@ -241,11 +241,12 @@
 
   <!-- counts + resolution lists -->
   <h2 style="margin-top:28px">The verdict, counted</h2>
+  <p class="sub">The 60 rows drawn above (each row = one feature or tight cluster, covering ~100 underlying features), by verdict. AI-create-site + Stock photos/videos graduated out of "hide" since the 2026-06-23 source run — their backends shipped (<code>ai-generation.service.ts</code>, <code>stock.service.ts</code>).</p>
   <div class="counts">
-    <span><b style="color:var(--v-keep)">~55</b> keep</span>
-    <span><b style="color:var(--v-fix)">~16</b> fix</span>
-    <span><b style="color:var(--v-merge)">6</b> merge (dedup)</span>
-    <span><b style="color:var(--v-hide)">8</b> hide</span>
+    <span><b style="color:var(--v-keep)">35</b> keep</span>
+    <span><b style="color:var(--v-fix)">16</b> fix</span>
+    <span><b style="color:var(--v-merge)">4</b> merge</span>
+    <span><b style="color:var(--v-hide)">4</b> hide</span>
     <span><b style="color:var(--v-cut)">1</b> cut</span>
     <span>·</span>
     <span>top-level nav: <b>17 → 5 + 4</b></span>
@@ -261,16 +262,15 @@
         <li>Settings hub → drop the catch-all</li>
         <li>Templates → not a dupe (rename to disambiguate)</li>
       </ol>
+      <p style="margin:8px 0 0;color:var(--muted)">6 decisions · 4 are merge-verdict chips above; 2 are drop/rename.</p>
     </div>
     <div class="card">
       <h4>Hide until backend real (#3)</h4>
       <ul>
-        <li>AI create-site · Stock photos/videos</li>
         <li>Real-time collab · Billing upgrade/paywall</li>
         <li>Localization · Extra-workspace create</li>
-        <li>Data-export</li>
       </ul>
-      <p style="margin:8px 0 0;color:var(--muted)">Design the slot, gate the feature.</p>
+      <p style="margin:8px 0 0;color:var(--muted)">Design the slot, gate the feature. (AI-create-site + Stock left this list — backends shipped. Export HTML is <strong>cut</strong>, not hidden.)</p>
     </div>
     <div class="card">
       <h4>Completeness check</h4>
