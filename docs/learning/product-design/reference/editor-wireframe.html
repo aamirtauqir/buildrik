@@ -415,8 +415,8 @@
 
   <!-- ===================================================== 9 STATES -->
   <section class="screen" id="states">
-    <h2>9 · States — empty / loading / error <span class="tag-list">patterns, applied inside surfaces (#13)</span></h2>
-    <p class="sub">Yeh alag screens nahi — yeh har panel ke <em>andar</em> lagne wale patterns hain. Happy path ~10%; baqi 90% yahan. (Users ki #1 shikayat: "no feedback in processes" — yahi us ka ilaaj.)</p>
+    <h2>9 · States — empty / loading / error <span class="tag-list">patterns + REAL coverage map (#13)</span></h2>
+    <p class="sub">Yeh alag screens nahi — har panel ke <em>andar</em> ke patterns. Happy path ~10%; baqi 90% yahan. <strong>⚠️ Honesty:</strong> "har surface pe teenon" sirf as a <em>generic chrome fallback</em> sach hai — per-screen coverage uneven (map below).</p>
     <div class="wf">
       <div class="wf-row" style="gap:14px;align-items:flex-start;flex-wrap:wrap">
         <div style="flex:1 1 180px">
@@ -432,9 +432,25 @@
           <p class="wf-frame__caption">Error — plain cause + a way out (retry), never silent</p>
         </div>
       </div>
+      <p class="tag-list" style="margin-top:8px"><strong>Universal baseline (every sidebar tab):</strong> crash → error-boundary "Something went wrong · Your work is safe · Try Again" (<code>SidebarErrorFallback</code>); lazy-load → generic 5-row skeleton (<code>PanelSkeleton</code>). This is generic, not per-screen — draw it once as the baseline.</p>
+      <div class="wf-box" style="margin-top:8px;padding:8px">
+        <span class="wf-label">Per-surface coverage (real, code-audited) <span class="wf-tag">1</span></span>
+        <div style="margin-top:6px;font-family:var(--wf-mono);font-size:11px;line-height:1.8">
+          <div>✅ full empty·loading·error: Forms · Version history · Components · Redirects</div>
+          <div>🟡 empty + loading, error = toast only: Media · Stock</div>
+          <div>○ empty-only (local/sync data, L+Err N/A): Inspector · Layers · Command palette · Templates</div>
+          <div style="color:var(--bad)">⚠️ gaps: CMS records modal (no loading/error) · NO permission-denied / read-only state anywhere</div>
+        </div>
+      </div>
+      <div class="wf-box" style="margin-top:8px;padding:8px">
+        <span class="wf-label">Save status pill <span class="wf-tag">2</span></span>
+        <div class="wf-row" style="margin-top:6px;gap:6px;flex-wrap:wrap"><span class="wf-pill wf-pill--on">● Saved · 2m</span><span class="wf-pill">◐ Saving…</span><span class="wf-pill">Unsaved</span><span class="wf-pill" style="color:var(--bad)">Save failed · retry</span><span class="wf-pill" style="opacity:.7">Offline — changes queued</span></div>
+        <span class="tag-list" style="margin-top:5px;display:inline-block;color:var(--bad)">⚠️ offline = browser-connectivity only (<code>navigator.onLine</code>); no queued-count; persistent union is idle|saving|error (offline is a separate prop). Server-down-while-online → error toast, not the offline pill.</span>
+      </div>
       <ol class="wf-why">
-        <li><strong>Empty</strong> = batao kya nahi hai + ek action (#13). <strong>Loading</strong> = skeleton (asli shape) → "kuch aa raha hai" (#2). <strong>Error</strong> = saaf wajah + raasta (#1 + #9-error-prevention's cousin); kabhi <em>chup</em> mat raho — wahi product "shit" feel karwata hai.</li>
-        <li>Topbar status pill = saving / saved · Nm ago / failed / offline-queued — har action ka feedback (#2). Yeh aap ki recovery Phase-1 "feedback layer" hai.</li>
+        <li><span class="wf-tag">1</span><strong>Draw the map, not the ideal.</strong> Claiming "every surface has all three" is the dishonest version — truth is a generic fallback + uneven per-surface depth. Fill the red gaps (CMS, toast-only errors, permission-denied) in the build (#13 · #3).</li>
+        <li><span class="wf-tag">2</span><strong>Save pill = the feedback layer.</strong> 4 real variants + offline overlay (recovery Phase-1). Empty/Loading/Error stay the canonical shapes: name-what's-missing / skeleton / plain-cause-+-retry, never silent.</li>
+        <li><strong>⚠️ Dead state-kit.</strong> Bespoke per-tab <code>SkeletonStates</code> + <code>EmptyStates</code> exist in the repo but have 0 consumers — the real fallback is the generic skeleton. Either wire them into the routers or stop drawing per-tab-shaped skeletons.</li>
       </ol>
     </div>
   </section>
@@ -641,6 +657,7 @@
           </div>
         </div>
       </div>
+      <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:8px;border-style:dashed"><span class="tag-list">Real today: ⚠️ <strong>Preview</strong> = new browser tab with a sanitized, sandboxed snapshot of <em>current editor content</em> (not the live URL; popup-blocked → toast). <strong>Preview as client</strong> (⋯ menu) reloads the editor into a stripped rail — still editable, NOT read-only. The preview-bar + "Viewing as Client" overlay drawn above is the target.</span></div>
       <ol class="wf-why">
         <li><span class="wf-tag">1</span><strong>No editor chrome.</strong> Preview = sach mein woh jo client dekhega — rail/inspector/canvas-toolbar sab gaya. Sirf ek patli exit bar (#1 match the real world).</li>
         <li><span class="wf-tag">2</span><strong>"Viewing as: Client".</strong> Saaf batao kis nazar se dekh rahe ho (#2 system status) — client-only sanitized view (drafts/admin hidden). Yeh agency wedge ka core.</li>
@@ -650,7 +667,7 @@
 
   <!-- 16 REQUEST REVIEW -->
   <section class="screen" id="request-review">
-    <h2>16 · Request review <span class="tag-list">topbar ship dropdown · J5</span></h2>
+    <h2>16 · Request review <span class="tag-list">client-view ship button · J5 · 🟡 submit real, no input fields, no notify</span></h2>
     <p class="meta"><b>Job:</b> "Client ko review ke liye bhejo + notify ho." · <b>Numayan:</b> Send button · <b>Dheema:</b> change summary.</p>
     <p class="mods"><b>Modules:</b> what-changed summary · recipient (client ▾) · message · Send · then status "Sent · awaiting review".</p>
     <div class="wf">
@@ -664,6 +681,7 @@
           <div style="border-top:1px dashed var(--wf-line);margin-top:10px;padding-top:8px"><span class="wf-pill wf-pill--on">● Sent · awaiting review</span><div class="tag-list" style="margin-top:5px">client ko ✉ gaya · review-queue mein dikha — loop closed</div></div>
         </div>
       </div>
+      <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:8px;border-style:dashed"><span class="tag-list">Real today: 🟡 "Send for review" appears <strong>only in client view</strong> (replaces Publish); idle → Sending → Sent ✓ → Retry. ⚠️ <strong>No what-changed / message / recipient input exists</strong> — submit fires with empty args. Admin queue is <strong>PENDING-only</strong>, shows no submitter name, no email-sent indicator, no notify. The summary + recipient + message + "✉ email" drawn above is the target.</span></div>
       <ol class="wf-why">
         <li><span class="wf-tag">1</span><strong>Change summary auto-bhara.</strong> Client ko "kya badla" bina poochhe dikhe (#1 + recognition). Agency ko dobara likhna na pade.</li>
         <li><span class="wf-tag">2</span><strong>Notify trigger = the missing piece.</strong> Aaj review silent jaata (no email) — yeh redesign explicitly "✉ client ko email" dikhata (#2: silence is the bug). Status 🟡 → wire the notify.</li>
@@ -689,8 +707,9 @@
           </div>
         </div>
       </div>
+      <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:8px;border-style:dashed"><span class="tag-list">Real today: ⚠️ <strong>no comment UI in the editor.</strong> Real impl = a <strong>dashboard</strong> pin-on-iframe overlay on the PUBLISHED site (click-drop x/y · body · resolve) + an Open/Done triage queue. No commenter names shown, no element-anchored pins (<code>targetSelector</code> stored but never set). The in-editor comment-mode drawn above is the target.</span></div>
       <ol class="wf-why">
-        <li><span class="wf-tag">1</span><strong>Comment mode = explicit.</strong> Toggle on → click anywhere to pin. Edit ke saath galti se mix na ho (#5 one mode at a time, #9). Same-origin overlay (path A) — isliye yeh kaam karega, cross-origin published site par nahi.</li>
+        <li><span class="wf-tag">1</span><strong>Comment mode = explicit.</strong> Toggle on → click anywhere to pin. Edit ke saath galti se mix na ho (#5 one mode at a time, #9). ⚠️ Correction: today this lives in the dashboard as an overlay on the <em>cross-origin published site</em> iframe — the in-editor same-origin overlay is the target, not what ships.</li>
         <li><span class="wf-tag">2</span><strong>Resolve closes the loop.</strong> Har pin ek thread; Resolve ✓ = done. Agency dekh sake kya bचा (#2). Yeh woh client-side jo aaj <em>missing</em> hai.</li>
       </ol>
     </div>
@@ -710,7 +729,7 @@
           <div class="wf-box" style="margin-top:6px;padding:8px"><div class="wf-line w-50"></div></div>
           <div class="wf-row wf-row--between" style="margin-top:10px"><span class="wf-label">Expires</span><span class="wf-pill">7 days ▾</span></div>
           <p class="tag-list" style="margin-top:10px"><span class="wf-tag">2</span> "Anyone with link + password → read-only preview"</p>
-          <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:6px;border-style:dashed"><span class="tag-list">⚠️ correction: dashboard mein real bcrypt password-gate SHIPPED (rate-limited, httpOnly cookie). Gap = editor ki ship-dropdown se Share missing.</span></div>
+          <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:6px;border-style:dashed"><span class="tag-list">⚠️ correction: dashboard Access tab mein real bcrypt gate SHIPPED — rate-limited 5/min, httpOnly cookie, QR + revoke, password Pro-gated. Honest disclaimer in code: protects the <em>share page</em>, not the live published URL. Gap = no Share UI in the editor at all.</span></div>
         </div>
       </div>
       <ol class="wf-why">
