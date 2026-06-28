@@ -42,6 +42,18 @@
     <strong style="color:var(--bad)">⚠️ Tags reconciled to shipped code — 2026-06-28.</strong> A code audit cross-checked every ✅/🟡/🔵 against <code>packages/editor/src</code>. Where a tag was false or inverted it now reads <strong>⚠️</strong> with the real state. Live-rail truth: <code>Insert · Pages · Styles · Site</code> (Media / Templates / Components fold under Insert) — <em>not</em> the drawn <code>Insert · Media · Pages · Design</code>. Four surfaces — <strong>Share, Comments, Shared-DS-push, Domains</strong> — ship in the <strong>dashboard</strong>, not the editor.
   </div>
 
+  <div style="border:1px solid var(--rule);border-radius:8px;padding:11px 15px;margin:0 0 14px;font-size:13px">
+    <strong>Scope + status key.</strong> This file is the <strong>editor</strong> appendix — Jobs 3-6, <em>inside one site</em> (build · on-brand · sign-off · ship). The <strong>dashboard / business</strong> jobs (Job 1 run-the-business: account · workspace · team · clients · billing · notifications; Job 2 start-a-site: sites list · new-site · templates · first-run · auth) are <em>not drawn here</em> — they live in the sibling set <code>docs/reviews/wireframes/</code> (<code>00-signin</code> · <code>10-dashboard</code> · <code>11-sites</code> · <code>16-billing</code> · <code>c1-team</code> · <code>a1-signup</code> …). Don't duplicate them here.
+    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:12px;font-family:var(--wf-mono);font-size:12px">
+      <span>✅ shipped + wired</span>
+      <span>🟡 partial / lossy</span>
+      <span>🔵 env-gated or stub</span>
+      <span style="color:var(--bad)">⚠️ NOT as drawn — code-audit divergence</span>
+      <span>(dashboard) = ships in dashboard app</span>
+    </div>
+    <div style="margin-top:6px;color:var(--muted)">Each screen draws the <strong>redesign target</strong>; its tag says how much is <strong>built today</strong>. Shipped ≠ target — read the tag.</div>
+  </div>
+
   <div class="legendbar">
     <div class="wf-legend" style="margin:0">
       <span><span class="sw" style="background:var(--wf-fill);border:1px solid var(--wf-line)"></span> box</span>
@@ -573,6 +585,11 @@
       </ol>
     </div>
   </section>
+
+  <!-- SIGN-OFF LOOP (J4/J5) framing -->
+  <div style="border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:12px 15px;margin:0 0 16px;font-size:13px">
+    <strong>Sign-off is ONE loop, not four screens.</strong> §15 Preview → §16 Request-review → §17 Comments → §18 Share → approve → back to edit. The screens below are blocks of that loop (J4/J5 in <a href="wireflows.html">wireflows</a>) — read them as a sequence, not standalone panels. <span style="color:var(--bad)">⚠️ Loop gaps still to spec:</span> reviewer identity tied to a real client, an explicit approval / approved state, resend + notify-failure handling, a resolved / unresolved comment queue, read-only client mode, and an audit trail. Today parts live in the dashboard (§17 · §18) and the editor side sends no notify — see each screen's tag.
+  </div>
 
   <!-- 15 PREVIEW -->
   <section class="screen" id="preview">
