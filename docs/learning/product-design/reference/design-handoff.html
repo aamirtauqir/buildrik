@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buildrik — Design Handoff (one file: IA · wireframes · flows · prototype)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<link rel="stylesheet" href="../assets/wireframe.css">
+<style>
+  :root{ --maxw:1100px; --p0:#2D6DFF; }
+  main{max-width:var(--maxw)}
+  .sub{color:var(--muted);font-size:15px;margin:-2px 0 14px}
+  code{font-family:var(--wf-mono);font-size:.88em;background:#f4f4f5;padding:1px 5px;border-radius:4px}
+
+  .entry{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 8px}
+  @media(max-width:820px){.entry{grid-template-columns:1fr 1fr}}
+  .entry a{display:block;border:1.5px solid var(--rule);border-radius:10px;padding:13px 15px;text-decoration:none;background:#fff;transition:border-color .12s}
+  .entry a:hover{border-color:var(--p0)}
+  .entry .k{font-family:var(--wf-mono);font-size:11px;color:var(--p0);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .entry .t{font-size:15px;color:var(--ink);font-weight:600;margin:3px 0 1px}
+  .entry .d{font-size:12px;color:var(--muted)}
+
+  .job{border:1px solid var(--rule);border-radius:10px;padding:14px 16px;background:#fff;margin-top:16px}
+  .job h2{font-size:16px;margin:0 0 2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .job .home{font-family:var(--wf-mono);font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px}
+  .home.editor{color:#2D6DFF;background:#EFF4FF;border:1px solid #C7D8FF}
+  .home.dash{color:#7C2D12;background:#FFF7ED;border:1px solid #FED7AA}
+  .home.both{color:#3F3F46;background:#F4F4F5;border:1px solid #E4E4E7}
+  .home.sub{color:#3F3F46;background:#F4F4F5;border:1px dashed #C4C4C8}
+  .job .job-sub{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+  .grid{display:flex;flex-wrap:wrap;gap:7px}
+  .grid a{font-family:var(--wf-mono);font-size:12px;color:var(--ink);text-decoration:none;border:1px solid var(--rule);border-radius:7px;padding:4px 9px;background:#fafafa;transition:all .1s}
+  .grid a:hover{border-color:var(--p0);color:var(--p0);background:#F5F9FF}
+  .grid a.slice{border-color:var(--p0);background:#F5F9FF;font-weight:600}
+  .grid a.slice::before{content:"◆ ";color:var(--p0)}
+
+  .brief{border:1.5px solid var(--p0);border-radius:10px;padding:14px 18px;margin-top:22px;background:#F5F9FF}
+  .brief h2{margin:0 0 6px;font-size:16px;color:var(--p0)}
+  .brief ul{margin:6px 0 0;padding-left:18px;line-height:1.7;font-size:13.5px}
+  .brief .bad{color:#DC2626;font-weight:600}
+  .brief .good{color:#15803D;font-weight:600}
+
+  .legendline{font-family:var(--wf-mono);font-size:12px;color:var(--muted);margin:10px 0}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Design Handoff · one file, everything linked</p>
+  <h1>Buildrik — the whole design, in one place.</h1>
+  <p class="sub">Every existing artifact — <strong>IA, 108 wireframes, user flows, and the clickable prototype</strong> — gathered into a single navigable handoff, organized by the IA's 6 jobs. This is the package to hand a designer (or Figma) to turn the grey-box wireframes into polished, on-brand UI. Nothing here is new design; it's the existing work, sequenced and ready to push.</p>
+
+  <!-- 4 ENTRY POINTS -->
+  <h2 style="margin-top:22px">The four pieces</h2>
+  <div class="entry">
+    <a href="ia-tree.html">
+      <div class="k">IA · build board</div>
+      <div class="t">ia-tree.html</div>
+      <div class="d">Every feature → home → verdict → priority. The spine + first-slice path.</div>
+    </a>
+    <a href="editor-wireframe.html">
+      <div class="k">Wireframes</div>
+      <div class="t">editor-wireframe.html</div>
+      <div class="d">39 editor surfaces, drawn, with build-status tags. + 108 screens below.</div>
+    </a>
+    <a href="wireflows.html">
+      <div class="k">User flows</div>
+      <div class="t">wireflows.html</div>
+      <div class="d">How screens connect — the task journeys end to end.</div>
+    </a>
+    <a href="../../../reviews/prototype/index.html">
+      <div class="k">Prototype</div>
+      <div class="t">clickable prototype</div>
+      <div class="d">109 screens, clickable. The hi-fi-ready interactive walk.</div>
+    </a>
+  </div>
+  <p class="legendline">Below: every screen grouped by job. <span style="color:var(--p0)">◆</span> = on the <strong>first-slice</strong> wedge path (build/polish these first). Links open the <strong>clickable prototype</strong> version.</p>
+
+  <!-- SUBSTRATE -->
+  <section class="job">
+    <h2>Auth front-door <span class="home sub">substrate — before the jobs</span></h2>
+    <p class="job-sub">The gate everyone passes once. Not a "job", but every screen needs the polish pass.</p>
+    <div class="grid">
+      <a href="../../../reviews/prototype/00-signin.html">00 · sign-in</a>
+      <a href="../../../reviews/prototype/a1-signup.html">a1 · signup</a>
+      <a href="../../../reviews/prototype/a2-verify-email.html">a2 · verify email</a>
+      <a href="../../../reviews/prototype/a3-password.html">a3 · password</a>
+      <a href="../../../reviews/prototype/a4-2fa.html">a4 · 2FA</a>
+      <a href="../../../reviews/prototype/a5-invite.html">a5 · invite</a>
+      <a href="../../../reviews/prototype/a6-workspace-select.html">a6 · workspace select</a>
+      <a href="../../../reviews/prototype/a7-transfer-accept.html">a7 · transfer accept</a>
+      <a href="../../../reviews/prototype/a8-auth-errors.html">a8 · auth errors</a>
+      <a href="../../../reviews/prototype/a9-invite-accept.html">a9 · invite accept</a>
+    </div>
+  </section>
+
+  <!-- J1 -->
+  <section class="job">
+    <h2>J1 · Run the business <span class="home dash">Dashboard</span></h2>
+    <p class="job-sub">Across sites / the whole account. The agency's control room.</p>
+    <div class="grid">
+      <a class="slice" href="../../../reviews/prototype/m-agency.html">m · clients (agency)</a>
+      <a href="../../../reviews/prototype/10-dashboard.html">10 · dashboard home</a>
+      <a href="../../../reviews/prototype/18-workspace.html">18 · workspace</a>
+      <a href="../../../reviews/prototype/c1-team.html">c1 · team</a>
+      <a href="../../../reviews/prototype/c2-notifications.html">c2 · notifications</a>
+      <a href="../../../reviews/prototype/c3-help.html">c3 · help</a>
+      <a href="../../../reviews/prototype/c4-integrations.html">c4 · integrations</a>
+      <a href="../../../reviews/prototype/c4b-vercel-team.html">c4b · vercel team</a>
+      <a href="../../../reviews/prototype/c5-api-tokens.html">c5 · API tokens</a>
+      <a href="../../../reviews/prototype/b0-settings-home.html">b0 · settings home</a>
+      <a href="../../../reviews/prototype/b1-account-settings.html">b1 · account</a>
+      <a href="../../../reviews/prototype/16-billing.html">16 · billing</a>
+      <a href="../../../reviews/prototype/30-paywall.html">30 · paywall</a>
+      <a href="../../../reviews/prototype/m-roles.html">m · roles</a>
+      <a href="../../../reviews/prototype/m-ownership.html">m · ownership</a>
+    </div>
+  </section>
+
+  <!-- J2 -->
+  <section class="job">
+    <h2>J2 · Start a site <span class="home dash">Dashboard</span></h2>
+    <p class="job-sub">The on-ramp from dashboard into a site.</p>
+    <div class="grid">
+      <a class="slice" href="../../../reviews/prototype/11-sites.html">11 · sites list</a>
+      <a class="slice" href="../../../reviews/prototype/01-new-site.html">01 · new site</a>
+      <a href="../../../reviews/prototype/02-ai-wizard.html">02 · AI wizard</a>
+      <a href="../../../reviews/prototype/03-template-gallery.html">03 · template gallery</a>
+      <a href="../../../reviews/prototype/03b-template-preview.html">03b · template preview</a>
+      <a href="../../../reviews/prototype/04-role-select.html">04 · role select</a>
+      <a href="../../../reviews/prototype/04b-setup.html">04b · setup</a>
+      <a href="../../../reviews/prototype/12-site-detail.html">12 · site detail</a>
+      <a href="../../../reviews/prototype/13-first-run.html">13 · first run</a>
+      <a href="../../../reviews/prototype/d1-sites-advanced.html">d1 · sites advanced</a>
+    </div>
+  </section>
+
+  <!-- J3 -->
+  <section class="job">
+    <h2>J3 · Build the page <span class="home editor">Editor</span></h2>
+    <p class="job-sub">Inside one site, content on the canvas. The product's calm center.</p>
+    <div class="grid">
+      <a class="slice" href="../../../reviews/prototype/editor-spine-wireframe.html">editor spine</a>
+      <a class="slice" href="../../../reviews/prototype/52-add.html">52 · add elements</a>
+      <a class="slice" href="../../../reviews/prototype/50-pages.html">50 · pages</a>
+      <a href="../../../reviews/prototype/50b-page-ops.html">50b · page ops</a>
+      <a href="../../../reviews/prototype/51-layers.html">51 · layers</a>
+      <a href="../../../reviews/prototype/40-edit-scope.html">40 · edit scope</a>
+      <a href="../../../reviews/prototype/41-scope-picker.html">41 · scope picker</a>
+      <a href="../../../reviews/prototype/53-settings.html">53 · page settings</a>
+      <a href="../../../reviews/prototype/54-ai.html">54 · AI mode</a>
+      <a href="../../../reviews/prototype/55-templates.html">55 · insert section</a>
+      <a href="../../../reviews/prototype/56-media.html">56 · media</a>
+      <a href="../../../reviews/prototype/56b-stock.html">56b · stock</a>
+      <a href="../../../reviews/prototype/56c-image-editor.html">56c · image editor</a>
+      <a href="../../../reviews/prototype/17-media.html">17 · media (dash)</a>
+      <a href="../../../reviews/prototype/58-history.html">58 · version history</a>
+      <a href="../../../reviews/prototype/71-command-palette.html">71 · ⌘K palette</a>
+      <a href="../../../reviews/prototype/e1-interactions.html">e1 · interactions</a>
+      <a href="../../../reviews/prototype/e3-editor-onboarding.html">e3 · editor onboarding</a>
+      <a href="../../../reviews/prototype/e6-cms.html">e6 · CMS</a>
+      <a href="../../../reviews/prototype/fix-editor-4mode.html">fix · 4-mode rail</a>
+      <a href="../../../reviews/prototype/fix-editor-declutter.html">fix · declutter</a>
+    </div>
+  </section>
+
+  <!-- J4 -->
+  <section class="job">
+    <h2>J4 · Make it on-brand <span class="home editor">Editor</span></h2>
+    <p class="job-sub">Where consistency (and the anti-slop cure) lives. The agency wedge.</p>
+    <div class="grid">
+      <a class="slice" href="../../../reviews/prototype/59-inspector.html">59 · inspector</a>
+      <a class="slice" href="../../../reviews/prototype/ds1-design-system.html">ds1 · design system</a>
+      <a class="slice" href="../../../reviews/prototype/m-ds-push.html">m · DS push (wedge)</a>
+      <a href="../../../reviews/prototype/59b-inspector-states.html">59b · inspector states</a>
+      <a href="../../../reviews/prototype/ds2-styles.html">ds2 · styles</a>
+      <a href="../../../reviews/prototype/ds3-ds-tools.html">ds3 · DS tools</a>
+      <a href="../../../reviews/prototype/ds-redesign.html">ds · redesign</a>
+      <a href="../../../reviews/prototype/57-components.html">57 · components</a>
+      <a href="../../../reviews/prototype/fix-styling-3reach.html">fix · styling 3-reach</a>
+      <a href="../../../reviews/prototype/fix-styling-model.html">fix · styling model</a>
+    </div>
+  </section>
+
+  <!-- J5 -->
+  <section class="job">
+    <h2>J5 · Get sign-off <span class="home both">Editor + Dashboard</span></h2>
+    <p class="job-sub">The agency↔client loop — the differentiator.</p>
+    <div class="grid">
+      <a class="slice" href="../../../reviews/prototype/21-preview.html">21 · preview-as-client</a>
+      <a class="slice" href="../../../reviews/prototype/m-approval.html">m · approval</a>
+      <a class="slice" href="../../../reviews/prototype/m-comments.html">m · comments</a>
+      <a href="../../../reviews/prototype/91-share.html">91 · share link</a>
+      <a href="../../../reviews/prototype/d4-share-access.html">d4 · share access</a>
+      <a href="../../../reviews/prototype/62-permissions.html">62 · permissions</a>
+    </div>
+  </section>
+
+  <!-- J6 -->
+  <section class="job">
+    <h2>J6 · Ship &amp; run it <span class="home both">Editor + Dashboard</span></h2>
+    <p class="job-sub">Publish one site (hero); manage many.</p>
+    <div class="grid">
+      <a class="slice" href="../../../reviews/prototype/20-publish.html">20 · publish</a>
+      <a class="slice" href="../../../reviews/prototype/90-published.html">90 · published</a>
+      <a href="../../../reviews/prototype/73-lifecycle.html">73 · lifecycle</a>
+      <a href="../../../reviews/prototype/70-confirm.html">70 · confirm</a>
+      <a href="../../../reviews/prototype/22-domain-pending.html">22 · domain pending</a>
+      <a href="../../../reviews/prototype/15-domains.html">15 · domains</a>
+      <a href="../../../reviews/prototype/d6-domains.html">d6 · domains</a>
+      <a href="../../../reviews/prototype/14-site-settings.html">14 · site settings</a>
+      <a href="../../../reviews/prototype/d5-seo.html">d5 · SEO</a>
+      <a href="../../../reviews/prototype/m-seo.html">m · SEO</a>
+      <a href="../../../reviews/prototype/19-analytics.html">19 · analytics</a>
+      <a href="../../../reviews/prototype/d2-forms.html">d2 · forms</a>
+      <a href="../../../reviews/prototype/forms-config.html">forms config</a>
+      <a href="../../../reviews/prototype/d3-redirects.html">d3 · redirects</a>
+      <a href="../../../reviews/prototype/e4-export.html">e4 · export (cut)</a>
+    </div>
+  </section>
+
+  <!-- STATES -->
+  <section class="job">
+    <h2>States <span class="home sub">substrate — applied inside every screen</span></h2>
+    <p class="job-sub">Empty / loading / error / conflict / save. A pattern, not a destination — but every screen above must cover its set.</p>
+    <div class="grid">
+      <a href="../../../reviews/prototype/80-states.html">80 · states overview</a>
+      <a href="../../../reviews/prototype/60-save-states.html">60 · save states</a>
+      <a href="../../../reviews/prototype/61-conflict.html">61 · conflict</a>
+      <a href="../../../reviews/prototype/s-dashboard-states.html">s · dashboard states</a>
+      <a href="../../../reviews/prototype/s-editor-states.html">s · editor states</a>
+      <a href="../../../reviews/prototype/s-account-states.html">s · account states</a>
+      <a href="../../../reviews/prototype/s-forms-states.html">s · forms states</a>
+      <a href="../../../reviews/prototype/s-media-states.html">s · media states</a>
+      <a href="../../../reviews/prototype/s-ship-states.html">s · ship states</a>
+    </div>
+  </section>
+
+  <!-- FLOWS / METHOD -->
+  <section class="job">
+    <h2>User flows &amp; journey maps <span class="home sub">how it all connects</span></h2>
+    <p class="job-sub">The flow-level view — read these to understand sequence before polishing screens.</p>
+    <div class="grid">
+      <a href="wireflows.html">wireflows (master)</a>
+      <a href="../../../reviews/prototype/m4-journey.html">m4 · journey</a>
+      <a href="../../../reviews/prototype/m0-spine.html">m0 · spine</a>
+      <a href="../../../reviews/prototype/m0b-spec.html">m0b · spec</a>
+      <a href="../../../reviews/prototype/m3-dashboard.html">m3 · dashboard</a>
+      <a href="../../../reviews/prototype/m-editor.html">m · editor</a>
+      <a href="../../../reviews/prototype/m-tracking.html">m · tracking</a>
+      <a href="../../../reviews/prototype/m-states.html">m · states</a>
+      <a href="../../../reviews/prototype/fix-boundary.html">fix · boundary</a>
+      <a href="../../../reviews/prototype/fix-settings-map.html">fix · settings map</a>
+    </div>
+  </section>
+
+  <!-- FIGMA / DESIGNER BRIEF -->
+  <div class="brief">
+    <h2>For the designer / Figma — what "fix" means</h2>
+    <p class="sub" style="margin:0 0 8px">These wireframes are grey-box low-fi (structure + copy, no styling). The job is to apply Buildrik's design system and make them hi-fi, on-brand, consistent. Per <code>DESIGN.md</code> (the SSOT — do not deviate without sign-off):</p>
+    <ul>
+      <li><strong>One accent:</strong> cobalt <code>#2D6DFF</code> only. <span class="bad">Purple / violet / indigo are banned.</span></li>
+      <li><strong>Type:</strong> General Sans (display), Inter Tight or Geist (body/UI), Geist Mono (data). <span class="bad">No Arial / Helvetica / Roboto / default stacks.</span></li>
+      <li><strong>Spacing:</strong> 4px base, compact density. Editor chrome inspector rows ≥32px.</li>
+      <li><strong>Motion:</strong> minimal. No spring physics, no scroll choreography.</li>
+      <li><strong>Theme:</strong> canonical light theme, <strong>desktop-only</strong> (dark direction was dropped 2026-04-18).</li>
+      <li><span class="bad">No AI-slop:</span> no decorative gradients-for-the-sake-of, no fake dashboards, no emoji-as-icon, no glassmorphism. See the anti-slop list in DESIGN.md.</li>
+      <li><strong>Priority:</strong> polish the <span style="color:var(--p0)">◆ first-slice</span> screens first (the agency wedge: Clients → Sites → Brand → DS-push → Review → Publish). The rest is P1/P2 — see <a href="ia-tree.html">ia-tree.html</a> for the full build order.</li>
+      <li><strong>States are not optional:</strong> each screen ships its empty / loading / error / success set (the States section above is the catalogue).</li>
+    </ul>
+  </div>
+
+  <p class="sub" style="margin-top:22px">Source set: <code>docs/reviews/wireframes/</code> (108) · <code>docs/reviews/prototype/</code> (109 clickable) · <code>reference/ia-tree.html</code> · <code>reference/wireflows.html</code> · <code>reference/editor-wireframe.html</code>. This page links them; it does not duplicate them. Hand this one file to a designer or a Figma agent as the complete brief.</p>
+</main>
+</body>
+</html>
