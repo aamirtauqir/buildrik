@@ -1258,24 +1258,24 @@
     <table>
       <thead><tr><th>Decision</th><th>Why</th><th>Rule</th></tr></thead>
       <tbody>
-        <tr><td>Rail = 4 locked slots (live: Insert·Pages·Styles·Site; Media/Templates/Components fold under Insert)</td><td>Spine fixed → muscle memory + add features without breaking layout</td><td>#15 · #14</td></tr>
+        <tr><td>Rail = 4 locked slots (live: Insert·Pages·Styles·Site; Media/Templates/Components fold under Insert; CMS folds under Pages as a Content view)</td><td>Spine fixed → muscle memory + add features without breaking layout. CMS got a front door without a new slot (#15)</td><td>#15 · #14</td></tr>
         <tr><td>Left = icon rail + drawer (2 columns), labels + collapsible</td><td>Pro/Webflow density (chosen over single panel); labels fix recognition; collapse frees the canvas</td><td>#1 · #9 · #6</td></tr>
         <tr><td>Publish = the only dark box</td><td>One screen, one purpose; eye goes to the goal</td><td>#5 · #4</td></tr>
         <tr><td>AI = topbar ✨ icon, not a rail slot</td><td>AI is a helper across jobs, not the job; don't crown it</td><td>#5 · #8</td></tr>
-        <tr><td>AI has 3 shapes: assistant (drawer) · propose-action · inline ✨</td><td>Full chat docks right; risky edits go through propose→confirm→execute; quick edits hug the element (#16)</td><td>#16 · #5 · #3</td></tr>
+        <tr><td>AI has 3 shapes: assistant (drawer) · propose-action · inline ✨ <span class="tag-list">⚠️ inline = alt-text leg only shipped; selected-text Rewrite/Tone bar absent (§27)</span></td><td>Full chat docks right; risky edits go through propose→confirm→execute; quick edits hug the element (#16)</td><td>#16 · #5 · #3</td></tr>
         <tr><td>AI never auto-mutates — propose → confirm → execute</td><td>ADMIN-gated + single-use token; user always confirms before a change lands (trust, no data-loss)</td><td>#5 · #3 · #13</td></tr>
-        <tr><td>ai.getQuotaStatus orphan homed in the AI drawer header</td><td>Route was ready but had no UI (deferred "needs a home") → meter avoids silent quota hits</td><td>#2 · #3</td></tr>
-        <tr><td>Frequent canvas-ops → canvas toolbar (undo/redo · history · breakpoints · zoom)</td><td>Tools near the work; topbar reserved for rare/global; far reach = effort (Fitts)</td><td>#16 · #4</td></tr>
+        <tr><td>ai.getQuotaStatus meter belongs in the AI drawer header <span class="tag-list">⚠️ still orphan — route exists, 0 editor consumers; meter NOT yet wired (§25)</span></td><td>Route is ready but has no UI ("needs a home") → a meter would avoid silent quota hits. Target, not shipped</td><td>#2 · #3</td></tr>
+        <tr><td>Frequent canvas-ops → canvas toolbar (undo/redo · history · breakpoints · zoom) <span class="tag-list">⚠️ target — live topbar still carries undo/redo + breakpoints; move not done (§0·§7)</span></td><td>Tools near the work; topbar reserved for rare/global; far reach = effort (Fitts)</td><td>#16 · #4</td></tr>
         <tr><td>Layers → footer ⌗ popover</td><td>Frequent but micro; rail slot would over-promote it</td><td>#14 · #9</td></tr>
         <tr><td>Shared DS push = a Brand action (the agency wedge)</td><td>One brand → many client sites in one click; the differentiator vs Webflow/Framer — surfaced, not buried</td><td>#14 · product</td></tr>
-        <tr><td>DS push shows a blast-radius confirm ("N sites will update")</td><td>Cross-client overwrite is irreversible-ish; show scope before the push (UX-audit gap)</td><td>#5 · #13</td></tr>
-        <tr><td>Canvas selection has an edit-scope picker (element vs master)</td><td>Stops accidental edits to a component master from an instance</td><td>#5 · #14</td></tr>
-        <tr><td>Stubs/gated stay honest: Stock no-key · Custom-CSS Pro-lock · My-Templates now server-backed</td><td>A gated/empty feature shows its real state, never a fake-working control</td><td>#3 · #13</td></tr>
+        <tr><td>DS push shows a blast-radius confirm ("N sites will update") <span class="tag-list">⚠️ drawn as target — confirm dialog not verified in shipped DS-push (§36, dashboard)</span></td><td>Cross-client overwrite is irreversible-ish; show scope before the push (UX-audit gap)</td><td>#5 · #13</td></tr>
+        <tr><td>Canvas selection has an edit-scope picker (element vs master) <span class="tag-list">⚠️ NOT built — only an AI-scope chip exists; element/master picker unbuilt (§32)</span></td><td>Stops accidental edits to a component master from an instance</td><td>#5 · #14</td></tr>
+        <tr><td>Stubs/gated stay honest: My-Templates ✅ server-backed <span class="tag-list">⚠️ but Custom-CSS is NOT Pro-locked — dead code (devMode=false, never renders, §37); Stock no-key prompt also dead (keys server-env only, §35)</span></td><td>A gated/empty feature should show its real state, never a fake-working control — two of these three currently fail that bar</td><td>#3 · #13</td></tr>
         <tr><td>Brand merges tokens+styles+components</td><td>One job ("the system") had three doors → one home</td><td>#14</td></tr>
         <tr><td>Inspector vs Brand = two altitudes</td><td>"This element" ≠ "the system"; never the same panel</td><td>#14 · #9</td></tr>
         <tr><td>AI-create-site / billing-upgrade / runtime-locale = hidden</td><td>Backend still stub/throws — never show a fake control. (Stock graduated: 🔵→✅ shipped + env-gated → now drawn with a no-key gate, §35, not hidden.)</td><td>#3</td></tr>
         <tr><td>Export HTML = cut</td><td>Takes the user out of the product (anti-retention)</td><td>product judgment</td></tr>
-        <tr><td>Every panel has empty/loading/error</td><td>Happy path is ~10%; silence reads as broken</td><td>#13 · #2</td></tr>
+        <tr><td>Every panel has empty/loading/error <span class="tag-list">⚠️ partial in code — Forms/History/Components/Redirects full; Media/Stock error=toast; CMS has neither (§9 coverage map)</span></td><td>Happy path is ~10%; silence reads as broken. Goal, not yet met everywhere</td><td>#13 · #2</td></tr>
       </tbody>
     </table>
 
