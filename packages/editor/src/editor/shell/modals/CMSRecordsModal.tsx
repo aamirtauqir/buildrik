@@ -54,6 +54,8 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   const [busy, setBusy] = React.useState(false);
 
   const collection = collections.find((c) => c.id === collectionId) ?? null;
+  const publishedCount = items.filter((i) => i.status === "published").length;
+  const hasDynamicPages = Boolean(collection?.pageSlugPattern);
 
   // Load collections when opened.
   React.useEffect(() => {
@@ -109,6 +111,17 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     setBusy(true);
     try {
       await composer.cms.collections.deleteContentItem(id);
+      await reloadItems();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const setStatus = async (id: string, status: CMSContentItem["status"]) => {
+    if (!composer) return;
+    setBusy(true);
+    try {
+      await composer.cms.collections.updateContentItem(id, { status });
       await reloadItems();
     } finally {
       setBusy(false);
@@ -217,6 +230,23 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                   </div>
                 ) : (
                   <>
+                    {hasDynamicPages && publishedCount === 0 && (
+                      <div
+                        role="status"
+                        style={{
+                          marginBottom: 10,
+                          padding: "8px 10px",
+                          fontSize: 12,
+                          borderRadius: 6,
+                          color: "var(--bd-warning-strong, var(--bd-warning))",
+                          background: "var(--bd-warning-bg)",
+                          border: "1px solid var(--bd-warning-border)",
+                        }}
+                      >
+                        No records published yet — this collection generates a page per entry, but
+                        dynamic pages won&apos;t generate until at least one record is published.
+                      </div>
+                    )}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                       <span style={{ fontSize: 12, color: "var(--bd-fg-secondary)" }}>
                         {items.length} record{items.length === 1 ? "" : "s"}
@@ -236,9 +266,27 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                           >
                             <span style={{ fontSize: 13 }}>
                               {collection ? displayValue(item, collection) : item.id}
-                              <span style={{ marginLeft: 8, fontSize: 11, color: "var(--bd-fg-muted)" }}>{item.status}</span>
+                              <span
+                                style={{
+                                  marginLeft: 8,
+                                  fontSize: 11,
+                                  fontWeight: 500,
+                                  color: item.status === "published" ? "var(--bd-success)" : "var(--bd-fg-muted)",
+                                }}
+                              >
+                                {item.status}
+                              </span>
                             </span>
                             <span style={{ display: "flex", gap: 4 }}>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                busy={busy}
+                                onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
+                                aria-label={item.status === "published" ? "Unpublish record" : "Publish record"}
+                              >
+                                {item.status === "published" ? "Unpublish" : "Publish"}
+                              </Button>
                               <Button variant="ghost" size="sm" onClick={() => startEdit(item)} aria-label="Edit record">
                                 <Pencil size={13} />
                               </Button>
