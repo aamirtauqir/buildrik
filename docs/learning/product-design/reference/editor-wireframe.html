@@ -258,24 +258,43 @@
   <!-- ============================================================ 3 PAGES -->
   <section class="screen" id="pages">
     <h2>3 · Pages panel <span class="tag-list">rail slot #2 (live)</span></h2>
-    <p class="meta"><b>Job:</b> "Doosre page par jaao / page manage karo." · <b>Numayan:</b> page list + New · <b>Dheema:</b> per-page menu.</p>
-    <p class="mods"><b>Modules:</b> "+ New page" · page list (home ★, current highlighted, reorder ⠿) · row menu (rename/duplicate/delete/set-home).</p>
+    <p class="meta"><b>Job:</b> "Doosre page par jaao / page manage karo." · <b>Numayan:</b> page list + Add page · <b>Dheema:</b> per-page menu, folders.</p>
+    <p class="mods"><b>Modules:</b> view segment [Pages | Search listings] · page tree (⠿ · icon · name · /slug · Home chip · status chip · ⋮) · ⌘K palette · in-panel search (≥5 pages) · footer stats + <strong>Add page</strong> (⋮ → From template / New folder) · folders (1 level, local) · bulk toolbar (≥2) · context menu · settings drawer (SEO/Social/Advanced). Source: <code>PagesTab.tsx</code>; persists via project blob (<code>sites.saveProject</code>).</p>
     <div class="wf">
-      <div class="wf-frame" style="max-width:300px">
-        <div style="padding:10px">
-          <div class="wf-row wf-row--between"><span class="wf-label">Pages</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>+ New</span></div>
-          <div class="wf-stack" style="margin-top:8px">
-            <div class="wf-box wf-box--2" style="padding:8px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-label">★</span><div class="wf-line w-60"></div></div><span class="wf-label">⋯</span></div></div>
-            <div class="wf-box" style="padding:8px"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-label">⠿</span><div class="wf-line w-50"></div></div><span class="wf-label">⋯</span></div></div>
-            <div class="wf-box" style="padding:8px"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-label">⠿</span><div class="wf-line w-40"></div></div><span class="wf-label">⋯</span></div></div>
-            <div class="wf-box" style="padding:8px"><div class="wf-row wf-row--between"><div class="wf-row"><span class="wf-label">⠿</span><div class="wf-line w-50"></div></div><span class="wf-label">⋯</span></div></div>
+      <div class="wf-row" style="gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div class="wf-frame" style="max-width:300px">
+          <div style="padding:10px">
+            <div class="wf-row" style="border-bottom:1px solid var(--wf-line);padding-bottom:6px"><span class="wf-pill wf-pill--on">Pages</span><span class="wf-pill">Search listings</span><span class="tag-list" style="margin-left:auto">⌘K <span class="wf-tag">1</span></span></div>
+            <div class="wf-stack" style="margin-top:8px">
+              <div class="wf-box wf-box--2" style="padding:7px;border-color:var(--wf-ink)"><div class="wf-row wf-row--between"><div class="wf-row" style="gap:6px"><span class="wf-label">⌂</span><div class="wf-line w-40"></div><span class="wf-pill" style="padding:0 5px">Home</span></div><span class="wf-label">⋮</span></div><div class="tag-list" style="margin-top:3px">/ · live</div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-row wf-row--between"><div class="wf-row" style="gap:6px"><span class="wf-label" style="cursor:grab">⠿</span><div class="wf-line w-50"></div></div><span class="wf-label">⋮</span></div><div class="tag-list" style="margin-top:3px">/about · live</div></div>
+              <div class="wf-box" style="padding:7px"><div class="wf-row wf-row--between"><div class="wf-row" style="gap:6px"><span class="wf-label" style="cursor:grab">⠿</span><div class="wf-line w-40"></div><span class="wf-pill" style="padding:0 5px;opacity:.6">hidden</span></div><span class="wf-label">⋮</span></div><div class="tag-list" style="margin-top:3px">/pricing · hidden</div></div>
+            </div>
+            <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:5px;border-style:dashed"><span class="tag-list">📁 Folder (drag pages in) · ⚠️ local-only <span class="wf-tag">2</span></span></div>
+            <div class="wf-row wf-row--between" style="margin-top:8px"><span class="tag-list">3 pages · 0 drafts · 0 hidden</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">3</span>＋ Add page ▾</span></div>
           </div>
-          <p class="tag-list" style="margin-top:8px"><span class="wf-tag">2</span> Layers tree → footer ⌗ (open tie)</p>
+        </div>
+        <div class="wf-frame" style="max-width:250px">
+          <div style="padding:10px">
+            <span class="wf-label">⋮ context menu</span>
+            <div class="wf-stack" style="margin-top:6px">
+              <div class="wf-box" style="padding:5px"><span class="tag-list">Rename · F2</span></div>
+              <div class="wf-box" style="padding:5px"><span class="tag-list">Duplicate · ⌘D</span></div>
+              <div class="wf-box" style="padding:5px"><span class="tag-list">Set as Homepage</span></div>
+              <div class="wf-box" style="padding:5px"><span class="tag-list">Copy Page Link</span></div>
+              <div class="wf-box" style="padding:5px"><span class="tag-list">Page Settings · ⌘,</span></div>
+              <div class="wf-box wf-box--ghost" style="padding:5px;border-style:dashed"><span class="tag-list" style="opacity:.55">Delete — disabled for Home / last <span class="wf-tag">4</span></span></div>
+            </div>
+            <div class="wf-row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">states →</span><span class="wf-pill">empty: "No pages yet"</span><span class="wf-pill">error · Try again</span><span class="wf-pill">delete → confirm + undo</span></div>
+          </div>
         </div>
       </div>
+      <p class="tag-list" style="margin-top:6px">Settings drawer (⌘,): <strong>SEO</strong> (Google preview · SEO score 0-100 · title · meta · <strong>URL slug edits here</strong> · ✨ AI title) · <strong>Social</strong> (OG title/desc/image + card) · <strong>Advanced</strong> (visibility live/hidden/password · indexing · custom &lt;head&gt;). Layers tree → footer ⌗ (separate altitude).</p>
       <ol class="wf-why">
-        <li><span class="wf-tag">1</span><strong>"+ New page" hero of this panel.</strong> Panel-level prominence: yeh is panel ka primary kaam (#5 ek hero, panel-scope). Baaki rows uniform.</li>
-        <li><span class="wf-tag">2</span><strong>Layers footer mein, Pages mein nahi.</strong> Layers = current page ka structure (frequent, micro); Pages = across pages (macro). Alag altitude → alag ghar. Footer ⌗ popover (#14). <em>Open tie:</em> kuch builders Layers ko Pages ke andar chahte — use test (§10).</li>
+        <li><span class="wf-tag">1</span><strong>Two views + ⌘K.</strong> [Pages] tree for nav, [Search listings] for whole-site SEO at a glance. ⌘K palette always on; in-panel search appears only at ≥5 pages 🟡 (#1 recognition).</li>
+        <li><span class="wf-tag">2</span><strong>Folders organise, but ⚠️ local-only.</strong> One level, drag pages in/out — but stored in browser localStorage, <em>not</em> synced to server/device. Draw the honesty: folders won't follow you to another machine.</li>
+        <li><span class="wf-tag">3</span><strong>Add page = blank only.</strong> Hero CTA. ⚠️ "From template" doesn't create a page — it jumps to the Templates tab. Slug auto-derived at create, editable later in Settings → SEO. ⚠️ status chips scheduled/external are display-only (no setter UI).</li>
+        <li><span class="wf-tag">4</span><strong>Guarded destructive.</strong> Delete <em>disabled</em> (not hidden) for Home + last page, with tooltip; delete → confirm dialog + undo toast (#5 error-prevention). ⚠️ Plan page-limit + per-site slug-uniqueness live only in orphaned <code>pages.*</code> routes — not enforced on editor-created pages (blob save).</li>
       </ol>
     </div>
   </section>
@@ -422,61 +441,75 @@
 
   <!-- 10 CMS -->
   <section class="screen" id="cms">
-    <h2>10 · CMS <span class="tag-list">⚠️ modal-driven today (not the drawn rail panel) · J3</span></h2>
-    <p class="meta"><b>Job:</b> "Content ko collection mein rakho, phir page se bind karo." · <b>Numayan:</b> records table · <b>Dheema:</b> field schema, binding.</p>
-    <p class="mods"><b>Modules:</b> Collections list (+New) · Records table (rows + Add) · Field schema · Binding (element→field) · dynamic-page badge.</p>
+    <h2>10 · CMS <span class="tag-list">⚠️ modal-driven · no rail/sidebar home · J3</span></h2>
+    <p class="meta"><b>Job:</b> "Content ko collection mein rakho, phir page se bind karo." · <b>Numayan:</b> setup + records · <b>Dheema:</b> binding, dynamic pages.</p>
+    <p class="mods"><b>Modules:</b> Collection setup wizard (2-step) · Records modal (list + field-form) · Binding popover (inspector). <strong>Entry only via</strong> Inspector chain-icon → "+ Create Collection" + Command palette → "Manage CMS Records" — no rail tab. Source: <code>CMSCollectionSetupModal.tsx</code> · <code>CMSRecordsModal.tsx</code> · <code>BindingPopover.tsx</code>.</p>
     <div class="wf">
-      <div class="wf-frame" style="max-width:560px">
-        <div style="display:grid;grid-template-columns:130px 1fr;min-height:200px">
-          <div style="border-right:1px solid var(--wf-line);padding:10px">
-            <div class="wf-drawer-title">CMS <span class="wf-collapse">+</span></div>
-            <div class="wf-stack" style="margin-top:4px">
-              <div class="wf-box wf-box--2" style="padding:7px;border-color:var(--wf-ink)"><div class="wf-line w-75"></div></div>
-              <div class="wf-box" style="padding:7px"><div class="wf-line w-60"></div></div>
-              <div class="wf-box" style="padding:7px"><div class="wf-line w-50"></div></div>
-              <div class="wf-box wf-box--ghost" style="padding:7px;border-style:dashed"><div class="wf-line w-40"></div></div>
-            </div>
-          </div>
+      <div class="wf-row" style="gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div class="wf-frame" style="max-width:260px">
           <div style="padding:10px">
-            <div class="wf-row wf-row--between"><span class="wf-label">Blog · 12 records</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>+ Add record</span></div>
-            <div class="wf-box wf-box--2" style="margin-top:8px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-30"></div><div class="wf-line w-25"></div></div></div>
-            <div class="wf-box" style="margin-top:4px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-30"></div><div class="wf-line w-25"></div></div></div>
-            <div class="wf-box" style="margin-top:4px;padding:6px"><div class="wf-row"><div class="wf-line w-30"></div><div class="wf-line w-30"></div><div class="wf-line w-25"></div></div></div>
-            <div class="wf-row" style="margin-top:10px;gap:6px"><span class="wf-pill">⛓ Bind to element</span><span class="wf-tag">2</span><span class="wf-pill">↺ Dynamic page</span></div>
+            <span class="wf-label">Collection setup <span class="wf-tag">1</span></span>
+            <div class="wf-box" style="margin-top:6px;padding:6px"><span class="tag-list">Name* · content-type ▾ · description</span></div>
+            <div class="wf-box wf-box--2" style="margin-top:6px;padding:6px;border-color:var(--wf-ink)"><span class="tag-list">Field: name + type ▾</span><div class="wf-row" style="margin-top:4px;gap:4px;flex-wrap:wrap"><span class="wf-pill" style="padding:0 5px">Text</span><span class="wf-pill" style="padding:0 5px">Number</span><span class="wf-pill" style="padding:0 5px">Image</span><span class="wf-pill" style="padding:0 5px">Date</span><span class="wf-pill" style="padding:0 5px">Boolean</span></div><span class="tag-list" style="color:var(--bad)">only 5 types creatable ⚠️</span></div>
+            <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:6px;border-style:dashed"><span class="tag-list">☐ Generate a page per entry (slug · template · SEO)</span></div>
+          </div>
+        </div>
+        <div class="wf-frame" style="max-width:260px">
+          <div style="padding:10px">
+            <span class="wf-label">Records modal <span class="wf-tag">2</span></span>
+            <div class="wf-row wf-row--between" style="margin-top:6px"><span class="tag-list">Blog ▾</span><span class="wf-pill wf-pill--solid">+ Add</span></div>
+            <div class="wf-box" style="margin-top:6px;padding:6px"><div class="wf-row wf-row--between"><div class="wf-line w-40"></div><span class="wf-pill" style="padding:0 5px;opacity:.6">draft</span></div></div>
+            <div class="wf-box" style="margin-top:4px;padding:6px"><div class="wf-row wf-row--between"><div class="wf-line w-50"></div><span class="wf-pill" style="padding:0 5px;opacity:.6">draft</span></div></div>
+            <span class="tag-list" style="color:var(--bad);margin-top:4px;display:inline-block">status read-only — no publish ⚠️ <span class="wf-tag">3</span></span>
+            <div class="wf-box wf-box--2" style="margin-top:8px;padding:6px;border-color:var(--wf-ink)"><span class="tag-list">⛓ Bind: Collection → Field → Record</span></div>
           </div>
         </div>
       </div>
+      <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:8px;border-style:dashed"><span class="tag-list"><span class="wf-tag">4</span>⚠️ Honest gaps: 9 engine field-types (richtext·datetime·select·multiselect·file·reference·color·url·email) NOT creatable + render as plain text (no media/color/reference picker; richtext = textarea; multiselect = single). Records stuck "draft" → dynamic pages render only PUBLISHED → <strong>dynamic pages unreachable via UI alone</strong>. Repeater / collection-binding engine-complete but NO UI (toggle inert). No record validation · no list-loading · no generation-progress. Sync 🟡 lossy (last-writer-per-device, additive hydrate). <code>cms.dynamicPages</code> / <code>generateDynamicPages</code> routers orphan.</span></div>
       <ol class="wf-why">
-        <li><span class="wf-tag">1</span><strong>"+ Add record" = panel hero.</strong> Collection mein content dalna sabse aam kaam → ek dark button (#5, panel-scope). Records table sabse zyada area (#4).</li>
-        <li><span class="wf-tag">2</span><strong>Binding alag, niche.</strong> "Element ko field se jodo" advanced step hai — table ke baad, alag chip (#9 progressive). Plain word "Bind", "schema" nahi (#1).</li>
-        <li><strong>Empty state (dashed):</strong> koi collection nahi → "Create your first collection" (#13). Server-sync 🟡 → har save par status (#2, recovery P1).</li>
+        <li><span class="wf-tag">1</span><strong>Setup wizard, 5 real types.</strong> Engine defines 14 field types, but only Text/Number/Image/Date/Boolean are creatable in-UI — draw exactly those, flag the rest (#3 don't imply what isn't there).</li>
+        <li><span class="wf-tag">2</span><strong>Records + single-field binding.</strong> Add/edit field-driven form; bind one element → one record's field. Multi-item repeater binding is engine-only — don't draw it as available.</li>
+        <li><span class="wf-tag">3</span><strong>Status is read-only — the trap.</strong> Records save as "draft" with no publish control, yet dynamic pages need PUBLISHED → the headline CMS payoff can't be reached from the UI. Draw the gap, don't fake the button (#3).</li>
+        <li><span class="wf-tag">4</span><strong>No home, hidden entry.</strong> CMS has no rail/sidebar tab — reached only from an element's binding chain-icon + the command palette. A discoverability gap to fix in the redesign, not a drawn feature.</li>
       </ol>
     </div>
   </section>
 
   <!-- 11 COMPONENTS -->
   <section class="screen" id="components">
-    <h2>11 · Components <span class="tag-list">inside Insert/Brand · J4</span></h2>
-    <p class="meta"><b>Job:</b> "Reusable block banao aur dobara use karo." · <b>Numayan:</b> component library · <b>Dheema:</b> variant/detach controls.</p>
-    <p class="mods"><b>Modules:</b> Library grid (master thumbs) · Create-component · selected-instance strip (variant ▾ · detach · edit master) · "local-only ⚠" badge.</p>
+    <h2>11 · Components <span class="tag-list">inside Insert/Brand · J4 · master ✅ server-backed</span></h2>
+    <p class="meta"><b>Job:</b> "Reusable block banao aur dobara use karo." · <b>Numayan:</b> component library · <b>Dheema:</b> variant/detach, override behaviour.</p>
+    <p class="mods"><b>Modules:</b> Library grid grouped by category · filter chips (All·UI·Sections·Saved·★) · search · per-row instance count · drill-in detail (Insert · Duplicate · Delete · Detach [Pro] · read-only Variants). Create <strong>only from a canvas selection</strong> (cap 100). Master persists server-side via <code>componentSync</code>. Source: <code>ComponentsTab.tsx</code>.</p>
     <div class="wf">
-      <div class="wf-frame" style="max-width:300px">
-        <div style="padding:10px">
-          <div class="wf-row wf-row--between"><span class="wf-label">Components</span><span class="wf-pill wf-pill--solid"><span class="wf-tag">1</span>+ Create</span></div>
-          <div class="wf-row" style="gap:6px;margin-top:8px;flex-wrap:wrap">
-            <div class="wf-box" style="width:47%;align-items:center;padding:10px 6px"><div class="wf-img" style="width:100%;height:34px"></div><div class="wf-line w-60" style="margin-top:6px"></div></div>
-            <div class="wf-box" style="width:47%;align-items:center;padding:10px 6px"><div class="wf-img" style="width:100%;height:34px"></div><div class="wf-line w-60" style="margin-top:6px"></div></div>
-            <div class="wf-box" style="width:47%;align-items:center;padding:10px 6px"><div class="wf-img" style="width:100%;height:34px"></div><div class="wf-line w-60" style="margin-top:6px"></div></div>
-            <div class="wf-box wf-box--ghost" style="width:47%;align-items:center;padding:10px 6px;border-style:dashed"><div class="wf-line w-40"></div></div>
+      <div class="wf-row" style="gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div class="wf-frame" style="max-width:280px">
+          <div style="padding:10px">
+            <div class="wf-row wf-row--between"><span class="wf-label">Components</span><span class="tag-list">＋ from selection <span class="wf-tag">1</span></span></div>
+            <div class="wf-row" style="margin-top:6px;gap:4px;flex-wrap:wrap"><span class="wf-pill wf-pill--on" style="padding:0 6px">All</span><span class="wf-pill" style="padding:0 6px">UI</span><span class="wf-pill" style="padding:0 6px">Sections</span><span class="wf-pill" style="padding:0 6px">★</span></div>
+            <div class="wf-row" style="gap:6px;margin-top:8px;flex-wrap:wrap">
+              <div class="wf-box" style="width:47%;align-items:center;padding:8px 6px"><div class="wf-img" style="width:100%;height:30px"></div><div class="wf-row wf-row--between" style="width:100%;margin-top:5px"><div class="wf-line w-50"></div><span class="tag-list">×3</span></div></div>
+              <div class="wf-box" style="width:47%;align-items:center;padding:8px 6px"><div class="wf-img" style="width:100%;height:30px"></div><div class="wf-row wf-row--between" style="width:100%;margin-top:5px"><div class="wf-line w-40"></div><span class="tag-list">×1</span></div></div>
+            </div>
+            <div class="wf-row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><span class="tag-list" style="color:var(--muted)">states →</span><span class="wf-pill">empty</span><span class="wf-pill">filtered-empty</span><span class="wf-pill">error · retry</span><span class="wf-pill" style="opacity:.6">no storage</span></div>
           </div>
-          <div class="wf-box wf-box--2" style="margin-top:10px;padding:8px;border-color:var(--wf-ink)"><span class="wf-label">Selected instance</span><span class="wf-pill" style="margin-left:6px">local-only ⚠</span><span class="wf-tag">2</span>
-            <div class="wf-row" style="margin-top:6px;gap:6px"><span class="wf-pill wf-pill--on">Variant ▾</span><span class="wf-pill">Detach</span><span class="wf-pill">Edit master</span></div>
+        </div>
+        <div class="wf-frame" style="max-width:250px">
+          <div style="padding:10px">
+            <span class="wf-label">Drill-in detail <span class="wf-tag">2</span></span>
+            <div class="wf-img" style="width:100%;height:40px;margin-top:6px"></div>
+            <div class="wf-row" style="margin-top:8px;gap:6px;flex-wrap:wrap"><span class="wf-pill wf-pill--solid">Insert</span><span class="wf-pill">Duplicate</span><span class="wf-pill">Delete</span></div>
+            <div class="wf-row" style="margin-top:6px;gap:6px;flex-wrap:wrap"><span class="wf-pill" style="border-style:dashed">Detach · Pro</span><span class="wf-pill" style="opacity:.7">Variants (preview)</span></div>
+            <div class="wf-box" style="margin-top:8px;padding:6px"><span class="tag-list">Delete → "N instances will detach" confirm</span></div>
+            <div class="wf-box wf-box--ghost" style="margin-top:6px;padding:6px;border-style:dashed"><span class="tag-list">⚠️ "saved on this device — didn't sync to cloud" toast <span class="wf-tag">3</span></span></div>
           </div>
         </div>
       </div>
+      <div class="wf-box wf-box--ghost" style="margin-top:8px;padding:8px;border-style:dashed"><span class="tag-list"><span class="wf-tag">4</span>🔴 Override model (see <a href="#canvas-controls">§32</a>): style + attribute edits to an instance now survive master re-sync (F1a fixed) — BUT <strong>content + trait edits silently revert to master</strong>, and a structural master change drops overrides by position. Dropped overrides are console-only (no toast/badge). There is <strong>no "differs from master / reset" indicator</strong>, and the master-edit → propagate path (<code>updateComponentMaster</code>) is <strong>not wired to any UI</strong>. The old "local-only ⚠" instance badge does not exist in code.</span></div>
       <ol class="wf-why">
-        <li><span class="wf-tag">1</span><strong>Grid + Create.</strong> Master library browse karna primary → thumb grid (#1 recognition). Create = panel hero.</li>
-        <li><span class="wf-tag">2</span><strong>Instance controls sirf jab select.</strong> Variant/detach/edit-master tab dikhein jab canvas par instance chuna ho (#9). Master server-backed (ab shipped) — par overrides 🟡, "local-only ⚠" badge tak fix na ho (#3 honesty interim).</li>
+        <li><span class="wf-tag">1</span><strong>Browse + create-from-selection.</strong> Grouped grid + filter chips + search (#1). No blank "+New" — components are born from a canvas selection. Per-row instance count shows reuse.</li>
+        <li><span class="wf-tag">2</span><strong>Drill-in, not a cramped strip.</strong> Detail = preview + Insert/Duplicate/Delete + Detach (Pro, hidden in beginner mode) + read-only Variants. Delete warns it detaches N instances (#5).</li>
+        <li><span class="wf-tag">3</span><strong>Cloud honesty is the real badge.</strong> Master is server-backed; on sync failure a "saved on this device, didn't sync to cloud" toast fires — that's the honest signal, not a per-instance local-only badge.</li>
+        <li><span class="wf-tag">4</span><strong>Overrides are partial + silent — draw it red.</strong> Don't imply a Figma-grade instance/override system. Content/trait edits revert, no indicator, no master-propagate UI (#3 honesty).</li>
       </ol>
     </div>
   </section>
