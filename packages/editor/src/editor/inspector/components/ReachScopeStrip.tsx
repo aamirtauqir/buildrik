@@ -76,7 +76,7 @@ export function ReachScopeStrip({ composer, selectedElement }: ReachScopeStripPr
     gap: 1,
     padding: "6px 8px",
     height: "auto",
-    borderRadius: 6,
+    borderRadius: 4,
     border: "1px solid var(--bd-border, #e5e7eb)",
     background: "transparent",
     textAlign: "left",
@@ -124,7 +124,7 @@ export function ReachScopeStrip({ composer, selectedElement }: ReachScopeStripPr
       )}
 
       {confirming && (
-        <div style={{ marginTop: 8, padding: 8, borderRadius: 6, background: "var(--bd-surface-2, #f9fafb)", border: "1px solid var(--bd-border, #e5e7eb)" }}>
+        <div style={{ marginTop: 8, padding: 8, borderRadius: 4, background: "var(--bd-surface-2, #f9fafb)", border: "1px solid var(--bd-border, #e5e7eb)" }}>
           <p style={{ margin: "0 0 6px", fontSize: 11, color: "var(--bd-text, #374151)" }}>
             Apply this element&apos;s styles to the <strong>{othersLabel}</strong> on this page? This changes more than the selected item.
           </p>

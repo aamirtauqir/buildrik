@@ -488,7 +488,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                     width: 280,
                     background: "var(--bd-surface)",
                     border: "1px solid var(--bd-border)",
-                    borderRadius: 8,
+                    borderRadius: 4,
                     boxShadow: "var(--bd-shadow-md, 0 8px 24px rgba(0,0,0,.12))",
                     padding: 12,
                     zIndex: 50,

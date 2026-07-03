@@ -237,7 +237,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                           marginBottom: 10,
                           padding: "8px 10px",
                           fontSize: 12,
-                          borderRadius: 6,
+                          borderRadius: 4,
                           color: "var(--bd-warning-strong, var(--bd-warning))",
                           background: "var(--bd-warning-bg)",
                           border: "1px solid var(--bd-warning-border)",

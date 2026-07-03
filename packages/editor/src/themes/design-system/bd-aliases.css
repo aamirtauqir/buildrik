@@ -73,6 +73,7 @@
   --bd-warning-tint: var(--buildrick-warning-light);
   --bd-warning-light: var(--buildrick-warning-light);
   --bd-warning-border: var(--buildrick-warning-border);
+  --bd-warning-strong: var(--buildrick-warning-strong);
   /* Short-form synonyms used by template/DS chrome (consumers carry inline fallbacks). */
   --bd-warn-soft: var(--buildrick-warning-light);
   --bd-warn-border: var(--buildrick-warning-border);
