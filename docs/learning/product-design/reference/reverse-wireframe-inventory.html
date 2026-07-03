@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reverse-wireframe inventory — template</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  table.inv{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+  table.inv th{text-align:left;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--rule);padding:6px 8px}
+  table.inv td{border-bottom:1px solid var(--rule);padding:7px 8px;vertical-align:top}
+  table.inv td:first-child{font-family:"Geist Mono",ui-monospace,monospace;font-size:12px;white-space:nowrap}
+  .v{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 7px;border-radius:5px}
+  .v.g{background:#FEF3F2;color:var(--bad)} .v.h{background:#FFFAEB;color:var(--warn)} .v.w{background:#ECFDF3;color:var(--good)} .v.q{background:var(--bg);color:var(--faint);border:1px solid var(--rule)}
+  .seq{counter-reset:s;padding-left:0;list-style:none}
+  .seq li{position:relative;padding:8px 0 8px 34px;border-bottom:1px solid var(--rule);font-size:14px}
+  .seq li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:7px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · reverse-wireframe inventory · template</p>
+  <h1>Read the backend. Mark every gap. That list is the worklist.</h1>
+  <p class="lede">Reusable companion to <a href="../lessons/0012-reverse-wireframe-the-backend.html">L12</a>. One row per backend capability. The <span class="v g">Ghost</span> and <span class="v h">Half</span> rows are what you wireframe — in pain order. Pre-seeded with Buildrik's <strong>real 25 routers</strong> so the first pass is just marking cells.</p>
+
+  <h2>The four columns</h2>
+  <table class="inv">
+    <tr><th>Column</th><th>What you write</th></tr>
+    <tr><td>Capability</td><td>router / service / model — the real name in the code</td></tr>
+    <tr><td>Can do</td><td>one line: what the backend lets it do</td></tr>
+    <tr><td>Frontend today</td><td>where a user reaches it — or "nowhere"; note missing states</td></tr>
+    <tr><td>Verdict</td><td><span class="v g">Ghost</span> · <span class="v h">Half</span> · <span class="v w">Wired</span></td></tr>
+  </table>
+
+  <h2>The verdicts</h2>
+  <table class="inv">
+    <tr><td><span class="v g">Ghost</span></td><td>Backend works, no UI reaches it. <strong>Draw a wireframe.</strong></td></tr>
+    <tr><td><span class="v h">Half</span></td><td>UI exists but missing states or not wired to real data. <strong>Wireframe the missing states</strong> (<a href="states-checklist.html">checklist</a>).</td></tr>
+    <tr><td><span class="v w">Wired</span></td><td>Fully exposed, all states, real data. <strong>Leave it.</strong></td></tr>
+    <tr><td><span class="v q">?</span></td><td>Not checked yet. Go look at the live app before you mark it.</td></tr>
+  </table>
+
+  <h2>Buildrik backend — first pass (mark each)</h2>
+  <p class="fine">Verdict column starts at <span class="v q">?</span>. Fill it from the live app, not from memory. Group = the user job it serves.</p>
+  <table class="inv">
+    <tr><th>Capability (router)</th><th>Can do</th><th>Frontend today</th><th>Verdict</th></tr>
+    <tr><td>sites</td><td>create / list / manage sites</td><td>dashboard list</td><td><span class="v q">?</span></td></tr>
+    <tr><td>site-detail</td><td>per-site settings + status</td><td>site detail page</td><td><span class="v q">?</span></td></tr>
+    <tr><td>pages</td><td>create / order / dynamic pages</td><td>editor + page panel</td><td><span class="v q">?</span></td></tr>
+    <tr><td>cms</td><td>collections + entries, server-sync</td><td>bind component → collection?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>forms</td><td>form blocks + store submissions</td><td>read submissions anywhere?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>media</td><td>assets + folders + versions</td><td>media tab</td><td><span class="v q">?</span></td></tr>
+    <tr><td>templates</td><td>templates + versions</td><td>template picker?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>theme</td><td>capture + push shared theme</td><td>/dashboard/theme</td><td><span class="v q">?</span></td></tr>
+    <tr><td>ai</td><td>generate / set-token / set-image</td><td>Ask-AI bar</td><td><span class="v q">?</span></td></tr>
+    <tr><td>reviews</td><td>send site for client review</td><td>request + track screen?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>comments</td><td>threaded comments on a site</td><td>comment UI present?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>clients</td><td>agency → client records</td><td>client layer in UI?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>team</td><td>members + invites + roles</td><td>team settings + Invite</td><td><span class="v q">?</span></td></tr>
+    <tr><td>notifications</td><td>notifications + prefs</td><td>notification surface?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>integrations</td><td>Vercel OAuth + workspace integrations</td><td>settings → integrations</td><td><span class="v q">?</span></td></tr>
+    <tr><td>billing</td><td>subscription / invoices / payment</td><td>billing screen?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>onboarding</td><td>onboarding state machine</td><td>first-run flow</td><td><span class="v q">?</span></td></tr>
+    <tr><td>account</td><td>account + deletion request</td><td>account modal</td><td><span class="v q">?</span></td></tr>
+    <tr><td>dashboard</td><td>activity / summary feed</td><td>dashboard home</td><td><span class="v q">?</span></td></tr>
+    <tr><td>actions</td><td>AI privileged propose→confirm</td><td>confirm dialog?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>api-tokens</td><td>create / revoke API tokens</td><td>tokens settings?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>help</td><td>help articles + tickets</td><td>help surface?</td><td><span class="v q">?</span></td></tr>
+    <tr><td>upload</td><td>signed upload + pending</td><td>upload flow</td><td><span class="v q">?</span></td></tr>
+    <tr><td>features</td><td>workspace feature flags</td><td>(internal — gating)</td><td><span class="v q">?</span></td></tr>
+    <tr><td>auth</td><td>login / 2FA / magic-link</td><td>auth pages</td><td><span class="v q">?</span></td></tr>
+  </table>
+
+  <h2>After the pass — the sequence</h2>
+  <ol class="seq">
+    <li>Sort the <span class="v g">Ghost</span> + <span class="v h">Half</span> rows by user pain (severity × frequency).</li>
+    <li>Wireframe each gap — <a href="../lessons/0004-design-to-build-handoff.html">handoff</a> + <a href="states-checklist.html">all states</a>.</li>
+    <li>Write the redesign plan from those wireframes.</li>
+    <li>Pressure-test it: <code>plan-design-review</code> + <code>plan-ceo-review</code>.</li>
+    <li>Build via the <a href="definition-of-done.html">5-rung ladder</a>; re-test the job.</li>
+  </ol>
+
+  <p class="source">Engine: the <a href="buildrik-design-principles.html">constitution</a>. Method: <a href="../lessons/0012-reverse-wireframe-the-backend.html">L12 — reverse-wireframe</a>. Feeds: <a href="../../reviews/buildrik-recovery-roadmap-20260621.md">recovery roadmap</a> Phase 3 (wire or hide the ghosts).</p>
+</main>
+</body>
+</html>

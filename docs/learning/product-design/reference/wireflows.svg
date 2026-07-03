@@ -1,0 +1,849 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1660" height="2752" viewBox="0 0 1660 2752">
+<rect x="0" y="0" width="1660" height="2752" fill="rgb(251, 251, 250)"/>
+<text x="0" y="13.1" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(45, 109, 255)" font-weight="600" letter-spacing="0.96" xml:space="preserve">REFERENCE · WIREFLOWS · JOB JOURNEYS · 2026-06-26</text>
+<text x="0" y="53.9" font-family="General Sans, Inter, sans-serif" font-size="32" fill="rgb(26, 26, 26)" font-weight="700" letter-spacing="-0.32" xml:space="preserve">The editor as journeys, not a list of panels.</text>
+<text x="0" y="86.69" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15" fill="rgb(107, 114, 128)" xml:space="preserve">Job-to-be-done first: each screen earns its place inside a</text>
+<text x="397.13" y="86.69" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15" fill="rgb(107, 114, 128)" xml:space="preserve">journey the user moves through</text>
+<text x="614.77" y="86.69" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15" fill="rgb(107, 114, 128)" xml:space="preserve">, left to right. Panels (Insert, Inspector,</text>
+<text x="0" y="111.44" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15" fill="rgb(107, 114, 128)" xml:space="preserve">Pages…) are the</text>
+<text x="114.97" y="111.44" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15" fill="rgb(107, 114, 128)" xml:space="preserve">blocks</text>
+<text x="158.98" y="111.44" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15" fill="rgb(107, 114, 128)" xml:space="preserve"> a flow uses — not the top-level spine.</text>
+<line x1="0" y1="134.19" x2="920" y2="134.19" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<line x1="0" y1="228.47" x2="920" y2="228.47" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<line x1="1.5" y1="133.69" x2="1.5" y2="228.97" stroke="rgb(45, 109, 255)" stroke-width="3"/>
+<line x1="919.5" y1="133.69" x2="919.5" y2="228.97" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<text x="19" y="162.39" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">The journey is the unit.</text>
+<text x="176.56" y="162.39" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(26, 26, 26)" xml:space="preserve"> Each screen earns its place inside a flow the user moves through — not as a standalone panel. The 41 per-</text>
+<text x="19" y="185.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(26, 26, 26)" xml:space="preserve">surface specs live in the</text>
+<line x1="178.73" y1="190.28" x2="290.31" y2="190.28" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="178.73" y="185.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(45, 109, 255)" xml:space="preserve">surface appendix</text>
+<text x="290.31" y="185.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(26, 26, 26)" xml:space="preserve">; they're the</text>
+<text x="371.58" y="185.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(26, 26, 26)" xml:space="preserve">blocks</text>
+<text x="413.06" y="185.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(26, 26, 26)" xml:space="preserve"> these journeys pass through, not the top-level structure. Read the flows</text>
+<text x="19" y="208.58" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(26, 26, 26)" xml:space="preserve">first; drop into a §N when you need a panel's detail.</text>
+<rect x="0" y="254.97" width="1660" height="468.75" rx="12" fill="none" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<rect x="19" y="276.97" width="33.66" height="21" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="28" y="291.37" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="13" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">J3</text>
+<text x="62.66" y="290.87" font-family="General Sans, Inter, sans-serif" font-size="18" fill="rgb(26, 26, 26)" font-weight="600" xml:space="preserve"> Make a page</text>
+<text x="19" y="313.87" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">User:</text>
+<text x="53.86" y="313.87" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> agency builder, empty page.</text>
+<text x="232.61" y="313.87" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">Done when:</text>
+<text x="308.67" y="313.87" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> a real section is on the canvas, styled, saved.</text>
+<text x="588.52" y="313.87" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">The job pulls toward one thing:</text>
+<text x="787.34" y="313.87" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> get</text>
+<text x="814.36" y="313.87" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve">content</text>
+<text x="860.78" y="313.87" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> onto an empty canvas fast — so every step's</text>
+<text x="19" y="335.31" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve">hero is "the next move," and the chrome stays quiet until the user needs it.</text>
+<rect x="19" y="364.84" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="24.69" y="377.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">1</text>
+<text x="44" y="377.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Editor khulta</text>
+<rect x="19" y="394.84" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="20" y="395.84" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="20" y1="410.34" x2="250" y2="410.34" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="25" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="192" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="215" y="398.84" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="20" y="410.84" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="39.5" y1="410.84" x2="39.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="415.84" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="24" y="431.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="447.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="463.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="85.5" y="459.16" width="78.98" height="44.38" rx="3" fill="none" stroke="rgb(45, 109, 255)" stroke-width="1" stroke-dasharray="3 2"/>
+<rect x="86.5" y="460.16" width="76.98" height="42.38" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<text x="120.98" y="477.06" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="8" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">＋</text>
+<text x="98.5" y="490.24" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="8" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">add section</text>
+<g opacity="0.4">
+<rect x="210" y="410.84" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="210.5" y1="410.84" x2="210.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="19" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="60.14" y="574.09" font-family="monospace" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">/edit/:id</text>
+<text x="127.88" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> kholta.</text>
+<text x="174.42" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="19" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> khaali canvas + ek hi prompt "add</text>
+<text x="19" y="611.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">section". Baaki sab dheema — pehla</text>
+<text x="19" y="630.34" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">kaam saaf.</text>
+<text x="84.81" y="630.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="98.06" y1="634.59" x2="151.05" y2="634.59" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="98.06" y="630.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§0 shell</text>
+<text x="255.75" y="504.29" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="281" y="364.84" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="286.69" y="377.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">2</text>
+<text x="306" y="377.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Insert se section chunta</text>
+<rect x="281" y="394.84" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="282" y="395.84" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="282" y1="410.34" x2="512" y2="410.34" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="287" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="454" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="477" y="398.84" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="282" y="410.84" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="301.5" y1="410.84" x2="301.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="415.84" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="286" y="431.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="447.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="463.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="302" y="410.84" width="170" height="141" rx="3" fill="rgb(244, 244, 245)"/>
+<rect x="303" y="411.84" width="168" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="307" y="415.84" width="88" height="5" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="307" y="424.84" width="160" height="24" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="307" y="452.84" width="160" height="24" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(45, 109, 255)" stroke-width="1"/>
+<rect x="431.31" y="456.84" width="31.69" height="13" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="436.31" y="465.54" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="9" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">grab</text>
+<rect x="307" y="480.84" width="160" height="24" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<g opacity="0.4">
+<rect x="472" y="410.84" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="472.5" y1="410.84" x2="472.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="281" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="318.66" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> rail #1 Insert → drawer khulta →</text>
+<text x="281" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">"Hero" section pakadta.</text>
+<text x="424.95" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="281" y="611.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> sections ki list, ek grab ho rahi.</text>
+<text x="466.28" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="281" y1="634.59" x2="492.78" y2="634.59" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="479.53" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§1</text>
+<text x="281" y="630.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">Insert</text>
+<text x="517.75" y="504.29" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="543" y="364.84" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="548.69" y="377.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">3</text>
+<text x="568" y="377.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Canvas pe girta</text>
+<rect x="543" y="394.84" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="544" y="395.84" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="544" y1="410.34" x2="774" y2="410.34" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="549" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="716" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="739" y="398.84" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="544" y="410.84" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="563.5" y1="410.84" x2="563.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="415.84" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="548" y="431.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="447.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="463.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="565" y="411.84" width="168" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="570" y="416.84" width="94.8" height="7" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="570" y="427.84" width="158" height="34" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="570" y="465.84" width="142.19" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="570" y="474.84" width="110.59" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<g opacity="0.4">
+<rect x="734" y="410.84" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="734.5" y1="410.84" x2="734.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="543" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="580.66" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> chhodta.</text>
+<text x="639.25" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="683.59" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> Hero canvas</text>
+<text x="543" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">pe aa gaya — heading + image + text.</text>
+<text x="543" y="611.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">Khaali se content.</text>
+<text x="650.98" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="664.23" y1="615.84" x2="730.47" y2="615.84" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="664.23" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§30 canvas</text>
+<text x="779.75" y="504.29" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="805" y="364.84" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="810.69" y="377.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">4</text>
+<text x="830" y="377.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Text seedha likhta</text>
+<rect x="805" y="394.84" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="806" y="395.84" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="806" y1="410.34" x2="1036" y2="410.34" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="811" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="978" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1001" y="398.84" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="806" y="410.84" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="825.5" y1="410.84" x2="825.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="415.84" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="810" y="431.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="447.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="463.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="833" y="417.84" width="156" height="9" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="832" y="403.84" width="10.22" height="13" rx="2" fill="rgb(45, 109, 255)"/>
+<text x="835" y="410.94" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">B</text>
+<rect x="844.22" y="403.84" width="17" height="13" rx="2" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="848.22" y="411.94" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve">✨</text>
+<rect x="834" y="418.84" width="100.09" height="7" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="832" y="431.84" width="158" height="34" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="832" y="469.84" width="142.19" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<g opacity="0.4">
+<rect x="996" y="410.84" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="996.5" y1="410.84" x2="996.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="805" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="842.66" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> heading pe click → type karta</text>
+<text x="805" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">(canvas pe, jagah pe).</text>
+<text x="937.38" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="981.72" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> cursor +</text>
+<text x="805" y="611.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">floating B/I/✨ bar.</text>
+<text x="916.8" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="930.05" y1="615.84" x2="1029.39" y2="615.84" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="930.05" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§31 inline-text</text>
+<text x="1041.75" y="504.29" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="1067" y="364.84" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="1072.69" y="377.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">5</text>
+<text x="1092" y="377.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Inspector se style</text>
+<rect x="1067" y="394.84" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="1068" y="395.84" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="1068" y1="410.34" x2="1298" y2="410.34" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1073" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1240" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1263" y="398.84" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="1068" y="410.84" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="1087.5" y1="410.84" x2="1087.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1072" y="415.84" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="1072" y="431.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1072" y="447.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1072" y="463.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1094" y="416.84" width="158" height="15" rx="3" fill="none" stroke="rgb(45, 109, 255)" stroke-width="1"/>
+<rect x="1098" y="420.84" width="97.5" height="7" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="1094" y="435.84" width="158" height="30" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1258" y="410.84" width="40" height="141" rx="3" fill="rgb(255, 255, 255)"/>
+<line x1="1258.5" y1="410.84" x2="1258.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1259" y="411.84" width="38" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="1263" y="415.84" width="24.8" height="5" rx="2" fill="rgb(45, 109, 255)"/>
+<rect x="1263" y="424.84" width="18.59" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="1263" y="433.84" width="27.89" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="1263" y="442.84" width="15.5" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<text x="1067" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="1104.66" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> element selected → inspector</text>
+<text x="1067" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">mein color/size badalta.</text>
+<text x="1208.89" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="1253.23" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> "You</text>
+<text x="1067" y="611.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">are editing this" + controls.</text>
+<text x="1229.52" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="1067" y1="634.59" x2="1256.02" y2="634.59" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="1242.77" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§5</text>
+<text x="1067" y="630.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">inspector</text>
+<text x="1303.75" y="504.29" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="1329" y="364.84" width="18" height="18" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="1334.69" y="377.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">6</text>
+<text x="1354" y="377.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Save + preview</text>
+<rect x="1329" y="394.84" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="1330" y="395.84" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="1330" y1="410.34" x2="1560" y2="410.34" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1335" y="398.84" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="1492.48" y="404.44" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">● saved</text>
+<rect x="1525" y="398.84" width="30" height="8" rx="3" fill="none" stroke="rgb(45, 109, 255)" stroke-width="1"/>
+<rect x="1526" y="399.84" width="28" height="6" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="1330" y="410.84" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="1349.5" y1="410.84" x2="1349.5" y2="551.84" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1334" y="415.84" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="1334" y="431.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1334" y="447.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1334" y="463.84" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1350" y="410.84" width="210" height="141" fill="rgb(255, 255, 255)"/>
+<rect x="1357" y="417.84" width="107.8" height="7" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="1357" y="428.84" width="196" height="36" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1357" y="468.84" width="172.47" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="1357" y="477.84" width="129.36" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="1357" y="488.84" width="34" height="11" rx="3" fill="rgb(82, 82, 91)"/>
+<text x="1329" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="1366.66" y="574.09" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> kuch nahi — auto-save. Preview</text>
+<text x="1329" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">▸ daba ke client-view dekhta.</text>
+<text x="1502.7" y="592.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="1329" y="611.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> "saved" + saaf page. Page ban gaya.</text>
+<text x="1547.16" y="612.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="1329" y1="634.59" x2="1401.86" y2="634.59" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="1329" y="630.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§15 preview</text>
+<line x1="19" y1="657.34" x2="1641" y2="657.34" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<text x="19" y="681.74" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(26, 26, 26)" font-weight="700" xml:space="preserve">Job ne shape kaise diya:</text>
+<text x="176.28" y="681.74" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve"> job ("page banao") ne</text>
+<text x="317.09" y="681.74" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve">sequence</text>
+<text x="375.91" y="681.74" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve"> decide ki — pehla step "add" (khaali → content), aakhri "preview/save" (kaam done). Panels (Insert §1, Canvas §32, Inline-text §33, Inspector §5, Preview §15) flow ke</text>
+<text x="1385.06" y="681.74" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve">andar</text>
+<text x="1419.64" y="681.74" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve"> aaye, blocks ki tarah — top-level</text>
+<text x="19" y="703.18" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve">spine ki tarah nahi. Yehi "job-first, THEN blocks" (L17): job sequence chalata, panels uske blocks.</text>
+<rect x="0" y="749.72" width="1660" height="447.31" rx="12" fill="none" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<rect x="19" y="771.72" width="33.66" height="21" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="28" y="786.12" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="13" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">J4</text>
+<text x="62.66" y="785.62" font-family="General Sans, Inter, sans-serif" font-size="18" fill="rgb(26, 26, 26)" font-weight="600" xml:space="preserve"> Make it on-brand</text>
+<text x="19" y="808.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">User:</text>
+<text x="53.86" y="808.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> builder who changed one thing and wants it everywhere.</text>
+<text x="402.3" y="808.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">Done when:</text>
+<text x="478.36" y="808.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> a change is consistent across the whole site.</text>
+<text x="755.78" y="808.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">The job pulls toward:</text>
+<text x="890.78" y="808.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> change once, apply widely — so the</text>
+<text x="19" y="830.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve">hero of every step is</text>
+<text x="145.86" y="830.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve">reach</text>
+<text x="179.86" y="830.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> (this → all → site), the cure for inconsistent "AI-slop" pages.</text>
+<rect x="19" y="859.59" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="24.69" y="871.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">1</text>
+<text x="44" y="871.79" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Ek element badalta</text>
+<rect x="19" y="889.59" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="20" y="890.59" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="20" y1="905.09" x2="250" y2="905.09" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="25" y="893.59" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="215" y="893.59" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="20" y="905.59" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="39.5" y1="905.59" x2="39.5" y2="1046.59" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="910.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="926.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="942.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="958.59" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="46" y="911.59" width="40" height="13" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(45, 109, 255)" stroke-width="1"/>
+<rect x="210" y="905.59" width="40" height="141" rx="3" fill="rgb(255, 255, 255)"/>
+<line x1="210.5" y1="905.59" x2="210.5" y2="1046.59" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="211" y="906.59" width="38" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="215" y="910.59" width="24.8" height="5" rx="2" fill="rgb(45, 109, 255)"/>
+<rect x="215" y="919.59" width="17.05" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<text x="19" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="56.66" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> ek button ka color badalta.</text>
+<text x="19" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="63.34" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> sirf</text>
+<text x="89.44" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">yeh</text>
+<text x="110.66" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> element badla.</text>
+<text x="203.94" y="1088.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="19" y1="1110.59" x2="230.44" y2="1110.59" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="217.19" y="1088.14" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§5</text>
+<text x="19" y="1106.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">inspector</text>
+<text x="255.75" y="999.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="281" y="859.59" width="18" height="18" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="286.69" y="871.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">2</text>
+<text x="306" y="871.79" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> "All like this" reach</text>
+<rect x="281" y="889.59" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="282" y="890.59" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="282" y1="905.09" x2="512" y2="905.09" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="287" y="893.59" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="477" y="893.59" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="282" y="905.59" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="301.5" y1="905.59" x2="301.5" y2="1046.59" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="910.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="926.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="942.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="958.59" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="308" y="911.59" width="40" height="11" rx="3" fill="rgb(45, 109, 255)"/>
+<rect x="308" y="928.59" width="40" height="11" rx="3" fill="rgb(45, 109, 255)"/>
+<rect x="308" y="945.59" width="40" height="11" rx="3" fill="rgb(45, 109, 255)"/>
+<rect x="472" y="905.59" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="472.5" y1="905.59" x2="472.5" y2="1046.59" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="478" y="911.59" width="29" height="42" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="477" y="910.59" width="31" height="12" rx="2" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="485.27" y="917.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve">This</text>
+<rect x="477" y="924.59" width="31" height="16" rx="2" fill="rgb(45, 109, 255)"/>
+<text x="487.08" y="930.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">All</text>
+<text x="485.27" y="936.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">like</text>
+<rect x="477" y="942.59" width="31" height="12" rx="2" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="485.27" y="949.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve">Site</text>
+<text x="281" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="318.66" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> reach "All like this" pe badhata.</text>
+<text x="281" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="325.34" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> saare buttons ek saath badle —</text>
+<text x="281" y="1106.34" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">recognition, na ki "selector specificity."</text>
+<text x="281" y="1125.64" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="294.25" y1="1129.34" x2="413.47" y2="1129.34" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="294.25" y="1125.64" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§12 inspector-full</text>
+<text x="517.75" y="999.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="543" y="859.59" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="548.69" y="871.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">3</text>
+<text x="568" y="871.79" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Brand: site token</text>
+<rect x="543" y="889.59" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="544" y="890.59" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="544" y1="905.09" x2="774" y2="905.09" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="549" y="893.59" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="739" y="893.59" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="544" y="905.59" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="563.5" y1="905.59" x2="563.5" y2="1046.59" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="910.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="926.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="942.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="958.59" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="565" y="906.59" width="168" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="570" y="911.59" width="14" height="14" rx="3" fill="rgb(45, 109, 255)"/>
+<rect x="570" y="929.59" width="14" height="14" rx="3" fill="rgb(63, 63, 70)"/>
+<rect x="570" y="947.59" width="14" height="14" rx="3" fill="rgb(212, 212, 216)"/>
+<rect x="570" y="968.59" width="142.19" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<g opacity="0.4">
+<rect x="734" y="905.59" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="734.5" y1="905.59" x2="734.5" y2="1046.59" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="543" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="580.66" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> Design/Brand panel → accent</text>
+<text x="543" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">token khud badalta.</text>
+<text x="662.14" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="706.48" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> ek jagah =</text>
+<text x="543" y="1106.34" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">sabka source.</text>
+<text x="627.8" y="1106.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="641.05" y1="1110.59" x2="694.03" y2="1110.59" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="641.05" y="1106.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§4 Brand</text>
+<text x="779.75" y="999.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="805" y="859.59" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="810.69" y="871.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">4</text>
+<text x="830" y="871.79" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Poori site ripple</text>
+<rect x="805" y="889.59" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="806" y="890.59" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="806" y1="905.09" x2="1036" y2="905.09" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="811" y="893.59" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1001" y="893.59" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="806" y="905.59" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="825.5" y1="905.59" x2="825.5" y2="1046.59" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="910.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="926.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="942.59" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="958.59" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="832" y="911.59" width="86.89" height="7" rx="2" fill="rgb(45, 109, 255)"/>
+<rect x="832" y="922.59" width="158" height="18" rx="3" fill="none" stroke="rgb(45, 109, 255)" stroke-width="1"/>
+<rect x="832" y="944.59" width="110.59" height="5" rx="2" fill="rgb(45, 109, 255)"/>
+<rect x="832" y="953.59" width="28" height="10" rx="3" fill="rgb(45, 109, 255)"/>
+<g opacity="0.4">
+<rect x="996" y="905.59" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="996.5" y1="905.59" x2="996.5" y2="1046.59" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="805" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="842.66" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> kuch nahi.</text>
+<text x="909.55" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="953.89" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> token change</text>
+<text x="805" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">har jagah ripple — headings, links, CTA</text>
+<text x="805" y="1106.34" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">sab naye accent pe.</text>
+<text x="925.44" y="1106.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="938.69" y1="1110.59" x2="991.67" y2="1110.59" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="938.69" y="1106.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§4 Brand</text>
+<text x="1041.75" y="999.04" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="1067" y="859.59" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="1072.69" y="871.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">5</text>
+<text x="1092" y="871.79" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Consistent preview</text>
+<rect x="1067" y="889.59" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="1068" y="890.59" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="1068" y1="905.09" x2="1298" y2="905.09" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1073" y="893.59" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="1288.78" y="899.19" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">✓</text>
+<rect x="1076" y="913.59" width="107" height="7" rx="2" fill="rgb(45, 109, 255)"/>
+<rect x="1076" y="925.59" width="214" height="24" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1076" y="954.59" width="181.89" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="1076" y="964.59" width="30" height="11" rx="3" fill="rgb(45, 109, 255)"/>
+<text x="1067" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="1104.66" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> preview.</text>
+<text x="1160.03" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="1204.38" y="1068.84" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> poori site ek</text>
+<text x="1067" y="1087.59" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">brand pe — yeh "AI-slop" ka ilaaj</text>
+<text x="1067" y="1106.34" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">(consistency).</text>
+<text x="1153.56" y="1106.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="1166.81" y1="1110.59" x2="1239.67" y2="1110.59" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="1166.81" y="1106.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§15 preview</text>
+<line x1="19" y1="1152.09" x2="1641" y2="1152.09" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<text x="19" y="1176.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(26, 26, 26)" font-weight="700" xml:space="preserve">Job ne shape kaise diya:</text>
+<text x="176.28" y="1176.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve"> job ("ek baar badlo, har jagah lago") ne reach ko hero banaya — this → all → site. Brand-merge (tokens+styles+components, §4) flow ke andar ek block; consistency ka source. Yehi dedup/"one home" lever, sequence mein dikhta.</text>
+<rect x="0" y="1223.03" width="1660" height="428.56" rx="12" fill="none" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<rect x="19" y="1245.03" width="33.66" height="21" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="28" y="1259.43" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="13" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">J3</text>
+<text x="62.66" y="1258.93" font-family="General Sans, Inter, sans-serif" font-size="18" fill="rgb(26, 26, 26)" font-weight="600" xml:space="preserve"> Structure content (CMS)</text>
+<text x="19" y="1281.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">User:</text>
+<text x="53.86" y="1281.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> builder with many similar pages (blog, products).</text>
+<text x="356.67" y="1281.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">Done when:</text>
+<text x="432.73" y="1281.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> one template feeds many records into many live pages.</text>
+<text x="773.08" y="1281.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">The job pulls toward:</text>
+<text x="908.08" y="1281.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> define once, repeat with data — so</text>
+<text x="19" y="1303.37" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve">the spine is collection → record → bind → generate.</text>
+<rect x="19" y="1332.91" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="24.69" y="1345.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">1</text>
+<text x="44" y="1345.1" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Collection banata</text>
+<rect x="19" y="1362.91" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="20" y="1363.91" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="20" y1="1378.41" x2="250" y2="1378.41" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="25" y="1366.91" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="215" y="1366.91" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="20" y="1378.91" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="39.5" y1="1378.91" x2="39.5" y2="1519.91" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="1383.91" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="24" y="1399.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="1415.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="24" y="1431.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="41" y="1379.91" width="168" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="46" y="1384.91" width="79" height="5" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="46" y="1393.91" width="158" height="17" rx="3" fill="none" stroke="rgb(45, 109, 255)" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="110.95" y="1404.01" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">＋ Blog</text>
+<g opacity="0.4">
+<rect x="210" y="1378.91" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="210.5" y1="1378.91" x2="210.5" y2="1519.91" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="19" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="56.66" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> CMS → "+ New collection" →</text>
+<text x="19" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">"Blog".</text>
+<text x="63.09" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="107.44" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> khaali collection,</text>
+<text x="19" y="1579.66" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">progressive.</text>
+<text x="94.41" y="1580.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="107.66" y1="1583.91" x2="154.02" y2="1583.91" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="107.66" y="1580.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§10 CMS</text>
+<text x="255.75" y="1462.98" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="281" y="1332.91" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="286.69" y="1345.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">2</text>
+<text x="306" y="1345.1" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Fields add</text>
+<rect x="281" y="1362.91" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="282" y="1363.91" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="282" y1="1378.41" x2="512" y2="1378.41" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="287" y="1366.91" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="477" y="1366.91" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="282" y="1378.91" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="301.5" y1="1378.91" x2="301.5" y2="1519.91" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="1383.91" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="286" y="1399.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="1415.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="286" y="1431.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="303" y="1379.91" width="168" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="308" y="1384.91" width="8" height="8" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="319" y="1386.41" width="79" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="308" y="1396.91" width="8" height="8" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="319" y="1398.41" width="63.19" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="308" y="1408.91" width="8" height="8" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="319" y="1410.41" width="94.8" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<g opacity="0.4">
+<rect x="472" y="1378.91" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="472.5" y1="1378.91" x2="472.5" y2="1519.91" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="281" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="318.66" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> fields banata: title · image ·</text>
+<text x="281" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">body.</text>
+<text x="316.63" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="360.97" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> collection ka shape.</text>
+<text x="484.28" y="1561.46" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="281" y1="1583.91" x2="327.36" y2="1583.91" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="281" y="1580.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§10 CMS</text>
+<text x="517.75" y="1462.98" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="543" y="1332.91" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="548.69" y="1345.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">3</text>
+<text x="568" y="1345.1" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Records bharta</text>
+<rect x="543" y="1362.91" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="544" y="1363.91" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="544" y1="1378.41" x2="774" y2="1378.41" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="549" y="1366.91" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="739" y="1366.91" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="544" y="1378.91" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="563.5" y1="1378.91" x2="563.5" y2="1519.91" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="1383.91" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="548" y="1399.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="1415.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="548" y="1431.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="565" y="1379.91" width="168" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="569" y="1383.91" width="160" height="13" rx="2" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="569" y="1399.91" width="160" height="13" rx="2" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="569" y="1415.91" width="160" height="13" rx="2" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<g opacity="0.4">
+<rect x="734" y="1378.91" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="734.5" y1="1378.91" x2="734.5" y2="1519.91" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="543" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="580.66" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> 3 posts add karta.</text>
+<text x="693.59" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="543" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> records ki list.</text>
+<text x="628.69" y="1561.46" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="641.94" y1="1565.16" x2="688.3" y2="1565.16" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="641.94" y="1561.46" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§10 CMS</text>
+<text x="779.75" y="1462.98" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="805" y="1332.91" width="18" height="18" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="810.69" y="1345.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">4</text>
+<text x="830" y="1345.1" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Element pe bind</text>
+<rect x="805" y="1362.91" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="806" y="1363.91" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="806" y1="1378.41" x2="1036" y2="1378.41" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="811" y="1366.91" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1001" y="1366.91" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="806" y="1378.91" width="20" height="141" fill="rgb(244, 244, 245)"/>
+<line x1="825.5" y1="1378.91" x2="825.5" y2="1519.91" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="1383.91" width="11" height="11" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="810" y="1399.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="1415.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="810" y="1431.91" width="11" height="11" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="832" y="1384.91" width="158" height="15" rx="3" fill="none" stroke="rgb(45, 109, 255)" stroke-width="1"/>
+<rect x="836" y="1388.91" width="90" height="7" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="833" y="1399.91" width="49.36" height="10" rx="2" fill="rgb(45, 109, 255)"/>
+<text x="836" y="1406.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">= post.title</text>
+<g opacity="0.4">
+<rect x="996" y="1378.91" width="40" height="141" fill="rgb(255, 255, 255)"/>
+<line x1="996.5" y1="1378.91" x2="996.5" y2="1519.91" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+</g>
+<text x="805" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="842.66" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> heading ko field se bind karta</text>
+<text x="805" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">("= post.title").</text>
+<text x="896.42" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="940.77" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> ek element,</text>
+<text x="805" y="1579.66" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">data ka.</text>
+<text x="854.94" y="1580.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="868.19" y1="1583.91" x2="960.91" y2="1583.91" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="868.19" y="1580.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§11 components</text>
+<text x="1041.75" y="1462.98" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="1067" y="1332.91" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="1072.69" y="1345.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">5</text>
+<text x="1092" y="1345.1" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Dynamic pages</text>
+<rect x="1067" y="1362.91" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="1068" y="1363.91" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="1068" y1="1378.41" x2="1298" y2="1378.41" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1073" y="1366.91" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="1284.56" y="1372.51" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">×3</text>
+<rect x="1075" y="1385.91" width="216" height="40" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1079" y="1389.91" width="216" height="40" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1083" y="1393.91" width="209" height="40" rx="3" fill="rgb(255, 255, 255)" stroke="rgb(45, 109, 255)" stroke-width="1"/>
+<rect x="1089" y="1399.91" width="103.5" height="5" rx="2" fill="rgb(45, 109, 255)"/>
+<text x="1067" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="1104.66" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> kuch nahi.</text>
+<text x="1171.55" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="1215.89" y="1542.16" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> ek template</text>
+<text x="1067" y="1560.91" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">→ 3 live pages, har post ka apna.</text>
+<text x="1263.48" y="1561.46" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="1067" y1="1583.91" x2="1296.61" y2="1583.91" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="1276.73" y="1561.46" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§10</text>
+<text x="1067" y="1580.21" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">CMS</text>
+<line x1="19" y1="1606.66" x2="1641" y2="1606.66" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<text x="19" y="1631.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(26, 26, 26)" font-weight="700" xml:space="preserve">Job ne shape kaise diya:</text>
+<text x="176.28" y="1631.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve"> job ("define once, repeat with data") = collection→record→bind→generate. Yeh asal CMS *flow* hai — na ki sirf "CMS panel" ka spec. Entry-point (rail progressive) + bind affordance flow mein resolve hote.</text>
+<rect x="0" y="1677.59" width="1660" height="428.56" rx="12" fill="none" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<rect x="19" y="1699.59" width="33.66" height="21" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="28" y="1713.99" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="13" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">J5</text>
+<text x="62.66" y="1713.49" font-family="General Sans, Inter, sans-serif" font-size="18" fill="rgb(26, 26, 26)" font-weight="600" xml:space="preserve"> Get sign-off</text>
+<text x="173.66" y="1711.89" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" font-weight="600" xml:space="preserve">★ agency loop</text>
+<text x="19" y="1736.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">User:</text>
+<text x="53.86" y="1736.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> agency sending work to a client.</text>
+<text x="256.19" y="1736.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">Done when:</text>
+<text x="332.25" y="1736.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> client feedback is captured, resolved, and re-shared — without leaving the tool.</text>
+<text x="818.77" y="1736.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">The job pulls toward:</text>
+<text x="953.77" y="1736.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> a round-trip (send →</text>
+<text x="19" y="1757.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve">comment → resolve → resend), the agency's core differentiator.</text>
+<rect x="19" y="1787.47" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="24.69" y="1799.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">1</text>
+<text x="44" y="1799.66" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Preview as client</text>
+<rect x="19" y="1817.47" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="20" y="1818.47" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="20" y1="1832.97" x2="250" y2="1832.97" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="111.81" y="1827.07" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(156, 163, 175)" font-weight="700" xml:space="preserve">client view</text>
+<rect x="28" y="1841.47" width="107" height="7" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="28" y="1853.47" width="214" height="26" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="28" y="1884.47" width="181.89" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="28" y="1894.47" width="139.09" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<text x="19" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="56.66" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> Preview ▸ "as client" kholta.</text>
+<text x="19" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="63.34" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> saaf page, koi editor-chrome</text>
+<text x="19" y="2034.22" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">nahi.</text>
+<text x="50.64" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="63.89" y1="2038.47" x2="136.75" y2="2038.47" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="63.89" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§15 preview</text>
+<text x="255.75" y="1917.54" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="281" y="1787.47" width="18" height="18" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="286.69" y="1799.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">2</text>
+<text x="306" y="1799.66" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Request review → send</text>
+<rect x="281" y="1817.47" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="282" y="1818.47" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="282" y1="1832.97" x2="512" y2="1832.97" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="287" y="1821.47" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="477" y="1821.47" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="289" y="1840.47" width="97.19" height="5" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="289" y="1850.47" width="172.8" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="289" y="1860.47" width="129.59" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="289" y="1872.47" width="46" height="13" rx="3" fill="rgb(82, 82, 91)"/>
+<text x="281" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="318.66" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> change-summary likhta → Send.</text>
+<text x="281" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="325.34" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> client ko link + email jaata (woh</text>
+<text x="281" y="2034.22" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">missing trigger).</text>
+<text x="380.31" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="393.56" y1="2038.47" x2="512.78" y2="2038.47" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="393.56" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§16 request-review</text>
+<text x="517.75" y="1917.54" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="543" y="1787.47" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="548.69" y="1799.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">3</text>
+<text x="568" y="1799.66" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Client comment pins</text>
+<rect x="543" y="1817.47" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="544" y="1818.47" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="544" y1="1832.97" x2="774" y2="1832.97" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="625.28" y="1827.07" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(156, 163, 175)" font-weight="700" xml:space="preserve">client · comment</text>
+<rect x="552" y="1841.47" width="214" height="26" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="584" y="1839.47" width="13" height="13" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="588.08" y="1848.37" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="8" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">1</text>
+<rect x="562" y="1867.47" width="13" height="13" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="566.08" y="1876.37" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="8" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">2</text>
+<text x="543" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="580.66" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> client page pe pins lagata,</text>
+<text x="543" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">likhta.</text>
+<text x="581.77" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="626.11" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> canvas pe comment</text>
+<text x="543" y="2034.22" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">dots + threads.</text>
+<text x="635.31" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="648.56" y1="2038.47" x2="728.05" y2="2038.47" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="648.56" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§17 comments</text>
+<text x="779.75" y="1917.54" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="805" y="1787.47" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="810.69" y="1799.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">4</text>
+<text x="830" y="1799.66" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Agency resolve</text>
+<rect x="805" y="1817.47" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="806" y="1818.47" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="806" y1="1832.97" x2="1036" y2="1832.97" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="811" y="1821.47" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1001" y="1821.47" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="814" y="1841.47" width="170" height="26" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="846" y="1839.47" width="13" height="13" rx="999" fill="rgb(212, 212, 216)"/>
+<text x="850.08" y="1848.37" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="8" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">✓</text>
+<rect x="992" y="1833.47" width="44" height="141" rx="3" fill="rgb(255, 255, 255)"/>
+<line x1="992.5" y1="1833.47" x2="992.5" y2="1974.47" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="993" y="1834.47" width="42" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="997" y="1838.47" width="31.5" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="997" y="1847.47" width="30" height="9" rx="2" fill="rgb(45, 109, 255)"/>
+<text x="805" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="842.66" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> comment fix karta → Resolve.</text>
+<text x="805" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="849.34" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> pin ✓ ho jaata, thread band.</text>
+<text x="1019.92" y="2016.02" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="805" y1="2038.47" x2="884.48" y2="2038.47" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="805" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§17 comments</text>
+<text x="1041.75" y="1917.54" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="1067" y="1787.47" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="1072.69" y="1799.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">5</text>
+<text x="1092" y="1799.66" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Re-share / approved</text>
+<rect x="1067" y="1817.47" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="1068" y="1818.47" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="1068" y1="1832.97" x2="1298" y2="1832.97" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1073" y="1821.47" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="1259.28" y="1827.07" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">approved</text>
+<text x="1179.08" y="1894.37" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="13" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">✓</text>
+<rect x="1118.8" y="1901.97" width="128.39" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="1161" y="1911.97" width="44" height="12" rx="3" fill="rgb(82, 82, 91)"/>
+<text x="1067" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="1104.66" y="1996.72" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> resolved → dobara share /</text>
+<text x="1067" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">approve.</text>
+<text x="1121.45" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="1165.8" y="2015.47" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> loop band — koi</text>
+<text x="1067" y="2034.22" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">dead-end nahi.</text>
+<text x="1159.23" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="1172.48" y1="2038.47" x2="1232.09" y2="2038.47" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="1172.48" y="2034.77" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§18 share</text>
+<line x1="19" y1="2061.22" x2="1641" y2="2061.22" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<text x="19" y="2085.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(26, 26, 26)" font-weight="700" xml:space="preserve">Job ne shape kaise diya:</text>
+<text x="176.28" y="2085.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve"> sign-off ek</text>
+<text x="249.5" y="2085.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve">round-trip</text>
+<text x="311.59" y="2085.62" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve"> hai, alag screens nahi — send→comment→resolve→resend. Yeh agency differentiator; isiliye iska flow poora hona zaroori (sirf "comments panel" spec kaafi nahi). Honesty: share-gate abhi 🟡 (badge tak gated).</text>
+<rect x="0" y="2132.16" width="1660" height="447.31" rx="12" fill="none" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<rect x="19" y="2154.16" width="33.66" height="21" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="28" y="2168.56" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="13" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">J6</text>
+<text x="62.66" y="2168.06" font-family="General Sans, Inter, sans-serif" font-size="18" fill="rgb(26, 26, 26)" font-weight="600" xml:space="preserve"> Ship it</text>
+<text x="19" y="2191.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">User:</text>
+<text x="53.86" y="2191.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> builder ready to go live.</text>
+<text x="203.08" y="2191.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">Done when:</text>
+<text x="279.14" y="2191.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> the site is published at a real URL, recoverable if wrong.</text>
+<text x="622.97" y="2191.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" font-weight="700" xml:space="preserve">The job pulls toward one button:</text>
+<text x="831.44" y="2191.06" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve"> Publish is the hero; SEO/domain are the setup</text>
+<text x="19" y="2212.49" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(107, 114, 128)" xml:space="preserve">before it, status + restore are the safety after.</text>
+<rect x="19" y="2242.03" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="24.69" y="2254.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">1</text>
+<text x="44" y="2254.23" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> SEO set</text>
+<rect x="19" y="2272.03" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="20" y="2273.03" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="20" y1="2287.53" x2="250" y2="2287.53" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="25" y="2276.03" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="215" y="2276.03" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="21" y="2289.03" width="228" height="139" rx="2" fill="none" stroke="rgb(45, 109, 255)" stroke-width="2"/>
+<rect x="27" y="2295.03" width="86.39" height="5" rx="2" fill="rgb(63, 63, 70)"/>
+<rect x="27" y="2304.03" width="216" height="11" rx="2" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="27" y="2319.03" width="118.8" height="4" rx="2" fill="rgb(45, 109, 255)"/>
+<rect x="27" y="2327.03" width="162" height="4" rx="2" fill="rgb(13, 148, 136)"/>
+<text x="19" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="56.66" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> title + description likhta.</text>
+<text x="205.22" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="19" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> live Google search-preview + char-</text>
+<text x="19" y="2488.78" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">count.</text>
+<text x="59.48" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="72.73" y1="2493.03" x2="119.09" y2="2493.03" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="72.73" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§19 SEO</text>
+<text x="255.75" y="2381.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="281" y="2242.03" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="286.69" y="2254.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">2</text>
+<text x="306" y="2254.23" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Domain connect</text>
+<rect x="281" y="2272.03" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="282" y="2273.03" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="282" y1="2287.53" x2="512" y2="2287.53" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="287" y="2276.03" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="477" y="2276.03" width="30" height="8" rx="999" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="289" y="2295.53" width="97.19" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<text x="501.38" y="2299.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">✓</text>
+<rect x="289" y="2305.53" width="75.59" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<text x="501.38" y="2309.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(107, 114, 128)" font-weight="700" xml:space="preserve">◐</text>
+<text x="281" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="318.66" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> apna domain connect karta</text>
+<text x="281" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">(CNAME copy).</text>
+<text x="374.36" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="418.7" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> verifying →</text>
+<text x="281" y="2488.78" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">verified states.</text>
+<text x="371.13" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="384.38" y1="2493.03" x2="457.23" y2="2493.03" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="384.38" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§21 domains</text>
+<text x="517.75" y="2381.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="543" y="2242.03" width="18" height="18" rx="999" fill="rgb(45, 109, 255)"/>
+<text x="548.69" y="2254.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">3</text>
+<text x="568" y="2254.23" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Publish (the hero)</text>
+<rect x="543" y="2272.03" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="544" y="2273.03" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="544" y1="2287.53" x2="774" y2="2287.53" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="549" y="2276.03" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="735" y="2276.03" width="34" height="8" rx="3" fill="rgb(82, 82, 91)" stroke="rgb(82, 82, 91)" stroke-width="1"/>
+<rect x="632" y="2344.53" width="54" height="18" rx="4" fill="rgb(82, 82, 91)"/>
+<rect x="616.2" y="2367.53" width="85.59" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<text x="543" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="580.66" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> Publish dabata.</text>
+<text x="677.95" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="722.3" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> ek hi</text>
+<text x="543" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">dark button — yeh tool ka maqsad (#5).</text>
+<text x="543" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="556.25" y1="2493.03" x2="662.22" y2="2493.03" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="556.25" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§14 publish-flow</text>
+<text x="779.75" y="2381.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="805" y="2242.03" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="810.69" y="2254.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">4</text>
+<text x="830" y="2254.23" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Building → live</text>
+<rect x="805" y="2272.03" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="806" y="2273.03" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="806" y1="2287.53" x2="1036" y2="2287.53" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="811" y="2276.03" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="1005.7" y="2281.63" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">● live</text>
+<rect x="814" y="2340.53" width="8" height="8" rx="999" fill="rgb(45, 109, 255)"/>
+<rect x="826" y="2342.03" width="85.59" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<rect x="814" y="2353.53" width="214" height="11" rx="3" fill="rgb(244, 244, 245)" stroke="rgb(45, 109, 255)" stroke-width="1"/>
+<text x="814" y="2374.63" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="7" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">site.com ↗</text>
+<text x="805" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="842.66" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> rukta.</text>
+<text x="883.39" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="927.73" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> Building… → ●</text>
+<text x="805" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">Live + clickable URL. (fail → retry</text>
+<text x="805" y="2488.78" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">state).</text>
+<text x="846.22" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="859.47" y1="2493.03" x2="965.44" y2="2493.03" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="859.47" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§14 publish-flow</text>
+<text x="1041.75" y="2381.48" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="22" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">→</text>
+<rect x="1067" y="2242.03" width="18" height="18" rx="999" fill="rgb(63, 63, 70)"/>
+<text x="1072.69" y="2254.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(255, 255, 255)" font-weight="700" xml:space="preserve">5</text>
+<text x="1092" y="2254.23" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve"> Restore safety net</text>
+<rect x="1067" y="2272.03" width="232" height="158" rx="7" fill="rgb(255, 255, 255)" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="1068" y="2273.03" width="230" height="15" fill="rgb(255, 255, 255)"/>
+<line x1="1068" y1="2287.53" x2="1298" y2="2287.53" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<rect x="1073" y="2276.03" width="20" height="8" rx="999" fill="none" stroke="rgb(212, 212, 216)" stroke-width="1"/>
+<text x="1286.75" y="2281.93" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="8" fill="rgb(63, 63, 70)" font-weight="700" xml:space="preserve">⏱</text>
+<rect x="1074" y="2294.03" width="218" height="12" rx="2" fill="none" stroke="rgb(63, 63, 70)" stroke-width="1"/>
+<rect x="1079" y="2297.53" width="83.19" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<text x="1283.38" y="2301.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(45, 109, 255)" font-weight="700" xml:space="preserve">●</text>
+<rect x="1078" y="2311.53" width="73.5" height="5" rx="2" fill="rgb(212, 212, 216)"/>
+<text x="1284.38" y="2315.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="6" fill="rgb(107, 114, 128)" font-weight="700" xml:space="preserve">↺</text>
+<text x="1067" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Karta:</text>
+<text x="1104.66" y="2451.28" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> galti hui to history (⌗/⏱) →</text>
+<text x="1067" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">Restore.</text>
+<text x="1119.06" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(45, 109, 255)" font-weight="650" xml:space="preserve">Dikhta:</text>
+<text x="1163.41" y="2470.03" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve"> cloud-backed</text>
+<text x="1067" y="2488.78" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="12.5" fill="rgb(82, 82, 91)" xml:space="preserve">versions, wapas la sakta.</text>
+<text x="1215.89" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(156, 163, 175)" xml:space="preserve">→</text>
+<line x1="1067" y1="2511.78" x2="1249.02" y2="2511.78" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="1229.14" y="2489.33" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">§23</text>
+<text x="1067" y="2508.08" font-family="ui-monospace, SF Mono, Geist Mono, Menlo, monospace" font-size="11" fill="rgb(45, 109, 255)" xml:space="preserve">version-history</text>
+<line x1="19" y1="2534.53" x2="1641" y2="2534.53" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<text x="19" y="2558.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(26, 26, 26)" font-weight="700" xml:space="preserve">Job ne shape kaise diya:</text>
+<text x="176.28" y="2558.93" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="13" fill="rgb(82, 82, 91)" xml:space="preserve"> ship ek arc hai — setup (SEO/domain) → ek hero (Publish) → safety (status + restore). Publish topbar mein hero rehta (infrequent par the goal, #5/#16). Honesty: redirects/domains backend-gaps badge tak honest.</text>
+<rect x="0" y="2605.47" width="1120" height="80.19" rx="10" fill="none" stroke="rgb(229, 231, 235)" stroke-width="1" stroke-dasharray="3 2"/>
+<text x="17" y="2638.17" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(26, 26, 26)" font-weight="700" xml:space="preserve">5 flows = top-level structure.</text>
+<text x="217" y="2638.17" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(107, 114, 128)" xml:space="preserve"> Yeh user ki journeys hain — spine. Har step ke neeche</text>
+<text x="571.44" y="2638.17" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(107, 114, 128)" xml:space="preserve">→ §N</text>
+<text x="606.22" y="2638.17" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(107, 114, 128)" xml:space="preserve"> uske</text>
+<line x1="643.95" y1="2642.97" x2="792.17" y2="2642.97" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="643.95" y="2638.17" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(45, 109, 255)" xml:space="preserve">surface spec (§0–§38)</text>
+<text x="792.17" y="2638.17" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(107, 114, 128)" xml:space="preserve"> ko point karta: woh specs ab</text>
+<text x="984.28" y="2638.17" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(107, 114, 128)" xml:space="preserve">flows ke blocks</text>
+<text x="17" y="2661.26" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="14" fill="rgb(107, 114, 128)" xml:space="preserve"> hain, top-level list nahi.</text>
+<line x1="0" y1="2714.16" x2="1120" y2="2714.16" stroke="rgb(229, 231, 235)" stroke-width="1"/>
+<text x="0" y="2743.25" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15.3" fill="rgb(107, 114, 128)" xml:space="preserve">Method:</text>
+<line x1="61.91" y1="2748.16" x2="228.95" y2="2748.16" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="61.91" y="2743.25" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15.3" fill="rgb(45, 109, 255)" xml:space="preserve">L17 job-first then blocks</text>
+<text x="228.95" y="2743.25" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15.3" fill="rgb(107, 114, 128)" xml:space="preserve"> · grouping by</text>
+<line x1="328.53" y1="2748.16" x2="509.42" y2="2748.16" stroke="rgb(239, 244, 255)" stroke-width="1"/>
+<text x="328.53" y="2743.25" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15.3" fill="rgb(45, 109, 255)" xml:space="preserve">#10 intent / #14 one home</text>
+<text x="509.42" y="2743.25" font-family="Inter Tight, Inter, -apple-system, system-ui, sans-serif" font-size="15.3" fill="rgb(107, 114, 128)" xml:space="preserve">. The journey is the unit, not the screen.</text>
+</svg>

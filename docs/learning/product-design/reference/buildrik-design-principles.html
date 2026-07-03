@@ -122,11 +122,34 @@
     <p class="test">Test: have I designed empty · loading · error · the edge (too-long / too-many)? If not, it's not done.</p>
   </div>
 
+  <p class="grp">Structure — where everything lives</p>
+
+  <div class="prin">
+    <h3><span class="n">14</span> Every feature has one home</h3>
+    <p class="rule">Each feature is reachable from exactly one place, grouped by the user's <em>job</em> — not by the backend module that built it. The two surfaces split by scope: Editor = inside one site; Dashboard = across sites / the business.</p>
+    <p class="use">"Site settings" lived in three places (editor tab · dashboard · settings hub) → picked one. The feature list was grouped by PRD module (the system's shape) → regroup by the six user jobs. This is the whole-product big brother of #10 "Group by intent".</p>
+    <p class="test">Test: can a user reach this from two places? And does its group name a user job, or a backend module?</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">15</span> Lock the spine; dock additions to the edge</h3>
+    <p class="rule">The core layout — rail slots, topbar zones, the one hero button, the inspector frame — holds a fixed position across every version. A new feature never reorders the spine; it docks into an existing home (a panel, a sub-tab, the ⋯ overflow).</p>
+    <p class="use">➕ Insert stays rail-slot #1 forever; a new element type goes <em>inside</em> the Insert panel, not as a new rail icon. The user's muscle memory survives every release. (Visible promise = spatial stability / consistency; the "why" = pace layering — fast features must not move the slow core.)</p>
+    <p class="test">Test: did adding this move anything the user already knew the position of? If yes — redock it to the edge.</p>
+  </div>
+
+  <div class="prin">
+    <h3><span class="n">16</span> Tools live near the work</h3>
+    <p class="rule">A control's <em>distance</em> from the thing it acts on is set by how often it's used. Frequent canvas operations — undo/redo, edit history, breakpoint switch, zoom — hug the canvas (a canvas toolbar). The topbar carries only <em>rare, global</em> actions: publish, share, exit, account. Reaching across the screen for a frequent action is a tax.</p>
+    <p class="use">Undo/redo + breakpoints + history left the topbar for a canvas toolbar; the topbar slimmed to Exit · Share · Publish · ⋯ — every survivor infrequent or global. Frequency decides not just how <em>loud</em> a control is (#4) but <em>where</em> it lives. Grounding: Fitts's Law (distance to target = effort) + the "tools near work" pattern in Figma/Framer.</p>
+    <p class="test">Test: how often is this used, and what does it act on? Frequent + acts-on-canvas → put it by the canvas. Rare + global → topbar / ⋯.</p>
+  </div>
+
   <h2>How to use this</h2>
   <p>Designing any surface? Run the <a href="../lessons/0004-design-to-build-handoff.html">five-step loop</a> — inventory → decide (cite a principle for each call) → 4-part handoff → build → next — and let these rules settle every decision. A "complete" surface is one designed in <a href="states-checklist.html">all its states</a> (#13), not just at rest. Disagreement is resolved by pointing at a number, not by opinion.</p>
   <p><strong>Principles vs patterns.</strong> Keep this list small and general. Situation-specific rules ("how we do an empty state", "how we confirm a delete") are <em>patterns</em>, which live a level below and grow freely. The hierarchy: <strong>Principles</strong> (few, general — this page) → <strong>Patterns</strong> (recurring solutions) → <strong>Components</strong> (real buttons/cards) → <strong>Tokens</strong> (colour/spacing/type). New situations usually add a pattern, not a principle. Principles are sharpened, added, or retired only rarely — but always written here first, so the whole editor moves together.</p>
 
-  <p class="source">This constitution distils five lessons (<a href="../lessons/0001-audit-your-editor.html">1</a>–<a href="../lessons/0005-the-topbar-is-a-bouncer.html">5</a>) into one page. Grounding source: <a href="https://www.nngroup.com/articles/ten-usability-heuristics/" target="_blank" rel="noopener">NN/g 10 Usability Heuristics</a>. Inspiration for "design principles as a constitution": <a href="https://www.designsystems.com/" target="_blank" rel="noopener">designsystems.com</a>.</p>
+  <p class="source">This constitution distils the course lessons (<a href="../lessons/0001-audit-your-editor.html">1</a>–5, plus later additions through <a href="../lessons/0020-tools-live-near-the-work.html">L20</a> = principle #16) into one page. Grounding source: <a href="https://www.nngroup.com/articles/ten-usability-heuristics/" target="_blank" rel="noopener">NN/g 10 Usability Heuristics</a>. Inspiration for "design principles as a constitution": <a href="https://www.designsystems.com/" target="_blank" rel="noopener">designsystems.com</a>.</p>
   <p class="fine">Think a principle is wrong, or missing? Tell me — we revise the constitution together. That's how a design language stays alive.</p>
 </main>
 </body>

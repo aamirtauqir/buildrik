@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 20 — Tools live near the work</title>
+<link rel="stylesheet" href="../assets/course.css">
+<link rel="stylesheet" href="../assets/wireframe.css">
+<style>
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .split .c{border:1px solid var(--rule);border-radius:9px;padding:12px 14px}
+  .split .near h4{color:#0F766E}.split .far h4{color:#B45309}
+  .split h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+  .split ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.7}
+  table td:first-child{font-weight:600}
+  @media(max-width:560px){.split{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 20 · ~5 minutes</p>
+  <h1>Tools live near the work.</h1>
+  <p class="lede">Aap ne ek paini baat kahi: <em>"jo cheezein canvas ka hissa hain — undo/redo, history, breakpoints — unhe canvas ke saath rakho. Topbar saaf rakho; us mein sirf woh daalo jo frequently use nahi hoti."</em> Yeh ek asli principle hai — aur yeh aap ke <a href="0005-the-topbar-is-a-bouncer.html">L5 (bouncer)</a> ko tez karta hai: ab faisla sirf "topbar mein jagah milе ya nahi" nahi, balke <strong>"yeh control kahan rahega"</strong> — uski frequency se.</p>
+
+  <h2>Frequency sirf 'kitna loud' nahi — 'kahan' bhi decide karti hai</h2>
+  <p>Aap ka <a href="../reference/buildrik-design-principles.html">#4</a> kehta hai: zyada use = zyada <em>numayan</em>. Yeh lesson ek doosra axis jodता hai: zyada use = <strong>kaam ke kareeb</strong>. Door chrome (topbar) tak baar-baar haath le jaana ek <em>tax</em> hai — har baar cursor + nazar ko safar karna padta hai. Iska naam <strong>Fitts's Law</strong>: target jitna door, utna time + effort. <a href="https://www.nngroup.com/articles/fitts-law/" target="_blank" rel="noopener">(NN/g)</a></p>
+
+  <div class="split">
+    <div class="c near"><h4>Near the canvas (frequent · canvas-op)</h4>
+      <ul>
+        <li><strong>Undo / redo</strong> — har minute</li>
+        <li><strong>Breakpoint / device switch</strong> — responsive banate waqt baar-baar</li>
+        <li><strong>Edit history</strong> (timeline)</li>
+        <li><strong>Zoom</strong></li>
+      </ul>
+    </div>
+    <div class="c far"><h4>Topbar (rare · global)</h4>
+      <ul>
+        <li><strong>Publish</strong> — kabhi-kabhi (par hero, #5)</li>
+        <li><strong>Share / Review</strong></li>
+        <li><strong>Exit</strong></li>
+        <li><strong>⋯</strong> Help · Account · Invite</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">Note: Publish <em>infrequent</em> hai (aap der tak build karte ho, publish kabhi-kabhi) — isliye woh topbar mein theek baithta hai. "Topbar = rare/global" aur "Publish = hero" mein koi takraao nahi: woh rare-but-important global ship-action hai.</div>
+
+  <h2>Wireframe par: canvas toolbar nikalta hai, topbar patla hota</h2>
+  <div class="wf">
+    <div class="wf-frame">
+      <div style="display:grid;grid-template-rows:30px 26px 1fr">
+        <div class="wf-shell__bar" style="height:30px"><span class="wf-label">‹ Exit</span><span class="wf-grow"></span><span class="wf-pill">Share</span><span class="wf-pill wf-pill--solid">Publish</span><span class="wf-label">⋯</span><span class="wf-tag">1</span></div>
+        <div style="border-bottom:1px solid var(--wf-line);background:var(--wf-fill);display:flex;align-items:center;gap:8px;padding:0 10px"><span class="wf-tag">2</span><span class="wf-pill">↶</span><span class="wf-pill">↷</span><span class="wf-pill">⏱ History</span><span class="wf-grow" style="text-align:center"><span class="wf-pill wf-pill--on">▭</span><span class="wf-pill">▢</span><span class="wf-pill">▯</span></span><span class="wf-pill">− 100% +</span></div>
+        <div class="wf-shell__canvas" style="min-height:120px"><span class="wf-label">canvas</span><div class="wf-img" style="height:46px;margin-top:8px"></div></div>
+      </div>
+    </div>
+    <p class="wf-frame__caption">slim topbar (rare/global) · canvas toolbar hugs the canvas (frequent ops)</p>
+    <ol class="wf-why">
+      <li><span class="wf-tag">1</span><strong>Topbar = sirf rare/global.</strong> Exit · Share · Publish · ⋯. Undo/breakpoints chale gaye → topbar saaf, kam shor (#8 subtract + #16).</li>
+      <li><span class="wf-tag">2</span><strong>Canvas toolbar = frequent canvas-ops.</strong> Undo/redo + history (left) · device-switch (center, kyunki yeh canvas ka <em>lens</em> hai) · zoom (right). Sab kaam ke kareeb (#16, Fitts).</li>
+    </ol>
+  </div>
+  <p class="fine">Yeh shipped topbar ko <em>re-lay-out</em> karega (undo/redo + breakpoints abhi topbar mein hain) — handlers same, sirf buttons neeche shift. "Move the boxes, keep the wires" (<a href="0008-build-without-breaking.html">L8</a>).</p>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Fitts's Law: target jitna door, utna zyada time aur effort use karne mein. Isliye frequent control ko kaam ke kareeb rakhte hain — door topbar tak baar-baar jaana tax hai.">
+      <p class="q-stem">Frequent control kaam ke kareeb kyun?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>far targets cost more</button>
+        <button class="q-opt">near targets look nicer</button>
+        <button class="q-opt">the topbar stays empty</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Topbar = rare + global. Undo/redo frequent canvas-op hai → canvas toolbar. Publish rare hai → topbar mein theek (hero ho ke bhi). Breakpoints frequent → canvas.">
+      <p class="q-stem">In mein se topbar mein kya rehta hai?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>the publish action</button>
+        <button class="q-opt">the undo button</button>
+        <button class="q-opt">the breakpoint switch</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="#4 frequency se 'kitna loud' decide hota; #16 frequency se 'kahan' decide hota. Do alag axis — ek prominence, doosra proximity (Fitts).">
+      <p class="q-stem">Frequency 'kahan rahe' decide kare — kaunsa rule?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>tools near work</button>
+        <button class="q-opt">lock the spine</button>
+        <button class="q-opt">one clear home</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Yeh aap ki <a href="../reference/buildrik-design-principles.html">constitution</a> mein <strong>#16 — "Tools live near the work"</strong> ban gaya (Structure group). Aur <a href="../reference/editor-wireframe.html">wireframe</a> update kar diya: topbar patla, canvas toolbar nikla. Yeh L5 (bouncer) ka agla qadam hai — pehle "topbar mein default NO"; ab "frequent canvas-op? to topbar nahi — canvas." Topbar ab sach mein saaf: sirf woh jo aap roz nahi chhute.</p>
+
+  <p class="source">Sources: <a href="https://www.nngroup.com/articles/fitts-law/" target="_blank" rel="noopener">NN/g — Fitts's Law</a> (distance = effort) · <a href="https://lawsofux.com/fittss-law/" target="_blank" rel="noopener">Laws of UX — Fitts's Law</a> · pattern: Figma/Framer canvas toolbars. Engine: <a href="../reference/buildrik-design-principles.html">constitution #16</a>, refines <a href="0005-the-topbar-is-a-bouncer.html">L5</a>. Kuch atke — poocho, main aap ka teacher hun.</p>
+  <p class="fine">Next: <strong>"next batch"</strong> — Stage-2 jaari (B2 sign-off loop: Preview · Review · Comments · Share). Canvas-toolbar change har drawn screen mein already reflect ho jaayega.</p>
+
+  <div class="nav">
+    <a href="0019-the-redesign-pipeline.html">← L19 · The pipeline</a>
+    <a href="../reference/buildrik-design-principles.html">The constitution →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

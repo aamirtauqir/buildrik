@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A model agency interview — annotated</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .turn{margin:14px 0}
+  .turn .who{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin:0 0 3px}
+  .turn .bub{border:1px solid var(--rule);border-radius:10px;padding:10px 14px;font-size:15px}
+  .turn.qn .who{color:var(--accent)} .turn.qn .bub{background:var(--accent-soft);border-color:#BFD4FF}
+  .turn.an .who{color:var(--good)} .turn.an .bub{background:#F0FDFA;border-color:#A7F3D0}
+  .why{font-size:13px;color:var(--muted);margin:5px 0 0 4px;border-left:2px solid var(--rule);padding:2px 0 2px 10px}
+  .why b{color:var(--ink)}
+  .coach{border:1px solid #FECACA;background:#FEF2F2;border-radius:10px;padding:12px 14px;margin:16px 0;font-size:14.5px}
+  .coach b{color:var(--bad)}
+  .verdict{border:1px solid #A7F3D0;background:#F0FDFA;border-radius:10px;padding:14px 16px;margin:18px 0}
+  .verdict ul{margin:8px 0 0;padding-left:20px;font-size:14.5px} .verdict li{margin:0 0 4px}
+  .moves{counter-reset:m;list-style:none;padding:0;margin:14px 0}
+  .moves li{counter-increment:m;position:relative;padding:8px 12px 8px 40px;border:1px solid var(--rule);border-radius:9px;margin:0 0 7px;font-size:15px}
+  .moves li::before{content:counter(m);position:absolute;left:10px;top:8px;width:22px;height:22px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font:700 12px/22px Inter;text-align:center}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Validation · model interview (annotated) · 2026-06-29</p>
+  <h1>A model agency interview — annotated.</h1>
+  <p class="lede">The demand-gate call, run end-to-end against a (fake) agency owner — <strong>Sara</strong>, who runs a 6-person web agency. Re-read this before each real call. The annotations show <em>why</em> each move works. Real pull only comes from real agencies — this just teaches the moves.</p>
+
+  <div class="panel">
+    <strong>The scene.</strong> Sara runs a small web agency (~12 active client sites on Webflow). She's busy, gets pitched constantly, and will be <em>polite</em> the moment you describe your product. Your job: learn her real pain without ever pitching — until the very end.
+  </div>
+
+  <h2>The call</h2>
+
+  <div class="turn qn"><p class="who">You</p><div class="bub">"No pitch — I just want to learn. Sara, tell me about the last time a client asked for a brand change across their whole site — logo, colors, or font. What happened?"</div></div>
+  <p class="why"><b>Why:</b> Didn't touch your idea. "Last time" = a past specific. Asked about <em>her</em> life, not your tool.</p>
+
+  <div class="turn an"><p class="who">Sara</p><div class="bub">"Ugh, just last month. A restaurant client rebranded — new logo, new colors. Their site was on Webflow, 14 pages. I had to open every page myself."</div></div>
+
+  <div class="turn qn"><p class="who">You</p><div class="bub">"14 pages manually... how long did that take, and who does that work?"</div></div>
+  <p class="why"><b>Why:</b> Grabbed the number ("14 pages") and dug the cost — time, who. Asked for a fact, not a compliment.</p>
+
+  <div class="turn an"><p class="who">Sara</p><div class="bub">"My junior did it, a whole day. And honestly... an old logo got left in one footer. The client caught it three days later. Awkward."</div></div>
+  <p class="why"><b>Why this is gold:</b> An unprompted failure story — real pain she volunteered once the question was specific enough.</p>
+
+  <div class="turn qn"><p class="who">You</p><div class="bub">"What did that footer-logo slip do to the client relationship?"</div></div>
+  <p class="why"><b>Why:</b> Dug the <em>consequence</em> — pain that compounds beyond the first answer.</p>
+
+  <div class="turn an"><p class="who">Sara</p><div class="bub">"Client was a bit annoyed — 'you guys are usually careful.' Small thing, but a scratch on trust. Now I double-check every rebrand myself, which eats more time."</div></div>
+
+  <div class="turn qn"><p class="who">You</p><div class="bub">"For multi-page changes like that, what do you use today — any tool, or manual?"</div></div>
+  <p class="why"><b>Why:</b> Current solution + its gap = the exact slot your wedge fills. Still no pitch.</p>
+
+  <div class="turn an"><p class="who">Sara</p><div class="bub">"Webflow plus a shared Figma where we keep brand assets. But Figma-to-Webflow is all by hand. Copy, paste, every page. No 'change once, apply everywhere.'"</div></div>
+
+  <div class="turn qn"><p class="who">You</p><div class="bub">"What do you all pay for this today — Webflow, Figma, anything else?"</div></div>
+
+  <div class="turn an"><p class="who">Sara</p><div class="bub">"Webflow per-site, Figma seats, and... honestly the most expensive thing is my junior's time. Every rebrand is basically one-to-two days of labor. We do 2-3 a month."</div></div>
+  <p class="why"><b>Why:</b> Money quantified — tool fees + the real cost, labor-days × 2-3/month. This is the "spent money/time" signal the gate needs.</p>
+
+  <div class="coach">
+    <b>⚠ Here's where a new founder slips.</b> Sara just named the pain — you'll <em>want</em> to blurt "That's exactly what we're building — change once, apply everywhere!" <b>Don't.</b> The second you pitch, Sara goes polite — "oh nice, sounds useful" (= zero signal). One more question, then show the design last.
+  </div>
+
+  <div class="turn qn"><p class="who">You</p><div class="bub">"When did the agency last adopt a new tool, and what pushed the switch?"</div></div>
+  <p class="why"><b>Why:</b> Finds her buying-trigger — <em>when</em> she actually switches — so you learn how to sell later.</p>
+
+  <div class="turn an"><p class="who">Sara</p><div class="bub">"Moved to Webflow from WordPress last year — maintenance was a nightmare for clients. We switched when two clients had hacked-site complaints. We move when the pain becomes client-facing."</div></div>
+
+  <h2>Now the design — last</h2>
+  <div class="turn qn"><p class="who">You</p><div class="bub">"Can I show you one thing — tell me if it touches your restaurant-rebrand case?" <em>(share the handoff + the ★ wedge journey)</em></div></div>
+
+  <div class="turn an"><p class="who">Sara</p><div class="bub"><em>(leans in)</em> "Wait — this changes one master brand and pushes it to every client site? One click? ...That saves me a day on every rebrand. When can I get this?"</div></div>
+  <p class="why"><b>"When can I get this?" = PULL.</b> A reaction to a real flow, not an opinion on a pitch. Because you hid the idea, this reaction is real.</p>
+
+  <div class="verdict">
+    <strong>Verdict — Sara = ▲ PULL</strong>
+    <ul>
+      <li>unprompted pain ✓ (the footer error, she volunteered it)</li>
+      <li>spends money / time ✓ (2-3 labor-days a month)</li>
+      <li>"when can I get this?" ✓</li>
+      <li>current workaround has a clear gap ✓ (Figma → Webflow, manual)</li>
+    </ul>
+    <p style="margin:10px 0 0;font-size:14px"><strong>1 of 5 done. Sara counts.</strong> You need ≥3 of 5 to fund the build (see <a href="agency-validation-plan.html">the gate</a>).</p>
+  </div>
+
+  <h2>The five moves you just saw</h2>
+  <ol class="moves">
+    <li>Hid the idea till the end → every answer stayed honest.</li>
+    <li>"Last time" / "how long" / "who" — past + numbers, never "would you."</li>
+    <li>Dug the <em>consequence</em> (trust, extra QA), not just the first answer.</li>
+    <li>Spotted the pitch-trap — felt the urge, stopped.</li>
+    <li>Showed the design LAST → got a real reaction, not politeness.</li>
+  </ol>
+
+  <div class="panel panel--accent">
+    <strong>This was a demo — Sara is fake.</strong> Real pull only comes from real agencies. Send <a href="agency-validation-plan.html">the outreach</a>, run 5 calls, follow this same arc. After your first real call, bring the notes back — we'll read it together: pull, or just politeness?
+  </div>
+
+  <p class="source">Primary source: <a href="https://www.momtestbook.com/" target="_blank" rel="noopener">The Mom Test — Rob Fitzpatrick</a>. Method: <a href="../lessons/0025-validate-with-real-agencies.html">Lesson 25</a>. Runnable plan: <a href="agency-validation-plan.html">agency-validation-plan.html</a>.</p>
+
+  <div class="nav">
+    <a href="agency-validation-plan.html">← The validation plan</a>
+    <a href="../lessons/0025-validate-with-real-agencies.html">L25 · How to validate →</a>
+  </div>
+</main>
+</body>
+</html>

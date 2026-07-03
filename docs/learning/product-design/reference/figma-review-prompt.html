@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figma-review prompt — make the AI find your file's issues</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .tmpl{background:var(--bg-2,#f9fafb);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;margin:10px 0;font-size:12.5px;line-height:1.6;white-space:pre-wrap;font-family:var(--bd-mono,ui-monospace,SFMono-Regular,Menlo,monospace);color:var(--ink)}
+  .tmpl b{color:var(--accent)}
+  table.st{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+  table.st th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);padding:5px 8px;border-bottom:1.5px solid var(--rule)}
+  table.st td{padding:6px 8px;border-bottom:1px solid #f1f1f3;vertical-align:top}
+  table.st td:first-child{font-weight:600;white-space:nowrap}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Figma-review prompt · MCP scan recipe</p>
+  <h1>The AI finds only what you tell it to look for.</h1>
+  <p class="lede">Figma MCP <strong>sees structure, not intent</strong> — it can list frames, nodes, fonts, sizes, overlaps. It <em>cannot</em> judge "this is off-brand" or "this is a dead-end" unless <strong>you hand it the rule</strong>. So your list of issues = your list of criteria. "Review my file" → vague mush. Name the lens + the criteria + the output shape → real issues with node-ids.</p>
+
+  <div class="panel panel--accent">
+    <strong>Rule 0 — read-only, Pro server, one skill first.</strong> Tell it: use the <code>plugin_figma_figma</code> server (saqib/Pro, no cap — <em>not</em> the capped account), load <code>/figma-use</code> before any scan, and <strong>don't edit</strong> — <code>findAll</code> scan only. A review that mutates the file is not a review.
+  </div>
+
+  <h2>The 4 slots — fill them, paste it</h2>
+  <div class="tmpl"><b>ACCESS</b> — which file + "Pro server, load /figma-use, read-only findAll, don't edit."
+
+<b>LENS</b> — which kind of review (pick one or stack): hygiene · brand · coverage.
+
+<b>CRITERIA</b> — the actual rules to check against (your brand tokens, your jobs/flows, "no empty frames"). THIS is what turns the flashlight into a finding.
+
+<b>OUTPUT</b> — the shape: a table (issue · node-id · severity · fix), then screenshot the worst frames so you can eyeball them.</div>
+
+  <h2>The three lenses (what each catches)</h2>
+  <table class="st">
+    <thead><tr><th>Lens</th><th>What it scans</th><th>Criteria you supply</th></tr></thead>
+    <tbody>
+      <tr><td>Hygiene</td><td>empty frames (0 children) · zero-size nodes (w/h=0) · overlaps · off-canvas · dupes</td><td>none — pure structure (the AI knows these)</td></tr>
+      <tr><td>Brand</td><td>every font family · every fill colour</td><td><strong>your allow-list</strong>: General Sans · Inter · Geist · Geist Mono; cobalt <code>#2D6DFF</code> only</td></tr>
+      <tr><td>Coverage</td><td>which jobs/flows have a frame · where flows end</td><td><strong>your 6 jobs</strong> (J1–J6) · "every flow ends on a real state, no dead-end/TODO/blank"</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Worked prompt — your actual file</h2>
+  <div class="tmpl"><b>ACCESS</b> — SCAN my Figma file RmtnWGlZX9Z3idP6f5vmLq for issues. Use the Pro Figma server (plugin_figma_figma). Load /figma-use first. Read-only — findAll over top-level frames, don't edit anything.
+
+<b>LENS</b> — three passes: hygiene, brand, coverage.
+
+<b>CRITERIA</b> —
+  hygiene: flag frames with 0 children, nodes with width or height = 0, overlapping or off-canvas frames, duplicates.
+  brand: list every font family + every fill colour; flag anything NOT in {General Sans, Inter, Geist, Geist Mono} and any accent that isn't cobalt #2D6DFF (purple/violet/indigo banned).
+  coverage: each of my 6 jobs (J1 run-business · J2 start-site · J3 build · J4 on-brand · J5 sign-off · J6 ship) must have a frame; every wireflow must end on a real live/done state — no blank, TODO, or dead-end.
+
+<b>OUTPUT</b> — one table: issue · node-id · severity (P1 blocks / P2 should-fix / P3 polish) · fix. Then get_screenshot the 3 worst frames so I can eyeball them. Re-scan once to confirm counts before reporting.</div>
+
+  <div class="panel" style="border-left:3px solid var(--bad,#dc2626)">
+    <strong>The honest ceiling.</strong> An MCP scan is a <a href="../lessons/0023-audit-jobs-with-wireframes.html">coherence + hygiene</a> review — it proves the file is <em>tidy and on-brand and complete</em>. It can <strong>never</strong> prove the design is <em>right for users</em>. A spotless Figma scan ≠ a validated product; that still needs <a href="agency-validation-plan.html">real agencies</a> (correctness). Don't let a green scan feel like a green light.
+  </div>
+
+  <h2>Eye + structure — pair the two tools</h2>
+  <p><code>findAll</code> reads the tree (counts, names, fonts, sizes) — the <strong>structure</strong>. It can't see "ugly" or "low contrast." For the <strong>eye</strong>, add <code>get_screenshot</code> on the suspect frames — it renders the frame to an image you actually look at. A complete review = scan (structure) <em>+</em> screenshot (eye). Ask for both.</p>
+
+  <p class="source">Pairs with the <a href="build-prompt-template.html">build-prompt template</a> (same fill-the-slots shape, for building not reviewing) and <a href="../lessons/0023-audit-jobs-with-wireframes.html">L23 coherence-vs-correctness</a>. Method record: memory <code>reference_figma_mcp_starter_cap</code> (which server, the capture recipe).</p>
+  <p class="fine">Want me to run the worked prompt above on your file right now? Say "scan it" — I'll do the 3 passes and bring back the table + screenshots.</p>
+</main>
+</body>
+</html>

@@ -126,13 +126,13 @@
     </div>
     <div class="rail">
       <h3>Editor <span class="home editor">inside one site</span></h3>
-      <p class="scope">The existing 4-mode rail, regrouped. CMS rides Pages as a Content view; collab/locale/export = gone (stock stays — env-gated). Share + domains are dashboard-homed.</p>
+      <p class="scope">The <strong>locked 4-slot spine</strong> (#15), code-reconciled 2026-06-28. CMS rides Pages as a Content view; collab/locale/export = gone (stock stays — env-gated). Share + domains are dashboard-homed. AI is <em>cross-cutting</em> (topbar ✨), not a rail slot. <strong>Job-grouping (J3 Build · J4 Brand · J5 Sign-off · J6 Ship) lives in the <a href="wireflows.html">journeys</a>, not the rail labels</strong> — the rail is tool/object-named (Webflow model), the jobs are the flows.</p>
       <div class="tree">
-        <div class="top">[topbar] Exit ‹ breadcrumb · Preview · Publish (hero) · Send for review · ⋯</div>
-        <div class="kid"><span class="bar">├</span> <b>Build</b> — add · pages · layers · CMS content · media · insert-section</div>
-        <div class="kid"><span class="bar">├</span> <b>Design</b> — inspector · Brand (tokens + styles + components, MERGED)</div>
-        <div class="kid"><span class="bar">├</span> <b>AI</b> — assistant</div>
-        <div class="kid"><span class="bar">└</span> <b>Settings</b> — page settings · SEO · forms · publish history</div>
+        <div class="top">[topbar] Exit ‹ breadcrumb · ✨ AI · Preview · Send for review · Publish (hero) · ⋯</div>
+        <div class="kid"><span class="bar">├</span> <b>Insert</b> — add · sections · media · templates · components <span style="color:var(--faint)">(rail #1, locked)</span></div>
+        <div class="kid"><span class="bar">├</span> <b>Pages</b> — pages · layers · CMS Content view</div>
+        <div class="kid"><span class="bar">├</span> <b>Styles</b> — inspector · Brand (tokens + styles + components, MERGED)</div>
+        <div class="kid"><span class="bar">└</span> <b>Site</b> — page settings · SEO · forms · publish history</div>
       </div>
     </div>
   </div>
@@ -201,7 +201,7 @@
         <tr class="slice-row"><td><span class="fname">Add elements / sections · Layers · Edit-scope picker</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">Build rail</td><td class="mono">E S</td><td class="mono-dim">element; add()</td><td class="mono-dim">all</td><td class="mono-dim">canvas</td></tr>
         <tr class="slice-row"><td><span class="fname">Pages manager + page ops (CRUD/reorder/home)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E·S</td><td class="mono-dim">Build › Pages</td><td class="mono">E L X S</td><td class="mono-dim">page; CRUD/reorder()</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
         <tr class="slice-row"><td><span class="fname">Text / heading / links / rich content</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">canvas insert</td><td class="mono">S</td><td class="mono-dim">element</td><td class="mono-dim">all</td><td class="mono-dim">canvas</td></tr>
-        <tr><td><span class="fname">4-mode editor (Build / AI / Design / Settings)</span><span class="fnote">this IS the editor's top-level rail</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">editor rail</td><td class="mono">S</td><td class="mono-dim">—</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
+        <tr><td><span class="fname">Editor rail — Insert · Pages · Styles · Site</span><span class="fnote">locked 4-slot spine (object-named); AI = topbar ✨, not a rail slot; job-grouping lives in the journeys</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p0">P0</span><span class="slice">◆</span></td><td class="mono">E</td><td class="mono-dim">editor rail</td><td class="mono">S</td><td class="mono-dim">—</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
         <tr><td><span class="fname">CMS — collections · records · binding · dynamic pages</span><span class="fnote">server-sync lossy; only 5 of 14 field types creatable; records stuck draft</span></td><td><span class="v v-fix">fix</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S</td><td class="mono-dim">Build › Content</td><td class="mono">E L X S A</td><td class="mono-dim">collection,item; CRUD/publish()</td><td class="mono-dim">all</td><td class="mono-dim">publish toggle</td></tr>
         <tr><td><span class="fname">Media library</span><span class="fnote">editor AND dashboard → editor is home; dashboard read-only</span></td><td><span class="v v-merge">merge</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E·S</td><td class="mono-dim">Build › Media</td><td class="mono">E L X S</td><td class="mono-dim">asset; upload()</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>
         <tr><td><span class="fname">Undo / redo</span><span class="fnote">RAM-only, lost on reload (backend fix later)</span></td><td><span class="v v-keep">keep</span></td><td class="c"><span class="p p-p1">P1</span></td><td class="mono">E</td><td class="mono-dim">⌘Z / ⌘⇧Z</td><td class="mono">S</td><td class="mono-dim">history (RAM)</td><td class="mono-dim">all</td><td class="mono-dim">—</td></tr>

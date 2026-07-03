@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 14 — Structure becomes navigation (the editor rail, explained)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .skel{font-family:"Geist Mono",ui-monospace,monospace;font-size:13px;line-height:1.7;background:#fff;border:1px solid var(--rule);border-radius:10px;padding:16px 18px;margin:16px 0;white-space:pre-wrap}
+  .skel .top{color:var(--accent);font-weight:600}
+  .skel .mode{color:var(--ink);font-weight:700}
+  .skel .in{color:var(--muted)}
+  .skel .gone{color:var(--bad);text-decoration:line-through}
+  table.rail td{font-size:13.5px;vertical-align:top}
+  table.rail td:first-child{font-weight:700;color:var(--accent);width:18%}
+  table.rail td:nth-child(2){width:24%}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .two .box{border:1px solid var(--rule);border-radius:9px;padding:12px 14px;font-size:13px}
+  .two .box b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);margin-bottom:4px}
+  @media(max-width:560px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 14 · ~6 minutes</p>
+  <h1>Structure becomes navigation.</h1>
+  <p class="lede">Step 1 (<a href="0013-one-home-group-by-the-job.html">L13 home-map</a>) ne faisla kiya kaunsa feature kis <em>ghar</em> mein — Editor ya Dashboard. Yeh Step 2 hai: woh ghar asal <strong>menu</strong> kaise bante hain — woh cheez jis par user click karta hai. Aap ne poocha "yeh sab samjhao" — toh editor ke rail ko line-by-line kholte hain.</p>
+
+  <div class="callout">
+    <strong>IA ≠ navigation.</strong> IA = cheezein kaise <em>organize</em> hain (the home-map). Navigation = woh organization user ko <em>kaise dikhti hai</em> (rail, tabs, topbar). Achhi nav bас IA ko honestly mirror karti hai — kuch naya invent nahi karti. <a href="https://www.nngroup.com/articles/ia-vs-navigation/" target="_blank" rel="noopener">(NN/g)</a>
+  </div>
+
+  <h2>The skeleton — annotated</h2>
+<pre class="skel"><span class="top">[topbar]  Exit ‹ breadcrumb · Preview · Publish (hero) · Review/Share · ⋯</span>
+ ├ <span class="mode">Build</span>     <span class="in">→ add · pages · layers · CMS content · media · insert-section</span>
+ ├ <span class="mode">Design</span>    <span class="in">→ inspector · Brand (tokens + styles + components, MERGED)</span>
+ ├ <span class="mode">AI</span>        <span class="in">→ assistant</span>
+ └ <span class="mode">Settings</span>  <span class="in">→ page settings · SEO · domains · forms · publish history</span>
+<span class="gone">   gone: collab · locale · export · stock</span></pre>
+
+  <h2>Editor ki nav do layer mein hai</h2>
+  <div class="two">
+    <div class="box"><b>Topbar</b>Poore site / session ke <em>actions</em>. Hamesha mojood, har mode mein same. "Main kahan hun + bahar nikalna + bhejna."</div>
+    <div class="box"><b>Rail (4 modes)</b>Site ke andar aap jo <em>kaam</em> karte ho. Ek waqt mein ek mode. "Main abhi kya kar raha hun."</div>
+  </div>
+  <p>Yeh do alag sawaal hain — isliye do alag jagah. Action (publish karo) tab par; kaam (page banao) rail par. Inhe mix karna hi "messy" banata hai.</p>
+
+  <h2>The topbar — har item ka kaam</h2>
+  <p>Aap yeh already <a href="0005-the-topbar-is-a-bouncer.html">L5</a> mein bana chuke ho. 3 zone:</p>
+  <table>
+    <tr><th>Zone</th><th>Items</th><th>Kyun</th></tr>
+    <tr><td><strong>Navigate</strong></td><td>Exit ‹ breadcrumb</td><td>kahan hun + wapas dashboard. Left = "back".</td></tr>
+    <tr><td><strong>View</strong></td><td>Preview · Review/Share</td><td>kaam dekho / client ko bhejo (sign-off, J5).</td></tr>
+    <tr><td><strong>Ship</strong></td><td><strong>Publish</strong> · ⋯</td><td>Publish = <em>hero</em> (filled cobalt) — tool isi liye hai (<a href="../reference/buildrik-design-principles.html">#5</a>). ⋯ = rare cheezein (Invite/⌘K/Help/Account) — earns-its-way-in fail (<a href="../reference/buildrik-design-principles.html">#7</a>).</td></tr>
+  </table>
+
+  <h2>The rail — 4 modes = site ke andar 4 kaam</h2>
+  <p>Yeh 4 modes editor ka <strong>primary navigation</strong> hain — tabs ki tarah, ek waqt ek. <a href="https://www.nngroup.com/articles/tabs-used-right/" target="_blank" rel="noopener">(NN/g — Tabs)</a>. Important: yeh rail <em>pehle se</em> sahi tha. Maine naya rail nahi banaya — sirf <strong>andar ki grouping</strong> theek ki.</p>
+  <table class="rail">
+    <tr><th>Mode</th><th>Job</th><th>Andar kya, aur kyun</th></tr>
+    <tr><td>Build</td><td>page banao</td><td>add · pages · layers · CMS content · media · insert-section. <em>Sab "page ko wujood do" actions ek jaga</em> (#10 group-by-job).</td></tr>
+    <tr><td>Design</td><td>brand par lao</td><td>inspector <em>(yeh element)</em> + Brand <em>(poora system)</em>. Do altitude, ek mode — niche dekho.</td></tr>
+    <tr><td>AI</td><td>madad lo</td><td>assistant. Cross-cutting capability ka apna entry-point (key chahiye).</td></tr>
+    <tr><td>Settings</td><td>site configure karo</td><td>page settings · SEO · domains · forms · publish history. Iss site ke "rules", canvas-edit nahi.</td></tr>
+  </table>
+
+  <h2>Design mode ki do altitude (yeh ahem hai)</h2>
+  <div class="two">
+    <div class="box"><b>Inspector</b>Sirf <em>chuna hua element</em> — iss button ka padding, iss text ka size. Local.</div>
+    <div class="box"><b>Brand</b>Poore site ka <em>system</em> — colors, fonts, tokens, reusable components. Ek jaga badlo, har jaga badle.</div>
+  </div>
+  <p>Pehle yeh 3 alag surfaces thin (Design-system <code>ds1</code> + Styles <code>ds2</code> + DS-tools <code>ds3</code>) — teen darwaze ek hi kaam ke. Merge karke ek <strong>"Brand"</strong> bana diya.</p>
+
+  <h2>Teen fixes — sab "ek ghar" (<a href="../reference/buildrik-design-principles.html">#14</a>)</h2>
+  <table>
+    <tr><th>Fix</th><th>Pehle</th><th>Ab</th></tr>
+    <tr><td>Brand</td><td>ds1 + ds2 + ds3 (3 surface)</td><td>1 area "Brand"</td></tr>
+    <tr><td>Media</td><td>editor + dashboard (2 ghar)</td><td>editor home (dashboard read-only)</td></tr>
+    <tr><td>Settings</td><td>editor tab + dashboard + hub (3 ghar)</td><td>1 home</td></tr>
+  </table>
+  <p>Duplicate = user ka mental map nahi banta. Ek ghar = user ko hamesha pata hota hai kahan jana hai.</p>
+
+  <h2>Jo gaya — aur kyun (<a href="../reference/buildrik-design-principles.html">#3</a>)</h2>
+  <table>
+    <tr><th>Hata</th><th>Wajah</th></tr>
+    <tr><td><strong>Collab</strong></td><td>6 P1 bugs, demo-only. Toota feature ko nav-space nahi (slot rakho, gate karo).</td></tr>
+    <tr><td><strong>Locale</strong></td><td>engine locale-unaware — backend hai par editor mein invisible. Adhura.</td></tr>
+    <tr><td><strong>Export</strong></td><td>kaam karta hai, par <em>cut</em> — user ko product se bahar le jaata hai (anti-retention). Yeh product faisla hai, capability nahi.</td></tr>
+    <tr><td><strong>Stock</strong></td><td>STUB — har query par <code>[]</code>. Khali feature ko jagah nahi.</td></tr>
+  </table>
+  <p class="fine">"Hide" ≠ "delete the code." Code rehta hai; bас nav se hat jaata hai jab tak real/ready na ho.</p>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Rail ke 4 modes = site ke andar aap jo 4 kaam karte ho (build/design/AI/settings). Yeh primary navigation hai — jobs, na ke naye features ya button-count.">
+      <p class="q-stem">Editor ka 4-mode rail represent karta hai…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>the four jobs you do inside a site</button>
+        <button class="q-opt">the four newest features we shipped</button>
+        <button class="q-opt">the four screens with most buttons</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Teen DS surfaces ek hi kaam (brand) karti thin → ek ghar (#14). Crowding ya age wajah nahi.">
+      <p class="q-stem">Teen DS surfaces ek 'Brand' bani kyunki…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>one job deserves exactly one home</button>
+        <button class="q-opt">three separate tabs looked crowded</button>
+        <button class="q-opt">the newest of the three should win</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Collab(toota)/locale(adhura)/stock(khali) = not-ready (#3); export = product ke khilaf (anti-retention). Room ya age se nahi.">
+      <p class="q-stem">Collab/locale/export/stock hataye gaye kyunki…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>not ready, or against the product</button>
+        <button class="q-opt">they were the oldest features here</button>
+        <button class="q-opt">the rail had room for four only</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Yeh poora skeleton koi naya design nahi — yeh <a href="../../reviews/ia-home-map-20260623.md">home-map</a> ko honestly nav mein badalna hai. Topbar = global actions (#5/#7). Rail = the 4 jobs (#10). Andar ki grouping = ek ghar (#14). Hataya gaya = not-ready (#3). <strong>Har faisla ek principle se aata hai — koi taste nahi.</strong> Yehi reason hai ke ab "kahan rakhun" ka jawab fixed hai.</p>
+
+  <p class="source">Grounding: <a href="https://www.nngroup.com/articles/ia-vs-navigation/" target="_blank" rel="noopener">NN/g — IA vs Navigation</a> + <a href="https://www.nngroup.com/articles/tabs-used-right/" target="_blank" rel="noopener">Tabs, Used Right</a>. Engine: the <a href="../reference/buildrik-design-principles.html">constitution</a>. Kuch clear nahi? Poocho — main aapka teacher hun.</p>
+  <p class="fine">Agla: yeh skeleton ko ek <em>clickable wireframe</em> mein badlna (asal rail + topbar), ya dashboard sidebar ko isi tarah kholna. Bolo kaunsa.</p>
+
+  <div class="nav">
+    <a href="0013-one-home-group-by-the-job.html">← L13 · One home</a>
+    <a href="../../reviews/ia-home-map-20260623.md">The home-map run →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

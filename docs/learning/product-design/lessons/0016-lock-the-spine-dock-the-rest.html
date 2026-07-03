@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 16 — Lock the spine, dock the rest</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .layers{margin:16px 0;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+  .layers .row{display:grid;grid-template-columns:120px 1fr;align-items:center;border-bottom:1px solid var(--rule)}
+  .layers .row:last-child{border-bottom:0}
+  .layers .lbl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:10px 12px;color:#fff}
+  .layers .desc{font-size:13.5px;padding:10px 14px;color:var(--ink)}
+  .layers .desc small{color:var(--muted);display:block;margin-top:2px}
+  .l-fast{background:#EA580C}.l-mid{background:var(--accent)}.l-slow{background:#0F766E}
+  .spine{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .spine .col{border:1px solid var(--rule);border-radius:9px;padding:12px 14px}
+  .spine .col h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+  .spine .core h4{color:#0F766E}.spine .edge h4{color:#EA580C}
+  .spine ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.7}
+  .test{counter-reset:s;padding:0;margin:14px 0;list-style:none}
+  .test li{counter-increment:s;position:relative;padding:7px 0 7px 34px;font-size:14.5px;border-bottom:1px solid var(--rule)}
+  .test li:last-child{border-bottom:0}
+  .test li::before{content:counter(s);position:absolute;left:0;top:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  @media(max-width:560px){.spine{grid-template-columns:1fr}.layers .row{grid-template-columns:90px 1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 16 · ~5 minutes</p>
+  <h1>Lock the spine, dock the rest.</h1>
+  <p class="lede">Aap ne bilkul theek cheez maangi: <em>"jab naye features add hon to editor ka core design kharab na ho — Add button ki position har version mein same rahe; core features kareeb rahein, extra helping features bahar."</em> Iska ek naam nahi — <strong>teen naam</strong> hain, teen layers par. Pehle naam, phir Buildrik par seedha apply.</p>
+
+  <h2>Iska naam kya hai</h2>
+  <p>Aap ek hi cheez ko teen altitudes se dekh rahe ho:</p>
+  <div class="layers">
+    <div class="row"><div class="lbl l-fast">Visible</div><div class="desc"><strong>Spatial stability</strong> — "consistency." Add button har version same jagah → user ki <em>muscle memory</em> bachti hai. <small>Nielsen heuristic #4: jab layout stable rehta hai, user ko dobara seekhna nahi padta.</small></div></div>
+    <div class="row"><div class="lbl l-mid">Structure</div><div class="desc"><strong>Stable core + periphery</strong> — core features fixed &amp; central; rare/helper features edge par ya ek-click andar. <small>Ye aap ka constitution <a href="../reference/buildrik-design-principles.html">#9 (progressive disclosure)</a> ka bada bhai hai.</small></div></div>
+    <div class="row"><div class="lbl l-slow">Why</div><div class="desc"><strong>Pace layering</strong> — system ki layers alag raftaar se badalti hain; fast layer ko slow layer hilaana mana. <small>Stewart Brand: "Fast learns, slow remembers. Fast proposes, slow disposes."</small></div></div>
+  </div>
+  <p>Code mein jab AI ko brief karo, yahi qaida <strong>Open–Closed Principle</strong> kehlata hai: <em>open for extension, closed for modification</em> — naya feature add karne ke liye purana core <strong>chhedna na pade</strong>.</p>
+  <p>Ek handle mein: <strong>"lock the spine, dock the rest."</strong></p>
+
+  <h2>Spine kya hai, edge kya hai</h2>
+  <p>Spine = woh chand cheezein jinki <em>jagah</em> user ko zabani yaad ho jaati hai. Inhe hilaana = har user ko dobara seekhne par majboor karna. Edge = baaki sab — yeh badalta rehta hai, par spine ko chhuye baghair.</p>
+  <div class="spine">
+    <div class="col core"><h4>Spine — fixed, kabhi reorder nahi</h4>
+      <ul>
+        <li>Rail ke slots: <strong>➕Insert · 🖼Media · 📄Pages · 🎨Design</strong></li>
+        <li>Topbar zones: Navigate │ View │ Status+Ship</li>
+        <li>The one hero button (Publish)</li>
+        <li>Inspector ka frame (header → tabs → body)</li>
+      </ul>
+    </div>
+    <div class="col edge"><h4>Edge — yahan naya feature dock karo</h4>
+      <ul>
+        <li><strong>Andar</strong> kisi spine-panel ke (naya element → Insert ke andar)</li>
+        <li>Ek <strong>sub-tab</strong> ya "More" section</li>
+        <li>⋯ <strong>overflow</strong> (rare/global controls)</li>
+        <li>Ek context menu / right-click</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">Aap ka asli example: ➕ Insert hamesha <strong>rail slot #1</strong> par rehta hai. Naya element-type (say "Pricing table") aata hai → woh <strong>Insert panel ke andar</strong> jaata hai, ek <strong>naya rail icon nahi</strong> banta. Spine same → muscle memory zinda. Yeh <a href="../reference/buildrik-design-principles.html">#14 "har feature ka ek ghar"</a> + #9 ka jod hai.</div>
+
+  <h2>Buildrik par kyun yeh abhi zaroori hai</h2>
+  <p>Aap jo rail lock kar rahe ho (Insert · Media · Pages · Design) — <em>woh khud spine lock karna hai.</em> Asli khatra agle 6 mahine hain: jab CMS, reviews, comments, animations — sab aayenge. Bina rule ke, har naya feature ek naya rail icon maangega, aur 6 mahine baad rail phir wahi 11-tab grab-bag ban jaayegi jise aapne abhi theek kiya. Rule yeh rokta hai: <strong>naya feature spine mein jagah nahi maangta — woh edge par dock karta hai.</strong></p>
+
+  <h2>The spine test — har naye feature se pehle</h2>
+  <ol class="test">
+    <li><strong>Kya yeh kisi cheez ki position hilaata hai</strong> jo user ko pehle se yaad hai? Haan → ruk jao.</li>
+    <li><strong>Kis spine-ghar ke andar yeh dock ho sakta hai?</strong> (Insert / Pages / Design / Media / ⋯). Koi ghar fit nahi → shayad feature hi galat hai.</li>
+    <li><strong>Common ya rare?</strong> Common → panel ke andar saamne. Rare → "More" / overflow ek click neeche (#9).</li>
+    <li><strong>Spine count badha?</strong> Naya top-level slot tabhi jab woh ek <em>nayi user-job</em> ho — varna #8 "subtract before you add."</li>
+  </ol>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Add button ka har version same jagah hona = spatial stability (Nielsen #4 consistency). Yeh muscle memory bachata hai — user ko dobara seekhna nahi padta.">
+      <p class="q-stem">"Button har version same jagah" — iska naam?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>spatial stability</button>
+        <button class="q-opt">progressive disclosure</button>
+        <button class="q-opt">prominence hierarchy</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Pace layering (Stewart Brand): layers alag raftaar se badalti hain; fast (features) ko slow (core layout) hilaana mana. Yahi 'kyun' hai jo sab ko bandhta hai.">
+      <p class="q-stem">Slow core + fast edges ka deep principle?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>the pace layering</button>
+        <button class="q-opt">the feature flagging</button>
+        <button class="q-opt">the visual layering</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Naya feature spine reorder nahi karta — woh kisi existing ghar (Insert/Pages/⋯) mein dock hota hai. Core ko rebuild ya move karna hi woh galti hai jo design 'kharab' karti hai.">
+      <p class="q-stem">Naya feature aaye to sahi move kya hai?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>dock it to the edge</button>
+        <button class="q-opt">move the core slots</button>
+        <button class="q-opt">redo the whole rail</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Yeh lesson aap ki <a href="../reference/buildrik-design-principles.html">constitution</a> mein ek naya usool ban gaya: <strong>#15 — "Lock the spine; dock additions to the edge."</strong> Ab jab bhi koi naya feature aaye (CMS, reviews, animations), use spine mein ghusne se pehle <em>spine test</em> chalao. Aur jaisa <a href="0015-youre-not-stuck-youre-in-the-gap.html">L15</a> mein kaha — spine lock karna hi pehla decision hai jo aapko aage badhne deta hai. Stable spine = aap features tezi se add kar sakte ho <em>bina</em> dar ke ki design toot jaayega.</p>
+
+  <p class="source">Sources: <a href="https://www.nngroup.com/articles/consistency-and-standards/" target="_blank" rel="noopener">NN/g — Consistency &amp; Standards (heuristic #4)</a> · <a href="https://jods.mitpress.mit.edu/pub/issue3-brand" target="_blank" rel="noopener">Stewart Brand — Pace Layering</a> (the deep "why"; <a href="https://longnow.org/ideas/pace-layers/" target="_blank" rel="noopener">Long Now mirror</a>) · code side: <a href="https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle" target="_blank" rel="noopener">Open–Closed Principle</a>. Engine: the <a href="../reference/buildrik-design-principles.html">constitution</a> (now #15). Kuch bhee atke — poocho, main aapka teacher hun.</p>
+  <p class="fine">Next: kaho <strong>"run the spine test on the rail"</strong> — main aap ke 4 locked slots + agle 5 aane-wale features (CMS, reviews, comments, animations, SEO) ko spine-test se guzaar ke dikha dunga konsa dock hota hai aur kahan. Phir wahi clickable mockup.</p>
+
+  <div class="nav">
+    <a href="0015-youre-not-stuck-youre-in-the-gap.html">← L15 · You're in the gap</a>
+    <a href="../reference/buildrik-design-principles.html">The constitution →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

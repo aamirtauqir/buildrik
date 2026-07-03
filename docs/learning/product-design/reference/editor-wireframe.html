@@ -35,7 +35,7 @@
   <h1>Editor surface specs — the appendix.</h1>
   <p class="lede">Per-surface specs: every editor panel, drawn low-fi (Screen → Job → Modules → Wireframe → Why), grounded in the real shipped shell (<code>AquibraStudio.tsx</code>). Use this as a <em>reference dictionary</em> — the <strong>blocks</strong> the journeys are built from.</p>
   <div style="border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:11px 15px;margin:10px 0 14px;font-size:14px">
-    <strong style="color:var(--accent)">Start with the journeys, not this list.</strong> The top-level structure is the 5 job journeys in <a href="wireflows.html"><strong>wireflows.html</strong></a> — the sequences the user moves through (Make a page · On-brand · Content · Sign-off · Ship). This page is the <strong>appendix</strong> those flows reference: each flow step points to a §N here for the panel's detail.
+    <strong style="color:var(--accent)">Start with the journeys, not this list.</strong> The top-level structure is the 10 journeys in <a href="wireflows.html"><strong>wireflows.html</strong></a> (all 6 jobs) — the <strong>★ agency-wedge spine</strong> + <strong>J1</strong> Run-business · <strong>J2</strong> Start-site · <strong>J3</strong> Make a page · <strong>J3</strong> Content · <strong>J4</strong> On-brand · <strong>J5</strong> Sign-off · <strong>J6</strong> Ship · <strong>J6</strong> Run · <strong>J6</strong> Forms. This page is the <strong>appendix</strong> those flows reference: each flow step points to a §N here for the panel's detail. The <strong>By-journey index</strong> just below shows which §N each job passes through; the module A–Z is the secondary lookup.
   </div>
 
   <div style="border:1px solid var(--rule);border-left:3px solid var(--bad);border-radius:8px;padding:11px 15px;margin:0 0 14px;font-size:13px">
@@ -63,6 +63,22 @@
       <span><span class="sw wf-img" style="min-height:0;height:14px"></span> image</span>
       <span><span class="wf-tag" style="width:14px;height:14px;font-size:9px">n</span> → "why" note</span>
     </div>
+  </div>
+
+  <div style="border:1px solid var(--rule);border-radius:8px;padding:12px 16px;margin:14px 0 8px;font-size:13.5px">
+    <strong style="font-family:var(--wf-mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--accent)">By journey — job-first view (★ agency wedge + the 4 editor jobs)</strong>
+    <div style="margin-top:8px;display:flex;flex-direction:column;gap:7px;line-height:1.5">
+      <div style="padding-bottom:6px;border-bottom:1px solid var(--rule)"><strong style="color:#0F766E">★ Agency wedge (cross-job spine)</strong> &nbsp;→&nbsp; clients/sites (dashboard) · <a href="#design">§4 Brand</a> · <a href="#ds-push">§36 DS push ★</a> · <a href="#request-review">§16 review</a> + dashboard queue · <a href="#publish-flow">§14 publish</a></div>
+      <div><strong>J3 · Make a page</strong> &nbsp;→&nbsp; <a href="#shell">§0 shell</a> · <a href="#insert">§1 Insert</a> · <a href="#canvas-controls">§32 canvas</a> · <a href="#inline-text">§33 inline-text</a> · <a href="#inspector">§5 inspector</a> · <a href="#preview">§15 preview</a></div>
+      <div><strong>J3 · Structure content (CMS)</strong> &nbsp;→&nbsp; <a href="#cms">§10 CMS</a> · <a href="#components">§11 components</a></div>
+      <div><strong>J4 · Make it on-brand</strong> &nbsp;→&nbsp; <a href="#inspector">§5 inspector</a> · <a href="#inspector-full">§5 reach</a> · <a href="#design">§4 Brand</a> · <a href="#preview">§15 preview</a></div>
+      <div><strong>J5 · Get sign-off</strong> &nbsp;→&nbsp; <a href="#preview">§15 preview</a> · <a href="#request-review">§16 request-review</a> · <a href="#comments">§17 comments</a> · <a href="#share">§18 share</a></div>
+      <div><strong>J6 · Ship it</strong> &nbsp;→&nbsp; <a href="#seo">§20 SEO</a> · <a href="#domains">§22 domains</a> · <a href="#publish-flow">§14 publish</a> · <a href="#version-history">§24 version-history</a></div>
+      <div><strong>J6 · Run &amp; measure</strong> &nbsp;→&nbsp; <a href="#publish-flow">§14 publish</a> · <a href="#inspector">§5 inspector</a> · dashboard analytics</div>
+      <div><strong>J6 · Forms → leads</strong> &nbsp;→&nbsp; <a href="#forms">§13 Forms</a> · live site · dashboard submissions</div>
+      <div style="color:var(--muted)"><strong>J1 · Run-business</strong> &amp; <strong>J2 · Start-site</strong> &nbsp;→&nbsp; dashboard journeys (sign-in · clients · team · sites · new-site); no editor § except J2's handoff to <a href="#shell">§0 shell</a></div>
+    </div>
+    <p style="margin:9px 0 0;color:var(--muted);font-size:12px">These match the 10 flows in <a href="wireflows.html">wireflows.html</a> (★ wedge + all 6 jobs). Cross-cutting surfaces (topbar §7 · footer §8 · states §9 · AI §25–27 · command-palette §29 · onboarding §30) sit inside every job, not one. Forms §13 · site-settings §21 · analytics §21a · redirects §23 ride J6. Below: the full surface A–Z.</p>
   </div>
 
   <div class="index">
@@ -607,9 +623,9 @@
     </div>
   </section>
 
-  <!-- SIGN-OFF LOOP (J4/J5) framing -->
+  <!-- SIGN-OFF LOOP (J5) framing -->
   <div style="border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:12px 15px;margin:0 0 16px;font-size:13px">
-    <strong>Sign-off is ONE loop, not four screens.</strong> §15 Preview → §16 Request-review → §17 Comments → §18 Share → approve → back to edit. The screens below are blocks of that loop (J4/J5 in <a href="wireflows.html">wireflows</a>) — read them as a sequence, not standalone panels. <span style="color:var(--bad)">⚠️ Loop gaps still to spec:</span> reviewer identity tied to a real client, an explicit approval / approved state, resend + notify-failure handling, a resolved / unresolved comment queue, read-only client mode, and an audit trail. Today parts live in the dashboard (§17 · §18) and the editor side sends no notify — see each screen's tag.
+    <strong>Sign-off is ONE loop, not four screens.</strong> §15 Preview → §16 Request-review → §17 Comments → §18 Share → approve → back to edit. The screens below are blocks of that loop (J5 in <a href="wireflows.html">wireflows</a>) — read them as a sequence, not standalone panels. <span style="color:var(--bad)">⚠️ Loop gaps still to spec:</span> reviewer identity tied to a real client, an explicit approval / approved state, resend + notify-failure handling, a resolved / unresolved comment queue, read-only client mode, and an audit trail. Today parts live in the dashboard (§17 · §18) and the editor side sends no notify — see each screen's tag.
   </div>
 
   <!-- 15 PREVIEW -->

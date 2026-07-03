@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 18 — Cover every surface, don't sketch a few</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .tri{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+  .tri .c{border:1px solid var(--rule);border-radius:9px;padding:12px 14px}
+  .tri .c h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .tri .c p{font-size:13px;margin:0;color:var(--muted)}
+  .tri .feat h4{color:#B45309}.tri .surf h4{color:var(--accent)}.tri .screen h4{color:#0F766E}
+  .bad-good{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .bad-good .col{border:1px solid var(--rule);border-radius:9px;padding:12px 14px;font-size:14px}
+  .bad-good .x{border-color:#FECACA;background:#FEF2F2}
+  .bad-good .y{border-color:#A7F3D0;background:#F0FDF9}
+  .bad-good h4{margin:0 0 8px;font-size:13px}
+  @media(max-width:560px){.tri,.bad-good{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 18 · ~5 minutes</p>
+  <h1>Cover every surface — don't sketch a few.</h1>
+  <p class="lede">Aap ne theek pakda: <em>"wireframe meri existing functionality ke hisaab se nahi ban rahi — aur features ki tarah nahi, sirf functionality dikhao, poora editor redesign."</em> Bilkul. <a href="0017-wireframe-job-first-then-blocks.html">L17</a> ne <em>tareeqa</em> sikhaya (ek screen). Yeh lesson <em>scope</em> theek karta hai: jab poora product redesign karna ho, wireframe ko aap ki <strong>har asli functionality</strong> ko cover karna padta hai — warna aap ek aisa product redesign kar rahe ho jo aap ke paas hai hi nahi.</p>
+
+  <h2>Pehle: feature ≠ surface ≠ screen</h2>
+  <p>Aap ki dosri baat ka dil yahi hai. Teen alag cheezein hain:</p>
+  <div class="tri">
+    <div class="c feat"><h4>Feature</h4><p>Ek capability. "Alt-text edit," "folder rename," "color token." Inventory mein 100+ hain. <strong>Yeh screen nahi.</strong></p></div>
+    <div class="c surf"><h4>Surface</h4><p>Woh jagah jahan user kaam <em>karta</em> hai. "Media panel," "Inspector," "Publish flow." Ek surface 5–15 features rakhta hai.</p></div>
+    <div class="c screen"><h4>Screen/State</h4><p>Surface ki ek haalat — Media: empty / browsing / detail / uploading. Yeh aap wireframe karte ho.</p></div>
+  </div>
+  <p>Isi liye "features ki tarah nahi": agar aap 100 features ki 100 screens banaoge, woh catalog hai, product nahi. Sahi move — features ko <strong>functional surfaces</strong> mein group karo (user ke <em>kaam</em> se, <a href="0013-one-home-group-by-the-job.html">job</a> se), phir <em>surface</em> redesign karo. Editor ≈ <strong>~15 major surfaces</strong> (coverage-map mein ≈40 finer functional rows), 100+ features nahi.</p>
+
+  <h2>Do galtiyan jo "complete" feel karwati hain par nahi hotin</h2>
+  <div class="bad-good">
+    <div class="col x"><h4>✗ Invent karna</h4>Aisi screen banana jiska aap ke code mein koi backend/functionality nahi (forward-wireframe drift). Aap khwaab redesign karte ho, product nahi.</div>
+    <div class="col y"><h4>✓ Reverse se</h4>Har screen kisi <em>asli</em> functionality se nikle (<a href="0012-reverse-wireframe-the-backend.html">L12</a>). Code/inventory = source of truth. Guess nahi.</div>
+  </div>
+  <div class="bad-good">
+    <div class="col x"><h4>✗ Sketch karna</h4>3–4 "representative" screens bana ke "ho gaya" kehna. Baqi 10 surfaces chhoot jaate — par aap ko lagta hai poora hua.</div>
+    <div class="col y"><h4>✓ Cover karna</h4>Har real surface list karo, har ko home do, <em>drawn/to-draw</em> mark karo, to-draw ko <strong>zero</strong> pe le jao.</div>
+  </div>
+
+  <h2>The fix: a coverage map</h2>
+  <p>Completeness ko feeling pe mat chhodo — usay <strong>countable</strong> banao. Ek table: bائیں aap ki har real functional surface (code-inventory se), daائیں uska redesign-home + kya woh wireframe mein draw ho chuki. Progress = <code>drawn / total</code>. Jab tak to-draw &gt; 0, redesign adhura. Yeh aap ka <a href="../reference/definition-of-done.html">definition-of-done</a> wireframing pe lagaya gaya hai.</p>
+  <div class="callout">Maine yeh aap ke liye bana di — aap ki asli editor functionality (code-grounded: <code>complete-feature-list</code> + <code>editor-orphans</code>) → har surface ka home → drawn status. Yeh wireframe ka <strong>checklist + grounding-proof</strong> hai: <strong><a href="../reference/editor-functionality-map.html">→ Editor functionality coverage map</a></strong>.</div>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Feature = ek capability (alt-text edit). Surface = woh jagah jahan user kaam karta hai (Media panel) jo kai features rakhti hai. Aap surface wireframe karte ho, har feature nahi.">
+      <p class="q-stem">Aap kya wireframe karte ho — feature ya surface?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>the working surface</button>
+        <button class="q-opt">the single feature</button>
+        <button class="q-opt">the backend module</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Coverage map har real surface ko countable banata hai (drawn/total). 'Lagta hai poora hua' ki jagah 'to-draw = 0' — feeling nahi, count.">
+      <p class="q-stem">Redesign 'complete' hai — kaise pata?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>to-draw equals zero</button>
+        <button class="q-opt">it feels quite done</button>
+        <button class="q-opt">four screens exist</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Har screen kisi asli code-functionality se nikalni chahiye (reverse-wireframe). Khwaab/guess se bani screen woh product redesign karti hai jo aap ke paas nahi.">
+      <p class="q-stem">Har wireframe screen kahan se aaye?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>from real functionality</button>
+        <button class="q-opt">from a good guess</button>
+        <button class="q-opt">from the wish list</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Sequence wahi hai jo <a href="0012-reverse-wireframe-the-backend.html">L12</a> ne di: <strong>inventory → cover → wireframe → plan-review → build.</strong> Aap ki shikayat exactly "inventory grounding" thi — isliye agla qadam <em>screens banana nahi</em>, pehle <a href="../reference/editor-functionality-map.html">coverage map</a> dekhna: kya maine aap ki saari functionality theek pakdi? Jab map confirm ho jaaye, phir main har to-draw surface ko wireframe banata hun, ek-ek, jab tak to-draw = 0.</p>
+
+  <p class="source">Sources: reverse-wireframing builds on <a href="0012-reverse-wireframe-the-backend.html">L12</a> (code = source of truth) + <a href="../reference/definition-of-done.html">definition-of-done</a> (countable, not "feels done"). Grounding docs: <code>docs/reviews/complete-feature-list-20260623.md</code> + <code>editor-orphans-20260624.md</code> (code-audited). Kuch atke — poocho, main aap ka teacher hun.</p>
+  <p class="fine">Next: <a href="../reference/editor-functionality-map.html">coverage map</a> kholo aur batao — koi functionality miss to nahi? Sahi pe <strong>"draw the to-draw surfaces"</strong> kaho — main har baqi surface ko wireframe bana dunga, to-draw → 0.</p>
+
+  <div class="nav">
+    <a href="0017-wireframe-job-first-then-blocks.html">← L17 · The method</a>
+    <a href="../reference/editor-functionality-map.html">Coverage map →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

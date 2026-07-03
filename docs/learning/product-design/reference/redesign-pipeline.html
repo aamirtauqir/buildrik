@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The whole-product redesign pipeline</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  :root{--maxw:860px}
+  .flowtable{width:100%;border-collapse:collapse;margin:18px 0;font-size:14px}
+  .flowtable th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule)}
+  .flowtable td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  .flowtable .role{font-family:ui-monospace,monospace;font-size:11px;color:#52525b;white-space:nowrap}
+  .stage{display:grid;grid-template-columns:36px 1fr;gap:14px;margin:0 0 6px;align-items:start}
+  .stage .num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;font-size:14px}
+  .stage .body{border-bottom:1px solid var(--rule);padding-bottom:14px}
+  .stage .body h3{margin:2px 0 4px;font-size:16px}
+  .stage .body p{font-size:14px;margin:0 0 4px;color:var(--muted)}
+  .stage .who{font-size:12px;font-family:ui-monospace,monospace;color:#52525b}
+  .s-design .num{background:#2563EB}.s-validate .num{background:#B45309}.s-build .num{background:#0F766E}
+  .s-done .num{background:#9ca3af}
+  .pill{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;margin-left:6px}
+  .p-you{background:#EFF4FF;color:#2563EB}.p-skill{background:#FEF3C7;color:#B45309}.p-auto{background:#F0FDF9;color:#0F766E}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .twocol .c{border:1px solid var(--rule);border-radius:9px;padding:12px 14px}
+  .twocol .keep{border-color:#A7F3D0;background:#F0FDF9}.twocol .new{border-color:#BFDBFE;background:#EFF6FF}
+  .twocol h4{margin:0 0 6px;font-size:13px}
+  @media(max-width:600px){.twocol{grid-template-columns:1fr}:root{--maxw:100%}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · the playbook · 2026-06-26</p>
+  <h1>The whole-product redesign pipeline.</h1>
+  <p class="lede">Haan — poora editor redesign ho sakta hai. Par yeh <strong>ek pipeline hai, ek button nahi.</strong> Yeh playbook batata hai: har skill <em>asal mein</em> kya karta hai, kis stage par fit hota hai, kaunsa flow <em>rakhna</em> hai vs <em>naya</em> banana, aur "har screen check ho" kahan hota hai. Backbone = <strong>job + module</strong> (Webflow ki tarah).</p>
+
+  <h2>Pehla faisla: purana flow rakho ya naya banao?</h2>
+  <p>Sab kuch naya karne ki zaroorat <strong>nahi</strong>. Yeh aap ke <a href="buildrik-design-principles.html">#8 (subtract)</a> + L8 ka "<em>re-lay-out, not re-wire</em>" hai — jo chal raha hai uske <em>wires</em> mat chhedo, sirf <em>shakl</em> badlo.</p>
+  <div class="twocol">
+    <div class="c keep"><h4>✓ Rakho + re-skin (flow theek hai)</h4>Agar user bina atke goal tak pohonchta hai → flow <strong>same</strong>, sirf presentation redesign. <em>Status ✅ wali surfaces</em>: publish, pages, canvas, inspector, media. Wires same, boxes naye.</div>
+    <div class="c new"><h4>✦ Naya flow (toota / confusing / missing)</h4>Agar user atakta hai ya feedback nahi milta → <strong>naya flow</strong>. <em>Status 🟡/🔵 wali</em>: client-review loop (client side toota), silent actions (no feedback), CMS sync. In ka flow dobara design hota hai.</div>
+  </div>
+  <div class="callout">Test per flow (ek line): <strong>"kya user goal tak bina atke pohonchta hai?"</strong> Haan → rakho + re-skin. Nahi → naya flow. Yeh faisla aap ki <a href="editor-functionality-map.html">coverage map</a> ke <em>status</em> column se already nikal aata hai (✅ = keep · 🟡🔵 = new).</div>
+
+  <h2>Har skill ka asli kaam (misconception fix)</h2>
+  <p>Yeh sabse zaroori clarity hai — warna aap ghalat skill se ghalat cheez maangoge:</p>
+  <table class="flowtable">
+    <thead><tr><th>Skill / actor</th><th>Yeh REALLY karta hai</th><th>Yeh NAHI karta</th><th>Stage</th></tr></thead>
+    <tbody>
+      <tr><td class="role">reverse-wireframe</td><td>code padh ke real surfaces nikalta (method, L12)</td><td>—</td><td>1</td></tr>
+      <tr><td class="role">main + aap ki eye</td><td><strong>wireframe banata</strong> — job <a href="wireflows.html">journeys</a> (top-level) + surface <a href="editor-wireframe.html">appendix</a> (blocks). Job-first, na ki surface-list (LR 0018)</td><td>—</td><td>2</td></tr>
+      <tr><td class="role">design-review</td><td><strong>bani hui UI</strong> ka QA — spacing/slop/hierarchy/slow-interaction, phir fix</td><td>wireframe nahi banata</td><td>7</td></tr>
+      <tr><td class="role">plan-design-review</td><td>likhe <strong>plan</strong> ko designer-eye se pressure-test (interactive)</td><td>draw/build nahi karta</td><td>5</td></tr>
+      <tr><td class="role">plan-ceo-review</td><td>plan ko founder-eye se: "kya yeh sahi cheez hai? scope?"</td><td>features khud fix nahi karta</td><td>5</td></tr>
+      <tr><td class="role">plan-eng-review</td><td>plan ki feasibility / architecture</td><td>—</td><td>5</td></tr>
+      <tr><td class="role">autoplan</td><td><strong>ceo+design+eng+dx reviews ek saath</strong> chala ke auto-decide</td><td>—</td><td>5 (all-in-one)</td></tr>
+      <tr><td class="role">codex</td><td>external model se code/plan review (daily cap ~14)</td><td>—</td><td>5 + 6</td></tr>
+      <tr><td class="role">/goal</td><td>autonomous <strong>build</strong> run ("don't stop")</td><td>design/wireframe nahi karta</td><td>6</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Khulasa:</strong> wireframe = <span class="pill p-you">main + aap</span> · validate = <span class="pill p-skill">reviews + codex</span> · build = <span class="pill p-auto">/goal + codex</span>. Koi skill wireframe <em>khud</em> nahi banata.</p>
+
+  <h2>The 8-stage pipeline</h2>
+
+  <div class="stage s-done"><div class="num">1</div><div class="body"><h3>Inventory — real functionality nikalo <span class="pill p-skill">DONE</span></h3><p>Code se har surface (reverse-wireframe). Output = <a href="editor-functionality-map.html">functionality coverage map</a> (~40 surfaces, status + home).</p><div class="who">reverse-wireframe · grounded in code</div></div></div>
+
+  <div class="stage s-design"><div class="num">2</div><div class="body"><h3>Wireframe every surface <span class="pill p-you">YOU + me · NOW</span></h3><p>Job + module backbone: 6 jobs → ~15 modules/surfaces → har surface ka grey-box (5-step recipe). Keep-flow surfaces = re-skin; new-flow surfaces = naya flow draw. To-draw → 0.</p><div class="who">me drives · aap har surface confirm karte</div></div></div>
+
+  <div class="stage s-design"><div class="num">3</div><div class="body"><h3>Check every screen <span class="pill p-you">YOU</span></h3><p>"Har screen check ho" — yahan. Har wireframe ko <a href="heuristics-cheatsheet.html">10 heuristics</a> + <a href="states-checklist.html">states checklist</a> se guzaaro (build se PEHLE — sasta). Aap ki eye + naming muscle (L1). Loop: draw → check → fix → next.</p><div class="who">aap + heuristics-cheatsheet · design-review ka method, par wireframe par</div></div></div>
+
+  <div class="stage s-validate"><div class="num">4</div><div class="body"><h3>Assemble the redesign plan <span class="pill p-you">me</span></h3><p>Ek doc: har surface → keep/new flow → 4-part build spec (<a href="build-prompt-template.html">L4 handoff</a>: WHAT/WHERE/DON'T-BREAK/DONE). Yeh woh "plan" hai jise stage 5 review karega.</p><div class="who">me writes · grounded in stages 2–3</div></div></div>
+
+  <div class="stage s-validate"><div class="num">5</div><div class="body"><h3>Pressure-test the plan <span class="pill p-skill">SKILLS</span></h3><p>Yahan aap ke naamzad skills aate hain. <code>autoplan</code> = ceo + design + eng reviews ek saath ("features sahi karte hain"). Phir <code>codex</code> = external second-opinion. Plan theek hone tak iterate (L: codex-iterate-until-clean).</p><div class="who">autoplan (ceo+design+eng) + codex · validate, don't generate</div></div></div>
+
+  <div class="stage s-build"><div class="num">6</div><div class="body"><h3>Build it <span class="pill p-auto">/goal + codex</span></h3><p><code>/goal</code> autonomous run — re-lay-out not re-wire (L8). Har piece 5-rung ladder se verify (types → tests → walk states → click → acceptance). <code>codex</code> har risky diff review.</p><div class="who">/goal builds · codex reviews · 5-rung verify</div></div></div>
+
+  <div class="stage s-build"><div class="num">7</div><div class="body"><h3>Design-review the BUILT UI <span class="pill p-skill">SKILL</span></h3><p>Ab <code>design-review</code> — bani hui real UI par: spacing, AI-slop, hierarchy, slow interactions → fix. (Yahi woh skill hai jise aap ne socha wireframe banata hai — yeh QA karta hai, build ke baad.)</p><div class="who">design-review · on the shipped UI, not the wireframe</div></div></div>
+
+  <div class="stage s-done"><div class="num">8</div><div class="body"><h3>Walk it with 5 users <span class="pill p-you">YOU</span></h3><p>Asli test (L15 / Krug). 3–5 agency users core job chalaayein; jo trip kare woh agla worklist. Decide &gt; perfection.</p><div class="who">aap · the real feedback loop</div></div></div>
+
+  <h2>Honest limits (autonomous ≠ magic)</h2>
+  <p>Stage 2–3 (<strong>design</strong>) aap ki <em>judgment</em> maangti hai — aap designer ho (L15), AI guess karega aur slop dega. Stage 6 (<strong>build</strong>) par <code>/goal</code> chamakta hai — woh wahi banata hai jo wireframe + plan specify karte hain. <strong>Ek /goal poora product "design" nahi karega</strong> — woh aap ke design ko build karega. Isliye sequence: pehle design (insaan), phir build (autonomous). Yeh L8 ka "presentation ≠ logic" macro level par.</p>
+
+  <h2>Job + module backbone (the Webflow model)</h2>
+  <p>Aap ka instinct theek: Webflow job-aur-module se bana hai — top-level = <em>jobs</em> (Designer/CMS/Editor), har job ke andar <em>modules</em> (panels/blocks) jo fixed jagah par rehte (#15 spine). Aap ka version: 6 jobs (<a href="ia-home-map.html">home-map</a>) → ~15 modules (<a href="editor-functionality-map.html">functionality-map</a>) → har module ka wireframe. Same do-axis jo L17 sikhata hai: <strong>job</strong> (prominence) × <strong>module</strong> (layout).</p>
+
+  <p class="source">Method: <a href="../lessons/0019-the-redesign-pipeline.html">Lesson 19</a>. Skills: <code>autoplan</code> (runs plan-ceo/design/eng review) · <code>codex</code> · <code>design-review</code> (QA built UI) · <code>/goal</code> (autonomous build). Flow rule: L8 re-lay-out-not-re-wire. Grounding: <a href="editor-functionality-map.html">functionality map</a> + <a href="ia-home-map.html">home-map</a>. Webflow = job+module reference model. Kuch atke — poocho.</p>
+  <div class="nav">
+    <a href="editor-functionality-map.html">← Coverage map</a>
+    <a href="../lessons/0019-the-redesign-pipeline.html">Lesson 19 →</a>
+  </div>
+</main>
+</body>
+</html>

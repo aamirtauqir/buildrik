@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 15 — You're not stuck, you're in the gap</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .wins{list-style:none;padding:0;margin:14px 0}
+  .wins li{padding:9px 12px;border:1px solid var(--rule);border-radius:8px;margin:7px 0;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+  .wins li::before{content:"✓";color:var(--good);font-weight:800;flex:none}
+  .gap{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  .gap .box{border:1px solid var(--rule);border-radius:9px;padding:12px 14px}
+  .gap .box b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);margin-bottom:4px}
+  .steps{counter-reset:s;padding:0;margin:14px 0;list-style:none}
+  .steps li{counter-increment:s;position:relative;padding:7px 0 7px 34px;font-size:14.5px;border-bottom:1px solid var(--rule)}
+  .steps li:last-child{border-bottom:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  @media(max-width:560px){.gap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 15 · ~5 minutes</p>
+  <h1>You're not stuck. You're in the gap.</h1>
+  <p class="lede">Aap ne kaha: <em>"main designer nahi hun, theek se design nahi kar pa raha."</em> Do cheezein sach hain, aur dono aapke haq mein hain. Pehli: aap <strong>already design kar rahe ho</strong> — saboot neeche. Doosri: jo "atak gaya" feel hai woh talent ki kami nahi — woh ek <strong>missing move</strong> hai. Ye lesson dono kholti hai.</p>
+
+  <h2>Pehle — aap design kar rahe ho (saboot)</h2>
+  <p>Sirf is session mein, aapne ye pakda — non-designer ye <em>feel</em> nahi karta:</p>
+  <ul class="wins">
+    <li>Topbar mein breadcrumb galat jagah thi — aapki aankh ne pakda.</li>
+    <li>"Site" group topbar se <strong>duplicate</strong> nikla (#14) — ye team ke apne E3 plan ka real bug tha. <strong>Aapne</strong> pakda.</li>
+    <li>"Add cluster ban raha hai" — wahi instinct jisne <em>palette vs grab-bag</em> distinction kholi.</li>
+    <li>"Bar-bar use wali cheezein left bar mein" — ye aapne khud bola, aur ye <a href="../reference/buildrik-design-principles.html">constitution #4</a> hai.</li>
+  </ul>
+  <p>Ye taste fire ho rahi hai. "Acha nahi lag raha" keh paana <em>hi</em> design hai (<a href="../learning-records/0002-learner-caught-a-real-design-error.md">aap pehle bhi mera error pakad chuke ho</a>).</p>
+
+  <h2>The gap — Ira Glass</h2>
+  <p>Shuru mein aapki <strong>taste</strong> aapke <strong>kaam se aage</strong> hoti hai. Aap pehchaan lete ho ki kuch "off" hai, par output abhi us level ka nahi. Woh faasla bura feel deta hai — par wahi engine hai. <a href="https://vimeo.com/85040589" target="_blank" rel="noopener">(Ira Glass — "The Gap")</a></p>
+  <div class="gap">
+    <div class="box"><b>Aapki taste</b>Janta hai rail abhi galat hai (clusters, grab-bag). Tez.</div>
+    <div class="box"><b>Aapki abhi-ki skill</b>Woh perfect rail abhi nahi nikaal pa rahi. Dheemi.</div>
+  </div>
+  <p>Faasla = normal. Ise band <em>zyada sochne se nahi</em>, <strong>reps + feedback se</strong> hota hai. Jo log "achanak achhe" lagte hain, unhone bас zyada baar try kiya.</p>
+
+  <h2>Rail itni endless kyun lagi</h2>
+  <p>Aap perfect rail ko <strong>sochkar deduce</strong> karne ki koshish kar rahe the. <em>Koi nahi kar sakta.</em> Rail ka jawab aapke <strong>sar mein nahi</strong> — woh isme hai ki <strong>asal user editor ko kaise use karta hai</strong>. Insert sub-tab ho ya alag slot, Media andar ho ya bahar — taste se nahi, <em>use</em> se tay hota hai. Isi liye circle ban raha tha: hum abstraction par baहस kar rahe the.</p>
+  <div class="callout">Designers think-until-perfect nahi karte. Woh <strong>good-enough par converge → test → fix</strong> karte hain. "You don't have to get it right, you have to make it testable." <a href="https://sensible.com/rocket-surgery-made-easy/" target="_blank" rel="noopener">(Steve Krug)</a></div>
+
+  <h2>The unstick — aapki rail ke liye, abhi</h2>
+  <ol class="steps">
+    <li><strong>Decide good-enough.</strong> Hamare paas already sabse kam-issue wala hai: <em>C + dissolve Settings</em> (Insert · Media · Pages · Design). Use lock karo — perfect nahi, <em>testable</em>.</li>
+    <li><strong>Clickable mockup banao</strong> (jaise <code>topbar-final.html</code>). Main bana dunga — asal rail dikhe.</li>
+    <li><strong>Asal job walk karo:</strong> "ek page banao + brand par lao + publish." Khud, phir 3-5 log. Chup-chaap dekho woh kahan haath maarte hain.</li>
+    <li><strong>Jo trip kare wahi fix karo.</strong> Insert dhoondh nahi paaye? Media galat jagah? Ab data hai, taste-jhagda nahi.</li>
+  </ol>
+  <p>Decision &gt; perfection. Pehla version galat ho toh bhi — testable galat &gt; perfect-in-head. Test use ko theek kar dega.</p>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Rail ka jawab use mein hai — kaun kya bar-bar reach karta. Sar ki deduction ya 'sundar-tareen layout' tie nahi todte; real use todta hai.">
+      <p class="q-stem">Design ka jawab kahan hota hai?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>in how the user actually uses it</button>
+        <button class="q-opt">in the designer's head, if smart</button>
+        <button class="q-opt">in the cleanest-looking arrangement</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Circle isliye bana ki hum sochkar EK perfect rail deduce kar rahe the — koi nahi kar sakta. Talent ya UI-tricks ki kami nahi thi.">
+      <p class="q-stem">Atakne ka asal sabab kya tha?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>deducing the one perfect answer</button>
+        <button class="q-opt">not knowing enough UI tricks</button>
+        <button class="q-opt">having no design talent here</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Ira Glass ka gap: shuru mein taste skill se aage hoti hai — isi liye apna kaam 'kam' lagta hai. Reps faasla bharte hain.">
+      <p class="q-stem">Ira Glass ka 'gap' kya kehta hai?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>taste outruns your skill at first</button>
+        <button class="q-opt">skill outruns your taste early</button>
+        <button class="q-opt">taste and skill never really meet</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Aapko "designer ban-na" nahi hai pehle — aapko <strong>converge → test → fix</strong> ka loop chalana hai, aur reps karne hain. Taste pehle se hai (saboot upar). Skill reps se aayegi. Aur har tie jo aaj fasaa raha hai (4 vs 5 tools, Media kahan) — woh ek 30-minute real-use walk mein khud khul jaayega. Ye seedha aapke <a href="../reference/the-path.html">mission ke "now" stage</a> se judta hai: craft aapke paas hai; ab use user par aim karo.</p>
+
+  <p class="source">Sources: <a href="https://vimeo.com/85040589" target="_blank" rel="noopener">Ira Glass — The Gap</a> (3 min, dekho — ye seedha aapke liye hai) + <a href="https://sensible.com/rocket-surgery-made-easy/" target="_blank" rel="noopener">Steve Krug — Rocket Surgery</a> (decide → test, perfect nahi). Engine: the <a href="../reference/buildrik-design-principles.html">constitution</a>. Kuch bhee atke — poocho, main aapka teacher hun.</p>
+  <p class="fine">Ready? Kaho <strong>"lock C + build the mockup"</strong> — main rail ka clickable mockup bana deta hun, phir hum use walk karke fix karenge. Bас. Aur sochna band.</p>
+
+  <div class="nav">
+    <a href="0014-structure-becomes-navigation.html">← L14 · Structure → navigation</a>
+    <a href="../reference/the-path.html">The path →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

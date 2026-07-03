@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 12 — Reverse-wireframe: read the backend, find the gap</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .legend{display:grid;gap:8px;margin:16px 0}
+  .row{border:1px solid var(--rule);border-radius:9px;padding:11px 14px;font-size:13.5px}
+  .row b{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 8px;border-radius:5px;margin-right:8px}
+  .row.ghost b{background:#FEF3F2;color:var(--bad)}
+  .row.half  b{background:#FFFAEB;color:var(--warn)}
+  .row.wired b{background:#ECFDF3;color:var(--good)}
+  table.inv td:first-child{font-family:"Geist Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink)}
+  table.inv td{font-size:13px;vertical-align:top}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 12 · ~6 minutes</p>
+  <h1>Reverse-wireframe: let the backend tell you what's missing.</h1>
+  <p class="lede">You asked: can we wireframe the app's <em>real</em> current functionality — everything the backend already does — and is that a job for the plan-review skills? Yes to the first; no to the second, and the difference is the whole lesson. This is the direct tool for your own diagnosis: <strong>the product isn't broken, it's half-wired.</strong></p>
+
+  <div class="callout">
+    <strong>Forward vs reverse wireframing</strong><br>
+    A <em>forward</em> wireframe draws the product you <em>wish</em> existed. A <em>reverse</em> wireframe draws the product that <em>already</em> exists in the backend. For a half-wired app, the second one is the map you actually need — it shows the gap between what the code can do and what the screen lets a user do.
+  </div>
+
+  <h2>Why the backend is the source of truth</h2>
+  <p>Taste can be wrong. A competitor's screen can mislead. The backend can't — it's a precise, honest list of every capability the product really has. Buildrik's backend right now:</p>
+  <div class="panel panel--accent">
+    <strong>25 tRPC routers · 50+ services · 58 Prisma models.</strong> Forms, CMS collections, reviews, comments, notifications, publishing, share-links, redirects, analytics, billing — all <em>built</em>. The question is never "does the capability exist?" It's "<em>does a user ever get to reach it?</em>"
+  </div>
+
+  <h2>The method — a capability inventory</h2>
+  <p>Walk the backend one capability at a time. For each, fill four cells. The table <em>is</em> the work — it turns "the app feels incomplete" into a finite, finishable list.</p>
+  <table class="inv">
+    <tr><th>Backend capability</th><th>What it can do</th><th>Frontend today</th><th>Verdict</th></tr>
+    <tr><td>forms · FormSubmission</td><td>Store every form submission</td><td>Form builds; can a user <em>read</em> submissions?</td><td>likely <b style="color:var(--bad)">GHOST</b></td></tr>
+    <tr><td>cms · CmsCollection</td><td>Collections + entries</td><td>Bind a component to a collection — with empty/loading/error?</td><td>likely <b style="color:var(--warn)">HALF</b></td></tr>
+    <tr><td>reviews · ReviewRequest</td><td>Send a site for client review</td><td>Is there a screen to request + track it?</td><td>check</td></tr>
+  </table>
+  <p class="fine">(Verdicts above are the <em>questions</em> to answer, not claims — the real pass takes ~20 minutes against the live app. I can run it with you.)</p>
+
+  <h2>Three verdicts — and only two make wireframes</h2>
+  <div class="legend">
+    <div class="row ghost"><b>Ghost</b>Backend works, frontend shows <em>nothing</em>. A user can't reach it at all. → <strong>Wireframe it.</strong></div>
+    <div class="row half"><b>Half</b>Frontend shows it, but missing states or integration (no empty/error, or not wired to real data). → <strong>Wireframe the missing states</strong> (<a href="0007-design-every-state.html">L7</a>).</div>
+    <div class="row wired"><b>Wired</b>Fully exposed, all states, real data. → <strong>Nothing to draw.</strong> Leave it.</div>
+  </div>
+  <p>The <span style="color:var(--bad)">Ghost</span> + <span style="color:var(--warn)">Half</span> rows <em>are</em> your wireframe worklist. You no longer guess what to draw — the gap tells you. And you order it by user pain (<a href="0002-rate-and-prioritise.html">L2</a>), not by what annoys you.</p>
+
+  <h2>Where the plan-review skills actually fit</h2>
+  <p>You asked if this is a <code>plan-design-review</code> / <code>plan-ceo-review</code> job. It isn't — those <em>pressure-test a plan that already exists</em>; they don't generate wireframes. Running them now is reviewing a thing you haven't written yet. The order:</p>
+  <table>
+    <tr><th>Step</th><th>Tool</th></tr>
+    <tr><td>1 · Inventory the backend → find Ghost/Half</td><td>this lesson + the <a href="../reference/reverse-wireframe-inventory.html">inventory template</a></td></tr>
+    <tr><td>2 · Wireframe each gap</td><td>the <a href="0004-design-to-build-handoff.html">handoff</a> + <a href="0007-design-every-state.html">all states</a></td></tr>
+    <tr><td>3 · Draft the redesign plan</td><td>write it as a doc</td></tr>
+    <tr><td>4 · <strong>Pressure-test the plan</strong></td><td><code>plan-design-review</code> + <code>plan-ceo-review</code></td></tr>
+    <tr><td>5 · Build, verify, don't break</td><td>the <a href="0008-build-without-breaking.html">5-rung ladder</a></td></tr>
+  </table>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="The backend is the one honest, complete list of real capabilities. Taste and competitor screens can mislead; a half-wired app needs reality, not a wish.">
+      <p class="q-stem">A reverse-wireframe's source of truth is…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>the backend's actual shipped capabilities</button>
+        <button class="q-opt">the nicest competitor's polished screens</button>
+        <button class="q-opt">your own designer taste and instinct</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Ghost = backend works but no UI reaches it. That's a missing surface — it needs a wireframe drawn from scratch.">
+      <p class="q-stem">A capability the backend has but no screen reaches is a…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>Ghost — it needs a wireframe</button>
+        <button class="q-opt">Wired — it needs no work</button>
+        <button class="q-opt">Half — it needs more states</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="plan-design-review and plan-ceo-review stress-test a plan that already exists. You run them at step 4 — after the inventory and wireframes produce a plan to test.">
+      <p class="q-stem">When do you run the plan-review skills?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>After the redesign plan exists</button>
+        <button class="q-opt">Before any wireframes exist</button>
+        <button class="q-opt">Instead of doing the inventory</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>This is the same loop you already know — <em>inventory → decide → handoff → build → verify</em> — but the inventory now reads the <strong>backend</strong> instead of one screen. It connects straight into the <a href="../../reviews/buildrik-recovery-roadmap-20260621.md">recovery roadmap</a>: Phase 3 is literally "wire or hide the ghosts." A reverse-wireframe inventory is how you find every ghost first.</p>
+
+  <p class="source">Builds on <a href="0007-design-every-state.html">Design every state (L7)</a> + <a href="0010-fix-the-spine-hide-the-rest.html">Fix the spine (L10)</a>. Reusable: the <a href="../reference/reverse-wireframe-inventory.html">reverse-wireframe inventory template</a>. Ask me anything that's unclear — I'm your teacher here.</p>
+  <p class="fine">Ready? Say "run the inventory" and I'll walk the 25 routers against the live app with you — filling Ghost / Half / Wired for each, in one pass.</p>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+/* Buildrik course — low-fi WIREFRAME kit.
+   The whole point of a wireframe is "not final": no colour, no real images,
+   no real type. Only structure. So this kit is MONOCHROME on purpose.
+   Prominence is shown by SIZE + FILL DARKNESS + POSITION — never by colour.
+   Pair with course.css (course.css = page chrome; this = the boxes). */
+
+:root {
+  --wf-ink:    #3f3f46;   /* box outline / text bars        */
+  --wf-line:   #d4d4d8;   /* hairlines, dividers            */
+  --wf-fill:   #f4f4f5;   /* default grey box               */
+  --wf-fill-2: #e7e7ea;   /* secondary fill (slightly up)   */
+  --wf-solid:  #52525b;   /* the HERO / most-prominent box  */
+  --wf-ghost:  #fafafa;   /* empty / placeholder fill       */
+  --wf-mono: ui-monospace, "SF Mono", "Geist Mono", Menlo, monospace;
+}
+
+/* A wireframe block sits inside a lesson/reference page. */
+.wf {
+  font-family: var(--wf-mono);
+  color: var(--wf-ink);
+  font-size: 12px;
+  line-height: 1.3;
+  margin: 18px 0;
+}
+
+/* Device / screen frame -------------------------------------------------- */
+.wf-frame {
+  border: 1.5px solid var(--wf-ink);
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+.wf-frame__caption {
+  font-family: var(--wf-mono); font-size: 11px; color: #a1a1aa;
+  text-transform: uppercase; letter-spacing: 0.06em; margin: 4px 2px 0;
+}
+
+/* The grey box — the atom of every wireframe ----------------------------- */
+.wf-box {
+  background: var(--wf-fill);
+  border: 1px solid var(--wf-line);
+  border-radius: 4px;
+  padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.wf-box--2     { background: var(--wf-fill-2); }
+.wf-box--solid { background: var(--wf-solid); border-color: var(--wf-solid); color: #fff; }  /* HERO */
+.wf-box--ghost { background: var(--wf-ghost); border-style: dashed; color: #a1a1aa; }        /* empty */
+.wf-box--plain { background: transparent; border: 0; padding: 0; }
+
+/* Text represented as bars (no real copy in low-fi) ---------------------- */
+.wf-line { height: 8px; border-radius: 3px; background: var(--wf-line); }
+.wf-line--ink { background: var(--wf-ink); }
+.w-100 { width: 100%; } .w-90 { width: 90%; } .w-75 { width: 75%; }
+.w-60  { width: 60%;  } .w-50 { width: 50%; } .w-40 { width: 40%; }
+.w-30  { width: 30%;  } .w-25 { width: 25%; } .w-15 { width: 15%; }
+
+/* A short real label is allowed (it names the block, not the content) ---- */
+.wf-label  { font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: #71717a; }
+.wf-cap    { font-size: 11px; color: #52525b; }
+
+/* Image / media placeholder = crossed box (the universal "picture goes here") */
+.wf-img {
+  background:
+    linear-gradient(45deg, transparent 47%, var(--wf-line) 47%, var(--wf-line) 53%, transparent 53%),
+    linear-gradient(-45deg, transparent 47%, var(--wf-line) 47%, var(--wf-line) 53%, transparent 53%),
+    var(--wf-fill);
+  border: 1px solid var(--wf-line);
+  border-radius: 4px;
+  min-height: 48px;
+}
+
+/* Small chrome atoms ----------------------------------------------------- */
+.wf-icon { width: 22px; height: 22px; border: 1px solid var(--wf-line); border-radius: 4px; background: var(--wf-fill); display: inline-block; flex: 0 0 auto; }
+.wf-icon--solid { background: var(--wf-solid); border-color: var(--wf-solid); }
+.wf-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border: 1px solid var(--wf-line); border-radius: 999px; background: var(--wf-fill); font-size: 11px; }
+.wf-pill--solid { background: var(--wf-solid); border-color: var(--wf-solid); color: #fff; }   /* hero button */
+.wf-pill--on { background: var(--wf-fill-2); border-color: var(--wf-ink); }                     /* selected */
+.wf-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--wf-line); border-radius: 4px; background: var(--wf-fill); font-size: 11px; }
+.wf-btn--solid { background: var(--wf-solid); border-color: var(--wf-solid); color: #fff; }
+
+/* Layout helpers --------------------------------------------------------- */
+.wf-row { display: flex; gap: 8px; align-items: center; }
+.wf-row--between { justify-content: space-between; }
+.wf-col { display: flex; flex-direction: column; gap: 8px; }
+.wf-stack > * + * { margin-top: 8px; }
+.wf-grow { flex: 1 1 auto; }
+
+/* The editor shell skeleton (topbar / rail / drawer / canvas / inspector / footer) */
+.wf-shell { display: grid; grid-template-rows: 34px 1fr 26px; height: 380px; }
+.wf-shell__bar { border-bottom: 1px solid var(--wf-ink); display: flex; align-items: center; gap: 8px; padding: 0 8px; background: #fff; }
+.wf-shell__body { display: grid; grid-template-columns: 40px 150px 1fr 150px; min-height: 0; }
+.wf-shell__rail { border-right: 1px solid var(--wf-ink); display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 0; background: var(--wf-fill); }
+.wf-shell__drawer { border-right: 1px solid var(--wf-line); padding: 8px; overflow: hidden; background: #fff; }
+.wf-shell__canvas { background:
+    radial-gradient(var(--wf-line) 1px, transparent 1px) 0 0 / 16px 16px;
+    padding: 14px; overflow: hidden; }
+.wf-shell__insp { border-left: 1px solid var(--wf-ink); padding: 8px; overflow: hidden; background: #fff; }
+.wf-shell__foot { border-top: 1px solid var(--wf-ink); display: flex; align-items: center; gap: 10px; padding: 0 8px; background: #fff; font-size: 10px; color: #71717a; }
+
+/* Rail slot (locked spine) */
+.wf-slot { width: 24px; height: 24px; border-radius: 5px; border: 1px solid var(--wf-line); background: #fff; display: grid; place-items: center; font-size: 10px; color: #52525b; }
+.wf-slot--on { background: var(--wf-solid); border-color: var(--wf-solid); color: #fff; }
+.wf-slot--dock { border-style: dashed; color: #a1a1aa; }
+
+/* Labelled rail item — icon + tiny text under it (the #1 recognition fix) */
+.wf-railitem { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
+.wf-railitem small { font-size: 8px; line-height: 1; color: #71717a; font-family: var(--wf-mono); letter-spacing: -.02em; }
+.wf-railitem--on small { color: var(--wf-solid); font-weight: 700; }
+
+/* Drawer title bar — always shows which job you're in (#2 orientation) */
+.wf-drawer-title { display: flex; align-items: center; justify-content: space-between; font-family: var(--wf-mono); font-size: 11px; font-weight: 700; color: #3f3f46; border-bottom: 1px solid var(--wf-line); padding-bottom: 6px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .04em; }
+.wf-collapse { font-size: 12px; color: #a1a1aa; }
+
+/* Numbered "why" annotation marker that ties a box to a note below --------*/
+.wf-tag { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 999px; background: var(--wf-solid); color: #fff; font-size: 10px; font-weight: 700; font-family: var(--wf-mono); vertical-align: middle; }
+
+/* "Why" decision list under a wireframe */
+.wf-why { list-style: none; padding: 0; margin: 14px 0 0; }
+.wf-why li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; margin: 0 0 8px; font-family: "Inter Tight", Inter, sans-serif; font-size: 14px; color: #52525b; }
+.wf-why .wf-tag { margin-top: 1px; }
+
+/* Legend strip */
+.wf-legend { display: flex; flex-wrap: wrap; gap: 16px; font-family: "Inter Tight", Inter, sans-serif; font-size: 13px; color: #71717a; margin: 8px 0 0; }
+.wf-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.wf-legend .sw { width: 20px; height: 14px; border-radius: 3px; }
+
+@media print {
+  .wf-frame { break-inside: avoid; }
+}

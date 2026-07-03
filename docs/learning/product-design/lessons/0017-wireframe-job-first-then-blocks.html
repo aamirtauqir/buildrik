@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 17 — Wireframe it: job first, then blocks</title>
+<link rel="stylesheet" href="../assets/course.css">
+<link rel="stylesheet" href="../assets/wireframe.css">
+<style>
+  .recipe{counter-reset:s;padding:0;margin:14px 0;list-style:none}
+  .recipe li{counter-increment:s;position:relative;padding:10px 0 10px 40px;font-size:15px;border-bottom:1px solid var(--rule)}
+  .recipe li:last-child{border-bottom:0}
+  .recipe li::before{content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .recipe b{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink);margin-bottom:1px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .two .col{border:1px solid var(--rule);border-radius:9px;padding:12px 14px}
+  .two .col h4{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+  .two .a h4{color:#0F766E}.two .b h4{color:#EA580C}
+  .two p{font-size:13.5px;margin:0;color:var(--muted)}
+  @media(max-width:560px){.two{grid-template-columns:1fr}.wf-shell__body{grid-template-columns:32px 90px 1fr 0}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 17 · ~6 minutes</p>
+  <h1>Wireframe it: pehle job, phir blocks.</h1>
+  <p class="lede">Aap ne <a href="0013-one-home-group-by-the-job.html">IA</a> kar li (kya kahan jaata hai), rail <a href="0016-lock-the-spine-dock-the-rest.html">lock</a> kar li (Insert · Media · Pages · Design). Ab agla qadam: us structure ko <strong>draw</strong> karna — taake test ho sake. Aap ne theek tareeqa maanga: <em>pehle "job-to-be-done", phir "module/block."</em> Yeh ek hi screen par <strong>do pass</strong> hain — pehla pass <em>kya zaroori hai</em> decide karta hai, doosra <em>woh kahan baithta hai.</em></p>
+
+  <h2>Do pass, ek screen</h2>
+  <div class="two">
+    <div class="col a"><h4>Pass 1 · Job</h4><p>User is screen par <strong>ek</strong> asal kaam karne aaya — woh kya hai? Yeh decide karta hai <strong>prominence</strong>: sabse bada kaam = sabse loud box. Baaki dheema.</p></div>
+    <div class="col b"><h4>Pass 2 · Modules</h4><p>Us kaam ke hisaab se screen ko <strong>blocks</strong> mein todo (header / main-action / info / nav). Phir blocks ko grey boxes mein <strong>grid</strong> par rakho.</p></div>
+  </div>
+  <p>Job pehle isliye, kyunki agar aap blocks pehle banaoge to aap sirf <em>UI</em> ko copy karoge. Job pehle = aap <em>user</em> se shuru karte ho. Yahi aap ka <a href="../reference/buildrik-design-principles.html">#4 (prominence = frequency × importance)</a> hai, aur Christensen ka <a href="https://www.youtube.com/watch?v=sfGtw2C95Ms" target="_blank" rel="noopener">"job-to-be-done"</a> lens — "log product ko ek kaam karwane ke liye hire karte hain."</p>
+
+  <h2>5-step recipe (aap ki tarteeb)</h2>
+  <ol class="recipe">
+    <li><b>Screen</b> Naam · kiske liye (user) · platform. Ek line.</li>
+    <li><b>Job</b> Ek main kaam. Phir likho: kya numayan, kya dheema.</li>
+    <li><b>Modules</b> Us kaam ke hisaab se blocks/sections — har block mein kya.</li>
+    <li><b>Wireframe</b> Sirf grey boxes, lines, placeholders. No colour, no asli tasveer. Grid par align. Sabse ahem action sabse numayan.</li>
+    <li><b>Why</b> Har bade faisle ki ek-line wajah ("ye yahan isliye kyunke…").</li>
+  </ol>
+
+  <h2>Worked example — the editor shell</h2>
+  <p>Chalo isi recipe ko aap ki sabse pehli screen par chalate hain — poora editor frame (the "spine").</p>
+  <p class="wf-cap" style="font-family:'Inter Tight',sans-serif;font-size:14px;color:var(--muted)">
+    <strong>1 · Screen:</strong> Editor shell (<code>/edit/:id</code>) · <strong>kiske liye:</strong> agency builder jo ek site banata hai · <strong>platform:</strong> Desktop.<br>
+    <strong>2 · Job:</strong> "Is page ko banao aur publish karo." → <span class="chip">Numayan</span> canvas + Publish; <span class="chip">dheema</span> rail icons, status, footer.<br>
+    <strong>3 · Modules:</strong> Topbar (site-wide actions) · Rail (jobs, ek waqt mein ek) · Drawer (active job ka panel) · Canvas (kaam ki jagah) · Inspector (selected cheez) · Footer (status).
+  </p>
+
+  <div class="wf">
+    <div class="wf-frame">
+      <div class="wf-shell">
+        <div class="wf-shell__bar">
+          <span class="wf-tag">a</span><span class="wf-label">‹Exit</span>
+          <span class="wf-icon"></span><span class="wf-icon"></span>
+          <span class="wf-grow" style="text-align:center"><span class="wf-pill">▭ ▢ ▯ device</span></span>
+          <span class="wf-pill">✨</span><span class="wf-pill">Preview</span>
+          <span class="wf-pill wf-pill--solid">Publish</span><span class="wf-tag">b</span><span class="wf-label">⋯</span>
+        </div>
+        <div class="wf-shell__body">
+          <div class="wf-shell__rail">
+            <span class="wf-slot wf-slot--on">＋</span><span class="wf-tag">c</span>
+            <span class="wf-slot">▣</span><span class="wf-slot">▤</span><span class="wf-slot">◑</span>
+          </div>
+          <div class="wf-shell__drawer">
+            <span class="wf-label">Insert panel</span>
+            <div class="wf-stack" style="margin-top:6px">
+              <div class="wf-box" style="padding:6px"><div class="wf-line w-60"></div></div>
+              <div class="wf-box" style="padding:6px"><div class="wf-line w-75"></div></div>
+              <div class="wf-box" style="padding:6px"><div class="wf-line w-50"></div></div>
+            </div>
+          </div>
+          <div class="wf-shell__canvas">
+            <span class="wf-tag">d</span><span class="wf-label">canvas — kaam ki jagah</span>
+            <div class="wf-img" style="height:60px;margin-top:8px"></div>
+            <div class="wf-box wf-box--plain" style="margin-top:8px"><div class="wf-line w-90"></div><div class="wf-line w-75" style="margin-top:6px"></div></div>
+          </div>
+          <div class="wf-shell__insp">
+            <span class="wf-label">You are editing…</span><span class="wf-tag">e</span>
+            <div class="wf-row" style="margin-top:6px"><span class="wf-icon"></span><div class="wf-line w-60"></div></div>
+            <div class="wf-row" style="margin-top:8px"><span class="wf-pill wf-pill--on">This</span><span class="wf-pill">All</span><span class="wf-pill">Site</span></div>
+            <div class="wf-box" style="margin-top:8px;padding:6px"><div class="wf-line w-90"></div><div class="wf-line w-50" style="margin-top:6px"></div></div>
+          </div>
+        </div>
+        <div class="wf-shell__foot"><span class="wf-tag">f</span>⌗ Structure · ● Connected · body›button · 1280×800 · 100%</div>
+      </div>
+    </div>
+    <p class="wf-frame__caption">Low-fi · grey boxes only · dark box = the one hero</p>
+
+    <ol class="wf-why">
+      <li><span class="wf-tag">a</span><strong>Exit top-left.</strong> Escape hamesha pehli jagah dhoondhi jaati hai (left-to-right reading). Site-wide action → topbar, canvas nahi.</li>
+      <li><span class="wf-tag">b</span><strong>Publish = sirf dark box.</strong> Ek screen par ek hero (#5). Baaki sab outline. ⋯ rare cheezein chhupata hai (#9).</li>
+      <li><span class="wf-tag">c</span><strong>Rail = locked spine.</strong> 4 slots, Insert #1 hamesha. Naya feature andar dock hota hai, naya icon nahi (#15).</li>
+      <li><span class="wf-tag">d</span><strong>Canvas sabse bada.</strong> Job "page banao" hai → kaam ki jagah ko sabse zyada room. Prominence = area (#4).</li>
+      <li><span class="wf-tag">e</span><strong>Inspector right, on-demand.</strong> Sirf jab kuch select ho. "You are editing this" + 3-reach = plain language (#1).</li>
+      <li><span class="wf-tag">f</span><strong>Footer = whisper.</strong> Status/zoom zaroori hai par kaam nahi — sabse dheema, neeche, chhota.</li>
+    </ol>
+  </div>
+
+  <h2>Low-fi ka anushasan (kyun grey)</h2>
+  <p>Wireframe ka poora maqsad hi "<em>final nahi</em>" hai. Colour ya asli tasveer dalte hi log <em>layout</em> par baat karna chhod ke <em>"ye neela acha hai?"</em> par aa jaate hain. Isliye:</p>
+  <div class="wf-legend">
+    <span><span class="sw" style="background:var(--wf-fill);border:1px solid var(--wf-line)"></span> box = koi bhi element</span>
+    <span><span class="sw" style="background:var(--wf-solid)"></span> dark = sabse numayan (hero)</span>
+    <span><span class="sw" style="background:var(--wf-ghost);border:1px dashed var(--wf-line)"></span> dashed = khaali / placeholder</span>
+    <span><span class="sw wf-img" style="min-height:0;height:14px"></span> ✕ box = tasveer aayegi</span>
+  </div>
+  <ul style="font-size:14.5px;line-height:1.7;margin-top:12px">
+    <li><strong>Copy ki jagah grey bars</strong> — asli text likhne se aap copywriting mein phans jaate ho. Structure pehle.</li>
+    <li><strong>Prominence size + position se</strong>, colour se nahi. Bada + upar/center = ahem.</li>
+    <li><strong>Grid par align</strong> — sab kuch ek base spacing par snap. Tedha alignment = baad ki guesswork.</li>
+  </ul>
+  <div class="callout">Krug ka usool: wireframe ko <em>"sahi"</em> nahi, <em>"testable"</em> banao. Grey boxes 5 minute mein phenk sakte ho; painted mockup se aap shaadi kar lete ho. Decide → draw → walk → fix.</div>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Job pehle isliye taake prominence user ke kaam se nikle, UI copy se nahi. Sabse bada kaam = sabse numayan box. Blocks pehle banao to aap sirf maujooda UI dohratе ho.">
+      <p class="q-stem">Wireframe mein "job" pehle kyun aata hai?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>it decides what's loud</button>
+        <button class="q-opt">it picks the colours</button>
+        <button class="q-opt">it speeds the build</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Low-fi grey isliye taake log layout par baat karein, paint par nahi. Colour/asli-tasveer aate hi feedback structure se hat ke taste par chala jaata hai.">
+      <p class="q-stem">Wireframe grey kyun rakhte hain?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>keep talk on layout</button>
+        <button class="q-opt">make it print fast</button>
+        <button class="q-opt">match the brand</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Ek screen par ek hero. Sirf Publish dark box hai, baaki outline — isliye aankh seedha kaam ke nateeje par jaati hai. Do dark box = koi hero nahi.">
+      <p class="q-stem">Shell mein sirf Publish dark kyun?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>one hero per screen</button>
+        <button class="q-opt">publish is dangerous</button>
+        <button class="q-opt">it fills the space</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Yahi 5-step recipe maine aap ke <strong>poore editor</strong> par chala di hai — har surface (shell · Insert · Media · Pages · Design · Inspector · topbar · footer) + uski empty/loading/error states, sab grey-box wireframe mein, har faisle ki wajah ke saath. Woh aap ka asli deliverable hai aur builder ke liye SSOT:</p>
+  <p class="ask"><strong>→ <a href="../reference/editor-wireframe.html">Buildrik Editor — complete low-fi wireframe</a></strong> · grounded in the real shell + locked 4-tool rail. Isay khol ke walk karo, phir 3–5 users par test karo (L15).</p>
+
+  <p class="source">Sources: <a href="https://www.youtube.com/watch?v=sfGtw2C95Ms" target="_blank" rel="noopener">Jobs-To-Be-Done — Christensen ("milkshake")</a> · <a href="https://sensible.com/dont-make-me-think/" target="_blank" rel="noopener">Steve Krug — Don't Make Me Think</a> ("make it testable, not right") · <a href="https://www.nngroup.com/articles/wireflows-when-and-how-to-use-them/" target="_blank" rel="noopener">NN/g — wireframes &amp; flows</a>. Engine: aap ki <a href="../reference/buildrik-design-principles.html">constitution</a> (#4 prominence · #5 one hero · #9 disclosure · #15 spine) + <a href="../reference/ia-home-map.html">home-map</a>. Kuch atke — poocho, main aap ka teacher hun.</p>
+  <p class="fine">Next: kaho <strong>"walk the wireframe"</strong> — main aap ke saath core job (page banao → publish) ko frame-by-frame chalunga, ya direct usay clickable HTML mockup bana dunga jaise <code>topbar-final.html</code>.</p>
+
+  <div class="nav">
+    <a href="0016-lock-the-spine-dock-the-rest.html">← L16 · Lock the spine</a>
+    <a href="../reference/editor-wireframe.html">Complete editor wireframe →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

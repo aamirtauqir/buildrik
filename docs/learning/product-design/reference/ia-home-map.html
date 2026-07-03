@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home-map — every feature, one home, one verdict</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .jobhdr{font-size:13px;font-weight:700;letter-spacing:.03em;margin:26px 0 2px;display:flex;gap:9px;align-items:baseline}
+  .jobhdr .home{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:1px 7px;border-radius:5px}
+  .home.ed{background:var(--accent-soft);color:var(--accent)} .home.db{background:#FEF2F2;color:var(--bad)} .home.both{background:#F2F4F7;color:var(--muted)}
+  table.hm{font-size:13px;margin:6px 0 0} table.hm td{padding:6px 9px;vertical-align:top}
+  table.hm td:first-child{font-weight:550;width:32%}
+  .v{font-size:10.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;padding:1px 6px;border-radius:5px;white-space:nowrap}
+  .v.keep{background:#ECFDF3;color:var(--good)} .v.merge{background:#FFFAEB;color:var(--warn)}
+  .v.cut{background:#FEF3F2;color:var(--bad)} .v.hide{background:#F2F4F7;color:var(--muted)} .v.fix{background:#FFF7ED;color:#C2410C}
+  .test{background:var(--accent-soft);border-radius:9px;padding:12px 16px;margin:14px 0;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Home-map worksheet · IA SSOT</p>
+  <h1>Every feature. One home. One verdict.</h1>
+  <p class="lede">The deliverable of <a href="../lessons/0013-one-home-group-by-the-job.html">Lesson 13</a>. The whole feature set, regrouped by the <strong>user's job</strong> (not the backend module), each with a single home (Editor / Dashboard) and a verdict. This is the SSOT every builder cites for "where does X go?" — seeded from the real <a href="../../reviews/feature-inventory.md">inventory</a> + <a href="../../reviews/feature-backend-map.md">backend-map</a>.</p>
+
+  <div class="test">
+    <strong>The scope test (decides every home):</strong> "Is this about <em>one</em> site's content, or about <em>many</em> sites / the business?"<br>
+    Inside one site → <span class="v keep" style="background:var(--accent-soft);color:var(--accent)">EDITOR</span> &nbsp;·&nbsp; Across sites / the business → <span class="v keep" style="background:#FEF2F2;color:var(--bad)">DASHBOARD</span>
+  </div>
+  <p class="fine">Verdicts — <span class="v keep">keep</span> as-is · <span class="v merge">merge</span> a duplicate into one home · <span class="v fix">fix</span> a wired-but-broken backend · <span class="v hide">hide</span> until the backend is real (constitution <a href="buildrik-design-principles.html">#3</a>) · <span class="v cut">cut</span> entirely.</p>
+
+  <p class="jobhdr"><span class="home db">Dashboard</span> Job 1 — Run the business</p>
+  <table class="hm">
+    <tr><td>Account · profile · password · 2FA</td><td><span class="v keep">keep</span></td><td>across the whole account, not one site.</td></tr>
+    <tr><td>Workspace settings · switch · delete</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+    <tr><td>Team — invite · roles · remove</td><td><span class="v keep">keep</span></td><td>resendInvite sends no email → <span class="v fix">fix</span> feedback.</td></tr>
+    <tr><td>Clients — CRUD + assign (agency)</td><td><span class="v keep">keep</span></td><td>flag off → turn ON; this is the agency wedge.</td></tr>
+    <tr><td>Notifications center</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+    <tr><td>Integrations (Vercel OAuth)</td><td><span class="v keep">keep</span></td><td>tuck under settings; rarely used.</td></tr>
+    <tr><td>Billing · plans · invoices</td><td><span class="v keep">keep</span></td><td>upgrade throws (no Stripe) → <span class="v hide">hide</span> the upgrade CTA until real.</td></tr>
+    <tr><td>API tokens</td><td><span class="v keep">keep</span></td><td>advanced; tuck deep.</td></tr>
+  </table>
+
+  <p class="jobhdr"><span class="home db">Dashboard</span> Job 2 — Start a site</p>
+  <table class="hm">
+    <tr><td>Sites list / detail / advanced</td><td><span class="v keep">keep</span></td><td>this IS the dashboard home.</td></tr>
+    <tr><td>Dashboard home · activity feed · quick actions</td><td><span class="v fix">fix</span></td><td>rename/dup/archive/delete write no log → feed under-fed; bandwidth=0 fake.</td></tr>
+    <tr><td>New site — blank / template</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+    <tr><td>New site — <strong>AI</strong></td><td><span class="v hide">hide</span></td><td>no AI branch → silently makes a blank site. Honesty (#3).</td></tr>
+    <tr><td>Template gallery + preview</td><td><span class="v keep">keep</span></td><td>seed.ts seeds NO templates → empty gallery; needs data or empty-state.</td></tr>
+    <tr><td>First-run / getting-started</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+  </table>
+
+  <p class="jobhdr"><span class="home ed">Editor</span> Job 3 — Build the page</p>
+  <table class="hm">
+    <tr><td>Canvas — add · select · resize · multi · group</td><td><span class="v keep">keep</span></td><td>the core. Calm by default (#6).</td></tr>
+    <tr><td>Add elements / sections panel</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+    <tr><td>Pages manager + page ops</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+    <tr><td>Layers tree</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+    <tr><td>CMS — collections · records · binding · dynamic pages</td><td><span class="v fix">fix</span></td><td>server-sync lossy + server→local hydration additive-only; add feedback.</td></tr>
+    <tr><td>Media library</td><td><span class="v merge">merge</span></td><td>appears in editor AND dashboard → editor is the home; dashboard = read-only overview at most.</td></tr>
+    <tr><td>Command palette (⌘⇧P)</td><td><span class="v keep">keep</span></td><td>tucked; power-user.</td></tr>
+    <tr><td>Editor onboarding checklist</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+    <tr><td>4-mode editor (build/AI/design/settings)</td><td><span class="v keep">keep</span></td><td>this is the editor's top-level rail.</td></tr>
+  </table>
+
+  <p class="jobhdr"><span class="home ed">Editor</span> Job 4 — Make it on-brand</p>
+  <table class="hm">
+    <tr><td>Inspector — type · spacing · layout · size · bg · effects · position</td><td><span class="v keep">keep</span></td><td>—</td></tr>
+    <tr><td>Design system / tokens &nbsp;·&nbsp; Styles &nbsp;·&nbsp; DS tools</td><td><span class="v merge">merge</span></td><td>3 surfaces (ds1·ds2·ds3) for one job → one "Brand" area.</td></tr>
+    <tr><td>Components — create · instance · variants</td><td><span class="v fix">fix</span></td><td>masters browser-IndexedDB only → data-loss on cache-clear; overrides revert on master-sync.</td></tr>
+    <tr><td>Shared DS push (agency → clients)</td><td><span class="v keep">keep</span></td><td>agency wedge; already wired.</td></tr>
+  </table>
+
+  <p class="jobhdr"><span class="home both">Editor + Dashboard</span> Job 5 — Get sign-off</p>
+  <table class="hm">
+    <tr><td>Preview / preview-as-client</td><td><span class="v keep">keep</span></td><td>editor.</td></tr>
+    <tr><td>Client review — request (editor) + queue (dashboard)</td><td><span class="v fix">fix</span></td><td>agency side wired; <strong>client side broken</strong> (share page just redirects, no approve/comment) + no notify trigger.</td></tr>
+    <tr><td>Comments</td><td><span class="v fix">fix</span></td><td>client overlay missing (cross-origin published site).</td></tr>
+    <tr><td>Share link + password</td><td><span class="v fix">fix</span></td><td>decorative — redirects to world-readable URL; token isn't a real gate.</td></tr>
+  </table>
+
+  <p class="jobhdr"><span class="home both">Editor + Dashboard</span> Job 6 — Ship &amp; run it</p>
+  <table class="hm">
+    <tr><td>Publish flow + lifecycle states</td><td><span class="v keep">keep</span></td><td>hero action (#5). Editor publishes; dashboard shows status across sites.</td></tr>
+    <tr><td>Custom domains — connect · verify · primary</td><td><span class="v fix">fix</span></td><td>dns-verify cron matches a dead host → verification never succeeds.</td></tr>
+    <tr><td>Per-page SEO</td><td><span class="v keep">keep</span></td><td>editor (per page). Site-level SEO defaults → merge into site settings (one SEO home).</td></tr>
+    <tr><td>Site settings <span class="fine">(editor tab · dashboard · settings hub)</span></td><td><span class="v merge">merge</span></td><td>3 homes → 1. Site-level config = dashboard site-detail.</td></tr>
+    <tr><td>Forms builder + submissions</td><td><span class="v keep">keep</span></td><td>submissions viewer is wired (was a guessed ghost — it isn't).</td></tr>
+    <tr><td>Analytics</td><td><span class="v fix">fix</span></td><td>dashboard site-detail; avgSession=0, hourly silently = daily.</td></tr>
+    <tr><td>Redirects</td><td><span class="v fix">fix</span></td><td>stored but never deployed → don't work live. Fix or hide.</td></tr>
+    <tr><td>Localization / locales</td><td><span class="v hide">hide</span></td><td>engine is locale-unaware; server-only, invisible to editor.</td></tr>
+    <tr><td>Export HTML</td><td><span class="v cut">cut</span></td><td>anti-retention — takes the user out of the product (prior product audit).</td></tr>
+  </table>
+
+  <h2>Duplicates to resolve (the dedup list)</h2>
+  <table class="hm">
+    <tr><th>Same job, many homes</th><th>Decision</th></tr>
+    <tr><td>Site settings × 3 (editor tab · dashboard · hub)</td><td>→ one home: dashboard site-detail.</td></tr>
+    <tr><td>Media × 2 (editor · dashboard)</td><td>→ editor is home; dashboard read-only.</td></tr>
+    <tr><td>SEO × 2 (editor SeoTab · dashboard d5/m-seo)</td><td>→ per-page in editor; site defaults in settings.</td></tr>
+    <tr><td>Design system × 3 (ds1 tokens · ds2 styles · ds3 tools)</td><td>→ one "Brand" area in editor.</td></tr>
+    <tr><td>Settings hub (b0 / fix-settings-map)</td><td>→ a hub pointing everywhere is the smell; let each setting live with its job, drop the catch-all.</td></tr>
+  </table>
+
+  <h2>Hide until the backend is real (#3)</h2>
+  <p>AI "create site" · Stock photos/videos · Real-time collab (6 P1 bugs) · Billing upgrade CTA · Localization · Data export (no processor). <strong>None of these earn nav space today</strong> — design the slot, gate the feature.</p>
+
+  <h2>Completeness test</h2>
+  <p>Before you call the home-map done, three checks: <strong>(1)</strong> Does every feature have exactly <em>one</em> home? <strong>(2)</strong> Does every group name a <em>user job</em>, not a backend module? <strong>(3)</strong> Are top-level items ~5–6, not 17? If yes to all three, the structure now matches how the user thinks — and "where does this go?" has a fixed answer.</p>
+
+  <p class="source">Method: <a href="../lessons/0013-one-home-group-by-the-job.html">Lesson 13</a>. Principle: <a href="buildrik-design-principles.html">#14 — Every feature has one home</a>. Verdicts grounded in <a href="../../reviews/feature-backend-map.md">feature-backend-map.md</a>. Living doc — revise as features land or die.</p>
+  <p class="fine"><strong>Completed run (2026-06-23):</strong> all ~100 features placed + the nav skeleton that falls out → <a href="../../reviews/ia-home-map-20260623.md">docs/reviews/ia-home-map-20260623.md</a>. This page is the method + seed; that doc is the canonical worklist builders cite.</p>
+</main>
+</body>
+</html>

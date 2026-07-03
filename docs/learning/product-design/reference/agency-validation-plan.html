@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agency validation plan — the demand gate</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:16px 0;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+  .two .h{padding:8px 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .two .pull .h{background:#F0FDFA;color:var(--good)} .two .no .h{background:#FEF2F2;color:var(--bad)}
+  .two ul{margin:0;padding:10px 12px 12px 28px;font-size:14.5px} .two li{margin:0 0 6px}
+  .two .pull{border-right:1px solid var(--rule)}
+  ol.qs{counter-reset:q;list-style:none;padding:0;margin:14px 0}
+  ol.qs li{counter-increment:q;position:relative;padding:10px 12px 10px 44px;border:1px solid var(--rule);border-radius:9px;margin:0 0 8px;font-size:15px}
+  ol.qs li::before{content:counter(q);position:absolute;left:12px;top:10px;width:22px;height:22px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font:700 12px/22px Inter;text-align:center}
+  ol.qs li em{color:var(--muted);font-size:13.5px}
+  .rule3{display:grid;gap:8px;margin:12px 0}
+  .rule3 .r{border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:8px 12px;font-size:14.5px}
+  .rule3 .r b{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · Validation · the demand gate · 2026-06-29</p>
+  <h1>Validate the wedge before you build it.</h1>
+  <p class="lede">The design is done and codex-clean. This is the one thing the design <em>can't</em> prove: do real agencies actually feel this pain? Run this before writing a line of build code.</p>
+
+  <div class="panel panel--accent">
+    <strong>The bet under everything:</strong> "Agencies feel real pain keeping many client sites on-brand <em>from one place</em> — enough to pay for it or switch tools." Every downstream move rides on this: the P0 build, the editor <code>theme.*</code> wiring that doesn't exist yet (LR-0017). <strong>No agency has confirmed it.</strong> This test either funds the build or kills it — both outcomes save you.
+  </div>
+
+  <h2>1 · Who to talk to</h2>
+  <div class="panel">
+    <strong>3–5 real web/digital agencies</strong> running <strong>≥3 client sites</strong>. People who would actually buy — <em>not friends</em> (they lie to be nice). Reach: cold DM, agency Slack/Discord, a local meetup, your network's network. You need strangers with the problem, not fans of you.
+  </div>
+
+  <h2>2 · The method — diagnose, don't pitch</h2>
+  <p>You are a doctor, not a salesman. The moment you describe Buildrik, they start being polite — and polite data is worthless. Three rules from <a href="https://www.momtestbook.com/" target="_blank" rel="noopener">The Mom Test</a> (Rob Fitzpatrick):</p>
+  <div class="rule3">
+    <div class="r"><b>1. Their life, not your idea.</b> Ask about how <em>they</em> work today. The second you mention your solution, the answers bend to flatter it.</div>
+    <div class="r"><b>2. Past specifics, not future opinions.</b> "Would you use X?" = worthless (everyone says yes). "Show me the last time this happened" = gold (it's a fact, not a guess).</div>
+    <div class="r"><b>3. Talk less, listen more.</b> Your job is to learn, not to convince.</div>
+  </div>
+  <div class="callout">Compliments are not data. "Cool idea," "sounds useful," "I'd definitely try it" = a polite no. Real signal is pain + what they've already spent on it.</div>
+
+  <h2>3 · The five questions</h2>
+  <p>All past-tense, all specific. Notice there is <strong>zero</strong> "would you use Buildrik" — that's a pitch, not a question.</p>
+  <ol class="qs">
+    <li>Abhi kitne client sites manage karte ho? <em>Last waala kaam dikhao jahan brand (logo / color / font) badalna pada.</em></li>
+    <li>Jab ek change saare pages / saare sites pe lagana tha — last baar wo <em>kaise</em> hua? <em>Kitna time laga, kitne tools, kaun karta hai?</em></li>
+    <li>Cross-client consistency pe pichle mahine kya <em>toota</em>? <em>Kisi client ne pakda ya complain kiya?</em></li>
+    <li>Iske liye abhi kya use karte ho, aur kitna <em>pay</em> karte ho? <em>(Webflow / Figma / manual copy-paste?)</em></li>
+    <li>Last naya tool kab adopt kiya — <em>kis dard ne</em> switch karaya?</li>
+  </ol>
+
+  <h2>4 · Show the design — last</h2>
+  <div class="panel">
+    Only <strong>after</strong> you've mined their real pain, show <a href="design-handoff.html">design-handoff.html</a> (the clickable prototype) + the <strong>★ agency-wedge journey</strong> in <a href="wireflows.html">wireflows.html</a>. Then shut up and watch. Their <em>reaction to a real flow</em> tells you far more than their <em>opinion on a pitch</em>. Do they lean in and say "wait, can it do my 5 clients at once?" — or just nod politely?
+  </div>
+
+  <h2>5 · Read the signal</h2>
+  <div class="two">
+    <div class="pull"><div class="h">▲ PULL — go</div>
+      <ul>
+        <li>unprompted current pain</li>
+        <li>already spends money / hours on it</li>
+        <li>"when can I get this?"</li>
+        <li>offers intros to other agencies</li>
+        <li>tries to use it right now</li>
+      </ul>
+    </div>
+    <div class="no"><div class="h">▽ NO-PULL — kill</div>
+      <ul>
+        <li>"cool idea"</li>
+        <li>hypothetical enthusiasm, no past pain</li>
+        <li>"sounds useful"</li>
+        <li>compliments, no budget</li>
+        <li>"I'd maybe try it someday"</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>6 · The gate</h2>
+  <div class="panel panel--accent">
+    <strong>≥ 3 of 5</strong> agencies show real <em>spent-money-or-time</em> pain on <em>this exact problem</em> → <strong>fund the P0 build</strong> (start the <code>theme.*</code> editor wiring). <strong>&lt; 3</strong> → the wedge isn't the wedge: pick the other differentiator (the agency review-loop — CEO-lens called it the sharper retention pain, LR-0017) or stop. <strong>Either result is a win</strong> — you learned before building, not after a wasted quarter.
+  </div>
+
+  <h2>Logistics</h2>
+  <p class="fine">20-minute calls. Record with consent. One notes doc, one row per agency: their pain (specific), what they spend today, pull/no-pull. Don't sell — diagnose. You already have everything you need to run this: the handoff (217 screens) + the wedge journey. Figma can wait — it makes this prettier, not truer.</p>
+
+  <p class="source">Primary source: <a href="https://www.momtestbook.com/" target="_blank" rel="noopener">The Mom Test — Rob Fitzpatrick</a> (how to talk to customers so the data is real). Method taught in <a href="../lessons/0025-validate-with-real-agencies.html">Lesson 25</a>. <strong>See it run:</strong> <a href="model-agency-interview.html">a model agency interview</a> — the whole call, annotated, re-read it before each real one. Why this is the move: <a href="../learning-records/0017-autoplan-caught-build-the-wrong-thing.md">LR-0017</a> (autoplan caught "build the wrong thing well") + Lesson 23 (only users prove correctness).</p>
+
+  <div class="ask"><strong>Stuck running it?</strong> Poocho — main aap ka teacher hoon. Pehli call ke baad wapas aao, hum saath read karenge: pull tha ya politeness.</div>
+
+  <div class="nav">
+    <a href="../lessons/0025-validate-with-real-agencies.html">← L25 · How to validate</a>
+    <a href="design-handoff.html">The handoff (what you show) →</a>
+  </div>
+</main>
+</body>
+</html>

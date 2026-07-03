@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 24 — Get your whole design into Figma (the quota-free route)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .pipe{display:flex;align-items:stretch;gap:0;margin:16px 0;flex-wrap:wrap}
+  .pipe .b{flex:1;min-width:120px;border:1px solid var(--rule);border-radius:9px;padding:11px 13px;font-size:13px;text-align:center}
+  .pipe .arr{display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:700;font-size:20px;padding:0 8px}
+  .pipe .b b{display:block;font-size:13.5px;margin-bottom:3px}
+  .pipe .b span{color:var(--muted);font-size:12px}
+  .pipe .src{background:#F0FDF9;border-color:#A7F3D0}.pipe .out{background:#EFF4FF;border-color:#BFDBFE}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .two .col{border:1px solid var(--rule);border-radius:9px;padding:12px 14px;font-size:13.5px}
+  .two .x{border-color:#FECACA;background:#FEF2F2}.two .y{border-color:#A7F3D0;background:#F0FDF9}
+  .two h4{margin:0 0 8px;font-size:13px}.two .x h4{color:var(--bad)}.two .y h4{color:#0F766E}
+  table.st{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+  table.st th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);padding:5px 8px;border-bottom:1.5px solid var(--rule)}
+  table.st td{padding:6px 8px;border-bottom:1px solid #f1f1f3}
+  table.st td:first-child{font-weight:600}
+  .note{border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14px}
+  .note b{color:var(--accent)}
+  @media(max-width:560px){.two{grid-template-columns:1fr}.pipe{flex-direction:column}.pipe .arr{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 24 · ~5 minutes</p>
+  <h1>Get your whole design into Figma — without redrawing it.</h1>
+  <p class="lede">Aap ne poocha: <em>"Figma mein yeh saara design kaise banaoon, jis se main aasaani se sab dekh sakoon?"</em> Do baatein: <strong>(1)</strong> tujhe Figma mein kuch <em>banana</em> nahi — design pehle se HTML mein exist karta, sirf <strong>export</strong> karna hai. <strong>(2)</strong> Tera <strong>Starter plan</strong> AI/MCP se "generate" ko block karta — quota-free raasta hai <strong>SVG-import</strong>.</p>
+
+  <h2>Pehle: shayad tujhe abhi Figma chahiye hi nahi</h2>
+  <p>Tere paas already <strong>"sab ek jagah dekho"</strong> hai — <a href="../reference/design-handoff.html">design-handoff.html</a> ek file jo <strong>217 screens</strong> (108 wireframes + 109 clickable prototype) + IA + wireflows + editor-surfaces ko link karti. Sirf <em>dekhne</em> ke liye kaam ho chuka.</p>
+  <div class="note">
+    <b>Figma ki asli value yahan:</b> infinite canvas pe <strong>saare screens ek saath, zoom-out bird's-eye</strong> — poora product ek nazar mein, free-move, comment, native-edit. Woh HTML nahi de sakti. Agar yeh chahiye → neeche ka raasta. Sirf viewing chahiye → handoff already kaafi hai.
+  </div>
+
+  <h2>Banana nahi — EXPORT. Aur kaun sa raasta.</h2>
+  <div class="two">
+    <div class="col x"><h4>✗ AI/MCP "generate karo"</h4>Tera <strong>Starter plan MCP ko hard-cap</strong> karta — <code>whoami</code> + <code>create_file</code> + ~1 write = quota khatam. 217 screens namumkin. (Tera apna <code>editor-wireframe.figma.README.md</code> yeh likhta — pehle hi block hua tha.)</div>
+    <div class="col y"><h4>✓ SVG-import (quota-free)</h4>HTML → SVG → Figma mein <strong>drag</strong>. Har box/text <strong>native editable layer</strong> ban jaata. <strong>Zero MCP quota.</strong> Yehi proven raasta — editor-surfaces se ho chuka.</div>
+  </div>
+
+  <div class="pipe">
+    <div class="b src"><b>HTML</b><span>source of truth — ia-tree, wireflows, wireframes</span></div>
+    <div class="arr">→</div>
+    <div class="b"><b>generator → SVG</b><span>script HTML/spec se SVG banata (rect·text·g)</span></div>
+    <div class="arr">→</div>
+    <div class="b out"><b>Figma</b><span>SVG drag → native layers · ek page per set</span></div>
+  </div>
+  <p>Figma SVG ko <strong>tod deta</strong>: <code>&lt;rect&gt;</code> → Rectangle, <code>&lt;text&gt;</code> → editable Text, <code>&lt;g&gt;</code> → Group (per-surface named, e.g. <code>0 The shell</code>). Drag karo, kuch bhi select/restyle/move karo.</p>
+
+  <h2>Plan: ek Figma file, N pages</h2>
+  <p>Ek blank Figma file (already bana hai), phir har artifact-set ki apni <strong>page</strong> — har page pe uska SVG drag:</p>
+  <table class="st">
+    <thead><tr><th>Figma page</th><th>SVG</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Editor surfaces (§0–38)</td><td><code>editor-wireframe.figma.svg</code></td><td>✅ ready — drag now</td></tr>
+      <tr><td>Wireflows (10 journeys)</td><td><code>wireflows.svg</code></td><td>⚠️ stale (5 flows) — moot if MCP route</td></tr>
+      <tr><td>IA tree</td><td><em>(none yet)</em></td><td>❌ needs an SVG</td></tr>
+      <tr><td>Dashboard screens (108)</td><td><em>(none yet)</em></td><td>❌ needs SVGs</td></tr>
+    </tbody>
+  </table>
+  <p>Drag karna seedha: Figma → File ▸ <em>Place / Import</em> → SVG chuno, <em>ya</em> SVG ko canvas pe drag karo. Bas.</p>
+
+  <div class="note" style="border-left-color:var(--bad)">
+    <b style="color:var(--bad)">Honest gap:</b> generator script (<code>gen-*-figma-svg.mjs</code>) scratchpad mein tha — clean ho gaya. Toh nayi SVGs (IA + 108 dashboard) banane ke liye generator dobara chahiye. Aur <code>wireflows.svg</code> stale hai. <em>"Sab Figma mein"</em> = pehle yeh SVGs banao (main bana sakta), phir drag.
+  </div>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Design HTML mein hai — Figma mein redraw ya MCP-generate nahi. HTML→SVG export → drag. Starter plan ki MCP-cap bypass.">
+      <p class="q-stem">Starter-plan pe saara design Figma mein — kaise?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>export to SVG, import</button>
+        <button class="q-opt">use MCP to generate</button>
+        <button class="q-opt">redraw frames by hand</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Starter plan MCP calls ko hard-cap karta — whoami+create+1 write quota khatam. SVG-import ko koi quota nahi chahiye.">
+      <p class="q-stem">Figma MCP-generate Starter pe kyun nahi?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>hard cap exhausts fast</button>
+        <button class="q-opt">it costs real money</button>
+        <button class="q-opt">svg looks much better</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Figma SVG ko parse karta: rect→Rectangle, text→editable Text, g→Group. Flat image nahi — sab native, editable.">
+      <p class="q-stem">SVG drag karne pe Figma mein kya milta?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>native editable layers</button>
+        <button class="q-opt">one flat image</button>
+        <button class="q-opt">a locked screenshot</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <div class="note" style="border-left-color:#0F766E">
+    <b style="color:#0F766E">Founder's call (2026-06-29):</b> SVG route reject; <strong>Figma MCP se recreate</strong> karenge — par pehle saare HTML artifacts sahi/complete karne ke baad. Yaad: Starter cap ki wajah se MCP incremental hoga (ek-ek artifact, mid-run rukne ke liye taiyaar).
+  </div>
+
+  <div class="note" style="border-left-color:var(--good)">
+    <b style="color:var(--good)">✓ DONE (2026-06-29):</b> Recreate ho gaya — MCP se, SVG nahi. <strong>Cap waala dar galat tha:</strong> do Figma MCP servers connected hain — purana cap <em>aamir/Starter</em> account ka tha; aaj jo server use hua wo <em>saqib/<strong>Pro</strong></em> hai, koi cap nahi. Method = <code>generate_figma_design</code> ne har HTML page ko <strong>localhost pe serve karke pixel-perfect Figma frames</strong> mein capture kiya (rect→Rectangle, text→Text — flat image nahi, editable layers). Saari <strong>4 artifacts ek file mein</strong>: <a href="https://www.figma.com/design/RmtnWGlZX9Z3idP6f5vmLq" target="_blank" rel="noopener">RmtnWGlZX9Z3idP6f5vmLq</a> (Page 1, ~7k nodes). Sabaq: "cap" maan-ne se pehle dekho MCP <em>kis account</em> pe auth karta — wo blocker account-mixup tha, asli limit nahi.
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Design <strong>banao nahi — export</strong> karo (HTML hi source of truth rehta). Starter plan pe raasta = <strong>SVG-import, MCP nahi</strong>. Ek Figma file, har set ki apni page. Sirf <em>viewing</em> chahiye to <a href="../reference/design-handoff.html">handoff</a> already de deta; Figma ka faida = sab ek saath, zoom-out map + designer canvas.</p>
+
+  <p class="source">Primary source: <a href="https://help.figma.com/hc/en-us/articles/360040028034-Import-files-into-Figma" target="_blank" rel="noopener">Figma — Import SVG &amp; files</a> (rect/text/g → native layers). Method record: <a href="../reference/editor-wireframe.figma.README.md">editor-wireframe.figma.README.md</a> (Starter MCP-cap → SVG route, proven). Kuch atke — poocho, main aap ka teacher hun.</p>
+  <p class="fine">Next offered: <strong>"Figma SVGs banao"</strong> — main generator dobara likhta, phir: (1) <code>wireflows.svg</code> regen (wedge ke saath), (2) <code>ia-tree.svg</code>, (3) dashboard screens SVG. Tu sirf drag karega Figma mein. Bolo to shuru.</p>
+
+  <div class="nav">
+    <a href="0023-audit-jobs-with-wireframes.html">← L23 · Audit jobs with wireframes</a>
+    <a href="../reference/design-handoff.html">The handoff (everything) →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

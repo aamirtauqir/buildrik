@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 19 — The redesign pipeline (not a button)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .lane{display:grid;grid-template-columns:90px 1fr;gap:0;margin:16px 0;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+  .lane .h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;padding:12px 10px;display:flex;align-items:center}
+  .lane .d{padding:11px 14px;font-size:14px;border-bottom:1px solid var(--rule)}
+  .lane .d:last-child{border-bottom:0}
+  .l-design{background:#2563EB}.l-validate{background:#B45309}.l-build{background:#0F766E}
+  .lane .d b{color:var(--ink)}
+  .keepnew{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .keepnew .c{border:1px solid var(--rule);border-radius:9px;padding:12px 14px;font-size:14px}
+  .keepnew .k{border-color:#A7F3D0;background:#F0FDF9}.keepnew .n{border-color:#BFDBFE;background:#EFF6FF}
+  .keepnew h4{margin:0 0 6px;font-size:13px}
+  @media(max-width:560px){.keepnew{grid-template-columns:1fr}.lane{grid-template-columns:70px 1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 19 · ~5 minutes</p>
+  <h1>Redesign is a pipeline, not a button.</h1>
+  <p class="lede">Aap ne poocha: poora product redesign karein — using <code>plan-ceo-review</code>, <code>design-review</code>, ek <code>/goal</code> skill + <code>codex</code>, har screen check ho, job+module (Webflow jaisa)? <strong>Haan — ho sakta hai.</strong> Par yeh ek <em>staged pipeline</em> hai, ek autonomous button nahi. Aur in skills ka kaam shayad woh nahi jo aap samajh rahe ho — pehle woh theek karte hain.</p>
+
+  <h2>1 · Purana flow rakho ya naya banao?</h2>
+  <p>Sab naya karne ki zaroorat nahi. Yeh L8 ka "<strong>re-lay-out, not re-wire</strong>" hai — jo chalta hai uske wires mat chhedo, sirf shakl badlo.</p>
+  <div class="keepnew">
+    <div class="c k"><h4>✓ Rakho + re-skin</h4>User bina atke goal tak pohonchta hai → flow same, presentation nayi. (Status ✅: publish, pages, inspector, media.)</div>
+    <div class="c n"><h4>✦ Naya flow</h4>User atakta / feedback nahi milta / toota hai → naya flow. (Status 🟡🔵: client-review loop, silent actions, CMS sync.)</div>
+  </div>
+  <p>Test: <strong>"user goal tak bina atke pohonchta hai?"</strong> Haan → keep. Nahi → new. Yeh faisla aap ki <a href="../reference/editor-functionality-map.html">coverage map</a> ke <em>status</em> column se already nikalta hai.</p>
+
+  <h2>2 · In skills ka asli kaam (yeh galat samjha ja raha tha)</h2>
+  <p>Aap ne kaha "design-review se wireframing banwate hain." Asal mein:</p>
+  <ul style="font-size:14.5px;line-height:1.75">
+    <li><strong>plan-ceo / plan-design / plan-eng-review</strong> = likhe hue <em>plan</em> ko pressure-test karte hain. <strong>Wireframe nahi banate.</strong> (<code>autoplan</code> teeno ek saath chalata hai.)</li>
+    <li><strong>design-review</strong> = <em>bani hui UI</em> ka QA (spacing/slop/hierarchy). <strong>Build ke baad,</strong> wireframe nahi.</li>
+    <li><strong>codex</strong> = external model se code/plan review. <strong>/goal</strong> = autonomous <em>build</em>.</li>
+  </ul>
+  <p>To: <strong>wireframe main banata hun (aap ki eye ke saath)</strong> · reviews + codex <strong>validate</strong> karte · /goal <strong>build</strong> karta. <em>Koi skill wireframe khud nahi banata.</em></p>
+
+  <h2>3 · Teen lanes mein poora pipeline</h2>
+  <div class="lane">
+    <div class="h l-design">Design<br>(YOU)</div>
+    <div>
+      <div class="d"><b>1 Inventory</b> — code → surfaces. <span style="color:var(--good)">✓ done</span> (<a href="../reference/editor-functionality-map.html">map</a>)</div>
+      <div class="d"><b>2 Wireframe</b> har surface (job+module, 5-step recipe). ← <strong>abhi yahan</strong></div>
+      <div class="d"><b>3 Check</b> har screen — <a href="../reference/heuristics-cheatsheet.html">heuristics</a> + states, build se pehle.</div>
+    </div>
+  </div>
+  <div class="lane">
+    <div class="h l-validate">Validate<br>(SKILLS)</div>
+    <div>
+      <div class="d"><b>4 Plan likho</b> — surface → flow → 4-part spec.</div>
+      <div class="d"><b>5 Pressure-test</b> — <code>autoplan</code> (ceo+design+eng) + <code>codex</code>. "Features sahi karte hain" = yahan.</div>
+    </div>
+  </div>
+  <div class="lane">
+    <div class="h l-build">Build<br>(AUTO)</div>
+    <div>
+      <div class="d"><b>6 Build</b> — <code>/goal</code> + <code>codex</code>, 5-rung verify, re-lay-out not re-wire.</div>
+      <div class="d"><b>7 design-review</b> bani hui UI par (QA).</div>
+      <div class="d"><b>8 Walk</b> 5 users (L15) — asli test.</div>
+    </div>
+  </div>
+
+  <h2>4 · Honest limit</h2>
+  <p>Stage 2–3 (design) aap ki <strong>judgment</strong> maangti — aap designer ho, AI guess karega = slop. Stage 6 (build) par <code>/goal</code> chamakta. <strong>Ek /goal poora product design nahi karega — woh aap ka design build karega.</strong> Isliye: pehle design (insaan), phir build (auto). Aur job+module backbone = bilkul Webflow ka model (top-level jobs, andar fixed modules, #15 spine).</p>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="plan-reviews likhe hue plan ko pressure-test karte hain; design-review bani UI ka QA. Wireframe insaan (aap+main) banata hai. Skills validate ya QA karte hain, generate nahi.">
+      <p class="q-stem">plan-ceo-review aap ke liye kya karta hai?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>pressure-tests the plan</button>
+        <button class="q-opt">draws the wireframes</button>
+        <button class="q-opt">builds the feature</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Jo flow bina atke goal tak le jaata hai usko rakho aur sirf re-skin karo (re-lay-out not re-wire). Naya flow sirf toote/confusing/missing ke liye.">
+      <p class="q-stem">Ek flow jo theek chal raha — kya karein?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>keep it, re-skin</button>
+        <button class="q-opt">rebuild it new</button>
+        <button class="q-opt">remove the flow</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="/goal autonomous run BUILD stage hai — woh wireframe+plan ko implement karta hai. Design (wireframe/judgment) insaan ka kaam hai; ek goal poora product design nahi karta.">
+      <p class="q-stem">/goal pipeline mein kahan baithta hai?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>the build stage</button>
+        <button class="q-opt">the design stage</button>
+        <button class="q-opt">the review stage</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Poora staged playbook (har skill ka role + keep/new rule + 8 stages) yahan hai: <strong><a href="../reference/redesign-pipeline.html">→ The redesign pipeline</a></strong>. Hum abhi <strong>Stage 2</strong> par hain — surfaces wireframe karna. Reviews (Stage 5) tab chalti hain jab plan likha ho; plan tab likhta hai jab wireframes ban chuke. Isliye agla kaam = baqi surfaces draw karna, na ke abhi review chalana. Pehle design, phir validate, phir build.</p>
+
+  <p class="source">Skills: <code>autoplan</code> (runs plan-ceo/design/eng) · <code>codex</code> · <code>design-review</code> (QA built UI) · <code>/goal</code> (autonomous build). Flow rule: <a href="0008-build-without-breaking.html">L8</a> re-lay-out-not-re-wire. Sequence: <a href="0012-reverse-wireframe-the-backend.html">L12</a>. Grounding: <a href="../reference/editor-functionality-map.html">coverage map</a>. Kuch atke — poocho, main aap ka teacher hun.</p>
+  <p class="fine">Next: <strong>"draw the to-draw surfaces"</strong> — main Stage-2 jaari rakhta hun, batch-by-batch (pehla batch: CMS · Components · Inspector-full · Forms · Publish-flow), har screen Stage-3 check ke saath. Jab to-draw = 0, phir Stage 4–5 (plan + autoplan + codex).</p>
+
+  <div class="nav">
+    <a href="0018-cover-every-surface-not-a-sketch.html">← L18 · Cover every surface</a>
+    <a href="../reference/redesign-pipeline.html">The pipeline →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 22 — Is six jobs right? (what counts as a job)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .tri{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+  .tri .c{border:1px solid var(--rule);border-radius:9px;padding:12px 14px}
+  .tri .c h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .tri .job h4{color:#0F766E}.tri .tool h4{color:var(--accent)}.tri .sub h4{color:#B45309}
+  .tri .c p{font-size:13px;margin:0;color:var(--muted)}
+  .test{border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14px}
+  .test b{color:var(--accent)}
+  table.cand{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+  table.cand th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);padding:5px 8px;border-bottom:1.5px solid var(--rule)}
+  table.cand td{padding:6px 8px;border-bottom:1px solid #f1f1f3;vertical-align:top}
+  table.cand td:first-child{font-weight:600}
+  @media(max-width:560px){.tri{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 22 · ~4 minutes</p>
+  <h1>Is six jobs right? — what counts as a job.</h1>
+  <p class="lede">Aap ne poocha: <em>"sirf 6 jobs hain ya aur bhi?"</em> Aaj <strong>haan, 6</strong> — aur woh achhe-form ke hain. Par <strong>6 koi qanoon nahi</strong>: yeh aap ke <em>code se nikaala</em> grouping hai, real users se sabit nahi. Yeh lesson do cheezein deta hai — (1) <strong>job kya hota hai</strong> (taa-ke aap khud gin sako), (2) <strong>6 sahi hai ya nahi</strong> ka asli test.</p>
+
+  <h2>Pehle: har cheez job nahi hoti</h2>
+  <p>List 6 pe isiliye ruki kyunki teen cheezein <em>job hain hi nahi</em>. Yeh farq pakdo:</p>
+  <div class="tri">
+    <div class="c job"><h4>Job</h4><p>Ek <em>nateeja</em> jo user chahta — UI ka zikr kiye baghair. "Sign-off lena," "page banana," "ship karna." Shuru + ant hota. Dost ko aise batata.</p></div>
+    <div class="c tool"><h4>Tool (cross-cutting)</h4><p>Har job ke <em>andar</em> chalta, apna ghar nahi. <strong>AI</strong> isi liye 7th job nahi — woh build/brand/ship ke andar madad karta. (<a href="../reference/ia-home-map.html">home-map</a>)</p></div>
+    <div class="c sub"><h4>Substrate</h4><p>System ko chahiye, par user ka "kaam" nahi. <strong>Auth · save · states · confirm.</strong> Inhe nav/job-space mat do (#13 states = pattern).</p></div>
+  </div>
+
+  <div class="test">
+    <b>The test — "I came here to ___":</b> blank mein jo aaye, woh job hai. "Main aaya <em>page banane</em> / <em>client se sign-off lene</em> / <em>publish karne</em>" → job. "Main aaya <em>login karne</em>" → nahi (substrate). "Main aaya <em>AI use karne</em>" → nahi (tool — AI kisi job ki khidmat mein hai). Job = <strong>outcome</strong>, na ke step, tool, ya plumbing.
+  </div>
+
+  <h2>Toh 6 sahi hai?</h2>
+  <p>6 <a href="../reference/ia-tree.html">aaj theek hain</a> — har ek asli outcome, har ek ka ghar, top-level 5–6 (IA test pass). <strong>Lekin yeh 6 code se reverse-engineer hue</strong> (backend-map se), users dekh ke nahi — isi liye woh modules pe itne saaf baithte hain. Ek real user shayad inhe alag kaate. Kuch <strong>candidate 7th jobs abhi J3/J6 ke andar chhupe</strong> hain:</p>
+  <table class="cand">
+    <thead><tr><th>Possible 7th job</th><th>Abhi kahan folded</th><th>Alag banega jab</th></tr></thead>
+    <tbody>
+      <tr><td>Grow / measure</td><td>J6 "run it" (analytics, SEO perf)</td><td>analytics real ho (abhi avgSession=0, fake)</td></tr>
+      <tr><td>Maintain a live site</td><td>J3 + J6 dobara enter karke</td><td>post-launch update→re-publish ek alag loop bane</td></tr>
+      <tr><td>Publish content regularly</td><td>J3 ke andar (CMS)</td><td>blog/products content-heavy ho jaaye</td></tr>
+    </tbody>
+  </table>
+  <p>Abhi inhe alag karna = <em>khaali</em> job banana (LR-0005 ghost-risk). Isi liye 6 par rehna sahi hai — par jaan lo yeh ek <strong>educated guess</strong> hai, sabit nahi.</p>
+
+  <div class="test" style="border-left-color:#0F766E">
+    <b style="color:#0F766E">6 ko sabit kaise karein:</b> features gin ke nahi — <strong>5 real users dekh ke</strong> (mission ka pro-frontier · Krug ka DIY 5-user test). Woh kaam karte waqt jin lafzon mein apna goal batate hain — wohi tere asli jobs hain. Code 6 deta hai; users batayenge 6, 5, ya 7.
+  </div>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Job = ek outcome user ka (UI ke baghair bayan ho). Inspector kholna = step; session verify = substrate.">
+      <p class="q-stem">In mein se ek job hai — kaun sa?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>get client sign-off</button>
+        <button class="q-opt">open the inspector</button>
+        <button class="q-opt">verify the session</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="AI har job ke andar madad karta — apna ghar/job nahi. Isi liye home-map use cross-cutting kehta, 7th job nahi.">
+      <p class="q-stem">Buildrik mein AI kya hai?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>cross-cutting inside jobs</button>
+        <button class="q-opt">a seventh standalone job</button>
+        <button class="q-opt">plain substrate like auth</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Jobs users se milte, code se nahi. 6 abhi code-derived guess hai — 5 real users dekh ke hi sabit hoga (mission pro-frontier).">
+      <p class="q-stem">6 jobs sahi hain — kaise sabit?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>watch real users work</button>
+        <button class="q-opt">count the backend modules</button>
+        <button class="q-opt">ask the model again</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Job = outcome, na ke step/tool/substrate. Aaj 6 — code se nikaale, theek-form ke. Candidate 7th ("grow," "maintain," "content") abhi J3/J6 mein folded; alag tab jab woh khaali na rahe. Sabstandard: <strong>users, na ke features</strong> tay karte hain kitne jobs hain. Yeh seedha mission ke pro-frontier se judta — <a href="../MISSION.md">user research</a>.</p>
+
+  <p class="source">Primary source: <a href="https://www.youtube.com/watch?v=sfGtw2C95Ms" target="_blank" rel="noopener">Clayton Christensen — Jobs To Be Done ("milkshake")</a> (job = progress a user wants, not a feature) · validation: <a href="https://sensible.com/dont-make-me-think/" target="_blank" rel="noopener">Steve Krug — DIY 5-user test</a>. Grounding: <a href="../reference/ia-home-map.html">home-map</a> (6 jobs + cross-cutting + substrate). Kuch atke — poocho, main aap ka teacher hun.</p>
+  <p class="fine">Next offered: <strong>"draw the 6th-job test"</strong> — ya ek chhota 5-user test script likho (Krug) jisse hum asli mein dekh sakein 6 sahi hai ya nahi. Aap ka call.</p>
+
+  <div class="nav">
+    <a href="0021-the-design-spine-jobs-to-wireframe.html">← L21 · The design spine</a>
+    <a href="../reference/ia-home-map.html">The 6 jobs →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

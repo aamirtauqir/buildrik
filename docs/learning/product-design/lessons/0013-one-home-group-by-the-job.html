@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 13 — One home, grouped by the job (information architecture)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .job{border:1px solid var(--rule);border-radius:9px;padding:11px 14px;margin:8px 0;font-size:13.5px}
+  .job b{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 8px;border-radius:5px;margin-right:8px}
+  .job .ed{background:var(--accent-soft);color:var(--accent)}
+  .job .db{background:#FEF2F2;color:var(--bad)}
+  table.home td:first-child{font-weight:550}
+  table.home td{font-size:13.5px;vertical-align:top}
+  .v{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:1px 7px;border-radius:5px;white-space:nowrap}
+  .v.keep{background:#ECFDF3;color:var(--good)} .v.merge{background:#FFFAEB;color:var(--warn)}
+  .v.cut{background:#FEF3F2;color:var(--bad)} .v.hide{background:#F2F4F7;color:var(--muted)}
+  .steps{counter-reset:s;padding:0;margin:14px 0;list-style:none}
+  .steps li{counter-increment:s;position:relative;padding:6px 0 6px 34px;font-size:14.5px;border-bottom:1px solid var(--rule)}
+  .steps li:last-child{border-bottom:0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:5px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 13 · ~6 minutes</p>
+  <h1>One home, grouped by the job.</h1>
+  <p class="lede">Aap ne bilkul theek pakda: <em>"samajh nahi aa raha kis cheez ko kahan rakhun."</em> Yeh taste ka masla nahi — yeh <strong>information architecture</strong> ka masla hai: features ko kaise group karein, aur har feature ka <strong>ek hi ghar</strong> kahan ho. Yehi woh layer hai jo "messy product" ko "obvious product" banati hai. Aur achhi khabar — guess nahi karna, aapke paas already poori feature-list maujood hai.</p>
+
+  <div class="callout">
+    <strong>IA kya hai?</strong> Features ko organize + label karna taake user (a) cheez dhoond le aur (b) jaane woh kahan hai. Buरी IA ki nishani aapke apne lafz hain — "kahan rakhun samajh nahi aata." Achhi IA <em>obvious</em> lagti hai. <a href="https://www.nngroup.com/articles/ia-vs-navigation/" target="_blank" rel="noopener">(NN/g: IA ≠ navigation — pehle structure, phir nav)</a>.
+  </div>
+
+  <h2>Asal galti: aap ne backend ki tarah group kiya, user ki tarah nahi</h2>
+  <p>Aapki <a href="../../reviews/feature-inventory.md">feature-inventory</a> abhi <strong>17 clusters</strong> mein bati hai — Auth, Workspace, Editor, Inspector, CMS, Media, AI, Publishing… Yeh <em>engineering ke modules</em> hain (PRD Module 1–9). User kabhi nahi sochta "main Module 4 mein jaa raha hun." Woh sochta hai <strong>"mujhe client ka site ship karna hai."</strong></p>
+  <p>Sabse badi IA galti yehi hai: product ko apne <em>system ki shakal</em> par chala dena (database tables, backend domains) bajaye <em>user ke kaam</em> ke. <a href="https://www.nngroup.com/articles/mental-models/" target="_blank" rel="noopener">(NN/g: structure user ke mental model se match honi chahiye, aapke org-chart se nahi.)</a></p>
+
+  <h2>Theek karne ke 3 rule</h2>
+
+  <h3>Rule 1 — Group by the <em>job</em>, not the module</h3>
+  <p>17 technical clusters ko ~6 user-jobs mein collapse karein. Agency operator ke asal kaam:</p>
+  <div class="job"><b class="db">Dashboard</b>Business chalao — account · team · clients · billing · integrations</div>
+  <div class="job"><b class="db">Dashboard</b>Site shuru karo — naya site · templates · first-run</div>
+  <div class="job"><b class="ed">Editor</b>Page banao — canvas · add · pages · layers · CMS content · media</div>
+  <div class="job"><b class="ed">Editor</b>Brand par lao — design system · tokens · components · inspector</div>
+  <div class="job"><b class="ed">+</b><b class="db">Dashboard</b>Sign-off lo — preview · client review · comments · share</div>
+  <div class="job"><b class="ed">+</b><b class="db">Dashboard</b>Ship + chalao — publish · domains · SEO · forms · analytics</div>
+
+  <h3>Rule 2 — Har feature ka <em>ek hi ghar</em></h3>
+  <p>Agar ek hi cheez do jagah se khulti hai, user ka mental map kabhi nahi banta. Duplicate = pick one, baaki merge. Yehi dedup aapki <a href="../reference/buildrik-design-principles.html">constitution</a> ka naya principle <strong>#14</strong> hai.</p>
+
+  <h3>Rule 3 — Do surfaces, ek hi sawaal se baant</h3>
+  <div class="panel panel--accent">
+    <strong>The scope test:</strong> "Kya yeh <em>ek</em> site ke andar ka kaam hai, ya <em>kai</em> sites / business ka?"<br>
+    Andar ek site → <strong>Editor</strong>. &nbsp; Across sites / business → <strong>Dashboard</strong>.
+  </div>
+  <p>Yeh ek line har "kahan rakhun" ka jawab de deti hai — bina taste ke.</p>
+
+  <h2>Worked example — aapke asal features par</h2>
+  <p>Inventory ki kuch asal rows. Har row: kaunsa <strong>ghar</strong>, aur <strong>verdict</strong> (rakho / merge / cut / chhupao). Verdict aapki <a href="../../reviews/feature-backend-map.md">backend-map</a> ke sach se aata hai — taste se nahi.</p>
+  <table class="home">
+    <tr><th>Feature</th><th>Ghar</th><th>Verdict</th><th>Kyun</th></tr>
+    <tr><td>Site settings <span class="fine">(3 jagah: editor tab · dashboard · settings hub)</span></td><td>Dashboard</td><td><span class="v merge">merge</span></td><td>Teen ghar = duplicate. Ek ghar chuno (#14).</td></tr>
+    <tr><td>Per-page SEO</td><td>Editor</td><td><span class="v keep">keep</span></td><td>Page ke andar ka kaam → scope test = editor.</td></tr>
+    <tr><td>Templates <span class="fine">(gallery vs editor tab)</span></td><td>Both — alag naam</td><td><span class="v keep">keep</span></td><td>Asal mein 2 alag job ("naya site" vs "section daalo"). <em>Duplicate dikhta hai, hai nahi</em> — naam saaf karo.</td></tr>
+    <tr><td>Stock photos/videos</td><td>—</td><td><span class="v hide">hide</span></td><td>Backend STUB, hamesha <code>[]</code> deta hai. Toота feature ko nav-space mat do (#3).</td></tr>
+    <tr><td>AI "create site"</td><td>—</td><td><span class="v hide">hide</span></td><td>Service mein AI branch nahi → blank site banta hai. Hide jab tak real na ho.</td></tr>
+    <tr><td>Real-time collab</td><td>slot rakho, gate</td><td><span class="v hide">hide</span></td><td>6 P1 bugs, off by default. Presence ki jagah design karo, feature gate (#3).</td></tr>
+    <tr><td>Export HTML</td><td>—</td><td><span class="v cut">cut</span></td><td>Retention ke khilaf — user ko bahar le jaata hai. Prior audit = cut.</td></tr>
+  </table>
+  <p class="fine">(Yeh ~7 rows hain; poori list ~100 features ki hai — woh worksheet mein.)</p>
+
+  <div class="callout"><strong>IA smell:</strong> top-level nav mein 17 cheezein, ya ek feature jiske 2 ghar hain. Dono ka matlab — structure abhi user ke kaam se match nahi karti.</div>
+
+  <h2>Method — the home-map pass</h2>
+  <ol class="steps">
+    <li>Flat list lo (inventory ki ~100 features).</li>
+    <li>Har feature: <strong>kaunsa user-job</strong> serve karta hai? (Rule 1)</li>
+    <li>Scope test se <strong>ghar</strong> do — Editor / Dashboard. (Rule 3)</li>
+    <li>Verdict: keep · merge · cut · hide — sach <a href="../../reviews/feature-backend-map.md">backend-map</a> se. (Rule 2)</li>
+    <li>Grouped result = <strong>nayi IA = nav ka skeleton.</strong> Ab guess khatam.</li>
+  </ol>
+  <p>Output ek <a href="../reference/ia-home-map.html">home-map</a> hai — woh SSOT jise har builder cite karega. Bilkul L12 ke reverse-wireframe ki tarah: list banao, gap khud bol dega.</p>
+
+  <h2>Aapka step-plan (UX pehle, polish baad mein)</h2>
+  <table>
+    <tr><th>#</th><th>Step</th><th>Output</th></tr>
+    <tr><td>1</td><td><strong>Structure (IA)</strong> — yeh lesson: group · ek ghar · keep/merge/cut/hide</td><td>home-map + dedup list</td></tr>
+    <tr><td>2</td><td><strong>Navigation</strong> — groups ko asal nav banao (dashboard sidebar + editor 4-rail)</td><td>~5 top-level, baaki nested</td></tr>
+    <tr><td>3</td><td><strong>Flows</strong> — har core job end-to-end chalo; toote raste + missing states/feedback fix</td><td>unbroken flows (<a href="0007-design-every-state.html">L7</a>)</td></tr>
+    <tr><td>4</td><td><strong>Visual polish</strong> — spacing/type/brand <em>(baad mein)</em></td><td>calm, ek-family look</td></tr>
+  </table>
+  <p>Structure pehle kyun? Kyunki nav, hierarchy, aur flows sab structure par tikte hain. Galat structure par sundar paint karne se messy product sundar-messy ban jaata hai. <strong>Sequence sahi hai — aap ne khud theek socha.</strong></p>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Features user ke kaam (JTBD) se group hote hain. Backend module ya ship-date system ki shakal hai, user ki nahi — wahi asal galti thi.">
+      <p class="q-stem">Features ko group karo…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>the user's job to be done</button>
+        <button class="q-opt">the backend module it came from</button>
+        <button class="q-opt">the date each feature was built</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Do ghar = user ka mental map nahi banta. Ek ghar chuno, doosra merge karo. Yehi principle #14 (dedup) hai.">
+      <p class="q-stem">Ek feature do jagah se khulta hai — toh…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>pick one home, merge the other</button>
+        <button class="q-opt">leave both, users like choice</button>
+        <button class="q-opt">add a third for good measure</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Scope test: ek site ke andar ka kaam → editor; kai sites/business → dashboard. Room ya age se faisla karna IA smell hai.">
+      <p class="q-stem">Editor vs Dashboard ka faisla hota hai…</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>scope — one site, or across many</button>
+        <button class="q-opt">room — whichever panel had space</button>
+        <button class="q-opt">age — whichever shipped recently</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Yeh wahi loop hai jo aap jante hain — <em>inventory → decide → handoff → build → verify</em> — lekin ab inventory poore <strong>product ki structure</strong> ko padhti hai, ek panel ko nahi. Principle <a href="../reference/buildrik-design-principles.html">#10 "Group by intent"</a> ek surface ke andar tha; <strong>#14 "One home"</strong> uska poore-product wala bada bhai hai. Home-map ban gaya toh Step 2 (nav) aur Step 3 (flows) bас bhar dene wala kaam hai.</p>
+
+  <p class="source">Grounding: <a href="https://www.nngroup.com/articles/ia-vs-navigation/" target="_blank" rel="noopener">NN/g — IA vs Navigation</a> + <a href="https://www.nngroup.com/articles/mental-models/" target="_blank" rel="noopener">Mental Models</a>. Foundational read: <a href="https://abbycovert.com/writing/how-to-make-sense-of-any-mess/" target="_blank" rel="noopener">Abby Covert — How to Make Sense of Any Mess</a> (IA for messes — exactly yeh). Reusable: the <a href="../reference/ia-home-map.html">home-map worksheet</a>. Kuch clear nahi? Poocho — main aapka teacher hun.</p>
+  <p class="fine">Ready? Kaho <strong>"run the home-map"</strong> aur main ~100 features ko ek pass mein job → ghar → verdict mein bhar dunga — aapki nayi IA ka skeleton.</p>
+
+  <div class="nav">
+    <a href="0012-reverse-wireframe-the-backend.html">← L12 · Reverse-wireframe</a>
+    <a href="../reference/ia-home-map.html">Home-map worksheet →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

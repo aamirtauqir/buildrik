@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 23 — Audit your jobs with your wireframes (coherence, not correctness)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .two .col{border:1px solid var(--rule);border-radius:9px;padding:12px 14px;font-size:13.5px}
+  .two .can{border-color:#A7F3D0;background:#F0FDF9}
+  .two .cant{border-color:#FECACA;background:#FEF2F2}
+  .two h4{margin:0 0 8px;font-size:13px}
+  .two .can h4{color:#0F766E}.two .cant h4{color:var(--bad)}
+  table.tests{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+  table.tests th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);padding:5px 8px;border-bottom:1.5px solid var(--rule)}
+  table.tests td{padding:7px 8px;border-bottom:1px solid #f1f1f3;vertical-align:top}
+  table.tests td:first-child{font-weight:600;white-space:nowrap}
+  .found{border:1px solid var(--rule);border-left:3px solid var(--bad);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14px}
+  .found b{color:var(--bad)}
+  .ceiling{border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14px}
+  .ceiling b{color:var(--accent)}
+  @media(max-width:560px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Lesson 23 · ~5 minutes</p>
+  <h1>Audit your jobs with your wireframes — coherence, not correctness.</h1>
+  <p class="lede">Aap ne poocha: <em>"jobs ko apni wireframing se audit nahi kar sakte?"</em> <strong>Haan — par ek had tak.</strong> Wireframe-audit batata hai kya tera job-model <em>andar se</em> theek hai (coherence). Woh nahi batata kya yeh <em>sahi</em> jobs hain (correctness) — woh sirf users dete hain. Aur abhi maine chala ke ek bada hole pakda.</p>
+
+  <h2>Do alag sawaal — mat milao</h2>
+  <div class="two">
+    <div class="col can"><h4>✓ Coherence (wireframe de sakta)</h4>Kya model andar se judta hai? Orphan surface · empty job · do-job-ek-mein seam · dead-end journey. <strong>Abhi, in haath ke artifacts pe runnable.</strong></div>
+    <div class="col cant"><h4>✗ Correctness (sirf users)</h4>Kya yeh users ke <em>asli</em> jobs hain — unke lafzon mein, unki seemao se? Wireframe se nahi: woh JOBS se bane, unhi ke against check = <strong>circular</strong> (model ko apne against). Clean audit ≠ sahi jobs.</div>
+  </div>
+
+  <h2>The wireframe job-audit — 5 tests</h2>
+  <p>Har test ek structural smell pakdta jo aksar kisi <em>missing ya galat job</em> ki taraf ishaara karta:</p>
+  <table class="tests">
+    <thead><tr><th>Test</th><th>Sawaal</th><th>Smell = </th></tr></thead>
+    <tbody>
+      <tr><td>1 · Orphan</td><td>Koi surface jiska koi job/journey nahi?</td><td>missing job, ya surface jo hona hi nahi chahiye</td></tr>
+      <tr><td>2 · Empty</td><td>Koi job jiska koi asli journey nahi?</td><td>woh job nahi — ek step/label hai</td></tr>
+      <tr><td>3 · Seam</td><td>Ek job ke andar do alag outcomes?</td><td>do jobs ek mein chhupe — split candidate</td></tr>
+      <tr><td>4 · Merge</td><td>Do jobs ek hi journey/surfaces share karte?</td><td>shayad ek hi job hai</td></tr>
+      <tr><td>5 · Dead-end</td><td>Koi journey jo user ke goal tak nahi pohonchti?</td><td>woh job product deliver hi nahi karta</td></tr>
+    </tbody>
+  </table>
+
+  <div class="found">
+    <b>Jo abhi nikla (test 1 + 3, live on your files):</b>
+    <ul style="margin:8px 0 0;padding-left:20px;line-height:1.6">
+      <li><strong>Orphan = §36 Shared DS push</strong> — tera #1 differentiator (agency wedge). Surface spec maujood, par jab yeh audit chala <code>ds-push</code> 5 journeys mein <strong>0 baar</strong> tha. Yaani J4 ("on-brand") apna sabse bada step kho chuka, <em>ya</em> ek chhupa job: "saare client sites ek jagah se on-brand rakhna." <span style="color:#0F766E;font-weight:600">✓ Since fixed:</span> ab ek ★ agency-wedge journey ban gayi (<a href="../reference/wireflows.html">wireflows</a>) — yehi audit ka payoff.</li>
+      <li><strong>Seam = J6 "Ship &amp; run it"</strong> — journey sirf <em>Ship</em> (SEO→domain→publish→live) dikhati; <em>"run it"</em> (analytics/grow) journey mein nahi. Wahi L22 wala "grow" 7th-job candidate, ab evidence ke saath.</li>
+    </ul>
+  </div>
+
+  <div class="ceiling">
+    <b>The ceiling — kyun yeh sabit nahi karta:</b> audit ne <em>smell</em> pakda (orphan wedge), <em>correctness</em> nahi. Woh tujhe bata sakta "yahan job-model toota hai," par yeh nahi ke "push-to-clients" agencies ka asli job hai ya nahi — woh sirf <a href="0022-is-six-jobs-right.html">5 real users</a> batayenge. Coherence-clean hona = internally theek; <strong>users add karte hain woh job jo kisi ne draw hi nahi kiya</strong> (LR-0018: completeness ≠ correctness).
+  </div>
+
+  <h2>Your turn</h2>
+  <div class="quiz">
+    <div class="q" data-explain="Wireframe-audit internal coherence test karta (orphan/empty/seam/dead-end). Correctness — sahi jobs — sirf users dete; wireframes jobs se bane, circular.">
+      <p class="q-stem">Wireframe job-audit kya sabit karta?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>internal coherence only</button>
+        <button class="q-opt">real user correctness</button>
+        <button class="q-opt">both at once</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Orphan surface (job/journey ke baghair) = structural smell jo missing/galat job ki taraf ishaara karta. §36 wedge ka koi journey nahi = chhupa job.">
+      <p class="q-stem">§36 wedge ka koi journey nahi — signal?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>a hidden missing job</button>
+        <button class="q-opt">a harmless extra surface</button>
+        <button class="q-opt">a normal substrate piece</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+    <div class="q" data-explain="Audit ne smell pakda, correctness nahi. Yeh ke 'push-to-clients' asli job hai ya J4 step — sirf real users tay karte.">
+      <p class="q-stem">Yeh job sahi hai — final proof?</p>
+      <div class="q-opts">
+        <button class="q-opt" data-correct>only real users confirm</button>
+        <button class="q-opt">only the wireframe confirms</button>
+        <button class="q-opt">only the model confirms</button>
+      </div>
+      <p class="q-fb"></p>
+    </div>
+  </div>
+
+  <h2>Carry this forward</h2>
+  <p>Wireframe-audit = <strong>coherence</strong> (orphan/empty/seam/merge/dead-end), <strong>correctness nahi</strong>. Use it as a cheap first pass — woh job-model ke break flag karta, aur break aksar missing/galat job pe ishaara karte (jaise wedge ka orphan). Par sabit users karte. Yeh seedha <a href="0022-is-six-jobs-right.html">L22</a> se judta: code/wireframe 6 deta; users 6, 5, ya 7 batate.</p>
+
+  <p class="source">Primary source: <a href="https://www.nngroup.com/articles/wireflows-when-and-how-to-use-them/" target="_blank" rel="noopener">NN/g — Wireflows</a> (journeys reveal flow gaps) · job theory: <a href="https://www.youtube.com/watch?v=sfGtw2C95Ms" target="_blank" rel="noopener">Christensen — Jobs To Be Done</a>. Live audit ran against <a href="../reference/wireflows.html">wireflows</a> + <a href="../reference/editor-wireframe.html">surface appendix</a>. Kuch atke — poocho, main aap ka teacher hun.</p>
+  <p class="fine">Next offered: <strong>"draw the wedge journey"</strong> — Shared DS push (§36) ko ek 6th journey banao (capture brand → select client sites → blast-radius confirm → push → per-site result), taa-ke wedge ka apna flow ho; phir tay karo woh J4-step hai ya 7th job. Aap ka call.</p>
+
+  <div class="nav">
+    <a href="0022-is-six-jobs-right.html">← L22 · Is six jobs right?</a>
+    <a href="../reference/wireflows.html">The journeys →</a>
+  </div>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor functionality → wireframe coverage map</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  :root{--maxw:880px}
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+  .summary .s{border:1px solid var(--rule);border-radius:9px;padding:12px;text-align:center}
+  .summary .n{font:700 26px/1 "General Sans",sans-serif}
+  .summary .k{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-top:4px}
+  .jobh{margin:34px 0 4px;font:600 17px/1.3 "General Sans",sans-serif}
+  .jobh small{font-weight:400;color:var(--muted);font-size:13px}
+  table{font-size:13.5px}
+  th:nth-child(3),td:nth-child(3),th:nth-child(5),td:nth-child(5){text-align:center;white-space:nowrap}
+  td:nth-child(1){font-weight:600}
+  .st{font-weight:700}
+  .ok{color:#0D9488}.pt{color:#B45309}.sb{color:#2563EB}.br{color:#DC2626}.nb{color:#9ca3af}
+  .dw{color:#0D9488;font-weight:700}.pa{color:#B45309;font-weight:700}.td{color:#DC2626;font-weight:700}
+  .home{font-family:ui-monospace,monospace;font-size:11px;color:#52525b}
+  .legend{font-size:13px;color:var(--muted);margin:10px 0}
+  .legend code{background:#f4f4f5;padding:1px 5px;border-radius:4px}
+  @media(max-width:620px){.summary{grid-template-columns:1fr 1fr}table{font-size:12px}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · grounding SSOT · 2026-06-26</p>
+  <h1>Editor functionality → wireframe coverage map.</h1>
+  <p class="lede">Aap ki <strong>asli editor functionality</strong> (code-grounded, from <code>complete-feature-list-20260623.md</code> + <code>editor-orphans-20260624.md</code>) → har <em>functional surface</em> ka redesign-home + kya woh <a href="editor-wireframe.html">surface appendix</a> mein draw ho chuki. Yeh <a href="../lessons/0018-cover-every-surface-not-a-sketch.html">Lesson 18</a> ka coverage map: redesign tab "complete" hai jab <strong>to-draw = 0</strong>. Yeh guess nahi — har row kisi real code-surface se hai (reverse-wireframe, <a href="../lessons/0012-reverse-wireframe-the-backend.html">L12</a>).</p>
+  <p class="lede" style="font-size:14px;border-left:3px solid var(--accent);padding-left:12px"><strong>Yeh map = inventory (surfaces), na ki structure.</strong> Coverage (to-draw = 0) answer karta "sab cover hua?" — par "structure user ke job pe hai?" alag sawaal hai (LR 0018). Top-level structure ab <a href="wireflows.html"><strong>wireflows.html</strong></a> mein hai — 10 journeys (★ agency wedge + saare 6 jobs). Yeh map + surface appendix un journeys ke <em>blocks</em> hain.</p>
+
+  <div class="summary">
+    <div class="s"><div class="n">41</div><div class="k">functional surfaces</div></div>
+    <div class="s"><div class="n" style="color:#0D9488">34</div><div class="k">drawn</div></div>
+    <div class="s"><div class="n" style="color:#B45309">7</div><div class="k">partial</div></div>
+    <div class="s"><div class="n" style="color:#0D9488">0</div><div class="k">to-draw ✓</div></div>
+  </div>
+  <p class="legend">
+    <strong>Status</strong> (does it really work): <span class="st ok">✅</span> works · <span class="st pt">🟡</span> partial · <span class="st sb">🔵</span> stub/fake · <span class="st nb">⚪</span> no-backend.
+    <strong>Drawn</strong> (in the wireframe yet): <span class="dw">✓</span> drawn · <span class="pa">◐</span> basic, needs states · <span class="td">◻</span> to-draw.
+    <br><strong>Surface ≠ feature</strong> (L18): har surface kai features rakhti hai; aap surface wireframe karte ho.
+  </p>
+
+  <!-- FRAME -->
+  <p class="jobh">The frame <small>· the shell that holds every job</small></p>
+  <table>
+    <thead><tr><th>Surface</th><th>Functionality it holds</th><th>Status</th><th>Redesign home</th><th>Drawn</th></tr></thead>
+    <tbody>
+      <tr><td>Editor shell</td><td>topbar · rail · canvas · inspector · footer grid</td><td class="st ok">✅</td><td class="home">whole frame</td><td class="dw">✓</td></tr>
+      <tr><td>Topbar</td><td>Exit · preview · share · publish · ✨AI · ⋯ · command-palette</td><td class="st ok">✅</td><td class="home">topbar</td><td class="dw">✓</td></tr>
+      <tr><td>Footer</td><td>⌗ structure · sync dot · breadcrumb · device dims · version</td><td class="st ok">✅</td><td class="home">footer</td><td class="dw">✓</td></tr>
+      <tr><td>Canvas toolbar</td><td>undo/redo · history · breakpoint switch · zoom (#16)</td><td class="st ok">✅</td><td class="home">canvas top strip</td><td class="dw">✓</td></tr>
+    </tbody>
+  </table>
+
+  <!-- J3 -->
+  <p class="jobh">J3 · Build the page <small>· content on the canvas</small></p>
+  <table>
+    <thead><tr><th>Surface</th><th>Functionality it holds</th><th>Status</th><th>Redesign home</th><th>Drawn</th></tr></thead>
+    <tbody>
+      <tr><td>Insert panel</td><td>elements · sections · components add (drag/click)</td><td class="st ok">✅</td><td class="home">rail #1</td><td class="pa">◐</td></tr>
+      <tr><td>Pages panel</td><td>CRUD · reorder · set-home · folders · new-from-template</td><td class="st ok">✅</td><td class="home">rail #3</td><td class="pa">◐</td></tr>
+      <tr><td>Layers</td><td>tree · hide/lock · rename · reorder · expand</td><td class="st ok">✅</td><td class="home">footer ⌗ popover</td><td class="dw">✓</td></tr>
+      <tr><td>Media panel</td><td>library · upload · folders · icons/fonts · detail drawer</td><td class="st ok">✅</td><td class="home">rail #2</td><td class="pa">◐</td></tr>
+      <tr><td>Stock browser</td><td>Unsplash/Pexels search (now shipped, env-gated)</td><td class="st sb">🔵→✅</td><td class="home">inside Media</td><td class="dw">✓</td></tr>
+      <tr><td>Image editor</td><td>crop · resize · versions</td><td class="st ok">✅</td><td class="home">Media modal</td><td class="dw">✓</td></tr>
+      <tr><td>CMS</td><td>collections · records · field binding · dynamic pages</td><td class="st pt">🟡</td><td class="home">rail (progressive)</td><td class="dw">✓</td></tr>
+      <tr><td>Canvas controls</td><td>select · resize handles · drag · group/ungroup · edit-scope picker</td><td class="st ok">✅</td><td class="home">on-canvas overlay</td><td class="dw">✓</td></tr>
+      <tr><td>Inline text edit</td><td>type/heading/links/rich content in place</td><td class="st ok">✅</td><td class="home">on-canvas</td><td class="dw">✓</td></tr>
+      <tr><td>Onboarding checklist</td><td>getting-started steps (completeStep)</td><td class="st ok">✅</td><td class="home">dismissible card</td><td class="dw">✓</td></tr>
+      <tr><td>Command palette</td><td>⌘⇧P quick actions / jump</td><td class="st ok">✅</td><td class="home">overlay (from topbar)</td><td class="dw">✓</td></tr>
+      <tr><td>My Templates</td><td>save-as-template · recents (now server-backed)</td><td class="st pt">🟡→✅</td><td class="home">inside Insert/Pages</td><td class="dw">✓</td></tr>
+    </tbody>
+  </table>
+
+  <!-- J4 -->
+  <p class="jobh">J4 · Make it on-brand <small>· consistency, the "AI-slop" cure</small></p>
+  <table>
+    <thead><tr><th>Surface</th><th>Functionality it holds</th><th>Status</th><th>Redesign home</th><th>Drawn</th></tr></thead>
+    <tbody>
+      <tr><td>Inspector — selected</td><td>type · spacing · layout · size · bg · effects · position · responsive · 3-reach · states</td><td class="st ok">✅</td><td class="home">inspector (right)</td><td class="dw">✓</td></tr>
+      <tr><td>Inspector — empty</td><td>nothing-selected guidance</td><td class="st ok">✅</td><td class="home">inspector (right)</td><td class="dw">✓</td></tr>
+      <tr><td>Interactions</td><td>13 triggers · click/hover/scroll targets</td><td class="st ok">✅</td><td class="home">inspector tab</td><td class="pa">◐</td></tr>
+      <tr><td>Animations</td><td>GSAP motion / transitions</td><td class="st pt">🟡</td><td class="home">inspector tab</td><td class="pa">◐</td></tr>
+      <tr><td>Design / Brand</td><td>tokens (color/font/spacing) · global styles · DS tools — MERGED</td><td class="st ok">✅</td><td class="home">rail #4</td><td class="pa">◐</td></tr>
+      <tr><td>Components</td><td>create · instance · variant · detach · master list</td><td class="st pt">🟡</td><td class="home">inside Insert/Brand</td><td class="dw">✓</td></tr>
+      <tr><td>Shared DS push</td><td>agency → client sites (the wedge)</td><td class="st ok">✅</td><td class="home">Brand action</td><td class="dw">✓</td></tr>
+      <tr><td>Custom CSS / code</td><td>per-element code injection (Pro)</td><td class="st ok">✅</td><td class="home">inspector advanced</td><td class="dw">✓</td></tr>
+    </tbody>
+  </table>
+
+  <!-- J5 -->
+  <p class="jobh">J5 · Get sign-off <small>· the agency ↔ client loop (differentiator)</small></p>
+  <table>
+    <thead><tr><th>Surface</th><th>Functionality it holds</th><th>Status</th><th>Redesign home</th><th>Drawn</th></tr></thead>
+    <tbody>
+      <tr><td>Preview</td><td>preview · preview-as-client (sanitized)</td><td class="st ok">✅</td><td class="home">topbar → overlay</td><td class="dw">✓</td></tr>
+      <tr><td>Request review</td><td>send for review · change summary</td><td class="st pt">🟡</td><td class="home">topbar ship dropdown</td><td class="dw">✓</td></tr>
+      <tr><td>Comments</td><td>pin x/y · thread · resolve</td><td class="st pt">🟡</td><td class="home">canvas overlay layer</td><td class="dw">✓</td></tr>
+      <tr><td>Share link</td><td>token · password · expiry</td><td class="st pt">🟡</td><td class="home">ship dropdown modal</td><td class="dw">✓</td></tr>
+    </tbody>
+  </table>
+
+  <!-- J6 -->
+  <p class="jobh">J6 · Ship &amp; run it <small>· publish + the editor's site settings</small></p>
+  <table>
+    <thead><tr><th>Surface</th><th>Functionality it holds</th><th>Status</th><th>Redesign home</th><th>Drawn</th></tr></thead>
+    <tbody>
+      <tr><td>Publish flow</td><td>publish · lifecycle states (building/live/failed) · published view</td><td class="st ok">✅</td><td class="home">topbar hero → flow</td><td class="dw">✓</td></tr>
+      <tr><td>Per-page SEO</td><td>title · description · social · slug</td><td class="st ok">✅</td><td class="home">inspector / settings</td><td class="dw">✓</td></tr>
+      <tr><td>Site settings</td><td>general · SEO defaults · social · code · security · localization</td><td class="st ok">✅</td><td class="home">settings surface</td><td class="dw">✓</td></tr>
+      <tr><td>Forms</td><td>builder · field config · submissions · export CSV</td><td class="st ok">✅</td><td class="home">inspector + settings</td><td class="dw">✓</td></tr>
+      <tr><td>Redirects</td><td>from → to rules</td><td class="st pt">🟡</td><td class="home">settings</td><td class="dw">✓</td></tr>
+      <tr><td>Custom domains</td><td>connect · verify · primary</td><td class="st pt">🟡</td><td class="home">settings (or dashboard)</td><td class="dw">✓</td></tr>
+    </tbody>
+  </table>
+
+  <!-- AI -->
+  <p class="jobh">AI · cross-cutting <small>· lives inside jobs, not a cluster</small></p>
+  <table>
+    <thead><tr><th>Surface</th><th>Functionality it holds</th><th>Status</th><th>Redesign home</th><th>Drawn</th></tr></thead>
+    <tbody>
+      <tr><td>AI assistant</td><td>chat · edit-commands · plan · quota meter</td><td class="st ok">✅</td><td class="home">topbar ✨ → drawer (§25)</td><td class="dw">✓</td></tr>
+      <tr><td>AI propose-action</td><td>propose → confirm → execute (ADMIN, single-use token)</td><td class="st ok">✅</td><td class="home">confirm overlay (§26)</td><td class="dw">✓</td></tr>
+      <tr><td>AI inline</td><td>SEO write-with-AI · alt-text generate · rewrite selection</td><td class="st ok">✅</td><td class="home">inline ✨ (§27)</td><td class="dw">✓</td></tr>
+    </tbody>
+  </table>
+
+  <!-- SUBSTRATE -->
+  <p class="jobh">Substrate <small>· patterns + state, applied inside every surface</small></p>
+  <table>
+    <thead><tr><th>Surface</th><th>Functionality it holds</th><th>Status</th><th>Redesign home</th><th>Drawn</th></tr></thead>
+    <tbody>
+      <tr><td>Save / autosave</td><td>5s debounce · conflict · status pill</td><td class="st ok">✅</td><td class="home">topbar status</td><td class="dw">✓</td></tr>
+      <tr><td>Undo / redo</td><td>history stack (RAM)</td><td class="st ok">✅</td><td class="home">canvas toolbar</td><td class="dw">✓</td></tr>
+      <tr><td>Version history</td><td>named versions · restore · compare (now server-backed)</td><td class="st pt">🟡→✅</td><td class="home">footer ⌗ / history panel</td><td class="dw">✓</td></tr>
+      <tr><td>States (empty/loading/error)</td><td>per-surface patterns (#13)</td><td class="st ok">✅</td><td class="home">inside each surface</td><td class="pa">◐</td></tr>
+    </tbody>
+  </table>
+
+  <hr>
+  <h2>How to read the gap</h2>
+  <p><strong>Every surface has a spec</strong> in the <a href="editor-wireframe.html">surface appendix</a> (§0–§38) — the 41 panels drawn low-fi. These are the <em>blocks</em>; the user journeys that string them together live in <a href="wireflows.html">wireflows.html</a>. The 7 ◐ "partial" surfaces (Insert · Pages · Media · Interactions · Animations · Design/Brand · States) have a basic screen but want deeper state-sets — that's polish inside each flow's build, not a coverage gap.</p>
+  <p>Sequence (<a href="../lessons/0012-reverse-wireframe-the-backend.html">L12</a>): <strong>(1)</strong> yeh map confirm karo — kya aap ki saari functionality theek hai? <strong>(2)</strong> phir har to-draw surface ko wireframe banao (5-step recipe, <a href="../lessons/0017-wireframe-job-first-then-blocks.html">L17</a>), to-draw → 0. <strong>(3)</strong> phir plan-design-review. <strong>(4)</strong> phir build (5-rung).</p>
+  <div class="callout"><strong>Honesty note:</strong> status icons 2026-06-23/24 code-audit se hain (kuch 🟡/🔵 ab ✅ ho chuke — version-history, components, stock, my-templates server-models shipped). Surface count ≈; exact number redesign ke dauran settle hoga. Yeh map living hai — surface draw hoti jaaye, drawn column update.</div>
+
+  <p class="source">Grounded in: <code>docs/reviews/complete-feature-list-20260623.md</code> · <code>editor-orphans-20260624.md</code> · <code>wiring-matrix-codex-20260624.md</code> (API-level, file:line) · <a href="ia-home-map.html">home-map</a>. Method: <a href="../lessons/0018-cover-every-surface-not-a-sketch.html">L18</a> (cover, don't sketch) + <a href="../lessons/0012-reverse-wireframe-the-backend.html">L12</a> (reverse). Kuch atke — poocho.</p>
+  <div class="nav">
+    <a href="editor-wireframe.html">← The wireframe (drawn so far)</a>
+    <a href="../lessons/0018-cover-every-surface-not-a-sketch.html">Lesson 18 →</a>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor redesign — the build plan (Stage 4)</title>
+<link rel="stylesheet" href="../assets/course.css">
+<style>
+  :root{--maxw:900px}
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+  .summary .s{border:1px solid var(--rule);border-radius:9px;padding:12px;text-align:center}
+  .summary .n{font:700 26px/1 "General Sans",sans-serif}
+  .summary .k{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-top:4px}
+  .phase{border:1px solid var(--rule);border-radius:10px;padding:14px 16px;margin:14px 0;page-break-inside:avoid}
+  .phase h3{font-size:15.5px;margin:0 0 3px;display:flex;gap:9px;align-items:baseline}
+  .phase h3 .p{color:var(--accent);font-weight:700}
+  .phase .goal{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+  .phase .gate{font-size:11.5px;color:var(--accent);margin:8px 0 0;font-weight:600}
+  table{font-size:13px;margin:6px 0}
+  th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3){white-space:nowrap;text-align:center}
+  td:nth-child(1){font-weight:600}
+  .tag{font:600 10.5px/1 ui-sans-serif;padding:2px 6px;border-radius:5px;white-space:nowrap}
+  .keep{background:#ecfdf5;color:#0D9488}.new{background:#fef3c7;color:#B45309}.grad{background:#eff6ff;color:#2563EB}.deep{background:#f4f4f5;color:#52525b}
+  .grp{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:24px 0 4px}
+  .star{color:var(--accent)}
+  .risk{border-left:3px solid var(--accent);padding:4px 0 4px 12px;margin:8px 0;font-size:13px}
+  @media(max-width:620px){.summary{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reference · the redesign plan · Stage 4 · 2026-06-26</p>
+  <h1>From coverage map to a build plan.</h1>
+  <p class="lede">Stage 2 produced the wireframe — now restructured as 5 job <a href="wireflows.html">journeys (wireflows)</a> with the per-surface specs as a referenced <a href="editor-wireframe.html">appendix</a>. This is <strong>Stage 4</strong> of the <a href="redesign-pipeline.html">pipeline</a>: turn the <a href="editor-functionality-map.html">coverage map</a> into an <em>ordered, honest build plan</em> — what gets built when, and whether each surface is a cheap reskin or real new-flow work. It is the input to <strong>Stage 5</strong> (autoplan = CEO + design + eng reviews, + codex on the plan). Nothing here is built yet — this is the thing the reviews pressure-test.</p>
+
+  <div class="phase" style="border:2px solid var(--accent);background:#fafbff">
+    <h3 style="color:var(--accent)">⚠ Stage-5 review outcome (2026-06-26) — DO NOT build the 6 phases yet</h3>
+    <p class="goal" style="color:var(--ink)">autoplan ran CEO + design + eng lenses (+ codex code-check) over this plan. Verdict: well-crafted, but with critical strategic and classification holes. <strong>Decision (the founder's call, a User Challenge): validate demand first.</strong> The 6-phase build below is now <strong>gated</strong> behind a demand test — it is kept as the blueprint for <em>after</em> the gate, not a green-lit program.</p>
+    <p style="font-size:13px;margin:6px 0"><strong>Phase −1 (the new gate, before P0):</strong> pick the ONE differentiator you actually believe in (Shared DS push <em>or</em> the client review loop — don't crown both), carve it as a thin vertical on the <em>current</em> chrome, and put it in front of 3-5 real agencies. Demand pulls → fund P0-P5 with evidence. No pull → the redesign premise is dead, and you saved a quarter. Reason: the differentiator already works in code; ~80% of this plan reskins surfaces no agency has complained about; and nothing tested agency demand until Stage 8 (after the whole build).</p>
+    <p style="font-size:13px;margin:6px 0"><strong>7 revisions required before any build is funded:</strong></p>
+    <ol style="font-size:12.5px;margin:4px 0">
+      <li><strong>Re-tag the wedge <span class="tag new">new flow</span>, not keep+reskin.</strong> Codex-confirmed: the editor has <em>zero</em> <code>theme.push/capture</code> wiring (the working UI is dashboard-only, no <code>themeSync.ts</code>). Homing it as an editor Brand action is a new build — days, not hours — plus a live <strong>clobber hazard</strong> (editor reads <code>dsSchemaVersion</code> only at load → an open client editor last-write-wins over a fresh push). Headline tally shifts to <strong>29 keep + 3 graduated + 9 new</strong>.</li>
+      <li><strong>Fix the keep/new method.</strong> Classify on TWO axes, not the status icon alone: (a) does the code work, (b) does the flow/IA change. The dedup "one home" merge IS the lever — that's new-flow work, miscounted as cheap. Re-derive tags from the feature-list's note column (it carries sub-statuses the single icon drops: Components <code>🔴 overrides revert</code>, Comments' real cost = the cross-origin client overlay, Animations' engine gone).</li>
+      <li><strong>Split the Inspector.</strong> Chrome (frame · reach-strip · tab row) → P0 spine; sections (Fill/Text/Interactions/CSS) → P2. Otherwise P1's "one family (#12)" gate fails on day one (new drawer panels + old inspector).</li>
+      <li><strong>Draw the 5 build-blockers</strong> before their phase: CMS entry-point · Interactions trigger-builder UI · Animations timeline UI · Components master-edit mode · P3 client-comment flow (can a share-link client comment?). All are misclassified "deepen states" but have no primary UI drawn.</li>
+      <li><strong>Share = security gap, not honesty-badge.</strong> Codex-confirmed: the password redirects to the public published URL (reachable without the token). Fix the backend gate or remove the lock — don't badge a lock that doesn't lock. (Redirects/Domains badges stay — those are honest.)</li>
+      <li><strong>Animations = engine capability removed</strong> (ScrollTrigger/Timeline deleted 2026-05-18), not a "partial to deepen." Decide: scope the panel to what GSAPEngine can do, or budget the engine rebuild.</li>
+      <li><strong>Move the demand-gate before Stage 6.</strong> 3-5 agency design partners on the thin wedge are the entry condition for funding the build — not a post-build Stage-8 walk.</li>
+    </ol>
+    <p class="gate">The phases below remain valid as the blueprint. They are not approved to build until Phase −1 (demand) passes and the 7 revisions land.</p>
+  </div>
+
+  <p class="grp">The method (how a map becomes a plan)</p>
+  <p>Three moves, in order:</p>
+  <ol>
+    <li><strong>Split keep vs new from the status column.</strong> A surface that already works (✅) is a <em>re-lay-out</em>, not a re-wire — keep the handlers, restyle the chrome (Lesson 8). A surface that's partial (🟡) or was a stub (🔵) needs a <em>new flow</em> + honesty gate. The status column already decided this; we just read it off.</li>
+    <li><strong>The split is also the effort estimate.</strong> Keep+reskin is cheap (hours). New-flow is the real design+build cost (days). So the plan can be honest about scope before a line is written.</li>
+    <li><strong>Order by dependency, then pull the differentiator forward.</strong> The spine must come first (everything docks into it, #15). After that, default order is by job (build → brand → sign-off → ship). But the business reason for this redesign is <em>agency-first</em> — so the <span class="star">wedge</span> (Shared DS push) and the agency sign-off loop get pulled <em>forward</em>, not left for last.</li>
+  </ol>
+
+  <p class="grp">The honest headline</p>
+  <div class="summary">
+    <div class="s"><div class="n">41</div><div class="k">surfaces</div></div>
+    <div class="s"><div class="n" style="color:#0D9488">29</div><div class="k">keep + reskin</div></div>
+    <div class="s"><div class="n" style="color:#2563EB">3</div><div class="k">graduated</div></div>
+    <div class="s"><div class="n" style="color:#B45309">9</div><div class="k">new flow</div></div>
+  </div>
+  <p style="font-size:13.5px"><strong>~70% of the redesign is re-lay-out, not rebuild.</strong> Twenty-nine surfaces keep their working logic and get new chrome. Three graduated since the audit (Stock 🔵→✅, My-Templates 🟡→✅, Version-history 🟡→✅) — reskin + drop the old gate. <strong>9 surfaces are genuine new-flow work</strong> (the wedge re-tagged after the Stage-5 review — see below) — and that's where the design risk and the build cost actually live. <em>Legend:</em> <span class="tag keep">keep+reskin</span> handlers stay · <span class="tag grad">graduated</span> now shipped, drop old gate · <span class="tag new">new flow</span> design + build · <span class="tag deep">deepen states</span> drawn basic, needs full state-set.</p>
+
+  <p class="grp">The phased build</p>
+
+  <div class="phase">
+    <h3><span class="p">P0</span> Lock the spine</h3>
+    <p class="goal">The 4 frame surfaces — the container everything docks into. Non-negotiably first — locking the spine (#15) before any feature lands means muscle memory survives every later phase. <em>Note: the rail's 4 locked slots and the inspector skeleton are part of the shell; the panels that fill them (Insert · Media · Pages · Design) are separate surfaces, counted once in P1/P2 — not here.</em></p>
+    <table>
+      <thead><tr><th>Surface</th><th>Type</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Editor shell (grid · rail slots · inspector frame)</td><td><span class="tag keep">keep+reskin</span></td><td>5-zone grid; 4 rail slots + inspector skeleton fixed (#12/#15)</td></tr>
+        <tr><td>Topbar (3 zones)</td><td><span class="tag keep">keep+reskin</span></td><td>slim — Exit · Share · Publish · ⋯ (#16)</td></tr>
+        <tr><td>Footer</td><td><span class="tag keep">keep+reskin</span></td><td>⌗ structure · sync dot · breadcrumb · dims · version</td></tr>
+        <tr><td>Canvas toolbar</td><td><span class="tag keep">keep+reskin</span></td><td>undo/redo · history · breakpoint · zoom (#16)</td></tr>
+      </tbody>
+    </table>
+    <p class="gate">Gate: spine positions frozen + the one shared panel skeleton (#12/#15) before P1. This is the contract every later phase obeys. <strong>4 surfaces.</strong></p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="p">P1</span> The editing loop <small>· J3 · highest daily-use</small></h3>
+    <p class="goal">The core make-a-page loop. Mostly reskin — but it's used every second, so the chrome payoff is biggest here. One genuinely new flow (CMS).</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Type</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Insert · Pages · Media panels</td><td><span class="tag keep">keep+reskin</span> <span class="tag deep">deepen states</span></td><td>add empty/loading/error per #13</td></tr>
+        <tr><td>Layers · Canvas-controls · Inline-text</td><td><span class="tag keep">keep+reskin</span></td><td>on-canvas + footer ⌗; edit-scope picker safety</td></tr>
+        <tr><td>Image-editor · Onboarding · Command-palette</td><td><span class="tag keep">keep+reskin</span></td><td>modal / dismissible card / ⌘⇧P overlay</td></tr>
+        <tr><td>Stock browser</td><td><span class="tag grad">graduated</span></td><td>🔵→✅ — reskin + no-key gate, no longer hidden</td></tr>
+        <tr><td>My Templates</td><td><span class="tag grad">graduated</span></td><td>🟡→✅ server-backed — reskin + cross-device</td></tr>
+        <tr><td>CMS</td><td><span class="tag new">new flow</span></td><td>collections → records → binding → dynamic pages; progressive disclosure</td></tr>
+      </tbody>
+    </table>
+    <p class="gate">Gate: the daily loop (add → arrange → edit text/image) feels like one family (#12); CMS flow walked end-to-end.</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="p">P2</span> The wedge + brand <small>· J4 · <span class="star">pulled forward for strategy</span></small></h3>
+    <p class="goal">Brand consistency (the AI-slop cure) <em>and</em> the differentiator. Shared DS push is the reason agencies pick this over Webflow — it does not wait until the end.</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Type</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Inspector (selected/empty) · Custom-CSS</td><td><span class="tag keep">keep+reskin</span></td><td>advanced tucked; Pro-gate honest</td></tr>
+        <tr><td>Design / Brand (merged)</td><td><span class="tag keep">keep+reskin</span> <span class="tag deep">deepen states</span></td><td>tokens + styles + components, one home</td></tr>
+        <tr><td>Interactions · Animations</td><td><span class="tag deep">deepen states</span> / <span class="tag new">new flow</span></td><td>Interactions ✅ deepen; Animations 🟡 careful</td></tr>
+        <tr><td>Components</td><td><span class="tag new">new flow</span></td><td>master/instance/variant/detach — the edit-scope safety</td></tr>
+        <tr><td><span class="star">Shared DS push ★</span></td><td><span class="tag new">new flow</span></td><td><strong>the wedge</strong> — NEW editor build (no <code>theme.*</code> wiring in editor today) + clobber-guard; multi-site select + blast-radius confirm (#5)</td></tr>
+      </tbody>
+    </table>
+    <p class="gate">Gate: one brand pushes to N client sites with a blast-radius confirm, end-to-end. This phase carries the business case — review it hardest.</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="p">P3</span> The agency sign-off loop <small>· J5 · Preview reskins, the rest new-flow</small></h3>
+    <p class="goal">The client review loop — the most broken area today (share is a decorative redirect) and the highest agency-retention lever. Preview is a reskin; the other three (Request-review, Comments, Share) are genuine new-flow work.</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Type</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Preview (as client)</td><td><span class="tag keep">keep+reskin</span></td><td>clean client overlay</td></tr>
+        <tr><td>Request review</td><td><span class="tag new">new flow</span></td><td>change-summary + the missing notify trigger</td></tr>
+        <tr><td>Comments</td><td><span class="tag new">new flow</span></td><td>canvas pins + threads + resolve</td></tr>
+        <tr><td>Share link + password</td><td><span class="tag new">new flow</span></td><td>real gate (today: decorative redirect 🟡 — honesty badge until enforced)</td></tr>
+      </tbody>
+    </table>
+    <p class="gate">Gate: a client opens a link → comments → agency resolves → re-shares, with no dead-ends. Honesty badges where the backend gate isn't real yet (#3).</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="p">P4</span> Ship &amp; run <small>· J6 · keep + two honesty gates</small></h3>
+    <p class="goal">Publishing and the config behind it. Mostly reskin; two surfaces need honest "saved-not-live" framing until the backend catches up.</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Type</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Publish flow · Per-page SEO · Site-settings · Forms</td><td><span class="tag keep">keep+reskin</span></td><td>Publish = the one hero (#5)</td></tr>
+        <tr><td>Redirects</td><td><span class="tag new">new flow</span></td><td>🟡 stored-not-deployed → honest badge</td></tr>
+        <tr><td>Custom domains</td><td><span class="tag new">new flow</span></td><td>🟡 dns-verify untested live → honest badge + retry</td></tr>
+      </tbody>
+    </table>
+    <p class="gate">Gate: publish works end-to-end; Redirects/Domains never claim "live" before the backend proves it (#2/#3).</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="p">P5</span> AI polish <small>· cross-cutting · interleave</small></h3>
+    <p class="goal">AI is a helper across jobs, not a phase of its own — it can land alongside P1–P4. All reskin; the one real task is giving quota a home.</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Type</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>AI assistant · propose-action · inline ✨</td><td><span class="tag keep">keep+reskin</span></td><td>drawer + confirm overlay + inline; quota meter homes the orphan</td></tr>
+      </tbody>
+    </table>
+    <p class="gate">Gate: every AI surface shows its no-key / thinking / error / quota states honestly (#3/#13).</p>
+  </div>
+
+  <div class="phase">
+    <h3><span class="p">S</span> Substrate <small>· woven through every phase, not a phase of its own</small></h3>
+    <p class="goal">The cross-cutting surfaces every phase inherits. Tagged here so the headline tally is provable from the body — this is where the 3rd graduated surface (Version-history) lives.</p>
+    <table>
+      <thead><tr><th>Surface</th><th>Type</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Save / autosave</td><td><span class="tag keep">keep+reskin</span></td><td>topbar status pill</td></tr>
+        <tr><td>Undo / redo</td><td><span class="tag keep">keep+reskin</span></td><td>RAM-only, lost on reload — honest caveat</td></tr>
+        <tr><td>States (empty/loading/error)</td><td><span class="tag keep">keep+reskin</span> <span class="tag deep">deepen states</span></td><td>the #13 set every surface inherits</td></tr>
+        <tr><td>Version history</td><td><span class="tag grad">graduated</span></td><td>🟡→✅ now server-backed — the 3rd graduated surface</td></tr>
+      </tbody>
+    </table>
+    <p class="gate">Gate: woven into each surface's build, never bolted on after. <strong>4 surfaces (3 keep + 1 graduated).</strong></p>
+  </div>
+
+  <p style="font-size:12.5px;color:var(--muted)"><strong>Tally proof:</strong> P0 frame (4 keep) · P1 (9 keep + 2 grad + 1 new) · P2 (5 keep + 3 new) · P3 (1 keep + 3 new) · P4 (4 keep + 2 new) · P5 (3 keep) · Substrate (3 keep + 1 grad) = <strong>29 keep + 3 graduated + 9 new = 41</strong> (wedge re-tagged keep→new per Stage-5). Every surface counted once.</p>
+
+  <p class="grp">What's explicitly NOT in this plan</p>
+  <p style="font-size:13.5px"><strong>Real-time collaboration.</strong> Demo-only — 6 P1 distributed-systems bugs (prior codex review). We design the presence slot but gate the feature (#3). It is not a phase; promoting it would be promoting something that isn't ready. <strong>Export-HTML</strong> stays cut (takes the user out of the product). <strong>AI-create-site / billing-upgrade / runtime-locale</strong> stay hidden (backend stub/throws).</p>
+
+  <p class="grp">Stage 5 — what the reviews must pressure-test</p>
+  <p>This plan is a set of bets. Hand it to <a href="redesign-pipeline.html">autoplan</a> (CEO + design + eng) and codex, and make them argue these:</p>
+  <div class="risk"><strong>Sequencing bet:</strong> is pulling the wedge (DS-push) to P2 right, or does it need the full editing loop shipped first? CEO-review owns this.</div>
+  <div class="risk"><strong>Honesty-vs-fix bet:</strong> for the 8 new-flows touching backend gaps (Comments, Share, Redirects, Domains), is "design honest + gate the feature" the right call, or fix the backend first? Eng-review owns this.</div>
+  <div class="risk"><strong>Effort bet:</strong> the 30 "keep+reskin" assume the handlers truly stay (re-lay-out, not re-wire). Eng-review should spot-check that no ✅ surface secretly needs a rewire.</div>
+  <div class="risk"><strong>Coherence bet:</strong> do the 7 "deepen-states" surfaces reach the same state-completeness bar (#13) as the freshly-drawn ones? Design-review owns this.</div>
+
+  <p class="source">Built from the <a href="editor-functionality-map.html">coverage map</a> (code-grounded) per the <a href="redesign-pipeline.html">redesign pipeline</a>, Stage 4. Keep/new rule = <a href="../lessons/0008-build-without-breaking.html">re-lay-out, not re-wire</a>. Next: Stage 5 (autoplan + codex on this plan) → then Build (Stage 6).</p>
+</main>
+</body>
+</html>
