@@ -11,6 +11,18 @@ Every feature in one place. Consolidates `feature-inventory.md` (the list) +
 > (data-loss). It also corrected 2 stale rows below (dns-verify, localization).
 > The API-wiring summary is appended at the end of this doc.
 
+> **2026-07-02 code-verify update** (35 grep checks, design-reconciliation run — full evidence
+> in `design-reconciliation-runlog-20260702.md`): Interactions = **13/13 wired** (not 7 —
+> InteractionRuntime.ts:164-253) · Component overrides **all 4 kinds survive** master-sync
+> (ComponentInstance.ts:109-151) + masters server-backed · Version history **server-backed
+> confirmed** (versionSync.ts:52,84) · **Edit-scope picker (element↔master) NOT BUILT** (only
+> ai/ScopeChip.tsx — the ✅ row below is stale) · **Inline-AI text bar NOT BUILT** (RichTextEditor
+> has zero AI actions) · Custom CSS = **dead code, not Pro-gated** (devMode hardcoded false,
+> ProInspector.tsx:95) · Domains verify = **real flow flips VERIFIED** (dns-verify/route.ts:44,53),
+> 🟡 e2e-untested · AI site-generation **wired e2e** (needs provider env key only) · Redirects
+> deploy-gap holds + dashboard redirects-tab lacks the "saved, not live" notice · Billing upgrade
+> checkout = stub (billing.service.ts:158).
+
 **Status:** ✅ WORKING · 🟡 PARTIAL (works, gap noted) · 🔵 STUB (UI exists, logic fake) ·
 🔴 BROKEN · ⚪ NO-BACKEND
 **Home:** DASH dashboard · ED editor rail · RIGHT inspector · TOP topbar · HIDE/CUT

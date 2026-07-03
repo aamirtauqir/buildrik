@@ -63,13 +63,258 @@
   <h1>The editor as journeys, not a list of panels.</h1>
   <p class="sub">Job-to-be-done first: each screen earns its place inside a <em>journey the user moves through</em>, left to right. Panels (Insert, Inspector, Pages…) are the <em>blocks</em> a flow uses — not the top-level spine.</p>
 
+  <div class="why-this" style="border-left-color:#b45309"><b>⚠ Superseded for journeys (2026-07-02).</b> The journey set now lives in Figma — file <code>RmtnWGlZX9Z3idP6f5vmLq</code>: page <em>"raw design"</em> (16-journey library + target states) and page <em>"Wireframe v2 — Happy Path"</em> (the ordered spine: ★ wedge + 6 job rows, states drawn). That file is the single canonical; this HTML stays as the 10-journey historical source it was captured from. Reconciliation record: <code>docs/reviews/design-reconciliation-runlog-20260702.md</code>.</div>
+
   <div class="why-this">
-    <b>The journey is the unit.</b> Each screen earns its place inside a flow the user moves through — not as a standalone panel. The 41 per-surface specs live in the <a href="editor-wireframe.html">surface appendix</a>; they're the <em>blocks</em> these journeys pass through, not the top-level structure. Read the flows first; drop into a §N when you need a panel's detail.
+    <b>The journey is the unit.</b> Each screen earns its place inside a flow the user moves through — not as a standalone panel. The 39 per-surface specs live in the <a href="editor-wireframe.html">surface appendix</a>; they're the <em>blocks</em> these journeys pass through, not the top-level structure. Read the flows first; drop into a §N when you need a panel's detail.
+  </div>
+
+  <div class="why-this" style="border-left-color:var(--muted)">
+    <b style="color:var(--muted)">Scope — what this draws.</b> The product has <strong>6 user jobs</strong> (<a href="ia-tree.html">ia-tree</a>). This file now has <strong>10 journeys covering all 6 jobs</strong> + the spine: <strong>★ agency-wedge</strong> (cross-job, first — the differentiator) · <strong>J1</strong> Run-business · <strong>J2</strong> Start-site · <strong>J3</strong> Build (×2: by hand · CMS) · <strong>J4</strong> Brand · <strong>J5</strong> Sign-off · <strong>J6</strong> Ship (×3: ship · run/measure · forms→leads). Dashboard jobs (J1/J2) now have their own journeys; their individual screens still live in the dashboard set (<code>docs/reviews/wireframes/</code>). Flow numbers match the <a href="ia-tree.html">IA's job numbers</a>; the wedge gets ★ because it spans jobs, not one.
+  </div>
+
+  <!-- ============================================================ FLOW 0 — THE AGENCY WEDGE (cross-job spine) -->
+  <div class="flow" style="border-color:var(--accent);border-width:1.5px;background:#FAFCFF">
+    <h2><span class="jn" style="background:#0F766E">★</span> The agency wedge — capture once, push to all, sign off, ship <span style="font:600 11px/1 var(--wf-mono);color:var(--accent);align-self:center">the first slice · the differentiator</span></h2>
+    <p class="jmeta"><b>User:</b> agency operator managing many client sites. <b>Done when:</b> one brand change reaches every selected client site, each client signs off, all ship — from one place. <b>This is the cross-job SPINE</b>, not one of the 6 jobs: it threads <b>J1/J2</b> (clients · sites) → <b>J4</b> (master brand) → the <b>wedge push</b> (§36) → <b>J5</b> (sign-off queue) → <b>J6</b> (ship). The per-job flows below are its segments in detail.</p>
+    <div class="track">
+
+      <!-- step 1 -->
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Saare clients ek jagah</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">dashboard</span><span class="g"></span><span class="mp mp--solid" style="width:22px"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div class="ln ln--ink" style="width:40%;height:6px"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:45%"></div><span style="width:18px;height:7px;background:var(--wf-fill);border-radius:2px"></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:55%"></div><span style="width:18px;height:7px;background:var(--wf-fill);border-radius:2px"></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:38%"></div><span style="width:18px;height:7px;background:var(--wf-fill);border-radius:2px"></span></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> dashboard → Clients/Sites, saare client sites ek list mein. <b>Dikhta:</b> har client + uske sites — agency ka command center. <span class="ref">→ J1/J2 (dashboard)</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 2 -->
+      <div class="step">
+        <div class="step-n"><span class="sb">2</span> Master brand kholo</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd"></span><span class="rd"></span><span class="rd"></span><span class="rd rd--on"></span></div>
+            <div class="mini__mid hot" style="padding:6px;display:flex;gap:4px;flex-wrap:wrap;align-content:flex-start"><span style="width:14px;height:14px;border-radius:3px;background:var(--accent);outline:2px solid var(--accent);outline-offset:1px"></span><span style="width:14px;height:14px;border-radius:3px;background:#3f3f46"></span><span style="width:14px;height:14px;border-radius:3px;background:var(--wf-line)"></span><div class="ln" style="width:90%;margin-top:3px"></div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> apna master brand (DS tokens) kholta — ek source of truth. <b>Dikhta:</b> Brand panel, tokens edit. <span class="ref">→ <a href="editor-wireframe.html#design">§4 Brand</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 3 -->
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Push → client sites chuno</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:center"><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">Shared DS push</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid hot" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div style="display:flex;gap:4px;align-items:center"><span style="width:9px;height:9px;border:1.5px solid var(--accent);background:var(--accent);border-radius:2px"></span><div class="ln ln--ink" style="width:50%"></div></div>
+            <div style="display:flex;gap:4px;align-items:center"><span style="width:9px;height:9px;border:1.5px solid var(--accent);background:var(--accent);border-radius:2px"></span><div class="ln ln--ink" style="width:60%"></div></div>
+            <div style="display:flex;gap:4px;align-items:center"><span style="width:9px;height:9px;border:1px solid var(--wf-line);border-radius:2px"></span><div class="ln" style="width:45%"></div></div>
+            <div style="display:flex;gap:4px;align-items:center"><span style="width:9px;height:9px;border:1.5px solid var(--accent);background:var(--accent);border-radius:2px"></span><div class="ln ln--ink" style="width:55%"></div></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> "Push to clients" → kaun se client sites update hon, multi-select. <b>Dikhta:</b> client sites ki checklist, kuch chune. <span class="ref">→ <a href="editor-wireframe.html#ds-push">§36 DS push ★</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 4 — HERO: blast-radius confirm -->
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">4</span> "N sites update" confirm</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--ghost"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px">
+            <div class="hot" style="border:1.5px solid var(--accent);border-radius:4px;padding:6px 8px;text-align:center;background:#fff">
+              <span style="font:700 11px/1 var(--wf-mono);color:var(--accent)">5 sites</span>
+              <div class="ln" style="width:60px;height:4px;margin:4px auto 5px"></div>
+              <span style="display:inline-block;width:40px;height:13px;background:var(--wf-solid);border-radius:3px"></span>
+            </div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> rukta — confirm: <em>"5 client sites will update."</em> <b>Dikhta:</b> blast-radius saaf, phir hi push. Cross-site mutation ka trust-gate (#5 hero, UX-audit gap ka jawab). <span class="ref">→ <a href="editor-wireframe.html#ds-push">§36 DS push</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 5 — per-site result -->
+      <div class="step">
+        <div class="step-n"><span class="sb">5</span> Push → per-site result</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">pushing…</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div class="ln" style="width:45%"></div><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">✓</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div class="ln" style="width:55%"></div><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">✓</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div class="ln" style="width:40%"></div><span style="font:700 7px/1 var(--wf-mono);color:var(--warn)">⚠</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div class="ln" style="width:50%"></div><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">✓</span></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> rukta. <b>Dikhta:</b> per-site result — 4 ✓, 1 ⚠ partial-fail (retry). Honest, silent nahi. <span class="ref">→ <a href="editor-wireframe.html#ds-push">§36 DS push</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 6 — sign-off queue (the J5 dashboard gap codex flagged) -->
+      <div class="step">
+        <div class="step-n"><span class="sb">6</span> Sign-off queue (status flip)</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">dashboard · reviews</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:40%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--accent);background:var(--wf-fill);border-radius:6px;padding:1px 4px">approved</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:50%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--warn);background:#FFFBEB;border-radius:6px;padding:1px 4px">waiting</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:45%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--accent);background:var(--wf-fill);border-radius:6px;padding:1px 4px">approved</span></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> har client ko preview + review bhejta; queue mein status dekhta. <b>Dikhta:</b> review queue — approved/waiting flips, bina phone-call. <span class="ref">→ <a href="editor-wireframe.html#request-review">§16 review</a> + dashboard queue ⚠ (no editor §)</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <!-- step 7 — HERO end: publish all -->
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">7</span> Approve → publish all → live</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">● live ×4</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column;justify-content:center">
+            <div style="display:flex;align-items:center;gap:4px"><span style="width:7px;height:7px;border-radius:999px;background:var(--accent)"></span><div class="ln ln--blue" style="width:45%"></div></div>
+            <div style="display:flex;align-items:center;gap:4px"><span style="width:7px;height:7px;border-radius:999px;background:var(--accent)"></span><div class="ln ln--blue" style="width:55%"></div></div>
+            <div style="display:flex;align-items:center;gap:4px"><span style="width:7px;height:7px;border-radius:999px;background:var(--accent)"></span><div class="ln ln--blue" style="width:40%"></div></div>
+            <span style="font:700 7px/1 var(--wf-mono);color:var(--accent);margin-top:2px">all client sites live ↗</span>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> approved sites publish karta. <b>Dikhta:</b> client sites ek saath live — ek brand, ek action mein. Loop band. <span class="ref">→ <a href="editor-wireframe.html#publish-flow">§14 publish</a></span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> agency ka asli kaam ek site banana nahi — <em>ek brand, saare clients pe, ek jagah se</em>. Isi liye hero steps = blast-radius confirm (step 4, trust) + multi-site publish (step 7). Yeh wireflow <strong>codex-audit ka #1 gap</strong> bharta: differentiator (§36 DS push) ko ab ek journey milti, single-site J4 se alag. <strong>⚠ Reality (LR-0017):</strong> editor mein <code>theme.*</code> wiring abhi zero — yeh redesign-target hai, shipped nahi. Aur yeh sabit tab hoga jab asli agencies use karein (correctness, L23).</p>
+  </div>
+
+  <!-- ============================================================ J1 — RUN THE BUSINESS (dashboard) -->
+  <div class="flow">
+    <h2><span class="jn">J1</span> Run the business <span style="font:600 11px/1 var(--wf-mono);color:var(--muted);align-self:center">· dashboard</span></h2>
+    <p class="jmeta"><b>User:</b> agency owner, day one. <b>Done when:</b> a client exists, a teammate is invited with the right role, and deploy is wired — without code. <b>The job pulls toward:</b> set up once, then forget — so each step is a one-time gate, calm, and gets out of the way when done.</p>
+    <div class="track">
+
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Sign in → dashboard</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">dashboard</span><span class="g"></span><span class="mp mp--solid" style="width:20px"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div class="ln ln--ink" style="width:35%;height:6px"></div>
+            <div style="display:flex;gap:4px"><div style="flex:1;height:22px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div><div style="flex:1;height:22px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div></div>
+            <div class="ln" style="width:70%"></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> sign-in → apna workspace landta. <b>Dikhta:</b> sites overview + quick actions — agency ka ghar. <span class="ref">→ (dashboard)</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">2</span> Client add karo</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">dashboard · clients</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid hot" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div style="border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:50%"></div></div>
+            <div style="border:1px dashed var(--accent);border-radius:3px;padding:4px;text-align:center;color:var(--accent);font:700 7px/1 var(--wf-mono)">＋ New client</div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> "+ New client" → client banata (agency wedge ka root). <b>Dikhta:</b> client list + add. <span class="ref">→ (dashboard) · feeds the ★ wedge</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Teammate invite (role)</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">settings · team</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div class="ln" style="width:45%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--muted);border:1px solid var(--wf-line);border-radius:6px;padding:1px 4px">admin</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><div class="ln" style="width:55%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:1px 4px">+ invite</span></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> teammate invite, role chunta (admin/member). <b>Dikhta:</b> member list + invite. ⚠ resendInvite email nahi bhejta (LR). <span class="ref">→ (dashboard)</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">4</span> Deploy wire (Vercel)</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">settings · integrations</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px">
+            <div style="display:flex;align-items:center;gap:5px"><span style="width:18px;height:18px;border-radius:4px;background:#3f3f46"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">connected ✓</span></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> Vercel OAuth connect. <b>Dikhta:</b> connected — ab publish kaam karega. Setup done, agency operational. <span class="ref">→ (dashboard)</span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> "business chalao" = ek-baar setup (client · team · deploy), na ke rozana kaam. Isi liye hero = <em>client add</em> (step 2) — wahi se ★ wedge shuru hota. Yeh J1 saare dashboard-screens (sign-in · clients · team · integrations) ko ek on-ramp journey mein baandhta, bikhri screens nahi.</p>
+  </div>
+
+  <!-- ============================================================ J2 — START A SITE (dashboard) -->
+  <div class="flow">
+    <h2><span class="jn">J2</span> Start a site <span style="font:600 11px/1 var(--wf-mono);color:var(--muted);align-self:center">· dashboard</span></h2>
+    <p class="jmeta"><b>User:</b> agency user with a client, no site yet. <b>Done when:</b> a new site is open in the editor in under a minute. <b>The job pulls toward:</b> least friction to first canvas — every step removes a question between "I want a site" and "I'm editing one."</p>
+    <div class="track">
+
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Client ke sites</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">dashboard · sites</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div class="ln ln--ink" style="width:40%;height:6px"></div>
+            <div style="display:flex;gap:4px"><div style="flex:1;height:26px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div><div style="flex:1;height:26px;border:1px dashed var(--accent);border-radius:3px;display:grid;place-items:center;color:var(--accent);font:700 9px/1 var(--wf-mono)">＋</div></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> client chunta → uske sites. <b>Dikhta:</b> site cards + ek "+ New". <span class="ref">→ (dashboard)</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">2</span> New: blank / template</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:center"><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">new site</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid hot" style="padding:6px;display:flex;gap:5px;align-items:center;justify-content:center">
+            <div style="width:38px;height:30px;border:1.5px solid var(--accent);border-radius:3px;background:#fff;display:grid;place-items:center;font:700 7px/1 var(--wf-mono);color:var(--accent)">blank</div>
+            <div style="width:38px;height:30px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> blank ya template chunta. <b>Dikhta:</b> do raaste, saaf. (AI-create abhi hidden — honesty #3.) <span class="ref">→ (dashboard)</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Naam + create</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:center"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">creating…</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;display:flex;flex-direction:column;gap:5px;justify-content:center">
+            <div style="height:13px;border:1.5px solid var(--accent);border-radius:3px;background:#fff"></div>
+            <div style="width:40px;height:12px;background:var(--wf-solid);border-radius:3px"></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> site ka naam likhta → Create. <b>Dikhta:</b> naam field + create button. <span class="ref">→ (dashboard)</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">4</span> Editor mein khulta</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--ghost"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+            <div class="mini__mid" style="align-items:center;justify-content:center;color:var(--faint)"><div class="hot" style="border:1px dashed var(--accent);padding:7px 10px;text-align:center;color:var(--accent);font-weight:700">＋<br>add section</div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> kuch nahi — site editor mein khul jaati. <b>Dikhta:</b> khaali canvas + "add section" — ab J3 (make a page) shuru. <span class="ref">→ <a href="editor-wireframe.html#shell">§0 shell</a> · hands to J3</span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> "site shuru karo" ka asli maqsad = jaldi se pehle canvas tak. Isi liye 4 hi steps, aur aakhri step <em>editor handoff</em> — J2 seedha J3 (ya ★ wedge) mein behta. Yeh dashboard ki new-site screens ko ek under-a-minute journey banata.</p>
   </div>
 
   <!-- ============================================================ FLOW 1 -->
   <div class="flow">
-    <h2><span class="jn">J1</span> Make a page</h2>
+    <h2><span class="jn">J3</span> Make a page</h2>
     <p class="jmeta"><b>User:</b> agency builder, empty page. <b>Done when:</b> a real section is on the canvas, styled, saved. <b>The job pulls toward one thing:</b> get <em>content</em> onto an empty canvas fast — so every step's hero is "the next move," and the chrome stays quiet until the user needs it.</p>
 
     <div class="track">
@@ -209,7 +454,7 @@
 
   <!-- ============================================================ FLOW 2 -->
   <div class="flow">
-    <h2><span class="jn">J2</span> Make it on-brand</h2>
+    <h2><span class="jn">J4</span> Make it on-brand</h2>
     <p class="jmeta"><b>User:</b> builder who changed one thing and wants it everywhere. <b>Done when:</b> a change is consistent across the whole site. <b>The job pulls toward:</b> change once, apply widely — so the hero of every step is <em>reach</em> (this → all → site), the cure for inconsistent "AI-slop" pages.</p>
     <div class="track">
 
@@ -233,7 +478,7 @@
             <div class="mini__mid" style="padding:6px;gap:6px;display:flex;flex-direction:column"><div style="width:40px;height:11px;background:var(--accent);border-radius:3px"></div><div style="width:40px;height:11px;background:var(--accent);border-radius:3px"></div><div style="width:40px;height:11px;background:var(--accent);border-radius:3px"></div></div>
             <div class="mini__insp"><div class="hot" style="display:flex;flex-direction:column;gap:2px"><span style="font:700 6px/1 var(--wf-mono);background:#fff;border:1px solid var(--wf-line);border-radius:2px;padding:2px;text-align:center">This</span><span style="font:700 6px/1 var(--wf-mono);background:var(--accent);color:#fff;border-radius:2px;padding:2px;text-align:center">All like</span><span style="font:700 6px/1 var(--wf-mono);background:#fff;border:1px solid var(--wf-line);border-radius:2px;padding:2px;text-align:center">Site</span></div></div></div>
         </div></div>
-        <div class="step-cap"><b>Karta:</b> reach "All like this" pe badhata. <b>Dikhta:</b> saare buttons ek saath badle — recognition, na ki "selector specificity." <span class="ref">→ <a href="editor-wireframe.html#inspector-full">§12 inspector-full</a></span></div>
+        <div class="step-cap"><b>Karta:</b> reach "All like this" pe badhata. <b>Dikhta:</b> saare buttons ek saath badle — recognition, na ki "selector specificity." <span class="ref">→ <a href="editor-wireframe.html#inspector-full">§5 inspector-full</a></span></div>
       </div>
       <div class="arrow">→</div>
 
@@ -276,7 +521,7 @@
 
   <!-- ============================================================ FLOW 3 -->
   <div class="flow">
-    <h2><span class="jn">J3</span> Structure content (CMS)</h2>
+    <h2><span class="jn">J3</span> Structure content (CMS) <span style="font:600 11px/1 var(--wf-mono);color:var(--muted);align-self:center">· same job J3, the data-driven path</span></h2>
     <p class="jmeta"><b>User:</b> builder with many similar pages (blog, products). <b>Done when:</b> one template feeds many records into many live pages. <b>The job pulls toward:</b> define once, repeat with data — so the spine is collection → record → bind → generate.</p>
     <div class="track">
 
@@ -343,7 +588,7 @@
 
   <!-- ============================================================ FLOW 4 -->
   <div class="flow">
-    <h2><span class="jn">J4</span> Get sign-off <span style="font:600 11px/1 var(--wf-mono);color:var(--accent);align-self:center">★ agency loop</span></h2>
+    <h2><span class="jn">J5</span> Get sign-off <span style="font:600 11px/1 var(--wf-mono);color:var(--accent);align-self:center">★ agency loop</span></h2>
     <p class="jmeta"><b>User:</b> agency sending work to a client. <b>Done when:</b> client feedback is captured, resolved, and re-shared — without leaving the tool. <b>The job pulls toward:</b> a round-trip (send → comment → resolve → resend), the agency's core differentiator.</p>
     <div class="track">
 
@@ -393,7 +638,7 @@
           <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">approved</span></div>
           <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;gap:5px;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font:700 13px/1 var(--wf-mono);color:var(--accent)">✓</span><div class="ln" style="width:60%"></div><div style="width:44px;height:12px;background:var(--wf-solid);border-radius:3px"></div></div></div>
         </div></div>
-        <div class="step-cap"><b>Karta:</b> resolved → dobara share / approve. <b>Dikhta:</b> loop band — koi dead-end nahi. <span class="ref">→ <a href="editor-wireframe.html#share">§18 share</a></span></div>
+        <div class="step-cap"><b>Karta:</b> resolved → client ko wapas share. <b>Dikhta:</b> client approve karta → status <em>In-review ➜ ✓ Approved</em> flip ho jaata (loop band, dead-end nahi). <span class="ref">→ <a href="editor-wireframe.html#share">§18 share</a></span></div>
       </div>
 
     </div>
@@ -402,8 +647,8 @@
 
   <!-- ============================================================ FLOW 5 -->
   <div class="flow">
-    <h2><span class="jn">J5</span> Ship it</h2>
-    <p class="jmeta"><b>User:</b> builder ready to go live. <b>Done when:</b> the site is published at a real URL, recoverable if wrong. <b>The job pulls toward one button:</b> Publish is the hero; SEO/domain are the setup before it, status + restore are the safety after.</p>
+    <h2><span class="jn">J6</span> Ship it</h2>
+    <p class="jmeta"><b>User:</b> builder ready to go live. <b>Done when:</b> the site is published at a real URL, recoverable if wrong. <b>The job pulls toward one button:</b> Publish is the hero action; SEO/domain are the setup before it, the safety net is armed (cloud snapshots), and the journey lands on ● live.</p>
     <div class="track">
 
       <div class="step">
@@ -437,30 +682,141 @@
       <div class="arrow">→</div>
 
       <div class="step">
-        <div class="step-n"><span class="sb">4</span> Building → live</div>
-        <div class="step-frame"><div class="mini">
-          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">● live</span></div>
-          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;gap:5px;display:flex;flex-direction:column;justify-content:center"><div style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:var(--accent)"></span><div class="ln" style="width:40%"></div></div><div style="height:11px;border:1px solid var(--accent);border-radius:3px;background:var(--wf-fill)"></div><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">site.com ↗</span></div></div>
-        </div></div>
-        <div class="step-cap"><b>Karta:</b> rukta. <b>Dikhta:</b> Building… → ● Live + clickable URL. (fail → retry state). <span class="ref">→ <a href="editor-wireframe.html#publish-flow">§14 publish-flow</a></span></div>
-      </div>
-      <div class="arrow">→</div>
-
-      <div class="step">
-        <div class="step-n"><span class="sb">5</span> Restore safety net</div>
+        <div class="step-n"><span class="sb">4</span> Safety net armed</div>
         <div class="step-frame"><div class="mini">
           <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 8px/1 var(--wf-mono)">⏱</span></div>
           <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:3px;display:flex;flex-direction:column"><div style="display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--wf-ink);border-radius:2px;padding:2px 4px"><div class="ln" style="width:40%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--accent)">●</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:2px 4px"><div class="ln" style="width:35%"></div><span style="font:700 6px/1 var(--wf-mono);color:var(--muted)">↺</span></div></div></div>
         </div></div>
-        <div class="step-cap"><b>Karta:</b> galti hui to history (⌗/⏱) → Restore. <b>Dikhta:</b> cloud-backed versions, wapas la sakta. <span class="ref">→ <a href="editor-wireframe.html#version-history">§24 version-history</a></span></div>
+        <div class="step-cap"><b>Karta:</b> kuch nahi — har publish cloud-backed snapshot. <b>Dikhta:</b> version history (⌗/⏱); galti hui to ↺ Restore one-click. <span class="ref">→ <a href="editor-wireframe.html#version-history">§24 version-history</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">5</span> ● Live — the goal</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">● live</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:8px;gap:5px;display:flex;flex-direction:column;justify-content:center"><div style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:999px;background:var(--accent)"></span><div class="ln" style="width:40%"></div></div><div style="height:11px;border:1px solid var(--accent);border-radius:3px;background:var(--wf-fill)"></div><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">site.com ↗</span></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> rukta. <b>Dikhta:</b> Building… → ● Live + clickable URL — <strong>site published, job done</strong>. (fail → retry). <span class="ref">→ <a href="editor-wireframe.html#publish-flow">§14 publish-flow</a></span></div>
       </div>
 
     </div>
-    <p class="flow-why"><b>Job ne shape kaise diya:</b> ship ek arc hai — setup (SEO/domain) → ek hero (Publish) → safety (status + restore). Publish topbar mein hero rehta (infrequent par the goal, #5/#16). Honesty: redirects/domains backend-gaps badge tak honest.</p>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> ship ek arc hai — setup (SEO/domain) → hero action (Publish) → safety net armed → ● live (the goal, terminal). Publish topbar mein the one button (#5/#16); journey live par band hota, restore-net pe nahi. Honesty: redirects/domains backend-gaps badge tak honest.</p>
+  </div>
+
+  <!-- ============================================================ J6b — RUN & MEASURE -->
+  <div class="flow">
+    <h2><span class="jn">J6</span> Run &amp; measure <span style="font:600 11px/1 var(--wf-mono);color:var(--muted);align-self:center">· the "run it" half of Ship</span></h2>
+    <p class="jmeta"><b>User:</b> agency with a live client site. <b>Done when:</b> they can see how the site performs, spot a problem, fix it, and re-ship — a loop, not a one-time launch. <b>The job pulls toward:</b> notice → fix → re-ship, so the hero is the round-trip back to live, not a dashboard full of numbers.</p>
+    <div class="track">
+
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Site live hai</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">● live</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:7px;gap:5px;display:flex;flex-direction:column"><div class="ln ln--ink" style="width:50%;height:6px"></div><div style="height:24px;border:1px solid var(--wf-line);border-radius:3px;background:var(--wf-fill)"></div><div class="ln" style="width:80%"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> kuch nahi — site live, chalti hui. <b>Dikhta:</b> published page, real URL. <span class="ref">→ <a href="editor-wireframe.html#publish-flow">§14 publish</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">2</span> Analytics — drop dikha</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">dashboard · analytics</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid hot" style="padding:6px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px">
+            <div style="display:flex;align-items:flex-end;gap:3px;height:38px"><div style="flex:1;height:60%;background:var(--wf-line)"></div><div style="flex:1;height:80%;background:var(--wf-line)"></div><div style="flex:1;height:45%;background:var(--accent)"></div><div style="flex:1;height:30%;background:var(--accent)"></div></div>
+            <div class="ln" style="width:55%"></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> dashboard Analytics kholta — visitors/sources. <b>Dikhta:</b> ek page ka traffic gir raha. ⚠ avgSession abhi fake (LR). <span class="ref">→ (dashboard analytics)</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Editor mein fix</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+            <div class="mini__mid hot" style="padding:6px;gap:4px;display:flex;flex-direction:column"><div class="ln ln--ink" style="width:60%;height:7px"></div><div style="height:22px;border:1.5px solid var(--accent);border-radius:3px;background:var(--wf-fill)"></div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> editor mein woh page kholta, headline/CTA theek karta. <b>Dikhta:</b> edit — yeh J3 loop dobara. <span class="ref">→ <a href="editor-wireframe.html#inspector">§5 inspector</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">4</span> Re-publish → live</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid hot" style="width:30px;box-shadow:0 0 0 2px var(--accent)"></span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span style="width:7px;height:7px;border-radius:999px;background:var(--accent)"></span><div class="ln ln--blue" style="width:50%"></div><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">live ↗ (updated)</span></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> Publish dobara. <b>Dikhta:</b> updated site live — loop band, notice→fix→ship. <span class="ref">→ <a href="editor-wireframe.html#publish-flow">§14 publish</a></span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> codex-audit ne pakda J6 sirf "Ship" tha, "run it" nahi. Yeh journey woh aadha half banati: live → measure → fix → re-ship. Hero = re-publish (round-trip), na ke analytics-numbers dekhna. ⚠ analytics backend abhi adhoora — yeh redesign-target.</p>
+  </div>
+
+  <!-- ============================================================ J6c — FORMS → LEADS -->
+  <div class="flow">
+    <h2><span class="jn">J6</span> Forms → leads <span style="font:600 11px/1 var(--wf-mono);color:var(--muted);align-self:center">· build the form, then see who came</span></h2>
+    <p class="jmeta"><b>User:</b> builder who wants the live site to capture leads. <b>Done when:</b> a form on the page collects submissions and the agency sees the leads — build-to-leads, end to end. <b>The job pulls toward:</b> one continuous line from "drop a form" to "a lead arrived," so the payoff (a real submission) is the hero, not the field editor.</p>
+    <div class="track">
+
+      <div class="step">
+        <div class="step-n"><span class="sb">1</span> Form block drop</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd rd--on"></span><span class="rd"></span><span class="rd"></span><span class="rd"></span></div>
+            <div class="mini__mid hot" style="padding:6px;gap:4px;display:flex;flex-direction:column"><div style="height:11px;border:1px solid var(--wf-line);border-radius:2px"></div><div style="height:11px;border:1px solid var(--wf-line);border-radius:2px"></div><div style="width:30px;height:10px;background:var(--wf-solid);border-radius:2px"></div></div>
+            <div class="mini__insp" style="opacity:.4"></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> Insert se Form block canvas pe daalta. <b>Dikhta:</b> form ka skeleton — fields + submit. <span class="ref">→ <a href="editor-wireframe.html#forms">§13 Forms</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">2</span> Fields configure</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span class="mp mp--solid"></span></div>
+          <div class="mini__body"><div class="mini__rail"><span class="rd"></span><span class="rd"></span><span class="rd"></span><span class="rd rd--on"></span></div>
+            <div class="mini__mid" style="padding:6px"><div style="border:1.5px solid var(--accent);border-radius:3px;padding:3px"><div class="ln ln--ink" style="width:50%"></div></div></div>
+            <div class="mini__insp hot"><div class="ln ln--blue" style="width:80%"></div><div class="ln" style="width:55%"></div><div class="ln" style="width:70%"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> fields set: naam · email · message; submit action. <b>Dikhta:</b> inspector mein form config. <span class="ref">→ <a href="editor-wireframe.html#forms">§13 Forms</a></span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n"><span class="sb">3</span> Live: visitor submit</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar"><span class="mp mp--ghost"></span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">● live</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:7px;gap:5px;display:flex;flex-direction:column"><div style="height:11px;border:1px solid var(--wf-line);border-radius:2px;background:var(--wf-fill)"></div><div style="height:11px;border:1px solid var(--wf-line);border-radius:2px;background:var(--wf-fill)"></div><div style="width:34px;height:12px;background:var(--wf-solid);border-radius:2px;box-shadow:0 0 0 2px var(--accent)"></div></div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> kuch nahi — visitor live form bharta, submit. <b>Dikhta:</b> published form, ek submission jaata. <span class="ref">→ live site</span></div>
+      </div>
+      <div class="arrow">→</div>
+
+      <div class="step">
+        <div class="step-n is-hero"><span class="sb">4</span> Leads dikhte</div>
+        <div class="step-frame"><div class="mini">
+          <div class="mini__bar" style="justify-content:flex-start;gap:4px"><span style="font:700 7px/1 var(--wf-mono);color:var(--faint)">submissions</span><span class="g"></span><span style="font:700 7px/1 var(--wf-mono);color:var(--accent)">3 new</span></div>
+          <div class="mini__body" style="grid-template-columns:1fr"><div class="mini__mid" style="padding:6px;gap:4px;display:flex;flex-direction:column">
+            <div style="border:1px solid var(--accent);border-radius:3px;padding:3px 4px;background:var(--wf-fill)"><div class="ln ln--ink" style="width:55%"></div></div>
+            <div style="border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:45%"></div></div>
+            <div style="border:1px solid var(--wf-line);border-radius:3px;padding:3px 4px"><div class="ln" style="width:60%"></div></div>
+          </div></div>
+        </div></div>
+        <div class="step-cap"><b>Karta:</b> submissions kholta. <b>Dikhta:</b> leads ki list — naya lead aaya. Build-to-leads loop band. (submissions wired; block-config write-path ⚠.) <span class="ref">→ <a href="editor-wireframe.html#forms">§13 Forms</a> + dashboard</span></div>
+      </div>
+
+    </div>
+    <p class="flow-why"><b>Job ne shape kaise diya:</b> form ek <em>panel</em> nahi — ek outcome (lead aaya). Isi liye journey build se shuru, par hero = aakhri step (real submission dikhna). Codex-audit ka Forms gap yeh bharta: builder→submission→leads, ek line.</p>
   </div>
 
   <div class="coming">
-    <b>5 flows = top-level structure.</b> Yeh user ki journeys hain — spine. Har step ke neeche <span class="ref">→ §N</span> uske <a href="editor-wireframe.html">surface spec (§0–§38)</a> ko point karta: woh specs ab <em>flows ke blocks</em> hain, top-level list nahi.
+    <b>10 journeys = top-level structure — saare 6 jobs covered.</b> ★ agency-wedge spine + J1 Run-business · J2 Start-site · J3 Build ×2 · J4 Brand · J5 Sign-off · J6 Ship ×3 (ship · run/measure · forms→leads). Numbers <a href="ia-tree.html">IA ke job-numbers</a> se match karte; wedge ★ kyun ke woh jobs ke beech ka spine hai. Har step ke neeche <span class="ref">→ §N</span> uske <a href="editor-wireframe.html">surface spec (§0–§38)</a> ko point karta: woh specs <em>flows ke blocks</em> hain, top-level list nahi.
   </div>
 
   <p class="source">Method: <a href="../lessons/0017-wireframe-job-first-then-blocks.html">L17 job-first then blocks</a> · grouping by <a href="buildrik-design-principles.html">#10 intent / #14 one home</a>. The journey is the unit, not the screen.</p>
