@@ -22,6 +22,10 @@ vi.mock("../tabs/settings/SettingsTab", () => ({ default: () => null }));
 import { LeftSidebar } from "../LeftSidebar";
 
 beforeAll(() => {
+  // These specs guard the LEGACY 11-tab rail (?rail=legacy escape hatch).
+  // fourToolRail is the default since the E3 rail redesign — without this
+  // pin, LeftSidebar renders FourToolRail and every legacy button is absent.
+  window.history.replaceState({}, "", "/?rail=legacy");
   if (typeof globalThis.window !== "undefined") {
     Object.defineProperty(globalThis.window, "matchMedia", {
       writable: true,

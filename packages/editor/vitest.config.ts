@@ -63,6 +63,7 @@ export default defineConfig({
       "@/lib": resolve(__dirname, "../../lib"),
       "@/components": resolve(__dirname, "../dashboard/components"),
       "@/app": resolve(__dirname, "../dashboard/app"),
+      "@/emails": resolve(__dirname, "../dashboard/emails"),
       "@server": resolve(__dirname, "../../server"),
       "@lib": resolve(__dirname, "../../lib"),
       "@hooks": resolve(__dirname, "./src/hooks"),

@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 
 describe("Site Detail Components", () => {
-  it("exports SITE_DETAIL_TABS with 6 tabs", async () => {
+  it("exports SITE_DETAIL_TABS with 7 tabs", async () => {
     const mod = await import("@/components/site-detail/tab-nav");
-    expect(mod.SITE_DETAIL_TABS).toHaveLength(6);
+    expect(mod.SITE_DETAIL_TABS).toHaveLength(7);
     const labels = mod.SITE_DETAIL_TABS.map((t: { label: string }) => t.label);
-    expect(labels).toEqual(["Overview", "Settings", "SEO", "Domains", "Access", "Analytics"]);
+    expect(labels).toEqual(["Overview", "Settings", "SEO", "Domains", "Redirects", "Sharing", "Traffic"]);
   });
 
   it("exports SiteHeader component", async () => {

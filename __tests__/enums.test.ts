@@ -14,11 +14,12 @@ describe("Enums", () => {
     expect(AuthProvider.GOOGLE).toBe("GOOGLE");
     expect(AuthProvider.GITHUB).toBe("GITHUB");
   });
-  it("UserRole has 4 values", () => {
-    expect(Object.values(UserRole)).toHaveLength(4);
+  it("UserRole has 5 values", () => {
+    expect(Object.values(UserRole)).toHaveLength(5);
     expect(UserRole.OWNER).toBe("OWNER");
     expect(UserRole.ADMIN).toBe("ADMIN");
     expect(UserRole.EDITOR).toBe("EDITOR");
+    expect(UserRole.DESIGNER).toBe("DESIGNER");
     expect(UserRole.VIEWER).toBe("VIEWER");
   });
   it("SiteStatus has 3 values", () => { expect(Object.values(SiteStatus)).toHaveLength(3); });
