@@ -126,6 +126,13 @@ chooser → template-gallery ✅ → **template-preview (NEW: full-screen scroll
 
 chooser → editor-blank W4 ✅ → editor-insert ✅ (WIRE: W4 "+ Add section" → insert → W5) → editor-build W5 ✅ (inline toolbar) → **editor-preview (NEW: chrome-less, Desktop/Tablet/Mobile toggle, shared exit for ALL 3 paths' Preview buttons)** → publish-flow ✅ → publish-live ✅. Edge: save-conflict ✅, version-history ✅. Deferred: unsaved-leave modal (P3).
 
+## 18. M2 v3 — built rules (2026-07-04/05, post design-review ×2)
+
+- **EK editor:** teeno paths ek `editor-ready` pe khatam; editor-variants (ai-draft/template-loaded/result-choice) DELETED. Blank path = founder's blank-canvas→insert→build.
+- **EK kahani:** onboarding content = new-user story ("Bright Events") — demo-workspace (Green Media/Vortex) refs BANNED in wizard screens. Data flows: S2 client → A1 business prefill ("— S2 ke client se") + type match → A2 "kit abhi khaali" (naya client = no kit; Recommended = Cobalt Clean preset) → A3/E/T3 sab "bright-events". Member first-run = alag scenario (Vortex/greenmedia — M3 se consistent), amber divider ke saath.
+- **EK counter per screen:** wizard dots sirf S1-S3; path screens sirf path-chip (A 1/3…). Dono kabhi ek saath nahi.
+- Screens = component instances (wizard-chrome / editor-chrome / auth-split-shell); step-chips S/A/T/B/E/M; states-board + flow-map frames on page.
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
