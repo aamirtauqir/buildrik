@@ -114,6 +114,18 @@ Wizard screens: 1440×1024, white bg, logo top-left (32px cobalt square + wordma
 
 Enter = primary CTA on every wizard step · Esc = dismiss coach mark (never = skip-step, avoids accidental skips) · Tab order: field → primary → skip · path-chooser: arrow keys move card focus, visible 2px cobalt focus ring, Enter selects · all body text ≥13px at ≥4.5:1 contrast · progress dots have aria-label "Step 2 of 3".
 
+## 15. AI path — complete flow (v2, built 2026-07-04)
+
+chooser → **ai-brief** (business-type chips + naam + 1-line + pages checkboxes — NO free prompt) → **ai-style-pick** (predefined DESIGN TOKEN presets: ★ client brand kit + Cobalt Clean/Warm Earth/Slate Mono; swatches + hex + fonts + radius per card) → ai-generating → **ai-result-choice** (2 layout variants) → editor-ai-draft (+ ↻ Regenerate-section pill) → dashboard. Error: retry → generating. Modal `ai-site-generate` demoted to dashboard quick-gen only. Deferred: refine bar (inline-AI = code TARGET), long-wait state, quota-exhausted state.
+
+## 16. Template path — complete flow (planned)
+
+chooser → template-gallery ✅ → **template-preview (NEW: full-screen scroll preview, Use/Back)** → **style-tokens (REUSE ai-style-pick — one shared token screen for both paths)** → **template-applying (NEW: 2s merge-skeleton "template + brand tokens")** → editor-template-loaded ✅ → dashboard. States: gallery load-fail / apply-fail (§8) ✅.
+
+## 17. Editor (Blank) path — complete flow (planned)
+
+chooser → editor-blank W4 ✅ → editor-insert ✅ (WIRE: W4 "+ Add section" → insert → W5) → editor-build W5 ✅ (inline toolbar) → **editor-preview (NEW: chrome-less, Desktop/Tablet/Mobile toggle, shared exit for ALL 3 paths' Preview buttons)** → publish-flow ✅ → publish-live ✅. Edge: save-conflict ✅, version-history ✅. Deferred: unsaved-leave modal (P3).
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |
