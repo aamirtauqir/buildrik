@@ -2,6 +2,7 @@
 
 @theme inline {
   --font-sans: 'Inter Tight', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
 
   /* Auth colors — craftwork surface (cobalt accent, auth-only; see DESIGN.md §Auth Surface) */
   --color-auth-cta: #2D6DFF;
@@ -97,6 +98,36 @@
   /* Dashboard layout */
   --sidebar-width: 262px;
   --topbar-height: 56px;
+
+  /* Dashboard shell + design-system contract (dc parity 2026-07-12).
+     Two-level shell: full-width top nav above the 262px sidebar. */
+  --topnav-h: 52px;
+  --sidebar-w: 262px;
+
+  /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 pill). Remaps rounded-* utilities. */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-pill: 9999px;
+
+  /* Named text tokens — page/section/eyebrow/metric/body. Kills arbitrary
+     text-[22px]. dc scale: body 13, page title 22, section 15, metric 24. */
+  --text-page-title: 22px;
+  --text-page-title--line-height: 1.2;
+  --text-page-title--font-weight: 700;
+  --text-section-title: 15px;
+  --text-section-title--line-height: 1.3;
+  --text-section-title--font-weight: 600;
+  --text-eyebrow: 11px;
+  --text-eyebrow--line-height: 1.2;
+  --text-eyebrow--font-weight: 600;
+  --text-metric: 24px;
+  --text-metric--line-height: 1.1;
+  --text-metric--font-weight: 700;
+  --text-body: 13px;
+  --text-body-sm: 12px;
 
   /* Onboarding (M2 wizard) — its own primary blue #2563EB, distinct from the
      auth cobalt and the dashboard red. See DESIGN.md §Onboarding Surface. */

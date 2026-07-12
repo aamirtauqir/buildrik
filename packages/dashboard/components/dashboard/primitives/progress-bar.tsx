@@ -1,0 +1,17 @@
+import { cn } from "@lib/utils";
+
+type ProgressTone = "accent" | "success" | "warning" | "error";
+
+/** Single progress bar for usage / getting-started / partner / sidebar meters.
+ *  Auto-escalates to warning/error near the cap when tone="auto". */
+export function ProgressBar({ pct, tone = "accent", className }: { pct: number; tone?: ProgressTone | "auto"; className?: string }) {
+  const clamped = Math.min(Math.max(pct, 0), 100);
+  const resolved: ProgressTone = tone === "auto" ? (clamped >= 85 ? "error" : clamped >= 60 ? "warning" : "accent") : tone;
+  const color =
+    resolved === "error" ? "var(--color-error)" : resolved === "warning" ? "#EAB308" : resolved === "success" ? "var(--color-success)" : "var(--color-primary)";
+  return (
+    <div className={cn("h-1.5 w-full overflow-hidden rounded-pill", className)} style={{ backgroundColor: "var(--color-border-default)" }}>
+      <div className="h-full rounded-pill transition-all" style={{ width: `${clamped}%`, backgroundColor: color }} />
+    </div>
+  );
+}
