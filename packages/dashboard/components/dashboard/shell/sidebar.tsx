@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, FolderKanban, Globe, Image as ImageIcon, Rocket, Briefcase, ClipboardCheck,
-  MessageSquare, Palette, Gift, Blocks, Library, Users, CreditCard, Tag, Activity, Link2,
+  Palette, Gift, Blocks, Library, Plug, Users, CreditCard, Tag, Activity, Link2,
   Settings, HelpCircle, ArrowUpRight,
 } from "lucide-react";
 import { cn } from "@lib/utils";
@@ -15,7 +15,7 @@ const PLAN_LABELS: Record<string, string> = { FREE: "Free", PRO: "Pro", BUSINESS
 
 const iconMap = {
   LayoutDashboard, FolderKanban, Globe, Image: ImageIcon, Rocket, Briefcase, ClipboardCheck,
-  MessageSquare, Palette, Gift, Blocks, Library, Users, CreditCard, Tag, Activity, Link2,
+  Palette, Gift, Blocks, Library, Plug, Users, CreditCard, Tag, Activity, Link2,
   Settings, HelpCircle,
 } as const;
 
@@ -28,19 +28,19 @@ export const NAV_GROUPS: NavGroup[] = [
   { label: null, items: [
     { label: "Home", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "All projects", href: "/dashboard/projects", icon: "FolderKanban" },
-    { label: "My Sites", href: "/dashboard/sites", icon: "Globe" },
-    { label: "Media", href: "/dashboard/media", icon: "Image" },
+    { label: "Sites", href: "/dashboard/sites", icon: "Globe" },
+    { label: "Media library", href: "/dashboard/media", icon: "Image" },
     { label: "Getting started", href: "/dashboard/getting-started", icon: "Rocket" },
   ] },
   { label: "Agency", items: [
-    { label: "Clients", href: "/dashboard/clients", icon: "Briefcase", agencyOnly: true },
-    { label: "Reviews", href: "/dashboard/reviews", icon: "ClipboardCheck", agencyOnly: true },
-    { label: "Comments", href: "/dashboard/comments", icon: "MessageSquare", agencyOnly: true },
+    { label: "Client management", href: "/dashboard/clients", icon: "Briefcase", agencyOnly: true },
+    { label: "Review & comments", href: "/dashboard/reviews", icon: "ClipboardCheck", agencyOnly: true },
     { label: "Shared theme", href: "/dashboard/theme", icon: "Palette", agencyOnly: true },
     { label: "Partner program", href: "/dashboard/partner", icon: "Gift", agencyOnly: true },
   ] },
   { label: "Extend", items: [
     { label: "Apps", href: "/dashboard/apps", icon: "Blocks" },
+    { label: "Apps & Integrations", href: "/dashboard/integrations", icon: "Plug" },
     { label: "Libraries & Templates", href: "/dashboard/libraries", icon: "Library" },
   ] },
   { label: "Workspace", items: [
@@ -49,8 +49,8 @@ export const NAV_GROUPS: NavGroup[] = [
     { label: "Plans", href: "/dashboard/plans", icon: "Tag" },
     { label: "Usage", href: "/dashboard/usage", icon: "Activity" },
     { label: "Domains", href: "/dashboard/domains", icon: "Link2" },
-    { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
-    { label: "Help", href: "/dashboard/help", icon: "HelpCircle" },
+    { label: "General settings", href: "/dashboard/settings", icon: "Settings" },
+    { label: "Help center", href: "/dashboard/help", icon: "HelpCircle" },
   ] },
 ];
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, Upload, Trash2, Copy, Check, Folder, ImageOff, MoreHorizontal, Pencil, X, AlertTriangle } from "lucide-react";
+import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, ImageOff, MoreHorizontal, Pencil, X, AlertTriangle } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
@@ -35,6 +35,8 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createValue, setCreateValue] = useState("");
   const folderMenuRef = useRef<HTMLDivElement>(null);
 
   const assets = trpc.media.listAssets.useQuery({ search: search || undefined, folderId, limit: 60 });
@@ -47,6 +49,16 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   });
   const createAsset = trpc.media.createAsset.useMutation();
 
+  const createFolder = trpc.media.createFolder.useMutation({
+    onSuccess: (folder) => {
+      folders.refetch();
+      setCreateOpen(false);
+      setCreateValue("");
+      setFolderId(folder.id);
+      addToast("success", "Folder created");
+    },
+    onError: (err) => addToast("error", "Create failed", err.message),
+  });
   const renameFolder = trpc.media.renameFolder.useMutation({
     onSuccess: () => { folders.refetch(); setRenameTarget(null); addToast("success", "Folder renamed"); },
     onError: (err) => addToast("error", "Rename failed", err.message),
@@ -174,6 +186,14 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               </div>
             );
           })}
+          <button
+            type="button"
+            onClick={() => { setCreateValue(""); setCreateOpen(true); }}
+            className="inline-flex items-center gap-1 rounded-md border border-dashed px-2.5 py-1.5 text-xs transition-colors hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+          >
+            <FolderPlus size={12} /> New folder
+          </button>
         </div>
       </div>
 
@@ -235,6 +255,49 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           )}
         </div>
       </div>
+
+      {/* Create folder */}
+      {createOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setCreateOpen(false)}>
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>New folder</h2>
+            <input
+              type="text"
+              value={createValue}
+              onChange={(e) => setCreateValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && createValue.trim()) {
+                  createFolder.mutate({ name: createValue.trim() });
+                } else if (e.key === "Escape") {
+                  setCreateOpen(false);
+                }
+              }}
+              placeholder="Folder name"
+              autoFocus
+              maxLength={80}
+              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+            />
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setCreateOpen(false)}
+                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { if (createValue.trim()) createFolder.mutate({ name: createValue.trim() }); }}
+                disabled={!createValue.trim() || createFolder.isPending}
+                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                {createFolder.isPending ? "Creating…" : "Create"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Rename folder */}
       {renameTarget && (

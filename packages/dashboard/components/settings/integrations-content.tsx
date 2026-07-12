@@ -1,0 +1,135 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { trpc } from "@lib/trpc/client";
+import { useToast } from "@/components/dashboard/toast-provider";
+import { IntegrationsTab } from "@/components/settings/integrations-tab";
+import { SectionCard, Pill } from "@/components/dashboard/primitives";
+
+function VercelIntegrationSection({ workspaceId }: { workspaceId: string }) {
+  const { addToast } = useToast();
+  const conn = trpc.integrations.vercel.getConnection.useQuery(
+    { workspaceId },
+    { enabled: !!workspaceId },
+  );
+  const disconnect = trpc.integrations.vercel.disconnect.useMutation({
+    onSuccess: (data) => {
+      conn.refetch();
+      if (data.vercelStillInstalled) {
+        addToast(
+          "info",
+          "Disconnected from this workspace",
+          "Buildrick can no longer publish from here. To fully revoke access, open Vercel → Integrations → Buildrick → Remove.",
+        );
+      } else {
+        addToast("success", "Vercel disconnected");
+      }
+    },
+  });
+  const search = useSearchParams();
+  const oauthError = search.get("error");
+
+  const handleConnect = () => {
+    window.location.href = `/api/integrations/vercel/authorize?workspaceId=${encodeURIComponent(workspaceId)}`;
+  };
+
+  return (
+    <SectionCard title="Vercel" description="Deploy your sites to Vercel. Connect once per workspace.">
+      {(oauthError === "oauth_state_invalid" || oauthError === "oauth_denied") && (
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          {oauthError === "oauth_state_invalid"
+            ? "OAuth session expired. Click Connect to retry."
+            : "Vercel didn't authorize the connection. Try again or check your Vercel account."}
+        </div>
+      )}
+
+      <div className="flex items-center justify-end">
+        {conn.isLoading ? (
+          <div className="h-8 w-28 animate-pulse rounded-md" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        ) : conn.data?.connected && conn.data.isActive ? (
+          <div className="flex items-center gap-3">
+            <Pill tone="success">Connected{conn.data.teamId ? ` · team ${conn.data.teamId}` : ""}</Pill>
+            <button
+              type="button"
+              onClick={() => disconnect.mutate({ workspaceId })}
+              disabled={disconnect.isPending}
+              className="rounded-md border px-3 py-1.5 text-sm hover:bg-neutral-50 disabled:opacity-60"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+            >
+              {disconnect.isPending ? "Disconnecting…" : "Disconnect"}
+            </button>
+          </div>
+        ) : conn.data?.connected && !conn.data.isActive ? (
+          <div className="flex items-center gap-3">
+            <Pill tone="error">Connection lost</Pill>
+            <button
+              type="button"
+              onClick={handleConnect}
+              className="rounded-md border px-3 py-1.5 text-sm hover:bg-neutral-50"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+            >
+              Reconnect
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleConnect}
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            Connect Vercel
+          </button>
+        )}
+      </div>
+    </SectionCard>
+  );
+}
+
+export function IntegrationsContent() {
+  const { addToast } = useToast();
+  const wsQuery = trpc.account.workspace.get.useQuery();
+  const workspaceId = wsQuery.data?.id;
+  const intQuery = trpc.account.integrations.list.useQuery();
+
+  const addMutation = trpc.account.integrations.add.useMutation({
+    onSuccess: () => { intQuery.refetch(); addToast("success", "Integration connected"); },
+    onError: (err: { message: string }) => addToast("error", "Failed", err.message),
+  });
+  const removeMutation = trpc.account.integrations.remove.useMutation({
+    onSuccess: () => { intQuery.refetch(); addToast("success", "Integration removed"); },
+  });
+  const updateMutation = trpc.account.integrations.update.useMutation({
+    onSuccess: () => { intQuery.refetch(); addToast("success", "Integration updated"); },
+    onError: (err: { message: string }) => addToast("error", "Failed", err.message),
+  });
+  const testEventMutation = trpc.account.integrations.testEvent.useMutation({
+    onSuccess: (res: { ok: boolean; status: number }) =>
+      res.ok
+        ? addToast("success", "Test event delivered", `Webhook responded ${res.status}`)
+        : addToast("error", "Test event failed", `Webhook responded ${res.status}`),
+    onError: (err: { message: string }) => addToast("error", "Test event failed", err.message),
+  });
+
+  if (intQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl bg-neutral-100" />;
+
+  const connected = (intQuery.data ?? []).map((item) => ({
+    id: item.id,
+    provider: item.provider as "GOOGLE_ANALYTICS" | "MAILCHIMP" | "ZAPIER" | "SLACK",
+    config: (item.config ?? {}) as Record<string, string>,
+  }));
+
+  return (
+    <div className="space-y-6">
+      {workspaceId && <VercelIntegrationSection workspaceId={workspaceId} />}
+      <IntegrationsTab
+        connected={connected}
+        onAdd={(provider, config) => addMutation.mutate({ provider, config })}
+        onRemove={(id) => removeMutation.mutate({ id })}
+        onUpdate={(id, config) => updateMutation.mutate({ id, config })}
+        onTestEvent={(id) => testEventMutation.mutate({ id })}
+        saving={addMutation.isPending || removeMutation.isPending || updateMutation.isPending || testEventMutation.isPending}
+      />
+    </div>
+  );
+}

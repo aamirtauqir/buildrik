@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   FileText,
@@ -11,20 +11,13 @@ import {
   Heart,
   ChevronDown,
   ChevronRight,
-  ChevronLeft,
   RefreshCw,
   ArrowLeft,
   Shield,
   Image,
   Search,
   FileCheck,
-  Download,
 } from "lucide-react";
-import { trpc } from "@lib/trpc/client";
-import {
-  SubmissionDrawer,
-  type FormSubmissionData,
-} from "@/components/site-detail/submission-drawer";
 import { StatCard, SectionCard, MetricValue, Pill } from "@/components/dashboard/primitives";
 
 export const HEALTH_METRICS = [
@@ -90,82 +83,6 @@ export function OverviewTab({
 }: OverviewTabProps) {
   const [healthExpanded, setHealthExpanded] = useState(false);
   const [expandedFormId, setExpandedFormId] = useState<string | null>(null);
-  const [submissionsPage, setSubmissionsPage] = useState(1);
-  const [filterFormBlockId, setFilterFormBlockId] = useState<string | undefined>(undefined);
-  const [drawerSubmission, setDrawerSubmission] = useState<FormSubmissionData | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const submissionsQuery = trpc.forms.listSubmissions.useQuery(
-    { siteId, formBlockId: filterFormBlockId, page: submissionsPage, perPage: 20 },
-    { enabled: formBlocks.length > 0 },
-  );
-
-  const utils = trpc.useUtils();
-
-  const updateMutation = trpc.forms.updateSubmission.useMutation({
-    onSuccess: () => {
-      utils.forms.listSubmissions.invalidate();
-    },
-  });
-
-  const deleteMutation = trpc.forms.deleteSubmission.useMutation({
-    onSuccess: () => {
-      utils.forms.listSubmissions.invalidate();
-      setDrawerOpen(false);
-      setDrawerSubmission(null);
-    },
-  });
-
-  const handleDrawerUpdate = useCallback(
-    (id: string, data: Partial<{ isRead: boolean; isSpam: boolean; isArchived: boolean }>) => {
-      updateMutation.mutate({ id, ...data });
-      if (drawerSubmission && drawerSubmission.id === id) {
-        setDrawerSubmission({ ...drawerSubmission, ...data });
-      }
-    },
-    [updateMutation, drawerSubmission],
-  );
-
-  const handleDrawerDelete = useCallback(
-    (id: string) => {
-      deleteMutation.mutate({ id });
-    },
-    [deleteMutation],
-  );
-
-  const handleOpenDrawer = useCallback((sub: FormSubmissionData) => {
-    setDrawerSubmission(sub);
-    setDrawerOpen(true);
-    if (!sub.isRead) {
-      updateMutation.mutate({ id: sub.id, isRead: true });
-    }
-  }, [updateMutation]);
-
-  const [exporting, setExporting] = useState(false);
-
-  const handleExportCsv = useCallback(async () => {
-    // Pull the FULL dataset from the server (respecting the active form
-    // filter) instead of serialising only the current 20-row page — the
-    // old client-side CSV silently truncated to the loaded page.
-    setExporting(true);
-    try {
-      const csv = await utils.forms.exportSubmissions.fetch({
-        siteId,
-        formBlockId: filterFormBlockId,
-        format: "csv",
-      });
-      if (!csv) return;
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `submissions-${siteId}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } finally {
-      setExporting(false);
-    }
-  }, [utils, siteId, filterFormBlockId]);
 
   if (isLoading) return <OverviewSkeleton />;
 
@@ -311,10 +228,18 @@ export function OverviewTab({
 
       {/* Form Submissions Section */}
       {formBlocks.length > 0 && (
-        <SectionCard title="Form Blocks">
-          {/* "View All Submissions" / "View details" links removed — there is
-              no dashboard submissions route (they 404'd). The per-form
-              submission counts below remain the live, accurate signal. */}
+        <SectionCard
+          title="Form Blocks"
+          actions={
+            <Link
+              href={`/dashboard/sites/${siteId}/feedback`}
+              className="text-xs font-medium"
+              style={{ color: "var(--color-primary)" }}
+            >
+              View all submissions →
+            </Link>
+          }
+        >
           <div className="space-y-2">
             {formBlocks.map((fb) => (
               <div key={fb.id} className="rounded-lg border" style={{ borderColor: "var(--color-bg-subtle)" }}>
@@ -353,168 +278,6 @@ export function OverviewTab({
           </div>
         </SectionCard>
       )}
-
-      {/* Submissions Table */}
-      {formBlocks.length > 0 && (
-        <SectionCard
-          title="All Submissions"
-          padding="none"
-          actions={
-            <>
-              <select
-                value={filterFormBlockId ?? ""}
-                onChange={(e) => {
-                  setFilterFormBlockId(e.target.value || undefined);
-                  setSubmissionsPage(1);
-                }}
-                className="rounded-lg border px-3 py-1.5 text-xs"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-              >
-                <option value="">All Forms</option>
-                {formBlocks.map((fb) => (
-                  <option key={fb.id} value={fb.id}>{fb.name}</option>
-                ))}
-              </select>
-              <button
-                onClick={handleExportCsv}
-                disabled={exporting || !submissionsQuery.data?.data.length}
-                className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-gray-50 disabled:opacity-40"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-              >
-                <Download className="h-3.5 w-3.5" />
-                {exporting ? "Exporting…" : "Export CSV"}
-              </button>
-            </>
-          }
-        >
-          {submissionsQuery.isLoading ? (
-            <div className="px-5 py-8">
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-10 w-full animate-pulse rounded" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-                ))}
-              </div>
-            </div>
-          ) : submissionsQuery.data && submissionsQuery.data.data.length > 0 ? (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b" style={{ borderColor: "var(--color-bg-subtle)" }}>
-                      <th className="px-5 py-3 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>Submitted</th>
-                      <th className="px-5 py-3 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>Form</th>
-                      <th className="px-5 py-3 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>Data Preview</th>
-                      <th className="px-5 py-3 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {submissionsQuery.data.data.map((sub) => {
-                      const s = sub as unknown as FormSubmissionData;
-                      const dataEntries = Object.entries(s.data);
-                      const preview = dataEntries
-                        .slice(0, 2)
-                        .map(([k, v]) => `${k}: ${String(v).slice(0, 30)}${String(v).length > 30 ? "\u2026" : ""}`)
-                        .join(" | ");
-                      return (
-                        <tr
-                          key={s.id}
-                          onClick={() => handleOpenDrawer(s)}
-                          className="cursor-pointer border-b transition-colors hover:bg-gray-50"
-                          style={{ borderColor: "var(--color-bg-subtle)" }}
-                        >
-                          <td className="whitespace-nowrap px-5 py-3 text-xs" style={{ color: "var(--color-text-primary)" }}>
-                            <MetricValue>
-                              {new Date(s.createdAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </MetricValue>
-                          </td>
-                          <td className="px-5 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                            {s.formBlock?.name ?? "Unknown"}
-                          </td>
-                          <td className="max-w-[300px] truncate px-5 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                            {preview || "\u2014"}
-                          </td>
-                          <td className="px-5 py-3">
-                            <div className="flex items-center gap-1.5">
-                              {!s.isRead && (
-                                <span
-                                  className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                                  style={{ backgroundColor: "#DBEAFE", color: "#2563EB" }}
-                                >
-                                  Unread
-                                </span>
-                              )}
-                              {s.isSpam && (
-                                <span
-                                  className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                                  style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
-                                >
-                                  Spam
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {submissionsQuery.data.total > 20 && (
-                <div
-                  className="flex items-center justify-between border-t px-5 py-3"
-                  style={{ borderColor: "var(--color-border-default)" }}
-                >
-                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    Page <MetricValue>{submissionsQuery.data.page}</MetricValue> of <MetricValue>{Math.ceil(submissionsQuery.data.total / 20)}</MetricValue>
-                    {" "}(<MetricValue>{submissionsQuery.data.total}</MetricValue> total)
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setSubmissionsPage((p) => Math.max(1, p - 1))}
-                      disabled={submissionsPage <= 1}
-                      className="rounded-lg border p-1.5 transition-colors hover:bg-gray-50 disabled:opacity-40"
-                      style={{ borderColor: "var(--color-border-default)" }}
-                    >
-                      <ChevronLeft className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
-                    </button>
-                    <button
-                      onClick={() => setSubmissionsPage((p) => p + 1)}
-                      disabled={submissionsPage >= Math.ceil(submissionsQuery.data.total / 20)}
-                      className="rounded-lg border p-1.5 transition-colors hover:bg-gray-50 disabled:opacity-40"
-                      style={{ borderColor: "var(--color-border-default)" }}
-                    >
-                      <ChevronRight className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="px-5 py-8 text-center">
-              <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>No submissions found.</p>
-            </div>
-          )}
-        </SectionCard>
-      )}
-
-      {/* Submission Drawer */}
-      <SubmissionDrawer
-        open={drawerOpen}
-        onClose={() => {
-          setDrawerOpen(false);
-          setDrawerSubmission(null);
-        }}
-        submission={drawerSubmission}
-        onUpdate={handleDrawerUpdate}
-        onDelete={handleDrawerDelete}
-      />
 
       {/* Recent Activity */}
       <SectionCard title="Recent Activity">

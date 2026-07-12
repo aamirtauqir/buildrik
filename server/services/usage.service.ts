@@ -23,6 +23,11 @@ export interface WorkspaceUsage {
 const MB_PER_GB = 1024;
 const toGB = (mb: number) => Math.round((mb / MB_PER_GB) * 10) / 10;
 
+// Build minutes aren't in PLAN_LIMITS — builds run off-platform and aren't
+// metered server-side. These are the per-tier caps surfaced in the Usage
+// "Build minutes" tile (design's 4th tile). -1 = unlimited.
+const BUILD_MINUTES_LIMIT: Record<PlanName, number> = { FREE: 500, PRO: 2500, BUSINESS: -1 };
+
 export async function getWorkspaceUsage(workspaceId: string): Promise<WorkspaceUsage> {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -30,10 +35,9 @@ export async function getWorkspaceUsage(workspaceId: string): Promise<WorkspaceU
 
   const siteIds = (await prisma.site.findMany({ where: { workspaceId }, select: { id: true } })).map((s) => s.id);
 
-  const [workspace, storageAgg, aiJobCount, submissionCount, recentSubmissions] = await Promise.all([
+  const [workspace, storageAgg, submissionCount, recentSubmissions] = await Promise.all([
     prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } }),
     prisma.mediaAsset.aggregate({ _sum: { bytes: true }, where: { siteId: { in: siteIds } } }),
-    prisma.aIGenerationJob.count({ where: { workspaceId, createdAt: { gte: startOfMonth } } }),
     prisma.formSubmission.count({ where: { siteId: { in: siteIds }, createdAt: { gte: startOfMonth } } }),
     prisma.formSubmission.findMany({
       where: { siteId: { in: siteIds }, createdAt: { gte: fourteenDaysAgo } },
@@ -57,15 +61,16 @@ export async function getWorkspaceUsage(workspaceId: string): Promise<WorkspaceU
   }
   const submissionSeries = [...buckets.entries()].map(([day, count]) => ({ day, count }));
 
+  // Design order: Bandwidth, Build minutes, Form submissions, Storage.
   const metrics: UsageMetric[] = [
-    { key: "storage", label: "Storage", used: toGB(storageMB), limit: toGB(limits.storageMB as number), unit: "GB" },
     // Bandwidth is not measured server-side (served from the edge); shown against
     // the plan cap and flagged estimated rather than fabricating a used value.
     { key: "bandwidth", label: "Bandwidth", used: 0, limit: toGB(limits.bandwidthMB as number), unit: "GB", estimated: true },
+    // Build minutes aren't metered server-side either (builds run off-platform);
+    // shown against the plan cap and flagged estimated, same as bandwidth.
+    { key: "build", label: "Build minutes", used: 0, limit: BUILD_MINUTES_LIMIT[plan], unit: "", estimated: true },
     { key: "submissions", label: "Form submissions", used: submissionCount, limit: limits.formSubmissions as number, unit: "" },
-    // dc design's 4th tile is "Build minutes" (untracked); AI generations is the
-    // real per-workspace monthly counter we do measure.
-    { key: "ai", label: "AI generations", used: aiJobCount, limit: limits.aiGenerations as number, unit: "" },
+    { key: "storage", label: "Storage", used: toGB(storageMB), limit: toGB(limits.storageMB as number), unit: "GB" },
   ];
 
   return {

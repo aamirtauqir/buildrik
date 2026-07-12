@@ -70,7 +70,7 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
       {/* CTAs */}
       <div className="mt-6 grid grid-cols-2 gap-3">
         <Link
-          href={`/dashboard/sites/${siteId}/sharing`}
+          href={`/dashboard/sites/${siteId}/access`}
           className="flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
           style={{ backgroundColor: "var(--color-primary)" }}
         >

@@ -1,9 +1,12 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Globe, ExternalLink } from "lucide-react";
+import { ArrowLeft, Pencil, Globe, ExternalLink, Send, Share2 } from "lucide-react";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone } from "@/components/sites/site-status";
 import { Pill } from "@/components/dashboard/primitives";
+import { SendReviewModal } from "@/components/reviews/send-review-modal";
+import { ShareDraftModal } from "@/components/site-detail/share-draft-modal";
 
 interface SiteHeaderProps {
   site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null };
@@ -12,6 +15,8 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   return (
     <div>
       <Link href="/dashboard/sites" className="mb-3 inline-flex items-center gap-1 text-sm transition-colors hover:underline" style={{ color: "var(--color-text-secondary)" }}>
@@ -28,6 +33,20 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShareOpen(true)}
+            className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          >
+            <Share2 className="h-4 w-4" />Share draft
+          </button>
+          <button
+            onClick={() => setReviewOpen(true)}
+            className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          >
+            <Send className="h-4 w-4" />Send for review
+          </button>
           {site.status === "PUBLISHED" && site.publishedUrl ? (
             <a
               href={site.publishedUrl}
@@ -59,6 +78,8 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
           {/* Dead "more options" button (no onClick, no menu) removed. */}
         </div>
       </div>
+      <ShareDraftModal open={shareOpen} onClose={() => setShareOpen(false)} siteId={site.id} />
+      <SendReviewModal open={reviewOpen} onClose={() => setReviewOpen(false)} siteId={site.id} siteName={site.name} />
     </div>
   );
 }

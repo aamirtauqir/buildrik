@@ -1,5 +1,5 @@
-import { CommentQueue } from "@/components/comments/comment-queue";
+import { ReviewComments } from "@/components/reviews/review-comments";
 
 export default function CommentsPage() {
-  return <CommentQueue />;
+  return <ReviewComments initialTab="comments" />;
 }

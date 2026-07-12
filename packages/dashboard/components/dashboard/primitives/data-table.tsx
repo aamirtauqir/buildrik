@@ -17,11 +17,13 @@ export function DataTable<T>({
   rows,
   keyOf,
   empty,
+  onRowClick,
 }: {
   columns: Column<T>[];
   rows: T[];
   keyOf: (row: T, i: number) => string;
   empty?: ReactNode;
+  onRowClick?: (row: T) => void;
 }) {
   if (rows.length === 0 && empty) return <>{empty}</>;
   return (
@@ -36,7 +38,12 @@ export function DataTable<T>({
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={keyOf(row, i)} className="border-b last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
+            <tr
+              key={keyOf(row, i)}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              className={cn("border-b last:border-0", onRowClick && "cursor-pointer transition-colors hover:bg-[var(--color-bg-subtle)]")}
+              style={{ borderColor: "var(--color-border-default)" }}
+            >
               {columns.map((c) => (
                 <td key={c.key} className={cn("px-4 py-3", c.align === "right" && "text-right", c.className)} style={{ color: "var(--color-text-primary)" }}>
                   {c.render ? c.render(row) : (row as Record<string, ReactNode>)[c.key]}

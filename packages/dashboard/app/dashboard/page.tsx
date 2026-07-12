@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
 import { StatCard, PageHeader, MetricValue } from "@/components/dashboard/primitives";
 import { MiniDonut, Sparkline, AvatarStack, TrendArrow } from "@/components/dashboard/dataviz";
@@ -21,6 +22,11 @@ type ActivityFilter = "all" | "mine" | "team";
 
 export default function DashboardPage() {
   const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
+  const { data: session } = useSession();
+  const firstName = session?.user?.name?.trim().split(/\s+/)[0] || "there";
+  const hour = new Date().getHours();
+  const timeOfDay = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
+  const greeting = `Good ${timeOfDay}, ${firstName}`;
   const stats = trpc.dashboard.stats.useQuery();
   const recentSites = trpc.dashboard.recentSites.useQuery();
   const activity = trpc.dashboard.activity.useQuery({ filter: activityFilter });
@@ -165,7 +171,8 @@ export default function DashboardPage() {
       )}
 
       <PageHeader
-        title="Dashboard"
+        title={greeting}
+        description="Here's what's happening in your workspace."
         actions={
           <Link href="/dashboard/sites/new" className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
             <Plus className="h-4 w-4" />New Site
