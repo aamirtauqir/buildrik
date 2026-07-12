@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { decode } from "next-auth/jwt";
 
-const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/success", "/auth/redirect"];
+// Auth routes that REQUIRE a session (logged-out → login).
+const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/workspace-setup", "/auth/success", "/auth/redirect"];
+
+// Token-consuming auth routes that must run for BOTH logged-in and logged-out
+// users (invite accept, email verify, password reset, magic-link callback,
+// change-email). Do NOT bounce a logged-in user off these — the token page runs.
+const tokenAuthRoutes = ["/auth/invite", "/auth/verify-email", "/auth/reset-password", "/auth/callback", "/auth/change-email"];
 
 /**
  * Cross-origin auth model (P0.4 — settings industrial plan)
@@ -64,8 +70,11 @@ export async function middleware(req: NextRequest) {
   const isAuthenticatedAuth = authenticatedAuthRoutes.some(
     (route) => pathname === route || pathname.startsWith(route + "/")
   );
+  const isTokenAuth = tokenAuthRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
 
-  if (isAuthRoute && !isAuthenticatedAuth && isLoggedIn) {
+  if (isAuthRoute && !isAuthenticatedAuth && !isTokenAuth && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 

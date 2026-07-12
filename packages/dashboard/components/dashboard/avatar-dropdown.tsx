@@ -62,6 +62,9 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
       <button
         onClick={() => !loading && setOpen((prev) => !prev)}
         disabled={loading}
+        aria-label="Account menu"
+        aria-haspopup="menu"
+        aria-expanded={open}
         className={loading
           ? "h-9 w-9 animate-pulse rounded-full bg-[var(--color-bg-subtle)]"
           : "flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-bold text-white"

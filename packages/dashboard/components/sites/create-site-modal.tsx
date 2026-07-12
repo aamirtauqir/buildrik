@@ -90,8 +90,8 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
               <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}><LayoutTemplate className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></div>
               <div><p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Use a Template</p><p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ templates</p></div>
             </button>
-            <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-red-50/50" style={{ borderColor: "var(--color-border-default)" }}>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FEF2F2" }}><Sparkles className="h-5 w-5" style={{ color: "var(--color-primary)" }} /></div>
+            <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[var(--color-primary-subtle)]/50" style={{ borderColor: "var(--color-border-default)" }}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}><Sparkles className="h-5 w-5" style={{ color: "var(--color-primary)" }} /></div>
               <div className="flex-1">
                 <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
                 <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>AI-powered site creation</p>

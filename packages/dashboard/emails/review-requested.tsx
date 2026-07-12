@@ -45,7 +45,7 @@ export default function ReviewRequested({
           </Section>
           <Hr style={{ borderColor: "#E2E8F0", marginTop: "32px" }} />
           <Text style={{ fontSize: "12px", color: "#94A3B8", textAlign: "center" as const }}>
-            Sent by Buildrik &middot; You can manage email preferences in your account settings.
+            Sent by Buildrick &middot; You can manage email preferences in your account settings.
           </Text>
         </Container>
       </Body>

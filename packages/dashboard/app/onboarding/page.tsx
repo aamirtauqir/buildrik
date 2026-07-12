@@ -1,23 +1,23 @@
 "use client";
 
 import { useEffect } from "react";
-import { useOnboardingFlow } from "@lib/hooks/use-onboarding-flow";
+import { useRouter } from "next/navigation";
+import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 
+/** Entry frame: resume the wizard at the last saved route (server-persisted via
+ *  WizardBoot). New users land on /onboarding/workspace (the default route). */
 export default function OnboardingPage() {
-  const { isLoading, navigateToCurrentStep } = useOnboardingFlow();
+  const router = useRouter();
+  const { data } = useWizard();
 
   useEffect(() => {
-    if (!isLoading) {
-      navigateToCurrentStep();
-    }
-  }, [isLoading, navigateToCurrentStep]);
+    const target = data.route && data.route !== "/onboarding" ? data.route : "/onboarding/workspace";
+    router.replace(target);
+  }, [data.route, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: "var(--color-text-primary)" }}>
-      <div className="text-center">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white border-t-transparent" />
-        <p className="mt-4 text-sm text-white/60">Loading...</p>
-      </div>
+    <div className="min-h-dvh bg-white flex items-center justify-center">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
     </div>
   );
 }

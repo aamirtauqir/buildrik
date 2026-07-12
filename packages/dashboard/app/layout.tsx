@@ -8,7 +8,7 @@ import { UnifiedEditorFlagProvider } from "@/components/editor-route/UnifiedEdit
 import { readUnifiedEditorFlag } from "@/components/editor-route/unified-flag.server";
 
 export const metadata: Metadata = {
-  title: "Buildrik",
+  title: "Buildrick",
   description: "Build beautiful websites, fast.",
 };
 

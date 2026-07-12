@@ -4,12 +4,7 @@ import { Globe, FileText, Pencil, Settings, Users, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
 import { ContextMenu } from "./context-menu";
 import { EditorLink } from "@/components/editor-route/EditorLink";
-
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  PUBLISHED: { bg: "#DCFCE7", text: "#166534" },
-  DRAFT: { bg: "#FEF9C3", text: "#854D0E" },
-  ARCHIVED: { bg: "#FED7AA", text: "#9A3412" },
-};
+import { siteStatusColor } from "./site-status";
 
 interface SiteCardFullProps {
   site: { id: string; name: string; slug: string; status: string; thumbnail: string | null; pages: number; lastEditedAt: Date; publishedUrl: string | null; visitors30d: number; createdBy: string; domain: string | null; themeLocked?: boolean };
@@ -34,7 +29,7 @@ function formatVisitors(count: number): string {
 }
 
 export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFullProps) {
-  const statusColor = STATUS_COLORS[site.status] ?? STATUS_COLORS.DRAFT;
+  const statusColor = siteStatusColor(site.status);
   return (
     <div className={cn("group relative rounded-xl border bg-white transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")} style={{ borderColor: "var(--color-border-default)" }}>
       <div className="absolute left-3 top-3 z-10">

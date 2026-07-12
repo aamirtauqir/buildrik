@@ -143,7 +143,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                       style={{
                         borderColor: selected ? "var(--color-primary)" : "var(--color-border-default)",
                         color: selected ? "var(--color-primary)" : "var(--color-text-secondary)",
-                        backgroundColor: selected ? "#FEF2F2" : "transparent",
+                        backgroundColor: selected ? "var(--color-primary-subtle)" : "transparent",
                       }}
                     >
                       {opt.label}{disabled ? " (upgrade)" : ""}

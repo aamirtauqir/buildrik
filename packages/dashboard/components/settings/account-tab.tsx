@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MailCheck } from "lucide-react";
 
 interface ConnectedAccount {
   provider: "google" | "github";
@@ -13,7 +14,7 @@ interface AccountTabProps {
   connectedAccounts?: ConnectedAccount[];
   onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void;
   onSetPassword?: (data: { newPassword: string }) => void;
-  onChangeEmail?: (data: { newEmail: string; password: string }) => void;
+  onChangeEmail?: (data: { newEmail: string; password: string }) => void | Promise<unknown>;
   onConnectAccount?: (provider: "google" | "github") => void;
   onDisconnectAccount?: (provider: "google" | "github") => void;
   saving?: boolean;
@@ -83,10 +84,14 @@ export function AccountTab({
   const [newEmail, setNewEmail] = useState("");
   const [emailPassword, setEmailPassword] = useState("");
   const [emailError, setEmailError] = useState("");
+  // Holds the new address once a verification link has been sent, so the tab
+  // shows a persistent "check your inbox" panel instead of only a toast. The
+  // email doesn't switch until the link in that inbox is clicked.
+  const [dsEmailChangePending, setDsEmailChangePending] = useState<string | null>(null);
 
   const isSocialOnly = !hasPassword;
 
-  function handleEmailSubmit(e: React.FormEvent) {
+  async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = newEmail.trim().toLowerCase();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed)) {
@@ -102,9 +107,16 @@ export function AccountTab({
       return;
     }
     setEmailError("");
-    onChangeEmail?.({ newEmail: trimmed, password: emailPassword });
-    setNewEmail("");
-    setEmailPassword("");
+    try {
+      // Only advance to the pending state once the link was actually sent —
+      // a wrong password rejects here and the parent surfaces the error toast.
+      await onChangeEmail?.({ newEmail: trimmed, password: emailPassword });
+      setDsEmailChangePending(trimmed);
+      setNewEmail("");
+      setEmailPassword("");
+    } catch {
+      // Parent handles the error message; keep the form as-is so the user can retry.
+    }
   }
 
   function handlePasswordSubmit(e: React.FormEvent) {
@@ -218,6 +230,40 @@ export function AccountTab({
         <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
           Email address
         </h2>
+
+        {dsEmailChangePending ? (
+          <div
+            className="max-w-sm rounded-lg border p-4"
+            style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-primary-subtle)" }}
+          >
+            <div className="flex items-start gap-3">
+              <MailCheck className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--color-primary)" }} />
+              <div className="space-y-1">
+                <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                  Confirm your new email
+                </p>
+                <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                  We sent a verification link to{" "}
+                  <span className="font-medium" style={{ color: "var(--color-text-primary)" }}>{dsEmailChangePending}</span>.
+                  Click it to finish changing your email. The link expires in 24 hours.
+                </p>
+                <p className="text-xs pt-1" style={{ color: "var(--color-text-secondary)" }}>
+                  {email ? <>Your current address <span style={{ color: "var(--color-text-primary)" }}>{email}</span> stays active until you confirm. </> : "Your current address stays active until you confirm. "}
+                  Didn&apos;t get it? Check your spam folder.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setDsEmailChangePending(null)}
+              className="mt-3 text-sm font-medium"
+              style={{ color: "var(--color-primary)" }}
+            >
+              Use a different email
+            </button>
+          </div>
+        ) : (
+        <>
         <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
           {email ? (
             <>Currently <span style={{ color: "var(--color-text-primary)" }}>{email}</span>. We'll send a confirmation link to the new address before switching.</>
@@ -276,6 +322,8 @@ export function AccountTab({
             {saving ? "Sending..." : "Send confirmation link"}
           </button>
         </form>
+        </>
+        )}
       </section>
 
       <div style={{ borderTop: "1px solid var(--color-border-default)" }} />

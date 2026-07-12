@@ -1,0 +1,476 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buildrik · DesignSystemTab REDESIGN</title><link rel="stylesheet" href="pt.css">
+<style>
+  /* ===== shared shell context (slim, just to ground the surface) ===== */
+  .ed{display:flex;flex-direction:column;height:760px}
+  .ed-top{height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--bg-2);font-size:12px;color:var(--ink-2);flex:0 0 auto}
+  .ed-top .brand{width:22px;height:22px;border-radius:6px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
+  .ed-top .crumb b{color:var(--ink)}
+  .ed-top .sp{flex:1}
+  .ed-top .tb{border:1px solid var(--line-d);border-radius:6px;padding:4px 9px;font-size:11px;color:var(--ink-2);background:#fff}
+  .ed-main{display:flex;flex:1;min-height:0}
+  .ed-rail{width:52px;flex:0 0 auto;border-right:1px solid var(--line);background:var(--bg-2);display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0}
+  .ed-rail .r{width:34px;height:34px;border-radius:7px;display:grid;place-items:center;font-size:14px;color:var(--ink-3);position:relative}
+  .ed-rail .r.on{color:var(--accent);background:var(--accent-tint)}
+  .ed-rail .r.on::before{content:"";position:absolute;left:-8px;top:7px;bottom:7px;width:3px;border-radius:2px;background:var(--accent)}
+
+  /* ===== the Design SURFACE (fullpage, two-pane) ===== */
+  .surf{flex:1;display:flex;flex-direction:column;min-width:0;background:#fff}
+  .surf-head{height:48px;flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--line)}
+  .surf-head .ttl{font-size:15px;font-weight:600;color:var(--ink)}
+  .surf-head .sub{font-size:11px;color:var(--ink-3)}
+  .surf-head .sub b{color:var(--ink-2);font-weight:500}
+  .surf-head .sp{flex:1}
+  .hbtn{border:1px solid var(--line-d);border-radius:7px;padding:6px 11px;font-size:12px;color:var(--ink);background:#fff;font-weight:500;display:inline-flex;align-items:center;gap:5px}
+  .hbtn:hover{background:var(--fill)}
+  .hbtn.kebab{padding:6px 9px;color:var(--ink-3)}
+  .surf-body{flex:1;display:flex;min-height:0}
+  .surf-foot{height:44px;flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:0 16px;border-top:1px solid var(--line);background:var(--bg-2);font-size:12px;color:var(--ink-2)}
+  .surf-foot .sp{flex:1}
+  .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:6px}
+
+  /* nav */
+  .nav{width:208px;flex:0 0 auto;border-right:1px solid var(--line);padding:12px 10px;overflow:auto;background:var(--bg-2)}
+  .nav .grp{font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin:14px 8px 5px}
+  .nav .grp:first-child{margin-top:2px}
+  .ni{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border-radius:7px;color:var(--ink-2);font-size:13px;cursor:pointer;position:relative;user-select:none}
+  .ni:hover{background:var(--fill)}
+  .ni.on{background:var(--accent-tint);color:var(--accent);font-weight:600}
+  .ni.on::before{content:"";position:absolute;left:-1px;top:7px;bottom:7px;width:2px;border-radius:2px;background:var(--accent)}
+  .ni .ico{width:15px;text-align:center;font-size:13px;opacity:.85}
+  .ni .ct{margin-left:auto;font-size:10px;color:var(--ink-3);font-family:var(--mono)}
+  .ni.on .ct{color:var(--accent)}
+  .ni .caret{margin-left:auto;font-size:10px;color:var(--ink-3);transition:transform .12s}
+  .nav.advopen .caret{transform:rotate(90deg)}
+  .subnav{display:none;margin:2px 0 2px 8px;border-left:1px solid var(--line);padding-left:6px}
+  .nav.advopen .subnav{display:block}
+  .sni{height:28px;display:flex;align-items:center;gap:7px;padding:0 8px;border-radius:6px;color:var(--ink-3);font-size:12px;cursor:pointer}
+  .sni:hover{background:var(--fill);color:var(--ink-2)}
+  .sni .ct{margin-left:auto;font-size:10px;font-family:var(--mono)}
+
+  /* right pane */
+  .pane{flex:1;min-width:0;overflow:auto;padding:18px 22px}
+  .pane[hidden]{display:none}
+  .ph{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .ph h3{font-size:15px;font-weight:600;color:var(--ink)}
+  .ph .sp{flex:1}
+  .ph .add{font-size:12px;color:var(--accent);font-weight:600;border:1px solid var(--line-d);border-radius:7px;padding:5px 10px}
+  .ph .add:hover{background:var(--accent-subtle);border-color:var(--accent)}
+  .psub{font-size:12px;color:var(--ink-3);margin-bottom:16px;line-height:1.5}
+  .seclbl{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:18px 0 8px}
+
+  /* color swatches */
+  .swgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .swcard{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff;cursor:pointer}
+  .swcard:hover{border-color:var(--line-d);background:var(--fill)}
+  .swcard.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-tint)}
+  .swcard .chip{width:30px;height:30px;border-radius:6px;border:1px solid var(--line-d);flex:0 0 auto}
+  .swcard .nm{font-size:12.5px;color:var(--ink);font-weight:500}
+  .swcard .hx{font-size:10.5px;color:var(--ink-3);font-family:var(--mono);margin-top:1px}
+  .swcard .ovr{margin-left:auto;font-size:8.5px;border:1px solid var(--line-d);color:var(--ink-3);border-radius:3px;padding:1px 5px}
+  .palette{display:flex;gap:6px;flex-wrap:wrap}
+  .palette .p{width:34px;height:34px;border-radius:6px;border:1px solid var(--line-d)}
+
+  /* type */
+  .field{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+  .field .fl{width:120px;font-size:12.5px;color:var(--ink-2)}
+  .sel{flex:1;border:1px solid var(--line-d);border-radius:7px;padding:8px 11px;font-size:12.5px;color:var(--ink);background:#fff;display:flex;align-items:center}
+  .sel .sp{flex:1}.sel .cv{color:var(--ink-3);font-size:11px}
+  .step{display:flex;align-items:center;border:1px solid var(--line-d);border-radius:7px;overflow:hidden}
+  .step b{padding:7px 13px;font-family:var(--mono);font-size:12.5px;color:var(--ink)}
+  .step span{padding:7px 11px;color:var(--ink-3);border-left:1px solid var(--line);cursor:pointer}
+  .step span:first-child{border-left:0;border-right:1px solid var(--line)}
+  .tprev{border:1px solid var(--line);border-radius:8px;padding:18px;margin-top:14px;background:var(--bg-2)}
+  .tprev .a{font-family:var(--display);font-weight:700;font-size:26px;color:var(--ink);letter-spacing:-.01em}
+  .tprev .b{font-size:14px;color:var(--ink);margin-top:8px}
+  .tprev .c{font-size:12px;color:var(--ink-3);margin-top:6px}
+
+  /* spacing */
+  .scale{display:flex;flex-direction:column;gap:7px}
+  .srow{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--ink-2)}
+  .srow .v{width:42px;font-family:var(--mono);color:var(--ink)}
+  .srow .bar{height:14px;background:var(--accent-tint);border:1px solid var(--accent);border-radius:3px}
+
+  /* foundations overview */
+  .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .fcard{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fff;cursor:pointer}
+  .fcard:hover{border-color:var(--line-d);background:var(--fill)}
+  .fcard .ft{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .fcard .fc{font-size:10.5px;color:var(--ink-3);font-family:var(--mono);margin-top:3px}
+
+  /* components */
+  .crow{display:flex;align-items:center;gap:10px;height:34px;padding:0 11px;border:1px solid var(--line);border-radius:7px;margin-bottom:6px;background:#fff;cursor:pointer}
+  .crow:hover{border-color:var(--line-d);background:var(--fill)}
+  .crow .cn{font-size:13px;color:var(--ink);font-weight:500}
+  .crow .cv{margin-left:auto;font-size:10.5px;color:var(--ink-3);font-family:var(--mono)}
+  .crow .ch{color:var(--ink-3);font-size:12px}
+  .cdetail .back{font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;margin-bottom:10px;display:inline-block}
+  .vtabs{display:flex;gap:4px;margin-bottom:12px}
+  .vtab{font-size:11.5px;padding:5px 11px;border:1px solid var(--line-d);border-radius:7px;color:var(--ink-2);cursor:pointer}
+  .vtab.on{border-color:var(--accent);color:var(--accent);background:var(--accent-tint);font-weight:600}
+  .bind{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;border:1px solid var(--line);border-radius:6px;margin-bottom:5px;font-size:12px;color:var(--ink-2)}
+  .bind b{color:var(--ink)} .bind .val{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+
+  /* export */
+  .fmts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+  .fmt{font-size:12px;padding:7px 12px;border:1px solid var(--line-d);border-radius:8px;color:var(--ink-2);cursor:pointer}
+  .fmt.on{border-color:var(--accent);color:var(--accent);background:var(--accent-tint);font-weight:600}
+  .estat{font-size:11px;color:var(--ink-3);font-family:var(--mono);margin-bottom:10px}
+  .code{border:1px solid var(--line);border-radius:8px;background:var(--bg-2);padding:13px 15px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);line-height:1.7;white-space:pre;overflow:auto;max-height:230px}
+  .code .k{color:var(--accent)}
+
+  /* ===== BEFORE (cramped 320 rail) ===== */
+  .before-wrap{display:flex;gap:0;height:760px;background:var(--fill);align-items:stretch}
+  .b320{width:320px;flex:0 0 auto;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column}
+  .bcanvas{flex:1;display:grid;place-items:center;color:var(--ink-3);font-size:12px}
+  .bhead{height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink)}
+  .btoolbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);align-items:center}
+  .btoolbar .seg{display:flex;border:1px solid var(--line-d);border-radius:6px;overflow:hidden}
+  .btoolbar .seg b{font-size:10.5px;padding:4px 8px;color:var(--ink-2)}
+  .btoolbar .seg b.on{background:var(--accent-tint);color:var(--accent)}
+  .btoolbar .ic{width:26px;height:24px;border:1px solid var(--line-d);border-radius:6px;display:grid;place-items:center;font-size:12px;color:var(--ink-3)}
+  .btoolbar .ex{font-size:10.5px;border:1px solid var(--line-d);border-radius:6px;padding:4px 8px;color:var(--ink-2)}
+  .btabs{display:flex;gap:1px;padding:0 12px;border-bottom:1px solid var(--line)}
+  .btabs a{font-size:11px;color:var(--ink-2);padding:7px 9px;border-bottom:2px solid transparent}
+  .btabs a.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+  .bcards{flex:1;overflow:auto;padding:10px 12px}
+  .bcard{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:6px;font-size:12px;color:var(--ink-2)}
+  .bcard .cv{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+  .bcard.dim{opacity:.5}
+  .bfoot{height:42px;display:flex;align-items:center;gap:8px;padding:0 12px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-3)}
+
+  /* ===== top toggle ===== */
+  .toggler{max-width:1180px;margin:26px auto 8px;display:flex;align-items:center;gap:10px}
+  .toggler .seg{display:flex;border:1px solid var(--line-d);border-radius:9px;overflow:hidden;background:#fff}
+  .toggler .seg button{border:0;background:#fff;font-size:12.5px;padding:8px 16px;color:var(--ink-2);font-weight:600}
+  .toggler .seg button.on{background:var(--accent);color:#fff}
+  .toggler .sp{flex:1}
+  .annobtn{border:1px solid var(--line-d);border-radius:9px;background:#fff;font-size:12px;padding:8px 13px;color:var(--ink-2);font-weight:500;display:flex;align-items:center;gap:7px}
+  .annobtn .box{width:13px;height:13px;border:1.5px solid var(--line-d);border-radius:3px}
+  body.anno .annobtn{border-color:var(--accent);color:var(--accent)}
+  body.anno .annobtn .box{background:var(--accent);border-color:var(--accent)}
+
+  /* annotation pins + legend */
+  .pin{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;z-index:20;box-shadow:0 1px 4px rgba(45,109,255,.4)}
+  body.anno .pin{display:flex}
+  .pin.warn{background:var(--warning)}
+  .legend{display:none;max-width:1180px;margin:8px auto 0;border:1px solid var(--line);border-radius:9px;background:#fff;padding:13px 16px}
+  body.anno .legend{display:block}
+  .legend h4{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px}
+  .legend .li{display:flex;gap:9px;font-size:12px;color:var(--ink-2);margin-bottom:7px;line-height:1.45}
+  .legend .li b{color:var(--ink)}
+  .legend .n{flex:0 0 18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
+  .legend .n.warn{background:var(--warning)}
+  .relwrap{position:relative}
+</style></head>
+<body data-surface="editor">
+<div class="wf-stamp">PROTOTYPE · DesignSystemTab REDESIGN</div>
+
+<div class="toggler">
+  <div class="seg">
+    <button id="t-after" class="on" onclick="show('after')">After — redesign</button>
+    <button id="t-before" onclick="show('before')">Before — current</button>
+  </div>
+  <span class="sp"></span>
+  <button class="annobtn" onclick="document.body.classList.toggle('anno')"><span class="box"></span> Annotations</button>
+</div>
+
+<!-- ============================ AFTER ============================ -->
+<div id="after">
+<div class="screen relwrap" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Design tab, redesigned — fullpage two-pane, Open-Design style.</b> Lead with the 3 things people touch daily (Color · Type · Spacing). 11 foundation tokens collapse into <b>Advanced</b>. Components get their own section. Toolbar drops from 6 controls to 2. One source: synced from the workspace shared theme, override shown inline.</div>
+
+  <div class="ed">
+    <!-- slim editor context -->
+    <div class="ed-top">
+      <span class="brand">N</span>
+      <span class="crumb"><b>Acme</b> › acme-main › <b>Home</b></span>
+      <span class="sp"></span>
+      <span class="tb">Preview</span><span class="tb">Publish</span>
+    </div>
+    <div class="ed-main">
+      <div class="ed-rail">
+        <div class="r">▦</div><div class="r">⧉</div><div class="r">▤</div>
+        <div class="r on">◐</div>
+        <div class="r">⚙</div><div class="r">⤴</div>
+      </div>
+
+      <!-- THE SURFACE -->
+      <div class="surf">
+        <div class="surf-head relwrap">
+          <div>
+            <div class="ttl">Design</div>
+            <div class="sub">Synced from <b>Northwind base</b> · <b>local override</b> on this site ↗</div>
+          </div>
+          <span class="sp"></span>
+          <button class="hbtn">✨ AI</button>
+          <button class="hbtn">⤓ Export</button>
+          <button class="hbtn kebab">⋯</button>
+          <span class="pin" style="top:9px;left:24px">5</span>
+          <span class="pin" style="top:9px;right:96px">3</span>
+        </div>
+
+        <div class="surf-body relwrap">
+          <span class="pin" style="top:14px;left:8px">1</span>
+          <span class="pin" style="top:188px;left:8px">2</span>
+          <span class="pin" style="top:300px;left:8px">4</span>
+          <span class="pin" style="top:50px;left:228px">6</span>
+
+          <!-- NAV -->
+          <div class="nav" id="nav">
+            <div class="grp">Theme</div>
+            <div class="ni on" data-pane="colors" onclick="go(this,'colors')"><span class="ico">◑</span> Colors <span class="ct">8</span></div>
+            <div class="ni" data-pane="type" onclick="go(this,'type')"><span class="ico">Aa</span> Typography <span class="ct">2</span></div>
+            <div class="ni" data-pane="spacing" onclick="go(this,'spacing')"><span class="ico">⊞</span> Spacing <span class="ct">9</span></div>
+
+            <div class="grp">Foundations</div>
+            <div class="ni" id="advtoggle" onclick="toggleAdv()"><span class="ico">▸</span> Advanced <span class="caret">›</span></div>
+            <div class="subnav">
+              <div class="sni" onclick="go(null,'advanced')">Radius <span class="ct">5</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Shadow <span class="ct">5</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Border <span class="ct">4</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Motion <span class="ct">6</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Opacity <span class="ct">4</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Z-index <span class="ct">6</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Breakpoints <span class="ct">4</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Grid <span class="ct">3</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Sizing <span class="ct">7</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Icons <span class="ct">3</span></div>
+              <div class="sni" onclick="go(null,'advanced')">Imagery <span class="ct">2</span></div>
+            </div>
+
+            <div class="grp">Build</div>
+            <div class="ni" data-pane="components" onclick="go(this,'components')"><span class="ico">◧</span> Components <span class="ct">11</span></div>
+            <div class="ni" data-pane="export" onclick="go(this,'export')"><span class="ico">⤓</span> Export</div>
+          </div>
+
+          <!-- PANES -->
+          <div class="pane" data-pane="colors">
+            <div class="ph"><h3>Colors</h3><span class="sp"></span><span class="add">+ Add color</span></div>
+            <div class="psub">The palette every page on this site pulls from. Edit a swatch to retint the whole site.</div>
+            <div class="seclbl">Semantic · what the site uses</div>
+            <div class="swgrid">
+              <div class="swcard sel"><span class="chip" style="background:#FFFFFF"></span><div><div class="nm">Background</div><div class="hx">#FFFFFF</div></div></div>
+              <div class="swcard"><span class="chip" style="background:#F7F7F8"></span><div><div class="nm">Surface</div><div class="hx">#F7F7F8</div></div></div>
+              <div class="swcard"><span class="chip" style="background:#1A1A1A"></span><div><div class="nm">Text</div><div class="hx">#1A1A1A</div></div></div>
+              <div class="swcard"><span class="chip" style="background:#2D6DFF"></span><div><div class="nm">Primary</div><div class="hx">#2D6DFF</div></div><span class="ovr">override</span></div>
+              <div class="swcard"><span class="chip" style="background:#E5E7EB"></span><div><div class="nm">Border</div><div class="hx">#E5E7EB</div></div></div>
+              <div class="swcard"><span class="chip" style="background:#6B7280"></span><div><div class="nm">Muted</div><div class="hx">#6B7280</div></div></div>
+            </div>
+            <div class="seclbl">Brand palette</div>
+            <div class="palette">
+              <span class="p" style="background:#0B3FB3"></span><span class="p" style="background:#1E58D9"></span>
+              <span class="p" style="background:#2D6DFF"></span><span class="p" style="background:#4B8DFF"></span>
+              <span class="p" style="background:#9DBEFF"></span><span class="p" style="background:#D6E4FF"></span>
+            </div>
+          </div>
+
+          <div class="pane" data-pane="type" hidden>
+            <div class="ph"><h3>Typography</h3></div>
+            <div class="psub">Two fonts and a scale. Everything else derives from these.</div>
+            <div class="field"><span class="fl">Heading font</span><div class="sel">General Sans <span class="sp"></span><span class="cv">▾</span></div></div>
+            <div class="field"><span class="fl">Body font</span><div class="sel">Inter Tight <span class="sp"></span><span class="cv">▾</span></div></div>
+            <div class="field"><span class="fl">Base size</span><div class="step"><span>–</span><b>16px</b><span>+</span></div></div>
+            <div class="field"><span class="fl">Scale</span><div class="sel">Major third · 1.250 <span class="sp"></span><span class="cv">▾</span></div></div>
+            <div class="tprev">
+              <div class="a">The quick brown fox</div>
+              <div class="b">Body copy reads in Inter Tight at 16px. Calm, dense, tool-grade.</div>
+              <div class="c">Caption / meta · 12px muted</div>
+            </div>
+          </div>
+
+          <div class="pane" data-pane="spacing" hidden>
+            <div class="ph"><h3>Spacing</h3></div>
+            <div class="psub">One base unit. The scale steps off it — used for every gap and padding token.</div>
+            <div class="field"><span class="fl">Base unit</span><div class="step"><span>–</span><b>4px</b><span>+</span></div></div>
+            <div class="seclbl">Scale</div>
+            <div class="scale">
+              <div class="srow"><span class="v">2</span><div class="bar" style="width:6px"></div></div>
+              <div class="srow"><span class="v">4</span><div class="bar" style="width:12px"></div></div>
+              <div class="srow"><span class="v">8</span><div class="bar" style="width:24px"></div></div>
+              <div class="srow"><span class="v">12</span><div class="bar" style="width:36px"></div></div>
+              <div class="srow"><span class="v">16</span><div class="bar" style="width:48px"></div></div>
+              <div class="srow"><span class="v">24</span><div class="bar" style="width:72px"></div></div>
+              <div class="srow"><span class="v">32</span><div class="bar" style="width:96px"></div></div>
+              <div class="srow"><span class="v">48</span><div class="bar" style="width:144px"></div></div>
+              <div class="srow"><span class="v">64</span><div class="bar" style="width:192px"></div></div>
+            </div>
+          </div>
+
+          <div class="pane" data-pane="advanced" hidden>
+            <div class="ph"><h3>Advanced foundations</h3></div>
+            <div class="psub">The 11 token families most sites never touch. Sane defaults inherited from the theme. Open one only when you need it.</div>
+            <div class="fgrid">
+              <div class="fcard"><div class="ft">Radius</div><div class="fc">5 tokens</div></div>
+              <div class="fcard"><div class="ft">Shadow</div><div class="fc">5 tokens</div></div>
+              <div class="fcard"><div class="ft">Border</div><div class="fc">4 tokens</div></div>
+              <div class="fcard"><div class="ft">Motion</div><div class="fc">6 tokens</div></div>
+              <div class="fcard"><div class="ft">Opacity</div><div class="fc">4 tokens</div></div>
+              <div class="fcard"><div class="ft">Z-index</div><div class="fc">6 tokens</div></div>
+              <div class="fcard"><div class="ft">Breakpoints</div><div class="fc">4 tokens</div></div>
+              <div class="fcard"><div class="ft">Grid</div><div class="fc">3 tokens</div></div>
+              <div class="fcard"><div class="ft">Sizing</div><div class="fc">7 tokens</div></div>
+              <div class="fcard"><div class="ft">Icons</div><div class="fc">3 tokens</div></div>
+              <div class="fcard"><div class="ft">Imagery</div><div class="fc">2 tokens</div></div>
+            </div>
+          </div>
+
+          <div class="pane" data-pane="components" hidden>
+            <div id="clist">
+              <div class="ph"><h3>Components</h3><span class="sp"></span><span class="add">+ New</span></div>
+              <div class="psub">Reusable styled pieces. Each pulls from the tokens above — change a token, every component updates.</div>
+              <div class="crow" onclick="cdetail('Button')"><span class="cn">Button</span><span class="cv">42 uses</span><span class="ch">›</span></div>
+              <div class="crow" onclick="cdetail('Card')"><span class="cn">Card</span><span class="cv">18 uses</span><span class="ch">›</span></div>
+              <div class="crow" onclick="cdetail('Form')"><span class="cn">Form</span><span class="cv">9 uses</span><span class="ch">›</span></div>
+              <div class="crow" onclick="cdetail('Link')"><span class="cn">Link</span><span class="cv">63 uses</span><span class="ch">›</span></div>
+              <div class="crow" onclick="cdetail('Badge')"><span class="cn">Badge</span><span class="cv">12 uses</span><span class="ch">›</span></div>
+              <div class="crow" onclick="cdetail('Alert')"><span class="cn">Alert</span><span class="cv">4 uses</span><span class="ch">›</span></div>
+              <div class="crow" onclick="cdetail('Nav')"><span class="cn">Nav</span><span class="cv">3 uses</span><span class="ch">›</span></div>
+              <div class="crow" onclick="cdetail('Table')"><span class="cn">Table</span><span class="cv">2 uses</span><span class="ch">›</span></div>
+            </div>
+            <div id="cdet" class="cdetail" hidden>
+              <span class="back" onclick="cback()">‹ Components</span>
+              <div class="ph"><h3 id="cdname">Button</h3></div>
+              <div class="vtabs"><span class="vtab on">Primary</span><span class="vtab">Secondary</span><span class="vtab">Ghost</span></div>
+              <div class="bind"><span>Background</span><span class="val">→ Primary <b style="color:var(--accent)">#2D6DFF</b></span></div>
+              <div class="bind"><span>Text</span><span class="val">→ Background #FFFFFF</span></div>
+              <div class="bind"><span>Radius</span><span class="val">→ radius.md 8px</span></div>
+              <div class="bind"><span>Padding</span><span class="val">→ spacing.12 / spacing.24</span></div>
+            </div>
+          </div>
+
+          <div class="pane" data-pane="export" hidden>
+            <div class="ph"><h3>Export</h3></div>
+            <div class="psub">Take the tokens out as code. Pick a format.</div>
+            <div class="fmts">
+              <span class="fmt on" onclick="fmt(this,'css')">CSS Variables</span>
+              <span class="fmt" onclick="fmt(this,'tw')">Tailwind</span>
+              <span class="fmt" onclick="fmt(this,'json')">JSON</span>
+              <span class="fmt" onclick="fmt(this,'figma')">Figma Variables</span>
+            </div>
+            <div class="estat">3 kinds · 19 tokens · 6 aliases · 1 dark variant</div>
+            <div class="code" id="ecode"><span class="k">:root</span> {
+  <span class="k">--color-background</span>: #FFFFFF;
+  <span class="k">--color-text</span>: #1A1A1A;
+  <span class="k">--color-primary</span>: #2D6DFF;
+  <span class="k">--font-heading</span>: "General Sans";
+  <span class="k">--font-body</span>: "Inter Tight";
+  <span class="k">--space-4</span>: 4px;
+  <span class="k">--radius-md</span>: 8px;
+}</div>
+          </div>
+        </div>
+
+        <div class="surf-foot">
+          <span><span class="dot"></span>3 unsaved changes</span>
+          <span class="sp"></span>
+          <button class="hbtn">Discard</button>
+          <button class="hbtn" style="border-color:var(--accent);color:var(--accent);font-weight:600">Apply changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <h4>What changed · why it's calmer</h4>
+  <div class="li"><span class="n">1</span><span><b>Lead with 3.</b> Color · Type · Spacing sit at the top, always open. These are the only tokens most users edit. Everything else is one level down.</span></div>
+  <div class="li"><span class="n">2</span><span><b>Advanced collapses 11 → 1 line.</b> Radius, shadow, motion, z-index, grid… all still there, but folded behind one row. Was 14 flat cards competing for attention in a 320px rail.</span></div>
+  <div class="li"><span class="n">3</span><span><b>Toolbar 6 → 2.</b> Only AI + Export stay visible. Beginner/Pro, dark-mode, browse-themes move into the ⋯ menu. No more wrapping to a second row.</span></div>
+  <div class="li"><span class="n">4</span><span><b>Components split out.</b> The 11 presets get their own section instead of sharing the token surface. Edit-token vs edit-component are different jobs.</span></div>
+  <div class="li"><span class="n">5</span><span><b>One source, visible.</b> Header states it's synced from the workspace shared theme, with the local override called out. No guessing which "home" is real.</span></div>
+  <div class="li"><span class="n">6</span><span><b>Fullpage two-pane</b> (per DESIGN.md: Design = fullpage surface). Left nav to switch, right pane to edit. Was a single cramped 320px scroll.</span></div>
+</div>
+</div>
+
+<!-- ============================ BEFORE ============================ -->
+<div id="before" hidden>
+<div class="screen relwrap" style="padding:0">
+  <div class="topnote" style="margin:0"><b>Current DesignSystemTab.tsx — everything in one 320px rail.</b> 4 section-tabs, 14 token kinds, 11 presets, and a 6-control toolbar that wraps. The token editor is squeezed into the narrowest panel width in the app.</div>
+  <div class="before-wrap">
+    <div class="b320 relwrap">
+      <span class="pin warn" style="top:50px;right:8px">A</span>
+      <span class="pin warn" style="top:96px;right:8px">B</span>
+      <span class="pin warn" style="top:300px;right:8px">C</span>
+      <div class="bhead">Design <span style="flex:1"></span><span style="font-size:11px;color:var(--ink-3);font-weight:400">📌 ? ✕</span></div>
+      <div class="btoolbar">
+        <div class="seg"><b class="on">Beginner</b><b>Pro</b></div>
+        <div class="ic">◐</div>
+        <span style="flex:1"></span>
+        <div class="ic">🎨</div><div class="ic">✨</div><span class="ex">Export ▾</span>
+      </div>
+      <div class="btabs"><a class="on">Tokens</a><a>Styles</a><a>Components</a><a>Export</a></div>
+      <div class="bcards">
+        <div class="bcard"><span>● Color</span><span class="cv">8</span></div>
+        <div class="bcard"><span>● Type</span><span class="cv">2</span></div>
+        <div class="bcard"><span>● Spacing</span><span class="cv">9</span></div>
+        <div class="bcard"><span>● Radius</span><span class="cv">5</span></div>
+        <div class="bcard"><span>● Shadow</span><span class="cv">5</span></div>
+        <div class="bcard dim"><span>○ Border</span><span class="cv">4</span></div>
+        <div class="bcard dim"><span>○ Opacity</span><span class="cv">4</span></div>
+        <div class="bcard dim"><span>○ Z-index</span><span class="cv">6</span></div>
+        <div class="bcard dim"><span>○ Breakpoint</span><span class="cv">4</span></div>
+        <div class="bcard dim"><span>○ Grid</span><span class="cv">3</span></div>
+        <div class="bcard dim"><span>○ Sizing</span><span class="cv">7</span></div>
+        <div class="bcard dim"><span>○ Icon</span><span class="cv">3</span></div>
+        <div class="bcard dim"><span>○ Imagery</span><span class="cv">2</span></div>
+        <div class="bcard dim"><span>○ Motion</span><span class="cv">6</span></div>
+      </div>
+      <div class="bfoot">3 unsaved · Discard · Apply</div>
+    </div>
+    <div class="bcanvas">canvas (pushed aside)</div>
+  </div>
+</div>
+
+<div class="legend">
+  <h4>Why it reads as cluttered</h4>
+  <div class="li"><span class="n warn">A</span><span><b>6-control toolbar wraps.</b> Beginner/Pro + dark-mode + 🎨 + ✨ + Export crammed into 320px, spills to a second row.</span></div>
+  <div class="li"><span class="n warn">B</span><span><b>4 section tabs + 14 token cards</b> stacked in one scroll. The 8 "foundation" kinds are only <i>dimmed</i>, not hidden — still there, still scrolling past them.</span></div>
+  <div class="li"><span class="n warn">C</span><span><b>Wrong width.</b> DESIGN.md says Design should be a fullpage surface; the code ships it as a 320px authoring rail. Token grids never get room to breathe.</span></div>
+</div>
+</div>
+
+<div class="proto-nav"><b>DS redesign:</b><a href="ds1-design-system.html">Workspace source</a><a href="ds2-styles.html">old Styles</a><a href="ds3-ds-tools.html">DS tools</a><a href="m-ds-push.html">Push contract</a><a href="index.html">Map</a></div>
+
+<script>
+function show(which){
+  document.getElementById('after').hidden = which!=='after';
+  document.getElementById('before').hidden = which!=='before';
+  document.getElementById('t-after').classList.toggle('on', which==='after');
+  document.getElementById('t-before').classList.toggle('on', which==='before');
+  window.scrollTo(0,0);
+}
+function go(el, pane){
+  document.querySelectorAll('#after .pane').forEach(p=>p.hidden = p.dataset.pane!==pane);
+  document.querySelectorAll('#nav .ni').forEach(n=>n.classList.remove('on'));
+  if(el){ el.classList.add('on'); }
+  else { // came from subnav → keep Advanced visually active
+    document.getElementById('advtoggle').classList.add('on');
+  }
+  if(pane==='components'){ cback(); }
+}
+function toggleAdv(){
+  document.getElementById('nav').classList.toggle('advopen');
+  go(null,'advanced');
+}
+function cdetail(name){
+  document.getElementById('clist').hidden = true;
+  document.getElementById('cdet').hidden = false;
+  document.getElementById('cdname').textContent = name;
+}
+function cback(){
+  document.getElementById('clist').hidden = false;
+  document.getElementById('cdet').hidden = true;
+}
+var samples = {
+  css: ':root {\n  --color-background: #FFFFFF;\n  --color-text: #1A1A1A;\n  --color-primary: #2D6DFF;\n  --font-heading: "General Sans";\n  --font-body: "Inter Tight";\n  --space-4: 4px;\n  --radius-md: 8px;\n}',
+  tw: 'module.exports = {\n  theme: {\n    colors: {\n      background: "#FFFFFF",\n      text: "#1A1A1A",\n      primary: "#2D6DFF",\n    },\n    fontFamily: { heading: ["General Sans"] },\n    spacing: { 1: "4px" },\n  }\n}',
+  json: '{\n  "color": {\n    "background": "#FFFFFF",\n    "text": "#1A1A1A",\n    "primary": "#2D6DFF"\n  },\n  "font": { "heading": "General Sans" }\n}',
+  figma: '{\n  "Color/Background": { "type": "COLOR", "value": "#FFFFFF" },\n  "Color/Primary":    { "type": "COLOR", "value": "#2D6DFF" },\n  "Number/Space-4":   { "type": "FLOAT", "value": 4 }\n}'
+};
+function fmt(el, key){
+  document.querySelectorAll('#after .fmt').forEach(f=>f.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('ecode').textContent = samples[key];
+}
+</script>
+</body></html>

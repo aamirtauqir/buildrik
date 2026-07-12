@@ -21,7 +21,7 @@ function VercelIntegrationSection({ workspaceId }: { workspaceId: string }) {
         addToast(
           "info",
           "Disconnected from this workspace",
-          "Buildrik can no longer publish from here. To fully revoke access, open Vercel → Integrations → Buildrik → Remove.",
+          "Buildrick can no longer publish from here. To fully revoke access, open Vercel → Integrations → Buildrick → Remove.",
         );
       } else {
         addToast("success", "Vercel disconnected");

@@ -5,11 +5,22 @@ import { prisma } from "@lib/prisma";
 import { validateToken, invalidateToken } from "@server/services/token.service";
 import { encode } from "next-auth/jwt";
 import { logAuditEvent } from "@server/services/audit.service";
+import { recordDeviceAndAlert } from "@server/services/device-alert.service";
 
 const createSessionSchema = z.object({
   sessionToken: z.string().uuid(),
   rememberMe: z.boolean().optional().default(false),
 });
+
+/** Exact same-origin match (not startsWith — blocks `https://app.x.com.evil.com`). */
+function sameOrigin(value: string | null, appUrl: string): boolean {
+  if (!value) return false;
+  try {
+    return new URL(value).origin === new URL(appUrl).origin;
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -19,14 +30,12 @@ export async function POST(req: NextRequest) {
   }
   const { sessionToken, rememberMe } = parsed.data;
 
-  // CSRF: verify request comes from same origin
+  // CSRF: this state-changing POST must come from our own origin. Require a
+  // matching Origin OR Referer, and reject when both are absent.
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  if (origin && !origin.startsWith(appUrl)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-  if (!origin && referer && !referer.startsWith(appUrl)) {
+  if (!sameOrigin(origin, appUrl) && !sameOrigin(referer, appUrl)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -53,7 +62,7 @@ export async function POST(req: NextRequest) {
   // flows bypass signIn → jwt; without this lookup, session.user.workspaceId
   // stays null and scopedProcedure rejects every editor tRPC call with 401.
   const member = await prisma.workspaceMember.findFirst({
-    where: { userId: user.id },
+    where: { userId: user.id, status: "ACTIVE" },
     select: { workspaceId: true },
   });
 
@@ -95,6 +104,15 @@ export async function POST(req: NextRequest) {
   }
 
   await logAuditEvent("SESSION_CREATED", "success", { userId: user.id, email: user.email });
+
+  // D1: record this device and email a "new sign-in" alert if unrecognized.
+  // Fully guarded + best-effort (never blocks or fails session creation).
+  await recordDeviceAndAlert(
+    user.id,
+    user.email,
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "",
+    req.headers.get("user-agent") || ""
+  );
 
   const response = NextResponse.json({ success: true });
   response.cookies.set(cookieName, token, {

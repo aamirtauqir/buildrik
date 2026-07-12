@@ -236,7 +236,7 @@ export async function enable2FA(userId: string) {
   if (!user) throw new Error("USER_NOT_FOUND");
 
   const secret = authenticator.generateSecret();
-  const otpauth = authenticator.keyuri(user.email, "Buildrik", secret);
+  const otpauth = authenticator.keyuri(user.email, "Buildrick", secret);
 
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const randomChars = (n: number) =>

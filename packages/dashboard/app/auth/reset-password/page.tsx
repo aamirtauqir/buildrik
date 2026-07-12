@@ -2,10 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { PasswordStrength } from "@/components/auth/password-strength";
@@ -17,31 +14,12 @@ function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  if (!token) {
-    return (
-      <AuthCard>
-        <AuthLogo />
-        <AuthIcon name="warning" color="red" />
-        <h1 className="text-auth-title text-auth-text-primary text-center">Invalid link</h1>
-        <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
-          This reset link is invalid. Please request a new one.
-        </p>
-        <div className="h-6" />
-        <AuthButton onClick={() => router.push("/auth/forgot-password")}>
-          Request New Link
-        </AuthButton>
-      </AuthCard>
-    );
-  }
-
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<{ confirm?: string }>({});
 
   const resetPasswordMutation = trpc.auth.resetPassword.useMutation({
-    onSuccess: () => {
-      router.push("/auth/password-changed");
-    },
+    onSuccess: () => router.push("/auth/password-changed"),
     onError: (err) => {
       if (err.message.includes("expired")) {
         router.push("/auth/error/expired-link?type=reset");
@@ -51,83 +29,72 @@ function ResetPasswordContent() {
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  if (!token) {
+    return (
+      <AuthCard>
+        <div className="text-center">
+          <h1 className="text-auth-title text-auth-text-primary">Invalid link</h1>
+          <p className="text-auth-subtitle text-auth-text-muted mt-2">
+            This reset link is invalid. Please request a new one.
+          </p>
+        </div>
+        <div className="h-6" />
+        <AuthButton onClick={() => router.push("/auth/forgot-password")}>
+          Request new link
+        </AuthButton>
+      </AuthCard>
+    );
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors: { confirm?: string } = {};
-
     if (newPassword !== confirmPassword) {
-      newErrors.confirm = "Passwords do not match";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      setErrors({ confirm: "Passwords do not match" });
       return;
     }
-
     setErrors({});
-    resetPasswordMutation.mutate({ token: token ?? "", newPassword, confirmPassword });
+    resetPasswordMutation.mutate({ token, newPassword, confirmPassword });
   };
 
   return (
     <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="lock" color="blue" />
+      <div className="text-center">
+        <h1 className="text-auth-title text-auth-text-primary">Choose a new password</h1>
+        <p className="text-auth-subtitle text-auth-text-muted mt-2">
+          Make it strong — you won&apos;t need to enter it often.
+        </p>
+      </div>
 
-      <h1 className="text-auth-title text-auth-text-primary text-center">
-        Set new password
-      </h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-        Must be at least 8 characters
-      </p>
+      <div className="h-6" />
 
-      <div className="h-4" />
-
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
         <AuthInput
-          label="New Password"
+          label="New password"
+          hideLabel
           type="password"
-          placeholder="Enter new password"
+          placeholder="New password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           required
+          autoFocus
         />
-
-        <div className="h-4" />
-
+        <PasswordStrength password={newPassword} variant="line" />
         <AuthInput
-          label="Confirm New Password"
+          label="Confirm password"
+          hideLabel
           type="password"
-          placeholder="Confirm new password"
+          placeholder="Confirm password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
+        {errors.confirm && <InlineError message={errors.confirm} />}
 
-        {errors.confirm && (
-          <>
-            <div className="h-1" />
-            <InlineError message={errors.confirm} />
-          </>
-        )}
-
-        <div className="h-3" />
-
-        <PasswordStrength password={newPassword} />
-
-        <div className="h-5" />
-
+        <div className="h-1" />
         <AuthButton type="submit" loading={resetPasswordMutation.isPending}>
-          Reset Password
+          Reset password
         </AuthButton>
       </form>
-
-      <div className="h-4" />
-
-      <div className="flex justify-center">
-        <Link href="/auth/login" className="text-auth-link text-auth-link hover:underline text-center">
-          ← Back to sign in
-        </Link>
-      </div>
     </AuthCard>
   );
 }

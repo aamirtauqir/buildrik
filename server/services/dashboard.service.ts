@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
+import { isFeatureEnabled } from "@/server/services/feature-flag.service";
 import type {
   DashboardStats,
   RecentSite,
@@ -388,11 +389,20 @@ export interface AttentionItem {
   href: string;
 }
 
-export async function getAttentionQueue(workspaceId: string): Promise<AttentionItem[]> {
+export async function getAttentionQueue(
+  workspaceId: string,
+  opts: { isAdmin: boolean } = { isAdmin: false }
+): Promise<AttentionItem[]> {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  // reviews & comments are admin-only agency queues — never surface them (or
+  // their deep links) to non-admins or solo workspaces, or the row links a
+  // member straight into a DeniedState.
+  const agencyEnabled = await isFeatureEnabled(workspaceId, "agency_layer");
+  const canSeeAgencyQueues = opts.isAdmin && agencyEnabled;
+
   const [pendingReviews, openComments, pendingDomains, failedPublishes] = await Promise.all([
-    prisma.reviewRequest.count({ where: { site: { workspaceId }, status: "PENDING" } }),
-    prisma.comment.count({ where: { site: { workspaceId }, status: "OPEN" } }),
+    canSeeAgencyQueues ? prisma.reviewRequest.count({ where: { site: { workspaceId }, status: "PENDING" } }) : Promise.resolve(0),
+    canSeeAgencyQueues ? prisma.comment.count({ where: { site: { workspaceId }, status: "OPEN" } }) : Promise.resolve(0),
     prisma.domain.count({ where: { site: { workspaceId }, status: "PENDING" } }),
     prisma.publishBuildJob.count({ where: { workspaceId, status: "FAILED", createdAt: { gte: sevenDaysAgo } } }),
   ]);

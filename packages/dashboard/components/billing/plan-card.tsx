@@ -60,7 +60,7 @@ export function PlanCard({
           {isCurrent && (
             <span
               className="rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}
+              style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
             >
               Current Plan
             </span>
@@ -103,7 +103,7 @@ export function PlanCard({
       {isCurrent && (
         <div
           className="mt-6 w-full rounded-lg py-2.5 text-center text-sm font-semibold"
-          style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}
+          style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
         >
           Active
         </div>

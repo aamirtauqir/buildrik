@@ -23,7 +23,9 @@ export const updateProfileSchema = z.object({
 });
 
 export const changeEmailSchema = z.object({
-  newEmail: z.string().email(),
+  // Normalize case-insensitively so the stored address stays lowercase and
+  // matches case-insensitive login. Keeps the whole email pipeline consistent.
+  newEmail: z.string().trim().toLowerCase().email(),
   password: z.string().optional().default(""),
 });
 

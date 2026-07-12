@@ -36,7 +36,7 @@ export function Topbar() {
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-20 flex h-14 items-center justify-between border-b bg-white px-6 lg:left-[220px]" style={{ borderColor: "var(--color-border-default)" }}>
+      <header className="fixed left-0 right-0 top-0 z-20 flex h-14 items-center justify-between border-b bg-white px-6 lg:left-[262px]" style={{ borderColor: "var(--color-border-default)" }}>
         <button
           onClick={() => setPaletteOpen(true)}
           className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"

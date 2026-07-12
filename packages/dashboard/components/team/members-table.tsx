@@ -25,7 +25,7 @@ type SortKey = "fullName" | "role" | "status" | "lastActiveAt";
 type SortDir = "asc" | "desc";
 
 const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
-  OWNER: { bg: "#FEF2F2", color: "var(--color-primary)" },
+  OWNER: { bg: "var(--color-primary-subtle)", color: "var(--color-primary)" },
   ADMIN: { bg: "#EFF6FF", color: "#3B82F6" },
   EDITOR: { bg: "#F0FDF4", color: "var(--color-success)" },
   DESIGNER: { bg: "#F0FDFA", color: "#0D9488" },
@@ -274,7 +274,7 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
                   key={member.id}
                   className={cn(
                     "cursor-pointer border-b border-[var(--color-border-default)] transition-colors last:border-0 hover:bg-[var(--color-bg-page)]",
-                    selected.has(member.id) && "bg-red-50"
+                    selected.has(member.id) && "bg-[var(--color-primary-subtle)]"
                   )}
                   onClick={() => setDetailMember(member)}
                 >
@@ -307,7 +307,7 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
                             {member.fullName}
                           </span>
                           {isOwner && (
-                            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}>
+                            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}>
                               Owner
                             </span>
                           )}

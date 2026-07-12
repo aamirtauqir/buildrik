@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
+import { AuthMessage } from "@/components/auth/auth-message";
 
 export default function RateLimitedPage() {
   const [seconds, setSeconds] = useState(60);
@@ -21,34 +19,20 @@ export default function RateLimitedPage() {
       });
     }, 1000);
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="warning" color="red" />
-
-      <h1 className="text-auth-title text-auth-text-primary text-center">
-        Too many requests
-      </h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-        You&apos;ve made too many requests. Please wait and try again.
-      </p>
-
-      <div className="h-4" />
-
-      <p className="text-auth-error text-auth-cta text-center font-semibold">
+    <AuthMessage
+      title="Too many requests"
+      subtitle="You've made too many attempts. Please wait a moment and try again."
+    >
+      <p className="text-auth-input font-semibold text-auth-cta text-center tabular-nums">
         {seconds > 0 ? `Try again in ${seconds}s` : "You can try again now"}
       </p>
-
-      <div className="h-6" />
-
-      <Link
-        href="/auth/login"
-        className="text-auth-label text-auth-link hover:underline text-center block"
-      >
-        ← Back to sign in
+      <Link href="/auth" className="text-auth-label text-auth-link hover:underline text-center">
+        Back to log in
       </Link>
-    </AuthCard>
+    </AuthMessage>
   );
 }

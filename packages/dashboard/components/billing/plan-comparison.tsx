@@ -134,7 +134,7 @@ export function PlanComparison({
                 return (
                   <th
                     key={plan}
-                    className={cn("relative px-6 py-4 text-center", isCurrent && "bg-[#FEF2F2]")}
+                    className={cn("relative px-6 py-4 text-center", isCurrent && "bg-[var(--color-primary-subtle)]")}
                   >
                     <div className="flex flex-col items-center gap-1">
                       {isBest && (
@@ -202,7 +202,7 @@ export function PlanComparison({
                     return (
                       <td
                         key={key}
-                        className={cn("px-6 py-3 text-center text-sm", isCurrent && "bg-[#FEF2F2]")}
+                        className={cn("px-6 py-3 text-center text-sm", isCurrent && "bg-[var(--color-primary-subtle)]")}
                         style={{ color: "var(--color-text-secondary)" }}
                       >
                         {row[key]}
@@ -221,7 +221,7 @@ export function PlanComparison({
                   const isCurrent = plan === currentPlan;
                   const isBest = plan === bestForYou;
                   return (
-                    <td key={plan} className={cn("px-6 py-4 text-center", isCurrent && "bg-[#FEF2F2]")}>
+                    <td key={plan} className={cn("px-6 py-4 text-center", isCurrent && "bg-[var(--color-primary-subtle)]")}>
                       {!isCurrent && plan !== "FREE" && (
                         <button
                           onClick={() => onSelectPlan?.(plan, interval)}

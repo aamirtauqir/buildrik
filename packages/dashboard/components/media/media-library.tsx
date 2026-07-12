@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Search, Upload, Trash2, Copy, Check, Folder, ImageOff } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Search, Upload, Trash2, Copy, Check, Folder, ImageOff, MoreHorizontal, Pencil, X, AlertTriangle } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
@@ -31,6 +31,11 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [folderId, setFolderId] = useState<string | null | undefined>(undefined);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const folderMenuRef = useRef<HTMLDivElement>(null);
 
   const assets = trpc.media.listAssets.useQuery({ search: search || undefined, folderId, limit: 60 });
   const folders = trpc.media.listFolders.useQuery({});
@@ -41,6 +46,40 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
     onError: (err) => addToast("error", "Failed", err.message),
   });
   const createAsset = trpc.media.createAsset.useMutation();
+
+  const renameFolder = trpc.media.renameFolder.useMutation({
+    onSuccess: () => { folders.refetch(); setRenameTarget(null); addToast("success", "Folder renamed"); },
+    onError: (err) => addToast("error", "Rename failed", err.message),
+  });
+  const deleteFolder = trpc.media.deleteFolder.useMutation({
+    onSuccess: (res, variables) => {
+      folders.refetch();
+      assets.refetch();
+      // If the deleted folder was the active filter, fall back to All.
+      setFolderId((cur) => (cur === variables.folderId ? undefined : cur));
+      setDeleteTarget(null);
+      addToast(
+        "success",
+        "Folder deleted",
+        res.movedAssets > 0
+          ? `${res.movedAssets} asset${res.movedAssets === 1 ? "" : "s"} moved to All`
+          : undefined
+      );
+    },
+    onError: (err) => addToast("error", "Delete failed", err.message),
+  });
+
+  // Close the folder action menu on any outside click.
+  useEffect(() => {
+    if (!openMenuId) return;
+    function onDown(e: MouseEvent) {
+      if (folderMenuRef.current && !folderMenuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [openMenuId]);
 
   const onPickFiles = () => fileRef.current?.click();
 
@@ -110,13 +149,31 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
             style={{ borderColor: "var(--color-border-default)" }}
           />
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div ref={folderMenuRef} className="flex flex-wrap items-center gap-1.5">
           <button type="button" onClick={() => setFolderId(undefined)} className="rounded-md border px-2.5 py-1.5 text-xs" style={{ borderColor: folderId === undefined ? "var(--color-primary)" : "var(--color-border-default)", color: folderId === undefined ? "var(--color-primary)" : "var(--color-text-secondary)" }}>All</button>
-          {(folders.data ?? []).map((f: { id: string; name: string }) => (
-            <button key={f.id} type="button" onClick={() => setFolderId(f.id)} className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-xs" style={{ borderColor: folderId === f.id ? "var(--color-primary)" : "var(--color-border-default)", color: folderId === f.id ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
-              <Folder size={12} /> {f.name}
-            </button>
-          ))}
+          {(folders.data ?? []).map((f: { id: string; name: string }) => {
+            const active = folderId === f.id;
+            return (
+              <div key={f.id} className="relative inline-flex items-center rounded-md border text-xs" style={{ borderColor: active ? "var(--color-primary)" : "var(--color-border-default)", color: active ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
+                <button type="button" onClick={() => setFolderId(f.id)} className="inline-flex items-center gap-1 py-1.5 pl-2.5 pr-1">
+                  <Folder size={12} /> {f.name}
+                </button>
+                <button type="button" onClick={() => setOpenMenuId((cur) => (cur === f.id ? null : f.id))} className="flex items-center rounded-r-md py-1.5 pl-0.5 pr-1.5 hover:bg-[var(--color-bg-subtle)]" aria-label={`Actions for ${f.name}`}>
+                  <MoreHorizontal size={13} />
+                </button>
+                {openMenuId === f.id && (
+                  <div className="absolute right-0 top-full z-20 mt-1 w-36 overflow-hidden rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
+                    <button type="button" onClick={() => { setRenameTarget({ id: f.id, name: f.name }); setRenameValue(f.name); setOpenMenuId(null); }} className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-[var(--color-bg-subtle)]" style={{ color: "var(--color-text-primary)" }}>
+                      <Pencil size={13} style={{ color: "var(--color-text-secondary)" }} /> Rename
+                    </button>
+                    <button type="button" onClick={() => { setDeleteTarget({ id: f.id, name: f.name }); setOpenMenuId(null); }} className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs hover:bg-[var(--color-bg-subtle)]" style={{ color: "var(--color-error)" }}>
+                      <Trash2 size={13} style={{ color: "var(--color-error)" }} /> Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -178,6 +235,72 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           )}
         </div>
       </div>
+
+      {/* Rename folder */}
+      {renameTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setRenameTarget(null)}>
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>Rename folder</h2>
+            <input
+              type="text"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && renameValue.trim()) {
+                  renameFolder.mutate({ folderId: renameTarget.id, name: renameValue.trim() });
+                } else if (e.key === "Escape") {
+                  setRenameTarget(null);
+                }
+              }}
+              placeholder="Folder name"
+              autoFocus
+              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+            />
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setRenameTarget(null)}
+                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { if (renameValue.trim()) renameFolder.mutate({ folderId: renameTarget.id, name: renameValue.trim() }); }}
+                disabled={!renameValue.trim() || renameValue.trim() === renameTarget.name || renameFolder.isPending}
+                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                {renameFolder.isPending ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete folder — assets are un-assigned to All, not deleted */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={() => setDeleteTarget(null)}>
+          <div className="w-[420px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold" style={{ color: "var(--color-error)" }}>Delete folder?</h2>
+              <button onClick={() => setDeleteTarget(null)}><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
+            </div>
+            <div className="mt-4 flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "#FEF2F2" }}>
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
+              <p className="text-sm" style={{ color: "#991B1B" }}>
+                Delete <strong>{deleteTarget.name}</strong>? Assets in this folder stay in your library and move to <strong>All</strong>. This can’t be undone.
+              </p>
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <button onClick={() => setDeleteTarget(null)} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
+              <button onClick={() => deleteFolder.mutate({ folderId: deleteTarget.id })} disabled={deleteFolder.isPending} className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50" style={{ backgroundColor: "var(--color-error)" }}>
+                {deleteFolder.isPending ? "Deleting…" : "Delete folder"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

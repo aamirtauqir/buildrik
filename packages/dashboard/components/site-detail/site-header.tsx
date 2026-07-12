@@ -2,12 +2,7 @@
 import Link from "next/link";
 import { ArrowLeft, Pencil, Globe, ExternalLink } from "lucide-react";
 import { EditorLink } from "@/components/editor-route/EditorLink";
-
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  PUBLISHED: { bg: "#DCFCE7", text: "#166534" },
-  DRAFT: { bg: "#FEF9C3", text: "#854D0E" },
-  ARCHIVED: { bg: "#FED7AA", text: "#9A3412" },
-};
+import { siteStatusColor } from "@/components/sites/site-status";
 
 interface SiteHeaderProps {
   site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null };
@@ -16,7 +11,7 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
-  const sc = STATUS_COLORS[site.status] ?? STATUS_COLORS.DRAFT;
+  const sc = siteStatusColor(site.status);
   return (
     <div>
       <Link href="/dashboard/sites" className="mb-3 inline-flex items-center gap-1 text-sm transition-colors hover:underline" style={{ color: "var(--color-text-secondary)" }}>

@@ -3,18 +3,25 @@
 @theme inline {
   --font-sans: 'Inter Tight', sans-serif;
 
-  /* Auth colors */
-  --color-auth-cta: #EF4444;
-  --color-auth-cta-hover: #DC2626;
+  /* Auth colors — craftwork surface (cobalt accent, auth-only; see DESIGN.md §Auth Surface) */
+  --color-auth-cta: #2D6DFF;
+  --color-auth-cta-hover: #1E58D9;
   --color-auth-input-border: #E2E8F0;
-  --color-auth-input-focus: #3B82F6;
+  --color-auth-input-focus: #2D6DFF;
   --color-auth-input-error: #EF4444;
+  --color-auth-error-text: #DC2626;
+  --color-auth-input-fill: #EAF1FF;
+  --color-auth-input-fill-border: #D3E1FF;
+  --color-auth-input-fill-focus: #DCE7FF;
+  --color-auth-btn-secondary: #ECECEF;
+  --color-auth-btn-secondary-hover: #E2E2E6;
+  --color-auth-page: #ECECEE;
   --color-auth-text-primary: #0F172A;
   --color-auth-text-body: #1E293B;
   --color-auth-text-secondary: #334155;
   --color-auth-text-muted: #64748B;
-  --color-auth-text-placeholder: #94A3B8;
-  --color-auth-link: #3B82F6;
+  --color-auth-text-placeholder: #64748B;
+  --color-auth-link: #2D6DFF;
   --color-auth-success-bg: #F0FDF4;
   --color-auth-success-border: #BBF7D0;
   --color-auth-success-text: #166534;
@@ -24,26 +31,31 @@
   --color-auth-strength-bg: #F8FAFC;
   --color-auth-strength-pass: #16A34A;
 
-  /* Auth shadows */
-  --shadow-auth-card: 0 4px 24px rgba(0, 0, 0, 0.08);
+  /* Auth shadows — floating craftwork card */
+  --shadow-auth-card: 0 12px 40px rgba(15, 23, 42, 0.12);
 
   /* Auth border radius */
-  --radius-auth-card: 16px;
-  --radius-auth-input: 8px;
-  --radius-auth-btn: 8px;
+  --radius-auth-card: 24px;
+  --radius-auth-input: 12px;
+  --radius-auth-btn: 12px;
 
-  /* Auth max-width */
-  --container-auth-card: 420px;
+  /* Auth layout — mockup: 1000×620 card, 440 art + 560 form (≤380 content) */
+  --container-auth-card: 380px;
+  --container-auth-shell: 1000px;
+  --spacing-auth-art: 440px;
 
   /* Auth spacing/height */
   --spacing-auth-input: 44px;
   --spacing-auth-btn: 44px;
 
   /* Auth font sizes */
-  --text-auth-title: 22px;
+  --text-auth-title: 20px;
   --text-auth-title--line-height: 1.3;
   --text-auth-title--font-weight: 700;
-  --text-auth-subtitle: 14px;
+  --text-auth-title-lg: 24px;
+  --text-auth-title-lg--line-height: 1.2;
+  --text-auth-title-lg--font-weight: 700;
+  --text-auth-subtitle: 13px;
   --text-auth-subtitle--line-height: 1.5;
   --text-auth-subtitle--font-weight: 400;
   --text-auth-label: 13px;
@@ -55,9 +67,6 @@
   --text-auth-btn: 14px;
   --text-auth-btn--line-height: 1;
   --text-auth-btn--font-weight: 600;
-  --text-auth-link: 14px;
-  --text-auth-link--line-height: 1.5;
-  --text-auth-link--font-weight: 500;
   --text-auth-error: 13px;
   --text-auth-error--line-height: 1.4;
   --text-auth-error--font-weight: 400;
@@ -65,9 +74,12 @@
   --text-auth-fine--line-height: 1.5;
   --text-auth-fine--font-weight: 400;
 
-  /* Dashboard colors */
-  --color-primary: #E42313;
-  --color-primary-hover: #CC1F10;
+  /* Dashboard colors — cobalt accent (unified with editor + auth 2026-07-12;
+     dc-skin rebrand, replaces the former red #E42313 dashboard accent). Error
+     and destructive stay red: red now means error/danger only. */
+  --color-primary: #2D6DFF;
+  --color-primary-hover: #1950DC;
+  --color-primary-subtle: #EBF1FF;
   --color-destructive: #7F1D1D;
   --color-bg-page: #FAFAFA;
   --color-bg-surface: #FFFFFF;
@@ -79,23 +91,39 @@
   --color-text-muted: #B0B0B0;
   --color-success: #22C55E;
   --color-warning: #EA580C;
-  --color-error: #E42313;
+  --color-error: #DC2626;
   --color-info: #3B82F6;
 
   /* Dashboard layout */
-  --sidebar-width: 220px;
+  --sidebar-width: 262px;
   --topbar-height: 56px;
+
+  /* Onboarding (M2 wizard) — its own primary blue #2563EB, distinct from the
+     auth cobalt and the dashboard red. See DESIGN.md §Onboarding Surface. */
+  --color-onb-primary: #2563EB;
+  --color-onb-primary-hover: #1D4FD7;
+  --color-onb-primary-tint: #EFF6FF;
+  --color-onb-ink: #0A0A0B;
+  --color-onb-text: #334155;
+  --color-onb-muted: #63748B;
+  --color-onb-subtle: #94A3B8;
+  --color-onb-line: #E3E8F0;
+  --color-onb-surface: #F8FAFC;
+  --color-onb-success: #21966B;
+  --color-onb-error: #DC2626;
+  --radius-onb: 8px;
+  --spacing-onb-input: 46px;
+  --spacing-onb-cta: 50px;
+  --container-onb: 520px;
+  --text-onb-title: 26px;
+  --text-onb-title--line-height: 1.25;
+  --text-onb-title--font-weight: 700;
 }
 
-/* Focus indicators */
+/* Focus indicators — cobalt (unified accent 2026-07-12) */
 *:focus-visible {
-  outline: 2px solid #E42313;
+  outline: 2px solid #2D6DFF;
   outline-offset: 2px;
-}
-
-/* Auth pages use blue focus */
-[data-auth-layout] *:focus-visible {
-  outline-color: #3B82F6;
 }
 
 /* Reduced motion */

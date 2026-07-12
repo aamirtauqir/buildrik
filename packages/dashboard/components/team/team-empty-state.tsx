@@ -6,7 +6,7 @@ const ROLE_CARDS = [
   {
     role: "Owner",
     description: "Full control of workspace, billing, and settings",
-    bg: "#FEF2F2",
+    bg: "var(--color-primary-subtle)",
     color: "var(--color-primary)",
     Icon: Crown,
   },
@@ -42,7 +42,7 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
     <div className="flex flex-col items-center px-6 py-16">
       <div
         className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl"
-        style={{ backgroundColor: "#FEF2F2" }}
+        style={{ backgroundColor: "var(--color-primary-subtle)" }}
       >
         <Users className="h-8 w-8" style={{ color: "var(--color-primary)" }} />
       </div>

@@ -55,16 +55,16 @@ export function OTPInput({ length = 6, value, onChange }: OTPInputProps) {
           ref={(el) => { inputRefs.current[i] = el; }}
           type="text"
           inputMode="numeric"
+          autoComplete={i === 0 ? "one-time-code" : "off"}
           maxLength={1}
           value={digits[i] || ""}
           aria-label={`Digit ${i + 1} of verification code`}
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           className={cn(
-            "w-[52px] h-auth-input text-center text-xl font-bold rounded-auth-input outline-none transition-colors",
-            digits[i]
-              ? "border-2 border-auth-text-primary text-auth-text-primary"
-              : "border-2 border-auth-input-border"
+            "w-[52px] h-[60px] text-center text-2xl font-medium rounded-auth-input outline-none transition-colors",
+            "bg-[#F5F5F6] text-auth-text-primary border focus:border-auth-input-focus",
+            digits[i] ? "border-auth-cta" : "border-transparent"
           )}
           style={{ caretColor: "transparent" }}
         />

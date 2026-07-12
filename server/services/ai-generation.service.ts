@@ -37,6 +37,10 @@ export async function createGenerationJob(
   }
 
   const metadata: Record<string, unknown> = {};
+  // The site name the user typed — the schema requires it, but the job had no
+  // column for it, so the worker fell back to naming the site after its
+  // businessType enum ("BUSINESS"). Carry it through so the real name sticks.
+  metadata.name = input.name;
   if (input.tone) metadata.tone = input.tone;
   if (input.content) metadata.content = input.content;
   if (input.images) metadata.images = input.images;

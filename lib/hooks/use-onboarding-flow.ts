@@ -3,7 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { trpc } from "@/lib/trpc/client";
+import { wizardDataSchema } from "@buildrik/shared/schemas/onboarding";
 
+/**
+ * Post-auth entry router for the M2 onboarding wizard. Resumes at the last saved
+ * frame (wizardData.route); new users start at S1; anyone past the wizard
+ * (CHECKLIST/COMPLETED/dismissed) goes to the dashboard, where the checklist
+ * widget takes over.
+ */
 export function useOnboardingFlow() {
   const router = useRouter();
   const stateQuery = trpc.onboarding.getState.useQuery();
@@ -12,31 +19,18 @@ export function useOnboardingFlow() {
     if (!stateQuery.data) return;
     const state = stateQuery.data;
 
-    if (state.completed || state.dismissed) {
+    if (
+      state.completed ||
+      state.dismissed ||
+      state.step === "CHECKLIST" ||
+      state.step === "COMPLETED"
+    ) {
       router.push("/dashboard");
       return;
     }
 
-    switch (state.step) {
-      case "ROLE_SELECT":
-        router.push("/onboarding/role");
-        break;
-      case "PROJECT_SETUP":
-        router.push("/onboarding/setup");
-        break;
-      case "SITE_CREATION":
-        router.push("/onboarding/setup");
-        break;
-      case "EDITOR_TOUR":
-      case "CHECKLIST":
-        router.push("/dashboard");
-        break;
-      case "COMPLETED":
-        router.push("/dashboard");
-        break;
-      default:
-        router.push("/onboarding/role");
-    }
+    const wizard = wizardDataSchema.safeParse(state.wizardData);
+    router.push(wizard.success ? wizard.data.route : "/onboarding/workspace");
   }, [stateQuery.data, router]);
 
   return {

@@ -48,7 +48,7 @@ export default function AccountPage() {
         changePasswordMutation.mutate({ ...data, confirmPassword: data.newPassword })
       }
       onSetPassword={(data) => setPasswordMutation.mutate({ newPassword: data.newPassword })}
-      onChangeEmail={(data) => changeEmailMutation.mutate(data)}
+      onChangeEmail={(data) => changeEmailMutation.mutateAsync(data)}
       onConnectAccount={(provider) =>
         signIn(provider, { callbackUrl: "/dashboard/settings/account" })
       }

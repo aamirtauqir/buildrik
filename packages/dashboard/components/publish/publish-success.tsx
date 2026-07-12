@@ -29,7 +29,7 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
       <h2 className="mt-4 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>Site Published!</h2>
       <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>Your site is now live and accessible to the world.</p>
 
-      {/* Buildrik URL */}
+      {/* Buildrick URL */}
       <UrlRow
         label="Live URL"
         url={buildrikUrl}

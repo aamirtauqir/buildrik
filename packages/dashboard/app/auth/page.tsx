@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -10,22 +10,16 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
 import { SocialButton } from "@/components/auth/social-button";
-import { PasswordStrength } from "@/components/auth/password-strength";
+import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import { signIn } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
-import { ArrowLeft } from "lucide-react";
-
-type AuthStep =
-  | { type: "email_entry" }
-  | { type: "checking" }
-  | { type: "login_password"; email: string; providers: ("google" | "github")[] }
-  | { type: "oauth_only"; email: string; providers: ("google" | "github")[] }
-  | { type: "signup_new"; email: string };
+import { safeReturnUrl } from "@lib/safe-return-url";
 
 function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const prefillEmail = searchParams.get("email") ?? "";
+  const returnUrl = safeReturnUrl(searchParams.get("returnUrl"));
   const reason = searchParams.get("reason");
   const reasonBanner =
     reason === "session-required"
@@ -33,45 +27,23 @@ function AuthPageContent() {
       : reason === "session-expired"
         ? { title: "Session expired", subtitle: "Sign in to continue." }
         : null;
-  const [step, setStep] = useState<AuthStep>({ type: "email_entry" });
-  const [email, setEmail] = useState(prefillEmail);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const checkEmailMutation = trpc.auth.checkEmail.useMutation({
-    onSuccess: (data, variables) => {
-      // Use variables.email (what was actually sent) not the current input state,
-      // which may have changed while the request was in-flight.
-      const resolvedEmail = variables.email;
-      setError(null);
-      if (!data.exists) {
-        setStep({ type: "signup_new", email: resolvedEmail });
-      } else if (data.hasPassword) {
-        setStep({ type: "login_password", email: resolvedEmail, providers: data.providers });
-      } else {
-        setStep({ type: "oauth_only", email: resolvedEmail, providers: data.providers });
-      }
-    },
-    onError: (err) => {
-      setStep({ type: "email_entry" });
-      if (err.data?.code === "TOO_MANY_REQUESTS") {
-        setError("Too many attempts. Try again in 15 minutes.");
-      } else {
-        setError(err.message);
-      }
-    },
-  });
+  const [email, setEmail] = useState(prefillEmail);
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [captchaRequired, setCaptchaRequired] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: async (data) => {
       if (data.requiresTwoFactor) {
-        if (rememberMe) {
-          try { sessionStorage.setItem("buildrik_rememberMe", "true"); } catch {}
-        }
-        router.push(`/auth/2fa?token=${data.tempToken}`);
+        // Carry rememberMe + returnUrl through the 2FA step (query params, since
+        // the create-session call happens on the 2FA page).
+        const params = new URLSearchParams({ token: data.tempToken ?? "" });
+        if (rememberMe) params.set("remember", "1");
+        if (returnUrl) params.set("returnUrl", returnUrl);
+        router.push(`/auth/2fa?${params.toString()}`);
       } else {
         const res = await fetch("/api/auth/create-session", {
           method: "POST",
@@ -79,423 +51,145 @@ function AuthPageContent() {
           body: JSON.stringify({ sessionToken: data.sessionToken, rememberMe }),
         });
         if (res.ok) {
-          router.push("/auth/redirect");
+          // Full navigation, not router.push: create-session just set the session
+          // cookie manually, but useSession on /auth/redirect would still read the
+          // stale "unauthenticated" client cache and bounce to /auth (which
+          // middleware then sends to /dashboard, skipping onboarding). A hard load
+          // makes /auth/redirect read the fresh cookie and route correctly.
+          window.location.assign(returnUrl ?? "/auth/redirect");
         } else {
           setError("Failed to create session");
         }
       }
     },
     onError: (err) => {
-      const cause = (err.data as Record<string, unknown>)?.cause as {
-        attemptsRemaining?: number;
-        locked?: boolean;
-        lockedUntil?: string;
-      } | undefined;
-      if (cause?.locked && cause.lockedUntil) {
-        router.push(`/auth/error/locked?until=${encodeURIComponent(cause.lockedUntil)}`);
+      // Too many failures from this IP → captcha required. Show the widget and
+      // let them re-submit with a solve.
+      if (err.message === "CAPTCHA_REQUIRED") {
+        setCaptchaRequired(true);
+        setError("Please complete the verification below, then try again.");
         return;
       }
-      if (cause?.attemptsRemaining !== undefined && cause.attemptsRemaining > 0) {
-        setError(`Incorrect password — ${cause.attemptsRemaining} more attempt${cause.attemptsRemaining === 1 ? "" : "s"}`);
-      } else {
-        setError(err.message);
+      // Account locked (too many failed attempts) → dedicated screen. Otherwise
+      // show the uniform "Incorrect email or password" (no attempts-remaining
+      // leak — see the enumeration fix in auth.service.login).
+      if (err.message.toLowerCase().includes("locked")) {
+        router.push("/auth/error/locked");
+        return;
       }
+      setError(err.message);
     },
   });
 
-  const magicLinkMutation = trpc.auth.magicLink.useMutation({
-    onSuccess: (_data, variables) => {
-      // Use variables.email (captured at call time) not step.email from closure,
-      // which may be stale if the user changed state before the response arrived.
-      router.push(`/auth/check-inbox?email=${encodeURIComponent(variables.email)}`);
-    },
-    onError: (err) => setError(err.message),
-  });
-
-  const signupMutation = trpc.auth.signup.useMutation({
-    onSuccess: () => {
-      if (step.type === "signup_new") {
-        router.push(`/auth/verify-email?email=${encodeURIComponent(step.email)}`);
-      }
-    },
-    onError: (err) => setError(err.message),
-  });
-
-  // If the page loaded with ?email= (e.g. redirect from /auth/login), skip the
-  // email entry step and run checkEmail immediately on mount.
-  useEffect(() => {
-    if (prefillEmail && step.type === "email_entry") {
-      setStep({ type: "checking" });
-      checkEmailMutation.mutate({ email: prefillEmail });
-    }
-    // Only runs on mount — prefillEmail is stable
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function handleEmailSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (step.type === "checking") return;
-    setError(null);
-    setStep({ type: "checking" });
-    checkEmailMutation.mutate({ email });
-  }
-
-  function handleLoginSubmit(e: React.FormEvent) {
+  function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (step.type !== "login_password") return;
-    loginMutation.mutate({ email: step.email, password, rememberMe });
-  }
-
-  function handleSignupSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    if (step.type !== "signup_new") return;
-    signupMutation.mutate({ fullName, email: step.email, password, termsAccepted: termsAccepted as true });
+    loginMutation.mutate({ email, password, rememberMe, turnstileToken: captchaToken ?? undefined });
   }
 
   function handleOAuthSignIn(provider: "google" | "github") {
-    if (rememberMe) {
-      try { sessionStorage.setItem("buildrik_rememberMe", "true"); } catch {}
-    }
-    signIn(provider, { callbackUrl: "/auth/redirect" });
+    signIn(provider, { callbackUrl: returnUrl ?? "/auth/redirect" });
   }
-
-  function resetToEmail() {
-    const prevEmail = step.type !== "email_entry" && step.type !== "checking" ? step.email : email;
-    setStep({ type: "email_entry" });
-    setEmail(prevEmail);
-    setPassword("");
-    setError(null);
-  }
-
-  const showChangeEmail = step.type !== "email_entry" && step.type !== "checking";
-  const currentEmail = step.type !== "email_entry" && step.type !== "checking" ? step.email : email;
 
   return (
-    <>
-      <AuthCard>
+    <AuthCard>
+      <div className="text-center">
         <AuthLogo />
+        <p className="text-auth-subtitle text-auth-text-muted">Log in to your account</p>
+      </div>
 
-        {step.type === "email_entry" || step.type === "checking" ? (
-          <>
-            <h1 className="text-auth-title text-auth-text-primary text-center">
-              Welcome to Buildrik
-            </h1>
-            <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-8">
-              Build beautiful websites, fast.
-            </p>
+      <div className="h-7" />
 
-            <form onSubmit={handleEmailSubmit} className="w-full flex flex-col items-center">
-              {error && (
-                <>
-                  <FormBanner variant="error" title={error} />
-                  <div className="h-4" />
-                </>
-              )}
+      {error && (
+        <>
+          <FormBanner variant="error" title={error} />
+          <div className="h-4" />
+        </>
+      )}
+      {!error && reasonBanner && (
+        <>
+          <FormBanner variant="error" title={reasonBanner.title} subtitle={reasonBanner.subtitle} />
+          <div className="h-4" />
+        </>
+      )}
 
-              {!error && reasonBanner && (
-                <>
-                  <FormBanner variant="error" title={reasonBanner.title} subtitle={reasonBanner.subtitle} />
-                  <div className="h-4" />
-                </>
-              )}
+      <SocialButton
+        provider="google"
+        variant="primary"
+        label="Login with Google"
+        onClick={() => handleOAuthSignIn("google")}
+      />
+      <div className="h-2.5" />
+      <SocialButton provider="github" onClick={() => handleOAuthSignIn("github")} />
 
-              <AuthInput
-                label="Email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                autoFocus
-              />
+      <div className="h-5" />
+      <AuthDivider text="or" />
+      <div className="h-5" />
 
-              <div className="h-3" />
+      <form onSubmit={handleLogin} className="w-full flex flex-col gap-3">
+        <AuthInput
+          label="Email"
+          hideLabel
+          type="email"
+          placeholder="Your Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          autoFocus
+        />
+        <AuthInput
+          label="Password"
+          hideLabel
+          type="password"
+          placeholder="Your Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+        />
 
-              <label className="flex items-center gap-2 cursor-pointer w-full">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  suppressHydrationWarning
-                  className="rounded border-auth-input-border"
-                />
-                <span className="text-auth-label text-auth-text-secondary">Remember me</span>
-              </label>
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              suppressHydrationWarning
+              className="rounded border-auth-input-fill-border accent-auth-cta"
+            />
+            <span className="text-auth-label text-auth-text-secondary">Remember me</span>
+          </label>
+          <Link href="/auth/forgot-password" className="text-auth-label text-auth-link hover:underline">
+            Forgot password?
+          </Link>
+        </div>
 
-              <div className="h-5" />
-
-              <AuthButton
-                type="submit"
-                loading={step.type === "checking" || checkEmailMutation.isPending}
-              >
-                Continue
-              </AuthButton>
-            </form>
-
-            <div className="h-6" />
-            <AuthDivider text="or" />
-            <div className="h-6" />
-
-            <SocialButton provider="google" onClick={() => handleOAuthSignIn("google")} />
-            <div className="h-2" />
-            <SocialButton provider="github" onClick={() => handleOAuthSignIn("github")} />
-          </>
-        ) : step.type === "login_password" ? (
-          <>
-            {showChangeEmail && (
-              <button
-                type="button"
-                onClick={resetToEmail}
-                className="flex items-center gap-1 text-auth-label text-auth-link hover:underline mb-4 self-start"
-              >
-                <ArrowLeft size={14} />
-                Change email
-              </button>
-            )}
-
-            <h1 className="text-auth-title text-auth-text-primary text-center">
-              Welcome back
-            </h1>
-            <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-              {currentEmail}
-            </p>
-
-            <form onSubmit={handleLoginSubmit} className="w-full flex flex-col items-center">
-              {error && (
-                <>
-                  <FormBanner variant="error" title={error} />
-                  <div className="h-4" />
-                </>
-              )}
-
-              <AuthInput
-                label="Password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                autoFocus
-              />
-
-              <div className="h-3" />
-
-              <div className="flex justify-end w-full">
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-auth-label text-auth-link hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
-              <div className="h-5" />
-
-              <AuthButton type="submit" loading={loginMutation.isPending}>
-                Sign In
-              </AuthButton>
-            </form>
-
-            {step.providers.length > 0 && (
-              <>
-                <div className="h-6" />
-                <AuthDivider text="or continue with" />
-                <div className="h-6" />
-                {step.providers.includes("google") && (
-                  <>
-                    <SocialButton provider="google" onClick={() => handleOAuthSignIn("google")} />
-                    <div className="h-2" />
-                  </>
-                )}
-                {step.providers.includes("github") && (
-                  <SocialButton provider="github" onClick={() => handleOAuthSignIn("github")} />
-                )}
-              </>
-            )}
-          </>
-        ) : step.type === "oauth_only" ? (
-          <>
-            {showChangeEmail && (
-              <button
-                type="button"
-                onClick={resetToEmail}
-                className="flex items-center gap-1 text-auth-label text-auth-link hover:underline mb-4 self-start"
-              >
-                <ArrowLeft size={14} />
-                Change email
-              </button>
-            )}
-
-            <h1 className="text-auth-title text-auth-text-primary text-center">
-              Welcome back
-            </h1>
-            <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-8">
-              {currentEmail}
-            </p>
-
-            {error && (
-              <>
-                <FormBanner variant="error" title={error} />
-                <div className="h-4" />
-              </>
-            )}
-
-            {step.providers.length > 0 ? (
-              <>
-                {step.providers.includes("google") && (
-                  <>
-                    <SocialButton provider="google" onClick={() => handleOAuthSignIn("google")} />
-                    <div className="h-2" />
-                  </>
-                )}
-                {step.providers.includes("github") && (
-                  <SocialButton provider="github" onClick={() => handleOAuthSignIn("github")} />
-                )}
-
-                <div className="h-4" />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setError(null);
-                    magicLinkMutation.mutate({ email: step.email });
-                  }}
-                  disabled={magicLinkMutation.isPending}
-                  className="text-auth-label text-auth-link hover:underline"
-                >
-                  {magicLinkMutation.isPending ? "Sending…" : "Send a magic link instead"}
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="text-auth-subtitle text-auth-text-muted text-center mb-6">
-                  This account has no password. Use a sign-in link to access it.
-                </p>
-                <AuthButton
-                  onClick={() => {
-                    setError(null);
-                    magicLinkMutation.mutate({ email: step.email });
-                  }}
-                  loading={magicLinkMutation.isPending}
-                >
-                  Send sign-in link
-                </AuthButton>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            {showChangeEmail && (
-              <button
-                type="button"
-                onClick={resetToEmail}
-                className="flex items-center gap-1 text-auth-label text-auth-link hover:underline mb-4 self-start"
-              >
-                <ArrowLeft size={14} />
-                Change email
-              </button>
-            )}
-
-            <h1 className="text-auth-title text-auth-text-primary text-center">
-              Create your account
-            </h1>
-            <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-              Start building for free
-            </p>
-
-            <form onSubmit={handleSignupSubmit} className="w-full flex flex-col items-center">
-              {error && (
-                <>
-                  <FormBanner variant="error" title={error} />
-                  <div className="h-4" />
-                </>
-              )}
-
-              <AuthInput
-                label="Full Name"
-                type="text"
-                placeholder="John Doe"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                autoComplete="name"
-                autoFocus
-              />
-
-              <div className="h-4" />
-
-              <AuthInput
-                label="Email"
-                type="email"
-                value={step.email}
-                readOnly
-                onChange={() => {}}
-              />
-
-              <div className="h-4" />
-
-              <AuthInput
-                label="Password"
-                type="password"
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-              />
-
-              <div className="h-3" />
-
-              <PasswordStrength password={password} />
-
-              <div className="h-4" />
-
-              <label className="flex items-start gap-2 cursor-pointer w-full">
-                <input
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  suppressHydrationWarning
-                  className="mt-0.5 rounded border-auth-input-border"
-                />
-                <span className="text-auth-label text-auth-text-secondary">
-                  I agree to the{" "}
-                  <Link href="/terms" className="text-auth-link hover:underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" className="text-auth-link hover:underline">
-                    Privacy Policy
-                  </Link>
-                </span>
-              </label>
-
-              <div className="h-5" />
-
-              <AuthButton
-                type="submit"
-                disabled={!termsAccepted}
-                loading={signupMutation.isPending}
-              >
-                Create Account
-              </AuthButton>
-            </form>
-          </>
+        {captchaRequired && (
+          <div className="py-1">
+            <TurnstileWidget onVerify={setCaptchaToken} />
+          </div>
         )}
-      </AuthCard>
 
-      <p className="text-auth-fine text-auth-text-placeholder text-center mt-6">
-        By continuing, you agree to our{" "}
-        <Link href="/terms" className="underline hover:text-auth-text-secondary">
-          Terms of Service
-        </Link>{" "}
-        and{" "}
-        <Link href="/privacy" className="underline hover:text-auth-text-secondary">
-          Privacy Policy
+        <div className="h-1" />
+
+        <AuthButton
+          type="submit"
+          variant="secondary"
+          loading={loginMutation.isPending}
+          disabled={captchaRequired && !captchaToken}
+        >
+          Log in
+        </AuthButton>
+      </form>
+
+      <div className="h-5" />
+
+      <p className="text-auth-label text-auth-text-muted text-center">
+        Don&apos;t have an account?{" "}
+        <Link href="/auth/signup" className="text-auth-link font-medium hover:underline">
+          Sign up
         </Link>
-        .
       </p>
-    </>
+    </AuthCard>
   );
 }
 

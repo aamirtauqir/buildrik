@@ -102,7 +102,7 @@ export async function sendIntegrationTestEvent(
   const payload = {
     type: "buildrik.test_event",
     provider: integration.provider,
-    message: "Test event from Buildrik — your webhook is connected.",
+    message: "Test event from Buildrick — your webhook is connected.",
   };
 
   try {

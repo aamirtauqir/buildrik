@@ -17,7 +17,7 @@ interface PaywallModalProps {
 
 const DEFAULT_PERKS = [
   "Custom domains with auto-SSL",
-  "Remove the Buildrik badge",
+  "Remove the Buildrick badge",
   "More sites, storage, and AI credits",
   "Team members + integrations",
 ];
@@ -30,7 +30,7 @@ export function PaywallModal({ open, onClose, feature, description, unlockPlan =
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between">
-          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold" style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}>
+          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold" style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}>
             <Sparkles className="h-3.5 w-3.5" /> {unlockPlan} feature
           </span>
           <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600"><X className="h-4 w-4" /></button>

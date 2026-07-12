@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { DASHBOARD_TASK_IDS } from "@buildrik/shared/schemas/onboarding";
+import { DASHBOARD_TASK_IDS, wizardDataSchema, type WizardData } from "@buildrik/shared/schemas/onboarding";
 
 const STEP_SEQUENCE = [
   "ROLE_SELECT",
@@ -35,8 +35,13 @@ export async function getOnboardingState(userId: string) {
   // advance the step — users were bounced back to /onboarding/setup forever.
   // Owning a live site means the project phase is done, whichever path made
   // it; this also heals accounts already stuck in the loop.
+  // Skip the repair while the M2 wizard is active (wizardData present): the new
+  // 24-frame flow creates a site at S2/paths but the user must stay IN the
+  // wizard, not be bounced to the checklist. The wizard flips step→CHECKLIST
+  // itself via completeWizard() when the editor opens.
   if (
     !existing.completed &&
+    !existing.wizardData &&
     (existing.step === "PROJECT_SETUP" || existing.step === "SITE_CREATION")
   ) {
     const site = await prisma.site.findFirst({
@@ -57,28 +62,24 @@ export async function getOnboardingState(userId: string) {
   return existing;
 }
 
-// 04-role-select now seeds the editor density preference (Simple/Advanced)
-// and advances the step. Density is a reversible preference, persisted on
-// UserPreference so the editor host threads it in as ?density.
-export async function selectRole(userId: string, density: "full" | "fewer") {
-  await prisma.userPreference.upsert({
-    where: { userId },
-    create: { userId, editorDensity: density },
-    update: { editorDensity: density },
-  });
+// M2 wizard: persist the whole wizard state (validated) after each step so a
+// refresh resumes at wizardData.route with inputs intact. Server is the source
+// of truth; the client only uses localStorage as a write-retry buffer.
+export async function saveWizard(userId: string, wizardData: WizardData) {
+  const parsed = wizardDataSchema.parse(wizardData);
   return prisma.onboardingState.update({
     where: { userId },
-    data: { role: density, step: "PROJECT_SETUP" },
+    data: { wizardData: parsed },
   });
 }
 
-export async function setupProject(
-  userId: string,
-  data: { projectName: string; method: string }
-) {
+// M2 wizard reached the editor (E1). Flip the coarse step machine to CHECKLIST
+// so the dashboard checklist widget shows afterward, and keep wizardData for
+// analytics/idempotency. Called when the site is created + editor opens.
+export async function completeWizard(userId: string) {
   return prisma.onboardingState.update({
     where: { userId },
-    data: { projectName: data.projectName, method: data.method, step: "SITE_CREATION" },
+    data: { step: "CHECKLIST" },
   });
 }
 

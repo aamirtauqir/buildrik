@@ -2,42 +2,87 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Globe, Briefcase, ClipboardCheck, MessageSquare, Palette, Users, CreditCard, Settings, ArrowUpRight, Image as ImageIcon } from "lucide-react";
+import {
+  LayoutDashboard, FolderKanban, Globe, Image as ImageIcon, Rocket, Briefcase, ClipboardCheck,
+  MessageSquare, Palette, Gift, Blocks, Store, Library, GraduationCap, BookOpen, Users, CreditCard,
+  Tag, Activity, Link2, Settings, HelpCircle, ArrowUpRight,
+} from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 
-const PLAN_LABELS: Record<string, string> = {
-  FREE: "Free",
-  PRO: "Pro",
-  BUSINESS: "Business",
-};
+const PLAN_LABELS: Record<string, string> = { FREE: "Free", PRO: "Pro", BUSINESS: "Business" };
 
-export const SIDEBAR_NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-  { label: "My Sites", href: "/dashboard/sites", icon: "Globe" },
+const iconMap = {
+  LayoutDashboard, FolderKanban, Globe, Image: ImageIcon, Rocket, Briefcase, ClipboardCheck,
+  MessageSquare, Palette, Gift, Blocks, Store, Library, GraduationCap, BookOpen, Users, CreditCard,
+  Tag, Activity, Link2, Settings, HelpCircle,
+} as const;
+
+type NavItem = { label: string; href: string; icon: keyof typeof iconMap; agencyOnly?: boolean };
+type NavGroup = { label: string | null; items: NavItem[] };
+
+// Nav SSOT — consumed by the sidebar (and mirrored by the command palette).
+// `agencyOnly` items appear only when the agency_layer feature flag is on.
+export const NAV_GROUPS: NavGroup[] = [
+  {
+    label: null,
+    items: [
+      { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
+      { label: "All projects", href: "/dashboard/projects", icon: "FolderKanban" },
+      { label: "My Sites", href: "/dashboard/sites", icon: "Globe" },
+      { label: "Media", href: "/dashboard/media", icon: "Image" },
+      { label: "Getting started", href: "/dashboard/getting-started", icon: "Rocket" },
+    ],
+  },
+  {
+    label: "Agency",
+    items: [
+      { label: "Clients", href: "/dashboard/clients", icon: "Briefcase", agencyOnly: true },
+      { label: "Reviews", href: "/dashboard/reviews", icon: "ClipboardCheck", agencyOnly: true },
+      { label: "Comments", href: "/dashboard/comments", icon: "MessageSquare", agencyOnly: true },
+      { label: "Shared theme", href: "/dashboard/theme", icon: "Palette", agencyOnly: true },
+      { label: "Partner program", href: "/dashboard/partner", icon: "Gift", agencyOnly: true },
+    ],
+  },
+  {
+    label: "Extend",
+    items: [
+      { label: "Apps", href: "/dashboard/apps", icon: "Blocks" },
+      { label: "Marketplace", href: "/dashboard/marketplace", icon: "Store" },
+      { label: "Libraries & Templates", href: "/dashboard/libraries", icon: "Library" },
+      { label: "Learn", href: "/dashboard/learn", icon: "GraduationCap" },
+      { label: "Resources", href: "/dashboard/resources", icon: "BookOpen" },
+    ],
+  },
+  {
+    label: "Workspace",
+    items: [
+      { label: "Team", href: "/dashboard/team", icon: "Users" },
+      { label: "Billing", href: "/dashboard/billing", icon: "CreditCard" },
+      { label: "Plans", href: "/dashboard/plans", icon: "Tag" },
+      { label: "Usage", href: "/dashboard/usage", icon: "Activity" },
+      { label: "Domains", href: "/dashboard/domains", icon: "Link2" },
+      { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
+      { label: "Help", href: "/dashboard/help", icon: "HelpCircle" },
+    ],
+  },
+];
+
+// Primary destinations for the mobile bottom bar (full grouped nav is desktop-only).
+const MOBILE_ITEMS: NavItem[] = [
+  { label: "Home", href: "/dashboard", icon: "LayoutDashboard" },
+  { label: "Sites", href: "/dashboard/sites", icon: "Globe" },
   { label: "Media", href: "/dashboard/media", icon: "Image" },
   { label: "Team", href: "/dashboard/team", icon: "Users" },
-  { label: "Billing", href: "/dashboard/billing", icon: "CreditCard" },
   { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
-] as const;
+];
 
-const iconMap = { LayoutDashboard, Globe, Briefcase, ClipboardCheck, MessageSquare, Palette, Users, CreditCard, Settings, Image: ImageIcon } as const;
-
-// Agency nav (Clients · Reviews · Comments) is surfaced only when the
-// agency_layer flag is on (ships dark for solo workspaces — no empty agency
-// chrome). Inserted after "My Sites" so the hierarchy reads Sites › agency tools.
-function useNavItems(): ReadonlyArray<{ label: string; href: string; icon: string }> {
+function useVisibleGroups(): NavGroup[] {
   const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
-  if (!features.data?.agency_layer) return SIDEBAR_NAV_ITEMS;
-  return [
-    SIDEBAR_NAV_ITEMS[0],
-    SIDEBAR_NAV_ITEMS[1],
-    { label: "Clients", href: "/dashboard/clients", icon: "Briefcase" },
-    { label: "Reviews", href: "/dashboard/reviews", icon: "ClipboardCheck" },
-    { label: "Comments", href: "/dashboard/comments", icon: "MessageSquare" },
-    { label: "Shared theme", href: "/dashboard/theme", icon: "Palette" },
-    ...SIDEBAR_NAV_ITEMS.slice(2),
-  ];
+  const agency = !!features.data?.agency_layer;
+  return NAV_GROUPS
+    .map((g) => ({ ...g, items: g.items.filter((it) => !it.agencyOnly || agency) }))
+    .filter((g) => g.items.length > 0);
 }
 
 function isActiveRoute(pathname: string, href: string): boolean {
@@ -47,22 +92,13 @@ function isActiveRoute(pathname: string, href: string): boolean {
 
 function MobileTabBar() {
   const pathname = usePathname();
-  const navItems = useNavItems();
-
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 flex h-14 items-center justify-around border-t bg-white lg:hidden" style={{ borderColor: "var(--color-border-default)" }}>
-      {navItems.map((item) => {
+      {MOBILE_ITEMS.map((item) => {
         const active = isActiveRoute(pathname, item.href);
-        const Icon = iconMap[item.icon as keyof typeof iconMap];
+        const Icon = iconMap[item.icon];
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors",
-              active ? "text-[var(--color-primary)]" : "text-[var(--color-text-secondary)]"
-            )}
-          >
+          <Link key={item.href} href={item.href} className={cn("flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors", active ? "text-[var(--color-primary)]" : "text-[var(--color-text-secondary)]")}>
             <Icon className="h-5 w-5" />
             {item.label}
           </Link>
@@ -74,10 +110,8 @@ function MobileTabBar() {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const navItems = useNavItems();
-  const health = trpc.dashboard.health.useQuery(undefined, {
-    staleTime: 60_000,
-  });
+  const groups = useVisibleGroups();
+  const health = trpc.dashboard.health.useQuery(undefined, { staleTime: 60_000 });
 
   const plan = health.data?.plan ?? "FREE";
   const sitesUsed = health.data?.sites.used ?? 0;
@@ -86,35 +120,41 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar — hidden below lg */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[220px] flex-col border-r bg-white lg:flex" style={{ borderColor: "var(--color-border-default)" }}>
-        <div className="flex h-14 items-center px-5">
-          <Link href="/dashboard" className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>Buildrik</Link>
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[262px] flex-col border-r bg-white lg:flex" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="flex h-14 shrink-0 items-center px-5">
+          <Link href="/dashboard" className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>Buildrick</Link>
         </div>
-        <nav className="flex-1 px-3 py-2">
-          <ul className="space-y-1">
-            {navItems.map((item) => {
-              const active = isActiveRoute(pathname, item.href);
-              const Icon = iconMap[item.icon as keyof typeof iconMap];
-              return (
-                <li key={item.href}>
-                  <Link href={item.href} className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    active ? "bg-red-50 text-[var(--color-primary)]" : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
-                  )}>
-                    <Icon className="h-5 w-5" />
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+        <nav className="flex-1 overflow-y-auto px-3 py-2">
+          {groups.map((group, gi) => (
+            <div key={group.label ?? `g${gi}`} className={gi > 0 ? "mt-4" : undefined}>
+              {group.label && (
+                <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>{group.label}</p>
+              )}
+              <ul className="space-y-0.5">
+                {group.items.map((item) => {
+                  const active = isActiveRoute(pathname, item.href);
+                  const Icon = iconMap[item.icon];
+                  return (
+                    <li key={item.href}>
+                      <Link href={item.href} className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                        active ? "bg-[var(--color-primary-subtle)] text-[var(--color-primary)]" : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
+                      )}>
+                        <Icon className="h-[18px] w-[18px] shrink-0" />
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </nav>
-        <div className="border-t px-4 py-3 space-y-2" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="shrink-0 border-t px-4 py-3 space-y-2" style={{ borderColor: "var(--color-border-default)" }}>
           <div className="flex items-center justify-between">
             <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>My Workspace</p>
             <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{
-              backgroundColor: plan === "FREE" ? "var(--color-bg-subtle)" : "#FEF2F2",
+              backgroundColor: plan === "FREE" ? "var(--color-bg-subtle)" : "var(--color-primary-subtle)",
               color: plan === "FREE" ? "var(--color-text-secondary)" : "var(--color-primary)",
             }}>
               {PLAN_LABELS[plan] ?? plan}
@@ -124,27 +164,15 @@ export function Sidebar() {
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-[11px]" style={{ color: "var(--color-text-secondary)" }}>Sites</span>
-                <span className="text-[11px] font-medium" style={{ color: "var(--color-text-primary)" }}>
-                  {sitesUsed}/{sitesLimit}
-                </span>
+                <span className="text-[11px] font-medium" style={{ color: "var(--color-text-primary)" }}>{sitesUsed}/{sitesLimit}</span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border-default)]">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${usagePct}%`,
-                    backgroundColor: usagePct >= 85 ? "#EF4444" : usagePct >= 60 ? "#EAB308" : "var(--color-success)",
-                  }}
-                />
+                <div className="h-full rounded-full transition-all" style={{ width: `${usagePct}%`, backgroundColor: usagePct >= 85 ? "var(--color-error)" : usagePct >= 60 ? "#EAB308" : "var(--color-success)" }} />
               </div>
             </div>
           )}
           {plan === "FREE" && (
-            <Link
-              href="/dashboard/billing"
-              className="flex items-center gap-1 text-[11px] font-medium hover:underline"
-              style={{ color: "var(--color-primary)" }}
-            >
+            <Link href="/dashboard/plans" className="flex items-center gap-1 text-[11px] font-medium hover:underline" style={{ color: "var(--color-primary)" }}>
               Upgrade
               <ArrowUpRight className="h-3 w-3" />
             </Link>
@@ -152,7 +180,6 @@ export function Sidebar() {
         </div>
       </aside>
 
-      {/* Mobile bottom tab bar — hidden at lg and above */}
       <MobileTabBar />
     </>
   );

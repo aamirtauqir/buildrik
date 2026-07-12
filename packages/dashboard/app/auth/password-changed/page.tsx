@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
 import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 
 export default function PasswordChangedPage() {
@@ -17,39 +15,31 @@ export default function PasswordChangedPage() {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          router.push("/auth/login");
+          router.push("/auth");
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-
     return () => clearInterval(interval);
   }, [router]);
 
   return (
     <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="check" color="green" />
-
-      <h1 className="text-auth-title text-auth-text-primary text-center">
-        Password changed
-      </h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-        Your password has been reset. You can now sign in.
-      </p>
+      <div className="text-center">
+        <h1 className="text-auth-title text-auth-text-primary">Password updated</h1>
+        <p className="text-auth-subtitle text-auth-text-muted mt-2">
+          Your password has been changed. Use it next time you log in.
+        </p>
+      </div>
 
       <div className="h-6" />
 
-      <AuthButton onClick={() => router.push("/auth/login")}>
-        Go to Sign In
-      </AuthButton>
+      <AuthButton onClick={() => router.push("/auth")}>Continue to log in</AuthButton>
 
       <div className="h-3" />
 
-      <p className="text-auth-fine text-auth-text-placeholder text-center">
-        Redirecting to sign in in {countdown}s...
-      </p>
+      <p className="text-auth-fine text-auth-text-placeholder text-center">Redirecting in {countdown}s…</p>
 
       <div className="h-4" />
 

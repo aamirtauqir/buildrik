@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, MoreHorizontal } from "lucide-react";
 import type { NotificationData } from "@buildrik/shared/schemas/notifications";
 
@@ -30,6 +31,15 @@ export function NotificationItem({
 }: NotificationItemProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // Navigate the notification target. Internal URLs go through the SPA router so
+  // a deleted target's destination `notFound()` renders the in-app not-found
+  // boundary gracefully instead of a hard full-page load to a dead resource.
+  function navigate(url: string) {
+    if (/^https?:\/\//i.test(url)) window.location.href = url;
+    else router.push(url);
+  }
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -47,7 +57,7 @@ export function NotificationItem({
       if (!notification.read) {
         onToggleRead(notification.id, true);
       }
-      window.location.href = notification.actionUrl;
+      navigate(notification.actionUrl);
     }
   }
 
@@ -73,14 +83,13 @@ export function NotificationItem({
             {timeAgo(notification.createdAt)}
           </span>
           {notification.actionUrl && (
-            <a
-              href={notification.actionUrl}
+            <button
               className="text-xs font-medium hover:underline"
               style={{ color: "var(--color-primary)" }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); navigate(notification.actionUrl!); }}
             >
               View
-            </a>
+            </button>
           )}
         </div>
       </div>

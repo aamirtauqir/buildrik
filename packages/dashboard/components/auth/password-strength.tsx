@@ -3,6 +3,8 @@ import { CheckCircle, Circle } from "lucide-react";
 
 interface PasswordStrengthProps {
   password: string;
+  /** "checklist" = 4-rule list (signup). "line" = single strength summary (mockup). */
+  variant?: "checklist" | "line";
 }
 
 const rules = [
@@ -12,7 +14,19 @@ const rules = [
   { label: "One special character (!@#$...)", test: (p: string) => /[!@#$%^&*(),.?":{}|<>]/.test(p) },
 ];
 
-export function PasswordStrength({ password }: PasswordStrengthProps) {
+export function PasswordStrength({ password, variant = "checklist" }: PasswordStrengthProps) {
+  if (variant === "line") {
+    if (!password) return null;
+    const passed = rules.filter((r) => r.test(password)).length;
+    const strong = passed === rules.length;
+    const text = strong ? "Strong password" : passed >= 2 ? "Fair password" : "Weak password";
+    return (
+      <p className={cn("text-auth-label", strong ? "text-auth-strength-pass" : "text-auth-text-muted")}>
+        {text}
+      </p>
+    );
+  }
+
   return (
     <div className="w-full bg-auth-strength-bg rounded-auth-input p-4 space-y-2">
       <p className="text-auth-label text-auth-text-secondary">Password must include:</p>

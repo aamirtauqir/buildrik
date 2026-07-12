@@ -4,12 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@lib/trpc/client";
+import { ArrowLeft } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -20,27 +19,33 @@ export default function ForgotPasswordPage() {
     onSuccess: () => {
       router.push(`/auth/check-inbox?type=reset&email=${encodeURIComponent(email)}`);
     },
-    onError: (err) => {
-      setError(err.message);
-    },
+    onError: (err) => setError(err.message),
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     forgotPasswordMutation.mutate({ email });
   };
 
   return (
     <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="key" color="blue" />
+      <button
+        type="button"
+        onClick={() => router.push("/auth")}
+        className="flex items-center gap-1 text-auth-label text-auth-text-muted hover:text-auth-text-secondary mb-5 self-start"
+      >
+        <ArrowLeft size={14} /> Back
+      </button>
 
-      <h1 className="text-auth-title text-auth-text-primary text-center">
-        Forgot your password?
-      </h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-        No worries, we&apos;ll send you reset instructions
-      </p>
+      <div className="text-center">
+        <h1 className="text-auth-title text-auth-text-primary">Reset your password</h1>
+        <p className="text-auth-subtitle text-auth-text-muted mt-2">
+          Enter the email tied to your account and we&apos;ll send a reset link.
+        </p>
+      </div>
+
+      <div className="h-6" />
 
       {error && (
         <>
@@ -49,30 +54,28 @@ export default function ForgotPasswordPage() {
         </>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
         <AuthInput
           label="Email"
+          hideLabel
           type="email"
-          placeholder="you@example.com"
+          placeholder="Your Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          autoFocus
         />
-
-        <div className="h-5" />
-
         <AuthButton type="submit" loading={forgotPasswordMutation.isPending}>
-          Send Reset Email
+          Send reset link
         </AuthButton>
       </form>
 
-      <div className="h-4" />
+      <div className="h-5" />
 
-      <div className="flex justify-center">
-        <Link href="/auth/login" className="text-auth-link text-auth-link hover:underline text-center">
-          ← Back to sign in
-        </Link>
-      </div>
+      <p className="text-auth-label text-auth-text-muted text-center">
+        Remember it?{" "}
+        <Link href="/auth" className="text-auth-link font-medium hover:underline">Log in</Link>
+      </p>
     </AuthCard>
   );
 }

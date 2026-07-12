@@ -24,7 +24,7 @@ function getConfig(variant: EmptyStateVariant): EmptyStateConfig {
     case "owner_new":
       return {
         icon: <Sparkles className={ICON_CLASS} />,
-        heading: "Welcome to Buildrik!",
+        heading: "Welcome to Buildrick!",
         description: "Build your first site in under 5 minutes.",
         showVideoArea: true,
         ctas: [

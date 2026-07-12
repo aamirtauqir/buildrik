@@ -7,21 +7,33 @@ const passwordRules = z
   .regex(/[0-9]/, "Must contain at least one number")
   .regex(/[!@#$%^&*(),.?":{}|<>]/, "Must contain at least one special character");
 
+// Email is case-insensitive: trim whitespace and lowercase before validating so
+// "Saqib@X.com" / "saqib@x.com " match the stored (lowercased) address on login,
+// signup, checkEmail, etc. Applied at the SSOT so every auth flow is consistent.
+export const emailField = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .email("Please enter a valid email address");
+
 export const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: emailField,
   password: z.string().min(8, "Password must be at least 8 characters"),
   rememberMe: z.boolean().optional().default(false),
+  // Cloudflare Turnstile token — required once an IP trips the failed-login
+  // threshold (server enforces; see auth router).
+  turnstileToken: z.string().optional(),
 });
 
 export const signupSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be under 100 characters"),
-  email: z.string().email("Please enter a valid email address"),
+  email: emailField,
   password: passwordRules,
   termsAccepted: z.literal(true, { errorMap: () => ({ message: "You must accept the terms" }) }),
 });
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: emailField,
 });
 
 export const resetPasswordSchema = z.object({
@@ -42,7 +54,7 @@ export const backupCodeSchema = z.object({
 });
 
 export const magicLinkSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: emailField,
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

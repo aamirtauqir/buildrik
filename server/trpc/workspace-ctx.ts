@@ -29,7 +29,7 @@ interface SessionContext {
 interface PrismaContext {
   workspaceMember: {
     findFirst: (args: {
-      where: { userId: string };
+      where: { userId: string; status: string; workspaceId?: string };
       select: { workspaceId: true };
     }) => Promise<{ workspaceId: string } | null>;
   };
@@ -45,19 +45,30 @@ export async function resolveWorkspaceId(ctx: WorkspaceCtx): Promise<string> {
   if (ctx.bearer?.apiToken?.workspaceId) {
     return ctx.bearer.apiToken.workspaceId;
   }
-  if (ctx.session?.user?.workspaceId) {
-    return ctx.session.user.workspaceId;
-  }
   const userId = ctx.session?.user?.id;
   if (!userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+  // Per-request revocation: the JWT-baked workspaceId is only honored if it is
+  // STILL an ACTIVE membership. A member removed mid-session (whose 30-day token
+  // still carries the old workspaceId) no longer resolves it here.
+  const sessionWs = ctx.session?.user?.workspaceId;
+  if (sessionWs) {
+    const active = await ctx.prisma.workspaceMember.findFirst({
+      where: { userId, workspaceId: sessionWs, status: "ACTIVE" },
+      select: { workspaceId: true },
+    });
+    if (active) {
+      return active.workspaceId;
+    }
+  }
+  // Fall back to any ACTIVE membership; none left → access revoked.
   const member = await ctx.prisma.workspaceMember.findFirst({
-    where: { userId },
+    where: { userId, status: "ACTIVE" },
     select: { workspaceId: true },
   });
   if (!member) {
-    throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
+    throw new TRPCError({ code: "FORBIDDEN", message: "Workspace access removed" });
   }
   return member.workspaceId;
 }

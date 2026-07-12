@@ -37,7 +37,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       {/* Date range picker */}
       <div className="flex items-center gap-2">
         {DATE_RANGE_OPTIONS.map((opt) => (
-          <button key={opt.value} onClick={() => onRangeChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors" style={{ backgroundColor: range === opt.value ? "#FEF2F2" : "transparent", color: range === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
+          <button key={opt.value} onClick={() => onRangeChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors" style={{ backgroundColor: range === opt.value ? "var(--color-primary-subtle)" : "transparent", color: range === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
             {opt.label}
           </button>
         ))}

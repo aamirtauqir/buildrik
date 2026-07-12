@@ -3,9 +3,8 @@
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
+import { AuthMessage } from "@/components/auth/auth-message";
+import { AuthButton } from "@/components/auth/auth-button";
 
 function LockedContent() {
   const searchParams = useSearchParams();
@@ -30,30 +29,25 @@ function LockedContent() {
   const secs = remaining !== null ? remaining % 60 : 0;
 
   return (
-    <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="lock" color="red" />
-      <h1 className="text-auth-title text-auth-text-primary text-center">Account locked</h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-        Too many failed attempts.
-        {!expired && remaining !== null && (
-          <> Try again in <strong>{mins}:{secs.toString().padStart(2, "0")}</strong></>
-        )}
-      </p>
-      <div className="h-4" />
-      {expired && (
-        <Link href="/auth/login" className="text-auth-link hover:underline text-center block font-semibold mb-3">
-          Back to sign in
-        </Link>
+    <AuthMessage
+      title="Account temporarily locked"
+      subtitle="Too many failed attempts. For your security this account is locked for a short while."
+    >
+      {!expired && remaining !== null && (
+        <p className="text-auth-input font-medium text-auth-text-primary tabular-nums">
+          {mins}:{secs.toString().padStart(2, "0")}
+        </p>
       )}
-      <Link href="/auth/forgot-password" className="text-auth-link hover:underline text-center block">
-        Reset your password
+      <Link href="/auth/forgot-password" className="w-full">
+        <AuthButton type="button">Reset password</AuthButton>
       </Link>
-      <div className="h-3" />
-      <Link href="mailto:support@buildrik.com" className="text-auth-link hover:underline text-center block">
+      <Link href="/auth" className="w-full">
+        <AuthButton type="button" variant="secondary">Back to log in</AuthButton>
+      </Link>
+      <Link href="mailto:support@buildrik.com" className="text-auth-label text-auth-link hover:underline text-center">
         Contact support
       </Link>
-    </AuthCard>
+    </AuthMessage>
   );
 }
 

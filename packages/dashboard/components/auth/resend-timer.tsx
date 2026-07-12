@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { AuthButton } from "./auth-button";
 
 interface ResendTimerProps {
   initialSeconds: number;
   onResend: () => void;
+  /** Button text when ready to resend. Defaults to "Resend". */
   label?: string;
 }
 
-export function ResendTimer({ initialSeconds, onResend, label = "Didn't receive it?" }: ResendTimerProps) {
+export function ResendTimer({ initialSeconds, onResend, label = "Resend" }: ResendTimerProps) {
   const [seconds, setSeconds] = useState(initialSeconds);
-  const [canResend, setCanResend] = useState(false);
+  const [canResend, setCanResend] = useState(initialSeconds <= 0);
 
   useEffect(() => {
     if (seconds <= 0) {
@@ -27,24 +29,11 @@ export function ResendTimer({ initialSeconds, onResend, label = "Didn't receive 
     setCanResend(false);
   }, [onResend, initialSeconds]);
 
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  const timeDisplay = `${mins}:${secs.toString().padStart(2, "0")}`;
-
-  if (!canResend) {
-    return (
-      <p className="text-auth-error text-auth-cta text-center">
-        Code expires in {timeDisplay}
-      </p>
-    );
-  }
+  const timeDisplay = `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`;
 
   return (
-    <p className="text-auth-subtitle text-auth-text-muted text-center">
-      {label}{" "}
-      <button onClick={handleResend} className="text-auth-link text-auth-link font-medium hover:underline">
-        Resend
-      </button>
-    </p>
+    <AuthButton type="button" variant="secondary" disabled={!canResend} onClick={handleResend}>
+      {canResend ? label : `Resend in ${timeDisplay}`}
+    </AuthButton>
   );
 }

@@ -27,7 +27,7 @@ export default function WsTransferInvite({ workspaceName = "My Workspace", accep
           </Text>
           <Hr style={{ borderColor: "#E2E8F0", marginTop: "32px" }} />
           <Text style={{ fontSize: "12px", color: "#94A3B8", textAlign: "center" as const }}>
-            Sent by Buildrik
+            Sent by Buildrick
           </Text>
         </Container>
       </Body>

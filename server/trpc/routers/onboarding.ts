@@ -3,16 +3,15 @@ import { router, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
   getOnboardingState,
-  selectRole,
-  setupProject,
   completeStep,
   completeDashboardTask,
   dismissOnboarding,
+  saveWizard,
+  completeWizard,
 } from "@/server/services/onboarding.service";
 import {
-  selectRoleSchema,
-  setupProjectSchema,
   completeDashboardTaskSchema,
+  wizardDataSchema,
 } from "@buildrik/shared/schemas/onboarding";
 
 export const onboardingRouter = router({
@@ -23,26 +22,6 @@ export const onboardingRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to load onboarding state" });
     }
   }),
-
-  selectRole: protectedProcedure
-    .input(selectRoleSchema)
-    .mutation(async ({ ctx, input }) => {
-      try {
-        return await selectRole(ctx.session.user.id, input.density);
-      } catch {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to save role" });
-      }
-    }),
-
-  setupProject: protectedProcedure
-    .input(setupProjectSchema)
-    .mutation(async ({ ctx, input }) => {
-      try {
-        return await setupProject(ctx.session.user.id, input);
-      } catch {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to save project setup" });
-      }
-    }),
 
   completeStep: protectedProcedure
     .input(z.object({ step: z.string() }))
@@ -65,6 +44,24 @@ export const onboardingRouter = router({
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to complete task" });
       }
     }),
+
+  saveWizard: protectedProcedure
+    .input(wizardDataSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await saveWizard(ctx.session.user.id, input);
+      } catch {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to save onboarding progress" });
+      }
+    }),
+
+  completeWizard: protectedProcedure.mutation(async ({ ctx }) => {
+    try {
+      return await completeWizard(ctx.session.user.id);
+    } catch {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to complete onboarding" });
+    }
+  }),
 
   dismiss: protectedProcedure.mutation(async ({ ctx }) => {
     try {

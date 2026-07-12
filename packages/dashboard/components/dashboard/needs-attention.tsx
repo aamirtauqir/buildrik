@@ -19,7 +19,7 @@ export function NeedsAttention() {
   if (query.isLoading || items.length === 0) return null;
 
   return (
-    <section className="mt-6 rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)", backgroundColor: "#FEF2F2" }}>
+    <section className="mt-6 rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-primary-subtle)" }}>
       <h2 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Needs attention</h2>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => {
@@ -31,7 +31,7 @@ export function NeedsAttention() {
               className="group flex items-center gap-3 rounded-lg border bg-white p-3 transition-colors hover:border-[var(--color-primary)]"
               style={{ borderColor: "var(--color-border-default)" }}
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}>
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}>
                 <Icon className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">

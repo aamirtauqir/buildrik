@@ -4,9 +4,6 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
-import { AuthButton } from "@/components/auth/auth-button";
 import { ResendTimer } from "@/components/auth/resend-timer";
 import { trpc } from "@lib/trpc/client";
 
@@ -17,22 +14,23 @@ function MagicLinkSentContent() {
 
   return (
     <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="mail" color="blue" />
-      <h1 className="text-auth-title text-auth-text-primary text-center">Check your email</h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
-        We sent a magic link to {email || "your email"}. Click the link to sign in. Expires in 15 minutes.
-      </p>
+      <div className="text-center">
+        <h1 className="text-auth-title text-auth-text-primary">Magic link on its way</h1>
+        <p className="text-auth-subtitle text-auth-text-muted mt-2">
+          We emailed a log-in link to{" "}
+          {email ? <span className="text-auth-text-secondary font-medium">{email}</span> : "your email"}. It expires in 15 minutes.
+        </p>
+      </div>
+
       <div className="h-6" />
-      <a href="mailto:" className="w-full">
-        <AuthButton type="button">Open Email App</AuthButton>
-      </a>
-      <div className="h-4" />
+
       <ResendTimer initialSeconds={60} onResend={() => resendMutation.mutate({ email })} />
-      <div className="h-3" />
-      <Link href="/auth/login" className="text-auth-link hover:underline text-center block">Use password instead</Link>
-      <div className="h-2" />
-      <Link href="/auth/login" className="text-auth-label text-auth-link hover:underline text-center block">← Back to sign in</Link>
+
+      <div className="h-4" />
+
+      <Link href="/auth/magic-link" className="text-auth-label text-auth-link hover:underline text-center block">
+        Try another email
+      </Link>
     </AuthCard>
   );
 }

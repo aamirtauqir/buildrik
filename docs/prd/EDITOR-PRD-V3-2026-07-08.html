@@ -1,0 +1,2938 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Buildrik Editor PRD v3.0</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--muted:#5b6472;--line:#e5e7eb;--accent:#2D6DFF;--code:#f4f6f8;--th:#f8fafc;--nav:#fafbfc;}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b2;--line:#232a33;--accent:#6ea8ff;--code:#161b22;--th:#161b22;--nav:#12161b;}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:15.5px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif;}
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+nav{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--nav);border-right:1px solid var(--line);padding:24px 16px}
+nav .brand{font-weight:700;font-size:15px;margin:0 8px 4px;letter-spacing:-.01em}
+nav .sub{color:var(--muted);font-size:12px;margin:0 8px 16px}
+nav a{display:block;padding:7px 10px;border-radius:6px;color:var(--fg);text-decoration:none;font-size:13.5px;margin-bottom:2px}
+nav a:hover{background:var(--code)}
+main{min-width:0;padding:48px 40px 140px;max-width:1100px}
+.chapter{margin-bottom:72px;scroll-margin-top:24px}
+.chapter-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border-bottom:2px solid var(--accent);display:inline-block;padding-bottom:4px;margin-bottom:20px}
+h1{font-size:1.7rem;line-height:1.2;margin:.2em 0 .4em;letter-spacing:-.02em}
+h2{font-size:1.3rem;margin:2em 0 .6em;padding-top:.6em;border-top:1px solid var(--line);letter-spacing:-.01em}
+h3{font-size:1.05rem;margin:1.5em 0 .4em}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+code{background:var(--code);padding:.12em .4em;border-radius:4px;font:13px/1.4 "SF Mono",ui-monospace,Menlo,monospace}
+pre{background:var(--code);padding:14px 16px;border-radius:8px;overflow-x:auto}pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:13.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600;white-space:nowrap}
+blockquote{margin:1em 0;padding:.2em 1em;border-left:3px solid var(--accent);color:var(--muted)}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+strong{font-weight:650}
+@media(max-width:900px){.layout{grid-template-columns:1fr}nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}}
+</style></head><body><div class="layout">
+<nav><div class="brand">Buildrik Editor PRD</div><div class="sub">v3.0 · main @ e5624ca1 · 2026-07-08</div>
+<a href="#master">Master — Editor PRD v3.0</a>
+<a href="#ch01">Ch.01 Shell · Rail · Panels</a>
+<a href="#ch02">Ch.02 Sidebar (11 tabs)</a>
+<a href="#ch03">Ch.03 Inspector</a>
+<a href="#ch04">Ch.04 Canvas</a>
+<a href="#ch05">Ch.05 Engine</a>
+<a href="#ch06">Ch.06 Design System · Catalog</a>
+<a href="#ch07">Ch.07 Blocks & Templates</a>
+<a href="#ch08">Ch.08 Media · Export · Preview</a>
+<a href="#ch09">Ch.09 AI · Services · Misc</a>
+<a href="#ch10">Ch.10 Server API · Data</a>
+<a href="#ch11">Ch.11 Flows (v3.0)</a>
+<a href="#ch12">Ch.12 Feature Catalog (v3.0)</a>
+</nav>
+<main>
+<section class="chapter" id="master"><div class="chapter-label">Master — Editor PRD v3.0</div><h1>Buildrik — PRD: Editor (M5)</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Version</strong></td>
+<td>3.0</td>
+</tr>
+<tr>
+<td><strong>Date</strong></td>
+<td>2026-07-08 (v2.0: 2026-07-07 · v1.0: 2026-07-06)</td>
+</tr>
+<tr>
+<td><strong>Source</strong></td>
+<td>Reverse-engineered — <code>main</code> @ <code>e5624ca1</code>. v1.0: 3 parallel scans. v2.0: <strong>10 deep per-module scans</strong> (~2.1M tokens). v3.0: 7 fresh cross-verify scans + <strong>flows volume</strong> (Ch.11) + <strong>master feature catalog</strong> (Ch.12).</td>
+</tr>
+<tr>
+<td><strong>Method</strong></td>
+<td>Nothing invented; uncertainty <code>[TBC]</code>. Citations <code>file:line</code> (<code>PKG</code> = <code>packages/editor/src</code>).</td>
+</tr>
+</tbody></table>
+<h2>Module chapters (v2.0 — deep dives, one file per module)</h2>
+<table>
+<thead>
+<tr>
+<th>Ch</th>
+<th>Scope</th>
+<th>File</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td>Shell, Topbar, Footer, Panels, Layers, Versions, Onboarding</td>
+<td><a href="#ch01">editor/01-shell-rail-panels.md</a></td>
+</tr>
+<tr>
+<td>02</td>
+<td>Sidebar rail + 11 tabs (Pages/Settings/Publish/History/AI/Insert/Media/Components/Templates)</td>
+<td><a href="#ch02">editor/02-sidebar.md</a></td>
+</tr>
+<tr>
+<td>03</td>
+<td>Inspector (18 sections, 7 profiles, edit-propagation contract)</td>
+<td><a href="#ch03">editor/03-inspector.md</a></td>
+</tr>
+<tr>
+<td>04</td>
+<td>Canvas (selection/drag/resize/inline-edit/snapping/keyboard)</td>
+<td><a href="#ch04">editor/04-canvas.md</a></td>
+</tr>
+<tr>
+<td>05</td>
+<td>Engine (document model, history, transactions, styling, storage)</td>
+<td><a href="#ch05">editor/05-engine.md</a></td>
+</tr>
+<tr>
+<td>06</td>
+<td>Design system, components catalog, themes, DSLinter</td>
+<td><a href="#ch06">editor/06-design-system-catalog.md</a></td>
+</tr>
+<tr>
+<td>07</td>
+<td>Blocks (63) &amp; Templates (18+11)</td>
+<td><a href="#ch07">editor/07-blocks-templates.md</a></td>
+</tr>
+<tr>
+<td>08</td>
+<td>Media, Export, Preview</td>
+<td><a href="#ch08">editor/08-media-export-preview.md</a></td>
+</tr>
+<tr>
+<td>09</td>
+<td>AI surfaces, Services layer, Wizard/Collab/Ecommerce/Animation</td>
+<td><a href="#ch09">editor/09-ai-services-misc.md</a></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Server API, publish/AI pipelines, plan rules, Prisma</td>
+<td><a href="#ch10">editor/10-server-api-data.md</a></td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Flows</strong> — 8 app flows, 12 user flows, 35 feature flows, dead-end map (v3.0)</td>
+<td><a href="#ch11">editor/11-flows.md</a></td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>Master feature catalog</strong> — every feature × status × backend × evidence + counts + new drift (v3.0)</td>
+<td><a href="#ch12">editor/12-feature-catalog.md</a></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>1–2. Executive summary</h2>
+<p>The editor is Buildrik&#39;s core product: a Vite-based visual site builder (<code>AquibraStudio</code>) with ~60 insertable blocks, a 3-tab inspector, a component/instance system, design tokens, AI editing (chat + agent + edit-command batches), versioning, and a Vercel publish pipeline. It is far more built than most docs assume — and its docs are its biggest liability: <strong>three authoritative documents disagree about what works</strong> (override-on-sync, interaction counts, edit-scope picker).</p>
+<p><strong>The single biggest risk:</strong> <em>governance features exist on the server but don&#39;t govern.</em> <code>Workspace.editsRequireApproval</code> is saved by settings but <strong>never read in the publish path</strong> — the entire client-review workflow is advisory; any ADMIN publishes regardless (<code>grep editsRequireApproval server/ → zero enforcement</code>). Same pattern client-side: the inspector&#39;s &quot;reset to master / is-overridden&quot; affordances are <strong>non-functional</strong> because two override path-schemes never match (<code>ComponentInstance.ts:257-278</code> builds <code>/elements/…</code> paths against stored <code>#/…</code> paths). The product&#39;s trust features — approval, override control — are the least trustworthy parts.</p>
+<h2>3. Users &amp; jobs</h2>
+<table>
+<thead>
+<tr>
+<th>User</th>
+<th>Entry</th>
+<th>Job</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Agency designer (OWNER/ADMIN/DESIGNER)</td>
+<td>dashboard &quot;Edit site&quot; → <code>/edit/:id</code> (needs <code>NEXT_PUBLIC_UNIFIED_EDITOR=true</code>, else dead legacy demo — CLAUDE.md env table)</td>
+<td>Build/style pages fast, push brand, publish</td>
+</tr>
+<tr>
+<td>Invited content editor (MEMBER)</td>
+<td><code>?view=client</code> → density <code>fewer</code> (<code>editorViewMode.ts:31-36</code>)</td>
+<td>Edit copy/images on assigned sites without breaking layout</td>
+</tr>
+<tr>
+<td>Workspace admin</td>
+<td>topbar publish / review resolve</td>
+<td>Gate quality: review, approve, publish</td>
+</tr>
+<tr>
+<td>Client (external)</td>
+<td>ShareLink preview (server model exists <code>schema.prisma:522</code>)</td>
+<td>View + approve — <strong>no editor surface</strong></td>
+</tr>
+</tbody></table>
+<h2>4. Success metrics <em>(proposed — partially instrumented)</em></h2>
+<p>Analytics reality: <strong>AI adoption IS instrumented</strong> (<code>ai.logAdoption</code> → <code>AiAdoptionEvent</code>, fire-and-forget <code>routers/ai.ts</code>); general product funnel is NOT (no PostHog/Segment/etc.). The accept/reject diff UI (<code>AITab.tsx:126-157</code>) is a ready-made signal nobody aggregates.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Definition</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Time-to-first-edit</td>
+<td>editor open → first applied change</td>
+<td>≤2 min (spec&#39;s own activation bar, onboarding spec L12)</td>
+</tr>
+<tr>
+<td>AI edit acceptance</td>
+<td>accepted ÷ (accepted+rejected) edit batches</td>
+<td>≥60% — instrument from existing diff UI</td>
+</tr>
+<tr>
+<td>Publish success</td>
+<td>publish jobs COMPLETED ÷ started</td>
+<td>≥95%</td>
+</tr>
+<tr>
+<td>Save-conflict rate</td>
+<td>ConflictModal shown ÷ sessions</td>
+<td>&lt;2%</td>
+</tr>
+<tr>
+<td>Override integrity</td>
+<td>instance syncs with <code>overridesDropped=0</code> ÷ syncs</td>
+<td>≥99% (event already emitted: <code>INSTANCE_SYNCED</code>, <code>ComponentInstances.ts:266-274</code>)</td>
+</tr>
+<tr>
+<td>Version restores</td>
+<td>restores ÷ active site-week</td>
+<td>baseline TBD (signal of trust in undo/versions)</td>
+</tr>
+<tr>
+<td>Quota-hit → upgrade</td>
+<td>UpgradeModal shown → billing visit</td>
+<td>≥20%</td>
+</tr>
+</tbody></table>
+<h2>5. User journeys (as built)</h2>
+<ul>
+<li><strong>J1 build:</strong> open editor → 4-tool rail (insert/pages/styles/site, <code>tabsConfig.ts:299-306</code>) → click-to-add or drag block (<code>useBlockInsertion.ts</code>) → style via inspector (3 tabs, per-breakpoint + pseudo-states) → autosave 5s debounce (<code>BuildrikSyncProvider.ts:494</code>).</li>
+<li><strong>J2 AI edit:</strong> AITab → scope element/page → chat or agent plan (max 8 steps) → streamed edit-command batch → accept/reject diff → applied in one transaction. Quota 403 → UpgradeModal → <code>/dashboard/billing</code>.</li>
+<li><strong>J3 componentize:</strong> save-as-component → instantiate → per-instance overrides (<code>#/</code> position paths) → master edit → sync re-applies overrides (F1a shipped; reorder survival F1b deferred).</li>
+<li><strong>J4 version rescue:</strong> HistoryTab → Time-Travel scrubber → preview banner → restore (client-side from server-mirrored snapshot; 50/site cap <code>site-version.service.ts:13</code>).</li>
+<li><strong>J5 publish:</strong> topbar Publish (flag <code>VITE_FEATURE_PUBLISH</code>) → prePublishChecks → ADMIN-only <code>sites.publish</code> → job QUEUED→BUILDING→DEPLOYING→COMPLETED, 2s poll → publishedUrl. Review flow exists but <strong>cannot block this</strong> (§13-A1).</li>
+<li><strong>J6 client review (broken loop):</strong> EDITOR submits review → ADMIN emails → resolve APPROVED/CHANGES_REQUESTED — but publish never checks it, and the external client (ShareLink) is not part of it.</li>
+</ul>
+<h2>6. Functional requirements (per surface, condensed)</h2>
+<p><strong>Shell</strong> (<code>AquibraStudio.tsx:603-611</code>): topbar (undo/redo, device toggles, preview, publish dropdown) · rail 4-tool default, <code>?rail=legacy</code> escape (11 tabs: add/ai/templates/assets/layers/pages/components/design/settings/publish/history, widths locked 280/320, <code>tabsConfig.ts:63-247</code>) · canvas · inspector (280px) · footer (sync pill, breadcrumb, zoom, structure ⌗).
+<strong>Elements:</strong> ~50 types (<code>element.ts:69-119</code>), ~60 registry blocks incl. 16 form controls + ecommerce (<code>blockRegistry.ts:96-174</code>). Click-to-add with smart-parent walk-up + nesting-error toasts (<code>useBlockInsertion.ts:66-165</code>); drag-drop with snap guides + touch + keyboard move. Multi-select with mixed-value detection (<code>ProInspector.tsx:155-191</code>).
+<strong>Inspector:</strong> 3 tabs (Style/Element/Effects), registry SSOT (<code>registry/index.tsx:56-65</code>); per-breakpoint + pseudo-state overrides w/ indicators; density <code>fewer</code> = first 3 sections + &quot;show full controls&quot; (<code>InspectorTabContent.tsx:174-230</code>). Defect: AllCSS section dead code (<code>devMode===false</code> hardcoded, not Pro-gated — <code>ProInspector.tsx:95</code>, complete-feature-list L94).
+<strong>Pages:</strong> JSON block tree per page (<code>Page.blocks</code>, sanitized on write <code>page.service.ts:110</code>); per-locale translations; slug auto-collision <code>-${Date.now()}</code>; plan gate <code>pagesPerSite</code>; no per-page publish status (site-level only); optimistic-concurrency via <code>updatedAt</code> → CONFLICT.
+<strong>Design tokens:</strong> 15 kinds, applied as CSS vars, dark-resolver aware (<code>TokenRegistryContext.tsx:157-192</code>). <strong>Defect: <code>persistAll</code> persists only 3 of 15 kinds</strong> — radius/shadow/motion/etc. lost on reload (<code>:198-202</code>).
+<strong>AI:</strong> two parallel entry surfaces — AITab (tRPC streaming, model picker: opus/sonnet/haiku/gpt-4o-mini, server-authoritative tier gating) and AIAssistantBar (legacy path via <code>shared/utils/openai</code>, dark-glass styling violating DESIGN.md light mandate <code>AIAssistantBar.tsx:179</code>). Edit commands: 14 types incl. set-token, set-style-variant, add-section (≤12 children), propose-action (<code>ai.service.ts:706</code>). Privileged action = only <code>site.publish</code>, always behind explicit ConfirmDialog + single-use 5-min token (<code>useAiActionGate.ts</code>, <code>action-confirmation.service</code>).
+<strong>Save/versions:</strong> autosave 5s debounce, empty-project data-loss guard, conflict modal w/ backup download; undo depth 100 (<code>config.ts:108</code>); versions mirrored to server, cap 50/site, restore client-side.
+<strong>Publish:</strong> ADMIN-only; payload caps 2MB/page, 16MB, 500 pages (<code>schemas/publish.ts:12-18</code>); Vercel via per-workspace OAuth; prod-without-pages honesty guard; 1 active job/site; stale cutoffs 5/15 min.
+<strong>Media:</strong> user-owned (not workspace-scoped — asymmetric by design, <code>media.service.ts:24-31</code>); storage quota gate + 80% warn; asset versions cap 5/25/100 auto-prune; AI alt-text (Claude Haiku, never overwrites user text, TOCTOU-guarded <code>alt-text.service.ts:141-156</code>); stock = Unsplash + Pexels server-proxied.
+<strong>Collab:</strong> engine exists (OT, presence, cursors, locks over SSE) but <strong>flag-off, demo-only, &quot;6 known non-convergence P1s&quot;</strong> (<code>runtimeEnv.ts:60-64</code>). Server op-log: 1.5s poll, 24h retention — latency = poll, not realtime.
+<strong>Comments:</strong> full server surface (create incl. VIEWER, list, workspace triage, resolve — <code>routers/comments.ts</code>) with pin coordinates — <strong>zero editor UI</strong> (client grep empty). Backend built, front door missing <code>[TBC where UI was planned]</code>.</p>
+<h2>7. State machines</h2>
+<table>
+<thead>
+<tr>
+<th>Machine</th>
+<th>States</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Site.status</td>
+<td>DRAFT → PUBLISHING → PUBLISHED (→DRAFT unpublish)</td>
+<td>String col, site-level only</td>
+</tr>
+<tr>
+<td>PublishBuildJob</td>
+<td>QUEUED → BUILDING → DEPLOYING → COMPLETED | FAILED | CANCELLED</td>
+<td>terminal clears raw HTML <code>log</code></td>
+</tr>
+<tr>
+<td>ReviewRequest</td>
+<td>PENDING → APPROVED | CHANGES_REQUESTED</td>
+<td>1 PENDING/site; <strong>gates nothing</strong></td>
+</tr>
+<tr>
+<td>Comment</td>
+<td>OPEN ⇄ RESOLVED</td>
+<td>flat, no threading</td>
+</tr>
+<tr>
+<td>AIGenerationJob</td>
+<td>QUEUED → GENERATING_* → … | CANCELLED</td>
+<td>cancellable pre-terminal</td>
+</tr>
+<tr>
+<td>Publish uiState (client)</td>
+<td>idle→publishing→published|failed|cancelled</td>
+<td>2s poll (<code>usePublishJob.ts</code>)</td>
+</tr>
+<tr>
+<td>ComponentInstance</td>
+<td>synced ⇄ stale (version-gated) → detached</td>
+<td>overridesPreserved/Dropped emitted</td>
+</tr>
+</tbody></table>
+<h2>8. Business &amp; plan rules (master)</h2>
+<p><strong>Plan-gated</strong> (<code>lib/constants/plan-limits.ts</code>, FREE/PRO/BUSINESS): sites 3/15/50 · pagesPerSite 10/30/50 · domains 0/3/20 · team 1/5/25 · storageMB 500/5120/51200 · fileUploadMaxMB 10/50/200 <strong>(defined but unwired — presign uses fixed per-context caps, §13-A5)</strong> · AI gens/mo 3/20/∞ · AI prompts/day 10/200/∞ · form subs 100/2500/∞ · redirects 100/500/∞ · integrations 0/2/∞ · analytics retention 7/30/90d · share-link expiry 7/30/90d · share-link passwords ✗/✓/✓ · asset versions 5/25/100 · template versions ∞ (all — enforced nowhere, dead).</p>
+<p><strong>Hard-coded:</strong> autosave debounce 5s · undo depth 100 · site versions 50/site · theme snapshots 10/site · publish poll 2s · publish payload 2MB/16MB/500p · stale job 5/15min · worker 300s · collab poll 1.5s, retention 24h, batch 200 · upload TTL 10min; per-context MB (site_media 50, avatar 5, favicon 0.5, og 2, ticket 10) · AI plan steps ≤8 · page-edit caps: 200 elements / 120 tokens / 100 assets · add-section ≤12 children · action-confirm TTL 5min · actions rate 20/60s · AI hourly anti-abuse 3/hr · quota reset midnight UTC.</p>
+<h2>9. API surface (condensed)</h2>
+<p>pages (8) · sites (publish family 5) · media (16: folders/assets/versions/quota/alt-text/stock) · upload (presign/confirm/limits) · ai (content/page/layout/summarize/milestone/quota/streamPrompt-subscription/componentSchema/logAdoption) · actions (propose/confirm, 20/60s) · theme (9, <code>agency_layer</code>-flagged + ADMIN) · reviews (3) · comments (4) · siteVersions (4) · siteComponents (6) · userTemplates (3). Non-tRPC: collab ops POST + SSE, publish worker, cron cleanups. Guards: <code>guardSiteEditor</code>(EDITOR) writes / <code>guardSiteAccess</code>(any member) reads; publish/theme = ADMIN; media = <strong>user-owned only</strong>. Full tables: server-side scan (§A of the map).</p>
+<h2>10. Enums</h2>
+<p>Element types (<del>50) · blocks (</del>60) · AI models <code>claude-opus-4-7 / claude-sonnet-4-6 (default) / claude-haiku-4-5 / gpt-4o-mini / ollama</code> (tier defaults haiku/sonnet/opus) · edit-commands (14) · rail tools (4) + tabs (11) · density <code>full/fewer</code> · devices desktop/tablet/mobile · publish/job/review/comment enums (§7) — all String columns, no DB enums.</p>
+<h2>11. Non-functional</h2>
+<ul>
+<li><strong>Security:</strong> server-side edit-command validation gate (style/attr allow-lists, unsafe-value regex, exact-id) <code>ai.service.ts</code> · DOMPurify = sanitize SSOT · privileged actions single-use tokens, role re-checked at execute · OAuth tokens AES-256-GCM.</li>
+<li><strong>Resilience:</strong> atomic quota reserve/release · empty-project save guard · idempotent version mirror · publish honesty guard · alt-text TOCTOU guard.</li>
+<li><strong>Debt:</strong> override path-scheme split (§13-A2) · token persist gap (§13-A3) · dual AI surfaces + DESIGN.md violation (§13-B) · dead root <code>src/editor/</code> copy · ~25 TODO/deprecated markers.</li>
+</ul>
+<h2>12. Spec-vs-built delta</h2>
+<p>Docs corpus: 14 specs/audits/plans (inventory in specs-map). The 10 truths:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Item</th>
+<th>Verdict</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Override-on-sync</td>
+<td><strong>Partial; 3 docs disagree.</strong> Style+attr survive (F1a <code>00eaa131</code>); content/trait disputed (complete-feature-list L92 🔴 vs design-reconciliation 07-02 &quot;all 4 survive&quot;); reset/is-overridden UI dead either way (path mismatch)</td>
+<td><code>ComponentInstances.ts:242</code>, <code>ComponentInstance.ts:257-278</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Edit-scope picker (element↔master)</td>
+<td><strong>NOT built</strong> — complete-feature-list ✅ is stale; only AI ScopeChip exists</td>
+<td>07-02 reconcile L17</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Inline-AI rewrite/tone bar</td>
+<td>NOT built (alt-text leg only; RichTextEditor has zero AI actions)</td>
+<td>07-02 L18</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Custom CSS Pro-gating</td>
+<td>Dead code — <code>devMode===false</code> never renders; not Pro-gated</td>
+<td><code>ProInspector.tsx:95</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Unified ⌘K</td>
+<td>Target; live = 2-3 fragmented palettes</td>
+<td>editor-wireframe §29 L1004</td>
+</tr>
+<tr>
+<td>6</td>
+<td>CMS front-door + per-record publish</td>
+<td>Target; dynamic pages unreachable via UI alone; <code>cms.dynamicPages</code> router orphan</td>
+<td>editor-wireframe §10, feature-list L517</td>
+</tr>
+<tr>
+<td>7</td>
+<td>DS-push / component-browser / blast-radius</td>
+<td>Backend shipped (<code>69fe715f</code>,<code>c6ae723f</code>); <strong>UI unverified/remaining</strong></td>
+<td>5-features L204</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Topbar-slim + inspector 6→2 levels</td>
+<td>ux-audit targets, open (G-1, G-3, D-1 High)</td>
+<td>ux-audit-20260621 L107-125</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Interaction triggers</td>
+<td>Count disputed: 7 (wireframe §5, feature-list) vs 13 (07-02 reconcile, <code>InteractionRuntime.ts:164-253</code>)</td>
+<td>unresolved</td>
+</tr>
+<tr>
+<td>10</td>
+<td>&quot;Dark-only&quot; token/layers plans</td>
+<td>Stale — light flip 2026-04-18 (CLAUDE.md); plans predate it</td>
+<td>design-token plan L46</td>
+</tr>
+</tbody></table>
+<p>Also: F1b slotKey deferred · templates 3→1 collapse &quot;won&#39;t do&quot; · seed-gallery claim contradicted by feature-list (&quot;seeds none&quot;) · sections-mode icon grid unverified.</p>
+<h2>13. Gaps &amp; decisions register</h2>
+<p><strong>A — broken/dead in code (8):</strong>
+A1 <strong><code>editsRequireApproval</code> saved but never enforced</strong> — review flow gates nothing (migration exists, zero server reads) · A2 <strong>override reset/is-overridden non-functional</strong> (path-scheme mismatch <code>#/</code> vs <code>/elements/</code>) + <code>syncToMaster</code> stub (<code>ComponentInstance.ts:295-338</code>) · A3 <code>persistAll</code> drops 12/15 token kinds (<code>TokenRegistryContext.tsx:198-202</code>) · A4 comments backend complete, editor UI absent · A5 <code>fileUploadMaxMB</code> plan limit unwired at presign · A6 dead root <code>src/editor/</code> (3 stale files) + AllCSS dead code + ComponentsPanelV2 AI stub (<code>:158</code>) · A7 <code>ai.getQuotaStatus</code> orphan (0 editor consumers) + AI-site-generation stub (&quot;no AI branch → blank site&quot;) · A8 <code>templateVersionsCap</code> + <code>TemplateVersion</code> model dead.</p>
+<p><strong>B — product decisions (7):</strong>
+B1 approval gate: enforce at publish (block unless APPROVED when flag on) ya setting delete karo — half-built trust feature worst option · B2 dual AI surfaces: AITab vs AIAssistantBar consolidate (Bar = legacy path + dark-glass DESIGN.md violation) · B3 collab: flag-off demo w/ 6 P1s — invest (real WS/convergence) or cut from marketing · B4 comments: build editor UI (server ready) or descope · B5 media user-owned vs workspace-scoped — multi-workspace quota ambiguity (<code>media.service.ts:24-31</code>) · B6 interaction-count dispute resolve (7 vs 13) — one doc must win · B7 <code>ai.summarize</code>/<code>milestoneSuggest</code> quota-free — cap or accept.</p>
+<p><strong>C — security (2):</strong> C1 review-approval bypass is also an authz statement (any ADMIN publishes even when workspace demands review) · C2 AllCSS raw-CSS editor must stay dead until Pro-gate + sanitize review.</p>
+<p><strong>D — spec-only (from §12):</strong> edit-scope picker · inline-AI bar · unified ⌘K · CMS front-door · topbar-slim · inspector collapse · F1b slotKey · PanelShell system (ux-audit root cause: &quot;the founder&#39;s &#39;AI-designed&#39; feeling, located&quot; — L117,131).</p>
+<p><strong>E — design↔code drift:</strong> AIAssistantBar dark glassmorphism vs light-theme mandate · <code>--ls-*</code> indigo remnants (layers plan) vs cobalt-only rule · stale dark-only plans · Figma M5 page vs built editor not diffed this pass <code>[TBC]</code>.</p>
+<h2>13b. v2.0 register addendum (new findings from deep scan — chapter cites inside)</h2>
+<p><strong>A — broken/dead (new):</strong> A9 DEPLOYING publish status declared everywhere, written nowhere (Ch.10) · A10 <code>listSitesSchema</code> omits PUBLISHING — mid-publish sites unfilterable (Ch.10) · A11 AI site-gen + <code>ai.page</code> hardcode gpt-4o-mini, bypassing PLAN_MODELS tiers — paid model quality unenforced on those paths (Ch.10) · A12 AI-gen job stranding: fire-and-forget dispatch, no reaper (Ch.10) · A13 dual conflicting arrow-key handlers on canvas (Ch.04) · A14 <code>contact-form</code> block exported but unregistered — unreachable (Ch.07) · A15 duplicate token IDs in DEFAULT_TOKENS (radius/shadow sm+md ×2) (Ch.06) · A16 EmailService cloud providers throw (route unimplemented); FormSubmissionService in-memory only (Ch.09) · A17 image-gen + streaming fake in openai facade; PageWizard &quot;AI&quot; simulated, inputs discarded (Ch.09) · A18 WelcomeModal + SpotlightOverlay orphans — spotlight ids carried by steps, nothing consumes (Ch.01) · A19 useAdvancedSettings value-auto-expand dead for kebab keys (Ch.03) · A20 publish worker MVP no-op steps shown as completed; lighthouseScore always null (Ch.10).</p>
+<p><strong>B — product decisions (new):</strong> B8 Redirects/Headers/Localization saved-but-unenforced with &quot;not yet live&quot; banners — ship enforcement or label beta (Ch.02) · B9 two responsive query sets (1023/767 vs 991/575) + two nesting caps (50/30) + two token taxonomies (9/14) — pick one each (Ch.05) · B10 SEO score UI labels contradict algorithm (+10/+40 shown, +20/none real) (Ch.02) · B11 brand-name chaos ×5 (Aquibra/aquibra.io/buildrick/buildrik/dudo) across UI copy, storage keys, help links, export title — user-visible in exports and help links (Ch.02/05/07/08) · B12 &quot;Preview as client&quot; is <code>?view=client</code> only — no tokenized share link despite ShareLink model (Ch.08, ties v1.0 open-Q1) · B13 summarize/milestoneSuggest quota-free (= v1.0 B7, now with exact cites) · B14 feature flags COLLABORATION/PLUGINS/VERSION_HISTORY=false contradict shipped code (Ch.05).</p>
+<p><strong>C — security (new):</strong> C3 EmailService custom template renders caller HTML unescaped (Ch.09) · C4 collab ops route trusts client clientId/op JSON — spoofable (Ch.05, production-blocked anyway) · C5 upload onUploadCompleted never throws → quota-exceeded silently logs, orphan blobs possible (Ch.10).</p>
+<p><strong>E — drift (new):</strong> hero attributes schema omits overlay props; two CSS-var prefixes inside blocks; footer year hardcoded 2024; publish target copy <code>buildrik.app</code> vs slug preview <code>aquibra.io</code> (Ch.07/02).</p>
+<h2>14. Release readiness</h2>
+<p><strong>Must-fix (trust core):</strong> A1/B1 approval-gate decision + enforcement · A2 override path unification (revenue-trust-plan already scoped it as a real arc; until fixed, &quot;reset to master&quot; lies to users) · A3 token persistence (users lose 12 kinds of design decisions on reload — silent data loss).
+<strong>Should-fix:</strong> B2 AI consolidation + E theme violation · A4/B4 comments decision · A5 plan-limit wiring · §12 doc reconciliation (one truth doc; complete-feature-list has 2 known-stale rows).
+<strong>Can-ship:</strong> current build/style/save/version/publish core — it is genuinely solid (validation gates, honesty guards, atomic quotas, conflict UX are senior-grade).
+<strong>Open questions:</strong> 1) Is client-facing review (ShareLink approval) the intended M6 wedge? Server pieces exist disconnected. 2) Collab investment vs cut — 6 P1s is a rewrite, not a polish. 3) Who owns doc-truth reconciliation cadence? Three SSOTs drifting is how #2-style stale-✅ rows happen.</p>
+<hr>
+<p><em>Companion PRDs: <code>BUILDRIK-PRD-COMPLETE.md</code> (M1 auth + M2 onboarding) · billing PRD in chat log 2026-07-06. Scan maps: 3 agent reports (client/server/specs), session 2026-07-06.</em></p>
+</section>
+<section class="chapter" id="ch01"><div class="chapter-label">Ch.01 Shell · Rail · Panels</div><h1>Editor PRD · Ch.01 — Shell, Rail, Panels, Onboarding</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · paths under <code>packages/editor/src/editor/</code></p>
+</blockquote>
+<h2>1.1 Surfaces</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Job</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AquibraStudio</td>
+<td>Root shell: providers (Tooltip 500ms delay, Toast, ErrorBoundary), composer init, wires everything</td>
+<td><code>shell/AquibraStudio.tsx:122,603-610</code></td>
+</tr>
+<tr>
+<td>Topbar</td>
+<td>Brand/exit, undo/redo/history, breakpoint switcher (wide/desktop/tablet/mobile), save pill, AI ✨, Preview ⌘P, Publish, ⋯ menu, ⌘K</td>
+<td><code>shell/Topbar.tsx:199</code></td>
+</tr>
+<tr>
+<td>StudioFooter</td>
+<td>32px bar: Structure ⌗ (4-tool mode), sync pill, breadcrumb <code>body › tag</code>, dims, zoom −/+ (presets 25–200), &quot;v2.14.0&quot;</td>
+<td><code>shell/StudioFooter.tsx:16-24,56</code></td>
+</tr>
+<tr>
+<td>StudioPanels</td>
+<td>3-column orchestrator (rail+drawer / canvas / inspector / fullpage)</td>
+<td><code>shell/StudioPanels.tsx:167</code></td>
+</tr>
+<tr>
+<td>StudioModals</td>
+<td>15+ modals</td>
+<td><code>shell/StudioModals.tsx:130</code></td>
+</tr>
+<tr>
+<td>PublishDropdown</td>
+<td>Split button, 4 workflow states</td>
+<td><code>shell/PublishDropdown.tsx:151</code></td>
+</tr>
+<tr>
+<td>PageTabBar</td>
+<td>Page switcher tabs: rename F2 + live slug preview, duplicate, delete (confirm + 8s Undo toast), set-home 🏠; can&#39;t delete home/last page</td>
+<td><code>shell/PageTabBar.tsx:37,160-171</code></td>
+</tr>
+<tr>
+<td>Layers panel</td>
+<td>Tree: search + SR announcements, drag reorder (30%/70% zones), hide/lock (localStorage per page), rename, group, 11 context actions, ⚡ instance badge, M/T hidden badges</td>
+<td><code>panels/layers/index.tsx:24,88-176</code></td>
+</tr>
+<tr>
+<td>VersionHistoryPanel</td>
+<td>Save version (name ≤50), restore/delete/compare (Visual diptych / Semantic list, cap 20 changes), AI summary (60s cooldown), hover 300ms snapshot, virtualized date groups</td>
+<td><code>panels/VersionHistoryPanel.tsx:43</code></td>
+</tr>
+<tr>
+<td>RichTextEditor</td>
+<td>WYSIWYG overlay: headings, 7 sizes, B/I/U/S, lists, align, colors, link</td>
+<td><code>panels/RichTextEditor.tsx:35</code></td>
+</tr>
+<tr>
+<td>Onboarding</td>
+<td>7-step linear checklist + achievement modals (4s auto-dismiss), collapses on element select</td>
+<td><code>onboarding/useOnboardingOrchestrator.ts:114</code></td>
+</tr>
+</tbody></table>
+<h2>1.2 Key behaviors</h2>
+<ul>
+<li><strong>Save pill</strong> 4 variants ok/saving/warn/error, clickable retry; labels incl. &quot;Offline — changes queued&quot;; relative-ago refresh 30s (<code>Topbar.tsx:187-195,270-317</code>).</li>
+<li><strong>Client view</strong> (<code>?view=client</code>): Publish → &quot;Send for review&quot; popover (note ≤500) (<code>Topbar.tsx:463-529</code>); density <code>fewer</code>.</li>
+<li><strong>Publish workflow states</strong> draft/in-review/approved/published drive label+options; ⚠ <strong>only Publish Now/Directly/Update wired — Submit-for-Review/Approve/Unpublish are no-ops</strong> (&quot;backend RBAC Phase 7&quot;, <code>PublishDropdown.tsx:163-165</code>). Approve disabled: &quot;Can&#39;t approve your own submission&quot; (<code>:99-103</code>).</li>
+<li><strong>Conflict handling</strong>: SAVE_CONFLICT_EVENT → ConflictModal Reload / Save-backup (<code>buildrik-backup-{ts}.json</code>) / Overwrite (<code>AquibraStudio.tsx:278-538</code>).</li>
+<li><strong>Wizard on blank canvas</strong> unless dismissed/starter-seen (<code>AquibraStudio.tsx:140-153</code>).</li>
+<li>4-tool rail default ON (<code>?rail=legacy</code> escape, <code>editorViewMode.ts:34</code>).</li>
+</ul>
+<h2>1.3 State machines</h2>
+<table>
+<thead>
+<tr>
+<th>FSM</th>
+<th>States</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Onboarding phase</td>
+<td>active → done (skipAll / last step); replayAll → active; schema v3</td>
+<td><code>useOnboardingOrchestrator.ts:31,60-213</code></td>
+</tr>
+<tr>
+<td>Publish job UI</td>
+<td>idle → publishing → published | failed | cancelled; poll 2000ms; republish only after terminal</td>
+<td><code>usePublishJob.ts:22-30,96,162-172</code></td>
+</tr>
+<tr>
+<td>Publish workflow</td>
+<td>draft/in-review/approved/published</td>
+<td><code>PublishDropdown.tsx:17</code></td>
+</tr>
+<tr>
+<td>Save</td>
+<td>idle/saving/error → variant ok/saving/warn/error</td>
+<td><code>useStudioState.ts:40-44</code>, <code>Topbar.tsx:292-301</code></td>
+</tr>
+<tr>
+<td>Sync</td>
+<td>connected/syncing/offline</td>
+<td><code>useStudioState.ts:60</code></td>
+</tr>
+<tr>
+<td>Review submit</td>
+<td>idle/sending/sent/error</td>
+<td><code>Topbar.tsx:234</code></td>
+</tr>
+</tbody></table>
+<h2>1.4 Business rules (magic numbers)</h2>
+<p>AUTOSAVE_DEBOUNCE 1000ms shell-level (<code>config.ts:113</code>) · achievement dismiss 4000ms · publish poll 2000ms · AI summary cooldown 60s · version name ≤50, review note ≤500 · compare cap 20 · row height 64/overscan 5 · layers drop-error clear 3s · zoom presets [25,50,75,100,125,150,200] · device dims wide 1440×900 / desktop 1280×800 / tablet 768×1024 / mobile 375×812 (<code>StudioFooter.tsx:17-24</code>) · preview fake-load 600ms, export 500ms (<code>StudioHeader.tsx:216,225</code>) · ConflictModal z 2147483646 · block re-click guard 150ms · hardcoded state colors in PublishDropdown/OnboardingChecklist/ConflictModal (component-theme exceptions, <code>PublishDropdown.tsx:55-78</code>)</p>
+<h2>1.5 Defects / orphans (feeds §13)</h2>
+<ol>
+<li><strong>ORPHAN WelcomeModal</strong> — exported, never mounted (<code>onboarding/index.ts:22</code>)</li>
+<li><strong>ORPHAN SpotlightOverlay</strong> — steps carry spotlightTarget ids, nothing consumes → spotlight inert (<code>onboardingSteps.ts:47-101</code>)</li>
+<li>Orphan hooks: useOverlayState, useDeviceZoom (duplicate logic, unimported); useTemplateManager/useDataManager/useMediaManager exported unconsumed (<code>shell/index.ts:26-28</code>)</li>
+<li>Publish workflow half-wired (see 1.2)</li>
+<li>Footer &quot;Connected · main&quot; — branch label static (<code>StudioFooter.tsx:130</code>)</li>
+<li><code>document.execCommand</code> (deprecated) in CommandPalette + RichTextEditor (<code>CommandPalette.tsx:83,90</code>)</li>
+<li>Overlay toggles inconsistent between useOverlayState and useStudioState (<code>useOverlayState.ts:70-97</code>)</li>
+<li>DrawerPanel likely legacy (unimported by StudioPanels)</li>
+</ol>
+<h2>1.6 Integration</h2>
+<p>Services: BuildrikSyncProvider (load/save/conflict), PublishService, version/component/cms/templateSync, ReviewService, AssetUploadService, AltTextService (auto-trigger on UPLOAD_COMPLETE, model claude-haiku-4-5), adoptionTracker. HTTP: <code>POST /api/trpc/ai.summarize</code> (<code>useAISummary.ts:109-123</code>). Feature flags: publish, collab, dsAi. Events consumed/emitted: full lists <code>useComposerInit.ts:308-316</code>, <code>useEditorEventListeners.ts</code>, <code>StudioPanels.tsx:248-294</code>. localStorage: page-wizard-dismissed, panel-state, layers-*, onboarding keys, MY_TEMPLATES.</p>
+</section>
+<section class="chapter" id="ch02"><div class="chapter-label">Ch.02 Sidebar (11 tabs)</div><h1>Editor PRD · Ch.02 — Sidebar (rail + 11 tabs)</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · paths under <code>packages/editor/src/editor/sidebar/</code> unless noted</p>
+</blockquote>
+<h2>2.1 Structure</h2>
+<p>Rail (60px, 3 zones creation/structure/config) + variable-width drawer (<code>LeftSidebar.tsx:105,475-513</code>). Canonical registry = 11 tabs (<code>rail/tabsConfig.ts:79-247</code>):</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>label</th>
+<th>⌨</th>
+<th>width</th>
+<th>pattern</th>
+<th>router target</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>add</td>
+<td>Insert</td>
+<td>A</td>
+<td>280</td>
+<td>drill-in</td>
+<td>BuildTab</td>
+</tr>
+<tr>
+<td>ai</td>
+<td>AI</td>
+<td>I</td>
+<td>320</td>
+<td>standalone</td>
+<td>AITab</td>
+</tr>
+<tr>
+<td>templates</td>
+<td>Templates</td>
+<td>T</td>
+<td>320</td>
+<td>drill-in</td>
+<td>TemplatesTab</td>
+</tr>
+<tr>
+<td>assets</td>
+<td>Media</td>
+<td>M</td>
+<td>320</td>
+<td>standalone</td>
+<td>MediaTab</td>
+</tr>
+<tr>
+<td>layers</td>
+<td>Layers</td>
+<td>Z</td>
+<td>280</td>
+<td>standalone</td>
+<td>→ panels/layers (thin shell)</td>
+</tr>
+<tr>
+<td>pages</td>
+<td>Pages</td>
+<td>P</td>
+<td>280</td>
+<td>standalone</td>
+<td>PagesTab</td>
+</tr>
+<tr>
+<td>components</td>
+<td>Components</td>
+<td>⇧A</td>
+<td>280</td>
+<td>drill-in</td>
+<td>ComponentsTab / V2 (flag)</td>
+</tr>
+<tr>
+<td>design</td>
+<td>Design</td>
+<td>D</td>
+<td>320</td>
+<td>standalone</td>
+<td>→ design-system/ui/DesignSystemTab (external)</td>
+</tr>
+<tr>
+<td>settings</td>
+<td>Settings</td>
+<td>S</td>
+<td>320</td>
+<td>drill-in</td>
+<td>SettingsTab</td>
+</tr>
+<tr>
+<td>publish</td>
+<td>Publish</td>
+<td>U</td>
+<td>280</td>
+<td>standalone</td>
+<td>PublishTab</td>
+</tr>
+<tr>
+<td>history</td>
+<td>History</td>
+<td>H</td>
+<td>280</td>
+<td>standalone</td>
+<td>HistoryTab (→ panels/VersionHistoryPanel)</td>
+</tr>
+</tbody></table>
+<p>Width rule locked 2026-05-22: 280 list/tree, 320 browse (<code>tabsConfig.ts:60-69</code>). TabRouter mounts one tab at a time (<code>TabRouter.tsx:6-19</code>). E3 4-tool rail collapses 11 → insert/pages/styles/site + assistant(topbar)/structure(footer); ⚠ config comment &quot;no behaviour wired yet&quot; is stale-ish — live rail renders from GROUPED_TABS_CONFIG (<code>tabsConfig.ts:273-311</code>).</p>
+<h2>2.2 Per-tab features (highlights)</h2>
+<ul>
+<li><strong>Pages</strong>: CRUD + folders (localStorage-only), bulk multi-select (⌘/Shift/Space) w/ bulk duplicate/move/delete, ⌘K palette, drag reorder, per-page settings drawer (SEO/Social/Advanced), copy link, &quot;Search listings&quot; SEO table view (<code>PagesTab.tsx:84,229-255</code>, <code>usePages.ts:34-333</code>).</li>
+<li><strong>Settings</strong>: drill-in, 10 sections in 3 groups (SITE/DISTRIBUTION/PLUMBING) + 3 workspace deep-links (Domains/Members/Billing), central dirty counter + sticky savebar (<code>SettingsTab.tsx:72-120,798-815</code>).</li>
+<li><strong>Publish</strong>: status badge, URL copy, 5-item checklist, read-only subscriber to Topbar&#39;s publishJob.</li>
+<li><strong>History</strong>: Changes/Saves views, Time-Travel scrubber (Ctrl+Shift+T), auto-milestone banner.</li>
+<li><strong>AI</strong>: Chat (accept/reject/regenerate diffs) + Agent (multi-step plan, approve/skip/auto-apply), model picker, scope chip.</li>
+<li><strong>Insert/BuildTab</strong>: exclusive-accordion catalog, search, drag/click insert. (&quot;Sections mode&quot; ~1300 lines deleted 2026-04-23 as unreachable, <code>BuildTab.tsx:6-12</code>.)</li>
+<li><strong>Media</strong>: 3 modes (280/320 launcher, 560 expanded, fullpage LibraryManager), type pills, stock modal, folders, bulk ops, detail overlay.</li>
+<li><strong>Components</strong>: category groups, create-from-selection, instantiate, variant swap, detach; MAX 100 (<code>useComponentsState.ts:13,445</code>).</li>
+<li><strong>Templates</strong>: 4-col grid, 2-stage filters, apply-to-current/add-as-page, usage drawer; panel 320 → 700 when detail open (<code>TemplatesTab.tsx:131-143</code>).</li>
+</ul>
+<h2>2.3 Validation rules</h2>
+<ul>
+<li>Slug: normalize (lowercase, spaces→hyphens, strip non <code>[a-z0-9-/]</code>); errors empty/uppercase/spaces/invalid; duplicate check (<code>utils/slug.ts:3-27</code>, <code>usePageSettings.ts:201-216</code>).</li>
+<li>⚠ SEO title counter shows /60 but maxLength 80 (<code>SeoTab.tsx:149,172-173</code>); desc counter /160 but slices 200 (<code>:211,218</code>).</li>
+<li>Head-code: tag-balance check &quot;Unclosed HTML tag detected&quot; (<code>usePageSettings.ts:71-80</code>). Save blocks on slugError/head error/empty password (<code>:242-257</code>). Autosave 500ms; ⌘S immediate.</li>
+<li>GA4 <code>/^G-[A-Z0-9]{10}$/i</code>; Meta Pixel <code>/^\d{15,16}$/</code> (<code>AnalyticsScreen.tsx:12,52</code>).</li>
+<li>Redirects: fromPath starts <code>/</code>, type 301/302 (<code>RedirectsScreen.tsx:84-93</code>).</li>
+<li>SEO score algorithm (max 100; noIndex → 0): title 10-60 +20, clean slug +20, desc 50-160 +30, title≥30 +10, desc≥100 +10, non-default slug +10 (<code>utils/seoScore.ts:10-22</code>).</li>
+</ul>
+<h2>2.4 State machines</h2>
+<p>Template apply idle→confirming→applying→success|error (15s timeout, <code>useTemplateApply.ts:82-163</code>) · AI agent idle→planning→running→done; step pending→running→awaiting→applied|skipped|nochange|failed (<code>useAgentRunner.ts:32-191</code>) · AI scope idle→locked during stream (<code>useAIScope.ts:19-72</code>) · page-settings save clean→saving→error (<code>usePageSettings.ts:19</code>) · settings drill-in root⇄section w/ 180ms lock + dirty guard (<code>SettingsTab.tsx:262-527</code>).</p>
+<h2>2.5 Enums</h2>
+<p>PageStatus ×7 live/draft/hidden/password/scheduled/error/external (<code>pages/types.ts:9</code>) — ⚠ drawer visibility only live/hidden/password (mismatch, <code>usePageSettings.ts:42</code>) · PlanTier starter/pro/enterprise · AIModel ×4 default sonnet (<code>ai/types.ts:1-7</code>) · MediaTypeFilter all/img/vid/ico/fnt · DiscSource unsplash/pexels/pixabay · TemplateIndustry ×5 · HSTS presets ×5 · locales ×24.</p>
+<h2>2.6 Business rules</h2>
+<p>MAX_COMPONENTS 100 · no page cap (guards: last page, homepage) · search shows at ≥5 pages · storage 1GB local fallback, server override, -1 unlimited (<code>media.ts:129</code>, <code>useUploadState.ts:110-123</code>) · MAX_RECENT elements 8 vs templates 3 (⚠ two values) · forms PER_PAGE 20 · delete-undo 8000ms · plan gating: only advanced+integrations require pro (<code>settings/types.ts:61-64</code>).</p>
+<h2>2.7 Defects (feeds §13)</h2>
+<ol>
+<li><strong>Brand chaos ×5 in one module</strong>: <code>buildrick</code> CSS/storage, <code>buildrik.com/app</code> publish, <code>aquibra.io/com</code> help+slug domains — help links diverge docs.buildrik.com vs docs.aquibra.com (<code>LeftSidebar.tsx:469</code> vs <code>FullPageView.tsx:51</code>)</li>
+<li><strong>SEO score labels lie</strong>: UI says &quot;slug +10 / indexing +40&quot;, code awards +20/none (<code>SeoTab.tsx:120-124</code> vs <code>seoScore.ts</code>)</li>
+<li><strong>PublishTab computes 7 checks, renders 5</strong> — hasContent, hasSocialImg dropped (<code>PublishTab.tsx:230-327</code>); &quot;SEO title&quot; checks site-level but hint points per-page</li>
+<li><strong>Redirects &amp; Headers saved but NOT enforced</strong> on live sites (explicit banners, <code>RedirectsScreen.tsx:156-161</code>, <code>HeadersScreen.tsx:160-164</code>); Localization routing &quot;Phase D&quot;</li>
+<li><strong>Integrations all &quot;Coming Soon&quot;</strong> — doc links only (<code>IntegrationsScreen.tsx:2-4,81</code>)</li>
+<li>Branding section = nav-map, no fields (<code>SettingsTab.tsx:130-211</code>)</li>
+<li>Dead style constants (Headers/Localization/Redirects screens); BuildTab favorites plumbing vestigial (<code>useBuildTab.ts:260-287</code>)</li>
+<li>Fixed-bug archaeology: 4 legacy <code>page:*</code> events never emitted (<code>usePages.ts:116-124</code>)</li>
+</ol>
+<h2>2.8 Integration</h2>
+<p>composer.elements (pages CRUD, importHTML, recordAppliedTemplate), composer.components, composer.media/mediaOps, project settings/save. tRPC: siteDetail.redirects/settings, forms.*, media.checkStorageQuota. Services: BuildrikSyncProvider (plan tier), MediaVersionService, adoptionTracker, streaming AI. Feature flags publish/componentsV2/dsAi/collab (all default OFF prod, <code>TabRouter.tsx:28,148,181</code>). ENV <code>VITE_DASHBOARD_URL</code> for deep-links.</p>
+</section>
+<section class="chapter" id="ch03"><div class="chapter-label">Ch.03 Inspector</div><h1>Editor PRD · Ch.03 — Inspector</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · paths under <code>packages/editor/src/editor/inspector/</code></p>
+</blockquote>
+<h2>3.1 Architecture</h2>
+<ul>
+<li>Root branches: multi-select → MultiSelectToolbar; none → EmptyState; single → full panel (breadcrumb, ReachScopeStrip, tabs, breakpoint+state strip, sections, VariantSection) (<code>ProInspector.tsx:242-458</code>).</li>
+<li><strong>3 tabs</strong> (concept axis): ids style/element/effects, <strong>relabeled Look/Layout/Effects</strong> (<code>InspectorTabs.tsx:23-28</code>); arrow-key cycling; auto-switch to profile&#39;s defaultTab on selection (<code>useInspectorState.ts:48-77</code>).</li>
+<li><strong>18-section registry</strong> (SSOT, 5 family files, <code>_shared.tsx:55-76</code>, <code>registry/index.tsx:56-65</code>); <code>styleKeys</code> slicing for perf, invariant-tested (<code>_shared.tsx:180-232</code>).</li>
+<li><strong>7 element profiles</strong> decide section order per type (<code>config/elementProfiles.ts:52-179</code>): CONTAINER (fallback + warn-once on unknown), TEXT, FLEX, GRID, MEDIA, BUTTON, INPUT; type map <code>:192-252</code>.</li>
+<li>shouldRender gates: typography=isTextLike; flex/grid=container-or-item; link=[link,button,cta]; <strong>all-css=devMode only — devMode hardcoded false → never renders</strong> (<code>element.tsx:74</code>, <code>ProInspector.tsx:95</code>).</li>
+<li><strong>Density</strong>: full | fewer — fewer keeps first 3 sections + &quot;Simplified view… Show all controls&quot; (<code>?density=full</code>) (<code>InspectorTabContent.tsx:174,219-237</code>).</li>
+<li>Tiering: index 0 primary, 1-2 secondary, ≥3 tertiary (<code>:182-183</code>); default expanded = first 2 style sections, persisted per <code>${elementType}:${sectionId}</code> in <code>buildrick-inspector-sections-v2</code> (<code>useInspectorSections.ts:26,150-163</code>).</li>
+</ul>
+<h2>3.2 Sections (what users edit)</h2>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Basic</th>
+<th>Advanced (count)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Size</td>
+<td>W/H + token-chain (SPACING tokens → <code>var(--buildrick-design-…)</code>)</td>
+<td>min/max W/H, object-fit (5) — <code>SizeSection.tsx:46-374</code></td>
+</tr>
+<tr>
+<td>Spacing</td>
+<td>Webflow-style nested margin/padding box, link-all per group</td>
+<td>row/col gap (2) — <code>SpacingSection.tsx:43-210</code></td>
+</tr>
+<tr>
+<td>Typography</td>
+<td>FontPicker (Google), size/weight(9)/line-height/letter-spacing/decoration/style + TYPE token chains</td>
+<td>color, align, transform, white-space, word-break, spacing, indent, vertical-align (5) — <code>FontControls.tsx:29-256</code></td>
+</tr>
+<tr>
+<td>Background</td>
+<td>color/gradient/image segmented; gradient linear/radial + angle 0-360; image + browse</td>
+<td>size/position(9)/repeat/attachment/blend (4) — <code>BackgroundSection.tsx:46-385</code></td>
+</tr>
+<tr>
+<td>Border</td>
+<td>width/style(9)/color</td>
+<td>per-side + outline ×4 (8); schema variant behind <code>buildrick:schema-border</code> flag — <code>BorderSection.tsx:64-188</code>, <code>featureFlags.ts:27</code></td>
+</tr>
+<tr>
+<td>Corner radius</td>
+<td>quad tl/tr/br/bl, linked default true (shorthand vs longhands) — <code>CornerRadiusSection.tsx:33-61</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Effects</td>
+<td>opacity 0-100, shadow presets ×7 + inner ×7, transform (scale 0-200/rotate ±180/move/skew ±45, composeTransform merge), transition, cursor ×13, filters (blur 0-20 etc., composeFilter), blend ×10, text-shadow, will-change — <code>EffectsSection.tsx:34-480</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Grid</td>
+<td>8 col templates, auto-flow, gaps, 9-dot alignment, item col/row + span shortcuts — <code>GridSection.tsx:43-334</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Flexbox</td>
+<td>EnableFlexPrompt; direction/wrap/9-dot align/justify/gaps; item grow/shrink/basis/align-self/order — <code>flexbox/*</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Layout</td>
+<td>display ×6 cards, ConstraintControl <strong>Fixed/Fill/Hug</strong> (Fill=100%, Hug=fit-content, Fixed default 200px), position ×5 + offsets + z-index (only when positioned)</td>
+<td>overflow/box-sizing/visibility/float/clear — <code>ConstraintControl.tsx:15-152</code>, <code>PositionControls.tsx:34-244</code></td>
+</tr>
+<tr>
+<td>Quick actions</td>
+<td>Block/Flex/Grid/Hide cards, batch display writes — <code>QuickActionsSection.tsx:101-136</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Link</td>
+<td>type none/page/url/email/phone/anchor; href encoding <code>#page:id</code>/mailto/tel/#; target _blank+noopener — <code>LinkSection.tsx:43-312</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Element props</td>
+<td>per-type configs (16 input types, video flags, select options 1/line, columns 2-6, icon picker) + custom data attrs — <code>elementProperties/config.ts:23-321</code></td>
+<td></td>
+</tr>
+<tr>
+<td>CSS classes</td>
+<td>chip list + autocomplete (project classes, max 8) — <code>CSSClassesSection.tsx:107-207</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Animation / Interactions / Visibility</td>
+<td>enable+editor / 14 triggers ×42 presets, delay 0-5s / per-breakpoint hide via <code>--hide-&lt;bp&gt;</code> — <code>interactions/types.ts:13-148</code>, <code>VisibilitySection.tsx:36-91</code></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><strong>MoreSettingsToggle</strong> = progressive disclosure w/ count badges (size 5, spacing 2, border 8, typography 5, bg-image 4); auto-expands on search match or existing values (<code>MoreSettingsToggle.tsx:23-57</code>, <code>useAdvancedSettings.ts:88-133</code>).</p>
+<h2>3.3 Edit propagation (the contract)</h2>
+<ul>
+<li>Cascade: base → breakpoint overlay → pseudo (<code>computeEffectiveStyles</code>, <code>cssContext.ts:52-74</code>).</li>
+<li>Single edit: instant local preview + <strong>300ms debounced</strong> engine write in <code>beginTransaction(&quot;style-change&quot;)</code> (<code>useStyleHandlers.ts:106-192</code>). Desktop → <code>el.setStyle</code>; breakpoint → <code>composer.styles.setBreakpointStyle</code>; pseudo → <code>setRule(selector,{pseudo,mediaQuery})</code> (<code>:145-181</code>).</li>
+<li>Multi-select: merged view (prop shown only if all agree, else &quot;Mixed&quot;); batch write one transaction (<code>useBatchStyleHandler.ts:87-214</code>); only 5 batch fields (bg-color, color, radius, padding, font-size, <code>BatchStylePanel.tsx:94-120</code>); align needs ≥2, distribute ≥3 (<code>MultiSelectToolbar.tsx:141-142</code>).</li>
+<li>Reach model: This item / <strong>All like this</strong> (peer propagate + blast-radius confirm) / Whole site (hint → Styles tab) (<code>ReachScopeStrip.tsx:93-138</code>).</li>
+<li>Token binds stored as <code>var(--buildrick-design-&lt;id&gt;)</code> never raw (<code>tokenBindingDetection.ts:17-41</code>).</li>
+<li>Context-driven disables: inline elements no W/H/vertical spacing; gaps need flex/grid; offsets need positioned; flex-item props need flex parent (<code>cssContext.ts:150-198</code>).</li>
+<li>Input validation: numeric regex, keyword units disable numeric field, Escape reverts + <code>aria-invalid</code> (<code>InputControls.tsx:122-246</code>).</li>
+</ul>
+<h2>3.4 State machines</h2>
+<p>Tab+pseudo (pseudo resets to normal on element change, <code>useInspectorState.ts:81-83</code>) · pseudo pills normal/hover/focus/active/disabled hidden until used (<code>ProInspector.tsx:149-153</code>) · bg type mode color/gradient/image re-derived (<code>BackgroundSection.tsx:46-50</code>) · pick-mode emit/reset (<code>usePickModeReset.ts:16-26</code>) · per-element scrollTop persistence (<code>ProInspector.tsx:198-232</code>).</p>
+<h2>3.5 Defects (feeds §13)</h2>
+<ol>
+<li><strong>all-css dead in production</strong> (219 lines never render) — devMode hardcoded (matches v1.0 A6)</li>
+<li><strong>useAdvancedSettings value-auto-expand broken for kebab keys</strong>: looks up <code>styles[&quot;minWidth&quot;]</code> but styles use <code>min-width</code> → never fires (<code>useAdvancedSettings.ts:116-122</code>)</li>
+<li><strong>ColorInput opacity stub</strong> — no alpha channel, 0/100 only (<code>ColorInput.tsx:46-48,180</code>)</li>
+<li>Interactions Timeline button removed (was console.warn stub) — no timeline exists (<code>InteractionEditor.tsx:160-162</code>)</li>
+<li><code>propertiesRegistry.ts</code> (1109 lines) mostly spec/reference — sections hardcode controls; many property types (linkPicker, gridTemplate, mappingBuilder…) have no renderer</li>
+<li>Schema-driven border/spacing pipeline parallel + off-by-default (localStorage flag)</li>
+<li>Fixed-bug markers: debounce dropped last keystroke (now flushed), transform wipe (now composed), columns double-mutation (now early-return)</li>
+</ol>
+<h2>3.6 Integration</h2>
+<p>Engine: element.setStyle/removeStyle, composer.styles.<em>, composer.components.updateInstanceVariant, AlignmentHandler, cms.bindings (BindingPopover). Token registries via TokenRegistryContext; DSBindingChip states token/preset/off-ds; beginner-mode bind hints via useDSModeOptional. Events: element:updated re-reads, inspector:pick-</em>, UI_OPEN_DESIGN_PANEL/BUILD_PANEL.</p>
+</section>
+<section class="chapter" id="ch04"><div class="chapter-label">Ch.04 Canvas</div><h1>Editor PRD · Ch.04 — Canvas</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · base <code>packages/editor/src/editor/canvas/</code></p>
+</blockquote>
+<h2>4.1 Capabilities</h2>
+<ul>
+<li><strong>Selection</strong>: SSOT = engine SelectionManager, React mirrors via events (<code>hooks/useComposerSelection.ts:96-108</code>). Click / Shift+click additive / ⌘click click-through cycling / double-click first child / triple-click deep-select (<code>useSelectionBehavior.ts:74-264</code>). Locked elements toast + block (<code>:88-115</code>). Hit expansion for small elements. Inspector pick-mode (crosshair, Escape cancels) (<code>Canvas.tsx:159-181,415-434</code>). Root excluded everywhere.</li>
+<li><strong>Drag</strong>: event delegation survives innerHTML recreation (<code>useCanvasElementDrag.ts:151-503</code>); Alt+drag = clone (<code>:216-240</code>); multi-drag payload <code>application/x-aquibra-multi</code>; custom ghost ≤300px removed after 50ms (BUG-018); touch long-press 500ms/5px cancel (<code>drag/useTouchDrag.ts:33-36</code>); drop chain multi→element→component→catalog→template→block (<code>drag/useDropExecution.ts:263-282</code>); DataTransfer snapshotted synchronously (browsers zero it, <code>:172-184</code>); OS image drop → upload + src (<code>:219-261</code>).</li>
+<li><strong>Resize/rotate</strong>: engine ResizeHandler; 8 handles (edges only if &gt;50px); rotation offset 24px, Shift 15° snap, aria slider 0-360; live W×H readout; hidden for locked (<code>overlays/SelectionHandles.tsx:81-208</code>, <code>SelectionBoxOverlay.tsx:426-533</code>).</li>
+<li><strong>Inline text edit</strong>: double-click, whitelisted tags (p…blockquote), no nested ids; Enter commits/Escape reverts; sanitize + setContent + save (<code>useCanvasInlineEdit.ts:31-211</code>). Rich commands via Selection API not execCommand; unsafe URLs rejected (<code>useCanvasInlineCommands.ts:46-131</code>).</li>
+<li><strong>Snapping</strong>: threshold 5px ÷ scale, sibling edges+centers, cap 5 lines, magenta overlay (<code>useCanvasSnapping.ts:31-184</code>); engine smart guides for drag-over; ruler guides persisted <code>buildrick-guides</code>.</li>
+<li><strong>Zoom</strong>: presets [10…300] step to next/prev; fit-to-screen 64px breathing clamp [0.1,5] (<code>shared/constants/canvas.ts:381-387</code>, <code>Canvas.tsx:260-282</code>). No free-pan mode.</li>
+<li><strong>Device preview</strong>: DEVICE_SIZES wide 1920 / desktop 100% / tablet 768×1024 / mobile 375×812 / watch 196×230; CSS device frame only mobile/tablet (<code>Canvas.types.ts:47-56</code>, <code>DeviceFramePreview.tsx:54-231</code>).</li>
+<li><strong>Context menu</strong>: nearest id + elementsFromPoint stack picker; data frozen at open; 4 submenus + standalone (<code>Canvas.tsx:437-462</code>, <code>menus/contextMenuRegistry.ts:49-105</code>).</li>
+<li><strong>Insertion UX</strong>: empty-canvas CTA (Browse templates/Start blank); QuickAddBar 5 blocks; palette quick-add; nesting-validated drops + column placeholder clearing + success animation (<code>CanvasEmptyCTA.tsx</code>, <code>drag/dropOperations.tsx:378-486</code>).</li>
+</ul>
+<h2>4.2 Keyboard</h2>
+<p>Canvas-scoped (<code>useCanvasKeyboard.ts</code>): ⌘A all · Tab/⇧Tab cycle · ⇧F10 context menu · Del/Backspace delete (multi = one txn, excludes locked) · Esc clear · arrows tree-nav (↑↓ siblings ←parent →child) · ⌘arrows 1px, ⇧arrows 10px, Alt-arrows reorder · ⌘D dup · ⌘C/⌘⌥C copy/copy-styles · ⌘V/⌘⌥V paste/paste-styles · ⌘X cut — all toasted w/ Undo. Cheat sheet &#39;?&#39;. Palette ⌘⇧P.
+⚠ <strong>Second overlapping window-level arrow handler</strong> <code>drag/useKeyboardMove.ts</code> (arrows = reorder/reparent) conflicts with canvas arrows — see defects.</p>
+<h2>4.3 State machines</h2>
+<p>No single canvas-mode enum — implicit flags: editing.id · pickMode · DragSessionState {isDragOver, draggingElementId, dropTargetId, dropPosition before/after/inside, isValidDrop, invalidDropReason, dropSlotRect} (<code>useDragSession.ts:35-73</code>) · clone/axis refs · touch refs · isResizing/isRotating · SectionDragState · MarqueeState (min-drag 5px, <code>useCanvasMarquee.ts:13-186</code>). Engine DragManager = drag SSOT.</p>
+<h2>4.4 Enums</h2>
+<p>DropPosition ×4 · DropErrorType ×8 (<code>useCanvasDragDrop.ts:27-35</code>) · InvalidDropReason ×9 (<code>DropFeedbackOverlay.tsx:18-28</code>) · CursorContext ×9 → CURSOR_MAP (<code>useCursorIntelligence.ts:23-80</code>) · AxisConstraint ×3 · HandlePosition ×8 · CanvasOverlayState {guides,spacing,grid,rulers,badges,xray}.</p>
+<h2>4.5 Business rules</h2>
+<p>Snap 5px (⚠ comment says 4) · grid 10px · zoom 10-300 step 10 (⚠ engine THRESHOLDS say 500 max) · element MIN 10 MAX 10000 (⚠ shared tokens minElementSize 20 — conflict) · drop edge zones 25% · drop slot 48px · drag throttle 50ms · auto-scroll edge 60/speed 2-20 (⚠ panel-drag 50/15) · multi-click 400ms/5px · rotation snap 15° · keyboard steps 1/10/50 · rulers 20/100/10 · z-scale 1→5500 (⚠ SmartGuides hardcodes 9999) · quick-style presets (padding 16, border 1px #ccc, shadow 0 2px 8px) · toasts 2-5s.</p>
+<h2>4.6 Defects (feeds §13)</h2>
+<ol>
+<li><strong>Dual conflicting arrow-key handlers</strong> (canvas vs window) — double-execution risk (<code>useCanvasKeyboard.ts:242-312</code> vs <code>useKeyboardMove.ts:61-176</code>); step magnitude dead in the latter</li>
+<li>Constant conflicts: minElementSize 20 vs 10; auto-scroll 60 vs 50; snap comment 4 vs 5; z 9999 vs scale</li>
+<li>GSAP selection animation disabled &quot;FOR STABILITY&quot;, code retained (<code>SelectionBoxOverlay.tsx:316-321</code>)</li>
+<li>Catalog drop v1 = placeholder insert, &quot;future renderer arc&quot; (<code>dropOperations.tsx:492-536</code>)</li>
+<li>Duplicate type defs (DragModifiers/AxisConstraint ×2); dead <code>payloads</code> arg cast <code>as any</code> (<code>useDropExecution.ts:265-278</code>)</li>
+<li>Bug-fix archaeology: BUG-009/012/015/018; 5 dead event listeners removed (<code>useCanvasSync.ts:44-49</code>); context Copy/Paste separate-clipboards fixed (<code>menus/actions/editActions.ts:18-24</code>)</li>
+<li>Palette &quot;Open SEO&quot; honest fallback — drawer deep-link pending (<code>useCanvasCommandPalette.ts:209-217</code>)</li>
+</ol>
+<h2>4.7 Integration</h2>
+<p>Engine: selection/elements/history/commands/canvas.{resize,drag,indicators}/media/mediaOps/components/styles/cms/designSystem.tokenBindingResolver/collab. Events consumed/emitted per lists (<code>useCanvasSync.ts:74-80</code>, <code>Canvas.tsx:299-513</code>). DOM contract: <code>data-buildrick-id</code>, <code>.buildrick-canvas</code>, innerHTML memoized against reconciler wipes (<code>Canvas.tsx:349-363,497-509</code>).</p>
+</section>
+<section class="chapter" id="ch05"><div class="chapter-label">Ch.05 Engine</div><h1>Editor PRD · Ch.05 — Engine (document core)</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · base <code>packages/editor/src/</code></p>
+</blockquote>
+<h2>5.0 Orientation</h2>
+<p>Headless document core; <code>Composer.ts</code> orchestrates ~30 managers; <code>EventEmitter</code> is the only engine→UI path (<code>engine/AGENTS.md:1-14</code>). <strong>Brand naming split</strong>: code &quot;Aquibra&quot;, DOM/data attrs &quot;buildrick&quot;, user-facing &quot;Buildrik&quot; (<code>shared/constants/config.ts:18</code>, <code>engine/styles/StyleEngine.ts:51</code>).</p>
+<h2>5.1 Document model</h2>
+<ul>
+<li><strong>ElementData</strong> (serialized node): id, type, tagName?, attributes?, classes?, styles?, breakpointStyles?, content?, children?, traits?, draggable?, droppable?, resizable?, locked?, data?, dataBindings? (<code>shared/types/element.ts:34-67</code>). Live tree = <code>Element</code> class instances w/ 4 delegates (Styles/Children/Operations/Serialization — 500-line file limit, <code>engine/elements/Element.ts:27-91</code>). Registry = flat <code>Map&lt;id, Element&gt;</code>; live instances are SSOT, <code>root</code> data reconstructed on export (<code>ElementManager.ts:26-29</code>, <code>manager/PageManager.ts:367-377</code>). ⚠ <code>buildElementTree</code> <strong>mutates input</strong> — history must clone around it (<code>ElementManager.ts:290-311</code>). animation/interactions stashed in <code>data</code> bag, not first-class (<code>ElementOperations.ts:181-244</code>).</li>
+<li><strong>PageData</strong>: id, name, slug?, isHome?, root, styles?, settings?, meta?, updatedAt?, slugManuallySet?, slugHistory? (<code>shared/types/project.ts:122-155</code>). Root always <code>container/div.buildrick-page-root</code> (<code>PageManager.ts:70-75</code>). Insertion-ordered Map = page order (<code>:100-103,321-340</code>). PageManager syncs 3 sources per mutation: Map + router + typed <code>PROJECT_CHANGED</code> (<code>:4-10</code>). PageSettings.visibility: live|hidden|password (<code>project.ts:165-178</code>). PageMeta = forward-compat JSONB + appliedTemplates[] (<code>:109-120</code>).</li>
+<li><strong>ProjectData</strong>: version, pages[], pagesOrder?, styles[], assets[], metadata?, settings?, dsSchemaVersion? (<code>project.ts:30-51</code>). <code>exportProject()</code> hardcodes version &quot;1.0.0&quot;, empties assets (<code>Composer.ts:494-506</code>).</li>
+</ul>
+<h2>5.2 Core operations</h2>
+<ul>
+<li>CRUD (<code>manager/ElementCRUD.ts</code>): createElement (droppable = CONTAINER_TYPES, <code>:30-51</code>); removeElement <strong>blocks page root</strong>, reassigns selection to parent, recursive (<code>:84-147</code>); moveElement clamps index (<code>:152-191</code>); duplicate/paste clone with fresh ids (<code>:196-250</code>, <code>ElementManager.ts:316-322</code>). wrap/unwrap/replaceWith/insertBefore/After (<code>ElementOperations.ts:64-172</code>); group/ungroup (<code>ElementManager.ts:206-247</code>).</li>
+<li><strong>Clipboard = in-memory Composer field</strong> (not system clipboard) + separate styleClipboard (<code>Composer.ts:95-99</code>); ⌘C/⌘X/⌘V default commands (<code>commands/defaultCommands.ts:104-149</code>).</li>
+<li><strong>Undo/redo</strong> (<code>HistoryManager.ts</code>): JSON-Patch diffs + checkpoint every 10, max 100 entries, coalesce 500ms (<code>:70-74</code>); canUndo needs length&gt;1 (baseline checkpoint, <code>:607-611</code>); undo/redo <strong>replace whole tree via importProject</strong> + selection revalidation (<code>:483-534</code>); <code>flushPending()</code> SSOT at start of both (<code>:247-274</code>); trim promotes next patch to checkpoint (<code>:586-603</code>); patch-path-divergence bail-outs &quot;iter 13 P0-9&quot; (<code>:459-491</code>); restoreSnapshot clone-before-import P0 2026-06-09 (<code>:407-424</code>); time-travel via restoreEntry/getEntrySnapshot (<code>:645-699</code>).</li>
+<li><strong>Transactions</strong>: deep-clone snapshot at outermost depth, nesting counter; rollback via <code>runWithoutTracking(importProject)</code> (<code>Composer.ts:80-83,712-777</code>).</li>
+<li><strong>Autosave</strong> (<code>storage/StorageAdapter.ts</code>): debounce 5000ms on PROJECT_CHANGED, only when dirty (<code>:45-57</code>); ⚠ <strong>no conflict handling</strong> — unconditional overwrite; redacts email apiKey + published password at rest (<code>:176-210</code>); ⚠ autosave path does NOT clear dirty flag — only explicit saveProject() does (<code>Composer.ts:435-447</code>).</li>
+</ul>
+<h2>5.3 Styling engine</h2>
+<ul>
+<li><strong>Two parallel representations</strong>: (a) element inline styles + breakpointStyles{desktop,tablet,mobile}; (b) StyleEngine global rules Map flushed to <code>&lt;style id=&quot;aquibra-styles&quot;&gt;</code> on RAF (<code>StyleEngine.ts:27-54,584-605</code>).</li>
+<li>Resolution: base styles → component override map on top (<code>ElementStyles.ts:154-162</code>); computeStyles merges element+class rules; global styles &quot;will be enhanced&quot; = not wired (<code>StyleEngine.ts:639-661</code>).</li>
+<li><strong>Breakpoints desktop-first</strong>: desktop=base, tablet <code>(max-width:1023px)</code>, mobile <code>(max-width:767px)</code> (<code>shared/constants/breakpoints.ts:15-58</code>); setBreakpointStyle writes rule + mirrors data (<code>StyleEngine.ts:192-222</code>). ⚠ <strong><code>setDeviceRule</code> uses conflicting 991/575 queries</strong> (<code>:162-180</code>).</li>
+<li><strong>Tokens</strong>: css var <code>--buildrick-design-${id}</code> (<code>designSystem/types.ts:128-130</code>); binding syntax <code>{{token.&lt;id&gt;}}</code> whole-value only (<code>TokenBindingResolver.ts:23-50</code>); engine-side writes history-aware in labeled transactions (<code>Composer.ts:151-291</code>); usage recompute microtask-coalesced (<code>:293-313</code>).</li>
+<li><strong>Dark</strong>: ColorMode light|dark|system persisted <code>buildrik:colorMode</code> (<code>colorMode/ColorMode.ts:4-71</code>); DarkResolver darkValue ?? value + <code>tokens:dark-missing</code> (<code>darkResolver/DarkResolver.ts:19-37</code>).</li>
+</ul>
+<h2>5.4 State machines</h2>
+<table>
+<thead>
+<tr>
+<th>FSM</th>
+<th>States</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Composer state</td>
+<td>ready, dirty, zoom, activePageId, snapToGrid, gridSize, isPreviewMode (+device computed SSOT &quot;E-004&quot;)</td>
+<td><code>Composer.ts:70,397-407,647-662</code></td>
+</tr>
+<tr>
+<td>Dirty</td>
+<td>false→true on markDirty (deferred in txn); cleared ONLY by saveProject()</td>
+<td><code>:689-747</code></td>
+</tr>
+<tr>
+<td>Collab connection</td>
+<td>disconnected/connecting/connected/reconnecting</td>
+<td><code>collaboration/CollaborationManager.ts:541-556</code></td>
+</tr>
+<tr>
+<td>ConnectionQuality</td>
+<td>excellent(&lt;100ms)/good(&lt;300)/poor/disconnected(no ACK 10s)</td>
+<td><code>OTEngine.ts:394-424</code></td>
+</tr>
+<tr>
+<td>Migration</td>
+<td>skipped/started/complete/failed + crash-resume marker</td>
+<td><code>MigrationManager.ts:24-52</code>, <code>runner.ts:36-83</code></td>
+</tr>
+<tr>
+<td>Crash recovery</td>
+<td>sentinel <code>buildrick:last-crash</code> in sessionStorage; recovers page/root/selection</td>
+<td><code>recovery/RecoveryManager.ts:26-198</code></td>
+</tr>
+</tbody></table>
+<h2>5.5 Enums</h2>
+<p>ElementType ×46 (<code>element.ts:69-119</code>) · TraitType ×8 (<code>:143-151</code>) · DeviceType desktop/tablet/mobile/<strong>watch/wide</strong> — ⚠ watch/wide have no breakpoint styles (<code>state.ts:34</code> vs <code>breakpoints.ts:100-125</code>) · HistoryEntryType checkpoint/patch, ChangeType ×5 (<code>historyTypes.ts:19-24</code>) · TokenCategory legacy ×9 vs TokenKind canonical ×14 — <strong>two unreconciled taxonomies</strong> (<code>designSystem/types.ts:20-69</code>) · ThemeMode ×3 · PresetCategory ×11 · WcagLevel ×5 · <strong>EVENTS catalog: 293 keys</strong> (<code>shared/constants/events.ts</code>)</p>
+<h2>5.6 Business rules (THRESHOLDS <code>shared/constants/config.ts:85-152</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>History</td>
+<td>max 100, checkpoint 10, coalesce 500ms (⚠ <code>HISTORY_DEBOUNCE:300</code> dead — hardcodes 500)</td>
+</tr>
+<tr>
+<td>Autosave</td>
+<td>engine 5000ms; shell hook 1000ms (<code>AUTOSAVE_DEBOUNCE</code>)</td>
+</tr>
+<tr>
+<td>Zoom</td>
+<td>10–500 step 10 (engine) — note canvas UI uses 10–300</td>
+</tr>
+<tr>
+<td>Grid</td>
+<td>default 10, clamp 1–100</td>
+</tr>
+<tr>
+<td>Named versions</td>
+<td>50/site, auto-checkpoint off (interval 0), JPEG snapshots q0.6; sync clone &lt;100 elements else idleCallback 2s</td>
+</tr>
+<tr>
+<td>Slug history</td>
+<td>100/page (301 redirects) · applied-templates 25/page</td>
+</tr>
+<tr>
+<td><strong>Nesting depth</strong></td>
+<td>⚠ CONFLICT: THRESHOLDS 50 (drag-drop) vs nesting/types 30 (validator)</td>
+</tr>
+<tr>
+<td>Media</td>
+<td>image 10MB, video 100MB, audio 50MB, SVG 1MB, max dim 4096</td>
+</tr>
+<tr>
+<td>OT</td>
+<td>ACK 30s, latency samples 10; collab editing 3s, soft-lock 5s</td>
+</tr>
+<tr>
+<td>Feature flags</td>
+<td>⚠ COLLABORATION:false, PLUGINS:false, VERSION_HISTORY:false — contradicts shipped VersionTimelineManager/CollaborationManager code (<code>config.ts:227-237</code>)</td>
+</tr>
+</tbody></table>
+<h2>5.7 Defects</h2>
+<ol>
+<li><strong>Collab DEMO-ONLY, 6 P1s</strong> — OT doesn&#39;t converge (remote always wins <code>OTEngine.ts:256-316</code>), remote apply clobbers 500ms coalesce window, corrupts undo (<code>HistoryManager.ts:319-336</code>), SSE replay non-idempotent, clientId spoofable (<code>AGENTS.md:24</code>)</li>
+<li>Dead constants: HISTORY_DEBOUNCE, ELEMENT_MIN/MAX_*, CANVAS_MAX_* (zero usages)</li>
+<li>TemplateManager soft-deprecated 2026-05-07 (<code>templates/TemplateManager.ts:10</code>); StateReconstructor &quot;not yet implemented&quot; (<code>history/index.ts:10</code>)</li>
+<li>Two responsive query sets (1023/767 vs 991/575); two nesting caps (50/30); two token taxonomies (9/14)</li>
+<li>Autosave: no conflict handling + dirty flag never cleared by it</li>
+<li>Type smells: <code>as unknown as</code> casts in VersionTimelineManager (<code>:724-778</code>)</li>
+</ol>
+<h2>5.8 Integration</h2>
+<p>Storage backends local/session/indexeddb/remote (<code>StorageAdapter.ts</code>; IndexedDB db &quot;aquibra-storage&quot;); VersionHistoryStorage separate IndexedDB; media IndexedDB. Export injectors: GA4/FB Pixel/Google Ads, SEO, Sitemap, Stripe, Formspree, AssetBundler, ReactExporter (<code>engine/export/*</code>). <code>markDirty()</code> → PROJECT_CHANGED = fan-out hub (history, autosave, token-usage, UI) (<code>Composer.ts:696-710</code>). PROJECT_LOADED fires ~4×/load — HistoryManager filters real payloads (<code>HistoryManager.ts:126-150</code>). importProject sanitizes via DOMPurify SSOT (<code>Composer.ts:452-470</code>).</p>
+</section>
+<section class="chapter" id="ch06"><div class="chapter-label">Ch.06 Design System · Catalog</div><h1>Editor PRD · Ch.06 — Design System, Components Catalog, Themes</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · paths under <code>packages/editor/src/</code></p>
+</blockquote>
+<h2>6.0 Two token systems (critical context)</h2>
+<ul>
+<li><strong>Chrome/editor-UI tokens</strong>: <code>--buildrick-*</code>, CSS in <code>themes/design-system/*.css</code>, typed union <code>shared/utils/token-names.ts:7-17</code>, read via <code>getToken()</code> (<code>shared/utils/tokens.ts:8-16</code>).</li>
+<li><strong>User-site DESIGN tokens</strong>: <code>--buildrick-design-*</code> + newer <code>--bd-*</code> for 11 new kinds (<code>editor/design-system/constants.ts:20-727</code>).</li>
+<li><code>themes/</code> = CSS-only layer files (color, typography, spacing, radius, shadow, motion, layout, z-index, a11y, bd-aliases, bd-topbar-overrides, design, index).</li>
+</ul>
+<h2>6.1 Design-system features</h2>
+<p><strong>14 token kinds</strong> (<code>engine/designSystem/types.ts:64-69</code>): color, type, spacing, radius, shadow, motion, border, opacity, zindex, breakpoint, grid, sizing, icon, imagery — each with own hook (<code>state/use*Tokens.ts</code>) + React context (<code>TokenRegistryContext.tsx:77-90</code>).</p>
+<p><strong>Theme modes</strong>: <code>light|dark|system</code> (<code>types.ts:125</code>); ColorMode persists <code>buildrik:colorMode</code>, system via <code>prefers-color-scheme</code> (<code>engine/colorMode/ColorMode.ts:4,16,58-70</code>). <strong>DarkResolver</strong>: dark → <code>darkValue ?? value</code>, emits <code>tokens:dark-missing</code>; empty-string darkValue = explicit (<code>engine/darkResolver/DarkResolver.ts:19-28</code>). UI = 2-pill Light/Dark — <strong>System dropped from UI</strong>, kept in state (<code>ui/ColorModeToggle.tsx:8-13,53-54</code>). DS panel dark-previews via <code>data-ds-preview</code>; chrome stays light (<code>ui/DesignSystemTab.tsx:147-161,487</code>).</p>
+<p><strong>Style presets</strong> ×11 categories (button/card/form/link/badge/alert/tooltip/modal/nav/table/layout — <code>types.ts:137-158</code>); 22 defaults seeded (<code>constants.ts:735-907</code>); property → <code>{tokenId}</code> bindings, raw values forbidden.</p>
+<p><strong>Starter themes ×6</strong>: cobaltDefault, stripeBlue, notionWarm, appleMinimal, linearDark, vercelMono (<code>starters/index.ts:18-25</code>) — applying restyles tokens, keeps elements (<code>ui/StarterGalleryModal.tsx:93-94</code>). Auto-open disabled (D3 2026-05-22) — &quot;Browse themes&quot; button only (<code>StarterGalleryMount.tsx:68-95</code>).</p>
+<p><strong>Beginner/Pro mode</strong> (<code>DSMode</code>): per-user, <code>buildrik:ds-mode</code>, default beginner (semantic tokens only; Pro adds primitives) (<code>DSModeContext.tsx:17-20</code>, <code>semanticKind.ts:27-33</code>).</p>
+<p><strong>⚠ &quot;Brand kit&quot;/&quot;brand blast&quot; DOES NOT EXIST in editor scope</strong> — &quot;brand&quot; is a token group name (<code>constants.ts:29,39,49</code>); &quot;blast&quot; only in ReachScopeStrip copy (<code>inspector/components/ReachScopeStrip.tsx:11</code>). Cross-site brand = dashboard shared-theme <strong>link-out only</strong> (<code>DesignSystemTab.tsx:500-527</code>) — no push API here. <em>(PM note: Figma dashboard wireframes assume a push/ledger flow — E-class drift.)</em></p>
+<h2>6.2 Components catalog</h2>
+<p><strong>30 compile-time components</strong> (<code>components-catalog/catalog.ts</code>, <code>CATALOG_LAST_UPDATED = 2026-04-12</code>): atoms ×8 (button…spinner <code>:19-235</code>), molecules ×11 (card…tooltip <code>:237-502</code>), organisms ×8+ (modal…feature-grid <code>:504-712</code>).</p>
+<p><strong>Model</strong> (<code>types.ts</code>): <code>ComponentType {id, category, variants[], sizes?, schema, defaultBindings}</code> (<code>:51-59</code>); <code>ComponentInstance</code> source = <code>catalog</code> | <code>user</code> (+<code>detached?</code>) (<code>:67-81</code>); <code>defaultBindings</code>: variant → CSS prop → <code>{tokenId}</code> (<code>:16-17</code>).</p>
+<p><strong>Insert flow</strong> (<code>placeCatalogComponent.ts</code>): interpretSchema (<code>{props.X}</code> only; <code>{variant}/{size}/{disabled}</code> deferred — <code>schemaInterpreter.ts:9-12,43,71-99</code>) → applyInterpretedTree in ONE transaction w/ rollback, slots = <code>div[data-slot]</code> (<code>applyInterpretedTree.ts:62-74,101-120</code>) → bindings as inline <code>var(--buildrick-design-&lt;id&gt;)</code> = O(1) token propagation (<code>:40-50,73-77</code>) → root tagged <code>data-buildrik-catalog-component</code> (<code>schemaInterpreter.ts:190-193</code>).</p>
+<p><strong>Detach</strong>: pro-mode only, <code>composer.components.detachInstance()</code> (<code>DetachInstanceButton.tsx:54,63-80</code>).</p>
+<p><strong>⚠ Catalog drag-drop canvas handler = unshipped stub</strong> (<code>CatalogCard.tsx:397-403</code>, <code>CatalogSection.tsx:5-8</code>). DS-tab ComponentsSection read-only by design; authoring = rail ComponentsPanelV2 (filters All|DS|Yours, search, +AI, +Save selection — <code>ComponentsPanelV2.tsx:130-134,240-261</code>).</p>
+<h2>6.3 Token CRUD / validation / propagation</h2>
+<ul>
+<li>CRUD (color = SSOT ref, <code>useColorTokens.ts</code>): add <code>:221-225</code>; update w/ per-token undo <code>:104-123</code>; delete hard OR soft (<code>replaceWith</code> → <code>replacedBy</code> bridge) <code>:227-248</code>; rename = new id + bridge <code>:250-263</code>. <strong>Per-token undo stacks</strong>, not global (<code>:126-187</code>). type &amp; spacing = fixed-set, no addToken (<code>useImportTokens.ts:69-70</code>).</li>
+<li>Validation: AddTokenModal name unique + hex <code>/^#([0-9A-Fa-f]{6})$/</code> (<code>AddTokenModal.tsx:23-40</code>); import shape-check (<code>importUtils.ts:33-79</code>); contrast auto-fix binary-search to AA 4.5 (<code>contrastFix.ts:9,17-50</code>).</li>
+<li>Propagation: live CSS var on documentElement per edit (<code>useTokenBase.ts:62</code>); Apply → <code>composer.setProjectSettings({designTokens, schemaVersion, designPresets})</code> + localStorage + markSaved (<code>DesignSystemTab.tsx:376-422</code>); usage map 2-pass scan → <code>Map&lt;tokenId, Set&lt;elementId&gt;&gt;</code> (<code>useTokenUsageMap.ts:32-38,66-134</code>); Reach model: This item / All like this (confirm) / Whole site (<code>ReachScopeStrip.tsx:31-68,93-138</code>).</li>
+</ul>
+<h2>6.4 State machines</h2>
+<table>
+<thead>
+<tr>
+<th>FSM</th>
+<th>States</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Dirty/save per registry</td>
+<td>tokens vs savedTokens → pendingDiff → isDirty; markSaved/discardAll/resetFromSaved/hydrateFromExternal</td>
+<td><code>useColorTokens.ts:87-101</code></td>
+</tr>
+<tr>
+<td>ColorMode</td>
+<td>light/dark/system, MQL resolve, <code>colorMode:changed</code></td>
+<td><code>ColorMode.ts:34-70</code></td>
+</tr>
+<tr>
+<td>DSMode</td>
+<td>beginner ⇄ pro</td>
+<td><code>DSModeContext.tsx:55-83</code></td>
+</tr>
+<tr>
+<td>Spacing preset</td>
+<td>compact/normal/spacious/null (manual edit → null; apply clears undo)</td>
+<td><code>useSpacingTokens.ts:11,71-105</code></td>
+</tr>
+<tr>
+<td>Type responsive</td>
+<td>desktop/mobile (setter only, no swap logic yet)</td>
+<td><code>useTypeTokens.ts:11,34,49</code></td>
+</tr>
+<tr>
+<td>Section-switch guard</td>
+<td>dirty → TabGuardModal Discard/Keep/Save&amp;switch</td>
+<td><code>DesignSystemTab.tsx:325-373</code></td>
+</tr>
+<tr>
+<td>Schema migration</td>
+<td>CURRENT_SCHEMA_VERSION = 4, iterative</td>
+<td><code>migrations/index.ts:37,164-184</code></td>
+</tr>
+</tbody></table>
+<h2>6.5 Enums</h2>
+<p>TokenKind ×14 · TokenType color/font-family/font-size/length/shadow/number/string/select (<code>types.ts:95-103</code>) · TokenCategory legacy ×9 (<code>:26-35</code>) · SemanticKind action/surface/text/feedback (<code>:74</code>) · WcagLevel aaa/aa/aa-large/fail/na (<code>:38</code>) · PresetCategory ×11 · ComponentTier atom/molecule/organism · DSMode ×2 · SpacingPreset ×3 · ResponsiveMode ×2 · LintRuleId ×7 (banned-hue, pure-black, empty-value, missing-dark, unresolved-binding, alias-depth-exceeded, semantic-needs-alias — <code>DSLinter.ts:12-19</code>) · ExportFormat css/tailwind/json (+figma stub, <code>ExportSection.tsx:37,178-193</code>)</p>
+<h2>6.6 Business rules</h2>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>NO BLACK</strong></td>
+<td><code>#000/#000000/black/rgb(0,0,0)</code> (incl. darkValue) = lint ERROR — &quot;use slate-700 or cobalt&quot;</td>
+<td><code>DSLinter.ts:122-138,213-216</code></td>
+</tr>
+<tr>
+<td><strong>Banned hues</strong></td>
+<td>purple/violet/indigo = ERROR; cobalt <code>#2D6DFF</code> sole accent</td>
+<td><code>DSLinter.ts:104-120,192-211</code></td>
+</tr>
+<tr>
+<td>Alias depth</td>
+<td>MAX 3</td>
+<td><code>DSLinter.ts:24,82-89</code></td>
+</tr>
+<tr>
+<td>Semantic-needs-alias</td>
+<td>semanticKind ⇒ aliasOf required</td>
+<td><code>DSLinter.ts:58-65</code></td>
+</tr>
+<tr>
+<td>Spacing grid</td>
+<td>4px, 3 preset px-maps</td>
+<td><code>useSpacingTokens.ts:13-27</code></td>
+</tr>
+<tr>
+<td>Default palette</td>
+<td>9 core (primary #3B82F6, text #334155…) + B5 seed (blue-500 #2D6DFF…)</td>
+<td><code>constants.ts:22-194</code></td>
+</tr>
+<tr>
+<td>Lint debounce</td>
+<td>500ms (spec D21)</td>
+<td><code>DSLinter.ts:35-38</code></td>
+</tr>
+<tr>
+<td>Export compat</td>
+<td>renamed vars kept 2 major versions</td>
+<td><code>exportUtils.ts:24-70</code></td>
+</tr>
+<tr>
+<td>Migrations</td>
+<td>additive/id-gated, never clobber user edits</td>
+<td><code>migrations/index.ts:143-147</code></td>
+</tr>
+<tr>
+<td>Token count cap</td>
+<td>none found</td>
+<td>—</td>
+</tr>
+</tbody></table>
+<h2>6.7 Defects / TODOs (feeds master §13)</h2>
+<ol>
+<li><strong>Duplicate token IDs</strong> in DEFAULT_TOKENS: radius-sm/md, shadow-sm/md defined twice (<code>--buildrick-design-*</code> vs <code>--bd-*</code>) — masked by kind-filtering, IDs non-unique (<code>constants.ts:367/709, 375/710, 407/711, 414/712</code>)</li>
+<li><strong>persistAll serializes only 3/14 kinds</strong> to localStorage → divergence for 11 new kinds (<code>TokenRegistryContext.tsx:197-212</code>) <em>(= v1.0 register A3)</em></li>
+<li>ReviewModal diffs only color/type/spacing (<code>DesignSystemTab.tsx:751-762</code>); <code>changedSectionLabels</code> hardcodes <code>[&quot;Tokens&quot;]</code> (<code>:484</code>)</li>
+<li>Typo&#39;d migration comment (rename identical both sides) — <code>constants.ts:16-18</code></li>
+<li>AI component schema → localStorage only; canvas insert needs unbuilt <code>createComponentFromSchema</code> (<code>ComponentsPanelV2.tsx:158,267-309</code>)</li>
+<li>Figma Variables export = stub envelope (<code>ExportSection.tsx:178-193</code>)</li>
+<li>Catalog drag→canvas drop stub (<code>CatalogCard.tsx:397-403</code>)</li>
+<li><code>window.prompt</code> TODO → modal (<code>TokenDetailView.tsx:481</code>)</li>
+<li>AIPromptModal onAccept no-op in DS tab (<code>DesignSystemTab.tsx:773-778</code>)</li>
+<li>Fixed-bug archaeology: <code>undo:applied</code> zero-emitter events (now <code>history:undo/redo</code>, <code>:301-305</code>); <code>buildrik:openRailTab</code> silent no-op (now <code>ui:switch-tab</code>, <code>ComponentsSection.tsx:275-286</code>)</li>
+</ol>
+<h2>6.8 Integration</h2>
+<p>Project persist: <code>composer.setProjectSettings</code> (Apply); load merges saved-over-defaults by id, migrates &lt;v4 (<code>DesignSystemTab.tsx:230-269,404-411</code>). localStorage keys: <code>buildrick-design-tokens-{projectId}-v1</code>, <code>…-presets-…</code>, <code>buildrik:starter-gallery-seen-*</code>. Cross-window: <code>SETTINGS_CHANGE</code> → conflict toast if dirty (<code>:286-295</code>). Export: CSS (dark strategies media|data-attr|off), JSON, Tailwind (drops dark variants — warned), Figma stub (<code>exportUtils.ts:80-124</code>). Engine services: composer.colorMode/darkResolver/dsLinter/components/designSystem.tokenBindingResolver/elements/styles/selection/aiAssistService + events <code>ui:switch-tab</code>, <code>UI_OPEN_STARTERS</code>, <code>COMPONENT_SAVE_AS_REQUESTED</code>.</p>
+</section>
+<section class="chapter" id="ch07"><div class="chapter-label">Ch.07 Blocks & Templates</div><h1>Editor PRD · Ch.07 — Blocks &amp; Templates</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · base <code>packages/editor/src/</code></p>
+</blockquote>
+<h2>7.1 Block architecture</h2>
+<p>Block config = static object (<code>BlockData</code> + elementType + optional <code>build()</code>), not React component (<code>blocks/types.ts:24</code>, <code>shared/types/block.ts:15</code>). Content = HTML string | ElementData tree | build() (precedence: build &gt; content, <code>blockRegistry.ts:220-223</code>). <strong>Registry SSOT: 63 configs</strong> (<code>blockRegistry.ts:96-182</code>).</p>
+<h2>7.2 Inventory (63 registered)</h2>
+<ul>
+<li><strong>Basic ×11</strong>: container, text, heading, paragraph, button, link, list, divider, row, column, spacer (<code>blocks/Basic/*</code>)</li>
+<li><strong>Media ×9</strong>: image (<strong>deliberately src-less</strong> — regression-tested so <code>element:needs-asset</code> picker fires, <code>Image.tsx:13-23</code>, <code>Image.regression.test.ts</code>), video, audio, svg, lottie, icon (build), gallery, video-embed, map-embed</li>
+<li><strong>Layout ×5</strong>: section, 2/3-columns, grid, flex (builders <code>blocks/builders.ts:61-116</code>)</li>
+<li><strong>Forms ×16</strong>: form, input, textarea, select, checkbox/radio (elementType <code>input</code>), file, date, time, email, password, number, range, color, label (elementType <code>text</code>), submit — all static HTML, no per-field schemas</li>
+<li><strong>Sections ×5</strong>: hero (<strong>ONLY config with attributes schema</strong>: title/subtitle/buttonText/URL/bgImage/bgColor/textAlign/height — ⚠ omits overlay/overlayColor present in React props, <code>HeroSection.tsx:8-19,120-133</code>), features (props: columns 2|3|4, variant cards|icons|list), footer, navbar, cta (static)</li>
+<li><strong>Components ×13</strong>: card, slider (slides/autoplay/dots/arrows), testimonials (columns 1-3, variants ×3), pricing (3 default tiers $9/$29/$99 &quot;Popular&quot;), progress, countdown, accordion, social-icons (size/variant/color), stack/switch/tabs/modal/table (build fns; tabs = proper tablist roles, <code>Tabs.tsx:12-105</code>)</li>
+<li><strong>Ecommerce ×4</strong>: product-card/detail (CMS <code>data-bind</code> attrs), product-grid (<code>data-cms-collection=&quot;products&quot;</code> template), cart-button (<code>data-checkout</code>) — ⚠ NOT in build-tab catalog</li>
+</ul>
+<p><strong>⚠ Defined-not-registered</strong>: <code>contactFormBlockConfig</code> exported from 2 index files but absent from blockDefinitions — unreachable (<code>ContactForm.tsx:349-362</code>).</p>
+<h2>7.3 Forms — three implementations + server</h2>
+<p>A. Registry blocks = inert HTML. B. <strong>ContactForm React</strong> (6 default fields, required+email regex validation, ⚠ <strong>catch swallows errors silently</strong> <code>ContactForm.tsx:126-127</code>). C. <strong>Inspector FormConfig</strong> (<code>shared/forms/FormSettingsSection.tsx:54-172</code>): enable → <code>formId form-${Date.now()}</code>, action submit|webhook|email, success/error messages, redirect. D. <strong>Public endpoint</strong> <code>POST /api/public/forms/[siteId]/[formBlockId]</code>: rate 10/60s per ip+form, body ≤256KB, ≤100 fields, value ≤10k chars, honeypot; errors 404/402(limit)/429 (<code>route.ts:6-57</code>, <code>shared/schemas/forms.ts:5-11</code>).</p>
+<h2>7.4 Templates</h2>
+<ul>
+<li><strong>Full-page ×18</strong> (<code>TemplateLibrary.tsx:55-185</code>): blank, contact-1, landing-1, pricing-1, portfolio-1, business-1 + 12 section-templates. ⚠ id <code>hero-split</code> reused across tabs — React key collision possible.</li>
+<li><strong>Section quick-insert ×11</strong> (<code>SectionTemplates.tsx:42-144</code>); ⚠ SectionType enum includes <code>content</code> but no template/tab uses it (<code>:31</code>).</li>
+<li><strong>Apply pipeline</strong>: <code>applyTemplate</code> = transaction → <code>importHTMLToActivePage</code> (<code>templateActions.ts:4-11</code>); ⚠ artificial 500ms loading delay (<code>TemplateLibrary.tsx:269-276</code>).</li>
+<li><strong>My Templates</strong>: localStorage only; <code>useTemplateManager</code> composer path wired-but-unused (&quot;future when formats unified&quot;, <code>:202-204</code>); rename local-only; SaveTemplate html prop unused; thumbnail XSS guard (<code>:26-34</code>).</li>
+<li>L0 stubs: TemplateCard, TemplateSelector (<code>templates/index.ts:6</code>).</li>
+</ul>
+<h2>7.5 Rules</h2>
+<p>Insert validates <code>canNestElement</code> (<code>blockRegistry.ts:214-217</code>); HTML sanitized pre-insert (<code>:189,226-233</code>); media blocks with no src → auto-switch to assets tab + <code>element:needs-asset</code>; build-tab catalog = 53 elements/6 categories (ecommerce excluded).</p>
+<h2>7.6 Defects (feeds §13)</h2>
+<ol>
+<li>contact-form unreachable (unregistered)</li>
+<li>Navigation category = empty stub dir, yet catalog &quot;navigation&quot; borrows from Sections (<code>Navigation/index.ts:1-6</code>, <code>catalog.ts:384-416</code>)</li>
+<li><strong>Brand-name chaos</strong>: &quot;Aquibra&quot;/&quot;dudo&quot;/&quot;buildrick&quot;/&quot;buildrik&quot;/BizPro mixed — Hero attr default &quot;Welcome to dudo&quot; vs HTML &quot;Welcome to Aquibra&quot; (<code>HeroSection.tsx:22,115,121</code>)</li>
+<li>Two CSS-var prefixes in blocks (<code>--buildrick-*</code> vs <code>--bd-*</code> in Tabs build, <code>Tabs.tsx:35-85</code>)</li>
+<li>Hardcoded &quot;2024&quot; footer year ×3 (stale, <code>Footer.tsx:18</code> etc.)</li>
+<li>Hero attributes schema incomplete vs props; stray blank JSX attrs ×3</li>
+<li>ContactForm + localStorage errors swallowed silently</li>
+</ol>
+</section>
+<section class="chapter" id="ch08"><div class="chapter-label">Ch.08 Media · Export · Preview</div><h1>Editor PRD · Ch.08 — Media, Export, Preview</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · base <code>packages/editor/src/</code></p>
+</blockquote>
+<p><strong>Framing correction</strong>: <code>preview/</code> (69 files) = dev-only <strong>Vibcoder component gallery</strong> (24 atoms + 18 molecules + 16 organisms, <code>preview/vibcoder-index.html:16-17</code>) — NOT product preview. Product export-preview lives in <code>editor/export/</code>; <code>vibcoder-topbar.tsx</code> = gallery demo of the Topbar organism.</p>
+<h2>8.1 Media</h2>
+<p><strong>Two parallel library UIs</strong>: LibraryManager (full-page 3-column: folders 240 | grid | details 320, shortcut J, <code>editor/media/LibraryManager.tsx:6-9,303-379</code>) + MediaLibraryPanel (modal, 4 tabs Library/Upload/From URL/Optimize — ⚠ From-URL tab &quot;coming soon&quot; stub while LibraryManager HAS working URL import via window.prompt, <code>MediaLibraryPanel.tsx:225</code>, <code>LibraryManager.tsx:161-177</code>).</p>
+<p><strong>Upload pipeline</strong> (<code>engine/media/MediaManager.ts:684-903</code>): validate → dataURL → <strong>MIME magic-byte sniff</strong> (spoofed ext) → <strong>SVG DOMPurify sanitize</strong> (FORBID xlink:href/href; reject non-svg root) → auto-WebP convert → thumbnail → IndexedDB local → best-effort server mirror. <strong>Local-first</strong>: server CUID replaces local id on mirror success; failure → <code>localOnly=true</code> + retryQueue (rebuilt on init — survives reload); delete-during-upload tombstone (<code>:804-880,219-254</code>).</p>
+<p><strong>Image editing</strong>: ImageEditorModal crop/adjust/resize (react-easy-crop), filter presets ×6, output always WebP q0.92, saves as version <code>_v{n}</code> (<code>ImageEditorModal.tsx:64-179</code>, <code>LibraryManager.tsx:216-228</code>). OptimizationPanel: WebP/AVIF/JPEG/PNG + support probe, quality 10-100 (default 85), max-dimension clamp, live savings, 300ms debounce (<code>OptimizationPanel.tsx:159-304</code>). Alt-text ≤125 chars + AI generate w/ provenance (<code>AssetDetailsPanel.tsx:28-29,431-524</code>). <strong>Replace-across</strong> all usages atomically (+ per-page selective modal, <code>:311-384</code>). Icons: Lucide only, recents ×12 (<code>IconPickerModal.tsx:47-48,315</code>).</p>
+<p><strong>Rules</strong>: image 10MB / video 100MB / audio 50MB / SVG 1MB / max dim 4096 (<code>shared/constants/media.ts:16-29</code>); quota 1GB local SSOT, server overrides, -1 unlimited, pre-check blocks (<code>media.ts:129</code>, <code>useUploadState.ts:110-126</code>); audio = local-only by design, no server schema (<code>MediaManager.ts:881-882</code>).</p>
+<p><strong>Upload FSM</strong>: pending(0) → uploading(25-50) → optimizing → processing(75) → complete(100) | error (<code>media.ts:709</code>); queue rows auto-clear 1.5s; failed retained w/ Retry (<code>useUploadState.ts:31-98,157-166</code>).</p>
+<h2>8.2 Export</h2>
+<p>Formats: type allows html|zip|json|react|vue|nextjs (<code>shared/types/export.ts:16</code>) — <strong>implemented: HTML, ZIP, React</strong>; Vue/Next = coming-soon; JSON unsurfaced (<code>ExportOptions.tsx:20-23,113-176</code>). ZIP = JSZip index.html+styles.css+assets (<code>engine/export/ExportEngine.ts:730-767</code>); React = components/*.tsx + package.json, no in-modal preview (<code>ReactExporter.ts:68-125</code>). Options: cssStyle inline/embedded/external, minify, meta/viewport/reset, pageTitle default &quot;Aquibra Export&quot; ⚠, cssPrefix <code>buildrick-</code>, analytics+Stripe injection (<code>export.ts:26-70</code>). CMS export none/static/template (handlebars|liquid) when bindings exist. Preview sanitized hard (strips script/iframe/handlers/js-urls) + sandboxed iframe (<code>ExportUtils.ts:11-63</code>).</p>
+<h2>8.3 Preview &amp; share</h2>
+<p>Device preview: desktop 1440×900 / tablet 768×1024 / mobile 375×667, scale-to-fit + device chrome, relative→absolute URL fix BUG-006 (<code>export.ts:129-147</code>, <code>PreviewFrame.tsx:37-166</code>). <strong>&quot;Preview as client&quot; = <code>?view=client</code> URL param (full reload) — NO shareable/tokenized link exists in editor</strong> (<code>shell/Topbar.tsx:614-623</code>; grep confirms) — ties to v1.0 finding that ShareLink model exists server-side only.</p>
+<h2>8.4 Defects (feeds §13)</h2>
+<ol>
+<li>MediaLibraryPanel From-URL stub vs LibraryManager working import — two inconsistent library UIs</li>
+<li>Trash &quot;coming soon&quot; toast (<code>LibraryManager.tsx:318-319</code>)</li>
+<li>ImageEditor Before/After compare missing (own audit <code>Section17.audit.md:54-71</code>)</li>
+<li>Vue/Next export placeholders; JSON declared-unsurfaced</li>
+<li>AssetGrid virtualization deferred (documented trigger: 1000+ assets)</li>
+<li>fmtBytes deliberately not unified with shared formatBytes (1 vs 2 decimals)</li>
+<li>Process defect noted in own audit: prototype-v3 plan tasks written without re-grepping — 6 phases already shipped (<code>Section20.audit.md:61-66</code>)</li>
+</ol>
+<h2>8.5 Integration</h2>
+<p>Blob = <strong>Vercel Blob</strong> client-token flow via <code>POST ${DASHBOARD_URL}/api/asset-upload</code> (clientPayload bytes/type/mime/filename/folderId/siteId → server validates session+quota+size → scoped token → direct browser upload) (<code>AssetUploadService.ts:50-92</code>). Metadata via tRPC media router (createAsset idempotent on URL). Server asset types image|video|icon|font (no audio, <code>:75</code>). Alt-text <code>media.generateAltText</code> (claude-haiku-4-5). Stock Unsplash/Pexels/Pixabay server-proxied. IndexedDB &quot;aquibra-media&quot; 3 stores. Drag payload <code>application/x-aquibra-media-*</code>.</p>
+</section>
+<section class="chapter" id="ch09"><div class="chapter-label">Ch.09 AI · Services · Misc</div><h1>Editor PRD · Ch.09 — AI surfaces, Services layer, Wizard/Collab/Ecommerce/Animation</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · reverse-engineered <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · paths relative to <code>packages/editor/src/</code> · nothing invented, uncertainty <code>[TBC]</code></p>
+</blockquote>
+<h2>9.1 AI entry surfaces (<code>ai/</code>, 10 files)</h2>
+<p>Global gate <code>AI_AVAILABLE = true</code> (<code>ai/AIAssistantBar.tsx:16</code>) gates all AI UI.</p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>What it does</th>
+<th>Reality check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>AICopilot</strong> (<code>AICopilot.tsx</code>)</td>
+<td>Chat modal; 6 hardcoded quick actions (Hero/Features/Pricing/Testimonials/CTA/Contact — <code>:55-104</code>); keyword-routes input to image/layout/content (<code>:318-334</code>); DOMPurify-narrowed HTML preview (<code>:116-193</code>)</td>
+<td>Real tRPC-backed generation</td>
+</tr>
+<tr>
+<td><strong>AIAssistant</strong> (<code>AIAssistant.tsx</code>)</td>
+<td>6-tab modal: Content/Layout/Image/Analyze/Colors/A11y (<code>:159-164</code>)</td>
+<td>Analyze tab = client-side <code>LayoutAnalyzer</code>, not AI (<code>:66-76</code>)</td>
+</tr>
+<tr>
+<td><strong>AIAssistantBar</strong> (<code>AIAssistantBar.tsx</code>)</td>
+<td>Floating ⌘K bar, Content/Layout modes (<code>:32,102-115</code>); layout mode → <code>composer.elements.importHTMLToActivePage</code> (<code>:61-71</code>)</td>
+<td>Legacy path (v1.0 PRD §13-B2); displays credit count from window event <code>ai-credits-update</code> (<code>:24-47</code>) — client never enforces credits</td>
+</tr>
+<tr>
+<td><strong>AccessibilityChecker</strong> (<code>AccessibilityChecker.tsx:37-179</code>)</td>
+<td>img-alt, empty button/link names, heading order, missing h1, WCAG contrast ≥4.5:1, font &lt;12px</td>
+<td>Pure client-side, NOT AI</td>
+</tr>
+<tr>
+<td><strong>ColorPalette</strong> (<code>ColorPalette.tsx:101-142</code>)</td>
+<td>complementary/analogous/triadic/split HSL generation</td>
+<td>Pure color-theory math, NOT AI</td>
+</tr>
+<tr>
+<td>L0 stubs</td>
+<td><code>AIPageGenerator, AIContentPanel, AICodeEditor</code> — files not created</td>
+<td><code>ai/index.ts:24-25</code></td>
+</tr>
+</tbody></table>
+<p><strong>Facade</strong> <code>shared/utils/openai.ts</code> — name is a lie: delegates entirely to tRPC (<code>:1-27</code>). Fns: generateContent/Variations (default 3, skipCache), generateLayout, generateImagePrompt, generateCode, improveContent, translateContent, summarizeContent, generateSEO, streamContent, batchRequests (<code>:92-332</code>).</p>
+<ul>
+<li>⚠ <strong>Image gen is fake</strong> — returns <code>picsum.photos</code> placeholder (<code>:150-157</code>).</li>
+<li>⚠ <strong>Streaming is fake</strong> — non-streaming fallback (<code>:256-276</code>). (AITab&#39;s real streaming lives elsewhere — v1.0 §6 AI.)</li>
+</ul>
+<p><strong>Transport</strong> <code>services/ai/AiTrpcClient.ts</code> — mutations <code>ai.content|page|layout</code> (<code>:195-224</code>). generatePage input: pageType landing/portfolio/product/pricing/blog × style modern/minimal/bold (<code>:200-215</code>). No AI job machine here — synchronous mutations; AICopilot&#39;s pending/complete/error = local chat UI (<code>AICopilot.tsx:399</code>).</p>
+<h2>9.2 Services layer (each service → API)</h2>
+<p>All dashboard tRPC via <code>createBuildrikApiClient(DASHBOARD_URL)</code>, cookies included, superjson (<code>services/api-client.ts:20-44</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Calls</th>
+<th>Product-critical behavior</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>BuildrikSyncProvider</strong></td>
+<td><code>sites.get</code>, <code>pages.list</code>, <code>siteDetail.settings.get</code> (load <code>:202-206</code>); <code>sites.saveProject</code> + <code>siteDetail.settings.update</code> (dual-save <code>:296-308</code>); <code>media.listAssets</code> limit 200 + <code>listFolders</code> (<code>:368-371</code>)</td>
+<td>Autosave debounce 5000ms; <strong>empty-project data-loss guard</strong> (2026-06-04 fixture-wipe incident, <code>:447-495</code>); optimistic concurrency <code>expectedLastEditedAt</code> → <code>SaveConflictError</code> + window event <code>buildrik:save-conflict</code> (<code>:51-73,313-323</code>); plan map FREE→starter/PRO→pro/BUSINESS→enterprise (<code>:186-190</code>)</td>
+</tr>
+<tr>
+<td><strong>AssetUploadService</strong></td>
+<td><code>@vercel/blob</code> client upload → <code>/api/asset-upload</code> (<code>:80-92</code>); media.createAsset/deleteAsset/createFolder/moveAsset/… (<code>:151-240</code>)</td>
+<td>Reachability probe treats 400 reachable / 401 unusable (<code>:107-123</code>)</td>
+</tr>
+<tr>
+<td><strong>AltTextService</strong></td>
+<td><code>media.generateAltText</code> (<code>:40-49</code>)</td>
+<td>null on failure; <code>skipped</code> preserves user text</td>
+</tr>
+<tr>
+<td><strong>MediaVersionService</strong></td>
+<td>list/create/restoreAssetVersion (<code>:34-51</code>)</td>
+<td>plan version-cap enforced server-side</td>
+</tr>
+<tr>
+<td><strong>PublishService</strong></td>
+<td><code>sites.publish/publishStatus/cancelPublish/get</code> (<code>:42-105</code>)</td>
+<td>job states §9.5; Vercel when <code>VERCEL_TOKEN</code> else dev simulation (<code>:36-40</code>)</td>
+</tr>
+<tr>
+<td><strong>ReviewService</strong></td>
+<td><code>reviews.submit</code> (<code>:20-24</code>)</td>
+<td>&quot;Send for review&quot;; exports <code>currentSiteId()</code> (<code>:13-18</code>) reused by all sync modules</td>
+</tr>
+<tr>
+<td><strong>cmsSync</strong></td>
+<td>cms.collections/entries upsert/delete/list (<code>:111-228</code>)</td>
+<td>retry queue latest-wins, <code>online</code> auto-retry, pending count (<code>:34-98</code>)</td>
+</tr>
+<tr>
+<td><strong>componentSync</strong></td>
+<td>siteComponents.upsert/delete/list/get (<code>:50-90</code>)</td>
+<td>agency-shared component masters mirror</td>
+</tr>
+<tr>
+<td><strong>versionSync</strong></td>
+<td>siteVersions.create/delete/list/get (<code>:52-94</code>)</td>
+<td>version-history mirror</td>
+</tr>
+<tr>
+<td><strong>templateSync</strong></td>
+<td>userTemplates.upsert/list (<code>:47-89</code>)</td>
+<td>local cache = localStorage <code>MY_TEMPLATES</code></td>
+</tr>
+<tr>
+<td><strong>StockService</strong></td>
+<td>media.searchStockPhotos/Videos (<code>:57-98</code>)</td>
+<td>unsplash/pexels/pixabay server-proxied; ⚠ header docstring falsely says &quot;stub&quot; (<code>:4</code>) — stale</td>
+</tr>
+<tr>
+<td><strong>EmailService</strong></td>
+<td>—</td>
+<td>⚠ <strong>sendgrid/mailgun/resend all throw &quot;backend proxy not yet configured&quot;</strong> (<code>:340-349</code>); SMTP unsupported in browser; mock in-memory only; custom template renders caller HTML unescaped — XSS surface if untrusted (<code>:151-157</code>)</td>
+</tr>
+<tr>
+<td><strong>FormSubmissionService</strong></td>
+<td>arbitrary <code>webhookUrl</code> POST (<code>:235-246</code>)</td>
+<td>⚠ submissions in-memory <code>Map</code> only — lost on reload (<code>:99,119-122</code>); validation: required/email/phone/number/min/maxLength/pattern (<code>:155-216</code>)</td>
+</tr>
+<tr>
+<td><strong>GoogleFontsService</strong></td>
+<td>fonts.googleapis.com css2 links (<code>:148-174</code>)</td>
+<td>25 hardcoded fallback fonts (<code>:49-75</code>)</td>
+</tr>
+</tbody></table>
+<h2>9.3 Wizard / Collaboration / Ecommerce / Animation — real vs stub</h2>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Verdict</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>PageWizard</strong></td>
+<td>⚠ <strong>&quot;AI&quot; is SIMULATED</strong> — 7 hardcoded steps insert static HTML with fake <code>setTimeout(800+rand·700)</code> delays; form inputs (pageType/description/style) <strong>never sent anywhere</strong>; subtitle still claims &quot;AI does the rest&quot;</td>
+<td><code>wizard/PageWizard.tsx:53-135,230</code>; catalog <code>sectionData.ts:20+</code></td>
+</tr>
+<tr>
+<td><strong>Collaboration UI</strong></td>
+<td>Real components, mock fallbacks: PresenceIndicators shows hardcoded MOCK_USERS (&quot;You&quot;,&quot;Ana&quot;) when disconnected (<code>PresenceIndicators.tsx:39-43</code>); ConnectionQuality 3-bar, &lt;100ms good/100-300 fair/&gt;300 poor (<code>ConnectionQualityIndicator.tsx:83-100</code>)</td>
+<td>engine collab = flag-off, 6 P1s (v1.0 §6)</td>
+</tr>
+<tr>
+<td><strong>Ecommerce</strong></td>
+<td>One real modal: CollectionSetupModal — Products collection prompt on e-com block drop (8 fields, optional 3 samples); creation delegated to caller</td>
+<td><code>CollectionSetupModal.tsx:28,105-118</code></td>
+</tr>
+<tr>
+<td><strong>AnimationEditor</strong></td>
+<td>Real config UI: 12 entrance/8 attention/5 exit presets, duration/delay/easing/iterations + live CSS preview (<code>AnimationEditor.tsx:24-66</code>); ⚠ trigger row (load/scroll/hover/click) REMOVED 2026-05-18 — engine never honored triggers (<code>:176-180</code>); TimelineEditor/ScrollTriggerEditor = L0 stubs (<code>index.ts:11</code>)</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2>9.4 Analytics reality</h2>
+<ul>
+<li><strong>sidebarAnalytics = production no-op</strong> — default <code>noopProvider</code>, console only under debug flag; &quot;Wire to PostHog/Mixpanel via setProvider when ready&quot; (<code>sidebarAnalytics.ts:4-44</code>). 4 call sites: <code>tab_switch</code> (<code>useSidebarState.ts:144</code>), <code>element_insert</code> (<code>useElementsState.ts:153</code>), <code>search</code> (<code>SearchBar.tsx:61</code>), <code>error</code> render (<code>InspectorErrorBoundary.tsx:45</code>).</li>
+<li><strong>AI adoption IS real</strong>: <code>adoptionTracker.ts:42-97</code> fire-and-forget <code>ai.logAdoption</code> — events edit.applied / agent.run (steps planned/applied/skipped/failed + duration) / edit.reverted; privacy: structural only, no prompt text (<code>:16-20</code>).</li>
+</ul>
+<h2>9.5 State machines</h2>
+<table>
+<thead>
+<tr>
+<th>Machine</th>
+<th>States</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Publish job</td>
+<td>QUEUED→BUILDING→DEPLOYING→COMPLETED | FAILED | CANCELLED; url only on COMPLETED</td>
+<td><code>PublishService.ts:28,64-69</code></td>
+</tr>
+<tr>
+<td>Wizard</td>
+<td>form → loading → error; per-step pending/generating/done</td>
+<td><code>PageWizard.tsx:21,26</code></td>
+</tr>
+<tr>
+<td>Collab connection</td>
+<td>connected/disconnected/connecting/reconnecting</td>
+<td><code>PresenceIndicators.tsx:283-297</code></td>
+</tr>
+<tr>
+<td>AI generation</td>
+<td>none — synchronous mutations</td>
+<td><code>AiTrpcClient.ts</code></td>
+</tr>
+</tbody></table>
+<h2>9.6 Enums (values in source)</h2>
+<p>ContentType ×16 (<code>AIPromptLibrary.ts:7-23</code>) · Tone ×12 (<code>:25-37</code>) · LayoutStyle ×8 (<code>:39-47</code>) · ImageSize ×6 / ImageStyle ×7 / Language ×8 / CodeStyle ×4 (<code>:49-70</code>) · AIErrorCode ×9 (<code>AIErrors.ts:7-16</code>) · AiAdoptionEvent/Surface (<code>shared/schemas/ai-adoption.ts:22-33</code>) · EmailTemplate ×4 / Provider ×5 (<code>EmailService.ts:16,55</code>) · FontCategory ×5 (<code>GoogleFontsService.ts:33</code>) · StockSource ×3 / Orientation ×3 (<code>StockService.ts:23-25</code>) · Harmony ×4 (<code>ColorPalette.tsx:23</code>) · A11y severity ×3 (<code>AccessibilityChecker.tsx:27</code>) · Animation entrance 12/attention 8/exit 5, easings 7 (<code>AnimationEditor.tsx:24-66</code>)</p>
+<h2>9.7 Business rules</h2>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Value</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AI client rate limit</td>
+<td>30 req / 60s sliding window</td>
+<td><code>AiTrpcClient.ts:17-18,62</code></td>
+</tr>
+<tr>
+<td>AI retry</td>
+<td>max 2, 1s expo backoff; only 5xx/network/408/429 (mutations consume credits, non-idempotent)</td>
+<td><code>:16,36-53,309-320</code></td>
+</tr>
+<tr>
+<td>AI request queue</td>
+<td>concurrency 3, priority-sorted</td>
+<td><code>:106,134</code></td>
+</tr>
+<tr>
+<td>AI timeout</td>
+<td>30s</td>
+<td><code>:14</code></td>
+</tr>
+<tr>
+<td>AICache</td>
+<td>TTL 5min, 100 entries FIFO</td>
+<td><code>AICache.ts:16-18,42-52</code></td>
+</tr>
+<tr>
+<td>Adoption caps</td>
+<td>commandIds 50, applied 1000, steps 100, durMs 3.6M</td>
+<td><code>ai-adoption.ts:31-39</code></td>
+</tr>
+<tr>
+<td>Media hydration</td>
+<td>200 assets initial</td>
+<td><code>BuildrikSyncProvider.ts:369</code></td>
+</tr>
+<tr>
+<td>Credit costs</td>
+<td>none client-side — server/host only, editor displays <code>remaining</code></td>
+<td><code>AIAssistantBar.tsx:24-47</code></td>
+</tr>
+</tbody></table>
+<h2>9.8 Defects / stubs ledger (feeds master §13)</h2>
+<ol>
+<li>Image gen fake (picsum) — <code>openai.ts:150-157</code></li>
+<li>Streaming fake in facade — <code>openai.ts:256-276</code></li>
+<li>PageWizard simulated AI, inputs discarded — <code>PageWizard.tsx:89-135</code></li>
+<li>EmailService cloud providers throw (route <code>/api/email/send</code> unimplemented) — <code>EmailService.ts:340-349</code></li>
+<li>FormSubmissionService in-memory only — <code>FormSubmissionService.ts:99</code></li>
+<li>sidebarAnalytics no-op — <code>sidebarAnalytics.ts:4-6</code></li>
+<li>StockService stale &quot;stub&quot; docstring (it works) — <code>StockService.ts:4</code></li>
+<li>Animation triggers removed (engine ignores) + Timeline/ScrollTrigger L0 — <code>AnimationEditor.tsx:176-180</code>, <code>animation/index.ts:11</code></li>
+<li>Collab MOCK_USERS fallback — <code>PresenceIndicators.tsx:39-43</code></li>
+<li>L0 stubs: AIPageGenerator/AIContentPanel/AICodeEditor — <code>ai/index.ts:24-25</code></li>
+<li>EmailService custom template unescaped HTML (XSS if untrusted caller) — <code>EmailService.ts:151-157</code></li>
+</ol>
+</section>
+<section class="chapter" id="ch10"><div class="chapter-label">Ch.10 Server API · Data</div><h1>Editor PRD · Ch.10 — Server API, Schemas, Data Model</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v2.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-07 · Prisma at repo-root <code>prisma/schema.prisma</code>; tRPC at <code>server/trpc/routers/</code> (NOT under packages)</p>
+</blockquote>
+<h2>10.1 API surface (editor-relevant)</h2>
+<p><strong>sites</strong> (<code>routers/sites.ts</code>): saveProject (EDITOR, optimistic <code>expectedLastEditedAt</code>→CONFLICT <code>:230-258</code>) · saveProjectData/getProjectData · prePublishChecks · publish (<strong>ADMIN</strong>, ALREADY_PUBLISHING→CONFLICT <code>:272-292</code>) · publishStatus · cancelPublish (NOT_CANCELLABLE→400) · unpublish (ADMIN, →DRAFT) · create/duplicate (SITE_LIMIT→FORBIDDEN &quot;Upgrade your plan&quot;) · bulk (delete=OWNER, archive/publish=ADMIN, ≤25 ids).</p>
+<p><strong>ai</strong> (<code>routers/ai.ts</code>, all protected): content/page/layout (reserve 1 unit first <code>:155-228</code>) · <strong>streamPrompt subscription</strong> (prompt ≤5000, intent text|style-command|plan; provider-check BEFORE reserve; refund on no-delivery <code>:274-371</code>) · componentSchema (reserve+refund) · ⚠ summarize + milestoneSuggest = <strong>NO quota</strong> (<code>:230-268</code>) · getQuotaStatus · logAdoption.</p>
+<p><strong>media</strong> (<code>routers/media.ts:54-318</code>): folders/assets/versions CRUD, generateAltText (Haiku vision), checkStorageQuota, stock search — all user-scoped.</p>
+<p><strong>Other</strong>: pages.* (PAGE_LIMIT), siteVersions.<em>, siteComponents.</em>, theme.* (agency_layer flag + ADMIN), upload.* (presign/confirm), templates.generate.* (AI site gen), billing.*.</p>
+<p><strong>REST</strong>: <code>GET /api/sse/publish/[jobId]</code> (SSE 1s poll, 10min lifetime) · <code>POST /api/workers/publish|ai-generate/[jobId]</code> (x-worker-secret=CRON_SECRET, maxDuration 300) · <code>POST /api/asset-upload</code> (Blob token flow) · <code>POST /api/public/forms/...</code> (10/60s, 256KB) · <code>POST /api/public/track/[siteId]</code> (60/60s, CORS *) · <code>GET /api/cron/billing-downgrade</code> (Bearer CRON_SECRET) · <code>POST /api/auth/create-session</code> (uuid token, CSRF same-origin, 30d rememberMe, <strong>max 10 sessions/user</strong>).</p>
+<h2>10.2 Publish pipeline</h2>
+<p>PublishBuildJob: ≤1 active/site via <strong>partial unique index in SQL migration only, not Prisma</strong> (<code>schema.prisma:1157-1181</code>). Written statuses QUEUED→BUILDING→COMPLETED|FAILED|CANCELLED — ⚠ <strong>DEPLOYING never written</strong> (stale queries/cron reference a state that can&#39;t exist). Site: PUBLISHING→PUBLISHED|DRAFT. Worker steps ×5 — ⚠ &quot;Optimizing images&quot; + &quot;Performance check&quot; are <strong>MVP no-ops shown as completed</strong>; lighthouseScore always null (<code>workers/publish/[jobId]/route.ts:13-19,348,370</code>). Stale cutoffs QUEUED 5min / BUILDING 15min → FAILED &quot;STRANDED_BY_WORKER_DISPATCH_LOSS&quot;. HTML payload on job.log Json, <strong>cleared at terminal</strong> (data-at-rest). dispatchWorker fire-and-forget, retries [200,500ms], 2s in-flight window. Vercel: workspace OAuth, deploy v13, poll 2s/timeout 60s, URL = shortest alias &gt; project.vercel.app; 401/403 → VERCEL_TOKEN_INVALID + markInactive; prod 0-pages hard-fail (dev simulation exempt ⚠); republish failure preserves PUBLISHED if url exists. <strong>Server-side injection at deploy</strong>: analytics beacon, favicon/og, canonical+robots, robots.txt, <strong>FREE-plan &quot;Made with Buildrik&quot; badge</strong> (<code>route.ts:227-342</code>).</p>
+<h2>10.3 AI site-generation worker</h2>
+<p>AIGenerationJob: QUEUED→GENERATING_STRUCTURE→_CONTENT→_STYLES→COMPLETED|FAILED|CANCELLED; claim via conditional updateMany (double-dispatch guard, 409); <strong>write-at-end</strong> single $transaction (cancel = no site, no quota burn); site creationMethod &quot;AI&quot;, first slug forced <code>home</code>. Inputs: name 2-100, businessType ×6, pages 1-<strong>8</strong>, desc ≤500 (<code>schemas/templates.ts:12-20</code>). Credits: monthly <code>aiGenerations</code> (CANCELLED excluded) + <strong>3/hr anti-abuse all plans</strong> (<code>ai-generation.service.ts:6,26,35</code>). ⚠ <strong>No retry/reaping — lost dispatch strands job QUEUED forever</strong> (<code>:82-84</code>). ⚠ <strong>MODEL DRIFT</strong>: worker + <code>ai.page</code> hardcode <code>gpt-4o-mini</code>, ignoring PLAN_MODELS tiers (<code>ai.service.ts:9,187</code>).</p>
+<h2>10.4 Business rules master (ACTUAL values)</h2>
+<p><strong>PLAN_LIMITS</strong> (FREE/PRO/BUSINESS, <code>lib/constants/plan-limits.ts</code>): sites 3/15/50 · pagesPerSite 10/30/50 · domains 0/3/20 · team 1/5/25 · storageMB 500/5120/51200 · bandwidthMB 1024/10240/102400 · aiGenerations 3/20/-1 · aiPromptsPerDay 10/200/-1 · fileUploadMaxMB 10/50/200 · formSubmissions 100/2500/-1 · redirects 100/500/-1 · integrations 0/2/-1 · analyticsRetention 7/30/90d · shareLinkExpiry 7/30/90d · shareLinkPasswords ✗/✓/✓ · assetVersionsCap 5/25/100 · templateVersionsCap ∞ all · price $0/$29/$79 mo ($0/23/63 yr).</p>
+<p><strong>PLAN_MODELS</strong> (<code>:103-121</code>): FREE haiku-4-5 [haiku,4o-mini] · PRO sonnet-4-6 [+haiku] · BUSINESS opus-4-7 [all]. Client model = hint; unlisted → tier default. ⚠ &quot;ollama&quot; in modelSchema but no allow-list (env-forced only).</p>
+<p><strong>Publish caps</strong> (<code>schemas/publish.ts</code>): page HTML 2MB · payload 16MB · pages 500. <strong>Upload</strong> (<code>schemas/upload.ts</code>): avatar 5 / favicon 0.5 / touch 0.5 / og 2 / workspace 1 / site_media 50 / ticket 10 MB; route ceiling min(50MB, plan cap) (<code>asset-upload/route.ts:117</code>). <strong>Quota service</strong>: UTC-midnight daily bucket, atomic conditional updateMany reserve, release floors 0; ⚠ <code>used</code> return value wrong on success branch (cosmetic, <code>quota.service.ts:73-112</code>). AI bounds: prompt 5000, scope 200 el/120 tokens/100 assets. Theme snapshots 10/site. Billing downgrade: PAST_DUE + 7d grace → FREE + unpublish beyond 3 (keep newest, non-destructive, <code>billing.service.ts:183-198</code>).</p>
+<h2>10.5 Prisma models (editor)</h2>
+<p>Site (status DRAFT default, slug <strong>globally unique</strong>, projectStyles/Assets/Settings Json, dsSchemaVersion, soft-delete <code>schema.prisma:216-292</code>) · Page (blocks Json, @@unique(siteId,slug), seoTitle VarChar(60)/seoDesc(160) <code>:410-432</code>) · PublishBuildJob <code>:1164-1181</code> · AIGenerationJob (standalone, <code>:999-1017</code>) · AIUsage (userId+dayBucket unique <code>:629-641</code>) · MediaAsset (@@unique(userId,url) <code>:843-868</code>) · MediaFolder/AssetVersion · SiteVersion (@@unique(siteId,versionId) <code>:933-948</code>) · SiteComponent <code>:956-971</code> · CmsCollection/Entry (dynamic-page publish <code>:318-359</code>) · PendingUpload (10min TTL <code>:1236-1250</code>) · RateLimitBucket <code>:1256-1263</code> · CollabOperation <code>:1268-1280</code>.</p>
+<h2>10.6 Enum drift (all String columns, app-level enums)</h2>
+<table>
+<thead>
+<tr>
+<th>Enum</th>
+<th>Drift</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Site.status</td>
+<td>runtime PUBLISHING exists; ⚠ <code>listSitesSchema.status</code> omits it — mid-publish unfilterable (<code>schemas/sites.ts:22</code>)</td>
+</tr>
+<tr>
+<td>PublishBuildJob.status</td>
+<td>⚠ DEPLOYING declared everywhere, written nowhere</td>
+</tr>
+<tr>
+<td>AIGenerationJob.status</td>
+<td><code>aiJobStatusSchema</code> = z.string() unshaped</td>
+</tr>
+<tr>
+<td>businessType vs page types</td>
+<td>different axes; pages free-form → fallback &quot;landing&quot;</td>
+</tr>
+<tr>
+<td>Roles</td>
+<td>EDITOR(default)/ADMIN/OWNER/VIEWER</td>
+</tr>
+</tbody></table>
+<h2>10.7 Defects (feeds §13)</h2>
+<ol>
+<li>DEPLOYING dead status; 2. PUBLISHING unfilterable; 3. AI model-tier bypass (gpt-4o-mini hardcode); 4. quota <code>used</code> misleading; 5. MVP no-op steps shown completed; 6. dev simulation can COMPLETE non-deployed site; 7. AI job stranding (no reaper); 8. summarize/milestone uncounted; 9. upload completion path historically fragile (P0-P3 codex scars; onUploadCompleted never throws → silent orphans possible).</li>
+</ol>
+</section>
+<section class="chapter" id="ch11"><div class="chapter-label">Ch.11 Flows (v3.0)</div><h1>Editor PRD · Ch.11 — Flows (App Flows · User Flows · Feature Flows)</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v3.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-08 · reverse-engineered; nothing invented; uncertainty <code>[TBC]</code> · paths under <code>packages/editor/src/</code> unless noted. This chapter documents flows <strong>as built</strong> (not as intended). Broken/absent legs are marked ⛔ and cross-referenced to the §13 register in the master doc.</p>
+</blockquote>
+<hr>
+<h2>11.0 Personas × entry matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Persona</th>
+<th>Entry</th>
+<th>Rail/density</th>
+<th>Ship action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Agency designer (OWNER/ADMIN/DESIGNER)</td>
+<td>dashboard &quot;Edit site&quot; → <code>/edit/:id</code> or <code>?siteId=</code> (<code>BuildrikSyncProvider.ts:402-413</code>)</td>
+<td>4-tool rail, full inspector</td>
+<td>Publish dropdown (flag <code>publish</code>) or Export fallback (<code>Topbar.tsx:530-548</code>)</td>
+</tr>
+<tr>
+<td>Invited content editor</td>
+<td>same URL, member session</td>
+<td>4-tool, full</td>
+<td>same (server enforces ADMIN on publish)</td>
+</tr>
+<tr>
+<td>Client-view editor</td>
+<td><code>?view=client</code> (<code>editorViewMode.ts:31-38</code>)</td>
+<td>4-tool + density <code>fewer</code></td>
+<td>&quot;Send for review&quot; popover (<code>Topbar.tsx:463-529</code>)</td>
+</tr>
+<tr>
+<td>Anonymous/local (demo)</td>
+<td>no siteId</td>
+<td>4-tool</td>
+<td>Export only; saves to localStorage</td>
+</tr>
+<tr>
+<td>Legacy rail escape</td>
+<td><code>?rail=legacy</code></td>
+<td>11-tab rail (<code>editorViewMode.ts:34</code>)</td>
+<td>as above</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>11.1 APP FLOWS (system-level)</h2>
+<h3>F-A1 · Boot &amp; project load</h3>
+<pre><code>demo/main.tsx → &lt;AquibraStudio&gt; → StudioSkeleton until composer:ready
+  └─ useComposerInit (composer:ready):
+     siteId? ──yes──▶ versions.setProjectId + components.setProjectId (per-site IndexedDB scope)
+     │               ▶ loadProject(siteId): parallel tRPC sites.get + pages.list + siteDetail.settings.get
+     │               ▶ DS schema migrations (instance.migration.run)
+     │               ▶ importProject (DOMPurify sanitize per page root, Composer.ts:452-470)
+     │               ▶ save pill seeded &quot;Saved · just now&quot; ▶ loadServerMedia (200 assets cap)
+     │               ▶ toast &quot;Project loaded / Loaded from dashboard&quot;
+     └──no───▶ engine IndexedDB → localStorage[&quot;buildrick-project&quot;] → else create &quot;Page 1&quot;
+</code></pre>
+<ul>
+<li>Auth fail on load: <code>UNAUTHORIZED</code> → toast &quot;Session expired / Sign in&quot; → <code>${DASHBOARD_URL}/auth</code>; other errors → &quot;Load failed / falling back to local&quot; (<code>useComposerInit.ts:209-232</code>).</li>
+<li>First-run blank canvas → PageWizard mounts unless <code>buildrik:page-wizard-dismissed</code>/starter-seen (<code>AquibraStudio.tsx:140-161,582-588</code>).</li>
+<li>Crash recovery: sessionStorage sentinel <code>buildrick:last-crash</code> restores page/root/selection (<code>recovery/RecoveryManager.ts:26-198</code>).</li>
+<li>Sources: <code>useComposerInit.ts:137-285</code>, <code>BuildrikSyncProvider.ts:197-233</code>.</li>
+</ul>
+<h3>F-A2 · Save / autosave / conflict</h3>
+<pre><code>any edit → markDirty → PROJECT_CHANGED (fan-out hub, Composer.ts:696-710)
+  ├─ HistoryManager: 500ms coalesce → patch/checkpoint (max 100, checkpoint every 10)
+  ├─ shell autosave hook: debounce → siteId ? saveProject(dashboard) : composer.saveProject(localStorage)
+  │    (fires on project:changed, history:undo/redo, version:restored — useComposerInit.ts:385-388)
+  └─ engine StorageAdapter autosave 5000ms (localStorage/IndexedDB; secrets redacted at rest)
+saveProject (BuildrikSyncProvider):
+  dual-write sites.saveProject{expectedLastEditedAt} + siteDetail.settings.update (Site-column fields only)
+  ├─ OK → baseline lastEditedAt advances; pendingChanges re-emitted
+  ├─ retry ×1 → onSaveError → save pill &quot;Save failed&quot; (clickable retry)
+  └─ SAVE_CONFLICT:&lt;ts&gt; → SaveConflictError → window &quot;buildrik:save-conflict&quot;
+       → ConflictModal: Reload | Save backup (buildrik-backup-&lt;ts&gt;.json) | Overwrite (adopt token, re-save)
+</code></pre>
+<ul>
+<li>Data-loss guard: empty tree never auto-saved until content observed this session (2026-06-04 fixture-wipe incident, <code>BuildrikSyncProvider.ts:86-92,444-474</code>).</li>
+<li>⛔ Engine-level autosave has no conflict handling and never clears dirty flag (<code>StorageAdapter.ts:45-57</code>, master §13).</li>
+<li>Sources: <code>BuildrikSyncProvider.ts:288-329,457-494</code>, <code>AquibraStudio.tsx:278-538</code>.</li>
+</ul>
+<h3>F-A3 · Publish pipeline (end-to-end)</h3>
+<pre><code>Topbar Publish (flag publish=true, siteId required)
+  → exportPublishPages(composer) — engine ExportEngine.exportAllPages({format:&quot;html&quot;}) client-side
+  → PublishService.publishSite: tRPC sites.publish{siteId, pages[{path,html}]} → jobId
+  → usePublishJob poll sites.publishStatus every 2000ms (immediate first poll)
+  server: PublishBuildJob QUEUED→BUILDING→COMPLETED|FAILED|CANCELLED (DEPLOYING declared, never written — §13b A9)
+    worker: prePublish honesty guards; Vercel deploy via workspace OAuth when configured, else dev simulation
+    server-side injection at deploy: analytics beacon, favicon/og, canonical+robots, robots.txt, FREE-plan badge
+  client terminal:
+  ├─ COMPLETED → sites.get → publishedUrl → toast &quot;Site published&quot; (6s) → PublishDropdown &quot;published&quot;
+  ├─ FAILED → toast; VERCEL_NOT_CONNECTED/TOKEN_INVALID branch deep-links dashboard integrations
+  └─ CANCELLED (sites.cancelPublish)
+</code></pre>
+<ul>
+<li>Republish blocked only while job non-terminal (<code>usePublishJob.ts:92-96</code>); prior published state hydrated on mount (<code>:144-160</code>).</li>
+<li>⛔ PublishDropdown states in-review/approved defined but never driven — shell passes only draft|published (<code>AquibraStudio.tsx:402</code>); Submit-for-Review / Approve / Unpublish menu items are no-ops (&quot;Phase 7&quot;, <code>PublishDropdown.tsx:163-165</code>).</li>
+<li>⛔ Review approval gates nothing server-side (<code>editsRequireApproval</code> never read — master §13 A1).</li>
+<li>Sources: <code>useExportHandlers.ts:83-159</code>, <code>PublishService.ts:19-105</code>, Ch.10 §10.2.</li>
+</ul>
+<h3>F-A4 · Media upload pipeline</h3>
+<pre><code>file picked/dropped (accept image/video/audio/svg/fonts)
+  → validate size (img 10MB / video 100MB / audio 50MB / SVG 1MB; dim ≤4096)
+  → MIME magic-byte sniff (spoofed ext) → SVG: DOMPurify sanitize (reject non-svg root)
+  → auto-WebP convert → thumbnail → IndexedDB &quot;aquibra-media&quot; (local-first)
+  → best-effort server mirror: @vercel/blob client upload via POST ${DASHBOARD_URL}/api/asset-upload
+      (server validates session+quota+size → scoped token → direct browser→Blob upload)
+  → media.createAsset (idempotent on URL); server CUID replaces local id
+  ├─ mirror fail → localOnly=true + retryQueue (rebuilt on init, survives reload)
+  ├─ delete-during-upload → tombstone
+  └─ UPLOAD_COMPLETE → AltTextService auto-trigger (claude-haiku-4-5; never overwrites user text)
+FSM: pending(0)→uploading(25-50)→optimizing→processing(75)→complete(100)|error; rows clear 1.5s
+</code></pre>
+<ul>
+<li>Quota: server <code>media.checkStorageQuota</code> (FREE/PRO/BUSINESS, −1 unlimited) else local 1GB SSOT; pre-check blocks; warn 80% / critical 95%.</li>
+<li>Sources: <code>MediaManager.ts:684-903</code>, <code>AssetUploadService.ts:50-92</code>, Ch.08 §8.1.</li>
+</ul>
+<h3>F-A5 · AI edit pipeline (AITab — the real path)</h3>
+<pre><code>AITab (rail &quot;ai&quot; / topbar ✨) → scope chip (element/page; locked during stream)
+  ├─ Chat: prompt ≤5000 → tRPC subscription ai.streamPrompt (intent text|style-command|plan)
+  │    server: provider-check BEFORE quota reserve; refund on no-delivery
+  │    → streamed edit-command batch (14 command types; server-side validation gate:
+  │      style/attr allow-lists, unsafe-value regex, exact-id — ai.service.ts)
+  │    → diff UI accept/reject/regenerate → applied in ONE transaction
+  │    → adoptionTracker fire-and-forget ai.logAdoption (edit.applied / edit.reverted)
+  └─ Agent: plan ≤8 steps → per-step pending→running→awaiting→applied|skipped|nochange|failed
+       (approve / skip / auto-apply; agent.run adoption event)
+Quota 403 → window &quot;upgrade-modal-open&quot; → UpgradeModal → ${DASHBOARD_URL}/dashboard/billing
+Privileged action (site.publish only): propose→ConfirmDialog→confirm w/ single-use 5-min token, role re-checked
+Client transport guards: 30 req/60s sliding window, timeout 30s, retry ×2 (5xx/408/429 only), queue concurrency 3, cache TTL 5min
+</code></pre>
+<ul>
+<li>⛔ Parallel legacy surfaces: AIAssistantBar (dark-glass, credits via window event, never enforced client-side) + AIAssistant modal both open on <code>showAI</code> simultaneously (<code>StudioModals.tsx:240-247</code> + <code>AquibraStudio.tsx:570-574</code>); AICopilot mounted but <strong>no trigger calls openCopilot</strong> — orphan. Image gen + streaming in <code>openai.ts</code> facade are fake (picsum / non-streaming fallback).</li>
+<li>Sources: Ch.02 §2.2/2.4, Ch.09 §9.1-9.2, <code>AiTrpcClient.ts:14-18,106</code>.</li>
+</ul>
+<h3>F-A6 · Version snapshot / restore</h3>
+<pre><code>HistoryTab / VersionHistoryPanel
+  save version (name ≤50) → VersionTimelineManager → IndexedDB &quot;aquibra-versions&quot; (cap 50, JPEG snapshot q0.6)
+  → versionSync mirror → tRPC siteVersions.create (server cap 50/site)
+  restore → client-side importProject from snapshot (clone-before-import, P0 2026-06-09)
+  time-travel scrubber (Ctrl+Shift+T): restoreEntry truncates redo, pushes &quot;Restored to:&quot; checkpoint
+  hover 300ms → preview banner &quot;Preview — not saved / Exit&quot; (canvas dims)
+  compare: Visual diptych / Semantic list (cap 20 changes); AI summary via POST /api/trpc/ai.summarize (60s cooldown; ⛔ quota-free — §13 B7)
+</code></pre>
+<ul>
+<li>Sources: Ch.01 (VersionHistoryPanel), <code>HistoryManager.ts:645-699</code>, <code>versionSync.ts:52-94</code>.</li>
+</ul>
+<h3>F-A7 · Undo / redo (user-visible contract)</h3>
+<pre><code>edit → PROJECT_CHANGED → 500ms coalesce → JSON-patch entry (style bursts labeled &quot;style-batch&quot;)
+undo/redo: flushPending() first → whole-tree importProject + selection revalidation
+  bail-out without mutation if patch path diverges (iter-13 P0-9 guard)
+not undoable: runWithoutTracking (txn rollback), collab remote ops, restore-in-progress
+canUndo requires stack &gt;1 (baseline checkpoint protected); depth 100; RAM-only — lost on reload
+</code></pre>
+<ul>
+<li>Sources: <code>HistoryManager.ts:70-274,451-611</code>.</li>
+</ul>
+<h3>F-A8 · Sync services fan-out (background mirrors)</h3>
+<table>
+<thead>
+<tr>
+<th>Mirror</th>
+<th>Trigger</th>
+<th>Server</th>
+<th>Offline behavior</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>cmsSync</td>
+<td>collection/entry mutations</td>
+<td>cms.* upsert/delete/list</td>
+<td>retry queue latest-wins, <code>online</code> auto-retry (<code>cmsSync.ts:34-98</code>)</td>
+</tr>
+<tr>
+<td>componentSync</td>
+<td>component master CRUD</td>
+<td>siteComponents.*</td>
+<td>best-effort</td>
+</tr>
+<tr>
+<td>versionSync</td>
+<td>version create/delete</td>
+<td>siteVersions.*</td>
+<td>idempotent mirror</td>
+</tr>
+<tr>
+<td>templateSync</td>
+<td>My Templates save</td>
+<td>userTemplates.upsert/list</td>
+<td>localStorage cache <code>MY_TEMPLATES</code></td>
+</tr>
+<tr>
+<td>MediaVersionService</td>
+<td>image-editor save <code>_v{n}</code></td>
+<td>media.*AssetVersion</td>
+<td>plan cap 5/25/100 server-side</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>11.2 USER FLOWS (persona step-by-step, as built)</h2>
+<h3>U1 · First-run builder → first publish</h3>
+<ol>
+<li>Dashboard &quot;Edit site&quot; → <code>/edit/:id</code> (needs <code>NEXT_PUBLIC_UNIFIED_EDITOR=true</code>, else dead legacy demo — root CLAUDE.md env table).</li>
+<li>F-A1 load → blank canvas → <strong>PageWizard</strong> (7 hardcoded steps insert static HTML; ⛔ &quot;AI&quot; simulated — inputs discarded, <code>PageWizard.tsx:53-135</code>) or empty-canvas CTA &quot;Browse Templates / Start blank&quot;.</li>
+<li>Onboarding checklist (7 steps: name-project → pick-start → add-element → edit-text → change-style → preview → publish) bottom-right pill; achievement modal 4s per completion; collapses on element select (<code>useOnboardingOrchestrator.ts:114</code>). ⛔ WelcomeModal + SpotlightOverlay orphans — never mounted.</li>
+<li>Build (U2) → Preview ⌘P (sanitized sandboxed window) → Publish (F-A3).</li>
+</ol>
+<h3>U2 · Build a page (core loop)</h3>
+<ol>
+<li>Rail Insert (A) → BuildTab exclusive-accordion catalog (53 elements / 6 categories; ecommerce excluded) → click-to-add (smart parent walk-up + nesting-error toast, <code>useBlockInsertion.ts:66-165</code>) or drag to canvas (snap guides 5px, drop zones 25% edges, touch long-press 500ms).</li>
+<li>Select → inspector (Look/Layout/Effects tabs, profile-ordered sections) → edits: instant local preview + 300ms debounced engine write in <code>beginTransaction(&quot;style-change&quot;)</code> (<code>useStyleHandlers.ts:106-192</code>).</li>
+<li>Breakpoint switcher (wide/desktop/tablet/mobile) → per-breakpoint overrides (desktop-first: tablet ≤1023, mobile ≤767); pseudo-state pills (hover/focus/active/disabled).</li>
+<li>Double-click → inline text edit (whitelisted tags; Enter commits, Esc reverts; Selection-API rich commands, unsafe URLs rejected).</li>
+<li>Right-click → context menu (Edit/Insert/Layout/Quick-Style submenus + Save-as-component/Group/Lock — full list Ch.04 §4.1).</li>
+<li>Autosave F-A2; undo toast on destructive ops.</li>
+</ol>
+<h3>U3 · Brand / design-system flow</h3>
+<ol>
+<li>Rail Styles (D) → DesignSystemTab v12: Tokens / Styles / Components / Export sections.</li>
+<li>Tokens: 14 kinds; edit → live CSS var on documentElement; per-token undo; lint (no-black, banned purple/violet/indigo, alias depth ≤3, contrast auto-fix to AA 4.5).</li>
+<li>Starter themes ×6 (cobalt/stripe/notion/apple/linear/vercel) — restyles tokens, keeps elements.</li>
+<li>Apply → <code>composer.setProjectSettings({designTokens, schemaVersion:4, designPresets})</code> + markSaved. ⛔ <code>persistAll</code> localStorage path serializes only 3/14 kinds (§13 A3).</li>
+<li>Bind in inspector: token chains stored <code>var(--buildrick-design-&lt;id&gt;)</code>; Reach strip This item / All like this (blast-radius confirm) / Whole site.</li>
+<li>Export: CSS (dark: media|data-attr|off) / JSON / Tailwind (drops dark variants, warned) / ⛔ Figma stub. Import: JSON-only parser, conflict strategies Replace/keep-mine/keep-theirs.</li>
+<li>Cross-site brand: &quot;Open Shared theme ↗&quot; <strong>link-out to dashboard only</strong> — no push UI in editor (§12 #7).</li>
+</ol>
+<h3>U4 · Component flow</h3>
+<ol>
+<li>Select subtree → context &quot;Save as component&quot; or rail Components (⇧A; MAX 100).</li>
+<li>Instantiate from panel → per-instance overrides stored as <code>#/</code> position paths.</li>
+<li>Variant swap via inspector VariantSection; detach = pro-DS-mode only.</li>
+<li>Master edit → sync re-applies overrides (style+attr survive — F1a; content/trait disputed; ⛔ reorder survival F1b deferred; ⛔ &quot;reset to master&quot;/is-overridden UI dead — path-scheme mismatch <code>#/</code> vs <code>/elements/</code>, §13 A2).</li>
+<li>Masters mirrored via componentSync → siteComponents.*.</li>
+<li>Catalog (27 read-only polished components) inserts via <code>placeCatalogComponent</code> one-transaction; ⛔ catalog drag-to-canvas stub; ⛔ ComponentsPanelV2 &quot;+AI&quot; schema → localStorage only, canvas insert unbuilt.</li>
+</ol>
+<h3>U5 · Client editor flow (<code>?view=client</code>)</h3>
+<ol>
+<li>Full reload with param → 4-tool rail + density <code>fewer</code> (inspector = first 3 sections + &quot;Show all controls&quot;).</li>
+<li>Edits identical engine path (no scoped permissions client-side).</li>
+<li>Ship = &quot;Send for review&quot; popover: summary + note ≤500 → <code>reviews.submit</code> (states idle/sending/sent/error).</li>
+<li>⛔ No tokenized share link exists (ShareLink model server-only, §13 B12); &quot;preview as client&quot; = URL param only.</li>
+</ol>
+<h3>U6 · Review / approval loop (⛔ broken as designed)</h3>
+<ol>
+<li>EDITOR submits review (U5) → ADMIN notified by email → resolve APPROVED | CHANGES_REQUESTED (1 PENDING/site).</li>
+<li>⛔ Publish never checks review state; <code>editsRequireApproval</code> saved but unenforced (§13 A1/C1).</li>
+<li>⛔ External client not in loop: comments backend complete (create incl. VIEWER, pins, resolve) — zero editor UI (§13 A4/B4).</li>
+</ol>
+<h3>U7 · Media flow</h3>
+<ol>
+<li>Rail Media (M) → 3 modes (280/320 launcher · 560 expanded · fullpage LibraryManager, shortcut J).</li>
+<li>Upload (F-A4) / Import URL (LibraryManager prompt; ⛔ modal &quot;From URL&quot; tab = coming-soon stub) / Add from stock (Unsplash/Pexels/Pixabay server-proxied; tabs Photos/Videos/Icons/Fonts).</li>
+<li>Organize: folders (create/delete; smart folders Recent-7d / In-use / Unused; ⛔ Trash = toast stub), bulk move/delete/select-all, sort, grid/list.</li>
+<li>Detail rail: alt text ≤125 + AI generate w/ provenance chip; Versions tab (revert = replaceAcross); Used-in tab.</li>
+<li>Edit image: crop (aspect presets, rotate ±180, flip, zoom 1-3×) / adjust (b/c/s ±100, blur 0-20, 6 filter presets) / resize → WebP q0.92 saved as <code>_v{n}</code> version.</li>
+<li>Optimize: WebP/AVIF/JPEG/PNG, quality 10-100 (default 85), max-dim clamp, live savings.</li>
+<li>Replace-across: all usages atomic (one undo) or per-page selective modal.</li>
+<li>Icons: Lucide 369, size 12-96 / stroke 0.5-4 / color, recents ×12.</li>
+</ol>
+<h3>U8 · CMS / ecommerce flow</h3>
+<ol>
+<li>Drop e-com block (product-card/grid/detail; ⛔ not in build-tab catalog — Ch.07) → CollectionSetupModal once per session → ProductCollectionService creates Products collection (8 fields, optional 3 samples) in composer.cms.</li>
+<li>Bind elements via inspector BindingPopover (cms.bindings).</li>
+<li>cmsSync mirrors collections/entries to server (retry queue).</li>
+<li>⛔ Dynamic pages have no editor front-door; records stay <code>draft</code>, per-record publish absent (§12 #6).</li>
+</ol>
+<h3>U9 · Version rescue flow</h3>
+<p>HistoryTab (H) → Changes/Saves views → scrub timeline → hover-preview → restore (F-A6) → autosave persists restored state. Auto-milestone banner surfaces suggested save points.</p>
+<h3>U10 · Export flow (no-publish path)</h3>
+<p>Topbar Export (flag off) → engine ZIP download direct; or ExportModal (StudioModals): format HTML/ZIP/React (⛔ Vue/Next coming-soon; JSON unsurfaced) → Preview/Code/Options tabs → download. Publish reuses the same engine exporters (F-A3).</p>
+<h3>U11 · Pages management flow</h3>
+<ol>
+<li>PageTabBar above canvas: switch, + add, rename (F2, live slug preview), duplicate (&quot;X Copy&quot;), set-home 🏠, delete (confirm + 8s undo toast; home/last page protected — <code>PageTabBar.tsx:37,160-171</code>).</li>
+<li>Rail Pages (P): CRUD + localStorage-only folders, bulk multi-select (⌘/Shift/Space) duplicate/move/delete, drag reorder, ⌘K palette, copy link, SEO table view.</li>
+<li>Per-page settings drawer: SEO (score algorithm max 100; noIndex→0)/Social/Advanced; slug normalize + collision check; head-code tag-balance guard; autosave 500ms, ⌘S immediate.</li>
+<li>⛔ SEO counters lie: title shows /60 but maxLength 80; desc /160 slices 200 (<code>SeoTab.tsx:149-218</code>); score labels contradict algorithm (§13b B10).</li>
+</ol>
+<h3>U12 · Site settings flow</h3>
+<p>Rail Site (S) → SettingsTab drill-in (root ⇄ section, 180ms lock + dirty guard): 10 sections in 3 groups (SITE/DISTRIBUTION/PLUMBING) + 3 workspace deep-links (Domains/Members/Billing → dashboard). Central dirty counter + sticky savebar. Plan gates: advanced + integrations require pro → LockedScreen → billing. ⛔ Redirects/Headers saved but not enforced on live sites (explicit banners); Integrations all &quot;Coming Soon&quot;; Localization routing &quot;Phase D&quot; (§13b B8).</p>
+<hr>
+<h2>11.3 FEATURE FLOWS (trigger → path → outcome → failure modes)</h2>
+<p>Compact per-feature contracts. Full field/validation detail lives in Ch.01-10.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Feature</th>
+<th>Trigger</th>
+<th>Path (engine/API)</th>
+<th>Outcome</th>
+<th>Failure/edge</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FF1</td>
+<td>Select element</td>
+<td>canvas click / layers / Tab-cycle</td>
+<td>SelectionManager SSOT → events mirror to React</td>
+<td>inspector opens, handles render</td>
+<td>locked → toast+block; root excluded</td>
+</tr>
+<tr>
+<td>FF2</td>
+<td>Multi-select</td>
+<td>Shift+click / marquee ≥5px / ⌘A</td>
+<td>SelectionManager multiple</td>
+<td>MultiSelectToolbar (align ≥2, distribute ≥3); merged &quot;Mixed&quot; values</td>
+<td>only 5 batch style fields</td>
+</tr>
+<tr>
+<td>FF3</td>
+<td>Insert block</td>
+<td>click/drag from BuildTab</td>
+<td><code>insertBlock</code>: canNest validate → sanitize → create/build</td>
+<td>success animation + toast</td>
+<td>8 drop-error types; nesting toast; 150ms re-click guard</td>
+</tr>
+<tr>
+<td>FF4</td>
+<td>Drag existing</td>
+<td>mousedown 5px / touch 500ms</td>
+<td>DragManager idle→pending→dragging; Alt=clone</td>
+<td>move/reparent one txn</td>
+<td>invalid-drop reasons ×9 overlay</td>
+</tr>
+<tr>
+<td>FF5</td>
+<td>Resize/rotate</td>
+<td>8 handles / rotation handle</td>
+<td>engine ResizeHandler</td>
+<td>live W×H readout; Shift 15° snap</td>
+<td>handles hidden ≤50px edges, locked</td>
+</tr>
+<tr>
+<td>FF6</td>
+<td>Inline text edit</td>
+<td>double-click text</td>
+<td>contentEditable + Selection API</td>
+<td>Enter commit → sanitize → setContent</td>
+<td>Esc revert; nested-id block; unsafe URL reject</td>
+</tr>
+<tr>
+<td>FF7</td>
+<td>Style edit</td>
+<td>inspector field</td>
+<td>300ms debounce → txn &quot;style-change&quot; → setStyle / setBreakpointStyle / setRule(pseudo)</td>
+<td>canvas updates; history coalesced</td>
+<td>numeric regex; Esc revert + aria-invalid; kebab-key auto-expand dead (§13b A19)</td>
+</tr>
+<tr>
+<td>FF8</td>
+<td>Token bind</td>
+<td>chip in inspector</td>
+<td><code>var(--buildrick-design-&lt;id&gt;)</code> write</td>
+<td>O(1) propagation via CSS var</td>
+<td>never raw values</td>
+</tr>
+<tr>
+<td>FF9</td>
+<td>Page CRUD</td>
+<td>PageTabBar / PagesTab</td>
+<td>PageManager (Map order; slug history 100; single-home invariant)</td>
+<td>typed PROJECT_CHANGED</td>
+<td>engine allows deleting last page — UI guards it <code>[TBC engine-side]</code></td>
+</tr>
+<tr>
+<td>FF10</td>
+<td>Template apply</td>
+<td>TemplatesTab / empty-CTA</td>
+<td>txn → importHTMLToActivePage; FSM idle→confirming→applying→success|error (15s timeout)</td>
+<td>sections appended</td>
+<td>500ms artificial delay; My Templates localStorage(+server mirror)</td>
+</tr>
+<tr>
+<td>FF11</td>
+<td>Component create</td>
+<td>context menu / panel</td>
+<td>ComponentManager master + instance</td>
+<td>⚡ badge in layers</td>
+<td>cap 100</td>
+</tr>
+<tr>
+<td>FF12</td>
+<td>Instance sync</td>
+<td>master edit</td>
+<td>version-gated stale → sync; overridesPreserved/Dropped events</td>
+<td>style/attr overrides survive</td>
+<td>⛔ reset-UI dead (A2); reorder drops overrides (F1b)</td>
+</tr>
+<tr>
+<td>FF13</td>
+<td>Publish</td>
+<td>Topbar</td>
+<td>F-A3</td>
+<td>publishedUrl</td>
+<td>ADMIN-only server-side; 2MB/16MB/500p caps; 1 active job/site</td>
+</tr>
+<tr>
+<td>FF14</td>
+<td>Send for review</td>
+<td>client-view Ship</td>
+<td>reviews.submit</td>
+<td>&quot;sent&quot; state</td>
+<td>⛔ gates nothing (A1)</td>
+</tr>
+<tr>
+<td>FF15</td>
+<td>AI chat edit</td>
+<td>AITab prompt</td>
+<td>F-A5 streaming</td>
+<td>accept/reject diff → txn</td>
+<td>quota 403 → UpgradeModal; provider-missing pre-reserve</td>
+</tr>
+<tr>
+<td>FF16</td>
+<td>AI agent run</td>
+<td>AITab agent mode</td>
+<td>plan ≤8 steps FSM</td>
+<td>per-step apply/skip</td>
+<td>step failed → continue/abort</td>
+</tr>
+<tr>
+<td>FF17</td>
+<td>AI alt-text</td>
+<td>media detail / auto on upload</td>
+<td>media.generateAltText (haiku)</td>
+<td>provenance chip</td>
+<td>never overwrites user text; TOCTOU-guarded server-side</td>
+</tr>
+<tr>
+<td>FF18</td>
+<td>Upload asset</td>
+<td>picker/drop/paste/OS-drag</td>
+<td>F-A4</td>
+<td>grid + usable src</td>
+<td>quota block pre-check; localOnly retry queue</td>
+</tr>
+<tr>
+<td>FF19</td>
+<td>Replace across</td>
+<td>media detail</td>
+<td>mediaOps.replaceAcross(Selective)</td>
+<td>atomic multi-page swap</td>
+<td>per-page modal counts elements</td>
+</tr>
+<tr>
+<td>FF20</td>
+<td>Version save/restore</td>
+<td>HistoryTab</td>
+<td>F-A6</td>
+<td>restored tree</td>
+<td>cap 50; preview banner guards accidental edits</td>
+</tr>
+<tr>
+<td>FF21</td>
+<td>Undo/redo</td>
+<td>⌘Z/⌘⇧Z</td>
+<td>F-A7</td>
+<td>tree swap + selection revalidate</td>
+<td>RAM-only; baseline protected</td>
+</tr>
+<tr>
+<td>FF22</td>
+<td>Interactions</td>
+<td>inspector section</td>
+<td>13-14 triggers × 42 presets, delay 0-5s</td>
+<td>runtime on preview mode only (InteractionManager start/stop)</td>
+<td>&quot;7&quot; in older docs stale (§13 B6); code enumerates 14</td>
+</tr>
+<tr>
+<td>FF23</td>
+<td>Animation</td>
+<td>inspector AnimationSection</td>
+<td>AnimationEditor 12/8/5 presets → generateAnimationCSS</td>
+<td>CSS animation config</td>
+<td>⛔ triggers removed 2026-05-18 (engine ignored); Timeline/ScrollTrigger L0</td>
+</tr>
+<tr>
+<td>FF24</td>
+<td>Forms</td>
+<td>form blocks + FormSettingsSection</td>
+<td>formId gen; action submit/webhook/email</td>
+<td>published: POST /api/public/forms (10/60s, 256KB, honeypot)</td>
+<td>editor-preview submissions in-memory only (§13b A16); ContactForm swallows errors</td>
+</tr>
+<tr>
+<td>FF25</td>
+<td>Export code</td>
+<td>ExportModal / topbar</td>
+<td>ExportEngine / ReactExporter client-side</td>
+<td>download blobs</td>
+<td>Vue/Next stubs; preview sanitized hard</td>
+</tr>
+<tr>
+<td>FF26</td>
+<td>Zoom/fit</td>
+<td>footer −/+, ⌘0-style fit</td>
+<td>presets 25-200 UI (engine allows 10-500 ⚠)</td>
+<td>scaled canvas</td>
+<td>no free-pan mode</td>
+</tr>
+<tr>
+<td>FF27</td>
+<td>Keyboard ops</td>
+<td>Ch.04 §4.2 map</td>
+<td>commands via CommandCenter</td>
+<td>toasted w/ Undo</td>
+<td>dual arrow-handler conflict (§13b A13)</td>
+</tr>
+<tr>
+<td>FF28</td>
+<td>Color mode</td>
+<td>topbar cycle</td>
+<td>ColorMode light/dark/system persisted <code>buildrik:colorMode</code></td>
+<td>DarkResolver darkValue ?? value</td>
+<td>DS UI dropped System pill (state keeps it)</td>
+</tr>
+<tr>
+<td>FF29</td>
+<td>Collab session</td>
+<td>&quot;Collaborate&quot; button (flag <code>collab</code>)</td>
+<td>CollaborationManager over SSE (1.5s poll, 24h retention)</td>
+<td>presence avatars, cursors</td>
+<td>⛔ DEMO-ONLY: OT non-convergent (6 P1s), MOCK_USERS fallback, clientId spoofable; ConnectionQualityIndicator orphan</td>
+</tr>
+<tr>
+<td>FF30</td>
+<td>Onboarding step</td>
+<td>checklist CTA</td>
+<td>composer.emit(UI_PANEL_OPEN...) routes to panel</td>
+<td>step complete + achievement 4s</td>
+<td>local-only; last step / skipAll → done</td>
+</tr>
+<tr>
+<td>FF31</td>
+<td>Stock insert</td>
+<td>media &quot;Add from stock&quot;</td>
+<td>media.searchStockPhotos/Videos proxy</td>
+<td>insert w/ attribution data</td>
+<td>keys unset → <code>[]</code> (silent empty)</td>
+</tr>
+<tr>
+<td>FF32</td>
+<td>Icon insert</td>
+<td>icon block / picker</td>
+<td>IconConfig lucide + size/stroke/color</td>
+<td>inline SVG element</td>
+<td>recents localStorage</td>
+</tr>
+<tr>
+<td>FF33</td>
+<td>Preview</td>
+<td>⌘P</td>
+<td>sanitized HTML → sandboxed window</td>
+<td>visual check</td>
+<td>popup blocked → warning toast</td>
+</tr>
+<tr>
+<td>FF34</td>
+<td>Command palettes</td>
+<td>⌘K (shell) / ⌘⇧P (canvas)</td>
+<td>2 separate registries</td>
+<td>action exec</td>
+<td>⛔ fragmented; unified ⌘K = spec-only (§12 #5); &quot;Open SEO&quot; honest fallback</td>
+</tr>
+<tr>
+<td>FF35</td>
+<td>Crash recovery</td>
+<td>reload after crash</td>
+<td>RecoveryManager sentinel</td>
+<td>page/root/selection restored</td>
+<td><code>recovery:runtime-fault-caught</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>11.4 Flow dead-ends (outcome-closure gaps)</h2>
+<p>Cross-referenced to master §13 + design-gaps audit 2026-06-30:</p>
+<ol>
+<li><strong>J5 sign-off loop open</strong> — review submit works; approval enforces nothing; client has no surface (A1, A4, B12, C1).</li>
+<li><strong>CMS payoff unreachable</strong> — collections/bindings work in-editor; dynamic pages/per-record publish have no front door (§12 #6).</li>
+<li><strong>Publish trust theater</strong> — worker shows &quot;Optimizing images&quot;/&quot;Performance check&quot; as completed no-ops; lighthouseScore always null (§13b A20); dev simulation can mark non-deployed site COMPLETED.</li>
+<li><strong>AI second path rot</strong> — AIAssistantBar/AICopilot/openai facade legs are legacy/fake/orphaned while AITab is real (B2).</li>
+<li><strong>Settings that don&#39;t act</strong> — Redirects/Headers/Localization/Integrations saved-or-shown but not live (§13b B8).</li>
+<li><strong>Local-feeling cloud</strong> — LibraryManager shows &quot;This device only&quot; pill while assets actually mirror to server <code>[TBC intended copy]</code> (Ch.08 report).</li>
+</ol>
+</section>
+<section class="chapter" id="ch12"><div class="chapter-label">Ch.12 Feature Catalog (v3.0)</div><h1>Editor PRD · Ch.12 — Master Feature Catalog</h1>
+<blockquote>
+<p>Part of BUILDRIK-PRD-EDITOR v3.0 · <code>main</code> @ <code>e5624ca1</code> · 2026-07-08 · One row per user-facing feature. Status verified against code this pass (7 parallel module scans); doc-status inherited from <code>docs/reviews/complete-feature-list-20260623.md</code> (07-02 code-verify update) where re-verified.</p>
+<p><strong>Status legend:</strong> ✅ working · 🟡 partial · 🔵 stub/fake · 🔴 broken · ⚪ local-only (no server persistence) · 👻 orphan (built, unreachable in UI) · 🔒 flag/plan-gated</p>
+<p><strong>Flow ref</strong> = Ch.11 flow ids (F-A*/U*/FF*).</p>
+</blockquote>
+<h2>12.1 Shell &amp; global</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Entry</th>
+<th>Status</th>
+<th>Backend</th>
+<th>Flow</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Boot: load project by siteId</td>
+<td><code>/edit/:id</code> or <code>?siteId=</code></td>
+<td>✅</td>
+<td>sites.get + pages.list + siteDetail.settings.get</td>
+<td>F-A1</td>
+<td><code>BuildrikSyncProvider.ts:197-233</code></td>
+</tr>
+<tr>
+<td>Boot: local/demo mode</td>
+<td>no siteId</td>
+<td>⚪</td>
+<td>localStorage/IndexedDB</td>
+<td>F-A1</td>
+<td><code>useComposerInit.ts:237-285</code></td>
+</tr>
+<tr>
+<td>Autosave (dashboard)</td>
+<td>any edit</td>
+<td>✅</td>
+<td>sites.saveProject dual-write</td>
+<td>F-A2</td>
+<td><code>BuildrikSyncProvider.ts:288-329,494</code></td>
+</tr>
+<tr>
+<td>Save-conflict UX</td>
+<td>concurrent edit</td>
+<td>✅</td>
+<td>expectedLastEditedAt → CONFLICT</td>
+<td>F-A2</td>
+<td><code>AquibraStudio.tsx:278-538</code></td>
+</tr>
+<tr>
+<td>Undo/redo</td>
+<td>⌘Z/⌘⇧Z</td>
+<td>✅⚪ RAM-only</td>
+<td>—</td>
+<td>F-A7</td>
+<td><code>HistoryManager.ts:70-274</code></td>
+</tr>
+<tr>
+<td>Save pill (4 variants + offline queue)</td>
+<td>topbar</td>
+<td>✅</td>
+<td>—</td>
+<td>F-A2</td>
+<td><code>Topbar.tsx:270-317</code></td>
+</tr>
+<tr>
+<td>Breakpoint switcher (wide/desktop/tablet/mobile)</td>
+<td>topbar</td>
+<td>✅</td>
+<td>—</td>
+<td>U2</td>
+<td><code>Topbar.tsx:388-393</code></td>
+</tr>
+<tr>
+<td>Color mode light/dark/system</td>
+<td>topbar cycle</td>
+<td>✅</td>
+<td>persisted <code>buildrik:colorMode</code></td>
+<td>FF28</td>
+<td><code>ColorMode.ts:4-71</code></td>
+</tr>
+<tr>
+<td>Preview (sanitized window)</td>
+<td>⌘P</td>
+<td>✅</td>
+<td>client-side</td>
+<td>FF33</td>
+<td><code>StudioHeader.tsx:197-217</code></td>
+</tr>
+<tr>
+<td>Publish dropdown</td>
+<td>topbar</td>
+<td>🟡🔒 flag <code>publish</code></td>
+<td>sites.publish family</td>
+<td>F-A3</td>
+<td><code>PublishDropdown.tsx</code> — only Publish/View/Copy wired; Submit-review/Approve/Unpublish no-ops (§13 A1)</td>
+</tr>
+<tr>
+<td>Export HTML fallback</td>
+<td>topbar (flag off)</td>
+<td>✅</td>
+<td>client-side ZIP</td>
+<td>U10</td>
+<td><code>useExportHandlers.ts:60-81</code></td>
+</tr>
+<tr>
+<td>Command palette (shell ⌘K)</td>
+<td>topbar/⌘K</td>
+<td>✅</td>
+<td>—</td>
+<td>FF34</td>
+<td><code>Topbar.tsx:259-268</code> — fragmented vs canvas ⌘⇧P</td>
+</tr>
+<tr>
+<td>Command palette (canvas ⌘⇧P)</td>
+<td>canvas</td>
+<td>✅</td>
+<td>—</td>
+<td>FF34</td>
+<td><code>useCanvasCommandPalette.ts</code></td>
+</tr>
+<tr>
+<td>Keyboard shortcut system</td>
+<td>global + canvas</td>
+<td>✅</td>
+<td>—</td>
+<td>FF27</td>
+<td>Ch.04 §4.2 — ⚠ dual arrow-handler conflict (§13b A13)</td>
+</tr>
+<tr>
+<td>4-tool rail (Insert/Pages/Styles/Site)</td>
+<td>default</td>
+<td>✅</td>
+<td>—</td>
+<td>11.0</td>
+<td><code>editorViewMode.ts:34</code> — <code>?rail=legacy</code> escape; ⚠ stale opt-in comment <code>LeftSidebar.tsx:399</code></td>
+</tr>
+<tr>
+<td>Legacy 11-tab rail</td>
+<td><code>?rail=legacy</code></td>
+<td>✅</td>
+<td>—</td>
+<td>11.0</td>
+<td><code>tabsConfig.ts:79-247</code></td>
+</tr>
+<tr>
+<td>Client view mode</td>
+<td><code>?view=client</code></td>
+<td>✅</td>
+<td>—</td>
+<td>U5</td>
+<td><code>editorViewMode.ts:31-38</code></td>
+</tr>
+<tr>
+<td>Send for review</td>
+<td>client-view Ship</td>
+<td>🟡</td>
+<td>reviews.submit</td>
+<td>U6</td>
+<td>gates nothing (§13 A1)</td>
+</tr>
+<tr>
+<td>Conflict modal backup download</td>
+<td>conflict</td>
+<td>✅</td>
+<td>—</td>
+<td>F-A2</td>
+<td><code>buildrik-backup-&lt;ts&gt;.json</code></td>
+</tr>
+<tr>
+<td>Issues pill</td>
+<td>topbar (when &gt;0)</td>
+<td>✅</td>
+<td>—</td>
+<td>—</td>
+<td><code>Topbar.tsx:398-409</code></td>
+</tr>
+<tr>
+<td>StructurePopover (footer ⌗)</td>
+<td>footer</td>
+<td>✅</td>
+<td>—</td>
+<td>—</td>
+<td><code>StructurePopover.tsx:52-99</code></td>
+</tr>
+<tr>
+<td>Footer zoom presets 25–200</td>
+<td>footer</td>
+<td>✅</td>
+<td>—</td>
+<td>FF26</td>
+<td><code>StudioFooter.tsx:17,73-90</code></td>
+</tr>
+<tr>
+<td>Footer &quot;Connected · main&quot; branch label</td>
+<td>footer</td>
+<td>🔵 static</td>
+<td>—</td>
+<td>—</td>
+<td><code>StudioFooter.tsx:130</code></td>
+</tr>
+<tr>
+<td>Crash recovery</td>
+<td>reload</td>
+<td>✅</td>
+<td>sessionStorage sentinel</td>
+<td>FF35</td>
+<td><code>RecoveryManager.ts:26-198</code></td>
+</tr>
+<tr>
+<td>Error boundary + reload screen</td>
+<td>crash</td>
+<td>✅</td>
+<td>—</td>
+<td>—</td>
+<td><code>AquibraStudio.tsx:84-119</code> — componentDidCatch empty</td>
+</tr>
+<tr>
+<td>Onboarding checklist (7 steps)</td>
+<td>first run</td>
+<td>✅⚪</td>
+<td>localStorage only</td>
+<td>FF30/U1</td>
+<td><code>useOnboardingOrchestrator.ts:114-239</code></td>
+</tr>
+<tr>
+<td>Achievement prompts</td>
+<td>step complete</td>
+<td>✅</td>
+<td>—</td>
+<td>U1</td>
+<td>4s auto-dismiss</td>
+</tr>
+<tr>
+<td>WelcomeModal</td>
+<td>—</td>
+<td>👻</td>
+<td>—</td>
+<td>—</td>
+<td>exported, never mounted (<code>onboarding/index.ts:22</code>)</td>
+</tr>
+<tr>
+<td>SpotlightOverlay</td>
+<td>—</td>
+<td>👻</td>
+<td>—</td>
+<td>—</td>
+<td>never mounted; spotlightTarget fields unused</td>
+</tr>
+<tr>
+<td>PageWizard</td>
+<td>blank first-run</td>
+<td>🔵 &quot;AI&quot; simulated</td>
+<td>none — inputs discarded</td>
+<td>U1</td>
+<td><code>PageWizard.tsx:53-135,230</code></td>
+</tr>
+<tr>
+<td>UpgradeModal (403 → billing)</td>
+<td>quota hit</td>
+<td>✅</td>
+<td>window <code>upgrade-modal-open</code></td>
+<td>F-A5</td>
+<td><code>UpgradeModal.tsx:56-76</code></td>
+</tr>
+<tr>
+<td>ConflictModal / TabGuard / confirm dialogs</td>
+<td>various</td>
+<td>✅</td>
+<td>—</td>
+<td>—</td>
+<td>Ch.01</td>
+</tr>
+</tbody></table>
+<h2>12.2 Canvas</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Status</th>
+<th>Notes / evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Select (click/shift/⌘-cycle/dbl/triple)</td>
+<td>✅</td>
+<td><code>useSelectionBehavior.ts:74-264</code>; locked → toast</td>
+</tr>
+<tr>
+<td>Marquee multi-select</td>
+<td>✅</td>
+<td>min-drag 5px</td>
+</tr>
+<tr>
+<td>Drag/reorder + Alt-clone + multi-drag + touch</td>
+<td>✅</td>
+<td><code>useCanvasElementDrag.ts</code>; long-press 500ms</td>
+</tr>
+<tr>
+<td>Drop validation (9 invalid reasons, 8 error types)</td>
+<td>✅</td>
+<td><code>DropFeedbackOverlay.tsx:18-28</code></td>
+</tr>
+<tr>
+<td>Resize/rotate (8 handles, 15° snap)</td>
+<td>✅</td>
+<td><code>SelectionHandles.tsx:81-208</code></td>
+</tr>
+<tr>
+<td>Inline text edit (whitelisted tags, sanitize)</td>
+<td>✅</td>
+<td><code>useCanvasInlineEdit.ts:31-211</code></td>
+</tr>
+<tr>
+<td>Rich-text commands (Selection API)</td>
+<td>✅</td>
+<td>unsafe URLs rejected</td>
+</tr>
+<tr>
+<td>Context menu (Edit/Insert/Layout/QuickStyle/standalone)</td>
+<td>✅</td>
+<td>full item list Ch.11 report / <code>contextMenuRegistry.ts:49-105</code></td>
+</tr>
+<tr>
+<td>Snapping + smart guides + ruler guides</td>
+<td>✅</td>
+<td>5px÷scale; guides persisted <code>buildrick-guides</code></td>
+</tr>
+<tr>
+<td>Section reorder handles</td>
+<td>✅</td>
+<td><code>useSectionReorder</code></td>
+</tr>
+<tr>
+<td>Empty-canvas CTA + QuickAddBar</td>
+<td>✅</td>
+<td>Browse templates / Start blank</td>
+</tr>
+<tr>
+<td>Zoom/fit-to-screen</td>
+<td>✅</td>
+<td>UI 25–200 (engine caps 10–500 ⚠ conflict)</td>
+</tr>
+<tr>
+<td>Device frame preview</td>
+<td>✅</td>
+<td>mobile/tablet chrome only</td>
+</tr>
+<tr>
+<td>Overlay toggles (guides/spacing/grid/rulers/badges/x-ray)</td>
+<td>✅</td>
+<td><code>CanvasFooterToolbar.tsx:33-55</code></td>
+</tr>
+<tr>
+<td>OS image drop → upload+src</td>
+<td>✅</td>
+<td><code>useDropExecution.ts:219-261</code></td>
+</tr>
+<tr>
+<td>Catalog component drop</td>
+<td>🔵 placeholder insert</td>
+<td>&quot;future renderer arc&quot; (<code>dropOperations.tsx:492-536</code>)</td>
+</tr>
+<tr>
+<td>GSAP selection animation</td>
+<td>👻 disabled &quot;FOR STABILITY&quot;</td>
+<td><code>SelectionBoxOverlay.tsx:316-321</code></td>
+</tr>
+</tbody></table>
+<h2>12.3 Sidebar tabs</h2>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>Feature set</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Insert (A)</td>
+<td>53 elements / 6 categories; search 150ms; exclusive accordion; drag+click insert</td>
+<td>✅</td>
+<td><code>catalog.ts:10-482</code> — favorites plumbing orphaned (<code>useBuildTab.ts:260-287</code>); ecommerce blocks not in catalog</td>
+</tr>
+<tr>
+<td>Pages (P)</td>
+<td>CRUD, rename-dup-check, duplicate, delete+8s undo, set-home, copy link, bulk ops, folders (⚪ localStorage), SEO table view, ⌘K</td>
+<td>✅</td>
+<td><code>usePages.ts:34-333</code>; page persistence rides sites.saveProject blob</td>
+</tr>
+<tr>
+<td>Page settings drawer</td>
+<td>SEO/Social/Advanced; autosave 500ms; slug validate+history; visibility live/hidden/password; head-code guard</td>
+<td>✅</td>
+<td>⚠ SEO counter lies (80 vs /60, 200 vs /160); score UI weights ≠ algorithm (<code>seoScore.ts:10-22</code> vs <code>SeoTab.tsx:120-124</code>)</td>
+</tr>
+<tr>
+<td>Templates (T)</td>
+<td>10 site templates + sections; 2-stage filters; page-size 6; detail 320→700; apply/add-as-page/replace+backup; premium 🔒 upgrade modal; usage drawer</td>
+<td>✅</td>
+<td><code>templatesData.ts:160-285</code>, apply FSM 15s timeout</td>
+</tr>
+<tr>
+<td>My Templates</td>
+<td>save/rename/delete</td>
+<td>🟡</td>
+<td>localStorage + userTemplates server mirror (<code>templateSync.ts:47-89</code>)</td>
+</tr>
+<tr>
+<td>Media (M)</td>
+<td>3 modes; pills+counts; stock modal; folders; bulk; detail overlay; versions</td>
+<td>✅</td>
+<td>Ch.08 — ⚠ UI ceiling 50MB vs copy &quot;10MB each&quot; (<code>UploadZone.tsx:18</code> vs <code>mediaData.ts:67-75</code>)</td>
+</tr>
+<tr>
+<td>Layers (Z)</td>
+<td>tree, search+SR, drag reorder 30/40/30, hide/lock (⚪ localStorage/page), rename F2, group, 11 context actions, ⚡ badges</td>
+<td>✅</td>
+<td><code>panels/layers/index.tsx</code></td>
+</tr>
+<tr>
+<td>Components (⇧A)</td>
+<td>groups, create-from-selection, instantiate, variant swap, detach; MAX 100</td>
+<td>🟡</td>
+<td>override reset UI dead (§13 A2); V2 panel 🔒 flag off; V2 &quot;+AI&quot; → localStorage only</td>
+</tr>
+<tr>
+<td>Design (D)</td>
+<td>DS tab v12: Tokens(14 kinds)/Styles(11 cats)/Components(read-only)/Export; starters ×6; lint; import/export</td>
+<td>✅</td>
+<td>Ch.06 — persistAll 3/14 kinds (§13 A3); Figma export stub; preset binding click no-op v1</td>
+</tr>
+<tr>
+<td>Settings (S)</td>
+<td>10 screens 3 groups + 3 workspace deep-links; dirty savebar; plan gates advanced+integrations→Pro</td>
+<td>✅</td>
+<td>screens detail Ch.11 report §2E</td>
+</tr>
+<tr>
+<td>— Redirects/Headers/Localization</td>
+<td>saved server-side</td>
+<td>🟡 not enforced live</td>
+<td>explicit banners (§13b B8)</td>
+</tr>
+<tr>
+<td>— Integrations</td>
+<td>6 catalog cards</td>
+<td>🔵 all &quot;Coming Soon&quot;</td>
+<td><code>IntegrationsScreen.tsx:81-89</code></td>
+</tr>
+<tr>
+<td>— Forms inbox</td>
+<td>filter tabs, 20/page, mark/spam/archive, CSV export</td>
+<td>✅</td>
+<td><code>FormsScreen.tsx</code></td>
+</tr>
+<tr>
+<td>— Analytics IDs</td>
+<td>GA4 + Meta Pixel + consent</td>
+<td>✅</td>
+<td>regex-validated; injected at export/publish</td>
+</tr>
+<tr>
+<td>— Branding</td>
+<td>nav-map only, no fields</td>
+<td>🔵</td>
+<td><code>SettingsTab.tsx:145-211</code></td>
+</tr>
+<tr>
+<td>Publish (U)</td>
+<td>status badge, URL copy, 5-item checklist</td>
+<td>✅ read-only</td>
+<td>computes 7 checks renders 5 (§13/Ch.02)</td>
+</tr>
+<tr>
+<td>History (H)</td>
+<td>Changes (virtualized undo timeline, j/k nav) + Saves (versions, restore/delete/compare, AI summary 60s cooldown) + Time-Travel Ctrl+Shift+T + auto-milestone</td>
+<td>✅</td>
+<td><code>HistoryTab.tsx</code>, <code>VersionHistoryPanel.tsx:43</code></td>
+</tr>
+<tr>
+<td>AI (I)</td>
+<td>chat + agent + model picker + scope chip</td>
+<td>✅</td>
+<td>F-A5; server-authoritative tier gating</td>
+</tr>
+</tbody></table>
+<h2>12.4 Inspector</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3 tabs (Look/Layout/Effects) + profile default-tab</td>
+<td>✅</td>
+<td><code>InspectorTabs.tsx:23-28</code>, 7 profiles <code>elementProfiles.ts:52-179</code></td>
+</tr>
+<tr>
+<td>18-section registry (SSOT)</td>
+<td>✅</td>
+<td><code>registry/index.tsx:56-65</code> — full field tables Ch.03 + Ch.11 report §3.2</td>
+</tr>
+<tr>
+<td>Per-breakpoint + pseudo-state overrides w/ indicators</td>
+<td>✅</td>
+<td><code>cssContext.ts:52-74</code></td>
+</tr>
+<tr>
+<td>Edit propagation: 300ms debounce, txn, instant preview</td>
+<td>✅</td>
+<td><code>useStyleHandlers.ts:106-192</code></td>
+</tr>
+<tr>
+<td>Multi-select merged view + batch (5 fields)</td>
+<td>✅</td>
+<td><code>useBatchStyleHandler.ts:87-214</code></td>
+</tr>
+<tr>
+<td>Reach strip (This item / All like this / Whole site)</td>
+<td>✅</td>
+<td><code>ReachScopeStrip.tsx:93-138</code></td>
+</tr>
+<tr>
+<td>Token binding chips + chains</td>
+<td>✅</td>
+<td><code>tokenBindingDetection.ts:17-41</code></td>
+</tr>
+<tr>
+<td>Element properties per-type + custom data-attrs</td>
+<td>✅</td>
+<td><code>config.ts:23-321</code> — duplicate link-editing homes (LinkSection + config)</td>
+</tr>
+<tr>
+<td>Link section (6 types, validation)</td>
+<td>✅</td>
+<td><code>LinkSection.tsx:43-312</code></td>
+</tr>
+<tr>
+<td>CSS classes chips + autocomplete (8)</td>
+<td>✅</td>
+<td><code>CSSClassesSection.tsx:107-207</code></td>
+</tr>
+<tr>
+<td>Visibility per-breakpoint (<code>--hide-*</code>)</td>
+<td>✅</td>
+<td><code>VisibilitySection.tsx:21-71</code></td>
+</tr>
+<tr>
+<td>Interactions (13-14 triggers × 42 presets)</td>
+<td>✅</td>
+<td><code>interactions/types.ts:13-148</code> — code enumerates element(5)+page(3)+scroll(3)+mouse(3); &quot;7&quot; in older docs is wireframe-era stale (§13 B6)</td>
+</tr>
+<tr>
+<td>Animation editor (12/8/5 presets)</td>
+<td>✅</td>
+<td>triggers removed 2026-05-18; Timeline/ScrollTrigger L0 stubs</td>
+</tr>
+<tr>
+<td>AllCSS raw editor</td>
+<td>👻 dead</td>
+<td><code>devMode</code> hardcoded false (<code>ProInspector.tsx:95</code>); keep dead until Pro-gate+sanitize (§13 C2)</td>
+</tr>
+<tr>
+<td>ColorInput alpha</td>
+<td>🔵 stub</td>
+<td>0/100 only (<code>ColorInput.tsx:46-48</code>)</td>
+</tr>
+<tr>
+<td>Schema-driven border/spacing</td>
+<td>🔒 localStorage flag</td>
+<td>parallel pipeline off-default</td>
+</tr>
+<tr>
+<td>DetachInstance</td>
+<td>✅ pro-DS-mode only</td>
+<td><code>DetachInstanceButton.tsx:54</code></td>
+</tr>
+</tbody></table>
+<h2>12.5 Engine (headless)</h2>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>~30 managers via Composer; events = only engine→UI path</td>
+<td>✅</td>
+<td><code>Composer.ts:207-291</code>; EVENTS catalog ~293 keys</td>
+</tr>
+<tr>
+<td>Element model: 48 types, nesting rules registry, depth cap</td>
+<td>✅</td>
+<td><code>element.ts:69-119</code>, <code>rules.ts:15-520</code> — ⚠ caps conflict 50 vs 30</td>
+</tr>
+<tr>
+<td>Pages: Map-ordered, single-home invariant, slug history 100, duplicate/reorder</td>
+<td>✅</td>
+<td><code>PageManager.ts:61-340</code> — engine allows last-page delete; UI guards</td>
+</tr>
+<tr>
+<td>History: patches+checkpoints, coalesce 500ms, depth 100, flushPending SSOT</td>
+<td>✅</td>
+<td><code>HistoryManager.ts</code></td>
+</tr>
+<tr>
+<td>Transactions w/ rollback snapshot</td>
+<td>✅</td>
+<td><code>Composer.ts:712-777</code></td>
+</tr>
+<tr>
+<td>Storage: local/session/IndexedDB/remote; secret redaction at rest</td>
+<td>✅</td>
+<td><code>StorageAdapter.ts:176-193</code></td>
+</tr>
+<tr>
+<td>Sanitize SSOT: DOMPurify at import/parse/head-code/SVG boundaries; fail-closed head sanitizer</td>
+<td>✅</td>
+<td><code>sanitization.ts:108-154</code>, <code>sanitizeHeadCode.ts:26-182</code></td>
+</tr>
+<tr>
+<td>Style engine: inline + global rules, desktop-first breakpoints</td>
+<td>✅</td>
+<td>⚠ setDeviceRule 991/575 vs canonical 1023/767 (§13b B9)</td>
+</tr>
+<tr>
+<td>Tokens: CSS vars, binding resolver, alias depth 3, dark resolver</td>
+<td>✅</td>
+<td><code>TokenBindingResolver.ts:23-50</code></td>
+</tr>
+<tr>
+<td>Interaction runtime (preview mode)</td>
+<td>✅</td>
+<td><code>InteractionRuntime.ts:164-253</code></td>
+</tr>
+<tr>
+<td>Version timeline (IndexedDB, cap 50, JPEG snapshots)</td>
+<td>✅</td>
+<td><code>VersionHistoryStorage.ts:210-224</code></td>
+</tr>
+<tr>
+<td>Export engine: HTML/ZIP/React + injectors (SEO/GA4/Pixel/Stripe/Formspree/sitemap)</td>
+<td>✅</td>
+<td><code>ExportEngine.ts</code> — &quot;zip&quot; absent from declared union ⚠</td>
+</tr>
+<tr>
+<td>Plugin manager</td>
+<td>🔒 off</td>
+<td><code>config.ts:235</code></td>
+</tr>
+<tr>
+<td>TemplateManager</td>
+<td>👻 soft-deprecated</td>
+<td><code>TemplateManager.ts:10</code></td>
+</tr>
+<tr>
+<td>Collab manager (OT over SSE)</td>
+<td>🔴 demo-only</td>
+<td>6 P1 non-convergence; remote-wins clobbers coalesce window (§13 B3)</td>
+</tr>
+</tbody></table>
+<h2>12.6 Media / DS / AI / peripheral</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Upload pipeline (sniff, SVG sanitize, WebP, local-first + Blob mirror + retry queue)</td>
+<td>✅</td>
+<td>F-A4; <code>MediaManager.ts:684-903</code></td>
+</tr>
+<tr>
+<td>Image editor (crop/adjust/resize, 6 filters, versions)</td>
+<td>✅</td>
+<td><code>ImageEditorModal.tsx</code> — hold-to-compare present (earlier audit gap closed) <code>[TBC which audit stands]</code></td>
+</tr>
+<tr>
+<td>Optimization panel (WebP/AVIF/JPEG/PNG)</td>
+<td>✅</td>
+<td><code>OptimizationPanel.tsx:159-304</code></td>
+</tr>
+<tr>
+<td>Alt-text + AI generate + provenance</td>
+<td>✅</td>
+<td>≤125 chars; haiku; TOCTOU server guard</td>
+</tr>
+<tr>
+<td>Replace-across (atomic + per-page)</td>
+<td>✅</td>
+<td><code>AssetDetailsPanel.tsx:311-415</code>, <code>ReplaceAcrossModal.tsx</code></td>
+</tr>
+<tr>
+<td>Stock search (Unsplash/Pexels/Pixabay proxy)</td>
+<td>✅ env-gated</td>
+<td>keys unset → silent <code>[]</code></td>
+</tr>
+<tr>
+<td>Icon picker (Lucide 369)</td>
+<td>✅</td>
+<td><code>IconPickerModal.tsx</code></td>
+</tr>
+<tr>
+<td>Modal library &quot;From URL&quot; tab</td>
+<td>🔵 stub</td>
+<td>vs working LibraryManager import — two inconsistent UIs</td>
+</tr>
+<tr>
+<td>Trash</td>
+<td>🔵 toast stub</td>
+<td><code>LibraryManager.tsx:318-319</code></td>
+</tr>
+<tr>
+<td>&quot;This device only&quot; pill</td>
+<td>⚠ misleading</td>
+<td>assets do mirror to server</td>
+</tr>
+<tr>
+<td>DS tokens/presets/starters/lint/import/export</td>
+<td>✅</td>
+<td>Ch.06</td>
+</tr>
+<tr>
+<td>Shared theme push (agency→clients)</td>
+<td>⚪ editor side</td>
+<td>link-out only; theme.* routers ADMIN+flag, zero editor wiring</td>
+</tr>
+<tr>
+<td>AITab chat/agent/models</td>
+<td>✅</td>
+<td>F-A5</td>
+</tr>
+<tr>
+<td>AIAssistant modal (6 tabs)</td>
+<td>🟡 legacy</td>
+<td>Analyze/Colors/A11y = client-side non-AI</td>
+</tr>
+<tr>
+<td>AIAssistantBar (⌘K bar)</td>
+<td>🟡 legacy + DESIGN.md violation</td>
+<td>dark glass; credits display-only</td>
+</tr>
+<tr>
+<td>AICopilot</td>
+<td>👻</td>
+<td>mounted, no trigger calls openCopilot</td>
+</tr>
+<tr>
+<td>AIPageGenerator/AIContentPanel/AICodeEditor</td>
+<td>👻 L0</td>
+<td><code>ai/index.ts:24-25</code></td>
+</tr>
+<tr>
+<td>Image generation</td>
+<td>🔵 fake</td>
+<td>picsum fallback (<code>openai.ts:150-157</code>)</td>
+</tr>
+<tr>
+<td>Facade streaming</td>
+<td>🔵 fake</td>
+<td>non-streaming fallback (AITab real streaming separate)</td>
+</tr>
+<tr>
+<td>AI adoption telemetry</td>
+<td>✅</td>
+<td><code>adoptionTracker.ts:42-97</code> — only real product instrumentation</td>
+</tr>
+<tr>
+<td>Sidebar analytics</td>
+<td>🔵 no-op</td>
+<td>provider never set (<code>sidebarAnalytics.ts:4-44</code>)</td>
+</tr>
+<tr>
+<td>Collab presence/quality UI</td>
+<td>🔴🔒</td>
+<td>MOCK_USERS fallback; ConnectionQualityIndicator 👻 never mounted</td>
+</tr>
+<tr>
+<td>Ecommerce CollectionSetupModal</td>
+<td>✅ local CMS</td>
+<td>once/session on e-com block drop</td>
+</tr>
+<tr>
+<td>Ecommerce blocks (4)</td>
+<td>🟡</td>
+<td>registered but excluded from build catalog</td>
+</tr>
+<tr>
+<td>contact-form block</td>
+<td>👻</td>
+<td>exported, unregistered (§13b A14)</td>
+</tr>
+<tr>
+<td>Forms runtime (editor preview)</td>
+<td>⚪ in-memory</td>
+<td><code>FormSubmissionService.ts:99</code> — published sites use real POST endpoint</td>
+</tr>
+<tr>
+<td>EmailService cloud providers</td>
+<td>🔵 throw</td>
+<td><code>/api/email/send</code> unimplemented (§13b A16)</td>
+</tr>
+<tr>
+<td>Export modal (HTML/ZIP/React; Vue/Next coming-soon)</td>
+<td>✅</td>
+<td><code>ExportOptions.tsx:20-23</code></td>
+</tr>
+<tr>
+<td>Animation editor</td>
+<td>✅</td>
+<td>triggers removed; Timeline/ScrollTrigger L0</td>
+</tr>
+</tbody></table>
+<h2>12.7 Counts snapshot</h2>
+<p>Blocks <strong>63</strong> (registry) / build catalog shows <strong>53</strong> (ecommerce+some excluded) · element types <strong>48</strong> · inspector sections <strong>18</strong> · element profiles <strong>7</strong> · sidebar tabs <strong>11</strong> (4-tool folded) · templates <strong>10</strong> (tab) + <strong>15</strong> (TemplateLibrary modal) + <strong>11</strong> section quick-inserts — ⚠ three template surfaces (§12 #F2 collapse &quot;won&#39;t do&quot;) · DS token kinds <strong>14</strong> · presets <strong>18</strong> seeded / <strong>11</strong> categories · starter themes <strong>6</strong> · catalog components <strong>27-30</strong> (<code>catalog.ts</code>; count drifts by tier filter <code>[TBC exact]</code>) · Lucide icons <strong>369</strong> · interaction triggers <strong>13</strong> × presets <strong>42</strong> · animation presets <strong>25</strong> · events catalog <strong>~293</strong> · settings screens <strong>10</strong> + 3 deep-links · shortcuts: full map Ch.04 §4.2.</p>
+<h2>12.8 New drift found this pass (feeds §13 as E/F rows)</h2>
+<ol>
+<li><code>LeftSidebar.tsx:399</code> comment claims 4-tool rail is opt-in <code>?rail=4</code>; code default is 4-tool ON, <code>?rail=legacy</code> opt-out (<code>editorViewMode.ts:34</code>). Stale comment, wrong param name.</li>
+<li>Media upload copy &quot;max 10 MB each&quot; vs enforced 50MB ceiling (<code>mediaData.ts:67-75</code> vs <code>UploadZone.tsx:18</code>).</li>
+<li>Templates: 3 parallel surfaces confirmed live (sidebar tab 10 · TemplateLibrary modal 15 · SectionTemplates 11) — F2 collapse still open.</li>
+<li>Help-docs domain split: <code>docs.buildrik.com</code> (<code>LeftSidebar.tsx:469</code>) vs <code>docs.aquibra.com</code> (<code>FullPageView.tsx:51</code>) — B11 brand chaos instance.</li>
+<li><code>showAI</code> opens AIAssistant modal AND AIAssistantBar simultaneously (<code>StudioModals.tsx:240-247</code> + <code>AquibraStudio.tsx:570-574</code>) — B2 consolidation evidence.</li>
+<li>AICopilot openCopilot prop plumbed through 3 files, zero callers; stale &quot;⌘K → Copilot&quot; comment (<code>CommandPalette.tsx:14,84</code>).</li>
+<li>Build-tab favorites: full state/persistence in <code>useBuildTab.ts:103-287</code>, no UI renders it.</li>
+<li>Onboarding &quot;AI token-pick flow&quot; (onboarding spec v3) — zero code in editor onboarding (schema v3 = checklist only). Spec-only, D-class.</li>
+<li>Engine allows deleting last/home page; only UI guards (<code>PageManager.ts:248-272</code> vs <code>usePages.ts:232-243</code>) — defense gap if API-driven.</li>
+<li><code>licenseKey</code> prop accepted, unused (<code>AquibraStudio.tsx:123</code>).</li>
+</ol>
+</section>
+</main></div></body></html>

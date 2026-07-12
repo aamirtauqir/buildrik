@@ -4,6 +4,10 @@ interface SocialButtonProps {
   provider: "google" | "github";
   onClick?: () => void;
   disabled?: boolean;
+  /** "primary" = cobalt fill, "secondary" = white bordered, "dark" = near-black fill (mockup signup GitHub). */
+  variant?: "primary" | "secondary" | "dark";
+  /** Override the default "Continue with …" label. */
+  label?: string;
 }
 
 function GoogleIcon() {
@@ -25,9 +29,10 @@ function GitHubIcon() {
   );
 }
 
-export function SocialButton({ provider, onClick, disabled }: SocialButtonProps) {
-  const label = provider === "google" ? "Continue with Google" : "Continue with GitHub";
+export function SocialButton({ provider, onClick, disabled, variant = "secondary", label }: SocialButtonProps) {
+  const text = label ?? (provider === "google" ? "Continue with Google" : "Continue with GitHub");
   const Icon = provider === "google" ? GoogleIcon : GitHubIcon;
+  const filled = variant === "primary" || variant === "dark";
 
   return (
     <button
@@ -35,15 +40,22 @@ export function SocialButton({ provider, onClick, disabled }: SocialButtonProps)
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "w-full h-auth-btn rounded-auth-btn text-sm font-medium",
-        "text-auth-text-secondary bg-white",
-        "border border-auth-input-border hover:bg-gray-50 transition-colors",
-        "flex items-center justify-center gap-3",
-        "disabled:opacity-50 disabled:cursor-not-allowed"
+        "w-full h-auth-btn rounded-auth-btn text-auth-btn font-semibold",
+        "flex items-center justify-center gap-3 transition-colors",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
+        variant === "primary" && "bg-auth-cta hover:bg-auth-cta-hover text-white",
+        variant === "dark" && "bg-[#1C1C1E] hover:bg-[#2A2A2E] text-white",
+        variant === "secondary" && "bg-white text-auth-text-secondary border border-auth-input-border hover:bg-gray-50 font-medium"
       )}
     >
-      <Icon />
-      {label}
+      {variant === "primary" ? (
+        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white shrink-0">
+          <Icon />
+        </span>
+      ) : (
+        <Icon />
+      )}
+      {text}
     </button>
   );
 }

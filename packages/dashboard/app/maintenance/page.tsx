@@ -29,7 +29,7 @@ export default function MaintenancePage() {
       <div className="text-center max-w-md mx-auto px-4">
         <div className="mx-auto mb-8">
           <h1 className="text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>
-            Buildrik
+            Buildrick
           </h1>
         </div>
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: "#FEF2F2" }}>

@@ -54,7 +54,7 @@ export function TemplateGallery({ open, onClose, templates, isLoading, category,
           ))}
           <div className="ml-auto flex gap-1">
             {TEMPLATE_SORT_OPTIONS.map((opt) => (
-              <button key={opt.value} onClick={() => onSortChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium" style={{ backgroundColor: sort === opt.value ? "#FEF2F2" : "transparent", color: sort === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>{opt.label}</button>
+              <button key={opt.value} onClick={() => onSortChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium" style={{ backgroundColor: sort === opt.value ? "var(--color-primary-subtle)" : "transparent", color: sort === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>{opt.label}</button>
             ))}
           </div>
         </div>

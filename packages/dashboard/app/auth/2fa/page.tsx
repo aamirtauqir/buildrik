@@ -1,22 +1,22 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { OTPInput } from "@/components/auth/otp-input";
 import { FormBanner } from "@/components/auth/form-banner";
-
 import { trpc } from "@lib/trpc/client";
+import { safeReturnUrl } from "@lib/safe-return-url";
+import { ArrowLeft } from "lucide-react";
 
 function TwoFAContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
+  const rememberMe = searchParams.get("remember") === "1";
+  const returnUrl = safeReturnUrl(searchParams.get("returnUrl"));
 
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -26,40 +26,47 @@ function TwoFAContent() {
       const res = await fetch("/api/auth/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionToken: data.sessionToken }),
+        body: JSON.stringify({ sessionToken: data.sessionToken, rememberMe }),
       });
       if (res.ok) {
-        router.push("/auth/redirect");
+        // Full navigation so /auth/redirect reads the just-set session cookie
+        // instead of a stale useSession bounce → /dashboard (skips onboarding).
+        window.location.assign(returnUrl ?? "/auth/redirect");
       } else {
         setError("Failed to create session");
       }
     },
     onError: (err) => {
       if (err.message.includes("Too many failed attempts")) {
-        router.push("/auth/error/2fa-locked");
+        // Carry the temp token so the backup-code recovery path stays usable.
+        router.push(`/auth/error/2fa-locked${token ? `?token=${encodeURIComponent(token)}` : ""}`);
         return;
       }
       setError(err.message);
     },
   });
 
-  const handleVerify = async () => {
+  const handleVerify = () => {
     if (code.length < 6) return;
     verify2FAMutation.mutate({ twoFactorToken: token || "", code });
   };
 
   return (
     <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="shield" color="blue" />
+      <button
+        type="button"
+        onClick={() => router.push("/auth")}
+        className="flex items-center gap-1 text-auth-label text-auth-text-muted hover:text-auth-text-secondary mb-5 self-start"
+      >
+        <ArrowLeft size={14} /> Back
+      </button>
 
-      <h1 className="text-auth-title text-auth-text-primary text-center">
-        Two-factor authentication
-      </h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
-        Enter the 6-digit code from your authenticator app or the code sent to
-        your phone.
-      </p>
+      <div className="text-center">
+        <h1 className="text-auth-title text-auth-text-primary">Enter your code</h1>
+        <p className="text-auth-subtitle text-auth-text-muted mt-2">
+          We sent a 6-digit code to your authenticator app.
+        </p>
+      </div>
 
       <div className="h-6" />
 
@@ -72,50 +79,25 @@ function TwoFAContent() {
 
       <OTPInput length={6} value={code} onChange={setCode} />
 
-      <div className="h-4" />
-
-      <p className="text-auth-subtitle text-auth-text-muted text-center">
-        Open your authenticator app to get the code.
-      </p>
-
       <div className="h-5" />
 
-      <AuthButton
-        loading={verify2FAMutation.isPending}
-        disabled={code.length < 6}
-        onClick={handleVerify}
-      >
-        Verify Code
+      <AuthButton loading={verify2FAMutation.isPending} disabled={code.length < 6} onClick={handleVerify}>
+        Verify
       </AuthButton>
 
-      <div className="h-3" />
+      <div className="h-4" />
 
-      <p className="text-auth-subtitle text-auth-text-placeholder text-center">
-        or
-      </p>
-
-      <div className="h-3" />
-
-      <p className="text-auth-subtitle text-auth-text-muted text-center">
-        Didn&apos;t get a code? Resend (45s)
+      <p className="text-auth-label text-auth-text-muted text-center">
+        Open your authenticator app to get the current code.
       </p>
 
       <div className="h-3" />
 
       <Link
-        href={`/auth/2fa/backup${token ? `?token=${token}` : ""}`}
-        className="text-auth-link hover:underline text-center block"
-      >
-        Use a recovery code instead
-      </Link>
-
-      <div className="h-2" />
-
-      <Link
-        href="/auth/login"
+        href={`/auth/2fa/backup?${new URLSearchParams({ ...(token ? { token } : {}), ...(rememberMe ? { remember: "1" } : {}), ...(returnUrl ? { returnUrl } : {}) }).toString()}`}
         className="text-auth-label text-auth-link hover:underline text-center block"
       >
-        ← Back to sign in
+        Use a recovery code instead
       </Link>
     </AuthCard>
   );

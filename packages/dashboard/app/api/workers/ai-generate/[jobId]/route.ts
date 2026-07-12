@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@lib/prisma";
 import { generatePage } from "@server/services/ai.service";
+import { rewriteImageSources, type ImagesPreference } from "@lib/ai/rewrite-image-sources";
 
 // AI site-generation worker. The dashboard creates an AIGenerationJob (QUEUED)
 // and polls it — but nothing processed the queue, so the "AI is building your
@@ -116,17 +117,26 @@ export async function POST(
   if (claim.count === 0) return new Response("Already claimed", { status: 409 });
 
   // generatePage takes a 3-value style; the job stores a richer `tone`. Map it.
-  const tone = ((job.metadata as Record<string, unknown> | null)?.tone as string) ?? "";
+  const meta = job.metadata as Record<string, unknown> | null;
+  const tone = (meta?.tone as string) ?? "";
+  // Prefer the name the user typed; older jobs (no name in metadata) fall back
+  // to a title-cased businessType instead of the raw "BUSINESS" enum.
+  const siteName = (
+    (meta?.name as string)?.trim() ||
+    job.businessType.charAt(0) + job.businessType.slice(1).toLowerCase()
+  ).slice(0, 100);
   const safeStyle: "modern" | "minimal" | "bold" =
     tone === "minimal" ? "minimal" : tone === "bold" ? "bold" : "modern";
   const pages = job.selectedPages.length > 0 ? job.selectedPages : ["landing"];
   const description = job.description || job.businessType;
+  // "placeholders" (labelled grey boxes) is the safe default when unset.
+  const imagesPref = ((meta?.images as ImagesPreference) ?? "placeholders") satisfies ImagesPreference;
 
   console.log(`[ai-generate-worker] job=${jobId} pages=${pages.length} type=${job.businessType}`);
 
   try {
     // Structure phase: resolve the site shell (slug) before content runs.
-    const slug = await uniqueSlug(job.businessType);
+    const slug = await uniqueSlug(siteName);
 
     // Content phase: every AI call happens before any Site/Page write.
     await setPhase(jobId, "GENERATING_CONTENT", 10);
@@ -139,7 +149,8 @@ export async function POST(
         description,
         style: safeStyle,
       });
-      generated.push({ name: pageName, blocks: sectionsToBlocks(result.sections) });
+      const withImages = result.sections.map((s) => ({ ...s, html: rewriteImageSources(s.html, imagesPref) }));
+      generated.push({ name: pageName, blocks: sectionsToBlocks(withImages) });
       await setPhase(jobId, "GENERATING_CONTENT", 10 + Math.round(((i + 1) / pages.length) * 70));
     }
 
@@ -151,7 +162,7 @@ export async function POST(
     const siteId = await prisma.$transaction(async (tx) => {
       const site = await tx.site.create({
         data: {
-          name: job.businessType.slice(0, 100),
+          name: siteName,
           slug,
           status: "DRAFT",
           workspaceId: job.workspaceId,

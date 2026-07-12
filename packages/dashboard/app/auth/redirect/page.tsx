@@ -4,28 +4,39 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useOnboardingFlow } from "@lib/hooks/use-onboarding-flow";
+import { AuthCard } from "@/components/auth/auth-card";
+import { Loader2 } from "lucide-react";
+import { trpc } from "@lib/trpc/client";
 
 export default function AuthRedirectPage() {
   const router = useRouter();
   const { status } = useSession();
   const { isLoading, navigateToCurrentStep } = useOnboardingFlow();
+  const workspacesQuery = trpc.account.workspace.listMine.useQuery(undefined, {
+    enabled: status === "authenticated",
+  });
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace("/auth?reason=session-required");
       return;
     }
-    if (status === "authenticated" && !isLoading) {
+    if (status === "authenticated" && !isLoading && !workspacesQuery.isLoading) {
+      // Removed from every workspace (no ACTIVE membership) → access-removed.
+      if (workspacesQuery.data && workspacesQuery.data.length === 0) {
+        router.replace("/auth/access-removed");
+        return;
+      }
       navigateToCurrentStep();
     }
-  }, [status, isLoading, navigateToCurrentStep, router]);
+  }, [status, isLoading, workspacesQuery.isLoading, workspacesQuery.data, navigateToCurrentStep, router]);
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-white">
-      <div className="text-center">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
-        <p className="mt-4 text-sm" style={{ color: "var(--color-text-secondary)" }}>Signing you in...</p>
+    <AuthCard noArt>
+      <div className="flex flex-col items-center gap-5 py-6">
+        <Loader2 className="w-8 h-8 text-auth-cta animate-spin" />
+        <p className="text-auth-subtitle text-auth-text-muted">Signing you in…</p>
       </div>
-    </div>
+    </AuthCard>
   );
 }

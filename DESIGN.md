@@ -1,4 +1,4 @@
-# Design System — Buildrik
+# Design System — Buildrick
 
 > **Staleness notice (2026-05-24 audit):** Sections §Typography, §Color, §Spacing,
 > §Layout, §Sidebar Panel System are partially stale. Token namespace migrated
@@ -20,23 +20,40 @@
 
 ## Surface Scope (which brand applies where)
 
-Buildrik runs three visual surfaces with **two brand accents**. This is intentional, not drift.
+Buildrick runs on **one brand accent: cobalt `#2D6DFF`** across editor, auth, and dashboard chrome. Onboarding runs its own scoped blue. Red is reserved for error/danger/destructive everywhere. (Unified 2026-07-12 — the dashboard's former red `#E42313` accent was flipped to cobalt as a deliberate rebrand matching the dc-skin; see changelog.)
 
 | Surface | Lives in | Accent | Display font | Body font | Audience |
 |---|---|---|---|---|---|
 | **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **Cobalt `#2D6DFF`** | General Sans | Inter Tight | Power user mid-flow. Quiet. |
-| **Dashboard chrome** (auth, settings, billing, team, sites list) | `packages/dashboard/app/auth/`, `app/dashboard/`, `app/onboarding/`, `app/maintenance/`, 404, share | **Red `#E42313`** (Tailwind red-600-ish; CSS token `--color-auth-cta: #EF4444` for hover scale) | Inter Tight | Inter Tight | New visitor / signed-out / admin tasks. Warmer, marketing-adjacent. |
-| **Marketing site** (separate repo / public landing pages) | n/a in this repo | Red `#E42313` (matches dashboard) | General Sans | Inter Tight | Cold traffic. |
+| **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | **Cobalt `#2D6DFF`** (`--color-primary`, hover `#1950DC`, subtle `#EBF1FF`) | Inter Tight | Inter Tight | Signed-in workspace tasks. |
+| **Auth chrome** (signed-out craftwork) | `app/auth/` | **Cobalt `#2D6DFF`** (`--color-auth-cta`, hover `#1E58D9`) + art rail | Inter Tight | Inter Tight | New visitor / signed-out. |
+| **Onboarding wizard** (scoped exception) | `app/onboarding/` | **Blue `#2563EB`** (`--color-onb-primary`) | Inter | Inter | Post-verification setup. |
+| **Marketing site** (separate repo) | n/a in this repo | Own brand; not governed here | General Sans | Inter Tight | Cold traffic. |
 
-**Why two accents:** the dashboard sits between marketing and editor in the user journey. It needs to feel inviting and brand-warm, not industrial. The editor sits where the user is producing work — color recedes so the canvas dominates.
+**Why one accent:** editor, auth, and dashboard are one continuous signed-in-adjacent product; a single cobalt accent reads as one brand. Onboarding keeps its blue per the M2 spec.
 
 Rules:
-- **Decorative icons inside dashboard pages** (forgot-password key, 2FA shield, OTP phone, etc.) **may use cobalt `#2D6DFF`** as a secondary accent. The primary CTA and the Buildrik logo stay red. Mixing both on one dashboard page is allowed.
-- **Editor chrome never uses red** as a CTA, surface, or accent. Red there means destructive only (delete confirm, errors).
-- **Dashboard never uses cobalt for CTAs or surfaces.** Cobalt in dashboard is only for those secondary-accent decorative icons.
-- The **NO BLACK RULE** below applies to **editor chrome only**. Dashboard may use `#0D0D0D` for primary text (matches its warmer marketing tone).
+- **Cobalt `#2D6DFF` is the single accent** for CTAs, links, active states, focus rings across editor + auth + dashboard.
+- **Red means error/danger/destructive only** (delete confirm, FAILED status, validation, over-limit, dunning) — on every surface. Never a red CTA or accent.
+- Purple/violet/indigo remain **banned** as accents (AI-slop guard).
+- The **NO BLACK RULE** below applies to **editor chrome only**. Dashboard may use `#0D0D0D` for primary text.
 
-If a new surface is unsure: ask which side of the auth boundary it lives on. Past `/auth` and into `/dashboard` or `/edit` = editor brand rules apply to its chrome.
+### Auth Surface — Craftwork (2026-07-10)
+
+The **`app/auth/**` screens** (login, signup, 2FA, OTP, magic-link, forgot/reset, verify-email, workspace, invite, error/state screens) run a distinct **craftwork** visual language on the shared cobalt accent.
+
+- **Accent = cobalt `#2D6DFF`** (`--color-auth-cta`, hover `#1E58D9`). Same accent as the rest of the dashboard now; the craftwork treatment below is what's auth-specific.
+- **Art rail** — a two-column floating white card (`AuthCard`) with a cobalt illustration (`AuthArt`) left, form right. The "no gradients / no decorative illustration" aesthetic rule does **not** apply to the auth art rail; it still applies to the rest of the dashboard.
+- **Gray-fill icon inputs** — `--color-auth-input-fill`, left icon, cobalt focus. Floating card on `--color-auth-page` (`#ECECEE`).
+- Source of truth: `app/globals.css` `--color-auth-*` tokens + `components/auth/*`.
+
+### Onboarding Surface — M2 Wizard (2026-07-11, scoped exception)
+
+The **`app/onboarding/**` wizard** (post-verification setup: workspace → first site → path chooser → AI/template/blank → editor) runs its own **primary blue `#2563EB`** — distinct from the auth cobalt `#2D6DFF` AND the dashboard red `#E42313`. This is per the M2 Onboarding implementation spec (user-provided) and is an approved scoped exception.
+
+- Accent = `--color-onb-primary` `#2563EB` (hover `#1D4FD7`, tint `#EFF6FF`). Primary CTAs, active stepper dot, progress fill, selected cards, links inside onboarding.
+- Full token set: `--color-onb-*` + `--radius-onb` / `--spacing-onb-*` / `--container-onb` / `--text-onb-*` in `app/globals.css`. Inter type scale (titles 26/700).
+- Scoped to `app/onboarding/` only. Do not spread `#2563EB` past it. Editor, auth, and the dashboard proper are all cobalt `#2D6DFF`.
 
 ## Aesthetic Direction
 - **Direction:** Industrial / Utilitarian, **light chrome**. Premium tool, not premium marketing. "Webflow meets Linear, daylight edition."
@@ -289,6 +306,8 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 | 2026-04-18 | Delete legacy navbar tokens `--bar`, `--blue`, `--txt`, etc. | Dead tokens from first-gen editor. 11 tokens, used in a handful of legacy places. Replace with `--aqb-*` canonical. |
 | 2026-04-18 | Add Design + Publish to rail | Previously keyboard-only, inconsistent with every other config surface. Goes in Config zone. |
 | 2026-04-19 | **Buildrik DS V1** — supersedes V3 theme unification | V3 shipped ~65% complete. DS V1 locks 7 architecture decisions: strict site/shell namespace, no alias layers, `--accent` alias-then-drain, a11y.css owns all media queries, intent+path hex lint, INSPECTOR_TOKENS codemod (single-commit convergence), full token versioning framework. Aggregator execution (no big-switch). See `docs/superpowers/specs/2026-04-19-buildrik-design-system-v1-design.md`. |
+| 2026-07-10 | **Auth surface → craftwork (cobalt + art rail)** | User-approved reskin of all `app/auth/**` screens to the "craftwork" design language: cobalt `#2D6DFF` accent, two-column floating card with art rail, gray-fill icon inputs. Scoped exception to the red dashboard brand — auth only; settings/billing/onboarding stay red. Business logic unchanged. See §Auth Surface — Craftwork. |
+| 2026-07-12 | **Dashboard accent flip RED → COBALT (brand unification)** | User-approved rebrand: the dashboard chrome's former red `#E42313` accent flips to cobalt `#2D6DFF`, matching the dc-skin and unifying with editor + auth (both already cobalt). Token change: `--color-primary` `#E42313`→`#2D6DFF`, `--color-primary-hover`→`#1950DC`, added `--color-primary-subtle` `#EBF1FF`, `--color-error`→`#DC2626`, focus outline→cobalt. Semantic reds (error/danger/destructive/FAILED) unchanged. Purple stays banned. Two-accent system retired → single cobalt (+ onboarding's scoped blue). Business logic unchanged. |
 | 2026-04-29 | **Vibcoder `bd-topbar` evolution — temporary override layer** | Vibcoder canonical `bd-topbar` ships at 48px floating panel with minimal composition (brand label · undo/redo · saved · 3-cell breakpoints · preview · share · publish). DESIGN.md §Layout requires 56px flush bar with full action set (brand mark + breadcrumb + 4-cell breakpoints + +Invite + cmd palette + help + account + state-variant status pill). Temporary override at `themes/design-system/bd-topbar-overrides.css` extends canonical via `@layer overrides` until upstream PR lands. Saving-pulse keyframe suppression added to `a11y.css` (Gate 7). Override sunsets on next `npm run vibcoder:vendor` after upstream merge — file deletion + `@import` removal verified by re-running `verify:ds`. See `docs/superpowers/specs/2026-04-29-vibcoder-bd-topbar-evolution.md`. |
 
 ## Token Namespace Contract (DS V1, 2026-04-19)

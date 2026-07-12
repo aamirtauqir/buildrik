@@ -15,7 +15,7 @@ interface ContextualArticle {
 // (prisma/seed.ts). The previous values were all fictional, so every
 // contextual-help link 404'd.
 const ARTICLE_META: Record<string, ContextualArticle> = {
-  "getting-started-overview": { title: "Getting started with Buildrik", slug: "getting-started-overview", readTime: 4 },
+  "getting-started-overview": { title: "Getting started with Buildrick", slug: "getting-started-overview", readTime: 4 },
   "creating-your-first-site": { title: "Creating your first site", slug: "creating-your-first-site", readTime: 3 },
   "managing-sites-dashboard": { title: "Managing sites from the dashboard", slug: "managing-sites-dashboard", readTime: 3 },
   "publishing-and-unpublishing": { title: "Publishing and unpublishing", slug: "publishing-and-unpublishing", readTime: 4 },

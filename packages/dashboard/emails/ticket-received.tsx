@@ -29,7 +29,7 @@ export default function TicketReceived({
           </Section>
           <Hr style={{ borderColor: "#E2E8F0", marginTop: "32px" }} />
           <Text style={{ fontSize: "12px", color: "#94A3B8", textAlign: "center" as const }}>
-            Sent by Buildrik &middot; You&apos;ll receive a reply at this address.
+            Sent by Buildrick &middot; You&apos;ll receive a reply at this address.
           </Text>
         </Container>
       </Body>

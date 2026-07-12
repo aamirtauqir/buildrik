@@ -8,17 +8,28 @@ import {
 } from "@/server/services/auth.service";
 import {
   loginSchema, signupSchema, forgotPasswordSchema,
-  resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema,
+  resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema, emailField,
 } from "@buildrik/shared/schemas/auth";
 import { generateToken } from "@/server/services/token.service";
+import { peekRateLimit, checkRateLimit } from "@/server/services/rate-limiter";
+import { captchaEnabled, verifyTurnstile } from "@/server/services/turnstile.service";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createNotification } from "@/server/services/notification.trigger";
 import { record as recordActivity } from "@/server/services/activity-log.service";
 
-// Strict: 5 attempts per 15 min (login, 2FA, token verification)
+// Strict: 5 attempts per 15 min (2FA, token verification)
 const strictRateLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
 // Normal: 10 attempts per 15 min (signup, resend, forgot password)
 const normalRateLimit = createRateLimitedProcedure(10, 15 * 60 * 1000);
+// Login uses a FAILURE-ONLY per-IP throttle (see the login procedure): only
+// wrong logins consume budget, so successful logins can't lock out a shared/NAT
+// IP. Per-account lockout (auth.service) handles targeted brute force.
+const LOGIN_MAX_FAILURES = 10;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+// Require a captcha solve once an IP has this many recent failed logins.
+const LOGIN_CAPTCHA_AFTER = 3;
+const clientIp = (headers: Headers | undefined) =>
+  headers?.get("x-forwarded-for")?.split(",")[0]?.trim() || headers?.get("x-real-ip") || "unknown";
 
 function handleAuthError(err: unknown): never {
   if (err instanceof AuthError) {
@@ -36,9 +47,24 @@ function handleAuthError(err: unknown): never {
 }
 
 export const authRouter = router({
-  login: strictRateLimit
+  login: publicProcedure
     .input(loginSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      const ip = clientIp(ctx.headers);
+      const rlKey = `login-fail:${ip}`;
+      const peek = await peekRateLimit(rlKey, LOGIN_MAX_FAILURES);
+      if (!peek.allowed) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many failed attempts. Please try again later." });
+      }
+      // Captcha gate: once this IP has enough recent failed logins, require a
+      // valid Turnstile solve BEFORE evaluating credentials — enforced here in
+      // the mutation (not just the UI) so scripted stuffing can't skip it.
+      if (captchaEnabled() && !(await peekRateLimit(rlKey, LOGIN_CAPTCHA_AFTER)).allowed) {
+        const ok = await verifyTurnstile(input.turnstileToken, ip);
+        if (!ok) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "CAPTCHA_REQUIRED" });
+        }
+      }
       try {
         const result = await login(input.email, input.password);
         if (result.requiresTwoFactor) {
@@ -47,6 +73,11 @@ export const authRouter = router({
         const sessionToken = await generateToken("session_grant", result.user!.id, 5);
         return { requiresTwoFactor: false as const, sessionToken, user: { id: result.user!.id, email: result.user!.email } };
       } catch (err) {
+        // Only wrong credentials consume the per-IP budget; a locked-account or
+        // other error does not (and a success above never reaches here).
+        if (err instanceof AuthError && err.code === "INVALID_CREDENTIALS") {
+          await checkRateLimit(rlKey, LOGIN_MAX_FAILURES, LOGIN_WINDOW_MS);
+        }
         handleAuthError(err);
       }
     }),
@@ -74,7 +105,7 @@ export const authRouter = router({
     }),
 
   resendVerification: normalRateLimit
-    .input(z.object({ email: z.string().email() }))
+    .input(z.object({ email: emailField }))
     .mutation(async ({ input }) => {
       await resendVerification(input.email);
       return { message: "If an account exists, a verification email has been sent" };
@@ -155,38 +186,25 @@ export const authRouter = router({
    * Strict rate limit (5/15 min) + 200ms constant-time floor prevent bulk enumeration.
    */
   checkEmail: strictRateLimit
-    .input(z.object({ email: z.string().email() }))
+    .input(z.object({ email: emailField }))
     .mutation(async ({ input, ctx }) => {
       const MIN_RESPONSE_MS = 200;
       const start = Date.now();
 
+      // Only `exists` is returned (signup's email-first routing needs it). Do NOT
+      // leak hasPassword / linked OAuth providers to unauthenticated callers —
+      // that turns this into a login-method profiling oracle for phishing.
       const user = await ctx.prisma.user.findUnique({
         where: { email: input.email },
-        select: {
-          passwordHash: true,
-          accounts: { select: { provider: true } },
-        },
+        select: { id: true },
       });
-
-      const providers: ("google" | "github")[] = [];
-      if (user) {
-        for (const a of user.accounts) {
-          if (a.provider === "google" || a.provider === "github") {
-            providers.push(a.provider);
-          }
-        }
-      }
 
       const elapsed = Date.now() - start;
       if (elapsed < MIN_RESPONSE_MS) {
         await new Promise<void>((r) => setTimeout(r, MIN_RESPONSE_MS - elapsed));
       }
 
-      return {
-        exists: user !== null,
-        hasPassword: user?.passwordHash !== null && user?.passwordHash !== undefined,
-        providers,
-      };
+      return { exists: user !== null };
     }),
 
   logout: protectedProcedure.mutation(async ({ ctx }) => {
@@ -203,7 +221,7 @@ export const authRouter = router({
       const invite = await ctx.prisma.invite.findUnique({
         where: { token: input.token },
         // a9-invite: include the workspace icon so the invite can wear the
-        // inviting agency's brand, not Buildrik's.
+        // inviting agency's brand, not Buildrick's.
         include: { workspace: { select: { name: true, iconUrl: true } } },
       });
       if (!invite) {

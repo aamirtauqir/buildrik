@@ -36,10 +36,10 @@ async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string
   // Fall back to the first membership for single-workspace users / stale tokens.
   const activeId = ctx.session.user.workspaceId as string | null | undefined;
   const member = await ctx.prisma.workspaceMember.findFirst({
-    where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId },
+    where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId, status: "ACTIVE" },
     include: { workspace: { select: { plan: true } } },
   }) ?? (activeId
-    ? await ctx.prisma.workspaceMember.findFirst({ where: { userId }, include: { workspace: { select: { plan: true } } } })
+    ? await ctx.prisma.workspaceMember.findFirst({ where: { userId, status: "ACTIVE" }, include: { workspace: { select: { plan: true } } } })
     : null);
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return { workspaceId: member.workspaceId, plan: member.workspace.plan as PlanName };

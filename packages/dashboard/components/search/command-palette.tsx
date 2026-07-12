@@ -59,15 +59,17 @@ const ACTION_ITEMS: ResultItem[] = [
 // new home, `description` says where it moved.
 interface MovedItem extends ResultItem {
   aliases: string[];
+  /** agency-layer-only destination — hidden in solo workspaces */
+  agencyOnly?: boolean;
 }
 const MOVED_ITEMS: MovedItem[] = [
   { id: "m-traffic", label: "Traffic", description: "Moved → Site › Analytics", href: "/dashboard/sites", scope: "moved", aliases: ["traffic", "analytics", "visitors", "stats"] },
-  { id: "m-shared-theme", label: "Shared theme", description: "Moved → Workspace › Shared theme", href: "/dashboard/theme", scope: "moved", aliases: ["shared theme", "design system", "theme", "tokens", "ds"] },
+  { id: "m-shared-theme", label: "Shared theme", description: "Moved → Workspace › Shared theme", href: "/dashboard/theme", scope: "moved", aliases: ["shared theme", "design system", "theme", "tokens", "ds"], agencyOnly: true },
   { id: "m-assets", label: "Assets", description: "Moved → Media", href: "/dashboard/media", scope: "moved", aliases: ["assets", "media", "images", "files", "uploads"] },
   { id: "m-redirects", label: "Redirects", description: "Moved → Site › Redirects", href: "/dashboard/sites", scope: "moved", aliases: ["redirects", "url forwarding", "301", "302"] },
   { id: "m-domains", label: "Domains", description: "Moved → Domains (all sites)", href: "/dashboard/domains", scope: "moved", aliases: ["domains", "dns", "custom domain"] },
   { id: "m-tokens", label: "API tokens", description: "Moved → Settings › API Tokens", href: "/dashboard/settings/api-tokens", scope: "moved", aliases: ["api tokens", "tokens", "ci", "api key"] },
-  { id: "m-reviews", label: "Reviews", description: "Approve client edits", href: "/dashboard/reviews", scope: "moved", aliases: ["reviews", "approval", "approve", "publishing"] },
+  { id: "m-reviews", label: "Reviews", description: "Approve client edits", href: "/dashboard/reviews", scope: "moved", aliases: ["reviews", "approval", "approve", "publishing"], agencyOnly: true },
 ];
 
 const SCOPE_ICONS: Record<string, typeof Globe> = {
@@ -124,6 +126,8 @@ interface CommandPaletteProps {
 export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const router = useRouter();
   const unified = useUnifiedEditorFlag();
+  const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
+  const agency = !!features.data?.agency_layer;
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
@@ -274,8 +278,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     if (scope === null) {
       const moved = MOVED_ITEMS.filter(
         (item) =>
-          item.label.toLowerCase().includes(lowerTerm) ||
-          item.aliases.some((a) => a.includes(lowerTerm) || lowerTerm.includes(a)),
+          (!item.agencyOnly || agency) &&
+          (item.label.toLowerCase().includes(lowerTerm) ||
+            item.aliases.some((a) => a.includes(lowerTerm) || lowerTerm.includes(a))),
       );
       if (moved.length > 0) {
         groups.push({ scope: "moved", label: "Moved", items: moved });
@@ -313,7 +318,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     }
 
     return groups;
-  }, [isSearching, term, scope, recentItems, shouldSearchSites, shouldSearchTeam, shouldSearchHelp, sitesQuery.data, teamQuery.data, helpQuery.data, unified]);
+  }, [isSearching, term, scope, recentItems, shouldSearchSites, shouldSearchTeam, shouldSearchHelp, sitesQuery.data, teamQuery.data, helpQuery.data, unified, agency]);
 
   const flatItems = useMemo(
     () => groupedResults.flatMap((g) => g.items),
@@ -381,7 +386,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             }}
             onKeyDown={handleKeyDown}
             placeholder="Search or jump to..."
-            aria-label="Search Buildrik"
+            aria-label="Search Buildrick"
             className="flex-1 border-0 bg-transparent py-3 text-sm outline-none"
             style={{ color: "var(--color-text-primary)" }}
           />

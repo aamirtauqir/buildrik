@@ -287,7 +287,7 @@ function injectSeoTags(
 }
 
 /**
- * Free-plan badge (90-published): a small fixed "Made with Buildrik" pill linking
+ * Free-plan badge (90-published): a small fixed "Made with Buildrick" pill linking
  * back to the marketing site. Injected only on FREE; paid plans ship clean.
  * Self-contained inline styles so it never depends on the page's CSS.
  */
@@ -299,7 +299,7 @@ function injectBadge(html: string, show: boolean): string {
     `display:inline-flex;align-items:center;gap:6px;padding:6px 10px;` +
     `background:#111;color:#fff;font:500 12px/1 sans-serif;` +
     `border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.2)">` +
-    `Made with Buildrik</a>`;
+    `Made with Buildrick</a>`;
   if (html.includes("</body>")) return html.replace("</body>", `${badge}</body>`);
   return html + badge;
 }
@@ -320,7 +320,7 @@ async function runVercelDeployJob(
   // protection. null = no/legacy password → clears protection on deploy.
   const passwordPlain = decryptPublishedPassword(site.publishedPassword);
 
-  // Free-plan "Made with Buildrik" badge (90-published): injected on FREE,
+  // Free-plan "Made with Buildrick" badge (90-published): injected on FREE,
   // removed on paid plans. Read the workspace plan once for the whole deploy.
   const ws = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } });
   const showBadge = (ws?.plan ?? "FREE") === "FREE";

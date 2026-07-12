@@ -23,7 +23,7 @@ interface InvoiceTableProps {
 
 const STATUS_BADGE: Record<InvoiceStatus, { bg: string; color: string; label: string }> = {
   PAID: { bg: "#F0FDF4", color: "var(--color-success)", label: "Paid" },
-  FAILED: { bg: "#FEF2F2", color: "var(--color-primary)", label: "Failed" },
+  FAILED: { bg: "#FEF2F2", color: "var(--color-error)", label: "Failed" },
   PENDING: { bg: "#FFFBEB", color: "#F59E0B", label: "Pending" },
   REFUNDED: { bg: "#F3F4F6", color: "var(--color-text-secondary)", label: "Refunded" },
 };

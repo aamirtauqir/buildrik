@@ -30,7 +30,7 @@ function BrandingDialog({
   onSave: (b: Branding) => void;
 }) {
   const [logoUrl, setLogoUrl] = useState(initial.logoUrl ?? "");
-  // Default unset (not Buildrik's red) — a client's brand color is theirs to pick;
+  // Default unset (not Buildrick's red) — a client's brand color is theirs to pick;
   // render falls back to var(--color-primary) until set.
   const [brandColor, setBrandColor] = useState(initial.brandColor ?? "");
   const [customDomain, setCustomDomain] = useState(initial.customDomain ?? "");
@@ -62,7 +62,7 @@ function BrandingDialog({
           </div>
           <label className="flex items-center gap-2 pt-1 text-sm" style={{ color: "var(--color-text-primary)" }}>
             <input type="checkbox" checked={hideBuildrik} onChange={(e) => setHideBuildrik(e.target.checked)} className="accent-[var(--color-primary)]" />
-            Hide Buildrik branding for this client
+            Hide Buildrick branding for this client
           </label>
         </div>
         <div className="mt-5 flex justify-end gap-2">

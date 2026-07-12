@@ -163,10 +163,14 @@ export async function revokeMember(memberId: string, workspaceId: string) {
   if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_REVOKE_OWNER");
 
-  return prisma.workspaceMember.update({
+  const updated = await prisma.workspaceMember.update({
     where: { id: memberId },
     data: { status: "SUSPENDED", suspendedAt: new Date() },
   });
+  // Cut the suspended member's active sessions immediately (defense-in-depth;
+  // per-request resolveWorkspaceId also revokes their workspace access).
+  await prisma.session.deleteMany({ where: { userId: member.userId } });
+  return updated;
 }
 
 export async function deleteMember(memberId: string, workspaceId: string) {
@@ -176,6 +180,7 @@ export async function deleteMember(memberId: string, workspaceId: string) {
   if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_DELETE_OWNER");
 
+  await prisma.session.deleteMany({ where: { userId: member.userId } });
   return prisma.workspaceMember.delete({ where: { id: memberId } });
 }
 

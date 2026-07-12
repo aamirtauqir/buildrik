@@ -110,26 +110,20 @@ export async function login(email: string, password: string) {
   const valid = await bcrypt.compare(password, hashToCompare);
 
   if (!user || !user.passwordHash || !valid) {
-    if (user) {
-      const remaining = await incrementFailedAttempts(user.id);
-      await logAuditEvent("LOGIN_FAILED", "failure", { email, metadata: { attemptsRemaining: remaining } });
-      await prisma.loginAttempt.create({
-        data: { email, userId: user.id, ipAddress: "", result: "FAILED" },
-      }).catch(() => {});
-      const lockedUser = remaining <= 0
-        ? await prisma.user.findUnique({ where: { id: user.id }, select: { lockedUntil: true } })
-        : null;
-      throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password", 401, {
-        attemptsRemaining: remaining,
-        locked: remaining <= 0,
-        lockedUntil: lockedUser?.lockedUntil?.toISOString() ?? null,
-      });
+    // Only consume the lockout counter for accounts that actually have a
+    // password — never lock (or leak the existence of) OAuth-only accounts.
+    if (user?.passwordHash) {
+      await incrementFailedAttempts(user.id);
     }
     await logAuditEvent("LOGIN_FAILED", "failure", { email });
     await prisma.loginAttempt.create({
-      data: { email, ipAddress: "", result: "FAILED" },
+      data: { email, userId: user?.id, ipAddress: "", result: "FAILED" },
     }).catch(() => {});
-    throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password");
+    // Identical error for every invalid-credential outcome (unknown email,
+    // wrong password, OAuth-only account) — no per-existence status/shape/
+    // attemptsRemaining. Prevents the login enumeration oracle. A genuinely
+    // locked account is caught by the pre-bcrypt isAccountLocked() check above.
+    throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password", 401);
   }
 
   await resetFailedAttempts(user.id);
@@ -243,7 +237,9 @@ export async function resetPassword(token: string, newPassword: string) {
   await invalidateToken(token);
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash },
+    // Clear any lockout — resetting the password is a legitimate recovery, so
+    // the user should not stay locked out of the login path afterward.
+    data: { passwordHash, failedAttempts: 0, lockedUntil: null },
   });
 
   await logAuditEvent("PASSWORD_RESET_COMPLETED", "success", { userId });

@@ -1,12 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ContextMenu } from "./context-menu";
-
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  PUBLISHED: { bg: "#DCFCE7", text: "#166534" },
-  DRAFT: { bg: "#FEF9C3", text: "#854D0E" },
-  ARCHIVED: { bg: "#FED7AA", text: "#9A3412" },
-};
+import { siteStatusColor } from "./site-status";
 
 interface Site {
   id: string;
@@ -63,7 +58,7 @@ export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSel
         </thead>
         <tbody>
           {sites.map((site) => {
-            const sc = STATUS_COLORS[site.status] ?? STATUS_COLORS.DRAFT;
+            const sc = siteStatusColor(site.status);
             return (
               <tr key={site.id} className="border-b transition-colors hover:bg-[var(--color-bg-page)]" style={{ borderColor: "var(--color-border-default)" }}>
                 <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.has(site.id)} onChange={() => {}} className="h-4 w-4 rounded accent-[var(--color-primary)]" onClick={(e) => onSelect(site.id, e)} /></td>

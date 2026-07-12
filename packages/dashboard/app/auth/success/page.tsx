@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { AuthLogo } from "@/components/auth/auth-logo";
+import { AuthCard } from "@/components/auth/auth-card";
 import { Loader2 } from "lucide-react";
 
 export default function SuccessPage() {
@@ -24,10 +24,14 @@ export default function SuccessPage() {
   }, [status, router]);
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <AuthLogo />
-      <Loader2 className="w-8 h-8 text-auth-cta animate-spin" />
-      <p className="text-auth-subtitle text-auth-text-muted">Setting up your workspace...</p>
-    </div>
+    <AuthCard noArt>
+      <div className="flex flex-col items-center gap-5 py-6">
+        <Loader2 className="w-8 h-8 text-auth-cta animate-spin" />
+        <div className="text-center">
+          <h1 className="text-auth-title text-auth-text-primary">Signing you in</h1>
+          <p className="text-auth-subtitle text-auth-text-muted mt-2">Setting up your workspace…</p>
+        </div>
+      </div>
+    </AuthCard>
   );
 }

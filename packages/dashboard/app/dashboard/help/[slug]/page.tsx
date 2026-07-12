@@ -106,7 +106,7 @@ export default function ArticleDetailPage() {
                   <button
                     onClick={() => handleFeedback(false)}
                     disabled={feedbackMutation.isPending}
-                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:border-red-300 hover:bg-red-50"
+                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-subtle)]"
                     style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                   >
                     <ThumbsDown className="h-4 w-4" />

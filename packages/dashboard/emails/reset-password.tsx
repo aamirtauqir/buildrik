@@ -14,7 +14,7 @@ export default function ResetPassword({ resetUrl = "https://app.buildrik.app/aut
             Reset your password
           </Heading>
           <Text style={{ fontSize: "14px", color: "#64748B", textAlign: "center" as const }}>
-            Click the button below to verify your email address and activate your Buildrik account.
+            Click the button below to verify your email address and activate your Buildrick account.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
             <Button href={resetUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
@@ -26,7 +26,7 @@ export default function ResetPassword({ resetUrl = "https://app.buildrik.app/aut
           </Text>
           <Hr style={{ borderColor: "#E2E8F0", marginTop: "32px" }} />
           <Text style={{ fontSize: "12px", color: "#94A3B8", textAlign: "center" as const }}>
-            Sent by Buildrik
+            Sent by Buildrick
           </Text>
         </Container>
       </Body>

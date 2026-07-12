@@ -1,6 +1,6 @@
 # Agency outreach pack — 5 Mom-Test calls (2026-07-03)
 
-Goal: 5 real agencies (≥3 client sites) ke saath 20-min research calls book karna. Kuch bechna nahi. Design LAST dikhani hai (sirf agar wo khud pooche). Gate: ≥3/5 spent-money-or-time pain → build funded.
+Goal: 5 real agencies (≥3 client sites) ke saath 20-min research calls book karna. Kuch bechna nahi. Design LAST dikhani hai (sirf agar wo khud pooche). Build decision: founder ka faisla. (2026-07-03: evidence rule + ≥3/5 gate removed — founder order.)
 
 ---
 
@@ -65,12 +65,15 @@ Rule: **past-tense pe raho. "Would you use…" KABHI nahi. Buildrik ka naam tab 
 | Agency | Name | Sites | Q1 time-cost | Q3 current tool + $ | Pull? (Y/N + evidence) |
 |---|---|---|---|---|---|
 | 1 | Contact #1 (naam TBD) | TBD (Webflow+Figma stack) | rebrand 12-15 pages: junior ~full day + owner QA, 2-3×/MONTH; footer-logo miss client ne pakra | Figma + Webflow + manual checklist ($ TBD) | **PULL** — spent-time recurring + top-3 (time + client-trust); ask-energy untested (deck abhi nahi dikhaya) |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
+| 2 | PixelForge Studio (naam TBD) | | | | msg sent: ____ |
+| 3 | BrightLayer Agency (naam TBD) | | | | msg sent: ____ |
+| 4 | Northstar Web Co (naam TBD) | | | | msg sent: ____ |
+| 5 | LaunchGrid Digital (naam TBD) | | | | msg sent: ____ |
+| 6 | UrbanNest Creative (naam TBD) | | | | msg sent: ____ |
 
-Gate: **≥3/5 pull → Approach B + build funded. <3/5 → wedge pivot baat-cheet (sign-off loop candidate).**
+Per-target prep docs (founder-generated, 2026-07-03, sab template — jawab aane pe Section 4A bharna): `~/Downloads/agency_builder_validation_docs/01..05_*.docx`. NOTE: in docs ke andar ka "copy-paste message" FOLLOW-UP tone ka hai ("aap ne product pe sochke bheja, shukriya") — COLD first-touch ke liye WRONG; pehla message hamesha upar wala Message 1 use karo.
+
+Build decision: founder ka faisla (gate removed 2026-07-03).
 
 ## Usability feedback (demand-gate se ALAG bucket)
 - 2026-07-03, Contact (same as #1? TBD): live app pe "features grouped nahi, junior ko start samajh nahi aata, mental model unclear (Webflow: left structure / right selected / top global)" — live-app bounce report; unka described ideal = hamara locked IA verbatim. → design-tester candidate #1 (deck before/after + junior walk).
@@ -86,4 +89,4 @@ Agency/person · size · active client sites · tool today · LAST REAL CASE · 
 2. **QA-automation after changes** (doc #30 "Very Strong pull" + Contact #1 ne khud kaha "phir mujhe QA karni pari" — har change ke baad desktop/mobile/links/footer manual check = wedge candidate NEW)
 3. Global header/footer + brand-kit narrow slice (doc section 10)
 
-Note: doc ke 39 "real-style answers" = EXAMPLES (doc ke apne alfaaz), data nahi. Counter unaffected.
+Note: doc ke 39 "real-style answers" = doc ke apne examples.

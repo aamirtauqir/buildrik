@@ -1,0 +1,753 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Buildrik Dashboard PRD</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--muted:#5b6472;--line:#e5e7eb;--accent:#2563eb;--code:#f4f6f8;--th:#f8fafc;}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b2;--line:#232a33;--accent:#6ea8ff;--code:#161b22;--th:#161b22;}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif;}
+.wrap{max-width:1000px;margin:0 auto;padding:56px 28px 120px;}
+h1{font-size:2rem;line-height:1.2;margin:0 0 .3em;letter-spacing:-.02em}
+h2{font-size:1.4rem;margin:2.2em 0 .6em;padding-top:.6em;border-top:1px solid var(--line);letter-spacing:-.01em}
+h3{font-size:1.1rem;margin:1.6em 0 .4em}
+h4{font-size:1rem;margin:1.2em 0 .3em;color:var(--muted)}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+code{background:var(--code);padding:.12em .4em;border-radius:4px;font:13.5px/1.4 "SF Mono",ui-monospace,Menlo,monospace}
+pre{background:var(--code);padding:14px 16px;border-radius:8px;overflow:auto}pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:14px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:600;white-space:nowrap}
+blockquote{margin:1em 0;padding:.2em 1em;border-left:3px solid var(--accent);color:var(--muted)}
+hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+strong{font-weight:650}
+</style></head><body><div class="wrap"><h1 id="buildrik-dashboard-product-requirements-document-reverse-engineered">Buildrik Dashboard — Product Requirements Document (reverse-engineered)</h1>
+<h2 id="1-header">1. Header</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Source repo</strong></td>
+<td><code>/Users/shahg/Desktop/pencil/buildrik</code> (pnpm monorepo)</td>
+</tr>
+<tr>
+<td><strong>Package in scope</strong></td>
+<td><code>@buildrik/dashboard</code> (<code>packages/dashboard</code>) + <code>server/</code>, <code>lib/</code>, <code>prisma/</code></td>
+</tr>
+<tr>
+<td><strong>Branch / HEAD</strong></td>
+<td><code>main</code> @ <code>e5624ca1</code> (HEAD commit dated 2026-07-05)</td>
+</tr>
+<tr>
+<td><strong>Generated</strong></td>
+<td>2026-07-06</td>
+</tr>
+<tr>
+<td><strong>Stack</strong></td>
+<td>Next.js 16 (App Router) · React 19 · Tailwind 4 · tRPC 11 · NextAuth 5 · Prisma 5 · PostgreSQL · Resend · Zod (<code>CLAUDE.md</code>)</td>
+</tr>
+<tr>
+<td><strong>Data-flow contract</strong></td>
+<td>Page → tRPC router → Service → Prisma (<code>CLAUDE.md</code>; routers never touch Prisma except noted inline reads)</td>
+</tr>
+<tr>
+<td><strong>Method</strong></td>
+<td>Reverse-engineered from code. Nothing invented. Uncertainty marked <code>[TBC]</code>. Every concrete claim cites <code>file:line</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Scope:</strong> the <em>dashboard</em> surface — "run the business" (home, sites mgmt, team, billing, settings, notifications, help, agency layer) + "start a site" + onboarding. The editor package (<code>packages/editor</code>) and the public marketing site are out of scope.</p>
+<hr />
+<h2 id="2-executive-summary">2. Executive summary</h2>
+<p>Buildrik's dashboard is the account/workspace chrome around an AI website builder: it lets a solo designer or agency create sites (blank / template / AI), manage them across a workspace, run a team, and administer settings — with an agency layer (clients, white-label, shared-theme push, client reviews) built behind the <code>agency_layer</code> feature flag. The security-authorization hardening plan is substantially shipped, and the surface breadth is high (≈35 routes, full state components).</p>
+<p><strong>The single biggest risk: the product cannot take money or measure itself.</strong> <code>billing.upgrade</code> permanently throws <code>PAYMENTS_NOT_CONFIGURED</code> (<code>server/services/billing.service.ts:158,173</code>) — there is no Stripe Checkout session creation, so no FREE→PRO/BUSINESS conversion can occur; the entire plan-limit/paywall system (§8) gates usage toward an upgrade that doesn't exist. Compounding it, <strong>there is no product analytics</strong> — greps for posthog/segment/mixpanel/amplitude/gtag return zero (§4); the only telemetry is env-gated Sentry plus a 3-event AI-adoption log. The business is monetization-blocked <em>and</em> funnel-blind at the same time.</p>
+<hr />
+<h2 id="3-users-jobs">3. Users &amp; jobs</h2>
+<table>
+<thead>
+<tr>
+<th>User type</th>
+<th>Entry path</th>
+<th>Job to be done</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Solo designer (workspace owner)</strong></td>
+<td>Signup → onboarding role/setup (<code>app/onboarding/role/page.tsx:7</code>, <code>setup/page.tsx:8</code>)</td>
+<td>Create + run client sites without Webflow/Framer overhead</td>
+</tr>
+<tr>
+<td><strong>Invited team member</strong> (ADMIN / EDITOR / DESIGNER / VIEWER)</td>
+<td>Invite email → <code>acceptInvite</code> (<code>server/trpc/routers/auth.ts:226</code>)</td>
+<td>Edit the sites they're granted; VIEWER = read-only</td>
+</tr>
+<tr>
+<td><strong>Agency owner</strong></td>
+<td>Onboarding "agency" turns on <code>agency_layer</code> flag (<code>project-setup.tsx</code> via <code>onboarding/setup/page.tsx:41</code>)</td>
+<td>Manage clients, white-label, push shared theme, run client reviews</td>
+</tr>
+<tr>
+<td><strong>External client / reviewer</strong></td>
+<td>Share link <code>app/share/[token]/page.tsx</code></td>
+<td>Review a site and sign off — <strong>currently dead-ends</strong> (§13-A)</td>
+</tr>
+<tr>
+<td><strong>Workspace admin</strong></td>
+<td>Dashboard → Team / Billing / Settings</td>
+<td>Seats, roles, plan, workspace config</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-success-metrics-required-proposed-not-instrumented">4. Success metrics — REQUIRED <em>(proposed — NOT instrumented)</em></h2>
+<p><strong>Finding #1: there is no product/funnel analytics in the codebase.</strong> Explicit greps for <code>posthog|segment|mixpanel|amplitude|gtag|datadog|logrocket|heap</code> across <code>server/ lib/ packages/dashboard/ src/</code> returned <strong>zero</strong> (scan 3). No signup→activation→conversion event stream exists. What exists:
+- <strong>Sentry</strong> — error monitoring only, env-gated (<code>packages/dashboard/instrumentation.ts:12</code>; <code>tracesSampleRate 0.1</code>); <strong>editor-route errors not even wired</strong> (TODO <code>EditorClient.tsx:19</code>, <code>EditorErrorBoundary.tsx:26</code>).
+- <strong>AI-adoption log</strong> — exactly 3 first-party events <code>edit.applied | edit.reverted | agent.run</code> (<code>packages/shared/schemas/ai-adoption.ts:15-19</code>), ingested via <code>ai.logAdoption</code> (<code>server/trpc/routers/ai.ts:412</code>). Structural metrics only; covers AI-edit trust, nothing about onboarding/billing/publish/retention.
+- <strong>Site traffic analytics</strong> (<code>server/services/analytics.service.ts</code>) — a <em>customer-facing feature</em>, not internal PM telemetry.
+- <strong>Audit log</strong> — security trail (<code>logAuditEvent</code>), not a funnel.</p>
+<p><strong>Proposed metric set (to instrument):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Definition</th>
+<th>Proposed target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Onboarding completion</td>
+<td>users reaching <code>OnboardingStep.COMPLETED</code> / signups (<code>onboarding.service.ts:111</code>)</td>
+<td>≥ 70%</td>
+</tr>
+<tr>
+<td>Time-to-first-site</td>
+<td>signup → first <code>Site</code> row (<code>sites.service.ts:163</code>)</td>
+<td>&lt; 10 min median</td>
+</tr>
+<tr>
+<td>Activation (first publish)</td>
+<td>workspaces with ≥1 <code>PUBLISHED</code> site within 7d</td>
+<td>≥ 40%</td>
+</tr>
+<tr>
+<td>Checklist completion</td>
+<td><code>dashboardTasks</code> all-done rate (<code>onboarding.service.ts:99</code>)</td>
+<td>≥ 50%</td>
+</tr>
+<tr>
+<td>Invite acceptance</td>
+<td><code>INVITE_ACCEPTED</code> / invites sent (<code>auth.ts:286</code>)</td>
+<td>≥ 60%</td>
+</tr>
+<tr>
+<td>FREE→paid conversion</td>
+<td>plan transitions FREE→PRO/BUSINESS</td>
+<td><strong>unmeasurable + impossible today</strong> (payments off, §2)</td>
+</tr>
+<tr>
+<td>Near-limit → upgrade</td>
+<td><code>isNearLimit</code> (<code>dashboard.ts:99</code>) sessions that convert</td>
+<td>instrument once payments live</td>
+</tr>
+</tbody>
+</table>
+<p>Whole section marked <strong>(proposed — not instrumented)</strong>. Naming the absence is the finding.</p>
+<hr />
+<h2 id="5-user-journeys-as-built">5. User journeys (as built)</h2>
+<ol>
+<li><strong>Onboarding</strong> — <code>role</code> (pick editor <em>density</em>, not persona) → <code>setup</code> (project name + method) → site creation → dashboard 7-task checklist. Read-repair skips <code>EDITOR_TOUR</code> (<code>onboarding.service.ts:38-55</code>).</li>
+<li><strong>Run the business</strong> — <code>/dashboard</code> home (stats, activity, quick actions, health, needs-attention, dunning) → Sites / Team / Billing / Settings.</li>
+<li><strong>Start a site</strong> — <code>/dashboard/sites/new</code> → blank | template gallery | AI 3-step wizard → opens editor (<code>sites/new/page.tsx:77,88,93</code>).</li>
+<li><strong>Manage a site</strong> — <code>sites/[id]</code> shell → Overview / Settings / SEO / Domains / Redirects / Access / Analytics / Publish tabs.</li>
+<li><strong>Agency (flag <code>agency_layer</code>)</strong> — Clients → assign sites + white-label → Shared-theme capture/push → Reviews/Comments sign-off (agency side only; client side broken).</li>
+<li><strong>Publish</strong> — pre-publish checks → SSE progress (cancel/retry) → success with URLs.</li>
+</ol>
+<hr />
+<h2 id="6-functional-requirements-per-surface-defects-inline">6. Functional requirements (per surface; defects inline)</h2>
+<p>Validation SSOT lives in <code>packages/shared/schemas/</code>; components add inline/client validation.</p>
+<h3 id="home-appdashboardpagetsx21">Home — <code>app/dashboard/page.tsx:21</code></h3>
+<p>Stat cards (Total/Published/Visits/Collaborators <code>:188-235</code>), QuickActions <code>:239</code>, RecentSites <code>:242</code>, ActivityFeed all/mine/team <code>:249</code>, WorkspaceHealth (only when a metric &gt;50% <code>:58</code>), NeedsAttention (agency <code>:178</code>), Checklist FAB <code>:272</code>. Banners: dunning <code>:124</code>, workspace-deletion grace <code>:137</code>, account-deletion grace <code>:154</code>. States: loading <code>:66</code>, <strong>error</strong> <code>:101</code>, role-variant empty <code>:180</code>.
+- <strong>DEFECT (broken link):</strong> <code>EmptyState</code> <code>editor_no_sites</code> CTA → <code>/dashboard/settings/team</code> which does not exist (<code>components/dashboard/empty-state.tsx:53</code>; real route <code>/dashboard/team</code>).</p>
+<h3 id="my-sites-appdashboardsitespagetsx22">My Sites — <code>app/dashboard/sites/page.tsx:22</code></h3>
+<p>Grid/list toggle <code>:326</code>, folder tabs incl. Archived <code>:343</code>, advanced filters <code>:364</code>, bulk bar (cap <strong>25</strong>, <code>bulk-action-bar.tsx:16</code>), pagination <code>:475</code>. Actions <code>handleSiteAction:229</code>: edit/manage/rename/duplicate/archive/delete/transfer/copyUrl/viewPublished. Validation: <code>createSiteSchema</code> name 2–100 + method enum (<code>schemas/sites.ts:3</code>), slug min3/max50/regex (<code>:51</code>), folder 1–50 (<code>:37</code>), bulk 1–25 ids (<code>:41</code>). States: loading <code>:389</code>, <strong>error</strong> <code>:403</code>, filtered-empty vs true-empty <code>:414/:424</code>.</p>
+<h3 id="create-site-appdashboardsitesnewpagetsx19">Create Site — <code>app/dashboard/sites/new/page.tsx:19</code></h3>
+<p>Views: choose → template gallery/preview | AI wizard | blank. AI wizard: type (Next disabled until selected <code>ai-wizard/step-type.tsx:49</code>), pages 1–8 + description ≤500 (Home locked <code>step-pages.tsx:47</code>), progress polls 2s <code>:67</code>. Credits-exhausted → upgrade/template modal <code>:99</code>. CreateSiteModal: live slug <code>:56</code>, at-limit paywall <code>:69</code>, AI credits <code>:99</code>.</p>
+<h3 id="site-detail-shell-sitesidlayouttsx10">Site Detail shell — <code>sites/[id]/layout.tsx:10</code></h3>
+<p>Tabs Overview/Settings/SEO/Domains/Redirects/Access/Analytics (<code>tab-nav.tsx:7</code>). SiteHeader: View Site (disabled if unpublished <code>:46</code>), Edit, Publish (DRAFT only <code>:58</code>), Unpublish (PUBLISHED only <code>:61</code>). States: loading <code>:32</code>, not-found <code>:42</code> (no error/denied at shell).
+- <strong>Overview</strong> <code>overview-tab.tsx:79</code> — stat boxes, health breakdown, form blocks + submissions table w/ CSV export <code>:145</code>; states loading/error/empty ✔.
+- <strong>Settings</strong> <code>settings-tab.tsx:34</code> — general, favicon upload (presign→PUT→confirm <code>:62</code>), <strong>Pro-gated</strong> password <code>:226</code> + custom code <code>:264</code>, social links. <strong>DEFECT: returns <code>null</code> on no data — no error state</strong> (<code>page.tsx:26</code>).
+- <strong>SEO</strong> <code>seo-tab.tsx:30</code> — read-only preview + editable Technical SEO (canonical/indexing/robots); loading + <strong>error</strong> ✔.
+- <strong>Domains</strong> <code>domains-tab.tsx:43</code> — connect (FREE→paywall <code>:49</code>), DNS records, set-primary; poll 30s. <strong>No error / no explicit empty state.</strong>
+- <strong>Redirects</strong> <code>redirects-tab.tsx:25</code> — from/to/301|302, CSV import/export, plan gate. <strong>No error state</strong>; <code>canEdit</code> hardcoded <code>true</code> (<code>page.tsx:50</code>). Missing "saved, not live" notice (spec F4).
+- <strong>Access/Sharing</strong> <code>access-tab.tsx:87</code> — share links (name/password/expiry chips gated by plan), QR per link. <strong>No error state.</strong> Note: share links ≠ access control <code>:112</code>.
+- <strong>Analytics</strong> <code>analytics-tab.tsx:34</code> — range chips, bar chart, sources/countries/devices. <strong>No error state.</strong>
+- <strong>Publish</strong> <code>sites/[id]/publish/page.tsx:12</code> — pre-publish checks (Publish disabled unless <code>checks.ready</code>), SSE progress w/ cancel+retry, success w/ URLs.
+  - <strong>DEFECT (broken link):</strong> PublishSuccess "Share with Client" → <code>/dashboard/sites/${id}/sharing</code>; real segment is <code>access</code> → 404 (<code>publish-success.tsx:73</code>).</p>
+<h3 id="team-appdashboardteampagetsx15">Team — <code>app/dashboard/team/page.tsx:15</code></h3>
+<p>Stat cards, sortable members table + role picker (<code>members-table.tsx:165</code>), pending invites resend/revoke, activity, invite modal. Invite validation: email regex + max-10 (<code>invite-modal.tsx:33</code>), backend <code>inviteMembersSchema</code> emails 1–10, role∈{ADMIN,EDITOR,DESIGNER,VIEWER}, message ≤500 (<code>schemas/team.ts:3</code>). States: loading/error/empty ✔.</p>
+<h3 id="media-media-librarytsx26">Media — <code>media-library.tsx:26</code></h3>
+<p><code>@vercel/blob/client</code> upload → <code>createAsset:47</code>, search, folders, storage quota footer w/ 80% warning <code>:176</code>. <strong>No error state</strong> for asset query.</p>
+<h3 id="billing-appdashboardbillingpagetsx76">Billing — <code>app/dashboard/billing/page.tsx:76</code></h3>
+<p>PlanCard, UsageBars (<strong>bandwidth omitted — no pipeline</strong> <code>:56</code>), PaymentMethodCard, InvoiceTable, dunning <code>:192</code>, cancel→CancelModal. Prices from <code>PLAN_LIMITS</code> SSOT <code>:29</code>. States loading/error ✔.
+- <strong>Intentional "not live":</strong> "Payment processing coming soon" <code>:159</code>; upgrades disabled (<code>plan-comparison.tsx:240</code>); interval switch removed to avoid desync <code>:239</code>; card update "coming soon" (<code>payment-method-card.tsx:112</code>).</p>
+<h3 id="settings-tabs-profileaccountsecuritynotificationsworkspaceintegrationsapi-tokensai-creditsdanger">Settings (tabs: Profile/Account/Security/Notifications/Workspace/Integrations/API Tokens/AI &amp; Credits/Danger)</h3>
+<ul>
+<li><strong>Profile</strong> <code>profile-form.tsx:64</code> — avatar upload (presign <code>:91</code>), name/bio(≤500)/lang/tz; email read-only. No error state.</li>
+<li><strong>Account</strong> <code>account-tab.tsx:68</code> — change/set password (inline match+min8), change email (inline), connect/disconnect Google/GitHub.</li>
+<li><strong>Security</strong> <code>security-tab.tsx:31</code> — 2FA enable (QR→backup→verify6), sessions, login history.</li>
+<li><strong>DEFECT (dead control):</strong> <code>security/page.tsx:6</code> passes no <code>currentSessionId</code> → "Revoke all other sessions" early-returns (dead button <code>:108</code>); "Current" badge never renders <code>:426</code>; current session shows a live Revoke <code>:449</code>.</li>
+<li><strong>Workspace</strong> <code>workspace-form.tsx:80</code> — general, branding (accent hex validated), collaboration approval, sharing; transfer ownership; delete (type-to-confirm, real mutation <code>:113</code>).</li>
+<li><strong>Integrations</strong> <code>integrations-tab.tsx:331</code> — Vercel OAuth + GA/Mailchimp/Zapier/Slack cards; team picker server route <code>:22</code>.</li>
+<li><strong>API Tokens</strong> <code>api-tokens-tab.tsx:39</code> — create (name+scopes+expiry), shown-once plaintext. No error state.</li>
+<li><strong>AI &amp; Credits</strong> <code>ai-credits-tab.tsx:49</code> — usage, generate CTA (disabled at 0), history; <strong>4 permanently-disabled "Coming Soon" cards</strong> <code>:204</code>.</li>
+<li><strong>Danger Zone</strong> <code>danger-zone-tab.tsx:53</code> — export, delete-account (type "DELETE").</li>
+<li><strong>DEFECT (dead guard):</strong> sole-owner/active-sub pre-check block never renders — <code>danger/page.tsx:20</code> never passes <code>isSoleOwner</code>/<code>hasActiveSubscription</code> props <code>:177</code>.</li>
+</ul>
+<h3 id="onboarding-apponboarding">Onboarding — <code>app/onboarding/</code></h3>
+<p><code>role</code> = editor density Simple/Advanced (reversible pref, not persona) → <code>setup</code> = solo/agency (agency flips <code>agency_layer</code>) + project name 2–100 + method ai/template/blank.</p>
+<h3 id="agency-flag-agency_layer-strongest-state-coverage-all-use-deniedstate-when-off">Agency (flag <code>agency_layer</code>; strongest state coverage — all use <code>DeniedState</code> when off)</h3>
+<p>Clients CRUD + white-label branding (<code>prisma/schema.prisma:466</code>), Client detail assign/branding/scoped-invite, Comments queue, Reviews approve/request-changes, Shared-theme capture/push. <strong>Client-side sign-off broken</strong> (§13).</p>
+<hr />
+<h2 id="7-state-machines">7. State machines</h2>
+<p>All status/role/plan columns are Prisma <strong><code>String</code></strong> (no native DB enums) — values enforced only at the Zod boundary + <code>lib/constants/enums.ts</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Machine</th>
+<th>States</th>
+<th>Transitions (file:line)</th>
+<th>Dead states</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SiteStatus</strong> (<code>enums.ts:36</code>)</td>
+<td>DRAFT · PUBLISHED · ARCHIVED</td>
+<td>create→DRAFT (<code>sites.service.ts:197</code>); archive→ARCHIVED <code>:457</code>; unarchive→DRAFT <code>:464</code>; publish→PUBLISHED (job pipeline <strong>or</strong> bulk direct <code>:587</code>); unpublish→DRAFT <code>:594</code>; delete = soft <code>deletedAt</code></td>
+<td>— (but <strong>two publish paths</strong>, §13-A)</td>
+</tr>
+<tr>
+<td><strong>InviteStatus</strong> (<code>enums.ts:48</code>)</td>
+<td>PENDING · ACCEPTED · DECLINED · EXPIRED</td>
+<td>PENDING→ACCEPTED (<code>auth.ts:283</code>); PENDING→EXPIRED (cron <code>api/cron/invite-expiry/route.ts:13</code>); revoke = row <strong>deleted</strong></td>
+<td><strong>DECLINED never written</strong> — dead</td>
+</tr>
+<tr>
+<td><strong>SubscriptionStatus</strong> (<code>enums.ts:66</code>)</td>
+<td>ACTIVE · PAST_DUE · CANCELLED · INCOMPLETE</td>
+<td>Stripe webhook →PAST_DUE <code>:19</code>, →CANCELLED <code>:86</code></td>
+<td><strong>INCOMPLETE never assigned</strong> — dead</td>
+</tr>
+<tr>
+<td><strong>OnboardingStep</strong> (<code>enums.ts:248</code> + dup <code>onboarding.service.ts:4</code>)</td>
+<td>ROLE_SELECT → PROJECT_SETUP → SITE_CREATION → EDITOR_TOUR → CHECKLIST → COMPLETED</td>
+<td>linear <code>nextStep:15</code>; read-repair SITE_CREATION→CHECKLIST <code>:38</code></td>
+<td><strong>EDITOR_TOUR effectively unreachable</strong> (tour procs removed <code>onboarding.ts:76</code>)</td>
+</tr>
+<tr>
+<td><strong>MemberStatus</strong> (<code>enums.ts:55</code>)</td>
+<td>ACTIVE · SUSPENDED</td>
+<td>ACTIVE→SUSPENDED via revoke (<code>team.service.ts:168</code>)</td>
+<td><strong>No un-suspend path</strong> — SUSPENDED terminal (only delete removes row)</td>
+</tr>
+<tr>
+<td><strong>DomainStatus</strong> (<code>enums.ts:85</code>)</td>
+<td>PENDING · VERIFIED · FAILED</td>
+<td>PENDING→VERIFIED (<code>domain.service.ts:99</code>)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-business-plan-rules-required">8. Business &amp; plan rules — REQUIRED</h2>
+<p><strong>SSOT: <code>lib/constants/plan-limits.ts</code> (<code>PLAN_LIMITS</code>, lines 26-90).</strong> Tiers <code>FREE | PRO | BUSINESS</code>; <code>-1</code> = unlimited.</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>FREE</th>
+<th>PRO</th>
+<th>BUSINESS</th>
+<th>Enforced at</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sites</td>
+<td>3</td>
+<td>15</td>
+<td>50</td>
+<td><code>sites.service.ts:174,362</code>; downgrade reconcile <code>billing.service.ts:184</code></td>
+</tr>
+<tr>
+<td>pagesPerSite</td>
+<td>10</td>
+<td>30</td>
+<td>50</td>
+<td><code>page.service.ts:64</code></td>
+</tr>
+<tr>
+<td>customDomains</td>
+<td>0</td>
+<td>3</td>
+<td>20</td>
+<td><code>domain.service.ts:53</code></td>
+</tr>
+<tr>
+<td>teamMembers (seats)</td>
+<td>1</td>
+<td>5</td>
+<td>25</td>
+<td><code>team.service.ts:70,97</code> (throws <code>TEAM_LIMIT</code>)</td>
+</tr>
+<tr>
+<td>storageMB</td>
+<td>500</td>
+<td>5120</td>
+<td>51200</td>
+<td><code>media.service.ts:135,476</code> (FORBIDDEN on upload)</td>
+</tr>
+<tr>
+<td>bandwidthMB</td>
+<td>1024</td>
+<td>10240</td>
+<td>102400</td>
+<td><strong>declared, no enforcement found <code>[TBC]</code></strong>; <code>usedMB</code> hardcoded 0 (<code>dashboard.service.ts:374</code>)</td>
+</tr>
+<tr>
+<td>aiGenerations</td>
+<td>3</td>
+<td>20</td>
+<td>∞</td>
+<td><code>account.service.ts:340</code></td>
+</tr>
+<tr>
+<td>aiPromptsPerDay</td>
+<td>10</td>
+<td>200</td>
+<td>∞</td>
+<td>atomic reserve <code>quota.service.ts:58-100</code>, UTC reset</td>
+</tr>
+<tr>
+<td>fileUploadMaxMB</td>
+<td>10</td>
+<td>50</td>
+<td>200</td>
+<td>media upload</td>
+</tr>
+<tr>
+<td>formSubmissions</td>
+<td>100</td>
+<td>2500</td>
+<td>∞</td>
+<td><code>form-submission.service.ts:42</code></td>
+</tr>
+<tr>
+<td>urlRedirects</td>
+<td>100</td>
+<td>500</td>
+<td>∞</td>
+<td>redirect service</td>
+</tr>
+<tr>
+<td>integrations</td>
+<td>0</td>
+<td>2</td>
+<td>∞</td>
+<td>integration gate</td>
+</tr>
+<tr>
+<td>analyticsRetentionDays</td>
+<td>7</td>
+<td>30</td>
+<td>90</td>
+<td>analytics window</td>
+</tr>
+<tr>
+<td>shareLinkExpiryMaxDays</td>
+<td>7</td>
+<td>30</td>
+<td>90</td>
+<td><code>share-link.service.ts:35</code> (throws <code>EXPIRY_EXCEEDS_PLAN</code>)</td>
+</tr>
+<tr>
+<td>shareLinkPasswords</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td><code>share-link.service.ts</code> (throws <code>PASSWORD_LINKS_NOT_AVAILABLE</code>)</td>
+</tr>
+<tr>
+<td>assetVersionsCap</td>
+<td>5</td>
+<td>25</td>
+<td>100</td>
+<td>media versions</td>
+</tr>
+<tr>
+<td><strong>priceMonthly (USD)</strong></td>
+<td>0</td>
+<td>29</td>
+<td>79</td>
+<td><code>plan-limits.ts:45/66/87</code></td>
+</tr>
+<tr>
+<td><strong>priceYearly (USD/mo)</strong></td>
+<td>0</td>
+<td>23</td>
+<td>63</td>
+<td><code>plan-limits.ts:46/67/88</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>AI model policy</strong> (<code>PLAN_MODELS</code> <code>plan-limits.ts:103-121</code>, server-authoritative <code>quota.service.ts:119</code>): FREE→haiku-4-5, PRO→sonnet-4-6, BUSINESS→opus-4-7; lower tier requesting premium silently downgraded.</p>
+<p><strong>SSOT leaks (hardcoded, NOT in <code>PLAN_LIMITS</code> — repricing hazard):</strong>
+- Share links per site: FREE=<strong>3</strong>, paid=∞ — hardcoded <code>share-link.service.ts:48</code> (throws <code>SHARE_LINK_LIMIT</code>).
+- Near-limit nudge at <strong>80%</strong> (<code>dashboard.ts:99</code>).
+- bcrypt cost 10 for share-link passwords (<code>share-link.service.ts:59</code>).
+- Invite resend max <strong>2</strong> (<code>team.service.ts:200</code>).</p>
+<p><strong>TTLs / lockouts / rate limits (security-numeric):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Value</th>
+<th>file:line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login IP rate limit</td>
+<td>5 / 5 min</td>
+<td><code>server/auth.config.ts:11,44</code></td>
+</tr>
+<tr>
+<td>Account lockout</td>
+<td>5 fails → 15 min</td>
+<td><code>rate-limit.service.ts:3,22</code></td>
+</tr>
+<tr>
+<td>Auth "strict" limiter</td>
+<td>5 / 15 min</td>
+<td><code>routers/auth.ts:19</code></td>
+</tr>
+<tr>
+<td>Auth "normal" limiter</td>
+<td>10 / 15 min</td>
+<td><code>auth.ts:21</code></td>
+</tr>
+<tr>
+<td>Privileged-action limiter</td>
+<td>20 / 60s</td>
+<td><code>routers/actions.ts:28</code></td>
+</tr>
+<tr>
+<td>Email-verify token</td>
+<td>24 h</td>
+<td><code>auth.service.ts:171</code></td>
+</tr>
+<tr>
+<td>Password-reset token</td>
+<td>1 h</td>
+<td><code>auth.service.ts:231</code></td>
+</tr>
+<tr>
+<td>Magic-link token</td>
+<td>15 min</td>
+<td><code>auth.service.ts:259</code></td>
+</tr>
+<tr>
+<td>2FA temp / session-grant</td>
+<td>5 min</td>
+<td><code>auth.service.ts:143</code>; <code>auth.ts:47</code></td>
+</tr>
+<tr>
+<td>Team invite</td>
+<td>7 days</td>
+<td><code>team.service.ts:105</code></td>
+</tr>
+<tr>
+<td>Workspace transfer</td>
+<td>48 h</td>
+<td><code>workspace-transfer.service.ts:34</code></td>
+</tr>
+<tr>
+<td>Session cookie maxAge</td>
+<td>30 days</td>
+<td><code>auth.config.ts:172</code></td>
+</tr>
+</tbody>
+</table>
+<p>Rate limiter is <strong>Postgres-backed atomic upsert</strong>, shared across serverless instances (<code>server/services/rate-limiter.ts:10-41</code>).</p>
+<hr />
+<h2 id="9-api-surface-condensed-validation-ssot-packagessharedschemas">9. API surface (condensed; validation SSOT <code>packages/shared/schemas/</code>)</h2>
+<p>Root: <code>server/trpc/router.ts:31</code>. All dashboard procedures use <code>protectedProcedure</code> (<code>trpc.ts:87</code> — denies bearer tokens; API tokens must use <code>scopedProcedure</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Router</th>
+<th>Key procedures</th>
+<th>Authz</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dashboard</code> (<code>routers/dashboard.ts</code>)</td>
+<td>stats, recentSites, attentionQueue, activity, health, quickActions</td>
+<td>member of workspace</td>
+</tr>
+<tr>
+<td><code>sites</code> (<code>sites.ts</code>)</td>
+<td>list/get/create/rename/duplicate/archive/unarchive/delete/bulk/checkSlug/transfer/publish/unpublish/saveProject(Data)/folders.*</td>
+<td>per-op role: read=member, edit=EDITOR, settings=ADMIN, destructive=OWNER</td>
+</tr>
+<tr>
+<td><code>team</code> (<code>team.ts</code>)</td>
+<td>stats/list/auditLog/invite/changeRole/revoke/delete/pendingInvites/revokeInvite/resendInvite</td>
+<td>mutations = <code>requireAdmin</code> (ADMIN)</td>
+</tr>
+<tr>
+<td><code>billing</code> (<code>billing.ts</code>)</td>
+<td>overview/plans/usage/invoices/upgrade/cancel/switchInterval/reactivate</td>
+<td>protected; <strong><code>upgrade</code> always throws <code>PAYMENTS_NOT_CONFIGURED</code></strong></td>
+</tr>
+<tr>
+<td><code>account</code> (<code>account.ts</code>)</td>
+<td>profile/changeEmail/changePassword/2FA/sessions/notifications/preferences/workspace.*/integrations/dangerZone</td>
+<td>userId-scoped; workspace.update = ADMIN</td>
+</tr>
+<tr>
+<td><code>onboarding</code> (<code>onboarding.ts</code>)</td>
+<td>getState/selectRole/setupProject/completeStep/completeDashboardTask/dismiss</td>
+<td>protected</td>
+</tr>
+<tr>
+<td><code>theme</code> (<code>theme.ts</code>)</td>
+<td>getShared/capture/push/setLock/<strong>previewPush</strong>/<strong>rollback</strong>/<strong>snapshots</strong>/presets.*</td>
+<td>agency (<code>agency_layer</code>)</td>
+</tr>
+<tr>
+<td><code>reviews</code>/<code>comments</code>/<code>clients</code>/<code>notifications</code>/<code>help</code>/<code>api-tokens</code></td>
+<td>sign-off, comment queue, client CRUD+branding, SSE notifications, support tickets, token mgmt</td>
+<td>flag/role/user-scoped</td>
+</tr>
+</tbody>
+</table>
+<p>Full input schemas in scan appendix; e.g. <code>listSitesSchema</code> (<code>schemas/sites.ts:19</code>) = page/perPage(1-50)/status/sort/search/folderId/clientId/dateRange/hasCustomDomain/hasTraffic.</p>
+<hr />
+<h2 id="10-enums-with-drift">10. Enums (with drift)</h2>
+<p>Source: <code>lib/constants/enums.ts</code> (<code>as const</code>; no DB enums). Full values in §7 + §3. <strong>Drift flags:</strong>
+1. <strong><code>OnboardingRole</code> {FREELANCER,SMALL_TEAM,AGENCY} is fully dead</strong> — zero consumers; the <code>OnboardingState.role</code> column actually stores editor <strong>density</strong> <code>"full"/"fewer"</code> (<code>onboarding.service.ts:71</code>). Misleading column name.
+2. <strong>Dead states:</strong> <code>InviteStatus.DECLINED</code>, <code>SubscriptionStatus.INCOMPLETE</code>, <code>OnboardingStep.EDITOR_TOUR</code> (§7).
+3. <strong>Creation-method case drift:</strong> DB constants UPPERCASE <code>BLANK/TEMPLATE/AI</code> vs input schemas lowercase <code>blank/template/ai</code> (<code>schemas/sites.ts:5</code>); onboarding stores lowercase.
+4. <strong>DB statuses with no app-constant:</strong> <code>Comment (OPEN|RESOLVED)</code>, <code>ReviewRequest (PENDING|APPROVED|CHANGES_REQUESTED)</code>, <code>CmsEntry (DRAFT|PUBLISHED)</code>, <code>PublishBuildJob (QUEUED|BUILDING|DEPLOYING|FAILED)</code> — string literals only.
+5. <strong>Sequence duplicated</strong> in <code>enums.ts:248</code> and <code>onboarding.service.ts:4</code> (two SSOTs).
+6. <code>DESIGNER</code> shares <code>EDITOR</code> rank exactly (rank 1, <code>permission.service.ts:7</code>) — intentional, no design-only capability.</p>
+<hr />
+<h2 id="11-non-functional">11. Non-functional</h2>
+<p><strong>Security posture — strong, hardening plan (<code>docs/plans/2026-06-09-001-...</code>) substantially shipped:</strong>
+- Edge middleware decodes the JWT (not mere cookie presence) <code>middleware.ts:51</code>; workspace-switch IDOR-guarded (<code>auth.config.ts:134</code>).
+- <code>protectedProcedure</code> denies bearer; bearer fails closed (<code>trpc.ts:34</code>). RBAC ranks VIEWER0&lt;EDITOR/DESIGNER1&lt;ADMIN2&lt;OWNER3 (<code>permission.service.ts:4</code>).
+- Fixed + verified: VIEWER-edit at both router (<code>pages.ts:27</code>) <strong>and page loader</strong> (<code>app/edit/[siteId]/page.tsx:20</code> → <code>userCanEditSite</code> → <code>notFound()</code> for VIEWER; test <code>userCanEditSite.test.ts:47</code> asserts viewer→false), invite email-mismatch (<code>auth.ts:259</code>), team IDOR (<code>team.ts:32</code>), account/session IDOR (<code>account.ts:115</code>).
+- <strong>Rate limiting is Postgres-backed</strong> (atomic upsert into <code>rate_limit_buckets</code>, <code>rate-limiter.ts:21</code>) — cross-serverless-instance-safe. The hardening plan's "H5 wire Redis" was resolved <em>this way</em> instead; no Redis/Upstash dependency exists (confirmed: zero <code>upstash|redis</code> references).</p>
+<p><strong>Resilience layer (a real strength):</strong> 18 cron jobs (<code>app/api/cron/*</code>) — <code>billing-dunning</code>, <code>invite-expiry</code>, <code>ssl-check</code>, <code>publish-job-cleanup</code>, <code>session-cleanup</code>, <code>token-cleanup</code>, <code>soft-delete-purge</code>, <code>workspace-transfer-expiry</code>, <code>ai-job-cleanup</code>, <code>ip-anonymization</code>, etc. Background hygiene is not an afterthought here.</p>
+<p><strong>Known debt / residual risk (all confirmed in code, no open <code>[TBC]</code>):</strong>
+- <strong>No product analytics</strong> (§4) — the single biggest measurement hole. <strong>Editor errors not sent to Sentry</strong> (TODOs <code>EditorClient.tsx:19</code>, <code>EditorErrorBoundary.tsx:26</code>).
+- <strong>Payments not integrated</strong> — upgrade stubbed (§2).
+- <strong>Published-site password</strong> enforcement depends on external Vercel deployment protection, asserted in a code comment but not implemented in-repo (<code>app/share/[token]/page.tsx:11-13</code>) — the share verify-cookie path is real, the published-render boundary is not. <strong>Decision-open, not unknown.</strong>
+- <strong><code>bandwidthMB</code></strong> declared (<code>plan-limits.ts:33</code>) but has <strong>no tracking pipeline</strong> — <code>usedMB</code> hardcoded 0 and the code says so (<code>billing.service.ts:39</code> comment); the UI hides the bar. Honest stub, not a silent bug.
+- <strong>Team router uses first-membership, not active workspace</strong> (<code>team.ts:22</code> <code>findFirst</code> by userId) — multi-workspace users can act on the wrong workspace.
+- <strong>Bulk-publish bypasses the deploy pipeline</strong> — <code>bulkAction</code> "publish" does <code>updateMany status:"PUBLISHED"</code> directly (<code>sites.service.ts:587</code>), no <code>PublishBuildJob</code>. Status flips without a real build.
+- Dead states + broken links + dead controls (§13).</p>
+<hr />
+<h2 id="12-spec-vs-built-delta-required">12. Spec-vs-built delta — REQUIRED</h2>
+<p>Docs read: <code>docs/prd/BUILDRIK-PRD-COMPLETE.md</code> (scoped to Auth/Onboarding; billing+team "out of scope" <code>:41</code>), <code>docs/reviews/2026-06-19-ceo-review-dashboard.md</code>, <code>docs/plans/2026-06-09-001-fix-dashboard-authz-hardening-plan.md</code>, <code>design-gaps-extensibility-audit-20260630.md</code>, <code>complete-feature-list-20260623.md</code>. Git recency: last 15 touches on <code>packages/dashboard</code>+<code>docs</code> are <strong>mostly docs/spec work</strong> — dashboard feature-code has quieted.</p>
+<h3 id="shared-theme-change-contract-ceo-review-keystone">Shared-theme "change contract" (CEO review keystone)</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Capture + push, partial-fail tolerant</td>
+<td><strong>BUILT</strong></td>
+<td><code>theme.ts:82,112</code></td>
+</tr>
+<tr>
+<td>Per-site lock (excluded from push)</td>
+<td><strong>BUILT</strong></td>
+<td><code>theme.ts:96</code>; <code>theme-manager.tsx:212</code></td>
+</tr>
+<tr>
+<td>Confirm dialog w/ baked count "Push to N"</td>
+<td><strong>BUILT</strong></td>
+<td><code>theme-manager.tsx:104-147</code></td>
+</tr>
+<tr>
+<td><strong>Item 1 — dry-run / blast-radius</strong> (<code>previewPush</code>)</td>
+<td><strong>PARTIAL — backend built, UI orphan</strong></td>
+<td><code>theme.ts:126</code>; <strong>0 UI callers</strong></td>
+</tr>
+<tr>
+<td><strong>Item 3 — push-time per-site override resolution</strong></td>
+<td><strong>SPEC-ONLY</strong></td>
+<td><code>ceo-review:46</code>; UI offers only pre-set lock (the flagged footgun)</td>
+</tr>
+<tr>
+<td><strong>Item 4 — push history (<code>ThemePushRun</code>)</strong></td>
+<td><strong>NOT BUILT</strong></td>
+<td>no such Prisma model; result is ephemeral React state</td>
+</tr>
+<tr>
+<td><strong>Item 5 — per-site rollback</strong></td>
+<td><strong>PARTIAL — backend built, UI orphan</strong></td>
+<td><code>theme.ts:140</code>, <code>SiteThemeSnapshot</code> <code>schema:297</code>; 0 UI callers</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dashboard-home-platform">Dashboard home + platform</h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7-task activation checklist</td>
+<td>BUILT</td>
+<td><code>dashboard-checklist.tsx</code>, mounted <code>page.tsx:272</code></td>
+</tr>
+<tr>
+<td><strong>Invited-member 3-task variant</strong></td>
+<td><strong>SPEC-ONLY / orphan</strong></td>
+<td>coded but never mounted with <code>variant</code> prop (<code>page.tsx:273</code>)</td>
+</tr>
+<tr>
+<td>Resume-cap / snooze rules</td>
+<td>SPEC-ONLY</td>
+<td><code>08-dashboard-checklist.md:32</code></td>
+</tr>
+<tr>
+<td>Account/API-tokens/2FA/sessions</td>
+<td>BUILT</td>
+<td><code>components/settings/*</code>, <code>api-tokens.ts</code></td>
+</tr>
+<tr>
+<td>Team invite/roles/revoke/transfer</td>
+<td>BUILT</td>
+<td><code>team.ts</code>, <code>workspace-transfer.service.ts</code></td>
+</tr>
+<tr>
+<td>Clients + white-label (agency wedge)</td>
+<td><strong>BUILT, flag-OFF</strong></td>
+<td><code>clients.ts:28</code>, branding <code>schema:466</code></td>
+</tr>
+<tr>
+<td>Notifications (SSE), Integrations (Vercel OAuth)</td>
+<td>BUILT (env-gated)</td>
+<td><code>notifications.ts</code>, <code>vercel-oauth.service.ts</code></td>
+</tr>
+<tr>
+<td>Billing usage/invoices/plans</td>
+<td>BUILT</td>
+<td><code>billing/page.tsx:82</code></td>
+</tr>
+<tr>
+<td><strong>Upgrade / paywall / payment</strong></td>
+<td><strong>PARTIAL — cosmetic stub</strong></td>
+<td><code>billing.service.ts:158,173</code> throws</td>
+</tr>
+<tr>
+<td>Sites list/detail/bulk</td>
+<td>PARTIAL</td>
+<td>bulk-publish = DB flip not real deploy; move/export no backend</td>
+</tr>
+<tr>
+<td>New-site blank/template/<strong>AI</strong></td>
+<td>BUILT, env-gated</td>
+<td><code>sites/new/page.tsx:93</code> (doc-internal drift on AI status)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="authz-hardening-plan-verified-no-open-tbc">Authz hardening plan (verified — no open <code>[TBC]</code>)</h3>
+<p>C1 role-gate mutations <strong>BUILT</strong> (<code>pages.ts:27</code>) AND the <strong>edit-page loader VIEWER-block is BUILT + tested</strong> (<code>app/edit/[siteId]/page.tsx:20</code> → <code>userCanEditSite</code> → <code>notFound()</code>; <code>userCanEditSite.test.ts:47</code> asserts viewer→false — resolves the two-agent contradiction: the earlier "not found" grep looked for <code>checkSiteRole</code> and missed <code>userCanEditSite</code>). H1/H2/H3 IDOR fixes <strong>BUILT</strong>. H4 published-site password <strong>PARTIAL</strong> — decision-open (external Vercel protection). H5 Redis limiter <strong>resolved differently</strong> — Postgres-backed limiter (<code>rate-limiter.ts:21</code>), cross-instance-safe, no Redis dependency.</p>
+<h3 id="client-sign-off">Client sign-off</h3>
+<p>Agency side <strong>BUILT</strong> (<code>reviews.ts:44-69</code>); <strong>client-side approve/reject SPEC-ONLY/broken</strong> — share page just redirects (<code>share/[token]/page.tsx:35</code>), P1 dead-end (<code>design-gaps-20260630.md:16</code>).</p>
+<p><strong>Biggest built-but-invisible surprise:</strong> the whole agency wedge (clients, shared-theme incl. preview/rollback/preset-library <code>theme.ts:167</code>, reviews) ships <strong>dark behind <code>agency_layer</code></strong> — richer than spec, but flag-off.</p>
+<hr />
+<h2 id="13-gaps-decisions-register">13. Gaps &amp; decisions register</h2>
+<p><strong>A — broken / dead in code</strong>
+- A1. <code>billing.upgrade</code> throws <code>PAYMENTS_NOT_CONFIGURED</code> — no Stripe Checkout (<code>billing.service.ts:173</code>).
+- A2. Broken links → 404: publish "Share with Client"→<code>/sharing</code> (real <code>access</code>) (<code>publish-success.tsx:73</code>); home editor-empty CTA→<code>/dashboard/settings/team</code> (<code>empty-state.tsx:53</code>); billing "Invite member"→same bad route (<code>usage-bars.tsx:17</code>).
+- A3. Dead control: Security "Revoke all other sessions" (missing <code>currentSessionId</code>, <code>security/page.tsx:6</code>).
+- A4. Dead guard: Danger-zone sole-owner/active-sub warnings never render (<code>danger/page.tsx:20</code>).
+- A5. Dead states: <code>InviteStatus.DECLINED</code>, <code>SubscriptionStatus.INCOMPLETE</code>, <code>OnboardingStep.EDITOR_TOUR</code>, <code>OnboardingRole</code> enum, MemberStatus un-suspend.
+- A6. <code>bandwidthMB</code> limit unenforced; <code>usedMB</code> hardcoded 0.
+- A7. Theme preview/rollback backends have <strong>no UI callers</strong>; invited-member checklist variant never mounted.
+- A8. Two publish paths (<code>bulk</code> direct-flip vs job pipeline) can diverge.</p>
+<p><strong>B — product decision needed</strong>
+- B1. Turn payments on (Stripe) — or explicitly stay free? Everything gates toward an upgrade that can't happen.
+- B2. Ship <code>agency_layer</code> on, or keep dark? The differentiated wedge is built but invisible.
+- B3. Wire the theme push-time safety (CEO items 3/4/5) — mostly UI-wiring of existing backend.
+- B4. Instrument a product-analytics funnel (§4) — pick a provider.
+- B5. Client-side sign-off flow — build it or drop the "review" promise.</p>
+<p><strong>C — security</strong>
+- C1. Published-site password boundary depends on external Vercel deployment protection, asserted in a comment but not implemented in-repo (<code>app/share/[token]/page.tsx:11</code>). <strong>Decision-open</strong> — enforce at publish or drop the feature.
+- C2. Team router uses first-membership, not active workspace (<code>team.ts:22</code>) — cross-workspace action risk for multi-workspace users. <strong>Real bug, low-effort fix</strong> (use <code>resolveWorkspaceId</code>).
+- C3. ~~Edit-page loader VIEWER-block~~ <strong>RESOLVED</strong> — loader blocks VIEWER via <code>userCanEditSite</code> (<code>app/edit/[siteId]/page.tsx:20</code>), covered by test. No action.</p>
+<p><strong>D — spec-only (from §12)</strong>
+- D1. Theme push history (<code>ThemePushRun</code>), push-time override resolution, resume-cap checklist rules, invited-member checklist variant.</p>
+<p><strong>E — design↔code drift</strong> <em>(Figma <code>M2 · Onboarding</code> in scope this session)</em>
+- E1. <strong>Persona vs density mismatch.</strong> Figma M2 <code>S1</code> asks "What best describes you?" with persona options (Web Designer / Freelancer …) — reads as a <em>persona</em> picker. Code stores editor <strong>density</strong> (<code>"full"/"fewer"</code>) in the <code>OnboardingState.role</code> column (<code>onboarding.service.ts:71</code>), and the <code>OnboardingRole {FREELANCER,SMALL_TEAM,AGENCY}</code> enum is <strong>dead</strong> (zero consumers). So the design implies persona-based tailoring the code never does. Decide which is real before building either side.
+- E2. <strong>Onboarding step model differs.</strong> Figma flow: S1 workspace → S2 client → S3 path → build → editor. Code flow: <code>ROLE_SELECT → PROJECT_SETUP → SITE_CREATION → (EDITOR_TOUR dead) → CHECKLIST → COMPLETED</code> (<code>onboarding.service.ts:4</code>). The "client" (S2) step in Figma has no code equivalent in the onboarding state machine; clients live in the agency layer. Reconcile the wizard shape.
+- E3. <strong>Cross-module exits map to real routes.</strong> Figma "Skip → M3 Dashboard" / "→ M5 Editor" chips correspond to real code routes (<code>dashboard-home-getting-started</code> = <code>/dashboard</code>; editor = <code>/edit/[siteId]</code>). The Figma prototype couldn't wire cross-page (same-page NAVIGATE limit); the code has the destinations. Not a defect — a prototyping-tool constraint.
+- E4. <strong>Doc-internal drift (code docs, not design):</strong> AI-site-generation marked both "stub" and "wired e2e" in <code>complete-feature-list-20260623.md</code> (<code>:56</code> vs <code>:24</code>) — the newer code-verify (<code>:24</code>, wired-but-env-gated) supersedes; the stale row should be struck.</p>
+<hr />
+<h2 id="14-release-readiness">14. Release readiness</h2>
+<p><strong>Must-fix before charging / GA</strong>
+- Payments integration (A1/B1) — no revenue path today.
+- Broken links A2 (3 × 404 on core CTAs) — cheap, high-visibility.
+- Security C1/C3 (published-site enforcement + edit-loader VIEWER block) — verify or close.
+- Analytics funnel (B4) — cannot measure activation/conversion without it.</p>
+<p><strong>Should-fix</strong>
+- Dead controls A3/A4; theme safety wiring B3; team active-workspace bug C2; missing error/denied states on Settings/Domains/Redirects/Access/Analytics/Media (§6).
+- Decide <code>agency_layer</code> GA (B2); SSOT leaks in §8 (share-link 3, near-limit 80%) into <code>PLAN_LIMITS</code>.</p>
+<p><strong>Can-ship (low risk / intentional)</strong>
+- "Coming soon" AI tools, billing interval switch removal, agency layer staying dark for now.</p>
+<p><strong>Open questions</strong>
+1. Is Buildrik launching paid, or free-only for now? (blocks half this register)
+2. Is <code>agency_layer</code> the launch differentiator or a later phase?
+3. Does the onboarding <code>role</code> step mean persona or editor density? (E1 — design &amp; code disagree)
+4. Published-site password: enforce at publish (Vercel protection) or drop the feature? (C1)
+5. Analytics provider of record?</p>
+<hr />
+<h2 id="15-launch-strategy-approved-2026-07-06-office-hours-ceo-review">15. Launch strategy (approved 2026-07-06 — office-hours + CEO review)</h2>
+<p>The PRD diagnoses; this section carries the decision. Approach <strong>"Measure → Safeguard → Charge"</strong> (design doc <code>~/.gstack/projects/aamirtauqir-buildrik/shahg-main-design-20260706-022448.md</code>, adversarially reviewed).</p>
+<p><strong>Confirmed premises:</strong> (1) activation/analytics is the true #1, not payments — you can't optimize a funnel you can't see; (2) the agency layer ships (it's the moat) but only after theme-push preview + rollback UI lands (blast-radius is the #1 risk); (3) free-only is fine short-term, but payments gets a committed date, not drift.</p>
+<p><strong>Sequence (each sprint gated on the prior):</strong>
+1. <strong>Measure</strong> — PostHog Cloud funnel: <code>signup_completed → onboarding_completed → first_site_created → first_publish → near_limit → limit_blocked</code>. + consent/DPA. + fix the 3 broken-link 404s (they sit on the activation path). <em>Build gate: 6 events visible in PostHog.</em>
+2. <strong>Safeguard</strong> — wire theme-push <strong>preview + rollback</strong> UI onto existing backends (<code>theme.ts:126,140</code>); preview shows "N will change · M locked" (M = pre-set locks, <code>theme.setLock</code>). Full-surface agency smoke QA → flip <code>agency_layer</code> ON. Push-time override + <code>ThemePushRun</code> history = v1.1. <em>Build gate: reversible push, clicked through.</em>
+3. <strong>Charge</strong> — Stripe Checkout on <code>billing.service.ts:158</code> (products/prices per <code>PLAN_LIMITS</code>, webhook + idempotency, happy-path). Lifecycle (proration/portal/failed-payment) = v1.1. <em>Build gate: test-mode upgrade → <code>Subscription</code> row.</em></p>
+<p><strong>CEO pressure-test — the load-bearing caveat:</strong> measure/charge both assume a funnel that has traffic. There are <strong>no user/traffic numbers anywhere in the repo</strong>. Two questions gate the whole sequence and must be answered from real data, not the codebase:
+- Do you have signups/traffic today? If ~zero, the real #1 is <strong>distribution</strong> (get 10-20 agencies in), and analytics-first is one level too late.
+- Is anyone currently at a plan limit asking to pay? If yes, pull Stripe forward; if no, holding payments is correct and "payments urgency" is theater.</p>
+<p><strong>Honest limit:</strong> measurement-first de-risks <strong>activation</strong>, not willingness-to-pay — conversion stays unfalsifiable until Sprint 3 (Stripe) exists.</p>
+<p><strong>First action (this week):</strong> create a PostHog Cloud project, fire ONE event — <code>signup_completed</code> — end to end, visible in the dashboard. Smallest step that turns "we think people activate" into a number.</p>
+<hr />
+<h2 id="definition-of-10-star-what-closes-the-gap">Definition of 10-star (what closes the gap)</h2>
+<p>This PRD is decision-grade when: every finding in §13 resolves (fixed / deferred-with-reason / rejected), every <code>[TBC]</code> is closed with evidence (<strong>done</strong> — this pass), §8 business rules are complete (<strong>done</strong>), §12 spec-delta reflects the newest code-verify (<strong>done</strong>), and §15 carries an approved, adversarially-reviewed forward plan (<strong>done</strong>). Remaining to reach a <em>shipped</em> 10-star product (not doc): the §14 must-fix tier — payments, broken links, published-password decision, and the activation funnel.</p>
+<hr />
+<p><em>Every claim above is checkable at the cited <code>file:line</code> on <code>main@e5624ca1</code>. All <code>[TBC]</code> from the first pass are now resolved in code (§11, §12, §13-C). Grounded end to end: nothing invented.</em></p></div></body></html>

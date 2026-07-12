@@ -3,94 +3,42 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
+import { AuthMessage } from "@/components/auth/auth-message";
 import { AuthButton } from "@/components/auth/auth-button";
 
-function ResetVariant() {
-  return (
-    <>
-      <h1 className="text-auth-title text-auth-text-primary text-center">
-        Reset link expired
-      </h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-        This password reset link has expired (1 hour limit).
-      </p>
-      <div className="h-4" />
-      <AuthButton onClick={() => (window.location.href = "/auth/forgot-password")}>
-        Request New Reset Link
-      </AuthButton>
-    </>
-  );
-}
-
-function VerifyVariant() {
-  return (
-    <>
-      <h1 className="text-auth-title text-auth-text-primary text-center">
-        Verification link expired
-      </h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-        This link has expired. Request a new verification email.
-      </p>
-      <div className="h-4" />
-      <AuthButton onClick={() => (window.location.href = "/auth/signup")}>
-        Resend Verification Email
-      </AuthButton>
-    </>
-  );
-}
-
-function MagicLinkVariant() {
-  return (
-    <>
-      <h1 className="text-auth-title text-auth-text-primary text-center">
-        Magic link expired
-      </h1>
-      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
-        This link has expired (15 min limit). Request a new one.
-      </p>
-      <div className="h-4" />
-      <AuthButton onClick={() => (window.location.href = "/auth/magic-link")}>
-        Request New Magic Link
-      </AuthButton>
-      <div className="h-3" />
-      <Link
-        href="/auth/login"
-        className="text-auth-link hover:underline text-center block"
-      >
-        Use password instead
-      </Link>
-    </>
-  );
-}
+const VARIANTS = {
+  reset: {
+    title: "Reset link expired",
+    subtitle: "This password reset link has expired (1 hour limit).",
+    cta: "Request a new reset link",
+    href: "/auth/forgot-password",
+  },
+  verify: {
+    title: "Verification link expired",
+    subtitle: "This link has expired. Request a new verification email.",
+    cta: "Resend verification email",
+    href: "/auth/signup",
+  },
+  "magic-link": {
+    title: "Magic link expired",
+    subtitle: "This link has expired (15 minute limit). Request a new one.",
+    cta: "Request a new magic link",
+    href: "/auth/magic-link",
+  },
+} as const;
 
 function ExpiredLinkContent() {
   const searchParams = useSearchParams();
-  const type = searchParams.get("type") ?? "reset";
+  const type = (searchParams.get("type") ?? "reset") as keyof typeof VARIANTS;
+  const v = VARIANTS[type] ?? VARIANTS.reset;
 
   return (
-    <AuthCard>
-      <AuthLogo />
-      <AuthIcon name="warning" color="red" />
-
-      {type === "reset" && <ResetVariant />}
-      {type === "verify" && <VerifyVariant />}
-      {type === "magic-link" && <MagicLinkVariant />}
-      {type !== "reset" && type !== "verify" && type !== "magic-link" && (
-        <ResetVariant />
-      )}
-
-      <div className="h-4" />
-
-      <Link
-        href="/auth/login"
-        className="text-auth-label text-auth-link hover:underline text-center block"
-      >
-        ← Back to sign in
+    <AuthMessage title={v.title} subtitle={v.subtitle}>
+      <AuthButton onClick={() => (window.location.href = v.href)}>{v.cta}</AuthButton>
+      <Link href="/auth" className="text-auth-label text-auth-text-muted hover:text-auth-text-secondary text-center">
+        Back to log in
       </Link>
-    </AuthCard>
+    </AuthMessage>
   );
 }
 

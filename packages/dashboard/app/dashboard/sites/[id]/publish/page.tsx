@@ -84,6 +84,7 @@ export default function PublishPage() {
           jobId={jobId}
           onComplete={handleComplete}
           onCancel={handleCancelPublish}
+          onRetry={handlePublish}
         />
       </div>
     );
@@ -93,7 +94,7 @@ export default function PublishPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="mx-auto max-w-lg text-center">
-          <p className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>Publish Error</p>
+          <p className="text-sm font-semibold" style={{ color: "var(--color-error)" }}>Publish Error</p>
           <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>{publishError ?? "Something went wrong."}</p>
           <button
             onClick={handleRetryFromError}

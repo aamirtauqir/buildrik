@@ -16,6 +16,8 @@ import {
   getQuickActions,
   getAttentionQueue,
 } from "@/server/services/dashboard.service";
+import { getWorkspaceUsage } from "@/server/services/usage.service";
+import { getPartnerDashboard } from "@/server/services/partner.service";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceMember(ctx: WorkspaceCtx) {
@@ -26,11 +28,11 @@ async function getWorkspaceMember(ctx: WorkspaceCtx) {
   const activeId = ctx.session.user.workspaceId as string | null | undefined;
   const member =
     (await ctx.prisma.workspaceMember.findFirst({
-      where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId },
+      where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId, status: "ACTIVE" },
       select: { workspaceId: true, role: true },
     })) ??
     (activeId
-      ? await ctx.prisma.workspaceMember.findFirst({ where: { userId }, select: { workspaceId: true, role: true } })
+      ? await ctx.prisma.workspaceMember.findFirst({ where: { userId, status: "ACTIVE" }, select: { workspaceId: true, role: true } })
       : null);
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
   return member;
@@ -49,7 +51,7 @@ export const dashboardRouter = router({
 
   attentionQueue: protectedProcedure.query(async ({ ctx }) => {
     const member = await getWorkspaceMember(ctx);
-    return getAttentionQueue(member.workspaceId);
+    return getAttentionQueue(member.workspaceId, { isAdmin: member.role === "ADMIN" || member.role === "OWNER" });
   }),
 
   activity: protectedProcedure
@@ -72,6 +74,16 @@ export const dashboardRouter = router({
   health: protectedProcedure.query(async ({ ctx }) => {
     const member = await getWorkspaceMember(ctx);
     return getWorkspaceHealth(member.workspaceId, ctx.session.user.id);
+  }),
+
+  usage: protectedProcedure.query(async ({ ctx }) => {
+    const member = await getWorkspaceMember(ctx);
+    return getWorkspaceUsage(member.workspaceId);
+  }),
+
+  partner: protectedProcedure.query(async ({ ctx }) => {
+    const member = await getWorkspaceMember(ctx);
+    return getPartnerDashboard(member.workspaceId);
   }),
 
   quickActions: protectedProcedure.query(async ({ ctx }) => {

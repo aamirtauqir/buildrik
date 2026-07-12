@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review loop — reverse-wireframe (agency ↔ client)</title>
+<style>
+  :root{--ink:#1a1a1a;--mut:#6b7280;--faint:#9ca3af;--line:#d0d5dd;--bg:#f7f7f6;--paper:#fff;
+        --accent:#2D6DFF;--good:#0D9488;--warn:#B45309;--bad:#DC2626;--soft:#EFF4FF;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:14px/1.55 "Inter Tight",Inter,system-ui,sans-serif;padding:40px 24px 100px}
+  main{max-width:1080px;margin:0 auto}
+  .eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 4px}
+  h1{font:700 27px/1.2 "General Sans",Inter,sans-serif;margin:0 0 6px;letter-spacing:-.01em}
+  .lede{color:var(--mut);font-size:16px;max-width:760px;margin:0 0 8px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 26px;font-size:12px;color:var(--mut)}
+  .chip{font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:1px 8px;border-radius:5px;white-space:nowrap}
+  .chip.ok{background:#ECFDF3;color:var(--good)} .chip.half{background:#FFFAEB;color:var(--warn)} .chip.gap{background:#FEF3F2;color:var(--bad)}
+  h2{font:600 18px/1.3 "General Sans",Inter,sans-serif;margin:34px 0 4px}
+  .sub{color:var(--faint);font-size:12.5px;margin:0 0 14px}
+  /* flow rail */
+  .rail{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .frame{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:0;overflow:hidden;display:flex;flex-direction:column}
+  .fh{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);background:#fafafa}
+  .fh .n{font-size:10px;color:var(--faint);font-weight:700}
+  .fh .t{font-size:12.5px;font-weight:600;flex:1}
+  .body{padding:12px;flex:1}
+  .who{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:8px}
+  .who.client{color:#7A5AF8}  /* second actor tint, wireframe-only, not product */
+  /* lo-fi widgets */
+  .box{border:1px dashed var(--line);border-radius:6px;padding:8px 10px;margin:6px 0;font-size:12px;color:var(--mut);background:#fcfcfc}
+  .btn{display:inline-block;border:1px solid var(--ink);border-radius:6px;padding:4px 11px;font-size:11.5px;font-weight:600;margin:4px 6px 0 0}
+  .btn.pri{background:var(--ink);color:#fff}
+  .btn.ghost{border-style:dashed;border-color:var(--bad);color:var(--bad)}
+  .line{height:8px;background:#eef0f2;border-radius:3px;margin:5px 0}
+  .line.s{width:55%} .line.m{width:75%} .line.l{width:92%}
+  .pin{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:20px;padding:2px 9px;font-size:11px;color:var(--mut);background:#fff;margin:3px 4px 0 0}
+  .dot{width:14px;height:14px;border-radius:50%;background:var(--accent);color:#fff;font-size:9px;font-weight:700;display:inline-grid;place-items:center}
+  .note{font-size:11px;color:var(--bad);margin-top:8px;border-left:2px solid var(--bad);padding-left:8px}
+  .note.ok{color:var(--good);border-color:var(--good)}
+  .arrow{align-self:center;color:var(--faint);font-size:20px;text-align:center}
+  /* states strip */
+  .states{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
+  .st{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 11px}
+  .st .lbl{font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);font-weight:700;margin-bottom:6px}
+  .st p{margin:0;font-size:11.5px;color:var(--mut)}
+  .ev{font-family:"Geist Mono",ui-monospace,monospace;font-size:11px;color:var(--ink)}
+  footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--mut)}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Reverse-wireframe · drawn from the real backend · 2026-06-22</p>
+  <h1>The review loop — agency sends, client reviews, agency resolves.</h1>
+  <p class="lede">Every frame is drawn from what the code actually has: <span class="ev">ReviewRequest</span> (PENDING·APPROVED·CHANGES_REQUESTED + changeSummary), <span class="ev">Comment</span> (x/y + targetSelector + OPEN/RESOLVED), <span class="ev">ShareLink</span> (token + password + expiry). Chips mark reality, not a wish.</p>
+  <div class="legend">
+    <span><span class="chip ok">✓ exists</span> wired in code today</span>
+    <span><span class="chip half">◐ half</span> partial — surface there, gap inside</span>
+    <span><span class="chip gap">✗ gap</span> backend ready, no UI path</span>
+  </div>
+
+  <h2>The loop — 6 frames</h2>
+  <p class="sub">Top row = agency operator. Bottom row = the external client/reviewer. The break is all on the client's side.</p>
+
+  <div class="rail">
+    <!-- 1 -->
+    <div class="frame">
+      <div class="fh"><span class="n">01</span><span class="t">Send for review</span><span class="chip ok">✓</span></div>
+      <div class="body">
+        <div class="who">Agency · in editor</div>
+        <div class="box">Change summary<br><span class="ev">"hero copy, 2 images"</span></div>
+        <div class="box">Note to reviewer (optional)</div>
+        <span class="btn pri">Send for review</span>
+        <div class="note ok">Wired: <span class="ev">ReviewService.submit</span> → status PENDING.</div>
+      </div>
+    </div>
+    <!-- 2 -->
+    <div class="frame">
+      <div class="fh"><span class="n">02</span><span class="t">Reviewer is notified</span><span class="chip gap">✗</span></div>
+      <div class="body">
+        <div class="who client">Client · email / link</div>
+        <div class="box" style="border-color:var(--bad)">✉ "Acme site is ready for your review" + share link</div>
+        <span class="btn ghost">build: notify on submit</span>
+        <div class="note">Gap: no review notification trigger exists. Submit is silent — the reviewer never learns there's something to do.</div>
+      </div>
+    </div>
+    <!-- 3 -->
+    <div class="frame">
+      <div class="fh"><span class="n">03</span><span class="t">Reviewer opens the site</span><span class="chip half">◐</span></div>
+      <div class="body">
+        <div class="who client">Client · share/[token]</div>
+        <div class="box">🔒 Password gate <span class="chip ok" style="font-size:9px">✓</span></div>
+        <div class="line l"></div><div class="line m"></div><div class="line s"></div>
+        <div class="note">Half: gate works, but it <strong>redirects to the published site</strong> — a read-only page. No review chrome around it.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">↓ &nbsp; the reviewer needs to act — here is where the loop breaks &nbsp; ↓</div>
+
+  <div class="rail">
+    <!-- 4 -->
+    <div class="frame">
+      <div class="fh"><span class="n">04</span><span class="t">Reviewer leaves comments</span><span class="chip gap">✗</span></div>
+      <div class="body">
+        <div class="who client">Client · on the page</div>
+        <div class="box">Click anywhere → pin a comment
+          <div><span class="pin"><span class="dot">1</span> "make logo bigger"</span><span class="pin"><span class="dot">2</span> "wrong phone #"</span></div>
+        </div>
+        <span class="btn ghost">build: client comment layer</span>
+        <div class="note">Gap: <span class="ev">Comment</span> has x/y + targetSelector, but commenting lives <em>inside the editor</em> (agency only). The external client has no way to pin one.</div>
+      </div>
+    </div>
+    <!-- 5 -->
+    <div class="frame">
+      <div class="fh"><span class="n">05</span><span class="t">Reviewer decides</span><span class="chip gap">✗</span></div>
+      <div class="body">
+        <div class="who client">Client · verdict bar</div>
+        <div class="box">Sticky bar: <span class="btn">Request changes</span><span class="btn pri">Approve</span></div>
+        <span class="btn ghost">build: client resolve action</span>
+        <div class="note">Gap: <span class="ev">reviews.resolve</span> exists but only the agency queue calls it. The client can't approve from the share view.</div>
+      </div>
+    </div>
+    <!-- 6 -->
+    <div class="frame">
+      <div class="fh"><span class="n">06</span><span class="t">Agency sees the result</span><span class="chip half">◐</span></div>
+      <div class="body">
+        <div class="who">Agency · review queue</div>
+        <div class="box">Acme site · <span class="ev">CHANGES_REQUESTED</span>
+          <div><span class="pin"><span class="dot">2</span> open comments</span></div>
+        </div>
+        <span class="btn">Request changes</span><span class="btn pri">Approve</span>
+        <div class="note">Half: queue + resolve + toast all wired (<span class="ev">review-queue.tsx</span>). Missing: an <strong>inbound notification</strong> when the client acts.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Every state (frame 03–05, the client view)</h2>
+  <p class="sub">The happy path is ~10%. The new client-review surface needs all of these or it'll feel broken — the exact complaint that started this.</p>
+  <div class="states">
+    <div class="st"><div class="lbl">Empty</div><p>No comments yet — "Click anywhere on the page to leave feedback."</p></div>
+    <div class="st"><div class="lbl">Loading</div><p>Fetching the site + existing comments. Skeleton, not blank.</p></div>
+    <div class="st"><div class="lbl">Error</div><p>Comment failed to save → inline retry, never a silent drop.</p></div>
+    <div class="st"><div class="lbl">Password</div><p>Wrong password → clear message; right → remembered via cookie.</p></div>
+    <div class="st"><div class="lbl">Expired / revoked</div><p><span class="ev">expiresAt</span> past or <span class="ev">isActive=false</span> → "This link is no longer available."</p></div>
+    <div class="st"><div class="lbl">Already approved</div><p>Verdict already given → read-only banner, no double-submit.</p></div>
+    <div class="st"><div class="lbl">Submitting verdict</div><p>Approve/Request-changes pending → button busy, disabled.</p></div>
+    <div class="st"><div class="lbl">Success</div><p>Confirmation: "Thanks — the team has been notified." (closes the loop)</p></div>
+  </div>
+
+  <footer>
+    <strong>Reading:</strong> three frames are ✓/◐ (agency side largely done); the whole <em>client</em> half (02 notify · 04 comment · 05 verdict) is the gap. Build target = a real <strong>client-review surface</strong> on <span class="ev">share/[token]</span> — comment layer + verdict bar + notification both ways — with all 8 states.<br>
+    Build handoff: <a href="review-loop-build-spec.md">review-loop-build-spec.md</a> · Method: <a href="../../learning/product-design/lessons/0012-reverse-wireframe-the-backend.html">L12 reverse-wireframe</a> · Inventory: <a href="../reverse-wireframe-inventory-20260622.md">inventory doc</a>
+  </footer>
+</main>
+</body>
+</html>

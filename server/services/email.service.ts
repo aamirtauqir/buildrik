@@ -47,17 +47,28 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 export async function sendVerificationEmail(to: string, token: string) {
   const html = await render(VerifyEmail({ verifyUrl: `${BASE_URL}/auth/verify-email?token=${encodeURIComponent(token)}` }));
-  await sendEmail(to, "Verify your email — Buildrik", html);
+  await sendEmail(to, "Verify your email — Buildrick", html);
 }
 
 export async function sendPasswordResetEmail(to: string, token: string) {
   const html = await render(ResetPassword({ resetUrl: `${BASE_URL}/auth/reset-password?token=${encodeURIComponent(token)}` }));
-  await sendEmail(to, "Reset your password — Buildrik", html);
+  await sendEmail(to, "Reset your password — Buildrick", html);
 }
 
 export async function sendMagicLinkEmail(to: string, token: string) {
   const html = await render(MagicLink({ signInUrl: `${BASE_URL}/auth/callback?token=${encodeURIComponent(token)}` }));
-  await sendEmail(to, "Sign in to Buildrik", html);
+  await sendEmail(to, "Sign in to Buildrick", html);
+}
+
+export async function sendNewDeviceAlertEmail(to: string) {
+  const html = `<div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px">
+    <h2 style="color:#0F172A;margin:0 0 8px">New sign-in to your Buildrick account</h2>
+    <p style="color:#334155">We noticed a sign-in from a device or location we don't recognize. If this was you, no action is needed.</p>
+    <p style="color:#334155">If this wasn't you, secure your account now:</p>
+    <p><a href="${BASE_URL}/auth/forgot-password" style="display:inline-block;background:#2D6DFF;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Secure my account</a></p>
+    <p style="color:#64748B;font-size:13px;margin-top:16px">Review this alert at ${BASE_URL}/auth/device-alert</p>
+  </div>`;
+  await sendEmail(to, "New sign-in to your Buildrick account", html);
 }
 
 export async function sendTeamInviteEmail(
@@ -71,37 +82,37 @@ export async function sendTeamInviteEmail(
     inviterName,
     workspaceName,
   }));
-  await sendEmail(to, `${inviterName} invited you to ${workspaceName} — Buildrik`, html);
+  await sendEmail(to, `${inviterName} invited you to ${workspaceName} — Buildrick`, html);
 }
 
 export async function sendEmailChangedEmail(to: string, token: string) {
   const html = await render(EmailChanged({ verifyUrl: `${BASE_URL}/auth/verify-email?token=${encodeURIComponent(token)}` }));
-  await sendEmail(to, "Verify your new email — Buildrik", html);
+  await sendEmail(to, "Verify your new email — Buildrick", html);
 }
 
 export async function sendPaymentFailedEmail(to: string) {
   const html = await render(PaymentFailed({ updateUrl: `${BASE_URL}/settings/billing` }));
-  await sendEmail(to, "Your payment failed — Buildrik", html);
+  await sendEmail(to, "Your payment failed — Buildrick", html);
 }
 
 export async function sendDunningReminderEmail(to: string, daysLeft: number) {
   const html = await render(DunningReminder({ daysLeft, updateUrl: `${BASE_URL}/settings/billing` }));
-  await sendEmail(to, `${daysLeft} days until downgrade — Buildrik`, html);
+  await sendEmail(to, `${daysLeft} days until downgrade — Buildrick`, html);
 }
 
 export async function sendAutoDowngradeEmail(to: string) {
   const html = await render(AutoDowngrade({ reactivateUrl: `${BASE_URL}/settings/billing` }));
-  await sendEmail(to, "Your plan has been downgraded — Buildrik", html);
+  await sendEmail(to, "Your plan has been downgraded — Buildrick", html);
 }
 
 export async function sendExportReadyEmail(to: string, downloadUrl: string) {
   const html = await render(ExportReady({ downloadUrl }));
-  await sendEmail(to, "Your data export is ready — Buildrik", html);
+  await sendEmail(to, "Your data export is ready — Buildrick", html);
 }
 
 export async function sendAccountDeletionEmail(to: string, deletionDate: string) {
   const html = await render(AccountDeletion({ deletionDate, cancelUrl: `${BASE_URL}/settings/danger-zone` }));
-  await sendEmail(to, "Account deletion scheduled — Buildrik", html);
+  await sendEmail(to, "Account deletion scheduled — Buildrick", html);
 }
 
 export async function sendTicketReceivedEmail(to: string, ticketNumber: number, subject: string, sla: string) {
@@ -111,37 +122,37 @@ export async function sendTicketReceivedEmail(to: string, ticketNumber: number, 
 
 export async function sendAICompleteEmail(to: string, siteName: string, siteId: string) {
   const html = await render(AiComplete({ siteName, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
-  await sendEmail(to, `Your site "${siteName}" is ready — Buildrik`, html);
+  await sendEmail(to, `Your site "${siteName}" is ready — Buildrick`, html);
 }
 
 export async function sendAIFailedEmail(to: string) {
   const html = await render(AiFailed({ retryUrl: `${BASE_URL}/sites/new` }));
-  await sendEmail(to, "Site generation failed — Buildrik", html);
+  await sendEmail(to, "Site generation failed — Buildrick", html);
 }
 
 export async function sendWSTransferOutEmail(to: string, workspaceName: string, newOwnerEmail: string) {
   const html = await render(WsTransferOut({ workspaceName, newOwnerEmail }));
-  await sendEmail(to, `Workspace transfer initiated — Buildrik`, html);
+  await sendEmail(to, `Workspace transfer initiated — Buildrick`, html);
 }
 
 export async function sendWSTransferInEmail(to: string, workspaceName: string) {
   const html = await render(WsTransferIn({ workspaceName, manageUrl: `${BASE_URL}/settings/workspace` }));
-  await sendEmail(to, `You now own "${workspaceName}" — Buildrik`, html);
+  await sendEmail(to, `You now own "${workspaceName}" — Buildrick`, html);
 }
 
 export async function sendSSLExpiringEmail(to: string, domain: string, domainId: string) {
   const html = await render(SslExpiring({ domain, renewUrl: `${BASE_URL}/domains/${encodeURIComponent(domainId)}` }));
-  await sendEmail(to, `SSL certificate expiring for ${domain} — Buildrik`, html);
+  await sendEmail(to, `SSL certificate expiring for ${domain} — Buildrick`, html);
 }
 
 export async function sendPlanLimitWarningEmail(to: string, resource: string) {
   const html = await render(PlanLimitWarning({ resource, upgradeUrl: `${BASE_URL}/settings/billing` }));
-  await sendEmail(to, `You're approaching your ${resource} limit — Buildrik`, html);
+  await sendEmail(to, `You're approaching your ${resource} limit — Buildrick`, html);
 }
 
 export async function sendWSTransferInviteEmail(to: string, workspaceName: string, token: string) {
   const html = await render(WsTransferInvite({ workspaceName, acceptUrl: `${BASE_URL}/transfer/accept?token=${encodeURIComponent(token)}` }));
-  await sendEmail(to, `Accept ownership of "${workspaceName}" — Buildrik`, html);
+  await sendEmail(to, `Accept ownership of "${workspaceName}" — Buildrick`, html);
 }
 
 export async function sendFormSubmissionEmail(
@@ -151,12 +162,12 @@ export async function sendFormSubmissionEmail(
   submissionId: string
 ) {
   const html = await render(FormSubmission({ siteName, fields, viewUrl: `${BASE_URL}/forms/${encodeURIComponent(submissionId)}` }));
-  await sendEmail(to, `New form submission on ${siteName} — Buildrik`, html);
+  await sendEmail(to, `New form submission on ${siteName} — Buildrick`, html);
 }
 
 export async function sendSiteTransferredEmail(to: string, fromName: string, siteName: string, siteId: string) {
   const html = await render(SiteTransferred({ fromName, siteName, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
-  await sendEmail(to, `Site "${siteName}" transferred to you — Buildrik`, html);
+  await sendEmail(to, `Site "${siteName}" transferred to you — Buildrick`, html);
 }
 
 export async function sendReviewRequestedEmail(
@@ -164,7 +175,7 @@ export async function sendReviewRequestedEmail(
   opts: { siteName: string; requesterName: string; note?: string; changeSummary?: string }
 ) {
   const html = await render(ReviewRequested({ ...opts, reviewsUrl: `${BASE_URL}/dashboard/reviews` }));
-  await sendEmail(to, `${opts.requesterName} sent "${opts.siteName}" for review — Buildrik`, html);
+  await sendEmail(to, `${opts.requesterName} sent "${opts.siteName}" for review — Buildrick`, html);
 }
 
 export async function sendReviewResolvedEmail(
@@ -174,7 +185,7 @@ export async function sendReviewResolvedEmail(
   const { siteId, ...rest } = opts;
   const html = await render(ReviewResolved({ ...rest, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
   const subject = opts.approved
-    ? `"${opts.siteName}" was approved — Buildrik`
-    : `Changes requested on "${opts.siteName}" — Buildrik`;
+    ? `"${opts.siteName}" was approved — Buildrick`
+    : `Changes requested on "${opts.siteName}" — Buildrick`;
   await sendEmail(to, subject, html);
 }

@@ -41,8 +41,25 @@ model User {
   workspaceMembers WorkspaceMember[]
   aiUsage          AIUsage[]
   apiTokens        ApiToken[]
+  knownDevices     KnownDevice[]
 
   @@map("users")
+}
+
+/// A device/location the user has successfully signed in from before. Stored as
+/// a coarse HMAC fingerprint (browser-family+OS + IP /24), never raw IP/UA, so a
+/// new-device sign-in can trigger a security alert without keeping reversible PII.
+model KnownDevice {
+  id          String   @id @default(cuid())
+  userId      String
+  fingerprint String
+  createdAt   DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, fingerprint])
+  @@index([userId])
+  @@map("known_devices")
 }
 
 model Account {
@@ -155,8 +172,29 @@ model Workspace {
   userTemplates   UserTemplate[]
   themeSnapshots  SiteThemeSnapshot[]
   themePresets    WorkspacePreset[]
+  referrals       Referral[]
 
   @@map("workspaces")
+}
+
+// Partner-program referral. A workspace refers others; each signed-up referral
+// carries the plan it converted on plus influenced MRR and earned commission.
+// Populated by the referral-tracking flow (not yet wired) — reads real rows.
+model Referral {
+  id              String   @id @default(cuid())
+  workspaceId     String
+  referredName    String
+  referredEmail   String?
+  plan            String
+  mrrCents        Int      @default(0)
+  commissionCents Int      @default(0)
+  signedUpAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@map("referrals")
 }
 
 // D4 (brand presets): an agency's named brand presets — captured token sets they
@@ -725,6 +763,10 @@ model OnboardingState {
   tourCompleted  Boolean  @default(false)
   completed      Boolean  @default(false)
   dismissed      Boolean  @default(false)
+  // M2 wizard state: { v, route, data:{workspace,site,path,ai,template} }. Its
+  // presence marks the new 24-frame flow as active (the old site-exists→CHECKLIST
+  // read-repair is skipped while it's set, so the wizard isn't ejected).
+  wizardData     Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

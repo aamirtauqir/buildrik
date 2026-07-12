@@ -1,23 +1,7 @@
-import { Space_Grotesk } from "next/font/google";
-import { OnboardingSidebar } from "@/components/onboarding/onboarding-sidebar";
+import { WizardBoot } from "@/components/onboarding/wizard/wizard-boot";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-space-grotesk",
-});
-
-export default function OnboardingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={`min-h-screen ${spaceGrotesk.variable}`} style={{ backgroundColor: "var(--color-bg-page)" }}>
-      <OnboardingSidebar />
-      <main className="ml-[72px] flex min-h-screen items-center justify-center">
-        {children}
-      </main>
-    </div>
-  );
+/** M2 wizard shell host. WizardBoot loads server state once and provides it to
+ *  every frame; it lives here so the provider persists across frame routes. */
+export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
+  return <WizardBoot>{children}</WizardBoot>;
 }

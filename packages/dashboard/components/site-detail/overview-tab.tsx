@@ -445,7 +445,7 @@ export function OverviewTab({
                               {s.isSpam && (
                                 <span
                                   className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                                  style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}
+                                  style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
                                 >
                                   Spam
                                 </span>
@@ -602,7 +602,7 @@ function StatBox({
       {badge && (
         <span
           className="mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium"
-          style={{ backgroundColor: "#FEF2F2", color: "var(--color-primary)" }}
+          style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
         >
           {badge}
         </span>

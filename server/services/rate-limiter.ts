@@ -39,3 +39,21 @@ export async function checkRateLimit(
     resetAt: row.resetAt.getTime(),
   };
 }
+
+/**
+ * Read-only check: does `key` still have budget WITHOUT consuming any? Lets a
+ * caller gate on the limit but only spend budget on the outcomes it cares about
+ * (e.g. login counts failures only, so a successful login never burns the bucket).
+ */
+export async function peekRateLimit(
+  key: string,
+  maxAttempts: number
+): Promise<{ allowed: boolean }> {
+  const now = new Date();
+  const rows = await prisma.$queryRaw<{ count: number; resetAt: Date }[]>`
+    SELECT "count", "resetAt" FROM "rate_limit_buckets" WHERE "key" = ${key}
+  `;
+  const row = rows[0];
+  if (!row || row.resetAt < now) return { allowed: true };
+  return { allowed: row.count < maxAttempts };
+}

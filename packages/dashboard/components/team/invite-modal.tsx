@@ -137,7 +137,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                   key={opt.value}
                   className={cn(
                     "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
-                    role === opt.value ? "border-[var(--color-primary)] bg-red-50" : "border-[var(--color-border-default)] hover:bg-[var(--color-bg-subtle)]"
+                    role === opt.value ? "border-[var(--color-primary)] bg-[var(--color-primary-subtle)]" : "border-[var(--color-border-default)] hover:bg-[var(--color-bg-subtle)]"
                   )}
                 >
                   <input
@@ -173,7 +173,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                 className={cn(
                   "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
                   accessMode === "all"
-                    ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]"
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary-subtle)] text-[var(--color-primary)]"
                     : "border-[var(--color-border-default)] hover:bg-[var(--color-bg-subtle)]"
                 )}
                 style={accessMode !== "all" ? { color: "var(--color-text-primary)" } : undefined}
@@ -186,7 +186,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
                 className={cn(
                   "rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
                   accessMode === "specific"
-                    ? "border-[var(--color-primary)] bg-red-50 text-[var(--color-primary)]"
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary-subtle)] text-[var(--color-primary)]"
                     : "border-[var(--color-border-default)] hover:bg-[var(--color-bg-subtle)]"
                 )}
                 style={accessMode !== "specific" ? { color: "var(--color-text-primary)" } : undefined}

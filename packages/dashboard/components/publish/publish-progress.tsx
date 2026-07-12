@@ -17,9 +17,11 @@ interface PublishProgressProps {
   jobId: string;
   onComplete: (job: { id: string; siteId: string; deploymentId: string | null }) => void;
   onCancel: () => void;
+  /** Re-run the publish (mint a fresh job) after a failed terminal state. */
+  onRetry: () => void;
 }
 
-export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgressProps) {
+export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: PublishProgressProps) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const sseJob = usePublishSSE(jobId);
@@ -56,9 +58,6 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
     cancelMutation.mutate({ jobId });
   }
 
-  function handleRetry() {
-    pollStatus.refetch();
-  }
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
@@ -66,14 +65,14 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
       {isFailed && (
         <div className="rounded-xl border p-4" style={{ borderColor: "#FCA5A5", backgroundColor: "#FEF2F2" }}>
           <div className="flex items-start gap-3">
-            <XCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
+            <XCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
             <div className="flex-1">
               <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Publish failed</p>
               <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 {job?.error ?? "An unexpected error occurred during publishing."}
               </p>
               <button
-                onClick={handleRetry}
+                onClick={onRetry}
                 className="mt-3 flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-white"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
@@ -115,13 +114,13 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
                   ) : isActive ? (
                     <Loader2 className="h-5 w-5 shrink-0 animate-spin" style={{ color: "var(--color-primary)" }} />
                   ) : isFail ? (
-                    <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
+                    <XCircle className="h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
                   ) : (
                     <Circle className="h-5 w-5 shrink-0" style={{ color: "var(--color-border-strong)" }} />
                   )}
                   <span
                     className="text-sm font-medium"
-                    style={{ color: isDone ? "var(--color-success)" : isActive ? "var(--color-text-primary)" : isFail ? "var(--color-primary)" : "var(--color-text-muted)" }}
+                    style={{ color: isDone ? "var(--color-success)" : isActive ? "var(--color-text-primary)" : isFail ? "var(--color-error)" : "var(--color-text-muted)" }}
                   >
                     {step.name}
                   </span>

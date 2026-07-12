@@ -43,7 +43,7 @@ export default async function VercelTeamPickerPage() {
       <div>
         <h1 className="text-xl font-semibold">Pick a Vercel team</h1>
         <p className="mt-1 text-sm text-neutral-600">
-          Sites in this Buildrik workspace will deploy to the team you pick. You
+          Sites in this Buildrick workspace will deploy to the team you pick. You
           can change this by disconnecting and reconnecting.
         </p>
       </div>

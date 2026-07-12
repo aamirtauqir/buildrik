@@ -2,9 +2,8 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { AuthLogo } from "@/components/auth/auth-logo";
-import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthCard } from "@/components/auth/auth-card";
+import { AuthMessage } from "@/components/auth/auth-message";
 import { AuthButton } from "@/components/auth/auth-button";
 import { Loader2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
@@ -27,7 +26,9 @@ function CallbackContent() {
         body: JSON.stringify({ sessionToken: data.sessionToken }),
       });
       if (res.ok) {
-        router.push("/auth/redirect");
+        // Full navigation so /auth/redirect reads the just-set session cookie
+        // instead of a stale useSession bounce → /dashboard (skips onboarding).
+        window.location.assign("/auth/redirect");
       } else {
         setError("Failed to create session");
       }
@@ -44,25 +45,22 @@ function CallbackContent() {
 
   if (error) {
     return (
-      <AuthCard>
-        <AuthLogo />
-        <AuthIcon name="warning" color="red" />
-        <h1 className="text-auth-title text-auth-text-primary text-center">Link expired</h1>
-        <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">{error}</p>
-        <div className="h-6" />
-        <AuthButton onClick={() => router.push("/auth/magic-link")}>Request New Link</AuthButton>
-        <div className="h-3" />
-        <a href="/auth/login" className="text-auth-label text-auth-link hover:underline text-center block">← Back to sign in</a>
-      </AuthCard>
+      <AuthMessage title="Link expired" subtitle={error}>
+        <AuthButton onClick={() => router.push("/auth/magic-link")}>Request a new link</AuthButton>
+        <a href="/auth" className="text-auth-label text-auth-text-muted hover:text-auth-text-secondary text-center">
+          Back to log in
+        </a>
+      </AuthMessage>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <AuthLogo />
-      <Loader2 className="w-8 h-8 text-auth-cta animate-spin" />
-      <p className="text-auth-subtitle text-auth-text-muted">Completing sign in...</p>
-    </div>
+    <AuthCard noArt>
+      <div className="flex flex-col items-center gap-5 py-6">
+        <Loader2 className="w-8 h-8 text-auth-cta animate-spin" />
+        <p className="text-auth-subtitle text-auth-text-muted">Completing sign in…</p>
+      </div>
+    </AuthCard>
   );
 }
 
