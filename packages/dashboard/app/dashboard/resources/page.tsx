@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FileText, Code2, Palette, LayoutTemplate, ScrollText, Users, ArrowUpRight } from "lucide-react";
+import { PageHeader } from "@/components/dashboard/primitives";
 
 const RESOURCES = [
   { icon: FileText, title: "Documentation", description: "Guides for building, publishing and managing sites.", href: "/dashboard/help", external: false },
@@ -13,12 +14,7 @@ const RESOURCES = [
 export default function ResourcesPage() {
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Resources</h1>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Docs, guides, brand assets and everything else you need.
-        </p>
-      </header>
+      <PageHeader title="Resources" description="Docs, guides, brand assets and everything else you need." />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {RESOURCES.map(({ icon: Icon, title, description, href }) => (

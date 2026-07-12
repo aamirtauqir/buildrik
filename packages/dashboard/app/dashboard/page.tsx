@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
-import { StatCard, MiniDonut, Sparkline, AvatarStack, TrendArrow } from "@/components/dashboard/stat-card";
+import { StatCard, PageHeader, MetricValue } from "@/components/dashboard/primitives";
+import { MiniDonut, Sparkline, AvatarStack, TrendArrow } from "@/components/dashboard/dataviz";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { RecentSites } from "@/components/dashboard/recent-sites";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
@@ -66,9 +67,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Dashboard</h1>
-        </div>
+        <PageHeader title="Dashboard" />
         {/* Stat cards skeleton */}
         <div className="mt-6 grid grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
@@ -101,9 +100,7 @@ export default function DashboardPage() {
   if (isError) {
     return (
       <div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Dashboard</h1>
-        </div>
+        <PageHeader title="Dashboard" />
         <div className="mt-6">
           <ErrorState
             title="Couldn't load your dashboard"
@@ -167,13 +164,14 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Dashboard</h1>
-        <Link href="/dashboard/sites/new" className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
-          <Plus className="h-4 w-4" />New Site
-        </Link>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        actions={
+          <Link href="/dashboard/sites/new" className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
+            <Plus className="h-4 w-4" />New Site
+          </Link>
+        }
+      />
 
       <NeedsAttention />
 
@@ -186,9 +184,10 @@ export default function DashboardPage() {
           {/* Stat Cards */}
           <div className="grid grid-cols-4 gap-4">
             <StatCard
-              title="Total Sites"
-              value={`${stats.data?.totalSites ?? 0} sites`}
-              subtitle={`${stats.data?.publishedSites ?? 0} published · ${stats.data?.draftSites ?? 0} draft`}
+              label="Total Sites"
+              mono={false}
+              value={<><MetricValue>{stats.data?.totalSites ?? 0}</MetricValue> sites</>}
+              delta={<><MetricValue>{stats.data?.publishedSites ?? 0}</MetricValue> published · <MetricValue>{stats.data?.draftSites ?? 0}</MetricValue> draft</>}
               href="/dashboard/sites"
               visual={
                 <MiniDonut
@@ -201,37 +200,26 @@ export default function DashboardPage() {
               }
             />
             <StatCard
-              title="Published"
-              value={`${stats.data?.publishedSites ?? 0} live`}
-              subtitle={stats.data?.lastPublishedSiteName ? `Last: ${stats.data.lastPublishedSiteName}` : undefined}
+              label="Published"
+              mono={false}
+              value={<><MetricValue>{stats.data?.publishedSites ?? 0}</MetricValue> live</>}
+              delta={stats.data?.lastPublishedSiteName ? `Last: ${stats.data.lastPublishedSiteName}` : undefined}
               href="/dashboard/sites?status=published"
             />
             <StatCard
-              title="Monthly Visits"
-              value={stats.data?.monthlyVisits ?? 0}
+              label="Monthly Visits"
+              value={<MetricValue>{stats.data?.monthlyVisits ?? 0}</MetricValue>}
               href="/dashboard/sites"
-              trend={stats.data?.visitsChange !== undefined ? { value: stats.data.visitsChange, label: "vs last month" } : undefined}
-              visual={
-                <div className="flex flex-col items-end gap-1">
-                  {stats.data?.dailyVisitors && stats.data.dailyVisitors.length >= 2 && (
-                    <Sparkline data={stats.data.dailyVisitors} />
-                  )}
-                  {stats.data?.visitsChange !== undefined && (
-                    <TrendArrow value={stats.data.visitsChange} />
-                  )}
-                </div>
-              }
+              delta={stats.data?.visitsChange !== undefined ? <span className="flex items-center gap-1"><TrendArrow value={stats.data.visitsChange} /> vs last month</span> : undefined}
+              visual={stats.data?.dailyVisitors && stats.data.dailyVisitors.length >= 2 ? <Sparkline data={stats.data.dailyVisitors} /> : undefined}
             />
             <StatCard
-              title="Collaborators"
-              value={`${stats.data?.collaborators ?? 0} active`}
-              subtitle={stats.data?.pendingInvites ? `${stats.data.pendingInvites} pending` : undefined}
+              label="Collaborators"
+              mono={false}
+              value={<><MetricValue>{stats.data?.collaborators ?? 0}</MetricValue> active</>}
+              delta={stats.data?.pendingInvites ? <><MetricValue>{stats.data.pendingInvites}</MetricValue> pending</> : undefined}
               href="/dashboard/team"
-              visual={
-                stats.data?.memberAvatars && stats.data.memberAvatars.length > 0
-                  ? <AvatarStack avatars={stats.data.memberAvatars} />
-                  : undefined
-              }
+              visual={stats.data?.memberAvatars && stats.data.memberAvatars.length > 0 ? <AvatarStack avatars={stats.data.memberAvatars} /> : undefined}
             />
           </div>
 

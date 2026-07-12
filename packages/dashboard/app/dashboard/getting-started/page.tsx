@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
+import { PageHeader, SectionCard, MetricValue, ProgressBar } from "@/components/dashboard/primitives";
 
 const STEPS = [
   { id: "workspace", title: "Create your workspace", href: "/dashboard" },
@@ -40,12 +41,7 @@ export default function GettingStartedPage() {
 
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Getting started</h1>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Finish setup to launch your first site.
-        </p>
-      </header>
+      <PageHeader title="Getting started" description="Finish setup to launch your first site." />
 
       {onboarding.isLoading ? (
         <LoadingSkeleton rows={5} variant="list" />
@@ -57,62 +53,53 @@ export default function GettingStartedPage() {
         />
       ) : (
         <>
-          <div
-            className="mb-5 rounded-xl border p-4"
-            style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
-          >
+          <SectionCard className="mb-5">
             <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
-              {doneCount} of {STEPS.length} complete
-              <span style={{ color: "var(--color-text-secondary)" }}> · {pct}%</span>
+              <MetricValue>{doneCount}</MetricValue> of <MetricValue>{STEPS.length}</MetricValue> complete
+              <span style={{ color: "var(--color-text-secondary)" }}> · <MetricValue>{pct}%</MetricValue></span>
             </p>
-            <div className="mt-3 h-1.5 w-full rounded-full" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
-              <div
-                className="h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${pct}%`, backgroundColor: "var(--color-primary)" }}
-              />
-            </div>
-          </div>
+            <ProgressBar pct={pct} className="mt-3" />
+          </SectionCard>
 
-          <ul
-            className="overflow-hidden rounded-xl border"
-            style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
-          >
-            {STEPS.map((step) => {
-              const done = completion[step.id];
-              const isNext = step.id === firstIncompleteId;
-              return (
-                <li
-                  key={step.id}
-                  className="flex items-center gap-3 border-b px-4 py-3.5 last:border-0"
-                  style={{ borderColor: "var(--color-border-default)" }}
-                >
-                  {done ? (
-                    <CheckCircle2 className="h-5 w-5 flex-shrink-0" style={{ color: "var(--color-success)" }} />
-                  ) : (
-                    <span
-                      className="h-5 w-5 flex-shrink-0 rounded-full border-2"
-                      style={{ borderColor: "var(--color-border-default)" }}
-                      aria-hidden
-                    />
-                  )}
-                  <span
-                    className="flex-1 text-sm font-medium"
-                    style={{ color: done ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}
+          <SectionCard title="Setup checklist" padding="none">
+            <ul>
+              {STEPS.map((step) => {
+                const done = completion[step.id];
+                const isNext = step.id === firstIncompleteId;
+                return (
+                  <li
+                    key={step.id}
+                    className="flex items-center gap-3 border-b px-4 py-3.5 last:border-0"
+                    style={{ borderColor: "var(--color-border-default)" }}
                   >
-                    {step.title}
-                  </span>
-                  {isNext && (
-                    <Link
-                      href={step.href}
-                      className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+                    {done ? (
+                      <CheckCircle2 className="h-5 w-5 flex-shrink-0" style={{ color: "var(--color-success)" }} />
+                    ) : (
+                      <span
+                        className="h-5 w-5 flex-shrink-0 rounded-full border-2"
+                        style={{ borderColor: "var(--color-border-default)" }}
+                        aria-hidden
+                      />
+                    )}
+                    <span
+                      className="flex-1 text-sm font-medium"
+                      style={{ color: done ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}
                     >
-                      Start
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                      {step.title}
+                    </span>
+                    {isNext && (
+                      <Link
+                        href={step.href}
+                        className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+                      >
+                        Start
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </SectionCard>
         </>
       )}
     </div>

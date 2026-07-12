@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, type LucideIcon } from "lucide-react";
 import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory } from "@/components/marketplace/catalog";
+import { PageHeader, Pill } from "@/components/dashboard/primitives";
 
 const iconMap: Record<string, LucideIcon> = {
   BarChart3,
@@ -36,12 +37,7 @@ export default function MarketplacePage() {
 
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Marketplace</h1>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Apps, integrations and templates to extend your sites.
-        </p>
-      </header>
+      <PageHeader title="Marketplace" description="Apps, integrations and templates to extend your sites." />
 
       <div className="relative mb-4">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "var(--color-text-secondary)" }} />
@@ -112,7 +108,9 @@ export default function MarketplacePage() {
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{app.name}</h3>
-                <p className="mt-0.5 text-xs font-medium uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>{app.category}</p>
+                <div className="mt-1.5">
+                  <Pill tone="neutral">{app.category}</Pill>
+                </div>
                 <p className="mt-2 flex-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>
                 <button
                   type="button"

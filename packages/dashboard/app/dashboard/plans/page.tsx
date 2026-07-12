@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
+import { PageHeader, MetricValue, Pill } from "@/components/dashboard/primitives";
 
 type PlanId = "STARTER" | "FREELANCER" | "AGENCY" | "ENTERPRISE";
 
@@ -78,35 +79,32 @@ export default function PlansPage() {
 
   return (
     <div>
-      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Plans</h1>
-          <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-            Upgrade, downgrade, or switch billing cycle anytime.
-          </p>
-        </div>
-
-        <div className="inline-flex shrink-0 rounded-lg border p-0.5" style={{ borderColor: "var(--color-border-default)" }} role="tablist" aria-label="Billing cycle">
-          <button
-            role="tab"
-            aria-selected={!yearly}
-            onClick={() => setYearly(false)}
-            className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
-            style={!yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
-          >
-            Monthly
-          </button>
-          <button
-            role="tab"
-            aria-selected={yearly}
-            onClick={() => setYearly(true)}
-            className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
-            style={yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
-          >
-            Yearly &minus;20%
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Plans"
+        description="Upgrade, downgrade, or switch billing cycle anytime."
+        actions={
+          <div className="inline-flex shrink-0 rounded-lg border p-0.5" style={{ borderColor: "var(--color-border-default)" }} role="tablist" aria-label="Billing cycle">
+            <button
+              role="tab"
+              aria-selected={!yearly}
+              onClick={() => setYearly(false)}
+              className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+              style={!yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
+            >
+              Monthly
+            </button>
+            <button
+              role="tab"
+              aria-selected={yearly}
+              onClick={() => setYearly(true)}
+              className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+              style={yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
+            >
+              Yearly &minus;20%
+            </button>
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {PLANS.map((plan) => {
@@ -126,26 +124,12 @@ export default function PlansPage() {
             >
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{plan.name}</h2>
-                {plan.popular && (
-                  <span
-                    className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-                    style={{ backgroundColor: "var(--color-primary)", color: "#FFFFFF" }}
-                  >
-                    Popular
-                  </span>
-                )}
-                {isCurrent && !plan.popular && (
-                  <span
-                    className="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-                    style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
-                  >
-                    Current
-                  </span>
-                )}
+                {plan.popular && <Pill tone="accent">Popular</Pill>}
+                {isCurrent && !plan.popular && <Pill tone="accent">Current</Pill>}
               </div>
 
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold" style={{ color: "var(--color-text-primary)" }}>{price.amount}</span>
+                <span className="text-3xl font-bold" style={{ color: "var(--color-text-primary)" }}><MetricValue>{price.amount}</MetricValue></span>
                 {price.suffix && <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>{price.suffix}</span>}
               </div>
               <div className="mt-1 h-4 text-xs" style={{ color: "var(--color-text-secondary)" }}>{price.note}</div>

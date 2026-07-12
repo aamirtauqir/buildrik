@@ -2,6 +2,7 @@
 
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
+import { PageHeader, SectionCard, StatCard, MetricValue, ProgressBar, Pill } from "@/components/dashboard/primitives";
 
 function fmt(n: number, unit: string) {
   const v = unit === "GB" ? n.toFixed(1) : n >= 1000 ? `${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k` : String(n);
@@ -13,12 +14,10 @@ export default function UsagePage() {
 
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Usage</h1>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          {query.data ? `Current billing period · ${query.data.period.label}` : "Track your workspace usage against plan limits."}
-        </p>
-      </header>
+      <PageHeader
+        title="Usage"
+        description={query.data ? `Current billing period · ${query.data.period.label}` : "Track your workspace usage against plan limits."}
+      />
 
       {query.isLoading ? (
         <LoadingSkeleton rows={4} variant="card" />
@@ -30,31 +29,20 @@ export default function UsagePage() {
             {query.data.metrics.map((m) => {
               const unlimited = m.limit < 0;
               const pct = unlimited || m.limit === 0 ? 0 : Math.min((m.used / m.limit) * 100, 100);
-              const over = pct >= 85;
               return (
-                <div key={m.key} className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>{m.label}</p>
-                    {m.estimated && <span className="rounded px-1.5 py-0.5 text-[10px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}>est.</span>}
-                  </div>
-                  <p className="mt-1.5 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>
-                    {fmt(m.used, m.unit)}
-                    <span className="text-sm font-normal" style={{ color: "var(--color-text-muted)" }}> / {unlimited ? "∞" : fmt(m.limit, m.unit)}</span>
-                  </p>
-                  <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--color-border-default)" }}>
-                    <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: over ? "var(--color-error)" : "var(--color-primary)" }} />
-                  </div>
-                </div>
+                <StatCard
+                  key={m.key}
+                  label={<span className="inline-flex items-center gap-1.5">{m.label}{m.estimated && <Pill tone="neutral">est.</Pill>}</span>}
+                  value={<>{fmt(m.used, m.unit)}<span className="text-body font-normal" style={{ color: "var(--color-text-muted)" }}> / {unlimited ? "∞" : fmt(m.limit, m.unit)}</span></>}
+                  delta={<ProgressBar pct={pct} tone="auto" />}
+                />
               );
             })}
           </div>
 
-          <div className="mt-5 rounded-xl border p-5" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
-            <p className="mb-4 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              Form submissions <span className="font-normal" style={{ color: "var(--color-text-secondary)" }}>· last 14 days</span>
-            </p>
+          <SectionCard className="mt-5" title="Form submissions" description="Last 14 days">
             <SubmissionChart data={query.data.submissionSeries} />
-          </div>
+          </SectionCard>
         </>
       ) : null}
     </div>
@@ -72,7 +60,7 @@ function SubmissionChart({ data }: { data: { day: string; count: number }[] }) {
             style={{ height: `${(d.count / max) * 100}%`, minHeight: d.count > 0 ? 4 : 2, backgroundColor: d.count > 0 ? "var(--color-primary)" : "var(--color-border-default)" }}
             title={`${d.day}: ${d.count}`}
           />
-          <span className="mt-1 text-[9px]" style={{ color: "var(--color-text-muted)" }}>{d.day.slice(8)}</span>
+          <span className="mt-1 text-[9px]" style={{ color: "var(--color-text-muted)" }}><MetricValue>{d.day.slice(8)}</MetricValue></span>
         </div>
       ))}
     </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Folder, FolderPlus, Layers, MoreHorizontal, Plus } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
+import { PageHeader, MetricValue } from "@/components/dashboard/primitives";
 
 const UNGROUPED_KEY = "__ungrouped__";
 
@@ -49,32 +50,30 @@ export default function ProjectsPage() {
 
   return (
     <div>
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>All projects</h1>
-          <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-            Group sites into projects for clients and teams.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-          >
-            <FolderPlus className="h-4 w-4" />
-            New folder
-          </button>
-          <Link
-            href="/dashboard/sites/new"
-            className="flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)]"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
-            <Plus className="h-4 w-4" />
-            New project
-          </Link>
-        </div>
-      </header>
+      <PageHeader
+        title="All projects"
+        description="Group sites into projects for clients and teams."
+        actions={
+          <>
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+            >
+              <FolderPlus className="h-4 w-4" />
+              New folder
+            </button>
+            <Link
+              href="/dashboard/sites/new"
+              className="flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+              style={{ backgroundColor: "var(--color-primary)" }}
+            >
+              <Plus className="h-4 w-4" />
+              New project
+            </Link>
+          </>
+        }
+      />
 
       {isLoading ? (
         <LoadingSkeleton rows={6} variant="card" />
@@ -122,9 +121,9 @@ export default function ProjectsPage() {
                 </div>
                 <h2 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{group.name}</h2>
                 <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                  {group.total} {group.total === 1 ? "site" : "sites"}
+                  <MetricValue>{group.total}</MetricValue> {group.total === 1 ? "site" : "sites"}
                   {" · "}
-                  <span style={{ color: "var(--color-success)" }}>{group.published} published</span>
+                  <span style={{ color: "var(--color-success)" }}><MetricValue>{group.published}</MetricValue> published</span>
                 </p>
               </div>
             );

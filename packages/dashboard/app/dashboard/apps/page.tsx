@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, ArrowRight, type LucideIcon } from "lucide-react";
 import { CATALOG_APPS } from "@/components/marketplace/catalog";
+import { PageHeader, Pill } from "@/components/dashboard/primitives";
 
 const iconMap: Record<string, LucideIcon> = {
   BarChart3,
@@ -17,12 +18,7 @@ export default function AppsPage() {
 
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Apps</h1>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Extend your sites with first-party and partner apps.
-        </p>
-      </header>
+      <PageHeader title="Apps" description="Extend your sites with first-party and partner apps." />
 
       <div
         className="mb-6 flex flex-col gap-4 rounded-xl border p-6 sm:flex-row sm:items-center sm:justify-between"
@@ -57,15 +53,9 @@ export default function AppsPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}>
                   <Icon className="h-5 w-5" />
                 </div>
-                {app.installed ? (
-                  <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ backgroundColor: "#ECFDF5", color: "var(--color-success)" }}>
-                    Installed
-                  </span>
-                ) : (
-                  <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
-                    Available
-                  </span>
-                )}
+                <Pill tone={app.installed ? "success" : "neutral"}>
+                  {app.installed ? "Installed" : "Available"}
+                </Pill>
               </div>
               <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{app.name}</h3>
               <p className="mt-2 flex-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>

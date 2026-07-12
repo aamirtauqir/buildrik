@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Library, Rocket, LayoutGrid, ShoppingBag, Newspaper } from "lucide-react";
 import { StateEmpty } from "@/components/states";
+import { PageHeader, Pill } from "@/components/dashboard/primitives";
 
 const TABS = [
   { value: "templates", label: "Templates" },
@@ -23,12 +24,7 @@ export default function LibrariesPage() {
 
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Libraries &amp; Templates</h1>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Reusable starting points and shared design systems.
-        </p>
-      </header>
+      <PageHeader title="Libraries & Templates" description="Reusable starting points and shared design systems." />
 
       <div
         className="mb-6 inline-flex gap-1 rounded-lg border p-1"
@@ -69,12 +65,7 @@ export default function LibrariesPage() {
               <div className="p-4">
                 <h2 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{name}</h2>
                 <div className="mt-2 flex items-center justify-between">
-                  <span
-                    className="rounded-full px-2 py-0.5 text-xs font-medium"
-                    style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}
-                  >
-                    {category}
-                  </span>
+                  <Pill tone="neutral">{category}</Pill>
                   <button
                     className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
                     style={{ backgroundColor: "var(--color-primary)" }}
