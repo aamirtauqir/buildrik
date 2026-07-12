@@ -95,14 +95,10 @@
   --color-error: #DC2626;
   --color-info: #3B82F6;
 
-  /* Dashboard layout */
-  --sidebar-width: 262px;
-  --topbar-height: 56px;
-
   /* Dashboard shell + design-system contract (dc parity 2026-07-12).
-     Two-level shell: full-width top nav above the 262px sidebar. */
-  --topnav-h: 52px;
-  --sidebar-w: 262px;
+     Two-level shell: full-width top nav (60px) above the 272px sidebar. */
+  --topnav-h: 60px;
+  --sidebar-w: 272px;
 
   /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 pill). Remaps rounded-* utilities. */
   --radius-xs: 4px;
@@ -114,7 +110,7 @@
 
   /* Named text tokens — page/section/eyebrow/metric/body. Kills arbitrary
      text-[22px]. dc scale: body 13, page title 22, section 15, metric 24. */
-  --text-page-title: 22px;
+  --text-page-title: 24px;
   --text-page-title--line-height: 1.2;
   --text-page-title--font-weight: 700;
   --text-section-title: 15px;
