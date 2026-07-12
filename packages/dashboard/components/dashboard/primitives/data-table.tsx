@@ -27,12 +27,12 @@ export function DataTable<T>({
 }) {
   if (rows.length === 0 && empty) return <>{empty}</>;
   return (
-    <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border-default)" }}>
+    <div className="overflow-hidden rounded-xl border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
       <table className="w-full text-body">
         <thead>
-          <tr className="border-b text-left text-eyebrow uppercase tracking-wide" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+          <tr className="border-b text-left text-eyebrow uppercase tracking-wide" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}>
             {columns.map((c) => (
-              <th key={c.key} className={cn("px-4 py-2.5 font-medium", c.align === "right" && "text-right")}>{c.header}</th>
+              <th key={c.key} className={cn("px-[18px] py-2.5 font-semibold", c.align === "right" && "text-right")}>{c.header}</th>
             ))}
           </tr>
         </thead>
@@ -45,7 +45,7 @@ export function DataTable<T>({
               style={{ borderColor: "var(--color-border-default)" }}
             >
               {columns.map((c) => (
-                <td key={c.key} className={cn("px-4 py-3", c.align === "right" && "text-right", c.className)} style={{ color: "var(--color-text-primary)" }}>
+                <td key={c.key} className={cn("px-[18px] py-3.5", c.align === "right" && "text-right", c.className)} style={{ color: "var(--color-text-primary)" }}>
                   {c.render ? c.render(row) : (row as Record<string, ReactNode>)[c.key]}
                 </td>
               ))}

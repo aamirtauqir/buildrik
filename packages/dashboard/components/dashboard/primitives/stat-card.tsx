@@ -28,7 +28,7 @@ export function StatCard({
   const inner = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <p className="text-eyebrow uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>{label}</p>
+        <p className="font-mono text-eyebrow uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>{label}</p>
         {visual ? (
           <div className="shrink-0">{visual}</div>
         ) : icon ? (

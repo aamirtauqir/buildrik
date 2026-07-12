@@ -14,6 +14,8 @@ function initials(name?: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 }
 
+/** Workspace switcher — the first card in the sidebar (dc mockup): ink tile +
+ *  name + "Plan · N seats" mono + chevrons, opening a full-width dropdown. */
 export function WorkspaceSwitcher() {
   const { data: session, update } = useSession();
   const router = useRouter();
@@ -49,14 +51,15 @@ export function WorkspaceSwitcher() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
+        className="flex w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left transition-colors hover:bg-[var(--color-bg-subtle)]"
+        style={{ borderColor: "var(--color-border-default)" }}
         aria-label="Switch workspace"
         aria-haspopup="menu"
         aria-expanded={open}
       >
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white" style={{ backgroundColor: "var(--color-primary)" }}>{initials(current?.name)}</span>
-        <span className="hidden min-w-0 text-left sm:block">
-          <span className="block max-w-[150px] truncate text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{current?.name ?? "Workspace"}</span>
+        <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-md text-xs font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(current?.name)}</span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[13.5px] font-bold leading-tight" style={{ color: "var(--color-text-primary)" }}>{current?.name ?? "Workspace"}</span>
           <span className="block text-eyebrow" style={{ color: "var(--color-text-secondary)" }}>
             <MetricValue>{PLAN_LABELS[plan] ?? plan} · {seats} seat{seats === 1 ? "" : "s"}</MetricValue>
           </span>
@@ -65,11 +68,11 @@ export function WorkspaceSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-40 mt-1 w-64 overflow-hidden rounded-xl border bg-white shadow-lg" style={{ borderColor: "var(--color-border-default)" }}>
+        <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl border bg-white shadow-card" style={{ borderColor: "var(--color-border-default)" }}>
           <div className="max-h-72 overflow-y-auto p-1">
             {workspaces.map((ws) => (
               <button key={ws.id} onClick={() => switchTo(ws.id)} disabled={!!switching} className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-60">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white" style={{ backgroundColor: "var(--color-primary)" }}>{initials(ws.name)}</span>
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(ws.name)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{ws.name}</span>
                   <span className="block text-eyebrow" style={{ color: "var(--color-text-secondary)" }}>{ws.memberCount} member{ws.memberCount === 1 ? "" : "s"}</span>

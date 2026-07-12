@@ -1,17 +1,18 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, FolderKanban, Globe, Image as ImageIcon, Rocket, Briefcase, ClipboardCheck,
   Palette, Gift, Blocks, Library, Plug, Users, CreditCard, Tag, Activity, Link2,
-  Settings, HelpCircle, ArrowUpRight,
+  Settings, HelpCircle, ArrowUpRight, Search,
 } from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 import { MetricValue, ProgressBar } from "@/components/dashboard/primitives";
-
-const PLAN_LABELS: Record<string, string> = { FREE: "Free", PRO: "Pro", BUSINESS: "Business" };
+import { WorkspaceSwitcher } from "./workspace-switcher";
+import { CommandPalette } from "@/components/search/command-palette";
 
 const iconMap = {
   LayoutDashboard, FolderKanban, Globe, Image: ImageIcon, Rocket, Briefcase, ClipboardCheck,
@@ -20,37 +21,37 @@ const iconMap = {
 } as const;
 
 type NavItem = { label: string; href: string; icon: keyof typeof iconMap; agencyOnly?: boolean };
-type NavGroup = { label: string | null; items: NavItem[] };
+type NavGroup = { items: NavItem[] };
 
-// Sidebar SSOT — workspace/operational destinations only. Top-level product
+// Sidebar SSOT — dc mockup grouping (dividers, no text labels). Top-level product
 // areas (Marketplace/Learn/Resources) live in the top nav, NOT here.
 export const NAV_GROUPS: NavGroup[] = [
-  { label: null, items: [
+  { items: [
     { label: "Home", href: "/dashboard", icon: "LayoutDashboard" },
     { label: "All projects", href: "/dashboard/projects", icon: "FolderKanban" },
     { label: "Sites", href: "/dashboard/sites", icon: "Globe" },
-    { label: "Media library", href: "/dashboard/media", icon: "Image" },
-    { label: "Getting started", href: "/dashboard/getting-started", icon: "Rocket" },
+    { label: "Apps", href: "/dashboard/apps", icon: "Blocks" },
   ] },
-  { label: "Agency", items: [
+  { items: [
+    { label: "Partner program", href: "/dashboard/partner", icon: "Gift", agencyOnly: true },
     { label: "Client management", href: "/dashboard/clients", icon: "Briefcase", agencyOnly: true },
     { label: "Review & comments", href: "/dashboard/reviews", icon: "ClipboardCheck", agencyOnly: true },
     { label: "Shared theme", href: "/dashboard/theme", icon: "Palette", agencyOnly: true },
-    { label: "Partner program", href: "/dashboard/partner", icon: "Gift", agencyOnly: true },
   ] },
-  { label: "Extend", items: [
-    { label: "Apps", href: "/dashboard/apps", icon: "Blocks" },
-    { label: "Apps & Integrations", href: "/dashboard/integrations", icon: "Plug" },
-    { label: "Libraries & Templates", href: "/dashboard/libraries", icon: "Library" },
+  { items: [
+    { label: "Media library", href: "/dashboard/media", icon: "Image" },
+    { label: "Getting started", href: "/dashboard/getting-started", icon: "Rocket" },
+    { label: "Help center", href: "/dashboard/help", icon: "HelpCircle" },
   ] },
-  { label: "Workspace", items: [
+  { items: [
+    { label: "General settings", href: "/dashboard/settings", icon: "Settings" },
     { label: "Team", href: "/dashboard/team", icon: "Users" },
-    { label: "Billing", href: "/dashboard/billing", icon: "CreditCard" },
     { label: "Plans", href: "/dashboard/plans", icon: "Tag" },
     { label: "Usage", href: "/dashboard/usage", icon: "Activity" },
+    { label: "Billing", href: "/dashboard/billing", icon: "CreditCard" },
     { label: "Domains", href: "/dashboard/domains", icon: "Link2" },
-    { label: "General settings", href: "/dashboard/settings", icon: "Settings" },
-    { label: "Help center", href: "/dashboard/help", icon: "HelpCircle" },
+    { label: "Apps & Integrations", href: "/dashboard/integrations", icon: "Plug" },
+    { label: "Libraries & Templates", href: "/dashboard/libraries", icon: "Library" },
   ] },
 ];
 
@@ -66,7 +67,7 @@ function useVisibleGroups(): NavGroup[] {
   const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
   const agency = !!features.data?.agency_layer;
   return NAV_GROUPS
-    .map((g) => ({ ...g, items: g.items.filter((it) => !it.agencyOnly || agency) }))
+    .map((g) => ({ items: g.items.filter((it) => !it.agencyOnly || agency) }))
     .filter((g) => g.items.length > 0);
 }
 
@@ -93,15 +94,44 @@ function MobileTabBar() {
   );
 }
 
+function StorageCard() {
+  const usage = trpc.dashboard.usage.useQuery(undefined, { staleTime: 60_000 });
+  const storage = usage.data?.metrics.find((m) => m.key === "storage");
+  const plan = usage.data?.plan ?? "FREE";
+  const used = storage?.used ?? 0;
+  const limit = storage?.limit ?? 0;
+  const pct = limit > 0 ? Math.min((used / limit) * 100, 100) : 0;
+
+  return (
+    <div className="rounded-lg p-3" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
+      <div className="flex items-center justify-between">
+        <p className="text-body-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Storage</p>
+        <span className="text-eyebrow" style={{ color: "var(--color-text-secondary)" }}>
+          <MetricValue>{used} / {limit > 0 ? limit : "∞"} GB</MetricValue>
+        </span>
+      </div>
+      <ProgressBar pct={pct} tone="accent" className="mt-2" />
+      {plan === "FREE" && (
+        <Link href="/dashboard/plans" className="mt-2 flex items-center gap-1 text-body-sm font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>
+          Upgrade plan <ArrowUpRight className="h-3 w-3" />
+        </Link>
+      )}
+    </div>
+  );
+}
+
 export function Sidebar() {
   const pathname = usePathname();
   const groups = useVisibleGroups();
-  const health = trpc.dashboard.health.useQuery(undefined, { staleTime: 60_000 });
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
-  const plan = health.data?.plan ?? "FREE";
-  const sitesUsed = health.data?.sites.used ?? 0;
-  const sitesLimit = health.data?.sites.limit ?? 0;
-  const usagePct = sitesLimit > 0 ? Math.min((sitesUsed / sitesLimit) * 100, 100) : 0;
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setPaletteOpen((o) => !o); }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <>
@@ -109,12 +139,23 @@ export function Sidebar() {
         className="fixed left-0 z-30 hidden w-[var(--sidebar-w)] flex-col border-r bg-white lg:flex"
         style={{ top: "var(--topnav-h)", height: "calc(100vh - var(--topnav-h))", borderColor: "var(--color-border-default)" }}
       >
-        <nav className="flex-1 overflow-y-auto px-3 py-3">
+        <div className="shrink-0 space-y-2 px-3.5 pt-3.5">
+          <WorkspaceSwitcher />
+          <button
+            onClick={() => setPaletteOpen(true)}
+            className="flex h-9 w-full items-center gap-2 rounded-lg border px-2.5 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
+            style={{ color: "var(--color-text-placeholder)", borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-subtle)" }}
+            aria-label="Search"
+          >
+            <Search className="h-4 w-4" />
+            <span className="flex-1 text-left">Search…</span>
+            <kbd className="rounded border bg-white px-1.5 text-eyebrow" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-muted)" }}>⌘K</kbd>
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3.5 py-3">
           {groups.map((group, gi) => (
-            <div key={group.label ?? `g${gi}`} className={gi > 0 ? "mt-4" : undefined}>
-              {group.label && (
-                <p className="px-3 pb-1 text-eyebrow uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>{group.label}</p>
-              )}
+            <div key={gi} className={gi > 0 ? "mt-3 border-t pt-3" : undefined} style={gi > 0 ? { borderColor: "var(--color-border-default)" } : undefined}>
               <ul className="space-y-0.5">
                 {group.items.map((item) => {
                   const active = isActiveRoute(pathname, item.href);
@@ -122,8 +163,8 @@ export function Sidebar() {
                   return (
                     <li key={item.href}>
                       <Link href={item.href} className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-body font-medium transition-colors",
-                        active ? "bg-[var(--color-primary-subtle)] text-[var(--color-primary)]" : "text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
+                        "flex items-center gap-[11px] rounded-md px-2.5 py-2 text-body transition-colors",
+                        active ? "bg-[var(--color-primary-subtle)] font-semibold text-[var(--color-primary)]" : "font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
                       )}>
                         <Icon className="h-[18px] w-[18px] shrink-0" />
                         {item.label}
@@ -135,32 +176,14 @@ export function Sidebar() {
             </div>
           ))}
         </nav>
-        <div className="shrink-0 border-t px-4 py-3 space-y-2" style={{ borderColor: "var(--color-border-default)" }}>
-          <div className="flex items-center justify-between">
-            <p className="text-body-sm font-medium" style={{ color: "var(--color-text-primary)" }}>My Workspace</p>
-            <span className="rounded-pill px-2 py-0.5 text-eyebrow font-semibold" style={{
-              backgroundColor: plan === "FREE" ? "var(--color-bg-subtle)" : "var(--color-primary-subtle)",
-              color: plan === "FREE" ? "var(--color-text-secondary)" : "var(--color-primary)",
-            }}>{PLAN_LABELS[plan] ?? plan}</span>
-          </div>
-          {!health.isLoading && (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-body-sm">
-                <span style={{ color: "var(--color-text-secondary)" }}>Sites</span>
-                <span className="font-medium" style={{ color: "var(--color-text-primary)" }}><MetricValue>{sitesUsed}/{sitesLimit}</MetricValue></span>
-              </div>
-              <ProgressBar pct={usagePct} tone="auto" />
-            </div>
-          )}
-          {plan === "FREE" && (
-            <Link href="/dashboard/plans" className="flex items-center gap-1 text-body-sm font-medium hover:underline" style={{ color: "var(--color-primary)" }}>
-              Upgrade <ArrowUpRight className="h-3 w-3" />
-            </Link>
-          )}
+
+        <div className="shrink-0 p-3.5">
+          <StorageCard />
         </div>
       </aside>
 
       <MobileTabBar />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </>
   );
 }
