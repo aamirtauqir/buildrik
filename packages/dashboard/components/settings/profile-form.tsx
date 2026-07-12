@@ -27,8 +27,8 @@ const TIMEZONES = [
 ];
 
 const INITIALS_COLORS = [
-  "var(--color-primary)", "#3b82f6", "#8b5cf6", "#059669", "#d97706",
-  "#dc2626", "#7c3aed", "#0891b2", "#be185d", "#4f46e5",
+  "var(--color-primary)", "#3b82f6", "#0d9488", "#059669", "#d97706",
+  "#dc2626", "#db2777", "#0891b2", "#be185d", "#0284c7",
 ];
 
 function getInitialsColor(name: string): string {

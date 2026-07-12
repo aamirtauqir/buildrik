@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, Plus, Trash2, Download, Upload } from "lucide-react";
+import { StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
 
 export interface RedirectRow {
   id: string;
@@ -46,6 +47,31 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
     e.target.value = "";
   };
 
+  const columns: Column<RedirectRow>[] = [
+    { key: "fromPath", header: "From", render: (r) => <MetricValue className="text-xs">{r.fromPath}</MetricValue> },
+    {
+      key: "toUrl",
+      header: "To",
+      render: (r) => (
+        <span style={{ color: "var(--color-text-secondary)" }}>
+          <MetricValue className="text-xs">{r.toUrl}</MetricValue>
+        </span>
+      ),
+    },
+    { key: "type", header: "Type", render: (r) => <Pill tone="neutral">{r.type}</Pill> },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      render: (r) =>
+        canEdit ? (
+          <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-red-600">
+            <Trash2 size={13} /> Delete
+          </button>
+        ) : null,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between">
@@ -70,18 +96,9 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
-          <p className="text-xs uppercase tracking-wide text-neutral-500">Active</p>
-          <p className="mt-1 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>{redirects.length}</p>
-        </div>
-        <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
-          <p className="text-xs uppercase tracking-wide text-neutral-500">Plan limit</p>
-          <p className="mt-1 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>{limit === -1 ? "∞" : limit}</p>
-        </div>
-        <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
-          <p className="text-xs uppercase tracking-wide text-neutral-500">Permanent (301)</p>
-          <p className="mt-1 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>{redirects.filter((r) => r.type === "301").length}</p>
-        </div>
+        <StatCard label="Active" value={<MetricValue>{redirects.length}</MetricValue>} />
+        <StatCard label="Plan limit" value={<MetricValue>{limit === -1 ? "∞" : limit}</MetricValue>} />
+        <StatCard label="Permanent (301)" value={<MetricValue>{redirects.filter((r) => r.type === "301").length}</MetricValue>} />
       </div>
 
       {/* Add row */}
@@ -115,41 +132,17 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
       )}
 
       {/* List */}
-      {redirects.length === 0 ? (
-        <div className="rounded-xl border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
-          <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No redirects yet</p>
-          <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>Renaming a page slug auto-creates one, or add yours above.</p>
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border-default)" }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-xs uppercase tracking-wide text-neutral-500" style={{ borderColor: "var(--color-border-default)" }}>
-                <th className="px-4 py-2.5 font-medium">From</th>
-                <th className="px-4 py-2.5 font-medium">To</th>
-                <th className="px-4 py-2.5 font-medium">Type</th>
-                <th className="px-4 py-2.5" />
-              </tr>
-            </thead>
-            <tbody>
-              {redirects.map((r) => (
-                <tr key={r.id} className="border-b last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
-                  <td className="px-4 py-3 font-mono text-xs" style={{ color: "var(--color-text-primary)" }}>{r.fromPath}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-neutral-500">{r.toUrl}</td>
-                  <td className="px-4 py-3"><span className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-600">{r.type}</span></td>
-                  <td className="px-4 py-3 text-right">
-                    {canEdit && (
-                      <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-red-600">
-                        <Trash2 size={13} /> Delete
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        rows={redirects}
+        keyOf={(r) => r.id}
+        empty={
+          <div className="rounded-xl border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
+            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No redirects yet</p>
+            <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>Renaming a page slug auto-creates one, or add yours above.</p>
+          </div>
+        }
+      />
     </div>
   );
 }

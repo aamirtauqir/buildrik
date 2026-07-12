@@ -13,6 +13,7 @@ import {
   HelpCircle,
   Clock,
   CornerUpRight,
+  Compass,
 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
@@ -81,7 +82,35 @@ const SCOPE_ICONS: Record<string, typeof Globe> = {
   help: HelpCircle,
   recent: Clock,
   moved: CornerUpRight,
+  navigate: Compass,
 };
+
+// Primary nav destinations — the reconciled two-level IA (top nav + sidebar).
+// Agency destinations are hidden in solo workspaces.
+const NAV_ITEMS: Array<ResultItem & { agencyOnly?: boolean }> = [
+  { id: "nav-dashboard", label: "Dashboard", description: "Home", href: "/dashboard", scope: "navigate" },
+  { id: "nav-marketplace", label: "Marketplace", description: "Apps & integrations", href: "/dashboard/marketplace", scope: "navigate" },
+  { id: "nav-learn", label: "Learn", description: "Academy", href: "/dashboard/learn", scope: "navigate" },
+  { id: "nav-resources", label: "Resources", description: "Docs & guides", href: "/dashboard/resources", scope: "navigate" },
+  { id: "nav-projects", label: "All projects", href: "/dashboard/projects", scope: "navigate" },
+  { id: "nav-sites", label: "My Sites", href: "/dashboard/sites", scope: "navigate" },
+  { id: "nav-media", label: "Media", href: "/dashboard/media", scope: "navigate" },
+  { id: "nav-getting-started", label: "Getting started", href: "/dashboard/getting-started", scope: "navigate" },
+  { id: "nav-apps", label: "Apps", href: "/dashboard/apps", scope: "navigate" },
+  { id: "nav-libraries", label: "Libraries & Templates", href: "/dashboard/libraries", scope: "navigate" },
+  { id: "nav-clients", label: "Clients", href: "/dashboard/clients", scope: "navigate", agencyOnly: true },
+  { id: "nav-reviews", label: "Reviews", href: "/dashboard/reviews", scope: "navigate", agencyOnly: true },
+  { id: "nav-comments", label: "Comments", href: "/dashboard/comments", scope: "navigate", agencyOnly: true },
+  { id: "nav-theme", label: "Shared theme", href: "/dashboard/theme", scope: "navigate", agencyOnly: true },
+  { id: "nav-partner", label: "Partner program", href: "/dashboard/partner", scope: "navigate", agencyOnly: true },
+  { id: "nav-team", label: "Team", href: "/dashboard/team", scope: "navigate" },
+  { id: "nav-billing", label: "Billing", href: "/dashboard/billing", scope: "navigate" },
+  { id: "nav-plans", label: "Plans", href: "/dashboard/plans", scope: "navigate" },
+  { id: "nav-usage", label: "Usage", href: "/dashboard/usage", scope: "navigate" },
+  { id: "nav-domains", label: "Domains", href: "/dashboard/domains", scope: "navigate" },
+  { id: "nav-settings", label: "Settings", href: "/dashboard/settings", scope: "navigate" },
+  { id: "nav-help", label: "Help", href: "/dashboard/help", scope: "navigate" },
+];
 
 export const SEARCH_SCOPES = [
   { key: "sites", label: "Sites" },
@@ -285,6 +314,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       if (moved.length > 0) {
         groups.push({ scope: "moved", label: "Moved", items: moved });
       }
+    }
+
+    // Go to — primary nav destinations reflecting the two-level IA.
+    if (scope === null) {
+      const nav = NAV_ITEMS.filter((item) => (!item.agencyOnly || agency) && item.label.toLowerCase().includes(lowerTerm));
+      if (nav.length > 0) groups.push({ scope: "navigate", label: "Go to", items: nav });
     }
 
     // Actions (static, client-filtered)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Pill } from "@/components/dashboard/primitives";
 
 export const INTEGRATION_CONFIGS = [
   {
@@ -376,19 +377,9 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onUpdate, onT
                   </p>
                 </div>
                 {connection ? (
-                  <span
-                    className="text-xs px-2 py-0.5 rounded-full font-medium"
-                    style={{ backgroundColor: "#dcfce7", color: "#16a34a" }}
-                  >
-                    Connected
-                  </span>
+                  <Pill tone="success">Connected</Pill>
                 ) : (
-                  <span
-                    className="text-xs px-2 py-0.5 rounded-full font-medium"
-                    style={{ backgroundColor: "#f5f5f5", color: "var(--color-text-secondary)" }}
-                  >
-                    Disconnected
-                  </span>
+                  <Pill tone="neutral">Disconnected</Pill>
                 )}
               </div>
 

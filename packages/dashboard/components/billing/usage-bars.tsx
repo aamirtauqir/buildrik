@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@lib/utils";
+import { ProgressBar, MetricValue } from "@/components/dashboard/primitives";
 
 export interface UsageItem {
   label: string;
@@ -26,12 +26,6 @@ interface UsageBarsProps {
   items: UsageItem[];
 }
 
-function barColor(pct: number): string {
-  if (pct >= 85) return "#EF4444";
-  if (pct >= 60) return "#EAB308";
-  return "#3B82F6";
-}
-
 function formatValue(value: number, unit?: string): string {
   if (!unit) return String(value);
   return `${value} ${unit}`;
@@ -39,8 +33,6 @@ function formatValue(value: number, unit?: string): string {
 
 function BarItem({ item }: { item: UsageItem }) {
   const pct = item.limit === 0 ? 0 : Math.min(100, Math.round((item.used / item.limit) * 100));
-  const color = barColor(pct);
-  const isNearLimit = pct >= 60;
 
   const defaultCta = DEFAULT_USAGE_ITEMS.find((d) => d.label === item.label);
   const ctaLabel = item.ctaLabel ?? defaultCta?.ctaLabel;
@@ -48,20 +40,15 @@ function BarItem({ item }: { item: UsageItem }) {
 
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between gap-2">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
         <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
           {item.label}
         </span>
-        <span className="text-xs" style={{ color: isNearLimit ? color : "var(--color-text-secondary)" }}>
-          {formatValue(item.used, item.unit)} / {formatValue(item.limit, item.unit)}
+        <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+          <MetricValue>{formatValue(item.used, item.unit)}</MetricValue> / <MetricValue>{formatValue(item.limit, item.unit)}</MetricValue>
         </span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--color-border-default)" }}>
-        <div
-          className="h-full rounded-full transition-all"
-          style={{ width: `${pct}%`, backgroundColor: color }}
-        />
-      </div>
+      <ProgressBar pct={pct} tone="auto" />
       {ctaLabel && ctaHref && (
         <a
           href={ctaHref}

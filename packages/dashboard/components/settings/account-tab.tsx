@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MailCheck } from "lucide-react";
+import { SectionCard, Pill } from "@/components/dashboard/primitives";
 
 interface ConnectedAccount {
   provider: "google" | "github";
@@ -141,17 +142,13 @@ export function AccountTab({
   }
 
   return (
-    <div className="space-y-8">
-      <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
-          {isSocialOnly ? "Set a password" : "Change password"}
-        </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          {isSocialOnly
-            ? "Add a password so you can also sign in with your email."
-            : "Use a strong password you don't use elsewhere."}
-        </p>
-
+    <div className="space-y-4">
+      <SectionCard
+        title={isSocialOnly ? "Set a password" : "Change password"}
+        description={isSocialOnly
+          ? "Add a password so you can also sign in with your email."
+          : "Use a strong password you don't use elsewhere."}
+      >
         <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-sm">
           {!isSocialOnly && (
             <div>
@@ -222,15 +219,9 @@ export function AccountTab({
             {saving ? "Saving..." : isSocialOnly ? "Set password" : "Update password"}
           </button>
         </form>
-      </section>
+      </SectionCard>
 
-      <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
-
-      <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Email address
-        </h2>
-
+      <SectionCard title="Email address">
         {dsEmailChangePending ? (
           <div
             className="max-w-sm rounded-lg border p-4"
@@ -324,18 +315,9 @@ export function AccountTab({
         </form>
         </>
         )}
-      </section>
+      </SectionCard>
 
-      <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
-
-      <section>
-        <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
-          Connected accounts
-        </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          Sign in faster using a social provider.
-        </p>
-
+      <SectionCard title="Connected accounts" description="Sign in faster using a social provider.">
         <div className="space-y-3">
           {(["google", "github"] as const).map((provider) => {
             const connected = connectedAccounts.find((a) => a.provider === provider);
@@ -355,12 +337,7 @@ export function AccountTab({
                       {connected.email}
                     </span>
                   ) : (
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-                    >
-                      Not connected
-                    </span>
+                    <Pill tone="neutral">Not connected</Pill>
                   )}
                 </div>
                 {connected ? (
@@ -386,7 +363,7 @@ export function AccountTab({
             );
           })}
         </div>
-      </section>
+      </SectionCard>
     </div>
   );
 }

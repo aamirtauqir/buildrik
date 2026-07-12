@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@lib/utils";
+import { PageHeader } from "@/components/dashboard/primitives";
 
 const SETTINGS_TABS = [
   { label: "Profile", href: "/dashboard/settings" },
@@ -20,8 +21,8 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
   return (
     <div>
-      <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Settings</h1>
-      <nav className="mt-4 border-b" style={{ borderColor: "var(--color-border-default)" }}>
+      <PageHeader title="Settings" description="Manage your profile, security, workspace, and integrations." />
+      <nav className="border-b" style={{ borderColor: "var(--color-border-default)" }}>
         <ul className="flex gap-0">
           {SETTINGS_TABS.map((tab) => {
             const isActive = tab.href === "/dashboard/settings"

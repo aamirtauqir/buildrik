@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@lib/utils";
+import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
 type PlanId = "FREE" | "PRO" | "BUSINESS";
 type Interval = "MONTHLY" | "YEARLY";
@@ -17,12 +18,6 @@ export interface PlanCardProps {
   onChangePlan?: () => void;
 }
 
-const PLAN_BADGE: Record<PlanId, { bg: string; color: string }> = {
-  FREE: { bg: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" },
-  PRO: { bg: "var(--color-bg-subtle)", color: "var(--color-text-primary)" },
-  BUSINESS: { bg: "var(--color-text-primary)", color: "#FFFFFF" },
-};
-
 function formatPrice(price: number, currency: string, interval: Interval): string {
   const symbol = currency.toUpperCase() === "USD" ? "$" : currency;
   const suffix = interval === "MONTHLY" ? "/mo" : "/yr";
@@ -30,7 +25,6 @@ function formatPrice(price: number, currency: string, interval: Interval): strin
 }
 
 export function PlanCard({
-  planId,
   name,
   price,
   interval,
@@ -40,45 +34,25 @@ export function PlanCard({
   isGrandfathered = false,
   onChangePlan,
 }: PlanCardProps) {
-  const badge = PLAN_BADGE[planId];
-
   return (
     <div
       className={cn(
-        "rounded-2xl border bg-white p-6",
+        "rounded-2xl border p-6",
         isCurrent ? "border-[var(--color-primary)]" : "border-[var(--color-border-default)]"
       )}
+      style={{ backgroundColor: "var(--color-bg-surface)" }}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span
-            className="rounded-full px-2.5 py-1 text-xs font-semibold"
-            style={{ backgroundColor: badge.bg, color: badge.color }}
-          >
-            {name}
-          </span>
-          {isCurrent && (
-            <span
-              className="rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
-            >
-              Current Plan
-            </span>
-          )}
-          {isGrandfathered && (
-            <span
-              className="rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{ backgroundColor: "#FEF3C7", color: "#92400E" }}
-            >
-              Legacy pricing
-            </span>
-          )}
+          <Pill tone="neutral">{name}</Pill>
+          {isCurrent && <Pill tone="accent">Current Plan</Pill>}
+          {isGrandfathered && <Pill tone="warning">Legacy pricing</Pill>}
         </div>
       </div>
 
       <div className="mt-4">
         <span className="text-3xl font-bold" style={{ color: "var(--color-text-primary)" }}>
-          {formatPrice(price, currency, interval)}
+          <MetricValue>{formatPrice(price, currency, interval)}</MetricValue>
         </span>
       </div>
 

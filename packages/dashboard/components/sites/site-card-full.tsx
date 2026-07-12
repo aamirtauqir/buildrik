@@ -4,7 +4,8 @@ import { Globe, FileText, Pencil, Settings, Users, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
 import { ContextMenu } from "./context-menu";
 import { EditorLink } from "@/components/editor-route/EditorLink";
-import { siteStatusColor } from "./site-status";
+import { siteStatusTone } from "./site-status";
+import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
 interface SiteCardFullProps {
   site: { id: string; name: string; slug: string; status: string; thumbnail: string | null; pages: number; lastEditedAt: Date; publishedUrl: string | null; visitors30d: number; createdBy: string; domain: string | null; themeLocked?: boolean };
@@ -29,7 +30,6 @@ function formatVisitors(count: number): string {
 }
 
 export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFullProps) {
-  const statusColor = siteStatusColor(site.status);
   return (
     <div className={cn("group relative rounded-xl border bg-white transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")} style={{ borderColor: "var(--color-border-default)" }}>
       <div className="absolute left-3 top-3 z-10">
@@ -42,7 +42,7 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
         <div className="p-4">
           <div className="flex items-center justify-between">
             <h3 className="truncate text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{site.name}</h3>
-            <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: statusColor.bg, color: statusColor.text }}>{site.status.toLowerCase()}</span>
+            <Pill tone={siteStatusTone(site.status)} className="shrink-0">{site.status.toLowerCase()}</Pill>
           </div>
           <div className="mt-1 flex items-center gap-2">
             <p className="truncate text-xs" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p>
@@ -54,11 +54,11 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
             )}
           </div>
           <div className="mt-2 flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-            <span className="flex items-center gap-1"><FileText className="h-3 w-3" />{site.pages} pages</span>
-            <span className="flex items-center gap-1"><Users className="h-3 w-3" />{formatVisitors(site.visitors30d)} visitors</span>
+            <span className="flex items-center gap-1"><FileText className="h-3 w-3" /><MetricValue>{site.pages}</MetricValue> pages</span>
+            <span className="flex items-center gap-1"><Users className="h-3 w-3" /><MetricValue>{formatVisitors(site.visitors30d)}</MetricValue> visitors</span>
           </div>
           <p className="mt-1.5 flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
-            <Clock className="h-3 w-3" />Edited {getTimeAgo(site.lastEditedAt)}
+            <Clock className="h-3 w-3" />Edited <MetricValue>{getTimeAgo(site.lastEditedAt)}</MetricValue>
           </p>
         </div>
       </Link>

@@ -13,6 +13,7 @@ import { RenameModal } from "@/components/sites/rename-modal";
 import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
 import { TransferModal } from "@/components/sites/transfer-modal";
 import { ErrorState } from "@/components/states";
+import { PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -315,28 +316,26 @@ export default function SitesPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1
-          className="text-[22px] font-bold"
-          style={{ color: "var(--color-text-primary)" }}
-        >
-          My Sites
-        </h1>
-        <div className="flex items-center gap-3">
-          <ViewToggle value={viewMode} onChange={(mode) => {
-            setViewMode(mode);
-            updatePrefs.mutate({ siteViewMode: mode as "grid" | "list" });
-          }} />
-          <button
-            onClick={() => setCreateOpen(true)}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
-            <Plus className="h-4 w-4" />
-            New Site
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="My Sites"
+        description="Manage, edit, and publish every site in your workspace."
+        actions={
+          <>
+            <ViewToggle value={viewMode} onChange={(mode) => {
+              setViewMode(mode);
+              updatePrefs.mutate({ siteViewMode: mode as "grid" | "list" });
+            }} />
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+              style={{ backgroundColor: "var(--color-primary)" }}
+            >
+              <Plus className="h-4 w-4" />
+              New Site
+            </button>
+          </>
+        }
+      />
 
       {/* Folder Tabs */}
       <div className="mt-4">

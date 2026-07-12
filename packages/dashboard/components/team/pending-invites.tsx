@@ -2,6 +2,7 @@
 
 import { cn } from "@lib/utils";
 import { roleLabel } from "@lib/constants/enums";
+import { Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 
 type Role = "ADMIN" | "EDITOR" | "VIEWER";
 
@@ -15,10 +16,10 @@ export interface PendingInvite {
   [key: string]: unknown;
 }
 
-const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
-  ADMIN: { bg: "#EFF6FF", color: "#3B82F6" },
-  EDITOR: { bg: "#F0FDF4", color: "var(--color-success)" },
-  VIEWER: { bg: "#F3F4F6", color: "var(--color-text-secondary)" },
+const ROLE_TONE: Record<Role, PillTone> = {
+  ADMIN: "accent",
+  EDITOR: "success",
+  VIEWER: "neutral",
 };
 
 const MAX_RESENDS = 2;
@@ -69,7 +70,6 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
         </thead>
         <tbody>
           {invites.map((invite) => {
-            const badge = ROLE_BADGE[invite.role as Role] ?? ROLE_BADGE.VIEWER;
             const days = daysUntil(invite.expiresAt);
             const expiringSoon = days <= 2;
             const resendDisabled = invite.resendCount >= MAX_RESENDS;
@@ -80,21 +80,16 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                   {invite.email}
                 </td>
                 <td className="px-4 py-3">
-                  <span
-                    className="rounded-full px-2.5 py-1 text-xs font-semibold"
-                    style={{ backgroundColor: badge.bg, color: badge.color }}
-                  >
-                    {roleLabel(invite.role)}
-                  </span>
+                  <Pill tone={ROLE_TONE[invite.role as Role] ?? "neutral"}>{roleLabel(invite.role)}</Pill>
                 </td>
                 <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                  {formatDate(invite.createdAt)}
+                  <MetricValue>{formatDate(invite.createdAt)}</MetricValue>
                 </td>
                 <td className="px-4 py-3 text-xs font-medium" style={{ color: expiringSoon ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
-                  {days === 0 ? "Expires today" : `Expires in ${days}d`}
+                  {days === 0 ? "Expires today" : <>Expires in <MetricValue>{days}d</MetricValue></>}
                 </td>
                 <td className="px-4 py-3 text-xs" style={{ color: resendDisabled ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
-                  Resent {invite.resendCount}/{MAX_RESENDS} times
+                  Resent <MetricValue>{invite.resendCount}/{MAX_RESENDS}</MetricValue> times
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-2">

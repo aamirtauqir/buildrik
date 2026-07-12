@@ -14,6 +14,7 @@ import type { Invoice } from "@/components/billing/invoice-table";
 import { PaymentMethodCard } from "@/components/billing/payment-method-card";
 import { CancelModal } from "@/components/billing/cancel-modal";
 import { DunningBanner } from "@/components/dashboard/dunning-banner";
+import { PageHeader, SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 type PlanKey = "FREE" | "PRO" | "BUSINESS";
 type Interval = "MONTHLY" | "YEARLY";
@@ -109,8 +110,8 @@ export default function BillingPage() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Billing</h1>
-        <div className="mt-6 space-y-4">
+        <PageHeader title="Billing" description="Manage your plan, payment method, and invoices." />
+        <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-32 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
@@ -122,14 +123,12 @@ export default function BillingPage() {
   if (overviewQuery.isError) {
     return (
       <div>
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Billing</h1>
-        <div className="mt-6">
-          <ErrorState
-            title="Couldn't load billing"
-            description="Something went wrong on our end. Your subscription is unaffected."
-            onRetry={() => overviewQuery.refetch()}
-          />
-        </div>
+        <PageHeader title="Billing" description="Manage your plan, payment method, and invoices." />
+        <ErrorState
+          title="Couldn't load billing"
+          description="Something went wrong on our end. Your subscription is unaffected."
+          onRetry={() => overviewQuery.refetch()}
+        />
       </div>
     );
   }
@@ -139,34 +138,35 @@ export default function BillingPage() {
   if (showPlans) {
     return (
       <div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Choose a Plan</h1>
-          <button
-            onClick={() => setShowPlans(false)}
-            className="rounded-lg border px-4 py-2 text-sm font-medium"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
-            Back to Billing
-          </button>
-        </div>
-        <div className="mt-6">
-          <div className="space-y-4">
-            <div
-              className="rounded-xl border p-4 text-center"
-              style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
+        <PageHeader
+          title="Choose a plan"
+          description="Upgrade or downgrade your workspace subscription."
+          actions={
+            <button
+              onClick={() => setShowPlans(false)}
+              className="rounded-lg border px-4 py-2 text-sm font-medium"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
             >
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
-                Payment processing coming soon
-              </p>
-              <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                We&apos;re integrating Stripe. Upgrades will be available here once it&apos;s ready.
-              </p>
-            </div>
-            <PlanComparison
-              currentPlan={planKey}
-              upgradesDisabled
-            />
+              Back to Billing
+            </button>
+          }
+        />
+        <div className="space-y-4">
+          <div
+            className="rounded-xl border p-4 text-center"
+            style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
+          >
+            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+              Payment processing coming soon
+            </p>
+            <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              We&apos;re integrating Stripe. Upgrades will be available here once it&apos;s ready.
+            </p>
           </div>
+          <PlanComparison
+            currentPlan={planKey}
+            upgradesDisabled
+          />
         </div>
       </div>
     );
@@ -174,23 +174,26 @@ export default function BillingPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Billing</h1>
-        {planKey === "FREE" && (
-          <button
-            onClick={() => setShowPlans(true)}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
-            View Plans
-          </button>
-        )}
-      </div>
+      <PageHeader
+        title="Billing"
+        description="Manage your plan, payment method, and invoices."
+        actions={
+          planKey === "FREE" ? (
+            <button
+              onClick={() => setShowPlans(true)}
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "var(--color-primary)" }}
+            >
+              View Plans
+            </button>
+          ) : undefined
+        }
+      />
 
       {/* D) Dunning countdown — grace end matches the billing-downgrade cron
           (7 days after the period end). */}
       {isDunning && (
-        <div className="mt-4">
+        <div className="mb-4">
           <DunningBanner
             graceEndsAt={
               overview?.currentPeriodEnd
@@ -204,11 +207,11 @@ export default function BillingPage() {
       {/* B) Reactivation banner */}
       {cancelAtPeriodEnd && overview?.currentPeriodEnd && (
         <div
-          className="mt-4 flex items-center justify-between rounded-xl border px-5 py-3"
+          className="mb-4 flex items-center justify-between rounded-xl border px-5 py-3"
           style={{ borderColor: "#F59E0B", backgroundColor: "#FFFBEB" }}
         >
           <p className="text-sm font-medium" style={{ color: "#92400E" }}>
-            Your plan cancels on {formatDate(overview.currentPeriodEnd)}
+            Your plan cancels on <MetricValue>{formatDate(overview.currentPeriodEnd)}</MetricValue>
           </p>
           <button
             onClick={() => reactivateMutation.mutate()}
@@ -221,7 +224,7 @@ export default function BillingPage() {
         </div>
       )}
 
-      <div className="mt-6 space-y-6">
+      <div className="space-y-6">
         {overview && (
           <>
             <PlanCard
@@ -245,7 +248,10 @@ export default function BillingPage() {
                 (nothing called setShowCancel). cancelSubscription is real
                 (sets cancelAtPeriodEnd; Reactivate undoes it). */}
             {planKey !== "FREE" && !cancelAtPeriodEnd && (
-              <div className="flex items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-white px-5 py-4">
+              <div
+                className="flex items-center justify-between rounded-xl border px-5 py-4"
+                style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+              >
                 <div>
                   <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                     Cancel subscription
@@ -266,7 +272,11 @@ export default function BillingPage() {
           </>
         )}
 
-        {overview && <UsageBars items={toUsageItems(overview.usage)} />}
+        {overview && (
+          <SectionCard title="Usage">
+            <UsageBars items={toUsageItems(overview.usage)} />
+          </SectionCard>
+        )}
 
         {overview?.paymentMethod && (
           <PaymentMethodCard paymentMethod={overview.paymentMethod} />

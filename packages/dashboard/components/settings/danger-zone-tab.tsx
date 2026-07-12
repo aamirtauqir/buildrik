@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 interface PreviousExport {
   id: string;
@@ -82,13 +83,7 @@ export function DangerZoneTab({
           Download a copy of everything we store about you and your workspace.
         </p>
 
-        <div
-          className="p-4 rounded-lg border mb-4"
-          style={{ borderColor: "var(--color-border-default)" }}
-        >
-          <p className="text-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
-            What&apos;s included:
-          </p>
+        <SectionCard title="What's included" className="mb-4">
           <ul className="space-y-1">
             {EXPORT_INCLUDES.map((item) => (
               <li key={item} className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
@@ -98,9 +93,9 @@ export function DangerZoneTab({
             ))}
           </ul>
           <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
-            Estimated size: {estimatedSize}
+            Estimated size: <MetricValue>{estimatedSize}</MetricValue>
           </p>
-        </div>
+        </SectionCard>
 
         {previousExports.length > 0 && (
           <div className="mb-4">
@@ -119,11 +114,11 @@ export function DangerZoneTab({
                 >
                   <div>
                     <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
-                      {exp.date}
+                      <MetricValue>{exp.date}</MetricValue>
                     </p>
                     <div className="flex items-center gap-2">
                       <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                        {exp.size}
+                        <MetricValue>{exp.size}</MetricValue>
                       </p>
                       {exp.expiresAt && (
                         <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@lib/utils";
 import { roleLabel } from "@lib/constants/enums";
+import { Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 import { MemberActions, type MemberAction } from "./member-actions";
 
 type Role = "OWNER" | "ADMIN" | "EDITOR" | "DESIGNER" | "VIEWER";
@@ -24,18 +25,18 @@ export interface Member {
 type SortKey = "fullName" | "role" | "status" | "lastActiveAt";
 type SortDir = "asc" | "desc";
 
-const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
-  OWNER: { bg: "var(--color-primary-subtle)", color: "var(--color-primary)" },
-  ADMIN: { bg: "#EFF6FF", color: "#3B82F6" },
-  EDITOR: { bg: "#F0FDF4", color: "var(--color-success)" },
-  DESIGNER: { bg: "#F0FDFA", color: "#0D9488" },
-  VIEWER: { bg: "#F3F4F6", color: "var(--color-text-secondary)" },
+const ROLE_TONE: Record<Role, PillTone> = {
+  OWNER: "accent",
+  ADMIN: "accent",
+  EDITOR: "success",
+  DESIGNER: "success",
+  VIEWER: "neutral",
 };
 
-const STATUS_BADGE: Record<Status, { label: string; color: string }> = {
-  ACTIVE: { label: "Active", color: "var(--color-success)" },
-  PENDING: { label: "Pending", color: "#F59E0B" },
-  SUSPENDED: { label: "Suspended", color: "var(--color-primary)" },
+const STATUS_TONE: Record<Status, { label: string; tone: PillTone }> = {
+  ACTIVE: { label: "Active", tone: "success" },
+  PENDING: { label: "Pending", tone: "warning" },
+  SUSPENDED: { label: "Suspended", tone: "error" },
 };
 
 function isOnline(lastActiveAt: Date | null): boolean {
@@ -90,8 +91,6 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
     return () => document.removeEventListener("mousedown", handleClick);
   }, [onClose]);
 
-  const badge = ROLE_BADGE[member.role as Role] ?? ROLE_BADGE.VIEWER;
-
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
       <div ref={ref} className="w-full max-w-sm rounded-2xl border border-[var(--color-border-default)] bg-white p-6 shadow-2xl">
@@ -123,21 +122,19 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
         <div className="mt-5 space-y-3">
           <div className="flex justify-between text-sm">
             <span style={{ color: "var(--color-text-secondary)" }}>Role</span>
-            <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ backgroundColor: badge.bg, color: badge.color }}>
-              {roleLabel(member.role)}
-            </span>
+            <Pill tone={ROLE_TONE[member.role as Role] ?? "neutral"}>{roleLabel(member.role)}</Pill>
           </div>
           <div className="flex justify-between text-sm">
             <span style={{ color: "var(--color-text-secondary)" }}>Sites Access</span>
-            <span style={{ color: "var(--color-text-primary)" }}>{member.sitesAccess}</span>
+            <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{member.sitesAccess}</MetricValue></span>
           </div>
           <div className="flex justify-between text-sm">
             <span style={{ color: "var(--color-text-secondary)" }}>Last Active</span>
-            <span style={{ color: "var(--color-text-primary)" }}>{relativeTime(member.lastActiveAt)}</span>
+            <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{relativeTime(member.lastActiveAt)}</MetricValue></span>
           </div>
           <div className="flex justify-between text-sm">
             <span style={{ color: "var(--color-text-secondary)" }}>Joined</span>
-            <span style={{ color: "var(--color-text-primary)" }}>{formatDate(member.joinedAt)}</span>
+            <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{formatDate(member.joinedAt)}</MetricValue></span>
           </div>
         </div>
 
@@ -263,8 +260,7 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
           </thead>
           <tbody>
             {sorted.map((member) => {
-              const badge = ROLE_BADGE[member.role as Role] ?? ROLE_BADGE.VIEWER;
-              const statusInfo = STATUS_BADGE[member.status as Status] ?? STATUS_BADGE.ACTIVE;
+              const statusInfo = STATUS_TONE[member.status as Status] ?? STATUS_TONE.ACTIVE;
               const isCurrentUser = member.userId === currentUserId;
               const isOwner = member.role === "OWNER";
               const online = isOnline(member.lastActiveAt);
@@ -306,16 +302,8 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
                           <span className="font-medium" style={{ color: "var(--color-text-primary)" }}>
                             {member.fullName}
                           </span>
-                          {isOwner && (
-                            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}>
-                              Owner
-                            </span>
-                          )}
-                          {isCurrentUser && (
-                            <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "#F3F4F6", color: "var(--color-text-secondary)" }}>
-                              You
-                            </span>
-                          )}
+                          {isOwner && <Pill tone="accent">Owner</Pill>}
+                          {isCurrentUser && <Pill tone="neutral">You</Pill>}
                         </div>
                         <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
                           {member.email}
@@ -324,30 +312,16 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className="rounded-full px-2.5 py-1 text-xs font-semibold"
-                      style={{ backgroundColor: badge.bg, color: badge.color }}
-                    >
-                      {roleLabel(member.role)}
-                    </span>
+                    <Pill tone={ROLE_TONE[member.role as Role] ?? "neutral"}>{roleLabel(member.role)}</Pill>
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className="flex items-center gap-1.5 text-xs font-medium"
-                      style={{ color: statusInfo.color }}
-                    >
-                      <span
-                        className="inline-block h-1.5 w-1.5 rounded-full"
-                        style={{ backgroundColor: statusInfo.color }}
-                      />
-                      {statusInfo.label}
-                    </span>
+                    <Pill tone={statusInfo.tone}>{statusInfo.label}</Pill>
                   </td>
                   <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    {relativeTime(member.lastActiveAt)}
+                    <MetricValue>{relativeTime(member.lastActiveAt)}</MetricValue>
                   </td>
                   <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    {member.sitesAccess}
+                    <MetricValue>{member.sitesAccess}</MetricValue>
                   </td>
                   <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                     <MemberActions

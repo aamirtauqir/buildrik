@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Copy, Eye, Trash2, Plus, Lock, Calendar, QrCode } from "lucide-react";
+import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 interface ShareLinkEntry { id: string; name: string; token: string; viewCount: number; isActive: boolean; expiresAt: Date | null; passwordHash: string | null; createdAt: Date; }
 
@@ -104,11 +105,12 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Share Links</h3>
+      <SectionCard
+        title="Share Links"
+        actions={
           <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}><Plus className="h-3 w-3" />New Link</button>
-        </div>
+        }
+      >
         <p className="mb-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
           Share links control who you hand the URL to. To actually restrict who can
           open a published site, set a published-site password in Settings — that is
@@ -167,10 +169,10 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                     <div>
                       <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{link.name}</p>
                       <div className="mt-1 flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                        <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{link.viewCount} views</span>
+                        <span className="flex items-center gap-1"><Eye className="h-3 w-3" /><MetricValue>{link.viewCount}</MetricValue> views</span>
                         {link.passwordHash && <span className="flex items-center gap-1"><Lock className="h-3 w-3" />Password</span>}
-                        {link.expiresAt && <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />Expires {new Date(link.expiresAt).toLocaleDateString()}</span>}
-                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Created {new Date(link.createdAt).toLocaleDateString()}</span>
+                        {link.expiresAt && <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />Expires <MetricValue>{new Date(link.expiresAt).toLocaleDateString()}</MetricValue></span>}
+                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Created <MetricValue>{new Date(link.createdAt).toLocaleDateString()}</MetricValue></span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
@@ -190,7 +192,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
             })}
           </div>
         )}
-      </div>
+      </SectionCard>
     </div>
   );
 }

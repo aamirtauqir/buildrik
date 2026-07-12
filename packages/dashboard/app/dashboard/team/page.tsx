@@ -4,13 +4,15 @@ import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { TeamStatCards } from "@/components/team/stat-cards";
 import { MembersTable } from "@/components/team/members-table";
 import { InviteModal } from "@/components/team/invite-modal";
 import { PendingInvites } from "@/components/team/pending-invites";
 import { TeamEmptyState } from "@/components/team/team-empty-state";
 import { ErrorState } from "@/components/states";
+import { PageHeader, StatCard, MetricValue } from "@/components/dashboard/primitives";
 import { UserPlus } from "lucide-react";
+
+const TEAM_DESCRIPTION = "Manage who can access and edit your workspace.";
 
 export default function TeamPage() {
   const { data: session } = useSession();
@@ -100,8 +102,8 @@ export default function TeamPage() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Team</h1>
-        <div className="mt-6 grid grid-cols-3 gap-4">
+        <PageHeader title="Team" description={TEAM_DESCRIPTION} />
+        <div className="grid grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
@@ -115,44 +117,48 @@ export default function TeamPage() {
   if (isError) {
     return (
       <div>
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Team</h1>
-        <div className="mt-6">
-          <ErrorState
-            title="Couldn't load your team"
-            description="Something went wrong on our end."
-            onRetry={() => {
-              statsQuery.refetch();
-              membersQuery.refetch();
-            }}
-          />
-        </div>
+        <PageHeader title="Team" description={TEAM_DESCRIPTION} />
+        <ErrorState
+          title="Couldn't load your team"
+          description="Something went wrong on our end."
+          onRetry={() => {
+            statsQuery.refetch();
+            membersQuery.refetch();
+          }}
+        />
       </div>
     );
   }
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Team</h1>
-        <button
-          onClick={() => setInviteOpen(true)}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
-          style={{ backgroundColor: "var(--color-primary)" }}
-        >
-          <UserPlus className="h-4 w-4" />
-          Invite Member
-        </button>
-      </div>
+      <PageHeader
+        title="Team"
+        description={TEAM_DESCRIPTION}
+        actions={
+          <button
+            onClick={() => setInviteOpen(true)}
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            <UserPlus className="h-4 w-4" />
+            Invite Member
+          </button>
+        }
+      />
 
       {isEmpty ? (
-        <div className="mt-8">
-          <TeamEmptyState onInvite={() => setInviteOpen(true)} />
-        </div>
+        <TeamEmptyState onInvite={() => setInviteOpen(true)} />
       ) : (
-        <div className="mt-6 space-y-8">
+        <div className="space-y-8">
           {/* Stats */}
-          {statsQuery.data && <TeamStatCards {...statsQuery.data} />}
+          {statsQuery.data && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <StatCard label="Total Members" value={<MetricValue>{statsQuery.data.total}</MetricValue>} />
+              <StatCard label="Active" value={<MetricValue>{statsQuery.data.active}</MetricValue>} />
+              <StatCard label="Pending Invitations" value={<MetricValue>{statsQuery.data.pending}</MetricValue>} />
+            </div>
+          )}
 
           {/* Members Table */}
           {membersQuery.data && (

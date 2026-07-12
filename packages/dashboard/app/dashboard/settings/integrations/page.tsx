@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { IntegrationsTab } from "@/components/settings/integrations-tab";
+import { SectionCard, Pill } from "@/components/dashboard/primitives";
 
 function VercelIntegrationSection({ workspaceId }: { workspaceId: string }) {
   const { addToast } = useToast();
@@ -36,49 +37,39 @@ function VercelIntegrationSection({ workspaceId }: { workspaceId: string }) {
   };
 
   return (
-    <section className="rounded-xl border border-neutral-200 p-4">
-      {oauthError === "oauth_state_invalid" && (
+    <SectionCard title="Vercel" description="Deploy your sites to Vercel. Connect once per workspace.">
+      {(oauthError === "oauth_state_invalid" || oauthError === "oauth_denied") && (
         <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-          OAuth session expired. Click Connect to retry.
-        </div>
-      )}
-      {oauthError === "oauth_denied" && (
-        <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-          Vercel didn&apos;t authorize the connection. Try again or check your Vercel account.
+          {oauthError === "oauth_state_invalid"
+            ? "OAuth session expired. Click Connect to retry."
+            : "Vercel didn't authorize the connection. Try again or check your Vercel account."}
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-semibold">Vercel</h2>
-          <p className="mt-1 text-sm text-neutral-600">
-            Deploy your sites to Vercel. Connect once per workspace.
-          </p>
-        </div>
-
+      <div className="flex items-center justify-end">
         {conn.isLoading ? (
-          <div className="h-8 w-28 animate-pulse rounded-md bg-neutral-100" />
+          <div className="h-8 w-28 animate-pulse rounded-md" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         ) : conn.data?.connected && conn.data.isActive ? (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-neutral-600">
-              Connected{conn.data.teamId ? ` (team ${conn.data.teamId})` : ""}
-            </span>
+            <Pill tone="success">Connected{conn.data.teamId ? ` · team ${conn.data.teamId}` : ""}</Pill>
             <button
               type="button"
               onClick={() => disconnect.mutate({ workspaceId })}
               disabled={disconnect.isPending}
-              className="rounded-md border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+              className="rounded-md border px-3 py-1.5 text-sm hover:bg-neutral-50 disabled:opacity-60"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
             >
               {disconnect.isPending ? "Disconnecting…" : "Disconnect"}
             </button>
           </div>
         ) : conn.data?.connected && !conn.data.isActive ? (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-red-600">Connection lost</span>
+            <Pill tone="error">Connection lost</Pill>
             <button
               type="button"
               onClick={handleConnect}
-              className="rounded-md border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50"
+              className="rounded-md border px-3 py-1.5 text-sm hover:bg-neutral-50"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
             >
               Reconnect
             </button>
@@ -87,13 +78,14 @@ function VercelIntegrationSection({ workspaceId }: { workspaceId: string }) {
           <button
             type="button"
             onClick={handleConnect}
-            className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700"
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
+            style={{ backgroundColor: "var(--color-primary)" }}
           >
             Connect Vercel
           </button>
         )}
       </div>
-    </section>
+    </SectionCard>
   );
 }
 

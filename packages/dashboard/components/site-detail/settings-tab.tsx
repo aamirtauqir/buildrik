@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
+import { SectionCard } from "@/components/dashboard/primitives";
 
 const SOCIAL_PLATFORMS = ["twitter", "instagram", "linkedin", "youtube", "github"] as const;
 type SocialPlatform = (typeof SOCIAL_PLATFORMS)[number];
@@ -146,84 +147,88 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
 
   return (
     <div className="space-y-6">
-      <Section title="General">
-        <Field label="Site Name" hint="This appears in browser tabs and search results">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border px-3 py-2 text-sm"
-            style={{ borderColor: "var(--color-border-default)" }}
-          />
-        </Field>
-        <Field label="Slug" hint={`${slug}.buildrik.app`}>
-          <input
-            type="text"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            className="w-full rounded-lg border px-3 py-2 text-sm"
-            style={{ borderColor: "var(--color-border-default)" }}
-          />
-        </Field>
-      </Section>
+      <SectionCard title="General">
+        <div className="space-y-4">
+          <Field label="Site Name" hint="This appears in browser tabs and search results">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              style={{ borderColor: "var(--color-border-default)" }}
+            />
+          </Field>
+          <Field label="Slug" hint={`${slug}.buildrik.app`}>
+            <input
+              type="text"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-sm"
+              style={{ borderColor: "var(--color-border-default)" }}
+            />
+          </Field>
+        </div>
+      </SectionCard>
 
-      <Section title="Favicon & Icons">
-        <Field label="Favicon" hint="ICO, PNG, or SVG. Max 500KB.">
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => faviconInputRef.current?.click()}
-              className="rounded-lg border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-            >
-              Upload Favicon
-            </button>
-            <input
-              ref={faviconInputRef}
-              type="file"
-              accept=".ico,.png,.svg"
-              onChange={handleFaviconChange}
-              className="hidden"
-            />
-            {faviconPreview && (
-              <div className="flex items-center gap-3">
-                <img src={faviconPreview} alt="Favicon 16px" className="rounded" style={{ width: 16, height: 16 }} />
-                <img src={faviconPreview} alt="Favicon 32px" className="rounded" style={{ width: 32, height: 32 }} />
-                <img src={faviconPreview} alt="Favicon 64px" className="rounded" style={{ width: 64, height: 64 }} />
-              </div>
-            )}
-          </div>
-        </Field>
-        <Field label="Touch Icon (180x180 PNG)" hint="Auto-generated from favicon if not set">
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => touchIconInputRef.current?.click()}
-              className="rounded-lg border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-            >
-              Upload Touch Icon
-            </button>
-            <input
-              ref={touchIconInputRef}
-              type="file"
-              accept=".png"
-              onChange={handleTouchIconChange}
-              className="hidden"
-            />
-            {touchIconPreview && (
-              <img
-                src={touchIconPreview}
-                alt="Touch icon preview"
-                className="rounded-lg"
-                style={{ width: 60, height: 60 }}
+      <SectionCard title="Favicon & Icons">
+        <div className="space-y-4">
+          <Field label="Favicon" hint="ICO, PNG, or SVG. Max 500KB.">
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => faviconInputRef.current?.click()}
+                className="rounded-lg border px-4 py-2 text-sm font-medium"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              >
+                Upload Favicon
+              </button>
+              <input
+                ref={faviconInputRef}
+                type="file"
+                accept=".ico,.png,.svg"
+                onChange={handleFaviconChange}
+                className="hidden"
               />
-            )}
-          </div>
-        </Field>
-      </Section>
+              {faviconPreview && (
+                <div className="flex items-center gap-3">
+                  <img src={faviconPreview} alt="Favicon 16px" className="rounded" style={{ width: 16, height: 16 }} />
+                  <img src={faviconPreview} alt="Favicon 32px" className="rounded" style={{ width: 32, height: 32 }} />
+                  <img src={faviconPreview} alt="Favicon 64px" className="rounded" style={{ width: 64, height: 64 }} />
+                </div>
+              )}
+            </div>
+          </Field>
+          <Field label="Touch Icon (180x180 PNG)" hint="Auto-generated from favicon if not set">
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => touchIconInputRef.current?.click()}
+                className="rounded-lg border px-4 py-2 text-sm font-medium"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              >
+                Upload Touch Icon
+              </button>
+              <input
+                ref={touchIconInputRef}
+                type="file"
+                accept=".png"
+                onChange={handleTouchIconChange}
+                className="hidden"
+              />
+              {touchIconPreview && (
+                <img
+                  src={touchIconPreview}
+                  alt="Touch icon preview"
+                  className="rounded-lg"
+                  style={{ width: 60, height: 60 }}
+                />
+              )}
+            </div>
+          </Field>
+        </div>
+      </SectionCard>
 
-      <Section title="Site Password">
+      <SectionCard title="Site Password">
         <ProGate isPro={isPro}>
           <div className="flex items-center gap-3">
             <button
@@ -259,9 +264,9 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
             </div>
           )}
         </ProGate>
-      </Section>
+      </SectionCard>
 
-      <Section title="Custom Code">
+      <SectionCard title="Custom Code">
         <ProGate isPro={isPro}>
           <Field label="Head Code" hint="Injected before </head>. Max 10KB.">
             <textarea
@@ -290,9 +295,9 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
             />
           </Field>
         </ProGate>
-      </Section>
+      </SectionCard>
 
-      <Section title="Social Links">
+      <SectionCard title="Social Links">
         <div className="space-y-3">
           {visiblePlatforms.map((platform) => (
             <div key={platform} className="flex items-center gap-2">
@@ -328,7 +333,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
             </button>
           )}
         </div>
-      </Section>
+      </SectionCard>
 
       <button
         onClick={handleSave}
@@ -337,17 +342,6 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
       >
         Save Changes
       </button>
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-      <h3 className="mb-4 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-        {title}
-      </h3>
-      <div className="space-y-4">{children}</div>
     </div>
   );
 }

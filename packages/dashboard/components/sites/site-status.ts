@@ -1,11 +1,13 @@
-// SSOT for site-status badge colors. Consumed by site-card-full, site-list-view,
-// and site-detail/site-header — previously duplicated in all three.
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  PUBLISHED: { bg: "#DCFCE7", text: "#166534" },
-  DRAFT: { bg: "#FEF9C3", text: "#854D0E" },
-  ARCHIVED: { bg: "#FED7AA", text: "#9A3412" },
+import type { PillTone } from "@/components/dashboard/primitives";
+
+// SSOT: site status → shared Pill tone. Consumed by site cards, list rows, and
+// the site-detail header — all render status via the Pill primitive.
+const STATUS_TONES: Record<string, PillTone> = {
+  PUBLISHED: "success",
+  DRAFT: "warning",
+  ARCHIVED: "neutral",
 };
 
-export function siteStatusColor(status: string): { bg: string; text: string } {
-  return STATUS_COLORS[status] ?? STATUS_COLORS.DRAFT;
+export function siteStatusTone(status: string): PillTone {
+  return STATUS_TONES[status] ?? "warning";
 }

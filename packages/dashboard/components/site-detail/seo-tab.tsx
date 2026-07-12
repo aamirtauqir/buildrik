@@ -6,6 +6,7 @@ import { Pencil } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+import { SectionCard } from "@/components/dashboard/primitives";
 
 /**
  * SEO content (meta title/description, social image) has ONE edit home: the
@@ -54,29 +55,29 @@ export function SeoTab({ site }: SeoTabProps) {
         </Link>
       </div>
 
-      <Section title="Google Search Preview">
+      <SectionCard title="Google Search Preview">
         <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           <p className="text-sm" style={{ color: "#1a0dab" }}>{metaTitle || "Page Title"}</p>
           <p className="text-xs" style={{ color: "#006621" }}>{siteSlug}.buildrik.app</p>
           <p className="text-xs" style={{ color: "#545454" }}>{metaDesc || "No description set"}</p>
         </div>
-      </Section>
+      </SectionCard>
 
-      <Section title="Current Meta Tags">
+      <SectionCard title="Current Meta Tags">
         <dl className="space-y-3 text-sm">
           <Row label="Meta title" value={metaTitle} empty="Not set" />
           <Row label="Meta description" value={metaDesc} empty="Not set" />
           <Row label="Title template" value={site.metaTitleTemplate ?? ""} empty="{page_title} | {site_name}" />
         </dl>
-      </Section>
+      </SectionCard>
 
       {ogImage && (
-        <Section title="Social Share Image (og:image)">
+        <SectionCard title="Social Share Image (og:image)">
           <div className="space-y-3">
             <SocialCardPreview title={metaTitle} description={metaDesc} slug={siteSlug} imageUrl={ogImage} variant="twitter" />
             <SocialCardPreview title={metaTitle} description={metaDesc} slug={siteSlug} imageUrl={ogImage} variant="facebook" />
           </div>
-        </Section>
+        </SectionCard>
       )}
 
       {site.id && <TechnicalSeoSection siteId={site.id} />}
@@ -113,7 +114,7 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
   });
 
   return (
-    <Section title="Technical SEO">
+    <SectionCard title="Technical SEO">
       {settings.isLoading ? (
         <div className="h-40 animate-pulse rounded-lg bg-neutral-100" />
       ) : (
@@ -172,7 +173,7 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
           </div>
         </div>
       )}
-    </Section>
+    </SectionCard>
   );
 }
 
@@ -183,15 +184,6 @@ function Row({ label, value, empty }: { label: string; value: string; empty: str
       <dd className="text-right" style={{ color: value ? "var(--color-text-primary)" : "var(--color-text-muted)" }}>
         {value || empty}
       </dd>
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-      <h3 className="mb-4 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{title}</h3>
-      {children}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SectionCard, ProgressBar, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 
 interface GenerationRecord {
   id: string;
@@ -23,20 +24,14 @@ const COMING_SOON_TOOLS = [
   { name: "SEO Optimization", description: "Auto-optimize meta tags, alt text, and content for search" },
 ];
 
-const STATUS_MAP: Record<string, { bg: string; color: string; label: string }> = {
-  COMPLETED: { bg: "#dcfce7", color: "#16a34a", label: "Completed" },
-  FAILED: { bg: "#fee2e2", color: "#991b1b", label: "Failed" },
-  QUEUED: { bg: "#fef9c3", color: "#854d0e", label: "In Progress" },
-  PROCESSING: { bg: "#fef9c3", color: "#854d0e", label: "In Progress" },
+const STATUS_MAP: Record<string, { tone: PillTone; label: string }> = {
+  COMPLETED: { tone: "success", label: "Completed" },
+  FAILED: { tone: "error", label: "Failed" },
+  QUEUED: { tone: "warning", label: "In Progress" },
+  PROCESSING: { tone: "warning", label: "In Progress" },
 };
 
-const DEFAULT_STATUS = { bg: "#f3f4f6", color: "#6b7280", label: "Unknown" };
-
-function getBarColor(percent: number): string {
-  if (percent > 85) return "#dc2626";
-  if (percent > 60) return "#ca8a04";
-  return "#16a34a";
-}
+const DEFAULT_STATUS: { tone: PillTone; label: string } = { tone: "neutral", label: "Unknown" };
 
 function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("en-US", {
@@ -56,37 +51,9 @@ export function AICreditsTab({
 
   return (
     <div className="space-y-8">
-      <section>
-        <h2 className="text-base font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
-          AI site generation credits
-        </h2>
-        <div
-          className="p-4 rounded-lg border"
-          style={{ borderColor: "var(--color-border-default)" }}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
-              <span className="font-semibold text-lg">{remaining}</span> remaining this month
-            </p>
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-              {used}/{limit} credits used
-            </p>
-          </div>
-          <div className="h-2.5 w-full rounded-full" style={{ backgroundColor: "var(--color-border-default)" }}>
-            <div
-              className="h-2.5 rounded-full transition-all"
-              style={{
-                width: `${usagePercent}%`,
-                backgroundColor: getBarColor(usagePercent),
-              }}
-            />
-          </div>
-          <p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
-            Credits reset on the 1st of each month.
-          </p>
-        </div>
-
-        <div className="flex justify-end mt-3">
+      <SectionCard
+        title="AI site generation credits"
+        actions={
           <Link
             href="/dashboard/sites/new?method=ai"
             className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white ${
@@ -97,8 +64,21 @@ export function AICreditsTab({
           >
             Generate New Site
           </Link>
+        }
+      >
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+            <MetricValue className="text-lg font-semibold">{remaining}</MetricValue> remaining this month
+          </p>
+          <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
+            <MetricValue>{used}/{limit}</MetricValue> credits used
+          </p>
         </div>
-      </section>
+        <ProgressBar pct={usagePercent} tone="auto" />
+        <p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
+          Credits reset on the 1st of each month.
+        </p>
+      </SectionCard>
 
       <section>
         <h2 className="text-base font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
@@ -144,18 +124,13 @@ export function AICreditsTab({
                 return (
                   <tr key={record.id} style={{ borderBottom: "1px solid var(--color-border-default)" }}>
                     <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
-                      {formatDate(record.createdAt)}
+                      <MetricValue>{formatDate(record.createdAt)}</MetricValue>
                     </td>
                     <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
                       {record.businessType}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className="text-xs font-medium px-2 py-0.5 rounded-full"
-                        style={{ backgroundColor: statusStyle.bg, color: statusStyle.color }}
-                      >
-                        {statusStyle.label}
-                      </span>
+                      <Pill tone={statusStyle.tone}>{statusStyle.label}</Pill>
                     </td>
                     <td className="px-4 py-3">
                       {isComplete && record.siteId ? (
@@ -197,12 +172,7 @@ export function AICreditsTab({
               aria-disabled="true"
             >
               <div className="absolute top-3 right-3">
-                <span
-                  className="text-xs font-medium px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-                >
-                  Coming Soon
-                </span>
+                <Pill tone="neutral">Coming Soon</Pill>
               </div>
               <p className="text-sm font-semibold pr-24" style={{ color: "var(--color-text-primary)" }}>
                 {tool.name}

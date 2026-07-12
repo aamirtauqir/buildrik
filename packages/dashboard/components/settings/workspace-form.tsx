@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
+import { SectionCard } from "@/components/dashboard/primitives";
 
 // Canonical cobalt accent (DESIGN.md). Must be a real hex — the workspace
 // update schema validates accentColor against /^#[0-9A-Fa-f]{6}$/, so the
@@ -153,12 +154,9 @@ export function WorkspaceForm({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
+      <SectionCard title="General">
       <form onSubmit={handleSubmit} className="space-y-5">
-        <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-          General
-        </h2>
-
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
@@ -356,14 +354,10 @@ export function WorkspaceForm({
           </button>
         </div>
       </form>
+      </SectionCard>
 
-      <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
-
+      <SectionCard title="Default sharing settings">
       <form onSubmit={handleSharingSubmit} className="space-y-4">
-        <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-          Default sharing settings
-        </h2>
-
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
@@ -464,6 +458,7 @@ export function WorkspaceForm({
           </button>
         </div>
       </form>
+      </SectionCard>
     </div>
   );
 }

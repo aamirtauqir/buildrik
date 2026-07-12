@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { ArrowLeft, Pencil, Globe, ExternalLink } from "lucide-react";
 import { EditorLink } from "@/components/editor-route/EditorLink";
-import { siteStatusColor } from "@/components/sites/site-status";
+import { siteStatusTone } from "@/components/sites/site-status";
+import { Pill } from "@/components/dashboard/primitives";
 
 interface SiteHeaderProps {
   site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null };
@@ -11,7 +12,6 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
-  const sc = siteStatusColor(site.status);
   return (
     <div>
       <Link href="/dashboard/sites" className="mb-3 inline-flex items-center gap-1 text-sm transition-colors hover:underline" style={{ color: "var(--color-text-secondary)" }}>
@@ -20,7 +20,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>{site.name}</h1>
-          <span className="rounded-full px-2.5 py-0.5 text-xs font-medium" style={{ backgroundColor: sc.bg, color: sc.text }}>{site.status.toLowerCase()}</span>
+          <Pill tone={siteStatusTone(site.status)}>{site.status.toLowerCase()}</Pill>
           {site.publishedUrl && (
             <a href={site.publishedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs hover:underline" style={{ color: "var(--color-text-secondary)" }}>
               <Globe className="h-3 w-3" />{site.slug}.buildrik.app

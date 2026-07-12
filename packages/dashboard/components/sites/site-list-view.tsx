@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { ContextMenu } from "./context-menu";
-import { siteStatusColor } from "./site-status";
+import { siteStatusTone } from "./site-status";
+import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
 interface Site {
   id: string;
@@ -58,16 +59,15 @@ export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSel
         </thead>
         <tbody>
           {sites.map((site) => {
-            const sc = siteStatusColor(site.status);
             return (
               <tr key={site.id} className="border-b transition-colors hover:bg-[var(--color-bg-page)]" style={{ borderColor: "var(--color-border-default)" }}>
                 <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.has(site.id)} onChange={() => {}} className="h-4 w-4 rounded accent-[var(--color-primary)]" onClick={(e) => onSelect(site.id, e)} /></td>
                 <td className="px-4 py-3"><Link href={`/dashboard/sites/${site.id}`} className="font-medium hover:underline" style={{ color: "var(--color-text-primary)" }}>{site.name}</Link><p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p></td>
-                <td className="px-4 py-3"><span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: sc.bg, color: sc.text }}>{site.status.toLowerCase()}</span></td>
-                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>{site.pages}</td>
-                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>{formatVisitors(site.visitors30d)}</td>
+                <td className="px-4 py-3"><Pill tone={siteStatusTone(site.status)}>{site.status.toLowerCase()}</Pill></td>
+                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{site.pages}</MetricValue></td>
+                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{formatVisitors(site.visitors30d)}</MetricValue></td>
                 <td className="px-4 py-3" style={{ color: site.domain ? "var(--color-text-primary)" : "var(--color-text-muted)" }}>{site.domain ?? "--"}</td>
-                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>{getTimeAgo(site.lastEditedAt)}</td>
+                <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{getTimeAgo(site.lastEditedAt)}</MetricValue></td>
                 <td className="px-4 py-3"><ContextMenu siteStatus={site.status} onAction={(action) => onAction(action, site.id)} /></td>
               </tr>
             );

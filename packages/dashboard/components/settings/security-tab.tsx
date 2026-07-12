@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
+import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
 function parseUserAgent(ua: string | null | undefined): string {
   if (!ua) return "Unknown device";
@@ -154,15 +155,9 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span
-              className="text-xs font-medium px-2 py-0.5 rounded-full"
-              style={{
-                backgroundColor: is2FAEnabled ? "#dcfce7" : "#fee2e2",
-                color: is2FAEnabled ? "#16a34a" : "#991b1b",
-              }}
-            >
+            <Pill tone={is2FAEnabled ? "success" : "error"}>
               {is2FAEnabled ? "Enabled" : "Disabled"}
-            </span>
+            </Pill>
             <button
               type="button"
               onClick={is2FAEnabled ? () => setShowDisableModal(true) : handleEnable}
@@ -429,21 +424,14 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                     <td className="px-4 py-3" style={{ color: "var(--color-text-primary)" }}>
                       <div className="flex items-center gap-2">
                         {parseUserAgent(session.device)}
-                        {isCurrent && (
-                          <span
-                            className="text-xs px-1.5 py-0.5 rounded-full font-medium"
-                            style={{ backgroundColor: "var(--color-primary)", color: "#fff" }}
-                          >
-                            Current
-                          </span>
-                        )}
+                        {isCurrent && <Pill tone="accent">Current</Pill>}
                       </div>
                     </td>
                     <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
-                      {session.ip ?? "-"}
+                      <MetricValue>{session.ip ?? "-"}</MetricValue>
                     </td>
                     <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
-                      {new Date(session.createdAt).toLocaleDateString()}
+                      <MetricValue>{new Date(session.createdAt).toLocaleDateString()}</MetricValue>
                     </td>
                     <td className="px-4 py-3 text-right">
                       {!isCurrent && (
@@ -522,21 +510,18 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                 return (
                 <tr key={attempt.id} style={{ borderBottom: "1px solid var(--color-border-default)" }}>
                   <td className="px-4 py-3">
-                    <span
-                      className="inline-flex items-center gap-1 text-xs font-medium"
-                      style={{ color: isSuccess ? "#16a34a" : "#991b1b" }}
-                    >
+                    <Pill tone={isSuccess ? "success" : "error"}>
                       {isSuccess ? "Success" : "Failed"}
-                    </span>
+                    </Pill>
                   </td>
                   <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
                     {parseUserAgent(attempt.userAgent)}
                   </td>
                   <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
-                    {attempt.ipAddress ?? "-"}
+                    <MetricValue>{attempt.ipAddress ?? "-"}</MetricValue>
                   </td>
                   <td className="px-4 py-3" style={{ color: "var(--color-text-secondary)" }}>
-                    {new Date(attempt.createdAt).toLocaleString()}
+                    <MetricValue>{new Date(attempt.createdAt).toLocaleString()}</MetricValue>
                   </td>
                 </tr>
                 );

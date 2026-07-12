@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Globe, Shield, Trash2, Star, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { PaywallModal } from "@/components/billing/paywall-modal";
+import { SectionCard, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 
 interface DnsRecordEntry {
   id?: string;
@@ -40,6 +41,12 @@ const PROVIDER_GUIDES = [
   { name: "Google Domains", url: "https://support.google.com/domains/answer/9211383" },
 ];
 
+const DOMAIN_STATUS_TONE: Record<string, PillTone> = {
+  VERIFIED: "success",
+  PENDING: "warning",
+  FAILED: "error",
+};
+
 export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }: DomainsTabProps) {
   const [newDomain, setNewDomain] = useState("");
   const [expandedSsl, setExpandedSsl] = useState<string | null>(null);
@@ -60,8 +67,7 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
         feature="Connect a custom domain"
         description="Custom domains with automatic SSL are part of Pro. Your site stays live on its buildrik.app address until you upgrade."
       />
-      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-        <h3 className="mb-4 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Connect Domain</h3>
+      <SectionCard title="Connect Domain">
         <div className="flex gap-2">
           <input type="text" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="www.example.com" className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
           <button onClick={handleConnect} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Connect</button>
@@ -76,10 +82,10 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
             ))}
           </div>
         </div>
-      </div>
+      </SectionCard>
 
       {domains.length > 0 && (
-        <div className="rounded-xl border bg-white" style={{ borderColor: "var(--color-border-default)" }}>
+        <SectionCard padding="none">
           <table className="w-full text-sm">
             <thead><tr className="border-b" style={{ borderColor: "var(--color-border-default)" }}>
               <th className="px-5 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Domain</th>
@@ -93,10 +99,10 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2">
                     <Globe className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
-                    {d.domain}
+                    <MetricValue>{d.domain}</MetricValue>
                   </div>
                 </td>
-                <td className="px-5 py-3"><StatusBadge status={d.status} /></td>
+                <td className="px-5 py-3"><Pill tone={DOMAIN_STATUS_TONE[d.status] ?? "warning"}>{d.status.toLowerCase()}</Pill></td>
                 <td className="px-5 py-3">
                   <button
                     onClick={() => setExpandedSsl(expandedSsl === d.id ? null : d.id)}
@@ -116,9 +122,9 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
                 </td>
                 <td className="px-5 py-3">
                   {d.isPrimary ? (
-                    <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#FEF9C3", color: "#854D0E" }}>
+                    <Pill tone="warning">
                       <Star className="h-3 w-3" />Primary
-                    </span>
+                    </Pill>
                   ) : (
                     <button
                       onClick={() => onSetPrimary(d.id)}
@@ -167,18 +173,8 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
               ];
             })}</tbody>
           </table>
-        </div>
+        </SectionCard>
       )}
     </div>
   );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, { bg: string; text: string }> = {
-    VERIFIED: { bg: "#DCFCE7", text: "#166534" },
-    PENDING: { bg: "#FEF9C3", text: "#854D0E" },
-    FAILED: { bg: "#FEF2F2", text: "#991B1B" },
-  };
-  const c = colors[status] ?? colors.PENDING;
-  return <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: c.bg, color: c.text }}>{status.toLowerCase()}</span>;
 }

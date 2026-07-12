@@ -1,6 +1,7 @@
 "use client";
 
 import { BarChart3 } from "lucide-react";
+import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 export const DATE_RANGE_OPTIONS = [
   { value: "today", label: "Today" },
@@ -62,14 +63,13 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       {!isLoading && data && data.timeSeries.length > 0 && (
         <>
           {/* Chart placeholder */}
-          <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Traffic Overview</h3>
-            <div className="mt-4 flex h-48 items-end gap-1">
+          <SectionCard title="Traffic Overview">
+            <div className="flex h-48 items-end gap-1">
               {data.timeSeries.map((d, i) => (
                 <div key={i} className="flex-1 rounded-t" style={{ height: `${Math.max(10, (d.visitors / Math.max(...data.timeSeries.map((t) => t.visitors), 1)) * 100)}%`, backgroundColor: "var(--color-primary)", opacity: 0.7 }} title={`${d.date}: ${d.visitors} visitors`} />
               ))}
             </div>
-          </div>
+          </SectionCard>
 
           {/* Traffic Sources + Countries */}
           {(() => {
@@ -79,36 +79,33 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
             return (
               <>
                 <div className="grid grid-cols-2 gap-6">
-                  <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-                    <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Traffic Sources</h3>
+                  <SectionCard title="Traffic Sources">
                     {data.trafficSources.map((s) => (
                       <div key={s.source} className="flex items-center justify-between py-2">
                         <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{s.source}</span>
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{pct(s.count, sourceTotal)}%</span>
+                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{pct(s.count, sourceTotal)}</MetricValue>%</span>
                       </div>
                     ))}
-                  </div>
-                  <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-                    <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Top Countries</h3>
+                  </SectionCard>
+                  <SectionCard title="Top Countries">
                     {data.countries.map((c) => (
                       <div key={c.country} className="flex items-center justify-between py-2">
                         <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{c.country}</span>
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{c.count} ({pct(c.count, countryTotal)}%)</span>
+                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{c.count}</MetricValue> (<MetricValue>{pct(c.count, countryTotal)}</MetricValue>%)</span>
                       </div>
                     ))}
-                  </div>
+                  </SectionCard>
                 </div>
                 {/* Devices — returned by the service but previously never rendered. */}
                 {data.devices && data.devices.length > 0 && (
-                  <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-                    <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Devices</h3>
+                  <SectionCard title="Devices">
                     {data.devices.map((d) => (
                       <div key={d.device} className="flex items-center justify-between py-2">
                         <span className="text-sm capitalize" style={{ color: "var(--color-text-primary)" }}>{d.device}</span>
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{d.count} ({pct(d.count, deviceTotal)}%)</span>
+                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{d.count}</MetricValue> (<MetricValue>{pct(d.count, deviceTotal)}</MetricValue>%)</span>
                       </div>
                     ))}
-                  </div>
+                  </SectionCard>
                 )}
               </>
             );

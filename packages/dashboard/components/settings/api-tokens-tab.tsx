@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Key, Plus, Copy, Check, Trash2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
 const SCOPE_LABELS: Record<string, string> = {
   "sites:read": "Read sites",
@@ -121,19 +122,19 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
                   <tr key={t.id} className="border-b last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
                     <td className="px-4 py-3 font-medium" style={{ color: "var(--color-text-primary)" }}>
                       {t.name}
-                      {revoked && <span className="ml-2 rounded bg-red-50 px-1.5 py-0.5 text-xs text-red-600">revoked</span>}
-                      {!revoked && expired && <span className="ml-2 rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-700">expired</span>}
+                      {revoked && <Pill tone="error" className="ml-2">revoked</Pill>}
+                      {!revoked && expired && <Pill tone="warning" className="ml-2">expired</Pill>}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-neutral-500">{t.prefix}…</td>
+                    <td className="px-4 py-3 text-xs text-neutral-500"><MetricValue>{t.prefix}…</MetricValue></td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {(t.scopes as string[]).map((s) => (
-                          <span key={s} className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-600">{s}</span>
+                          <Pill key={s} tone="neutral">{s}</Pill>
                         ))}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-neutral-500">{relativeTime(t.lastUsedAt)}</td>
-                    <td className="px-4 py-3 text-neutral-500">{t.expiresAt ? relativeTime(t.expiresAt).replace(" ago", "") : "never"}</td>
+                    <td className="px-4 py-3 text-neutral-500"><MetricValue>{relativeTime(t.lastUsedAt)}</MetricValue></td>
+                    <td className="px-4 py-3 text-neutral-500"><MetricValue>{t.expiresAt ? relativeTime(t.expiresAt).replace(" ago", "") : "never"}</MetricValue></td>
                     <td className="px-4 py-3 text-right">
                       {revoked ? (
                         <button

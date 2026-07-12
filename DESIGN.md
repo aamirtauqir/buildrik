@@ -55,6 +55,18 @@ The **`app/onboarding/**` wizard** (post-verification setup: workspace → first
 - Full token set: `--color-onb-*` + `--radius-onb` / `--spacing-onb-*` / `--container-onb` / `--text-onb-*` in `app/globals.css`. Inter type scale (titles 26/700).
 - Scoped to `app/onboarding/` only. Do not spread `#2563EB` past it. Editor, auth, and the dashboard proper are all cobalt `#2D6DFF`.
 
+## Dashboard Shell + Design System (2026-07-12)
+
+The dashboard is built as ONE system, not per-screen markup. Enforced by a shell + a primitive layer + a token contract (see `packages/dashboard/components/dashboard/shell/`, `…/primitives/`, `app/globals.css`).
+
+**Two-level shell** (`DashboardShell`):
+- **Top nav** (full-width, `--topnav-h: 52px`): brand · the four product areas `Dashboard · Marketplace · Learn · Resources` · ⌘K search · notifications · help · workspace switcher (`Plan · N seats` in mono) · account. These four areas live ONLY in the top nav.
+- **Sidebar** (`--sidebar-w: 262px`, below the top nav): workspace/operational destinations only (Home, All projects, Sites, Media, Getting started, Agency group, Extend = Apps/Libraries, Workspace = Team/Billing/Plans/Usage/Domains/Settings/Help). Never repeats the top-nav areas.
+
+**Token contract** (`globals.css @theme`): radius scale `--radius-xs 4 / sm 6 / md 8 / lg 10 / xl 12 / pill`; `--font-mono` Geist Mono for all data (counts, $, sizes, seats, dates) with `tabular-nums`; named text tokens `--text-page-title 22 / section 15 / eyebrow 11 / metric 24 / body 13`. No arbitrary `text-[22px]` or freehand `rounded-*` in new work.
+
+**Primitives** (`components/dashboard/primitives/`, use these — do NOT hand-roll): `PageHeader`, `SectionCard`, `StatCard` (+ `visual`/`href`), `DataTable`, `Pill` (tones neutral/success/warning/error/accent), `ProgressBar`, `MetricValue`. Screens compose primitives; they don't style surfaces directly. Data-viz helpers (donut/sparkline/avatars) live in `dataviz.tsx`.
+
 ## Aesthetic Direction
 - **Direction:** Industrial / Utilitarian, **light chrome**. Premium tool, not premium marketing. "Webflow meets Linear, daylight edition."
 - **Decoration level:** Minimal. Surfaces communicate depth through layered warm neutrals and hairline borders. No gradients, no blobs, no grain, no decorative texture, no shadows beyond subtle elevation on modals.

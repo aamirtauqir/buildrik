@@ -25,6 +25,7 @@ import {
   SubmissionDrawer,
   type FormSubmissionData,
 } from "@/components/site-detail/submission-drawer";
+import { StatCard, SectionCard, MetricValue, Pill } from "@/components/dashboard/primitives";
 
 export const HEALTH_METRICS = [
   { label: "SEO", key: "seo" as const, icon: Search, tab: "settings" },
@@ -203,46 +204,51 @@ export function OverviewTab({
     <div className="space-y-8">
       {/* Stat Cards */}
       <div className="grid grid-cols-3 gap-4">
-        <StatBox
+        <StatCard
           icon={<FileText className="h-5 w-5" />}
           label="Total Pages"
-          value={String(stats.totalPages)}
-          subtitle={stats.totalPages > 0 ? `${stats.totalPages} page${stats.totalPages === 1 ? "" : "s"} total` : undefined}
+          value={<MetricValue>{stats.totalPages}</MetricValue>}
+          delta={stats.totalPages > 0 ? `${stats.totalPages} page${stats.totalPages === 1 ? "" : "s"} total` : undefined}
         />
-        <StatBox
+        <StatCard
           icon={<Eye className="h-5 w-5" />}
           label="Monthly Visitors"
-          value={formatNumber(stats.monthlyVisitors)}
-          trend={stats.visitorsChange}
+          value={<MetricValue>{formatNumber(stats.monthlyVisitors)}</MetricValue>}
+          delta={
+            <span style={{ color: stats.visitorsChange >= 0 ? "var(--color-success)" : "var(--color-primary)" }}>
+              {stats.visitorsChange >= 0 ? "\u2191" : "\u2193"} <MetricValue>{Math.abs(stats.visitorsChange)}%</MetricValue>
+            </span>
+          }
         />
-        <StatBox
+        <StatCard
           icon={<Calendar className="h-5 w-5" />}
           label="Last Published"
-          value={lastPublishedAt ? timeAgo(lastPublishedAt) : "Never"}
-          subtitle={lastPublishedBy ? `by ${lastPublishedBy}` : undefined}
+          value={<MetricValue>{lastPublishedAt ? timeAgo(lastPublishedAt) : "Never"}</MetricValue>}
+          delta={lastPublishedBy ? `by ${lastPublishedBy}` : undefined}
         />
-        <StatBox
+        <StatCard
           icon={<Users className="h-5 w-5" />}
           label="Team Members"
-          value={String(stats.teamMembers)}
-          link={{ label: "Manage \u2192", href: `/dashboard/sites/${siteId}/settings` }}
+          value={<MetricValue>{stats.teamMembers}</MetricValue>}
+          href={`/dashboard/sites/${siteId}/settings`}
+          delta={"Manage \u2192"}
         />
-        <StatBox
+        <StatCard
           icon={<MessageSquare className="h-5 w-5" />}
           label="Form Submissions"
-          value={`${stats.formSubmissions} this month`}
-          badge={stats.unreadSubmissions > 0 ? `${stats.unreadSubmissions} unread` : undefined}
+          mono={false}
+          value={<><MetricValue>{stats.formSubmissions}</MetricValue> this month</>}
+          delta={stats.unreadSubmissions > 0 ? <Pill tone="accent"><MetricValue>{stats.unreadSubmissions}</MetricValue> unread</Pill> : undefined}
         />
-        <StatBox
+        <StatCard
           icon={<Heart className="h-5 w-5" />}
           label="Site Health"
-          value={`${stats.healthScore}/100`}
-          valueColor={healthColor}
+          value={<span style={{ color: healthColor }}><MetricValue>{stats.healthScore}</MetricValue>/100</span>}
         />
       </div>
 
       {/* Health Score Expandable Panel */}
-      <div className="rounded-xl border bg-white" style={{ borderColor: "var(--color-border-default)" }}>
+      <SectionCard padding="none">
         <button
           onClick={() => setHealthExpanded(!healthExpanded)}
           className="flex w-full items-center justify-between p-5"
@@ -301,18 +307,15 @@ export function OverviewTab({
             </div>
           </div>
         )}
-      </div>
+      </SectionCard>
 
       {/* Form Submissions Section */}
       {formBlocks.length > 0 && (
-        <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Form Blocks</h3>
-            {/* "View All Submissions" / "View details" links removed — there is
-                no dashboard submissions route (they 404'd). The per-form
-                submission counts below remain the live, accurate signal. */}
-          </div>
-          <div className="mt-3 space-y-2">
+        <SectionCard title="Form Blocks">
+          {/* "View All Submissions" / "View details" links removed — there is
+              no dashboard submissions route (they 404'd). The per-form
+              submission counts below remain the live, accurate signal. */}
+          <div className="space-y-2">
             {formBlocks.map((fb) => (
               <div key={fb.id} className="rounded-lg border" style={{ borderColor: "var(--color-bg-subtle)" }}>
                 <button
@@ -325,7 +328,7 @@ export function OverviewTab({
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                      {fb._count.submissions} submission{fb._count.submissions === 1 ? "" : "s"}
+                      <MetricValue>{fb._count.submissions}</MetricValue> submission{fb._count.submissions === 1 ? "" : "s"}
                     </span>
                     {expandedFormId === fb.id ? (
                       <ChevronDown className="h-3.5 w-3.5" style={{ color: "var(--color-text-secondary)" }} />
@@ -340,7 +343,7 @@ export function OverviewTab({
                       <p className="py-2 text-xs" style={{ color: "var(--color-text-muted)" }}>No submissions yet.</p>
                     ) : (
                       <p className="py-2 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                        {fb._count.submissions} total submission{fb._count.submissions === 1 ? "" : "s"}.
+                        <MetricValue>{fb._count.submissions}</MetricValue> total submission{fb._count.submissions === 1 ? "" : "s"}.
                       </p>
                     )}
                   </div>
@@ -348,15 +351,16 @@ export function OverviewTab({
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
       )}
 
       {/* Submissions Table */}
       {formBlocks.length > 0 && (
-        <div className="rounded-xl border bg-white" style={{ borderColor: "var(--color-border-default)" }}>
-          <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: "var(--color-border-default)" }}>
-            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>All Submissions</h3>
-            <div className="flex items-center gap-3">
+        <SectionCard
+          title="All Submissions"
+          padding="none"
+          actions={
+            <>
               <select
                 value={filterFormBlockId ?? ""}
                 onChange={(e) => {
@@ -380,9 +384,9 @@ export function OverviewTab({
                 <Download className="h-3.5 w-3.5" />
                 {exporting ? "Exporting…" : "Export CSV"}
               </button>
-            </div>
-          </div>
-
+            </>
+          }
+        >
           {submissionsQuery.isLoading ? (
             <div className="px-5 py-8">
               <div className="space-y-3">
@@ -419,12 +423,14 @@ export function OverviewTab({
                           style={{ borderColor: "var(--color-bg-subtle)" }}
                         >
                           <td className="whitespace-nowrap px-5 py-3 text-xs" style={{ color: "var(--color-text-primary)" }}>
-                            {new Date(s.createdAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            <MetricValue>
+                              {new Date(s.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </MetricValue>
                           </td>
                           <td className="px-5 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
                             {s.formBlock?.name ?? "Unknown"}
@@ -466,8 +472,8 @@ export function OverviewTab({
                   style={{ borderColor: "var(--color-border-default)" }}
                 >
                   <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    Page {submissionsQuery.data.page} of {Math.ceil(submissionsQuery.data.total / 20)}
-                    {" "}({submissionsQuery.data.total} total)
+                    Page <MetricValue>{submissionsQuery.data.page}</MetricValue> of <MetricValue>{Math.ceil(submissionsQuery.data.total / 20)}</MetricValue>
+                    {" "}(<MetricValue>{submissionsQuery.data.total}</MetricValue> total)
                   </p>
                   <div className="flex items-center gap-2">
                     <button
@@ -495,7 +501,7 @@ export function OverviewTab({
               <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>No submissions found.</p>
             </div>
           )}
-        </div>
+        </SectionCard>
       )}
 
       {/* Submission Drawer */}
@@ -511,24 +517,23 @@ export function OverviewTab({
       />
 
       {/* Recent Activity */}
-      <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-        <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Recent Activity</h3>
+      <SectionCard title="Recent Activity">
         {activity.length === 0 ? (
-          <p className="mt-3 text-sm" style={{ color: "var(--color-text-muted)" }}>No activity yet. Start editing to see updates here.</p>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>No activity yet. Start editing to see updates here.</p>
         ) : (
-          <div className="mt-3 space-y-3">
+          <div className="space-y-3">
             {activity.map((a) => (
               <div key={a.id} className="flex items-start gap-2">
                 <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "var(--color-primary)" }} />
                 <div>
                   <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>{a.description ?? a.action}</p>
-                  <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{timeAgo(a.createdAt)}</p>
+                  <p className="text-xs" style={{ color: "var(--color-text-muted)" }}><MetricValue>{timeAgo(a.createdAt)}</MetricValue></p>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </SectionCard>
     </div>
   );
 }
@@ -563,55 +568,6 @@ function OverviewSkeleton() {
           ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-function StatBox({
-  icon,
-  label,
-  value,
-  trend,
-  badge,
-  link,
-  subtitle,
-  valueColor,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  trend?: number;
-  badge?: string;
-  link?: { label: string; href: string };
-  subtitle?: string;
-  valueColor?: string;
-}) {
-  return (
-    <div className="rounded-xl border bg-white p-4" style={{ borderColor: "var(--color-border-default)" }}>
-      <div className="flex items-center gap-2" style={{ color: "var(--color-text-secondary)" }}>
-        {icon}
-        <span className="text-xs font-medium">{label}</span>
-      </div>
-      <p className="mt-2 text-xl font-bold" style={{ color: valueColor ?? "var(--color-text-primary)" }}>{value}</p>
-      {subtitle && <p className="mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>{subtitle}</p>}
-      {trend !== undefined && (
-        <p className="mt-1 text-xs font-medium" style={{ color: trend >= 0 ? "var(--color-success)" : "var(--color-primary)" }}>
-          {trend >= 0 ? "\u2191" : "\u2193"} {Math.abs(trend)}%
-        </p>
-      )}
-      {badge && (
-        <span
-          className="mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium"
-          style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
-        >
-          {badge}
-        </span>
-      )}
-      {link && (
-        <Link href={link.href} className="mt-1 block text-xs font-medium" style={{ color: "var(--color-primary)" }}>
-          {link.label}
-        </Link>
-      )}
     </div>
   );
 }
