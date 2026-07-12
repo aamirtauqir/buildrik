@@ -33,12 +33,7 @@ export function ReviewQueue() {
 
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Reviews</h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Sites your content editors have submitted for review.
-        </p>
-      </header>
+      <h2 className="mb-4 text-section-title" style={{ color: "var(--color-text-primary)" }}>Review queue</h2>
 
       {reviewsQuery.isLoading ? (
         <LoadingSkeleton rows={3} variant="list" />

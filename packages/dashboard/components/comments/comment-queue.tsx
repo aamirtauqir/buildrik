@@ -37,12 +37,7 @@ export function CommentQueue() {
 
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Comments</h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Change-requests your clients pinned on their site previews.
-        </p>
-      </header>
+      <h2 className="mb-4 text-section-title" style={{ color: "var(--color-text-primary)" }}>Latest comments</h2>
 
       {!forbidden && (
         <div className="mb-4 flex gap-1 border-b" style={{ borderColor: "var(--color-border-default)" }}>
