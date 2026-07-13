@@ -80,6 +80,8 @@ export default function SitesPage() {
     id: string;
     name: string;
   } | null>(null);
+  /** Number of sites a pending bulk delete would destroy; null = no pending delete. */
+  const [bulkDeleteCount, setBulkDeleteCount] = useState<number | null>(null);
   const [transferTarget, setTransferTarget] = useState<{
     id: string;
     name: string;
@@ -293,9 +295,17 @@ export default function SitesPage() {
         setSelectedIds(new Set());
         return;
       }
-      if (action === "delete" || action === "publish" || action === "unpublish" || action === "archive" || action === "unarchive") {
+      // Deleting sites is irreversible, and deleting a SET of them is the most
+      // destructive action on this screen — yet it used to fire straight from the
+      // toolbar while deleting a single site made you type its name. Same gate for
+      // both now.
+      if (action === "delete") {
+        if (ids.length > 0) setBulkDeleteCount(ids.length);
+        return;
+      }
+      if (action === "publish" || action === "unpublish" || action === "archive" || action === "unarchive") {
         bulkMutation.mutate({
-          action: action as "archive" | "delete" | "unarchive" | "publish" | "unpublish",
+          action: action as "archive" | "unarchive" | "publish" | "unpublish",
           siteIds: ids,
         });
       }
@@ -580,6 +590,19 @@ export default function SitesPage() {
               confirmName: name,
             })
           }
+        />
+      )}
+
+      {bulkDeleteCount !== null && (
+        <DeleteConfirmModal
+          open={true}
+          title={`Delete ${bulkDeleteCount} ${bulkDeleteCount === 1 ? "site" : "sites"}`}
+          siteName={`delete ${bulkDeleteCount} ${bulkDeleteCount === 1 ? "site" : "sites"}`}
+          onClose={() => setBulkDeleteCount(null)}
+          onConfirm={() => {
+            bulkMutation.mutate({ action: "delete", siteIds: Array.from(selectedIds) });
+            setBulkDeleteCount(null);
+          }}
         />
       )}
 

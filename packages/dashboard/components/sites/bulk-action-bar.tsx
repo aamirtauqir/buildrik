@@ -7,10 +7,12 @@ import { Archive, FolderInput, Trash2, X, ChevronDown } from "lucide-react";
 // while the live site never changed. Per-site publish goes through the editor.
 // "Export All" likewise removed — no export backend exists and handleBulkAction
 // had no export branch, so it was a silent dead click.
+// "…All" read as "act on every site" when these only ever act on the current
+// selection — dangerous wording next to an irreversible delete.
 export const BULK_ACTIONS = [
-  { label: "Archive All", action: "archive", icon: "Archive" },
+  { label: "Archive selected", action: "archive", icon: "Archive" },
   { label: "Move to Folder", action: "move", icon: "FolderInput" },
-  { label: "Delete All", action: "delete", icon: "Trash2" },
+  { label: "Delete selected", action: "delete", icon: "Trash2" },
 ] as const;
 
 export const BULK_SELECTION_CAP = 25;
