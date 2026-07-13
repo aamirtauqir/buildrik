@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { FileText, Pencil, Settings, Users, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
+import { siteHost } from "@buildrik/shared/constants/domains";
 import { ContextMenu } from "./context-menu";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone, siteStatusLabel } from "./site-status";
@@ -50,7 +51,7 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
             <Pill tone={siteStatusTone(site.status)} className="shrink-0">{siteStatusLabel(site.status)}</Pill>
           </div>
           <div className="mt-1 flex items-center gap-2">
-            <p className="truncate text-body-sm" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p>
+            <p className="truncate text-body-sm" style={{ color: "var(--color-text-muted)" }}>{siteHost(site.slug)}</p>
             {site.themeLocked && (
               <span className="inline-flex shrink-0 items-center gap-1 rounded-pill bg-[var(--color-bg-subtle)] px-1.5 py-0.5 text-eyebrow font-medium" style={{ color: "var(--color-text-secondary)" }} title="This site overrides the shared theme">
                 <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: "var(--color-amber)" }} />

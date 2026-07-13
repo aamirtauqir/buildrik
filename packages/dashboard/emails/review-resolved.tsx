@@ -13,7 +13,7 @@ export default function ReviewResolved({
   approved = true,
   resolverName = "An admin",
   note,
-  viewUrl = "https://app.buildrik.app/sites/xxx",
+  viewUrl = "https://app.buildrick.io/sites/xxx",
 }: ReviewResolvedProps) {
   const headline = approved
     ? `“${siteName}” was approved`

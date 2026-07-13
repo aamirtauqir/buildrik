@@ -5,7 +5,7 @@ interface AccountDeletionProps {
   cancelUrl: string;
 }
 
-export default function AccountDeletion({ deletionDate = "April 7, 2026", cancelUrl = "https://app.buildrik.app/settings/danger-zone" }: AccountDeletionProps) {
+export default function AccountDeletion({ deletionDate = "April 7, 2026", cancelUrl = "https://app.buildrick.io/settings/danger-zone" }: AccountDeletionProps) {
   return (
     <Html>
       <Head />

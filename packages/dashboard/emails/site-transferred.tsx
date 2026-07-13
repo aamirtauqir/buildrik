@@ -6,7 +6,7 @@ interface SiteTransferredProps {
   viewUrl: string;
 }
 
-export default function SiteTransferred({ fromName = "Alex", siteName = "My Site", viewUrl = "https://app.buildrik.app/sites/xxx" }: SiteTransferredProps) {
+export default function SiteTransferred({ fromName = "Alex", siteName = "My Site", viewUrl = "https://app.buildrick.io/sites/xxx" }: SiteTransferredProps) {
   return (
     <Html>
       <Head />

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Copy, ExternalLink, Share2, BarChart3, Pencil, LayoutDashboard, Globe, ArrowUpRight } from "lucide-react";
+import { SITE_DOMAIN, siteHost, siteUrl } from "@buildrik/shared/constants/domains";
 
 interface PublishSuccessProps {
   siteId: string;
@@ -14,7 +15,7 @@ interface PublishSuccessProps {
 export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: PublishSuccessProps) {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
-  const buildrikUrl = `https://${slug}.buildrik.app`;
+  const buildrikUrl = siteUrl(slug);
   const domainUrl = customDomain ? `https://${customDomain}` : null;
 
   function handleCopy(url: string) {
@@ -51,10 +52,10 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
       {plan === "FREE" && !customDomain && (
         <div className="mt-4 rounded-xl border p-4 text-left" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
           <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-            Your site is live on <span style={{ color: "var(--color-primary)" }}>{slug}.buildrik.app</span>
+            Your site is live on <span style={{ color: "var(--color-primary)" }}>{siteHost(slug)}</span>
           </p>
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-            Upgrade to PRO to connect your own domain — your client will never see buildrik.app.
+            Upgrade to PRO to connect your own domain — your client will never see {SITE_DOMAIN}.
           </p>
           <Link
             href="/dashboard/billing"

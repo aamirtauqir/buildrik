@@ -4,7 +4,7 @@ interface ResetPasswordProps {
   resetUrl: string;
 }
 
-export default function ResetPassword({ resetUrl = "https://app.buildrik.app/auth/reset-password?token=xxx" }: ResetPasswordProps) {
+export default function ResetPassword({ resetUrl = "https://app.buildrick.io/auth/reset-password?token=xxx" }: ResetPasswordProps) {
   return (
     <Html>
       <Head />

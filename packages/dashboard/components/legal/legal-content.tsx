@@ -55,7 +55,7 @@ export function TermsContent() {
       <H>6. Disclaimer</H>
       <p>The service is provided &quot;as is&quot; without warranty of any kind.</p>
       <H>7. Contact</H>
-      <p>Questions about these terms: {email("legal@buildrik.app")}</p>
+      <p>Questions about these terms: {email("legal@buildrick.io")}</p>
     </Wrap>
   );
 }
@@ -87,7 +87,7 @@ export function PrivacyContent() {
       <H>Your rights</H>
       <p>
         You can access, export, correct, or delete your data from your account settings, or by
-        emailing {email("privacy@buildrik.app")}. EU residents have additional rights under GDPR.
+        emailing {email("privacy@buildrick.io")}. EU residents have additional rights under GDPR.
         California residents have additional rights under CCPA.
       </p>
       <H>Cookies</H>
@@ -96,7 +96,7 @@ export function PrivacyContent() {
         can decline in the cookie banner.
       </p>
       <H>Contact</H>
-      <p>Data protection inquiries: {email("privacy@buildrik.app")}</p>
+      <p>Data protection inquiries: {email("privacy@buildrick.io")}</p>
     </Wrap>
   );
 }

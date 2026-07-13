@@ -13,7 +13,7 @@ export default function ReviewRequested({
   requesterName = "A teammate",
   note,
   changeSummary,
-  reviewsUrl = "https://app.buildrik.app/dashboard/reviews",
+  reviewsUrl = "https://app.buildrick.io/dashboard/reviews",
 }: ReviewRequestedProps) {
   return (
     <Html>

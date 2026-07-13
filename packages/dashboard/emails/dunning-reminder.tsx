@@ -5,7 +5,7 @@ interface DunningReminderProps {
   updateUrl: string;
 }
 
-export default function DunningReminder({ daysLeft = 3, updateUrl = "https://app.buildrik.app/settings/billing" }: DunningReminderProps) {
+export default function DunningReminder({ daysLeft = 3, updateUrl = "https://app.buildrick.io/settings/billing" }: DunningReminderProps) {
   return (
     <Html>
       <Head />

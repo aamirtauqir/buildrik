@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal } from "lucide-react";
+import { siteHost } from "@buildrik/shared/constants/domains";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone } from "@/components/sites/site-status";
 import { Pill, MetricValue } from "@/components/dashboard/primitives";
@@ -41,7 +42,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
     };
   }, []);
 
-  const subdomain = `${site.slug}.buildrik.app`;
+  const subdomain = siteHost(site.slug);
 
   return (
     <div>

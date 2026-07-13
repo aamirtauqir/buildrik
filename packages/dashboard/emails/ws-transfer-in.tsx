@@ -5,7 +5,7 @@ interface WsTransferInProps {
   manageUrl: string;
 }
 
-export default function WsTransferIn({ workspaceName = "My Workspace", manageUrl = "https://app.buildrik.app/settings/workspace" }: WsTransferInProps) {
+export default function WsTransferIn({ workspaceName = "My Workspace", manageUrl = "https://app.buildrick.io/settings/workspace" }: WsTransferInProps) {
   return (
     <Html>
       <Head />

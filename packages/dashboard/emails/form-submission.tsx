@@ -9,7 +9,7 @@ interface FormSubmissionProps {
 export default function FormSubmission({
   siteName = "My Site",
   fields = [{ label: "Name", value: "Jane" }, { label: "Email", value: "jane@example.com" }],
-  viewUrl = "https://app.buildrik.app/forms/xxx",
+  viewUrl = "https://app.buildrick.io/forms/xxx",
 }: FormSubmissionProps) {
   const preview = fields.slice(0, 3);
   return (

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Globe, Shield, Trash2, Star, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { SITE_DOMAIN } from "@buildrik/shared/constants/domains";
 import { PaywallModal } from "@/components/billing/paywall-modal";
 import { SectionCard, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 
@@ -65,7 +66,7 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
         open={paywall}
         onClose={() => setPaywall(false)}
         feature="Connect a custom domain"
-        description="Custom domains with automatic SSL are part of Pro. Your site stays live on its buildrik.app address until you upgrade."
+        description={`Custom domains with automatic SSL are part of Pro. Your site stays live on its ${SITE_DOMAIN} address until you upgrade.`}
       />
       <SectionCard title="Connect Domain">
         <div className="flex gap-2">

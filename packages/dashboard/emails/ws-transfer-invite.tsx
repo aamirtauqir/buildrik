@@ -5,7 +5,7 @@ interface WsTransferInviteProps {
   acceptUrl: string;
 }
 
-export default function WsTransferInvite({ workspaceName = "My Workspace", acceptUrl = "https://app.buildrik.app/transfer/accept?token=xxx" }: WsTransferInviteProps) {
+export default function WsTransferInvite({ workspaceName = "My Workspace", acceptUrl = "https://app.buildrick.io/transfer/accept?token=xxx" }: WsTransferInviteProps) {
   return (
     <Html>
       <Head />

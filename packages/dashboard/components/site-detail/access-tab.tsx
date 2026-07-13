@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Copy, Eye, Trash2, Plus, Lock, Calendar, QrCode } from "lucide-react";
+import { PREVIEW_HOST } from "@buildrik/shared/constants/domains";
 import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 interface ShareLinkEntry { id: string; name: string; token: string; viewCount: number; isActive: boolean; expiresAt: Date | null; passwordHash: string | null; createdAt: Date; }
@@ -162,7 +163,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
         ) : (
           <div className="space-y-2">
             {shareLinks.map((link) => {
-              const shareUrl = `preview.buildrik.app/share/${link.token}`;
+              const shareUrl = `${PREVIEW_HOST}/share/${link.token}`;
               return (
                 <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
                   <div className="flex items-center justify-between">

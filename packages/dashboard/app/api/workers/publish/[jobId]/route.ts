@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@lib/prisma";
 import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
+import { siteUrl } from "@buildrik/shared/constants/domains";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { runVercelDeploy } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
@@ -410,7 +411,7 @@ async function runSimulation(jobId: string, siteId: string): Promise<string> {
   });
   return domain?.domain
     ? `https://${domain.domain}`
-    : `https://${site?.slug ?? siteId}.buildrik.app`;
+    : siteUrl(site?.slug ?? siteId);
 }
 
 function delay(ms: number) {

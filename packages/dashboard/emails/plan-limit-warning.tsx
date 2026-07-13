@@ -5,7 +5,7 @@ interface PlanLimitWarningProps {
   upgradeUrl: string;
 }
 
-export default function PlanLimitWarning({ resource = "storage", upgradeUrl = "https://app.buildrik.app/settings/billing" }: PlanLimitWarningProps) {
+export default function PlanLimitWarning({ resource = "storage", upgradeUrl = "https://app.buildrick.io/settings/billing" }: PlanLimitWarningProps) {
   return (
     <Html>
       <Head />

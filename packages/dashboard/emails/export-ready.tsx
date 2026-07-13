@@ -4,7 +4,7 @@ interface ExportReadyProps {
   downloadUrl: string;
 }
 
-export default function ExportReady({ downloadUrl = "https://app.buildrik.app/settings/export/download" }: ExportReadyProps) {
+export default function ExportReady({ downloadUrl = "https://app.buildrick.io/settings/export/download" }: ExportReadyProps) {
   return (
     <Html>
       <Head />

@@ -7,7 +7,7 @@ interface TeamInviteProps {
 }
 
 export default function TeamInvite({
-  inviteUrl = "https://app.buildrik.app/auth/invite?token=xxx",
+  inviteUrl = "https://app.buildrick.io/auth/invite?token=xxx",
   inviterName = "A teammate",
   workspaceName = "My Workspace",
 }: TeamInviteProps) {

@@ -4,7 +4,7 @@ interface MagicLinkProps {
   signInUrl: string;
 }
 
-export default function MagicLink({ signInUrl = "https://app.buildrik.app/auth/magic-link?token=xxx" }: MagicLinkProps) {
+export default function MagicLink({ signInUrl = "https://app.buildrick.io/auth/magic-link?token=xxx" }: MagicLinkProps) {
   return (
     <Html>
       <Head />

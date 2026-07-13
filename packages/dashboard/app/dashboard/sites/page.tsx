@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
+import { siteHost } from "@buildrik/shared/constants/domains";
 import { ViewToggle } from "@/components/sites/view-toggle";
 import { SiteFilters } from "@/components/sites/site-filters";
 import { FolderTabs } from "@/components/sites/folder-tabs";
@@ -272,7 +273,7 @@ export default function SitesPage() {
           break;
         case "copyUrl":
           if (site) {
-            navigator.clipboard.writeText(`${site.slug}.buildrik.app`);
+            navigator.clipboard.writeText(siteHost(site.slug));
             addToast("success", "URL copied to clipboard");
           }
           break;

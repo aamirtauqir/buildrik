@@ -4,7 +4,7 @@ interface PaymentFailedProps {
   updateUrl: string;
 }
 
-export default function PaymentFailed({ updateUrl = "https://app.buildrik.app/settings/billing" }: PaymentFailedProps) {
+export default function PaymentFailed({ updateUrl = "https://app.buildrick.io/settings/billing" }: PaymentFailedProps) {
   return (
     <Html>
       <Head />

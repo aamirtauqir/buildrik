@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
+import { siteHost } from "@buildrik/shared/constants/domains";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 import { SectionCard } from "@/components/dashboard/primitives";
@@ -58,7 +59,7 @@ export function SeoTab({ site }: SeoTabProps) {
       <SectionCard title="Google Search Preview">
         <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           <p className="text-sm" style={{ color: "#1a0dab" }}>{metaTitle || "Page Title"}</p>
-          <p className="text-xs" style={{ color: "#006621" }}>{siteSlug}.buildrik.app</p>
+          <p className="text-xs" style={{ color: "#006621" }}>{siteHost(siteSlug)}</p>
           <p className="text-xs" style={{ color: "#545454" }}>{metaDesc || "No description set"}</p>
         </div>
       </SectionCard>
@@ -215,7 +216,7 @@ function SocialCardPreview({
           style={{ backgroundImage: `url(${imageUrl})`, height: variant === "twitter" ? 252 : 274 }}
         />
         <div className="p-3" style={{ backgroundColor: variant === "twitter" ? "#fff" : "#F0F2F5" }}>
-          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{slug}.buildrik.app</p>
+          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{siteHost(slug)}</p>
           <p className="truncate text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             {title || "Page Title"}
           </p>

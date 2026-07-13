@@ -5,7 +5,7 @@ interface AiCompleteProps {
   viewUrl: string;
 }
 
-export default function AiComplete({ siteName = "My Site", viewUrl = "https://app.buildrik.app/sites/xxx" }: AiCompleteProps) {
+export default function AiComplete({ siteName = "My Site", viewUrl = "https://app.buildrick.io/sites/xxx" }: AiCompleteProps) {
   return (
     <Html>
       <Head />

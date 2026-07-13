@@ -4,7 +4,7 @@ interface AutoDowngradeProps {
   reactivateUrl: string;
 }
 
-export default function AutoDowngrade({ reactivateUrl = "https://app.buildrik.app/settings/billing" }: AutoDowngradeProps) {
+export default function AutoDowngrade({ reactivateUrl = "https://app.buildrick.io/settings/billing" }: AutoDowngradeProps) {
   return (
     <Html>
       <Head />

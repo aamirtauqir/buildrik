@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { X, Copy, Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
+import { PREVIEW_HOST } from "@buildrik/shared/constants/domains";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
 
@@ -37,7 +38,7 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
   const createMutation = trpc.siteDetail.sharing.create.useMutation({
     onSuccess: (link) => {
       utils.siteDetail.sharing.list.invalidate({ siteId });
-      setCreatedUrl(`preview.buildrik.app/share/${link.token}`);
+      setCreatedUrl(`${PREVIEW_HOST}/share/${link.token}`);
     },
     onError: (err) => addToast("error", "Couldn't create draft link", err.message),
   });

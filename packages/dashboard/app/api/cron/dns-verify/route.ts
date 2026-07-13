@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     let matched = false;
     try {
       // Match the actual DNS answer against THIS record's expected value
-      // (was hardcoded to the dead host `sites.buildrik.app`), per record type.
+      // (was hardcoded to the dead host `sites.buildrick.app`), per record type.
       switch (record.type.toUpperCase()) {
         case "CNAME":
           matched = (await dns.resolveCname(fqdn)).some((r) => norm(r) === expected);

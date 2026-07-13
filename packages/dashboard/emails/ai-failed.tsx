@@ -4,7 +4,7 @@ interface AiFailedProps {
   retryUrl: string;
 }
 
-export default function AiFailed({ retryUrl = "https://app.buildrik.app/sites/new" }: AiFailedProps) {
+export default function AiFailed({ retryUrl = "https://app.buildrick.io/sites/new" }: AiFailedProps) {
   return (
     <Html>
       <Head />

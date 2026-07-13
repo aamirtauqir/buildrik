@@ -5,7 +5,7 @@ interface SslExpiringProps {
   renewUrl: string;
 }
 
-export default function SslExpiring({ domain = "example.com", renewUrl = "https://app.buildrik.app/domains/xxx" }: SslExpiringProps) {
+export default function SslExpiring({ domain = "example.com", renewUrl = "https://app.buildrick.io/domains/xxx" }: SslExpiringProps) {
   return (
     <Html>
       <Head />

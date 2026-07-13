@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { siteHost } from "@buildrik/shared/constants/domains";
 import { ContextMenu } from "./context-menu";
 import { siteStatusTone, siteStatusLabel } from "./site-status";
 import { Pill, MetricValue } from "@/components/dashboard/primitives";
@@ -55,7 +56,7 @@ export function SiteListView({ sites, selectedIds, onSelect, onSelectAll, allSel
               <td className="px-[18px] py-3.5"><input type="checkbox" checked={selectedIds.has(site.id)} onChange={() => {}} className="h-4 w-4 rounded accent-[var(--color-primary)]" onClick={(e) => onSelect(site.id, e)} aria-label={`Select ${site.name}`} /></td>
               <td className="px-[18px] py-3.5">
                 <Link href={`/dashboard/sites/${site.id}`} className="font-medium hover:underline" style={{ color: "var(--color-text-primary)" }}>{site.name}</Link>
-                <p className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p>
+                <p className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>{siteHost(site.slug)}</p>
               </td>
               <td className="px-[18px] py-3.5" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{getTimeAgo(site.lastEditedAt)}</MetricValue></td>
               <td className="px-[18px] py-3.5"><Pill tone={siteStatusTone(site.status)}>{siteStatusLabel(site.status)}</Pill></td>

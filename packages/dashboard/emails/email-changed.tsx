@@ -4,7 +4,7 @@ interface EmailChangedProps {
   verifyUrl: string;
 }
 
-export default function EmailChanged({ verifyUrl = "https://app.buildrik.app/auth/verify-email?token=xxx" }: EmailChangedProps) {
+export default function EmailChanged({ verifyUrl = "https://app.buildrick.io/auth/verify-email?token=xxx" }: EmailChangedProps) {
   return (
     <Html>
       <Head />
