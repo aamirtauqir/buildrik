@@ -81,12 +81,15 @@ export default function MarketplacePage() {
           <h2 className="mt-1 text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>{FEATURED_APP.name}</h2>
           <p className="mt-1 max-w-xl text-sm" style={{ color: "var(--color-text-secondary)" }}>{FEATURED_APP.description}</p>
         </div>
+        {/* No marketplace backend yet — inert rather than a silent no-op. */}
         <button
           type="button"
-          className="shrink-0 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "var(--color-primary)" }}
+          disabled
+          title="Coming soon"
+          className="shrink-0 cursor-not-allowed rounded-lg px-4 py-2.5 text-sm font-semibold"
+          style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.6)" }}
         >
-          {FEATURED_APP.cta}
+          Coming soon
         </button>
       </div>
 
@@ -114,10 +117,12 @@ export default function MarketplacePage() {
                 <p className="mt-2 flex-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>
                 <button
                   type="button"
-                  className="mt-4 self-start rounded-lg border px-3.5 py-1.5 text-sm font-semibold transition-colors hover:bg-[var(--color-primary-subtle)]"
-                  style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
+                  disabled
+                  title="Coming soon"
+                  className="mt-4 self-start cursor-not-allowed rounded-lg border px-3.5 py-1.5 text-sm font-semibold"
+                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-muted)" }}
                 >
-                  {app.action}
+                  Coming soon
                 </button>
               </div>
             );

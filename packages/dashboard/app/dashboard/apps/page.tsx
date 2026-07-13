@@ -59,12 +59,16 @@ export default function AppsPage() {
               </div>
               <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{app.name}</h3>
               <p className="mt-2 flex-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>
+              {/* No apps backend exists yet — the CTA is inert by design rather than
+                  a silent no-op. Wire this when the apps service lands. */}
               <button
                 type="button"
-                className="mt-4 self-start rounded-lg px-3.5 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "var(--color-primary)" }}
+                disabled
+                title="Coming soon"
+                className="mt-4 self-start cursor-not-allowed rounded-lg px-3.5 py-1.5 text-sm font-semibold"
+                style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
               >
-                {app.installed ? "Open" : "Install"}
+                Coming soon
               </button>
             </div>
           );

@@ -33,13 +33,16 @@ export default function LearnPage() {
               Lesson <MetricValue>3</MetricValue> of <MetricValue>6</MetricValue>
             </p>
           </div>
+          {/* No courses backend yet — inert rather than a silent no-op. */}
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "var(--color-primary)" }}
+            disabled
+            title="Coming soon"
+            className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+            style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
           >
             <PlayCircle className="h-4 w-4" />
-            Resume
+            Coming soon
           </button>
         </div>
         <ProgressBar pct={50} className="mt-4" />

@@ -66,11 +66,15 @@ export default function LibrariesPage() {
                 <h2 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{name}</h2>
                 <div className="mt-2 flex items-center justify-between">
                   <Pill tone="neutral">{category}</Pill>
+                  {/* No template-apply backend yet — inert rather than a silent no-op. */}
                   <button
-                    className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ backgroundColor: "var(--color-primary)" }}
+                    type="button"
+                    disabled
+                    title="Coming soon"
+                    className="cursor-not-allowed rounded-lg px-3 py-1.5 text-xs font-semibold"
+                    style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
                   >
-                    Use
+                    Coming soon
                   </button>
                 </div>
               </div>
