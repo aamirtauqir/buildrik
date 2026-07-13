@@ -170,12 +170,12 @@ export function ClientsView() {
 
   const clients = (clientsQuery.data ?? []) as ClientRow[];
 
-  // Derived summary + status, computed from the list the view already loads (no
-  // extra tRPC). A client with sites is "Active"; one with none is still
-  // "Awaiting" its first site / sign-off.
+  // Summary counts, derived from the list the view already loads (no extra tRPC).
+  // The client list carries no review/sign-off state, so we report only what the
+  // data supports — a client with no sites is "No sites", not "awaiting sign-off".
   const activeClients = clients.filter((c) => c.siteCount > 0).length;
   const totalSites = clients.reduce((n, c) => n + c.siteCount, 0);
-  const awaiting = clients.filter((c) => c.siteCount === 0).length;
+  const withoutSites = clients.filter((c) => c.siteCount === 0).length;
 
   const tileColor = new Map(
     clients.map((c, i) => [c.id, c.brandColor ?? TILE_TOKENS[i % TILE_TOKENS.length]] as const),
@@ -223,7 +223,7 @@ export function ClientsView() {
       key: "status",
       header: "Status",
       render: (c) =>
-        c.siteCount > 0 ? <Pill tone="success">Active</Pill> : <Pill tone="warning">Awaiting</Pill>,
+        c.siteCount > 0 ? <Pill tone="success">Active</Pill> : <Pill tone="neutral">No sites</Pill>,
     },
     {
       key: "actions",
@@ -293,14 +293,7 @@ export function ClientsView() {
           <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <StatCard label="Active clients" value={<MetricValue>{activeClients}</MetricValue>} />
             <StatCard label="Client sites" value={<MetricValue>{totalSites}</MetricValue>} />
-            <StatCard
-              label="Awaiting sign-off"
-              value={
-                <span style={{ color: "var(--color-warning)" }}>
-                  <MetricValue>{awaiting}</MetricValue>
-                </span>
-              }
-            />
+            <StatCard label="Without sites" value={<MetricValue>{withoutSites}</MetricValue>} />
           </div>
 
           <DataTable
