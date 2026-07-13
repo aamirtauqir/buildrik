@@ -23,6 +23,16 @@ import TicketReceived from "@/emails/ticket-received";
 import ReviewRequested from "@/emails/review-requested";
 import ReviewResolved from "@/emails/review-resolved";
 
+/** cPanel/Passenger pipes env vars through a shell, so a `$` in the password is
+ *  read as a variable and silently eaten (`^+qH$gt@...` lost `$gt`, giving a
+ *  535 auth failure in prod while dev worked). Base64 has no shell metacharacters,
+ *  so SMTP_PASS_B64 survives such hosts. Plain SMTP_PASS still works elsewhere. */
+function smtpPassword(): string | undefined {
+  const b64 = process.env.SMTP_PASS_B64;
+  if (b64) return Buffer.from(b64, "base64").toString("utf8");
+  return process.env.SMTP_PASS;
+}
+
 let _transport: nodemailer.Transporter | null = null;
 function getTransport() {
   if (!_transport) {
@@ -35,7 +45,7 @@ function getTransport() {
       secure: port === 465,
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        pass: smtpPassword(),
       },
     });
   }

@@ -159,7 +159,8 @@ Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packa
 | `SMTP_HOST` | Transactional email host (e.g. `buildrick.io`) | Yes for production |
 | `SMTP_PORT` | `465` for implicit TLS (SMTPS), `587` for STARTTLS. The transport sets `secure: true` only on 465. | Yes for production |
 | `SMTP_USER` | Mailbox login (e.g. `info@buildrick.io`) | Yes for production |
-| `SMTP_PASS` | Mailbox password. Never commit — `.env.local` in dev, cPanel Node-app env in prod. | Yes for production |
+| `SMTP_PASS` | Mailbox password (plain). Never commit — `.env.local` in dev. | Dev; prod only if the host doesn't mangle it |
+| `SMTP_PASS_B64` | Base64 of the password. **Required on cPanel/Passenger**, which pipes env vars through a shell: a `$` in the password is read as a variable and silently eaten (`^+qH$gt@…` lost `$gt` → 535 auth failure in prod while dev worked). Base64 has no shell metacharacters. Takes precedence over `SMTP_PASS`. | Yes on cPanel |
 | `EMAIL_FROM` | Sender, e.g. `Buildrick <info@buildrick.io>`. Most SMTP hosts require this to match `SMTP_USER`'s domain. | Yes for production |
 | `VERCEL_TOKEN` | Shared Vercel API token (legacy — being replaced by per-workspace OAuth) | Optional during OAuth rollout |
 | `ENCRYPTION_KEY` | 32-byte hex (`openssl rand -hex 32`) for AES-256-GCM token-at-rest (Vercel OAuth + future integrations). Rotate by re-encrypting all rows. | Yes for Vercel OAuth flow |
