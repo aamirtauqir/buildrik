@@ -7,7 +7,6 @@ import { Pill, MetricValue, type PillTone } from "@/components/dashboard/primiti
 import { MemberActions, type MemberAction } from "./member-actions";
 
 type Role = "OWNER" | "ADMIN" | "EDITOR" | "DESIGNER" | "VIEWER";
-type Status = "ACTIVE" | "PENDING" | "SUSPENDED";
 
 export interface Member {
   id: string;
@@ -22,21 +21,15 @@ export interface Member {
   sitesAccess: string;
 }
 
-type SortKey = "fullName" | "role" | "status" | "lastActiveAt";
-type SortDir = "asc" | "desc";
-
+// Owner is the only role that reads as accent (primary). Every other role —
+// Admin, Content editor, Designer, Viewer — is a neutral chip so the table
+// never implies Admin/Editor carry owner-level authority.
 const ROLE_TONE: Record<Role, PillTone> = {
   OWNER: "accent",
-  ADMIN: "accent",
-  EDITOR: "success",
-  DESIGNER: "success",
+  ADMIN: "neutral",
+  EDITOR: "neutral",
+  DESIGNER: "neutral",
   VIEWER: "neutral",
-};
-
-const STATUS_TONE: Record<Status, { label: string; tone: PillTone }> = {
-  ACTIVE: { label: "Active", tone: "success" },
-  PENDING: { label: "Pending", tone: "warning" },
-  SUSPENDED: { label: "Suspended", tone: "error" },
 };
 
 function isOnline(lastActiveAt: Date | null): boolean {
@@ -45,7 +38,7 @@ function isOnline(lastActiveAt: Date | null): boolean {
 }
 
 function relativeTime(date: Date | null): string {
-  if (!date) return "\u2014";
+  if (!date) return "—";
   const diff = Date.now() - new Date(date).getTime();
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1) return "Just now";
@@ -62,22 +55,21 @@ function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-function Initials({ name }: { name: string }) {
+function initialsOf(name: string): string {
   const parts = name.trim().split(" ");
   const initials = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0].slice(0, 2);
-  return (
-    <div
-      className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
-      style={{ backgroundColor: "var(--color-primary)" }}
-    >
-      {initials.toUpperCase()}
-    </div>
-  );
+  return initials.toUpperCase();
 }
 
-function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active) return <span className="ml-1 text-[var(--color-text-muted)]">{"\u2195"}</span>;
-  return <span className="ml-1" style={{ color: "var(--color-primary)" }}>{dir === "asc" ? "\u2191" : "\u2193"}</span>;
+function Avatar({ name, size = 32 }: { name: string; size?: number }) {
+  return (
+    <div
+      className="flex shrink-0 items-center justify-center rounded-full font-semibold text-white"
+      style={{ width: size, height: size, fontSize: size <= 32 ? 12 : 18, backgroundColor: "var(--color-primary)" }}
+    >
+      {initialsOf(name)}
+    </div>
+  );
 }
 
 function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => void }) {
@@ -93,46 +85,38 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-      <div ref={ref} className="w-full max-w-sm rounded-2xl border border-[var(--color-border-default)] bg-white p-6 shadow-2xl">
+      <div ref={ref} className="w-full max-w-sm rounded-2xl border p-6 shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
         <div className="flex items-center gap-4">
           {member.avatar ? (
             <img src={member.avatar} alt={member.fullName} className="h-14 w-14 rounded-full object-cover" />
           ) : (
-            <div
-              className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold text-white"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              {member.fullName.trim().split(" ").length > 1
-                ? member.fullName.trim().split(" ")[0][0] + member.fullName.trim().split(" ").slice(-1)[0][0]
-                : member.fullName.slice(0, 2)
-              }
-            </div>
+            <Avatar name={member.fullName} size={56} />
           )}
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>{member.fullName}</h3>
+              <h3 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{member.fullName}</h3>
               {isOnline(member.lastActiveAt) && (
                 <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--color-success)" }} />
               )}
             </div>
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>{member.email}</p>
+            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>{member.email}</p>
           </div>
         </div>
 
         <div className="mt-5 space-y-3">
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-body">
             <span style={{ color: "var(--color-text-secondary)" }}>Role</span>
             <Pill tone={ROLE_TONE[member.role as Role] ?? "neutral"}>{roleLabel(member.role)}</Pill>
           </div>
-          <div className="flex justify-between text-sm">
-            <span style={{ color: "var(--color-text-secondary)" }}>Sites Access</span>
+          <div className="flex justify-between text-body">
+            <span style={{ color: "var(--color-text-secondary)" }}>Sites access</span>
             <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{member.sitesAccess}</MetricValue></span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span style={{ color: "var(--color-text-secondary)" }}>Last Active</span>
+          <div className="flex justify-between text-body">
+            <span style={{ color: "var(--color-text-secondary)" }}>Last active</span>
             <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{relativeTime(member.lastActiveAt)}</MetricValue></span>
           </div>
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between text-body">
             <span style={{ color: "var(--color-text-secondary)" }}>Joined</span>
             <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{formatDate(member.joinedAt)}</MetricValue></span>
           </div>
@@ -140,10 +124,50 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
 
         <button
           onClick={onClose}
-          className="mt-5 w-full rounded-lg border border-[var(--color-border-default)] py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-          style={{ color: "var(--color-text-secondary)" }}
+          className="mt-5 w-full rounded-lg border py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
         >
           Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Ink action bar for the bulk-select mode. Appears only while a selection is
+// live; reuses the (already-wired) per-row delete action for bulk removal.
+function BulkBar({
+  count,
+  allSelected,
+  onSelectAll,
+  onRemove,
+  onCancel,
+}: {
+  count: number;
+  allSelected: boolean;
+  onSelectAll: () => void;
+  onRemove: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="fixed inset-x-0 bottom-6 z-30 flex justify-center px-4">
+      <div className="flex items-center gap-3 rounded-pill px-4 py-2.5 shadow-card" style={{ backgroundColor: "var(--color-ink)" }}>
+        <span className="text-body-sm font-medium text-white">
+          <MetricValue>{count}</MetricValue> selected
+        </span>
+        <span className="h-4 w-px" style={{ backgroundColor: "rgba(255,255,255,0.2)" }} />
+        <button onClick={onSelectAll} className="text-body-sm font-medium text-white/80 transition-colors hover:text-white">
+          {allSelected ? "Clear all" : "Select all"}
+        </button>
+        <button
+          onClick={onRemove}
+          className="rounded-md px-2.5 py-1 text-body-sm font-medium text-white transition-opacity hover:opacity-90"
+          style={{ backgroundColor: "var(--color-error)" }}
+        >
+          Remove
+        </button>
+        <button onClick={onCancel} className="text-body-sm font-medium text-white/60 transition-colors hover:text-white">
+          Cancel
         </button>
       </div>
     </div>
@@ -155,19 +179,25 @@ interface MembersTableProps {
   currentUserId: string;
   onAction: (action: MemberAction, memberId: string) => void;
   onChangeRole?: (memberId: string, role: string) => void;
+  selectMode: boolean;
+  onExitSelectMode: () => void;
 }
 
 const ASSIGNABLE_ROLES: Role[] = ["ADMIN", "EDITOR", "DESIGNER", "VIEWER"];
 
-export function MembersTable({ members, currentUserId, onAction, onChangeRole }: MembersTableProps) {
+export function MembersTable({ members, currentUserId, onAction, onChangeRole, selectMode, onExitSelectMode }: MembersTableProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [sortKey, setSortKey] = useState<SortKey>("fullName");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [detailMember, setDetailMember] = useState<Member | null>(null);
   // "Change Role" used to dispatch onAction("changeRole"), which the page's
   // switch ignored — a silent dead end. Intercept it here and open a role
   // picker that calls the (already-wired) onChangeRole mutation.
   const [roleEditMember, setRoleEditMember] = useState<Member | null>(null);
+
+  // Leaving select mode drops the pending selection so it can't linger and
+  // apply to a later action.
+  useEffect(() => {
+    if (!selectMode) setSelected(new Set());
+  }, [selectMode]);
 
   function handleMemberAction(action: MemberAction, memberId: string) {
     if (action === "changeRole") {
@@ -176,16 +206,6 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
       return;
     }
     onAction(action, memberId);
-  }
-
-  function toggleSort(key: SortKey) {
-    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(key); setSortDir("asc"); }
-  }
-
-  function toggleAll() {
-    if (selected.size === members.length) setSelected(new Set());
-    else setSelected(new Set(members.map((m) => m.id)));
   }
 
   function toggleOne(id: string) {
@@ -197,133 +217,90 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
     });
   }
 
-  const sorted = [...members].sort((a, b) => {
-    let av: string | number | null = null;
-    let bv: string | number | null = null;
-    if (sortKey === "fullName") { av = a.fullName.toLowerCase(); bv = b.fullName.toLowerCase(); }
-    else if (sortKey === "role") { av = a.role; bv = b.role; }
-    else if (sortKey === "status") { av = a.status; bv = b.status; }
-    else if (sortKey === "lastActiveAt") {
-      av = a.lastActiveAt ? new Date(a.lastActiveAt).getTime() : 0;
-      bv = b.lastActiveAt ? new Date(b.lastActiveAt).getTime() : 0;
-    }
-    if (av === null || bv === null) return 0;
-    if (av < bv) return sortDir === "asc" ? -1 : 1;
-    if (av > bv) return sortDir === "asc" ? 1 : -1;
-    return 0;
-  });
+  // Owner rows and your own row can't be removed (mirrors the per-row menu
+  // guards), so they're never selectable for a bulk action.
+  const selectableIds = members
+    .filter((m) => m.role !== "OWNER" && m.userId !== currentUserId)
+    .map((m) => m.id);
 
-  const allSelected = selected.size === members.length && members.length > 0;
+  function toggleAll() {
+    setSelected((prev) => (prev.size === selectableIds.length ? new Set() : new Set(selectableIds)));
+  }
+
+  function removeSelected() {
+    selected.forEach((id) => onAction("delete", id));
+    onExitSelectMode();
+  }
+
+  function handleRowClick(member: Member) {
+    if (selectMode) {
+      if (member.role === "OWNER" || member.userId === currentUserId) return;
+      toggleOne(member.id);
+    } else {
+      setDetailMember(member);
+    }
+  }
 
   return (
     <>
-      <div className="overflow-x-auto rounded-xl border border-[var(--color-border-default)] bg-white">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-xl border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
+        <table className="w-full text-body">
           <thead>
-            <tr className="border-b border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-page)" }}>
-              <th className="w-10 px-4 py-3">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={toggleAll}
-                  className="accent-[var(--color-primary)]"
-                />
-              </th>
-              {(
-                [
-                  { key: "fullName", label: "Name" },
-                  { key: "role", label: "Role" },
-                  { key: "status", label: "Status" },
-                  { key: "lastActiveAt", label: "Last Active" },
-                ] as { key: SortKey; label: string }[]
-              ).map((col) => (
-                <th
-                  key={col.key}
-                  className="cursor-pointer select-none px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide"
-                  style={{ color: "var(--color-text-secondary)" }}
-                  onClick={() => toggleSort(col.key)}
-                >
-                  {col.label}
-                  <SortIcon active={sortKey === col.key} dir={sortDir} />
-                </th>
-              ))}
-              <th
-                className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide"
-                style={{ color: "var(--color-text-secondary)" }}
-              >
-                Sites Access
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
-                Actions
-              </th>
+            <tr className="border-b text-left text-eyebrow uppercase tracking-wide" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}>
+              <th className="px-[18px] py-2.5 font-semibold">Member</th>
+              <th className="px-[18px] py-2.5 font-semibold">Email</th>
+              <th className="px-[18px] py-2.5 font-semibold">Role</th>
+              <th className="px-[18px] py-2.5 font-semibold">Last active</th>
+              <th className="w-10 px-[18px] py-2.5 font-semibold" aria-label="Actions" />
             </tr>
           </thead>
           <tbody>
-            {sorted.map((member) => {
-              const statusInfo = STATUS_TONE[member.status as Status] ?? STATUS_TONE.ACTIVE;
+            {members.map((member) => {
               const isCurrentUser = member.userId === currentUserId;
               const isOwner = member.role === "OWNER";
-              const online = isOnline(member.lastActiveAt);
+              const selectable = selectMode && !isOwner && !isCurrentUser;
+              const isSelected = selected.has(member.id);
 
               return (
                 <tr
                   key={member.id}
+                  onClick={() => handleRowClick(member)}
                   className={cn(
-                    "cursor-pointer border-b border-[var(--color-border-default)] transition-colors last:border-0 hover:bg-[var(--color-bg-page)]",
-                    selected.has(member.id) && "bg-[var(--color-primary-subtle)]"
+                    "border-b transition-colors last:border-0",
+                    (!selectMode || selectable) && "cursor-pointer hover:bg-[var(--color-bg-subtle)]",
+                    isSelected && "bg-[var(--color-primary-subtle)]"
                   )}
-                  onClick={() => setDetailMember(member)}
+                  style={{ borderColor: "var(--color-border-default)" }}
                 >
-                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={selected.has(member.id)}
-                      onChange={() => toggleOne(member.id)}
-                      className="accent-[var(--color-primary)]"
-                    />
-                  </td>
-                  <td className="px-4 py-3">
+                  <td className="px-[18px] py-3.5" style={{ color: "var(--color-text-primary)" }}>
                     <div className="flex items-center gap-3">
-                      <div className="relative">
-                        {member.avatar ? (
-                          <img src={member.avatar} alt={member.fullName} className="h-8 w-8 rounded-full object-cover" />
-                        ) : (
-                          <Initials name={member.fullName} />
-                        )}
-                        {online && (
-                          <span
-                            className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white"
-                            style={{ backgroundColor: "var(--color-success)" }}
-                          />
-                        )}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-medium" style={{ color: "var(--color-text-primary)" }}>
-                            {member.fullName}
-                          </span>
-                          {isOwner && <Pill tone="accent">Owner</Pill>}
-                          {isCurrentUser && <Pill tone="neutral">You</Pill>}
-                        </div>
-                        <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                          {member.email}
-                        </p>
-                      </div>
+                      {selectMode && (
+                        <input
+                          type="checkbox"
+                          readOnly
+                          checked={isSelected}
+                          disabled={!selectable}
+                          className="pointer-events-none accent-[var(--color-primary)]"
+                        />
+                      )}
+                      {member.avatar ? (
+                        <img src={member.avatar} alt={member.fullName} className="h-8 w-8 shrink-0 rounded-full object-cover" />
+                      ) : (
+                        <Avatar name={member.fullName} />
+                      )}
+                      <span className="font-medium">{member.fullName}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-[18px] py-3.5" style={{ color: "var(--color-text-secondary)" }}>
+                    {member.email}
+                  </td>
+                  <td className="px-[18px] py-3.5">
                     <Pill tone={ROLE_TONE[member.role as Role] ?? "neutral"}>{roleLabel(member.role)}</Pill>
                   </td>
-                  <td className="px-4 py-3">
-                    <Pill tone={statusInfo.tone}>{statusInfo.label}</Pill>
-                  </td>
-                  <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                  <td className="px-[18px] py-3.5" style={{ color: "var(--color-text-secondary)" }}>
                     <MetricValue>{relativeTime(member.lastActiveAt)}</MetricValue>
                   </td>
-                  <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    <MetricValue>{member.sitesAccess}</MetricValue>
-                  </td>
-                  <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                  <td className="px-[18px] py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                     <MemberActions
                       memberId={member.id}
                       isOwner={isOwner}
@@ -338,17 +315,27 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
         </table>
       </div>
 
+      {selectMode && selected.size > 0 && (
+        <BulkBar
+          count={selected.size}
+          allSelected={selected.size === selectableIds.length && selectableIds.length > 0}
+          onSelectAll={toggleAll}
+          onRemove={removeSelected}
+          onCancel={onExitSelectMode}
+        />
+      )}
+
       {detailMember && (
         <MemberDetailCard member={detailMember} onClose={() => setDetailMember(null)} />
       )}
 
       {roleEditMember && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-          <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border-default)] bg-white p-6 shadow-2xl">
-            <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
+          <div className="w-full max-w-sm rounded-2xl border p-6 shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
+            <h3 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>
               Change role
             </h3>
-            <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
               {roleEditMember.fullName} — currently {roleLabel(roleEditMember.role)}
             </p>
             <div className="mt-4 space-y-2">
@@ -362,12 +349,12 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
                       onChangeRole?.(roleEditMember.id, role);
                       setRoleEditMember(null);
                     }}
-                    className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
                     style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                   >
                     <span>{roleLabel(role)}</span>
                     {isCurrent && (
-                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>current</span>
+                      <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>current</span>
                     )}
                   </button>
                 );
@@ -375,8 +362,8 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole }:
             </div>
             <button
               onClick={() => setRoleEditMember(null)}
-              className="mt-4 w-full rounded-lg border border-[var(--color-border-default)] py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-              style={{ color: "var(--color-text-secondary)" }}
+              className="mt-4 w-full rounded-lg border py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
             >
               Cancel
             </button>

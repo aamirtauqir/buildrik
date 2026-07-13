@@ -6,13 +6,13 @@ import { ChevronDown } from "lucide-react";
 
 export const SITE_DETAIL_TABS = [
   { label: "Overview", segment: "overview" },
-  { label: "Settings", segment: "settings" },
-  { label: "SEO", segment: "seo" },
-  { label: "Domains", segment: "domains" },
-  { label: "Redirects", segment: "redirects" },
-  { label: "Submissions", segment: "feedback" },
-  { label: "Sharing", segment: "access" },
   { label: "Traffic", segment: "analytics" },
+  { label: "Domains", segment: "domains" },
+  { label: "SEO", segment: "seo" },
+  { label: "Forms", segment: "feedback" },
+  { label: "Redirects", segment: "redirects" },
+  { label: "Sharing", segment: "access" },
+  { label: "Settings", segment: "settings" },
 ] as const;
 
 function getTabHref(base: string, segment: string) {
@@ -44,8 +44,10 @@ export function TabNav({ siteId }: { siteId: string }) {
             return (
               <li key={tab.segment} className="shrink-0">
                 <Link href={href} className={cn(
-                  "inline-block px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap",
-                  isActive ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]" : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+                  "inline-block px-4 py-2.5 text-sm transition-colors whitespace-nowrap",
+                  isActive
+                    ? "border-b-2 border-[var(--color-primary)] font-semibold text-[var(--color-text-primary)]"
+                    : "font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                 )}>{tab.label}</Link>
               </li>
             );

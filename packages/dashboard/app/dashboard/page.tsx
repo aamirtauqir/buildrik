@@ -1,37 +1,38 @@
 "use client";
 
-import { useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { trpc } from "@lib/trpc/client";
-import { StatCard, PageHeader, MetricValue } from "@/components/dashboard/primitives";
-import { MiniDonut, Sparkline, AvatarStack, TrendArrow } from "@/components/dashboard/dataviz";
+import { StatCard, PageHeader, SectionCard, MetricValue } from "@/components/dashboard/primitives";
+import { TrendArrow } from "@/components/dashboard/dataviz";
 import { QuickActions } from "@/components/dashboard/quick-actions";
-import { RecentSites } from "@/components/dashboard/recent-sites";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
-import { WorkspaceHealth } from "@/components/dashboard/workspace-health";
 import { EmptyState, type EmptyStateVariant } from "@/components/dashboard/empty-state";
 import { DunningBanner } from "@/components/dashboard/dunning-banner";
 import { DashboardChecklist } from "@/components/onboarding/dashboard-checklist";
 import { NeedsAttention } from "@/components/dashboard/needs-attention";
 import { ErrorState } from "@/components/states";
-import Link from "next/link";
-import { Plus } from "lucide-react";
 
-type ActivityFilter = "all" | "mine" | "team";
-
+/** 24800 → "24.8k", 1_200_000 → "1.2m". Keeps big visitor counts compact. */
+function formatCompact(n: number): string {
+  if (n < 1000) return String(n);
+  if (n < 1_000_000) {
+    const k = n / 1000;
+    return `${k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)}k`;
+  }
+  const m = n / 1_000_000;
+  return `${m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)}m`;
+}
 
 export default function DashboardPage() {
-  const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
   const { data: session } = useSession();
   const firstName = session?.user?.name?.trim().split(/\s+/)[0] || "there";
   const hour = new Date().getHours();
   const timeOfDay = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
   const greeting = `Good ${timeOfDay}, ${firstName}`;
+
   const stats = trpc.dashboard.stats.useQuery();
-  const recentSites = trpc.dashboard.recentSites.useQuery();
-  const activity = trpc.dashboard.activity.useQuery({ filter: activityFilter });
-  const health = trpc.dashboard.health.useQuery();
-  const quickActionsQuery = trpc.dashboard.quickActions.useQuery();
+  const activity = trpc.dashboard.activity.useQuery({ filter: "all" });
   const wsData = trpc.account.workspace.get.useQuery();
   const pendingDeletion = trpc.account.dangerZone.pendingDeletion.useQuery();
   const cancelWsDelete = trpc.account.workspace.cancelDelete.useMutation({ onSuccess: () => wsData.refetch() });
@@ -43,8 +44,6 @@ export default function DashboardPage() {
   });
   const showChecklist = onboardingState.data && !onboardingState.data.completed && !onboardingState.data.dismissed;
 
-  const isLoading = stats.isLoading || recentSites.isLoading;
-  const isError = stats.isError || recentSites.isError;
   const isEmpty = stats.data?.totalSites === 0;
 
   // Determine empty state variant based on role
@@ -59,43 +58,20 @@ export default function DashboardPage() {
         : "viewer"
     : null;
 
-  const quickActions = quickActionsQuery.data ?? [];
-
-  // Only show workspace health when any metric exceeds 50%
-  const showHealth = health.data && (
-    health.data.sites.used / health.data.sites.limit > 0.5 ||
-    health.data.storage.usedMB / health.data.storage.limitMB > 0.5 ||
-    health.data.aiCredits.used / health.data.aiCredits.limit > 0.5
-  );
-
   const isPastDue = billingOverview.data?.status === "PAST_DUE";
 
-  if (isLoading) {
+  if (stats.isLoading) {
     return (
       <div>
-        <PageHeader title="Dashboard" />
-        {/* Stat cards skeleton */}
-        <div className="mt-6 grid grid-cols-4 gap-4">
+        <PageHeader title={greeting} description="Here's what's happening across your workspace." />
+        <div className="grid grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+            <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
           ))}
         </div>
-        {/* Quick actions skeleton */}
-        <div className="mt-6 grid grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-          ))}
-        </div>
-        {/* Recent sites skeleton */}
-        <div className="mt-6 grid grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-40 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-          ))}
-        </div>
-        {/* Activity + Health skeleton */}
-        <div className="mt-6 grid grid-cols-3 gap-6">
-          <div className="col-span-2 h-48 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-          <div className="h-48 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        <div className="mt-6 grid gap-6" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
+          <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+          <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         </div>
       </div>
     );
@@ -103,7 +79,7 @@ export default function DashboardPage() {
 
   // Without this, a failed stats query left data undefined → an all-zeros
   // dashboard rendered as if the workspace were genuinely empty.
-  if (isError) {
+  if (stats.isError) {
     return (
       <div>
         <PageHeader title="Dashboard" />
@@ -111,10 +87,7 @@ export default function DashboardPage() {
           <ErrorState
             title="Couldn't load your dashboard"
             description="Something went wrong on our end. Refresh to try again."
-            onRetry={() => {
-              stats.refetch();
-              recentSites.refetch();
-            }}
+            onRetry={() => stats.refetch()}
           />
         </div>
       </div>
@@ -170,15 +143,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <PageHeader
-        title={greeting}
-        description="Here's what's happening in your workspace."
-        actions={
-          <Link href="/dashboard/sites/new" className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
-            <Plus className="h-4 w-4" />New Site
-          </Link>
-        }
-      />
+      <PageHeader title={greeting} description="Here's what's happening across your workspace." />
 
       <NeedsAttention />
 
@@ -187,80 +152,60 @@ export default function DashboardPage() {
           <EmptyState variant={emptyVariant} />
         </div>
       ) : (
-        <div className="mt-6 space-y-8">
-          {/* Stat Cards */}
+        <div className="space-y-6">
+          {/* Stat tiles */}
           <div className="grid grid-cols-4 gap-4">
             <StatCard
-              label="Total Sites"
-              mono={false}
-              value={<><MetricValue>{stats.data?.totalSites ?? 0}</MetricValue> sites</>}
-              delta={<><MetricValue>{stats.data?.publishedSites ?? 0}</MetricValue> published · <MetricValue>{stats.data?.draftSites ?? 0}</MetricValue> draft</>}
+              label="Sites"
+              value={stats.data?.totalSites ?? 0}
+              delta={<><MetricValue>{stats.data?.draftSites ?? 0}</MetricValue> in draft</>}
               href="/dashboard/sites"
-              visual={
-                <MiniDonut
-                  segments={[
-                    { value: stats.data?.publishedSites ?? 0, color: "var(--color-success)" },
-                    { value: stats.data?.draftSites ?? 0, color: "#EAB308" },
-                    { value: stats.data?.archivedSites ?? 0, color: "var(--color-text-secondary)" },
-                  ]}
-                />
-              }
             />
             <StatCard
               label="Published"
               mono={false}
               value={<><MetricValue>{stats.data?.publishedSites ?? 0}</MetricValue> live</>}
-              delta={stats.data?.lastPublishedSiteName ? `Last: ${stats.data.lastPublishedSiteName}` : undefined}
+              delta={(stats.data?.publishedSites ?? 0) > 0 ? "live now" : "none published"}
               href="/dashboard/sites?status=published"
             />
             <StatCard
-              label="Monthly Visits"
-              value={<MetricValue>{stats.data?.monthlyVisits ?? 0}</MetricValue>}
+              label="Visitors"
+              value={formatCompact(stats.data?.monthlyVisits ?? 0)}
+              delta={
+                <span className="flex items-center gap-1">
+                  <TrendArrow value={stats.data?.visitsChange ?? 0} /> · 30d
+                </span>
+              }
               href="/dashboard/sites"
-              delta={stats.data?.visitsChange !== undefined ? <span className="flex items-center gap-1"><TrendArrow value={stats.data.visitsChange} /> vs last month</span> : undefined}
-              visual={stats.data?.dailyVisitors && stats.data.dailyVisitors.length >= 2 ? <Sparkline data={stats.data.dailyVisitors} /> : undefined}
             />
             <StatCard
-              label="Collaborators"
-              mono={false}
-              value={<><MetricValue>{stats.data?.collaborators ?? 0}</MetricValue> active</>}
-              delta={stats.data?.pendingInvites ? <><MetricValue>{stats.data.pendingInvites}</MetricValue> pending</> : undefined}
+              label="Form leads"
+              value={stats.data?.collaborators ?? 0}
+              delta={
+                (stats.data?.pendingInvites ?? 0) > 0
+                  ? <><MetricValue>{stats.data?.pendingInvites}</MetricValue> pending</>
+                  : undefined
+              }
               href="/dashboard/team"
-              visual={stats.data?.memberAvatars && stats.data.memberAvatars.length > 0 ? <AvatarStack avatars={stats.data.memberAvatars} /> : undefined}
             />
           </div>
 
-          {/* Quick Actions */}
-          <QuickActions actions={quickActions} />
-
-          {/* Recent Sites */}
-          {recentSites.data && recentSites.data.length > 0 && (
-            <RecentSites sites={recentSites.data} />
-          )}
-
-          {/* Activity + Health side by side */}
-          <div className="grid grid-cols-3 gap-6">
-            <div className="col-span-2">
-              <div className="mb-2 flex gap-1">
-                {(["all", "mine", "team"] as const).map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setActivityFilter(f)}
-                    className={
-                      activityFilter === f
-                        ? "rounded-lg bg-[var(--color-bg-subtle)] px-3 py-1 text-xs font-medium text-[var(--color-text-primary)]"
-                        : "rounded-lg px-3 py-1 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)]"
-                    }
-                  >
-                    {f === "all" ? "All" : f === "mine" ? "My Activity" : "Team"}
-                  </button>
-                ))}
-              </div>
+          {/* Recent activity + Quick actions */}
+          <div className="grid gap-6" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
+            <SectionCard
+              title="Recent activity"
+              actions={
+                <Link href="/dashboard/notifications" className="text-body-sm font-medium" style={{ color: "var(--color-primary)" }}>
+                  View all
+                </Link>
+              }
+            >
               <ActivityFeed feed={activity.data ?? { groups: [] }} />
-            </div>
-            <div>
-              {showHealth && health.data && <WorkspaceHealth data={health.data} />}
-            </div>
+            </SectionCard>
+
+            <SectionCard title="Quick actions">
+              <QuickActions />
+            </SectionCard>
           </div>
         </div>
       )}

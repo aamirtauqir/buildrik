@@ -18,18 +18,49 @@ interface FolderTabsProps {
   onToggleArchived: () => void;
 }
 
+function Tab({ active, onClick, name, count }: { active: boolean; onClick: () => void; name: string; count: number }) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "-mb-px flex items-center gap-1.5 border-b-2 px-1 py-2.5 text-body font-medium transition-colors",
+        active
+          ? "border-[var(--color-primary)] text-[var(--color-primary)]"
+          : "border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+      )}
+    >
+      {name}
+      <span
+        className="rounded-pill px-1.5 py-0.5 text-eyebrow font-semibold"
+        style={{
+          backgroundColor: active ? "var(--color-primary-subtle)" : "var(--color-bg-subtle)",
+          color: active ? "var(--color-primary)" : "var(--color-text-muted)",
+        }}
+      >
+        {count}
+      </span>
+    </button>
+  );
+}
+
 export function FolderTabs({ tabs, activeId, onSelect, onCreateFolder, archivedCount, showArchived, onToggleArchived }: FolderTabsProps) {
   return (
-    <div className="flex items-center gap-1 border-b" style={{ borderColor: "var(--color-border-default)" }}>
+    <div className="flex items-center gap-5 border-b" style={{ borderColor: "var(--color-border-default)" }}>
       {tabs.map((tab) => (
-        <button key={tab.id ?? "all"} onClick={() => onSelect(tab.id)} className={cn("px-4 py-2.5 text-sm font-medium transition-colors", activeId === tab.id ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]" : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]")}>
-          {tab.name} ({tab.count})
-        </button>
+        <Tab
+          key={tab.id ?? "all"}
+          active={!showArchived && activeId === tab.id}
+          onClick={() => onSelect(tab.id)}
+          name={tab.name}
+          count={tab.count}
+        />
       ))}
-      <button onClick={onToggleArchived} className={cn("px-4 py-2.5 text-sm font-medium transition-colors", showArchived ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]" : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]")}>
-        Archived ({archivedCount})
-      </button>
-      <button onClick={onCreateFolder} className="ml-auto rounded-lg p-2 transition-colors hover:bg-[var(--color-bg-subtle)]" aria-label="Create folder">
+      <Tab active={showArchived} onClick={onToggleArchived} name="Archived" count={archivedCount} />
+      <button
+        onClick={onCreateFolder}
+        className="ml-auto rounded-md p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
+        aria-label="Create folder"
+      >
         <FolderPlus className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
       </button>
     </div>

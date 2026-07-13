@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { Globe, FileText, Pencil, Settings, Users, Clock } from "lucide-react";
+import { FileText, Pencil, Settings, Users, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
 import { ContextMenu } from "./context-menu";
 import { EditorLink } from "@/components/editor-route/EditorLink";
-import { siteStatusTone } from "./site-status";
+import { siteStatusTone, siteStatusLabel } from "./site-status";
 import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
 interface SiteCardFullProps {
@@ -31,43 +31,48 @@ function formatVisitors(count: number): string {
 
 export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFullProps) {
   return (
-    <div className={cn("group relative rounded-xl border bg-white transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")} style={{ borderColor: "var(--color-border-default)" }}>
+    <div
+      className={cn("group relative overflow-hidden rounded-xl border bg-white shadow-card transition-shadow hover:shadow-md", selected && "ring-2 ring-[var(--color-primary)]")}
+      style={{ borderColor: "var(--color-border-default)" }}
+    >
       <div className="absolute left-3 top-3 z-10">
         <input type="checkbox" checked={selected} onChange={() => {}} className="h-4 w-4 rounded border-gray-300 accent-[var(--color-primary)]" onClick={(e) => { e.stopPropagation(); onSelect(site.id, e); }} />
       </div>
       <Link href={`/dashboard/sites/${site.id}`}>
-        <div className="flex h-36 items-center justify-center rounded-t-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
-          <Globe className="h-10 w-10" style={{ color: "var(--color-text-muted)" }} />
-        </div>
+        {/* 16:10 gradient preview placeholder */}
+        <div
+          className="aspect-[16/10] w-full"
+          style={{ background: "linear-gradient(135deg, var(--color-primary-subtle) 0%, var(--color-bg-subtle) 100%)" }}
+        />
         <div className="p-4">
-          <div className="flex items-center justify-between">
-            <h3 className="truncate text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{site.name}</h3>
-            <Pill tone={siteStatusTone(site.status)} className="shrink-0">{site.status.toLowerCase()}</Pill>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="truncate text-[14px] font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{site.name}</h3>
+            <Pill tone={siteStatusTone(site.status)} className="shrink-0">{siteStatusLabel(site.status)}</Pill>
           </div>
           <div className="mt-1 flex items-center gap-2">
-            <p className="truncate text-xs" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p>
+            <p className="truncate text-body-sm" style={{ color: "var(--color-text-muted)" }}>{site.slug}.buildrik.app</p>
             {site.themeLocked && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--color-bg-subtle)] px-1.5 py-0.5 text-[10px] font-medium" style={{ color: "var(--color-text-secondary)" }} title="This site overrides the shared theme">
-                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: "#EAB308" }} />
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-pill bg-[var(--color-bg-subtle)] px-1.5 py-0.5 text-eyebrow font-medium" style={{ color: "var(--color-text-secondary)" }} title="This site overrides the shared theme">
+                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: "var(--color-amber)" }} />
                 Local theme
               </span>
             )}
           </div>
-          <div className="mt-2 flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-            <span className="flex items-center gap-1"><FileText className="h-3 w-3" /><MetricValue>{site.pages}</MetricValue> pages</span>
-            <span className="flex items-center gap-1"><Users className="h-3 w-3" /><MetricValue>{formatVisitors(site.visitors30d)}</MetricValue> visitors</span>
+          <div className="mt-2.5 flex items-center gap-3 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <span className="flex items-center gap-1"><FileText className="h-3.5 w-3.5" /><MetricValue>{site.pages}</MetricValue> pages</span>
+            <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /><MetricValue>{formatVisitors(site.visitors30d)}</MetricValue> visitors</span>
+            <span className="ml-auto flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
+              <Clock className="h-3.5 w-3.5" /><MetricValue>{getTimeAgo(site.lastEditedAt)}</MetricValue>
+            </span>
           </div>
-          <p className="mt-1.5 flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
-            <Clock className="h-3 w-3" />Edited <MetricValue>{getTimeAgo(site.lastEditedAt)}</MetricValue>
-          </p>
         </div>
       </Link>
       <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-b-xl bg-white/95 px-4 py-3 opacity-0 transition-opacity group-hover:opacity-100" style={{ borderTop: "1px solid var(--color-border-default)" }}>
-        <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
-          <Pencil className="h-3 w-3" />Edit
+        <EditorLink siteId={site.id} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-body-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
+          <Pencil className="h-3.5 w-3.5" />Edit
         </EditorLink>
-        <Link href={`/dashboard/sites/${site.id}`} className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
-          <Settings className="h-3 w-3" />Manage
+        <Link href={`/dashboard/sites/${site.id}`} className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-body-sm font-medium" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+          <Settings className="h-3.5 w-3.5" />Manage
         </Link>
         <div className="ml-auto">
           <ContextMenu siteStatus={site.status} onAction={(action) => onAction(action, site.id)} />

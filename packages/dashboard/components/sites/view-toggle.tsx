@@ -11,12 +11,27 @@ const iconMap = { LayoutGrid, List } as const;
 
 export function ViewToggle({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <div className="flex rounded-lg border" style={{ borderColor: "var(--color-border-default)" }}>
+    <div
+      className="flex items-center gap-0.5 rounded-md border p-0.5"
+      style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+    >
       {VIEW_MODES.map((mode) => {
         const Icon = iconMap[mode.icon as keyof typeof iconMap];
+        const active = value === mode.value;
         return (
-          <button key={mode.value} onClick={() => onChange(mode.value)} className={cn("p-2 transition-colors", value === mode.value ? "bg-[var(--color-bg-subtle)]" : "hover:bg-[var(--color-bg-subtle)]")} aria-label={mode.label} title={mode.label}>
-            <Icon className="h-4 w-4" style={{ color: value === mode.value ? "var(--color-text-primary)" : "var(--color-text-secondary)" }} />
+          <button
+            key={mode.value}
+            onClick={() => onChange(mode.value)}
+            className="flex h-[34px] w-[34px] items-center justify-center rounded-sm transition-colors"
+            style={{
+              backgroundColor: active ? "var(--color-primary-subtle)" : "transparent",
+              color: active ? "var(--color-primary)" : "var(--color-text-secondary)",
+            }}
+            aria-label={mode.label}
+            aria-pressed={active}
+            title={mode.label}
+          >
+            <Icon className="h-4 w-4" />
           </button>
         );
       })}

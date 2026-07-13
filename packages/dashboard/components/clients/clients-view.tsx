@@ -1,18 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Briefcase, Plus, Pencil, Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Briefcase, Plus, Pencil, Trash2, X, MoreHorizontal } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
+import { PageHeader, StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
 
 interface ClientRow {
   id: string;
   name: string;
   brandColor: string | null;
+  customDomain: string | null;
   siteCount: number;
 }
+
+// Initials-tile palette. A client's own brandColor wins when set; otherwise the
+// tile cycles the design-system accent tokens so an un-branded list still reads
+// as a coordinated set.
+const TILE_TOKENS = ["var(--color-teal)", "var(--color-amber)", "var(--color-primary)", "var(--color-pink)"];
 
 // Single name dialog reused for create + rename (the only field that needs
 // input at this stage; branding/white-label lands in E2-T5).
@@ -123,6 +130,7 @@ function ConfirmDeleteDialog({
 }
 
 export function ClientsView() {
+  const router = useRouter();
   const { addToast } = useToast();
   // clients.list returns [] both when the agency_layer flag is off AND when it's
   // on with zero clients — the flag disambiguates so a solo workspace gets a
@@ -133,6 +141,7 @@ export function ClientsView() {
   const [creating, setCreating] = useState(false);
   const [renaming, setRenaming] = useState<ClientRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<ClientRow | null>(null);
+  const [menu, setMenu] = useState<{ id: string; top: number; left: number } | null>(null);
 
   const createMut = trpc.clients.create.useMutation({
     onSuccess: () => {
@@ -161,26 +170,100 @@ export function ClientsView() {
 
   const clients = (clientsQuery.data ?? []) as ClientRow[];
 
+  // Derived summary + status, computed from the list the view already loads (no
+  // extra tRPC). A client with sites is "Active"; one with none is still
+  // "Awaiting" its first site / sign-off.
+  const activeClients = clients.filter((c) => c.siteCount > 0).length;
+  const totalSites = clients.reduce((n, c) => n + c.siteCount, 0);
+  const awaiting = clients.filter((c) => c.siteCount === 0).length;
+
+  const tileColor = new Map(
+    clients.map((c, i) => [c.id, c.brandColor ?? TILE_TOKENS[i % TILE_TOKENS.length]] as const),
+  );
+
+  const columns: Column<ClientRow>[] = [
+    {
+      key: "name",
+      header: "Client",
+      render: (c) => (
+        <div className="flex items-center gap-3">
+          <span
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-eyebrow font-semibold text-white"
+            style={{ backgroundColor: tileColor.get(c.id) }}
+          >
+            {c.name.slice(0, 2).toUpperCase()}
+          </span>
+          <span className="font-medium" style={{ color: "var(--color-text-primary)" }}>{c.name}</span>
+        </div>
+      ),
+    },
+    {
+      key: "sites",
+      header: "Sites",
+      render: (c) => (
+        <span>
+          <MetricValue>{c.siteCount}</MetricValue>{" "}
+          <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
+            {c.siteCount === 1 ? "site" : "sites"}
+          </span>
+        </span>
+      ),
+    },
+    {
+      key: "contact",
+      header: "Contact",
+      render: (c) =>
+        c.customDomain ? (
+          <span style={{ color: "var(--color-text-secondary)" }}>{c.customDomain}</span>
+        ) : (
+          <span style={{ color: "var(--color-text-muted)" }}>—</span>
+        ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (c) =>
+        c.siteCount > 0 ? <Pill tone="success">Active</Pill> : <Pill tone="warning">Awaiting</Pill>,
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      render: (c) => (
+        <button
+          type="button"
+          aria-label="Client actions"
+          onClick={(e) => {
+            e.stopPropagation();
+            const r = e.currentTarget.getBoundingClientRect();
+            setMenu(menu?.id === c.id ? null : { id: c.id, top: r.bottom + 4, left: r.right - 156 });
+          }}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-[var(--color-bg-subtle)]"
+        >
+          <MoreHorizontal className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
+        </button>
+      ),
+    },
+  ];
+
+  const addButton = agencyEnabled ? (
+    <button
+      onClick={() => setCreating(true)}
+      className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white"
+      style={{ backgroundColor: "var(--color-primary)" }}
+    >
+      <Plus className="h-4 w-4" />
+      Add client
+    </button>
+  ) : undefined;
+
   return (
     <div>
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Clients</h1>
-          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-            Group sites by the client they belong to.
-          </p>
-        </div>
-        {agencyEnabled && clients.length > 0 && (
-          <button
-            onClick={() => setCreating(true)}
-            className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
-            <Plus className="h-4 w-4" />
-            New client
-          </button>
-        )}
-      </header>
+      <PageHeader
+        title="Clients"
+        description="Organize sites by client and collect sign-off."
+        actions={addButton}
+      />
 
       {featuresQuery.isLoading ? (
         <LoadingSkeleton rows={3} variant="card" />
@@ -203,49 +286,65 @@ export function ClientsView() {
           icon={<Briefcase className="h-7 w-7" />}
           title="No clients yet"
           description="Create a client to group its sites, brand them, and invite the client to edit content."
-          action={{ label: "+ New client", onClick: () => setCreating(true) }}
+          action={{ label: "Add client", onClick: () => setCreating(true) }}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {clients.map((c) => (
-            <div
-              key={c.id}
-              className="group rounded-xl border bg-white p-4 transition-shadow hover:shadow-sm"
-              style={{ borderColor: "var(--color-border-default)" }}
-            >
-              <div className="flex items-start justify-between">
-                <span
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-semibold text-white"
-                  style={{ backgroundColor: c.brandColor ?? "var(--color-primary)" }}
-                >
-                  {c.name.slice(0, 2).toUpperCase()}
+        <>
+          <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <StatCard label="Active clients" value={<MetricValue>{activeClients}</MetricValue>} />
+            <StatCard label="Client sites" value={<MetricValue>{totalSites}</MetricValue>} />
+            <StatCard
+              label="Awaiting sign-off"
+              value={
+                <span style={{ color: "var(--color-warning)" }}>
+                  <MetricValue>{awaiting}</MetricValue>
                 </span>
-                <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button
-                    onClick={() => setRenaming(c)}
-                    aria-label="Rename client"
-                    className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]"
-                  >
-                    <Pencil className="h-3.5 w-3.5" style={{ color: "var(--color-text-secondary)" }} />
-                  </button>
-                  <button
-                    onClick={() => setConfirmDelete(c)}
-                    aria-label="Delete client"
-                    className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" style={{ color: "var(--color-text-secondary)" }} />
-                  </button>
-                </div>
-              </div>
-              <Link href={`/dashboard/clients/${c.id}`} className="mt-3 block">
-                <h3 className="text-sm font-semibold hover:underline" style={{ color: "var(--color-text-primary)" }}>{c.name}</h3>
-                <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                  {c.siteCount} {c.siteCount === 1 ? "site" : "sites"}
-                </p>
-              </Link>
-            </div>
-          ))}
-        </div>
+              }
+            />
+          </div>
+
+          <DataTable
+            columns={columns}
+            rows={clients}
+            keyOf={(c) => c.id}
+            onRowClick={(c) => router.push(`/dashboard/clients/${c.id}`)}
+          />
+        </>
+      )}
+
+      {menu && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setMenu(null)} />
+          <div
+            className="fixed z-50 w-[156px] overflow-hidden rounded-lg border shadow-card"
+            style={{ top: menu.top, left: menu.left, borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                const c = clients.find((x) => x.id === menu.id);
+                if (c) setRenaming(c);
+                setMenu(null);
+              }}
+              className="flex w-full items-center gap-2 px-3 py-2 text-body-sm hover:bg-[var(--color-bg-subtle)]"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              <Pencil className="h-3.5 w-3.5" /> Rename
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const c = clients.find((x) => x.id === menu.id);
+                if (c) setConfirmDelete(c);
+                setMenu(null);
+              }}
+              className="flex w-full items-center gap-2 px-3 py-2 text-body-sm hover:bg-[var(--color-bg-subtle)]"
+              style={{ color: "var(--color-error)" }}
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Delete
+            </button>
+          </div>
+        </>
       )}
 
       {creating && (

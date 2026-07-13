@@ -1,63 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Plus,
-  UserPlus,
-  Globe,
-  BarChart3,
-  Settings,
-  CreditCard,
-  Headphones,
-  LayoutTemplate,
-  type LucideIcon,
-} from "lucide-react";
 
-export const QUICK_ACTION_ICONS: Record<string, LucideIcon> = {
-  Plus,
-  UserPlus,
-  Globe,
-  BarChart3,
-  Settings,
-  CreditCard,
-  Headphones,
-  LayoutTemplate,
-};
+// Fixed destinations, reusing the hrefs the dynamic quick-action list already
+// pointed at (create-site flow, team invite, template start).
+const ACTIONS = [
+  { label: "Create a site", href: "/dashboard/sites/new", variant: "primary" as const },
+  { label: "Invite teammate", href: "/dashboard/team", variant: "outline" as const },
+  { label: "Browse templates", href: "/dashboard/sites/new?method=template", variant: "outline" as const },
+];
 
-type QuickAction = {
-  icon: string;
-  label: string;
-  description: string;
-  href: string;
-};
-
-type QuickActionsProps = {
-  actions: QuickAction[];
-};
-
-export function QuickActions({ actions }: QuickActionsProps) {
-  const visible = actions.slice(0, 4);
-
+export function QuickActions() {
   return (
-    <div className="flex flex-row gap-3">
-      {visible.map((action) => {
-        const Icon = QUICK_ACTION_ICONS[action.icon] ?? Plus;
-        return (
+    <div className="flex flex-col gap-2">
+      {ACTIONS.map((action) =>
+        action.variant === "primary" ? (
           <Link
             key={action.label}
             href={action.href}
-            className="flex flex-1 items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-white p-4 hover:border-[var(--color-primary)]/30 transition-colors"
+            className="flex items-center justify-center rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-body font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)]"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-subtle)]">
-              <Icon className="h-4 w-4 text-[var(--color-primary)]" />
-            </span>
-            <div>
-              <p className="text-sm font-medium text-[var(--color-text-primary)]">{action.label}</p>
-              <p className="text-xs text-[var(--color-text-muted)]">{action.description}</p>
-            </div>
+            {action.label}
           </Link>
-        );
-      })}
+        ) : (
+          <Link
+            key={action.label}
+            href={action.href}
+            className="flex items-center justify-center rounded-lg border px-4 py-2.5 text-body font-medium transition-colors hover:border-[var(--color-primary)]"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          >
+            {action.label}
+          </Link>
+        )
+      )}
     </div>
   );
 }

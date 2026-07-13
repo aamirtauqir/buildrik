@@ -74,7 +74,7 @@ export function AICreditsTab({
             <MetricValue>{used}/{limit}</MetricValue> credits used
           </p>
         </div>
-        <ProgressBar pct={usagePercent} tone="auto" />
+        <ProgressBar pct={usagePercent} tone="accent" />
         <p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
           Credits reset on the 1st of each month.
         </p>

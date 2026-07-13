@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
+import { cn } from "@lib/utils";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { PageHeader, SectionCard, MetricValue, ProgressBar } from "@/components/dashboard/primitives";
 
@@ -40,7 +41,7 @@ export default function GettingStartedPage() {
   const firstIncompleteId = STEPS.find((s) => !completion[s.id])?.id;
 
   return (
-    <div>
+    <div className="mx-auto max-w-[760px]">
       <PageHeader title="Getting started" description="Finish setup to launch your first site." />
 
       {onboarding.isLoading ? (
@@ -54,7 +55,7 @@ export default function GettingStartedPage() {
       ) : (
         <>
           <SectionCard className="mb-5">
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+            <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
               <MetricValue>{doneCount}</MetricValue> of <MetricValue>{STEPS.length}</MetricValue> complete
               <span style={{ color: "var(--color-text-secondary)" }}> · <MetricValue>{pct}%</MetricValue></span>
             </p>
@@ -65,29 +66,38 @@ export default function GettingStartedPage() {
             <ul>
               {STEPS.map((step) => {
                 const done = completion[step.id];
-                const isNext = step.id === firstIncompleteId;
+                const isCurrent = step.id === firstIncompleteId;
                 return (
                   <li
                     key={step.id}
                     className="flex items-center gap-3 border-b px-4 py-3.5 last:border-0"
-                    style={{ borderColor: "var(--color-border-default)" }}
+                    style={{
+                      borderColor: "var(--color-border-default)",
+                      backgroundColor: isCurrent ? "var(--color-primary-subtle)" : undefined,
+                    }}
                   >
                     {done ? (
-                      <CheckCircle2 className="h-5 w-5 flex-shrink-0" style={{ color: "var(--color-success)" }} />
+                      <span
+                        className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+                        style={{ backgroundColor: "var(--color-success)" }}
+                        aria-hidden
+                      >
+                        <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                      </span>
                     ) : (
                       <span
                         className="h-5 w-5 flex-shrink-0 rounded-full border-2"
-                        style={{ borderColor: "var(--color-border-default)" }}
+                        style={{ borderColor: isCurrent ? "var(--color-primary)" : "var(--color-border-strong)" }}
                         aria-hidden
                       />
                     )}
                     <span
-                      className="flex-1 text-sm font-medium"
-                      style={{ color: done ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}
+                      className={cn("flex-1 text-body font-medium", done && "line-through")}
+                      style={{ color: done ? "var(--color-text-muted)" : "var(--color-text-primary)" }}
                     >
                       {step.title}
                     </span>
-                    {isNext && (
+                    {isCurrent && (
                       <Link
                         href={step.href}
                         className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"

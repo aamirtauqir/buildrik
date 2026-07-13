@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { Folder, FolderPlus, Layers, MoreHorizontal, Plus, Users } from "lucide-react";
+import { Folder, FolderPlus, Layers, MoreHorizontal, Plus } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
-import { PageHeader, MetricValue, Pill } from "@/components/dashboard/primitives";
+import { PageHeader, MetricValue } from "@/components/dashboard/primitives";
+import { AvatarStack } from "@/components/dashboard/dataviz";
 import { useToast } from "@/components/dashboard/toast-provider";
 
 const UNGROUPED_KEY = "__ungrouped__";
+
+// Folder-tile accent cycle — tokens only. Cards step through these in grid order.
+const ICON_TONES = ["var(--color-primary)", "var(--color-amber)", "var(--color-teal)", "var(--color-pink)"];
 
 type ProjectGroup = {
   key: string;
@@ -15,8 +19,8 @@ type ProjectGroup = {
   total: number;
   published: number;
   ungrouped: boolean;
-  /** distinct site creators in this project — no name/avatar data exists, so this
-   *  drives a member-count chip rather than an avatar stack */
+  /** distinct site creators in this project — only user ids exist (no name/avatar
+   *  data), so these drive an initial-based avatar stack, not per-person photos */
   members: Set<string>;
 };
 
@@ -115,48 +119,60 @@ export default function ProjectsPage() {
           action={{ label: "New site", href: "/dashboard/sites/new" }}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {groups.map((group) => {
+        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
+          {groups.map((group, i) => {
             const Icon = group.ungrouped ? Layers : Folder;
+            const tone = ICON_TONES[i % ICON_TONES.length];
+            const members = [...group.members];
             return (
               <div
                 key={group.key}
-                className="rounded-xl border p-5"
+                className="flex min-h-[150px] flex-col rounded-xl border p-5 shadow-card"
                 style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
               >
                 <div className="mb-4 flex items-start justify-between">
                   <div
-                    className="flex h-10 w-10 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
+                    className="flex h-[38px] w-[38px] items-center justify-center rounded-lg text-white"
+                    style={{ backgroundColor: tone }}
                   >
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-[18px] w-[18px]" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    {group.members.size > 0 && (
-                      <Pill tone="neutral" className="tabular-nums">
-                        <Users className="h-3 w-3" />
-                        {group.members.size} {group.members.size === 1 ? "member" : "members"}
-                      </Pill>
-                    )}
-                    <button
-                      type="button"
-                      aria-label="Project options"
-                      className="rounded-md p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
-                      style={{ color: "var(--color-text-secondary)" }}
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    aria-label="Project options"
+                    className="-mr-1.5 -mt-1 rounded-md p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </button>
                 </div>
-                <h2 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{group.name}</h2>
-                <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{group.name}</h2>
+                <p className="mt-1 font-mono text-body-sm tabular-nums" style={{ color: "var(--color-text-muted)" }}>
                   <MetricValue>{group.total}</MetricValue> {group.total === 1 ? "site" : "sites"}
                   {" · "}
                   <span style={{ color: "var(--color-success)" }}><MetricValue>{group.published}</MetricValue> published</span>
                 </p>
+                {members.length > 0 && (
+                  <div className="mt-auto pt-4">
+                    <AvatarStack avatars={members.map((id) => ({ name: id, avatar: null }))} />
+                  </div>
+                )}
               </div>
             );
           })}
+          <Link
+            href="/dashboard/sites/new"
+            className="flex min-h-[150px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+            style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-secondary)" }}
+          >
+            <div
+              className="flex h-[38px] w-[38px] items-center justify-center rounded-lg"
+              style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}
+            >
+              <Plus className="h-[18px] w-[18px]" />
+            </div>
+            New project
+          </Link>
         </div>
       )}
     </div>

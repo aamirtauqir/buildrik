@@ -9,15 +9,16 @@ import { InviteModal } from "@/components/team/invite-modal";
 import { PendingInvites } from "@/components/team/pending-invites";
 import { TeamEmptyState } from "@/components/team/team-empty-state";
 import { ErrorState } from "@/components/states";
-import { PageHeader, StatCard, MetricValue } from "@/components/dashboard/primitives";
+import { PageHeader, MetricValue } from "@/components/dashboard/primitives";
 import { UserPlus } from "lucide-react";
 
-const TEAM_DESCRIPTION = "Manage who can access and edit your workspace.";
+const TEAM_DESCRIPTION = "Manage members, roles, and seats.";
 
 export default function TeamPage() {
   const { data: session } = useSession();
   const { addToast } = useToast();
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
 
   // Queries
   const statsQuery = trpc.team.stats.useQuery();
@@ -103,11 +104,7 @@ export default function TeamPage() {
     return (
       <div>
         <PageHeader title="Team" description={TEAM_DESCRIPTION} />
-        <div className="grid grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-          ))}
-        </div>
+        <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
       </div>
     );
   }
@@ -136,14 +133,34 @@ export default function TeamPage() {
         title="Team"
         description={TEAM_DESCRIPTION}
         actions={
-          <button
-            onClick={() => setInviteOpen(true)}
-            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
-            <UserPlus className="h-4 w-4" />
-            Invite Member
-          </button>
+          <>
+            {statsQuery.data && (
+              <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+                <MetricValue>{statsQuery.data.active} / {statsQuery.data.total}</MetricValue> seats
+              </span>
+            )}
+            {!isEmpty && (
+              <button
+                onClick={() => setSelectMode((v) => !v)}
+                className="rounded-lg border px-3 py-2 text-body font-medium transition-colors"
+                style={
+                  selectMode
+                    ? { borderColor: "var(--color-primary)", color: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }
+                    : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }
+                }
+              >
+                Select
+              </button>
+            )}
+            <button
+              onClick={() => setInviteOpen(true)}
+              className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white"
+              style={{ backgroundColor: "var(--color-primary)" }}
+            >
+              <UserPlus className="h-4 w-4" />
+              Invite
+            </button>
+          </>
         }
       />
 
@@ -151,15 +168,6 @@ export default function TeamPage() {
         <TeamEmptyState onInvite={() => setInviteOpen(true)} />
       ) : (
         <div className="space-y-8">
-          {/* Stats */}
-          {statsQuery.data && (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <StatCard label="Total Members" value={<MetricValue>{statsQuery.data.total}</MetricValue>} />
-              <StatCard label="Active" value={<MetricValue>{statsQuery.data.active}</MetricValue>} />
-              <StatCard label="Pending Invitations" value={<MetricValue>{statsQuery.data.pending}</MetricValue>} />
-            </div>
-          )}
-
           {/* Members Table */}
           {membersQuery.data && (
             <MembersTable
@@ -169,6 +177,8 @@ export default function TeamPage() {
               onChangeRole={(memberId, role) =>
                 changeRoleMutation.mutate({ memberId, role: role as "ADMIN" | "EDITOR" | "VIEWER" })
               }
+              selectMode={selectMode}
+              onExitSelectMode={() => setSelectMode(false)}
             />
           )}
 

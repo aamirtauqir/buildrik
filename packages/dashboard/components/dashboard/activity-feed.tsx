@@ -33,32 +33,34 @@ export function collapseEntries(entries: ActivityEntry[]): Array<{ entry: Activi
   return out;
 }
 
-function EntryRow({ entry, count }: { entry: ActivityEntry; count: number }) {
+// Dot colors cycle through the accent set (primary → success → amber → teal)
+// so the flat feed reads as a scannable, rhythmic list.
+const DOT_COLORS = [
+  "var(--color-primary)",
+  "var(--color-success)",
+  "var(--color-amber)",
+  "var(--color-teal)",
+];
+
+function ActivityRow({ entry, count, index }: { entry: ActivityEntry; count: number; index: number }) {
   return (
-    <li className="flex items-start gap-3">
-      {entry.actorAvatar ? (
-        <img
-          src={entry.actorAvatar}
-          alt=""
-          className="mt-0.5 h-5 w-5 shrink-0 rounded-full object-cover"
-        />
-      ) : (
-        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--color-primary)]" />
-      )}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-[var(--color-text-primary)]">
-          {entry.actorName && (
-            <span className="font-medium">{entry.actorName} </span>
-          )}
-          {entry.description ?? entry.action}
-          {count > 1 && (
-            <span className="ml-1.5 text-xs font-medium text-[var(--color-text-muted)]">
-              ×{count}
-            </span>
-          )}
-        </p>
-        <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">{timeAgo(entry.createdAt)}</p>
-      </div>
+    <li className="flex items-center gap-3">
+      <span
+        className="h-2 w-2 shrink-0 rounded-full"
+        style={{ backgroundColor: DOT_COLORS[index % DOT_COLORS.length] }}
+      />
+      <p className="min-w-0 flex-1 truncate text-body" style={{ color: "var(--color-text-primary)" }}>
+        {entry.actorName && <span className="font-medium">{entry.actorName} </span>}
+        {entry.description ?? entry.action}
+        {count > 1 && (
+          <span className="ml-1.5 text-body-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
+            ×{count}
+          </span>
+        )}
+      </p>
+      <span className="shrink-0 font-mono tabular-nums text-body-sm" style={{ color: "var(--color-text-muted)" }}>
+        {timeAgo(entry.createdAt)}
+      </span>
     </li>
   );
 }
@@ -67,33 +69,25 @@ type ActivityFeedProps = {
   feed: ActivityFeedData;
 };
 
+/** Flat "Recent activity" list — colored dot + text + right-aligned mono
+ *  timestamp per row. Renders rows only; the surrounding SectionCard owns the
+ *  title, "View all" action, and card chrome. */
 export function ActivityFeed({ feed }: ActivityFeedProps) {
-  if (feed.groups.length === 0) {
+  const rows = collapseEntries(feed.groups.flatMap((group) => group.entries));
+
+  if (rows.length === 0) {
     return (
-      <div className="rounded-xl border border-[var(--color-border-default)] bg-white p-5">
-        <h2 className="mb-4 text-sm font-semibold text-[var(--color-text-primary)]">Activity</h2>
-        <p className="py-8 text-center text-sm text-[var(--color-text-muted)]">No activity yet.</p>
-      </div>
+      <p className="py-8 text-center text-body" style={{ color: "var(--color-text-muted)" }}>
+        No activity yet.
+      </p>
     );
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border-default)] bg-white p-5">
-      <h2 className="mb-4 text-sm font-semibold text-[var(--color-text-primary)]">Activity</h2>
-      <div className="space-y-5">
-        {feed.groups.map((group) => (
-          <div key={group.label}>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--color-text-secondary)]">
-              {group.label}
-            </p>
-            <ul className="space-y-3">
-              {collapseEntries(group.entries).map(({ entry, count }) => (
-                <EntryRow key={entry.id} entry={entry} count={count} />
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
+    <ul className="space-y-3.5">
+      {rows.map(({ entry, count }, i) => (
+        <ActivityRow key={entry.id} entry={entry} count={count} index={i} />
+      ))}
+    </ul>
   );
 }
