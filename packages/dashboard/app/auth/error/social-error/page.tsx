@@ -8,14 +8,15 @@ import { AuthButton } from "@/components/auth/auth-button";
 
 function SocialErrorContent() {
   const searchParams = useSearchParams();
-  const provider = searchParams.get("provider") ?? "the provider";
-  const providerLabel = provider.charAt(0).toUpperCase() + provider.slice(1);
+  const provider = searchParams.get("provider");
+  // Only title-case a real provider name. Capitalising the fallback rendered
+  // "We couldn't authenticate with The provider." on any hit without ?provider.
+  const subtitle = provider
+    ? `We couldn't authenticate with ${provider.charAt(0).toUpperCase()}${provider.slice(1)}. Please try again.`
+    : "We couldn't authenticate with that provider. Please try again.";
 
   return (
-    <AuthMessage
-      title="Sign-in failed"
-      subtitle={`We couldn't authenticate with ${providerLabel}. Please try again.`}
-    >
+    <AuthMessage title="Sign-in failed" subtitle={subtitle}>
       <AuthButton onClick={() => window.history.back()}>Try again</AuthButton>
       <Link href="/auth" className="text-auth-label text-auth-link hover:underline text-center">
         Use email instead
