@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LayoutTemplate } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
+import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
@@ -35,40 +37,42 @@ export default function TemplateSelectedPage() {
   }
 
   return (
-    <WizardShell chrome={{ variant: "simple" }} onSkip={skipSetup} skipping={skipping}>
-      <div className="text-center mb-8">
-        <h1 className="text-onb-title font-bold text-onb-ink">Template selected</h1>
-        <p className="mt-2 text-sm text-onb-muted">Ready to start editing with this template.</p>
-      </div>
-
-      <div className="rounded-onb border border-onb-line bg-onb-surface px-4">
-        <div className="flex items-center justify-between py-2.5 border-b border-onb-line">
-          <span className="text-sm text-onb-muted">Template</span>
-          <span className="text-sm font-medium text-onb-ink">{q.data?.name ?? "…"}</span>
+    <WizardShell chrome={{ variant: "simple" }} onSkip={skipSetup} skipping={skipping} padY={48}>
+      <div className="flex flex-col items-center gap-10">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <h1 className="text-onb-title font-bold text-onb-text">Template selected</h1>
+          <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">
+            Ready to start editing with this template.
+          </p>
         </div>
-        <div className="flex items-center justify-between py-2.5">
-          <span className="text-sm text-onb-muted">Site</span>
-          <span className="text-sm font-medium text-onb-ink">{data.site?.name ?? "Untitled site"}</span>
+
+        <div className="w-[400px] max-w-full overflow-hidden rounded-xl bg-white shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
+          <div className="flex h-[220px] items-center justify-center bg-slate-100">
+            {q.data?.thumbnail ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={q.data.thumbnail} alt={q.data.name} className="h-full w-full object-cover" />
+            ) : (
+              <LayoutTemplate className="h-10 w-10 text-onb-subtle" />
+            )}
+          </div>
+          <div className="flex flex-col gap-2 p-5">
+            <span className="text-base font-semibold text-onb-text">{q.data?.name ?? "…"}</span>
+            <span className="text-[13px] text-onb-muted">{data.site?.name ?? "Untitled site"}</span>
+          </div>
         </div>
-      </div>
 
-      {netErr ? (
-        <p className="mt-4 text-sm text-onb-error text-center" role="alert">
-          {netErr}
-        </p>
-      ) : null}
+        {netErr ? (
+          <p className="text-center text-sm text-onb-error" role="alert">
+            {netErr}
+          </p>
+        ) : null}
 
-      <div className="mt-8 flex flex-col gap-2">
-        <OnbButton loading={busy} disabled={busy} onClick={start}>
-          Open in Editor
-        </OnbButton>
-        <button
-          type="button"
-          onClick={() => router.push("/onboarding/template")}
-          className="text-sm text-onb-muted hover:text-onb-text"
-        >
-          Choose another template
-        </button>
+        <div className="flex flex-col items-center gap-4 self-stretch">
+          <OnbButton loading={busy} disabled={busy} onClick={start}>
+            Open in Editor
+          </OnbButton>
+          <OnbBack to="/onboarding/template">Choose another template</OnbBack>
+        </div>
       </div>
     </WizardShell>
   );

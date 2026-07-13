@@ -79,53 +79,58 @@ export default function WorkspacePage() {
 
   return (
     <WizardShell chrome={{ variant: "stepper", step: 1 }} onSkip={skipSetup} skipping={skipping}>
-      <div className="text-center mb-8">
-        <h1 className="text-onb-title font-bold text-onb-ink">Create your workspace</h1>
-        <p className="mt-2 text-sm text-onb-muted">
-          Your workspace keeps clients, sites, assets, and team members together.
-        </p>
+      <div className="flex flex-col items-center gap-10">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <h1 className="text-onb-title font-bold text-onb-text">Create your workspace</h1>
+          <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">
+            Your workspace keeps clients, sites, assets, and team members together.
+          </p>
+        </div>
+
+        <form onSubmit={submit} className="flex w-full flex-col gap-4">
+          <OnbField
+            label="Workspace name"
+            placeholder="My Workspace"
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (nameError) setNameError(undefined);
+            }}
+            error={liveNameError}
+            autoFocus
+          />
+          <OnbSelect
+            label="Your role"
+            placeholder="Select your role"
+            options={ROLES}
+            value={role}
+            onChange={(e) => {
+              setRole(e.target.value);
+              if (roleError) setRoleError(undefined);
+            }}
+            error={roleError}
+          />
+          <OnbSelect
+            label="Team size (optional)"
+            options={TEAM_SIZES}
+            value={teamSize}
+            onChange={(e) => setTeamSize(e.target.value)}
+          />
+
+          <OnbButton type="submit" loading={busy} disabled={busy}>
+            {busy ? "Creating workspace…" : "Create workspace"}
+          </OnbButton>
+        </form>
       </div>
 
-      <form onSubmit={submit} className="flex flex-col gap-5">
-        <OnbField
-          label="Workspace name"
-          placeholder="My Workspace"
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-            if (nameError) setNameError(undefined);
-          }}
-          error={liveNameError}
-          autoFocus
-        />
-        <OnbSelect
-          label="Your role"
-          placeholder="Select your role"
-          options={ROLES}
-          value={role}
-          onChange={(e) => {
-            setRole(e.target.value);
-            if (roleError) setRoleError(undefined);
-          }}
-          error={roleError}
-        />
-        <OnbSelect
-          label="Team size (optional)"
-          options={TEAM_SIZES}
-          value={teamSize}
-          onChange={(e) => setTeamSize(e.target.value)}
-        />
-
-        {netError ? (
-          <p className="text-sm text-onb-error text-center" role="alert">
-            {netError}
-          </p>
-        ) : null}
-
-        <OnbButton type="submit" loading={busy} disabled={busy} className="mt-1">
-          Create workspace
-        </OnbButton>
-      </form>
+      {netError ? (
+        <div
+          role="alert"
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-[10px] border border-onb-error bg-white px-[18px] py-3 text-[13px] font-medium text-onb-error shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
+        >
+          ⚠ {netError}
+        </div>
+      ) : null}
     </WizardShell>
   );
 }

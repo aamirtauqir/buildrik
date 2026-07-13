@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Search, LayoutTemplate } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { cn } from "@lib/utils";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
+import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
@@ -24,7 +24,6 @@ const LABEL: Record<string, string> = Object.fromEntries(CATEGORIES.map((c) => [
 /** T1 · Choose a template. Real templates from templates.list; picking one
  *  stores its id in wizardData and advances to the preview (T2). Back → S3. */
 export default function TemplateGalleryPage() {
-  const router = useRouter();
   const { saveAndGo } = useWizard();
   const { skipSetup, skipping } = useOnboardingComplete();
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]["value"]>("ALL");
@@ -34,78 +33,93 @@ export default function TemplateGalleryPage() {
   const templates = list.data?.data ?? [];
 
   return (
-    <WizardShell chrome={{ variant: "simple" }} wide onSkip={skipSetup} skipping={skipping}>
-      <div className="text-center mb-6">
-        <h1 className="text-onb-title font-bold text-onb-ink">Choose a template</h1>
-      </div>
+    <WizardShell chrome={{ variant: "simple" }} wide onSkip={skipSetup} skipping={skipping} padY={60}>
+      <div className="flex flex-col items-center gap-7">
+        <div className="flex flex-col items-center gap-4 self-stretch">
+          <h1 className="text-onb-title font-bold text-onb-text">Choose a template</h1>
 
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-onb-subtle" />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search templates..."
-          className="w-full h-onb-input pl-9 pr-3 rounded-onb bg-onb-surface border border-onb-line text-sm text-onb-text outline-none focus:border-onb-primary placeholder:text-onb-subtle"
-        />
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-6">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.value}
-            type="button"
-            onClick={() => setCategory(c.value)}
-            className={cn(
-              "h-8 px-3 rounded-onb border text-xs transition-colors",
-              category === c.value
-                ? "border-onb-primary bg-onb-primary-tint text-onb-primary font-medium"
-                : "border-onb-line text-onb-text hover:border-onb-subtle"
-            )}
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
-
-      {list.isLoading ? (
-        <div className="flex justify-center py-16">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
+          <div className="flex h-[41px] w-[560px] max-w-full items-center gap-2.5 rounded-onb bg-white px-4 shadow-[inset_0_0_0_1px_var(--color-onb-line)] focus-within:shadow-[inset_0_0_0_1px_var(--color-onb-primary)]">
+            <Search className="h-4 w-4 shrink-0 text-onb-subtle" strokeWidth={1.8} />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search templates..."
+              className="h-full w-full bg-transparent text-sm text-onb-text outline-none placeholder:text-onb-subtle"
+            />
+          </div>
         </div>
-      ) : templates.length === 0 ? (
-        <p className="text-center text-sm text-onb-muted py-16">No templates match your search.</p>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {templates.map((t) => (
+
+        <div className="flex flex-wrap justify-center gap-2">
+          {CATEGORIES.map((c) => (
             <button
-              key={t.id}
+              key={c.value}
               type="button"
-              onClick={() => saveAndGo("/onboarding/template/preview", { template: { id: t.id } })}
-              className="text-left rounded-onb border border-onb-line hover:border-onb-primary overflow-hidden transition-colors"
+              onClick={() => setCategory(c.value)}
+              aria-pressed={category === c.value}
+              className={cn(
+                "rounded-full px-3.5 py-[7px] text-[13px] font-medium transition-colors",
+                category === c.value
+                  ? "bg-onb-primary text-white"
+                  : "bg-white text-onb-muted shadow-[inset_0_0_0_1px_var(--color-onb-line)] hover:text-onb-text"
+              )}
             >
-              <div className="aspect-video bg-onb-surface flex items-center justify-center">
-                {t.thumbnail ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={t.thumbnail} alt={t.name} className="h-full w-full object-cover" />
-                ) : (
-                  <LayoutTemplate className="w-7 h-7 text-onb-subtle" />
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-sm font-semibold text-onb-ink truncate">{t.name}</p>
-                <p className="text-xs text-onb-muted mt-0.5">{LABEL[t.category] ?? t.category}</p>
-              </div>
+              {c.label}
             </button>
           ))}
         </div>
-      )}
 
-      <button
-        type="button"
-        onClick={() => router.push("/onboarding/path")}
-        className="mt-8 w-full text-center text-sm text-onb-muted hover:text-onb-text"
-      >
-        Back
-      </button>
+        {list.isLoading ? (
+          <div className="flex min-h-[300px] items-center justify-center self-stretch">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
+          </div>
+        ) : templates.length === 0 ? (
+          <div className="flex min-h-[300px] flex-col items-center justify-center gap-4 self-stretch py-[60px]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[14px] bg-slate-100">
+              <Search className="h-4 w-4 text-onb-muted" strokeWidth={1.8} />
+            </div>
+            <p className="text-base font-semibold text-onb-text">No templates found</p>
+            <p className="text-[13px] text-onb-muted">Try a different category, or clear the search.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setCategory("ALL");
+              }}
+              className="mt-2 flex h-10 items-center rounded-onb px-5 text-[13px] font-semibold text-onb-text shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-colors hover:bg-onb-surface"
+            >
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-6 self-stretch">
+            {templates.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => saveAndGo("/onboarding/template/preview", { template: { id: t.id } })}
+                className="flex flex-col overflow-hidden rounded-xl bg-white text-left shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-shadow hover:shadow-[inset_0_0_0_2px_var(--color-onb-primary)]"
+              >
+                <div className="flex h-[170px] items-center justify-center border-b border-onb-line bg-slate-100">
+                  {t.thumbnail ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={t.thumbnail} alt={t.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <LayoutTemplate className="h-7 w-7 text-onb-subtle" />
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5 p-4">
+                  <span className="truncate text-[15px] font-semibold text-onb-text">{t.name}</span>
+                  <span className="text-xs text-onb-muted">{LABEL[t.category] ?? t.category}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="flex self-stretch">
+          <OnbBack to="/onboarding/path" />
+        </div>
+      </div>
     </WizardShell>
   );
 }

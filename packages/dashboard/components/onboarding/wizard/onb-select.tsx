@@ -18,16 +18,18 @@ interface OnbSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 export const OnbSelect = forwardRef<HTMLSelectElement, OnbSelectProps>(
   ({ label, hint, error, placeholder, options, className, value, ...props }, ref) => (
     <div className="w-full">
-      <label className="block text-sm font-semibold text-onb-ink mb-1.5">{label}</label>
+      <label className="block text-sm font-semibold text-onb-text mb-2">{label}</label>
       <div className="relative">
         <select
           ref={ref}
           value={value}
           className={cn(
-            "w-full h-onb-input pl-3.5 pr-10 rounded-onb text-sm bg-onb-surface appearance-none",
-            "border transition-colors outline-none",
-            value ? "text-onb-text" : "text-onb-subtle",
-            error ? "border-onb-error" : "border-onb-line focus:border-onb-primary",
+            "w-full h-onb-input pl-4 pr-10 rounded-onb text-[13.5px] appearance-none",
+            "transition-colors outline-none",
+            value ? "text-onb-text" : "text-onb-muted",
+            error
+              ? "bg-white shadow-[inset_0_0_0_1.5px_var(--color-onb-error)]"
+              : "bg-onb-field shadow-[inset_0_0_0_1px_var(--color-onb-field-ring)] focus:shadow-[inset_0_0_0_1.5px_var(--color-onb-primary)]",
             className
           )}
           {...props}
@@ -43,12 +45,12 @@ export const OnbSelect = forwardRef<HTMLSelectElement, OnbSelectProps>(
             </option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-onb-subtle" />
+        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-onb-muted" />
       </div>
       {error ? (
-        <p className="mt-1.5 text-xs text-onb-error">{error}</p>
+        <p className="mt-2 text-xs leading-[1.4] text-onb-error">⚠ {error}</p>
       ) : hint ? (
-        <p className="mt-1.5 text-xs text-onb-muted">{hint}</p>
+        <p className="mt-2 text-xs leading-[1.4] text-onb-muted">{hint}</p>
       ) : null}
     </div>
   )

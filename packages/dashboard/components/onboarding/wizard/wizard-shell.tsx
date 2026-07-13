@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@lib/utils";
-import { LayoutGrid } from "lucide-react";
 
 type Chrome =
   | { variant: "stepper"; step: 1 | 2 | 3 }
@@ -12,73 +11,110 @@ interface WizardShellProps {
   chrome: Chrome;
   onSkip?: () => void;
   skipping?: boolean;
-  /** Widen the content column for gallery-style frames (T1). */
+  /** Widen the content column for gallery-style frames (T1, A5, E1). */
   wide?: boolean;
+  /** "full" = 180px closed by a hairline (setup + template frames); "compact" =
+   *  110px, no rule (the whole AI-draft flow). Not derivable from `chrome` —
+   *  A4/A5 carry no indicator yet still use the compact header. */
+  header?: "full" | "compact";
+  /** Content padding, top and bottom. Frames vary (40–100px); 80 is the default. */
+  padY?: number;
   children: React.ReactNode;
 }
 
 function StepperDots({ step }: { step: number }) {
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-3.5">
       <div className="flex items-center gap-2">
         {[1, 2, 3].map((i) => (
           <span
             key={i}
-            className={cn("h-2 w-2 rounded-full transition-colors", i <= step ? "bg-onb-primary" : "bg-onb-line")}
+            className={cn(
+              "h-[9px] w-[9px] rounded-full transition-colors",
+              i <= step ? "bg-onb-primary" : "bg-onb-line"
+            )}
           />
         ))}
       </div>
-      <span className="text-xs text-onb-muted">Step {step} of 3</span>
+      <span className="text-[11px] text-onb-muted">Step {step} of 3</span>
     </div>
   );
 }
 
 function ProgressBar({ step, label }: { step: number; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <span className="text-xs font-medium text-onb-muted">{label} — {step} of 3</span>
-      <div className="h-1.5 w-[200px] rounded-full bg-onb-line overflow-hidden">
+    <div className="flex w-[200px] flex-col items-center gap-2.5">
+      <span className="text-[13px] font-semibold text-onb-primary">
+        {label} — {step} of 3
+      </span>
+      <div className="h-1 w-[200px] overflow-hidden rounded-sm bg-onb-line">
         <div className="h-full bg-onb-primary transition-all" style={{ width: `${(step / 3) * 100}%` }} />
       </div>
     </div>
   );
 }
 
-/** M2 onboarding wizard chrome: white header (logo + Skip) with a phase-specific
- *  center indicator (stepper / progress / none), then the centered content column. */
-export function WizardShell({ chrome, onSkip, skipping, wide, children }: WizardShellProps) {
+/** M2 onboarding wizard chrome. Two header geometries, per the frame gallery:
+ *  the setup + template frames use a 180px header closed by a hairline, while
+ *  the AI-draft flow uses a shorter 110px header with no rule under it. Header
+ *  children are absolutely placed to hit the frames' fixed offsets. */
+export function WizardShell({
+  chrome,
+  onSkip,
+  skipping,
+  wide,
+  header = "full",
+  padY = 80,
+  children,
+}: WizardShellProps) {
+  const compact = header === "compact";
+
   return (
     <div className="min-h-dvh bg-white flex flex-col">
-      <header className="relative flex items-center justify-between px-8 py-5 border-b border-onb-line">
-        <span className="flex items-center gap-2">
-          <LayoutGrid className="w-7 h-7 text-onb-primary" />
-          <span className="text-lg font-bold text-onb-ink">Buildrick</span>
-        </span>
-        {chrome.variant !== "simple" && (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            {chrome.variant === "stepper" ? (
-              <StepperDots step={chrome.step} />
-            ) : (
-              <ProgressBar step={chrome.step} label={chrome.label} />
-            )}
-          </div>
+      <header
+        className={cn(
+          "relative shrink-0",
+          compact ? "h-[110px]" : "h-onb-header border-b border-onb-line"
         )}
+      >
+        <span className={cn("absolute left-12 flex items-center gap-3", compact ? "top-[38px]" : "top-10")}>
+          <span className="flex h-8 w-8 items-center justify-center rounded-onb bg-onb-primary text-[17px] font-bold text-white">
+            B
+          </span>
+          <span className="text-lg font-bold text-onb-text">Buildrick</span>
+        </span>
+
+        {chrome.variant === "stepper" ? (
+          <div className="absolute left-1/2 top-[92px] -translate-x-1/2">
+            <StepperDots step={chrome.step} />
+          </div>
+        ) : null}
+        {chrome.variant === "progress" ? (
+          <div className="absolute left-1/2 top-[34px] -translate-x-1/2">
+            <ProgressBar step={chrome.step} label={chrome.label} />
+          </div>
+        ) : null}
+
         {onSkip ? (
           <button
             type="button"
             onClick={onSkip}
             disabled={skipping}
-            className="text-sm text-onb-muted hover:text-onb-text disabled:opacity-50"
+            className={cn(
+              "absolute right-12 text-[13px] font-medium text-onb-muted hover:text-onb-text disabled:opacity-50",
+              compact ? "top-[44px]" : "top-[46px]"
+            )}
           >
             {skipping ? "Skipping…" : "Skip setup"}
           </button>
-        ) : (
-          <span className="w-16" />
-        )}
+        ) : null}
       </header>
 
-      <main className="flex-1 flex justify-center px-4 py-14">
-        <div className={cn("w-full", wide ? "max-w-3xl" : "max-w-onb")}>{children}</div>
+      <main
+        className="flex flex-1 justify-center px-4"
+        style={{ paddingTop: padY, paddingBottom: padY }}
+      >
+        <div className={cn("w-full", wide ? "max-w-[900px]" : "max-w-onb")}>{children}</div>
       </main>
     </div>
   );

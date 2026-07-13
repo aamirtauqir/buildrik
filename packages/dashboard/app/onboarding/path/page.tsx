@@ -1,9 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { Plus, PanelsTopLeft, Sparkles, type LucideIcon } from "lucide-react";
 import { cn } from "@lib/utils";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
+import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
@@ -32,31 +33,33 @@ const RECOMMEND: Record<string, Path> = {
   other: "ai",
 };
 
-const CARDS: { path: Path; title: string; description: string; cta: string }[] = [
+const CARDS: { path: Path; title: string; description: string; cta: string; icon: LucideIcon }[] = [
   {
     path: "ai",
     title: "AI Draft",
     description: "Answer a few questions and Buildrick creates a first draft with pages, sections, and copy.",
     cta: "Start AI Draft",
+    icon: Sparkles,
   },
   {
     path: "template",
     title: "Template",
     description: "Pick a professional layout and customize it in the editor.",
     cta: "Browse Templates",
+    icon: PanelsTopLeft,
   },
   {
     path: "blank",
     title: "Blank Canvas",
     description: "Start from zero with full design control.",
     cta: "Open Blank Canvas",
+    icon: Plus,
   },
 ];
 
 /** S3 · How do you want to start? Three build paths; the one matching the S1
  *  role is highlighted + mirrored by the bottom CTA. Back → S2. */
 export default function PathPage() {
-  const router = useRouter();
   const { data, saveAndGo } = useWizard();
   const { skipSetup, skipping } = useOnboardingComplete();
 
@@ -67,59 +70,91 @@ export default function PathPage() {
   const choose = (path: Path) => saveAndGo(ROUTE[path], { path });
 
   return (
-    <WizardShell chrome={{ variant: "stepper", step: 3 }} onSkip={skipSetup} skipping={skipping}>
-      <div className="text-center mb-8">
-        <h1 className="text-onb-title font-bold text-onb-ink">How do you want to start?</h1>
-        <p className="mt-2 text-sm text-onb-muted">Choose the fastest way to create your first site.</p>
+    <WizardShell chrome={{ variant: "stepper", step: 3 }} onSkip={skipSetup} skipping={skipping} padY={60}>
+      <div className="flex flex-col items-center gap-3 text-center">
+        <h1 className="text-onb-title text-onb-text">How do you want to start?</h1>
+        <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">
+          Choose the fastest way to create your first site.
+        </p>
       </div>
 
-      <div className="flex flex-col gap-3">
+      {/* The 3×320 card row (992px) is wider than the 480px wizard column, so it
+          breaks out of it and re-centres on the viewport. */}
+      <div className="relative left-1/2 mt-12 flex w-[992px] max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-wrap items-start justify-center gap-4">
         {CARDS.map((c) => {
           const isRec = c.path === recommended;
+          const Icon = c.icon;
           return (
             <div
               key={c.path}
               className={cn(
-                "relative rounded-onb border p-5",
-                isRec ? "border-onb-primary bg-onb-primary-tint border-l-4" : "border-onb-line bg-white"
+                "flex min-h-80 w-80 flex-col justify-between gap-4 rounded-xl bg-white p-6",
+                "transition-[box-shadow,transform] duration-150",
+                "hover:-translate-y-[3px] hover:shadow-[0_12px_28px_color-mix(in_srgb,var(--color-onb-primary)_15%,transparent),inset_0_0_0_2px_var(--color-onb-primary)]",
+                isRec
+                  ? "border-l-4 border-onb-primary shadow-[0_4px_12px_rgba(0,0,0,0.03),inset_0_0_0_1px_var(--color-onb-primary)]"
+                  : "shadow-[0_4px_12px_rgba(0,0,0,0.03),inset_0_0_0_1px_var(--color-onb-line)]"
               )}
             >
-              {isRec ? (
-                <span className="absolute -top-2 left-4 rounded-full bg-onb-primary px-2 py-0.5 text-[10px] font-semibold text-white">
-                  Recommended
-                </span>
-              ) : null}
-              <p className="text-base font-semibold text-onb-ink">{c.title}</p>
-              <p className="mt-1 text-sm text-onb-muted leading-relaxed">{c.description}</p>
-              {isRec ? (
-                <p className="mt-1 text-xs font-medium text-onb-primary">
-                  Recommended because you selected {ROLE_LABEL[role] ?? "your role"}.
-                </p>
-              ) : null}
-              <OnbButton
-                variant={isRec ? "primary" : "secondary"}
-                className="mt-3.5"
+              <div className="flex flex-col gap-4 self-stretch">
+                <div className="flex items-start justify-between">
+                  <span
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-onb",
+                      isRec ? "bg-onb-primary-tint" : "bg-onb-surface"
+                    )}
+                  >
+                    <Icon
+                      size={20}
+                      strokeWidth={1.7}
+                      className={isRec ? "text-onb-primary" : "text-onb-muted"}
+                    />
+                  </span>
+                  {isRec ? (
+                    <span className="rounded-[20px] bg-onb-primary px-2.5 py-1 text-[10px] font-bold text-white">
+                      Recommended
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <span className="text-lg font-semibold text-onb-text">{c.title}</span>
+                  <span className="text-[13px] leading-[1.5] text-onb-muted">{c.description}</span>
+                </div>
+
+                {isRec ? (
+                  <span className="text-[11px] font-medium text-onb-primary">
+                    Recommended because you selected {ROLE_LABEL[role] ?? "your role"}.
+                  </span>
+                ) : null}
+              </div>
+
+              <button
+                type="button"
                 onClick={() => choose(c.path)}
+                className={cn(
+                  "flex h-onb-input items-center justify-center rounded-onb bg-white",
+                  "text-sm font-semibold transition-colors",
+                  isRec
+                    ? "text-onb-primary shadow-[inset_0_0_0_1px_var(--color-onb-primary)] hover:bg-onb-primary-tint"
+                    : "text-onb-text shadow-[inset_0_0_0_1px_var(--color-onb-line)] hover:bg-onb-surface"
+                )}
               >
                 {c.cta}
-              </OnbButton>
+              </button>
             </div>
           );
         })}
       </div>
 
-      <div className="mt-6 flex flex-col items-center gap-1">
+      <div className="mt-12 flex flex-col items-center gap-3">
         <OnbButton onClick={() => choose(recommended)}>{recCard.cta}</OnbButton>
         <span className="text-xs text-onb-subtle">Based on your selection above</span>
       </div>
 
-      <button
-        type="button"
-        onClick={() => router.push("/onboarding/site")}
-        className="mt-5 w-full text-center text-sm text-onb-muted hover:text-onb-text"
-      >
-        Back
-      </button>
+      <div className="mt-12 flex justify-center">
+        <OnbBack to="/onboarding/site" />
+      </div>
     </WizardShell>
   );
 }

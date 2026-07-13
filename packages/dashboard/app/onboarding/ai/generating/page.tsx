@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, AlertCircle } from "lucide-react";
+import { Check, AlertCircle } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { cn } from "@lib/utils";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
+import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import type { WizardData } from "@buildrik/shared/schemas/onboarding";
 
@@ -47,6 +48,7 @@ function buildInput(ai: NonNullable<WizardData["ai"]>) {
   if (ai.location) parts.push(`Location: ${ai.location}.`);
   if (ai.style) parts.push(`Visual style: ${ai.style}.`);
   if (ai.color) parts.push(`Colors: ${ai.color}.`);
+  if (ai.refs) parts.push(`Reference sites: ${ai.refs}.`);
   return {
     name: (ai.name ?? "My Site").slice(0, 100),
     businessType: INDUSTRY_TO_TYPE[ai.industry ?? "other"] ?? "BUSINESS",
@@ -108,13 +110,24 @@ export default function AiGeneratingPage() {
       .catch((e) => setError(e instanceof Error ? friendlyError(e.message) : "Couldn't start generation."));
   }, [data.ai, createJob, router]);
 
-  // React to terminal status.
+  // React to terminal status. The poll keeps running until this unmounts, so the
+  // handoff is latched — otherwise a second COMPLETED tick fires saveAndGo again
+  // while the first is still in flight.
   const status = statusQ.data;
+  const settled = useRef(false);
   useEffect(() => {
-    if (!status) return;
-    if (status.status === "COMPLETED" && status.siteId) {
-      saveAndGo("/onboarding/ai/preview", { siteId: status.siteId, path: "ai" });
+    if (!status || settled.current) return;
+    if (status.status === "COMPLETED") {
+      settled.current = true;
+      // `siteId` is nullable. Without this branch a completed-but-siteless job
+      // matches no case and the user watches the spinner forever.
+      if (status.siteId) {
+        saveAndGo("/onboarding/ai/preview", { siteId: status.siteId, path: "ai" });
+      } else {
+        setError("The draft finished but no site came back. Please try again.");
+      }
     } else if (status.status === "FAILED") {
+      settled.current = true;
       setError(friendlyError(status.error ?? "Generation failed. Please try again."));
     }
   }, [status, saveAndGo]);
@@ -133,45 +146,45 @@ export default function AiGeneratingPage() {
   }
 
   return (
-    <WizardShell chrome={{ variant: "simple" }}>
+    <WizardShell chrome={{ variant: "simple" }} header="compact" padY={100}>
       {error ? (
-        <div className="text-center">
-          <AlertCircle className="mx-auto w-10 h-10 text-onb-error" />
-          <h1 className="mt-4 text-onb-title font-bold text-onb-ink">Couldn't create your draft</h1>
-          <p className="mt-2 text-sm text-onb-muted">{error}</p>
-          <div className="mt-8 flex flex-col gap-2">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <div className="flex flex-col items-center gap-3">
+            <AlertCircle className="h-10 w-10 text-onb-error" />
+            <h1 className="text-onb-title font-bold text-onb-text">Couldn't create your draft</h1>
+            <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">{error}</p>
+          </div>
+          <div className="flex w-full flex-col gap-6">
             <OnbButton onClick={() => router.push("/onboarding/ai/brand")}>Edit answers &amp; retry</OnbButton>
-            <button
-              type="button"
-              onClick={() => router.push("/onboarding/path")}
-              className="text-sm text-onb-muted hover:text-onb-text"
-            >
-              Choose a different path
-            </button>
+            <OnbBack to="/onboarding/path">Choose a different path</OnbBack>
           </div>
         </div>
       ) : (
-        <>
-          <div className="text-center mb-10">
-            <h1 className="text-onb-title font-bold text-onb-ink">Creating your site draft</h1>
-            <p className="mt-2 text-sm text-onb-muted">This usually takes a moment.</p>
+        <div className="flex flex-col items-center gap-12">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <h1 className="text-onb-title font-bold text-onb-text">Creating your site draft</h1>
+            <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">This usually takes a moment.</p>
           </div>
 
-          <div className="flex flex-col gap-3 mb-10">
+          <div className="flex w-[280px] flex-col gap-5">
             {STEPS.map((s) => {
               const done = progress > s.at + 25;
               const active = progress >= s.at && !done;
               return (
-                <div key={s.label} className="flex items-center gap-3">
-                  <span
-                    className={cn(
-                      "flex h-6 w-6 items-center justify-center rounded-full border shrink-0",
-                      done ? "border-onb-primary bg-onb-primary text-white" : active ? "border-onb-primary text-onb-primary" : "border-onb-line text-onb-subtle"
+                <div key={s.label} className={cn("flex items-center gap-3", !done && !active && "opacity-40")}>
+                  <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                    {done ? (
+                      <Check className="h-3.5 w-3.5 text-onb-success" strokeWidth={3} />
+                    ) : (
+                      <span
+                        className={cn(
+                          "h-4 w-4 rounded-full",
+                          active ? "bg-onb-primary" : "shadow-[inset_0_0_0_2px_var(--color-onb-muted)]"
+                        )}
+                      />
                     )}
-                  >
-                    {done ? <Check className="h-3.5 w-3.5" /> : active ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   </span>
-                  <span className={cn("text-sm", done || active ? "text-onb-ink font-medium" : "text-onb-subtle")}>
+                  <span className={cn("text-[15px] text-onb-text", active ? "font-bold" : "font-medium")}>
                     {s.label}
                   </span>
                 </div>
@@ -179,10 +192,19 @@ export default function AiGeneratingPage() {
             })}
           </div>
 
-          <button type="button" onClick={cancel} className="w-full text-center text-sm text-onb-muted hover:text-onb-text">
-            Cancel and go back
-          </button>
-        </>
+          <div className="flex w-[400px] flex-col items-center gap-5">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-onb-line">
+              <div className="h-full rounded-full bg-onb-primary transition-all" style={{ width: `${progress}%` }} />
+            </div>
+            <button
+              type="button"
+              onClick={cancel}
+              className="text-[13px] font-semibold text-onb-muted transition-colors hover:text-onb-text"
+            >
+              Cancel and go back
+            </button>
+          </div>
+        </div>
       )}
     </WizardShell>
   );

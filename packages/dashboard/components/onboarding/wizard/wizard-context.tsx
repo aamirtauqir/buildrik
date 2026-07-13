@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useCallback, useMemo, useState } from "react";
+import { createContext, useContext, useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import type { WizardData } from "@buildrik/shared/schemas/onboarding";
@@ -37,6 +37,18 @@ export function WizardProvider({ initial, children }: { initial: WizardData; chi
   const [data, setData] = useState<WizardData>(initial);
   const save = trpc.onboarding.saveWizard.useMutation();
 
+  // `saveAndGo` must keep a STABLE identity. It used to close over `data` and
+  // list it as a dep, so every call — which setStates `data` — minted a new
+  // `saveAndGo`. Any effect depending on it (A4 polls job status, then calls it
+  // on COMPLETED) therefore re-fired on its own result, looping: each pass
+  // queued another saveWizard until the batched request stalled and the
+  // router.push behind it never ran, stranding the user on the spinner with a
+  // finished site. Read `data` through a ref instead and depend on nothing that
+  // changes per-render (`mutateAsync` and `router` are both stable).
+  const dataRef = useRef(data);
+  dataRef.current = data;
+  const { mutateAsync } = save;
+
   const update = useCallback((patch: Partial<WizardData>) => {
     setData((prev) => {
       const next = { ...prev, ...patch };
@@ -47,17 +59,17 @@ export function WizardProvider({ initial, children }: { initial: WizardData; chi
 
   const saveAndGo = useCallback(
     async (route: string, patch?: Partial<WizardData>) => {
-      const next: WizardData = { ...data, ...patch, v: 1, route };
+      const next: WizardData = { ...dataRef.current, ...patch, v: 1, route };
       setData(next);
       writeLocal(next);
       try {
-        await save.mutateAsync(next);
+        await mutateAsync(next);
       } catch {
         /* localStorage buffer retains it; server retry on next transition */
       }
       router.push(route);
     },
-    [data, save, router]
+    [mutateAsync, router]
   );
 
   const value = useMemo<WizardContextValue>(

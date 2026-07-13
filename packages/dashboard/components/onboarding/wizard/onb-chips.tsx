@@ -25,7 +25,7 @@ export function OnbChips({ label, options, value, onChange, multi, hint }: ChipG
 
   return (
     <div>
-      <p className="text-sm font-semibold text-onb-ink mb-1.5">{label}</p>
+      <p className="text-sm font-semibold text-onb-text mb-3">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((o) => (
           <button
@@ -34,17 +34,17 @@ export function OnbChips({ label, options, value, onChange, multi, hint }: ChipG
             onClick={() => toggle(o.value)}
             aria-pressed={selected(o.value)}
             className={cn(
-              "h-9 px-3.5 rounded-onb border text-sm transition-colors",
+              "rounded-onb px-3.5 py-[9px] text-[13px] font-medium transition-colors",
               selected(o.value)
-                ? "border-onb-primary bg-onb-primary-tint text-onb-primary font-medium"
-                : "border-onb-line bg-white text-onb-text hover:border-onb-subtle"
+                ? "bg-onb-primary-tint text-onb-primary shadow-[inset_0_0_0_1.5px_var(--color-onb-primary)]"
+                : "bg-white text-onb-text shadow-[inset_0_0_0_1px_var(--color-onb-line)] hover:shadow-[inset_0_0_0_1px_var(--color-onb-subtle)]"
             )}
           >
             {o.label}
           </button>
         ))}
       </div>
-      {hint ? <p className="mt-1.5 text-xs text-onb-muted">{hint}</p> : null}
+      {hint ? <p className="mt-2 text-xs text-onb-muted">{hint}</p> : null}
     </div>
   );
 }

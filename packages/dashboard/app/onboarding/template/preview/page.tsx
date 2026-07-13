@@ -2,15 +2,17 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutTemplate } from "lucide-react";
+import { Check, LayoutTemplate, MoreHorizontal } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
+import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
-/** T2 · Template preview. Shows the picked template's included pages + details,
- *  then confirms into T3. Back → gallery. */
+/** T2 · Template preview. Full-bleed split frame: the template rendered inside a
+ *  browser mock on the left, its details + CTA in the right rail. Confirms into
+ *  T3; back → gallery. (No wizard header here — the frame puts the brand tile in
+ *  the rail, so this page owns its own chrome.) */
 export default function TemplatePreviewPage() {
   const router = useRouter();
   const { data, saveAndGo, saving } = useWizard();
@@ -27,57 +29,96 @@ export default function TemplatePreviewPage() {
 
   if (!templateId) return null;
 
+  if (q.isLoading || !t) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-onb-surface">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
+      </div>
+    );
+  }
+
+  const preview = t.previewUrl || t.thumbnail;
+
   return (
-    <WizardShell chrome={{ variant: "simple" }} onSkip={skipSetup} skipping={skipping}>
-      {q.isLoading || !t ? (
-        <div className="flex justify-center py-20">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
+    <div className="flex min-h-dvh bg-onb-surface">
+      <div className="flex flex-1 flex-col bg-slate-100 p-8">
+        <div className="flex h-[45px] items-center justify-between rounded-t-xl bg-white px-6 shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
+          <div className="flex gap-2">
+            <span className="h-2 w-2 rounded-full bg-red-400" />
+            <span className="h-2 w-2 rounded-full bg-amber-400" />
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+          </div>
+          <span className="rounded-md bg-slate-100 px-8 py-1 text-[11px] text-onb-muted">
+            {t.slug}-preview.buildrick.site
+          </span>
+          <MoreHorizontal className="h-4 w-4 text-onb-subtle" />
         </div>
-      ) : (
-        <>
-          <div className="aspect-video rounded-onb border border-onb-line bg-onb-surface flex items-center justify-center mb-6 overflow-hidden">
-            {t.previewUrl || t.thumbnail ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={(t.previewUrl || t.thumbnail)!} alt={t.name} className="h-full w-full object-cover" />
-            ) : (
-              <LayoutTemplate className="w-10 h-10 text-onb-subtle" />
-            )}
+
+        <div className="flex flex-1 items-center justify-center overflow-hidden rounded-b-xl border border-t-0 border-onb-line bg-white">
+          {preview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview} alt={t.name} className="h-full w-full object-cover object-top" />
+          ) : (
+            <LayoutTemplate className="h-10 w-10 text-onb-subtle" />
+          )}
+        </div>
+      </div>
+
+      <aside className="flex w-[504px] shrink-0 flex-col justify-between border-l border-onb-line bg-white p-10">
+        <div className="flex flex-col gap-8">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-onb bg-onb-primary text-[17px] font-bold text-white">
+                B
+              </span>
+              <span className="text-lg font-bold text-onb-text">Buildrick</span>
+            </span>
+            <button
+              type="button"
+              onClick={skipSetup}
+              disabled={skipping}
+              className="text-[13px] font-medium text-onb-muted transition-colors hover:text-onb-text disabled:opacity-50"
+            >
+              {skipping ? "Skipping…" : "Skip setup"}
+            </button>
           </div>
 
-          <h1 className="text-onb-title font-bold text-onb-ink">{t.name}</h1>
-          {t.description ? <p className="mt-2 text-sm text-onb-muted">{t.description}</p> : null}
+          <div className="flex flex-col gap-3">
+            <h1 className="text-2xl font-bold text-onb-text">{t.name}</h1>
+            {t.description ? (
+              <div className="flex flex-col gap-1">
+                <p className="text-xs font-semibold text-onb-subtle">BEST FOR</p>
+                <p className="text-sm text-onb-muted">{t.description}</p>
+              </div>
+            ) : null}
+          </div>
 
           {pages.length > 0 ? (
-            <div className="mt-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-onb-subtle mb-2">Included pages</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col gap-3">
+              <p className="text-xs font-semibold text-onb-subtle">INCLUDED PAGES</p>
+              <div className="flex flex-col gap-2">
                 {pages.map((p, i) => (
-                  <span key={i} className="rounded-onb border border-onb-line px-2.5 py-1 text-xs text-onb-text">
+                  <span key={i} className="flex items-center gap-2 text-[13px] text-onb-text">
+                    <Check className="h-[13px] w-[13px] shrink-0 text-onb-success" strokeWidth={3} />
                     {p.name ?? `Page ${i + 1}`}
                   </span>
                 ))}
               </div>
             </div>
           ) : null}
+        </div>
 
-          <div className="mt-8 flex flex-col gap-2">
-            <OnbButton
-              loading={saving}
-              disabled={saving}
-              onClick={() => saveAndGo("/onboarding/template/selected")}
-            >
-              Use this template
-            </OnbButton>
-            <button
-              type="button"
-              onClick={() => router.push("/onboarding/template")}
-              className="text-sm text-onb-muted hover:text-onb-text"
-            >
-              Back to gallery
-            </button>
-          </div>
-        </>
-      )}
-    </WizardShell>
+        <div className="flex flex-col gap-4">
+          <OnbButton
+            loading={saving}
+            disabled={saving}
+            onClick={() => saveAndGo("/onboarding/template/selected")}
+          >
+            Use this template
+          </OnbButton>
+          <OnbBack to="/onboarding/template">Back to gallery</OnbBack>
+        </div>
+      </aside>
+    </div>
   );
 }

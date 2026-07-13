@@ -65,6 +65,7 @@ export const wizardDataSchema = z.object({
     tone: z.string().optional(),
     style: z.string().optional(),
     color: z.string().optional(),
+    refs: z.string().optional(),
   }).optional(),
   template: z.object({ id: z.string().optional() }).optional(),
   blank: z.object({

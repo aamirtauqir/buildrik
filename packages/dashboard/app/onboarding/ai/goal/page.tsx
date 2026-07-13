@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbField } from "@/components/onboarding/wizard/onb-field";
 import { OnbChips } from "@/components/onboarding/wizard/onb-chips";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
+import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
@@ -24,7 +24,6 @@ const PAGES = ["About", "Services", "Pricing", "Portfolio", "Contact", "Blog", "
 
 /** A2 · Goal, audience & pages (AI Draft 2/3). Home is always included. → A3. */
 export default function AiGoalPage() {
-  const router = useRouter();
   const { data, saveAndGo, saving } = useWizard();
   const { skipSetup, skipping } = useOnboardingComplete();
 
@@ -51,38 +50,49 @@ export default function AiGoalPage() {
       chrome={{ variant: "progress", step: 2, label: "AI Draft" }}
       onSkip={skipSetup}
       skipping={skipping}
+      header="compact"
+      padY={40}
     >
-      <div className="text-center mb-8">
-        <h1 className="text-onb-title font-bold text-onb-ink">What should this website achieve?</h1>
-        <p className="mt-2 text-sm text-onb-muted">Pick a main goal, audience, and pages.</p>
+      <div className="-mx-[30px] flex flex-col items-center gap-10">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <h1 className="text-onb-title font-bold text-onb-text">What should this website achieve?</h1>
+          <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">
+            Pick a main goal, audience, and pages.
+          </p>
+        </div>
+
+        <form onSubmit={submit} className="flex w-full flex-col gap-10">
+          <div className="flex flex-col gap-6">
+            <OnbChips label="Main goal" options={GOALS} value={goal} onChange={(v) => setGoal(v as string)} />
+            <OnbField
+              label="Target audience"
+              placeholder="Small business owners and event planners"
+              value={audience}
+              onChange={(e) => setAudience(e.target.value)}
+            />
+            <OnbField label="Main CTA text" placeholder="Book a call" value={cta} onChange={(e) => setCta(e.target.value)} />
+            <OnbChips
+              label="Pages (Home is always included)"
+              options={PAGES}
+              value={pages}
+              onChange={(v) => setPages(v as string[])}
+              multi
+            />
+          </div>
+
+          <div className="flex flex-col gap-6">
+            {err ? (
+              <p className="text-center text-sm text-onb-error" role="alert">
+                {err}
+              </p>
+            ) : null}
+            <OnbButton type="submit" loading={saving} disabled={saving}>
+              Continue
+            </OnbButton>
+            <OnbBack to="/onboarding/ai/basics" />
+          </div>
+        </form>
       </div>
-
-      <form onSubmit={submit} className="flex flex-col gap-5">
-        <OnbChips label="Main goal" options={GOALS} value={goal} onChange={(v) => setGoal(v as string)} />
-        <OnbField
-          label="Target audience"
-          placeholder="Small business owners and event planners"
-          value={audience}
-          onChange={(e) => setAudience(e.target.value)}
-        />
-        <OnbField label="Main CTA text" placeholder="Book a call" value={cta} onChange={(e) => setCta(e.target.value)} />
-        <OnbChips
-          label="Pages (Home is always included)"
-          options={PAGES}
-          value={pages}
-          onChange={(v) => setPages(v as string[])}
-          multi
-        />
-
-        {err ? <p className="text-sm text-onb-error text-center" role="alert">{err}</p> : null}
-
-        <OnbButton type="submit" loading={saving} disabled={saving} className="mt-1">
-          Continue
-        </OnbButton>
-        <button type="button" onClick={() => router.push("/onboarding/ai/basics")} className="text-sm text-onb-muted hover:text-onb-text">
-          Back
-        </button>
-      </form>
     </WizardShell>
   );
 }

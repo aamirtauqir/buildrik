@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbField } from "@/components/onboarding/wizard/onb-field";
 import { OnbSelect } from "@/components/onboarding/wizard/onb-select";
 import { OnbCard } from "@/components/onboarding/wizard/onb-card";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
+import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
@@ -25,7 +25,6 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  *  wizardData; the actual site (and any client) is created at path completion so
  *  the method (blank/template/ai) is known. → S3. Back → S1. */
 export default function SitePage() {
-  const router = useRouter();
   const { data, saveAndGo, saving } = useWizard();
   const { skipSetup, skipping } = useOnboardingComplete();
   const clients = trpc.clients.list.useQuery(undefined, { refetchOnWindowFocus: false });
@@ -81,88 +80,92 @@ export default function SitePage() {
   }
 
   return (
-    <WizardShell chrome={{ variant: "stepper", step: 2 }} onSkip={skipSetup} skipping={skipping}>
-      <div className="text-center mb-8">
-        <h1 className="text-onb-title font-bold text-onb-ink">Set up your first site</h1>
-        <p className="mt-2 text-sm text-onb-muted">Name your site, then choose how to organize it.</p>
-      </div>
-
-      <form onSubmit={submit} className="flex flex-col gap-5">
-        <OnbField
-          label="Site name"
-          placeholder="e.g. Bright Events Website"
-          value={siteName}
-          onChange={(e) => {
-            setSiteName(e.target.value);
-            if (siteErr) setSiteErr(undefined);
-          }}
-          error={siteErr}
-          autoFocus
-        />
-
-        <div className="flex flex-col gap-2.5">
-          {ORG_CARDS.map((c) => (
-            <OnbCard
-              key={c.value}
-              title={c.title}
-              description={c.description}
-              selected={orgType === c.value}
-              onSelect={() => setOrgType(c.value)}
-            />
-          ))}
+    <WizardShell chrome={{ variant: "stepper", step: 2 }} onSkip={skipSetup} skipping={skipping} wide padY={60}>
+      <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <h1 className="text-onb-title font-bold text-onb-text">Set up your first site</h1>
+          <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">
+            Name your site, then choose how to organize it.
+          </p>
         </div>
 
-        {orgType === "new" ? (
-          <>
+        <form onSubmit={submit} className="flex w-full flex-col items-center gap-8">
+          <div className="flex w-full max-w-onb flex-col gap-4">
             <OnbField
-              label="Client name"
-              placeholder="Enter client business name"
-              value={clientName}
+              label="Site name"
+              placeholder="e.g. Bright Events Website"
+              value={siteName}
               onChange={(e) => {
-                setClientName(e.target.value);
-                if (clientNameErr) setClientNameErr(undefined);
+                setSiteName(e.target.value);
+                if (siteErr) setSiteErr(undefined);
               }}
-              error={clientNameErr}
+              error={siteErr}
+              autoFocus
             />
-            <OnbField
-              label="Client email (optional)"
-              type="email"
-              placeholder="client@example.com"
-              value={clientEmail}
-              onChange={(e) => {
-                setClientEmail(e.target.value);
-                if (emailErr) setEmailErr(undefined);
-              }}
-              error={emailErr}
-              hint="Used for review and approval links. We won't email them until you send a link."
-            />
-          </>
-        ) : orgType === "existing" ? (
-          <OnbSelect
-            label="Select client"
-            placeholder="Select a client"
-            options={clientOptions}
-            value={clientId}
-            onChange={(e) => {
-              setClientId(e.target.value);
-              if (pickErr) setPickErr(undefined);
-            }}
-            error={pickErr}
-            hint={clientOptions.length === 0 ? "No clients in this workspace yet." : undefined}
-          />
-        ) : null}
+          </div>
 
-        <OnbButton type="submit" loading={saving} disabled={saving} className="mt-1">
-          Continue
-        </OnbButton>
-        <button
-          type="button"
-          onClick={() => router.push("/onboarding/workspace")}
-          className="text-sm text-onb-muted hover:text-onb-text"
-        >
-          Back
-        </button>
-      </form>
+          {/* The org-type row breaks out past the 480px form column (804px in the
+              frame); items-center overflows it symmetrically, keeping it centred. */}
+          <div className="flex w-[804px] gap-3">
+            {ORG_CARDS.map((c) => (
+              <OnbCard
+                key={c.value}
+                title={c.title}
+                description={c.description}
+                selected={orgType === c.value}
+                onSelect={() => setOrgType(c.value)}
+              />
+            ))}
+          </div>
+
+          <div className="flex w-full max-w-onb flex-col gap-4">
+            {orgType === "new" ? (
+              <>
+                <OnbField
+                  label="Client name"
+                  placeholder="Enter client business name"
+                  value={clientName}
+                  onChange={(e) => {
+                    setClientName(e.target.value);
+                    if (clientNameErr) setClientNameErr(undefined);
+                  }}
+                  error={clientNameErr}
+                />
+                <OnbField
+                  label="Client email (optional)"
+                  type="email"
+                  placeholder="client@example.com"
+                  value={clientEmail}
+                  onChange={(e) => {
+                    setClientEmail(e.target.value);
+                    if (emailErr) setEmailErr(undefined);
+                  }}
+                  error={emailErr}
+                  hint="Used for review and approval links. We won't email them until you send a link."
+                />
+              </>
+            ) : orgType === "existing" ? (
+              <OnbSelect
+                label="Select client"
+                placeholder="Select a client"
+                options={clientOptions}
+                value={clientId}
+                onChange={(e) => {
+                  setClientId(e.target.value);
+                  if (pickErr) setPickErr(undefined);
+                }}
+                error={pickErr}
+                hint={clientOptions.length === 0 ? "No clients in this workspace yet." : undefined}
+              />
+            ) : null}
+
+            <OnbButton type="submit" loading={saving} disabled={saving}>
+              Continue
+            </OnbButton>
+            <OnbBack to="/onboarding/workspace" />
+          </div>
+        </form>
+      </div>
     </WizardShell>
   );
 }

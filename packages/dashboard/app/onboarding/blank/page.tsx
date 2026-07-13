@@ -1,18 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { cn } from "@lib/utils";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbField } from "@/components/onboarding/wizard/onb-field";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
+import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
 const START_PAGES = ["Home page", "Landing page", "Empty page"];
 const LAYOUTS = ["Header only", "Header + hero", "Completely blank"];
 
-function Pills({
+/** B1's option groups: equal-width 56px segments, not chips. Local to this frame
+ *  — no other screen draws this shape. */
+function OptionRow({
   label,
   options,
   value,
@@ -24,9 +26,9 @@ function Pills({
   onChange: (v: string) => void;
 }) {
   return (
-    <div>
-      <p className="text-sm font-semibold text-onb-ink mb-1.5">{label}</p>
-      <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col gap-3 self-stretch">
+      <span className="text-sm font-semibold text-onb-text">{label}</span>
+      <div className="flex gap-3 self-stretch">
         {options.map((o) => (
           <button
             key={o}
@@ -34,10 +36,10 @@ function Pills({
             onClick={() => onChange(o)}
             aria-pressed={value === o}
             className={cn(
-              "h-9 px-3.5 rounded-onb border text-sm transition-colors",
+              "flex h-14 flex-1 items-center justify-center rounded-onb text-[13.5px] font-medium transition-colors",
               value === o
-                ? "border-onb-primary bg-onb-primary-tint text-onb-primary font-medium"
-                : "border-onb-line bg-white text-onb-text hover:border-onb-subtle"
+                ? "bg-onb-primary-tint text-onb-primary shadow-[inset_0_0_0_1.5px_var(--color-onb-primary)]"
+                : "bg-white text-onb-text shadow-[inset_0_0_0_1px_var(--color-onb-line)] hover:shadow-[inset_0_0_0_1px_var(--color-onb-subtle)]"
             )}
           >
             {o}
@@ -52,7 +54,6 @@ function Pills({
  *  starting-page / layout-starter picks are captured for the editor to honor
  *  later (createSite makes an empty site today). */
 export default function BlankPage() {
-  const router = useRouter();
   const { data } = useWizard();
   const { createAndAdvance, busy, skipSetup, skipping } = useOnboardingComplete();
 
@@ -81,13 +82,15 @@ export default function BlankPage() {
   }
 
   return (
-    <WizardShell chrome={{ variant: "stepper", step: 3 }} onSkip={skipSetup} skipping={skipping}>
-      <div className="text-center mb-8">
-        <h1 className="text-onb-title font-bold text-onb-ink">Start with a blank canvas</h1>
-        <p className="mt-2 text-sm text-onb-muted">Set the basics before opening the editor.</p>
+    <WizardShell chrome={{ variant: "stepper", step: 3 }} onSkip={skipSetup} skipping={skipping} padY={60}>
+      <div className="mb-10 flex flex-col items-center gap-3 text-center">
+        <h1 className="text-onb-title font-bold text-onb-text">Start with a blank canvas</h1>
+        <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">
+          Set the basics before opening the editor.
+        </p>
       </div>
 
-      <form onSubmit={submit} className="flex flex-col gap-5">
+      <form onSubmit={submit} className="flex flex-col items-start gap-6">
         <OnbField
           label="Site name"
           placeholder="e.g. Bright Events Website"
@@ -99,8 +102,13 @@ export default function BlankPage() {
           error={siteErr}
           autoFocus
         />
-        <Pills label="Starting page" options={START_PAGES} value={startingPage} onChange={setStartingPage} />
-        <Pills
+        <OptionRow
+          label="Starting page"
+          options={START_PAGES}
+          value={startingPage}
+          onChange={setStartingPage}
+        />
+        <OptionRow
           label="Layout starter (optional)"
           options={LAYOUTS}
           value={layoutStarter}
@@ -108,21 +116,15 @@ export default function BlankPage() {
         />
 
         {netErr ? (
-          <p className="text-sm text-onb-error text-center" role="alert">
+          <p className="self-stretch text-center text-sm text-onb-error" role="alert">
             {netErr}
           </p>
         ) : null}
 
-        <OnbButton type="submit" loading={busy} disabled={busy} className="mt-1">
+        <OnbButton type="submit" loading={busy} disabled={busy}>
           Open Blank Canvas
         </OnbButton>
-        <button
-          type="button"
-          onClick={() => router.push("/onboarding/path")}
-          className="text-sm text-onb-muted hover:text-onb-text"
-        >
-          Back
-        </button>
+        <OnbBack to="/onboarding/path" />
       </form>
     </WizardShell>
   );
