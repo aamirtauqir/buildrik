@@ -129,16 +129,9 @@ function VercelCard({ workspaceId }: { workspaceId: string }) {
   if (conn.isLoading) {
     right = <div className="h-8 w-24 animate-pulse rounded-md" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   } else if (data?.connected && data.isActive) {
-    right = (
-      <>
-        {data.teamId && (
-          <span style={{ color: "var(--color-text-muted)" }}>
-            <MetricValue className="text-body-sm">{data.teamId}</MetricValue>
-          </span>
-        )}
-        <Pill tone="success">Connected</Pill>
-      </>
-    );
+    // Team id lives in the expanded panel — in the row's shrink-0 right slot it
+    // can't shrink and pushes the pill outside the card.
+    right = <Pill tone="success">Connected</Pill>;
   } else if (data?.connected && !data.isActive) {
     right = (
       <>
@@ -162,14 +155,21 @@ function VercelCard({ workspaceId }: { workspaceId: string }) {
       onToggle={() => setExpanded((v) => !v)}
     >
       <div className="flex items-center justify-between gap-3">
-        <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Connected once per workspace. Disconnect stops publishing from here.
-        </p>
+        <div className="min-w-0">
+          <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            Connected once per workspace. Disconnect stops publishing from here.
+          </p>
+          {data?.teamId && (
+            <p className="mt-1 truncate" style={{ color: "var(--color-text-muted)" }}>
+              <MetricValue className="text-body-sm">{data.teamId}</MetricValue>
+            </p>
+          )}
+        </div>
         <button
           type="button"
           onClick={() => disconnect.mutate({ workspaceId })}
           disabled={disconnect.isPending}
-          className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:opacity-60"
+          className="shrink-0 rounded-md border px-3 py-1.5 text-sm font-medium disabled:opacity-60"
           style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}
         >
           {disconnect.isPending ? "Disconnecting…" : "Disconnect"}
