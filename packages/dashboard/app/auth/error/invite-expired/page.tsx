@@ -5,8 +5,8 @@ import { AuthButton } from "@/components/auth/auth-button";
 export default function InviteExpiredPage() {
   return (
     <AuthMessage
-      title="Invite expired"
-      subtitle="This invitation link has expired. Ask the workspace admin to send a new invite."
+      title="This invitation expired"
+      subtitle="Invitations are valid for 7 days. Ask the workspace owner to send a new one."
     >
       <Link href="/auth" className="w-full">
         <AuthButton type="button">Back to log in</AuthButton>
