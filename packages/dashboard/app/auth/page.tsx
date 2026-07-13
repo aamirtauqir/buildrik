@@ -4,7 +4,6 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
-import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthButton } from "@/components/auth/auth-button";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
@@ -14,6 +13,7 @@ import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import { signIn } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
 import { safeReturnUrl } from "@lib/safe-return-url";
+import { cn } from "@lib/utils";
 
 function AuthPageContent() {
   const router = useRouter();
@@ -32,6 +32,9 @@ function AuthPageContent() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Backend 5xx → the mockup's "signin-server-error" state (retry + support),
+  // which is a different shape from a rejected credential.
+  const [serverError, setServerError] = useState(false);
   const [captchaRequired, setCaptchaRequired] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
@@ -58,11 +61,12 @@ function AuthPageContent() {
           // makes /auth/redirect read the fresh cookie and route correctly.
           window.location.assign(returnUrl ?? "/auth/redirect");
         } else {
-          setError("Failed to create session");
+          setServerError(true);
         }
       }
     },
     onError: (err) => {
+      setServerError(false);
       // Too many failures from this IP → captcha required. Show the widget and
       // let them re-submit with a solve.
       if (err.message === "CAPTCHA_REQUIRED") {
@@ -77,13 +81,24 @@ function AuthPageContent() {
         router.push("/auth/error/locked");
         return;
       }
+      if (err.data?.code === "INTERNAL_SERVER_ERROR") {
+        setError(null);
+        setServerError(true);
+        return;
+      }
       setError(err.message);
     },
   });
 
+  const pending = loginMutation.isPending;
+  // A rejected credential (not the captcha prompt) reds the password field and
+  // offers the passwordless way in — the mockup's signin-error state.
+  const credentialError = Boolean(error) && !captchaRequired;
+
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setServerError(false);
     loginMutation.mutate({ email, password, rememberMe, turnstileToken: captchaToken ?? undefined });
   }
 
@@ -93,75 +108,89 @@ function AuthPageContent() {
 
   return (
     <AuthCard>
-      <div className="text-center">
-        <AuthLogo />
-        <p className="text-auth-subtitle text-auth-text-muted">Log in to your account</p>
+      <div className="flex flex-col items-center gap-1.5 text-center mb-5">
+        <span className="text-auth-subtitle text-auth-text-muted">Log in to</span>
+        <span className="text-[21px] font-bold leading-none tracking-[-0.02em] text-auth-text-primary">
+          Buildrick
+        </span>
       </div>
 
-      <div className="h-7" />
-
-      {error && (
+      {serverError && (
+        <>
+          <FormBanner variant="error" title="Something went wrong on our end. Please try again in a moment." />
+          <div className="h-4" />
+        </>
+      )}
+      {!serverError && error && (
         <>
           <FormBanner variant="error" title={error} />
           <div className="h-4" />
         </>
       )}
-      {!error && reasonBanner && (
+      {!serverError && !error && reasonBanner && (
         <>
           <FormBanner variant="error" title={reasonBanner.title} subtitle={reasonBanner.subtitle} />
           <div className="h-4" />
         </>
       )}
 
-      <SocialButton
-        provider="google"
-        variant="primary"
-        label="Login with Google"
-        onClick={() => handleOAuthSignIn("google")}
-      />
-      <div className="h-2.5" />
-      <SocialButton provider="github" onClick={() => handleOAuthSignIn("github")} />
+      {/* Mockup collapses the social + divider block while the credential
+          submit is in flight (signin-loading frame). */}
+      {!pending && (
+        <>
+          <SocialButton
+            provider="google"
+            variant="primary"
+            label="Login with Google"
+            onClick={() => handleOAuthSignIn("google")}
+          />
+          <div className="h-2.5" />
+          {/* Not in the mockup, but GitHub OAuth is wired in server/auth.config.ts —
+              kept so the provider stays reachable. */}
+          <SocialButton provider="github" onClick={() => handleOAuthSignIn("github")} />
 
-      <div className="h-5" />
-      <AuthDivider text="or" />
-      <div className="h-5" />
+          <div className="h-4" />
+          <AuthDivider text="or" />
+          <div className="h-4" />
+        </>
+      )}
 
       <form onSubmit={handleLogin} className="w-full flex flex-col gap-3">
-        <AuthInput
-          label="Email"
-          hideLabel
-          type="email"
-          placeholder="Your Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-          autoFocus
-        />
-        <AuthInput
-          label="Password"
-          hideLabel
-          type="password"
-          placeholder="Your Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-        />
-
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              suppressHydrationWarning
-              className="rounded border-auth-input-fill-border accent-auth-cta"
-            />
-            <span className="text-auth-label text-auth-text-secondary">Remember me</span>
-          </label>
-          <Link href="/auth/forgot-password" className="text-auth-label text-auth-link hover:underline">
-            Forgot password?
-          </Link>
+        <div className={cn("flex flex-col gap-3", pending && "opacity-50 pointer-events-none")}>
+          <AuthInput
+            label="Email"
+            hideLabel
+            type="email"
+            placeholder="Your Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            autoFocus
+          />
+          <AuthInput
+            label="Password"
+            hideLabel
+            type="password"
+            placeholder="Your Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            invalid={credentialError}
+          />
         </div>
+
+        {/* Not in the mockup; `rememberMe` is a real backend flag (create-session
+            session lifetime), so the control stays. */}
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            suppressHydrationWarning
+            className="rounded border-auth-input-fill-border accent-auth-cta"
+          />
+          <span className="text-auth-label text-auth-text-secondary">Remember me</span>
+        </label>
 
         {captchaRequired && (
           <div className="py-1">
@@ -173,22 +202,46 @@ function AuthPageContent() {
 
         <AuthButton
           type="submit"
-          variant="secondary"
-          loading={loginMutation.isPending}
+          variant={pending ? "primary" : "secondary"}
+          loading={pending}
           disabled={captchaRequired && !captchaToken}
         >
-          Log in
+          {pending ? "Logging in…" : serverError ? "Try again" : "Log in"}
         </AuthButton>
+
+        {credentialError && !pending && (
+          <Link href="/auth/magic-link" className="w-full">
+            <AuthButton type="button">Email me a magic link</AuthButton>
+          </Link>
+        )}
       </form>
 
-      <div className="h-5" />
+      <div className="h-6" />
 
-      <p className="text-auth-label text-auth-text-muted text-center">
-        Don&apos;t have an account?{" "}
-        <Link href="/auth/signup" className="text-auth-link font-medium hover:underline">
-          Sign up
-        </Link>
-      </p>
+      <Link href="/auth/forgot-password" className="text-auth-label font-semibold text-auth-text-body hover:underline">
+        Forgot password?
+      </Link>
+
+      {!pending && (
+        <>
+          <div className="h-3.5" />
+          {serverError ? (
+            <p className="text-auth-label text-auth-text-muted text-center">
+              Still stuck?{" "}
+              <a href="mailto:support@buildrik.com" className="font-semibold text-auth-text-body hover:underline">
+                Contact support
+              </a>
+            </p>
+          ) : (
+            <p className="text-auth-label text-auth-text-muted text-center">
+              Don&apos;t have an account?{" "}
+              <Link href="/auth/signup" className="font-semibold text-auth-text-body hover:underline">
+                Sign up
+              </Link>
+            </p>
+          )}
+        </>
+      )}
     </AuthCard>
   );
 }

@@ -24,9 +24,9 @@ function ChangeEmailContent() {
       <button
         type="button"
         onClick={() => router.back()}
-        className="flex items-center gap-1 text-auth-label text-auth-text-muted hover:text-auth-text-secondary mb-5 self-start"
+        className="flex items-center gap-1.5 text-auth-label text-auth-text-muted hover:text-auth-text-body mb-5 self-start"
       >
-        <ArrowLeft size={14} /> Back
+        <ArrowLeft size={16} /> Back
       </button>
 
       <div className="text-center">

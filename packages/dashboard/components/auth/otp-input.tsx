@@ -7,9 +7,11 @@ interface OTPInputProps {
   length?: number;
   value: string;
   onChange: (code: string) => void;
+  /** Paint every cell in the error border (mockup `2fa-wrong`). */
+  error?: boolean;
 }
 
-export function OTPInput({ length = 6, value, onChange }: OTPInputProps) {
+export function OTPInput({ length = 6, value, onChange, error }: OTPInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const digits = value.split("").concat(Array(length).fill("")).slice(0, length);
 
@@ -48,7 +50,7 @@ export function OTPInput({ length = 6, value, onChange }: OTPInputProps) {
   );
 
   return (
-    <div className="flex gap-3 justify-center" onPaste={handlePaste}>
+    <div className="flex w-full gap-2.5" onPaste={handlePaste}>
       {Array.from({ length }).map((_, i) => (
         <input
           key={i}
@@ -59,12 +61,17 @@ export function OTPInput({ length = 6, value, onChange }: OTPInputProps) {
           maxLength={1}
           value={digits[i] || ""}
           aria-label={`Digit ${i + 1} of verification code`}
+          aria-invalid={error || undefined}
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           className={cn(
-            "w-[52px] h-[60px] text-center text-2xl font-medium rounded-auth-input outline-none transition-colors",
-            "bg-[#F5F5F6] text-auth-text-primary border focus:border-auth-input-focus",
-            digits[i] ? "border-auth-cta" : "border-transparent"
+            "h-[62px] min-w-0 flex-1 rounded-auth-input text-center font-mono text-2xl font-medium outline-none transition-colors",
+            "bg-[#F5F5F6] text-auth-text-body border",
+            error
+              ? "border-auth-input-error"
+              : digits[i]
+                ? "border-[#1C1C1E]"
+                : "border-[#ECECEE] focus:border-auth-input-focus"
           )}
           style={{ caretColor: "transparent" }}
         />

@@ -18,23 +18,31 @@ function MagicLinkSentContent() {
         <h1 className="text-auth-title text-auth-text-primary">Magic link on its way</h1>
         <p className="text-auth-subtitle text-auth-text-muted mt-2">
           We emailed a log-in link to{" "}
-          {email ? <span className="text-auth-text-secondary font-medium">{email}</span> : "your email"}. It expires in 15 minutes.
+          {email ? <span className="text-auth-text-body font-medium">{email}</span> : "your email"}. It&apos;s valid for
+          15 minutes.
         </p>
       </div>
 
       <div className="h-6" />
 
-      <ResendTimer initialSeconds={60} onResend={() => resendMutation.mutate({ email })} />
+      <ResendTimer initialSeconds={60} label="Resend link" onResend={() => resendMutation.mutate({ email })} />
 
       <div className="h-4" />
 
-      <Link href="/auth/magic-link" className="text-auth-label text-auth-link hover:underline text-center block">
-        Try another email
-      </Link>
+      <p className="text-auth-label text-auth-text-muted text-center">
+        Didn&apos;t arrive?{" "}
+        <Link href="/auth/magic-link" className="text-auth-text-body font-semibold hover:underline">
+          Try another email
+        </Link>
+      </p>
     </AuthCard>
   );
 }
 
 export default function MagicLinkSentPage() {
-  return <Suspense fallback={null}><MagicLinkSentContent /></Suspense>;
+  return (
+    <Suspense fallback={null}>
+      <MagicLinkSentContent />
+    </Suspense>
+  );
 }

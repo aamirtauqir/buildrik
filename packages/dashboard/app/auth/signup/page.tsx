@@ -12,6 +12,7 @@ import { SocialButton } from "@/components/auth/social-button";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { signIn } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
+import { cn } from "@lib/utils";
 import { ArrowLeft } from "lucide-react";
 import { LegalModal } from "@/components/legal/legal-modal";
 import { TermsContent, PrivacyContent } from "@/components/legal/legal-content";
@@ -28,11 +29,15 @@ function SignupContent() {
   const [error, setError] = useState<string | null>(null);
   const [legal, setLegal] = useState<"terms" | "privacy" | null>(null);
 
+  function goToEmailExists(taken: string) {
+    router.push(`/auth/email-exists?email=${encodeURIComponent(taken)}`);
+  }
+
   const checkEmailMutation = trpc.auth.checkEmail.useMutation({
     onSuccess: (data, variables) => {
       setError(null);
       if (data.exists) {
-        router.push(`/auth?email=${encodeURIComponent(variables.email)}`);
+        goToEmailExists(variables.email);
       } else {
         setPhase("details");
       }
@@ -44,7 +49,15 @@ function SignupContent() {
 
   const signupMutation = trpc.auth.signup.useMutation({
     onSuccess: () => router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`),
-    onError: (err) => setError(err.message),
+    onError: (err) => {
+      // auth.service.signup throws EMAIL_EXISTS (409 → CONFLICT) when the address
+      // was claimed between the checkEmail probe and submit. Same destination.
+      if (err.data?.code === "CONFLICT") {
+        goToEmailExists(email);
+        return;
+      }
+      setError(err.message);
+    },
   });
 
   function handleEmailContinue(e: React.FormEvent) {
@@ -63,9 +76,79 @@ function SignupContent() {
     signIn(provider, { callbackUrl: "/auth/redirect" });
   }
 
+  const creating = signupMutation.isPending;
+
+  const loginLink = (
+    <>
+      Already have an account?{" "}
+      <Link href="/auth" className="font-semibold text-auth-text-body hover:underline">
+        Log in
+      </Link>
+    </>
+  );
+
+  if (phase === "capture") {
+    return (
+      <AuthCard>
+        <div className="w-full flex flex-col gap-2.5 mb-7">
+          <h1 className="text-[44px] font-bold leading-[1.08] tracking-[-0.03em] text-auth-text-primary">
+            Create your account
+          </h1>
+          <p className="text-[17px] leading-[1.45] text-auth-text-muted">
+            Start building client sites in minutes.
+          </p>
+        </div>
+
+        {error && (
+          <>
+            <FormBanner variant="error" title={error} />
+            <div className="h-4" />
+          </>
+        )}
+
+        <SocialButton provider="google" variant="primary" label="Continue with Google" onClick={() => oauth("google")} />
+        <div className="h-3" />
+        <SocialButton provider="github" variant="dark" onClick={() => oauth("github")} />
+
+        <div className="h-5" />
+        <AuthDivider text="or" />
+        <div className="h-5" />
+
+        <form onSubmit={handleEmailContinue} className="w-full flex flex-col gap-3">
+          <AuthInput
+            label="Email"
+            hideLabel
+            type="email"
+            placeholder="you@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            autoFocus
+          />
+          <AuthButton type="submit" variant="secondary" loading={checkEmailMutation.isPending}>
+            Continue with email
+          </AuthButton>
+        </form>
+
+        <p className="w-full text-auth-subtitle leading-[1.55] text-auth-text-muted mt-6">
+          By continuing you agree to our{" "}
+          <button type="button" onClick={() => setLegal("terms")} className="font-semibold text-auth-text-body hover:underline">Terms</button>
+          {" "}&amp;{" "}
+          <button type="button" onClick={() => setLegal("privacy")} className="font-semibold text-auth-text-body hover:underline">Privacy Policy</button>.
+          <br />
+          {loginLink}
+        </p>
+
+        <LegalModal open={legal !== null} onClose={() => setLegal(null)}>
+          {legal === "terms" ? <TermsContent /> : legal === "privacy" ? <PrivacyContent /> : null}
+        </LegalModal>
+      </AuthCard>
+    );
+  }
+
   return (
     <AuthCard>
-      {phase === "details" && (
+      {!creating && (
         <button
           type="button"
           onClick={() => { setPhase("capture"); setError(null); }}
@@ -75,12 +158,12 @@ function SignupContent() {
         </button>
       )}
 
-      <div className="text-center">
-        <h1 className="text-auth-title-lg text-auth-text-primary">Create your account</h1>
-        <p className="text-auth-subtitle text-auth-text-muted mt-1.5">Start building client sites in minutes.</p>
+      <div className="flex flex-col items-center gap-1.5 text-center mb-5">
+        <span className="text-auth-subtitle text-auth-text-muted">Sign up for</span>
+        <span className="text-[21px] font-bold leading-none tracking-[-0.02em] text-auth-text-primary">
+          Buildrick
+        </span>
       </div>
-
-      <div className="h-7" />
 
       {error && (
         <>
@@ -89,91 +172,61 @@ function SignupContent() {
         </>
       )}
 
-      {phase === "capture" ? (
-        <>
-          <SocialButton provider="google" variant="primary" label="Sign up with Google" onClick={() => oauth("google")} />
-          <div className="h-2.5" />
-          <SocialButton provider="github" variant="dark" onClick={() => oauth("github")} />
-
-          <div className="h-5" />
-          <AuthDivider text="or" />
-          <div className="h-5" />
-
-          <form onSubmit={handleEmailContinue} className="w-full flex flex-col gap-3">
-            <AuthInput
-              label="Email"
-              hideLabel
-              type="email"
-              placeholder="you@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              autoFocus
-            />
-            <AuthButton type="submit" variant="secondary" loading={checkEmailMutation.isPending}>
-              Continue with email
-            </AuthButton>
-          </form>
-
-          <p className="text-auth-fine text-auth-text-placeholder text-center mt-6">
-            By continuing, you agree to our{" "}
-            <button type="button" onClick={() => setLegal("terms")} className="text-auth-link font-medium hover:underline">Terms</button>{" "}
-            and{" "}
-            <button type="button" onClick={() => setLegal("privacy")} className="text-auth-link font-medium hover:underline">Privacy Policy</button>.
-          </p>
-        </>
-      ) : (
-        <form onSubmit={handleSignup} className="w-full flex flex-col gap-3">
+      <form onSubmit={handleSignup} className="w-full flex flex-col gap-3">
+        <div className={cn("flex flex-col gap-3", creating && "opacity-50 pointer-events-none")}>
           <AuthInput
             label="Full name"
             hideLabel
             type="text"
-            placeholder="Your name"
+            placeholder="Full name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             autoComplete="name"
             autoFocus
           />
-          <AuthInput label="Email" hideLabel type="email" value={email} readOnly onChange={() => {}} />
+          <AuthInput label="Work email" hideLabel type="email" value={email} readOnly onChange={() => {}} />
           <AuthInput
             label="Password"
             hideLabel
             type="password"
-            placeholder="Create a password"
+            placeholder="Create password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
           />
           <PasswordStrength password={password} />
+        </div>
 
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
-              suppressHydrationWarning
-              className="mt-0.5 rounded border-auth-input-fill-border accent-auth-cta"
-            />
-            <span className="text-auth-label text-auth-text-secondary">
-              I agree to the{" "}
-              <button type="button" onClick={(e) => { e.preventDefault(); setLegal("terms"); }} className="text-auth-link hover:underline">Terms of Service</button>{" "}
-              and{" "}
-              <button type="button" onClick={(e) => { e.preventDefault(); setLegal("privacy"); }} className="text-auth-link hover:underline">Privacy Policy</button>
-            </span>
-          </label>
+        <label className="flex items-start gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            suppressHydrationWarning
+            className="mt-0.5 rounded border-auth-input-fill-border accent-auth-cta"
+          />
+          <span className="text-auth-label text-auth-text-secondary">
+            I agree to the{" "}
+            <button type="button" onClick={(e) => { e.preventDefault(); setLegal("terms"); }} className="text-auth-link hover:underline">Terms</button>{" "}
+            and{" "}
+            <button type="button" onClick={(e) => { e.preventDefault(); setLegal("privacy"); }} className="text-auth-link hover:underline">Privacy Policy</button>
+          </span>
+        </label>
 
-          <div className="h-1" />
-          <AuthButton type="submit" disabled={!termsAccepted} loading={signupMutation.isPending}>
-            Create account
-          </AuthButton>
-        </form>
-      )}
+        <div className="h-1" />
 
-      <div className="h-5" />
-      <p className="text-auth-label text-auth-text-muted text-center">
-        Already have an account?{" "}
-        <Link href="/auth" className="text-auth-link font-medium hover:underline">Log in</Link>
-      </p>
+        <AuthButton
+          type="submit"
+          variant={creating ? "primary" : "secondary"}
+          disabled={!termsAccepted}
+          loading={creating}
+        >
+          {creating ? "Creating your account…" : "Create account"}
+        </AuthButton>
+      </form>
+
+      <div className="h-3.5" />
+      <p className="text-auth-label text-auth-text-muted text-center">{loginLink}</p>
 
       <LegalModal open={legal !== null} onClose={() => setLegal(null)}>
         {legal === "terms" ? <TermsContent /> : legal === "privacy" ? <PrivacyContent /> : null}

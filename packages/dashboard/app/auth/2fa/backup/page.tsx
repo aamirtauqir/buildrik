@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthButton } from "@/components/auth/auth-button";
@@ -9,10 +9,9 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@lib/trpc/client";
 import { safeReturnUrl } from "@lib/safe-return-url";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, KeyRound } from "lucide-react";
 
 function BackupCodeContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
   const rememberMe = searchParams.get("remember") === "1";
@@ -36,31 +35,34 @@ function BackupCodeContent() {
         setError("Failed to create session");
       }
     },
-    onError: (err) => setError(err.message),
+    // verifyBackupCode only returns `backupCodesRemaining` when the code MATCHES.
+    // The failure path throws a bare "Invalid backup code", so the mockup's
+    // "3 codes remaining" counter has no value to read on this branch.
+    onError: () => setError("That backup code didn't match. Each code can only be used once."),
   });
 
   const handleVerify = () => {
+    setError(null);
     verifyBackupCodeMutation.mutate({ twoFactorToken: token || "", backupCode });
   };
 
   return (
     <AuthCard>
-      <button
-        type="button"
-        onClick={() => router.push(`/auth/2fa${token ? `?token=${token}` : ""}`)}
-        className="flex items-center gap-1 text-auth-label text-auth-text-muted hover:text-auth-text-secondary mb-5 self-start"
+      <Link
+        href={`/auth/2fa${token ? `?token=${encodeURIComponent(token)}` : ""}`}
+        className="mb-5 flex items-center gap-1.5 self-start text-auth-input font-medium text-auth-text-muted hover:text-auth-text-body"
       >
-        <ArrowLeft size={14} /> Back
-      </button>
+        <ArrowLeft size={16} strokeWidth={1.7} /> Back to code
+      </Link>
 
       <div className="text-center">
         <h1 className="text-auth-title text-auth-text-primary">Enter a backup code</h1>
         <p className="text-auth-subtitle text-auth-text-muted mt-2">
-          Enter one of your recovery codes. Each code works once.
+          Use one of the one-time backup codes you saved when setting up two-factor.
         </p>
       </div>
 
-      <div className="h-6" />
+      <div className="h-5" />
 
       {error && (
         <>
@@ -71,16 +73,18 @@ function BackupCodeContent() {
 
       <form
         onSubmit={(e) => { e.preventDefault(); handleVerify(); }}
-        className="w-full flex flex-col gap-3"
+        className="flex w-full flex-col gap-3.5"
       >
         <AuthInput
           label="Backup code"
           hideLabel
-          icon={null}
+          icon={KeyRound}
+          // The schema is XXXX-XXXX-XXXX (three groups, uppercase) — the mockup's
+          // "xxxx-xxxx" placeholder would fail validation, so it is not copied.
           placeholder="XXXX-XXXX-XXXX"
           value={backupCode}
           onChange={(e) => setBackupCode(e.target.value.toUpperCase())}
-          className="text-center tracking-[0.2em]"
+          className={error ? "border-auth-input-error bg-white tracking-[0.12em]" : "tracking-[0.12em]"}
           autoFocus
         />
         <AuthButton type="submit" loading={verifyBackupCodeMutation.isPending} disabled={!backupCode}>
@@ -88,14 +92,14 @@ function BackupCodeContent() {
         </AuthButton>
       </form>
 
-      <div className="h-4" />
+      <div className="h-3.5" />
 
-      <Link
-        href={`/auth/2fa${token ? `?token=${token}` : ""}`}
-        className="text-auth-label text-auth-link hover:underline text-center block"
-      >
-        Use authenticator instead
-      </Link>
+      <p className="text-center text-auth-input text-auth-text-muted">
+        Lost your codes?{" "}
+        <Link href="mailto:support@buildrik.com" className="font-semibold text-auth-text-body hover:underline">
+          Contact support
+        </Link>
+      </p>
     </AuthCard>
   );
 }

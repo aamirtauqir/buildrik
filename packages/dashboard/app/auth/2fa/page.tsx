@@ -38,37 +38,46 @@ function TwoFAContent() {
     },
     onError: (err) => {
       if (err.message.includes("Too many failed attempts")) {
-        // Carry the temp token so the backup-code recovery path stays usable.
-        router.push(`/auth/error/2fa-locked${token ? `?token=${encodeURIComponent(token)}` : ""}`);
+        // verify2FA invalidates the temp token when it locks out, so there is
+        // no token left to carry — the only way forward is a fresh log-in.
+        router.push("/auth/error/2fa-locked");
         return;
       }
-      setError(err.message);
+      // The service throws a bare "Invalid code" and never reports how many
+      // attempts remain, so the mockup's attempt counter has nothing to read.
+      setError("Incorrect code. Check your authenticator app and try again.");
     },
   });
 
   const handleVerify = () => {
     if (code.length < 6) return;
+    setError(null);
     verify2FAMutation.mutate({ twoFactorToken: token || "", code });
   };
 
+  const backupHref = `/auth/2fa/backup?${new URLSearchParams({
+    ...(token ? { token } : {}),
+    ...(rememberMe ? { remember: "1" } : {}),
+    ...(returnUrl ? { returnUrl } : {}),
+  }).toString()}`;
+
   return (
     <AuthCard>
-      <button
-        type="button"
-        onClick={() => router.push("/auth")}
-        className="flex items-center gap-1 text-auth-label text-auth-text-muted hover:text-auth-text-secondary mb-5 self-start"
+      <Link
+        href="/auth"
+        className="mb-5 flex items-center gap-1.5 self-start text-auth-input font-medium text-auth-text-muted hover:text-auth-text-body"
       >
-        <ArrowLeft size={14} /> Back
-      </button>
+        <ArrowLeft size={16} strokeWidth={1.7} /> Back to log in
+      </Link>
 
       <div className="text-center">
         <h1 className="text-auth-title text-auth-text-primary">Enter your code</h1>
         <p className="text-auth-subtitle text-auth-text-muted mt-2">
-          We sent a 6-digit code to your authenticator app.
+          Open your authenticator app for the current 6-digit code. It changes every 30 seconds.
         </p>
       </div>
 
-      <div className="h-6" />
+      <div className="h-5" />
 
       {error && (
         <>
@@ -77,9 +86,9 @@ function TwoFAContent() {
         </>
       )}
 
-      <OTPInput length={6} value={code} onChange={setCode} />
+      <OTPInput length={6} value={code} onChange={setCode} error={!!error} />
 
-      <div className="h-5" />
+      <div className="h-4" />
 
       <AuthButton loading={verify2FAMutation.isPending} disabled={code.length < 6} onClick={handleVerify}>
         Verify
@@ -87,18 +96,12 @@ function TwoFAContent() {
 
       <div className="h-4" />
 
-      <p className="text-auth-label text-auth-text-muted text-center">
-        Open your authenticator app to get the current code.
+      <p className="text-center text-auth-input text-auth-text-muted">
+        Can&apos;t reach your app?{" "}
+        <Link href={backupHref} className="font-semibold text-auth-text-body hover:underline">
+          Use a backup code
+        </Link>
       </p>
-
-      <div className="h-3" />
-
-      <Link
-        href={`/auth/2fa/backup?${new URLSearchParams({ ...(token ? { token } : {}), ...(rememberMe ? { remember: "1" } : {}), ...(returnUrl ? { returnUrl } : {}) }).toString()}`}
-        className="text-auth-label text-auth-link hover:underline text-center block"
-      >
-        Use a recovery code instead
-      </Link>
     </AuthCard>
   );
 }

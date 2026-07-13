@@ -32,7 +32,6 @@ function GitHubIcon() {
 export function SocialButton({ provider, onClick, disabled, variant = "secondary", label }: SocialButtonProps) {
   const text = label ?? (provider === "google" ? "Continue with Google" : "Continue with GitHub");
   const Icon = provider === "google" ? GoogleIcon : GitHubIcon;
-  const filled = variant === "primary" || variant === "dark";
 
   return (
     <button
@@ -48,13 +47,7 @@ export function SocialButton({ provider, onClick, disabled, variant = "secondary
         variant === "secondary" && "bg-white text-auth-text-secondary border border-auth-input-border hover:bg-gray-50 font-medium"
       )}
     >
-      {variant === "primary" ? (
-        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white shrink-0">
-          <Icon />
-        </span>
-      ) : (
-        <Icon />
-      )}
+      <Icon />
       {text}
     </button>
   );

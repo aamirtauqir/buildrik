@@ -1,43 +1,63 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthMessage } from "@/components/auth/auth-message";
 import { AuthButton } from "@/components/auth/auth-button";
 
+/**
+ * One screen for every dead link (reset / verify / magic). Copy states the real
+ * server TTLs from auth.service: password_reset 60 min, email_verify 24 h,
+ * magic_link 15 min. A token that fails validateToken may be expired, already
+ * used, or malformed — indistinguishable server-side, so the copy covers all.
+ */
 const VARIANTS = {
   reset: {
-    title: "Reset link expired",
-    subtitle: "This password reset link has expired (1 hour limit).",
-    cta: "Request a new reset link",
+    title: "This link isn't valid",
+    subtitle:
+      "Password reset links last 1 hour and work once. Request a new one and open it straight from your email.",
+    cta: "Request a new link",
     href: "/auth/forgot-password",
   },
   verify: {
     title: "Verification link expired",
-    subtitle: "This link has expired. Request a new verification email.",
+    subtitle:
+      "This link is no longer valid. Request a new verification email and open it within 24 hours.",
     cta: "Resend verification email",
-    href: "/auth/signup",
+    href: "/auth/verify-email",
   },
-  "magic-link": {
-    title: "Magic link expired",
-    subtitle: "This link has expired (15 minute limit). Request a new one.",
-    cta: "Request a new magic link",
+  magic: {
+    title: "This magic link expired",
+    subtitle: "For your security, magic links last 15 minutes. Request a fresh one to log in.",
+    cta: "Request a new link",
     href: "/auth/magic-link",
   },
 } as const;
 
+function variantFor(type: string | null) {
+  if (type === "verify") return VARIANTS.verify;
+  if (type === "magic-link") return VARIANTS.magic;
+  return VARIANTS.reset;
+}
+
 function ExpiredLinkContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const type = (searchParams.get("type") ?? "reset") as keyof typeof VARIANTS;
-  const v = VARIANTS[type] ?? VARIANTS.reset;
+  const email = searchParams.get("email") ?? "";
+  const variant = variantFor(searchParams.get("type"));
+
+  // Only the verify screen can act on an email (it owns the resend button).
+  const href =
+    variant === VARIANTS.verify && email
+      ? `${variant.href}?email=${encodeURIComponent(email)}`
+      : variant.href;
 
   return (
-    <AuthMessage title={v.title} subtitle={v.subtitle}>
-      <AuthButton onClick={() => (window.location.href = v.href)}>{v.cta}</AuthButton>
-      <Link href="/auth" className="text-auth-label text-auth-text-muted hover:text-auth-text-secondary text-center">
+    <AuthMessage title={variant.title} subtitle={variant.subtitle}>
+      <AuthButton onClick={() => router.push(href)}>{variant.cta}</AuthButton>
+      <AuthButton variant="secondary" onClick={() => router.push("/auth")}>
         Back to log in
-      </Link>
+      </AuthButton>
     </AuthMessage>
   );
 }

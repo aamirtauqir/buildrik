@@ -12,6 +12,9 @@ interface AuthInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: LucideIcon | null;
   /** Hide the visible label (kept for screen readers). Mockup uses placeholder-as-label. */
   hideLabel?: boolean;
+  /** Error styling without a per-field message — for form-level errors that already
+   *  render a banner (mockup reds the offending field but prints the reason once). */
+  invalid?: boolean;
 }
 
 function defaultIcon(type?: string): LucideIcon | null {
@@ -22,11 +25,12 @@ function defaultIcon(type?: string): LucideIcon | null {
 }
 
 export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
-  ({ label, error, type, icon, hideLabel, className, ...props }, ref) => {
+  ({ label, error, type, icon, hideLabel, invalid, className, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === "password";
     const inputType = isPassword && showPassword ? "text" : type;
     const Icon = icon === undefined ? defaultIcon(type) : icon;
+    const hasError = invalid || Boolean(error);
 
     return (
       <div className="w-full">
@@ -42,7 +46,10 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
           {Icon && (
             <Icon
               size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-auth-text-placeholder pointer-events-none"
+              className={cn(
+                "absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none",
+                hasError ? "text-auth-input-error" : "text-auth-text-placeholder"
+              )}
             />
           )}
           <input
@@ -54,7 +61,7 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
               "placeholder:text-auth-text-placeholder",
               "bg-auth-input-fill transition-colors outline-none",
               "border border-auth-input-fill-border focus:bg-auth-input-fill-focus focus:border-auth-input-focus",
-              error && "border-auth-input-error bg-white",
+              hasError && "border-auth-input-error",
               Icon ? "pl-11" : "pl-4",
               isPassword ? "pr-10" : "pr-4",
               className

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { cn } from "@lib/utils";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
@@ -22,6 +23,10 @@ export default function WorkspaceSetupPage() {
       router.push("/dashboard");
       router.refresh();
     },
+    // Workspace.name has no unique constraint and createWorkspace auto-dedupes
+    // the slug, so the mockup's "That workspace name is taken" state can never
+    // fire. The only error this mutation actually throws is the plan limit
+    // ("Free plan is limited to one workspace"), which we surface verbatim.
     onError: (err) => setError(err.message),
   });
 
@@ -31,16 +36,18 @@ export default function WorkspaceSetupPage() {
     createMutation.mutate({ name });
   };
 
+  const pending = createMutation.isPending;
+
   return (
     <AuthCard>
       <div className="text-center">
         <h1 className="text-auth-title text-auth-text-primary">Create your workspace</h1>
         <p className="text-auth-subtitle text-auth-text-muted mt-2">
-          Name your workspace to get started. You can invite teammates later.
+          This is where you and your team will build and manage sites.
         </p>
       </div>
 
-      <div className="h-6" />
+      <div className="h-5" />
 
       {error && (
         <>
@@ -49,20 +56,24 @@ export default function WorkspaceSetupPage() {
         </>
       )}
 
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
-        <AuthInput
-          label="Workspace name"
-          hideLabel
-          type="text"
-          icon={Briefcase}
-          placeholder="Acme Studio"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          autoFocus
-        />
-        <AuthButton type="submit" disabled={!name} loading={createMutation.isPending}>
-          Create workspace
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3.5">
+        <div className={cn(pending && "pointer-events-none opacity-50")}>
+          <AuthInput
+            label="Workspace name"
+            hideLabel
+            type="text"
+            icon={Briefcase}
+            placeholder="Workspace name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={error ? "border-auth-input-error bg-white" : undefined}
+            disabled={pending}
+            required
+            autoFocus
+          />
+        </div>
+        <AuthButton type="submit" disabled={!name} loading={pending}>
+          {pending ? "Creating workspace…" : "Create workspace"}
         </AuthButton>
       </form>
     </AuthCard>

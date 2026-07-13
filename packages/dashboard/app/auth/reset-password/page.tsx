@@ -1,60 +1,65 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { PasswordStrength } from "@/components/auth/password-strength";
-import { InlineError } from "@/components/auth/inline-error";
+import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@lib/trpc/client";
+import { resetPasswordSchema } from "@buildrik/shared/schemas/auth";
+import { cn } from "@lib/utils";
+
+const MISMATCH = "Passwords don't match. Re-enter the same password in both fields.";
 
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const token = searchParams.get("token") ?? "";
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<{ confirm?: string }>({});
+  const [error, setError] = useState<string | null>(null);
+  const [mismatch, setMismatch] = useState(false);
 
   const resetPasswordMutation = trpc.auth.resetPassword.useMutation({
     onSuccess: () => router.push("/auth/password-changed"),
     onError: (err) => {
-      if (err.message.includes("expired")) {
-        router.push("/auth/error/expired-link?type=reset");
-      } else {
-        setErrors({ confirm: err.message });
-      }
+      // 410 TOKEN_EXPIRED is mapped to NOT_FOUND by the auth router. The token
+      // is dead (expired, already used, or unknown) — send them to the one
+      // expired/invalid-link screen rather than failing in place.
+      if (err.data?.code === "NOT_FOUND") router.replace("/auth/error/expired-link?type=reset");
+      else setError(err.message);
     },
   });
 
-  if (!token) {
-    return (
-      <AuthCard>
-        <div className="text-center">
-          <h1 className="text-auth-title text-auth-text-primary">Invalid link</h1>
-          <p className="text-auth-subtitle text-auth-text-muted mt-2">
-            This reset link is invalid. Please request a new one.
-          </p>
-        </div>
-        <div className="h-6" />
-        <AuthButton onClick={() => router.push("/auth/forgot-password")}>
-          Request new link
-        </AuthButton>
-      </AuthCard>
-    );
-  }
+  useEffect(() => {
+    if (!token) router.replace("/auth/error/expired-link?type=reset");
+  }, [token, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      setErrors({ confirm: "Passwords do not match" });
+    const parsed = resetPasswordSchema.safeParse({ token, newPassword, confirmPassword });
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      if (issue.path[0] === "token") {
+        router.replace("/auth/error/expired-link?type=reset");
+        return;
+      }
+      const isMismatch = issue.path[0] === "confirmPassword";
+      setMismatch(isMismatch);
+      setError(isMismatch ? MISMATCH : issue.message);
       return;
     }
-    setErrors({});
-    resetPasswordMutation.mutate({ token, newPassword, confirmPassword });
+    setMismatch(false);
+    setError(null);
+    resetPasswordMutation.mutate(parsed.data);
   };
+
+  if (!token) return null;
+
+  const saving = resetPasswordMutation.isPending;
 
   return (
     <AuthCard>
@@ -67,32 +72,40 @@ function ResetPasswordContent() {
 
       <div className="h-6" />
 
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
-        <AuthInput
-          label="New password"
-          hideLabel
-          type="password"
-          placeholder="New password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-          autoFocus
-        />
-        <PasswordStrength password={newPassword} variant="line" />
-        <AuthInput
-          label="Confirm password"
-          hideLabel
-          type="password"
-          placeholder="Confirm password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
-        {errors.confirm && <InlineError message={errors.confirm} />}
+      {error && (
+        <>
+          <FormBanner variant="error" title={error} />
+          <div className="h-4" />
+        </>
+      )}
 
-        <div className="h-1" />
-        <AuthButton type="submit" loading={resetPasswordMutation.isPending}>
-          Reset password
+      <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-3">
+        <div className={cn("w-full flex flex-col gap-3", saving && "opacity-50 pointer-events-none")}>
+          <AuthInput
+            label="New password"
+            hideLabel
+            type="password"
+            placeholder="New password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+            autoFocus
+          />
+          <PasswordStrength password={newPassword} variant="line" />
+          <AuthInput
+            label="Confirm password"
+            hideLabel
+            type="password"
+            placeholder="Confirm password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            className={cn(mismatch && "border-auth-input-error")}
+          />
+        </div>
+
+        <AuthButton type="submit" loading={saving}>
+          {saving ? "Updating password…" : "Reset password"}
         </AuthButton>
       </form>
     </AuthCard>

@@ -233,6 +233,11 @@ export const authRouter = router({
       });
       return {
         found: true as const,
+        // The address the invite is bound to. Token-gated (the caller already
+        // holds the secret from the invite email), and the invite screens need
+        // it: "sent to priya@…, you're logged in as jordan@…" on the email
+        // mismatch, and as the fixed signup email on /auth/join-workspace.
+        email: invite.email,
         workspaceName: invite.workspace.name,
         workspaceIconUrl: invite.workspace.iconUrl,
         inviterName: inviter?.fullName ?? "A team member",

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Plus, Check } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { AuthCard } from "@/components/auth/auth-card";
 import { trpc } from "@lib/trpc/client";
 
@@ -17,6 +18,16 @@ const ROLE_LABELS: Record<string, string> = {
 
 function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+}
+
+/**
+ * The mockup's meta line reads "4 members · 12 sites", but `workspace.listMine`
+ * (listUserWorkspaces) returns only role + memberCount — there is no site count
+ * on that query. We render the two facts we actually have.
+ */
+function meta(role: string, memberCount: number) {
+  const who = memberCount === 1 ? "Just you" : `${memberCount} members`;
+  return `${ROLE_LABELS[role] ?? role} · ${who}`;
 }
 
 export default function WorkspaceSelectPage() {
@@ -39,28 +50,32 @@ export default function WorkspaceSelectPage() {
       <div className="text-center">
         <h1 className="text-auth-title text-auth-text-primary">Choose a workspace</h1>
         <p className="text-auth-subtitle text-auth-text-muted mt-2">
-          You belong to more than one workspace. Pick which to work in.
+          You belong to more than one workspace. Pick where to continue.
         </p>
       </div>
 
-      <div className="h-6" />
+      <div className="h-5" />
 
       {workspacesQuery.isLoading ? (
-        <div className="flex w-full flex-col gap-3">
-          {[0, 1, 2].map((i) => <div key={i} className="h-[68px] animate-pulse rounded-auth-input bg-auth-input-fill" />)}
+        <div className="flex w-full flex-col gap-2.5">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-[68px] animate-pulse rounded-auth-input bg-auth-btn-secondary" />
+          ))}
         </div>
       ) : workspaces.length === 0 ? (
-        <p className="text-center text-auth-subtitle text-auth-text-muted">You&apos;re not a member of any workspace yet.</p>
+        <p className="text-center text-auth-subtitle text-auth-text-muted">
+          You&apos;re not a member of any workspace yet.
+        </p>
       ) : (
-        <div className="flex w-full flex-col gap-3">
+        <div className="flex w-full flex-col gap-2.5">
           {workspaces.map((ws) => (
             <button
               key={ws.id}
               onClick={() => select(ws.id)}
               disabled={!!switchingId}
-              className="flex w-full items-center gap-3 rounded-auth-input border border-auth-input-fill-border p-3.5 text-left transition-colors hover:bg-auth-input-fill disabled:opacity-60"
+              className="flex w-full items-center gap-3 rounded-auth-input border border-[#ECECEE] bg-white px-[15px] py-[13px] text-left transition-colors hover:border-auth-text-body disabled:opacity-60"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-auth-cta text-sm font-bold text-white">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-auth-cta text-[15px] font-bold tracking-[-0.02em] text-white">
                 {ws.iconUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={ws.iconUrl} alt="" className="h-full w-full object-cover" />
@@ -68,26 +83,28 @@ export default function WorkspaceSelectPage() {
                   initials(ws.name)
                 )}
               </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-auth-label font-semibold text-auth-text-primary">{ws.name}</span>
-                <span className="block text-auth-fine text-auth-text-muted">
-                  {ROLE_LABELS[ws.role] ?? ws.role} · {ws.memberCount} member{ws.memberCount === 1 ? "" : "s"}
-                </span>
+              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="truncate text-auth-input font-semibold text-auth-text-primary">{ws.name}</span>
+                <span className="text-auth-fine text-auth-text-muted">{meta(ws.role, ws.memberCount)}</span>
               </span>
-              {switchingId === ws.id && <Check className="h-4 w-4 shrink-0 text-auth-cta" />}
+              {switchingId === ws.id ? (
+                <Loader2 className="h-[18px] w-[18px] shrink-0 animate-spin text-auth-cta" />
+              ) : (
+                <ChevronRight size={18} strokeWidth={1.7} className="shrink-0 text-auth-text-placeholder" />
+              )}
             </button>
           ))}
         </div>
       )}
 
-      <div className="h-4" />
-      <button
-        onClick={() => router.push("/auth/workspace-setup")}
-        className="flex w-full items-center justify-center gap-1.5 text-auth-label text-auth-link text-center hover:underline"
-      >
-        <Plus className="h-4 w-4" />
-        Create new workspace
-      </button>
+      <div className="h-3.5" />
+
+      <p className="text-center text-auth-input text-auth-text-muted">
+        Need a new one?{" "}
+        <Link href="/auth/workspace-setup" className="font-semibold text-auth-text-body hover:underline">
+          Create a workspace
+        </Link>
+      </p>
     </AuthCard>
   );
 }

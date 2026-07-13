@@ -9,8 +9,8 @@
   --color-auth-cta-hover: #1E58D9;
   --color-auth-input-border: #E2E8F0;
   --color-auth-input-focus: #2D6DFF;
-  --color-auth-input-error: #EF4444;
-  --color-auth-error-text: #DC2626;
+  --color-auth-input-error: #E5484D;
+  --color-auth-error-text: #C0343A;
   --color-auth-input-fill: #EAF1FF;
   --color-auth-input-fill-border: #D3E1FF;
   --color-auth-input-fill-focus: #DCE7FF;
@@ -24,12 +24,9 @@
   --color-auth-text-muted: #6B6B70;
   --color-auth-text-placeholder: #9A9AA0;
   --color-auth-link: #2D6DFF;
-  --color-auth-success-bg: #F0FDF4;
-  --color-auth-success-border: #BBF7D0;
-  --color-auth-success-text: #166534;
-  --color-auth-error-bg: #FEF2F2;
-  --color-auth-error-border: #FECACA;
-  --color-auth-error-text: #991B1B;
+  /* Banner fills are tinted inline (9% of the status colour); the frames carry
+     no border, so the old bg/border pairs are gone rather than left dead. */
+  --color-auth-success-text: #12805C;
   --color-auth-strength-bg: #F8FAFC;
   --color-auth-strength-pass: #16A34A;
 

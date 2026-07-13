@@ -1,5 +1,5 @@
 import { cn } from "@lib/utils";
-import { CheckCircle, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 interface FormBannerProps {
   variant: "success" | "error";
@@ -7,25 +7,27 @@ interface FormBannerProps {
   subtitle?: string;
 }
 
+/**
+ * Craftwork form banner — a borderless tinted chip, not a bordered alert box.
+ * The frames tint the fill to 9% of the status colour and carry no border.
+ */
 export function FormBanner({ variant, title, subtitle }: FormBannerProps) {
   const isSuccess = variant === "success";
 
   return (
     <div
       className={cn(
-        "w-full rounded-auth-input px-4 py-3 flex items-start gap-3",
-        isSuccess
-          ? "bg-auth-success-bg border border-auth-success-border"
-          : "bg-auth-error-bg border border-auth-error-border"
+        "flex w-full items-center gap-[9px] rounded-[10px] px-[14px] py-[11px]",
+        isSuccess ? "bg-[rgb(18_128_92_/_0.09)]" : "bg-[rgb(229_72_77_/_0.09)]"
       )}
     >
       {isSuccess ? (
-        <CheckCircle className="w-5 h-5 text-auth-success-text shrink-0 mt-0.5" />
+        <CheckCircle2 className="h-[18px] w-[18px] shrink-0 text-auth-success-text" strokeWidth={1.8} />
       ) : (
-        <XCircle className="w-5 h-5 text-auth-error-text shrink-0 mt-0.5" />
+        <AlertTriangle className="h-[18px] w-[18px] shrink-0 text-auth-error-text" strokeWidth={1.8} />
       )}
-      <div>
-        <p className={cn("text-auth-label font-medium", isSuccess ? "text-auth-success-text" : "text-auth-error-text")}>
+      <div className="min-w-0">
+        <p className={cn("text-[13px] leading-[1.4]", isSuccess ? "text-auth-success-text" : "text-auth-error-text")}>
           {title}
         </p>
         {subtitle && (
