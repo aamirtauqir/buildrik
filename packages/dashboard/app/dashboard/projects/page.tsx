@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Folder, FolderPlus, Layers, MoreHorizontal, Plus } from "lucide-react";
+import { Folder, FolderPlus, Layers, MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
 import { PageHeader, MetricValue } from "@/components/dashboard/primitives";
@@ -26,10 +27,21 @@ type ProjectGroup = {
 
 export default function ProjectsPage() {
   const { addToast } = useToast();
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   // Real workspace sites (max page size) — counts are derived from these rows.
   const sitesQuery = trpc.sites.list.useQuery({ page: 1, perPage: 50 });
   // Folder names + membership; folders with no sites still surface as projects.
   const foldersQuery = trpc.sites.folders.list.useQuery();
+
+  useEffect(() => {
+    if (!openMenu) return;
+    const onDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpenMenu(null);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [openMenu]);
 
   const createFolderMutation = trpc.sites.folders.create.useMutation({
     onSuccess: () => {
@@ -39,9 +51,40 @@ export default function ProjectsPage() {
     onError: (err) => addToast("error", "Failed to create folder", err.message),
   });
 
+  const renameFolderMutation = trpc.sites.folders.rename.useMutation({
+    onSuccess: () => {
+      foldersQuery.refetch();
+      addToast("success", "Folder renamed");
+    },
+    onError: (err) => addToast("error", "Couldn't rename folder", err.message),
+  });
+
+  const deleteFolderMutation = trpc.sites.folders.delete.useMutation({
+    onSuccess: () => {
+      foldersQuery.refetch();
+      sitesQuery.refetch();
+      addToast("success", "Folder deleted");
+    },
+    onError: (err) => addToast("error", "Couldn't delete folder", err.message),
+  });
+
   const handleNewFolder = () => {
     const name = window.prompt("Folder name")?.trim();
     if (name) createFolderMutation.mutate({ name });
+  };
+
+  const handleRename = (id: string, current: string) => {
+    setOpenMenu(null);
+    const name = window.prompt("Rename folder", current)?.trim();
+    if (name && name !== current) renameFolderMutation.mutate({ id, name });
+  };
+
+  const handleDelete = (id: string, name: string) => {
+    setOpenMenu(null);
+    // Sites in the folder are not deleted — they fall back to Ungrouped.
+    if (window.confirm(`Delete the folder "${name}"? Its sites move to Ungrouped.`)) {
+      deleteFolderMutation.mutate({ id });
+    }
   };
 
   const isLoading = sitesQuery.isLoading || foldersQuery.isLoading;
@@ -137,14 +180,45 @@ export default function ProjectsPage() {
                   >
                     <Icon className="h-[18px] w-[18px]" />
                   </div>
-                  <button
-                    type="button"
-                    aria-label="Project options"
-                    className="-mr-1.5 -mt-1 rounded-md p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </button>
+                  {/* Ungrouped is a synthetic bucket, not a folder — nothing to rename or delete. */}
+                  {!group.ungrouped && (
+                    <div className="relative" ref={openMenu === group.key ? menuRef : undefined}>
+                      <button
+                        type="button"
+                        aria-label="Project options"
+                        aria-haspopup="menu"
+                        aria-expanded={openMenu === group.key}
+                        onClick={() => setOpenMenu((k) => (k === group.key ? null : group.key))}
+                        className="-mr-1.5 -mt-1 rounded-md p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </button>
+                      {openMenu === group.key && (
+                        <div
+                          className="absolute right-0 top-full z-20 mt-1 w-44 overflow-hidden rounded-lg border bg-white shadow-card"
+                          style={{ borderColor: "var(--color-border-default)" }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleRename(group.key, group.name)}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
+                            style={{ color: "var(--color-text-primary)" }}
+                          >
+                            <Pencil className="h-3.5 w-3.5" /> Rename
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(group.key, group.name)}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
+                            style={{ color: "var(--color-error)" }}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{group.name}</h2>
                 <p className="mt-1 font-mono text-body-sm tabular-nums" style={{ color: "var(--color-text-muted)" }}>
