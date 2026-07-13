@@ -66,16 +66,17 @@ fi
 pass "D2: no purple/violet/indigo bleed in dashboard chrome"
 
 # ─────────────────────────────────────────────────────────────
-# Gate D3 — --color-primary must be the brand red.
-# DESIGN.md L15-17: dashboard chrome CTA = #E42313 red. Sentinel for accidental
-# rebrand (e.g. someone copy-pasting cobalt config from editor).
+# Gate D3 — --color-primary must be the brand accent.
+# Cobalt #2D6DFF since the 2026-07-12 RED → COBALT flip (DESIGN.md §Product
+# Context + changelog). Still a sentinel for accidental accent drift; it just
+# guards the current accent instead of the retired red #E42313.
 # ─────────────────────────────────────────────────────────────
-if ! grep -qE "^\s*--color-primary:\s*#E42313\s*;" packages/dashboard/app/globals.css 2>/dev/null; then
-  echo "GATE FAIL: D3 — --color-primary in globals.css must be #E42313 (DESIGN.md L15)"
+if ! grep -qE "^\s*--color-primary:\s*#2D6DFF\s*;" packages/dashboard/app/globals.css 2>/dev/null; then
+  echo "GATE FAIL: D3 — --color-primary in globals.css must be #2D6DFF (DESIGN.md §Product Context)"
   grep -nE "^\s*--color-primary:" packages/dashboard/app/globals.css 2>/dev/null
   exit 1
 fi
-pass "D3: --color-primary = #E42313 (DESIGN.md two-accent dashboard red)"
+pass "D3: --color-primary = #2D6DFF (DESIGN.md single cobalt accent)"
 
 # ─────────────────────────────────────────────────────────────
 # Gate D4 — NO BLACK rule.
