@@ -27,8 +27,21 @@ const tokenAuthRoutes = ["/auth/invite", "/auth/verify-email", "/auth/reset-pass
  */
 const EDITOR_ORIGIN = process.env.EDITOR_ORIGIN || "http://localhost:5050";
 
+/** Anything with a file extension is a static asset, not a route. */
+const STATIC_ASSET = /\.[a-z0-9]+$/i;
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Static files under a matched prefix must never be treated as routes. The
+  // auth art lives at `public/auth/signin-art.jpg`, so its URL is `/auth/...`,
+  // which `isAuthRoute` matched — a logged-in user's request for the image was
+  // redirected to /dashboard, the browser got HTML instead of a JPEG, and the
+  // art rail fell back to flat navy on every auth screen reachable while
+  // logged in (verify-email, invite, change-email, reset-password).
+  if (STATIC_ASSET.test(pathname)) {
+    return NextResponse.next();
+  }
 
   // Handle CORS preflight for API routes (editor cross-origin tRPC calls)
   if (pathname.startsWith("/api/") && req.method === "OPTIONS") {

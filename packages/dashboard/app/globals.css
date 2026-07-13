@@ -14,14 +14,15 @@
   --color-auth-input-fill: #EAF1FF;
   --color-auth-input-fill-border: #D3E1FF;
   --color-auth-input-fill-focus: #DCE7FF;
-  --color-auth-btn-secondary: #ECECEF;
-  --color-auth-btn-secondary-hover: #E2E2E6;
+  --color-auth-btn-secondary: #EFEFF0;
+  --color-auth-btn-secondary-hover: #E5E5E7;
   --color-auth-page: #ECECEE;
-  --color-auth-text-primary: #0F172A;
-  --color-auth-text-body: #1E293B;
-  --color-auth-text-secondary: #334155;
-  --color-auth-text-muted: #64748B;
-  --color-auth-text-placeholder: #64748B;
+  /* Craftwork ink is near-black, not slate — titles #0A0A0B, body/links #111113. */
+  --color-auth-text-primary: #0A0A0B;
+  --color-auth-text-body: #111113;
+  --color-auth-text-secondary: #111113;
+  --color-auth-text-muted: #6B6B70;
+  --color-auth-text-placeholder: #9A9AA0;
   --color-auth-link: #2D6DFF;
   --color-auth-success-bg: #F0FDF4;
   --color-auth-success-border: #BBF7D0;
@@ -33,24 +34,24 @@
   --color-auth-strength-pass: #16A34A;
 
   /* Auth shadows — floating craftwork card */
-  --shadow-auth-card: 0 12px 40px rgba(15, 23, 42, 0.12);
+  --shadow-auth-card: 0 26px 60px -24px rgba(17, 17, 25, 0.22), 0 10px 28px -18px rgba(17, 17, 25, 0.14);
 
   /* Auth border radius */
   --radius-auth-card: 24px;
   --radius-auth-input: 12px;
   --radius-auth-btn: 12px;
 
-  /* Auth layout — mockup: 1000×620 card, 440 art + 560 form (≤380 content) */
+  /* Auth layout — mockup: 1000×620 card, split 50/50 (form pane holds a 380 column) */
   --container-auth-card: 380px;
   --container-auth-shell: 1000px;
-  --spacing-auth-art: 440px;
+  --spacing-auth-shell-min: 620px;
 
   /* Auth spacing/height */
-  --spacing-auth-input: 44px;
-  --spacing-auth-btn: 44px;
+  --spacing-auth-input: 52px;
+  --spacing-auth-btn: 50px;
 
   /* Auth font sizes */
-  --text-auth-title: 20px;
+  --text-auth-title: 18.5px;
   --text-auth-title--line-height: 1.3;
   --text-auth-title--font-weight: 700;
   --text-auth-title-lg: 24px;
