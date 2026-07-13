@@ -26,9 +26,13 @@ import ReviewResolved from "@/emails/review-resolved";
 let _transport: nodemailer.Transporter | null = null;
 function getTransport() {
   if (!_transport) {
+    const port = Number(process.env.SMTP_PORT) || 587;
     _transport = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 2525,
+      port,
+      // 465 is implicit TLS (SMTPS) — the socket is encrypted from the start.
+      // Anything else starts plaintext and upgrades via STARTTLS.
+      secure: port === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -38,7 +42,7 @@ function getTransport() {
   return _transport;
 }
 
-const FROM = process.env.EMAIL_FROM || "noreply@buildrik.app";
+const FROM = process.env.EMAIL_FROM || "info@buildrick.io";
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 async function sendEmail(to: string, subject: string, html: string) {

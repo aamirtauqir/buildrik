@@ -2,7 +2,7 @@
 
 ## Stack
 
-Next.js 16 (App Router, Turbopack) | React 19 | Tailwind CSS 4 | tRPC 11 | NextAuth 5 | Prisma 5 | PostgreSQL | Resend | Zod
+Next.js 16 (App Router, Turbopack) | React 19 | Tailwind CSS 4 | tRPC 11 | NextAuth 5 | Prisma 5 | PostgreSQL | Nodemailer (SMTP) | Zod
 
 ## Architecture
 
@@ -86,7 +86,7 @@ Don't split a 20-line function into 4 files. A file should contain enough contex
 
 ### No hidden side effects
 - Functions should do what their name says. `getUser()` should not send an email.
-- Module-level code must not throw or trigger I/O. Use lazy initialization for external clients (Resend, etc.).
+- Module-level code must not throw or trigger I/O. Use lazy initialization for external clients (the SMTP transport, etc.).
 - Constructors and top-level `const` must be side-effect-free.
 
 ### Low coupling, high cohesion
@@ -156,7 +156,11 @@ Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packa
 |-----|---------|-----------|
 | `DATABASE_URL` | Postgres connection string | Yes |
 | `NEXTAUTH_SECRET` | NextAuth session signing key | Yes |
-| `RESEND_API_KEY` | Transactional email (verification, magic links) | Yes for production |
+| `SMTP_HOST` | Transactional email host (e.g. `buildrick.io`) | Yes for production |
+| `SMTP_PORT` | `465` for implicit TLS (SMTPS), `587` for STARTTLS. The transport sets `secure: true` only on 465. | Yes for production |
+| `SMTP_USER` | Mailbox login (e.g. `info@buildrick.io`) | Yes for production |
+| `SMTP_PASS` | Mailbox password. Never commit — `.env.local` in dev, cPanel Node-app env in prod. | Yes for production |
+| `EMAIL_FROM` | Sender, e.g. `Buildrick <info@buildrick.io>`. Most SMTP hosts require this to match `SMTP_USER`'s domain. | Yes for production |
 | `VERCEL_TOKEN` | Shared Vercel API token (legacy — being replaced by per-workspace OAuth) | Optional during OAuth rollout |
 | `ENCRYPTION_KEY` | 32-byte hex (`openssl rand -hex 32`) for AES-256-GCM token-at-rest (Vercel OAuth + future integrations). Rotate by re-encrypting all rows. | Yes for Vercel OAuth flow |
 | `VERCEL_OAUTH_CLIENT_ID` | OAuth integration public client id (from vercel.com/integrations/console) | Yes for Vercel OAuth flow |
