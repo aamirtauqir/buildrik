@@ -76,7 +76,12 @@ export function DashboardChecklist({
   completedIds = [],
   onDismiss,
 }: DashboardChecklistProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  // Opens collapsed. This panel is `fixed bottom-6 right-6` and 393px tall, which
+  // lands exactly on the dashboard's "Quick actions" card — opening expanded made
+  // Create a site / Invite teammate / Browse templates unclickable for every new
+  // user, on the one screen where those CTAs matter most. Collapsed still shows
+  // the "Getting Started 0/7" bar, so the checklist stays discoverable.
+  const [collapsed, setCollapsed] = useState(true);
 
   const items = variant === "invited" ? INVITED_CHECKLIST_ITEMS : FULL_CHECKLIST_ITEMS;
   const completedSet = new Set(completedIds);
