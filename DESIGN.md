@@ -47,6 +47,12 @@ The **`app/auth/**` screens** (login, signup, 2FA, OTP, magic-link, forgot/reset
 - **Gray-fill icon inputs** — `--color-auth-input-fill`, left icon, cobalt focus. Floating card on `--color-auth-page` (`#ECECEE`).
 - Source of truth: `app/globals.css` `--color-auth-*` tokens + `components/auth/*`.
 
+**Frame parity (2026-07-13).** Rebuilt against the M1 craftwork gallery (52 frames). The card is **1000×620, radius 24, art rail left** — it is *not* full-bleed; it was briefly flattened to `fixed inset-0` and that dropped the card on every art screen. Inputs 52px, buttons 50px, titles 18.5px. Craftwork ink is **near-black** (`#0A0A0B` titles, `#111113` body/links), muted `#6B6B70` — not slate. Error red is `#E5484D` (border) / `#C0343A` (text). `FormBanner` is a **borderless tinted chip** (9% fill), not a bordered alert box.
+
+- **The gallery's intro prose is stale** — it claims a black Google button, gray-fill inputs and form-on-the-left. The frames themselves show a cobalt Google button, blue-fill inputs and art-on-the-left. Trust the frames.
+- **Deliberate deviations from the frames** (user-confirmed 2026-07-13): sign-in keeps the **GitHub button** and the **"Remember me"** checkbox. The frames omit both, but GitHub OAuth is live and `rememberMe` really drives session lifetime — dropping the checkbox would silently pin every session short.
+- **Not implemented, by design:** the frames' "N attempts remaining" counters. Login/2FA errors are generic *on purpose* to deny a user-enumeration oracle; surfacing counts would reverse that. Likewise the lockout countdown, workspace site counts and the device-alert Device/Location/Time table have no backing data (the device fingerprint is a one-way hash). Do not fabricate them.
+
 ### Onboarding Surface — M2 Wizard (2026-07-11, scoped exception)
 
 The **`app/onboarding/**` wizard** (post-verification setup: workspace → first site → path chooser → AI/template/blank → editor) runs its own **primary blue `#2563EB`**, distinct from the cobalt `#2D6DFF` used everywhere else. This is an approved scoped exception, re-confirmed by the user on 2026-07-13.
