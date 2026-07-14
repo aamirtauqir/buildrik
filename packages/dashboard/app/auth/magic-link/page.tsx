@@ -102,7 +102,7 @@ export default function MagicLinkRequestPage() {
 
       <p className="text-auth-label text-auth-text-muted text-center">
         Prefer a password?{" "}
-        <Link href="/auth" className="text-auth-text-body font-semibold hover:underline">
+        <Link href="/auth" className="font-semibold text-auth-text-body hover:underline">
           Log in normally
         </Link>
       </p>

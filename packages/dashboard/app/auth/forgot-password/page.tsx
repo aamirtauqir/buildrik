@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
 
       <p className="text-auth-label text-auth-text-muted text-center">
         Remembered it?{" "}
-        <Link href="/auth" className="text-auth-text-body font-semibold hover:underline">
+        <Link href="/auth" className="font-semibold text-auth-text-body hover:underline">
           Log in
         </Link>
       </p>

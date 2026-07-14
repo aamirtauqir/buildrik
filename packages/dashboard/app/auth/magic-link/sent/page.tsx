@@ -32,7 +32,7 @@ function MagicLinkSentContent() {
 
       <p className="text-auth-label text-auth-text-muted text-center">
         Didn&apos;t arrive?{" "}
-        <Link href="/auth/magic-link" className="text-auth-text-body font-semibold hover:underline">
+        <Link href="/auth/magic-link" className="font-semibold text-auth-text-body hover:underline">
           Try another email
         </Link>
       </p>

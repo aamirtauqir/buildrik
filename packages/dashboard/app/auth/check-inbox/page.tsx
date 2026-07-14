@@ -43,7 +43,7 @@ function CheckInboxContent() {
         Wrong address?{" "}
         <Link
           href={isReset ? "/auth/forgot-password" : `/auth/change-email${email ? `?email=${encodeURIComponent(email)}` : ""}`}
-          className="text-auth-text-body font-semibold hover:underline"
+          className="font-semibold text-auth-text-body hover:underline"
         >
           Use a different email
         </Link>

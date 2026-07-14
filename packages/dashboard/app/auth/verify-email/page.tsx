@@ -122,7 +122,7 @@ function VerifyEmailContent() {
         Wrong email?{" "}
         <Link
           href={`/auth/change-email${email ? `?email=${encodeURIComponent(email)}` : ""}`}
-          className="text-auth-text-body font-semibold hover:underline"
+          className="font-semibold text-auth-text-body hover:underline"
         >
           Change it
         </Link>

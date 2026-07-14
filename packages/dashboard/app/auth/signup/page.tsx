@@ -18,6 +18,9 @@ import { ArrowLeft } from "lucide-react";
 import { LegalModal } from "@/components/legal/legal-modal";
 import { TermsContent, PrivacyContent } from "@/components/legal/legal-content";
 
+/** Both phases open the same two modals — they get the same treatment. */
+const LEGAL_LINK = "font-semibold text-auth-text-body hover:underline";
+
 function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -146,9 +149,9 @@ function SignupContent() {
 
         <p className="w-full text-auth-subtitle leading-[1.55] text-auth-text-muted mt-6">
           By continuing you agree to our{" "}
-          <button type="button" onClick={() => setLegal("terms")} className="font-semibold text-auth-text-body hover:underline">Terms</button>
+          <button type="button" onClick={() => setLegal("terms")} className={LEGAL_LINK}>Terms</button>
           {" "}&amp;{" "}
-          <button type="button" onClick={() => setLegal("privacy")} className="font-semibold text-auth-text-body hover:underline">Privacy Policy</button>.
+          <button type="button" onClick={() => setLegal("privacy")} className={LEGAL_LINK}>Privacy Policy</button>.
           <br />
           {loginLink}
         </p>
@@ -221,9 +224,9 @@ function SignupContent() {
           />
           <span className="text-auth-label text-auth-text-secondary">
             I agree to the{" "}
-            <button type="button" onClick={(e) => { e.preventDefault(); setLegal("terms"); }} className="text-auth-link hover:underline">Terms</button>{" "}
+            <button type="button" onClick={(e) => { e.preventDefault(); setLegal("terms"); }} className={LEGAL_LINK}>Terms</button>{" "}
             and{" "}
-            <button type="button" onClick={(e) => { e.preventDefault(); setLegal("privacy"); }} className="text-auth-link hover:underline">Privacy Policy</button>
+            <button type="button" onClick={(e) => { e.preventDefault(); setLegal("privacy"); }} className={LEGAL_LINK}>Privacy Policy</button>
           </span>
         </label>
 

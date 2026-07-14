@@ -3,31 +3,41 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
+import { AuthBackLink } from "@/components/auth/auth-back-link";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
-import { ArrowLeft } from "lucide-react";
+import { FormBanner } from "@/components/auth/form-banner";
+import { emailField } from "@buildrik/shared/schemas/auth";
 
 function ChangeEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const current = searchParams.get("email") ?? "";
   const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  // This screen is reached from the verification email itself, so browser history
+  // often points at the mail client, not at us — the back link needs a real
+  // destination rather than router.back().
+  const backHref = `/auth/verify-email${current ? `?email=${encodeURIComponent(current)}` : ""}`;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const parsed = emailField.safeParse(email);
+    if (!parsed.success) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    setError(null);
     // Re-run signup with the new email (reuses checkEmail/signup — no pending-email mutation exists).
-    router.push(`/auth/signup?email=${encodeURIComponent(email)}`);
+    router.push(`/auth/signup?email=${encodeURIComponent(parsed.data)}`);
   };
 
   return (
     <AuthCard>
-      <button
-        type="button"
-        onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-auth-label text-auth-text-muted hover:text-auth-text-body mb-5 self-start"
-      >
-        <ArrowLeft size={16} /> Back
-      </button>
+      <AuthBackLink href={backHref} placement="top">
+        Back
+      </AuthBackLink>
 
       <div className="text-center">
         <p className="text-auth-subtitle text-auth-text-muted">Change email for</p>
@@ -36,15 +46,26 @@ function ChangeEmailContent() {
 
       <div className="h-6" />
 
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3">
+      {error && (
+        <>
+          <FormBanner variant="error" title={error} />
+          <div className="h-4" />
+        </>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-3">
         <AuthInput
           label="New email"
           hideLabel
           type="email"
           placeholder="New work email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (error) setError(null);
+          }}
+          invalid={Boolean(error)}
+          autoComplete="email"
           autoFocus
         />
         <AuthButton type="submit" disabled={!email}>Update and resend</AuthButton>

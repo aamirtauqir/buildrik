@@ -2,8 +2,8 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { AuthMessage } from "@/components/auth/auth-message";
+import { AuthBackLink } from "@/components/auth/auth-back-link";
 
 /** mm:ss for anything over a minute — the window is up to 15 of them. */
 function format(total: number) {
@@ -48,9 +48,7 @@ function RateLimitedContent() {
       ) : (
         <p className="text-auth-input font-semibold text-auth-cta text-center">You can try again now</p>
       )}
-      <Link href="/auth" className="text-auth-label text-auth-link hover:underline text-center">
-        Back to log in
-      </Link>
+      <AuthBackLink />
     </AuthMessage>
   );
 }

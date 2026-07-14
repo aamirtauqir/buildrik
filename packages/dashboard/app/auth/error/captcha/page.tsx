@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { AuthMessage } from "@/components/auth/auth-message";
+import { AuthBackLink } from "@/components/auth/auth-back-link";
 import { AuthButton } from "@/components/auth/auth-button";
 
 export default function CaptchaPage() {
@@ -12,9 +12,7 @@ export default function CaptchaPage() {
         CAPTCHA widget
       </div>
       <AuthButton disabled>Continue</AuthButton>
-      <Link href="/auth" className="text-auth-label text-auth-link hover:underline text-center">
-        Back to log in
-      </Link>
+      <AuthBackLink />
     </AuthMessage>
   );
 }
