@@ -3,16 +3,19 @@ import { describe, it, expect } from "vitest";
 describe("Dashboard Components", () => {
   describe("StatCard", () => {
     it("exports StatCard component", async () => {
-      const mod = await import("@/components/dashboard/stat-card");
+      const mod = await import("@/components/dashboard/primitives/stat-card");
       expect(mod.StatCard).toBeDefined();
       expect(typeof mod.StatCard).toBe("function");
     });
   });
 
   describe("QuickActions", () => {
-    it("exports QUICK_ACTION_ICONS map", async () => {
+    // Was asserting a QUICK_ACTION_ICONS map. The component was rewritten and no
+    // longer exports one; only the component itself is public now.
+    it("exports QuickActions component", async () => {
       const mod = await import("@/components/dashboard/quick-actions");
-      expect(mod.QUICK_ACTION_ICONS).toBeDefined();
+      expect(mod.QuickActions).toBeDefined();
+      expect(typeof mod.QuickActions).toBe("function");
     });
   });
 

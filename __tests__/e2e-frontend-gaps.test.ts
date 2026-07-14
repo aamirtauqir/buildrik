@@ -88,7 +88,12 @@ describe("F6: check-inbox handles verification resend (not just reset)", () => {
   });
 
   it("resend onResend handles both reset and verify types", () => {
-    // Should not only check type === "reset"
-    expect(src).toContain('type === "verify"');
+    // Was asserting the literal `type === "verify"`. The page branches the other
+    // way round — `isReset = type === "reset"`, else verify — which satisfies the
+    // same contract, so this failed on wording, not behaviour. Assert that both
+    // arms actually exist instead of grepping for one spelling of the condition.
+    expect(src).toContain('searchParams.get("type")');
+    expect(src, "reset arm").toContain("forgotPassword");
+    expect(src, "verify arm").toContain("resendVerification");
   });
 });

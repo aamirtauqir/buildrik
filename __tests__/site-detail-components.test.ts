@@ -1,11 +1,25 @@
 import { describe, it, expect } from "vitest";
 
 describe("Site Detail Components", () => {
-  it("exports SITE_DETAIL_TABS with 7 tabs", async () => {
+  // Was frozen at 7 tabs in a fixed order. "Forms" was added and the order
+  // changed, so this has been red since. Assert the contract instead of the
+  // snapshot: adding a tab should not break a test, but a tab with no route or a
+  // duplicate segment should.
+  it("exports SITE_DETAIL_TABS with a label and a unique segment per tab", async () => {
     const mod = await import("@/components/site-detail/tab-nav");
-    expect(mod.SITE_DETAIL_TABS).toHaveLength(7);
-    const labels = mod.SITE_DETAIL_TABS.map((t: { label: string }) => t.label);
-    expect(labels).toEqual(["Overview", "Settings", "SEO", "Domains", "Redirects", "Sharing", "Traffic"]);
+    const tabs = mod.SITE_DETAIL_TABS as Array<{ label: string; segment: string }>;
+
+    expect(tabs.length).toBeGreaterThan(0);
+    for (const t of tabs) {
+      expect(t.label, JSON.stringify(t)).toBeTruthy();
+      expect(t.segment, t.label).toBeTruthy();
+    }
+
+    const segments = tabs.map((t) => t.segment);
+    expect(new Set(segments).size, `duplicate segments: ${segments.join(", ")}`).toBe(segments.length);
+
+    // Overview is the landing tab and must stay first.
+    expect(tabs[0].label).toBe("Overview");
   });
 
   it("exports SiteHeader component", async () => {

@@ -35,8 +35,10 @@ describe("Sites Components", () => {
       expect(labels).not.toContain("Publish All");
       expect(labels).not.toContain("Unpublish All");
       expect(labels).not.toContain("Export All");
-      expect(labels).toContain("Delete All");
-      expect(labels).toContain("Archive All");
+      // Renamed "… All" → "… selected" (the bar acts on the selection, not on
+      // every site — the old wording invited exactly the accident it describes).
+      expect(labels).toContain("Delete selected");
+      expect(labels).toContain("Archive selected");
       expect(labels).toContain("Move to Folder");
     });
   });

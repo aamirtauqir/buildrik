@@ -1,29 +1,13 @@
 import { describe, it, expect } from "vitest";
 
+/**
+ * ONBOARDING_DENSITIES (role-select) and CREATION_METHODS (project-setup) belonged
+ * to the old 2-step onboarding that the M2 wizard replaced. Both components are
+ * gone; their tests stayed and have been red ever since. Removed. The checklist
+ * is still live and still covered below.
+ */
 describe("Onboarding Components", () => {
-  describe("ONBOARDING_DENSITIES", () => {
-    it("offers Simple (fewer) and Advanced (full) density — a preference, not a permission", async () => {
-      const mod = await import("@/components/onboarding/role-select");
-      expect(mod.ONBOARDING_DENSITIES).toHaveLength(2);
-      const values = mod.ONBOARDING_DENSITIES.map((d: { value: string }) => d.value);
-      expect(values).toContain("fewer");
-      expect(values).toContain("full");
-      const labels = mod.ONBOARDING_DENSITIES.map((d: { label: string }) => d.label);
-      expect(labels).toContain("Simple");
-      expect(labels).toContain("Advanced");
-    });
-  });
 
-  describe("CREATION_METHODS", () => {
-    it("has 3 methods: ai, template, blank", async () => {
-      const mod = await import("@/components/onboarding/project-setup");
-      expect(mod.CREATION_METHODS).toHaveLength(3);
-      const values = mod.CREATION_METHODS.map((m: { value: string }) => m.value);
-      expect(values).toContain("ai");
-      expect(values).toContain("template");
-      expect(values).toContain("blank");
-    });
-  });
 
   describe("checklist items", () => {
     it("full and invited variants each have at least 3 items", async () => {

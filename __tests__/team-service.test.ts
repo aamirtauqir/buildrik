@@ -8,6 +8,11 @@ vi.mock("@/lib/prisma", () => ({
     workspace: { findUnique: vi.fn() },
     site: { count: vi.fn() },
     activityLog: { findMany: vi.fn(), create: vi.fn() },
+    // Removing a member also kills their sessions, so a revoked person is signed
+    // out immediately rather than at token expiry. The mock never grew this, so
+    // every deleteMember/revokeMember test has been dead on "Cannot read
+    // properties of undefined (reading 'deleteMany')".
+    session: { deleteMany: vi.fn() },
   },
 }));
 

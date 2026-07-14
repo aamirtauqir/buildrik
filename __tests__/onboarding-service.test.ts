@@ -44,6 +44,12 @@ const mockState = {
   updatedAt: new Date(),
 };
 
+/**
+ * `selectRole` and `setupProject` were the old 2-step onboarding. The M2 wizard
+ * replaced them and the service functions were deleted; their tests stayed and
+ * have been red ever since. Removed. getOnboardingState and completeStep are
+ * still live and still covered below.
+ */
 describe("Onboarding Service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -102,55 +108,7 @@ describe("Onboarding Service", () => {
     });
   });
 
-  describe("selectRole", () => {
-    it("seeds editor density preference and advances step to PROJECT_SETUP", async () => {
-      const updated = { ...mockState, role: "fewer", step: "PROJECT_SETUP" };
-      vi.mocked(prisma.userPreference.upsert).mockResolvedValue({} as any);
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
-      const result = await selectRole("user_1", "fewer");
-      expect(result.step).toBe("PROJECT_SETUP");
-      expect(prisma.userPreference.upsert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { userId: "user_1" },
-          create: { userId: "user_1", editorDensity: "fewer" },
-          update: { editorDensity: "fewer" },
-        })
-      );
-      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { userId: "user_1" },
-          data: expect.objectContaining({ role: "fewer", step: "PROJECT_SETUP" }),
-        })
-      );
-    });
-  });
 
-  describe("setupProject", () => {
-    it("updates projectName and method and advances to SITE_CREATION", async () => {
-      const updated = {
-        ...mockState,
-        role: "FREELANCER",
-        step: "SITE_CREATION",
-        projectName: "My Portfolio",
-        method: "template",
-      };
-      vi.mocked(prisma.onboardingState.update).mockResolvedValue(updated as any);
-      const result = await setupProject("user_1", { projectName: "My Portfolio", method: "template" });
-      expect(result.projectName).toBe("My Portfolio");
-      expect(result.method).toBe("template");
-      expect(result.step).toBe("SITE_CREATION");
-      expect(prisma.onboardingState.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { userId: "user_1" },
-          data: expect.objectContaining({
-            projectName: "My Portfolio",
-            method: "template",
-            step: "SITE_CREATION",
-          }),
-        })
-      );
-    });
-  });
 
   describe("completeStep", () => {
     it("advances from SITE_CREATION to EDITOR_TOUR", async () => {

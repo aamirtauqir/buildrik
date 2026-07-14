@@ -27,14 +27,20 @@ describe("Login non-2FA session creation", () => {
     expect(loginPageSource).toContain("/api/auth/create-session");
   });
 
-  it("router returns sessionToken for non-2FA login", () => {
-    // Find the login mutation section
-    const loginSection = routerSource.slice(
-      routerSource.indexOf("login: strictRateLimit"),
-      routerSource.indexOf("signup: normalRateLimit")
-    );
-    // Non-2FA path should generate and return sessionToken
-    expect(loginSection).toContain("session_grant");
+  it("router returns a session_grant token for non-2FA login", () => {
+    // Sliced on "login: strictRateLimit" … "signup: normalRateLimit". The login
+    // procedure was renamed to `login: publicProcedure`, so indexOf returned -1,
+    // the slice came back empty, and this has asserted against "" ever since —
+    // silently passing nothing, then failing. Anchor on what is actually there.
+    const start = routerSource.indexOf("login: ");
+    const end = routerSource.indexOf("signup: ");
+    expect(start, "login procedure not found in the auth router").toBeGreaterThan(-1);
+    expect(end, "signup procedure not found in the auth router").toBeGreaterThan(start);
+
+    const loginSection = routerSource.slice(start, end);
+    // The non-2FA path mints a short-lived session_grant token, which
+    // /api/auth/create-session exchanges for the real session cookie.
+    expect(loginSection).toContain('generateToken("session_grant"');
     expect(loginSection).toContain("sessionToken");
   });
 });
