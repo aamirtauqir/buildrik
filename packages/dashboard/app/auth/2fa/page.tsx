@@ -37,7 +37,11 @@ function TwoFAContent() {
       }
     },
     onError: (err) => {
-      if (err.message.includes("Too many failed attempts")) {
+      // Two distinct lockouts land on the same screen: the service's own
+      // failed-attempt cap, and the router's per-IP rate limit (verify2FA is
+      // strict-limited, 5 / 15min). The second one used to fall through and show
+      // the limiter's raw message.
+      if (err.message.includes("Too many failed attempts") || err.data?.code === "TOO_MANY_REQUESTS") {
         // verify2FA invalidates the temp token when it locks out, so there is
         // no token left to carry — the only way forward is a fresh log-in.
         router.push("/auth/error/2fa-locked");

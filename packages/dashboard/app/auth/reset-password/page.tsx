@@ -30,6 +30,8 @@ function ResetPasswordContent() {
       // is dead (expired, already used, or unknown) — send them to the one
       // expired/invalid-link screen rather than failing in place.
       if (err.data?.code === "NOT_FOUND") router.replace("/auth/error/expired-link?type=reset");
+      // resetPassword is strict-rate-limited (5 / 15min per IP).
+      else if (err.data?.code === "TOO_MANY_REQUESTS") router.push("/auth/error/rate-limited");
       else setError(err.message);
     },
   });

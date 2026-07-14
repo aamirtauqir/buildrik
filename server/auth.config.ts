@@ -125,8 +125,13 @@ export const authConfig: NextAuthConfig = {
       // every request would be wasteful.
       if (user) {
         token.userId = user.id;
+        // `findFirst` with no ordering returned an ARBITRARY workspace for anyone
+        // in more than one — so which workspace you landed in was down to whatever
+        // Postgres handed back first. Prefer the one they last used; /auth/redirect
+        // sends multi-workspace users to the chooser anyway, this is the fallback.
         const member = await prisma.workspaceMember.findFirst({
           where: { userId: user.id, status: "ACTIVE" },
+          orderBy: [{ lastActiveAt: "desc" }, { joinedAt: "asc" }],
           select: { workspaceId: true },
         });
         token.workspaceId = member?.workspaceId ?? null;

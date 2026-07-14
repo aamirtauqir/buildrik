@@ -20,7 +20,15 @@ export default function MagicLinkRequestPage() {
 
   const magicLinkMutation = trpc.auth.magicLink.useMutation({
     onSuccess: () => router.push(`/auth/magic-link/sent?email=${encodeURIComponent(email)}`),
-    onError: (err) => setError(err.message),
+    onError: (err) => {
+      // magicLink is rate-limited (10 / 15min per IP) — send them to the screen
+      // built for it instead of leaking the limiter's raw message into the form.
+      if (err.data?.code === "TOO_MANY_REQUESTS") {
+        router.push("/auth/error/rate-limited");
+        return;
+      }
+      setError(err.message);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthButton } from "@/components/auth/auth-button";
@@ -12,6 +12,7 @@ import { safeReturnUrl } from "@lib/safe-return-url";
 import { ArrowLeft, KeyRound } from "lucide-react";
 
 function BackupCodeContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
   const rememberMe = searchParams.get("remember") === "1";
@@ -38,7 +39,16 @@ function BackupCodeContent() {
     // verifyBackupCode only returns `backupCodesRemaining` when the code MATCHES.
     // The failure path throws a bare "Invalid backup code", so the mockup's
     // "3 codes remaining" counter has no value to read on this branch.
-    onError: () => setError("That backup code didn't match. Each code can only be used once."),
+    onError: (err) => {
+      // verifyBackupCode is strict-rate-limited (5 / 15min per IP). That used to
+      // fall through and render as "That backup code didn't match", which is a
+      // lie — the code may have been right; they were simply throttled.
+      if (err.data?.code === "TOO_MANY_REQUESTS") {
+        router.push("/auth/error/2fa-locked");
+        return;
+      }
+      setError("That backup code didn't match. Each code can only be used once.");
+    },
   });
 
   const handleVerify = () => {

@@ -22,7 +22,16 @@ export default function ForgotPasswordPage() {
     onSuccess: () => {
       router.push(`/auth/check-inbox?type=reset&email=${encodeURIComponent(email)}`);
     },
-    onError: (err) => setError(err.message),
+    onError: (err) => {
+      // forgotPassword is rate-limited (10 / 15min per IP). Without this the
+      // limiter's raw "Too many requests. Please try again later." was dumped
+      // into the form while the designed rate-limit screen sat unreachable.
+      if (err.data?.code === "TOO_MANY_REQUESTS") {
+        router.push("/auth/error/rate-limited");
+        return;
+      }
+      setError(err.message);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
