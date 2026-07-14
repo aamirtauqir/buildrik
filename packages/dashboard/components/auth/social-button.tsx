@@ -6,8 +6,6 @@ interface SocialButtonProps {
   disabled?: boolean;
   /** "primary" = cobalt fill, "secondary" = white bordered, "dark" = near-black fill (mockup signup GitHub). */
   variant?: "primary" | "secondary" | "dark";
-  /** Override the default "Continue with …" label. */
-  label?: string;
 }
 
 function GoogleIcon() {
@@ -29,8 +27,11 @@ function GitHubIcon() {
   );
 }
 
-export function SocialButton({ provider, onClick, disabled, variant = "secondary", label }: SocialButtonProps) {
-  const text = label ?? (provider === "google" ? "Continue with Google" : "Continue with GitHub");
+// The label is fixed on purpose. It used to be overridable, and the sign-in page
+// used that to say "Login with Google" while sign-up said "Continue with Google"
+// for the identical action. One action, one wording.
+export function SocialButton({ provider, onClick, disabled, variant = "secondary" }: SocialButtonProps) {
+  const text = provider === "google" ? "Continue with Google" : "Continue with GitHub";
   const Icon = provider === "google" ? GoogleIcon : GitHubIcon;
 
   return (

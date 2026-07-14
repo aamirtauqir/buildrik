@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
+import { AuthBackLink } from "@/components/auth/auth-back-link";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { PasswordStrength } from "@/components/auth/password-strength";
@@ -111,6 +112,9 @@ function ResetPasswordContent() {
           {saving ? "Updating password…" : "Reset password"}
         </AuthButton>
       </form>
+
+      <div className="h-4" />
+      <AuthBackLink />
     </AuthCard>
   );
 }

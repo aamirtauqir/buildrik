@@ -8,7 +8,7 @@ import { AuthButton } from "@/components/auth/auth-button";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
-import { SocialButton } from "@/components/auth/social-button";
+import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
 import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import { signIn } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
@@ -143,16 +143,10 @@ function AuthPageContent() {
           submit is in flight (signin-loading frame). */}
       {!pending && (
         <>
-          <SocialButton
-            provider="google"
-            variant="primary"
-            label="Login with Google"
-            onClick={() => handleOAuthSignIn("google")}
-          />
-          <div className="h-2.5" />
-          {/* Not in the mockup, but GitHub OAuth is wired in server/auth.config.ts —
-              kept so the provider stays reachable. */}
-          <SocialButton provider="github" onClick={() => handleOAuthSignIn("github")} />
+          {/* GitHub is not in the mockup, but the provider is wired in
+              server/auth.config.ts — AuthSocialButtons keeps it reachable and
+              keeps this block identical to sign-up's. */}
+          <AuthSocialButtons onSelect={handleOAuthSignIn} />
 
           <div className="h-4" />
           <AuthDivider text="or" />

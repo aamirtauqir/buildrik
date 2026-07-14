@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
+import { AuthBackLink } from "@/components/auth/auth-back-link";
 import { AuthButton } from "@/components/auth/auth-button";
 import { ResendTimer } from "@/components/auth/resend-timer";
 import { trpc } from "@lib/trpc/client";
@@ -126,6 +127,9 @@ function VerifyEmailContent() {
           Change it
         </Link>
       </p>
+
+      <div className="h-3" />
+      <AuthBackLink />
     </AuthCard>
   );
 }

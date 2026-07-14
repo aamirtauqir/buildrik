@@ -8,7 +8,7 @@ import { AuthButton } from "@/components/auth/auth-button";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
-import { SocialButton } from "@/components/auth/social-button";
+import { AuthSocialButtons } from "@/components/auth/auth-social-buttons";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { signIn } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
@@ -118,9 +118,7 @@ function SignupContent() {
           </>
         )}
 
-        <SocialButton provider="google" variant="primary" label="Continue with Google" onClick={() => oauth("google")} />
-        <div className="h-3" />
-        <SocialButton provider="github" variant="dark" onClick={() => oauth("github")} />
+        <AuthSocialButtons onSelect={oauth} />
 
         <div className="h-5" />
         <AuthDivider text="or" />

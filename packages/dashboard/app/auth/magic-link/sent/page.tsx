@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
+import { AuthBackLink } from "@/components/auth/auth-back-link";
 import { ResendTimer } from "@/components/auth/resend-timer";
 import { trpc } from "@lib/trpc/client";
 
@@ -35,6 +36,9 @@ function MagicLinkSentContent() {
           Try another email
         </Link>
       </p>
+    
+      <div className="h-3" />
+      <AuthBackLink />
     </AuthCard>
   );
 }
