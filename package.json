@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "env:check": "node scripts/check-prod-env.mjs",
     "env:check:local": "node scripts/check-prod-env.mjs --file .env.local --dev",
+    "env:check:prod": "bash scripts/check-prod-env-live.sh",
     "dev:clean": "node scripts/dev-clean.mjs",
     "dev:reset": "node scripts/dev-clean.mjs && rm -rf packages/dashboard/.next packages/editor/dist packages/editor/node_modules/.vite",
     "smoke:prod": "node scripts/smoke-deployed.mjs"

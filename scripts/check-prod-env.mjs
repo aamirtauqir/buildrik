@@ -129,43 +129,82 @@ const editorOrigin = env.EDITOR_ORIGIN;
 const authUrl = env.AUTH_URL;
 const nextauthUrl = env.NEXTAUTH_URL;
 const viteDashboardUrl = env.VITE_DASHBOARD_URL;
-const vercelOauthRedirect = env.VERCEL_OAUTH_REDIRECT_URI;
 
 // Core presence
 requirePresent("DATABASE_URL");
 requireRandomSecret("NEXTAUTH_SECRET");
 requireRandomSecret("AUTH_SECRET");
-requireRandomSecret("SESSION_GRANT_SECRET");
 requireRandomSecret("ENCRYPTION_KEY", 64); // 32-byte hex
 requireRandomSecret("CRON_SECRET");
+
+// NextAuth v5 reads this itself — it never appears in a `grep process.env` of
+// the app, which is how it stayed undocumented. Behind cPanel's proxy, without
+// it NextAuth rejects the forwarded host and every sign-in fails.
+requirePresent("AUTH_TRUST_HOST");
 
 // URL shape
 requireHttps("NEXT_PUBLIC_APP_URL");
 requireHttps("EDITOR_ORIGIN");
 requireHttps("AUTH_URL");
 requireHttps("NEXTAUTH_URL");
-requireHttps("VITE_DASHBOARD_URL");
-requireHttps("VERCEL_OAUTH_REDIRECT_URI");
+// VITE_DASHBOARD_URL is deliberately NOT required here. It is an editor
+// build-time var; the server's runtime env has no use for it, and when the
+// editor is bundled into Next, runtimeEnv falls back to NEXT_PUBLIC_APP_URL.
+// Requiring it made this script fail a perfectly good production.
+if (env.VITE_DASHBOARD_URL) requireHttps("VITE_DASHBOARD_URL");
 
-// Email
-requirePresent("RESEND_API_KEY");
+// Email. Transactional mail goes over SMTP (nodemailer) — this used to require
+// RESEND_API_KEY, which nothing in the codebase reads, so the check both failed
+// a correctly-configured production and passed one with no mail config at all.
+requirePresent("SMTP_HOST");
+requirePresent("SMTP_PORT");
+requirePresent("SMTP_USER");
+if (!env.SMTP_PASS_B64 && !env.SMTP_PASS) {
+  fail("SMTP_PASS_B64", "missing (and no SMTP_PASS fallback)");
+} else if (!env.SMTP_PASS_B64) {
+  // cPanel/Passenger pipes env through a shell, so a `$` in the password is read
+  // as a variable and silently eaten. Base64 has no shell metacharacters.
+  fail("SMTP_PASS_B64", "only SMTP_PASS is set — cPanel will corrupt a password containing `$`");
+} else {
+  pass("SMTP_PASS_B64");
+}
 const emailFrom = env.EMAIL_FROM;
+// Both RFC 5322 forms are valid and nodemailer takes either: a bare address, or
+// a display name with the address in angle brackets. The old check only allowed
+// the bare form, so it failed the documented value (`Buildrick <info@…>`).
+const ADDR = String.raw`[^@\s<>]+@[^@\s<>]+\.[^@\s<>]+`;
 if (!emailFrom) {
   fail("EMAIL_FROM", "missing");
-} else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailFrom)) {
+} else if (!new RegExp(`^(?:${ADDR}|[^<>]+<${ADDR}>)$`).test(emailFrom.trim())) {
   fail("EMAIL_FROM", `invalid format: ${emailFrom}`);
 } else {
   pass("EMAIL_FROM");
 }
 
-// OAuth
+// OAuth. Without these NextAuth still redirects to the provider — with
+// `client_id=undefined` — so the buttons look alive and are not. Both were
+// missing in production for months (2026-07-14).
 requirePresent("GOOGLE_CLIENT_ID");
 requirePresent("GOOGLE_CLIENT_SECRET");
 requirePresent("GITHUB_CLIENT_ID");
 requirePresent("GITHUB_CLIENT_SECRET");
+
+// Publishing. Sites deploy into the workspace's own Vercel account; without
+// VERCEL_INTEGRATION_ID nobody can even connect one, so nobody can publish.
 requirePresent("VERCEL_INTEGRATION_ID");
 requirePresent("VERCEL_CLIENT_ID");
 requirePresent("VERCEL_CLIENT_SECRET");
+
+// AI drafting. Absent → every ai-generate-worker job fails on "Missing
+// credentials" and the AI onboarding path is dead.
+requirePresent("OPENAI_API_KEY");
+
+// Editing. Unset/false sends "Edit site" to the retired standalone demo.
+if (env.NEXT_PUBLIC_UNIFIED_EDITOR === "true") {
+  pass("NEXT_PUBLIC_UNIFIED_EDITOR");
+} else {
+  fail("NEXT_PUBLIC_UNIFIED_EDITOR", `expected "true", got ${env.NEXT_PUBLIC_UNIFIED_EDITOR ?? "unset"} — "Edit site" would open the dead demo`);
+}
 
 /** ─── Cross-var consistency ──────────────────────────────────────────── */
 
@@ -199,18 +238,11 @@ if (viteDashboardUrl && dashboardUrl && viteDashboardUrl !== dashboardUrl) {
   pass("VITE_DASHBOARD_URL ↔ NEXT_PUBLIC_APP_URL");
 }
 
-// Vercel OAuth callback must be under the dashboard origin
-if (vercelOauthRedirect && dashboardUrl) {
-  const expectedPrefix = `${dashboardUrl}/api/integrations/vercel/callback`;
-  if (vercelOauthRedirect !== expectedPrefix) {
-    fail(
-      "VERCEL_OAUTH_REDIRECT_URI shape",
-      `expected ${expectedPrefix}, got ${vercelOauthRedirect}`,
-    );
-  } else {
-    pass("VERCEL_OAUTH_REDIRECT_URI shape");
-  }
-}
+// There is deliberately no VERCEL_OAUTH_REDIRECT_URI check. The var does not
+// exist: the callback URL is registered with Vercel at integration-registration
+// time, and the callback route derives its own redirect_uri from the request
+// (`${url.protocol}//${url.host}/api/integrations/vercel/callback`). This script
+// used to require it, and CLAUDE.md used to document it.
 
 // AUTH_TRUST_HOST required when behind Vercel proxy
 if (env.AUTH_TRUST_HOST !== "true" && !isDev) {

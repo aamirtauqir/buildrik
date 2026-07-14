@@ -226,6 +226,16 @@ Sites deploy into **the workspace's own Vercel account** via per-workspace OAuth
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signature check. Stripe is not fully wired (no `STRIPE_SECRET_KEY` is read anywhere, and Checkout is still a TODO), so this is inert today. | No — not until billing is finished |
 | `PEXELS_API_KEY` / `UNSPLASH_ACCESS_KEY` | Stock-photo search in the media library. | Only for stock search |
 
+### Before you deploy
+
+```bash
+npm run env:check:prod     # pulls the LIVE cPanel env and checks it
+```
+
+`scripts/check-prod-env.mjs` already required `GOOGLE_CLIENT_ID`, `GITHUB_CLIENT_ID`,
+`VERCEL_CLIENT_ID` and `VERCEL_INTEGRATION_ID` — the exact vars production was
+missing for months. The guard existed; nobody ever pointed it at the server. Run it.
+
 ### Where the values live
 
 - **Dev:** `.env.local` at the repo root (gitignored). Never commit secrets.
