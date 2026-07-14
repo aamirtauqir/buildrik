@@ -88,7 +88,6 @@
     "packages/editor/src/editor/sidebar/tabs/ai/ChatThread.tsx",
     "packages/editor/src/editor/sidebar/tabs/ai/Composer.tsx",
     "packages/editor/src/editor/sidebar/tabs/ai/EmptyThread.tsx",
-    "packages/editor/src/editor/sidebar/tabs/ai/ModelPicker.tsx",
     "packages/editor/src/editor/sidebar/tabs/ai/ScopeChip.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/components/CatAccordion.tsx",
