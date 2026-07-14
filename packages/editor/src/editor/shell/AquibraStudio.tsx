@@ -293,7 +293,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // can wire it into Topbar / PublishDropdown without re-instantiating.
   const {
     handleExportHTML,
-    handleExportForDeploy,
     handleVercelPublish,
     publishJob,
   } = useExportHandlers({
@@ -451,7 +450,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onOpenImageEditor={modals.openImageEditor}
         onOpenCreateCollection={modals.openCMSCollectionSetup}
         onOpenTemplates={modals.openTemplates}
-        onExportForDeploy={handleExportForDeploy}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
         publishJob={publishJob}

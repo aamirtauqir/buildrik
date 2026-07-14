@@ -49,7 +49,7 @@ const rangeLabel: Record<TitleRange, string> = {
 
 
 export const SeoTab: React.FC<Props> = ({ s, page }) => {
-  const domain = s.domain ?? "yoursite.aquibra.io";
+  const domain = s.domain ?? "yoursite.com";
   const range = titleRange(s.seoTitle);
   const [aiBusy, setAiBusy] = React.useState(false);
 
@@ -79,7 +79,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       {/* Google preview — prototype .gpreview */}
       <div style={{ padding: 14, background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)", borderRadius: 4 }}>
         <div style={{ font: "500 10.5px var(--bd-mono)", color: "var(--bd-fg-secondary)" }}>
-          {s.domain ?? "yoursite.aquibra.io"} › {page.slug?.replace(/^\//, "") || page.id}
+          {s.domain ?? "yoursite.com"} › {page.slug?.replace(/^\//, "") || page.id}
         </div>
         <div style={{ margin: "var(--bd-space-1) 0 2px", font: "500 16px var(--bd-font)", color: "var(--bd-accent)" }}>
           {s.seoTitle || page.name}

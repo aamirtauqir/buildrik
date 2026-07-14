@@ -64,6 +64,12 @@ import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 
 /**
+ * From-address for form-submission notifications on published sites. Must stay on
+ * a domain we control, so it can be SPF/DKIM-verified with the mail provider.
+ */
+const FORM_NOTIFICATION_SENDER = "noreply@buildrick.io";
+
+/**
  * Main Aquibra Composer class
  * Central orchestrator for the visual editing experience
  */
@@ -570,13 +576,17 @@ ${html}
       emailService.configure({
         provider: "sendgrid",
         apiKey: emailConfig.apiKey,
-        fromEmail: "noreply@aquibra.com", // Default sender; could be made configurable
+        // Sender must be on a domain we can verify with the provider. It used to
+        // be noreply@aquibra.com — a domain from the project this was forked from,
+        // which SendGrid would reject as an unverified sender, so form
+        // notifications failed silently.
+        fromEmail: FORM_NOTIFICATION_SENDER,
       });
     } else if (emailConfig.provider !== "none" && emailConfig.apiKey && emailConfig.enabled) {
       // For other providers with API keys, use mock until properly configured
       emailService.configure({
         provider: "mock",
-        fromEmail: "noreply@aquibra.com",
+        fromEmail: FORM_NOTIFICATION_SENDER,
       });
     }
 

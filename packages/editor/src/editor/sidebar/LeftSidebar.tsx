@@ -80,10 +80,6 @@ export interface LeftSidebarProps {
   projectId?: string | null;
   publishJob?: UsePublishJobResult;
   onVercelPublish?: () => Promise<void>;
-  onExportForDeploy?: () => Promise<{
-    files: Array<{ path: string; content: string }>;
-    projectName?: string;
-  }>;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
@@ -294,7 +290,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   projectId,
   publishJob,
   onVercelPublish,
-  onExportForDeploy,
   onOpenLibrary,
   onOpenImageEditor,
   onOpenIconPicker,

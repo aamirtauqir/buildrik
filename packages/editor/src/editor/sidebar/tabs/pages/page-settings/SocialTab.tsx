@@ -22,7 +22,7 @@ interface Props {
 export const SocialTab: React.FC<Props> = ({ s, page }) => {
   const title = s.ogTitle || s.seoTitle || page.name;
   const desc = s.ogDesc || s.seoDesc || "";
-  const domain = s.domain ?? "yoursite.aquibra.io";
+  const domain = s.domain ?? "yoursite.com";
 
   return (
     <Stack gap="lg" style={{ gap: 14 }}>

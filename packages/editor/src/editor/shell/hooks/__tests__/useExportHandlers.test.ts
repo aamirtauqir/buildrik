@@ -1,6 +1,6 @@
 /**
  * useExportHandlers.test.ts — covers handleExportHTML success/failure,
- * handleExportForDeploy payload shape, handleVercelPublish branches
+ * handleVercelPublish branches
  * (no siteId, empty pages, success, export failure), and the
  * publish-toast useEffect for COMPLETED / FAILED transitions.
  *
@@ -159,51 +159,6 @@ describe("useExportHandlers", () => {
     });
   });
 
-  // handleExportForDeploy ----------------------------------------------------
-  describe("handleExportForDeploy", () => {
-    it("returns { files, projectName } shape from ExportEngine.exportAllPages", async () => {
-      const { result } = renderHook(() => useExportHandlers(opts));
-      let payload: Awaited<
-        ReturnType<typeof result.current.handleExportForDeploy>
-      > | null = null;
-      await act(async () => {
-        payload = await result.current.handleExportForDeploy();
-      });
-      expect(payload).not.toBeNull();
-      const p = payload!;
-      expect(p.files).toEqual([
-        { path: "index.html", content: "<html />" },
-        { path: "about.html", content: "<html>about</html>" },
-        { path: "asset.css", content: "body{}" },
-      ]);
-      expect(p.projectName).toBe("my-cool-site");
-    });
-
-    it("falls back to 'aquibra-site' when seo.siteName is missing", async () => {
-      const composer = {
-        getProjectSettings: vi.fn(() => ({})),
-      } as unknown as UseExportHandlersOptions["composer"];
-      const { result } = renderHook(() =>
-        useExportHandlers({ ...opts, composer }),
-      );
-      let payload: Awaited<
-        ReturnType<typeof result.current.handleExportForDeploy>
-      > | null = null;
-      await act(async () => {
-        payload = await result.current.handleExportForDeploy();
-      });
-      expect(payload!.projectName).toBe("aquibra-site");
-    });
-
-    it("throws if composer is null", async () => {
-      const { result } = renderHook(() =>
-        useExportHandlers({ ...opts, composer: null }),
-      );
-      await expect(result.current.handleExportForDeploy()).rejects.toThrow(
-        /Composer not ready/,
-      );
-    });
-  });
 
   // handleVercelPublish ------------------------------------------------------
   describe("handleVercelPublish", () => {

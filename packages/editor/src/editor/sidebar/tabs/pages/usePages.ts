@@ -300,11 +300,22 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       // A4: read real domain from ProjectData metadata. Was previously cast
       // from a nonexistent `composer.project.domain`, always undefined.
       const domain = composer?.getProjectMetadata?.()?.domain ?? null;
-      const url = domain ? `https://${domain}/${slug}` : `https://yoursite.aquibra.io/${slug}`;
 
-      const successMsg = domain
-        ? `Link copied: ${url}`
-        : `Link copied: ${url} · Connect a custom domain in Settings →`;
+      // No domain means there is no link yet. Copying a made-up one (this used to
+      // hand out `yoursite.aquibra.io/<slug>` — a host from the project this was
+      // forked from) puts a dead URL in the user's clipboard, which is worse than
+      // telling them there isn't one.
+      if (!domain) {
+        addToast({
+          title: "No address yet",
+          description: "Connect a custom domain in Settings, or publish the site first.",
+          tone: "info",
+        });
+        return;
+      }
+
+      const url = `https://${domain}/${slug}`;
+      const successMsg = `Link copied: ${url}`;
 
       // A8: navigator.clipboard is undefined in non-secure contexts (http://,
       // some iframes). Fall back to a toast that shows the URL so the user

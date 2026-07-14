@@ -3,13 +3,11 @@
  * stage 4). Owns the complete export + publish lifecycle:
  *
  *   - handleExportHTML        → ExportEngine.downloadZip() + toasts.
- *   - handleExportForDeploy   → ExportEngine.exportAllPages() →
- *                               { files, projectName } payload for the
- *                               Vercel deploy path (also fed into
- *                               handleVercelPublish below).
- *   - handleVercelPublish     → siteId resolution → exportForDeploy →
+ *   - handleVercelPublish     → siteId resolution → exportPublishPages() →
  *                               publishJob.publish(). Hidden behind
  *                               VITE_FEATURE_PUBLISH at the caller.
+ *                               The Vercel project name is derived server-side
+ *                               from the site's slug; the editor does not send one.
  *   - usePublishJob()         → instantiated inside the hook so the
  *                               returned `publishJob` is the same
  *                               instance the publish-toast effect
@@ -32,11 +30,6 @@ import { DASHBOARD_URL as dashboardUrlFromEnv } from "@/shared/utils/runtimeEnv"
 import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";
 import { exportPublishPages } from "../exportPublishPages";
 
-export interface DeployPayload {
-  files: { path: string; content: string }[];
-  projectName: string;
-}
-
 export interface UseExportHandlersOptions {
   composer: Composer | null;
   addToast: (input: ToastInput) => string;
@@ -45,7 +38,6 @@ export interface UseExportHandlersOptions {
 
 export interface UseExportHandlersResult {
   handleExportHTML: () => Promise<void>;
-  handleExportForDeploy: () => Promise<DeployPayload>;
   handleVercelPublish: () => Promise<void>;
   publishJob: UsePublishJobResult;
 }
@@ -79,18 +71,6 @@ export function useExportHandlers({
       setExportLoading(false);
     }
   }, [composer, addToast, setExportLoading]);
-
-  const handleExportForDeploy = React.useCallback(async (): Promise<DeployPayload> => {
-    if (!composer) throw new Error("Composer not ready");
-    const exportEngine = new ExportEngine(composer);
-    const result = await exportEngine.exportAllPages({ format: "html", minify: true });
-    const settings = composer.getProjectSettings?.();
-    const projectName = settings?.seo?.siteName || "aquibra-site";
-    return {
-      files: result.files.map((f) => ({ path: f.name, content: f.content })),
-      projectName,
-    };
-  }, [composer]);
 
   const handleVercelPublish = React.useCallback(async () => {
     const siteId = getSiteIdFromUrl();
@@ -158,5 +138,5 @@ export function useExportHandlers({
     }
   }, [publishJob.uiState, publishJob.publishedUrl, publishJob.error, addToast]);
 
-  return { handleExportHTML, handleExportForDeploy, handleVercelPublish, publishJob };
+  return { handleExportHTML, handleVercelPublish, publishJob };
 }

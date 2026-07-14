@@ -78,10 +78,6 @@ export interface StudioPanelsProps {
     imageSrc: string,
     onSave: (editedSrc: string) => void | Promise<void>,
   ) => void;
-  onExportForDeploy?: () => Promise<{
-    files: Array<{ path: string; content: string }>;
-    projectName?: string;
-  }>;
   canvasRef?: React.RefObject<CanvasRef | null>;
   composerContainerRef?: React.RefObject<HTMLDivElement | null>;
   /** Whether the active tab is in fullpage mode (derived from useStudioState) */
@@ -193,7 +189,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onOpenIconPicker,
   onOpenCreateCollection,
   onOpenImageEditor,
-  onExportForDeploy,
   canvasRef,
   composerContainerRef,
   isFullPageMode = false,
