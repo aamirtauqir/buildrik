@@ -54,7 +54,7 @@ describe("AITab skeleton", () => {
 
   it("renders a composer textarea", () => {
     renderWithToast(<AITab composer={null} isPinned={false} onPinToggle={vi.fn()} onHelpClick={vi.fn()} onClose={vi.fn()} />);
-    expect(screen.getByPlaceholderText(/Ask Claude/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Ask AI/i)).toBeInTheDocument();
   });
 });
 

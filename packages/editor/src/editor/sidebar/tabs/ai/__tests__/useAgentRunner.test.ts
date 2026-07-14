@@ -47,7 +47,7 @@ describe("useAgentRunner", () => {
         ? { plan: PLAN, edit: null, text: "" }
         : { plan: null, edit: editWithRows(1), text: "" },
     );
-    const { result } = renderHook(() => useAgentRunner(composer, "claude-sonnet-4-6"));
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
 
     await act(async () => { result.current.start("build a pricing page"); });
     await waitFor(() => expect(result.current.steps).toHaveLength(2));
@@ -65,7 +65,7 @@ describe("useAgentRunner", () => {
 
   it("surfaces an error and ends when the plan is empty", async () => {
     runPromptOnce.mockResolvedValue({ plan: [], edit: null, text: "" });
-    const { result } = renderHook(() => useAgentRunner(composer, "claude-sonnet-4-6"));
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("xyz"); });
     await waitFor(() => expect(result.current.phase).toBe("done"));
     expect(result.current.error).toMatch(/couldn't break that into steps/i);
@@ -78,7 +78,7 @@ describe("useAgentRunner", () => {
         ? { plan: [PLAN[0]], edit: null, text: "" }
         : { plan: null, edit: editWithRows(1), text: "" },
     );
-    const { result } = renderHook(() => useAgentRunner(composer, "claude-sonnet-4-6"));
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("x"); });
     await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
     act(() => { result.current.skip(); });
@@ -96,7 +96,7 @@ describe("useAgentRunner", () => {
         ? { plan: null, edit: editWithRows(0), text: "" } // step 0: no rows
         : { plan: null, edit: editWithRows(1), text: "" }; // step 1: has rows
     });
-    const { result } = renderHook(() => useAgentRunner(composer, "claude-sonnet-4-6"));
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("x"); });
     await waitFor(() => expect(result.current.steps[1].status).toBe("awaiting"));
     expect(result.current.steps[0].status).toBe("nochange");
@@ -108,7 +108,7 @@ describe("useAgentRunner", () => {
         ? { plan: PLAN, edit: null, text: "" }
         : { plan: null, edit: editWithRows(1), text: "" },
     );
-    const { result } = renderHook(() => useAgentRunner(composer, "claude-sonnet-4-6"));
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     act(() => { result.current.setAutoApply(true); });
     await act(async () => { result.current.start("build"); });
     await waitFor(() => expect(result.current.phase).toBe("done"));
@@ -122,7 +122,7 @@ describe("useAgentRunner", () => {
         ? { plan: PLAN, edit: null, text: "" }
         : { plan: null, edit: editWithRows(1), text: "" },
     );
-    const { result } = renderHook(() => useAgentRunner(composer, "claude-sonnet-4-6"));
+    const { result } = renderHook(() => useAgentRunner(composer, "gpt-4o-mini"));
     await act(async () => { result.current.start("x"); });
     await waitFor(() => expect(result.current.steps[0].status).toBe("awaiting"));
     act(() => { result.current.stop(); });

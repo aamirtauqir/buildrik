@@ -23,10 +23,10 @@ describe("ComponentSchemaAIClient", () => {
 
   it("threads model option through", async () => {
     const mutate = vi.fn<ComponentSchemaMutate>(async () => ({ raw: "{}" }));
-    const client = new ComponentSchemaAIClient({ mutate, model: "claude-opus-4-7" });
+    const client = new ComponentSchemaAIClient({ mutate, model: "gpt-4o-mini" });
     await client.generate({ prompt: "p" });
 
-    expect(mutate.mock.calls[0][0]).toEqual({ prompt: "p", model: "claude-opus-4-7" });
+    expect(mutate.mock.calls[0][0]).toEqual({ prompt: "p", model: "gpt-4o-mini" });
   });
 
   it("propagates mutate errors", async () => {

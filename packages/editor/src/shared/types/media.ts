@@ -110,7 +110,7 @@ export interface MediaAsset {
     altText?: {
       /** ISO timestamp when the AI returned. */
       generatedAt: string;
-      /** Provider model used (e.g., "claude-haiku-4-5"). */
+      /** Provider model used (e.g., "gpt-4o-mini"). */
       model: string;
     };
   };

@@ -7,14 +7,12 @@ describe("Composer", () => {
     const onSubmit = vi.fn();
     render(
       <Composer
-        model="claude-sonnet-4-6"
-        onModelChange={vi.fn()}
         onSubmit={onSubmit}
         onStop={vi.fn()}
         streaming={false}
       />,
     );
-    const ta = screen.getByPlaceholderText(/Ask Claude/i);
+    const ta = screen.getByPlaceholderText(/Ask AI/i);
     fireEvent.change(ta, { target: { value: "Hello" } });
     fireEvent.keyDown(ta, { key: "Enter" });
     expect(onSubmit).toHaveBeenCalledWith("Hello");
@@ -24,14 +22,12 @@ describe("Composer", () => {
     const onSubmit = vi.fn();
     render(
       <Composer
-        model="claude-sonnet-4-6"
-        onModelChange={vi.fn()}
         onSubmit={onSubmit}
         onStop={vi.fn()}
         streaming={false}
       />,
     );
-    const ta = screen.getByPlaceholderText(/Ask Claude/i);
+    const ta = screen.getByPlaceholderText(/Ask AI/i);
     fireEvent.change(ta, { target: { value: "Hello" } });
     fireEvent.keyDown(ta, { key: "Enter", shiftKey: true });
     expect(onSubmit).not.toHaveBeenCalled();
@@ -40,8 +36,6 @@ describe("Composer", () => {
   it("send button disabled when text is empty", () => {
     render(
       <Composer
-        model="claude-sonnet-4-6"
-        onModelChange={vi.fn()}
         onSubmit={vi.fn()}
         onStop={vi.fn()}
         streaming={false}
@@ -55,8 +49,6 @@ describe("Composer", () => {
     const onStop = vi.fn();
     render(
       <Composer
-        model="claude-sonnet-4-6"
-        onModelChange={vi.fn()}
         onSubmit={vi.fn()}
         onStop={onStop}
         streaming={true}
@@ -69,14 +61,12 @@ describe("Composer", () => {
   it("clears textarea after submit", () => {
     render(
       <Composer
-        model="claude-sonnet-4-6"
-        onModelChange={vi.fn()}
         onSubmit={vi.fn()}
         onStop={vi.fn()}
         streaming={false}
       />,
     );
-    const ta = screen.getByPlaceholderText(/Ask Claude/i) as HTMLTextAreaElement;
+    const ta = screen.getByPlaceholderText(/Ask AI/i) as HTMLTextAreaElement;
     fireEvent.change(ta, { target: { value: "Hello" } });
     fireEvent.keyDown(ta, { key: "Enter" });
     expect(ta.value).toBe("");

@@ -22,7 +22,6 @@
     "smoke:prod": "node scripts/smoke-deployed.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.91.1",
     "@auth/prisma-adapter": "^2.0.0",
     "@emotion/react": "^11.14.0",
     "@prisma/client": "^5.22.0",

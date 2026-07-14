@@ -112,6 +112,31 @@ export async function releaseQuota(userId: string): Promise<void> {
 }
 
 /**
+ * Say once, out loud, which provider this process will actually use.
+ *
+ * The Ollama branch below is a free local fallback for developers. It is also
+ * how in-editor AI stayed broken in production for months without anyone
+ * noticing: on a dev machine every request short-circuited to a local model, so
+ * the paid path — the only one production has — was never exercised. Silence was
+ * the bug. A dev now sees, on the first AI call, that they are NOT testing what
+ * production runs.
+ */
+let announced = false;
+function announceProvider(model: string): void {
+  if (announced) return;
+  announced = true;
+  if (model === "ollama") {
+    console.warn(
+      `[ai] OLLAMA_BASE_URL is set — every AI request in this process uses the local ` +
+        `model (${process.env.OLLAMA_MODEL ?? "unset"}), NOT the paid provider production runs. ` +
+        `Unset it to exercise the real path.`,
+    );
+  } else {
+    console.log(`[ai] provider: openai (model: ${model})`);
+  }
+}
+
+/**
  * Server-authoritative model selection. The client-sent model is a hint:
  * honoured only if it is in the user's tier allow-list, otherwise the tier
  * default is used. Prevents a lower tier from forcing a premium model.
@@ -122,11 +147,15 @@ export async function resolveModelForUser(
 ): Promise<string> {
   // Local Ollama mode: when configured, force the local model regardless of
   // tier or client hint so no paid API key is used. Quota still applies.
-  if ((process.env.OLLAMA_BASE_URL ?? "").length > 0) return "ollama";
+  if ((process.env.OLLAMA_BASE_URL ?? "").length > 0) {
+    announceProvider("ollama");
+    return "ollama";
+  }
   const plan = await getUserPlan(userId);
   const cfg = PLAN_MODELS[plan];
-  if (hint && cfg.allowed.includes(hint)) return hint;
-  return cfg.default;
+  const model = hint && cfg.allowed.includes(hint) ? hint : cfg.default;
+  announceProvider(model);
+  return model;
 }
 
 export async function checkQuota(userId: string): Promise<QuotaStatus> {

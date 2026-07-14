@@ -31,6 +31,7 @@ import { AssetGrid } from "./components/AssetGrid";
 import { FolderBreadcrumb } from "../sidebar/tabs/media/components/FolderBreadcrumb";
 import { fmtBytes } from "./utils/fmtBytes";
 import { generateAltTextRemote } from "../../services/AltTextService";
+import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
 
 interface LibraryManagerProps {
@@ -370,7 +371,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               generatedMetadata: {
                 altText: {
                   generatedAt: new Date().toISOString(),
-                  model: result.model ?? "claude-haiku-4-5",
+                  model: result.model ?? DEFAULT_MODEL,
                 },
               },
             });

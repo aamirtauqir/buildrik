@@ -118,7 +118,7 @@ describe("useAltTextAutoTrigger", () => {
     mocks.generateAltTextRemote.mockResolvedValueOnce({
       altText: "A red bicycle by a brick wall.",
       skipped: false,
-      model: "claude-haiku-4-5",
+      model: "gpt-4o-mini",
     });
 
     renderHook(() => useAltTextAutoTrigger(composer));
@@ -131,11 +131,11 @@ describe("useAltTextAutoTrigger", () => {
     const [updateId, updates] = media.updateAsset.mock.calls[0];
     expect(updateId).toBe("cuid-server-1");
     expect(updates.altText).toBe("A red bicycle by a brick wall.");
-    expect(updates.generatedMetadata?.altText?.model).toBe("claude-haiku-4-5");
+    expect(updates.generatedMetadata?.altText?.model).toBe("gpt-4o-mini");
     expect(typeof updates.generatedMetadata?.altText?.generatedAt).toBe("string");
   });
 
-  it("falls back to claude-haiku-4-5 when service result omits model", async () => {
+  it("falls back to gpt-4o-mini when service result omits model", async () => {
     const media = makeMediaMock();
     const composer = { media } as any;
     const asset = makeAsset();
@@ -152,7 +152,7 @@ describe("useAltTextAutoTrigger", () => {
     });
 
     const updates = media.updateAsset.mock.calls[0][1];
-    expect(updates.generatedMetadata?.altText?.model).toBe("claude-haiku-4-5");
+    expect(updates.generatedMetadata?.altText?.model).toBe("gpt-4o-mini");
   });
 
   it("skips when upload event signals failure", async () => {

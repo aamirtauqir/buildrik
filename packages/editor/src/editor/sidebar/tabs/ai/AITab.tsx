@@ -28,7 +28,11 @@ export interface AITabProps {
 export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) => {
   const { scope, status, lock, unlock } = useAIScope(composer);
   const stream = useStreamPrompt();
-  const [model, setModel] = React.useState<AIModel>(DEFAULT_MODEL);
+  // Not state: the server owns model choice (`resolveModelForUser` gates it by
+  // plan and ignores a client hint it doesn't allow). The picker that used to
+  // set this offered four models, three of which the server could never call —
+  // a control that never controlled anything. Removed.
+  const model: AIModel = DEFAULT_MODEL;
   const [mode, setMode] = React.useState<"chat" | "agent">("chat");
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const streamingMsgIdRef = React.useRef<string | null>(null);
@@ -160,7 +164,7 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
     <TabFrame className="bd-ai-tab">
       <TabFrame.Header
         title="AI"
-        subtitle="Chat with Claude to edit your page"
+        subtitle="Chat with AI to edit your page"
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
@@ -212,8 +216,6 @@ export const AITab: React.FC<AITabProps> = ({ composer, onHelpClick, onClose }) 
         />
       )}
       <PromptComposer
-        model={model}
-        onModelChange={setModel}
         onSubmit={mode === "agent" ? agent.start : submit}
         onStop={mode === "agent" ? agent.stop : stream.stop}
         streaming={mode === "agent" ? agent.phase === "planning" || agent.phase === "running" : stream.streaming}

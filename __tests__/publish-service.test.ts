@@ -27,7 +27,17 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+// Sites deploy into the workspace's OWN Vercel account, so runPrePublishChecks
+// hard-fails without a connection and startPublish refuses to queue. Mocked at
+// the service boundary rather than at prisma so tests don't have to build a
+// well-formed encrypted-token row.
+vi.mock("@server/services/integrations.service", () => ({
+  getActiveVercelConnection: vi.fn(),
+  markInactive: vi.fn(),
+}));
+
 import { prisma } from "@/lib/prisma";
+import { getActiveVercelConnection } from "@server/services/integrations.service";
 import {
   runPrePublishChecks,
   startPublish,
@@ -37,12 +47,39 @@ import {
   unpublishSite,
 } from "@/server/services/publish.service";
 
+const VERCEL_CONNECTED = { token: "t", teamId: null };
+
 describe("Publish Service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default: the workspace HAS Vercel connected. Tests that care about the
+    // missing-connection path override this explicitly.
+    vi.mocked(getActiveVercelConnection).mockResolvedValue(VERCEL_CONNECTED as never);
   });
 
   describe("runPrePublishChecks", () => {
+    // The check that did not exist. Without a Vercel connection the worker
+    // reached runVercelDeploy and threw VERCEL_NOT_CONNECTED — but only after
+    // the job had queued, shown a progress bar and marked the site PUBLISHING.
+    it("hard-fails when the workspace has no Vercel connection", async () => {
+      vi.mocked(getActiveVercelConnection).mockResolvedValue(null);
+      vi.mocked(prisma.page.count).mockResolvedValue(3);
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+        metaTitleTemplate: "t",
+        touchIcon: "i",
+        deletedAt: null,
+        workspaceId: "w1",
+      } as never);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.page.findMany).mockResolvedValue([] as never);
+
+      const result = await runPrePublishChecks("site-1");
+
+      expect(result.ready).toBe(false);
+      const vercel = result.checks.find((c) => c.label === "Vercel connected");
+      expect(vercel?.status).toBe("fail");
+    });
+
     it("fails when site has no pages", async () => {
       vi.mocked(prisma.page.count).mockResolvedValue(0);
       vi.mocked(prisma.site.findUnique).mockResolvedValue({

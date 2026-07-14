@@ -1,10 +1,17 @@
 /**
- * P7 — AI alt-text generation via Claude Haiku vision.
+ * P7 — AI alt-text generation via vision.
+ *
+ * This called Anthropic directly (`new Anthropic({ apiKey: ANTHROPIC_API_KEY })`)
+ * against `claude-haiku-4-5`. No Anthropic key has ever existed on this project,
+ * so the feature threw on every call in production and nobody saw it: dev routes
+ * in-editor AI to Ollama, and alt-text is auto-triggered in the background where
+ * a failure is silent. It now runs on the same OpenAI client as every other AI
+ * call in the product.
  *
  * Critical contract (prototype-v3 §25 #3): "AI alt-text never overwrites
  * user-typed alt-text." Enforced in two layers:
  *   1. Pre-call skip-guard: if asset.altText is already set, return it
- *      without calling Anthropic (fast path, free).
+ *      without calling the provider (fast path, free).
  *   2. Post-call TOCTOU re-check: between the API call starting and
  *      finishing, a user might type alt-text in the editor. Re-read
  *      asset.altText after the AI returns; if non-empty now, discard
@@ -16,17 +23,11 @@
  *
  * @license BSD-3-Clause
  */
-import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
-
-let _anthropic: Anthropic | null = null;
-function getClient(): Anthropic {
-  if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return _anthropic;
-}
+import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
+import { getOpenAI } from "./openai.client";
+import { assertProviderConfigured } from "./ai.service";
 
 const ALT_TEXT_PROMPT = [
   "Generate concise alt text for this image suitable for screen readers.",
@@ -38,10 +39,10 @@ const ALT_TEXT_PROMPT = [
   "Return ONLY the alt text, nothing else.",
 ].join("\n");
 
-const MODEL = "claude-haiku-4-5";
+const MODEL = DEFAULT_MODEL;
 
 export interface GenerateAltTextOptions {
-  /** Public image URL — must be reachable from Anthropic API. */
+  /** Public image URL — must be reachable from the provider. */
   imageUrl: string;
   /** Optional override (test-only). */
   signal?: AbortSignal;
@@ -56,18 +57,21 @@ export interface AltTextResult {
 }
 
 /**
- * Bare AI call. Calls Claude Haiku with a vision message + alt-text prompt
- * and returns the trimmed model output. Does NOT persist or check ownership;
- * see `applyAltTextToAsset` for the orchestrator.
+ * Bare AI call. Sends the image + alt-text prompt to the vision model and
+ * returns the trimmed output. Does NOT persist or check ownership; see
+ * `applyAltTextToAsset` for the orchestrator.
  *
  * Throws on:
- *   - Empty / non-text response
- *   - Anthropic API errors (re-raised as-is for tRPC translation)
+ *   - No configured provider (clear message, before any network call)
+ *   - Empty response
+ *   - Provider API errors (re-raised as-is for tRPC translation)
  */
 export async function generateAltText(
   options: GenerateAltTextOptions,
 ): Promise<AltTextResult> {
-  const response = await getClient().messages.create(
+  assertProviderConfigured(MODEL);
+
+  const response = await getOpenAI().chat.completions.create(
     {
       model: MODEL,
       max_tokens: 200,
@@ -75,11 +79,8 @@ export async function generateAltText(
         {
           role: "user",
           content: [
-            {
-              type: "image",
-              source: { type: "url", url: options.imageUrl },
-            },
             { type: "text", text: ALT_TEXT_PROMPT },
+            { type: "image_url", image_url: { url: options.imageUrl } },
           ],
         },
       ],
@@ -87,9 +88,7 @@ export async function generateAltText(
     { signal: options.signal },
   );
 
-  const block = response.content[0];
-  const raw = block?.type === "text" ? block.text : "";
-  const altText = raw.trim();
+  const altText = (response.choices[0]?.message?.content ?? "").trim();
   if (!altText) {
     throw new Error("AI returned empty alt text");
   }
@@ -99,8 +98,8 @@ export async function generateAltText(
     model: MODEL,
     usage: response.usage
       ? {
-          inputTokens: response.usage.input_tokens,
-          outputTokens: response.usage.output_tokens,
+          inputTokens: response.usage.prompt_tokens,
+          outputTokens: response.usage.completion_tokens,
         }
       : undefined,
   };

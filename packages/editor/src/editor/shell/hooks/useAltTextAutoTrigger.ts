@@ -25,6 +25,7 @@ import type { Composer } from "../../../engine";
 import { MEDIA_EVENTS } from "../../../shared/constants/media";
 import type { MediaAsset } from "../../../shared/types/media";
 import { generateAltTextRemote } from "../../../services/AltTextService";
+import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 
 interface UploadCompletePayload {
   success: boolean;
@@ -66,7 +67,7 @@ export function useAltTextAutoTrigger(composer: Composer | null): void {
           ...(fresh.generatedMetadata ?? {}),
           altText: {
             generatedAt: new Date().toISOString(),
-            model: result.model ?? "claude-haiku-4-5",
+            model: result.model ?? DEFAULT_MODEL,
           },
         },
       });

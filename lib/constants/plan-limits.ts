@@ -97,25 +97,32 @@ export function getPlanLimit(plan: PlanName, key: PlanLimitKey): number | boolea
  * Per-tier AI model policy. The client may send a preferred model, but the
  * server treats it as a hint only: an unlisted (e.g. premium) model requested
  * by a lower tier is ignored in favour of that tier's `default`. Model ids must
- * match `server/services/types.ts` `modelSchema` exactly (validated at the
- * router via `modelSchema.parse`).
+ * match `packages/shared/schemas/ai.ts` `modelSchema` exactly — the test in
+ * `plan-models.test.ts` enforces that, so a fictional id cannot ship again.
+ */
+/**
+ * Every tier runs the same model today. It is deliberately flat, not an oversight.
+ *
+ * This used to read FREE=claude-haiku, PRO=claude-sonnet, BUSINESS=claude-opus —
+ * a "higher plan, better model" ladder. It never worked: no Anthropic key has
+ * ever existed on this project, so every tier's default threw, and the tiering
+ * was never a cost lever anyway (AI quota is counted in generations and prompts,
+ * see PLAN_LIMITS, not in model spend). It was a claim, not a mechanism.
+ *
+ * The ladder is worth rebuilding, but on models we can actually call and with a
+ * cost model behind it. Until then, one honest model beats three fictional ones.
  */
 export const PLAN_MODELS: Record<PlanName, { default: string; allowed: string[] }> = {
   FREE: {
-    default: "claude-haiku-4-5",
-    allowed: ["claude-haiku-4-5", "gpt-4o-mini"],
+    default: "gpt-4o-mini",
+    allowed: ["gpt-4o-mini"],
   },
   PRO: {
-    default: "claude-sonnet-4-6",
-    allowed: ["claude-haiku-4-5", "claude-sonnet-4-6", "gpt-4o-mini"],
+    default: "gpt-4o-mini",
+    allowed: ["gpt-4o-mini"],
   },
   BUSINESS: {
-    default: "claude-opus-4-7",
-    allowed: [
-      "claude-opus-4-7",
-      "claude-sonnet-4-6",
-      "claude-haiku-4-5",
-      "gpt-4o-mini",
-    ],
+    default: "gpt-4o-mini",
+    allowed: ["gpt-4o-mini"],
   },
 };

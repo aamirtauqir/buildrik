@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getProvider } from "@server/services/ai.service";
-import { AnthropicProvider } from "@server/services/anthropic.client";
+import { openAIProvider } from "@server/services/openai.client";
+import { ollamaProvider } from "@server/services/ollama.client";
 
 vi.mock("openai", () => ({
   default: class MockOpenAI {
@@ -8,21 +9,26 @@ vi.mock("openai", () => ({
   },
 }));
 
+/**
+ * There is one paid provider. This used to assert that `claude-*` models routed
+ * to an AnthropicProvider — a provider we have never held a key for, naming
+ * models that were not real Anthropic API ids. Both are gone.
+ */
 describe("getProvider", () => {
   beforeEach(() => {
-    process.env.ANTHROPIC_API_KEY = "k";
     process.env.OPENAI_API_KEY = "k";
   });
 
-  it("returns AnthropicProvider for claude-* models", () => {
-    expect(getProvider("claude-opus-4-7")).toBeInstanceOf(AnthropicProvider);
-    expect(getProvider("claude-sonnet-4-6")).toBeInstanceOf(AnthropicProvider);
-    expect(getProvider("claude-haiku-4-5")).toBeInstanceOf(AnthropicProvider);
+  it("routes gpt-* to the OpenAI provider", () => {
+    expect(getProvider("gpt-4o-mini")).toBe(openAIProvider);
   });
 
-  it("returns a non-Anthropic provider for gpt-* models", () => {
+  it("routes the local placeholder to the Ollama provider", () => {
+    expect(getProvider("ollama")).toBe(ollamaProvider);
+  });
+
+  it("returns something that satisfies the provider contract", () => {
     const provider = getProvider("gpt-4o-mini");
-    expect(provider).not.toBeInstanceOf(AnthropicProvider);
     expect(typeof provider.stream).toBe("function");
     expect(typeof provider.generate).toBe("function");
   });

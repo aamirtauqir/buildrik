@@ -1,10 +1,7 @@
-export type AIModel =
-  | "claude-opus-4-7"
-  | "claude-sonnet-4-6"
-  | "claude-haiku-4-5"
-  | "gpt-4o-mini";
-
-export const DEFAULT_MODEL: AIModel = "claude-sonnet-4-6";
+// The model list is server-owned. This file used to declare its own copy of the
+// union plus its own DEFAULT_MODEL, which drifted from the server's: both named
+// Claude models that the server could never call. One source now.
+export { DEFAULT_MODEL, type AIModel } from "@buildrik/shared/schemas/ai";
 
 export type AIScope =
   | { kind: "element"; id: string; label: string }

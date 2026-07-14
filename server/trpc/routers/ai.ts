@@ -21,7 +21,7 @@ import {
   releaseQuota,
   resolveModelForUser,
 } from "../../services/quota.service";
-import { modelSchema, DEFAULT_MODEL } from "../../services/types";
+import { modelSchema, DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import { aiAdoptionInputSchema } from "@buildrik/shared/schemas/ai-adoption";
 import { recordAiAdoption } from "../../services/ai-adoption.service";
 

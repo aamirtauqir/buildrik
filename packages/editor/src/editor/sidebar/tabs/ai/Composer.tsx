@@ -2,19 +2,15 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 
 import * as React from "react";
-import type { AIModel } from "./types";
-import { ModelPicker } from "./ModelPicker";
 
 export interface ComposerProps {
-  model: AIModel;
-  onModelChange: (m: AIModel) => void;
   onSubmit: (text: string) => void;
   onStop: () => void;
   streaming: boolean;
 }
 
 export const Composer: React.FC<ComposerProps> = ({
-  model, onModelChange, onSubmit, onStop, streaming,
+  onSubmit, onStop, streaming,
 }) => {
   const [text, setText] = React.useState("");
   const trimmed = text.trim();
@@ -29,7 +25,7 @@ export const Composer: React.FC<ComposerProps> = ({
     <div className="bd-ai-composer">
       <Textarea
         className="bd-ai-composer-input"
-        placeholder="Ask Claude…"
+        placeholder="Ask AI…"
         aria-label="Prompt"
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -42,7 +38,6 @@ export const Composer: React.FC<ComposerProps> = ({
         rows={2}
       />
       <div className="bd-ai-composer-bar">
-        <ModelPicker model={model} onChange={onModelChange} />
         {streaming ? (
           <Button
             type="button"

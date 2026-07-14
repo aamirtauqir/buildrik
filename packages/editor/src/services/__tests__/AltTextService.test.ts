@@ -32,7 +32,7 @@ describe("AltTextService.generateAltTextRemote", () => {
     mocks.generateAltTextMutate.mockResolvedValueOnce({
       altText: "A red bicycle by a brick wall.",
       skipped: false,
-      model: "claude-haiku-4-5",
+      model: "gpt-4o-mini",
     });
 
     const result = await generateAltTextRemote("asset-cuid-123");
@@ -40,7 +40,7 @@ describe("AltTextService.generateAltTextRemote", () => {
     expect(result).toEqual({
       altText: "A red bicycle by a brick wall.",
       skipped: false,
-      model: "claude-haiku-4-5",
+      model: "gpt-4o-mini",
     });
     expect(mocks.generateAltTextMutate).toHaveBeenCalledWith({ assetId: "asset-cuid-123" });
   });

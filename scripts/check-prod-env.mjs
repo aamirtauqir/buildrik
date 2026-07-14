@@ -195,9 +195,22 @@ requirePresent("VERCEL_INTEGRATION_ID");
 requirePresent("VERCEL_CLIENT_ID");
 requirePresent("VERCEL_CLIENT_SECRET");
 
-// AI drafting. Absent → every ai-generate-worker job fails on "Missing
-// credentials" and the AI onboarding path is dead.
+// AI. Absent → every ai-generate-worker job fails on "Missing credentials", the
+// AI onboarding path is dead, and in-editor AI + alt-text throw.
 requirePresent("OPENAI_API_KEY");
+
+// OLLAMA_BASE_URL must NOT be set in production. resolveModelForUser
+// short-circuits to the local model whenever it is present — in production that
+// points at a model server that does not exist, and it would silently route
+// every AI request there. It is a dev-only escape hatch.
+if (env.OLLAMA_BASE_URL) {
+  fail(
+    "OLLAMA_BASE_URL",
+    "set in production — resolveModelForUser would route ALL AI to a local model server that isn't there",
+  );
+} else {
+  pass("OLLAMA_BASE_URL (correctly unset)");
+}
 
 // Editing. Unset/false sends "Edit site" to the retired standalone demo.
 if (env.NEXT_PUBLIC_UNIFIED_EDITOR === "true") {

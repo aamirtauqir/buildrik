@@ -21,7 +21,7 @@ describe("useStreamPrompt", () => {
       return { unsubscribe: vi.fn() };
     });
     const { result } = renderHook(() => useStreamPrompt());
-    act(() => { result.current.start({ prompt: "hi", scope: { kind: "page" }, model: "claude-sonnet-4-6" }); });
+    act(() => { result.current.start({ prompt: "hi", scope: { kind: "page" }, model: "gpt-4o-mini" }); });
     act(() => { onData({ type: "text", text: "Hello " }); });
     act(() => { onData({ type: "text", text: "world" }); });
     await waitFor(() => expect(result.current.text).toBe("Hello world"));
@@ -34,7 +34,7 @@ describe("useStreamPrompt", () => {
       return { unsubscribe: vi.fn() };
     });
     const { result } = renderHook(() => useStreamPrompt());
-    act(() => { result.current.start({ prompt: "hi", scope: { kind: "page" }, model: "claude-sonnet-4-6" }); });
+    act(() => { result.current.start({ prompt: "hi", scope: { kind: "page" }, model: "gpt-4o-mini" }); });
     expect(result.current.streaming).toBe(true);
     act(() => { onData({ type: "done" }); });
     await waitFor(() => expect(result.current.streaming).toBe(false));
@@ -44,7 +44,7 @@ describe("useStreamPrompt", () => {
     const unsubscribe = vi.fn();
     subscribe.mockImplementation(() => ({ unsubscribe }));
     const { result } = renderHook(() => useStreamPrompt());
-    act(() => { result.current.start({ prompt: "hi", scope: { kind: "page" }, model: "claude-sonnet-4-6" }); });
+    act(() => { result.current.start({ prompt: "hi", scope: { kind: "page" }, model: "gpt-4o-mini" }); });
     act(() => { result.current.stop(); });
     expect(unsubscribe).toHaveBeenCalled();
     expect(result.current.streaming).toBe(false);
@@ -58,7 +58,7 @@ describe("useStreamPrompt", () => {
       return { unsubscribe: vi.fn() };
     });
     const { result } = renderHook(() => useStreamPrompt());
-    act(() => { result.current.start({ prompt: "hi", scope: { kind: "page" }, model: "claude-sonnet-4-6" }); });
+    act(() => { result.current.start({ prompt: "hi", scope: { kind: "page" }, model: "gpt-4o-mini" }); });
     const serverEdit = { target: "Hero.copy", summary: "tighten", rows: [], applyOps: { preview: {}, commit: {} } };
     act(() => { onData({ type: "edit", edit: serverEdit }); });
     act(() => { onData({ type: "done" }); });

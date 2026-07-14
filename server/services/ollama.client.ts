@@ -1,5 +1,6 @@
 import OpenAI from "openai";
-import type { AIModel, AIProvider, TokenChunk } from "./types";
+import type { AIModel } from "@buildrik/shared/schemas/ai";
+import type { AIProvider, TokenChunk } from "./types";
 
 /**
  * Local Ollama provider via its OpenAI-compatible endpoint. Lets the editor run

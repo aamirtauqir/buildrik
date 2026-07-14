@@ -41,7 +41,7 @@ describe("ai router", () => {
     streamContent.mockReset();
     // Server resolves the model from the user's tier; the client model is a
     // hint. Default to echoing the requested model for these tests.
-    resolveModelForUser.mockResolvedValue("claude-sonnet-4-6");
+    resolveModelForUser.mockResolvedValue("gpt-4o-mini");
   });
 
   it("getQuotaStatus returns current quota", async () => {
@@ -69,7 +69,7 @@ describe("ai router", () => {
       const sub = await caller.streamPrompt({
         prompt: "hi",
         scope: { kind: "element", id: "el-1" },
-        model: "claude-sonnet-4-6",
+        model: "gpt-4o-mini",
       });
       const iter = sub[Symbol.asyncIterator]();
       await iter.next();
@@ -91,7 +91,7 @@ describe("ai router", () => {
     const sub = await caller.streamPrompt({
       prompt: "hi",
       scope: { kind: "element", id: "el-1" },
-      model: "claude-sonnet-4-6",
+      model: "gpt-4o-mini",
     });
     const collected: unknown[] = [];
     for await (const chunk of sub) collected.push(chunk);
@@ -99,6 +99,6 @@ describe("ai router", () => {
     // Usage is now accounted by reserveQuota (reserve-then-stream), not a
     // separate recordUsage call — the router resolves the model server-side
     // and reserves against it.
-    expect(reserveQuota).toHaveBeenCalledWith("user-1", "claude-sonnet-4-6");
+    expect(reserveQuota).toHaveBeenCalledWith("user-1", "gpt-4o-mini");
   });
 });

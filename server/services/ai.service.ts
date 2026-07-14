@@ -1,12 +1,13 @@
-import OpenAI from "openai";
+import { getOpenAI, openAIProvider } from "./openai.client";
 
-let _openai: OpenAI;
-function getOpenAI(): OpenAI {
-  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  return _openai;
-}
-
-const MODEL = "gpt-4o-mini";
+/**
+ * Onboarding drafts always run on the default paid model, and deliberately do
+ * NOT follow the Ollama override that `resolveModelForUser` applies to in-editor
+ * AI: a first site draft is the user's first impression of the product and must
+ * not silently swap to whatever local model a developer happens to be running.
+ * Sourced from DEFAULT_MODEL so there is one place that names the model.
+ */
+const MODEL: AIModel = DEFAULT_MODEL;
 
 const SECTION_SCHEMAS: Record<
   string,
@@ -187,6 +188,11 @@ export async function generateContent(
 export async function generatePage(
   input: PageGenerationInput
 ): Promise<PageGenerationResult> {
+  // Without this the OpenAI SDK throws its own "Missing credentials" deep inside
+  // the loop, once per section, after the job has already been marked RUNNING.
+  // Every ai-generate job in production failed exactly that way for months.
+  assertProviderConfigured(MODEL);
+
   const sectionTypes = PAGE_SECTION_ORDER[input.pageType];
   const sections: PageSection[] = [];
 
@@ -441,54 +447,17 @@ ${pageInfo}`,
 }
 
 // ─── Provider abstraction (T3) ────────────────────────────────────────────
-import { anthropicProvider } from "./anthropic.client";
 import { ollamaProvider } from "./ollama.client";
 import {
-  isClaudeModel,
   isOllamaModel,
   isOpenAIModel,
   DEFAULT_MODEL,
   type AIModel,
-  type AIProvider,
-  type TokenChunk,
-} from "./types";
-
-class OpenAIProvider implements AIProvider {
-  async *stream(
-    prompt: string,
-    model: AIModel,
-    signal: AbortSignal,
-  ): AsyncIterable<TokenChunk> {
-    const sdkStream = await getOpenAI().chat.completions.create({
-      model,
-      stream: true,
-      messages: [{ role: "user", content: prompt }],
-    });
-    for await (const event of sdkStream) {
-      if (signal.aborted) return;
-      const text = event.choices[0]?.delta?.content;
-      if (text) yield { type: "text", text };
-      if (event.choices[0]?.finish_reason) {
-        yield { type: "done" };
-        return;
-      }
-    }
-  }
-
-  async generate(prompt: string, model: AIModel): Promise<string> {
-    const res = await getOpenAI().chat.completions.create({
-      model,
-      messages: [{ role: "user", content: prompt }],
-    });
-    return res.choices[0]?.message?.content ?? "";
-  }
-}
-
-const openAIProvider = new OpenAIProvider();
+} from "@buildrik/shared/schemas/ai";
+import type { AIProvider, TokenChunk } from "./types";
 
 export function getProvider(model: AIModel): AIProvider {
-  if (isOllamaModel(model)) return ollamaProvider;
-  return isClaudeModel(model) ? anthropicProvider : openAIProvider;
+  return isOllamaModel(model) ? ollamaProvider : openAIProvider;
 }
 
 /**
@@ -504,9 +473,6 @@ export function assertProviderConfigured(model: AIModel): void {
       throw new Error("Local AI is not configured (set OLLAMA_BASE_URL).");
     }
     return;
-  }
-  if (isClaudeModel(model) && !process.env.ANTHROPIC_API_KEY) {
-    throw new Error("AI is not configured: no Anthropic API key on the server.");
   }
   if (isOpenAIModel(model) && !process.env.OPENAI_API_KEY) {
     throw new Error("AI is not configured: no OpenAI API key on the server.");
