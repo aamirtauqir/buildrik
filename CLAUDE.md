@@ -152,24 +152,85 @@ Historical record kept in `V1_WALK_AND_FIX.md` (closed log).
 
 Dashboard package (Next.js — `process.env.X`). Vite editor env lives in `packages/editor/CLAUDE.md`.
 
+**This table is the deploy checklist.** It was incomplete for months, and that is not a documentation nit: `GOOGLE_CLIENT_ID`, `GITHUB_CLIENT_ID` and `OPENAI_API_KEY` were absent from it, were therefore never set in production, and **social login and AI drafting were silently dead in prod while working fine in dev** (2026-07-14). If you add a `process.env.X` read, add the row here in the same commit.
+
+### Core
+
 | Var | Purpose | Required? |
 |-----|---------|-----------|
-| `DATABASE_URL` | Postgres connection string | Yes |
-| `NEXTAUTH_SECRET` | NextAuth session signing key | Yes |
-| `SMTP_HOST` | Transactional email host (e.g. `buildrick.io`) | Yes for production |
-| `SMTP_PORT` | `465` for implicit TLS (SMTPS), `587` for STARTTLS. The transport sets `secure: true` only on 465. | Yes for production |
-| `SMTP_USER` | Mailbox login (e.g. `info@buildrick.io`) | Yes for production |
+| `DATABASE_URL` | Postgres connection string. Also needed in `packages/dashboard/.env` (not `.env.local`) — Prisma CLI reads only `.env`. | Yes |
+| `NEXTAUTH_SECRET` | NextAuth session signing key. Also the source of the AES key for encrypted 2FA secrets (`auth.service.ts`), so rotating it invalidates those. | Yes |
+| `NEXTAUTH_URL` | Canonical origin NextAuth builds callback URLs against. | Yes in production |
+| `NEXT_PUBLIC_APP_URL` | The dashboard's own origin (`https://app.buildrick.io`). Used for draft share links (`/share/<token>`) and absolute links in email. **Baked at build time** — see the build-time note below. | Yes |
+| `AUTH_TRUST_HOST` | `true`. NextAuth v5 reads this **itself** — you will not find it via `grep process.env` in this repo. Behind cPanel/LiteSpeed the app sits behind a proxy, and without it NextAuth rejects the forwarded host (`UntrustedHost`) and every sign-in fails. | Yes on cPanel |
+| `AUTH_SECRET` / `AUTH_URL` | NextAuth v5's own names for `NEXTAUTH_SECRET` / `NEXTAUTH_URL`. Also read internally, not through our source. Production sets both pairs. | Yes in production |
+| `COOKIE_DOMAIN` | Optional cookie domain override when the app and editor sit on different subdomains. | No |
+| `CRON_SECRET` | Bearer token the cron routes (`/api/cron/*`) check before running. | Yes in production |
+
+### Auth providers
+
+Social login is broken — not degraded, **broken** — without these: NextAuth still redirects to the provider, but with `client_id=undefined`, and Google/GitHub show an error page.
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth app (Google Cloud Console). The prod callback `https://app.buildrick.io/api/auth/callback/google` must be listed under **Authorized redirect URIs**, or Google returns `Error 400: redirect_uri_mismatch`. | Yes — "Continue with Google" is dead without them |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | GitHub OAuth app. Same rule for its callback URL. | Yes — "Continue with GitHub" is dead without them |
+| `TURNSTILE_SECRET_KEY` / `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile. Only reached after repeated failed logins trip the captcha gate. | Only if captcha is enabled |
+
+### Email (SMTP)
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `SMTP_HOST` | Transactional email host (e.g. `buildrick.io`) | Yes in production |
+| `SMTP_PORT` | `465` for implicit TLS (SMTPS), `587` for STARTTLS. The transport sets `secure: true` only on 465. | Yes in production |
+| `SMTP_USER` | Mailbox login (e.g. `info@buildrick.io`) | Yes in production |
 | `SMTP_PASS` | Mailbox password (plain). Never commit — `.env.local` in dev. | Dev; prod only if the host doesn't mangle it |
 | `SMTP_PASS_B64` | Base64 of the password. **Required on cPanel/Passenger**, which pipes env vars through a shell: a `$` in the password is read as a variable and silently eaten (`^+qH$gt@…` lost `$gt` → 535 auth failure in prod while dev worked). Base64 has no shell metacharacters. Takes precedence over `SMTP_PASS`. | Yes on cPanel |
-| `EMAIL_FROM` | Sender, e.g. `Buildrick <info@buildrick.io>`. Most SMTP hosts require this to match `SMTP_USER`'s domain. | Yes for production |
-| `VERCEL_TOKEN` | Shared Vercel API token (legacy — being replaced by per-workspace OAuth) | Optional during OAuth rollout |
-| `ENCRYPTION_KEY` | 32-byte hex (`openssl rand -hex 32`) for AES-256-GCM token-at-rest (Vercel OAuth + future integrations). Rotate by re-encrypting all rows. | Yes for Vercel OAuth flow |
-| `VERCEL_OAUTH_CLIENT_ID` | OAuth integration public client id (from vercel.com/integrations/console) | Yes for Vercel OAuth flow |
-| `VERCEL_OAUTH_CLIENT_SECRET` | OAuth integration secret | Yes for Vercel OAuth flow |
-| `VERCEL_OAUTH_REDIRECT_URI` | Callback URL registered with Vercel (e.g. `https://app.buildrik.com/api/integrations/vercel/callback` in prod, `http://localhost:3000/api/integrations/vercel/callback` in dev) | Yes for Vercel OAuth flow |
-| `NEXT_PUBLIC_UNIFIED_EDITOR` | Graduates the in-Next editor at `/edit/:id`. When unset/`false`, the dashboard "Edit" link falls back to the legacy `NEXT_PUBLIC_EDITOR_URL` (`localhost:5050/?siteId=`) standalone demo, which is dev-only and doesn't load real projects. Set `true` in dev (`.env.local`) and in prod (Vercel env) so editing actually opens the working editor. | Yes — without it, "Edit site" points at the dead demo |
+| `EMAIL_FROM` | Sender, e.g. `Buildrick <info@buildrick.io>`. Most SMTP hosts require this to match `SMTP_USER`'s domain. | Yes in production |
 
-`.env.local` (gitignored, repo root) holds dev values. Production values live in Vercel project env settings. Never commit secrets.
+### Publishing (Vercel)
+
+Sites deploy into **the workspace's own Vercel account** via per-workspace OAuth — Buildrick hosts nothing. Publishing is impossible without a connection, and `runPrePublishChecks` hard-fails on it.
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `VERCEL_INTEGRATION_ID` | Integration slug from vercel.com/integrations/console. `buildAuthUrl` throws without it, so nobody can connect Vercel at all. | Yes for publishing |
+| `VERCEL_CLIENT_ID` / `VERCEL_CLIENT_SECRET` | OAuth credentials used by `exchangeCodeForToken`. **Note the names** — an earlier version of this table called them `VERCEL_OAUTH_CLIENT_ID`/`_SECRET`, which the code has never read. | Yes for publishing |
+| `ENCRYPTION_KEY` | 32-byte hex (`openssl rand -hex 32`) for AES-256-GCM token-at-rest. Rotate by re-encrypting all rows. | Yes for publishing |
+| `VERCEL_PROJECT_PREFIX` | Optional prefix on generated Vercel project names. | No |
+| `VERCEL_TOKEN` | Shared Vercel API token from the retired "Buildrick hosts everything" model. Nothing in the publish path reads it now. | No — legacy |
+
+**There is no `VERCEL_OAUTH_REDIRECT_URI`.** The callback is registered with Vercel at integration-registration time, and the callback route derives its own `redirect_uri` from the request (`${url.protocol}//${url.host}/api/integrations/vercel/callback`). Setting this var does nothing.
+
+### AI
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `OPENAI_API_KEY` | AI site generation. Without it every `ai-generate-worker` job fails on "Missing credentials" and the AI onboarding path dies (the UI degrades to "AI drafting isn't configured yet"). | Yes if the AI path is offered |
+| `ANTHROPIC_API_KEY` | Claude models, where selected. | Only for Claude models |
+| `OLLAMA_BASE_URL` / `OLLAMA_MODEL` / `OLLAMA_TIMEOUT_MS` | Local model provider. | Only for local AI |
+
+### Editor
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `NEXT_PUBLIC_UNIFIED_EDITOR` | Graduates the in-Next editor at `/edit/:id`. When unset/`false`, the dashboard "Edit" link falls back to the legacy `NEXT_PUBLIC_EDITOR_URL` (`localhost:5050/?siteId=`) standalone demo, which is dev-only and doesn't load real projects. Set `true` in dev (`.env.local`) and in prod. | Yes — without it, "Edit site" points at the dead demo |
+| `EDITOR_ORIGIN` | Origin allowed to call the tRPC endpoint cross-origin. | Yes in production |
+| `NEXT_PUBLIC_EDITOR_URL` | Legacy standalone-editor URL. Only read when `NEXT_PUBLIC_UNIFIED_EDITOR` is off. | No |
+
+### Optional / partially built
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob. Only `del()` is used — uploads do not go through it. Without it, deleted assets leave orphan blobs behind; nothing user-facing breaks. | No |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signature check. Stripe is not fully wired (no `STRIPE_SECRET_KEY` is read anywhere, and Checkout is still a TODO), so this is inert today. | No — not until billing is finished |
+| `PEXELS_API_KEY` / `UNSPLASH_ACCESS_KEY` | Stock-photo search in the media library. | Only for stock search |
+
+### Where the values live
+
+- **Dev:** `.env.local` at the repo root (gitignored). Never commit secrets.
+- **Production:** the **cPanel Node.js app** environment, not Vercel. Read/write it with `cloudlinux-selector` (or the cPanel UI); the stored config is `~/.cl.selector/node-selector.json`. `cloudlinux-selector set --env-vars` **replaces the entire map** — merge with the existing keys first or you will delete `DATABASE_URL` and take the site down.
+- **`NEXT_PUBLIC_*` are baked into the bundle at build time.** Setting one in the server's runtime env has no effect on the client — it must be present when `next build` runs. `.env.production.local` exists for exactly this.
 
 ## Skill routing
 
