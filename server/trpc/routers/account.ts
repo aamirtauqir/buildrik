@@ -21,7 +21,7 @@ import {
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
-import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion, listUserWorkspaces, createWorkspace, WorkspaceLimitError } from "@/server/services/workspace-settings.service";
+import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion, listUserWorkspaces, createWorkspace, WorkspaceLimitError, WorkspaceNameTakenError } from "@/server/services/workspace-settings.service";
 import { checkWorkspaceRole } from "@/server/services/permission.service";
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration, updateIntegration, sendIntegrationTestEvent } from "@/server/services/integrations.service";
@@ -142,6 +142,11 @@ export const accountRouter = router({
       } catch (e) {
         if (e instanceof WorkspaceLimitError) {
           throw new TRPCError({ code: "FORBIDDEN", message: e.message });
+        }
+        // CONFLICT so the UI can show the designed "name taken" state instead of
+        // a generic failure.
+        if (e instanceof WorkspaceNameTakenError) {
+          throw new TRPCError({ code: "CONFLICT", message: e.message });
         }
         throw e;
       }

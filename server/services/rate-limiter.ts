@@ -17,7 +17,16 @@ export async function checkRateLimit(
 
   // Raw SQL (physical table name per @@map) — Prisma's upsert can't express
   // "reset the counter only if the window lapsed" in one statement.
-  const rows = await prisma.$queryRaw<{ count: number; resetAt: Date }[]>`
+  //
+  // `resetAt` is `timestamp WITHOUT time zone`, and raw SQL binds a JS Date as
+  // LOCAL wall-clock. Reading it straight back and calling .getTime() therefore
+  // reports an instant shifted by the server's UTC offset — on a UTC+5 box the
+  // countdown read "313 minutes" for a 15-minute window. Enforcement was never
+  // wrong (both sides of the comparison carry the same shift), but the value is
+  // unusable off the row. So compute the remaining seconds IN Postgres, where
+  // both operands live in the same space, and rebuild the instant from the
+  // Node clock.
+  const rows = await prisma.$queryRaw<{ count: number; secondsLeft: number }[]>`
     INSERT INTO "rate_limit_buckets" ("key", "count", "resetAt")
     VALUES (${key}, 1, ${newResetAt})
     ON CONFLICT ("key") DO UPDATE SET
@@ -29,14 +38,15 @@ export async function checkRateLimit(
         WHEN "rate_limit_buckets"."resetAt" < ${now} THEN ${newResetAt}
         ELSE "rate_limit_buckets"."resetAt"
       END
-    RETURNING "count", "resetAt"
+    RETURNING "count", EXTRACT(EPOCH FROM ("resetAt" - ${now}))::double precision AS "secondsLeft"
   `;
 
   const row = rows[0];
+  const secondsLeft = Math.max(0, Math.ceil(Number(row.secondsLeft)));
   return {
     allowed: row.count <= maxAttempts,
     remaining: Math.max(0, maxAttempts - row.count),
-    resetAt: row.resetAt.getTime(),
+    resetAt: now.getTime() + secondsLeft * 1000,
   };
 }
 

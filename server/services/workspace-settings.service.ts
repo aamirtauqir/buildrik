@@ -1,6 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import type { UpdateWorkspaceInput } from "@buildrik/shared/schemas/account";
 
+/** Thrown when the user already has a workspace by this name (case-insensitive). */
+export class WorkspaceNameTakenError extends Error {
+  code = "WORKSPACE_NAME_TAKEN" as const;
+  constructor() {
+    super("That workspace name is taken. Try another.");
+    this.name = "WorkspaceNameTakenError";
+  }
+}
+
 /** Thrown when a free user tries to create a 2nd workspace (W1 plan gate). */
 export class WorkspaceLimitError extends Error {
   code = "WORKSPACE_LIMIT" as const;
@@ -44,6 +53,20 @@ export async function createWorkspace(
     throw new WorkspaceLimitError();
   }
 
+  // Names were never checked — only the slug was auto-deduped — so a user could
+  // end up with two workspaces called the same thing and no way to tell them
+  // apart in the switcher. Scoped to THIS user: two different people may both
+  // have a "My Workspace".
+  const clash = await prisma.workspaceMember.findFirst({
+    where: {
+      userId,
+      status: "ACTIVE",
+      workspace: { name: { equals: name.trim(), mode: "insensitive" } },
+    },
+    select: { id: true },
+  });
+  if (clash) throw new WorkspaceNameTakenError();
+
   const slug = await uniqueWorkspaceSlug(name);
   const ws = await prisma.$transaction(async (tx) => {
     const created = await tx.workspace.create({ data: { name, slug, ownerId: userId } });
@@ -76,7 +99,9 @@ export async function listUserWorkspaces(userId: string) {
           name: true,
           iconUrl: true,
           plan: true,
-          _count: { select: { members: true } },
+          // siteCount feeds the workspace chooser's "4 members · 12 sites" line,
+          // which previously had no site number to read.
+          _count: { select: { members: true, sites: true } },
         },
       },
     },
@@ -88,6 +113,7 @@ export async function listUserWorkspaces(userId: string) {
     plan: m.workspace.plan,
     role: m.role,
     memberCount: m.workspace._count.members,
+    siteCount: m.workspace._count.sites,
   }));
 }
 

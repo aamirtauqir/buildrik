@@ -20,14 +20,11 @@ function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 }
 
-/**
- * The mockup's meta line reads "4 members · 12 sites", but `workspace.listMine`
- * (listUserWorkspaces) returns only role + memberCount — there is no site count
- * on that query. We render the two facts we actually have.
- */
-function meta(role: string, memberCount: number) {
+/** "Owner · Just you · 1 site" — listUserWorkspaces now returns siteCount too. */
+function meta(role: string, memberCount: number, siteCount: number) {
   const who = memberCount === 1 ? "Just you" : `${memberCount} members`;
-  return `${ROLE_LABELS[role] ?? role} · ${who}`;
+  const sites = `${siteCount} ${siteCount === 1 ? "site" : "sites"}`;
+  return `${ROLE_LABELS[role] ?? role} · ${who} · ${sites}`;
 }
 
 export default function WorkspaceSelectPage() {
@@ -85,7 +82,7 @@ export default function WorkspaceSelectPage() {
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="truncate text-auth-input font-semibold text-auth-text-primary">{ws.name}</span>
-                <span className="text-auth-fine text-auth-text-muted">{meta(ws.role, ws.memberCount)}</span>
+                <span className="text-auth-fine text-auth-text-muted">{meta(ws.role, ws.memberCount, ws.siteCount)}</span>
               </span>
               {switchingId === ws.id ? (
                 <Loader2 className="h-[18px] w-[18px] shrink-0 animate-spin text-auth-cta" />

@@ -102,7 +102,13 @@ export async function login(email: string, password: string) {
     await prisma.loginAttempt.create({
       data: { email, userId: user.id, ipAddress: "", result: "LOCKED" },
     }).catch(() => {});
-    throw new AuthError("ACCOUNT_LOCKED", "Account locked. Try again later.", 423);
+    // Carry the real expiry so the locked screen can count down instead of
+    // saying "try again later" and leaving the user to guess. This leaks nothing:
+    // you only reach here by already holding a locked account's email, and the
+    // lock is a *response* to attempts on it — it is not an enumeration oracle.
+    throw new AuthError("ACCOUNT_LOCKED", "Account locked. Try again later.", 423, {
+      lockedUntil: user.lockedUntil?.toISOString() ?? null,
+    });
   }
 
   // Always run bcrypt to prevent timing-based email enumeration
@@ -144,9 +150,35 @@ export async function login(email: string, password: string) {
 }
 
 export async function signup(fullName: string, email: string, password: string) {
-  const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
-  if (existing) {
+  const existing = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, emailVerified: true },
+  });
+
+  // A VERIFIED account owns this address — refuse.
+  if (existing?.emailVerified) {
     throw new AuthError("EMAIL_EXISTS", "Email already registered", 409);
+  }
+
+  // An UNVERIFIED row is an unclaimed registration, not an owner. Refusing it
+  // permanently squatted the address: a typo at signup ("jordn@…") left a row
+  // that blocked that address forever — and if the typo happened to be someone
+  // else's real address, that person could never register. It also made
+  // /auth/change-email (which re-runs signup) strand an orphan user + workspace
+  // every time someone corrected a typo.
+  //
+  // Reclaiming it is safe: whoever signs up still has to prove control of the
+  // inbox before the account does anything, and a stale verify link for the
+  // discarded row is invalidated with it.
+  if (existing) {
+    await prisma.$transaction(async (tx) => {
+      // Workspace.ownerId is a plain column, not a cascading FK — delete the
+      // workspaces first or they outlive the user with a dead owner.
+      await tx.workspace.deleteMany({ where: { ownerId: existing.id } });
+      await tx.verificationToken.deleteMany({ where: { identifier: existing.id } });
+      await tx.user.delete({ where: { id: existing.id } });
+    });
+    await logAuditEvent("SIGNUP_RECLAIMED_UNVERIFIED", "success", { email });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);

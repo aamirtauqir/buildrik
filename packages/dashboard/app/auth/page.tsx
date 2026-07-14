@@ -78,7 +78,12 @@ function AuthPageContent() {
       // show the uniform "Incorrect email or password" (no attempts-remaining
       // leak — see the enumeration fix in auth.service.login).
       if (err.message.toLowerCase().includes("locked")) {
-        router.push("/auth/error/locked");
+        // auth.service now attaches the real lockedUntil; errorFormatter forwards
+        // AuthError.data through as `data.cause`. Pass it on so the screen counts
+        // down to the actual unlock instead of showing nothing.
+        const cause = err.data?.cause as { lockedUntil?: string | null } | undefined;
+        const until = cause?.lockedUntil;
+        router.push(until ? `/auth/error/locked?until=${encodeURIComponent(until)}` : "/auth/error/locked");
         return;
       }
       if (err.data?.code === "INTERNAL_SERVER_ERROR") {

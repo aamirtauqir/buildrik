@@ -8,6 +8,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@lib/trpc/client";
+import { rateLimitedHref } from "@lib/rate-limit-redirect";
 import { emailField } from "@buildrik/shared/schemas/auth";
 import { cn } from "@lib/utils";
 import { ArrowLeft } from "lucide-react";
@@ -27,7 +28,7 @@ export default function ForgotPasswordPage() {
       // limiter's raw "Too many requests. Please try again later." was dumped
       // into the form while the designed rate-limit screen sat unreachable.
       if (err.data?.code === "TOO_MANY_REQUESTS") {
-        router.push("/auth/error/rate-limited");
+        router.push(rateLimitedHref(err));
         return;
       }
       setError(err.message);

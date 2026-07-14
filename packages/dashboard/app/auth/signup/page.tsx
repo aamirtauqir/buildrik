@@ -12,6 +12,7 @@ import { SocialButton } from "@/components/auth/social-button";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { signIn } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
+import { emailField } from "@buildrik/shared/schemas/auth";
 import { cn } from "@lib/utils";
 import { ArrowLeft } from "lucide-react";
 import { LegalModal } from "@/components/legal/legal-modal";
@@ -27,6 +28,7 @@ function SignupContent() {
   const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [invalidEmail, setInvalidEmail] = useState(false);
   const [legal, setLegal] = useState<"terms" | "privacy" | null>(null);
 
   function goToEmailExists(taken: string) {
@@ -63,6 +65,16 @@ function SignupContent() {
   function handleEmailContinue(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    // Validate against the SSOT schema and show the styled banner, like
+    // forgot-password and magic-link do. This form previously relied on the
+    // browser's native tooltip, so signup was the odd one out.
+    const parsed = emailField.safeParse(email);
+    if (!parsed.success) {
+      setInvalidEmail(true);
+      setError("Enter a valid email address.");
+      return;
+    }
+    setInvalidEmail(false);
     checkEmailMutation.mutate({ email });
   }
 
@@ -114,14 +126,18 @@ function SignupContent() {
         <AuthDivider text="or" />
         <div className="h-5" />
 
-        <form onSubmit={handleEmailContinue} className="w-full flex flex-col gap-3">
+        <form onSubmit={handleEmailContinue} noValidate className="w-full flex flex-col gap-3">
           <AuthInput
             label="Email"
             hideLabel
             type="email"
             placeholder="you@company.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (invalidEmail) setInvalidEmail(false);
+            }}
+            invalid={invalidEmail}
             autoComplete="email"
             autoFocus
           />

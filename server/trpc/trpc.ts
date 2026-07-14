@@ -59,6 +59,24 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
     // Zod input failures default to a JSON.stringify of the issue array —
     // unreadable when surfaced in a toast. Rewrite to "field: message" lines.
     const zod = error.cause instanceof ZodError ? error.cause : null;
+
+    // Structured error payloads (AuthError.data, the rate limiter's resetAt) are
+    // passed as the TRPCError `cause`. tRPC does NOT keep a plain object there:
+    // its constructor copies the keys onto an internal `UnknownCauseError`. The
+    // old guard here was `cause instanceof Error ? undefined : cause`, which
+    // therefore threw away *exactly* the shape tRPC produces — so no AuthError
+    // data ever reached the client, silently. Lift the cause's own enumerable
+    // fields instead, minus the Error plumbing (never ship `stack`).
+    const cause = error.cause as Record<string, unknown> | undefined;
+    const causeData =
+      cause && !zod
+        ? Object.fromEntries(
+            Object.entries(cause).filter(
+              ([k, v]) => !["message", "stack", "name", "cause"].includes(k) && v !== undefined
+            )
+          )
+        : {};
+
     return {
       ...shape,
       message: zod
@@ -68,7 +86,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
         : shape.message,
       data: {
         ...shape.data,
-        cause: error.cause instanceof Error ? undefined : error.cause,
+        ...(Object.keys(causeData).length > 0 ? { cause: causeData } : {}),
       },
     };
   },
@@ -130,9 +148,14 @@ export function createRateLimitedProcedure(maxAttempts: number, windowMs: number
     const key = `${ip}:${path}`;
     const result = await checkRateLimit(key, maxAttempts, windowMs);
     if (!result.allowed) {
+      // checkRateLimit already computes resetAt; it used to be thrown away, so the
+      // rate-limit screen hardcoded a 60s countdown while the real window is up to
+      // 15 minutes — users retried on the fake timer and got blocked again.
+      // errorFormatter forwards `cause` to the client as `data.cause`.
       throw new TRPCError({
         code: "TOO_MANY_REQUESTS",
         message: "Too many requests. Please try again later.",
+        cause: { resetAt: new Date(result.resetAt).toISOString() },
       });
     }
     return next();

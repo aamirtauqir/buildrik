@@ -8,6 +8,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@lib/trpc/client";
+import { rateLimitedHref } from "@lib/rate-limit-redirect";
 import { emailField } from "@buildrik/shared/schemas/auth";
 import { cn } from "@lib/utils";
 import { ArrowLeft, Zap } from "lucide-react";
@@ -24,7 +25,7 @@ export default function MagicLinkRequestPage() {
       // magicLink is rate-limited (10 / 15min per IP) — send them to the screen
       // built for it instead of leaking the limiter's raw message into the form.
       if (err.data?.code === "TOO_MANY_REQUESTS") {
-        router.push("/auth/error/rate-limited");
+        router.push(rateLimitedHref(err));
         return;
       }
       setError(err.message);

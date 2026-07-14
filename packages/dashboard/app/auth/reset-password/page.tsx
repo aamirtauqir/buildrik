@@ -8,6 +8,7 @@ import { AuthButton } from "@/components/auth/auth-button";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@lib/trpc/client";
+import { rateLimitedHref } from "@lib/rate-limit-redirect";
 import { resetPasswordSchema } from "@buildrik/shared/schemas/auth";
 import { cn } from "@lib/utils";
 
@@ -31,7 +32,7 @@ function ResetPasswordContent() {
       // expired/invalid-link screen rather than failing in place.
       if (err.data?.code === "NOT_FOUND") router.replace("/auth/error/expired-link?type=reset");
       // resetPassword is strict-rate-limited (5 / 15min per IP).
-      else if (err.data?.code === "TOO_MANY_REQUESTS") router.push("/auth/error/rate-limited");
+      else if (err.data?.code === "TOO_MANY_REQUESTS") router.push(rateLimitedHref(err));
       else setError(err.message);
     },
   });
