@@ -445,9 +445,10 @@ export function useComponentsState({
   const isAtComponentLimit = components.length >= MAX_COMPONENTS;
   const isStandaloneMode = onClose !== undefined || onPinToggle !== undefined;
 
-  const handleHelpClickFn = React.useCallback(() => {
-    onHelpClick?.() ?? window.open("https://docs.aquibra.com/components", "_blank");
-  }, [onHelpClick]);
+  // No fallback: PanelHeader hides the help affordance when the handler is
+  // undefined, which is what we want. The old fallback opened docs.aquibra.com —
+  // a domain from a project this was forked from, which does not resolve.
+  const handleHelpClickFn = onHelpClick;
 
   return {
     // Search

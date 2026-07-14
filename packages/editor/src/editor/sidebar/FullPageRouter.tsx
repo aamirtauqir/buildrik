@@ -18,7 +18,7 @@ const LibraryManager = React.lazy(() =>
 
 /** Props shared across all fullpage tabs (no pin concept in fullpage mode) */
 export interface FullPageCommonProps {
-  onHelpClick: () => void;
+  onHelpClick?: () => void;
   onClose: () => void;
   onOpenImageEditor?: (
     imageSrc: string,

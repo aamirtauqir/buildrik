@@ -14,6 +14,7 @@ import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { TabFrame } from "@/shared/extensions/TabFrame";
 import { Stack, useToast } from "@/editor/shared/vibcoder";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 // ============================================
 // Types
@@ -409,12 +410,12 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       </div>
       {/* Privacy & Terms footer */}
       <div style={privacyFooterStyles}>
-        By publishing, your site is hosted on Buildrik servers.{" "}
-        <a href="https://buildrik.com/privacy" target="_blank" rel="noopener noreferrer" style={privacyLinkStyles}>
+        By publishing, your site is deployed to your connected Vercel account.{" "}
+        <a href={`${DASHBOARD_URL}/privacy`} target="_blank" rel="noopener noreferrer" style={privacyLinkStyles}>
           Privacy policy
         </a>
         {" · "}
-        <a href="https://buildrik.com/terms" target="_blank" rel="noopener noreferrer" style={privacyLinkStyles}>
+        <a href={`${DASHBOARD_URL}/terms`} target="_blank" rel="noopener noreferrer" style={privacyLinkStyles}>
           Terms of service
         </a>
       </div>

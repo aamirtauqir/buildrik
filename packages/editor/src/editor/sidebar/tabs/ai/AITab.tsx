@@ -21,7 +21,7 @@ export interface AITabProps {
   composer: Composer | null;
   isPinned: boolean;
   onPinToggle: () => void;
-  onHelpClick: () => void;
+  onHelpClick?: () => void;
   onClose: () => void;
 }
 

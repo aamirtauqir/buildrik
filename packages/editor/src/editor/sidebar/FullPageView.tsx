@@ -48,7 +48,6 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   const [errorKey, setErrorKey] = React.useState(0);
 
   const commonTabProps = {
-    onHelpClick: () => window.open("https://docs.aquibra.com", "_blank"),
     onClose,
     onOpenImageEditor,
     onOpenIconPicker,

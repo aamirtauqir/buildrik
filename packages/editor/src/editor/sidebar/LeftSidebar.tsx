@@ -466,7 +466,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const commonTabProps = {
     isPinned,
     onPinToggle: onPinToggle ?? (() => {}),
-    onHelpClick: () => window.open("https://docs.buildrik.com", "_blank"),
     onClose: onDrawerToggle,
   };
 

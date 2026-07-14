@@ -9,6 +9,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@lib/trpc/client";
 import { safeReturnUrl } from "@lib/safe-return-url";
+import { SUPPORT_EMAIL } from "@lib/constants/contact";
 import { ArrowLeft, KeyRound } from "lucide-react";
 
 function BackupCodeContent() {
@@ -106,7 +107,7 @@ function BackupCodeContent() {
 
       <p className="text-center text-auth-input text-auth-text-muted">
         Lost your codes?{" "}
-        <Link href="mailto:support@buildrik.com" className="font-semibold text-auth-text-body hover:underline">
+        <Link href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold text-auth-text-body hover:underline">
           Contact support
         </Link>
       </p>

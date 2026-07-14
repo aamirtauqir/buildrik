@@ -2,6 +2,7 @@ import { type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@lib/prisma";
 import { slugifyProjectName, type VercelFile } from "@lib/vercel";
+import { MARKETING_URL } from "@lib/constants/contact";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { runVercelDeploy } from "@server/services/publish.service";
@@ -294,7 +295,7 @@ function injectSeoTags(
 function injectBadge(html: string, show: boolean): string {
   if (!show) return html;
   const badge =
-    `<a href="https://buildrik.com?ref=badge" target="_blank" rel="noopener" ` +
+    `<a href="${MARKETING_URL}?ref=badge" target="_blank" rel="noopener" ` +
     `style="position:fixed;bottom:12px;right:12px;z-index:2147483647;` +
     `display:inline-flex;align-items:center;gap:6px;padding:6px 10px;` +
     `background:#111;color:#fff;font:500 12px/1 sans-serif;` +

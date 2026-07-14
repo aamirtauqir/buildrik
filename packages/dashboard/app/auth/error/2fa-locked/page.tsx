@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Shield } from "lucide-react";
 import { AuthMessage } from "@/components/auth/auth-message";
 import { AuthButton } from "@/components/auth/auth-button";
+import { SUPPORT_EMAIL } from "@lib/constants/contact";
 
 /**
  * The `2fa-too-many` mockup frame. Two things in it are deliberately dropped:
@@ -24,7 +25,7 @@ export default function TwoFALockedPage() {
         <AuthButton type="button">Back to log in</AuthButton>
       </Link>
       <Link
-        href="mailto:support@buildrik.com"
+        href={`mailto:${SUPPORT_EMAIL}`}
         className="text-center text-auth-input text-auth-text-muted hover:text-auth-text-body"
       >
         Lost your codes? <span className="font-semibold text-auth-text-body">Contact support</span>

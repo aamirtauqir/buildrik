@@ -13,6 +13,7 @@ import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import { signIn } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
 import { safeReturnUrl } from "@lib/safe-return-url";
+import { SUPPORT_EMAIL } from "@lib/constants/contact";
 import { cn } from "@lib/utils";
 
 function AuthPageContent() {
@@ -227,7 +228,7 @@ function AuthPageContent() {
           {serverError ? (
             <p className="text-auth-label text-auth-text-muted text-center">
               Still stuck?{" "}
-              <a href="mailto:support@buildrik.com" className="font-semibold text-auth-text-body hover:underline">
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold text-auth-text-body hover:underline">
                 Contact support
               </a>
             </p>

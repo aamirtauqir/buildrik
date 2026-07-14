@@ -55,7 +55,7 @@ export interface TabRouterProps {
   commonTabProps: {
     isPinned: boolean;
     onPinToggle: () => void;
-    onHelpClick: () => void;
+    onHelpClick?: () => void;
     onClose: () => void;
   };
   onBlockClick?: (data: BlockData) => void;
