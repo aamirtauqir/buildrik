@@ -112,7 +112,7 @@ export default function PublishPage() {
     <div className="flex min-h-[400px] items-center justify-center">
       <PublishSuccess
         siteId={siteId}
-        slug={slug}
+        publishedUrl={site.data?.publishedUrl ?? null}
         customDomain={customDomain}
         plan={plan}
       />

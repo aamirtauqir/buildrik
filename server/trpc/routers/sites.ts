@@ -287,6 +287,14 @@ export const sitesRouter = router({
             code: "CONFLICT",
             message: "A publish job is already in progress.",
           });
+        // Sites deploy into the workspace's own Vercel account. The pre-publish
+        // check already disables the button, but the editor and the API can still
+        // reach here — they get a reason, not a 500.
+        if (e instanceof Error && e.message === "VERCEL_NOT_CONNECTED")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "Connect this workspace to Vercel before publishing.",
+          });
         throw e;
       }
     }),

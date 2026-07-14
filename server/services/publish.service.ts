@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { PrePublishChecksResult, PublishPage } from "@buildrik/shared/schemas/publish";
+import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } from "@buildrik/shared/schemas/publish";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
@@ -18,7 +18,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
     prisma.page.count({ where: { siteId } }),
     prisma.site.findUnique({
       where: { id: siteId },
-      select: { metaTitleTemplate: true, touchIcon: true, deletedAt: true },
+      select: { metaTitleTemplate: true, touchIcon: true, deletedAt: true, workspaceId: true },
     }),
     prisma.domain.findFirst({
       where: { siteId, status: "VERIFIED" },
@@ -30,6 +30,22 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   ]);
 
   const checks: PrePublishChecksResult["checks"] = [];
+
+  // Vercel connected. This is the only check that can be a hard fail besides
+  // "Pages ready": sites deploy into the workspace's OWN Vercel account, so
+  // without a connection runVercelDeploy throws VERCEL_NOT_CONNECTED and the
+  // publish dies at the last step — after the job has queued and shown a
+  // progress bar. Failing here keeps it from ever starting.
+  const vercel = site ? await getActiveVercelConnection(site.workspaceId) : null;
+  if (vercel) {
+    checks.push({ label: VERCEL_CHECK_LABEL, status: "pass", detail: "This workspace is connected to Vercel." });
+  } else {
+    checks.push({
+      label: VERCEL_CHECK_LABEL,
+      status: "fail",
+      detail: "Sites deploy to your own Vercel account. Connect it to publish.",
+    });
+  }
 
   // Pages ready
   if (pageCount === 0) {
@@ -49,7 +65,7 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   if (domain) {
     checks.push({ label: "Domain connected", status: "pass", detail: `Connected to ${domain.domain}.` });
   } else {
-    checks.push({ label: "Domain connected", status: "warning", detail: "No verified domain. Your site will use a buildrik.com subdomain." });
+    checks.push({ label: "Domain connected", status: "warning", detail: "No custom domain. Your site will be live on its Vercel URL." });
   }
 
   // Empty pages
@@ -158,9 +174,20 @@ export async function startPublish(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { name: true, deletedAt: true, publishedUrl: true },
+    select: { name: true, deletedAt: true, publishedUrl: true, workspaceId: true },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  // Refuse to queue a publish that cannot succeed. Sites deploy into the
+  // workspace's own Vercel account, so with no connection the worker reaches
+  // runVercelDeploy and throws — but only after the job has queued, shown a
+  // progress bar, and marked the site PUBLISHING. Checking here means the user
+  // sees "connect Vercel" instead of a build that pretends to run and then dies.
+  // Dev keeps its no-credentials loop: runSimulation covers it there.
+  if (process.env.NODE_ENV !== "development") {
+    const vercel = await getActiveVercelConnection(site.workspaceId);
+    if (!vercel) throw new Error("VERCEL_NOT_CONNECTED");
+  }
 
   // Persist HTML payload (if provided) on the job so the worker can deploy
   // without re-fetching from the editor. `log` is an existing Json column.

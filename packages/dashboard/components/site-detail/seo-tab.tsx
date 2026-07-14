@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { siteHost } from "@buildrik/shared/constants/domains";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 import { SectionCard } from "@/components/dashboard/primitives";
@@ -29,9 +28,13 @@ interface SeoTabProps {
   };
 }
 
+// This tab reads siteDetail.settings, which carries no domain and no
+// publishedUrl — so the site's real address isn't knowable here. The search and
+// social cards show a neutral stand-in rather than a host we can't promise.
+const SERP_PLACEHOLDER_HOST = "yoursite.com";
+
 export function SeoTab({ site }: SeoTabProps) {
   const unified = useUnifiedEditorFlag();
-  const siteSlug = site.slug ?? "example";
   const metaTitle = site.metaTitle ?? "";
   const metaDesc = site.metaDescription ?? "";
   const ogImage = site.ogImage ?? null;
@@ -59,7 +62,7 @@ export function SeoTab({ site }: SeoTabProps) {
       <SectionCard title="Google Search Preview">
         <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           <p className="text-sm" style={{ color: "#1a0dab" }}>{metaTitle || "Page Title"}</p>
-          <p className="text-xs" style={{ color: "#006621" }}>{siteHost(siteSlug)}</p>
+          <p className="text-xs" style={{ color: "#006621" }}>{SERP_PLACEHOLDER_HOST}</p>
           <p className="text-xs" style={{ color: "#545454" }}>{metaDesc || "No description set"}</p>
         </div>
       </SectionCard>
@@ -75,8 +78,8 @@ export function SeoTab({ site }: SeoTabProps) {
       {ogImage && (
         <SectionCard title="Social Share Image (og:image)">
           <div className="space-y-3">
-            <SocialCardPreview title={metaTitle} description={metaDesc} slug={siteSlug} imageUrl={ogImage} variant="twitter" />
-            <SocialCardPreview title={metaTitle} description={metaDesc} slug={siteSlug} imageUrl={ogImage} variant="facebook" />
+            <SocialCardPreview title={metaTitle} description={metaDesc} imageUrl={ogImage} variant="twitter" />
+            <SocialCardPreview title={metaTitle} description={metaDesc} imageUrl={ogImage} variant="facebook" />
           </div>
         </SectionCard>
       )}
@@ -192,13 +195,11 @@ function Row({ label, value, empty }: { label: string; value: string; empty: str
 function SocialCardPreview({
   title,
   description,
-  slug,
   imageUrl,
   variant,
 }: {
   title: string;
   description: string;
-  slug: string;
   imageUrl: string;
   variant: "twitter" | "facebook";
 }) {
@@ -216,7 +217,7 @@ function SocialCardPreview({
           style={{ backgroundImage: `url(${imageUrl})`, height: variant === "twitter" ? 252 : 274 }}
         />
         <div className="p-3" style={{ backgroundColor: variant === "twitter" ? "#fff" : "#F0F2F5" }}>
-          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{siteHost(slug)}</p>
+          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{SERP_PLACEHOLDER_HOST}</p>
           <p className="truncate text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             {title || "Page Title"}
           </p>

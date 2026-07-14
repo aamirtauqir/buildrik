@@ -36,6 +36,31 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Draft share links are served by the dashboard itself, at `/share/<token>`.
+ * They used to be built against `preview.buildrick.app`, a host that has no DNS
+ * record and no handler — so every link handed to a client was dead. Baked at
+ * build time, so this is safe in both the server and client halves of a page.
+ */
+export function shareUrl(token: string): string {
+  return `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/share/${token}`;
+}
+
+/**
+ * The address to show for a site: its verified custom domain, else the host of
+ * the URL it actually deployed to. Null when the site has never been published —
+ * in which case there is no address, and the UI must not invent one.
+ */
+export function siteAddress(site: { domain?: string | null; publishedUrl?: string | null }): string | null {
+  if (site.domain) return site.domain;
+  if (!site.publishedUrl) return null;
+  try {
+    return new URL(site.publishedUrl).host;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Render one CSV cell: RFC-4180 quoting plus spreadsheet formula
  * neutralization. User-supplied values starting with = + - @ or a tab/CR
  * execute as formulas when the export opens in Excel/Sheets (`=cmd|...`

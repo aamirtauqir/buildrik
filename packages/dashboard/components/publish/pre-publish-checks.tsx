@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, AlertTriangle, XCircle, X } from "lucide-react";
-import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
+import Link from "next/link";
+import { CheckCircle2, AlertTriangle, XCircle, X, ArrowUpRight } from "lucide-react";
+import { VERCEL_CHECK_LABEL, type PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 
 const STATUS_ICON = {
   pass: <CheckCircle2 className="h-5 w-5" style={{ color: "var(--color-success)" }} />,
@@ -36,6 +37,16 @@ export function PrePublishChecks({ checks, onPublish, onCancel }: PrePublishChec
               <div>
                 <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{check.label}</p>
                 <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{check.detail}</p>
+                {check.label === VERCEL_CHECK_LABEL && check.status === "fail" && (
+                  <Link
+                    href="/dashboard/settings/integrations"
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold hover:underline"
+                    style={{ color: "var(--color-primary)" }}
+                  >
+                    Connect Vercel
+                    <ArrowUpRight className="h-3 w-3" />
+                  </Link>
+                )}
               </div>
             </div>
           ))}

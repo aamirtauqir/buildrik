@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal } from "lucide-react";
-import { siteHost } from "@buildrik/shared/constants/domains";
+import { siteAddress } from "@lib/utils";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone } from "@/components/sites/site-status";
 import { Pill, MetricValue } from "@/components/dashboard/primitives";
@@ -10,7 +10,7 @@ import { SendReviewModal } from "@/components/reviews/send-review-modal";
 import { ShareDraftModal } from "@/components/site-detail/share-draft-modal";
 
 interface SiteHeaderProps {
-  site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null };
+  site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null; domain?: string | null };
   onPublish?: () => void;
   onUnpublish?: () => void;
 }
@@ -42,7 +42,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
     };
   }, []);
 
-  const subdomain = siteHost(site.slug);
+  const address = siteAddress(site);
 
   return (
     <div>
@@ -59,13 +59,15 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
               <h1 className="text-[22px] font-bold leading-tight" style={{ color: "var(--color-text-primary)" }}>{site.name}</h1>
               <Pill tone={siteStatusTone(site.status)}>{toTitleCase(site.status)}</Pill>
             </div>
-            {site.publishedUrl ? (
+            {address === null ? (
+              <span className="mt-0.5 inline-block text-body-sm" style={{ color: "var(--color-text-muted)" }}>Not published</span>
+            ) : site.publishedUrl ? (
               <a href={site.publishedUrl} target="_blank" rel="noopener noreferrer" className="mt-0.5 inline-block hover:underline" style={{ color: "var(--color-text-muted)" }}>
-                <MetricValue className="text-body-sm">{subdomain}</MetricValue>
+                <MetricValue className="text-body-sm">{address}</MetricValue>
               </a>
             ) : (
               <span className="mt-0.5 inline-block" style={{ color: "var(--color-text-muted)" }}>
-                <MetricValue className="text-body-sm">{subdomain}</MetricValue>
+                <MetricValue className="text-body-sm">{address}</MetricValue>
               </span>
             )}
           </div>

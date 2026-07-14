@@ -1,7 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { siteHost } from "@buildrik/shared/constants/domains";
 import { SectionCard } from "@/components/dashboard/primitives";
 
 const SOCIAL_PLATFORMS = ["twitter", "instagram", "linkedin", "youtube", "github"] as const;
@@ -159,7 +158,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               style={{ borderColor: "var(--color-border-default)" }}
             />
           </Field>
-          <Field label="Slug" hint={siteHost(slug)}>
+          <Field label="Slug" hint="Used in your site's URL.">
             <input
               type="text"
               value={slug}

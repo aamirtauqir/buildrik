@@ -64,6 +64,13 @@ export const publishResultSchema = z.object({
   lighthouseScore: z.number().nullable(),
 });
 
+/**
+ * The one check whose failure has a fix the user can act on in one click, so the
+ * UI hangs a "Connect Vercel" link off it. Shared so the label can't drift apart
+ * from the string the check is pushed with.
+ */
+export const VERCEL_CHECK_LABEL = "Vercel connected";
+
 export const prePublishChecksResultSchema = z.object({
   ready: z.boolean(),
   checks: z.array(z.object({

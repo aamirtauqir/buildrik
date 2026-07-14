@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { X, Plus, LayoutTemplate, Sparkles, Check, Lock, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@lib/trpc/client";
-import { siteHost } from "@buildrik/shared/constants/domains";
 
 interface CreateSiteModalProps {
   open: boolean;
@@ -40,8 +39,6 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
 
   if (!open) return null;
 
-  const slug = slugify(name);
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
       <div className="w-[480px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
@@ -53,7 +50,6 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
           <label className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Site Name</label>
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }} />
           <div className="mt-1 flex items-center gap-2">
-            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{siteHost(slug)}</p>
             {debouncedSlug.length >= 3 && slugCheck.data && (
               slugCheck.data.available ? (
                 <span className="flex items-center gap-1 text-xs text-green-600">

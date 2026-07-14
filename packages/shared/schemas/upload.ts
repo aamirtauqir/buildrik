@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { CDN_HOST } from "../constants/domains";
 
 export const presignSchema = z.object({
   fileName: z.string().min(1),
@@ -20,15 +19,6 @@ export const UPLOAD_LIMITS: Record<string, { formats: string[]; maxSizeMB: numbe
   workspace_icon: { formats: ["image/jpeg", "image/png"], maxSizeMB: 1, dimensions: "64x64" },
   site_media: { formats: ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml", "video/mp4", "video/webm"], maxSizeMB: 50 },
   ticket: { formats: ["image/png", "image/jpeg", "application/pdf"], maxSizeMB: 10 },
-};
-
-export const CDN_PATHS: Record<string, string> = {
-  avatar: `${CDN_HOST}/avatars/{userId}/{hash}`,
-  favicon: `${CDN_HOST}/sites/{siteId}/favicon`,
-  touch_icon: `${CDN_HOST}/sites/{siteId}/touch-icon`,
-  og_image: `${CDN_HOST}/sites/{siteId}/og-image`,
-  workspace_icon: `${CDN_HOST}/workspaces/{wsId}/icon`,
-  site_media: `${CDN_HOST}/media/{wsId}/{hash}`,
 };
 
 export type PresignInput = z.infer<typeof presignSchema>;

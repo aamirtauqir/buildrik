@@ -3,7 +3,6 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@lib/prisma";
 import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
-import { siteUrl } from "@buildrik/shared/constants/domains";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { runVercelDeploy } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
@@ -409,9 +408,14 @@ async function runSimulation(jobId: string, siteId: string): Promise<string> {
     where: { id: jobId },
     data: { deploymentId: `sim_${jobId.slice(0, 8)}` },
   });
+  // `.invalid` is reserved by RFC 2606 and can never resolve. The simulation
+  // used to return a real-looking `<slug>.buildrick.app` URL, which is how a
+  // dead domain survived so long: dev publishes appeared to succeed and handed
+  // back an address nobody ever clicked. A URL that visibly cannot work keeps
+  // the fake path honest.
   return domain?.domain
     ? `https://${domain.domain}`
-    : siteUrl(site?.slug ?? siteId);
+    : `https://${site?.slug ?? siteId}.dev-simulated.invalid`;
 }
 
 function delay(ms: number) {

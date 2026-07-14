@@ -3,20 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Copy, ExternalLink, Share2, BarChart3, Pencil, LayoutDashboard, Globe, ArrowUpRight } from "lucide-react";
-import { SITE_DOMAIN, siteHost, siteUrl } from "@buildrik/shared/constants/domains";
+import { siteAddress } from "@lib/utils";
 
 interface PublishSuccessProps {
   siteId: string;
-  slug: string;
+  /** Where the site actually deployed. Sites go to the workspace's own Vercel account. */
+  publishedUrl: string | null;
   customDomain?: string | null;
   plan?: string;
 }
 
-export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: PublishSuccessProps) {
+export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FREE" }: PublishSuccessProps) {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
-  const buildrikUrl = siteUrl(slug);
   const domainUrl = customDomain ? `https://${customDomain}` : null;
+  const liveHost = siteAddress({ domain: customDomain, publishedUrl });
 
   function handleCopy(url: string) {
     navigator.clipboard.writeText(url);
@@ -30,13 +31,15 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
       <h2 className="mt-4 text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>Site Published!</h2>
       <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>Your site is now live and accessible to the world.</p>
 
-      {/* Buildrick URL */}
-      <UrlRow
-        label="Live URL"
-        url={buildrikUrl}
-        isCopied={copiedUrl === buildrikUrl}
-        onCopy={() => handleCopy(buildrikUrl)}
-      />
+      {/* The deployment's own URL, in the workspace's Vercel account */}
+      {publishedUrl && (
+        <UrlRow
+          label="Live URL"
+          url={publishedUrl}
+          isCopied={copiedUrl === publishedUrl}
+          onCopy={() => handleCopy(publishedUrl)}
+        />
+      )}
 
       {/* Custom domain URL */}
       {domainUrl && (
@@ -52,10 +55,10 @@ export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: Pu
       {plan === "FREE" && !customDomain && (
         <div className="mt-4 rounded-xl border p-4 text-left" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}>
           <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-            Your site is live on <span style={{ color: "var(--color-primary)" }}>{siteHost(slug)}</span>
+            Your site is live on <span style={{ color: "var(--color-primary)" }}>{liveHost ?? "its Vercel URL"}</span>
           </p>
           <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-            Upgrade to PRO to connect your own domain — your client will never see {SITE_DOMAIN}.
+            Connect your own domain on PRO — Buildrick sets it up on Vercel and verifies the DNS for you.
           </p>
           <Link
             href="/dashboard/billing"

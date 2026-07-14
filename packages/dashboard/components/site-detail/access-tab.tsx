@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Copy, Eye, Trash2, Plus, Lock, Calendar, QrCode } from "lucide-react";
-import { PREVIEW_HOST } from "@buildrik/shared/constants/domains";
+import { shareUrl } from "@lib/utils";
 import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 interface ShareLinkEntry { id: string; name: string; token: string; viewCount: number; isActive: boolean; expiresAt: Date | null; passwordHash: string | null; createdAt: Date; }
@@ -163,7 +163,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
         ) : (
           <div className="space-y-2">
             {shareLinks.map((link) => {
-              const shareUrl = `${PREVIEW_HOST}/share/${link.token}`;
+              const url = shareUrl(link.token);
               return (
                 <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
                   <div className="flex items-center justify-between">
@@ -178,14 +178,14 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                     </div>
                     <div className="flex items-center gap-1">
                       <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="QR Code"><QrCode className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
-                      <button onClick={() => navigator.clipboard.writeText(shareUrl)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                      <button onClick={() => navigator.clipboard.writeText(url)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
                       <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Revoke"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
                     </div>
                   </div>
                   {showQr === link.id && (
                     <div className="mt-3 flex flex-col items-center gap-2 rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
-                      <QrCodeCanvas url={`https://${shareUrl}`} />
-                      <p className="text-xs font-mono" style={{ color: "var(--color-text-secondary)" }}>{shareUrl}</p>
+                      <QrCodeCanvas url={url} />
+                      <p className="text-xs font-mono" style={{ color: "var(--color-text-secondary)" }}>{url}</p>
                     </div>
                   )}
                 </div>

@@ -14,7 +14,6 @@ import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { TabFrame } from "@/shared/extensions/TabFrame";
 import { Stack, useToast } from "@/editor/shared/vibcoder";
-import { SITE_DOMAIN } from "@buildrik/shared/constants/domains";
 
 // ============================================
 // Types
@@ -329,7 +328,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </Stack>
           {projectId && (
             <p style={{ ...metaTextStyles, marginTop: 4 }}>
-              Publishing to <strong style={{ color: "var(--bd-fg-primary)" }}>{SITE_DOMAIN}/{projectId}</strong>
+              Publishing to <strong style={{ color: "var(--bd-fg-primary)" }}>your connected Vercel project</strong>
             </p>
           )}
         </section>

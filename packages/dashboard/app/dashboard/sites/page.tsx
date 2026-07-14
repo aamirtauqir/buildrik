@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { siteHost } from "@buildrik/shared/constants/domains";
 import { ViewToggle } from "@/components/sites/view-toggle";
 import { SiteFilters } from "@/components/sites/site-filters";
 import { FolderTabs } from "@/components/sites/folder-tabs";
@@ -273,8 +272,15 @@ export default function SitesPage() {
           break;
         case "copyUrl":
           if (site) {
-            navigator.clipboard.writeText(siteHost(site.slug));
-            addToast("success", "URL copied to clipboard");
+            // Was copying `<slug>.buildrick.app`, a host with no DNS record — so
+            // every "copied" link was dead the moment it was pasted.
+            const url = site.domain ? `https://${site.domain}` : site.publishedUrl;
+            if (url) {
+              navigator.clipboard.writeText(url);
+              addToast("success", "URL copied to clipboard");
+            } else {
+              addToast("error", "This site isn't published yet");
+            }
           }
           break;
         case "viewPublished":
