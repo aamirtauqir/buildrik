@@ -38,13 +38,14 @@
   --radius-auth-input: 12px;
   --radius-auth-btn: 12px;
 
-  /* Auth layout — full-bleed white surface (user 2026-07-15): the card spans the
-     viewport (max-width 100vw, card width is calc(100vw-32px)), split 50/50 with
-     the art rail; form pane holds a 380 column. Was a 1000×620 floating card on
-     an #ECECEE tint (DESIGN.md §Auth Surface, superseded). */
+  /* Auth layout — full-bleed white surface (user 2026-07-15): the art card fills
+     the whole viewport (width 100vw, height 100dvh), split 50/50 with the art rail
+     on the left; form pane holds a 380 column. Was a 1000×620 floating card on an
+     #ECECEE tint (DESIGN.md §Auth Surface, superseded). The compact `noArt` spinner
+     screens stay a small centered card, not full-bleed. */
   --container-auth-card: 380px;
   --container-auth-shell: 100vw;
-  --spacing-auth-shell-min: 620px;
+  --spacing-auth-shell-min: 100dvh;
 
   /* Auth spacing/height — compact controls (user 2026-07-15; was input 52 / btn 50) */
   --spacing-auth-input: 40px;

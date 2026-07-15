@@ -15,23 +15,23 @@ const formColumn = (children: React.ReactNode) => (
 );
 
 /**
- * Craftwork auth shell — a floating white card on the page tint, art rail left,
- * form right (DESIGN.md §Auth Surface). Every mockup frame is this 1000×620
- * card. It is NOT full-bleed: the card was flattened to `fixed inset-0` in the
- * dashboard reskin, which dropped the radius, the shadow and the page tint on
- * every art screen at once.
+ * Craftwork auth shell (user 2026-07-15): the art screens are full-bleed — the
+ * card fills the whole viewport (`w-full` capped at 100vw, `min-h-auth-shell-min`
+ * = 100dvh), split 50/50 with the art rail left and the form right. No radius or
+ * shadow on this path — it is the surface, not a floating island.
  *
  * `noArt` is for the transient spinner screens (splash/callback/redirect/
- * success) that have no mockup frame — same card, no art column, and sized to
- * its content rather than stretched to 1000×620 around a lone spinner.
+ * success): a small centered white card that keeps the radius + shadow, sized to
+ * its content rather than stretched full-bleed around a lone spinner.
  */
 export function AuthCard({ children, className, noArt }: AuthCardProps) {
   return (
     <div
       className={cn(
-        "w-[calc(100vw-32px)] overflow-hidden rounded-auth-card bg-white shadow-auth-card",
-        "flex",
-        noArt ? "max-w-[460px]" : "max-w-auth-shell md:min-h-auth-shell-min",
+        "overflow-hidden bg-white flex",
+        noArt
+          ? "my-8 w-[calc(100vw-32px)] max-w-[460px] rounded-auth-card shadow-auth-card"
+          : "w-full max-w-auth-shell min-h-auth-shell-min",
         className
       )}
     >
