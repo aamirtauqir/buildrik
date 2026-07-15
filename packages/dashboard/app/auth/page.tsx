@@ -224,7 +224,7 @@ function AuthPageContent() {
 
       {!pending && (
         <>
-          <div className="h-3.5" />
+          <div className="h-2" />
           {serverError ? (
             <p className="text-auth-label text-auth-text-muted text-center">
               Still stuck?{" "}
