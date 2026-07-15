@@ -106,10 +106,10 @@ function SignupContent() {
     return (
       <AuthCard>
         <div className="w-full flex flex-col gap-2.5 mb-7">
-          <h1 className="text-[44px] font-bold leading-[1.08] tracking-[-0.03em] text-auth-text-primary">
+          <h1 className="text-[21px] font-bold leading-[1.08] tracking-[-0.03em] text-auth-text-primary">
             Create your account
           </h1>
-          <p className="text-[17px] leading-[1.45] text-auth-text-muted">
+          <p className="text-[13px] leading-[1.45] text-auth-text-muted">
             Start building client sites in minutes.
           </p>
         </div>
