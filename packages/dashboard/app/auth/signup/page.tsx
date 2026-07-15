@@ -105,7 +105,7 @@ function SignupContent() {
   if (phase === "capture") {
     return (
       <AuthCard>
-        <div className="w-full flex flex-col gap-2.5 mb-7">
+        <div className="w-full flex flex-col gap-1 mb-7 text-center">
           <h1 className="text-[21px] font-bold leading-[1.08] tracking-[-0.03em] text-auth-text-primary">
             Create your account
           </h1>
