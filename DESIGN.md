@@ -44,8 +44,10 @@ The **`app/auth/**` screens** (login, signup, 2FA, OTP, magic-link, forgot/reset
 
 - **Accent = cobalt `#2D6DFF`** (`--color-auth-cta`, hover `#1E58D9`). Same accent as the rest of the dashboard now; the craftwork treatment below is what's auth-specific.
 - **Art rail** — a two-column floating white card (`AuthCard`) with a cobalt illustration (`AuthArt`) left, form right. The "no gradients / no decorative illustration" aesthetic rule does **not** apply to the auth art rail; it still applies to the rest of the dashboard.
-- **Gray-fill icon inputs** — `--color-auth-input-fill`, left icon, cobalt focus. Floating card on `--color-auth-page` (`#ECECEE`).
+- **Gray-fill icon inputs** — `--color-auth-input-fill`, left icon, cobalt focus.
 - Source of truth: `app/globals.css` `--color-auth-*` tokens + `components/auth/*`.
+
+**Full-bleed white + compact controls (user 2026-07-15).** Supersedes the 1000×620-floating-card + `#ECECEE`-tint decision below. The card now spans the viewport: `--container-auth-shell: 100vw` (card width stays `calc(100vw-32px)`), and the page is white — `--color-auth-page: #FFFFFF`. Controls shrank to **input 40px, button 42px** (`--spacing-auth-input` / `--spacing-auth-btn`). Radius (24) + soft shadow are kept, so it reads as a full-width white panel with the art rail on its left half, not a floating island on a tint. All changes are the `globals.css` tokens — one edit, all 12 auth screens (SSOT).
 
 **Frame parity (2026-07-13).** Rebuilt against the M1 craftwork gallery (52 frames). The card is **1000×620, radius 24, art rail left** — it is *not* full-bleed; it was briefly flattened to `fixed inset-0` and that dropped the card on every art screen. Inputs 52px, buttons 50px, titles 18.5px. Craftwork ink is **near-black** (`#0A0A0B` titles, `#111113` body/links), muted `#6B6B70` — not slate. Error red is `#E5484D` (border) / `#C0343A` (text). `FormBanner` is a **borderless tinted chip** (9% fill), not a bordered alert box.
 
