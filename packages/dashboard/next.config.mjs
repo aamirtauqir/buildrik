@@ -15,7 +15,12 @@ const nextConfig = {
   outputFileTracingRoot: process.cwd().includes("packages/dashboard")
     ? process.cwd().replace(/\/packages\/dashboard$/, "")
     : process.cwd(),
-  serverExternalPackages: ["@prisma/client", "bcryptjs", "isomorphic-dompurify"],
+  // "openai" is externalized (not bundled) so the standalone tracer copies it
+  // into .next/standalone/node_modules. Both openai.client.ts and
+  // ollama.client.ts import it (Ollama speaks the OpenAI-compatible API); nft
+  // did NOT trace it through the bundled path, so the standalone shipped
+  // without it and every AI call died on "Cannot find module 'openai'".
+  serverExternalPackages: ["@prisma/client", "bcryptjs", "isomorphic-dompurify", "openai"],
   transpilePackages: ["@buildrik/editor"],
   compiler: { emotion: true },
   // Legacy ?siteId= bookmark forwarding on dashboard origin only.
