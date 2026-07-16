@@ -4,6 +4,7 @@ import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } fro
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
+import { isPublishBlockedByApproval } from "@server/services/publish-approval";
 import {
   createVercelDeployment,
   waitForDeploymentReady,
@@ -177,6 +178,38 @@ export async function startPublish(
     select: { name: true, deletedAt: true, publishedUrl: true, workspaceId: true },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
+
+  // m-approval gate: in a workspace that requires approval, a non-Owner/non-Admin
+  // member cannot publish directly — the site's latest review must be APPROVED.
+  // Previously `editsRequireApproval` was read only in settings and never enforced.
+  {
+    const [workspace, member] = await Promise.all([
+      prisma.workspace.findUnique({
+        where: { id: workspaceId },
+        select: { editsRequireApproval: true },
+      }),
+      prisma.workspaceMember.findUnique({
+        where: { userId_workspaceId: { userId, workspaceId } },
+        select: { role: true },
+      }),
+    ]);
+    if (workspace?.editsRequireApproval) {
+      const latestReview = await prisma.reviewRequest.findFirst({
+        where: { siteId },
+        orderBy: { createdAt: "desc" },
+        select: { status: true },
+      });
+      if (
+        isPublishBlockedByApproval({
+          editsRequireApproval: true,
+          role: member?.role ?? "EDITOR",
+          latestReviewStatus: latestReview?.status ?? null,
+        })
+      ) {
+        throw new Error("APPROVAL_REQUIRED");
+      }
+    }
+  }
 
   // Refuse to queue a publish that cannot succeed. Sites deploy into the
   // workspace's own Vercel account, so with no connection the worker reaches

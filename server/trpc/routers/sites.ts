@@ -295,6 +295,14 @@ export const sitesRouter = router({
             code: "PRECONDITION_FAILED",
             message: "Connect this workspace to Vercel before publishing.",
           });
+        // m-approval gate (publish.service startPublish): a member in an
+        // approval-required workspace without an APPROVED review gets a clear
+        // reason, not a 500.
+        if (e instanceof Error && e.message === "APPROVAL_REQUIRED")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "This site needs an approved review before it can be published.",
+          });
         throw e;
       }
     }),
