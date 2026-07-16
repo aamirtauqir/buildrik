@@ -385,7 +385,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             }
           }}
           onOpenProjectSettings={modals.openProjectSettings}
-          onOpenDesignSystem={() => state.openLeftPanelToTab("styling")}
+          onOpenDesignSystem={() => state.openLeftPanelToTab("design")}
           onOpenPublish={() => state.openLeftPanelToTab("publish")}
           onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
@@ -412,6 +412,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           state.setDevice(d);
           if (composer) composer.setDevice(d);
         }}
+        canUndo={state.canUndo}
+        canRedo={state.canRedo}
         zoom={state.zoom}
         onZoomChange={state.setZoom}
         isLeftPanelOpen={state.isLeftPanelOpen}

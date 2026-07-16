@@ -86,5 +86,116 @@ describe("versionSync", () => {
     window.history.replaceState({}, "", "/dashboard");
     await mirrorVersionCreate(ver("v1"), false);
     expect(create).not.toHaveBeenCalled();
+    await mirrorVersionDelete("v9");
+    expect(del).not.toHaveBeenCalled();
+  });
+
+  it("resolves the siteId from the legacy ?siteId= URL", async () => {
+    window.history.replaceState({}, "", "/?siteId=legacy-7");
+    await mirrorVersionCreate(ver("v1"), false);
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ siteId: "legacy-7" }));
+  });
+});
+
+// AUDIT P1-1 (2026-07-16): versionSync has NO retry queue — unlike cmsSync,
+// a failed mirror is warned + notified once and then dropped permanently.
+// These tests pin the CURRENT behavior; the todo below tracks the gap.
+describe("versionSync failure semantics (audit P1-1 — no retry queue)", () => {
+  it("a failed create warns once and does NOT retry", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    create.mockRejectedValueOnce(new Error("network down"));
+    await mirrorVersionCreate(ver("v1"), false);
+    expect(create).toHaveBeenCalledTimes(1); // no re-attempt — op is dropped
+    expect(warn).toHaveBeenCalledWith(
+      "[version-sync] create mirror failed (kept locally)",
+      expect.any(Error)
+    );
+    warn.mockRestore();
+  });
+
+  it("a failed delete warns + never throws, and (current behavior) does NOT notify subscribers", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    del.mockRejectedValueOnce(new Error("network down"));
+    const heard: number[] = [];
+    const off = onVersionSyncError(() => heard.push(1));
+    await expect(mirrorVersionDelete("v9")).resolves.toBeUndefined();
+    expect(warn).toHaveBeenCalledWith("[version-sync] delete mirror failed", expect.any(Error));
+    expect(heard).toEqual([]); // delete failures are subscriber-silent today
+    expect(del).toHaveBeenCalledTimes(1); // and never retried
+    off();
+    warn.mockRestore();
+  });
+
+  it.todo(
+    "BUG P1-1: no retry queue — a failed version mirror is dropped permanently (console.warn + one-shot notify only); cmsSync's queue + online-listener pattern should be ported"
+  );
+  it.todo(
+    "BUG: mirrorVersionDelete failure never fires onVersionSyncError (create does) — a failed delete mirror is silent to the toast layer, leaving a ghost version on the server"
+  );
+
+  it("an unsubscribed listener stops receiving failures", async () => {
+    create.mockRejectedValue(new Error("down"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const heard: number[] = [];
+    const off = onVersionSyncError(() => heard.push(1));
+    await mirrorVersionCreate(ver("v1"), false);
+    off();
+    await mirrorVersionCreate(ver("v2"), false);
+    expect(heard).toEqual([1]);
+    create.mockReset();
+    warn.mockRestore();
+  });
+
+  it("a throwing subscriber does not break the sync layer or other subscribers", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    create.mockRejectedValueOnce(new Error("down"));
+    const heard: number[] = [];
+    const offBad = onVersionSyncError(() => {
+      throw new Error("subscriber exploded");
+    });
+    const offGood = onVersionSyncError(() => heard.push(2));
+    await expect(mirrorVersionCreate(ver("v1"), false)).resolves.toBeUndefined();
+    expect(heard).toEqual([2]);
+    offBad();
+    offGood();
+    warn.mockRestore();
+  });
+});
+
+describe("versionSync hydrate edge paths", () => {
+  it("returns the number of versions added", async () => {
+    list.mockResolvedValueOnce([{ versionId: "a" }, { versionId: "b" }]);
+    loadVersions.mockResolvedValueOnce([]);
+    get.mockResolvedValueOnce({ id: "a" }).mockResolvedValueOnce({ id: "b" });
+    await expect(hydrateVersionsFromServer()).resolves.toBe(2);
+    expect(saveVersion).toHaveBeenCalledTimes(2);
+  });
+
+  it("skips a version whose payload fetch returns null (not counted, not saved)", async () => {
+    list.mockResolvedValueOnce([{ versionId: "a" }]);
+    loadVersions.mockResolvedValueOnce([]);
+    get.mockResolvedValueOnce(null);
+    await expect(hydrateVersionsFromServer()).resolves.toBe(0);
+    expect(saveVersion).not.toHaveBeenCalled();
+  });
+
+  it("short-circuits without reading local storage when the server has no versions", async () => {
+    list.mockResolvedValueOnce([]);
+    await expect(hydrateVersionsFromServer()).resolves.toBe(0);
+    expect(loadVersions).not.toHaveBeenCalled();
+  });
+
+  it("a failed hydrate warns + resolves 0 — never throws into editor open", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    list.mockRejectedValueOnce(new Error("offline"));
+    await expect(hydrateVersionsFromServer()).resolves.toBe(0);
+    expect(warn).toHaveBeenCalledWith("[version-sync] hydrate from server failed", expect.any(Error));
+    warn.mockRestore();
+  });
+
+  it("no-ops (returns 0) when unauthenticated/outside the editor URL", async () => {
+    window.history.replaceState({}, "", "/dashboard");
+    await expect(hydrateVersionsFromServer()).resolves.toBe(0);
+    expect(list).not.toHaveBeenCalled();
   });
 });

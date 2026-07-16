@@ -30,6 +30,12 @@ export interface CanvasProps {
   onZoomChange?: (zoom: number) => void;
   /** Callback when overlay toggles change (from footer toolbar) */
   onOverlayChange?: (overlay: keyof CanvasOverlayState, enabled: boolean) => void;
+  /** Change the active device/breakpoint (from the footer toolbar's switcher). */
+  onDeviceChange?: (device: DeviceType) => void;
+  /** Whether an undo step is available (drives the footer toolbar's Undo). */
+  canUndo?: boolean;
+  /** Whether a redo step is available (drives the footer toolbar's Redo). */
+  canRedo?: boolean;
   /** Open the image editor for a media element on the canvas (consumed by CanvasOverlayGroup) */
   onOpenImageEditor?: (item: { key: string; src: string; name: string }) => void;
 }

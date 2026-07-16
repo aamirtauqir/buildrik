@@ -153,4 +153,60 @@ describe("useTokensForKind", () => {
     const old = result.current.tokens.find((t) => t.id === "radius-md");
     expect(old?.replacedBy).toBeUndefined();
   });
+
+  it("addToken surfaces the new id in pendingDiff (no saved counterpart)", () => {
+    const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
+    act(() =>
+      result.current.addToken({ ...radiusToken, id: "radius-xl", value: "24px" })
+    );
+    expect(result.current.pendingDiff["radius-xl"]).toBe("24px");
+    expect(result.current.isDirty).toBe(true);
+  });
+
+  // S1 C1 persistence gap: hydrateFromExternal replaces tokens+savedTokens for
+  // THIS kind from a multi-kind external array (Composer load / resetAllKinds).
+
+  describe("hydrateFromExternal", () => {
+    it("replaces tokens AND savedTokens with the kind-matching subset", () => {
+      const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
+      act(() =>
+        result.current.hydrateFromExternal([
+          { ...radiusToken, value: "99px" },
+          colorToken, // different kind — must be filtered out
+        ])
+      );
+      expect(result.current.tokens).toHaveLength(1);
+      expect(result.current.tokens[0].value).toBe("99px");
+      expect(result.current.savedTokens[0].value).toBe("99px");
+      expect(result.current.isDirty).toBe(false);
+    });
+
+    it("clears pending edits and undo stacks", () => {
+      const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
+      act(() => result.current.updateToken("radius-md", "12px"));
+      expect(result.current.isDirty).toBe(true);
+      act(() => result.current.hydrateFromExternal([{ ...radiusToken, value: "10px" }]));
+      expect(result.current.isDirty).toBe(false);
+      expect(result.current.canUndo("radius-md")).toBe(false);
+      expect(result.current.canRedo("radius-md")).toBe(false);
+    });
+
+    it("applies hydrated values to :root CSS vars", () => {
+      const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
+      act(() => result.current.hydrateFromExternal([{ ...radiusToken, value: "42px" }]));
+      expect(
+        document.documentElement.style.getPropertyValue(radiusToken.cssVar)
+      ).toBe("42px");
+    });
+
+    it("is a no-op when the external set has no tokens of this kind — pending edits survive", () => {
+      const { result } = renderHook(() => useTokensForKind("radius", [radiusToken]));
+      act(() => result.current.updateToken("radius-md", "12px"));
+      act(() => result.current.hydrateFromExternal([colorToken]));
+      // No radius entries in the external set → nothing replaced.
+      expect(result.current.tokens[0].value).toBe("12px");
+      expect(result.current.isDirty).toBe(true);
+      expect(result.current.canUndo("radius-md")).toBe(true);
+    });
+  });
 });

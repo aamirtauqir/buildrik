@@ -1,0 +1,184 @@
+/**
+ * MediaOptimizerHelpers — pure helper coverage.
+ *
+ * jsdom's Image never actually loads, so loadImage is exercised against a
+ * stubbed global Image that fires onload/onerror deterministically.
+ * fetch-based helpers use Node's real fetch for data: URLs (supported by
+ * undici) and a stubbed fetch for remote-URL branches.
+ *
+ * NOTE on formatBytes: it is a known duplicate (audit P1-5). Tests below
+ * lock in CURRENT behavior as-is; they are not an endorsement of keeping
+ * two copies.
+ *
+ * @license BSD-3-Clause
+ */
+
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  dataUrlToBlob,
+  estimateSize,
+  formatBytes,
+  getCompressionSavings,
+  getMimeType,
+  loadImage,
+} from "../MediaOptimizerHelpers";
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+describe("loadImage", () => {
+  class FakeImage {
+    onload: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    crossOrigin: string | null = null;
+    private _src = "";
+
+    get src() {
+      return this._src;
+    }
+    set src(value: string) {
+      this._src = value;
+      queueMicrotask(() => {
+        if (value.includes("bad")) this.onerror?.();
+        else this.onload?.();
+      });
+    }
+  }
+
+  it("resolves with the image element and sets crossOrigin=anonymous", async () => {
+    vi.stubGlobal("Image", FakeImage);
+
+    const img = await loadImage("https://cdn.example.com/pic.png");
+
+    expect(img).toBeInstanceOf(FakeImage);
+    expect(img.crossOrigin).toBe("anonymous");
+    expect(img.src).toBe("https://cdn.example.com/pic.png");
+  });
+
+  it("rejects with 'Failed to load image' when the image errors", async () => {
+    vi.stubGlobal("Image", FakeImage);
+
+    await expect(loadImage("https://cdn.example.com/bad.png")).rejects.toThrow(
+      "Failed to load image",
+    );
+  });
+});
+
+describe("dataUrlToBlob", () => {
+  it("converts a base64 data URL to a Blob (size + type preserved)", async () => {
+    // "hello" base64-encoded
+    const blob = await dataUrlToBlob("data:text/plain;base64,aGVsbG8=");
+    expect(blob.size).toBe(5);
+    expect(blob.type).toBe("text/plain");
+    expect(await blob.text()).toBe("hello");
+  });
+
+  it("propagates fetch failures", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.reject(new Error("network down"))),
+    );
+    await expect(dataUrlToBlob("data:text/plain;base64,aGVsbG8=")).rejects.toThrow(
+      "network down",
+    );
+  });
+});
+
+describe("getMimeType", () => {
+  it("maps every export format to its MIME type", () => {
+    expect(getMimeType("jpeg")).toBe("image/jpeg");
+    expect(getMimeType("png")).toBe("image/png");
+    expect(getMimeType("webp")).toBe("image/webp");
+    expect(getMimeType("avif")).toBe("image/avif");
+  });
+});
+
+describe("estimateSize", () => {
+  it("estimates byte size from base64 payload length (len * 3/4, rounded)", async () => {
+    // 8 base64 chars → 6 bytes
+    await expect(estimateSize("data:image/png;base64,AAAAAAAA")).resolves.toBe(6);
+    // "aGVsbG8=" is 8 chars incl. padding → round(8*3/4) = 6 (over-estimate
+    // of the true 5 decoded bytes — padding is not subtracted; current behavior).
+    await expect(estimateSize("data:text/plain;base64,aGVsbG8=")).resolves.toBe(6);
+  });
+
+  it("returns 0 for a data URL with an empty or missing payload", async () => {
+    await expect(estimateSize("data:,")).resolves.toBe(0);
+    await expect(estimateSize("data:no-comma-here")).resolves.toBe(0);
+  });
+
+  it("fetches non-data URLs and returns the blob size", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve({ blob: () => Promise.resolve(new Blob(["12345678"])) }),
+      ),
+    );
+
+    await expect(estimateSize("https://example.com/img.png")).resolves.toBe(8);
+  });
+
+  it("returns 0 when the fetch fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.reject(new Error("offline"))),
+    );
+
+    await expect(estimateSize("https://example.com/img.png")).resolves.toBe(0);
+  });
+});
+
+describe("formatBytes (current behavior — known duplicate, audit P1-5)", () => {
+  it("formats byte-range values", () => {
+    expect(formatBytes(0)).toBe("0 B");
+    expect(formatBytes(1)).toBe("1 B");
+    expect(formatBytes(512)).toBe("512 B");
+    expect(formatBytes(1023)).toBe("1023 B");
+  });
+
+  it("formats KB-range values with one decimal", () => {
+    expect(formatBytes(1024)).toBe("1.0 KB");
+    expect(formatBytes(1536)).toBe("1.5 KB");
+    expect(formatBytes(10 * 1024)).toBe("10.0 KB");
+  });
+
+  it("KB/MB boundary: 1048575 renders as 1024.0 KB (as-is)", () => {
+    expect(formatBytes(1024 * 1024 - 1)).toBe("1024.0 KB");
+  });
+
+  it("formats MB-range values with two decimals", () => {
+    expect(formatBytes(1024 * 1024)).toBe("1.00 MB");
+    expect(formatBytes(2.5 * 1024 * 1024)).toBe("2.50 MB");
+    // No GB tier — large values stay in MB (as-is).
+    expect(formatBytes(5 * 1024 * 1024 * 1024)).toBe("5120.00 MB");
+  });
+
+  it("negative input falls through the < 1024 branch verbatim (as-is, no guard)", () => {
+    expect(formatBytes(-42)).toBe("-42 B");
+  });
+});
+
+describe("getCompressionSavings", () => {
+  it("computes savings percentage with one decimal", () => {
+    expect(getCompressionSavings(1000, 250)).toBe("75.0%");
+    expect(getCompressionSavings(3000, 1000)).toBe("66.7%");
+  });
+
+  it("returns 0.0% when nothing was saved", () => {
+    expect(getCompressionSavings(1000, 1000)).toBe("0.0%");
+  });
+
+  it("returns 100.0% when the optimized size is zero", () => {
+    expect(getCompressionSavings(1000, 0)).toBe("100.0%");
+  });
+
+  it("goes negative when 'optimization' grew the file (as-is)", () => {
+    expect(getCompressionSavings(1000, 1500)).toBe("-50.0%");
+  });
+
+  it("guards division by zero: originalSize <= 0 → '0%'", () => {
+    expect(getCompressionSavings(0, 100)).toBe("0%");
+    expect(getCompressionSavings(-10, 100)).toBe("0%");
+  });
+});

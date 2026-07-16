@@ -61,3 +61,83 @@ describe("useSpacingTokens presets", () => {
     Object.values(values).forEach((v) => expect(v % 2).toBe(0));
   });
 });
+
+describe("useSpacingTokens — activePreset lifecycle", () => {
+  it("starts with activePreset and savedPreset both 'normal'", () => {
+    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+    expect(result.current.activePreset).toBe("normal");
+    expect(result.current.savedPreset).toBe("normal");
+  });
+
+  it("applyPreset switches activePreset and clears per-token undo stacks", () => {
+    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+    act(() => result.current.updateToken("space-4", "99px"));
+    expect(result.current.canUndo("space-4")).toBe(true);
+    act(() => result.current.applyPreset("compact"));
+    expect(result.current.activePreset).toBe("compact");
+    expect(result.current.canUndo("space-4")).toBe(false);
+  });
+
+  it("manual token edit drops activePreset to null (custom scale)", () => {
+    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+    act(() => result.current.applyPreset("spacious"));
+    expect(result.current.activePreset).toBe("spacious");
+    act(() => result.current.updateToken("space-4", "21px"));
+    expect(result.current.activePreset).toBeNull();
+  });
+
+  it("markSaved persists the active preset as savedPreset", () => {
+    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+    act(() => result.current.applyPreset("compact"));
+    act(() => result.current.markSaved());
+    expect(result.current.savedPreset).toBe("compact");
+    expect(result.current.isDirty).toBe(false);
+  });
+
+  it("discardAll restores savedPreset alongside token values", () => {
+    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+    act(() => result.current.applyPreset("compact"));
+    act(() => result.current.markSaved());
+    // Manual edit → activePreset null + dirty values.
+    act(() => result.current.updateToken("space-4", "77px"));
+    expect(result.current.activePreset).toBeNull();
+    act(() => result.current.discardAll());
+    expect(result.current.activePreset).toBe("compact");
+    expect(result.current.tokens.find((t) => t.id === "space-4")?.value).toBe("12px");
+  });
+
+  it("markSaved after a manual edit persists savedPreset=null (custom scale saved)", () => {
+    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+    act(() => result.current.updateToken("space-4", "77px"));
+    act(() => result.current.markSaved());
+    expect(result.current.savedPreset).toBeNull();
+  });
+});
+
+describe("useSpacingTokens — stageDefaults (C3 factory reset)", () => {
+  it("stages spacing defaults without touching savedTokens (Review/Apply flow)", () => {
+    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+    const defaults = makeTokens().map((t) => ({ ...t, value: "5px" }));
+    act(() => result.current.stageDefaults(defaults));
+    expect(result.current.tokens.every((t) => t.value === "5px")).toBe(true);
+    // savedTokens untouched — the reset is staged, so the panel goes dirty.
+    expect(result.current.savedTokens.every((t) => t.value === "0px")).toBe(true);
+    expect(result.current.isDirty).toBe(true);
+  });
+
+  it("resets activePreset to 'normal' and filters non-spacing categories out", () => {
+    const { result } = renderHook(() => useSpacingTokens(makeTokens()));
+    act(() => result.current.updateToken("space-4", "77px")); // preset → null
+    const defaults: ReturnType<typeof makeTokens> = [
+      ...makeTokens(),
+      {
+        id: "color-primary", name: "Primary", value: "#FFF",
+        category: "colors", cssVar: "--buildrick-design-color-primary", type: "color",
+      },
+    ];
+    act(() => result.current.stageDefaults(defaults));
+    expect(result.current.activePreset).toBe("normal");
+    expect(result.current.tokens.some((t) => t.id === "color-primary")).toBe(false);
+    expect(result.current.tokens).toHaveLength(9);
+  });
+});

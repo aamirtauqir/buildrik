@@ -5,7 +5,13 @@
 
 import { describe, it, expect, vi } from "vitest";
 import type { Composer } from "../../../../../engine/Composer";
-import { getAllNavigableElements } from "../keyboardHelpers";
+import type { Element } from "../../../../../engine/elements/Element";
+import {
+  getAllNavigableElements,
+  getNavigationTargets,
+  moveElementPosition,
+  reorderElement,
+} from "../keyboardHelpers";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Test helpers
@@ -150,5 +156,249 @@ describe("getAllNavigableElements", () => {
 
       expect(result).toEqual([]);
     });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getNavigationTargets
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Build a navigable Element stub. `parent` and `children` wire the
+ * getParent/getChildren methods that getNavigationTargets walks.
+ */
+function navElement(
+  id: string,
+  opts: { parent?: Element | null; children?: Element[] } = {}
+): Element {
+  return {
+    getId: () => id,
+    getParent: () => opts.parent ?? null,
+    getChildren: () => opts.children ?? [],
+  } as unknown as Element;
+}
+
+describe("getNavigationTargets", () => {
+  it("returns prev/next siblings from the parent's child list", () => {
+    const a = navElement("a");
+    const b = navElement("b");
+    const c = navElement("c");
+    const parent = navElement("parent", { children: [a, b, c] });
+    // Re-wire b so it points at the shared parent
+    const bWithParent = navElement("b", { parent });
+    // The parent must return the same-id middle node so findIndex matches
+    const parentReal = navElement("parent", { children: [a, bWithParent, c] });
+    const middle = navElement("b", { parent: parentReal });
+
+    const { prev, next, parent: p, firstChild } = getNavigationTargets(middle);
+
+    expect(prev?.getId()).toBe("a");
+    expect(next?.getId()).toBe("c");
+    expect(p?.getId()).toBe("parent");
+    expect(firstChild).toBeNull();
+  });
+
+  it("returns null prev at the first sibling and null next at the last", () => {
+    const first = navElement("first");
+    const last = navElement("last");
+    const parent = navElement("parent", { children: [first, last] });
+
+    const firstNode = navElement("first", { parent });
+    const parentForFirst = navElement("parent", { children: [firstNode, last] });
+    const firstWired = navElement("first", { parent: parentForFirst });
+
+    const targets = getNavigationTargets(firstWired);
+    expect(targets.prev).toBeNull();
+    expect(targets.next?.getId()).toBe("last");
+  });
+
+  it("returns the firstChild when the element has children", () => {
+    const child1 = navElement("child-1");
+    const child2 = navElement("child-2");
+    const el = navElement("el", { children: [child1, child2] });
+
+    const { firstChild, parent } = getNavigationTargets(el);
+    expect(firstChild?.getId()).toBe("child-1");
+    // No parent → prev/next both null
+    expect(parent).toBeNull();
+  });
+
+  it("returns all-null when the element is a detached root (no parent, no children)", () => {
+    const orphan = navElement("orphan");
+    expect(getNavigationTargets(orphan)).toEqual({
+      prev: null,
+      next: null,
+      parent: null,
+      firstChild: null,
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// moveElementPosition
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Composer stub whose getElement returns a style-tracking element. */
+function makeMoveComposer(styles: Record<string, string>) {
+  const setStyle = vi.fn((prop: string, value: string) => {
+    styles[prop] = value;
+  });
+  const element = {
+    getStyles: () => styles,
+    setStyle,
+  } as unknown as Element;
+  const beginTransaction = vi.fn();
+  const endTransaction = vi.fn();
+  const composer = {
+    elements: { getElement: vi.fn(() => element) },
+    beginTransaction,
+    endTransaction,
+  } as unknown as Composer;
+  return { composer, setStyle, beginTransaction, endTransaction };
+}
+
+describe("moveElementPosition", () => {
+  it("adjusts top/left for absolute-positioned elements", () => {
+    const { composer, setStyle } = makeMoveComposer({
+      position: "absolute",
+      top: "10px",
+      left: "20px",
+    });
+
+    moveElementPosition(composer, "el", 5, -3);
+
+    expect(setStyle).toHaveBeenCalledWith("top", "7px"); // 10 + (-3)
+    expect(setStyle).toHaveBeenCalledWith("left", "25px"); // 20 + 5
+  });
+
+  it("treats fixed like absolute and defaults missing top/left to 0", () => {
+    const { composer, setStyle } = makeMoveComposer({ position: "fixed" });
+
+    moveElementPosition(composer, "el", 4, 8);
+
+    expect(setStyle).toHaveBeenCalledWith("top", "8px");
+    expect(setStyle).toHaveBeenCalledWith("left", "4px");
+  });
+
+  it("uses transform translate for static/relative flow elements", () => {
+    const { composer, setStyle } = makeMoveComposer({ position: "static" });
+
+    moveElementPosition(composer, "el", 12, -6);
+
+    expect(setStyle).toHaveBeenCalledWith("transform", "translate(12px, -6px)");
+  });
+
+  it("accumulates onto an existing translate and preserves other transforms", () => {
+    const { composer, setStyle } = makeMoveComposer({
+      // no explicit position → defaults to "static" branch
+      transform: "translate(10px, 5px) rotate(45deg)",
+    });
+
+    moveElementPosition(composer, "el", 3, 4);
+
+    expect(setStyle).toHaveBeenCalledWith("transform", "translate(13px, 9px) rotate(45deg)");
+  });
+
+  it("wraps mutations in a keyboard-move transaction", () => {
+    const { composer, beginTransaction, endTransaction } = makeMoveComposer({
+      position: "absolute",
+    });
+
+    moveElementPosition(composer, "el", 1, 1);
+
+    expect(beginTransaction).toHaveBeenCalledWith("keyboard-move");
+    expect(endTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it("is a no-op when the element does not exist", () => {
+    const beginTransaction = vi.fn();
+    const composer = {
+      elements: { getElement: vi.fn(() => null) },
+      beginTransaction,
+      endTransaction: vi.fn(),
+    } as unknown as Composer;
+
+    moveElementPosition(composer, "missing", 5, 5);
+
+    expect(beginTransaction).not.toHaveBeenCalled();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// reorderElement
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Element with a parent whose children list drives reorder indices. */
+function makeReorderFixture(selectedId: string, childIds: string[]) {
+  const children = childIds.map((id) => ({ getId: () => id }) as unknown as Element);
+  const parent = {
+    getId: () => "parent",
+    getChildren: () => children,
+  } as unknown as Element;
+  const element = {
+    getParent: () => parent,
+  } as unknown as Element;
+  const moveElement = vi.fn();
+  const composer = {
+    elements: { moveElement },
+    beginTransaction: vi.fn(),
+    endTransaction: vi.fn(),
+  } as unknown as Composer;
+  return { element, composer, moveElement };
+}
+
+describe("reorderElement", () => {
+  it("moves up to index-1", () => {
+    const { element, composer, moveElement } = makeReorderFixture("b", ["a", "b", "c"]);
+    reorderElement(element, composer, "b", "up");
+    expect(moveElement).toHaveBeenCalledWith("b", "parent", 0);
+  });
+
+  it("moves down to index+1", () => {
+    const { element, composer, moveElement } = makeReorderFixture("b", ["a", "b", "c"]);
+    reorderElement(element, composer, "b", "down");
+    expect(moveElement).toHaveBeenCalledWith("b", "parent", 2);
+  });
+
+  it("moves to first (index 0)", () => {
+    const { element, composer, moveElement } = makeReorderFixture("c", ["a", "b", "c"]);
+    reorderElement(element, composer, "c", "first");
+    expect(moveElement).toHaveBeenCalledWith("c", "parent", 0);
+  });
+
+  it("moves to last (index length-1)", () => {
+    const { element, composer, moveElement } = makeReorderFixture("a", ["a", "b", "c"]);
+    reorderElement(element, composer, "a", "last");
+    expect(moveElement).toHaveBeenCalledWith("a", "parent", 2);
+  });
+
+  it("does nothing when moving up from the first position", () => {
+    const { element, composer, moveElement } = makeReorderFixture("a", ["a", "b", "c"]);
+    reorderElement(element, composer, "a", "up");
+    expect(moveElement).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when moving down from the last position", () => {
+    const { element, composer, moveElement } = makeReorderFixture("c", ["a", "b", "c"]);
+    reorderElement(element, composer, "c", "down");
+    expect(moveElement).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when the element has no parent", () => {
+    const element = { getParent: () => null } as unknown as Element;
+    const moveElement = vi.fn();
+    const composer = {
+      elements: { moveElement },
+      beginTransaction: vi.fn(),
+      endTransaction: vi.fn(),
+    } as unknown as Composer;
+    reorderElement(element, composer, "x", "up");
+    expect(moveElement).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when the selected id is not among siblings", () => {
+    const { element, composer, moveElement } = makeReorderFixture("ghost", ["a", "b"]);
+    reorderElement(element, composer, "ghost", "up");
+    expect(moveElement).not.toHaveBeenCalled();
   });
 });

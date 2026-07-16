@@ -13,9 +13,7 @@
 import * as React from "react";
 import type { Composer } from "../../engine";
 import {
-  BreakpointSwitcher,
   Button,
-  Divider,
   IconButton,
   Tooltip,
   TooltipTrigger,
@@ -23,7 +21,6 @@ import {
   TooltipContent,
   TooltipKbd,
   Topbar as VibcoderTopbar,
-  TopbarGroup,
   TopbarStatus,
   TopbarStatusDot,
 } from "@/editor/shared/vibcoder";
@@ -65,54 +62,16 @@ const Stroke: React.FC<{ size?: number; children: React.ReactNode; w?: number }>
   </svg>
 );
 
-const IconUndo = () => (
-  <Stroke>
-    <path d="M9 14L4 9l5-5" />
-    <path d="M4 9h10a6 6 0 0 1 6 6v0a6 6 0 0 1-6 6H8" />
-  </Stroke>
-);
-const IconRedo = () => (
-  <Stroke>
-    <path d="M15 14l5-5-5-5" />
-    <path d="M20 9H10a6 6 0 0 0-6 6v0a6 6 0 0 0 6 6h6" />
-  </Stroke>
-);
-const IconHistory = () => (
-  <Stroke>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3 2" />
-  </Stroke>
-);
+// IconUndo/IconRedo removed — Undo/Redo now live on the canvas footer toolbar
+// (Figma contract §2). See CanvasFooterToolbar.
 const IconEye = () => (
   <Stroke>
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
     <circle cx="12" cy="12" r="3" />
   </Stroke>
 );
-const IconDesktop = () => (
-  <Stroke>
-    <rect x="2" y="4" width="20" height="12" rx="2" />
-    <path d="M8 20h8 M12 16v4" />
-  </Stroke>
-);
-const IconTablet = () => (
-  <Stroke>
-    <rect x="5" y="3" width="14" height="18" rx="2" />
-    <path d="M12 18h.01" />
-  </Stroke>
-);
-const IconMobile = () => (
-  <Stroke>
-    <rect x="7" y="2" width="10" height="20" rx="2" />
-    <path d="M12 18h.01" />
-  </Stroke>
-);
-const IconWide = () => (
-  <Stroke>
-    <rect x="1" y="5" width="22" height="10" rx="2" />
-    <path d="M8 19h8 M12 15v4" />
-  </Stroke>
-);
+// Device icons (IconDesktop/Tablet/Mobile/Wide) removed — the breakpoint
+// switcher moved to the canvas footer toolbar (Figma contract §2).
 const IconWarn = () => (
   <Stroke w={2.5} size={12}>
     <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -214,16 +173,15 @@ export const Topbar: React.FC<TopbarProps> = ({
   isDirty = false,
   lastSavedAt,
   collaborationSlot,
-  onUndo,
-  onRedo,
   onPreview,
   onPublish,
   onSave,
   onOpenIssues,
   onOpenHistory,
+  onOpenDesignSystem,
+  onOpenProjectSettings,
   onHelp,
   onExportHTML,
-  onDeviceChange,
   onOpenAI,
 }) => {
   const publishEnabled = isFeatureEnabled("publish");
@@ -318,13 +276,6 @@ export const Topbar: React.FC<TopbarProps> = ({
 
   const isStatusInteractive = savedVariant === "warn" || savedVariant === "error";
 
-  const bpGlyphs = {
-    wide: <IconWide />,
-    desktop: <IconDesktop />,
-    tablet: <IconTablet />,
-    mobile: <IconMobile />,
-  } as const;
-
   return (
     <>
       <VibcoderTopbar>
@@ -349,48 +300,14 @@ export const Topbar: React.FC<TopbarProps> = ({
               ‹ Exit
             </a>
           </div>
-          <Divider orientation="vertical" />
-          <TopbarGroup>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton onClick={onUndo} disabled={!canUndo} aria-label="Undo">
-                  <IconUndo />
-                </IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>Undo <TooltipKbd>⌘Z</TooltipKbd></TooltipContent>
-              </TooltipPortal>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton onClick={onRedo} disabled={!canRedo} aria-label="Redo">
-                  <IconRedo />
-                </IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>Redo <TooltipKbd>⌘⇧Z</TooltipKbd></TooltipContent>
-              </TooltipPortal>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton onClick={onOpenHistory} aria-label="History">
-                  <IconHistory />
-                </IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>History</TooltipContent>
-              </TooltipPortal>
-            </Tooltip>
-          </TopbarGroup>
+          {/* Figma contract §2: the topbar carries only brand · breadcrumb · save ·
+              Preview · Publish · ⌘K · site menu. Undo/Redo + device switcher moved
+              to the canvas footer toolbar; History/Design/Settings moved into the
+              ⋯ site menu (Zone 3). All remain reachable via ⌘K. */}
         </div>
 
-        {/* ZONE 2 — View: device/breakpoint switcher, centered (1fr column). */}
-        <BreakpointSwitcher
-          value={device as "wide" | "desktop" | "tablet" | "mobile"}
-          onChange={(d) => onDeviceChange?.(d)}
-          includeWide
-          glyphs={bpGlyphs}
-        />
+        {/* ZONE 2 — reserved (breakpoint switcher now lives on the canvas toolbar). */}
+        <div aria-hidden="true" />
 
         {/* ZONE 3 — Status + Ship: live status, the AI helper, Preview, and the one
             hero action (Publish). Rare actions live in the ⋯ overflow. */}
@@ -595,6 +512,39 @@ export const Topbar: React.FC<TopbarProps> = ({
             </Tooltip>
             {moreOpen && (
               <Menu style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 1000, minWidth: 200 }}>
+                {/* Figma contract §2: History, Design, and Settings are site-level
+                    concerns — they live in this ⋯ site menu, not the rail or as
+                    standalone topbar icons. Each is also reachable via ⌘K. */}
+                {onOpenDesignSystem && (
+                  <MenuItem
+                    onClick={() => {
+                      onOpenDesignSystem();
+                      setMoreOpen(false);
+                    }}
+                  >
+                    Design system
+                  </MenuItem>
+                )}
+                {onOpenProjectSettings && (
+                  <MenuItem
+                    onClick={() => {
+                      onOpenProjectSettings();
+                      setMoreOpen(false);
+                    }}
+                  >
+                    Site settings
+                  </MenuItem>
+                )}
+                {onOpenHistory && (
+                  <MenuItem
+                    onClick={() => {
+                      onOpenHistory();
+                      setMoreOpen(false);
+                    }}
+                  >
+                    Version history
+                  </MenuItem>
+                )}
                 <MenuItem
                   onClick={() => {
                     window.open(`${dashboardUrl}/dashboard/team`, "_blank", "noopener,noreferrer");

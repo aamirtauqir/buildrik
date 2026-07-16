@@ -124,4 +124,52 @@ describe("useImportTokens", () => {
     expect(stats?.modified).toBe(0);
     expect(stats?.skipped).toContain("mystery-id");
   });
+
+  it("legacy category fallback routes category='colors' without a kind hint", () => {
+    const useCombined = () => {
+      const apply = useImportTokens();
+      const color = useColorRegistry();
+      return { apply, color };
+    };
+    const { result } = renderHook(useCombined, { wrapper: wrap });
+    const before = result.current.color.tokens.length;
+
+    act(() => {
+      result.current.apply([mkToken("color-legacy-routed", "#123456", { kind: undefined })]);
+    });
+
+    expect(result.current.color.tokens).toHaveLength(before + 1);
+  });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // BUG PIN §2-B13 — the modification path calls `updateToken(t.id, t.value)`,
+  // a (id, value) narrow-band API. An incoming token that carries a darkValue
+  // for an EXISTING id has its darkValue silently dropped: the registry token
+  // keeps its old darkValue (or none), so re-importing a dark-mode-complete
+  // export loses every dark variant on the modify path (adds keep theirs).
+  // ───────────────────────────────────────────────────────────────────────────
+  describe("§2-B13 darkValue drop on the modification path (pinned)", () => {
+    it("documents the bug: importing an existing id with a darkValue updates value but drops darkValue", () => {
+      const useCombined = () => {
+        const apply = useImportTokens();
+        const color = useColorRegistry();
+        return { apply, color };
+      };
+      const { result } = renderHook(useCombined, { wrapper: wrap });
+      const targetId = result.current.color.tokens[0].id;
+
+      act(() => {
+        result.current.apply([mkToken(targetId, "#FF0000", { darkValue: "#220000" })]);
+      });
+
+      const updated = result.current.color.tokens.find((t) => t.id === targetId);
+      expect(updated?.value).toBe("#FF0000");
+      // ← current behavior: darkValue never reaches the registry.
+      expect(updated?.darkValue).not.toBe("#220000");
+    });
+
+    it.todo(
+      "§2-B13 fix: modification path must carry darkValue (widen updateToken or add a patch API) — flip the documenting test above when fixed"
+    );
+  });
 });

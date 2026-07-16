@@ -91,4 +91,24 @@ describe("diffTokens", () => {
     expect(diff.added).toEqual([]);
     expect(diff.modified).toEqual([]);
   });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // BUG PIN §2-B13 — diffTokens compares `value` ONLY. A token whose incoming
+  // darkValue differs (light value identical) is classified as unchanged, so
+  // the import UI shows "0 conflicts / nothing to apply" and the dark variant
+  // silently never lands. Same blind spot for name/description edits.
+  // ───────────────────────────────────────────────────────────────────────────
+  describe("§2-B13 diffTokens is value-only (pinned)", () => {
+    it("documents the bug: a darkValue-only change is NOT classified as modified", () => {
+      const current = [tok("color-brand", "#0055FF", { darkValue: "#001133" })];
+      const incoming = [tok("color-brand", "#0055FF", { darkValue: "#FFFFFF" })];
+      const diff = diffTokens(current, incoming);
+      expect(diff.added).toEqual([]);
+      expect(diff.modified).toEqual([]); // ← dark variant change invisible to import
+    });
+
+    it.todo(
+      "§2-B13 fix: diffTokens should treat darkValue changes as modifications — flip the documenting test above when fixed"
+    );
+  });
 });

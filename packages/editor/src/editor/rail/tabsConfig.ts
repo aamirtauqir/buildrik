@@ -309,3 +309,48 @@ export const RAIL_TOOL_META: Record<RailTool, RailToolMeta> = {
 export function getRailTools(): Array<{ tool: RailTool; meta: RailToolMeta }> {
   return RAIL_TOOLS.map((tool) => ({ tool, meta: RAIL_TOOL_META[tool] }));
 }
+
+// ─── Figma-contract rail (F1) ─────────────────────────────────────────────────
+//
+// The 02 · Editor Figma design (2026-07) supersedes the E3 4-tool rail: the rail
+// carries five first-class tools grouped into two zones, and everything else
+// leaves the rail entirely.
+//
+//   creation   Add · Assets · Components
+//   structure  Layers · Pages
+//
+// The six panels that leave the rail keep their engine + panel intact and are
+// reachable off-rail (verified entry points, so nothing is stranded):
+//   ai        → contextual: canvas selection + ⌘K command palette
+//   templates → inside the Add drawer ("Browse templates")
+//   design    → topbar ⋯ site menu ("Design system")
+//   settings  → topbar ⋯ site menu ("Site settings")
+//   publish   → topbar Publish button
+//   history   → topbar ⋯ site menu ("History")
+//
+// This is a THIRD render source alongside the zone rail (legacy) and the tool
+// rail (E3). All three read GROUPED_TABS_CONFIG; none of them mutate it. Which
+// one renders is chosen by editorViewMode.railMode ("figma" is the default).
+
+/** The five rail tools of the Figma contract, in rail order, grouped by zone. */
+export const RAIL_FIGMA: ReadonlyArray<{ zone: Extract<TabZone, "creation" | "structure">; ids: readonly GroupedTabId[] }> = [
+  { zone: "creation", ids: ["add", "assets", "components"] },
+  { zone: "structure", ids: ["layers", "pages"] },
+] as const;
+
+/** Flat set of tab ids that appear in the Figma rail (for filtering / tests). */
+export const RAIL_FIGMA_IDS: ReadonlySet<GroupedTabId> = new Set(
+  RAIL_FIGMA.flatMap((g) => g.ids),
+);
+
+/**
+ * The Figma rail as ordered groups of resolved tab configs. Each group is one
+ * visual cluster in the rail (a divider sits between groups). Unknown ids are
+ * dropped defensively so a config typo can't crash the rail.
+ */
+export function getFigmaRailGroups(): Array<{ zone: TabZone; tabs: GroupedTabConfig[] }> {
+  return RAIL_FIGMA.map((g) => ({
+    zone: g.zone,
+    tabs: g.ids.map((id) => TAB_CONFIG_MAP.get(id)).filter((t): t is GroupedTabConfig => Boolean(t)),
+  }));
+}

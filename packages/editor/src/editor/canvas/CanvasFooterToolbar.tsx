@@ -24,7 +24,14 @@ import {
   TooltipContent,
   TooltipKbd,
 } from "@/editor/shared/vibcoder";
+import { BreakpointSwitcher, type Breakpoint } from "@/editor/shared/vibcoder/BreakpointSwitcher";
 import { ZOOM_PRESETS } from "./shared";
+import { ROW_SM } from "@/shared/constants/layout";
+
+// Undo/redo/device switching moved OFF the topbar and onto this canvas toolbar
+// (Figma contract §2: viewport + edit controls belong to the canvas, the topbar
+// stays minimal). Device values are the BreakpointSwitcher's 4-way union.
+export type FooterDevice = Breakpoint;
 
 // ============================================
 // Types
@@ -52,6 +59,20 @@ export interface CanvasFooterToolbarProps {
   onHelpClick?: () => void;
   /** Fit canvas to visible viewport */
   onFitToScreen?: () => void;
+
+  // ── Edit + viewport controls (moved off the topbar) ──────────────────────
+  /** Current device/breakpoint. When provided, the device switcher renders. */
+  device?: FooterDevice;
+  /** Change the active device/breakpoint. */
+  onDeviceChange?: (device: FooterDevice) => void;
+  /** Whether an undo step is available. When onUndo is provided, undo renders. */
+  canUndo?: boolean;
+  /** Whether a redo step is available. */
+  canRedo?: boolean;
+  /** Perform undo. */
+  onUndo?: () => void;
+  /** Perform redo. */
+  onRedo?: () => void;
 }
 
 // ============================================
@@ -104,6 +125,35 @@ const HelpIcon = () => (
     <path d="M12 17h.01" strokeLinecap="round" />
   </svg>
 );
+
+const UndoIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 7v6h6" />
+    <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+  </svg>
+);
+
+const RedoIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 7v6h-6" />
+    <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
+  </svg>
+);
+
+const editBtnStyles: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: ROW_SM,
+  height: ROW_SM,
+  padding: 0,
+  color: "var(--buildrick-text-secondary)",
+  background: "transparent",
+  border: "1px solid transparent",
+  borderRadius: "var(--buildrick-radius-sm)",
+  cursor: "pointer",
+  transition: "all 0.15s ease",
+};
 
 // ============================================
 // Overlay Button Component
@@ -173,6 +223,12 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
   onZoomChange,
   onHelpClick,
   onFitToScreen,
+  device,
+  onDeviceChange,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
 }) => {
   const [showPresets, setShowPresets] = React.useState(false);
   const presetsRef = React.useRef<HTMLDivElement>(null);
@@ -190,8 +246,64 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
 
   useClickOutside(presetsRef, () => setShowPresets(false), { enabled: showPresets });
 
+  const showEditGroup = Boolean(onUndo || onRedo || (device && onDeviceChange));
+
   return (
     <div style={containerStyles}>
+      {/* Edit + viewport group — undo/redo + device switcher (moved off topbar) */}
+      {showEditGroup && (
+        <>
+          <div style={overlaysGroupStyles}>
+            {onUndo && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    className="canvas-footer-btn"
+                    onClick={onUndo}
+                    disabled={canUndo === false}
+                    aria-label="Undo"
+                    style={editBtnStyles}
+                  >
+                    <UndoIcon />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipPortal>
+                  <TooltipContent>Undo <TooltipKbd>⌘Z</TooltipKbd></TooltipContent>
+                </TooltipPortal>
+              </Tooltip>
+            )}
+            {onRedo && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    className="canvas-footer-btn"
+                    onClick={onRedo}
+                    disabled={canRedo === false}
+                    aria-label="Redo"
+                    style={editBtnStyles}
+                  >
+                    <RedoIcon />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipPortal>
+                  <TooltipContent>Redo <TooltipKbd>⌘⇧Z</TooltipKbd></TooltipContent>
+                </TooltipPortal>
+              </Tooltip>
+            )}
+            {device && onDeviceChange && (
+              <BreakpointSwitcher
+                value={device}
+                onChange={onDeviceChange}
+                includeWide
+                aria-label="Device breakpoint"
+              />
+            )}
+          </div>
+          <div style={dividerStyles} />
+        </>
+      )}
       {/* Overlay Toggles */}
       <div style={overlaysGroupStyles}>
         <OverlayButton
@@ -315,7 +427,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
             <TooltipTrigger asChild>
               <Button
                 type="button"
-                style={{ ...zoomBtnStyles, width: "28px", height: "28px" }}
+                style={{ ...zoomBtnStyles, width: ROW_SM, height: ROW_SM }}
                 onClick={onHelpClick}
                 aria-label="Show keyboard shortcuts (press ? key)"
               >

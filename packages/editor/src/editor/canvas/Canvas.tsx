@@ -82,6 +82,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       showFooterToolbar = true,
       onZoomChange,
       onOverlayChange,
+      onDeviceChange,
+      canUndo,
+      canRedo,
     },
     ref
   ) => {
@@ -591,6 +594,12 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onZoomChange={onZoomChange}
               onFitToScreen={handleFitToScreen}
               onHelpClick={openCheatSheet}
+              device={device === "watch" ? "mobile" : device}
+              onDeviceChange={onDeviceChange}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              onUndo={composer ? () => composer.history.undo() : undefined}
+              onRedo={composer ? () => composer.history.redo() : undefined}
             />
             <DeviceFrameToggle
               active={deviceFrameActive}

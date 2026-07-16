@@ -35,19 +35,16 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html"],
       reportsDirectory: "./coverage",
-      // Scope to the engine + the canvas/inspector hook layers that Phase D
-      // is most likely to touch. Widen `include` later if coverage matters
-      // outside these areas.
-      include: [
-        "src/engine/**/*.{ts,tsx}",
-        "src/editor/canvas/hooks/**/*.{ts,tsx}",
-        "src/editor/inspector/hooks/**/*.{ts,tsx}",
-        "src/editor/shell/hooks/**/*.{ts,tsx}",
-      ],
+      // Widened 2026-07-08 (deep-audit coverage arc): the previous 4-glob scope
+      // measured only 244/1227 source files and overstated real coverage.
+      // Whole-package truth now; preview galleries + stubs stay out.
+      include: ["src/**/*.{ts,tsx}"],
       exclude: [
         "**/__tests__/**",
         "**/*.{test,spec}.{ts,tsx}",
         "**/*.d.ts",
+        "src/preview/**",
+        "src/test-stubs/**",
       ],
     },
   },

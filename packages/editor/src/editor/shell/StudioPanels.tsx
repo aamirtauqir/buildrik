@@ -44,6 +44,9 @@ export interface StudioPanelsProps {
   } | null;
   device: DeviceType;
   onDeviceChange?: (device: DeviceType) => void;
+  /** Whether undo/redo steps are available — drives the canvas footer toolbar. */
+  canUndo?: boolean;
+  canRedo?: boolean;
   zoom: number;
   onZoomChange: (zoom: number) => void;
   isLeftPanelOpen: boolean;
@@ -165,6 +168,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   selectedElement,
   device,
   onDeviceChange,
+  canUndo,
+  canRedo,
   zoom,
   onZoomChange,
   isLeftPanelOpen,
@@ -420,6 +425,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
               devMode={devMode}
               onAIRequest={onAIRequest}
               onOpenImageEditor={handleEditMedia}
+              onZoomChange={onZoomChange}
+              onOverlayChange={onOverlayChange}
+              onDeviceChange={onDeviceChange}
+              canUndo={canUndo}
+              canRedo={canRedo}
             />
             {isVersionPreview && (
               <div style={previewBannerStyle}>

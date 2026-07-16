@@ -195,10 +195,26 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   // Versioned format is {schemaVersion, tokens} — the loader accepts both
   // this and the legacy array-only format for backward compat.
   const persistAll = React.useCallback(() => {
+    // Persist ALL 14 token kinds. Previously only color/spacing/type were saved,
+    // so edits to the other 11 (radius, shadow, motion, border, opacity, zindex,
+    // breakpoint, grid, sizing, icon, imagery) were silently lost on reload — the
+    // load path reads every kind, but the save dropped 11 of them. Any kind added
+    // here MUST also appear in the deps array below.
     const all: DesignToken[] = [
       ...colorState.tokens,
       ...spacingState.tokens,
       ...typeState.tokens,
+      ...radiusState.tokens,
+      ...shadowState.tokens,
+      ...motionState.tokens,
+      ...borderState.tokens,
+      ...opacityState.tokens,
+      ...zindexState.tokens,
+      ...breakpointState.tokens,
+      ...gridState.tokens,
+      ...sizingState.tokens,
+      ...iconState.tokens,
+      ...imageryState.tokens,
     ];
     try {
       const versioned = {
@@ -209,7 +225,23 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
     } catch {
       // SecurityError in private browsing → no crash, just skip persistence
     }
-  }, [colorState.tokens, spacingState.tokens, typeState.tokens, storageKey]);
+  }, [
+    colorState.tokens,
+    spacingState.tokens,
+    typeState.tokens,
+    radiusState.tokens,
+    shadowState.tokens,
+    motionState.tokens,
+    borderState.tokens,
+    opacityState.tokens,
+    zindexState.tokens,
+    breakpointState.tokens,
+    gridState.tokens,
+    sizingState.tokens,
+    iconState.tokens,
+    imageryState.tokens,
+    storageKey,
+  ]);
 
   const config = React.useMemo<RegistryConfig>(() => ({ persistAll }), [persistAll]);
 

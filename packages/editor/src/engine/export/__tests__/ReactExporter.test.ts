@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect } from "vitest";
+import JSZip from "jszip";
 import { ReactExporter } from "../ReactExporter";
 import type { Composer } from "../../Composer";
 import type { ElementData, PageData } from "../../../shared/types";
@@ -276,5 +277,137 @@ describe("ReactExporter", () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toBeDefined();
+  });
+});
+
+// Extension coverage (2026-07): zip bundling, scaffold files, naming
+// fallbacks, escaping, and the duplicate-page-name pin.
+describe("ReactExporter — zip bundle, scaffold, naming fallbacks (extension)", () => {
+  it("exportZip bundles all exported files into a zip blob", async () => {
+    const composer = makeTestComposer([
+      {
+        id: "page-1",
+        name: "Home",
+        root: makeElement({ id: "el-1", type: "container", styles: { color: "red" } }),
+      },
+    ]);
+
+    const blob = await new ReactExporter(composer).exportZip();
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+
+    expect(zip.file("components/Home.tsx")).toBeTruthy();
+    expect(zip.file("components/Home.module.css")).toBeTruthy();
+    expect(zip.file("index.tsx")).toBeTruthy();
+    expect(zip.file("package.json")).toBeTruthy();
+
+    const tsx = await zip.file("components/Home.tsx")!.async("string");
+    expect(tsx).toContain("export const Home: React.FC");
+  });
+
+  it("exportZip rejects when there is nothing to export", async () => {
+    const exporter = new ReactExporter(makeTestComposer([]));
+
+    await expect(exporter.exportZip()).rejects.toThrow("No pages to export");
+  });
+
+  it("generates a minimal package.json scaffold with React 18 dependencies", () => {
+    const composer = makeTestComposer([
+      { id: "page-1", name: "Home", root: makeElement({ id: "el-1", type: "container" }) },
+    ]);
+
+    const result = new ReactExporter(composer).export();
+    const pkgFile = result.files!.find((f) => f.name === "package.json")!;
+    const pkg = JSON.parse(pkgFile.content);
+
+    expect(pkg.name).toBe("buildrik-export");
+    expect(pkg.private).toBe(true);
+    expect(pkg.dependencies.react).toBe("^18.3.0");
+    expect(pkg.dependencies["react-dom"]).toBe("^18.3.0");
+    expect(pkg.devDependencies.typescript).toBeDefined();
+    expect(pkgFile.mimeType).toBe("application/json");
+  });
+
+  it("emits no CSS module (and no styles import) for a fully unstyled page", () => {
+    const composer = makeTestComposer([
+      {
+        id: "page-1",
+        name: "Plain",
+        root: makeElement({
+          id: "el-1",
+          type: "container",
+          children: [makeElement({ id: "el-2", type: "paragraph", content: "Text" })],
+        }),
+      },
+    ]);
+
+    const result = new ReactExporter(composer).export();
+
+    expect(result.files!.map((f) => f.name)).toEqual([
+      "components/Plain.tsx",
+      "index.tsx",
+      "package.json",
+    ]);
+    const tsx = result.files!.find((f) => f.name === "components/Plain.tsx")!;
+    expect(tsx.content).not.toContain("import styles");
+  });
+
+  it("falls back to the slug, then 'Page', for the component name", () => {
+    const composer = makeTestComposer([
+      {
+        id: "page-1",
+        name: "",
+        slug: "pricing-plans",
+        root: makeElement({ id: "el-1", type: "container" }),
+      },
+      { id: "page-2", name: "###", root: makeElement({ id: "el-2", type: "container" }) },
+    ]);
+
+    const result = new ReactExporter(composer).export();
+    const names = result.files!.map((f) => f.name);
+
+    expect(names).toContain("components/PricingPlans.tsx");
+    expect(names).toContain("components/Page.tsx");
+  });
+
+  it("escapes HTML-sensitive characters in text content", () => {
+    const composer = makeTestComposer([
+      {
+        id: "page-1",
+        name: "Escaped",
+        root: makeElement({
+          id: "el-1",
+          type: "container",
+          children: [makeElement({ id: "el-2", type: "paragraph", content: `<b>&"'` })],
+        }),
+      },
+    ]);
+
+    const result = new ReactExporter(composer).export();
+    const tsx = result.files!.find((f) => f.name === "components/Escaped.tsx")!;
+
+    expect(tsx.content).toContain("&lt;b&gt;&amp;&quot;&#39;");
+    expect(tsx.content).not.toContain("<b>");
+  });
+
+  it.todo(
+    "BUG: two pages with the same name produce colliding components/<Name>.tsx entries (last one wins inside a zip) and index.tsx re-exports the same identifier twice — invalid TypeScript"
+  );
+
+  it("pins current behavior: duplicate page names emit duplicate file paths and duplicate index exports", () => {
+    const composer = makeTestComposer([
+      { id: "page-1", name: "Home", root: makeElement({ id: "el-1", type: "container" }) },
+      { id: "page-2", name: "Home", root: makeElement({ id: "el-2", type: "container" }) },
+    ]);
+
+    const result = new ReactExporter(composer).export();
+
+    const homeFiles = result.files!.filter((f) => f.name === "components/Home.tsx");
+    expect(homeFiles).toHaveLength(2);
+
+    const indexTsx = result.files!.find((f) => f.name === "index.tsx")!;
+    const exportLines = indexTsx.content
+      .split("\n")
+      .filter((l) => l.includes("export { Home }"));
+    expect(exportLines).toHaveLength(2);
   });
 });

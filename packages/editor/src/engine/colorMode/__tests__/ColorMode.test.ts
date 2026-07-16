@@ -116,4 +116,12 @@ describe("ColorMode", () => {
       expect.objectContaining({ mode: "system", resolved: "dark" })
     );
   });
+
+  it.todo(
+    "AUDIT: ColorMode has no destroy() — the MediaQueryList 'change' listener added in the " +
+      "constructor (mql.addEventListener('change', this.onSystemChange)) is never removed. " +
+      "Every ColorMode construction (repeated editor mounts, hot reload, tests) leaks one MQL " +
+      "listener that keeps the instance + its EventEmitter reachable. Composer.destroy() has " +
+      "nothing to call. Add destroy() { this.mql?.removeEventListener('change', this.onSystemChange) }.",
+  );
 });

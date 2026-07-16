@@ -11,8 +11,8 @@ import * as React from "react";
 import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
-import type { GroupedTabId, TabZone, RailTool } from "../rail/tabsConfig";
-import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool } from "../rail/tabsConfig";
+import type { GroupedTabId, GroupedTabConfig, TabZone, RailTool } from "../rail/tabsConfig";
+import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool, getFigmaRailGroups } from "../rail/tabsConfig";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
@@ -107,18 +107,24 @@ const SETTINGS_DIRTY_SET: ReadonlySet<string> = new Set(["settings"]);
 
 function RailZone({
   zone,
+  tabs: tabsOverride,
   activeTab,
   drawerOpen,
   onBtnClick,
   dirtyTabIds,
 }: {
   zone: TabZone;
+  /** Explicit tab list. When omitted, all tabs in `zone` render (legacy path). */
+  tabs?: GroupedTabConfig[];
   activeTab: GroupedTabId;
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
   dirtyTabIds?: ReadonlySet<string>;
 }) {
-  const tabs = React.useMemo(() => getTabsByZone(zone), [zone]);
+  const tabs = React.useMemo(
+    () => tabsOverride ?? getTabsByZone(zone),
+    [tabsOverride, zone],
+  );
 
   return (
     <div className="ls-zone">
@@ -161,7 +167,46 @@ function RailZone({
 }
 
 // ============================================
-// E3 — 4-tool rail (flag-gated: ?rail=4)
+// F1 — Figma-contract rail (default)
+// ============================================
+// Five rail tools in two zones: Add/Assets/Components (creation) then
+// Layers/Pages (structure), with a divider between. Reuses RailZone's button
+// markup via an explicit tab list. The six off-rail panels (AI, Templates,
+// Design, Settings, Publish, History) still open from ⌘K + topbar — nothing
+// is stranded (see tabsConfig RAIL_FIGMA + tabsConfig.figma.test.ts).
+function FigmaRail({
+  activeTab,
+  drawerOpen,
+  onBtnClick,
+  dirtyTabIds,
+}: {
+  activeTab: GroupedTabId;
+  drawerOpen: boolean;
+  onBtnClick: (tabId: GroupedTabId) => void;
+  dirtyTabIds?: ReadonlySet<string>;
+}) {
+  const groups = React.useMemo(() => getFigmaRailGroups(), []);
+  return (
+    <>
+      {groups.map((g, i) => (
+        <React.Fragment key={g.zone}>
+          <RailZone
+            zone={g.zone}
+            tabs={g.tabs}
+            activeTab={activeTab}
+            drawerOpen={drawerOpen}
+            onBtnClick={onBtnClick}
+            dirtyTabIds={dirtyTabIds}
+          />
+          {i < groups.length - 1 && <div className="ls-divider" />}
+        </React.Fragment>
+      ))}
+    </>
+  );
+}
+
+// ============================================
+// E3 — 4-tool rail (escape hatch: ?rail=e3)
 // ============================================
 // Each tool button opens its PRIMARY folded panel; the remaining folded tabs
 // (templates/components/media under Insert; publish/history under Site) reach
@@ -391,8 +436,9 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   // Global keyboard shortcuts (A, T, Z, etc.)
   useSidebarKeyboard(safeTabChange);
 
-  // E3 4-tool rail opt-in (?rail=4 or ?view=client) — read once; default 11-button.
-  const useFourToolRail = React.useMemo(() => getEditorViewMode().fourToolRail, []);
+  // Rail mode — read once. Default "figma" (F1); "e3" and "legacy" are escape hatches.
+  const railMode = React.useMemo(() => getEditorViewMode().railMode, []);
+  const useFourToolRail = railMode === "e3";
 
   // Component creation handler
   const handleCreateComponent = React.useCallback(() => {
@@ -482,11 +528,18 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
         <div className="ls-divider" />
 
-        {useFourToolRail ? (
+        {railMode === "e3" ? (
           <FourToolRail
             activeTab={activeTab}
             drawerOpen={drawerOpen}
             onBtnClick={handleBtnClick}
+          />
+        ) : railMode === "figma" ? (
+          <FigmaRail
+            activeTab={activeTab}
+            drawerOpen={drawerOpen}
+            onBtnClick={handleBtnClick}
+            dirtyTabIds={settingsDirty ? SETTINGS_DIRTY_SET : EMPTY_SET}
           />
         ) : (
           ZONES.map((zone, i) => (

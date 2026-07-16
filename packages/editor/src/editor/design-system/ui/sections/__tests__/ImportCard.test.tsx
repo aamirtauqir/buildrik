@@ -121,6 +121,100 @@ describe("ImportCard — conflict resolution", () => {
   });
 });
 
+describe("ImportCard — conflict strategy behavior", () => {
+  const conflictAndNew = [
+    {
+      id: "color-primary", name: "Brand Override", value: "#222222",
+      category: "colors", cssVar: "--buildrick-design-color-primary", type: "color",
+      kind: "color",
+    },
+    {
+      id: "color-strategy-new", name: "Strategy New", value: "#00AA55",
+      category: "colors", cssVar: "--buildrick-design-color-strategy-new", type: "color",
+      kind: "color",
+    },
+  ];
+
+  function renderWithProbe() {
+    const colors: { current: Array<{ id: string; value: string }> } = { current: [] };
+    const Probe: React.FC = () => {
+      const c = useColorRegistry();
+      colors.current = c.tokens.map((t) => ({ id: t.id, value: t.value }));
+      return null;
+    };
+    const utils = render(
+      wrap(
+        <>
+          <Probe />
+          <ImportCard />
+        </>,
+      ),
+    );
+    return { ...utils, colors };
+  }
+
+  it("'Replace' (default) overwrites the conflicting token AND adds the new one", async () => {
+    const { getByTestId, getByText, findByTestId, colors } = renderWithProbe();
+
+    await act(async () => {
+      fireEvent.drop(getByTestId("import-drop-zone"), {
+        dataTransfer: { files: [makeJsonFile(conflictAndNew)] },
+      });
+    });
+    await findByTestId("import-resolve-box");
+
+    // replace = 1 modified + 1 added staged.
+    fireEvent.click(getByText(/Apply 2 valid only/i));
+
+    await waitFor(() => {
+      expect(colors.current.find((t) => t.id === "color-primary")?.value).toBe("#222222");
+      expect(colors.current.find((t) => t.id === "color-strategy-new")?.value).toBe("#00AA55");
+    });
+  });
+
+  it("'Merge · keep mine' skips the conflicting id and only adds the new token", async () => {
+    const { getByTestId, getByText, findByTestId, colors } = renderWithProbe();
+    const originalPrimary = colors.current.find((t) => t.id === "color-primary")?.value;
+    expect(originalPrimary).toBeDefined();
+    expect(originalPrimary).not.toBe("#222222");
+
+    await act(async () => {
+      fireEvent.drop(getByTestId("import-drop-zone"), {
+        dataTransfer: { files: [makeJsonFile(conflictAndNew)] },
+      });
+    });
+    await findByTestId("import-resolve-box");
+
+    fireEvent.click(getByText(/Merge · keep mine/i));
+    // keep-mine narrows the staged set to NEW ids only → count drops to 1.
+    fireEvent.click(getByText(/Apply 1 valid only/i));
+
+    await waitFor(() => {
+      expect(colors.current.find((t) => t.id === "color-strategy-new")?.value).toBe("#00AA55");
+    });
+    // Existing token untouched.
+    expect(colors.current.find((t) => t.id === "color-primary")?.value).toBe(originalPrimary);
+  });
+
+  it("'Merge · keep theirs' behaves like Replace in v1 (all incoming staged)", async () => {
+    const { getByTestId, getByText, findByTestId, colors } = renderWithProbe();
+
+    await act(async () => {
+      fireEvent.drop(getByTestId("import-drop-zone"), {
+        dataTransfer: { files: [makeJsonFile(conflictAndNew)] },
+      });
+    });
+    await findByTestId("import-resolve-box");
+
+    fireEvent.click(getByText(/Merge · keep theirs/i));
+    fireEvent.click(getByText(/Apply 2 valid only/i));
+
+    await waitFor(() => {
+      expect(colors.current.find((t) => t.id === "color-primary")?.value).toBe("#222222");
+    });
+  });
+});
+
 describe("ImportCard — cancel + apply", () => {
   it("Cancel returns to drop-zone state (detail block gone)", async () => {
     const { getByTestId, getByText, queryByTestId, findByTestId } = render(wrap(<ImportCard />));

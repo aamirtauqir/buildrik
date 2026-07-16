@@ -273,4 +273,11 @@ describe("DSLinter.errors", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].rule).toBe("pure-black");
   });
+
+  it.todo(
+    "AUDIT: the spec D21 500ms lint debounce is not an engine concern — DSLinter is pure/sync " +
+      "by design and delegates debouncing to the UI consumer (editor/design-system/ui/DSLintMount). " +
+      "No engine-level test can pin it; verify a UI-level test covers the 500ms window, or the " +
+      "debounce contract is enforced nowhere.",
+  );
 });

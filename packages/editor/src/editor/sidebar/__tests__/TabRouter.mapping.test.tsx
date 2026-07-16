@@ -1,0 +1,132 @@
+/**
+ * TabRouter.mapping.test.tsx — lazy tab-id → component mapping.
+ * The "ai" case is covered by TabRouter.ai.test.tsx; this file covers the
+ * remaining panel tabs, the componentsV2/publish feature-flag gating, and
+ * the unknown-tab null fallback.
+ */
+
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import * as React from "react";
+import { TabRouter, type TabRouterProps } from "../TabRouter";
+import type { GroupedTabId } from "../../rail/tabsConfig";
+
+const flags = vi.hoisted(() => ({ enabled: new Set<string>() }));
+
+vi.mock("@/shared/utils/featureFlags", () => ({
+  isFeatureEnabled: (flag: string) => flags.enabled.has(flag),
+}));
+
+vi.mock("../tabs/build", () => ({
+  BuildTab: () => <div data-testid="tab-build" />,
+}));
+vi.mock("../tabs/layers/LayersTab", () => ({
+  default: () => <div data-testid="tab-layers" />,
+}));
+vi.mock("../tabs/pages/PagesTab", () => ({
+  default: () => <div data-testid="tab-pages" />,
+}));
+vi.mock("../tabs/templates/TemplatesTab", () => ({
+  TemplatesTab: () => <div data-testid="tab-templates" />,
+}));
+vi.mock("../tabs/ComponentsTab", () => ({
+  default: () => <div data-testid="tab-components-legacy" />,
+}));
+vi.mock("@/editor/components-catalog/ui/ComponentsPanelV2", () => ({
+  ComponentsPanelV2: () => <div data-testid="tab-components-v2" />,
+}));
+vi.mock("../tabs/media/MediaTab", () => ({
+  MediaTab: () => <div data-testid="tab-assets" />,
+}));
+vi.mock("../tabs/publish/PublishTab", () => ({
+  default: (props: { onVercelPublish?: () => Promise<void> }) => (
+    <div data-testid="tab-publish" data-vercel={props.onVercelPublish ? "wired" : "none"} />
+  ),
+}));
+vi.mock("../tabs/history/HistoryTab", () => ({
+  default: () => <div data-testid="tab-history" />,
+}));
+vi.mock("../tabs/settings/SettingsTab", () => ({
+  default: () => <div data-testid="tab-settings" />,
+}));
+vi.mock("../tabs/ai/AITab", () => ({
+  AITab: () => <div data-testid="tab-ai" />,
+}));
+vi.mock("@/editor/design-system/ui/DesignSystemTab", () => ({
+  default: () => <div data-testid="tab-design" />,
+}));
+
+const noop = vi.fn();
+
+function renderRouter(activeTab: GroupedTabId, extra: Partial<TabRouterProps> = {}) {
+  return render(
+    <TabRouter
+      activeTab={activeTab}
+      composer={null}
+      commonTabProps={{ isPinned: false, onPinToggle: noop, onHelpClick: noop, onClose: noop }}
+      onSwitchToAdd={noop}
+      onCreateComponent={noop}
+      {...extra}
+    />
+  );
+}
+
+beforeEach(() => {
+  flags.enabled.clear();
+});
+
+describe("TabRouter — tab id → panel component mapping", () => {
+  const cases: Array<[GroupedTabId, string]> = [
+    ["add", "tab-build"],
+    ["templates", "tab-templates"],
+    ["layers", "tab-layers"],
+    ["pages", "tab-pages"],
+    ["assets", "tab-assets"],
+    ["publish", "tab-publish"],
+    ["history", "tab-history"],
+    ["settings", "tab-settings"],
+    ["design", "tab-design"],
+  ];
+
+  it.each(cases)("activeTab=%s renders %s", async (tabId, testId) => {
+    renderRouter(tabId);
+    expect(await screen.findByTestId(testId)).toBeInTheDocument();
+  });
+
+  it("renders nothing for an unknown tab id", () => {
+    const { container } = renderRouter("not-a-tab" as unknown as GroupedTabId);
+    expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe("TabRouter — components tab flag gating", () => {
+  it("renders the legacy ComponentsTab when componentsV2 is OFF", async () => {
+    renderRouter("components");
+    expect(await screen.findByTestId("tab-components-legacy")).toBeInTheDocument();
+    expect(screen.queryByTestId("tab-components-v2")).toBeNull();
+  });
+
+  it("renders ComponentsPanelV2 when componentsV2 is ON", async () => {
+    flags.enabled.add("componentsV2");
+    renderRouter("components");
+    expect(await screen.findByTestId("tab-components-v2")).toBeInTheDocument();
+    expect(screen.queryByTestId("tab-components-legacy")).toBeNull();
+  });
+});
+
+describe("TabRouter — publish action flag gating", () => {
+  const onVercelPublish = async () => {};
+
+  it("withholds onVercelPublish from PublishTab when the publish flag is OFF", async () => {
+    renderRouter("publish", { onVercelPublish });
+    const tab = await screen.findByTestId("tab-publish");
+    expect(tab.getAttribute("data-vercel")).toBe("none");
+  });
+
+  it("passes onVercelPublish through when the publish flag is ON", async () => {
+    flags.enabled.add("publish");
+    renderRouter("publish", { onVercelPublish });
+    const tab = await screen.findByTestId("tab-publish");
+    expect(tab.getAttribute("data-vercel")).toBe("wired");
+  });
+});

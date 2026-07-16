@@ -130,3 +130,166 @@ describe("useColorTokens — renameToken", () => {
     expect(old?.replacedBy).toBeUndefined();
   });
 });
+
+describe("useColorTokens — per-token undo/redo stacks", () => {
+  it("updateToken pushes an undo entry; undoToken restores the previous value", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.updateToken("color-primary", "#FF0000"));
+    expect(result.current.tokens[0].value).toBe("#FF0000");
+    expect(result.current.canUndo("color-primary")).toBe(true);
+    act(() => result.current.undoToken("color-primary"));
+    expect(result.current.tokens[0].value).toBe("#3B82F6");
+    expect(result.current.canRedo("color-primary")).toBe(true);
+  });
+
+  it("redoToken re-applies the undone value and restores the undo entry", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.updateToken("color-primary", "#FF0000"));
+    act(() => result.current.undoToken("color-primary"));
+    act(() => result.current.redoToken("color-primary"));
+    expect(result.current.tokens[0].value).toBe("#FF0000");
+    expect(result.current.canUndo("color-primary")).toBe(true);
+    expect(result.current.canRedo("color-primary")).toBe(false);
+  });
+
+  it("a fresh edit clears the redo stack for that token", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.updateToken("color-primary", "#FF0000"));
+    act(() => result.current.undoToken("color-primary"));
+    expect(result.current.canRedo("color-primary")).toBe(true);
+    act(() => result.current.updateToken("color-primary", "#00FF00"));
+    expect(result.current.canRedo("color-primary")).toBe(false);
+  });
+
+  it("same-value update does not push an undo entry (no-op guard)", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.updateToken("color-primary", "#3B82F6"));
+    expect(result.current.canUndo("color-primary")).toBe(false);
+    expect(result.current.isDirty).toBe(false);
+  });
+
+  it("stacks are per-token — editing one token leaves the other's stack empty", () => {
+    const SECOND: DesignToken = { ...MOCK_TOKEN, id: "color-second", value: "#111111" };
+    const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, SECOND]));
+    act(() => result.current.updateToken("color-primary", "#FF0000"));
+    expect(result.current.canUndo("color-primary")).toBe(true);
+    expect(result.current.canUndo("color-second")).toBe(false);
+    // Undo on the untouched token is a no-op.
+    act(() => result.current.undoToken("color-second"));
+    expect(result.current.tokens.find((t) => t.id === "color-second")?.value).toBe("#111111");
+  });
+
+  it("multi-step undo walks back through the full history", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.updateToken("color-primary", "#111111"));
+    act(() => result.current.updateToken("color-primary", "#222222"));
+    act(() => result.current.undoToken("color-primary"));
+    expect(result.current.tokens[0].value).toBe("#111111");
+    act(() => result.current.undoToken("color-primary"));
+    expect(result.current.tokens[0].value).toBe("#3B82F6");
+    expect(result.current.canUndo("color-primary")).toBe(false);
+  });
+});
+
+describe("useColorTokens — pendingDiff / markSaved / discardAll", () => {
+  it("updateToken populates pendingDiff with previous/current values", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.updateToken("color-primary", "#FF0000"));
+    expect(result.current.pendingDiff["color-primary"]).toEqual({
+      tokenId: "color-primary",
+      previousValue: "#3B82F6",
+      currentValue: "#FF0000",
+    });
+    expect(result.current.isDirty).toBe(true);
+  });
+
+  it("markSaved snapshots tokens as saved and clears diff + stacks", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.updateToken("color-primary", "#FF0000"));
+    act(() => result.current.markSaved());
+    expect(result.current.pendingDiff).toEqual({});
+    expect(result.current.isDirty).toBe(false);
+    expect(result.current.savedTokens[0].value).toBe("#FF0000");
+    expect(result.current.canUndo("color-primary")).toBe(false);
+  });
+
+  it("discardAll reverts edited values to savedTokens and clears stacks", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() => result.current.updateToken("color-primary", "#FF0000"));
+    act(() => result.current.discardAll());
+    expect(result.current.tokens[0].value).toBe("#3B82F6");
+    expect(result.current.isDirty).toBe(false);
+    expect(result.current.canUndo("color-primary")).toBe(false);
+    expect(result.current.canRedo("color-primary")).toBe(false);
+  });
+
+  it("resetFromSaved replaces tokens+saved and keeps only category='colors'", () => {
+    const { result } = renderHook(() => useColorTokens(INITIAL));
+    act(() =>
+      result.current.resetFromSaved([
+        { ...MOCK_TOKEN, value: "#ABCDEF" },
+        {
+          id: "space-4",
+          name: "Space 4",
+          value: "16px",
+          category: "spacing",
+          cssVar: "--buildrick-design-space-4",
+          type: "length",
+        },
+      ])
+    );
+    expect(result.current.tokens).toHaveLength(1);
+    expect(result.current.tokens[0].value).toBe("#ABCDEF");
+    expect(result.current.savedTokens[0].value).toBe("#ABCDEF");
+    expect(result.current.isDirty).toBe(false);
+  });
+
+  it("filterTokens matches name, value and description case-insensitively", () => {
+    const withDesc: DesignToken = {
+      ...MOCK_TOKEN,
+      id: "color-cta",
+      name: "CTA",
+      value: "#FF6B00",
+      description: "Call to action",
+    };
+    const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, withDesc]));
+    expect(result.current.filterTokens("primary").map((t) => t.id)).toEqual(["color-primary"]);
+    expect(result.current.filterTokens("#ff6b").map((t) => t.id)).toEqual(["color-cta"]);
+    expect(result.current.filterTokens("call to").map((t) => t.id)).toEqual(["color-cta"]);
+    expect(result.current.filterTokens("   ")).toHaveLength(2); // blank → all
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUG PIN §2-B13 — pendingDiff and discardAll pair tokens[i] with
+// savedTokens[i] by ARRAY INDEX, not by id. Once addToken / hard deleteToken
+// shifts the array, the diff attributes changes to the wrong token and
+// discardAll writes a *different token's* saved value over an untouched one.
+// (useTokensForKind already does the id-keyed lookup — this hook should too.)
+// ─────────────────────────────────────────────────────────────────────────────
+describe("useColorTokens — §2-B13 index-based diff/discard bug (pinned)", () => {
+  it("documents the bug: hard-deleting the first token makes the untouched second token show up in pendingDiff", () => {
+    const SECOND: DesignToken = { ...MOCK_TOKEN, id: "color-second", value: "#111111" };
+    const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, SECOND]));
+    act(() => result.current.deleteToken("color-primary")); // hard delete index 0
+    // tokens = [color-second], savedTokens = [color-primary, color-second].
+    // Index pairing compares color-second against color-primary's saved value:
+    const diff = result.current.pendingDiff["color-second"];
+    expect(diff).toBeDefined(); // ← wrong: color-second was never edited
+    expect(diff.previousValue).toBe("#3B82F6"); // ← the DELETED token's value
+  });
+
+  it("documents the bug: discardAll after a hard delete overwrites the untouched token with the deleted token's value", () => {
+    const SECOND: DesignToken = { ...MOCK_TOKEN, id: "color-second", value: "#111111" };
+    const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, SECOND]));
+    act(() => result.current.deleteToken("color-primary"));
+    act(() => result.current.discardAll());
+    const second = result.current.tokens.find((t) => t.id === "color-second");
+    // Cross-token corruption: color-second now carries color-primary's value.
+    expect(second?.value).toBe("#3B82F6");
+  });
+
+  it.todo(
+    "§2-B13 fix: pendingDiff/discardAll must look up saved by id (savedTokens.find(s => s.id === t.id)) so add/delete cannot misattribute diffs — flip the two documenting tests above when fixed"
+  );
+});
