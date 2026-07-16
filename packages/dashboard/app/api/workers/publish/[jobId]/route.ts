@@ -11,7 +11,9 @@ import { decryptPublishedPassword } from "@server/services/site-settings.service
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-const STEPS = [
+// Exported for unit testing. Next only treats HTTP-method exports (GET/POST/…)
+// as route handlers; these named helper exports are ignored by the router.
+export const STEPS = [
   "Generating pages",
   "Optimizing images",
   "Deploying to CDN",
@@ -19,18 +21,27 @@ const STEPS = [
   "Performance check",
 ] as const;
 
+// Steps that are NOT actually run in the MVP. They must report "skipped", never
+// "done" — a green checkmark for work that didn't happen is a false signal
+// (image optimization and the Lighthouse performance check both come later).
+// Keep this in sync with the STEPS indices above.
+export const SKIPPED_STEPS: ReadonlySet<number> = new Set([
+  1, // Optimizing images
+  4, // Performance check (Lighthouse)
+]);
+
 function stepProgress(stepIndex: number): number {
   return Math.round(((stepIndex + 1) / STEPS.length) * 100);
 }
 
-function buildSteps(activeIndex: number, failed = false) {
-  return STEPS.map((name, i) => ({
-    name,
-    status:
-      i < activeIndex ? "done"
-      : i === activeIndex ? (failed ? "failed" : "active")
-      : "pending",
-  }));
+export function buildSteps(activeIndex: number, failed = false) {
+  return STEPS.map((name, i) => {
+    if (i === activeIndex) return { name, status: failed ? "failed" : "active" };
+    if (i > activeIndex) return { name, status: "pending" };
+    // i < activeIndex — the pipeline has passed this step: it either genuinely
+    // ran ("done") or was never run ("skipped"). Never claim "done" for a skip.
+    return { name, status: SKIPPED_STEPS.has(i) ? "skipped" : "done" };
+  });
 }
 
 export async function POST(
@@ -346,7 +357,8 @@ async function runVercelDeployJob(
   await checkCancelled(jobId);
   await setStep(jobId, 0);
 
-  // Step 1 — Optimizing images: skipped in MVP.
+  // Step 1 — Optimizing images: not run in MVP. Reports "skipped" (see
+  // SKIPPED_STEPS), never "done".
   await checkCancelled(jobId);
   await setStep(jobId, 1);
 
@@ -368,7 +380,8 @@ async function runVercelDeployJob(
   await checkCancelled(jobId);
   await setStep(jobId, 3);
 
-  // Step 4 — Performance check: skipped in MVP (Lighthouse comes later).
+  // Step 4 — Performance check (Lighthouse): not run in MVP. Reports "skipped"
+  // (see SKIPPED_STEPS), never "done"; lighthouseScore stays null.
   await setStep(jobId, 4);
 
   // Prefer custom verified domain if configured, else Vercel-provided URL.
