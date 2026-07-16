@@ -6,7 +6,7 @@ import { createDecipheriv, createHash, randomBytes, randomUUID } from "crypto";
 import { encrypt, decrypt } from "@/lib/encryption";
 import { generateToken, validateToken, invalidateToken } from "./token.service";
 import { isAccountLocked, incrementFailedAttempts, resetFailedAttempts } from "./rate-limit.service";
-import { sendVerificationEmail, sendPasswordResetEmail, sendMagicLinkEmail } from "./email.service";
+import { sendVerificationEmail, sendPasswordResetEmail, sendOAuthOnlyLoginEmail, sendMagicLinkEmail } from "./email.service";
 import { logAuditEvent } from "./audit.service";
 
 async function hashBackupCodes(codes: string[]): Promise<string[]> {
@@ -251,10 +251,27 @@ export async function resendVerification(email: string) {
 }
 
 export async function forgotPassword(email: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, passwordHash: true, accounts: { select: { provider: true } } },
+  });
   if (!user) return; // always return success, prevent enumeration
 
+  // The token is minted either way — an OAuth-only user may still want to SET a
+  // password, and reset/set share the same flow. Which email we send is the only
+  // difference, and that difference reaches only the mailbox owner.
   const token = await generateToken("password_reset", user.id, 60); // 1 hour per PRD
+
+  if (!user.passwordHash) {
+    // No password → this is a social account. A "reset your password" email would
+    // be a lie (there is none) and would loop them; tell them how they actually
+    // sign in. Distinct audit event so this path is visible in the log.
+    const providers = user.accounts.map((a) => a.provider);
+    await sendOAuthOnlyLoginEmail(email, providers, token);
+    await logAuditEvent("PASSWORD_RESET_OAUTH_ONLY", "success", { email });
+    return;
+  }
+
   await sendPasswordResetEmail(email, token);
   await logAuditEvent("PASSWORD_RESET_REQUESTED", "success", { email });
 }

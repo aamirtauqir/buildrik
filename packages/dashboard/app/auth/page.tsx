@@ -210,9 +210,19 @@ function AuthPageContent() {
         </AuthButton>
 
         {credentialError && !pending && (
-          <Link href="/auth/magic-link" className="w-full">
-            <AuthButton type="button">Email me a magic link</AuthButton>
-          </Link>
+          <>
+            {/* Shown on EVERY failed credential attempt, so it leaks nothing
+                about whether the account exists or how it signs in. It just
+                points the one group this screen can't otherwise help — people
+                who signed up with Google/GitHub and have no password — back at
+                the buttons above, instead of looping on "Incorrect password". */}
+            <p className="text-auth-label text-auth-text-muted text-center">
+              Signed up with Google or GitHub? Use the buttons above.
+            </p>
+            <Link href="/auth/magic-link" className="w-full">
+              <AuthButton type="button">Email me a magic link</AuthButton>
+            </Link>
+          </>
         )}
       </form>
 
