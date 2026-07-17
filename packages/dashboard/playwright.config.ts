@@ -73,11 +73,11 @@ export default defineConfig({
             use: { ...bsConnect({ browser: "playwright-webkit", browser_version: "latest", os: "OS X", os_version: "Ventura" }), storageState: AUTH_STATE },
             dependencies: ["setup"],
           },
-          {
-            name: "bs-safari-iphone",
-            use: { ...bsConnect({ browser: "playwright-webkit", os: "ios", os_version: "16", device: "iPhone 14" }), storageState: AUTH_STATE },
-            dependencies: ["setup"],
-          },
+          // Real-device (iOS/Android) is opt-in: BrowserStack allows only ONE
+          // browser context per device session, so it MUST run serially
+          // (--workers=1) and is much slower. Add back + run in a dedicated
+          // pass if you need mobile:
+          //   { name: "bs-safari-iphone", use: { ...bsConnect({ browser: "playwright-webkit", os: "ios", os_version: "16", device: "iPhone 14" }), storageState: AUTH_STATE }, dependencies: ["setup"] },
         ]
       : [
           {
