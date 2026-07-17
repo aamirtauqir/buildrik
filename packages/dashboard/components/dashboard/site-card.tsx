@@ -42,7 +42,7 @@ export function SiteCard({ site }: SiteCardProps) {
   }
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-[var(--color-border-default)] bg-white hover:border-[var(--color-primary)]/30 transition-colors">
+    <div className="group relative flex flex-col overflow-hidden rounded-lg border border-[var(--color-border-default)] bg-white hover:border-[var(--color-primary)]/30 transition-colors">
       {/* Thumbnail */}
       <div className="relative flex h-32 items-center justify-center bg-[var(--color-bg-subtle)]">
         {site.thumbnail ? (

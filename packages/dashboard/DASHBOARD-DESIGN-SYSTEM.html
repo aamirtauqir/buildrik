@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Design System — Buildrick</title>
+<style>
+  :root{
+    --bg-page:#F9FAFC; --bg-surface:#FFFFFF; --bg-subtle:#F3F5F8;
+    --border:#E8EAEF; --border-strong:#D6DAE1;
+    --text-primary:#1C212C; --text-secondary:#6B7380; --text-muted:#8A91A0;
+    --primary:#2D6DFF; --primary-hover:#1950DC; --primary-subtle:#EBF1FF;
+    --shadow:0 1px 2px rgba(15,23,41,.04),0 1px 3px rgba(15,23,41,.05);
+    --font:"Inter Tight","Geist",-apple-system,system-ui,sans-serif;
+    --mono:"Geist Mono",ui-monospace,monospace;
+  }
+  @media(prefers-color-scheme:dark){:root{
+    --bg-page:#0C0E13;--bg-surface:#14171F;--bg-subtle:#1C202A;--border:#242833;--border-strong:#2E3340;
+    --text-primary:#EDEFF3;--text-secondary:#A2AAB8;--text-muted:#727A8A;--primary-subtle:#16213B;
+    --shadow:0 1px 2px rgba(0,0,0,.3);}}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg-page);color:var(--text-primary);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 28px 90px;}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+  .mark{width:32px;height:32px;border-radius:7px;background:var(--text-primary);color:var(--bg-surface);display:grid;place-items:center;font-weight:800;font-size:15px;}
+  h1{font-size:28px;font-weight:720;letter-spacing:-.02em;margin:0;}
+  .sub{color:var(--text-secondary);font-size:14.5px;margin:6px 0 4px;}
+  .meta{color:var(--text-muted);font-family:var(--mono);font-size:12px;margin-bottom:30px;}
+  h2{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin:40px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .sw{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+  .sw .chip{height:56px;border-bottom:1px solid var(--border);}
+  .sw .lbl{padding:9px 11px;}
+  .sw .name{font-size:12px;font-weight:600;}
+  .sw .hex{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:1px;}
+  .type-row{display:flex;align-items:baseline;gap:16px;padding:11px 0;border-bottom:1px solid var(--border);}
+  .type-row:last-child{border:none;}
+  .type-tok{font-family:var(--mono);font-size:11.5px;color:var(--text-muted);width:150px;flex:none;}
+  .radii{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;}
+  .radii .r{text-align:center;}
+  .radii .box{width:64px;height:64px;background:var(--primary-subtle);border:1.5px solid var(--primary);}
+  .radii .rlbl{font-family:var(--mono);font-size:11px;color:var(--text-muted);margin-top:7px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .card{background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);}
+  .card h3{font-size:15px;font-weight:650;margin:0 0 8px;}
+  .card p{margin:0;color:var(--text-secondary);font-size:13px;}
+  .prim{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .prim .p{background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:11px 13px;box-shadow:var(--shadow);}
+  .prim .pn{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--primary);}
+  .prim .pd{font-size:12px;color:var(--text-secondary);margin-top:2px;}
+  ul.rules{list-style:none;padding:0;margin:0;}
+  ul.rules li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px;display:flex;gap:10px;}
+  ul.rules li:last-child{border:none;}
+  ul.rules .t{color:var(--primary);font-weight:700;flex:none;}
+  .pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:9999px;}
+  code{font-family:var(--mono);font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;}
+  @media(max-width:760px){.swatches{grid-template-columns:repeat(2,1fr);}.grid2,.prim{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="mark">B</span><h1>Dashboard Design System</h1></div>
+  <p class="sub">The token contract + primitives for Buildrick dashboard chrome. Sourced live from <code>app/globals.css</code> and <code>components/dashboard/</code>.</p>
+  <p class="meta">Surface: dashboard chrome · Accent: cobalt #2D6DFF · Font: Inter Tight + Geist Mono · Desktop-first, light</p>
+
+  <h2>Surfaces &amp; borders</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#F9FAFC"></div><div class="lbl"><div class="name">bg-page</div><div class="hex">#F9FAFC</div></div></div>
+    <div class="sw"><div class="chip" style="background:#FFFFFF"></div><div class="lbl"><div class="name">bg-surface</div><div class="hex">#FFFFFF</div></div></div>
+    <div class="sw"><div class="chip" style="background:#F3F5F8"></div><div class="lbl"><div class="name">bg-subtle</div><div class="hex">#F3F5F8</div></div></div>
+    <div class="sw"><div class="chip" style="background:#E8EAEF"></div><div class="lbl"><div class="name">border-default</div><div class="hex">#E8EAEF</div></div></div>
+    <div class="sw"><div class="chip" style="background:#D6DAE1"></div><div class="lbl"><div class="name">border-strong</div><div class="hex">#D6DAE1</div></div></div>
+    <div class="sw"><div class="chip" style="background:#141924"></div><div class="lbl"><div class="name">ink</div><div class="hex">#141924</div></div></div>
+  </div>
+
+  <h2>Text</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#1C212C"></div><div class="lbl"><div class="name">text-primary</div><div class="hex">#1C212C · 12.9:1</div></div></div>
+    <div class="sw"><div class="chip" style="background:#6B7380"></div><div class="lbl"><div class="name">text-secondary</div><div class="hex">#6B7380 · 4.8:1</div></div></div>
+    <div class="sw"><div class="chip" style="background:#8A91A0"></div><div class="lbl"><div class="name">text-muted</div><div class="hex">#8A91A0 · 3.16:1</div></div></div>
+  </div>
+
+  <h2>Accent — single cobalt</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#2D6DFF"></div><div class="lbl"><div class="name">primary</div><div class="hex">#2D6DFF</div></div></div>
+    <div class="sw"><div class="chip" style="background:#1950DC"></div><div class="lbl"><div class="name">primary-hover</div><div class="hex">#1950DC</div></div></div>
+    <div class="sw"><div class="chip" style="background:#EBF1FF"></div><div class="lbl"><div class="name">primary-subtle</div><div class="hex">#EBF1FF</div></div></div>
+    <div class="sw"><div class="chip" style="background:#2D6DFF"></div><div class="lbl"><div class="name">info = accent</div><div class="hex">#2D6DFF</div></div></div>
+  </div>
+
+  <h2>Semantic — status only, never decoration</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#059669"></div><div class="lbl"><div class="name">success</div><div class="hex">#059669</div></div></div>
+    <div class="sw"><div class="chip" style="background:#D97706"></div><div class="lbl"><div class="name">warning</div><div class="hex">#D97706</div></div></div>
+    <div class="sw"><div class="chip" style="background:#DC2626"></div><div class="lbl"><div class="name">error</div><div class="hex">#DC2626</div></div></div>
+    <div class="sw"><div class="chip" style="background:#7F1D1D"></div><div class="lbl"><div class="name">destructive</div><div class="hex">#7F1D1D</div></div></div>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+    <span class="pill" style="background:#DCFCE7;color:#059669;">success-subtle</span>
+    <span class="pill" style="background:#FEF3C7;color:#B45309;">warning-subtle</span>
+    <span class="pill" style="background:#FEE2E2;color:#DC2626;">error-subtle</span>
+    <span class="pill" style="background:#EBF1FF;color:#1950DC;">accent-subtle</span>
+  </div>
+
+  <h2>Categorical — charts / avatars / app icons only</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#0D94A6"></div><div class="lbl"><div class="name">teal</div><div class="hex">#0D94A6</div></div></div>
+    <div class="sw"><div class="chip" style="background:#EA8E1E"></div><div class="lbl"><div class="name">amber</div><div class="hex">#EA8E1E</div></div></div>
+    <div class="sw"><div class="chip" style="background:#DB508C"></div><div class="lbl"><div class="name">pink</div><div class="hex">#DB508C</div></div></div>
+  </div>
+
+  <h2>Typography — Inter Tight (UI) · Geist Mono (data)</h2>
+  <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:10px;padding:6px 20px;box-shadow:var(--shadow);">
+    <div class="type-row"><span class="type-tok">page-title · 24/700</span><span style="font-size:24px;font-weight:700;letter-spacing:-.02em;">Good evening, Aamir</span></div>
+    <div class="type-row"><span class="type-tok">metric · 27/730 (StatCard)</span><span style="font-size:27px;font-weight:730;letter-spacing:-.02em;font-variant-numeric:tabular-nums;font-family:var(--font);">24.8k</span></div>
+    <div class="type-row"><span class="type-tok">section-title · 15/650</span><span style="font-size:15px;font-weight:650;">Recent activity</span></div>
+    <div class="type-row"><span class="type-tok">body · 13/400</span><span style="font-size:13px;">Manage, edit, and publish every site in your workspace.</span></div>
+    <div class="type-row"><span class="type-tok">body-sm · 12/400</span><span style="font-size:12px;">Visible to all workspace members.</span></div>
+    <div class="type-row"><span class="type-tok">eyebrow · 11/600</span><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);">Published</span></div>
+    <div class="type-row"><span class="type-tok">mono · data</span><span style="font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;">0 / 0.5 GB · 34d ago · $49.00</span></div>
+  </div>
+
+  <h2>Radius scale</h2>
+  <div class="radii">
+    <div class="r"><div class="box" style="border-radius:4px"></div><div class="rlbl">xs · 4</div></div>
+    <div class="r"><div class="box" style="border-radius:6px"></div><div class="rlbl">sm · 6</div></div>
+    <div class="r"><div class="box" style="border-radius:8px"></div><div class="rlbl">md · 8</div></div>
+    <div class="r"><div class="box" style="border-radius:10px"></div><div class="rlbl">lg · 10</div></div>
+    <div class="r"><div class="box" style="border-radius:12px"></div><div class="rlbl">xl · 12</div></div>
+    <div class="r"><div class="box" style="border-radius:9999px"></div><div class="rlbl">pill</div></div>
+  </div>
+
+  <h2>Shell &amp; spacing</h2>
+  <div class="grid2">
+    <div class="card"><h3>Two-level shell</h3><p>Top nav <code>--topnav-h: 56px</code> (brand · Explore areas · ⌘K · notifications · account). Sidebar <code>--sidebar-w: 272px</code> below it — 6 destinations + 2 support. SSOT: <code>shell/nav.ts</code>.</p></div>
+    <div class="card"><h3>Spacing</h3><p>4px base grid · compact density. Scale 2 / 4 / 8 / 12 / 16 / 24 / 32 / 48. Depth via nesting + hairline borders, subtle card shadow — no heavy elevation.</p></div>
+  </div>
+
+  <h2>Primitives — compose these, don't hand-roll</h2>
+  <div class="prim">
+    <div class="p"><div class="pn">PageHeader</div><div class="pd">h1 title + subtitle</div></div>
+    <div class="p"><div class="pn">SectionCard</div><div class="pd">rounded-10 + shadow-card</div></div>
+    <div class="p"><div class="pn">StatCard</div><div class="pd">metric tile + visual/href</div></div>
+    <div class="p"><div class="pn">DataTable</div><div class="pd">columned rows</div></div>
+    <div class="p"><div class="pn">Pill</div><div class="pd">neutral/success/warning/error/accent</div></div>
+    <div class="p"><div class="pn">ProgressBar</div><div class="pd">auto-escalating fill</div></div>
+    <div class="p"><div class="pn">MetricValue</div><div class="pd">mono + tabular-nums data</div></div>
+  </div>
+
+  <h2>Core rules</h2>
+  <ul class="rules">
+    <li><span class="t">1</span><span><b>One accent — cobalt #2D6DFF.</b> CTAs, links, active states, focus rings. Purple/violet/indigo banned.</span></li>
+    <li><span class="t">2</span><span><b>Red = error/danger only.</b> Never a red CTA or hover. (info = the cobalt accent, not a second blue.)</span></li>
+    <li><span class="t">3</span><span><b>Tabular data in Geist Mono + tabular-nums</b> — counts, currency, sizes, seats, dates via <code>MetricValue</code>. Hero stat metrics may use the display font (Inter Tight), as the artifact does; consistency within a surface beats mono everywhere.</span></li>
+    <li><span class="t">4</span><span><b>No default font stacks.</b> Inter Tight + Geist Mono only — no system-ui / Arial / Roboto, no named fallbacks.</span></li>
+    <li><span class="t">5</span><span><b>Cards earn their existence.</b> No decorative card grids, no 3-col icon-in-circle features, no colored left-border cards.</span></li>
+    <li><span class="t">6</span><span><b>No emoji as design elements.</b> Use lucide icons.</span></li>
+    <li><span class="t">7</span><span><b>Prefer named text tokens</b> — but artifact-matched pixel values (<code>text-[13.5px]</code>, <code>font-[520]</code>) are allowed when matching a mockup 1:1. Depth via hairline borders + subtle shadow, not heavy elevation.</span></li>
+  </ul>
+
+  <p class="meta" style="margin-top:36px;">Generated from live source 2026-07-17 · dashboard chrome only (auth / onboarding run their own scoped surfaces — see DESIGN.md §Surface Scope).</p>
+</div>
+</body>
+</html>

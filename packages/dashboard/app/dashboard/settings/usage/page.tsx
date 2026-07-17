@@ -73,7 +73,7 @@ function UsageTile({ metric, tone }: { metric: UsageMetric; tone: "accent" | "wa
   const pct = unlimited || metric.limit === 0 ? 0 : Math.min((metric.used / metric.limit) * 100, 100);
   return (
     <div
-      className="rounded-xl border p-4 shadow-card"
+      className="rounded-lg border p-4 shadow-card"
       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
     >
       <div className="flex items-center gap-1.5">

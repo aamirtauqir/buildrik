@@ -19,7 +19,7 @@ export function NeedsAttention() {
   if (query.isLoading || items.length === 0) return null;
 
   return (
-    <section className="mt-6 rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-primary-subtle)" }}>
+    <section className="mt-6 rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-primary-subtle)" }}>
       <h2 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Needs attention</h2>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => {
