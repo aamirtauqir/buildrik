@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { LayoutGrid } from "lucide-react";
 import { cn } from "@lib/utils";
 import { AvatarDropdown } from "@/components/dashboard/avatar-dropdown";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
@@ -47,8 +46,8 @@ export function TopNav() {
     >
       {/* Brand: ink tile + wordmark */}
       <Link href="/dashboard" className="flex shrink-0 items-center gap-2.5 pr-2">
-        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-md" style={{ backgroundColor: "var(--color-ink)" }}>
-          <LayoutGrid className="h-4 w-4 text-white" />
+        <span className="flex h-[30px] w-[30px] items-center justify-center rounded-md text-[15px] font-extrabold leading-none text-white" style={{ backgroundColor: "var(--color-ink)" }}>
+          B
         </span>
         <span className="text-[17px] font-extrabold tracking-tight" style={{ color: "var(--color-text-primary)" }}>Buildrick</span>
       </Link>

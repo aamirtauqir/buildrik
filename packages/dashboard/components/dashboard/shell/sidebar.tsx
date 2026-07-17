@@ -84,6 +84,12 @@ export function Sidebar() {
   const pathname = usePathname();
   const groups = useVisibleGroups();
   const [paletteOpen, setPaletteOpen] = useState(false);
+  // Projects count badge. Reuses the same stats query the Home page runs, so
+  // react-query dedupes it there; elsewhere it's one 60s-cached call.
+  const stats = trpc.dashboard.stats.useQuery(undefined, { staleTime: 60_000 });
+  const navCount: Record<string, number | undefined> = {
+    "/dashboard/projects": stats.data?.totalSites,
+  };
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -125,6 +131,7 @@ export function Sidebar() {
                 {group.items.map((item) => {
                   const active = isActiveRoute(pathname, item.href);
                   const Icon = iconMap[item.icon];
+                  const count = navCount[item.href];
                   return (
                     <li key={item.href}>
                       <Link href={item.href} className={cn(
@@ -133,6 +140,14 @@ export function Sidebar() {
                       )}>
                         <Icon className="h-[18px] w-[18px] shrink-0" />
                         {item.label}
+                        {count != null && count > 0 && (
+                          <span
+                            className="ml-auto rounded-full px-2 py-0.5 text-eyebrow font-semibold tabular-nums"
+                            style={{ backgroundColor: active ? "var(--color-bg-surface)" : "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
+                          >
+                            {count}
+                          </span>
+                        )}
                       </Link>
                     </li>
                   );

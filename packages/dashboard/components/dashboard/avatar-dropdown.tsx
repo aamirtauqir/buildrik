@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Settings, CreditCard, HelpCircle, LogOut, type LucideIcon } from "lucide-react";
+import { Settings, CreditCard, HelpCircle, LogOut, ChevronDown, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type MenuItem = {
@@ -67,10 +67,16 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
         aria-expanded={open}
         className={loading
           ? "h-9 w-9 animate-pulse rounded-full bg-[var(--color-bg-subtle)]"
-          : "flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-bold text-white"
+          : "flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 transition-colors hover:bg-[var(--color-bg-subtle)]"
         }
       >
-        {!loading && initials}
+        {!loading && (
+          <>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-bold text-white">{initials}</span>
+            <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Account</span>
+            <ChevronDown className="h-4 w-4" style={{ color: "var(--color-text-muted)" }} />
+          </>
+        )}
       </button>
 
       {open && (

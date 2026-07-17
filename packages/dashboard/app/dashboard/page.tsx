@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { trpc } from "@lib/trpc/client";
 import { StatCard, PageHeader, SectionCard, MetricValue } from "@/components/dashboard/primitives";
-import { TrendArrow } from "@/components/dashboard/dataviz";
+import { TrendArrow, Sparkline } from "@/components/dashboard/dataviz";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { EmptyState, type EmptyStateVariant } from "@/components/dashboard/empty-state";
@@ -176,6 +176,7 @@ export default function DashboardPage() {
                   <TrendArrow value={stats.data?.visitsChange ?? 0} /> · 30d
                 </span>
               }
+              visual={<Sparkline data={stats.data?.dailyVisitors ?? []} />}
               href="/dashboard/projects"
             />
             <StatCard

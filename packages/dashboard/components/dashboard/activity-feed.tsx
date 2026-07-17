@@ -1,6 +1,21 @@
 "use client";
 
+import { CheckCircle2, AlertTriangle, Settings2, UserPlus, Rocket, Activity, type LucideIcon } from "lucide-react";
 import type { ActivityFeed as ActivityFeedData, ActivityEntry } from "@buildrik/shared/schemas/dashboard";
+
+// Map an activity to a colored icon chip by keyword in its action/description.
+// Real audit-log entries have no `type` enum, so we classify on the visible
+// text — the same signal the reader sees. Tone drives both the icon and the
+// chip tint; falls back to a neutral activity glyph.
+function activityVisual(text: string): { Icon: LucideIcon; tone: string } {
+  const t = text.toLowerCase();
+  if (t.includes("fail") || t.includes("error")) return { Icon: AlertTriangle, tone: "var(--color-amber)" };
+  if (t.includes("publish") || t.includes("deploy") || t.includes("live")) return { Icon: CheckCircle2, tone: "var(--color-success)" };
+  if (t.includes("join") || t.includes("invite") || t.includes("member") || t.includes("team")) return { Icon: UserPlus, tone: "var(--color-primary)" };
+  if (t.includes("setting") || t.includes("updated") || t.includes("changed")) return { Icon: Settings2, tone: "var(--color-teal)" };
+  if (t.includes("site") || t.includes("app") || t.includes("build")) return { Icon: Rocket, tone: "var(--color-primary)" };
+  return { Icon: Activity, tone: "var(--color-text-muted)" };
+}
 
 function timeAgo(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -33,22 +48,20 @@ export function collapseEntries(entries: ActivityEntry[]): Array<{ entry: Activi
   return out;
 }
 
-// Dot colors cycle through the accent set (primary → success → amber → teal)
-// so the flat feed reads as a scannable, rhythmic list.
-const DOT_COLORS = [
-  "var(--color-primary)",
-  "var(--color-success)",
-  "var(--color-amber)",
-  "var(--color-teal)",
-];
-
-function ActivityRow({ entry, count, index }: { entry: ActivityEntry; count: number; index: number }) {
+function ActivityRow({ entry, count }: { entry: ActivityEntry; count: number }) {
   return (
     <li className="flex items-center gap-3">
-      <span
-        className="h-2 w-2 shrink-0 rounded-full"
-        style={{ backgroundColor: DOT_COLORS[index % DOT_COLORS.length] }}
-      />
+      {(() => {
+        const { Icon, tone } = activityVisual(`${entry.action} ${entry.description ?? ""}`);
+        return (
+          <span
+            className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg"
+            style={{ backgroundColor: `color-mix(in srgb, ${tone} 12%, transparent)`, color: tone }}
+          >
+            <Icon className="h-[17px] w-[17px]" strokeWidth={2} />
+          </span>
+        );
+      })()}
       <p className="min-w-0 flex-1 truncate text-body" style={{ color: "var(--color-text-primary)" }}>
         {entry.actorName && <span className="font-medium">{entry.actorName} </span>}
         {entry.description ?? entry.action}
@@ -85,8 +98,8 @@ export function ActivityFeed({ feed }: ActivityFeedProps) {
 
   return (
     <ul className="space-y-3.5">
-      {rows.map(({ entry, count }, i) => (
-        <ActivityRow key={entry.id} entry={entry} count={count} index={i} />
+      {rows.map(({ entry, count }) => (
+        <ActivityRow key={entry.id} entry={entry} count={count} />
       ))}
     </ul>
   );
