@@ -126,6 +126,16 @@ export const SEARCH_SCOPES = [
   { key: "help", label: "Help" },
 ];
 
+// Every static destination the palette can navigate to (nav + settings + actions
+// + moved aliases). The IA v2 contract test (E2) asserts each one resolves
+// against the live route table — no entry may point at a deleted route.
+export const PALETTE_HREFS: string[] = [
+  ...NAV_ITEMS,
+  ...SETTINGS_ITEMS,
+  ...ACTION_ITEMS,
+  ...MOVED_ITEMS,
+].map((i) => i.href);
+
 function getRecentItems(): RecentItem[] {
   try {
     const raw = localStorage.getItem(RECENT_ITEMS_KEY);

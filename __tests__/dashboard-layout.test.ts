@@ -81,6 +81,18 @@ describe("Sidebar navigation", () => {
     const flagged = ITEMS.filter((i) => i.agencyOnly).map((i) => i.href);
     expect(flagged).toEqual(["/dashboard/agency"]);
   });
+
+  // MobileTabBar filter (spec §Responsive, test #5). The mobile bar renders the
+  // six primary destinations with the same agencyOnly filter: solo sees 5,
+  // agency sees 6. The bar derives from NAV_GROUPS[0].items, so assert the
+  // filter arithmetic at the source.
+  it("filters the mobile destinations to 5 solo / 6 agency", () => {
+    const primary = NAV_GROUPS[0].items;
+    expect(primary).toHaveLength(6);
+    const solo = primary.filter((i) => !i.agencyOnly);
+    expect(solo).toHaveLength(5);
+    expect(solo.some((i) => i.href === "/dashboard/agency")).toBe(false);
+  });
 });
 
 describe("isActiveRoute", () => {

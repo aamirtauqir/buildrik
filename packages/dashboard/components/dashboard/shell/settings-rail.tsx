@@ -45,6 +45,13 @@ const RAIL_GROUPS: { label: string; items: RailItem[] }[] = [
 
 const DANGER: RailItem = { label: "Danger zone", href: "/dashboard/settings/danger" };
 
+// Every destination the rail links to — asserted against the real route table
+// by the settings-smoke contract test (spec test #9: no silent 404 from a move).
+export const SETTINGS_RAIL_HREFS: string[] = [
+  ...RAIL_GROUPS.flatMap((g) => g.items),
+  DANGER,
+].map((i) => i.href);
+
 function RailLink({ item }: { item: RailItem }) {
   const active = useSectionTabActive(item.href, item.index ? { index: true } : undefined);
   return (
