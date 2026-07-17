@@ -171,7 +171,7 @@ export default function TeamPage() {
           {/* Pending Invites */}
           {pendingQuery.data && pendingQuery.data.length > 0 && (
             <div>
-              <h2 className="mb-3 text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Pending Invitations</h2>
+              <h2 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>Pending Invitations</h2>
               <PendingInvites
                 invites={pendingQuery.data}
                 onRevoke={(inviteId) => revokeInviteMutation.mutate({ inviteId })}
@@ -182,7 +182,7 @@ export default function TeamPage() {
 
           {/* Team Activity */}
           <div className="rounded-xl border bg-white p-5" style={{ borderColor: "var(--color-border-default)" }}>
-            <h3 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Team Activity</h3>
+            <h3 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>Team Activity</h3>
             {activityQuery.data && activityQuery.data.length > 0 ? (
               <div className="space-y-3">
                 {activityQuery.data.map((entry) => (

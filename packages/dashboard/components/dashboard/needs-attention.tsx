@@ -20,7 +20,7 @@ export function NeedsAttention() {
 
   return (
     <section className="mt-6 rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-primary-subtle)" }}>
-      <h2 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Needs attention</h2>
+      <h2 className="mb-3 text-section-title" style={{ color: "var(--color-text-primary)" }}>Needs attention</h2>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => {
           const Icon = ICONS[item.type as keyof typeof ICONS] ?? AlertTriangle;
