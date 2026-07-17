@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { LayoutTemplate, Sparkles, FileText } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { TemplateGallery } from "@/components/templates/template-gallery";
@@ -145,7 +146,7 @@ function NewSitePageInner() {
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
-              <span className="text-xl">📋</span>
+              <LayoutTemplate className="h-6 w-6" style={{ color: "var(--color-text-secondary)" }} />
             </div>
             <div>
               <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Use a Template</p>
@@ -158,7 +159,7 @@ function NewSitePageInner() {
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)" }}>
-              <span className="text-xl">✨</span>
+              <Sparkles className="h-6 w-6" style={{ color: "var(--color-primary)" }} />
             </div>
             <div>
               <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
@@ -172,7 +173,7 @@ function NewSitePageInner() {
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
-              <span className="text-xl">📄</span>
+              <FileText className="h-6 w-6" style={{ color: "var(--color-text-secondary)" }} />
             </div>
             <div>
               <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p>
