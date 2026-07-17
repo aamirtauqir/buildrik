@@ -63,7 +63,7 @@ export function SiteCard({ site }: SiteCardProps) {
             siteId={site.id}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#C91F10] transition-colors"
+            className="flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--color-primary-hover)] transition-colors"
           >
             <Pencil className="h-3 w-3" />
             Edit

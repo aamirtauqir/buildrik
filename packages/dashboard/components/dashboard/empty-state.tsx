@@ -97,7 +97,7 @@ export function EmptyState({ variant }: EmptyStateProps) {
               href={cta.href}
               className={
                 i === 0
-                  ? "flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[#c91e0f]"
+                  ? "flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)]"
                   : "flex items-center gap-2 rounded-lg border border-[var(--color-border-default)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-bg-subtle)]"
               }
             >
