@@ -53,5 +53,5 @@ export const darkSurface = {
   background: "var(--buildrick-stage-dark, #111)",
   padding: 16,
   borderRadius: 6,
-  color: "var(--buildrick-text-on-accent, #fff)",
+  color: "var(--buildrick-text-on-accent)",
 };

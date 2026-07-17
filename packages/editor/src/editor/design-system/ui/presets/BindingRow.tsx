@@ -46,7 +46,7 @@ const valueButtonStyle: React.CSSProperties = {
   flex: "1 1 auto",
   minWidth: 0,
   padding: "3px 8px",
-  background: "var(--bd-bg-canvas, #0e0e10)",
+  background: "var(--bd-bg-canvas)",
   color: "var(--bd-fg-primary)",
   border: "1px solid var(--bd-border)",
   borderRadius: 4,
@@ -59,7 +59,7 @@ const valueButtonStyle: React.CSSProperties = {
 const dangerBtnStyle: React.CSSProperties = {
   padding: "3px 8px",
   background: "transparent",
-  color: "var(--bd-error, #ef4444)",
+  color: "var(--bd-error)",
   border: "1px solid rgba(239,68,68,0.3)",
   borderRadius: 4,
   fontSize: 11,

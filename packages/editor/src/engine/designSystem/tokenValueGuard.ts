@@ -33,7 +33,7 @@ const UNSAFE_TOKEN_VALUE = /url\(|expression\(|javascript:|@import|[<>{};]/i;
 const COLOR_RE = /^(?:#[0-9a-fA-F]{3,8}|rgba?\([\d.,\s%]+\)|hsla?\([\d.,\s%]+\)|[a-zA-Z]+)$/;
 const LENGTH_RE = /^-?(?:\d+\.?\d*|\.\d+)(?:px|rem|em|%|vh|vw|vmin|vmax|ch|ex|fr|pt)?$/;
 const NUMBER_RE = /^-?(?:\d+\.?\d*|\.\d+)$/;
-const FONT_RE = /^[a-zA-Z0-9 ,'"\-]+$/;
+const FONT_RE = /^[a-zA-Z0-9 ,'"-]+$/;
 
 const MAX_TOKEN_VALUE_LEN = 120;
 

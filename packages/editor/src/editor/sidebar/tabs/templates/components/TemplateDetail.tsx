@@ -81,7 +81,7 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
               <circle cx="12" cy="12" r="10" />
               <path d="M12 8v4M12 16h.01" />
             </svg>
-            <p style={{ fontSize: 11, color: "var(--bd-fg-muted, #475569)", margin: "6px 0 0", textAlign: "center" }}>
+            <p style={{ fontSize: 11, color: "var(--bd-fg-muted)", margin: "6px 0 0", textAlign: "center" }}>
               Preview unavailable
             </p>
             {onPreviewRetry && (

@@ -106,9 +106,10 @@ describe("ExportModal — rendering + export generation", () => {
       expect.objectContaining({ format: "html", cssStyle: "embedded", minify: false })
     );
     expect(mocks.exportFn).toHaveBeenCalledTimes(1);
-    // Stats row: elements + formatted HTML/CSS sizes.
-    expect(screen.getByText(/2\.0 KB HTML/)).toBeInTheDocument();
-    expect(screen.getByText(/512 B CSS/)).toBeInTheDocument();
+    // Stats row: elements + formatted HTML/CSS sizes (canonical shared
+    // formatBytes: trimmed decimals + "Bytes" unit).
+    expect(screen.getByText(/2 KB HTML/)).toBeInTheDocument();
+    expect(screen.getByText(/512 Bytes CSS/)).toBeInTheDocument();
   });
 
   it("renders the format grid with HTML/ZIP/React selectable and Vue/Next.js stubbed", async () => {
@@ -218,7 +219,7 @@ describe("ExportModal — download flows", () => {
     await waitFor(() =>
       expect(clicked).toEqual([
         // Default pageTitle drives the archive name.
-        { download: "Aquibra Export.zip", href: expect.stringContaining("blob:") },
+        { download: "Buildrick Export.zip", href: expect.stringContaining("blob:") },
       ])
     );
     expect(mocks.generateZip).toHaveBeenCalledWith(expect.objectContaining({ format: "zip" }));
@@ -249,7 +250,7 @@ describe("ExportModal — download flows", () => {
 
     await waitFor(() =>
       expect(clicked).toEqual([
-        { download: "Aquibra Export-react.zip", href: expect.stringContaining("blob:") },
+        { download: "Buildrick Export-react.zip", href: expect.stringContaining("blob:") },
       ])
     );
     expect(mocks.reactCtor).toHaveBeenCalledWith(composer);

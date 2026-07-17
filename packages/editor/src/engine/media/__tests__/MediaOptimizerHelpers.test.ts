@@ -6,9 +6,9 @@
  * fetch-based helpers use Node's real fetch for data: URLs (supported by
  * undici) and a stubbed fetch for remote-URL branches.
  *
- * NOTE on formatBytes: it is a known duplicate (audit P1-5). Tests below
- * lock in CURRENT behavior as-is; they are not an endorsement of keeping
- * two copies.
+ * byte formatting is no longer defined here — the duplicate was drained in
+ * favor of the canonical shared/utils/helpers/number.ts:formatBytes, which
+ * owns that behavior + its tests.
  *
  * @license BSD-3-Clause
  */
@@ -17,7 +17,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   dataUrlToBlob,
   estimateSize,
-  formatBytes,
   getCompressionSavings,
   getMimeType,
   loadImage,
@@ -126,36 +125,6 @@ describe("estimateSize", () => {
     );
 
     await expect(estimateSize("https://example.com/img.png")).resolves.toBe(0);
-  });
-});
-
-describe("formatBytes (current behavior — known duplicate, audit P1-5)", () => {
-  it("formats byte-range values", () => {
-    expect(formatBytes(0)).toBe("0 B");
-    expect(formatBytes(1)).toBe("1 B");
-    expect(formatBytes(512)).toBe("512 B");
-    expect(formatBytes(1023)).toBe("1023 B");
-  });
-
-  it("formats KB-range values with one decimal", () => {
-    expect(formatBytes(1024)).toBe("1.0 KB");
-    expect(formatBytes(1536)).toBe("1.5 KB");
-    expect(formatBytes(10 * 1024)).toBe("10.0 KB");
-  });
-
-  it("KB/MB boundary: 1048575 renders as 1024.0 KB (as-is)", () => {
-    expect(formatBytes(1024 * 1024 - 1)).toBe("1024.0 KB");
-  });
-
-  it("formats MB-range values with two decimals", () => {
-    expect(formatBytes(1024 * 1024)).toBe("1.00 MB");
-    expect(formatBytes(2.5 * 1024 * 1024)).toBe("2.50 MB");
-    // No GB tier — large values stay in MB (as-is).
-    expect(formatBytes(5 * 1024 * 1024 * 1024)).toBe("5120.00 MB");
-  });
-
-  it("negative input falls through the < 1024 branch verbatim (as-is, no guard)", () => {
-    expect(formatBytes(-42)).toBe("-42 B");
   });
 });
 

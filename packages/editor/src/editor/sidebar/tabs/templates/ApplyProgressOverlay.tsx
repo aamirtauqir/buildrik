@@ -83,7 +83,7 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
             flexDirection: "column",
             gap: 4,
             fontSize: 12,
-            color: "var(--bd-fg-muted, #6B7280)",
+            color: "var(--bd-fg-muted)",
             textAlign: "left",
             minWidth: 220,
           }}
@@ -99,10 +99,10 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
                   alignItems: "center",
                   gap: 8,
                   color: done
-                    ? "var(--bd-success, #16A34A)"
+                    ? "var(--bd-success)"
                     : active
-                      ? "var(--bd-cobalt, #2D6DFF)"
-                      : "var(--bd-fg-disabled, #B0B7C0)",
+                      ? "var(--bd-cobalt)"
+                      : "var(--bd-fg-disabled)",
                   fontWeight: active ? 500 : 400,
                 }}
               >

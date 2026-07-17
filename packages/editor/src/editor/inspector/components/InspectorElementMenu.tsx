@@ -100,7 +100,7 @@ const styles = {
     color: disabled
       ? "var(--buildrick-text-muted)"
       : danger
-        ? "var(--buildrick-error, #ef4444)"
+        ? "var(--buildrick-error)"
         : "var(--buildrick-text-primary)",
     fontSize: 12,
     fontWeight: 500,

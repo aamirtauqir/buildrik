@@ -162,7 +162,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         borderRadius: 8,
         overflow: "hidden",
         border: isChanged ? "1px solid rgba(245,158,11,0.4)" : "1px solid var(--bd-border)",
-        borderLeft: isChanged ? "3px solid #f59e0b" : "1px solid var(--bd-border)",
+        borderLeft: isChanged ? /* @lint-hex-policy: "changed" indicator amber-500, matches sibling rgba(245,158,11) accents (off chrome palette) */ "3px solid #f59e0b" : "1px solid var(--bd-border)",
         background: isExpanded ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
         transition: "border-color 0.15s",
       }}
@@ -297,7 +297,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                       style={{
                         fontSize: 12,
                         fontWeight: 600,
-                        color: "var(--buildrick-design-color-success, #22c55e)",
+                        color: "var(--buildrick-design-color-success)",
                         marginBottom: 4,
                       }}
                     >

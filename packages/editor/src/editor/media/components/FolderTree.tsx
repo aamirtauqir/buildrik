@@ -210,7 +210,7 @@ export function FolderTree({
       <div className="mgr-tree">
         {/* Smart folders (Bugs #6, #7 fix: actually filter) */}
         <TreeNode
-          icon={<Clock size={14} style={{ color: "#0EA5E9" }} />}
+          icon={<Clock size={14} style={{ color: /* @lint-hex-policy: "Recent" smart-folder sky-500 marker, off chrome palette */ "#0EA5E9" }} />}
           label="Recent"
           count={recentCount}
           active={smartFolder === "recent"}
@@ -274,7 +274,7 @@ export function FolderTree({
             {allTags.map((tag) => (
               <TreeNode
                 key={`tag-${tag}`}
-                icon={<div className="mgr-node-dot" style={{ background: "#0EA5E9" }} />}
+                icon={<div className="mgr-node-dot" style={{ background: /* @lint-hex-policy: tag-node sky-500 dot, off chrome palette */ "#0EA5E9" }} />}
                 label={tag}
                 count={libraryItems.filter((i) => i.altText?.includes(tag)).length}
                 active={false}

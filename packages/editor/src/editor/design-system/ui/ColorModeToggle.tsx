@@ -79,7 +79,7 @@ const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
       borderRadius: "var(--bd-radius-full)",
       cursor: "pointer",
       background: active ? "var(--bd-accent)" : "transparent",
-      color: active ? "#fff" : "var(--bd-fg-muted)",
+      color: active ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
       transition: "background 80ms",
     }}
   >

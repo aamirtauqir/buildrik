@@ -43,7 +43,7 @@ const dotStyle: React.CSSProperties = {
   width: 6,
   height: 6,
   borderRadius: "var(--bd-radius-full)",
-  background: "var(--bd-success, #22c55e)",
+  background: "var(--bd-success)",
   flexShrink: 0,
 };
 

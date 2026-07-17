@@ -23,6 +23,7 @@ import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { useToast } from "@/editor/shared/vibcoder";
 import { getDefaultPageName } from "../../../../shared/utils/pageUtils";
+import { slugify } from "@shared/utils/helpers/string";
 import type { PageItem } from "./types";
 
 interface ContextMenuState {
@@ -91,7 +92,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
           raw.map((p) => ({
             id: p.id,
             name: p.name,
-            slug: p.slug ?? p.name?.toLowerCase().replace(/\s+/g, "-") ?? p.id,
+            slug: p.slug ?? (p.name ? slugify(p.name) : undefined) ?? p.id,
             route: (
               composer as { router?: { getPath?: (id: string) => string | undefined } }
             ).router?.getPath?.(p.id),
@@ -144,7 +145,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   const addPage = React.useCallback(() => {
     if (!composer) return;
     const name = getDefaultPageName(pages);
-    const slug = name.toLowerCase().replace(/\s+/g, "-");
+    const slug = slugify(name);
     try {
       // Use createPage's synchronous return value directly. The previous
       // setTimeout(60) + getAllPages().last() pattern broke when pages are

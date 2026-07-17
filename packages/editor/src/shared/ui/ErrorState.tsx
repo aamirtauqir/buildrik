@@ -58,13 +58,13 @@ const severityConfig: Record<
 > = {
   error: {
     icon: "✕",
-    color: "var(--buildrick-error, #ef4444)",
+    color: "var(--buildrick-error)",
     bgColor: "rgba(239, 68, 68, 0.1)",
     borderColor: "rgba(239, 68, 68, 0.3)",
   },
   warning: {
     icon: "⚠",
-    color: "var(--buildrick-warning, #f59e0b)",
+    color: "var(--buildrick-warning)",
     bgColor: "rgba(245, 158, 11, 0.1)",
     borderColor: "rgba(245, 158, 11, 0.3)",
   },
@@ -367,7 +367,7 @@ export const FieldError: React.FC<FieldErrorProps> = ({ message, className = "" 
         gap: 4,
         marginTop: 4,
         fontSize: 12,
-        color: "var(--buildrick-error, #ef4444)",
+        color: "var(--buildrick-error)",
       }}
     >
       <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor">

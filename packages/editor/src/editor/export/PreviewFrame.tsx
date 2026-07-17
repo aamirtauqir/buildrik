@@ -83,7 +83,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
     <div
       ref={containerRef}
       style={{
-        background: "#1a1a2e",
+        background: /* @lint-hex-policy: device-preview frame mockup color, not editor chrome */ "#1a1a2e",
         borderRadius: 8,
         padding: 16,
         display: "flex",
@@ -107,7 +107,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             style={{
               width: deviceDimensions.width,
               height: 24,
-              background: "#333",
+              background: /* @lint-hex-policy: device-preview frame mockup color, not editor chrome */ "#333",
               borderRadius: "12px 12px 0 0",
               display: "flex",
               justifyContent: "center",
@@ -118,7 +118,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
               style={{
                 width: 60,
                 height: 4,
-                background: "#555",
+                background: /* @lint-hex-policy: device-preview frame mockup color, not editor chrome */ "#555",
                 borderRadius: 2,
               }}
             />
@@ -132,7 +132,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
           style={{
             width: deviceDimensions.width,
             height: scaledHeight / scale,
-            border: device === "desktop" ? "none" : "4px solid #333",
+            border: device === "desktop" ? "none" : /* @lint-hex-policy: device-preview frame mockup color, not editor chrome */ "4px solid #333",
             borderTop: device === "desktop" ? "none" : "none",
             borderRadius: device === "desktop" ? 8 : "0 0 12px 12px",
             background: "var(--buildrick-bg-card)",
@@ -147,7 +147,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             style={{
               width: deviceDimensions.width,
               height: 20,
-              background: "#333",
+              background: /* @lint-hex-policy: device-preview frame mockup color, not editor chrome */ "#333",
               borderRadius: "0 0 12px 12px",
               display: "flex",
               justifyContent: "center",
@@ -158,7 +158,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
               style={{
                 width: 40,
                 height: 4,
-                background: "#555",
+                background: /* @lint-hex-policy: device-preview frame mockup color, not editor chrome */ "#555",
                 borderRadius: 2,
               }}
             />

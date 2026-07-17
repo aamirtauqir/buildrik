@@ -287,7 +287,7 @@ function ToolSubNav({
         display: "flex",
         gap: 2,
         padding: "6px 8px",
-        borderBottom: "1px solid var(--bd-border, var(--color-border-default, #e5e7eb))",
+        borderBottom: "1px solid var(--bd-border)",
       }}
     >
       {subs.map((t) => {
@@ -304,7 +304,7 @@ function ToolSubNav({
               fontWeight: active ? 600 : 500,
               padding: "4px 10px",
               borderRadius: 6,
-              color: active ? "var(--bd-accent, #2D6DFF)" : "var(--bd-text-secondary, #64748b)",
+              color: active ? "var(--bd-accent)" : "var(--bd-text-secondary)",
               background: active ? "var(--bd-accent-subtle, rgba(45,109,255,0.08))" : "transparent",
             }}
           >

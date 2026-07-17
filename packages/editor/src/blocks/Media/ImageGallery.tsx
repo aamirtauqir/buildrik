@@ -98,7 +98,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
                   right: 0,
                   padding: "12px 16px",
                   background: "linear-gradient(transparent, rgba(0,0,0,0.8))",
-                  color: "#fff",
+                  color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
                   fontSize: 14,
                 }}
               >
@@ -156,7 +156,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               left: 20,
               background: "rgba(255,255,255,0.1)",
               border: "none",
-              color: "#fff",
+              color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
               fontSize: 32,
               padding: "20px 24px",
               cursor: "pointer",
@@ -188,7 +188,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               right: 20,
               background: "rgba(255,255,255,0.1)",
               border: "none",
-              color: "#fff",
+              color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
               fontSize: 32,
               padding: "20px 24px",
               cursor: "pointer",
@@ -206,7 +206,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               right: 20,
               background: "rgba(255,255,255,0.1)",
               border: "none",
-              color: "#fff",
+              color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
               fontSize: 24,
               padding: "12px 16px",
               cursor: "pointer",
@@ -220,7 +220,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
             style={{
               position: "absolute",
               bottom: 20,
-              color: "#fff",
+              color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
               fontSize: 14,
             }}
           >

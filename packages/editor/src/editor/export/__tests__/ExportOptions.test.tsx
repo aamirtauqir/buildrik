@@ -57,7 +57,7 @@ describe("OptionsPanel", () => {
   it("edits the page title through onChange", () => {
     const onChange = vi.fn();
     render(<OptionsPanel config={DEFAULT_EXPORT_CONFIG} onChange={onChange} />);
-    const input = screen.getByDisplayValue("Aquibra Export");
+    const input = screen.getByDisplayValue("Buildrick Export");
     fireEvent.change(input, { target: { value: "My Site" } });
     expect(onChange).toHaveBeenCalledWith({ pageTitle: "My Site" });
   });

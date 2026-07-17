@@ -23,7 +23,6 @@ vi.mock("../../../engine/media", () => ({
     }
     optimize = optimizeMock;
   },
-  formatBytes: (n: number) => `${n} B`,
 }));
 
 import { OptimizationPanel } from "../OptimizationPanel";

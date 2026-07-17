@@ -47,15 +47,15 @@ export function ConflictModal({ open, onReload, onSaveBackup, onOverwrite, onClo
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ width: "100%", maxWidth: 440, background: "#fff", borderRadius: 12, boxShadow: "0 10px 40px rgba(0,0,0,0.25)", padding: 24, fontFamily: "Inter, system-ui, sans-serif" }}
+        style={{ width: "100%", maxWidth: 440, background: /* @lint-hex-policy: ConflictModal self-themed state colors (documented component-theme exception) */ "#fff", borderRadius: 12, boxShadow: "0 10px 40px rgba(0,0,0,0.25)", padding: 24, fontFamily: "Inter, system-ui, sans-serif" }}
       >
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#111" }}>This site changed somewhere else</h2>
-        <p style={{ marginTop: 8, marginBottom: 0, fontSize: 14, lineHeight: 1.5, color: "#555" }}>
+        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: /* @lint-hex-policy: ConflictModal self-themed state colors (documented component-theme exception) */ "#111" }}>This site changed somewhere else</h2>
+        <p style={{ marginTop: 8, marginBottom: 0, fontSize: 14, lineHeight: 1.5, color: /* @lint-hex-policy: ConflictModal self-themed state colors (documented component-theme exception) */ "#555" }}>
           Your copy is behind — it was edited in another tab or device since you opened it.
           We can&apos;t auto-merge, so pick how to continue. Nothing is lost without your choice.
         </p>
         {confirmOverwrite && (
-          <p style={{ marginTop: 10, marginBottom: 0, fontSize: 13, color: "#B45309" }}>
+          <p style={{ marginTop: 10, marginBottom: 0, fontSize: 13, color: /* @lint-hex-policy: ConflictModal self-themed state colors (documented component-theme exception) */ "#B45309" }}>
             Overwrite replaces the newer copy with yours. The other changes will be gone.
           </p>
         )}

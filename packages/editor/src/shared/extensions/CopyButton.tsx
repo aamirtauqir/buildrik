@@ -77,7 +77,7 @@ const styles = {
     background: "rgba(255, 255, 255, 0.15)",
   } as React.CSSProperties,
   copied: {
-    color: "var(--buildrick-success, #22c55e)",
+    color: "var(--buildrick-success)",
   } as React.CSSProperties,
 };
 

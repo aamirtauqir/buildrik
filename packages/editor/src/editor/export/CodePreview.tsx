@@ -56,28 +56,28 @@ function highlightHTML(code: string): React.ReactNode[] {
     if (match[1]) {
       // Tags
       parts.push(
-        <span key={key++} style={{ color: "#e06c75" }}>
+        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#e06c75" }}>
           {match[0]}
         </span>
       );
     } else if (match[2]) {
       // Attributes
       parts.push(
-        <span key={key++} style={{ color: "#d19a66" }}>
+        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#d19a66" }}>
           {match[0]}
         </span>
       );
     } else if (match[3]) {
       // Strings
       parts.push(
-        <span key={key++} style={{ color: "#98c379" }}>
+        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#98c379" }}>
           {match[0]}
         </span>
       );
     } else if (match[4]) {
       // Entities
       parts.push(
-        <span key={key++} style={{ color: "#56b6c2" }}>
+        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#56b6c2" }}>
           {match[0]}
         </span>
       );
@@ -120,21 +120,21 @@ function highlightCSS(code: string): React.ReactNode[] {
     if (match[1]) {
       // Selectors
       parts.push(
-        <span key={key++} style={{ color: "#e06c75" }}>
+        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#e06c75" }}>
           {match[0]}
         </span>
       );
     } else if (match[2]) {
       // Properties
       parts.push(
-        <span key={key++} style={{ color: "#56b6c2" }}>
+        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#56b6c2" }}>
           {match[0]}
         </span>
       );
     } else if (match[3]) {
       // Values
       parts.push(
-        <span key={key++} style={{ color: "#98c379" }}>
+        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#98c379" }}>
           {match[0]}
         </span>
       );
@@ -148,7 +148,7 @@ function highlightCSS(code: string): React.ReactNode[] {
     } else if (match[5]) {
       // Braces
       parts.push(
-        <span key={key++} style={{ color: "#abb2bf" }}>
+        <span key={key++} style={{ color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#abb2bf" }}>
           {match[0]}
         </span>
       );
@@ -177,7 +177,7 @@ const LineNumbers: React.FC<{ count: number }> = ({ count }) => (
       fontSize: 12,
       fontFamily: "monospace",
       userSelect: "none",
-      borderRight: "1px solid #3e4451",
+      borderRight: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "1px solid #3e4451",
     }}
   >
     {Array.from({ length: count }, (_, i) => (
@@ -215,7 +215,7 @@ const CodeBlock: React.FC<{
       <div
         style={{
           display: "flex",
-          background: "#282c34",
+          background: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#282c34",
           borderRadius: 8,
           padding: 16,
           overflow: "auto",
@@ -231,7 +231,7 @@ const CodeBlock: React.FC<{
             fontSize: 13,
             lineHeight: 1.6,
             fontFamily: "'Fira Code', 'Monaco', 'Consolas', monospace",
-            color: "#abb2bf",
+            color: /* @lint-hex-policy: code-syntax highlight theme (One Dark), not editor chrome */ "#abb2bf",
             whiteSpace: "pre-wrap",
             wordBreak: "break-word",
           }}

@@ -21,9 +21,7 @@ describe("WelcomeModal", () => {
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("aria-modal", "true");
     expect(dialog).toHaveAttribute("aria-labelledby", "welcome-title");
-    // NOTE: copy still reads "Buildrik" (pre-rename spelling) — orphan
-    // component, never updated in the 2026-07-11 Buildrick brand rename.
-    expect(screen.getByText("Welcome to Buildrik")).toBeInTheDocument();
+    expect(screen.getByText("Welcome to Buildrick")).toBeInTheDocument();
     expect(
       screen.getByText("Start with a template — or build from scratch.")
     ).toBeInTheDocument();

@@ -486,7 +486,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
                     style={{
                       fontSize: 11,
                       fontFamily: "var(--bd-font-mono, ui-monospace, monospace)",
-                      color: "var(--bd-fg-muted, #6B7280)",
+                      color: "var(--bd-fg-muted)",
                       minWidth: 24,
                       textAlign: "right",
                     }}

@@ -92,7 +92,7 @@ describe("ExportEngine.export — format branches", () => {
 
     expect(result.success).toBe(true);
     expect(result.html).toContain("<!DOCTYPE html>");
-    expect(result.html).toContain("<title>Aquibra Export</title>"); // default page-title fallback
+    expect(result.html).toContain("<title>Buildrick Export</title>"); // default page-title fallback
     expect(result.html).toContain("<style>");
     expect(result.html).toContain(".buildrick-root");
     expect(result.css).toContain("box-sizing:border-box"); // reset css included by default
@@ -218,7 +218,7 @@ describe("ExportEngine.generateHTML — config knobs", () => {
 
     const html = engine.generateHTML({ cssStyle: "external" });
     expect(html).not.toContain("\n");
-    expect(html).toContain("<title>Aquibra Export</title>");
+    expect(html).toContain("<title>Buildrick Export</title>");
 
     const css = engine.generateCSS();
     expect(css).toContain(".buildrick-root{background-color:red;}");

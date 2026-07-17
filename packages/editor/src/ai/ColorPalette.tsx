@@ -211,7 +211,7 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ onApplyColor }) => {
                 background: harmony === h ? "var(--buildrick-accent)" : "var(--buildrick-bg-dark)",
                 border: "1px solid var(--buildrick-border)",
                 borderRadius: 4,
-                color: harmony === h ? "#fff" : "var(--buildrick-text-primary)",
+                color: harmony === h ? /* @lint-hex-policy: color-harmony tool selected-swatch text */ "#fff" : "var(--buildrick-text-primary)",
                 fontSize: 12,
                 cursor: "pointer",
                 textTransform: "capitalize",

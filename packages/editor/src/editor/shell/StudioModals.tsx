@@ -6,9 +6,6 @@
  */
 
 import * as React from "react";
-import { AIAssistant } from "../../ai/AIAssistant";
-import type { AIGenerationResult } from "../../ai/AIAssistant";
-import { AICopilot } from "../../ai/AICopilot";
 import type { Composer } from "../../engine";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { SaveTemplate } from "../../templates/SaveTemplate";
@@ -33,12 +30,6 @@ import { ProjectSettingsModal } from "./modals/ProjectSettingsModal";
 export interface StudioModalsProps {
   /** Composer instance */
   composer: Composer | null;
-  /** Currently selected element */
-  selectedElement: {
-    id: string;
-    type: string;
-    tagName?: string;
-  } | null;
 
   // Template modals
   showTemplates: boolean;
@@ -51,15 +42,6 @@ export interface StudioModalsProps {
   // Export modal
   showExporter: boolean;
   onCloseExporter: () => void;
-
-  // AI modals
-  showAI: boolean;
-  onCloseAI: () => void;
-  onAIGenerate: (result: AIGenerationResult) => void;
-  aiContext: { elementId?: string; elementType?: string; prompt?: string } | null;
-  showCopilot: boolean;
-  onCloseCopilot: () => void;
-  onCopilotInsert: (content: string, type: "text" | "html" | "image") => void;
 
   // Keyboard shortcuts
   showShortcuts: boolean;
@@ -129,7 +111,6 @@ export interface StudioModalsProps {
 
 export const StudioModals: React.FC<StudioModalsProps> = ({
   composer,
-  selectedElement,
   showTemplates,
   onCloseTemplates,
   onSelectTemplate,
@@ -138,13 +119,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   onSaveTemplate,
   showExporter,
   onCloseExporter,
-  showAI,
-  onCloseAI,
-  onAIGenerate,
-  aiContext,
-  showCopilot,
-  onCloseCopilot,
-  onCopilotInsert,
   showShortcuts,
   onCloseShortcuts,
   showMediaLibrary,
@@ -191,30 +165,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
     [addToast]
   );
 
-  // Handle element selection from AI assistant
-  const handleSelectElement = React.useCallback(
-    (elementId: string) => {
-      if (composer) {
-        const el = composer.elements.getElement(elementId);
-        if (el) {
-          composer.selection.select(el);
-        }
-      }
-    },
-    [composer]
-  );
-
-  // Compute context label for AI assistant
-  const contextLabel = React.useMemo(() => {
-    if (aiContext?.elementType) {
-      return `${aiContext.elementType} (${aiContext.elementId?.slice(-6)})`;
-    }
-    if (selectedElement?.type) {
-      return `${selectedElement.type} (${selectedElement.id.slice(-6)})`;
-    }
-    return undefined;
-  }, [aiContext, selectedElement]);
-
   return (
     <>
       {/* Template Library */}
@@ -236,26 +186,8 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
       {/* Export Modal */}
       <ExportModal isOpen={showExporter} onClose={onCloseExporter} composer={composer} />
 
-      {/* AI Assistant */}
-      <AIAssistant
-        isOpen={showAI}
-        onClose={onCloseAI}
-        onGenerate={onAIGenerate}
-        contextLabel={contextLabel}
-        composer={composer}
-        onSelectElement={handleSelectElement}
-      />
-
       {/* Keyboard Shortcuts */}
       <KeyboardShortcutsPanel isOpen={showShortcuts} onClose={onCloseShortcuts} />
-
-      {/* AI Copilot */}
-      <AICopilot
-        isOpen={showCopilot}
-        onClose={onCloseCopilot}
-        composer={composer}
-        onInsert={onCopilotInsert}
-      />
 
       {/* Media Library */}
       <MediaLibraryPanel

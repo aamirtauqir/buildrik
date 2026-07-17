@@ -134,7 +134,7 @@ export const StudioSkeleton: FC = () => {
         <div
           style={{
             flex: 1,
-            background: "var(--buildrick-canvas-bg, #1E1E24)",
+            background: /* @lint-hex-policy: --buildrick-canvas-bg undefined; hex fallback is load-bearing dark-canvas skeleton */ "var(--buildrick-canvas-bg, #1E1E24)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -170,7 +170,7 @@ export const StudioSkeleton: FC = () => {
                 height: 48,
                 borderRadius: "50%",
                 border: "3px solid var(--buildrick-bg-shimmer-dark)",
-                borderTopColor: "var(--buildrick-accent, #00d4aa)",
+                borderTopColor: "var(--buildrick-accent)",
                 ...spinStyle,
               }}
             />

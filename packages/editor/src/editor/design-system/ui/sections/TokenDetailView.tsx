@@ -149,7 +149,7 @@ const lintPassStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   fontSize: 12,
-  color: "var(--bd-success, #22c55e)",
+  color: "var(--bd-success)",
 };
 
 const lintFailStyle: React.CSSProperties = {
@@ -157,7 +157,7 @@ const lintFailStyle: React.CSSProperties = {
   flexDirection: "column",
   gap: 6,
   fontSize: 12,
-  color: "var(--buildrick-warning-strong, #B45309)",
+  color: "var(--buildrick-warning-strong)",
 };
 
 const lintActionRowStyle: React.CSSProperties = {
@@ -195,8 +195,8 @@ const actionBtnStyle: React.CSSProperties = {
 
 const dangerBtnStyle: React.CSSProperties = {
   ...actionBtnStyle,
-  color: "var(--bd-danger, #ef4444)",
-  borderColor: "var(--bd-danger, #ef4444)",
+  color: "var(--bd-danger)",
+  borderColor: "var(--bd-danger)",
 };
 
 // ─ Used-by expand styles (D6.b drill-in list) ─────────────────────────────
@@ -252,8 +252,8 @@ const usagePropStyle: React.CSSProperties = {
 const beginnerNoticeStyle: React.CSSProperties = {
   marginTop: 12,
   padding: "10px 12px",
-  background: "var(--buildrick-info-soft, #EFF4FF)",
-  color: "var(--buildrick-info-strong, #1F4FBF)",
+  background: "var(--buildrick-info-soft)",
+  color: "var(--buildrick-info-strong)",
   borderRadius: 6,
   fontSize: 11.5,
   lineHeight: 1.5,

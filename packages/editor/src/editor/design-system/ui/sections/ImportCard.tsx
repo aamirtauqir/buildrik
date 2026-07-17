@@ -85,7 +85,7 @@ const dropZoneActiveStyle: React.CSSProperties = {
 const detailBlockStyle: React.CSSProperties = {
   marginTop: 12,
   padding: 12,
-  background: "var(--bd-bg-canvas, #0e0e10)",
+  background: "var(--bd-bg-canvas)",
   border: "1px solid var(--bd-border)",
   borderRadius: 6,
   display: "flex",
@@ -192,7 +192,7 @@ const pasteAreaStyle: React.CSSProperties = {
   minHeight: 100,
   marginTop: 6,
   padding: 8,
-  background: "var(--bd-bg-canvas, #0e0e10)",
+  background: "var(--bd-bg-canvas)",
   color: "var(--bd-fg-secondary)",
   border: "1px solid var(--bd-border)",
   borderRadius: 6,
@@ -233,7 +233,7 @@ function detectFormat(raw: string, fileName: string | null): string {
   if (/"collections"\s*:|"modes"\s*:/.test(head)) {
     return "Figma Variables JSON";
   }
-  if (/^\s*[\[{]/.test(head)) {
+  if (/^\s*[[{]/.test(head)) {
     return "Design tokens JSON";
   }
   return "Unknown format";
@@ -461,7 +461,7 @@ export const ImportCard: React.FC = () => {
             </div>
             <div style={detailRowStyle}>
               <span style={detailKeyStyle}>Valid tokens</span>
-              <span style={{ ...detailValueStyle, color: "var(--bd-fg-success, #10b981)" }}>
+              <span style={{ ...detailValueStyle, color: "var(--bd-fg-success)" }}>
                 {parsed.tokens.length}
               </span>
             </div>
@@ -469,7 +469,7 @@ export const ImportCard: React.FC = () => {
               <span style={detailKeyStyle}>Errors</span>
               <span style={{
                 ...detailValueStyle,
-                color: parsed.errors.length > 0 ? "var(--bd-fg-danger, #ef4444)" : "var(--bd-fg-muted)",
+                color: parsed.errors.length > 0 ? "var(--bd-fg-danger)" : "var(--bd-fg-muted)",
               }}>
                 {parsed.errors.length === 0
                   ? "0"
@@ -480,7 +480,7 @@ export const ImportCard: React.FC = () => {
               <span style={detailKeyStyle}>Conflicts</span>
               <span style={{
                 ...detailValueStyle,
-                color: conflictCount > 0 ? "var(--bd-fg-warn, #f59e0b)" : "var(--bd-fg-muted)",
+                color: conflictCount > 0 ? "var(--bd-fg-warn)" : "var(--bd-fg-muted)",
               }}>
                 {conflictCount === 0
                   ? "0"

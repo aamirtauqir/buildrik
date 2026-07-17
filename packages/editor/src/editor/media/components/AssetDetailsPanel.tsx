@@ -23,7 +23,7 @@ import { Download, FolderOpen, Pencil, Replace, Sparkles, Trash2, X } from "luci
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
-import { fmtBytes } from "../utils/fmtBytes";
+import { formatBytes } from "@shared/utils/helpers/number";
 
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
@@ -125,7 +125,7 @@ export function AssetDetailsPanel({
         <div className="mgr-det-head">
           <div className="mgr-det-filename">{selectedItem.name}</div>
           <div className="mgr-det-sub">
-            {selectedItem.type.toUpperCase()} · {fmtBytes(selectedItem.size)}
+            {selectedItem.type.toUpperCase()} · {formatBytes(selectedItem.size)}
           </div>
         </div>
         <div className="mgr-det-preview">
@@ -182,7 +182,7 @@ export function AssetDetailsPanel({
                   </>
                 )}
                 <span className="mgr-kv-key">File size</span>
-                <span className="mgr-kv-val">{fmtBytes(selectedItem.size)}</span>
+                <span className="mgr-kv-val">{formatBytes(selectedItem.size)}</span>
                 <span className="mgr-kv-key">MIME</span>
                 <span className="mgr-kv-val">{selectedItem.mimeType}</span>
                 <span className="mgr-kv-key">Added</span>
@@ -246,7 +246,7 @@ export function AssetDetailsPanel({
                       )}
                     </div>
                     <div style={{ fontSize: 10, color: "var(--buildrick-text-disabled)" }}>
-                      {fmtBytes(v.size)} · {new Date(v.createdAt).toLocaleString()}
+                      {formatBytes(v.size)} · {new Date(v.createdAt).toLocaleString()}
                     </div>
                   </div>
                   {i > 0 && v.key !== selectedItem.key && (
@@ -480,8 +480,8 @@ function AltTextSection({
           fontSize: 12,
           padding: "6px 8px",
           borderRadius: 4,
-          border: "1px solid var(--buildrick-border, #e2e8f0)",
-          background: "var(--buildrick-bg-input, #fff)",
+          border: "1px solid var(--buildrick-border)",
+          background: "var(--buildrick-bg-input)",
           color: "var(--buildrick-text-primary)",
           resize: "vertical",
           fontFamily: "inherit",

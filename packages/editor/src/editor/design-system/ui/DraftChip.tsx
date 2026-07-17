@@ -29,7 +29,7 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
     <span
       style={{
         fontSize: 11,
-        color: "var(--bd-warning, #f59e0b)",
+        color: "var(--bd-warning)",
         fontWeight: 600,
         padding: "2px 8px",
         borderRadius: 20,
@@ -45,7 +45,7 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
           width: 6,
           height: 6,
           borderRadius: "var(--bd-radius-full)",
-          background: "var(--bd-warning, #f59e0b)",
+          background: "var(--bd-warning)",
           flexShrink: 0,
           animation: "buildrick-dot-pulse 1.5s infinite",
         }}

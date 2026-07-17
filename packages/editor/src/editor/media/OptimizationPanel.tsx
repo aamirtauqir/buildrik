@@ -9,7 +9,8 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
-import { MediaOptimizer, formatBytes } from "../../engine/media";
+import { MediaOptimizer } from "../../engine/media";
+import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";

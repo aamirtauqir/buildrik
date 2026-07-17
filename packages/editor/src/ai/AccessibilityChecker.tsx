@@ -236,7 +236,7 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
           <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Errors</div>
         </div>
         <div style={{ textAlign: "center", flex: 1 }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#eab308" }}>{warningCount}</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: /* @lint-hex-policy: contrast-checker warning count amber (data-viz, off chrome palette) */ "#eab308" }}>{warningCount}</div>
           <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Warnings</div>
         </div>
         <div style={{ textAlign: "center", flex: 1 }}>

@@ -71,9 +71,9 @@ export const FormStateOverlay: React.FC<FormStateOverlayProps> = ({
 
   return (
     <div style={overlayStyles}>
-      <div style={{ ...cardStyles, borderColor: isSuccess ? "#10b981" : "#ef4444" }}>
+      <div style={{ ...cardStyles, borderColor: isSuccess ? /* @lint-hex-policy: form success/error status colors (emerald-500 / red-500, off chrome palette) */ "#10b981" : /* @lint-hex-policy: form success/error status colors (emerald-500 / red-500, off chrome palette) */ "#ef4444" }}>
         <div style={iconContainerStyles}>{isSuccess ? <SuccessIcon /> : <ErrorIcon />}</div>
-        <h3 style={{ ...titleStyles, color: isSuccess ? "#10b981" : "#ef4444" }}>
+        <h3 style={{ ...titleStyles, color: isSuccess ? /* @lint-hex-policy: form success/error status colors (emerald-500 / red-500, off chrome palette) */ "#10b981" : /* @lint-hex-policy: form success/error status colors (emerald-500 / red-500, off chrome palette) */ "#ef4444" }}>
           {isSuccess ? "Success!" : "Error"}
         </h3>
         <p style={messageStyles}>{isSuccess ? successMessage : errorMessage}</p>
@@ -155,7 +155,7 @@ const titleStyles: React.CSSProperties = {
 const messageStyles: React.CSSProperties = {
   margin: "0 0 16px 0",
   fontSize: "14px",
-  color: "var(--buildrick-text-secondary, #666)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const errorListStyles: React.CSSProperties = {

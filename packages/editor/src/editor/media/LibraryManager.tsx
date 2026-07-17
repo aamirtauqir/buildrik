@@ -29,7 +29,7 @@ import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { FolderBreadcrumb } from "../sidebar/tabs/media/components/FolderBreadcrumb";
-import { fmtBytes } from "./utils/fmtBytes";
+import { formatBytes } from "@shared/utils/helpers/number";
 import { generateAltTextRemote } from "../../services/AltTextService";
 import { DEFAULT_MODEL } from "@buildrik/shared/schemas/ai";
 import "./LibraryManager.css";
@@ -43,8 +43,6 @@ interface LibraryManagerProps {
     onSelect: (icon: IconConfig) => void
   ) => void;
 }
-
-// fmtBytes moved to ./utils/fmtBytes.ts (D5 Stage 2, audit-remediation 2026-05-08).
 
 // ─── Type pills config ──────────────────────────────────────
 const TYPE_PILLS = [
@@ -383,7 +381,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       <div className="mgr-status">
         <span><strong style={{ color: "var(--buildrick-text-secondary)" }}>{state.counts.all}</strong> assets</span>
         <span className="mgr-status-dot" />
-        <span>{fmtBytes(state.storage.used)} / {fmtBytes(state.storage.total)}</span>
+        <span>{formatBytes(state.storage.used)} / {formatBytes(state.storage.total)}</span>
         <div className="mgr-status-right">
           <div className="mgr-quota-bar">
             <div className="mgr-quota-fill" style={{ width: `${storageUsedPct}%` }} />

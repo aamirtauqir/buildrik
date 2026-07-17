@@ -92,18 +92,18 @@ export const CANVAS_COLORS = {
   // Background
   bgPanel: "#1e1e2e",
   bgPanelSecondary: "#181825",
-  bgInput: "var(--buildrick-bg-input, #181825)",
+  bgInput: "var(--buildrick-bg-input)",
   bgHover: BRAND_ACCENT.alpha15,
 
   // Text
   textPrimary: "#cdd6f4",
-  textSecondary: "var(--buildrick-text-secondary, #a6adc8)",
+  textSecondary: "var(--buildrick-text-secondary)",
   textMuted: "#6c7086",
 
   // Borders
   border: "rgba(255,255,255,0.1)",
   borderLight: "rgba(255,255,255,0.06)",
-  borderInput: "var(--buildrick-border, #313244)",
+  borderInput: "var(--buildrick-border)",
 
   // Accent — cobalt accent ramp via BRAND_ACCENT
   primary: BRAND_ACCENT.DEFAULT,

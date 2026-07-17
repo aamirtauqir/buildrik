@@ -112,7 +112,6 @@ function makeParams(overrides: Partial<UseComposerInitParams> = {}): UseComposer
     setZoom: vi.fn(),
     setShowTemplates: vi.fn(),
     setShowExporter: vi.fn(),
-    setShowAI: vi.fn(),
     setShowComponentView: vi.fn(),
     setIsDirty: vi.fn(),
     setSaveState: vi.fn(),

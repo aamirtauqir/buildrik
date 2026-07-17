@@ -28,7 +28,7 @@ const defaultSlides: Slide[] = [
   {
     id: "1",
     image: "https://picsum.photos/1200/500?random=1",
-    title: "Welcome to Aquibra",
+    title: "Welcome to Buildrick",
     subtitle: "Build stunning websites visually",
     buttonText: "Get Started",
     buttonUrl: "#",
@@ -119,7 +119,7 @@ export const Slider: React.FC<SliderProps> = ({
               justifyContent: "center",
               background: slide.image
                 ? `url(${slide.image}) center/cover no-repeat`
-                : slide.backgroundColor || "#1a1a2e",
+                : slide.backgroundColor || /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#1a1a2e",
             }}
           >
             {/* Overlay */}
@@ -146,7 +146,7 @@ export const Slider: React.FC<SliderProps> = ({
                   style={{
                     fontSize: 48,
                     fontWeight: 700,
-                    color: "#fff",
+                    color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
                     marginBottom: 16,
                   }}
                 >
@@ -170,8 +170,8 @@ export const Slider: React.FC<SliderProps> = ({
                   style={{
                     display: "inline-block",
                     padding: "14px 32px",
-                    background: "var(--buildrick-accent, #00d4aa)",
-                    color: "#fff",
+                    background: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "var(--buildrick-accent, #00d4aa)",
+                    color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
                     fontSize: 16,
                     fontWeight: 600,
                     borderRadius: 8,
@@ -201,7 +201,7 @@ export const Slider: React.FC<SliderProps> = ({
               borderRadius: "50%",
               background: "rgba(255,255,255,0.2)",
               border: "none",
-              color: "#fff",
+              color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
               fontSize: 24,
               cursor: "pointer",
               backdropFilter: "blur(4px)",
@@ -221,7 +221,7 @@ export const Slider: React.FC<SliderProps> = ({
               borderRadius: "50%",
               background: "rgba(255,255,255,0.2)",
               border: "none",
-              color: "#fff",
+              color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
               fontSize: 24,
               cursor: "pointer",
               backdropFilter: "blur(4px)",
@@ -254,7 +254,7 @@ export const Slider: React.FC<SliderProps> = ({
                 borderRadius: 5,
                 border: "none",
                 background:
-                  index === activeIndex ? "var(--buildrick-accent, #00d4aa)" : "rgba(255,255,255,0.5)",
+                  index === activeIndex ? /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "var(--buildrick-accent, #00d4aa)" : "rgba(255,255,255,0.5)",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
               }}

@@ -45,6 +45,13 @@ export interface EmailMessage {
   template?: EmailTemplate;
   /** Template variables */
   templateVars?: Record<string, string>;
+  /**
+   * Opt in to raw (unescaped) HTML for the `custom` template's
+   * `templateVars.html`. Defaults to false: caller-supplied HTML is
+   * HTML-escaped so injected markup (e.g. `<img onerror>`) arrives inert.
+   * Only set this when the HTML body is fully trusted.
+   */
+  allowRawHtml?: boolean;
 }
 
 /**
@@ -107,7 +114,10 @@ export interface FormEmailOptions {
 
 const TEMPLATES: Record<
   EmailTemplate,
-  (vars: Record<string, string>) => { subject: string; html: string; text: string }
+  (
+    vars: Record<string, string>,
+    allowRawHtml?: boolean
+  ) => { subject: string; html: string; text: string }
 > = {
   form_confirmation: (vars) => ({
     subject: vars.subject || "Thank you for your submission",
@@ -148,11 +158,17 @@ const TEMPLATES: Record<
     text: `Welcome${vars.name ? `, ${vars.name}` : ""}!\n\nThank you for signing up. We're excited to have you.`,
   }),
 
-  custom: (vars) => ({
+  custom: (vars, allowRawHtml = false) => ({
     subject: vars.subject || "Message",
-    // vars.html is intentionally raw (caller-supplied HTML email). The text
-    // fallback must escape — vars.text is plain text, not markup.
-    html: vars.html || `<p>${escapeHTML(vars.text || "")}</p>`,
+    // Default: escape caller-supplied HTML so injected markup (e.g. an
+    // <img onerror>) lands inert in the outbound mail. Senders with a fully
+    // trusted HTML body opt in via message.allowRawHtml. The text fallback
+    // always escapes — vars.text is plain text, not markup.
+    html: vars.html
+      ? allowRawHtml
+        ? vars.html
+        : escapeHTML(vars.html)
+      : `<p>${escapeHTML(vars.text || "")}</p>`,
     text: vars.text || "",
   }),
 };
@@ -196,7 +212,7 @@ export class EmailService {
       let finalMessage = message;
       if (message.template) {
         const templateFn = TEMPLATES[message.template];
-        const templateResult = templateFn(message.templateVars || {});
+        const templateResult = templateFn(message.templateVars || {}, message.allowRawHtml);
         finalMessage = {
           ...message,
           subject: message.subject || templateResult.subject,

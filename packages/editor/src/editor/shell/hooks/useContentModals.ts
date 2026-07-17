@@ -18,7 +18,6 @@
 import * as React from "react";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../../shared/types/media";
 import type {
-  AIContext,
   IconPickerContext,
   ImageEditorContext,
   MediaLibraryContext,
@@ -40,17 +39,6 @@ export interface UseContentModalsReturn {
   setShowExporter: React.Dispatch<React.SetStateAction<boolean>>;
   openExporter: () => void;
   closeExporter: () => void;
-
-  // AI / Copilot
-  showAI: boolean;
-  setShowAI: React.Dispatch<React.SetStateAction<boolean>>;
-  aiContext: AIContext | null;
-  openAI: (context?: AIContext) => void;
-  closeAI: () => void;
-  showCopilot: boolean;
-  setShowCopilot: React.Dispatch<React.SetStateAction<boolean>>;
-  openCopilot: () => void;
-  closeCopilot: () => void;
 
   // Media Library
   showMediaLibrary: boolean;
@@ -87,9 +75,6 @@ export function useContentModals(): UseContentModalsReturn {
   const [showTemplates, setShowTemplates] = React.useState(false);
   const [showSaveTemplate, setShowSaveTemplate] = React.useState(false);
   const [showExporter, setShowExporter] = React.useState(false);
-  const [showAI, setShowAI] = React.useState(false);
-  const [aiContext, setAIContext] = React.useState<AIContext | null>(null);
-  const [showCopilot, setShowCopilot] = React.useState(false);
   const [showMediaLibrary, setShowMediaLibrary] = React.useState(false);
   const [mediaLibraryContext, setMediaLibraryContext] =
     React.useState<MediaLibraryContext | null>(null);
@@ -106,18 +91,6 @@ export function useContentModals(): UseContentModalsReturn {
 
   const openExporter = React.useCallback(() => setShowExporter(true), []);
   const closeExporter = React.useCallback(() => setShowExporter(false), []);
-
-  const openAI = React.useCallback((context?: AIContext) => {
-    setAIContext(context || null);
-    setShowAI(true);
-  }, []);
-  const closeAI = React.useCallback(() => {
-    setShowAI(false);
-    setAIContext(null);
-  }, []);
-
-  const openCopilot = React.useCallback(() => setShowCopilot(true), []);
-  const closeCopilot = React.useCallback(() => setShowCopilot(false), []);
 
   const openMediaLibrary = React.useCallback(
     (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void) => {
@@ -159,9 +132,6 @@ export function useContentModals(): UseContentModalsReturn {
     setShowTemplates(false);
     setShowSaveTemplate(false);
     setShowExporter(false);
-    setShowAI(false);
-    setAIContext(null);
-    setShowCopilot(false);
     setShowMediaLibrary(false);
     setMediaLibraryContext(null);
     setShowImageEditor(false);
@@ -183,15 +153,6 @@ export function useContentModals(): UseContentModalsReturn {
     setShowExporter,
     openExporter,
     closeExporter,
-    showAI,
-    setShowAI,
-    aiContext,
-    openAI,
-    closeAI,
-    showCopilot,
-    setShowCopilot,
-    openCopilot,
-    closeCopilot,
     showMediaLibrary,
     mediaLibraryContext,
     openMediaLibrary,

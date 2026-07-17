@@ -32,7 +32,7 @@ function Demo() {
       <div
         style={{
           padding: 12,
-          border: "1px solid var(--bd-border, #ddd)",
+          border: "1px solid var(--bd-border)",
           borderRadius: 8,
           fontSize: 13,
         }}

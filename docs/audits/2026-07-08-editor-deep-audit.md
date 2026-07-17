@@ -227,7 +227,21 @@ These are the remaining `it.todo`/register items that are NOT clear-correct bugs
 | D7 | Dead-code dirs (engine/history unimplemented, engine/templates deprecated, editor/wizard simulated, engine/integrations) | **Delete** (raises coverage, removes confusion) — destructive, needs your sign-off. |
 | D8 | Duplicate utils across modules (formatBytes ×4, slugify ×5, contrast const drift, MediaAsset/Template/DeviceType type dup) | Consolidate to one each — cross-module, coordinated codemod. |
 | D9 | CI lint `\|\| true` → blocking + fix 226 inline-hex backlog + import-boundary violations | Architectural: flip the gate, drain the backlog. |
-| D10 | `rules.ts` ELEMENT_RULES keys defined twice (dead duplicates) | Delete the earlier copies (clear, but touches nesting rules — verify no behavior change). |
+| ~~D10~~ | ~~`rules.ts` ELEMENT_RULES keys defined twice~~ | **WITHDRAWN — false finding.** The "second copies" (heading/paragraph/link/button/form at `rules.ts:526+`) are keys of `STRICT_HTML5_RULES` (a separate map, `{forbidden, allowed}` shape declared at `:525`), not duplicates of `ELEMENT_RULES` (`:15`). No dead code. (Phantom-bug caught by verifying before deleting.) |
+
+## 5h. DECISION PASS — D1/D2/D5/D6/D7/D8/D9 executed (2026-07-17, user-approved)
+
+Seven product decisions resolved via user sign-off, then executed. Editor tsc 0, eslint 0, vite build passes; server tests green.
+
+- **D1 · Approval gate ENFORCED (server).** Found a hidden bug: a prior "fix" commit already ran in prod but exempted BOTH `OWNER` and `ADMIN` — and since only ADMIN+ can publish, the gate governed nobody (dead code in prod). Real fix: `publish-approval.ts` `APPROVAL_EXEMPT_ROLES` = `{OWNER}` only. Now flag-on + non-OWNER blocks publish unless latest `ReviewRequest` is APPROVED. 315/315 server tests green. **⚠ prod behavior change — after deploy, ADMINs in approval-required workspaces need an APPROVED review to publish.** Known limitation: edits after approval aren't auto-invalidated (needs change-since-approval tracking, separate feature).
+- **D2 · AI consolidated to AITab.** Removed AIAssistantBar + AICopilot + AIAssistant (a 4th surface only reachable via the ripped-out `showAI` path); −2357 lines, 6 files deleted. All 3 entry points (✨ topbar, ⌘J, ⌘K "AI") now route to AITab via `ui:switch-tab`. No dead-end — AI still reachable.
+- **D5 · Brand sweep → "Buildrick".** 14 user-visible strings unified (hero/slider/footer defaults, export doc titles, DS copy). Correctly LEFT: storage keys, `data-*` attrs, CSS classes, `cssPrefix`, service/package identifiers, dev-preview galleries (data-loss/breakage avoided). 8 tests flipped.
+- **D6 · EmailService XSS closed.** `custom` template escapes `templateVars.html` by default; `allowRawHtml` opt-in for trusted callers. No in-repo caller regressed.
+- **D7 · Dead code documented (not deleted, per your call).** `@deprecated DEAD/SIMULATED` banners on engine/history, engine/templates, editor/wizard, engine/integrations.
+- **D8 · Duplicate utils consolidated.** formatBytes ×4→1 (shared), slugify ×5→1 (pages keep a thin nested-`/` wrapper over shared), duplicate `MediaAsset` type deleted (was zero-importer). One CMS-private slugify left (out of scope, flagged).
+- **D9 · CI lint now BLOCKING + hex backlog drained.** eslint 247→0: 226 inline-hex resolved (144 via token, 82 via `@lint-hex-policy` where no exact token exists, 0 wrong-value swaps); `editor-ci.yml` `pnpm run lint || true` → `pnpm run lint`. Registered the missing `eslint-plugin-react-hooks`. tsc 0, vite build passes.
+
+**Still open by your choice (flagged bets, not bugs):** D3 collaboration (demo-only, 6 P1s — invest weeks in real OT/CRDT or cut from marketing) · D4 comments (server done, zero editor UI — build or descope). Plus the one deferred clear-item: ColorInput real alpha channel (scope). ~66 remaining `it.todo` markers are these bets + genuinely-untestable-surface pins.
 
 ## 6. Raw agent reports
 

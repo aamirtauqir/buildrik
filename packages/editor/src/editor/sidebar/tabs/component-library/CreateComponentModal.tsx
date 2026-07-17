@@ -56,13 +56,13 @@ export interface CreateComponentModalProps {
 const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: 11,
-  color: "var(--bd-fg-muted, #64748B)",
+  color: "var(--bd-fg-muted)",
   marginBottom: 4,
 };
 
 const bindingsCardStyle: React.CSSProperties = {
-  background: "var(--bd-bg-muted, #F1F5F9)",
-  border: "1px solid var(--bd-border, #E2E8F0)",
+  background: "var(--bd-bg-muted)",
+  border: "1px solid var(--bd-border)",
   borderRadius: 6,
   padding: "10px 12px",
 };
@@ -77,7 +77,7 @@ const bindingsCheckboxStyle: React.CSSProperties = {
 
 const bindingsHintStyle: React.CSSProperties = {
   fontSize: 11,
-  color: "var(--bd-fg-muted, #64748B)",
+  color: "var(--bd-fg-muted)",
   marginTop: 4,
   paddingLeft: 22,
 };

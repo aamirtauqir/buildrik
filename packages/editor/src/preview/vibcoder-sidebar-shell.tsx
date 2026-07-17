@@ -18,7 +18,7 @@ const mainPane: React.CSSProperties = {
 };
 
 const containerCard: React.CSSProperties = {
-  border: "1px solid var(--buildrick-border, #e5e7eb)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
   height: 200,
   overflow: "hidden",

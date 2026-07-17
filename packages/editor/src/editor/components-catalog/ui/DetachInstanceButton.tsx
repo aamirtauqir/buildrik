@@ -31,7 +31,7 @@ const buttonStyle: React.CSSProperties = {
   gap: 6,
   padding: "4px 10px",
   background: "transparent",
-  color: "var(--bd-warning, #f59e0b)",
+  color: "var(--bd-warning)",
   border: "1px solid rgba(245,158,11,0.3)",
   borderRadius: 4,
   fontSize: 11,

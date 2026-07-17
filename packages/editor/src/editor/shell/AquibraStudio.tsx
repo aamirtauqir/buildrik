@@ -12,7 +12,6 @@ import { Stack } from "@/editor/shared/vibcoder/Stack";
  */
 
 import * as React from "react";
-import { AIAssistantBar } from "../../ai/AIAssistantBar";
 import { getBlockDefinitions } from "../../blocks/blockRegistry";
 import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
@@ -179,7 +178,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setZoom: state.setZoom,
     setShowTemplates: modals.setShowTemplates,
     setShowExporter: modals.setShowExporter,
-    setShowAI: modals.setShowAI,
     setShowComponentView: state.setShowComponentView,
     setIsDirty: state.setIsDirty,
     setSaveState: state.setSaveState,
@@ -237,10 +235,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // Use handlers hook
   const handlers = useStudioHandlers({
     composer,
-    selectedElement,
-    aiContext: modals.aiContext,
     addToast,
-    openAI: modals.openAI,
     closeTemplates: modals.closeTemplates,
   });
 
@@ -359,18 +354,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onSetPreviewLoading={modals.setPreviewLoading}
           onSetExportLoading={modals.setExportLoading}
           onShowTemplates={modals.openTemplates}
-          onShowAI={() =>
-            modals.openAI(
-              selectedElement
-                ? {
-                    elementId: selectedElement.id,
-                    elementType: selectedElement.type,
-                    prompt: `Improve content for ${selectedElement.type}`,
-                  }
-                : undefined
-            )
-          }
-          onShowCopilot={modals.openCopilot}
+          // ✨ Ask AI → the AITab rail panel (single consolidated AI surface).
+          // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
+          // canvas selection itself, so no element context needs threading.
+          onShowAI={() => composer.emit("ui:switch-tab", { tab: "ai" })}
           onShowExporter={modals.openExporter}
           onToggleXRay={() => state.setShowXRay((v) => !v)}
           onToggleDevMode={state.toggleDevMode}
@@ -446,7 +433,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           else if (overlay === "badges") state.setShowBadges(enabled);
           else if (overlay === "xray") state.setShowXRay(enabled);
         }}
-        onAIRequest={handlers.handleAIRequest}
         onOpenMediaLibrary={modals.openMediaLibrary}
         onOpenIconPicker={modals.openIconPicker}
         onOpenImageEditor={modals.openImageEditor}
@@ -461,7 +447,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       <StudioModals
         composer={composer}
-        selectedElement={selectedElement}
         showTemplates={modals.showTemplates}
         onCloseTemplates={modals.closeTemplates}
         onSelectTemplate={handlers.handleSelectTemplate}
@@ -470,13 +455,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onSaveTemplate={handlers.handleSaveTemplate}
         showExporter={modals.showExporter}
         onCloseExporter={modals.closeExporter}
-        showAI={modals.showAI}
-        onCloseAI={modals.closeAI}
-        onAIGenerate={handlers.applyAIResult}
-        aiContext={modals.aiContext}
-        showCopilot={modals.showCopilot}
-        onCloseCopilot={modals.closeCopilot}
-        onCopilotInsert={handlers.handleCopilotInsert}
         showShortcuts={modals.showShortcuts}
         onCloseShortcuts={modals.closeShortcuts}
         showMediaLibrary={modals.showMediaLibrary}
@@ -566,12 +544,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       />
 
       <UpgradeModal />
-
-      <AIAssistantBar
-        isOpen={modals.showAI}
-        onClose={() => modals.setShowAI(false)}
-        composer={composer}
-      />
 
       {/* First-time onboarding checklist (gated to new users by the orchestrator). */}
       <OnboardingMount composer={composer} />

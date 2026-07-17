@@ -7,14 +7,14 @@ const stackWide = { ...stack, gap: 16, maxWidth: 480 };
 
 const tileFrame = {
   width: 160,
-  border: "1px solid var(--bd-border, #ddd)",
+  border: "1px solid var(--bd-border)",
   borderRadius: 8,
   overflow: "hidden" as const,
 };
 
 const thumbBox = {
   height: 90,
-  background: "var(--bd-bg-subtle, #f4f4f4)",
+  background: "var(--bd-bg-subtle)",
 };
 
 function Demo() {
@@ -63,7 +63,7 @@ function Demo() {
       <div style={tileFrame}>
         <div style={thumbBox} />
         <TileMeta title="Live document" meta="3 collaborators" variant="with-status">
-          <StatusDot pulse style={{ color: "#22C55E" }} />
+          <StatusDot pulse style={{ color: /* @lint-hex-policy: dev gallery StatusDot demo color */ "#22C55E" }} />
         </TileMeta>
       </div>
     </div>

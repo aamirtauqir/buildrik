@@ -65,7 +65,7 @@ const GROUP_META: Record<string, { label: string; subtext: string }> = {
   // text/feedback). Primitives sit at the bottom — Pro-only visibility.
   semantic: {
     label: "Semantic",
-    subtext: "Role-named tokens — Buildrik's recommended palette.",
+    subtext: "Role-named tokens — Buildrick's recommended palette.",
   },
   brand: {
     label: "Brand",
@@ -147,7 +147,7 @@ const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, is
         borderRadius: 4,
         background: value,
         border: isLight
-          ? "1px solid var(--bd-border-medium, #cbd5e1)"
+          ? "1px solid var(--bd-border-medium)"
           : "1px solid var(--bd-border)",
       }}
     >
@@ -161,7 +161,7 @@ const ColorSwatch: React.FC<{ value: string; isDirty?: boolean }> = ({ value, is
             width: 5,
             height: 5,
             borderRadius: "var(--bd-radius-full)",
-            background: "var(--bd-warning, #f59e0b)",
+            background: "var(--bd-warning)",
           }}
         />
       )}
@@ -338,7 +338,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             cursor: "pointer",
             background: filterMode === "all" ? "var(--bd-accent)" : "transparent",
             borderColor: filterMode === "all" ? "var(--bd-accent)" : "var(--bd-border)",
-            color: filterMode === "all" ? "#fff" : "var(--bd-fg-muted)",
+            color: filterMode === "all" ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
           }}
         >
           All
@@ -355,9 +355,9 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             fontSize: 11,
             fontWeight: 600,
             cursor: "pointer",
-            background: filterMode === "issues" ? "#ef4444" : "transparent",
-            borderColor: filterMode === "issues" ? "#ef4444" : "var(--bd-border)",
-            color: filterMode === "issues" ? "#fff" : "var(--bd-fg-muted)",
+            background: filterMode === "issues" ? /* @lint-hex-policy: issues-filter active red-500, off chrome palette (intentional) */ "#ef4444" : "transparent",
+            borderColor: filterMode === "issues" ? /* @lint-hex-policy: issues-filter active red-500, off chrome palette (intentional) */ "#ef4444" : "var(--bd-border)",
+            color: filterMode === "issues" ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
           }}
           title={`${issuesCount} token${issuesCount !== 1 ? "s" : ""} fail WCAG AA`}
         >

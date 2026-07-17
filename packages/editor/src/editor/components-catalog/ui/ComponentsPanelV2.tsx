@@ -49,7 +49,7 @@ const containerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--bd-bg-canvas, #0e0e10)",
+  background: "var(--bd-bg-canvas)",
 };
 
 const subHeaderStyle: React.CSSProperties = {
@@ -82,7 +82,7 @@ const pillStyle = (active: boolean): React.CSSProperties => ({
 const searchInputStyle: React.CSSProperties = {
   width: "100%",
   padding: "5px 10px",
-  background: "var(--bd-bg-canvas, #0e0e10)",
+  background: "var(--bd-bg-canvas)",
   color: "var(--bd-fg-primary)",
   border: "1px solid var(--bd-border)",
   borderRadius: 6,

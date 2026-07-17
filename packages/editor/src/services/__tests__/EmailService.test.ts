@@ -2,7 +2,8 @@
  * EmailService tests — provider routing (cloud providers surface the
  * backend-proxy-not-configured error), mock provider capture, template
  * rendering + escaping, and sendFormEmails composition. The custom
- * template's raw-HTML pass-through is encoded as current behavior + it.todo.
+ * template HTML-escapes caller-supplied `templateVars.html` by default;
+ * raw pass-through requires the explicit `allowRawHtml` opt-in.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import {
@@ -182,7 +183,20 @@ describe("EmailService template rendering", () => {
     expect(sent.text).toBe("<b>hi</b>");
   });
 
-  it("CURRENT BEHAVIOR: custom template passes vars.html through UNESCAPED", async () => {
+  it("custom template passes vars.html through raw ONLY when allowRawHtml is set", async () => {
+    const raw = '<div class="promo"><h1>Sale</h1></div>';
+    await service.send({
+      to: { email: "user@example.com" },
+      subject: "",
+      template: "custom",
+      templateVars: { html: raw },
+      allowRawHtml: true,
+    });
+
+    expect(service.getSentEmails()[0].html).toBe(raw);
+  });
+
+  it("SECURITY: custom template HTML-escapes caller-supplied vars.html by default so injected markup is inert", async () => {
     const hostile = '<img src=x onerror="steal()">';
     await service.send({
       to: { email: "user@example.com" },
@@ -191,12 +205,10 @@ describe("EmailService template rendering", () => {
       templateVars: { html: hostile },
     });
 
-    expect(service.getSentEmails()[0].html).toBe(hostile);
+    const sent = service.getSentEmails()[0];
+    expect(sent.html).toBe('&lt;img src=x onerror="steal()"&gt;');
+    expect(sent.html).not.toContain("<img");
   });
-
-  it.todo(
-    "SECURITY: the custom template renders caller-supplied HTML unescaped into the email body — any upstream surface that lets a site visitor reach templateVars.html can inject markup into outbound mail"
-  );
 
   it("explicit message html/text/subject override the template output", async () => {
     await service.send({

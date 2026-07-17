@@ -530,7 +530,7 @@ export class Composer extends EventEmitter {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aquibra Export</title>
+  <title>Buildrick Export</title>
   <style>${css}</style>
 </head>
 <body>

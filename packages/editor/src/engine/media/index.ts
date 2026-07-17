@@ -25,7 +25,7 @@ export {
 } from "./MediaStorageTypes";
 export type { MediaRescueAction } from "./MediaStorageTypes";
 export { ImageProcessor } from "./ImageProcessor";
-export { MediaOptimizer, formatBytes, getCompressionSavings } from "./MediaOptimizer";
+export { MediaOptimizer, getCompressionSavings } from "./MediaOptimizer";
 export type { OptimizationOptions, OptimizationResult, FormatSupport } from "./MediaOptimizer";
 
 // Re-export types from types/media.ts for convenience

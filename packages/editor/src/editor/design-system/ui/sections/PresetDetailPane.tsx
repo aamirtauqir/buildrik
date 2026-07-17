@@ -126,7 +126,7 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
                 background: isActive
                   ? "var(--bd-accent)"
                   : "var(--bd-bg-panel)",
-                color: isActive ? "#fff" : "var(--bd-fg-primary)",
+                color: isActive ? "var(--bd-fg-on-accent)" : "var(--bd-fg-primary)",
                 border: isActive
                   ? "1px solid var(--bd-accent)"
                   : "1px solid var(--bd-border)",

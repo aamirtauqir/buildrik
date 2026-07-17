@@ -77,24 +77,24 @@ export function ReachScopeStrip({ composer, selectedElement }: ReachScopeStripPr
     padding: "6px 8px",
     height: "auto",
     borderRadius: 4,
-    border: "1px solid var(--bd-border, #e5e7eb)",
+    border: "1px solid var(--bd-border)",
     background: "transparent",
     textAlign: "left",
     lineHeight: 1.2,
   };
   const cardActive: React.CSSProperties = {
     ...cardBase,
-    borderColor: "var(--bd-accent, #2D6DFF)",
-    background: "var(--bd-accent-soft, #EFF4FF)",
+    borderColor: "var(--bd-accent)",
+    background: "var(--bd-accent-soft)",
   };
-  const cardTop: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: "var(--bd-text, #374151)" };
-  const cardSub: React.CSSProperties = { fontSize: 10, color: "var(--bd-text-muted, #9ca3af)" };
+  const cardTop: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: "var(--bd-text)" };
+  const cardSub: React.CSSProperties = { fontSize: 10, color: "var(--bd-text-muted)" };
 
   return (
-    <div style={{ padding: "10px 12px", borderBottom: "1px solid var(--bd-border, #e5e7eb)" }}>
+    <div style={{ padding: "10px 12px", borderBottom: "1px solid var(--bd-border)" }}>
       <div style={{ display: "flex", gap: 6 }}>
         <Button variant="bare" size="sm" style={cardActive} title="Just this element">
-          <span style={{ ...cardTop, color: "var(--bd-accent, #2D6DFF)" }}>This item</span>
+          <span style={{ ...cardTop, color: "var(--bd-accent)" }}>This item</span>
           <span style={cardSub}>just here</span>
         </Button>
         <Button
@@ -113,19 +113,19 @@ export function ReachScopeStrip({ composer, selectedElement }: ReachScopeStripPr
           <span style={cardSub}>every page</span>
         </Button>
       </div>
-      <p style={{ margin: "6px 0 0", fontSize: 10, color: "var(--bd-text-muted, #9ca3af)" }}>
-        <strong style={{ color: "var(--bd-text-muted, #6b7280)" }}>Just this</strong> by default — nothing else moves. Widen only to change all of them.
+      <p style={{ margin: "6px 0 0", fontSize: 10, color: "var(--bd-text-muted)" }}>
+        <strong style={{ color: "var(--bd-text-muted)" }}>Just this</strong> by default — nothing else moves. Widen only to change all of them.
       </p>
 
       {siteHint && (
-        <p style={{ margin: "8px 0 0", fontSize: 11, color: "var(--bd-text-muted, #6b7280)" }}>
+        <p style={{ margin: "8px 0 0", fontSize: 11, color: "var(--bd-text-muted)" }}>
           Site-wide colors, fonts &amp; spacing live in the <strong>Styles</strong> tab — change them once, everywhere updates.
         </p>
       )}
 
       {confirming && (
-        <div style={{ marginTop: 8, padding: 8, borderRadius: 4, background: "var(--bd-surface-2, #f9fafb)", border: "1px solid var(--bd-border, #e5e7eb)" }}>
-          <p style={{ margin: "0 0 6px", fontSize: 11, color: "var(--bd-text, #374151)" }}>
+        <div style={{ marginTop: 8, padding: 8, borderRadius: 4, background: "var(--bd-surface-2)", border: "1px solid var(--bd-border)" }}>
+          <p style={{ margin: "0 0 6px", fontSize: 11, color: "var(--bd-text)" }}>
             Apply this element&apos;s styles to the <strong>{othersLabel}</strong> on this page? This changes more than the selected item.
           </p>
           <div style={{ display: "flex", gap: 6 }}>

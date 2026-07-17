@@ -5,7 +5,7 @@ import { sectionLabel } from "./_galleryStyles";
 
 const tile: React.CSSProperties = {
   background: "var(--buildrick-surface-2, #f3f4f6)",
-  border: "1px solid var(--buildrick-border, #e5e7eb)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 4,
   padding: "8px 12px",
   fontSize: 13,
@@ -13,7 +13,7 @@ const tile: React.CSSProperties = {
 
 const containerCard: React.CSSProperties = {
   background: "var(--buildrick-surface, #fff)",
-  border: "1px solid var(--buildrick-border, #e5e7eb)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
   padding: 12,
   maxWidth: 520,

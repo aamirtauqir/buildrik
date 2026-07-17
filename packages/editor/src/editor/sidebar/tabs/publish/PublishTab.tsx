@@ -70,7 +70,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
       background: isPublished
         ? "var(--bd-success-bg, rgba(34, 197, 94, 0.12))"
         : "rgba(245, 158, 11, 0.15)",
-      color: isPublished ? "var(--bd-success, #22c55e)" : "var(--bd-warning)",
+      color: isPublished ? "var(--bd-success)" : "var(--bd-warning)",
     }}
   >
     <span
@@ -79,7 +79,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
         height: 6,
         borderRadius: "var(--bd-radius-full)",
         background: isPublished
-          ? "var(--bd-success, #22c55e)"
+          ? "var(--bd-success)"
           : "var(--bd-warning)",
       }}
     />
@@ -115,7 +115,7 @@ const ChecklistItem: React.FC<{
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: ok ? "var(--bd-success, #22c55e)" : "transparent",
+        background: ok ? "var(--bd-success)" : "transparent",
         border: ok ? "none" : "1px solid var(--bd-border-light, var(--bd-border))",
         flexShrink: 0,
         transition: "background 0.15s",
@@ -336,7 +336,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
 
         {/* Trust signal */}
         <div style={trustBadgeStyles}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--bd-success, #22c55e)" }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--bd-success)" }}>
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
           <span>Your site data is encrypted and stored securely.</span>
@@ -573,7 +573,7 @@ const errorStyles: React.CSSProperties = {
   background: "var(--bd-error-tint, rgba(239, 68, 68, 0.1))",
   borderRadius: "var(--bd-radius-md)",
   border: "1px solid var(--bd-error-tint, rgba(239, 68, 68, 0.2))",
-  color: "var(--bd-error, #ef4444)",
+  color: "var(--bd-error)",
   fontSize: "var(--bd-text-xs, 12px)",
 };
 

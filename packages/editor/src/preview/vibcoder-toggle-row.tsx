@@ -7,7 +7,7 @@ import { sectionLabel, stack } from "./_galleryStyles";
 const stackWide = { ...stack, gap: 0, maxWidth: 480 };
 const card = {
   padding: "0 16px",
-  border: "1px solid var(--bd-border, #ddd)",
+  border: "1px solid var(--bd-border)",
   borderRadius: 8,
 };
 

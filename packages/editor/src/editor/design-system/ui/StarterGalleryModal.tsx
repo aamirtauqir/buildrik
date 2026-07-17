@@ -60,11 +60,11 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent size="xl" aria-labelledby="starter-gallery-title">
-        <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bd-border, #e2e8f0)" }}>
+        <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bd-border)" }}>
           <ModalTitle id="starter-gallery-title" style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em" }}>
             Pick a starter design system
           </ModalTitle>
-          <ModalDescription style={{ fontSize: 13, color: "var(--bd-text-muted, #64748b)", marginTop: 4 }}>
+          <ModalDescription style={{ fontSize: 13, color: "var(--bd-text-muted)", marginTop: 4 }}>
             Each starter ships tokens with light + dark values. You can edit anything later.
           </ModalDescription>
         </div>
@@ -89,8 +89,8 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
           ))}
         </div>
 
-        <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bd-border, #e2e8f0)" }}>
-          <div style={{ fontSize: 11, color: "var(--bd-text-muted, #64748b)", marginRight: "auto" }}>
+        <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bd-border)" }}>
+          <div style={{ fontSize: 11, color: "var(--bd-text-muted)", marginRight: "auto" }}>
             Tip: applying a starter restyles tokens but keeps your elements.
           </div>
           <Button variant="ghost" size="sm" type="button" onClick={handleSkip}>
@@ -135,12 +135,12 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
         borderRadius: 8,
         overflow: "hidden",
         border: selected
-          ? "2px solid var(--bd-accent, #2D6DFF)"
-          : "1px solid var(--bd-border, #e2e8f0)",
+          ? "2px solid var(--bd-accent)"
+          : "1px solid var(--bd-border)",
         boxShadow: selected ? "0 0 0 2px rgba(45, 109, 255, 0.16)" : "none",
         display: "flex",
         flexDirection: "column",
-        background: "var(--bd-surface, #fff)",
+        background: "var(--bd-surface)",
       }}
     >
       <div
@@ -157,13 +157,13 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
         {starter.name}
       </div>
       <div style={{ padding: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bd-text, #0f172a)" }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bd-text)" }}>
           {starter.name}
         </div>
         <div
           style={{
             fontSize: 11,
-            color: "var(--bd-text-muted, #64748b)",
+            color: "var(--bd-text-muted)",
             marginTop: 2,
             overflow: "hidden",
             textOverflow: "ellipsis",

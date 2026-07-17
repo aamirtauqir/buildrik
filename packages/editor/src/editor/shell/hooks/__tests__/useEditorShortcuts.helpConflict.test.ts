@@ -45,7 +45,7 @@ describe("PIN §2-B5 — '?' double help-surface conflict", () => {
 
   it("one '?' press opens BOTH the shell shortcuts modal AND the canvas cheat sheet", () => {
     const setShowShortcuts = vi.fn();
-    const modals = { setShowShortcuts, setShowAI: vi.fn() };
+    const modals = { setShowShortcuts };
     const composer = { history: { undo: vi.fn(), redo: vi.fn() } };
 
     const { result } = renderHook(() => {
@@ -73,7 +73,7 @@ describe("PIN §2-B5 — '?' double help-surface conflict", () => {
       useEditorShortcuts({
         composer: { history: { undo: vi.fn(), redo: vi.fn() } } as unknown as
           UseEditorShortcutsOptions["composer"],
-        modals: { setShowShortcuts, setShowAI: vi.fn() },
+        modals: { setShowShortcuts },
         saveProject: vi.fn(),
       }),
     );
@@ -97,7 +97,7 @@ describe("PIN §2-B5 — '?' double help-surface conflict", () => {
       useEditorShortcuts({
         composer: { history: { undo: vi.fn(), redo: vi.fn() } } as unknown as
           UseEditorShortcutsOptions["composer"],
-        modals: { setShowShortcuts, setShowAI: vi.fn() },
+        modals: { setShowShortcuts },
         saveProject: vi.fn(),
       });
       return useKeyboardCheatSheet();

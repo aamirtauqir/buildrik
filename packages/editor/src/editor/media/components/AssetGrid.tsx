@@ -58,7 +58,7 @@ import type {
   MediaTypeFilter,
 } from "../../sidebar/tabs/media/data/mediaTypes";
 import type { SmartFolder } from "./FolderTree";
-import { fmtBytes } from "../utils/fmtBytes";
+import { formatBytes } from "@shared/utils/helpers/number";
 
 // ─── Toast contract (matches @/editor/shared/vibcoder useToast) ──────────
 
@@ -344,7 +344,7 @@ export function AssetGrid({
                   <div className="mgr-list-dims">
                     {item.width && item.height ? `${item.width}×${item.height}` : "—"}
                   </div>
-                  <div className="mgr-list-size">{fmtBytes(item.size)}</div>
+                  <div className="mgr-list-size">{formatBytes(item.size)}</div>
                 </div>
               );
             }
@@ -387,7 +387,7 @@ export function AssetGrid({
                   <div className="mgr-asset-name">{item.name}</div>
                   <div className="mgr-asset-sub">
                     {item.width && item.height ? `${item.width}×${item.height} · ` : ""}
-                    {fmtBytes(item.size)}
+                    {formatBytes(item.size)}
                   </div>
                 </div>
               </div>

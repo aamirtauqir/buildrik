@@ -62,7 +62,7 @@ export const DEFAULT_EXPORT_CONFIG: ExportConfig = {
   minify: false,
   includeMeta: true,
   includeViewport: true,
-  pageTitle: "Aquibra Export",
+  pageTitle: "Buildrick Export",
   metaDescription: "",
   includeResetCSS: true,
   cssPrefix: "buildrick-",

@@ -5,7 +5,7 @@ import { sectionLabel } from "./_galleryStyles";
 
 const containerCard: React.CSSProperties = {
   background: "var(--buildrick-surface, #fff)",
-  border: "1px solid var(--buildrick-border, #e5e7eb)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
   padding: 12,
   maxWidth: 320,
@@ -17,8 +17,8 @@ const containerCard: React.CSSProperties = {
  */
 const block: React.CSSProperties = {
   background:
-    "linear-gradient(135deg, var(--buildrick-accent, #2D6DFF) 0%, #6A9BFF 100%)",
-  color: "var(--buildrick-text-on-accent, #fff)",
+    "linear-gradient(135deg, var(--buildrick-accent) 0%, #6A9BFF 100%)",
+  color: "var(--buildrick-text-on-accent)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",

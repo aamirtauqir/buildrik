@@ -140,7 +140,7 @@ const containerStyles: React.CSSProperties = {
   padding: "0 8px",
   height: 36,
   background: "var(--buildrick-bg-card, var(--bd-bg-card))",
-  border: "1px solid var(--buildrick-border, #D1D9E6)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 4,
   color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
   transition: "border-color 0.15s ease, box-shadow 0.15s ease",

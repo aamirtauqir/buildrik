@@ -107,7 +107,7 @@ const warningCalloutStyle: React.CSSProperties = {
 const previewStyle: React.CSSProperties = {
   margin: 0,
   padding: 12,
-  background: "var(--bd-bg-canvas, #0e0e10)",
+  background: "var(--bd-bg-canvas)",
   color: "var(--bd-fg-secondary)",
   border: "1px solid var(--bd-border)",
   borderRadius: 6,

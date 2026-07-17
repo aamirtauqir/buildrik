@@ -133,10 +133,9 @@ export interface TopbarProps {
   onOpenPublish?: () => void;
   onOpenPlugins?: () => void;
   onOpenHistory?: () => void;
+  /** ✨ Ask AI — opens the AITab rail panel (shown only in the E3 escape-hatch rail). */
   onOpenAI?: () => void;
   onShowTemplates?: () => void;
-  onShowAI?: () => void;
-  onShowCopilot?: () => void;
   onAddPage?: () => void;
   onExportHTML?: () => void;
 }
@@ -295,7 +294,7 @@ export const Topbar: React.FC<TopbarProps> = ({
               href={`${dashboardUrl}/dashboard/sites`}
               className="bd-topbar__exit"
               aria-label="Exit to Dashboard"
-              style={{ fontSize: 13, color: "var(--bd-text-muted, #6b7280)", textDecoration: "none", whiteSpace: "nowrap" }}
+              style={{ fontSize: 13, color: "var(--bd-text-muted)", textDecoration: "none", whiteSpace: "nowrap" }}
             >
               ‹ Exit
             </a>

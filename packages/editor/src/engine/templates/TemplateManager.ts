@@ -1,3 +1,4 @@
+/** @deprecated DEAD/SIMULATED — soft-deprecated 2026-05-07; superseded by the raw-HTML importHTMLToActivePage template-apply path — do not build on this; see docs/audits/2026-07-08-editor-deep-audit.md §5c bucket A. */
 /**
  * Template Manager
  * Manages templates, marketplace, and template operations

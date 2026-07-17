@@ -71,8 +71,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "#2D6DFF",
-            color: "#fff",
+            background: "var(--bd-accent)",
+            color: "var(--bd-fg-on-accent)",
             fontSize: 9,
             padding: "3px 8px",
             borderRadius: 3,
@@ -154,7 +154,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
               left: 1,
               width: 12,
               height: 12,
-              background: "#fff",
+              background: "var(--bd-bg-card)",
               borderRadius: "var(--bd-radius-full)",
             }}
           />
@@ -171,7 +171,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
             width: 14,
             height: 14,
             border: "2px solid var(--bd-border)",
-            borderTopColor: "#2D6DFF",
+            borderTopColor: "var(--bd-accent)",
             borderRadius: "var(--bd-radius-full)",
           }}
         />
@@ -180,7 +180,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "var(--bd-bg-canvas, #fff)",
+            background: "var(--bd-bg-canvas)",
             border: "1px solid var(--bd-border)",
             width: "80%",
             height: 22,
@@ -207,12 +207,12 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "#DCFCE7",
-            color: "#16A34A",
+            background: "var(--bd-success-soft)",
+            color: "var(--bd-success)",
             fontSize: 8,
             padding: "2px 6px",
             borderRadius: 3,
-            border: "1px solid #BBF7D0",
+            border: /* @lint-hex-policy: alert-preview green-200 border, no exact chrome token */ "1px solid #BBF7D0",
           }}
         >
           Alert
@@ -233,8 +233,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "#DCFCE7",
-            color: "#16A34A",
+            background: "var(--bd-success-soft)",
+            color: "var(--bd-success)",
             fontSize: 8,
             padding: "1px 6px",
             borderRadius: 9,
@@ -250,7 +250,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
     case "tabs":
       return (
         <div style={{ display: "flex", gap: 4, fontSize: 8, color: "var(--bd-fg-secondary)" }}>
-          <span style={{ borderBottom: "2px solid #2D6DFF", paddingBottom: 1 }}>One</span>
+          <span style={{ borderBottom: "2px solid var(--bd-accent)", paddingBottom: 1 }}>One</span>
           <span>Two</span>
         </div>
       );
@@ -259,7 +259,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
         <div style={{ display: "flex", gap: 3, fontSize: 8, color: "var(--bd-fg-secondary)" }}>
           <span>‹</span>
           <span>1</span>
-          <span style={{ color: "#2D6DFF" }}>2</span>
+          <span style={{ color: "var(--bd-accent)" }}>2</span>
           <span>3</span>
           <span>›</span>
         </div>
@@ -276,7 +276,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
         <div
           style={{
             background: "var(--bd-fg-primary)",
-            color: "var(--bd-bg-canvas, #fff)",
+            color: "var(--bd-bg-canvas)",
             fontSize: 8,
             padding: "2px 6px",
             borderRadius: 3,
@@ -289,7 +289,7 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "var(--bd-bg-canvas, #fff)",
+            background: "var(--bd-bg-canvas)",
             border: "1px solid var(--bd-border)",
             width: "70%",
             height: 22,
@@ -330,8 +330,8 @@ function MiniPreview({ component }: { component: ComponentType }): React.ReactEl
       return (
         <div
           style={{
-            background: "#2D6DFF",
-            color: "#fff",
+            background: "var(--bd-accent)",
+            color: "var(--bd-fg-on-accent)",
             fontSize: 9,
             padding: "3px 10px",
             borderRadius: 3,

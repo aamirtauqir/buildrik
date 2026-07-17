@@ -12,14 +12,6 @@ import { render, screen, cleanup } from "@testing-library/react";
 // Convention: modals with an isOpen prop render their marker only when open —
 // that mirrors the real components' contract (they render null when closed).
 
-vi.mock("../../../ai/AIAssistant", () => ({
-  AIAssistant: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="modal-ai-assistant" /> : null,
-}));
-vi.mock("../../../ai/AICopilot", () => ({
-  AICopilot: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="modal-ai-copilot" /> : null,
-}));
 vi.mock("../../../templates/SaveTemplate", () => ({
   SaveTemplate: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-save-template" /> : null,
@@ -89,7 +81,6 @@ function makeComposer() {
 function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
   return {
     composer: makeComposer(),
-    selectedElement: null,
     showTemplates: false,
     onCloseTemplates: vi.fn(),
     onSelectTemplate: vi.fn(),
@@ -98,13 +89,6 @@ function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
     onSaveTemplate: vi.fn(),
     showExporter: false,
     onCloseExporter: vi.fn(),
-    showAI: false,
-    onCloseAI: vi.fn(),
-    onAIGenerate: vi.fn(),
-    aiContext: null,
-    showCopilot: false,
-    onCloseCopilot: vi.fn(),
-    onCopilotInsert: vi.fn(),
     showShortcuts: false,
     onCloseShortcuts: vi.fn(),
     showMediaLibrary: false,
@@ -150,9 +134,7 @@ const ALL_MARKERS = [
   "modal-template-library",
   "modal-save-template",
   "modal-export",
-  "modal-ai-assistant",
   "modal-shortcuts",
-  "modal-ai-copilot",
   "modal-media-library",
   "modal-image-editor",
   "modal-icon-picker",
@@ -180,9 +162,7 @@ describe("StudioModals — mounting contract", () => {
     ["showTemplates", "modal-template-library"],
     ["showSaveTemplate", "modal-save-template"],
     ["showExporter", "modal-export"],
-    ["showAI", "modal-ai-assistant"],
     ["showShortcuts", "modal-shortcuts"],
-    ["showCopilot", "modal-ai-copilot"],
     ["showMediaLibrary", "modal-media-library"],
     ["showCollectionSetup", "modal-collection-setup"],
     ["showCreateComponent", "modal-create-component"],

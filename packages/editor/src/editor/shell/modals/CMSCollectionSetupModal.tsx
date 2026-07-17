@@ -128,7 +128,7 @@ const s: Record<string, React.CSSProperties> = {
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
     borderRadius: "var(--buildrick-radius-md)",
-    color: "var(--buildrick-text-primary, #e4e4e7)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 13,
     outline: "none",
     boxSizing: "border-box" as const,
@@ -140,7 +140,7 @@ const s: Record<string, React.CSSProperties> = {
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
     borderRadius: "var(--buildrick-radius-md)",
-    color: "var(--buildrick-text-primary, #e4e4e7)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 13,
     outline: "none",
     cursor: "pointer",
@@ -152,7 +152,7 @@ const s: Record<string, React.CSSProperties> = {
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
     borderRadius: "var(--buildrick-radius-md)",
-    color: "var(--buildrick-text-primary, #e4e4e7)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 13,
     outline: "none",
     resize: "vertical" as const,
@@ -173,7 +173,7 @@ const s: Record<string, React.CSSProperties> = {
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
     borderRadius: "var(--buildrick-radius-sm)",
-    color: "var(--buildrick-text-primary, #e4e4e7)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
     outline: "none",
   },
@@ -183,7 +183,7 @@ const s: Record<string, React.CSSProperties> = {
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
     borderRadius: "var(--buildrick-radius-sm)",
-    color: "var(--buildrick-text-primary, #e4e4e7)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
     outline: "none",
     cursor: "pointer",
@@ -560,7 +560,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           </div>
 
           {/* E7 — dynamic-page binding */}
-          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--buildrick-border, #2a2a2a)" }}>
+          <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--buildrick-border)" }}>
             <Button
               type="button"
               variant={genPages ? "primary" : "secondary"}

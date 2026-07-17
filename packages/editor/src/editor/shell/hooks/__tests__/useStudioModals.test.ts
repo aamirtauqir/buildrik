@@ -19,8 +19,6 @@ describe("useStudioModals", () => {
     expect(m.showTemplates).toBe(false);
     expect(m.showSaveTemplate).toBe(false);
     expect(m.showExporter).toBe(false);
-    expect(m.showAI).toBe(false);
-    expect(m.showCopilot).toBe(false);
     expect(m.showShortcuts).toBe(false);
     expect(m.showMediaLibrary).toBe(false);
     expect(m.showImageEditor).toBe(false);
@@ -32,7 +30,6 @@ describe("useStudioModals", () => {
     expect(m.showCMSCollectionSetup).toBe(false);
     expect(m.showCMSRecords).toBe(false);
     expect(m.showCommandPalette).toBe(false);
-    expect(m.aiContext).toBeNull();
     expect(m.mediaLibraryContext).toBeNull();
     expect(m.imageEditorContext).toBeNull();
     expect(m.iconPickerContext).toBeNull();
@@ -48,7 +45,6 @@ describe("useStudioModals", () => {
     ["templates", "openTemplates", "closeTemplates", "showTemplates"],
     ["saveTemplate", "openSaveTemplate", "closeSaveTemplate", "showSaveTemplate"],
     ["exporter", "openExporter", "closeExporter", "showExporter"],
-    ["copilot", "openCopilot", "closeCopilot", "showCopilot"],
     ["projectSettings", "openProjectSettings", "closeProjectSettings", "showProjectSettings"],
     ["cmsCollectionSetup", "openCMSCollectionSetup", "closeCMSCollectionSetup", "showCMSCollectionSetup"],
     ["cmsRecords", "openCMSRecords", "closeCMSRecords", "showCMSRecords"],
@@ -73,27 +69,6 @@ describe("useStudioModals", () => {
   });
 
   // Context-carrying modals -----------------------------------------------------
-  it("openAI stores the context; closeAI clears it", () => {
-    const { result } = renderHook(() => useStudioModals());
-    act(() => result.current.openAI({ elementId: "el-1", elementType: "text", prompt: "p" }));
-    expect(result.current.showAI).toBe(true);
-    expect(result.current.aiContext).toEqual({
-      elementId: "el-1",
-      elementType: "text",
-      prompt: "p",
-    });
-    act(() => result.current.closeAI());
-    expect(result.current.showAI).toBe(false);
-    expect(result.current.aiContext).toBeNull();
-  });
-
-  it("openAI without a context opens with null context", () => {
-    const { result } = renderHook(() => useStudioModals());
-    act(() => result.current.openAI());
-    expect(result.current.showAI).toBe(true);
-    expect(result.current.aiContext).toBeNull();
-  });
-
   it("openMediaLibrary stores allowedTypes + onSelect; close clears context", () => {
     const { result } = renderHook(() => useStudioModals());
     const onSelect = vi.fn();
@@ -180,8 +155,6 @@ describe("useStudioModals", () => {
       result.current.openTemplates();
       result.current.openSaveTemplate();
       result.current.openExporter();
-      result.current.openAI({ elementId: "x" });
-      result.current.openCopilot();
       result.current.setShowShortcuts(true);
       result.current.openMediaLibrary(["image"], vi.fn());
       result.current.openImageEditor("src.png", vi.fn());
@@ -202,8 +175,6 @@ describe("useStudioModals", () => {
     expect(m.showTemplates).toBe(false);
     expect(m.showSaveTemplate).toBe(false);
     expect(m.showExporter).toBe(false);
-    expect(m.showAI).toBe(false);
-    expect(m.showCopilot).toBe(false);
     expect(m.showShortcuts).toBe(false);
     expect(m.showMediaLibrary).toBe(false);
     expect(m.showImageEditor).toBe(false);
@@ -215,7 +186,6 @@ describe("useStudioModals", () => {
     expect(m.showCMSCollectionSetup).toBe(false);
     expect(m.showCMSRecords).toBe(false);
     expect(m.showCommandPalette).toBe(false);
-    expect(m.aiContext).toBeNull();
     expect(m.mediaLibraryContext).toBeNull();
     expect(m.imageEditorContext).toBeNull();
     expect(m.iconPickerContext).toBeNull();

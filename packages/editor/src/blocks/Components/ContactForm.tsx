@@ -158,7 +158,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             background: "var(--buildrick-design-color-primary)",
             border: "none",
             borderRadius: 8,
-            color: "#fff",
+            color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
             fontWeight: 600,
             cursor: "pointer",
           }}
@@ -332,7 +332,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             background: "var(--buildrick-design-color-primary)",
             border: "none",
             borderRadius: 8,
-            color: "#fff",
+            color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
             fontSize: 16,
             fontWeight: 600,
             cursor: isSubmitting ? "wait" : "pointer",

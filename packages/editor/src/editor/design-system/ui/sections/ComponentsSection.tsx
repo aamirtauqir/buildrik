@@ -187,7 +187,7 @@ function CatalogPreview({ component }: { component: ComponentType }): React.Reac
           style={{
             padding: "3px 10px",
             background: "var(--bd-accent)",
-            color: "#fff",
+            color: "var(--bd-fg-on-accent)",
             borderRadius: 4,
             fontSize: 10,
           }}
@@ -311,7 +311,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
         </Button>
       </div>
       <div style={headerSubtitleStyle}>
-        Buildrik catalog v3 · last updated {CATALOG_LAST_UPDATED}
+        Buildrick catalog v3 · last updated {CATALOG_LAST_UPDATED}
       </div>
 
       <div style={cardGridStyle} data-catalog-grid>

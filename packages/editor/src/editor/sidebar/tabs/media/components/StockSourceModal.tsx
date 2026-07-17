@@ -132,7 +132,7 @@ export function StockSourceModal({
             style={{
               margin: "12px 20px 0",
               padding: "8px 12px",
-              background: "var(--bd-cobalt-tint, #eaf1ff)",
+              background: "var(--bd-cobalt-tint)",
               borderRadius: 4,
               display: "flex",
               alignItems: "center",
@@ -147,7 +147,7 @@ export function StockSourceModal({
             {quota.upgradeHref && (
               <a
                 href={quota.upgradeHref}
-                style={{ color: "var(--bd-accent, #2D6DFF)", fontWeight: 500, textDecoration: "none" }}
+                style={{ color: "var(--bd-accent)", fontWeight: 500, textDecoration: "none" }}
               >
                 Upgrade for unlimited →
               </a>
@@ -185,7 +185,7 @@ export function StockSourceModal({
               role="radiogroup"
               aria-label="Stock source"
               data-testid="stock-source-pills"
-              style={{ display: "flex", gap: 2, padding: 2, background: "var(--bd-bg-subtle, #f1f5f9)", borderRadius: 6 }}
+              style={{ display: "flex", gap: 2, padding: 2, background: "var(--bd-bg-subtle)", borderRadius: 6 }}
             >
               {SOURCES.map((s) => {
                 const active = source === s.id;
@@ -205,8 +205,8 @@ export function StockSourceModal({
                       borderRadius: 4,
                       fontSize: 12,
                       fontWeight: active ? 600 : 500,
-                      color: active ? "var(--bd-fg-on-accent, #fff)" : "var(--bd-fg-muted, #64748b)",
-                      background: active ? "var(--bd-accent, #2D6DFF)" : "transparent",
+                      color: active ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
+                      background: active ? "var(--bd-accent)" : "transparent",
                     }}
                   >
                     {s.label}

@@ -65,7 +65,7 @@ export const SocialIcons: React.FC<SocialIconsProps> = ({
             borderRadius: "50%",
             background: variant === "filled" ? color : "transparent",
             border: variant === "outline" ? `2px solid ${color}` : "none",
-            color: variant === "filled" ? "#fff" : color,
+            color: variant === "filled" ? /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff" : color,
             fontSize: iconSize * 0.5,
             textDecoration: "none",
             transition: "transform 0.2s ease",

@@ -12,10 +12,10 @@ interface DiffRowProps {
 }
 
 const opColors: Record<string, string> = {
-  add: "var(--bd-success, #22c55e)",
-  remove: "var(--bd-error, #ef4444)",
+  add: "var(--bd-success)",
+  remove: "var(--bd-error)",
   replace: "var(--bd-accent, var(--bd-accent))",
-  info: "var(--bd-fg-muted, #908D85)",
+  info: "var(--bd-fg-muted)",
 };
 
 const opIcons: Record<string, string> = {

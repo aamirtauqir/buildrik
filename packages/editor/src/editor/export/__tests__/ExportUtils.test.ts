@@ -1,6 +1,7 @@
 /**
  * ExportUtils tests — pure helpers for the export modal:
- * sanitizeHTMLForPreview, setupPreviewWindow, downloadFile, formatBytes.
+ * sanitizeHTMLForPreview, setupPreviewWindow, downloadFile.
+ * (byte formatting now lives in the canonical shared number helper.)
  *
  * @license BSD-3-Clause
  */
@@ -9,7 +10,6 @@ import {
   sanitizeHTMLForPreview,
   setupPreviewWindow,
   downloadFile,
-  formatBytes,
 } from "../ExportUtils";
 
 describe("sanitizeHTMLForPreview", () => {
@@ -134,7 +134,7 @@ describe("setupPreviewWindow", () => {
     expect(iframe.srcdoc).toBe("<h1>Preview</h1>");
     expect(iframe.style.width).toBe("100%");
     expect(iframe.style.height).toBe("100vh");
-    expect(doc.title).toBe("Aquibra Preview");
+    expect(doc.title).toBe("Buildrick Preview");
   });
 });
 
@@ -182,25 +182,5 @@ describe("downloadFile", () => {
     expect(document.body.querySelector("a")).toBeNull();
 
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:mock-url");
-  });
-});
-
-describe("formatBytes", () => {
-  it("formats byte-range values as B", () => {
-    expect(formatBytes(0)).toBe("0 B");
-    expect(formatBytes(512)).toBe("512 B");
-    expect(formatBytes(1023)).toBe("1023 B");
-  });
-
-  it("formats kilobyte-range values as KB with one decimal", () => {
-    expect(formatBytes(1024)).toBe("1.0 KB");
-    expect(formatBytes(1536)).toBe("1.5 KB");
-    // Pin actual boundary behavior: everything below 1 MiB stays KB.
-    expect(formatBytes(1024 * 1024 - 1)).toBe("1024.0 KB");
-  });
-
-  it("formats megabyte-range values as MB with two decimals", () => {
-    expect(formatBytes(1024 * 1024)).toBe("1.00 MB");
-    expect(formatBytes(2.5 * 1024 * 1024)).toBe("2.50 MB");
   });
 });

@@ -1,8 +1,9 @@
 /**
- * useStudioHandlers.test.ts — quick-add, AI request/apply, copilot
- * insert, template select/save. Composer + block registry + template
- * actions are mocked; assertions target transaction discipline and
- * the per-branch element mutations.
+ * useStudioHandlers.test.ts — quick-add + template select/save.
+ * Composer + block registry + template actions are mocked; assertions
+ * target transaction discipline and the per-branch element mutations.
+ * (AI request/apply + copilot insert were removed with the AIAssistant
+ * surface — AI is now the AITab, which owns its own edit apply path.)
  *
  * @license BSD-3-Clause
  */
@@ -13,7 +14,6 @@ import { useStudioHandlers, type UseStudioHandlersParams } from "../useStudioHan
 import { STORAGE_KEYS } from "../../../../shared/constants/config";
 import type { BlockData } from "../../../../shared/types";
 import type { Template } from "../../../../templates/TemplateLibrary";
-import type { AIGenerationResult } from "../../../../ai/AIAssistant";
 
 vi.mock("../../../../blocks/blockRegistry", () => ({
   getBlockDefinitions: vi.fn(() => [
@@ -92,19 +92,15 @@ function mount(overrides: Partial<UseStudioHandlersParams> = {}) {
   const root = makeElement({ getId: vi.fn(() => "root-1") });
   const composer = makeComposer(root);
   const addToast = vi.fn().mockReturnValue("toast-id");
-  const openAI = vi.fn();
   const closeTemplates = vi.fn();
   const params: UseStudioHandlersParams = {
     composer: composer as unknown as UseStudioHandlersParams["composer"],
-    selectedElement: null,
-    aiContext: null,
     addToast,
-    openAI,
     closeTemplates,
     ...overrides,
   };
   const hook = renderHook(() => useStudioHandlers(params));
-  return { hook, composer, root, addToast, openAI, closeTemplates };
+  return { hook, composer, root, addToast, closeTemplates };
 }
 
 const BLOCK: BlockData = { id: "hero-1" } as unknown as BlockData;
@@ -169,184 +165,6 @@ describe("useStudioHandlers", () => {
       composer.elements.createPage.mockReturnValue({ root: { id: "root-new" } } as never);
       act(() => hook.result.current.handleQuickAdd(BLOCK));
       expect(composer.elements.createPage).toHaveBeenCalledWith("Page 1");
-    });
-  });
-
-  // handleAIRequest ------------------------------------------------------------
-  it("handleAIRequest opens AI with a suggestion prompt for the element type", () => {
-    const { hook, openAI } = mount();
-    act(() =>
-      hook.result.current.handleAIRequest({ elementId: "el-9", elementType: "hero" }),
-    );
-    expect(openAI).toHaveBeenCalledWith({
-      elementId: "el-9",
-      elementType: "hero",
-      prompt: "Suggest improvements for hero",
-    });
-  });
-
-  it("handleAIRequest falls back to 'element' when type missing", () => {
-    const { hook, openAI } = mount();
-    act(() => hook.result.current.handleAIRequest({}));
-    expect(openAI).toHaveBeenCalledWith(
-      expect.objectContaining({ prompt: "Suggest improvements for element" }),
-    );
-  });
-
-  // applyAIResult --------------------------------------------------------------
-  describe("applyAIResult", () => {
-    const textResult: AIGenerationResult = {
-      type: "text",
-      content: "new copy",
-    } as AIGenerationResult;
-
-    it("no-ops without composer or without a target element id", () => {
-      const noComposer = mount({ composer: null });
-      act(() => noComposer.hook.result.current.applyAIResult(textResult));
-
-      const noTarget = mount(); // aiContext + selectedElement both null
-      act(() => noTarget.hook.result.current.applyAIResult(textResult));
-      expect(noTarget.composer.beginTransaction).not.toHaveBeenCalled();
-    });
-
-    it("text on an <img> sets alt instead of content", () => {
-      const el = makeElement({ getTagName: vi.fn(() => "IMG") });
-      const { hook, composer } = mount({ aiContext: { elementId: "el-1" } });
-      composer.elements.getElement.mockReturnValue(el as never);
-      act(() => hook.result.current.applyAIResult(textResult));
-      expect(el.setAttribute).toHaveBeenCalledWith("alt", "new copy");
-      expect(el.setContent).not.toHaveBeenCalled();
-      expect(composer.selection.select).toHaveBeenCalledWith(el);
-      expect(composer.endTransaction).toHaveBeenCalled();
-    });
-
-    it("text on a normal element removes children then sets content", () => {
-      const child = makeElement({ getId: vi.fn(() => "child-1") });
-      const el = makeElement({ getChildren: vi.fn(() => [child]) });
-      const { hook, composer } = mount({ aiContext: { elementId: "el-1" } });
-      composer.elements.getElement.mockReturnValue(el as never);
-      act(() => hook.result.current.applyAIResult(textResult));
-      expect(composer.elements.removeElement).toHaveBeenCalledWith("child-1");
-      expect(el.setContent).toHaveBeenCalledWith("new copy");
-    });
-
-    it("html into a container type clears it and inserts the HTML", () => {
-      const el = makeElement({ getType: vi.fn(() => "section") });
-      const { hook, composer } = mount({ aiContext: { elementId: "el-1" } });
-      composer.elements.getElement.mockReturnValue(el as never);
-      act(() =>
-        hook.result.current.applyAIResult({
-          type: "html",
-          content: "<div>ai</div>",
-        } as AIGenerationResult),
-      );
-      expect(el.setContent).toHaveBeenCalledWith("");
-      expect(composer.elements.insertHTMLToElement).toHaveBeenCalledWith(
-        "el-1",
-        "<div>ai</div>",
-      );
-    });
-
-    it("html into a non-container type inserts nothing", () => {
-      const el = makeElement({ getType: vi.fn(() => "text") });
-      const { hook, composer } = mount({ aiContext: { elementId: "el-1" } });
-      composer.elements.getElement.mockReturnValue(el as never);
-      act(() =>
-        hook.result.current.applyAIResult({
-          type: "html",
-          content: "<div>ai</div>",
-        } as AIGenerationResult),
-      );
-      expect(composer.elements.insertHTMLToElement).not.toHaveBeenCalled();
-      expect(composer.endTransaction).toHaveBeenCalled();
-    });
-
-    it("image sets src and defaults alt only when missing", () => {
-      const el = makeElement({ getAttribute: vi.fn(() => undefined) });
-      const { hook, composer } = mount({ aiContext: { elementId: "el-1" } });
-      composer.elements.getElement.mockReturnValue(el as never);
-      act(() =>
-        hook.result.current.applyAIResult({
-          type: "image",
-          content: "https://img/ai.png",
-        } as AIGenerationResult),
-      );
-      expect(el.setAttribute).toHaveBeenCalledWith("src", "https://img/ai.png");
-      expect(el.setAttribute).toHaveBeenCalledWith("alt", "AI generated image");
-    });
-
-    it("image keeps an existing alt", () => {
-      const el = makeElement({ getAttribute: vi.fn(() => "existing alt") });
-      const { hook, composer } = mount({ aiContext: { elementId: "el-1" } });
-      composer.elements.getElement.mockReturnValue(el as never);
-      act(() =>
-        hook.result.current.applyAIResult({
-          type: "image",
-          content: "https://img/ai.png",
-        } as AIGenerationResult),
-      );
-      expect(el.setAttribute).toHaveBeenCalledTimes(1);
-      expect(el.setAttribute).toHaveBeenCalledWith("src", "https://img/ai.png");
-    });
-
-    it("falls back to selectedElement.id when aiContext has no elementId", () => {
-      const el = makeElement();
-      const { hook, composer } = mount({
-        aiContext: null,
-        selectedElement: { id: "sel-1", type: "text" },
-      });
-      composer.elements.getElement.mockReturnValue(el as never);
-      act(() => hook.result.current.applyAIResult(textResult));
-      expect(composer.elements.getElement).toHaveBeenCalledWith("sel-1");
-    });
-  });
-
-  // handleCopilotInsert ----------------------------------------------------------
-  describe("handleCopilotInsert", () => {
-    it("html → insertHTMLToElement on root + 'Layout Inserted' toast", () => {
-      const { hook, composer, addToast } = mount();
-      act(() => hook.result.current.handleCopilotInsert("<div>x</div>", "html"));
-      expect(composer.elements.insertHTMLToElement).toHaveBeenCalledWith(
-        "root-1",
-        "<div>x</div>",
-      );
-      expect(addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Layout Inserted", tone: "success" }),
-      );
-      expect(composer.endTransaction).toHaveBeenCalled();
-    });
-
-    it("text → creates a text element, sets content, selects it", () => {
-      const textEl = makeElement();
-      const { hook, composer, root, addToast } = mount();
-      composer.elements.createElement.mockReturnValue(textEl as never);
-      act(() => hook.result.current.handleCopilotInsert("hello", "text"));
-      expect(composer.elements.createElement).toHaveBeenCalledWith("text");
-      expect(textEl.setContent).toHaveBeenCalledWith("hello");
-      expect(root.addChild).toHaveBeenCalledWith(textEl);
-      expect(composer.selection.select).toHaveBeenCalledWith(textEl);
-      expect(addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Text Inserted" }),
-      );
-    });
-
-    it("image → creates an image element with src + alt", () => {
-      const imgEl = makeElement();
-      const { hook, composer, addToast } = mount();
-      composer.elements.createElement.mockReturnValue(imgEl as never);
-      act(() => hook.result.current.handleCopilotInsert("https://x/i.png", "image"));
-      expect(composer.elements.createElement).toHaveBeenCalledWith("image");
-      expect(imgEl.setAttribute).toHaveBeenCalledWith("src", "https://x/i.png");
-      expect(imgEl.setAttribute).toHaveBeenCalledWith("alt", "AI generated image");
-      expect(addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Image Inserted" }),
-      );
-    });
-
-    it("no-ops without composer", () => {
-      const { hook, addToast } = mount({ composer: null });
-      act(() => hook.result.current.handleCopilotInsert("x", "html"));
-      expect(addToast).not.toHaveBeenCalled();
     });
   });
 

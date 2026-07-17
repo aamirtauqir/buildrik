@@ -1,3 +1,4 @@
+/** @deprecated DEAD/SIMULATED — the AI page generation is faked: no model is called, static section templates are inserted and steps advance on hardcoded setTimeout delays — do not build on this; see docs/audits/2026-07-08-editor-deep-audit.md §5c bucket A. */
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
@@ -281,7 +282,7 @@ const FormView: React.FC<FormViewProps> = ({
             <div style={{ fontWeight: 600, fontSize: 14, color: "var(--buildrick-text-primary)" }}>
               {preset.label}
             </div>
-            <div style={{ fontSize: 12, color: "var(--muted, #b7c5dc)", marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--muted, #b7c5dc)", marginTop: 4 }}>
               {preset.description}
             </div>
           </Button>
@@ -328,13 +329,13 @@ const LoadingView: React.FC<LoadingViewProps> = ({ steps, progress, onCancel }) 
         <div key={step.label} style={checklistItemStyles}>
           <span style={{ width: 20, textAlign: "center" as const, flexShrink: 0 }}>
             {step.status === "done" && (
-              <span style={{ color: "var(--green, #38d07a)" }}>&#10003;</span>
+              <span style={{ color: /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--green, #38d07a)" }}>&#10003;</span>
             )}
             {step.status === "generating" && (
               <span style={{ color: "var(--bd-accent)" }}>&#9673;</span>
             )}
             {step.status === "pending" && (
-              <span style={{ color: "var(--muted, #b7c5dc)", opacity: 0.4 }}>&#9675;</span>
+              <span style={{ color: /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--muted, #b7c5dc)", opacity: 0.4 }}>&#9675;</span>
             )}
           </span>
           <span
@@ -343,14 +344,14 @@ const LoadingView: React.FC<LoadingViewProps> = ({ steps, progress, onCancel }) 
                 step.status === "generating"
                   ? "var(--buildrick-text-primary)"
                   : step.status === "done"
-                    ? "var(--green, #38d07a)"
-                    : "var(--muted, #b7c5dc)",
+                    ? /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--green, #38d07a)"
+                    : /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--muted, #b7c5dc)",
               fontWeight: step.status === "generating" ? 600 : 400,
             }}
           >
             {step.label}
             {step.status === "generating" && (
-              <span style={{ color: "var(--muted, #b7c5dc)", fontWeight: 400 }}>
+              <span style={{ color: /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--muted, #b7c5dc)", fontWeight: 400 }}>
                 {" "}
                 (generating...)
               </span>
@@ -444,7 +445,7 @@ const headlineStyles: React.CSSProperties = {
 
 const subtitleStyles: React.CSSProperties = {
   fontSize: 16,
-  color: "var(--muted, #b7c5dc)",
+  color: /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--muted, #b7c5dc)",
   margin: "0 0 36px",
   lineHeight: 1.5,
 };
@@ -531,7 +532,7 @@ const generateBtnStyles: React.CSSProperties = {
 const skipLinkStyles: React.CSSProperties = {
   background: "none",
   border: "none",
-  color: "var(--muted, #b7c5dc)",
+  color: /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--muted, #b7c5dc)",
   fontSize: 13,
   cursor: "pointer",
   marginTop: 20,
@@ -588,7 +589,7 @@ const checklistItemStyles: React.CSSProperties = {
 const cancelBtnStyles: React.CSSProperties = {
   background: "none",
   border: "1px solid var(--buildrick-bg-panel)",
-  color: "var(--muted, #b7c5dc)",
+  color: /* @lint-hex-policy: wizard progress uses site-scoped --muted/--green tokens; hex fallback load-bearing */ "var(--muted, #b7c5dc)",
   padding: "10px 24px",
   borderRadius: 8,
   fontSize: 13,

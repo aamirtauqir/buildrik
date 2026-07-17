@@ -66,7 +66,7 @@ const defaultTemplates: Template[] = [
     name: "Modern Landing",
     category: "Landing Pages",
     thumbnail: "🚀",
-    html: `<div data-buildrick-id="t1-nav" data-buildrick-type="navbar"><nav style="display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.1)"><div style="font-weight:bold;font-size:24px;color:#667eea">Aquibra</div><div style="display:flex;gap:30px"><a href="#" style="text-decoration:none;color:#333;font-weight:500">Home</a><a href="#" style="text-decoration:none;color:#333;font-weight:500">Features</a><a href="#" style="text-decoration:none;color:#333;font-weight:500">Pricing</a><a href="#" style="text-decoration:none;color:#333;font-weight:500">Contact</a></div><button style="padding:12px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600">Get Started</button></nav></div>
+    html: `<div data-buildrick-id="t1-nav" data-buildrick-type="navbar"><nav style="display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.1)"><div style="font-weight:bold;font-size:24px;color:#667eea">Buildrick</div><div style="display:flex;gap:30px"><a href="#" style="text-decoration:none;color:#333;font-weight:500">Home</a><a href="#" style="text-decoration:none;color:#333;font-weight:500">Features</a><a href="#" style="text-decoration:none;color:#333;font-weight:500">Pricing</a><a href="#" style="text-decoration:none;color:#333;font-weight:500">Contact</a></div><button style="padding:12px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600">Get Started</button></nav></div>
 <div data-buildrick-id="t1-hero" data-buildrick-type="hero"><section style="padding:100px 40px;text-align:center;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff"><h1 style="font-size:56px;margin:0 0 20px;font-weight:800">Build Beautiful Websites</h1><p style="font-size:20px;margin:0 0 40px;opacity:0.9;max-width:600px;margin-left:auto;margin-right:auto">Create stunning websites visually with our drag-and-drop builder. No coding required.</p><div style="display:flex;gap:16px;justify-content:center"><button style="padding:16px 32px;background:#fff;color:#667eea;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer">Start Free Trial</button><button style="padding:16px 32px;background:transparent;color:#fff;border:2px solid #fff;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer">Watch Demo</button></div></section></div>
 <div data-buildrick-id="t1-features" data-buildrick-type="features"><section style="padding:80px 40px;background:#f8f9fa"><h2 style="text-align:center;font-size:36px;margin:0 0 60px;color:#333">Why Choose Us</h2><div style="display:flex;gap:30px;max-width:1200px;margin:0 auto"><div style="flex:1;background:#fff;padding:40px;border-radius:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.08)"><div style="font-size:48px;margin-bottom:20px">⚡</div><h3 style="margin:0 0 12px;color:#333">Lightning Fast</h3><p style="color:#666;margin:0">Build websites in minutes, not hours</p></div><div style="flex:1;background:#fff;padding:40px;border-radius:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.08)"><div style="font-size:48px;margin-bottom:20px">🎨</div><h3 style="margin:0 0 12px;color:#333">Beautiful Design</h3><p style="color:#666;margin:0">Professional templates ready to use</p></div><div style="flex:1;background:#fff;padding:40px;border-radius:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.08)"><div style="font-size:48px;margin-bottom:20px">📱</div><h3 style="margin:0 0 12px;color:#333">Fully Responsive</h3><p style="color:#666;margin:0">Looks great on all devices</p></div></div></section></div>`,
     description: "Modern landing page with hero section",
@@ -321,7 +321,7 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
                     activeCategory === cat ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
                   border: "none",
                   borderRadius: 20,
-                  color: activeCategory === cat ? "#fff" : "var(--buildrick-text-secondary)",
+                  color: activeCategory === cat ? /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#fff" : "var(--buildrick-text-secondary)",
                   fontSize: 12,
                   cursor: "pointer",
                   textTransform: "capitalize",
@@ -343,7 +343,7 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
               <p style={{ marginTop: 16, color: "var(--buildrick-text-muted)" }}>Loading template...</p>
             </div>
           ) : filteredTemplates.length === 0 ? (
-            <div style={{ textAlign: "center", padding: 60, color: "#6c7086" }}>
+            <div style={{ textAlign: "center", padding: 60, color: /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#6c7086" }}>
               <div style={{ fontSize: 32, marginBottom: 8 }}>📭</div>
               <div>No templates match your search</div>
             </div>

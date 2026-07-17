@@ -13,13 +13,12 @@ import {
   dataUrlToBlob,
   getMimeType,
   estimateSize,
-  formatBytes,
   getCompressionSavings,
 } from "./MediaOptimizerHelpers";
 
 // Re-export types and utilities
 export type { OptimizationOptions, OptimizationResult, FormatSupport };
-export { formatBytes, getCompressionSavings };
+export { getCompressionSavings };
 
 // ============================================================================
 // MEDIA OPTIMIZER CLASS

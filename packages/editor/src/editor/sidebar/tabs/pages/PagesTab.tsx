@@ -237,7 +237,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             style={{
               display: "inline-flex",
               margin: "8px 12px 0",
-              border: "1px solid var(--bd-border, #e5e7eb)",
+              border: "1px solid var(--bd-border)",
               borderRadius: 4,
               overflow: "hidden",
               alignSelf: "flex-start",
@@ -258,9 +258,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                     fontSize: 11,
                     fontWeight: on ? 600 : 400,
                     borderRadius: 0,
-                    borderRight: i === 0 ? "1px solid var(--bd-border, #e5e7eb)" : undefined,
-                    background: on ? "var(--bd-accent, #2D6DFF)" : "transparent",
-                    color: on ? "#fff" : "var(--bd-fg-muted, #6b7280)",
+                    borderRight: i === 0 ? "1px solid var(--bd-border)" : undefined,
+                    background: on ? "var(--bd-accent)" : "transparent",
+                    color: on ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
                   }}
                 >
                   {label}

@@ -53,7 +53,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           id="welcome-title"
           style={{ fontSize: 28, fontWeight: 700, marginBottom: 8, margin: 0 }}
         >
-          Welcome to Buildrik
+          Welcome to Buildrick
         </h1>
         <p style={{ color: "var(--buildrick-text-muted)", marginBottom: 32, marginTop: 8 }}>
           Start with a template — or build from scratch.

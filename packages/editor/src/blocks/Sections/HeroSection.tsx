@@ -19,7 +19,7 @@ export interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
-  title = "Welcome to dudo",
+  title = "Welcome to Buildrick",
   subtitle = "Build beautiful websites with our visual composer",
   buttonText = "Get Started",
   buttonUrl = "#",
@@ -61,7 +61,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           style={{
             fontSize: 48,
             fontWeight: 700,
-            color: "#fff",
+            color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
             marginBottom: 16,
             lineHeight: 1.2,
           }}
@@ -86,8 +86,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             style={{
               display: "inline-block",
               padding: "14px 32px",
-              background: "var(--buildrick-accent, #00d4aa)",
-              color: "#fff",
+              background: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "var(--buildrick-accent, #00d4aa)",
+              color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
               fontSize: 16,
               fontWeight: 600,
               borderRadius: 8,
@@ -112,13 +112,13 @@ export const heroBlockConfig = {
   content:
     '<section class="buildrick-hero-section" data-buildrick-type="hero">' +
     '<div class="buildrick-hero-content">' +
-    "<h1>Welcome to Aquibra</h1>" +
+    "<h1>Welcome to Buildrick</h1>" +
     "<p>Build beautiful websites in minutes with our visual composer.</p>" +
     '<a href="#" class="buildrick-hero-button">Get Started</a>' +
     "</div>" +
     "</section>",
   attributes: {
-    title: { type: "text", default: "Welcome to dudo" },
+    title: { type: "text", default: "Welcome to Buildrick" },
     subtitle: { type: "text", default: "Build beautiful websites" },
     buttonText: { type: "text", default: "Get Started" },
     buttonUrl: { type: "text", default: "#" },

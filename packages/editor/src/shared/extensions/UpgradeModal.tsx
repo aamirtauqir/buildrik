@@ -171,7 +171,7 @@ const featureRowStyle: React.CSSProperties = {
 };
 
 const checkStyle: React.CSSProperties = {
-  color: "var(--buildrick-success, #22c55e)",
+  color: "var(--buildrick-success)",
   fontWeight: 700,
   fontSize: 14,
 };

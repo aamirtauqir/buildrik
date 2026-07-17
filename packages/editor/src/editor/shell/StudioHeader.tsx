@@ -73,8 +73,8 @@ export interface StudioHeaderProps {
 
   // UI toggles
   onShowTemplates: () => void;
+  /** ✨ Ask AI — opens the AITab rail panel (single consolidated AI surface). */
   onShowAI: () => void;
-  onShowCopilot?: () => void;
   onShowExporter: () => void;
   onToggleXRay: () => void;
   onToggleDevMode?: () => void;
@@ -140,7 +140,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onSetExportLoading,
   onShowTemplates,
   onShowAI,
-  onShowCopilot,
   onShowExporter,
   onToggleXRay,
   onToggleDevMode,
@@ -298,8 +297,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       onUndo={() => composer?.history.undo()}
       onRedo={() => composer?.history.redo()}
       onShowTemplates={onShowTemplates}
-      onShowAI={onShowAI}
-      onShowCopilot={onShowCopilot}
       onPreview={handlePreview}
       onPublish={onVercelPublish ?? onOpenPublish ?? handleExport}
       publishState={publishState}

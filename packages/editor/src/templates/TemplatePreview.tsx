@@ -67,7 +67,7 @@ const PreviewFrame: React.FC<{ html: string }> = ({ html }) => {
         width: "100%",
         height: "100%",
         border: "none",
-        background: "#fff",
+        background: /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#fff",
       }}
     />
   );
@@ -185,7 +185,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <div
           style={{
             flex: 1,
-            background: "#1a1a2e",
+            background: /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#1a1a2e",
             display: "flex",
             justifyContent: "center",
             padding: 24,
@@ -196,7 +196,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             style={{
               width: previewWidth,
               height: "100%",
-              background: "#fff",
+              background: /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#fff",
               borderRadius: 8,
               overflow: "hidden",
               boxShadow: "0 10px 40px rgba(0,0,0,0.3)",

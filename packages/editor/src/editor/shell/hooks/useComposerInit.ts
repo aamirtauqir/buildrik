@@ -47,7 +47,6 @@ export interface UseComposerInitParams {
   setZoom: (z: number) => void;
   setShowTemplates: React.Dispatch<React.SetStateAction<boolean>>;
   setShowExporter: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowAI: React.Dispatch<React.SetStateAction<boolean>>;
   setShowComponentView: React.Dispatch<React.SetStateAction<boolean>>;
   setIsDirty: (dirty: boolean) => void;
   setSaveState: React.Dispatch<
@@ -75,7 +74,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     setZoom,
     setShowTemplates,
     setShowExporter,
-    setShowAI,
     setShowComponentView,
     setIsDirty,
     setSaveState,
@@ -299,7 +297,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
 
     const toggleTemplatesHandler = () => setShowTemplates((v) => !v);
     const toggleExporterHandler = () => setShowExporter((v) => !v);
-    const toggleAIHandler = () => setShowAI((v) => !v);
+    // AI is one surface now — the AITab rail panel. The ⌘K "AI" command emits
+    // ui:toggle:ai; translate it to opening the "ai" tab (StudioPanels listens
+    // for ui:switch-tab) instead of the removed AIAssistant modal.
+    const toggleAIHandler = () => instance.emit("ui:switch-tab", { tab: "ai" });
     const toggleComponentViewHandler = () => setShowComponentView((v) => !v);
     const deviceChangedHandler = (d: DeviceType) => setDevice(d);
     const zoomChangedHandler = (z: number) => setZoom(z);

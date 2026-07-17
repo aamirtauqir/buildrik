@@ -31,13 +31,6 @@ import { useDomainModals } from "./useDomainModals";
 // Context Types
 // ============================================
 
-/** AI assistant context for element-specific prompts */
-export interface AIContext {
-  elementId?: string;
-  elementType?: string;
-  prompt?: string;
-}
-
 /** Media library context for asset selection */
 export interface MediaLibraryContext {
   onSelect: (asset: MediaAsset) => void;
@@ -106,17 +99,6 @@ export interface UseStudioModalsReturn {
   setShowExporter: React.Dispatch<React.SetStateAction<boolean>>;
   openExporter: () => void;
   closeExporter: () => void;
-
-  // AI modals
-  showAI: boolean;
-  setShowAI: React.Dispatch<React.SetStateAction<boolean>>;
-  aiContext: AIContext | null;
-  openAI: (context?: AIContext) => void;
-  closeAI: () => void;
-  showCopilot: boolean;
-  setShowCopilot: React.Dispatch<React.SetStateAction<boolean>>;
-  openCopilot: () => void;
-  closeCopilot: () => void;
 
   // Shortcuts modal
   showShortcuts: boolean;

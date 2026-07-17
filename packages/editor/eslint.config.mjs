@@ -23,6 +23,12 @@ import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
 const buildrik = require("./eslint-rules/index.cjs");
+// react-hooks: source files carry `// eslint-disable-next-line
+// react-hooks/exhaustive-deps` directives that erroneously reported
+// "rule definition not found" while the plugin was unregistered. Register
+// it so those directives resolve; exhaustive-deps runs at WARN (advisory,
+// non-blocking) matching the plugin's own recommended severity.
+const reactHooks = require("eslint-plugin-react-hooks");
 
 // Chrome paths — enforced by Chrome Axioms. Mirrors scope in
 // scripts/ds-grep-gates.sh (gates 11-14) and DESIGN.md §Chrome Axioms → Scope.
@@ -87,11 +93,13 @@ export default [
         ecmaFeatures: { jsx: true },
       },
     },
-    plugins: { buildrik, "@typescript-eslint": tseslintPlugin },
+    plugins: { buildrik, "@typescript-eslint": tseslintPlugin, "react-hooks": reactHooks },
     rules: {
       "buildrik/no-inline-hex": "error",
       "buildrik/no-inspector-tokens": "error",
       "buildrik/no-get-property-value-ds": "error",
+      // Advisory only — resolves the in-source disable directives; never blocks.
+      "react-hooks/exhaustive-deps": "warn",
       // Phase 0 sanitizer rule. Path-aware allowlist hard-coded inside
       // the rule (Canvas.tsx + AICopilot.tsx). Live audit per
       // 2026-05-07 plan: 2 expected hits — both inside the allowlist.

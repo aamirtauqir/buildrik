@@ -62,23 +62,23 @@ const STATE_STYLE: Record<
   }
 > = {
   token: {
-    bg: "var(--bd-success-soft, #dcfce7)",
-    fg: "var(--bd-success-strong, #166534)",
-    border: "var(--bd-success-border, #86efac)",
+    bg: "var(--bd-success-soft)",
+    fg: "var(--bd-success-strong)",
+    border: "var(--bd-success-border)",
     prefix: "",
     actionLabel: (l) => `Jump to token ${l} in Design tab`,
   },
   preset: {
-    bg: "var(--bd-info-soft, #dbeafe)",
-    fg: "var(--bd-info-strong, #1e40af)",
-    border: "var(--bd-info-border, #93c5fd)",
+    bg: "var(--bd-info-soft)",
+    fg: "var(--bd-info-strong)",
+    border: "var(--bd-info-border)",
     prefix: "",
     actionLabel: (l) => `Jump to preset ${l} in Design tab`,
   },
   "off-ds": {
-    bg: "var(--bd-warn-soft, #fef9c3)",
-    fg: "var(--bd-warn-strong, #854d0e)",
-    border: "var(--bd-warn-border, #fde68a)",
+    bg: "var(--bd-warn-soft)",
+    fg: "var(--bd-warn-strong)",
+    border: "var(--bd-warn-border)",
     prefix: "⚠ ",
     actionLabel: (l) => `Off-design-system value ${l}. Click to bind to a token.`,
   },
@@ -151,7 +151,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
         style={{
           padding: 0,
           fontSize: 11,
-          color: "var(--bd-accent, #2D6DFF)",
+          color: "var(--bd-accent)",
           textDecoration: "underline dotted",
           textUnderlineOffset: 2,
         }}

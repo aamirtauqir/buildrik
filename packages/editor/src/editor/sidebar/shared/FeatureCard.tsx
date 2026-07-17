@@ -93,7 +93,7 @@ export const FeatureCardGrid: React.FC<FeatureCardGridProps> = ({ children, colu
             fontSize: 10,
             fontWeight: 600,
             letterSpacing: "0.08em",
-            color: "var(--buildrick-text-muted, #6B7280)",
+            color: "var(--buildrick-text-muted)",
             textTransform: "uppercase",
           }}
         >

@@ -501,9 +501,9 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                           style={{
                             padding: "5px 8px",
                             fontSize: 11,
-                            background: active ? "var(--bd-cobalt-soft, #EAF1FF)" : "transparent",
-                            border: `1px solid ${active ? "var(--bd-cobalt, #2D6DFF)" : "var(--bd-border, #E5E8EC)"}`,
-                            color: active ? "var(--bd-cobalt, #2D6DFF)" : "var(--bd-fg-secondary, #4A5568)",
+                            background: active ? "var(--bd-cobalt-soft)" : "transparent",
+                            border: `1px solid ${active ? "var(--bd-cobalt)" : "var(--bd-border)"}`,
+                            color: active ? "var(--bd-cobalt)" : "var(--bd-fg-secondary)",
                             borderRadius: 4,
                             cursor: "pointer",
                             fontWeight: active ? 500 : 400,

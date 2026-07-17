@@ -1,12 +1,15 @@
-/** Slug utilities — pure functions, no side effects, no app imports */
+/** Slug utilities — pure functions, no side effects. */
 
+import { slugify } from "@shared/utils/helpers/string";
+
+/**
+ * Path-aware slug. Pages support nested routes (e.g. "blog/post"), and
+ * validateSlug permits "/", so we slugify each "/"-separated segment with
+ * the canonical shared slugify and rejoin — preserving the "/" separators
+ * the flat shared slugify would otherwise strip.
+ */
 export function normalizeSlug(raw: string): string {
-  return raw
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9\-/]/g, "")
-    .replace(/-{2,}/g, "-")
-    .replace(/^-|-$/g, "");
+  return raw.split("/").map(slugify).join("/");
 }
 
 export function validateSlug(slug: string): string | null {

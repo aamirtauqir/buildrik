@@ -4,9 +4,9 @@ import { Center } from "../editor/shared/vibcoder/Center";
 import { sectionLabel } from "./_galleryStyles";
 
 const child: React.CSSProperties = {
-  background: "var(--buildrick-accent, #2D6DFF)",
-  color: "var(--buildrick-text-on-accent, #fff)",
-  border: "1px solid var(--buildrick-border, #e5e7eb)",
+  background: "var(--buildrick-accent)",
+  color: "var(--buildrick-text-on-accent)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
   padding: "12px 20px",
   fontSize: 13,
@@ -14,7 +14,7 @@ const child: React.CSSProperties = {
 
 const containerCard: React.CSSProperties = {
   background: "var(--buildrick-surface, #fff)",
-  border: "1px solid var(--buildrick-border, #e5e7eb)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
   padding: 12,
   maxWidth: 520,
@@ -23,7 +23,7 @@ const containerCard: React.CSSProperties = {
 
 const pageCard: React.CSSProperties = {
   background: "var(--buildrick-surface, #fff)",
-  border: "1px solid var(--buildrick-border, #e5e7eb)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
   maxWidth: 520,
   // Capped so 100vh demo doesn't blow out the gallery — page modifier still

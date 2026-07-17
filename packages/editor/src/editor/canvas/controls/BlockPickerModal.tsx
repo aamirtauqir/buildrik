@@ -236,7 +236,7 @@ const overlayStyles: React.CSSProperties = {
 };
 
 const modalStyles: React.CSSProperties = {
-  background: "var(--buildrick-bg-panel, #1e1e2e)",
+  background: "var(--buildrick-bg-panel)",
   borderRadius: 12,
   boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
   width: 380,
@@ -257,13 +257,13 @@ const headerStyles: React.CSSProperties = {
 const titleStyles: React.CSSProperties = {
   fontWeight: 600,
   fontSize: 14,
-  color: "var(--buildrick-text-primary, #cdd6f4)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const closeButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--buildrick-text-secondary, #a6adc8)",
+  color: "var(--buildrick-text-secondary)",
   cursor: "pointer",
   padding: 4,
   borderRadius: 6,
@@ -284,7 +284,7 @@ const searchInputStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   outline: "none",
-  color: "var(--buildrick-text-primary, #cdd6f4)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 13,
 };
 

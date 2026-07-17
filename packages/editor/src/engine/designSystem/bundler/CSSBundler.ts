@@ -23,6 +23,7 @@ const DEFAULT_OPTIONS: Required<BundleOptions> = {
 function escapeCssValue(value: string): string {
   // Reject control chars + closing-brace injection. CSS values shouldn't
   // contain `{`, `}`, or unescaped backslashes anyway.
+  // eslint-disable-next-line no-control-regex -- control-char stripping is the intent
   return value.replace(/[\x00-\x1f\x7f{}]/g, "");
 }
 

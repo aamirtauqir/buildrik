@@ -192,7 +192,7 @@ export const SectionTemplates: React.FC<SectionTemplatesProps> = ({ onInsert, fi
               borderRadius: 6,
               cursor: "pointer",
               fontSize: 12,
-              color: activeType === st.type ? "#fff" : "var(--buildrick-text)",
+              color: activeType === st.type ? /* @lint-hex-policy: template preview/thumbnail color — not editor chrome */ "#fff" : "var(--buildrick-text)",
               display: "flex",
               alignItems: "center",
               gap: 4,

@@ -148,15 +148,18 @@ jobs:
       - name: DS vocab-add gate
         run: bash packages/editor/scripts/check-vocab-add.sh HEAD
 
-      # ESLint runs advisory-only by design. DS V1 rules (no-inline-hex,
-      # no-inspector-tokens, no-get-property-value-ds) and Chrome Axiom
-      # rules (A1.1-A1.3) surface as IDE warnings; real enforcement lives
-      # in the grep gates (verify:ds, lint:ds-hex) which ARE blocking.
-      # See DESIGN.md Chrome Axioms - Enforcement. Do not remove || true
-      # without also flipping WARN to FAIL on chrome-axiom baselines.
-      - name: ESLint (DS rules, advisory)
+      # ESLint is BLOCKING (D9, 2026-07-17). error-severity rules fail the
+      # build: no-inline-hex (inline chrome hex must be a var(--buildrick-*)/
+      # var(--bd-*) token or carry a `@lint-hex-policy:` annotation), plus
+      # no-inspector-tokens, no-get-property-value-ds, no-dangerous-html, and
+      # the engine/shared/services import-boundary rules. WARN-severity rules
+      # (Chrome Axioms A1.1-A1.3, no-magic-layout-literals, exhaustive-deps)
+      # stay advisory — eslint exits 0 on warnings, non-zero only on errors.
+      # The grep gates (verify:ds, lint:ds-hex) remain the enforcement for the
+      # WARN-baseline chrome axioms. Do not re-add `|| true`.
+      - name: ESLint (blocking on errors)
         working-directory: packages/editor
-        run: pnpm run lint || true
+        run: pnpm run lint
 
       - name: Run editor tests
         working-directory: packages/editor

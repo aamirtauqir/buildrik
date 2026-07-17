@@ -119,7 +119,7 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
             width: 6,
             height: 6,
             borderRadius: "var(--bd-radius-full)",
-            background: "var(--bd-warning, #f59e0b)",
+            background: "var(--bd-warning)",
           }}
         />
       )}
@@ -181,7 +181,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
         style={{
           width: 60,
           padding: "4px 6px",
-          background: "var(--bd-surface-1, #fff)",
+          background: "var(--bd-surface-1)",
           border: "1px solid var(--bd-border)",
           borderRadius: 4,
           color: "var(--bd-fg-primary)",

@@ -34,7 +34,7 @@ export interface DetachConfirmModalProps {
 
 const metaStyle: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--bd-fg-muted, #64748B)",
+  color: "var(--bd-fg-muted)",
   margin: "0 0 12px 0",
 };
 
@@ -50,7 +50,7 @@ const bulletItemStyle: React.CSSProperties = {
   gap: 8,
   padding: "6px 0",
   fontSize: 12,
-  color: "var(--bd-fg-secondary, #475569)",
+  color: "var(--bd-fg-secondary)",
 };
 
 const bulletIconStyle: React.CSSProperties = {
@@ -69,22 +69,22 @@ const footerStyle: React.CSSProperties = {
 const BULLETS: ReadonlyArray<{ icon: string; color: string; text: string }> = [
   {
     icon: "✓",
-    color: "var(--buildrick-success-strong, #15803D)",
+    color: "var(--buildrick-success-strong)",
     text: "Current resolved bindings will be snapshotted",
   },
   {
     icon: "✓",
-    color: "var(--buildrick-success-strong, #15803D)",
+    color: "var(--buildrick-success-strong)",
     text: "This instance becomes free-form (edit anything)",
   },
   {
     icon: "⚠",
-    color: "var(--buildrick-warning-strong, #854D0E)",
+    color: "var(--buildrick-warning-strong)",
     text: "Master edits will no longer affect this instance",
   },
   {
     icon: "↩",
-    color: "var(--buildrick-info-strong, #1F4FBF)",
+    color: "var(--buildrick-info-strong)",
     text: "Undo restores the link (Cmd+Z)",
   },
 ];

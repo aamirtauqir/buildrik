@@ -31,13 +31,13 @@ const baseStyle: React.CSSProperties = {
 };
 
 const usedStyle: React.CSSProperties = {
-  background: "var(--buildrick-success-soft, #dcfce7)",
-  color: "var(--buildrick-success-strong, #15803d)",
+  background: "var(--buildrick-success-soft)",
+  color: "var(--buildrick-success-strong)",
 };
 
 const unusedStyle: React.CSSProperties = {
-  background: "var(--bd-bg-muted, #f1f5f9)",
-  color: "var(--bd-fg-muted, #64748b)",
+  background: "var(--bd-bg-muted)",
+  color: "var(--bd-fg-muted)",
 };
 
 export const TokenUsageChip: React.FC<TokenUsageChipProps> = ({ count }) => {

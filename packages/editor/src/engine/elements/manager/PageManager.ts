@@ -22,7 +22,7 @@
 
 import { EVENTS } from "../../../shared/constants";
 import type { PageData, SlugChange } from "../../../shared/types";
-import { generateId } from "../../../shared/utils/helpers";
+import { generateId, slugify } from "../../../shared/utils/helpers";
 import type { ElementManagerContext } from "./types";
 
 /** Max slug-history entries kept per page. Oldest evicts. */
@@ -439,17 +439,6 @@ export class PageManager {
 }
 
 // ── Module-local utilities (pure, testable) ─────────────────────────────────
-
-/** Slug-from-name: lowercase, hyphen-joined, alnum/hyphen only. */
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-{2,}/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 /** "About" → "About Copy" → "About Copy 2" → "About Copy 3" ... */
 function uniqueCopyName(baseName: string, taken: Set<string>): string {

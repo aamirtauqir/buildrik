@@ -48,16 +48,16 @@ function Demo() {
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>color via parent (currentColor)</h2>
       <div style={wideRow}>
-        <span style={{ color: "var(--bd-fg-primary, #000)" }}>
+        <span style={{ color: "var(--bd-fg-primary)" }}>
           <Icon name="info" /> primary
         </span>
-        <span style={{ color: "var(--buildrick-accent, #2D6DFF)" }}>
+        <span style={{ color: "var(--buildrick-accent)" }}>
           <Icon name="link" /> accent
         </span>
-        <span style={{ color: "var(--buildrick-success, #10b981)" }}>
+        <span style={{ color: "var(--buildrick-success)" }}>
           <Icon name="check-circle" /> success
         </span>
-        <span style={{ color: "var(--buildrick-error, #ef4444)" }}>
+        <span style={{ color: "var(--buildrick-error)" }}>
           <Icon name="alert-circle" /> error
         </span>
       </div>

@@ -59,7 +59,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <div style={{ fontSize: 24, marginBottom: 24 }}>
             {[...Array(testimonials[activeIndex].rating || 5)].map((_, i) => (
-              <span key={i} style={{ color: "#fbbf24" }}>
+              <span key={i} style={{ color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fbbf24" }}>
                 ★
               </span>
             ))}
@@ -173,7 +173,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
           {testimonial.rating && (
             <div style={{ marginBottom: 16 }}>
               {[...Array(testimonial.rating)].map((_, i) => (
-                <span key={i} style={{ color: "#fbbf24" }}>
+                <span key={i} style={{ color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fbbf24" }}>
                   ★
                 </span>
               ))}
@@ -214,7 +214,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#fff",
+                  color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
                   fontWeight: 600,
                 }}
               >

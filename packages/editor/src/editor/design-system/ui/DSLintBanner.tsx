@@ -70,8 +70,8 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
       aria-live={tone === "error" ? "assertive" : "polite"}
       className={`bd-ds-lint-banner bd-ds-lint-banner--${tone}`}
       style={{
-        background: tone === "error" ? "var(--bd-error-tint, #fee2e2)" : "var(--bd-warning-tint, #fef9c3)",
-        borderLeft: `3px solid ${tone === "error" ? "var(--bd-error, #dc2626)" : "var(--bd-warning, #eab308)"}`,
+        background: tone === "error" ? "var(--bd-error-tint)" : "var(--bd-warning-tint)",
+        borderLeft: `3px solid ${tone === "error" ? "var(--bd-error)" : "var(--bd-warning)"}`,
         padding: "10px 12px",
         borderRadius: "0 6px 6px 0",
         fontSize: 12,
@@ -82,7 +82,7 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
         style={{
           listStyle: "none",
           fontSize: 11,
-          color: "var(--bd-text, #0f172a)",
+          color: "var(--bd-text)",
           marginTop: 6,
           padding: 0,
           lineHeight: 1.7,

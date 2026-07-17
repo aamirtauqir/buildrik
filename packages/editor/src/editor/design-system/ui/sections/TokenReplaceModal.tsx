@@ -97,7 +97,7 @@ const confirmBtnStyle = (enabled: boolean): React.CSSProperties => ({
   background: enabled ? "var(--bd-accent)" : "var(--bd-bg-elevated)",
   border: "1px solid var(--bd-border)",
   borderRadius: 6,
-  color: enabled ? "var(--bd-fg-on-accent, #fff)" : "var(--bd-fg-muted)",
+  color: enabled ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
   fontSize: 12,
   cursor: enabled ? "pointer" : "not-allowed",
 });
@@ -128,7 +128,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
         <ModalTitle>Replace {token.name}?</ModalTitle>
         <ModalDescription>
           {usage} consumer{usage === 1 ? "" : "s"} reference this token. Pick a
-          replacement and Buildrik will redirect every binding via the rename
+          replacement and Buildrick will redirect every binding via the rename
           bridge — no consumer breaks.
         </ModalDescription>
         <div style={listStyle} role="radiogroup" aria-label="Replacement candidates">

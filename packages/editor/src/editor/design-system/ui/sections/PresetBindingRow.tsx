@@ -72,7 +72,7 @@ export const PresetBindingRow: React.FC<PresetBindingRowProps> = ({
         padding: "3px 8px",
         borderRadius: 4,
         background: "rgba(34, 197, 94, 0.1)",
-        color: "var(--bd-success, #16A34A)",
+        color: "var(--bd-success)",
         fontFamily:
           "var(--buildrick-font-family-mono, ui-monospace, monospace)",
         fontSize: 11,

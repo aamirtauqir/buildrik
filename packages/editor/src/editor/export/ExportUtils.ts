@@ -62,7 +62,7 @@ export function setupPreviewWindow(targetWindow: Window, html: string): void {
   Object.assign(iframe.style, { border: "0", width: "100%", height: "100vh" });
   iframe.srcdoc = html;
   targetWindow.document.body.appendChild(iframe);
-  targetWindow.document.title = "Aquibra Preview";
+  targetWindow.document.title = "Buildrick Preview";
 }
 
 // ============================================================================
@@ -82,13 +82,4 @@ export function downloadFile(content: string, filename: string, mimeType: string
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-}
-
-/**
- * Format bytes to human readable string
- */
-export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }

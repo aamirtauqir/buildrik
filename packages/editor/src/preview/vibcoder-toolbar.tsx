@@ -68,8 +68,8 @@ function Demo() {
       <h2 style={sectionLabel}>--inset (no border, flush inside parent card)</h2>
       <div
         style={{
-          background: "var(--bd-bg-card, #fff)",
-          border: "1px solid var(--bd-border, #ddd)",
+          background: "var(--bd-bg-card)",
+          border: "1px solid var(--bd-border)",
           borderRadius: 8,
           padding: 12,
         }}

@@ -20,16 +20,13 @@ function makeComposer() {
       undo: vi.fn(),
       redo: vi.fn(),
     },
+    emit: vi.fn(),
   };
 }
 
-function makeModals(): ShortcutModals & {
-  showAI: boolean;
-} {
+function makeModals(): ShortcutModals {
   return {
-    showAI: false,
     setShowShortcuts: vi.fn(),
-    setShowAI: vi.fn(),
   };
 }
 
@@ -159,23 +156,16 @@ describe("useEditorShortcuts", () => {
     expect(ev.defaultPrevented).toBe(false);
   });
 
-  it("Cmd+J toggles AI modal (setter receives a function)", () => {
+  it("Cmd+J opens the AI tab (composer ui:switch-tab)", () => {
     mount();
     dispatchKey({ key: "j", metaKey: true });
-    const setShowAI = modals.setShowAI as unknown as ReturnType<typeof vi.fn>;
-    expect(setShowAI).toHaveBeenCalledTimes(1);
-    const updater = setShowAI.mock.calls[0][0] as (prev: boolean) => boolean;
-    // updater is a (prev: boolean) => boolean — verify toggle semantics
-    expect(typeof updater).toBe("function");
-    expect(updater(false)).toBe(true);
-    expect(updater(true)).toBe(false);
+    expect(composer.emit).toHaveBeenCalledWith("ui:switch-tab", { tab: "ai" });
   });
 
-  it("Escape closes both shortcuts and AI modals", () => {
+  it("Escape closes the shortcuts modal", () => {
     mount();
     dispatchKey({ key: "Escape" });
     expect(modals.setShowShortcuts).toHaveBeenCalledWith(false);
-    expect(modals.setShowAI).toHaveBeenCalledWith(false);
   });
 
   // EDITABLE-SURFACE GUARD -----------------------------------------------------

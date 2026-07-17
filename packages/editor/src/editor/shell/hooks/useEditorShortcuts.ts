@@ -8,8 +8,8 @@
  *   Cmd/Ctrl+Shift+Z      → composer.history.redo()
  *   Cmd/Ctrl+Y            → composer.history.redo()
  *   Cmd/Ctrl+/            → modals.setShowShortcuts(true)
- *   Cmd/Ctrl+J            → modals.setShowAI(toggle)
- *   Escape                → close shortcuts + AI modals
+ *   Cmd/Ctrl+J            → open the AI tab (composer ui:switch-tab → AITab)
+ *   Escape                → close shortcuts modal
  *   ?                     → modals.setShowShortcuts(true)
  *
  * The handler short-circuits when the keydown originates inside an
@@ -31,7 +31,6 @@ import type { Composer } from "../../../engine";
 // useStudioModals; passing the full modals object keeps mocking simple.
 export interface ShortcutModals {
   setShowShortcuts: (v: boolean) => void;
-  setShowAI: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface UseEditorShortcutsOptions {
@@ -79,11 +78,11 @@ export function useEditorShortcuts({
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "j") {
         e.preventDefault();
-        modals.setShowAI((prev) => !prev);
+        // AI is one surface now — open the AITab rail panel.
+        composer.emit("ui:switch-tab", { tab: "ai" });
       }
       if (e.key === "Escape") {
         modals.setShowShortcuts(false);
-        modals.setShowAI(false);
       }
       if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();

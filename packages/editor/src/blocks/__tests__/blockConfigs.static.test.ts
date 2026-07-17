@@ -81,13 +81,11 @@ describe("heroBlockConfig — attributes schema", () => {
     expect(attrs.textAlign.default).toBe("center");
   });
 
-  it("PIN: title default ('Welcome to dudo') diverges from the content HTML ('Welcome to Aquibra')", () => {
-    // Audit finding — pinned, deliberately NOT fixed here. The attributes
-    // schema default still carries the old "dudo" brand string while the
-    // inserted HTML content says "Welcome to Aquibra"; neither matches the
-    // current Buildrick brand. Any change to either side must reconcile both
-    // (and the HeroSection React default, also "Welcome to dudo").
-    expect(attrs.title.default).toBe("Welcome to dudo");
-    expect(heroBlockConfig.content).toContain("Welcome to Aquibra");
+  it("hero title default and inserted content HTML both use the unified Buildrick brand", () => {
+    // D5 brand sweep (2026-07-17): the schema default, the inserted HTML
+    // content, and the HeroSection React default were reconciled from the
+    // old divergent "dudo"/"Aquibra" strings to the current Buildrick brand.
+    expect(attrs.title.default).toBe("Welcome to Buildrick");
+    expect(heroBlockConfig.content).toContain("Welcome to Buildrick");
   });
 });

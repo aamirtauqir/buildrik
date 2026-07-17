@@ -7,7 +7,6 @@
 export {
   useStudioModals,
   type UseStudioModalsReturn,
-  type AIContext,
   type MediaLibraryContext,
   type ImageEditorContext,
   type IconPickerContext,

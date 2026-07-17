@@ -214,8 +214,8 @@ function ThumbBlock({ label, name, kind, size }: ThumbBlockProps) {
   const accent = kind === "new" ? "var(--bd-accent)" : "var(--bd-fg-muted)";
   const bg =
     kind === "new"
-      ? "linear-gradient(135deg, var(--bd-cobalt-soft), #e9f0fc)"
-      : "linear-gradient(135deg, #fff4e8, #fde9d2)";
+      ? /* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */ "linear-gradient(135deg, var(--bd-cobalt-soft), #e9f0fc)"
+      : /* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */ "linear-gradient(135deg, #fff4e8, #fde9d2)";
   return (
     <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 10 }}>
       <div
@@ -279,7 +279,7 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
           style={{
             width: thumbW,
             height: thumbH,
-            background: "linear-gradient(135deg, #fff4e8, #fde9d2)",
+            background: /* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */ "linear-gradient(135deg, #fff4e8, #fde9d2)",
             borderRadius: 3,
           }}
         />
@@ -291,7 +291,7 @@ function PageRow({ page, checked, onToggle, thumbW, thumbH }: PageRowProps) {
             width: thumbW,
             height: thumbH,
             background: checked
-              ? "linear-gradient(135deg, var(--bd-cobalt-soft), #e9f0fc)"
+              ? /* @lint-hex-policy: warm-tint illustrative gradient for replace-across hero */ "linear-gradient(135deg, var(--bd-cobalt-soft), #e9f0fc)"
               : "var(--bd-bg-subtle)",
             borderRadius: 3,
             border: checked

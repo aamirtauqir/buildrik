@@ -39,7 +39,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       size="sm"
       onClick={onDiscard}
       disabled={!isDirty}
-      style={{ color: isDirty ? "#ef4444" : undefined }}
+      style={{ color: isDirty ? /* @lint-hex-policy: discard-affordance red-500, off chrome palette */ "#ef4444" : undefined }}
     >
       Discard
     </Button>

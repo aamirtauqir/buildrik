@@ -351,7 +351,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                       flex: 1,
                       padding: "6px 10px",
                       background:
-                        cmsSettings.syntax === syntax ? "#a6e3a1" : "var(--buildrick-bg-panel-secondary)",
+                        cmsSettings.syntax === syntax ? /* @lint-hex-policy: syntax-theme swatch color (Catppuccin), not chrome */ "#a6e3a1" : "var(--buildrick-bg-panel-secondary)",
                       border: "none",
                       borderRadius: 4,
                       color: cmsSettings.syntax === syntax ? "var(--buildrick-text-heading)" : "var(--buildrick-text-primary)",

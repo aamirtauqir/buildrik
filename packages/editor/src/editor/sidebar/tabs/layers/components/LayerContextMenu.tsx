@@ -67,7 +67,7 @@ export const LayerContextMenu: React.FC<LayerContextMenuProps> = ({
         <span>{isLocked ? "Unlock" : "Lock"}</span>
       </Button>
       <div style={dividerStyles} />
-      <Button style={{ ...itemStyles, color: "var(--bd-error, #ef4444)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
+      <Button style={{ ...itemStyles, color: "var(--bd-error)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
         <Trash2 size={14} />
         <span>Delete</span>
       </Button>
@@ -98,7 +98,7 @@ export const DragTooltip: React.FC<DragTooltipProps> = ({
       ...tooltipStyles,
       left: position.x + 12,
       top: position.y + 12,
-      background: variant === "error" ? "var(--bd-error, #ef4444)" : "var(--bd-bg-hover)",
+      background: variant === "error" ? "var(--bd-error)" : "var(--bd-bg-hover)",
     }}
     role="tooltip"
   >
@@ -129,7 +129,7 @@ const itemStyles: React.CSSProperties = {
   padding: "8px 12px",
   border: "none",
   background: "transparent",
-  color: "var(--bd-fg-primary, #F5F5F0)",
+  color: "var(--bd-fg-primary)",
   fontSize: 13,
   cursor: "pointer",
   fontFamily: "inherit",

@@ -24,7 +24,8 @@ import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";
-import { downloadFile, formatBytes } from "./ExportUtils";
+import { downloadFile } from "./ExportUtils";
+import { formatBytes } from "@shared/utils/helpers/number";
 import { PreviewFrame } from "./PreviewFrame";
 
 // ============================================================================

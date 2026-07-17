@@ -7,7 +7,7 @@ import type { StarterDS } from "./types";
 export const cobaltDefault: StarterDS = {
   id: "cobalt-default",
   name: "Cobalt Default",
-  description: "Buildrik's own — cobalt accent on warm slate neutrals.",
+  description: "Buildrick's own — cobalt accent on warm slate neutrals.",
   tokens: [
     { id: "color-primary",    name: "Primary",    value: "#2D6DFF", category: "colors", cssVar: "--buildrick-design-color-primary",    type: "color", kind: "color", group: "brand",   darkValue: "#5B8DFF" },
     { id: "color-secondary",  name: "Secondary",  value: "#64748B", category: "colors", cssVar: "--buildrick-design-color-secondary",  type: "color", kind: "color", group: "brand",   darkValue: "#94A3B8" },

@@ -38,8 +38,8 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
         gap: 2,
         padding: 2,
         borderRadius: 6,
-        background: "var(--bd-bg-subtle, #f1f5f9)",
-        border: "1px solid var(--bd-border, #e2e8f0)",
+        background: "var(--bd-bg-subtle)",
+        border: "1px solid var(--bd-border)",
       }}
     >
       {SEGMENTS.map((seg) => {
@@ -61,8 +61,8 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
               borderRadius: 4,
               fontSize: 12,
               fontWeight: active ? 600 : 500,
-              color: active ? "var(--bd-fg-on-accent, #fff)" : "var(--bd-fg-muted, #64748b)",
-              background: active ? "var(--bd-accent, #2D6DFF)" : "transparent",
+              color: active ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
+              background: active ? "var(--bd-accent)" : "transparent",
               transition: "background-color 0.12s, color 0.12s",
               userSelect: "none",
             }}

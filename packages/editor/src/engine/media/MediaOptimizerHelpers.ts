@@ -96,15 +96,6 @@ export async function estimateSize(dataUrl: string): Promise<number> {
 // ============================================================================
 
 /**
- * Format bytes to human-readable string
- */
-export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
-
-/**
  * Get compression savings as percentage
  */
 export function getCompressionSavings(originalSize: number, optimizedSize: number): string {
