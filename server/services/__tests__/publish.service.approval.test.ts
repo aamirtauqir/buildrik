@@ -67,6 +67,44 @@ describe("startPublish · approval gate enforcement", () => {
     expect(jobCreate).not.toHaveBeenCalled(); // gate fires before queueing
   });
 
+  // §13-C1: the actual bug. sites.publish already requires ADMIN+, so this is the
+  // realistic actor. An Admin was previously exempt → the gate blocked nobody.
+  it("Admin + gate ON + no approved review → throws APPROVAL_REQUIRED (no job queued) (§13-C1)", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+
+    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_REQUIRED");
+    expect(jobCreate).not.toHaveBeenCalled();
+  });
+
+  it("Admin + gate ON + latest review CHANGES_REQUESTED → throws APPROVAL_REQUIRED (no job queued)", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    reviewFindFirst.mockResolvedValue({ status: "CHANGES_REQUESTED" });
+
+    await expect(startPublish("site-1", "ws-1", "user-admin")).rejects.toThrow("APPROVAL_REQUIRED");
+    expect(jobCreate).not.toHaveBeenCalled();
+  });
+
+  it("Admin + gate ON + latest review APPROVED → NOT blocked by approval", async () => {
+    baseHappyMocks();
+    workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });
+    memberFindUnique.mockResolvedValue({ role: "ADMIN" });
+    reviewFindFirst.mockResolvedValue({ status: "APPROVED" });
+    jobCreate.mockResolvedValue({ id: "job-1" });
+    siteUpdate.mockResolvedValue({});
+
+    let approvalError = false;
+    try {
+      await startPublish("site-1", "ws-1", "user-admin");
+    } catch (e) {
+      if (e instanceof Error && e.message === "APPROVAL_REQUIRED") approvalError = true;
+    }
+    expect(approvalError).toBe(false);
+  });
+
   it("Owner + gate ON + no review → NOT blocked by approval (exempt)", async () => {
     baseHappyMocks();
     workspaceFindUnique.mockResolvedValue({ editsRequireApproval: true });

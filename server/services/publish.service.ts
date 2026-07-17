@@ -179,9 +179,11 @@ export async function startPublish(
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
-  // m-approval gate: in a workspace that requires approval, a non-Owner/non-Admin
-  // member cannot publish directly — the site's latest review must be APPROVED.
-  // Previously `editsRequireApproval` was read only in settings and never enforced.
+  // m-approval gate: in a workspace that requires approval, a publish is blocked
+  // unless the site's latest review is APPROVED. Only the OWNER is exempt; ADMINs
+  // are gated too (§13-C1 — sites.publish already requires ADMIN+, so exempting
+  // ADMIN would gate nobody). Previously `editsRequireApproval` was read only in
+  // settings and never enforced.
   {
     const [workspace, member] = await Promise.all([
       prisma.workspace.findUnique({

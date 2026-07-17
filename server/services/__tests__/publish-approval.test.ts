@@ -5,9 +5,11 @@ import { isPublishBlockedByApproval } from "../publish-approval";
  * Publish approval gate (m-approval) — enforcement policy.
  *
  * Regression for the gap where `editsRequireApproval` was read only in settings
- * and never checked at publish, so an Editor could publish directly even with the
- * gate on. Policy: gate off → allowed; Owner/Admin → always allowed; everyone
- * else → blocked unless the site's latest review is APPROVED.
+ * and never checked at publish, so a publish went through even with the gate on.
+ * Policy: gate off → allowed; OWNER → always allowed; everyone else (ADMIN and
+ * below) → blocked unless the site's latest review is APPROVED. ADMIN is gated on
+ * purpose (§13-C1): sites.publish already requires ADMIN+, so exempting ADMIN
+ * would make the setting gate nobody.
  */
 describe("isPublishBlockedByApproval", () => {
   it("gate OFF → never blocked, regardless of role or review", () => {
@@ -16,13 +18,22 @@ describe("isPublishBlockedByApproval", () => {
     ).toBe(false);
   });
 
-  it("Owner and Admin are exempt even with the gate on and no approval", () => {
-    for (const role of ["OWNER", "ADMIN"]) {
-      expect(
-        isPublishBlockedByApproval({ editsRequireApproval: true, role, latestReviewStatus: null }),
-        `${role} should be exempt`,
-      ).toBe(false);
-    }
+  it("Owner is exempt even with the gate on and no approval", () => {
+    expect(
+      isPublishBlockedByApproval({ editsRequireApproval: true, role: "OWNER", latestReviewStatus: null }),
+    ).toBe(false);
+  });
+
+  it("Admin is NOT exempt — gate on and no approval → blocked (§13-C1)", () => {
+    expect(
+      isPublishBlockedByApproval({ editsRequireApproval: true, role: "ADMIN", latestReviewStatus: null }),
+    ).toBe(true);
+  });
+
+  it("Admin with gate on and latest review APPROVED → allowed", () => {
+    expect(
+      isPublishBlockedByApproval({ editsRequireApproval: true, role: "ADMIN", latestReviewStatus: "APPROVED" }),
+    ).toBe(false);
   });
 
   it("Editor with gate on and NO review → blocked", () => {
