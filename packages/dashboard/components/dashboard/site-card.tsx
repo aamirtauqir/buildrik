@@ -4,14 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Globe, Pencil, ArrowRight, Upload, Link2, Check } from "lucide-react";
-import { cn } from "@lib/utils";
 import type { RecentSite } from "@buildrik/shared/schemas/dashboard";
 import { EditorLink } from "@/components/editor-route/EditorLink";
+import { Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 
-const STATUS_STYLES: Record<string, string> = {
-  published: "bg-[#DCFCE7] text-[#166534]",
-  draft: "bg-[#FEF9C3] text-[#854D0E]",
-  archived: "bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]",
+const STATUS_TONE: Record<string, PillTone> = {
+  published: "success",
+  draft: "warning",
+  archived: "neutral",
 };
 
 function timeAgo(date: Date): string {
@@ -31,7 +31,6 @@ type SiteCardProps = {
 
 export function SiteCard({ site }: SiteCardProps) {
   const [copied, setCopied] = useState(false);
-  const statusStyle = STATUS_STYLES[site.status] ?? "bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]";
 
   function handleCopyUrl(e: React.MouseEvent) {
     e.preventDefault();
@@ -58,7 +57,7 @@ export function SiteCard({ site }: SiteCardProps) {
         )}
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
           <EditorLink
             siteId={site.id}
             target="_blank"
@@ -81,22 +80,22 @@ export function SiteCard({ site }: SiteCardProps) {
         {site.status === "draft" && (
           <Link
             href={`/dashboard/sites/${site.id}`}
-            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-white"
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-white"
             title="Publish"
           >
-            <Upload className="h-3.5 w-3.5 text-[#854D0E]" />
+            <Upload className="h-3.5 w-3.5 text-[var(--color-warning-text)]" />
           </Link>
         )}
         {site.status === "published" && site.publishedUrl && (
           <button
             onClick={handleCopyUrl}
-            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 hover:bg-white"
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-white"
             title="Copy URL"
           >
             {copied ? (
-              <Check className="h-3.5 w-3.5 text-[#166534]" />
+              <Check className="h-3.5 w-3.5 text-[var(--color-success-text)]" />
             ) : (
-              <Link2 className="h-3.5 w-3.5 text-[#166534]" />
+              <Link2 className="h-3.5 w-3.5 text-[var(--color-success-text)]" />
             )}
           </button>
         )}
@@ -106,12 +105,12 @@ export function SiteCard({ site }: SiteCardProps) {
       <div className="p-3">
         <div className="flex items-center justify-between gap-2">
           <p className="truncate text-sm font-medium text-[var(--color-text-primary)]">{site.name}</p>
-          <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-xs font-medium capitalize", statusStyle)}>
+          <Pill tone={STATUS_TONE[site.status] ?? "neutral"} className="shrink-0 capitalize">
             {site.status}
-          </span>
+          </Pill>
         </div>
         <p className="mt-1 text-xs text-[var(--color-text-muted)]">
-          Edited {timeAgo(site.lastEditedAt)} · {site.pages} page{site.pages !== 1 ? "s" : ""}
+          Edited {timeAgo(site.lastEditedAt)} · <MetricValue>{site.pages}</MetricValue> page{site.pages !== 1 ? "s" : ""}
         </p>
       </div>
     </div>
