@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, FolderKanban, Globe, Image as ImageIcon, Rocket, Briefcase, ClipboardCheck,
-  Palette, Gift, Blocks, Library, Plug, Users, CreditCard, Tag, Activity, Link2,
+  LayoutDashboard, FolderKanban, Image as ImageIcon, Rocket, Briefcase, Library,
   Settings, HelpCircle, ArrowUpRight, Search,
 } from "lucide-react";
 import { cn } from "@lib/utils";
@@ -15,72 +14,60 @@ import { WorkspaceSwitcher } from "./workspace-switcher";
 import { CommandPalette } from "@/components/search/command-palette";
 
 const iconMap = {
-  LayoutDashboard, FolderKanban, Globe, Image: ImageIcon, Rocket, Briefcase, ClipboardCheck,
-  Palette, Gift, Blocks, Library, Plug, Users, CreditCard, Tag, Activity, Link2,
+  LayoutDashboard, FolderKanban, Image: ImageIcon, Rocket, Briefcase, Library,
   Settings, HelpCircle,
 } as const;
 
 type NavItem = { label: string; href: string; icon: keyof typeof iconMap; agencyOnly?: boolean };
-type NavGroup = { items: NavItem[] };
+type NavGroup = { label?: string; items: NavItem[] };
 
-// Sidebar SSOT — dc mockup grouping (dividers, no text labels). Top-level product
+// Sidebar SSOT — IA v2: 6 destinations + 2 support items (spec
+// docs/superpowers/specs/2026-07-16-dashboard-ia-v2-design.md). Top-level product
 // areas (Marketplace/Learn/Resources) live in the top nav, NOT here.
 export const NAV_GROUPS: NavGroup[] = [
   { items: [
     { label: "Home", href: "/dashboard", icon: "LayoutDashboard" },
-    { label: "All projects", href: "/dashboard/projects", icon: "FolderKanban" },
-    { label: "Sites", href: "/dashboard/sites", icon: "Globe" },
-    { label: "Apps", href: "/dashboard/apps", icon: "Blocks" },
+    { label: "Projects", href: "/dashboard/projects", icon: "FolderKanban" },
+    { label: "Agency", href: "/dashboard/agency", icon: "Briefcase", agencyOnly: true },
+    { label: "Media", href: "/dashboard/media", icon: "Image" },
+    { label: "Templates", href: "/dashboard/templates", icon: "Library" },
+    { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ] },
-  { items: [
-    { label: "Partner program", href: "/dashboard/partner", icon: "Gift", agencyOnly: true },
-    { label: "Client management", href: "/dashboard/clients", icon: "Briefcase", agencyOnly: true },
-    { label: "Review & comments", href: "/dashboard/reviews", icon: "ClipboardCheck", agencyOnly: true },
-    { label: "Shared theme", href: "/dashboard/theme", icon: "Palette", agencyOnly: true },
-  ] },
-  { items: [
-    { label: "Media library", href: "/dashboard/media", icon: "Image" },
+  { label: "Support", items: [
     { label: "Getting started", href: "/dashboard/getting-started", icon: "Rocket" },
     { label: "Help center", href: "/dashboard/help", icon: "HelpCircle" },
   ] },
-  { items: [
-    { label: "General settings", href: "/dashboard/settings", icon: "Settings" },
-    { label: "Team", href: "/dashboard/team", icon: "Users" },
-    { label: "Plans", href: "/dashboard/plans", icon: "Tag" },
-    { label: "Usage", href: "/dashboard/usage", icon: "Activity" },
-    { label: "Billing", href: "/dashboard/billing", icon: "CreditCard" },
-    { label: "Domains", href: "/dashboard/domains", icon: "Link2" },
-    { label: "Apps & Integrations", href: "/dashboard/integrations", icon: "Plug" },
-    { label: "Libraries & Templates", href: "/dashboard/libraries", icon: "Library" },
-  ] },
 ];
 
-const MOBILE_ITEMS: NavItem[] = [
-  { label: "Home", href: "/dashboard", icon: "LayoutDashboard" },
-  { label: "Sites", href: "/dashboard/sites", icon: "Globe" },
-  { label: "Media", href: "/dashboard/media", icon: "Image" },
-  { label: "Team", href: "/dashboard/team", icon: "Users" },
-  { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
-];
+// Mobile carries the same 6 destinations — derived, not a second hardcoded list.
+const MOBILE_ITEMS: NavItem[] = NAV_GROUPS[0].items;
+
+function useAgencyEnabled(): boolean {
+  const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
+  return !!features.data?.agency_layer;
+}
 
 function useVisibleGroups(): NavGroup[] {
-  const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
-  const agency = !!features.data?.agency_layer;
+  const agency = useAgencyEnabled();
   return NAV_GROUPS
-    .map((g) => ({ items: g.items.filter((it) => !it.agencyOnly || agency) }))
+    .map((g) => ({ ...g, items: g.items.filter((it) => !it.agencyOnly || agency) }))
     .filter((g) => g.items.length > 0);
 }
 
-function isActiveRoute(pathname: string, href: string): boolean {
+export function isActiveRoute(pathname: string, href: string): boolean {
   if (href === "/dashboard") return pathname === "/dashboard";
+  // Site-detail keeps its /dashboard/sites/[id] URLs; its nav parent is Projects.
+  if (href === "/dashboard/projects" && pathname.startsWith("/dashboard/sites")) return true;
   return pathname.startsWith(href);
 }
 
 function MobileTabBar() {
   const pathname = usePathname();
+  const agency = useAgencyEnabled();
+  const items = MOBILE_ITEMS.filter((it) => !it.agencyOnly || agency);
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 flex h-14 items-center justify-around border-t bg-white lg:hidden" style={{ borderColor: "var(--color-border-default)" }}>
-      {MOBILE_ITEMS.map((item) => {
+      {items.map((item) => {
         const active = isActiveRoute(pathname, item.href);
         const Icon = iconMap[item.icon];
         return (
@@ -156,6 +143,11 @@ export function Sidebar() {
         <nav className="flex-1 overflow-y-auto px-3.5 py-3">
           {groups.map((group, gi) => (
             <div key={gi} className={gi > 0 ? "mt-3 border-t pt-3" : undefined} style={gi > 0 ? { borderColor: "var(--color-border-default)" } : undefined}>
+              {group.label && (
+                <p className="mb-1 px-2.5 text-eyebrow font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
+                  {group.label}
+                </p>
+              )}
               <ul className="space-y-0.5">
                 {group.items.map((item) => {
                   const active = isActiveRoute(pathname, item.href);
