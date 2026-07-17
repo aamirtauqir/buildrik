@@ -49,7 +49,7 @@ export function PaywallModal({ open, onClose, feature, description, unlockPlan =
 
         <div className="mt-6 flex gap-2">
           <Link
-            href="/dashboard/billing"
+            href="/dashboard/settings/billing"
             className="flex-1 rounded-lg px-4 py-2.5 text-center text-sm font-semibold text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
           >

@@ -6,7 +6,7 @@ import Link from "next/link";
 // pointed at (create-site flow, team invite, template start).
 const ACTIONS = [
   { label: "Create a site", href: "/dashboard/sites/new", variant: "primary" as const },
-  { label: "Invite teammate", href: "/dashboard/team", variant: "outline" as const },
+  { label: "Invite teammate", href: "/dashboard/settings/team", variant: "outline" as const },
   { label: "Browse templates", href: "/dashboard/sites/new?method=template", variant: "outline" as const },
 ];
 

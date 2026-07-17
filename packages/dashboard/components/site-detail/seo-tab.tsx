@@ -38,7 +38,7 @@ export function SeoTab({ site }: SeoTabProps) {
   const metaTitle = site.metaTitle ?? "";
   const metaDesc = site.metaDescription ?? "";
   const ogImage = site.ogImage ?? null;
-  const editorHref = site.id ? getEditorHref(site.id, unified) : "/dashboard/sites";
+  const editorHref = site.id ? getEditorHref(site.id, unified) : "/dashboard/projects";
 
   return (
     <div className="space-y-6">

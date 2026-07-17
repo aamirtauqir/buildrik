@@ -225,7 +225,7 @@ function PlanCta({ plan, isCurrent, currentPlanId }: { plan: Plan; isCurrent: bo
   if (plan.popular) {
     return (
       <Link
-        href="/dashboard/billing"
+        href="/dashboard/settings/billing"
         className="block w-full rounded-lg py-2.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
@@ -236,7 +236,7 @@ function PlanCta({ plan, isCurrent, currentPlanId }: { plan: Plan; isCurrent: bo
 
   return (
     <Link
-      href="/dashboard/billing"
+      href="/dashboard/settings/billing"
       className="block w-full rounded-lg border py-2.5 text-center text-sm font-semibold transition-colors"
       style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)" }}
     >

@@ -75,7 +75,7 @@ export function ThemeManager() {
         <DeniedState
           title="The agency layer isn't enabled"
           description="Shared themes are part of the agency layer. Ask a workspace admin to enable it."
-          action={{ label: "Back to sites", href: "/dashboard/sites" }}
+          action={{ label: "Back to projects", href: "/dashboard/projects" }}
         />
       ) : sharedQuery.isError || targetsQuery.isError ? (
         <ErrorState

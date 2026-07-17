@@ -285,14 +285,14 @@ export const Topbar: React.FC<TopbarProps> = ({
         <div className="bd-topbar__zone bd-topbar__zone--left">
           <div className="bd-topbar__brand-group">
             <a
-              href={`${dashboardUrl}/dashboard/sites`}
+              href={`${dashboardUrl}/dashboard/projects`}
               className="bd-topbar__brand-mark"
               aria-label="Exit to Dashboard"
             >
               B
             </a>
             <a
-              href={`${dashboardUrl}/dashboard/sites`}
+              href={`${dashboardUrl}/dashboard/projects`}
               className="bd-topbar__exit"
               aria-label="Exit to Dashboard"
               style={{ fontSize: 13, color: "var(--bd-text-muted, #6b7280)", textDecoration: "none", whiteSpace: "nowrap" }}
@@ -547,7 +547,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                 )}
                 <MenuItem
                   onClick={() => {
-                    window.open(`${dashboardUrl}/dashboard/team`, "_blank", "noopener,noreferrer");
+                    window.open(`${dashboardUrl}/dashboard/settings/team`, "_blank", "noopener,noreferrer");
                     setMoreOpen(false);
                   }}
                 >

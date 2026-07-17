@@ -220,7 +220,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
       <DeniedState
         title="Agency features aren't enabled"
         description="Ask a workspace admin to enable the agency layer."
-        action={{ label: "Back to sites", href: "/dashboard/sites" }}
+        action={{ label: "Back to projects", href: "/dashboard/projects" }}
       />
     );
   }
@@ -230,7 +230,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
         title="Client not found"
         description="It may have been deleted."
         retryLabel="Back to clients"
-        onRetry={() => (window.location.href = "/dashboard/clients")}
+        onRetry={() => (window.location.href = "/dashboard/agency")}
       />
     );
   }
@@ -242,7 +242,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
   return (
     <div>
       <Link
-        href="/dashboard/clients"
+        href="/dashboard/agency"
         className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium"
         style={{ color: "var(--color-text-secondary)" }}
       >

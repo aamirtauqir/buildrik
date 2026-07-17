@@ -36,7 +36,7 @@ export function CommentQueue() {
         <DeniedState
           title="Only admins can see client comments"
           description="Ask a workspace admin to review the change-requests clients have left."
-          action={{ label: "Back to sites", href: "/dashboard/sites" }}
+          action={{ label: "Back to projects", href: "/dashboard/projects" }}
         />
       ) : commentsQuery.isError ? (
         <ErrorState

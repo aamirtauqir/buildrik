@@ -61,7 +61,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
             Connect your own domain on PRO — Buildrick sets it up on Vercel and verifies the DNS for you.
           </p>
           <Link
-            href="/dashboard/billing"
+            href="/dashboard/settings/billing"
             className="mt-3 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
@@ -98,7 +98,7 @@ export function PublishSuccess({ siteId, publishedUrl, customDomain, plan = "FRE
           Edit Site
         </Link>
         <Link
-          href="/dashboard/sites"
+          href="/dashboard/projects"
           className="flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >

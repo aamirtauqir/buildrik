@@ -69,7 +69,7 @@ describe("UpgradeModal — upgrade action", () => {
 
     expect(open).toHaveBeenCalledTimes(1);
     const [url, target] = open.mock.calls[0];
-    expect(String(url)).toMatch(/\/dashboard\/billing$/);
+    expect(String(url)).toMatch(/\/dashboard\/settings\/billing$/);
     expect(target).toBe("_blank");
     await waitFor(() =>
       expect(screen.queryByText("Upgrade Your Plan")).not.toBeInTheDocument()

@@ -224,7 +224,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               {q.totalBytes > 0 && <ProgressBar pct={usedPct} tone="auto" className="mt-2" />}
               {q.warningAt80Percent && (
                 <p className="mt-1.5 text-body-sm" style={{ color: "var(--color-error)" }}>
-                  Almost full — <a href="/dashboard/billing" className="font-medium underline">upgrade</a>.
+                  Almost full — <a href="/dashboard/settings/billing" className="font-medium underline">upgrade</a>.
                 </p>
               )}
             </div>

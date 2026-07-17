@@ -57,7 +57,7 @@ export default function SiteDetailLayout({
       <Breadcrumb
         items={[
           { label: "Dashboard", href: "/dashboard" },
-          { label: "My Sites", href: "/dashboard/sites" },
+          { label: "Projects", href: "/dashboard/projects" },
           { label: site.name },
         ]}
       />

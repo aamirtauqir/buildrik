@@ -72,7 +72,7 @@ function StorageCard() {
       </div>
       <ProgressBar pct={pct} tone="accent" className="mt-2" />
       {plan === "FREE" && (
-        <Link href="/dashboard/plans" className="mt-2 flex items-center gap-1 text-body-sm font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>
+        <Link href="/dashboard/settings/plans" className="mt-2 flex items-center gap-1 text-body-sm font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>
           Upgrade plan <ArrowUpRight className="h-3 w-3" />
         </Link>
       )}

@@ -159,7 +159,7 @@ export default function DashboardPage() {
               label="Sites"
               value={stats.data?.totalSites ?? 0}
               delta={<><MetricValue>{stats.data?.draftSites ?? 0}</MetricValue> in draft</>}
-              href="/dashboard/sites"
+              href="/dashboard/projects"
             />
             <StatCard
               label="Published"
@@ -176,7 +176,7 @@ export default function DashboardPage() {
                   <TrendArrow value={stats.data?.visitsChange ?? 0} /> · 30d
                 </span>
               }
-              href="/dashboard/sites"
+              href="/dashboard/projects"
             />
             <StatCard
               label="Form leads"
@@ -186,7 +186,7 @@ export default function DashboardPage() {
                   ? <><MetricValue>{stats.data?.pendingInvites}</MetricValue> pending</>
                   : undefined
               }
-              href="/dashboard/team"
+              href="/dashboard/settings/team"
             />
           </div>
 

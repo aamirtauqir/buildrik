@@ -269,7 +269,7 @@ export function ClientsView() {
         <DeniedState
           title="Agency features aren't enabled"
           description="Clients group sites per customer with white-label branding. Ask a workspace admin to enable the agency layer."
-          action={{ label: "Back to sites", href: "/dashboard/sites" }}
+          action={{ label: "Back to projects", href: "/dashboard/projects" }}
         />
       ) : clientsQuery.isLoading ? (
         <LoadingSkeleton rows={3} variant="card" />
@@ -298,7 +298,7 @@ export function ClientsView() {
             columns={columns}
             rows={clients}
             keyOf={(c) => c.id}
-            onRowClick={(c) => router.push(`/dashboard/clients/${c.id}`)}
+            onRowClick={(c) => router.push(`/dashboard/agency/${c.id}`)}
           />
         </>
       )}

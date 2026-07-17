@@ -51,7 +51,7 @@ export function ReviewQueue() {
         <DeniedState
           title="Only admins can review submissions"
           description="Ask a workspace admin to review the sites your editors have submitted."
-          action={{ label: "Back to sites", href: "/dashboard/sites" }}
+          action={{ label: "Back to projects", href: "/dashboard/projects" }}
         />
       ) : reviewsQuery.isError ? (
         <ErrorState

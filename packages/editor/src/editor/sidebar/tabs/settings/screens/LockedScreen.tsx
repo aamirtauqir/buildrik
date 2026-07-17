@@ -57,11 +57,11 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
       // Absolute dashboard billing URL — the editor runs on its own origin
       // (port 5050), and "/dashboard/settings/subscription" was both a
       // wrong-origin relative link AND a 404 (no such page). Billing lives
-      // at /dashboard/billing.
+      // at /dashboard/settings/billing.
       const dashboardUrl =
         (import.meta as { env?: { VITE_DASHBOARD_URL?: string } }).env?.VITE_DASHBOARD_URL ||
         "http://localhost:3000";
-      window.open(`${dashboardUrl}/dashboard/billing`, "_blank");
+      window.open(`${dashboardUrl}/dashboard/settings/billing`, "_blank");
     }
   };
 

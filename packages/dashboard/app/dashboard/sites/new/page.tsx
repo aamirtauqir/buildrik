@@ -270,7 +270,7 @@ function NewSitePageInner() {
           error={status?.error ?? null}
           siteId={status?.siteId ?? null}
           creditsExhausted={creditsExhausted}
-          onUpgrade={() => router.push("/dashboard/billing")}
+          onUpgrade={() => router.push("/dashboard/settings/billing")}
           onUseTemplate={() => {
             setCreditsExhausted(false);
             setJobId(null);
