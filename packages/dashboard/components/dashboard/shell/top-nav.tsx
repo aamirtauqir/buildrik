@@ -56,7 +56,7 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
             <Link
               key={item.href}
               href={item.href}
-              className={cn("relative rounded-lg px-3 py-1.5 text-body font-medium transition-colors", active ? "" : "hover:bg-[var(--color-bg-subtle)]")}
+              className={cn("relative rounded-lg px-3 py-1.5 text-[13.5px] font-[530] transition-colors", active ? "" : "hover:bg-[var(--color-bg-subtle)]")}
               style={{ color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}
             >
               {item.label}
