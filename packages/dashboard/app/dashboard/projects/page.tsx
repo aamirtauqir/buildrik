@@ -1,66 +1,212 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { Folder, FolderPlus, Layers, MoreHorizontal, Plus, Pencil, Trash2 } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
-import { PageHeader, MetricValue } from "@/components/dashboard/primitives";
-import { AvatarStack } from "@/components/dashboard/dataviz";
+import { ViewToggle } from "@/components/sites/view-toggle";
+import { SiteFilters } from "@/components/sites/site-filters";
+import { FolderTabs } from "@/components/sites/folder-tabs";
+import { SiteGrid } from "@/components/sites/site-grid";
+import { SiteListView } from "@/components/sites/site-list-view";
+import { BulkActionBar, BULK_SELECTION_CAP } from "@/components/sites/bulk-action-bar";
+import { CreateSiteModal } from "@/components/sites/create-site-modal";
+import { RenameModal } from "@/components/sites/rename-modal";
+import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
+import { TransferModal } from "@/components/sites/transfer-modal";
+import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
+import { PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
-
-const UNGROUPED_KEY = "__ungrouped__";
-
-// Folder-tile accent cycle — tokens only. Cards step through these in grid order.
-const ICON_TONES = ["var(--color-primary)", "var(--color-amber)", "var(--color-teal)", "var(--color-pink)"];
-
-type ProjectGroup = {
-  key: string;
-  name: string;
-  total: number;
-  published: number;
-  ungrouped: boolean;
-  /** distinct site creators in this project — only user ids exist (no name/avatar
-   *  data), so these drive an initial-based avatar stack, not per-person photos */
-  members: Set<string>;
-};
+import { useRouter } from "next/navigation";
+import { Plus, Search, CheckSquare } from "lucide-react";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 export default function ProjectsPage() {
   const { addToast } = useToast();
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  // Real workspace sites (max page size) — counts are derived from these rows.
-  const sitesQuery = trpc.sites.list.useQuery({ page: 1, perPage: 50 });
-  // Folder names + membership; folders with no sites still surface as projects.
+  const router = useRouter();
+  const unified = useUnifiedEditorFlag();
+
+  // Preferences
+  const prefs = trpc.account.preferences.get.useQuery();
+  const updatePrefs = trpc.account.preferences.update.useMutation();
+
+  // View state
+  const [viewMode, setViewMode] = useState("grid");
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<string | undefined>(undefined);
+  const [sort, setSort] = useState("lastEdited");
+  const [page, setPage] = useState(1);
+  const [folderId, setFolderId] = useState<string | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const lastSelectedIdRef = useRef<string | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  // "/" focuses the search field. ⌘K belongs to the sidebar's command palette —
+  // binding it here too made both fire on one keystroke (D10.6).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Advanced filter state
+  const [createdBy, setCreatedBy] = useState<string | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | undefined>(undefined);
+  const [templateUsed, setTemplateUsed] = useState<string | undefined>(undefined);
+  const [hasCustomDomain, setHasCustomDomain] = useState<boolean | undefined>(undefined);
+  const [hasTraffic, setHasTraffic] = useState<"none" | "1-100" | "100-1000" | "1000+" | undefined>(undefined);
+
+  // Initialize from saved preferences
+  useEffect(() => {
+    if (prefs.data) {
+      if (prefs.data.siteViewMode) setViewMode(prefs.data.siteViewMode);
+      if (prefs.data.siteViewSort) setSort(prefs.data.siteViewSort);
+    }
+  }, [prefs.data]);
+
+  // Modal state
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createFolderOpen, setCreateFolderOpen] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [renameTarget, setRenameTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [renameFolderTarget, setRenameFolderTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  /** Number of sites a pending bulk delete would destroy; null = no pending delete. */
+  const [bulkDeleteCount, setBulkDeleteCount] = useState<number | null>(null);
+  const [transferTarget, setTransferTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  // Queries
+  const sitesQuery = trpc.sites.list.useQuery({
+    page,
+    perPage: 12,
+    status: showArchived ? "ARCHIVED" as const : status as "PUBLISHED" | "DRAFT" | "ARCHIVED" | undefined,
+    sort: sort as
+      | "lastEdited"
+      | "name"
+      | "created"
+      | "traffic"
+      | "pages"
+      | "published",
+    search: search || undefined,
+    folderId: showArchived ? undefined : folderId,
+    createdBy,
+    dateRange,
+    templateUsed,
+    hasCustomDomain,
+    hasTraffic,
+  });
+
+  // Real archived count for the Archived tab badge (was hardcoded 0).
+  const archivedQuery = trpc.sites.list.useQuery({ page: 1, perPage: 1, status: "ARCHIVED" as const });
+
   const foldersQuery = trpc.sites.folders.list.useQuery();
 
+  // Folders are an enhancement, not a dependency: if the folders query fails,
+  // the tab row hides and the site list still renders (spec §Failure modes).
   useEffect(() => {
-    if (!openMenu) return;
-    const onDown = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpenMenu(null);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [openMenu]);
+    if (foldersQuery.isError) {
+      addToast("error", "Couldn't load folders", "Your sites are shown without folder tabs.");
+    }
+  }, [foldersQuery.isError, addToast]);
+
+  // Mutations
+  const createMutation = trpc.sites.create.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      setCreateOpen(false);
+      addToast("success", "Site created");
+    },
+    onError: (err) => addToast("error", "Failed to create site", err.message),
+  });
+
+  const renameMutation = trpc.sites.rename.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      setRenameTarget(null);
+      addToast("success", "Site renamed");
+    },
+  });
+
+  const deleteMutation = trpc.sites.delete.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      setDeleteTarget(null);
+      addToast("success", "Site deleted");
+    },
+    onError: (err) => addToast("error", "Failed to delete", err.message),
+  });
+
+  const archiveMutation = trpc.sites.archive.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      addToast("success", "Site archived");
+    },
+  });
+
+  const duplicateMutation = trpc.sites.duplicate.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      addToast("success", "Site duplicated");
+    },
+    onError: (err) => addToast("error", "Failed to duplicate", err.message),
+  });
+
+  const bulkMutation = trpc.sites.bulk.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      setSelectedIds(new Set());
+      addToast("success", "Bulk action completed");
+    },
+  });
+
+  const moveMutation = trpc.sites.folders.moveSite.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      addToast("success", "Sites moved to folder");
+    },
+    onError: (err: { message: string }) => addToast("error", "Failed to move sites", err.message),
+  });
 
   const createFolderMutation = trpc.sites.folders.create.useMutation({
     onSuccess: () => {
       foldersQuery.refetch();
+      setCreateFolderOpen(false);
+      setNewFolderName("");
       addToast("success", "Folder created");
     },
-    onError: (err) => addToast("error", "Failed to create folder", err.message),
+    onError: (err: { message: string }) => addToast("error", "Failed to create folder", err.message),
   });
 
   const renameFolderMutation = trpc.sites.folders.rename.useMutation({
     onSuccess: () => {
       foldersQuery.refetch();
+      setRenameFolderTarget(null);
       addToast("success", "Folder renamed");
     },
     onError: (err) => addToast("error", "Couldn't rename folder", err.message),
   });
 
   const deleteFolderMutation = trpc.sites.folders.delete.useMutation({
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
+      // The deleted folder may be the active tab — fall back to All Sites.
+      if (folderId === vars.id) setFolderId(null);
       foldersQuery.refetch();
       sitesQuery.refetch();
       addToast("success", "Folder deleted");
@@ -68,185 +214,526 @@ export default function ProjectsPage() {
     onError: (err) => addToast("error", "Couldn't delete folder", err.message),
   });
 
-  const handleNewFolder = () => {
-    const name = window.prompt("Folder name")?.trim();
-    if (name) createFolderMutation.mutate({ name });
-  };
-
-  const handleRename = (id: string, current: string) => {
-    setOpenMenu(null);
-    const name = window.prompt("Rename folder", current)?.trim();
-    if (name && name !== current) renameFolderMutation.mutate({ id, name });
-  };
-
-  const handleDelete = (id: string, name: string) => {
-    setOpenMenu(null);
-    // Sites in the folder are not deleted — they fall back to Ungrouped.
-    if (window.confirm(`Delete the folder "${name}"? Its sites move to Ungrouped.`)) {
+  const handleDeleteFolder = (id: string, name: string) => {
+    // Sites in the folder are not deleted — they stay under All Sites.
+    if (window.confirm(`Delete the folder "${name}"? Its sites are kept and stay under All Sites.`)) {
       deleteFolderMutation.mutate({ id });
     }
   };
 
-  const isLoading = sitesQuery.isLoading || foldersQuery.isLoading;
-  const isError = sitesQuery.isError || foldersQuery.isError;
+  // Selection handler with shift+click range selection
+  const handleSelect = useCallback((id: string, event?: React.MouseEvent) => {
+    const sites = sitesQuery.data?.data ?? [];
+
+    if (event?.shiftKey && lastSelectedIdRef.current) {
+      const siteIds = sites.map((s) => s.id);
+      const lastIdx = siteIds.indexOf(lastSelectedIdRef.current);
+      const currentIdx = siteIds.indexOf(id);
+      if (lastIdx !== -1 && currentIdx !== -1) {
+        const start = Math.min(lastIdx, currentIdx);
+        const end = Math.max(lastIdx, currentIdx);
+        const rangeIds = siteIds.slice(start, end + 1);
+
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          for (const rangeId of rangeIds) {
+            if (next.size >= BULK_SELECTION_CAP && !next.has(rangeId)) {
+              addToast("warning", `Selection capped at ${BULK_SELECTION_CAP} items`);
+              break;
+            }
+            next.add(rangeId);
+          }
+          return next;
+        });
+        lastSelectedIdRef.current = id;
+        return;
+      }
+    }
+
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        if (next.size >= BULK_SELECTION_CAP) {
+          addToast("warning", `Selection capped at ${BULK_SELECTION_CAP} items`);
+          return prev;
+        }
+        next.add(id);
+      }
+      return next;
+    });
+    lastSelectedIdRef.current = id;
+  }, [sitesQuery.data, addToast]);
+
+  const handleSelectAll = useCallback(() => {
+    if (!sitesQuery.data) return;
+    const allIds = sitesQuery.data.data.map((s) => s.id);
+    const allSelected = allIds.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      const capped = allIds.slice(0, BULK_SELECTION_CAP);
+      if (allIds.length > BULK_SELECTION_CAP) {
+        addToast("warning", `Selection capped at ${BULK_SELECTION_CAP} items`);
+      }
+      setSelectedIds(new Set(capped));
+    }
+  }, [sitesQuery.data, selectedIds, addToast]);
+
+  // Context menu action handler
+  const handleSiteAction = useCallback(
+    (action: string, siteId: string) => {
+      const site = sitesQuery.data?.data.find((s) => s.id === siteId);
+      switch (action) {
+        case "edit": {
+          const href = getEditorHref(siteId, unified);
+          if (unified) router.push(href);
+          else window.location.href = href;
+          break;
+        }
+        case "manage":
+          router.push(`/dashboard/sites/${siteId}`);
+          break;
+        case "rename":
+          if (site) setRenameTarget({ id: siteId, name: site.name });
+          break;
+        case "duplicate":
+          duplicateMutation.mutate({ id: siteId });
+          break;
+        case "archive":
+          archiveMutation.mutate({ id: siteId });
+          break;
+        case "delete":
+          if (site) setDeleteTarget({ id: siteId, name: site.name });
+          break;
+        case "transfer":
+          if (site) setTransferTarget({ id: siteId, name: site.name });
+          break;
+        case "copyUrl":
+          if (site) {
+            // Was copying `<slug>.buildrick.app`, a host with no DNS record — so
+            // every "copied" link was dead the moment it was pasted.
+            const url = site.domain ? `https://${site.domain}` : site.publishedUrl;
+            if (url) {
+              navigator.clipboard.writeText(url);
+              addToast("success", "URL copied to clipboard");
+            } else {
+              addToast("error", "This site isn't published yet");
+            }
+          }
+          break;
+        case "viewPublished":
+          if (site?.publishedUrl) window.open(site.publishedUrl, "_blank");
+          break;
+      }
+    },
+    [sitesQuery.data, duplicateMutation, archiveMutation, addToast, unified, router]
+  );
+
+  // Bulk action handler
+  const handleBulkAction = useCallback(
+    (action: string, folderId?: string) => {
+      const ids = Array.from(selectedIds);
+      if (action === "move" && folderId) {
+        for (const siteId of ids) {
+          moveMutation.mutate({ siteId, folderId });
+        }
+        setSelectedIds(new Set());
+        return;
+      }
+      // Deleting sites is irreversible, and deleting a SET of them is the most
+      // destructive action on this screen — yet it used to fire straight from the
+      // toolbar while deleting a single site made you type its name. Same gate for
+      // both now.
+      if (action === "delete") {
+        if (ids.length > 0) setBulkDeleteCount(ids.length);
+        return;
+      }
+      if (action === "publish" || action === "unpublish" || action === "archive" || action === "unarchive") {
+        bulkMutation.mutate({
+          action: action as "archive" | "unarchive" | "publish" | "unpublish",
+          siteIds: ids,
+        });
+      }
+    },
+    [selectedIds, bulkMutation, moveMutation]
+  );
+
+  // Folder tabs — every folder appears, count 0 included: empty folders stay
+  // visible (E4), exactly like the old projects page guaranteed.
+  const folderTabs = [
+    {
+      id: null,
+      name: "All Sites",
+      count: sitesQuery.data?.total ?? 0,
+    },
+    ...(foldersQuery.data?.map((f: { id: string; name: string; _count?: { sites: number } }) => ({
+      id: f.id,
+      name: f.name,
+      count: f._count?.sites ?? 0,
+    })) ?? []),
+  ];
+
+  const folders = (foldersQuery.data ?? []).map((f: { id: string; name: string }) => ({
+    id: f.id,
+    name: f.name,
+  }));
 
   const sites = sitesQuery.data?.data ?? [];
-  const folders = foldersQuery.data ?? [];
+  const allSelected =
+    sites.length > 0 && sites.every((s) => selectedIds.has(s.id));
 
-  // Seed one group per folder so empty projects still appear, then fold each
-  // site into its folder (or the Ungrouped bucket) counting totals + published.
-  const groupMap = new Map<string, ProjectGroup>();
-  for (const folder of folders) {
-    groupMap.set(folder.id, { key: folder.id, name: folder.name, total: 0, published: 0, ungrouped: false, members: new Set() });
-  }
-  for (const site of sites) {
-    const key = site.folderId ?? UNGROUPED_KEY;
-    let group = groupMap.get(key);
-    if (!group) {
-      // Reached for the Ungrouped bucket, or a site whose folder isn't in the
-      // folders list — we can't invent a folder name, so it reads as Ungrouped.
-      group = { key, name: "Ungrouped", total: 0, published: 0, ungrouped: true, members: new Set() };
-      groupMap.set(key, group);
-    }
-    group.total += 1;
-    if (site.status === "PUBLISHED") group.published += 1;
-    if (site.createdBy) group.members.add(site.createdBy);
-  }
-  const groups = [...groupMap.values()];
+  // A selected folder counts as a filter: an empty folder is a filtered-empty
+  // ("nothing HERE"), never the true-empty ("no sites at all").
+  const hasActiveFilters = Boolean(
+    search || status || createdBy || dateRange || templateUsed ||
+    hasCustomDomain !== undefined || hasTraffic || folderId !== null || showArchived
+  );
+
+  const clearFilters = () => {
+    setSearch("");
+    setStatus(undefined);
+    setCreatedBy(undefined);
+    setDateRange(undefined);
+    setTemplateUsed(undefined);
+    setHasCustomDomain(undefined);
+    setHasTraffic(undefined);
+    setFolderId(null);
+    setShowArchived(false);
+    setPage(1);
+  };
 
   return (
     <div>
+      {/* Header */}
       <PageHeader
-        title="All projects"
-        description="Group sites into projects for clients and teams."
+        title="Projects"
+        description="Manage, edit, and publish every site in your workspace."
         actions={
           <>
             <button
-              type="button"
-              onClick={handleNewFolder}
-              disabled={createFolderMutation.isPending}
-              className="flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:pointer-events-none disabled:opacity-60"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              onClick={handleSelectAll}
+              className="flex items-center gap-1.5 rounded-md border px-3.5 py-2 text-body-sm font-medium transition-colors"
+              style={selectedIds.size > 0
+                ? { borderColor: "var(--color-primary)", color: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }
+                : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}
             >
-              <FolderPlus className="h-4 w-4" />
-              New folder
+              <CheckSquare className="h-4 w-4" />
+              Select
             </button>
-            <Link
-              href="/dashboard/sites/new"
-              className="flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+            <ViewToggle value={viewMode} onChange={(mode) => {
+              setViewMode(mode);
+              updatePrefs.mutate({ siteViewMode: mode as "grid" | "list" });
+            }} />
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="flex items-center gap-1.5 rounded-md px-4 py-2 text-body-sm font-semibold text-white transition-opacity hover:opacity-90"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               <Plus className="h-4 w-4" />
-              New project
-            </Link>
+              New site
+            </button>
           </>
         }
       />
 
-      {isLoading ? (
-        <LoadingSkeleton rows={6} variant="card" />
-      ) : isError ? (
-        <ErrorState
-          title="Couldn't load projects"
-          description="Something went wrong on our end."
-          onRetry={() => {
-            sitesQuery.refetch();
-            foldersQuery.refetch();
+      {/* Folder tabs — hidden when the folders query fails; the list still renders */}
+      {!foldersQuery.isError && (
+        <FolderTabs
+          tabs={folderTabs}
+          activeId={folderId}
+          onSelect={(id) => {
+            setFolderId(id);
+            setShowArchived(false);
+            setPage(1);
+          }}
+          onCreateFolder={() => setCreateFolderOpen(true)}
+          onRenameFolder={(id, name) => setRenameFolderTarget({ id, name })}
+          onDeleteFolder={handleDeleteFolder}
+          archivedCount={archivedQuery.data?.total ?? 0}
+          showArchived={showArchived}
+          onToggleArchived={() => {
+            setShowArchived(!showArchived);
+            setFolderId(null);
+            setPage(1);
           }}
         />
-      ) : sites.length === 0 ? (
-        <StateEmpty
-          icon={<Layers className="h-7 w-7" />}
-          title="No projects yet"
-          description="Create your first site and it'll show up here, grouped into projects you can share with clients and teams."
-          action={{ label: "New site", href: "/dashboard/sites/new" }}
-        />
-      ) : (
-        <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
-          {groups.map((group, i) => {
-            const Icon = group.ungrouped ? Layers : Folder;
-            const tone = ICON_TONES[i % ICON_TONES.length];
-            const members = [...group.members];
-            return (
-              <div
-                key={group.key}
-                className="flex min-h-[150px] flex-col rounded-xl border p-5 shadow-card"
-                style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
-              >
-                <div className="mb-4 flex items-start justify-between">
-                  <div
-                    className="flex h-[38px] w-[38px] items-center justify-center rounded-lg text-white"
-                    style={{ backgroundColor: tone }}
-                  >
-                    <Icon className="h-[18px] w-[18px]" />
-                  </div>
-                  {/* Ungrouped is a synthetic bucket, not a folder — nothing to rename or delete. */}
-                  {!group.ungrouped && (
-                    <div className="relative" ref={openMenu === group.key ? menuRef : undefined}>
-                      <button
-                        type="button"
-                        aria-label="Project options"
-                        aria-haspopup="menu"
-                        aria-expanded={openMenu === group.key}
-                        onClick={() => setOpenMenu((k) => (k === group.key ? null : group.key))}
-                        className="-mr-1.5 -mt-1 rounded-md p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
-                        style={{ color: "var(--color-text-muted)" }}
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </button>
-                      {openMenu === group.key && (
-                        <div
-                          className="absolute right-0 top-full z-20 mt-1 w-44 overflow-hidden rounded-lg border bg-white shadow-card"
-                          style={{ borderColor: "var(--color-border-default)" }}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => handleRename(group.key, group.name)}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
-                            style={{ color: "var(--color-text-primary)" }}
-                          >
-                            <Pencil className="h-3.5 w-3.5" /> Rename
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(group.key, group.name)}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-left text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
-                            style={{ color: "var(--color-error)" }}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" /> Delete
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <h2 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{group.name}</h2>
-                <p className="mt-1 font-mono text-body-sm tabular-nums" style={{ color: "var(--color-text-muted)" }}>
-                  <MetricValue>{group.total}</MetricValue> {group.total === 1 ? "site" : "sites"}
-                  {" · "}
-                  <span style={{ color: "var(--color-success)" }}><MetricValue>{group.published}</MetricValue> published</span>
-                </p>
-                {members.length > 0 && (
-                  <div className="mt-auto pt-4">
-                    <AvatarStack avatars={members.map((id) => ({ name: id, avatar: null }))} />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          <Link
-            href="/dashboard/sites/new"
-            className="flex min-h-[150px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-            style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-secondary)" }}
+      )}
+
+      {/* Search + filters */}
+      <div className="mt-4 flex flex-col gap-3">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "var(--color-text-muted)" }} />
+          <input
+            ref={searchRef}
+            type="text"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            placeholder="Search sites…"
+            className="w-full rounded-md border py-2 pl-9 pr-10 text-body outline-none focus:border-[var(--color-primary)]"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }}
+          />
+          <kbd
+            className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border px-1.5 py-0.5 text-eyebrow font-medium"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-muted)", backgroundColor: "var(--color-bg-subtle)" }}
           >
-            <div
-              className="flex h-[38px] w-[38px] items-center justify-center rounded-lg"
-              style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}
+            /
+          </kbd>
+        </div>
+        <SiteFilters
+          status={status}
+          onStatusChange={(val) => { setStatus(val); setPage(1); }}
+          sort={sort}
+          onSortChange={(val) => {
+            setSort(val);
+            setPage(1);
+            updatePrefs.mutate({ siteViewSort: val });
+          }}
+          createdBy={createdBy}
+          onCreatedByChange={(val) => { setCreatedBy(val); setPage(1); }}
+          dateRange={dateRange}
+          onDateRangeChange={(val) => { setDateRange(val); setPage(1); }}
+          templateUsed={templateUsed}
+          onTemplateUsedChange={(val) => { setTemplateUsed(val); setPage(1); }}
+          hasCustomDomain={hasCustomDomain}
+          onHasCustomDomainChange={(val) => { setHasCustomDomain(val); setPage(1); }}
+          hasTraffic={hasTraffic}
+          onHasTrafficChange={(val) => { setHasTraffic(val); setPage(1); }}
+        />
+      </div>
+
+      {/* Loading */}
+      {sitesQuery.isLoading && (
+        <div className="mt-6">
+          <LoadingSkeleton rows={6} variant="card" />
+        </div>
+      )}
+
+      {/* Error — was falling through to the "No sites yet" empty state, which
+          mislead users into "create your first site" when the query had failed. */}
+      {!sitesQuery.isLoading && sitesQuery.isError && (
+        <div className="mt-6">
+          <ErrorState
+            title="Couldn't load your sites"
+            description="Something went wrong on our end. Your sites are safe."
+            onRetry={() => sitesQuery.refetch()}
+          />
+        </div>
+      )}
+
+      {/* Filtered-empty: a folder or filter combination matched nothing */}
+      {!sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && hasActiveFilters && (
+        <div className="mt-6">
+          <StateEmpty
+            icon={<Search className="h-7 w-7" />}
+            title="No sites found"
+            description="Try a different search term or filter."
+            action={{ label: "Clear filters", onClick: clearFilters }}
+          />
+        </div>
+      )}
+
+      {/* True-empty: the workspace has no sites at all */}
+      {!sitesQuery.isLoading && !sitesQuery.isError && sites.length === 0 && !hasActiveFilters && (
+        <div
+          className="mt-8 flex flex-col items-center rounded-xl border-2 border-dashed py-16 text-center"
+          style={{ borderColor: "var(--color-border-default)" }}
+        >
+          <p
+            className="text-base font-semibold"
+            style={{ color: "var(--color-text-primary)" }}
+          >
+            No sites yet
+          </p>
+          <p
+            className="mt-1 text-sm"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            Create your first site to get started.
+          </p>
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="mt-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            <Plus className="h-4 w-4" />
+            Create a site
+          </button>
+        </div>
+      )}
+
+      {!sitesQuery.isLoading && sites.length > 0 && (
+        <div className="mt-6">
+          {viewMode === "grid" ? (
+            <SiteGrid
+              sites={sites}
+              selectedIds={selectedIds}
+              onSelect={handleSelect}
+              onAction={handleSiteAction}
+            />
+          ) : (
+            <SiteListView
+              sites={sites}
+              selectedIds={selectedIds}
+              onSelect={handleSelect}
+              onSelectAll={handleSelectAll}
+              allSelected={allSelected}
+              onAction={handleSiteAction}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {sitesQuery.data && sitesQuery.data.totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            Page {page} of {sitesQuery.data.totalPages} ({sitesQuery.data.total} sites)
+          </p>
+          <div className="flex gap-2">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage(p => p - 1)}
+              className="px-3 py-1.5 text-sm rounded-lg border disabled:opacity-50"
+              style={{ borderColor: "var(--color-border-default)" }}
             >
-              <Plus className="h-[18px] w-[18px]" />
+              Previous
+            </button>
+            <button
+              disabled={page >= sitesQuery.data.totalPages}
+              onClick={() => setPage(p => p + 1)}
+              className="px-3 py-1.5 text-sm rounded-lg border disabled:opacity-50"
+              style={{ borderColor: "var(--color-border-default)" }}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Action Bar */}
+      <BulkActionBar
+        selectedCount={selectedIds.size}
+        onAction={handleBulkAction}
+        onClear={() => setSelectedIds(new Set())}
+        folders={folders}
+      />
+
+      {/* Modals */}
+      <CreateSiteModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onSubmit={(data) => {
+          if (data.method === "blank") {
+            createMutation.mutate({ name: data.name, method: "blank" });
+          } else {
+            setCreateOpen(false);
+            router.push(`/dashboard/sites/new?method=${data.method}&name=${encodeURIComponent(data.name)}`);
+          }
+        }}
+      />
+
+      {renameTarget && (
+        <RenameModal
+          open={true}
+          currentName={renameTarget.name}
+          onClose={() => setRenameTarget(null)}
+          onSubmit={(name) =>
+            renameMutation.mutate({ id: renameTarget.id, name })
+          }
+        />
+      )}
+
+      {renameFolderTarget && (
+        <RenameModal
+          open={true}
+          title="Rename Folder"
+          currentName={renameFolderTarget.name}
+          onClose={() => setRenameFolderTarget(null)}
+          onSubmit={(name) =>
+            renameFolderMutation.mutate({ id: renameFolderTarget.id, name })
+          }
+        />
+      )}
+
+      {deleteTarget && (
+        <DeleteConfirmModal
+          open={true}
+          siteName={deleteTarget.name}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={(name) =>
+            deleteMutation.mutate({
+              id: deleteTarget.id,
+              confirmName: name,
+            })
+          }
+        />
+      )}
+
+      {bulkDeleteCount !== null && (
+        <DeleteConfirmModal
+          open={true}
+          title={`Delete ${bulkDeleteCount} ${bulkDeleteCount === 1 ? "site" : "sites"}`}
+          siteName={`delete ${bulkDeleteCount} ${bulkDeleteCount === 1 ? "site" : "sites"}`}
+          onClose={() => setBulkDeleteCount(null)}
+          onConfirm={() => {
+            bulkMutation.mutate({ action: "delete", siteIds: Array.from(selectedIds) });
+            setBulkDeleteCount(null);
+          }}
+        />
+      )}
+
+      {transferTarget && (
+        <TransferModal
+          open={true}
+          siteId={transferTarget.id}
+          siteName={transferTarget.name}
+          onClose={() => setTransferTarget(null)}
+        />
+      )}
+
+      {createFolderOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>New Folder</h2>
+            <input
+              type="text"
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && newFolderName.trim()) {
+                  createFolderMutation.mutate({ name: newFolderName.trim() });
+                } else if (e.key === "Escape") {
+                  setCreateFolderOpen(false);
+                  setNewFolderName("");
+                }
+              }}
+              placeholder="Folder name"
+              autoFocus
+              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+            />
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => { setCreateFolderOpen(false); setNewFolderName(""); }}
+                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (newFolderName.trim()) createFolderMutation.mutate({ name: newFolderName.trim() });
+                }}
+                disabled={!newFolderName.trim() || createFolderMutation.isPending}
+                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                {createFolderMutation.isPending ? "Creating..." : "Create Folder"}
+              </button>
             </div>
-            New project
-          </Link>
+          </div>
         </div>
       )}
     </div>
