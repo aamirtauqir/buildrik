@@ -5,13 +5,13 @@
 // contract tests can all import it without a cycle.
 
 export type NavIcon =
-  | "LayoutDashboard"
-  | "FolderKanban"
-  | "Briefcase"
+  | "Home"
+  | "LayoutGrid"
+  | "Users"
   | "Image"
-  | "Library"
+  | "LayoutTemplate"
   | "Settings"
-  | "Rocket"
+  | "Shield"
   | "HelpCircle";
 
 export type NavItem = { label: string; href: string; icon: NavIcon; agencyOnly?: boolean };
@@ -19,15 +19,15 @@ export type NavGroup = { label?: string; items: NavItem[] };
 
 export const NAV_GROUPS: NavGroup[] = [
   { items: [
-    { label: "Home", href: "/dashboard", icon: "LayoutDashboard" },
-    { label: "Projects", href: "/dashboard/projects", icon: "FolderKanban" },
-    { label: "Agency", href: "/dashboard/agency", icon: "Briefcase", agencyOnly: true },
+    { label: "Home", href: "/dashboard", icon: "Home" },
+    { label: "Projects", href: "/dashboard/projects", icon: "LayoutGrid" },
+    { label: "Agency", href: "/dashboard/agency", icon: "Users", agencyOnly: true },
     { label: "Media", href: "/dashboard/media", icon: "Image" },
-    { label: "Templates", href: "/dashboard/templates", icon: "Library" },
+    { label: "Templates", href: "/dashboard/templates", icon: "LayoutTemplate" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ] },
   { label: "Support", items: [
-    { label: "Getting started", href: "/dashboard/getting-started", icon: "Rocket" },
+    { label: "Getting started", href: "/dashboard/getting-started", icon: "Shield" },
     { label: "Help center", href: "/dashboard/help", icon: "HelpCircle" },
   ] },
 ];

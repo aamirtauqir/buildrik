@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, FolderKanban, Image as ImageIcon, Rocket, Briefcase, Library,
+  Home, LayoutGrid, Image as ImageIcon, Shield, Users, LayoutTemplate,
   Settings, HelpCircle, ArrowUpRight,
 } from "lucide-react";
 import { cn } from "@lib/utils";
@@ -12,9 +12,9 @@ import { MetricValue, ProgressBar } from "@/components/dashboard/primitives";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { NAV_GROUPS, isActiveRoute, type NavGroup, type NavIcon } from "./nav";
 
-const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
-  LayoutDashboard, FolderKanban, Image: ImageIcon, Rocket, Briefcase, Library,
-  Settings, HelpCircle,
+const iconMap: Record<NavIcon, typeof Home> = {
+  Home, LayoutGrid, Users, Image: ImageIcon, LayoutTemplate,
+  Settings, Shield, HelpCircle,
 };
 
 // Mobile carries the same 6 destinations — derived, not a second hardcoded list.
@@ -115,7 +115,7 @@ export function Sidebar() {
                     <li key={item.href}>
                       <Link href={item.href} className={cn(
                         "flex items-center gap-[11px] rounded-lg px-[9px] py-2 text-[13.5px] transition-colors",
-                        active ? "bg-[var(--color-primary-subtle)] font-semibold text-[var(--color-primary)]" : "font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
+                        active ? "bg-[var(--color-primary-subtle)] font-semibold text-[var(--color-primary)]" : "font-[520] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
                       )}>
                         <Icon className="h-[18px] w-[18px] shrink-0" />
                         {item.label}

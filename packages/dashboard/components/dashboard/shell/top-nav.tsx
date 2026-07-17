@@ -46,7 +46,7 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
         <span className="flex h-[30px] w-[30px] items-center justify-center rounded-md text-[15px] font-extrabold leading-none text-white" style={{ backgroundColor: "var(--color-ink)" }}>
           B
         </span>
-        <span className="text-[17px] font-extrabold tracking-tight" style={{ color: "var(--color-text-primary)" }}>Buildrick</span>
+        <span className="text-[15.5px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>Buildrick</span>
       </Link>
       <nav className="flex items-center gap-1">
         <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.11em]" style={{ color: "var(--color-text-muted)" }}>Explore</span>
