@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, FolderKanban, Image as ImageIcon, Rocket, Briefcase, Library,
-  Settings, HelpCircle, ArrowUpRight, Search,
+  Settings, HelpCircle, ArrowUpRight,
 } from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 import { MetricValue, ProgressBar } from "@/components/dashboard/primitives";
 import { WorkspaceSwitcher } from "./workspace-switcher";
-import { CommandPalette } from "@/components/search/command-palette";
 import { NAV_GROUPS, isActiveRoute, type NavGroup, type NavIcon } from "./nav";
 
 const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
@@ -83,7 +81,6 @@ function StorageCard() {
 export function Sidebar() {
   const pathname = usePathname();
   const groups = useVisibleGroups();
-  const [paletteOpen, setPaletteOpen] = useState(false);
   // Projects count badge. Reuses the same stats query the Home page runs, so
   // react-query dedupes it there; elsewhere it's one 60s-cached call.
   const stats = trpc.dashboard.stats.useQuery(undefined, { staleTime: 60_000 });
@@ -91,32 +88,14 @@ export function Sidebar() {
     "/dashboard/projects": stats.data?.totalSites,
   };
 
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setPaletteOpen((o) => !o); }
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
   return (
     <>
       <aside
         className="fixed left-0 z-30 hidden w-[var(--sidebar-w)] flex-col border-r bg-white lg:flex"
         style={{ top: "var(--topnav-h)", height: "calc(100vh - var(--topnav-h))", borderColor: "var(--color-border-default)" }}
       >
-        <div className="shrink-0 space-y-2 px-3.5 pt-3.5">
+        <div className="shrink-0 px-3.5 pt-3.5">
           <WorkspaceSwitcher />
-          <button
-            onClick={() => setPaletteOpen(true)}
-            className="flex h-9 w-full items-center gap-2 rounded-lg border px-2.5 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
-            style={{ color: "var(--color-text-placeholder)", borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-subtle)" }}
-            aria-label="Search"
-          >
-            <Search className="h-4 w-4" />
-            <span className="flex-1 text-left">Search…</span>
-            <kbd className="rounded border bg-white px-1.5 text-eyebrow" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-muted)" }}>⌘K</kbd>
-          </button>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3.5 py-3">
@@ -163,7 +142,6 @@ export function Sidebar() {
       </aside>
 
       <MobileTabBar />
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </>
   );
 }
