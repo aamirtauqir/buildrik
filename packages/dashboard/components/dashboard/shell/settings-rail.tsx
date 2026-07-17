@@ -65,23 +65,26 @@ function RailLink({ item }: { item: RailItem }) {
   );
 }
 
-/** Grouped vertical settings rail (≥lg); collapses to a horizontal scrollable
- *  chip row with the group eyebrows as inline dividers on smaller viewports. */
+/** Horizontal settings tab bar above the section content: the 4 labeled
+ *  subgroups render inline as a wrapping row with their eyebrows as dividers,
+ *  Danger isolated at the end. Same token classes + active rule as AgencyTabs
+ *  (section-tab SSOT), so both sections navigate identically. */
 export function SettingsRail() {
   return (
     <nav
       aria-label="Settings sections"
-      className="flex items-center gap-4 overflow-x-auto pb-2 lg:block lg:overflow-visible lg:pb-0"
+      className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b pb-3"
+      style={{ borderColor: "var(--color-border-default)" }}
     >
-      {RAIL_GROUPS.map((group, gi) => (
-        <div key={group.label} className={cn("flex items-center gap-1 lg:block", gi > 0 && "lg:mt-5")}>
-          <p
-            className="shrink-0 px-3 text-eyebrow font-semibold uppercase tracking-wide lg:mb-1"
+      {RAIL_GROUPS.map((group) => (
+        <div key={group.label} className="flex items-center gap-1">
+          <span
+            className="shrink-0 px-1 text-eyebrow font-semibold uppercase tracking-wide"
             style={{ color: "var(--color-text-muted)" }}
           >
             {group.label}
-          </p>
-          <ul className="flex gap-1 lg:block lg:space-y-0.5">
+          </span>
+          <ul className="flex items-center gap-1">
             {group.items.map((item) => (
               <li key={item.href} className="shrink-0">
                 <RailLink item={item} />
@@ -91,7 +94,7 @@ export function SettingsRail() {
         </div>
       ))}
       <div
-        className="shrink-0 lg:mt-5 lg:border-t lg:pt-4"
+        className="flex shrink-0 items-center border-l pl-3"
         style={{ borderColor: "var(--color-border-default)" }}
       >
         <RailLink item={DANGER} />
