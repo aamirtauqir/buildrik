@@ -16,6 +16,18 @@ vi.mock("@/lib/prisma", () => ({
     domain: {
       findFirst: vi.fn(),
     },
+    // m-approval gate reads these in startPublish. Defaults (gate off / no
+    // membership row) short-circuit the gate so existing tests exercise the
+    // original paths; the gate's own behavior lives in publish.service.approval.test.
+    workspace: {
+      findUnique: vi.fn().mockResolvedValue({ editsRequireApproval: false }),
+    },
+    workspaceMember: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
+    reviewRequest: {
+      findFirst: vi.fn().mockResolvedValue(null),
+    },
     publishBuildJob: {
       findFirst: vi.fn(),
       findUnique: vi.fn(),
