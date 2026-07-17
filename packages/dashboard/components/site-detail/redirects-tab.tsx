@@ -106,7 +106,7 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
         <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           {atLimit ? (
             <p className="text-sm text-amber-700">
-              You&apos;ve hit your plan&apos;s redirect limit. <a href="/dashboard/billing" className="font-medium underline">Upgrade</a> to add more.
+              You&apos;ve hit your plan&apos;s redirect limit. <a href="/dashboard/settings/billing" className="font-medium underline">Upgrade</a> to add more.
             </p>
           ) : (
             <div className="flex flex-wrap items-end gap-2">

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+import { NAV_GROUPS } from "@/components/dashboard/shell/nav";
 
 const RECENT_ITEMS_KEY = "buildrik_recent_items";
 const MAX_RECENT = 5;
@@ -36,41 +37,56 @@ interface ResultItem {
 }
 
 const SETTINGS_ITEMS: ResultItem[] = [
-  { id: "s-profile", label: "Profile", description: "Edit your profile", href: "/dashboard/settings", scope: "settings" },
-  { id: "s-account", label: "Account", description: "Account preferences", href: "/dashboard/settings/account", scope: "settings" },
-  { id: "s-security", label: "Security", description: "Password & 2FA", href: "/dashboard/settings/security", scope: "settings" },
-  { id: "s-notifications", label: "Notifications", description: "Notification preferences", href: "/dashboard/settings/notifications", scope: "settings" },
-  { id: "s-workspace", label: "Workspace", description: "Workspace settings", href: "/dashboard/settings/workspace", scope: "settings" },
+  { id: "s-workspace", label: "Workspace", description: "Workspace settings & branding", href: "/dashboard/settings", scope: "settings" },
+  { id: "s-team", label: "Team", description: "Members & invites", href: "/dashboard/settings/team", scope: "settings" },
+  { id: "s-domains", label: "Domains", description: "Custom domains", href: "/dashboard/settings/domains", scope: "settings" },
   { id: "s-integrations", label: "Integrations", description: "Connected services", href: "/dashboard/settings/integrations", scope: "settings" },
   { id: "s-ai", label: "AI & Credits", description: "AI usage and credits", href: "/dashboard/settings/ai", scope: "settings" },
   { id: "s-tokens", label: "API Tokens", description: "Tokens for scripting & CI", href: "/dashboard/settings/api-tokens", scope: "settings" },
-  { id: "s-danger", label: "Danger Zone", description: "Delete workspace", href: "/dashboard/settings/danger", scope: "settings" },
+  { id: "s-plans", label: "Plans", description: "Plan & upgrades", href: "/dashboard/settings/plans", scope: "settings" },
+  { id: "s-billing", label: "Billing", description: "Invoices & payment", href: "/dashboard/settings/billing", scope: "settings" },
+  { id: "s-usage", label: "Usage", description: "Limits & quotas", href: "/dashboard/settings/usage", scope: "settings" },
+  { id: "s-profile", label: "Profile", description: "Edit your profile", href: "/dashboard/settings/profile", scope: "settings" },
+  { id: "s-account", label: "Account", description: "Account preferences", href: "/dashboard/settings/account", scope: "settings" },
+  { id: "s-security", label: "Security", description: "Password & 2FA", href: "/dashboard/settings/security", scope: "settings" },
+  { id: "s-notifications", label: "Notifications", description: "Notification preferences", href: "/dashboard/settings/notifications", scope: "settings" },
+  { id: "s-danger", label: "Danger Zone", description: "Delete workspace or account", href: "/dashboard/settings/danger", scope: "settings" },
 ];
 
 const ACTION_ITEMS: ResultItem[] = [
   { id: "a-create-site", label: "Create Site", description: "Start a new site", href: "/dashboard/sites/new", scope: "actions" },
-  { id: "a-invite", label: "Invite Member", description: "Add a team member", href: "/dashboard/team?invite=true", scope: "actions" },
+  { id: "a-invite", label: "Invite Member", description: "Add a team member", href: "/dashboard/settings/team?invite=true", scope: "actions" },
   { id: "a-ai", label: "Generate with AI", description: "AI-powered generation", href: "/dashboard/sites/new?ai=true", scope: "actions" },
-  { id: "a-domain", label: "Connect Domain", description: "Link a custom domain", href: "/dashboard/domains", scope: "actions" },
+  { id: "a-domain", label: "Connect Domain", description: "Link a custom domain", href: "/dashboard/settings/domains", scope: "actions" },
 ];
 
-// 71-command-palette "where did X go": the reconciled IA moved several concepts
-// to new homes. Searching an old name resolves to its destination so nobody has
-// to relearn the map. `aliases` are the old/searched terms; `label` is the
-// new home, `description` says where it moved.
+// "Where did X go": IA v2 (19 nav items → 6+2) relocated these concepts.
+// Searching an old name resolves to its destination so nobody has to relearn
+// the map. `aliases` are the old/searched terms; `label` is the new home,
+// `description` says where it moved.
 interface MovedItem extends ResultItem {
   aliases: string[];
   /** agency-layer-only destination — hidden in solo workspaces */
   agencyOnly?: boolean;
 }
 const MOVED_ITEMS: MovedItem[] = [
-  { id: "m-traffic", label: "Traffic", description: "Moved → Site › Analytics", href: "/dashboard/sites", scope: "moved", aliases: ["traffic", "analytics", "visitors", "stats"] },
-  { id: "m-shared-theme", label: "Shared theme", description: "Moved → Workspace › Shared theme", href: "/dashboard/theme", scope: "moved", aliases: ["shared theme", "design system", "theme", "tokens", "ds"], agencyOnly: true },
-  { id: "m-assets", label: "Assets", description: "Moved → Media", href: "/dashboard/media", scope: "moved", aliases: ["assets", "media", "images", "files", "uploads"] },
-  { id: "m-redirects", label: "Redirects", description: "Moved → Site › Redirects", href: "/dashboard/sites", scope: "moved", aliases: ["redirects", "url forwarding", "301", "302"] },
-  { id: "m-domains", label: "Domains", description: "Moved → Domains (all sites)", href: "/dashboard/domains", scope: "moved", aliases: ["domains", "dns", "custom domain"] },
-  { id: "m-tokens", label: "API tokens", description: "Moved → Settings › API Tokens", href: "/dashboard/settings/api-tokens", scope: "moved", aliases: ["api tokens", "tokens", "ci", "api key"] },
-  { id: "m-reviews", label: "Reviews", description: "Approve client edits", href: "/dashboard/reviews", scope: "moved", aliases: ["reviews", "approval", "approve", "publishing"], agencyOnly: true },
+  { id: "m-sites", label: "Sites", description: "Moved → Projects", href: "/dashboard/projects", scope: "moved", aliases: ["sites", "my sites", "websites", "all projects"] },
+  { id: "m-apps", label: "Apps", description: "Moved → Marketplace", href: "/dashboard/marketplace", scope: "moved", aliases: ["apps", "applications", "integrations marketplace"] },
+  { id: "m-libraries", label: "Libraries & Templates", description: "Moved → Templates", href: "/dashboard/templates", scope: "moved", aliases: ["libraries", "library", "templates"] },
+  { id: "m-clients", label: "Clients", description: "Moved → Agency › Clients", href: "/dashboard/agency", scope: "moved", aliases: ["clients", "client management"], agencyOnly: true },
+  { id: "m-reviews", label: "Reviews", description: "Moved → Agency › Reviews", href: "/dashboard/agency/reviews", scope: "moved", aliases: ["reviews", "approval", "approve", "publishing"], agencyOnly: true },
+  { id: "m-comments", label: "Comments", description: "Moved → Agency › Reviews", href: "/dashboard/agency/reviews", scope: "moved", aliases: ["comments", "review comments"], agencyOnly: true },
+  { id: "m-shared-theme", label: "Shared theme", description: "Moved → Agency › Shared theme", href: "/dashboard/agency/theme", scope: "moved", aliases: ["shared theme", "design system", "theme", "tokens", "ds"], agencyOnly: true },
+  { id: "m-partner", label: "Partner program", description: "Moved → Agency › Partner", href: "/dashboard/agency/partner", scope: "moved", aliases: ["partner", "partner program", "referral"], agencyOnly: true },
+  { id: "m-team", label: "Team", description: "Moved → Settings › Team", href: "/dashboard/settings/team", scope: "moved", aliases: ["team", "members", "invite"] },
+  { id: "m-plans", label: "Plans", description: "Moved → Settings › Plans", href: "/dashboard/settings/plans", scope: "moved", aliases: ["plans", "pricing", "upgrade"] },
+  { id: "m-billing", label: "Billing", description: "Moved → Settings › Billing", href: "/dashboard/settings/billing", scope: "moved", aliases: ["billing", "invoices", "payment"] },
+  { id: "m-usage", label: "Usage", description: "Moved → Settings › Usage", href: "/dashboard/settings/usage", scope: "moved", aliases: ["usage", "limits", "quota"] },
+  { id: "m-domains", label: "Domains", description: "Moved → Settings › Domains", href: "/dashboard/settings/domains", scope: "moved", aliases: ["domains", "dns", "custom domain"] },
+  { id: "m-traffic", label: "Traffic", description: "Moved → Site › Analytics", href: "/dashboard/projects", scope: "moved", aliases: ["traffic", "analytics", "visitors", "stats"] },
+  { id: "m-redirects", label: "Redirects", description: "Moved → Site › Redirects", href: "/dashboard/projects", scope: "moved", aliases: ["redirects", "url forwarding", "301", "302"] },
+  { id: "m-assets", label: "Assets", description: "Moved → Media", href: "/dashboard/media", scope: "moved", aliases: ["assets", "images", "files", "uploads"] },
+  { id: "m-tokens", label: "API tokens", description: "Moved → Settings › API Tokens", href: "/dashboard/settings/api-tokens", scope: "moved", aliases: ["api tokens", "ci", "api key"] },
 ];
 
 const SCOPE_ICONS: Record<string, typeof Globe> = {
@@ -85,31 +101,20 @@ const SCOPE_ICONS: Record<string, typeof Globe> = {
   navigate: Compass,
 };
 
-// Primary nav destinations — the reconciled two-level IA (top nav + sidebar).
-// Agency destinations are hidden in solo workspaces.
+// Primary nav destinations. Sidebar entries DERIVE from NAV_GROUPS (the SSOT) so
+// nav drift is structurally impossible; only the topbar's own destinations
+// (Marketplace/Learn/Resources) are hand-written here.
 const NAV_ITEMS: Array<ResultItem & { agencyOnly?: boolean }> = [
-  { id: "nav-dashboard", label: "Dashboard", description: "Home", href: "/dashboard", scope: "navigate" },
+  ...NAV_GROUPS.flatMap((g) => g.items).map((it) => ({
+    id: `nav-${it.href === "/dashboard" ? "home" : it.href.slice("/dashboard/".length)}`,
+    label: it.label,
+    href: it.href,
+    scope: "navigate",
+    agencyOnly: it.agencyOnly,
+  })),
   { id: "nav-marketplace", label: "Marketplace", description: "Apps & integrations", href: "/dashboard/marketplace", scope: "navigate" },
   { id: "nav-learn", label: "Learn", description: "Academy", href: "/dashboard/learn", scope: "navigate" },
   { id: "nav-resources", label: "Resources", description: "Docs & guides", href: "/dashboard/resources", scope: "navigate" },
-  { id: "nav-projects", label: "All projects", href: "/dashboard/projects", scope: "navigate" },
-  { id: "nav-sites", label: "My Sites", href: "/dashboard/sites", scope: "navigate" },
-  { id: "nav-media", label: "Media", href: "/dashboard/media", scope: "navigate" },
-  { id: "nav-getting-started", label: "Getting started", href: "/dashboard/getting-started", scope: "navigate" },
-  { id: "nav-apps", label: "Apps", href: "/dashboard/apps", scope: "navigate" },
-  { id: "nav-libraries", label: "Libraries & Templates", href: "/dashboard/libraries", scope: "navigate" },
-  { id: "nav-clients", label: "Clients", href: "/dashboard/clients", scope: "navigate", agencyOnly: true },
-  { id: "nav-reviews", label: "Reviews", href: "/dashboard/reviews", scope: "navigate", agencyOnly: true },
-  { id: "nav-comments", label: "Comments", href: "/dashboard/comments", scope: "navigate", agencyOnly: true },
-  { id: "nav-theme", label: "Shared theme", href: "/dashboard/theme", scope: "navigate", agencyOnly: true },
-  { id: "nav-partner", label: "Partner program", href: "/dashboard/partner", scope: "navigate", agencyOnly: true },
-  { id: "nav-team", label: "Team", href: "/dashboard/team", scope: "navigate" },
-  { id: "nav-billing", label: "Billing", href: "/dashboard/billing", scope: "navigate" },
-  { id: "nav-plans", label: "Plans", href: "/dashboard/plans", scope: "navigate" },
-  { id: "nav-usage", label: "Usage", href: "/dashboard/usage", scope: "navigate" },
-  { id: "nav-domains", label: "Domains", href: "/dashboard/domains", scope: "navigate" },
-  { id: "nav-settings", label: "Settings", href: "/dashboard/settings", scope: "navigate" },
-  { id: "nav-help", label: "Help", href: "/dashboard/help", scope: "navigate" },
 ];
 
 export const SEARCH_SCOPES = [
@@ -120,6 +125,16 @@ export const SEARCH_SCOPES = [
   { key: "actions", label: "Actions" },
   { key: "help", label: "Help" },
 ];
+
+// Every static destination the palette can navigate to (nav + settings + actions
+// + moved aliases). The IA v2 contract test (E2) asserts each one resolves
+// against the live route table — no entry may point at a deleted route.
+export const PALETTE_HREFS: string[] = [
+  ...NAV_ITEMS,
+  ...SETTINGS_ITEMS,
+  ...ACTION_ITEMS,
+  ...MOVED_ITEMS,
+].map((i) => i.href);
 
 function getRecentItems(): RecentItem[] {
   try {

@@ -47,7 +47,7 @@ describe("LockedScreen — pro / enterprise variants", () => {
     fireEvent.click(screen.getByRole("button", { name: /upgrade to enterprise plan/i }));
     expect(openSpy).toHaveBeenCalledTimes(1);
     const [url, target] = openSpy.mock.calls[0];
-    expect(String(url)).toMatch(/\/dashboard\/billing$/);
+    expect(String(url)).toMatch(/\/dashboard\/settings\/billing$/);
     expect(target).toBe("_blank");
   });
 });

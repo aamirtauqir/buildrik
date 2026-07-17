@@ -9,7 +9,8 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Composer } from "../../engine";
 import { AccessibilityChecker } from "../AccessibilityChecker";
 
@@ -163,10 +164,11 @@ describe("AccessibilityChecker — color contrast", () => {
     // indistinguishable (no integer channel value falls between them), so the
     // drift cannot be pinned through the UI — pin the source instead so any
     // silent change to the luminance math surfaces in review.
-    // vitest root is packages/editor, so cwd-relative works for both the
-    // editor run and the dashboard node_modules dual-run (same real file).
+    // Resolve relative to THIS test file, not process.cwd() — the root vitest
+    // config globs editor tests, so a full-suite run from the repo root has
+    // cwd = repo root and a cwd-relative path ENOENTs.
     const source = readFileSync(
-      resolve(process.cwd(), "src/ai/AccessibilityChecker.tsx"),
+      resolve(dirname(fileURLToPath(import.meta.url)), "../AccessibilityChecker.tsx"),
       "utf8"
     );
     expect(source).toContain("0.03928");

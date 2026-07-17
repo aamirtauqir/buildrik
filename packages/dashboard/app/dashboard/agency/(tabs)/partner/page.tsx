@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Users, TrendingUp, Wallet, Copy, Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
-import { PageHeader, StatCard, MetricValue, ProgressBar, DataTable, type Column } from "@/components/dashboard/primitives";
+import { StatCard, MetricValue, ProgressBar, DataTable, type Column } from "@/components/dashboard/primitives";
 
 const usd = (cents: number) => {
   const d = cents / 100;
@@ -48,8 +48,7 @@ export default function PartnerPage() {
 
   return (
     <div>
-      <PageHeader title="Partner program" description="Earn commission and perks by referring agencies." />
-
+      {/* The agency layout owns the section PageHeader (D10.4). */}
       {query.isLoading ? (
         <LoadingSkeleton rows={3} variant="card" />
       ) : query.isError ? (

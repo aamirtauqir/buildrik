@@ -73,7 +73,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
               Upgrade your plan to create more sites.
             </p>
             <Link
-              href="/dashboard/billing"
+              href="/dashboard/settings/billing"
               onClick={onClose}
               className="mt-4 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white"
               style={{ backgroundColor: "var(--color-primary)" }}

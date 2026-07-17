@@ -15,7 +15,7 @@ const DEFAULT_USAGE_ITEMS: Pick<UsageItem, "label" | "ctaLabel" | "ctaHref">[] =
   { label: "Sites", ctaLabel: "Create site", ctaHref: "/dashboard/sites/new" },
   { label: "Bandwidth", ctaLabel: "View usage", ctaHref: "/dashboard/settings/billing" },
   { label: "Team members", ctaLabel: "Invite member", ctaHref: "/dashboard/settings/team" },
-  { label: "Custom domains", ctaLabel: "Connect domain", ctaHref: "/dashboard/domains" },
+  { label: "Custom domains", ctaLabel: "Connect domain", ctaHref: "/dashboard/settings/domains" },
   { label: "Storage", ctaLabel: "Manage files", ctaHref: "/dashboard/settings/billing" },
   { label: "AI credits", ctaLabel: "View usage", ctaHref: "/dashboard/settings/billing" },
   { label: "Form submissions", ctaLabel: "View forms", ctaHref: "/dashboard/forms" },

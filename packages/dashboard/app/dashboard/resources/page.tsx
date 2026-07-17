@@ -5,8 +5,8 @@ import { PageHeader } from "@/components/dashboard/primitives";
 const RESOURCES = [
   { icon: FileText, title: "Documentation", description: "Guides for building, publishing and managing sites.", href: "/dashboard/help", external: false },
   { icon: Code2, title: "API reference", description: "Endpoints, tokens and webhooks for developers.", href: "/dashboard/settings/api-tokens", external: false },
-  { icon: Palette, title: "Brand kit", description: "Logos, colors and usage guidelines to download.", href: "/dashboard/libraries", external: false },
-  { icon: LayoutTemplate, title: "Template gallery", description: "Starter designs for every kind of site.", href: "/dashboard/libraries", external: false },
+  { icon: Palette, title: "Brand kit", description: "Logos, colors and usage guidelines to download.", href: "/dashboard/templates", external: false },
+  { icon: LayoutTemplate, title: "Template gallery", description: "Starter designs for every kind of site.", href: "/dashboard/templates", external: false },
   { icon: ScrollText, title: "Changelog", description: "What's new — features, fixes and improvements.", href: "/dashboard/help", external: false },
   { icon: Users, title: "Community", description: "Ask questions and share work with other builders.", href: "/dashboard/help", external: false },
 ] as const;

@@ -9,10 +9,8 @@ import { InviteModal } from "@/components/team/invite-modal";
 import { PendingInvites } from "@/components/team/pending-invites";
 import { TeamEmptyState } from "@/components/team/team-empty-state";
 import { ErrorState } from "@/components/states";
-import { PageHeader, MetricValue } from "@/components/dashboard/primitives";
+import { MetricValue } from "@/components/dashboard/primitives";
 import { UserPlus } from "lucide-react";
-
-const TEAM_DESCRIPTION = "Manage members, roles, and seats.";
 
 export default function TeamPage() {
   const { data: session } = useSession();
@@ -101,68 +99,56 @@ export default function TeamPage() {
   const currentUserId = session?.user?.id ?? "";
 
   if (isLoading) {
-    return (
-      <div>
-        <PageHeader title="Team" description={TEAM_DESCRIPTION} />
-        <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-      </div>
-    );
+    return <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   }
 
   // Without this, a failed stats/list query left data undefined → isEmpty true →
   // the "invite your first member" empty state showed on a real error.
   if (isError) {
     return (
-      <div>
-        <PageHeader title="Team" description={TEAM_DESCRIPTION} />
-        <ErrorState
-          title="Couldn't load your team"
-          description="Something went wrong on our end."
-          onRetry={() => {
-            statsQuery.refetch();
-            membersQuery.refetch();
-          }}
-        />
-      </div>
+      <ErrorState
+        title="Couldn't load your team"
+        description="Something went wrong on our end."
+        onRetry={() => {
+          statsQuery.refetch();
+          membersQuery.refetch();
+        }}
+      />
     );
   }
 
   return (
     <div>
-      <PageHeader
-        title="Team"
-        description={TEAM_DESCRIPTION}
-        actions={
-          <>
-            {statsQuery.data && (
-              <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                <MetricValue>{statsQuery.data.active} / {statsQuery.data.total}</MetricValue> seats
-              </span>
-            )}
-            {!isEmpty && (
-              <button
-                onClick={() => setSelectMode((v) => !v)}
-                className="rounded-lg border px-3 py-2 text-body font-medium transition-colors"
-                style={
-                  selectMode
-                    ? { borderColor: "var(--color-primary)", color: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }
-                    : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }
-                }
-              >
-                Select
-              </button>
-            )}
-            <button
-              onClick={() => setInviteOpen(true)}
-              className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              <UserPlus className="h-4 w-4" />
-              Invite
-            </button>
-          </>
-        }
-      />
+      {/* The settings layout owns the section PageHeader (D10.4) — this page
+          keeps only its functional actions. */}
+      <div className="mb-6 flex items-center justify-end gap-2">
+        {statsQuery.data && (
+          <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <MetricValue>{statsQuery.data.active} / {statsQuery.data.total}</MetricValue> seats
+          </span>
+        )}
+        {!isEmpty && (
+          <button
+            onClick={() => setSelectMode((v) => !v)}
+            className="rounded-lg border px-3 py-2 text-body font-medium transition-colors"
+            style={
+              selectMode
+                ? { borderColor: "var(--color-primary)", color: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }
+                : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }
+            }
+          >
+            Select
+          </button>
+        )}
+        <button
+          onClick={() => setInviteOpen(true)}
+          className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white"
+          style={{ backgroundColor: "var(--color-primary)" }}
+        >
+          <UserPlus className="h-4 w-4" />
+          Invite
+        </button>
+      </div>
 
       {isEmpty ? (
         <TeamEmptyState onInvite={() => setInviteOpen(true)} />

@@ -1,4 +1,5 @@
 import { withSentryConfig } from "@sentry/nextjs";
+import { IA_V2_REDIRECTS } from "../../lib/ia-v2-redirects.mjs";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -34,6 +35,9 @@ const nextConfig = {
         destination: "/edit/:id",
         permanent: true,
       },
+      // IA v2 route merge — table lives in lib/ia-v2-redirects.mjs (SSOT,
+      // asserted by the redirect-table contract test).
+      ...IA_V2_REDIRECTS,
     ];
   },
   async headers() {

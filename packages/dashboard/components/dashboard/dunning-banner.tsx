@@ -52,7 +52,7 @@ export function DunningBanner({ graceEndsAt }: DunningBannerProps) {
       </div>
       <div className="ml-4 flex items-center gap-2">
         <Link
-          href="/dashboard/billing"
+          href="/dashboard/settings/billing"
           className="shrink-0 rounded-lg bg-red-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-red-700"
         >
           Update Payment

@@ -6,7 +6,7 @@ import { Briefcase, Plus, Pencil, Trash2, X, MoreHorizontal } from "lucide-react
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
-import { PageHeader, StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
+import { StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
 
 interface ClientRow {
   id: string;
@@ -259,11 +259,9 @@ export function ClientsView() {
 
   return (
     <div>
-      <PageHeader
-        title="Clients"
-        description="Organize sites by client and collect sign-off."
-        actions={addButton}
-      />
+      {/* The agency layout owns the section PageHeader (D10.4) — this page keeps
+          only its functional action. */}
+      {addButton && <div className="mb-6 flex justify-end">{addButton}</div>}
 
       {featuresQuery.isLoading ? (
         <LoadingSkeleton rows={3} variant="card" />
@@ -271,7 +269,7 @@ export function ClientsView() {
         <DeniedState
           title="Agency features aren't enabled"
           description="Clients group sites per customer with white-label branding. Ask a workspace admin to enable the agency layer."
-          action={{ label: "Back to sites", href: "/dashboard/sites" }}
+          action={{ label: "Back to projects", href: "/dashboard/projects" }}
         />
       ) : clientsQuery.isLoading ? (
         <LoadingSkeleton rows={3} variant="card" />
@@ -300,7 +298,7 @@ export function ClientsView() {
             columns={columns}
             rows={clients}
             keyOf={(c) => c.id}
-            onRowClick={(c) => router.push(`/dashboard/clients/${c.id}`)}
+            onRowClick={(c) => router.push(`/dashboard/agency/${c.id}`)}
           />
         </>
       )}

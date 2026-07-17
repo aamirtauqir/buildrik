@@ -76,7 +76,7 @@ describe("DeniedState", () => {
     render(
       <DeniedState
         action={{ label: "Back", href: "/dashboard" }}
-        secondary={{ label: "Ask an admin", href: "/dashboard/team" }}
+        secondary={{ label: "Ask an admin", href: "/dashboard/settings/team" }}
       />,
     );
     expect(screen.getByText(/don't have access/i)).toBeTruthy();

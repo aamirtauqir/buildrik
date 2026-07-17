@@ -64,7 +64,7 @@ export default function StatesGalleryPage() {
         </h2>
         <DeniedState
           action={{ label: "Back to home", href: "/dashboard" }}
-          secondary={{ label: "Ask an admin", href: "/dashboard/team" }}
+          secondary={{ label: "Ask an admin", href: "/dashboard/settings/team" }}
         />
       </section>
     </main>

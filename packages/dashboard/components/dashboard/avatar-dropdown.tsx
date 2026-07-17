@@ -13,7 +13,7 @@ type MenuItem = {
 
 export const AVATAR_MENU_ITEMS: MenuItem[] = [
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
-  { label: "Billing", href: "/dashboard/billing", icon: CreditCard },
+  { label: "Billing", href: "/dashboard/settings/billing", icon: CreditCard },
   { label: "Help", href: "/dashboard/help", icon: HelpCircle },
   { label: "Logout", href: "#", icon: LogOut },
 ];

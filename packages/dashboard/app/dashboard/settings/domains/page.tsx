@@ -20,15 +20,7 @@ export default function WorkspaceDomainsPage() {
 
   return (
     <div>
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Domains</h1>
-          <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-            Every custom domain across your sites, in one place.
-          </p>
-        </div>
-      </header>
-
+      {/* The settings layout owns the section PageHeader (D10.4). */}
       {query.isLoading ? (
         <LoadingSkeleton rows={4} variant="list" />
       ) : query.isError ? (

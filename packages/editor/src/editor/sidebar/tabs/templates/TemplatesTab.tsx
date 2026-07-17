@@ -504,9 +504,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           onCancel={() => sel.setShowUpgrade(false)}
           onUpgrade={() => {
             sel.setShowUpgrade(false);
-            // P2 fix (codex finding A5): actual dashboard route is /dashboard/billing,
-            // not /dashboard/settings/billing. Verified via packages/dashboard/app/dashboard/billing/page.tsx.
-            window.open("/dashboard/billing", "_blank");
+            // Billing lives at /dashboard/settings/billing (IA v2 route merge).
+            window.open("/dashboard/settings/billing", "_blank");
           }}
         />
       )}

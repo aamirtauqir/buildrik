@@ -103,12 +103,12 @@ export function OverviewTab({
             </button>
           )}
           <Link
-            href="/dashboard/sites"
+            href="/dashboard/projects"
             className="flex items-center gap-1 rounded-lg border px-4 py-2 text-sm font-medium"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to My Sites
+            Back to Projects
           </Link>
         </div>
       </div>

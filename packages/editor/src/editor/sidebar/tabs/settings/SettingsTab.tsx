@@ -95,8 +95,8 @@ const GROUP_LABELS: Record<NavGroupId, string> = {
 //
 // Only links to dashboard pages that actually exist ship here. A1 day-1
 // shipped 8 links optimistically; subsequent verification revealed only
-// 3 had real backing pages (Domains + Members under /dashboard/team +
-// Billing under /dashboard/billing). API tokens / Webhooks / Environments /
+// 3 had real backing pages (Domains + Members under /dashboard/settings/team +
+// Billing under /dashboard/settings/billing). API tokens / Webhooks / Environments /
 // Audit log / Versions are deferred until their dashboard pages exist —
 // linking to 404s silently is worse than not linking at all.
 const DASHBOARD_URL = (import.meta as { env?: { VITE_DASHBOARD_URL?: string } }).env?.VITE_DASHBOARD_URL || "http://localhost:3000";
@@ -115,8 +115,8 @@ interface WorkspaceLink {
 
 const WORKSPACE_LINKS: WorkspaceLink[] = [
   { id: "domains", title: "Domains", path: "domains", scope: "site" },
-  { id: "members", title: "Members", path: "/dashboard/team", scope: "workspace" },
-  { id: "billing", title: "Billing", path: "/dashboard/billing", scope: "workspace" },
+  { id: "members", title: "Members", path: "/dashboard/settings/team", scope: "workspace" },
+  { id: "billing", title: "Billing", path: "/dashboard/settings/billing", scope: "workspace" },
 ];
 
 function buildWorkspaceUrl(link: WorkspaceLink, siteId: string | null): string {

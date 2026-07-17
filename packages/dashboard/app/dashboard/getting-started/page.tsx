@@ -10,9 +10,9 @@ import { PageHeader, SectionCard, MetricValue, ProgressBar } from "@/components/
 const STEPS = [
   { id: "workspace", title: "Create your workspace", href: "/dashboard" },
   { id: "site", title: "Create your first site", href: "/dashboard/sites/new" },
-  { id: "domain", title: "Connect a custom domain", href: "/dashboard/domains" },
-  { id: "team", title: "Invite a teammate", href: "/dashboard/team" },
-  { id: "publish", title: "Publish your site", href: "/dashboard/sites" },
+  { id: "domain", title: "Connect a custom domain", href: "/dashboard/settings/domains" },
+  { id: "team", title: "Invite a teammate", href: "/dashboard/settings/team" },
+  { id: "publish", title: "Publish your site", href: "/dashboard/projects" },
 ] as const;
 
 export default function GettingStartedPage() {

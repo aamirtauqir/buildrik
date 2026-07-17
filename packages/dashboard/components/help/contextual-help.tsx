@@ -29,9 +29,9 @@ const ARTICLE_META: Record<string, ContextualArticle> = {
 
 const CONTEXT_MAP: Record<string, string[]> = {
   "/dashboard": ["getting-started-overview", "creating-your-first-site"],
-  "/dashboard/sites": ["managing-sites-dashboard", "publishing-and-unpublishing", "editor-basics"],
-  "/dashboard/team": ["inviting-team-members", "roles-and-permissions"],
-  "/dashboard/billing": ["choosing-a-plan", "managing-billing"],
+  "/dashboard/projects": ["managing-sites-dashboard", "publishing-and-unpublishing", "editor-basics"],
+  "/dashboard/settings/team": ["inviting-team-members", "roles-and-permissions"],
+  "/dashboard/settings/billing": ["choosing-a-plan", "managing-billing"],
   "/dashboard/settings": ["connecting-a-domain", "roles-and-permissions"],
 };
 

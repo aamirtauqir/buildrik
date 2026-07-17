@@ -409,12 +409,12 @@ export async function getAttentionQueue(
 
   const items: AttentionItem[] = [];
   if (pendingReviews > 0)
-    items.push({ type: "reviews", label: pendingReviews === 1 ? "edit needs review" : "edits need review", count: pendingReviews, href: "/dashboard/reviews" });
+    items.push({ type: "reviews", label: pendingReviews === 1 ? "edit needs review" : "edits need review", count: pendingReviews, href: "/dashboard/agency/reviews" });
   if (openComments > 0)
-    items.push({ type: "comments", label: openComments === 1 ? "open comment" : "open comments", count: openComments, href: "/dashboard/comments" });
+    items.push({ type: "comments", label: openComments === 1 ? "open comment" : "open comments", count: openComments, href: "/dashboard/agency/reviews" });
   if (pendingDomains > 0)
-    items.push({ type: "domains", label: pendingDomains === 1 ? "domain verifying" : "domains verifying", count: pendingDomains, href: "/dashboard/domains" });
+    items.push({ type: "domains", label: pendingDomains === 1 ? "domain verifying" : "domains verifying", count: pendingDomains, href: "/dashboard/settings/domains" });
   if (failedPublishes > 0)
-    items.push({ type: "publish_failed", label: failedPublishes === 1 ? "publish failed" : "publishes failed", count: failedPublishes, href: "/dashboard/sites" });
+    items.push({ type: "publish_failed", label: failedPublishes === 1 ? "publish failed" : "publishes failed", count: failedPublishes, href: "/dashboard/projects" });
   return items;
 }

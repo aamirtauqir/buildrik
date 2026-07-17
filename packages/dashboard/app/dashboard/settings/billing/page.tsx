@@ -14,7 +14,7 @@ import type { Invoice } from "@/components/billing/invoice-table";
 import { PaymentMethodCard } from "@/components/billing/payment-method-card";
 import { CancelModal } from "@/components/billing/cancel-modal";
 import { DunningBanner } from "@/components/dashboard/dunning-banner";
-import { PageHeader, SectionCard, MetricValue } from "@/components/dashboard/primitives";
+import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 type PlanKey = "FREE" | "PRO" | "BUSINESS";
 type Interval = "MONTHLY" | "YEARLY";
@@ -109,27 +109,21 @@ export default function BillingPage() {
 
   if (isLoading) {
     return (
-      <div>
-        <PageHeader title="Billing" description="Manage your plan, payment method, and invoices." />
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-          ))}
-        </div>
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-32 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        ))}
       </div>
     );
   }
 
   if (overviewQuery.isError) {
     return (
-      <div>
-        <PageHeader title="Billing" description="Manage your plan, payment method, and invoices." />
-        <ErrorState
-          title="Couldn't load billing"
-          description="Something went wrong on our end. Your subscription is unaffected."
-          onRetry={() => overviewQuery.refetch()}
-        />
-      </div>
+      <ErrorState
+        title="Couldn't load billing"
+        description="Something went wrong on our end. Your subscription is unaffected."
+        onRetry={() => overviewQuery.refetch()}
+      />
     );
   }
 
@@ -138,19 +132,19 @@ export default function BillingPage() {
   if (showPlans) {
     return (
       <div>
-        <PageHeader
-          title="Choose a plan"
-          description="Upgrade or downgrade your workspace subscription."
-          actions={
-            <button
-              onClick={() => setShowPlans(false)}
-              className="rounded-lg border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-            >
-              Back to Billing
-            </button>
-          }
-        />
+        {/* The settings layout owns the section PageHeader (D10.4). */}
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+            Choose a plan — upgrade or downgrade your workspace subscription.
+          </p>
+          <button
+            onClick={() => setShowPlans(false)}
+            className="shrink-0 rounded-lg border px-4 py-2 text-sm font-medium"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+          >
+            Back to Billing
+          </button>
+        </div>
         <div className="space-y-4">
           <div
             className="rounded-xl border p-4 text-center"
@@ -174,21 +168,19 @@ export default function BillingPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Billing"
-        description="Manage your plan, payment method, and invoices."
-        actions={
-          planKey === "FREE" ? (
-            <button
-              onClick={() => setShowPlans(true)}
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              View Plans
-            </button>
-          ) : undefined
-        }
-      />
+      {/* The settings layout owns the section PageHeader (D10.4) — this page
+          keeps its "View Plans" action for FREE workspaces. */}
+      {planKey === "FREE" && (
+        <div className="mb-6 flex justify-end">
+          <button
+            onClick={() => setShowPlans(true)}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "var(--color-primary)" }}
+          >
+            View Plans
+          </button>
+        </div>
+      )}
 
       {/* D) Dunning countdown — grace end matches the billing-downgrade cron
           (7 days after the period end). */}

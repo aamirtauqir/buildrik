@@ -219,7 +219,7 @@ export async function sendReviewRequestedEmail(
   to: string,
   opts: { siteName: string; requesterName: string; note?: string; changeSummary?: string }
 ) {
-  const html = await render(ReviewRequested({ ...opts, reviewsUrl: `${BASE_URL}/dashboard/reviews` }));
+  const html = await render(ReviewRequested({ ...opts, reviewsUrl: `${BASE_URL}/dashboard/agency/reviews` }));
   await sendEmail(to, `${opts.requesterName} sent "${opts.siteName}" for review — Buildrick`, html);
 }
 

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../trpc";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
+import { isFeatureEnabled } from "@/server/services/feature-flag.service";
 import {
   checkSiteRole,
   checkWorkspaceRole,
@@ -24,6 +25,18 @@ function translateReviewError(e: unknown): never {
   throw e;
 }
 
+// Reviews are part of the agency layer (IA v2 E1) — same `agency_layer` flag
+// that gates clients + theme. Mutations hard-fail when it's off; the list
+// collapses to empty so a non-agency workspace never sees agency chrome.
+async function requireAgencyLayer(workspaceId: string): Promise<void> {
+  if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Agency layer is not enabled for this workspace",
+    });
+  }
+}
+
 async function requireAdmin(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ctx: any,
@@ -42,6 +55,8 @@ export const reviewsRouter = router({
   submit: protectedProcedure
     .input(submitReviewInput)
     .mutation(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
       } catch (e) {
@@ -51,11 +66,13 @@ export const reviewsRouter = router({
       return submitReview(input.siteId, ctx.session.user.id, input.note, input.changeSummary);
     }),
 
-  // Admins see the review queue + resolve it.
+  // Admins see the review queue + resolve it. Flag off → [] so the UI collapses
+  // to an empty queue rather than erroring (mirrors clients.list).
   list: protectedProcedure
     .input(z.object({ status: reviewStatusSchema.optional() }).optional())
     .query(async ({ ctx, input }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
+      if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return [];
       await requireAdmin(ctx, workspaceId);
       return listReviews(workspaceId, input?.status);
     }),
@@ -64,6 +81,7 @@ export const reviewsRouter = router({
     .input(resolveReviewInput)
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
       await requireAdmin(ctx, workspaceId);
       try {
         return await resolveReview(workspaceId, input.id, input.status, ctx.session.user.id);

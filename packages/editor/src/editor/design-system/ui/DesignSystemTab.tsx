@@ -534,7 +534,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => window.open(`${DASHBOARD_URL}/dashboard/theme`, "_blank", "noopener")}
+          onClick={() => window.open(`${DASHBOARD_URL}/dashboard/agency/theme`, "_blank", "noopener")}
           title="Open the workspace shared theme"
           style={{ whiteSpace: "nowrap", flexShrink: 0 }}
         >
