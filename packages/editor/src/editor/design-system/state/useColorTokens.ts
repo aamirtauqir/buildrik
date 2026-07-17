@@ -20,8 +20,10 @@ export interface ColorTokensState {
 }
 
 export interface ColorTokensActions {
-  /** Stage a color change + apply to :root for live preview */
-  updateToken: (id: string, value: string) => void;
+  /** Stage a color change + apply to :root for live preview. Optional
+   *  darkValue carries the dark-mode variant (used by token import so a
+   *  dark-complete export isn't stripped on the modify path). */
+  updateToken: (id: string, value: string, darkValue?: string) => void;
   /** Undo the last change for a specific token */
   undoToken: (id: string) => void;
   /** Redo the last undone change for a specific token */
@@ -85,10 +87,15 @@ export function useColorTokens(
   const [redoStack, setRedoStack] = useState<Record<string, UndoEntry[]>>({});
 
   // Derive pendingDiff from tokens vs savedTokens.
+  // §2-B13 (2026-07): match savedTokens BY ID, not by array index. Once
+  // addToken / hard deleteToken shifts the array, index pairing misattributes
+  // a change to the wrong token (and discardAll would then overwrite an
+  // untouched token with a different token's saved value). Mirrors
+  // useTokensForKind's id-keyed lookup.
   // B4 (2026-05-16): replacedBy soft-delete also counts as a change.
   const pendingDiff: Record<string, TokenDiff> = {};
-  tokens.forEach((token, i) => {
-    const saved = savedTokens[i];
+  tokens.forEach((token) => {
+    const saved = savedTokens.find((s) => s.id === token.id);
     if (saved && (token.value !== saved.value || token.replacedBy !== saved.replacedBy)) {
       pendingDiff[token.id] = {
         tokenId: token.id,
@@ -101,23 +108,29 @@ export function useColorTokens(
   const isDirty = Object.keys(pendingDiff).length > 0 || tokens.length !== savedTokens.length;
 
   // ─ updateToken ─
-  const updateToken = useCallback((id: string, value: string) => {
+  const updateToken = useCallback((id: string, value: string, darkValue?: string) => {
     setTokens((prev) => {
       const idx = prev.findIndex((t) => t.id === id);
       if (idx === -1) return prev;
 
-      const oldValue = prev[idx].value;
-      if (oldValue === value) return prev;
+      const old = prev[idx];
+      const darkChanged = darkValue !== undefined && darkValue !== old.darkValue;
+      // No-op guard: skip if neither the light nor the dark value changes.
+      if (old.value === value && !darkChanged) return prev;
 
-      // Push undo entry
-      setUndoStack((prevStack) => {
-        const existing = prevStack[id] ?? [];
-        return { ...prevStack, [id]: [...existing, { tokenId: id, snapshot: oldValue }] };
-      });
-      // Clear redo stack for this token
-      setRedoStack((prevRedo) => ({ ...prevRedo, [id]: [] }));
+      // Undo history tracks the light value only — push an entry only when the
+      // light value actually changes (a dark-only edit is not its own step).
+      if (old.value !== value) {
+        setUndoStack((prevStack) => {
+          const existing = prevStack[id] ?? [];
+          return { ...prevStack, [id]: [...existing, { tokenId: id, snapshot: old.value }] };
+        });
+        setRedoStack((prevRedo) => ({ ...prevRedo, [id]: [] }));
+      }
 
-      const next = prev.map((t, i) => (i === idx ? { ...t, value } : t));
+      const next = prev.map((t, i) =>
+        i === idx ? { ...t, value, ...(darkValue !== undefined ? { darkValue } : {}) } : t
+      );
       return next;
     });
   }, []);
@@ -196,16 +209,12 @@ export function useColorTokens(
   }, []);
 
   const discardAll = useCallback(() => {
-    setTokens((prev) => {
-      const reverted = prev.map((token, i) => {
-        const saved = savedTokens[i];
-        if (saved && token.value !== saved.value) {
-          return { ...token, value: saved.value };
-        }
-        return token;
-      });
-      return reverted;
-    });
+    // §2-B13 (2026-07): revert wholesale to savedTokens (id-keyed truth),
+    // matching useTokensForKind. The prior index-paired revert corrupted
+    // untouched tokens after an add/delete shifted the array. CSS-var
+    // re-application is centralized in TokenRegistryProvider's effect, which
+    // re-resolves on this tokens change.
+    setTokens(savedTokens);
     setUndoStack({});
     setRedoStack({});
   }, [savedTokens]);

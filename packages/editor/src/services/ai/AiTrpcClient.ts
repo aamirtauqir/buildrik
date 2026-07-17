@@ -239,6 +239,37 @@ class AiTrpcClient {
     this.requestQueue.clear();
   }
 
+  /**
+   * Race a single mutation attempt against a client-side timeout so a hung
+   * request rejects (and frees its concurrency slot) instead of blocking one
+   * forever. The underlying mutation promise gets a no-op catch so a late
+   * rejection after the timeout wins doesn't surface as an unhandled rejection.
+   */
+  private async withTimeout<T>(
+    mutation: () => Promise<T>,
+    timeoutMs: number
+  ): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(
+        () =>
+          reject(
+            createAIError(`Request timed out after ${timeoutMs}ms`, "TIMEOUT", {
+              isTimeout: true,
+            })
+          ),
+        timeoutMs
+      );
+    });
+    const pending = mutation();
+    pending.catch(() => {});
+    try {
+      return await Promise.race([pending, timeout]);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+    }
+  }
+
   private async execute<T>(
     cacheKey: string,
     input: Record<string, unknown>,
@@ -250,6 +281,7 @@ class AiTrpcClient {
       skipCache = false,
       cacheTTL,
       priority = 0,
+      timeout = DEFAULT_TIMEOUT,
     } = options;
 
     const startTime = performance.now();
@@ -265,20 +297,25 @@ class AiTrpcClient {
       }
     }
 
+    // Record at ADMISSION (check + record are synchronous here, so atomic): a
+    // synchronous burst can't slip past the 30/60s cap the way it did when
+    // recordRequest() only fired inside the queued task. One logical request =
+    // one slot — recording here (not per attempt) also stops retries from
+    // double-counting against the client-side cap.
     if (!this.rateLimiter.canMakeRequest()) {
       throw createAIError("Rate limit exceeded", "RATE_LIMITED", {
         isRateLimited: true,
         retryAfter: this.rateLimiter.getRetryAfter(),
       });
     }
+    this.rateLimiter.recordRequest();
 
     return this.requestQueue.add(async () => {
       let lastError: AIError | null = null;
 
       for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-          this.rateLimiter.recordRequest();
-          const data = await mutation();
+          const data = await this.withTimeout(mutation, timeout);
 
           aiCache.set(cacheKey, input, data, cacheTTL);
 
@@ -291,6 +328,14 @@ class AiTrpcClient {
               | undefined,
           };
         } catch (err: unknown) {
+          // A client-side timeout means we stopped waiting, but the mutation
+          // may already have reached the server and spent credits — retrying a
+          // non-idempotent AI call would double-spend, so surface it and stop.
+          if (err instanceof Error && (err as AIError).code === "TIMEOUT") {
+            lastError = err as AIError;
+            break;
+          }
+
           const errorMessage =
             err instanceof Error ? err.message : "Unknown error";
           const isTooManyRequests =

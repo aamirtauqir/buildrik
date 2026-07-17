@@ -204,7 +204,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
                   <NoPreviewMessage format="React" />
                 )}
                 {activeTab === "code" && result?.html && (
-                  <CodePreview html={result.html} css={result.css || ""} showLineNumbers />
+                  <CodePreview html={result.html} cssCode={result.css || ""} showLineNumbers />
                 )}
                 {activeTab === "code" && config.format === "react" && result?.files && (
                   <ReactCodePreview files={result.files} />
@@ -401,7 +401,7 @@ const ReactCodePreview: React.FC<{ files: NonNullable<ExportResult["files"]> }> 
   const cssFile = files.find((f) => f.name.endsWith(".css"));
   const html = componentFile?.content ?? "// No component found";
   const css = cssFile?.content ?? "";
-  return <CodePreview html={html} css={css} showLineNumbers />;
+  return <CodePreview html={html} cssCode={css} showLineNumbers />;
 };
 
 export default ExportModal;

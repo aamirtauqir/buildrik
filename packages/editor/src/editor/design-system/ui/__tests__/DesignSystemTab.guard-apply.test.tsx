@@ -21,7 +21,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { DesignSystemTab } from "../DesignSystemTab";
 import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
-import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
+import { StylePresetRegistryProvider, useButtonPresets } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
 import { ToastProvider } from "@/editor/shared/vibcoder";
 import { CURRENT_SCHEMA_VERSION } from "../../migrations";
@@ -159,9 +159,58 @@ describe("DesignSystemTab — dirty guard (TabGuardModal)", () => {
     });
   });
 
-  it.todo(
-    "§2-B13: guard Discard (handleGuardDiscard) and footer Discard (handleDiscard) call discardAll on the 14 token registries only — the 11 STYLE PRESET registries keep their dirty edits, so 'Discard' leaves preset changes staged and the Styles dot lit"
-  );
+  // §2-B13 (FIXED): guard Discard (handleGuardDiscard) and footer Discard
+  // (handleDiscard) now call discardAll on the 11 STYLE PRESET registries as
+  // well as the 14 token registries, so a preset-only dirty state is reverted
+  // and the Styles tab dot clears.
+  it("footer Discard reverts a dirty STYLE PRESET so the Styles tab dot clears", async () => {
+    const composer = makeFakeComposer();
+
+    // Capture the button-preset registry (shared context) so the test can
+    // dirty it the way a future binding editor would.
+    let buttonReg: ReturnType<typeof useButtonPresets> | null = null;
+    function Capture() {
+      buttonReg = useButtonPresets();
+      return null;
+    }
+
+    const utils = render(
+      wrap(
+        <>
+          <Capture />
+          <DesignSystemTab composer={composer} />
+        </>,
+      ),
+    );
+    await waitFor(() => utils.getByLabelText("Small radius value"));
+
+    const stylesTab = () =>
+      utils.getAllByRole("tab").find((t) => t.textContent?.startsWith("Styles"))!;
+
+    // Dirty a PRESET (not a token) — the Styles side goes dirty.
+    act(() => {
+      buttonReg!.addPreset({
+        id: "button-test-dirty",
+        friendlyName: "Test",
+        category: "button",
+        variant: "primary",
+        bindings: {},
+      });
+    });
+
+    await waitFor(() => {
+      expect(stylesTab().querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+    });
+    expect(buttonReg!.isDirty).toBe(true);
+
+    // Footer Discard must revert the preset registry too (§2-B13 fix).
+    fireEvent.click(utils.getByText("Discard"));
+
+    await waitFor(() => {
+      expect(stylesTab().querySelector('[aria-label="unsaved changes"]')).toBeNull();
+    });
+    expect(buttonReg!.isDirty).toBe(false);
+  });
 });
 
 describe("DesignSystemTab — Apply pipeline (via guard 'Save and switch')", () => {
@@ -219,8 +268,8 @@ describe("DesignSystemTab — Apply pipeline (via guard 'Save and switch')", () 
   });
 });
 
-describe("DesignSystemTab — §2-B1 engine undo wipes unsaved DS edits (pinned)", () => {
-  it("documents the bug: history:undo triggers loadFromComposer, which replaces staged edits with stored settings", async () => {
+describe("DesignSystemTab — §2-B1 engine undo preserves unsaved DS edits (fixed)", () => {
+  it("history:undo does NOT wipe staged DS-tab edits when the tab is dirty", async () => {
     // Stored settings carry radius-sm at its default 4px so the load path
     // takes the designTokens branch (non-empty) and hydrates all kinds.
     const composer = makeFakeComposer([
@@ -245,14 +294,35 @@ describe("DesignSystemTab — §2-B1 engine undo wipes unsaved DS edits (pinned)
       (composer as unknown as { emit: (e: string) => void }).emit("history:undo");
     });
 
-    // ← current behavior: the staged 10px edit is gone, silently.
+    // The dirty guard keeps the staged 10px edit and the unsaved-changes dot;
+    // the canvas undo does not silently reload stored settings over them.
+    await waitFor(() => {
+      expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("10px");
+      expect(document.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+    });
+  });
+
+  it("history:undo still reloads from settings when the tab is clean (no staged edits to protect)", async () => {
+    const composer = makeFakeComposer([
+      {
+        id: "radius-sm",
+        name: "Small radius",
+        value: "4px",
+        category: "layout",
+        cssVar: "--bd-radius-sm",
+        type: "length",
+      },
+    ]);
+    const utils = await renderTab(composer);
+
+    // No edits → clean. A canvas undo may safely reload; nothing is wiped.
+    act(() => {
+      (composer as unknown as { emit: (e: string) => void }).emit("history:undo");
+    });
+
     await waitFor(() => {
       expect((utils.getByLabelText("Small radius value") as HTMLInputElement).value).toBe("4px");
       expect(document.querySelector('[aria-label="unsaved changes"]')).toBeNull();
     });
   });
-
-  it.todo(
-    "§2-B1 fix: history:undo/redo reload should preserve (or merge-warn about) unsaved DS-tab edits instead of silently wiping them — flip the documenting test above when fixed"
-  );
 });

@@ -45,19 +45,25 @@ describe("getPropertiesForType", () => {
     expect(autoplay?.type).toBe("checkbox");
   });
 
-  // BUG (pinned): types whose specific list ALSO defines an id present in
-  // `default` produce a duplicate entry — image/link/iframe all carry a
-  // "title" field, and `default` adds another "title". getPropertiesForType
-  // does not de-dupe, so ElementPropertiesSection renders two "Title" fields
-  // with the same key (React "two children with the same key `title`"
-  // warning) that share attribute state. Should de-dupe by id, keeping the
-  // type-specific definition. Pinning current (buggy) behavior.
-  it.todo(
-    "should de-dupe fields by id so a type-specific 'title' isn't duplicated by the default 'title'"
-  );
+  // FIXED: types whose specific list ALSO defines an id present in `default`
+  // no longer produce a duplicate entry — image/link/iframe all carry a
+  // "title" field, and the default "title" is dropped in favor of the
+  // type-specific one. ElementPropertiesSection therefore renders a single
+  // "Title" field (no React "two children with the same key `title`" warning).
+  it("de-dupes fields by id, keeping the type-specific definition", () => {
+    const props = getPropertiesForType("image");
+    const titleFields = props.filter((p) => p.id === "title");
+    expect(titleFields).toHaveLength(1);
+    // the surviving field is the image-specific one (its placeholder), not
+    // the generic default ("Element title").
+    expect(titleFields[0].placeholder).toBe("Image title");
+    // every id in the returned list is unique
+    const ids = props.map((p) => p.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
 
-  it("PIN: getPropertiesForType currently emits a duplicate 'title' for image", () => {
+  it("emits exactly one 'title' for image", () => {
     const titleFields = getPropertiesForType("image").filter((p) => p.id === "title");
-    expect(titleFields).toHaveLength(2); // known bug — see it.todo above
+    expect(titleFields).toHaveLength(1);
   });
 });

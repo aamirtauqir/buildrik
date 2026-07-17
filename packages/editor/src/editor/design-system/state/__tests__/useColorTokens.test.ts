@@ -261,35 +261,32 @@ describe("useColorTokens — pendingDiff / markSaved / discardAll", () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// BUG PIN §2-B13 — pendingDiff and discardAll pair tokens[i] with
-// savedTokens[i] by ARRAY INDEX, not by id. Once addToken / hard deleteToken
-// shifts the array, the diff attributes changes to the wrong token and
-// discardAll writes a *different token's* saved value over an untouched one.
-// (useTokensForKind already does the id-keyed lookup — this hook should too.)
+// §2-B13 (FIXED) — pendingDiff and discardAll now match savedTokens BY ID,
+// not by array index (mirrors useTokensForKind). Once addToken / hard
+// deleteToken shifts the array, changes are no longer misattributed to the
+// wrong token and discardAll cannot overwrite an untouched token with a
+// different token's saved value.
 // ─────────────────────────────────────────────────────────────────────────────
-describe("useColorTokens — §2-B13 index-based diff/discard bug (pinned)", () => {
-  it("documents the bug: hard-deleting the first token makes the untouched second token show up in pendingDiff", () => {
+describe("useColorTokens — §2-B13 id-based diff/discard (fixed)", () => {
+  it("hard-deleting the first token does NOT misattribute a diff to the untouched second token", () => {
     const SECOND: DesignToken = { ...MOCK_TOKEN, id: "color-second", value: "#111111" };
     const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, SECOND]));
     act(() => result.current.deleteToken("color-primary")); // hard delete index 0
     // tokens = [color-second], savedTokens = [color-primary, color-second].
-    // Index pairing compares color-second against color-primary's saved value:
-    const diff = result.current.pendingDiff["color-second"];
-    expect(diff).toBeDefined(); // ← wrong: color-second was never edited
-    expect(diff.previousValue).toBe("#3B82F6"); // ← the DELETED token's value
+    // color-second was never edited → id lookup finds its own saved value.
+    expect(result.current.pendingDiff["color-second"]).toBeUndefined();
+    // The delete still marks the registry dirty (array length shrank).
+    expect(result.current.isDirty).toBe(true);
   });
 
-  it("documents the bug: discardAll after a hard delete overwrites the untouched token with the deleted token's value", () => {
+  it("discardAll after a hard delete restores savedTokens without corrupting the untouched token", () => {
     const SECOND: DesignToken = { ...MOCK_TOKEN, id: "color-second", value: "#111111" };
     const { result } = renderHook(() => useColorTokens([MOCK_TOKEN, SECOND]));
     act(() => result.current.deleteToken("color-primary"));
     act(() => result.current.discardAll());
-    const second = result.current.tokens.find((t) => t.id === "color-second");
-    // Cross-token corruption: color-second now carries color-primary's value.
-    expect(second?.value).toBe("#3B82F6");
+    // Both tokens are back at their own saved values — no cross-token bleed.
+    expect(result.current.tokens.find((t) => t.id === "color-second")?.value).toBe("#111111");
+    expect(result.current.tokens.find((t) => t.id === "color-primary")?.value).toBe("#3B82F6");
+    expect(result.current.isDirty).toBe(false);
   });
-
-  it.todo(
-    "§2-B13 fix: pendingDiff/discardAll must look up saved by id (savedTokens.find(s => s.id === t.id)) so add/delete cannot misattribute diffs — flip the two documenting tests above when fixed"
-  );
 });

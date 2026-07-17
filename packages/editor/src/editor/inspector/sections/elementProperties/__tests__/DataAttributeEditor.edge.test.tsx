@@ -36,18 +36,14 @@ describe("DataAttributeEditor — edge cases", () => {
     expect(el.setAttribute).toHaveBeenCalledWith("data-flag", "");
   });
 
-  // BUG (pinned): the hint promises "data-* or aria-*", but any key that
-  // doesn't already start with "data-" is blindly prefixed with "data-".
-  // An "aria-label" key therefore becomes "data-aria-label" — the aria
-  // attribute is never actually written. Should pass aria-* keys through
-  // unprefixed (or validate against both namespaces).
-  it.todo("should pass aria-* keys through unprefixed instead of writing data-aria-*");
-
-  it("PIN: an aria-* key is wrongly rewritten to data-aria-*", () => {
+  // FIXED: the hint promises "data-* or aria-*", and an "aria-*" key is now
+  // passed through unprefixed. An "aria-label" key writes aria-label — it is
+  // no longer mangled into "data-aria-label".
+  it("passes aria-* keys through unprefixed instead of writing data-aria-*", () => {
     const { el } = setup();
     add("aria-label", "Close");
-    expect(el.setAttribute).toHaveBeenCalledWith("data-aria-label", "Close");
-    expect(el.setAttribute).not.toHaveBeenCalledWith("aria-label", "Close");
+    expect(el.setAttribute).toHaveBeenCalledWith("aria-label", "Close");
+    expect(el.setAttribute).not.toHaveBeenCalledWith("data-aria-label", "Close");
   });
 
   it("does not de-dupe: repeated same-key adds overwrite via two setAttribute calls", () => {

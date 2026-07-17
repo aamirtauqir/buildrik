@@ -400,10 +400,9 @@ describe("syncInstance — override survival across master re-clone", () => {
 
     expect(await syncInstance(c, maps, instanceId)).toBe(true);
 
-    // Old instance element replaced in place under the page root. Pinned:
-    // sync detaches the old element from the tree but does NOT deregister
-    // its subtree from the ElementManager registry (stale entries remain).
-    expect(manager.getElement(instanceId)?.getParent()).toBeNull();
+    // Old instance element replaced in place under the page root — fully
+    // deregistered from the ElementManager registry, not merely detached.
+    expect(manager.getElement(instanceId)).toBeUndefined();
     expect(maps.instances.has(instanceId)).toBe(false);
     const root = manager.getElement(page.root.id)!;
     expect(root.getChildCount()).toBe(1);
@@ -428,9 +427,21 @@ describe("syncInstance — override survival across master re-clone", () => {
     });
   });
 
-  it.todo(
-    "BUG: syncInstance replaces the instance subtree via parent.removeChild + pasteElement but never deletes the OLD subtree's elements from the ElementManager registry — every sync leaks the previous clone's Element objects (getAllElements / findByMediaSrc still see them)"
-  );
+  it("deregisters the OLD instance subtree on sync — no leaked elements", async () => {
+    const { manager, maps, instanceId, component, c } = await seed();
+    const oldEl = manager.getElement(instanceId)!;
+    const oldIds = [oldEl.getId(), ...oldEl.getDescendants().map((e) => e.getId())];
+    expect(oldIds.length).toBeGreaterThan(1);
+
+    component.version = 2;
+    expect(await syncInstance(c, maps, instanceId)).toBe(true);
+
+    // None of the old clone's Element objects remain in the registry.
+    const liveIds = new Set(manager.getAllElements().map((e) => e.getId()));
+    for (const id of oldIds) {
+      expect(liveIds.has(id)).toBe(false);
+    }
+  });
 
   it("syncAllInstances brings every stale instance of the component up to date", async () => {
     const { manager, maps, component, page, c } = await seed();

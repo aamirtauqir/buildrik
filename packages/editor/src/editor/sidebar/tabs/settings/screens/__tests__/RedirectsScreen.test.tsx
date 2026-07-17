@@ -128,20 +128,40 @@ describe("RedirectsScreen — add redirect", () => {
     expect(createMock).not.toHaveBeenCalled();
   });
 
-  it("KNOWN P2 (pin): toUrl is accepted UNVALIDATED — junk targets pass straight to create; do not 'fix' without a product decision", async () => {
+  it("rejects a junk / javascript: toUrl and does NOT call create", async () => {
     setup();
     await screen.findByText(/No redirects yet/i);
     fireEvent.change(fromInput(), { target: { value: "/old" } });
     fireEvent.change(toInput(), { target: { value: "not a url ### javascript:alert(1)" } });
     fireEvent.click(screen.getByRole("button", { name: /add redirect/i }));
 
+    expect(await screen.findByRole("alert")).toHaveTextContent(/To URL must be a path/i);
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a bare javascript: scheme target", async () => {
+    setup();
+    await screen.findByText(/No redirects yet/i);
+    fireEvent.change(fromInput(), { target: { value: "/old" } });
+    fireEvent.change(toInput(), { target: { value: "javascript:alert(1)" } });
+    fireEvent.click(screen.getByRole("button", { name: /add redirect/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/To URL must be a path/i);
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  it("accepts an absolute https target", async () => {
+    setup();
+    await screen.findByText(/No redirects yet/i);
+    fireEvent.change(fromInput(), { target: { value: "/old" } });
+    fireEvent.change(toInput(), { target: { value: "https://example.com/new" } });
+    fireEvent.click(screen.getByRole("button", { name: /add redirect/i }));
+
     await waitFor(() =>
       expect(createMock).toHaveBeenCalledWith(
-        expect.objectContaining({ toUrl: "not a url ### javascript:alert(1)" })
+        expect.objectContaining({ toUrl: "https://example.com/new" })
       )
     );
-    // No validation error was shown for the malformed target.
-    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("surfaces a create failure as an alert and does not clear the draft", async () => {

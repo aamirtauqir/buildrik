@@ -86,8 +86,13 @@ export class FormspreeInjector {
       const actionUrl = this.getFormAction(form.formSettings);
       if (!actionUrl) continue;
 
+      // Escape regex metacharacters in the id before interpolating it into a
+      // pattern — an id like "form.1" or "f+1" would otherwise over-match or
+      // throw "Invalid regular expression".
+      const escapedId = this.escapeRegExp(form.id);
+
       // Find the form element by ID and update its attributes
-      const formPattern = new RegExp(`(<form[^>]*id=["']${form.id}["'][^>]*)>`, "gi");
+      const formPattern = new RegExp(`(<form[^>]*id=["']${escapedId}["'][^>]*)>`, "gi");
 
       result = result.replace(formPattern, (_match, formTag) => {
         // Remove existing action and method attributes
@@ -104,7 +109,7 @@ export class FormspreeInjector {
       // Inject hidden fields after form opening tag
       const hiddenFields = this.getHiddenFields(form.formSettings);
       if (hiddenFields) {
-        const formOpenPattern = new RegExp(`(<form[^>]*id=["']${form.id}["'][^>]*>)`, "gi");
+        const formOpenPattern = new RegExp(`(<form[^>]*id=["']${escapedId}["'][^>]*>)`, "gi");
         result = result.replace(formOpenPattern, `$1\n${hiddenFields}`);
       }
     }
@@ -130,6 +135,10 @@ export class FormspreeInjector {
   // --------------------------------------------------------------------------
   // PRIVATE HELPERS
   // --------------------------------------------------------------------------
+
+  private escapeRegExp(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
 
   private escape(str: string): string {
     return str

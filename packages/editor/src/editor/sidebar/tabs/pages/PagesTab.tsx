@@ -150,13 +150,30 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   }, [bulk.selectedIds, p.duplicatePage, bulk.clearSelection]);
 
   const handleBulkDelete = React.useCallback(() => {
-    const deletable = [...bulk.selectedIds].filter((id) => {
+    const selected = [...bulk.selectedIds];
+    // The home page is never bulk-deletable (matches the per-page guard).
+    let deletable = selected.filter((id) => {
       const pg = p.pages.find((x) => x.id === id);
-      return pg && !pg.isHome && p.pages.length > bulk.selectedIds.size;
+      return pg && !pg.isHome;
     });
+    // A site always needs ≥1 page. If the selection would wipe every page
+    // (e.g. no page is flagged home), spare the first one in tree order so
+    // the action isn't a silent no-op.
+    if (deletable.length >= p.pages.length && orderedPageIds.length > 0) {
+      const spareId = orderedPageIds[0];
+      deletable = deletable.filter((id) => id !== spareId);
+    }
+    if (deletable.length === 0) {
+      // Nothing bulk-deletable (only the home/last page was selected) —
+      // route through the guarded single-delete so the user still gets the
+      // explanatory toast instead of nothing happening.
+      if (selected.length > 0) p.deletePage(selected[0]);
+      bulk.clearSelection();
+      return;
+    }
     deletable.forEach((id) => p.deletePage(id));
     bulk.clearSelection();
-  }, [bulk.selectedIds, p.pages, p.deletePage, bulk.clearSelection]);
+  }, [bulk.selectedIds, p.pages, p.deletePage, orderedPageIds, bulk.clearSelection]);
 
   const handleBulkMoveToFolder = React.useCallback(
     (folderId: string) => {

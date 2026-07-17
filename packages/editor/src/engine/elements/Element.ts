@@ -10,6 +10,7 @@
 import { EVENTS } from "../../shared/constants/events";
 import type { ElementData, TraitData, TraitValue } from "../../shared/types";
 import type { AnimationConfig } from "../../shared/types/animations";
+import type { BreakpointStyles } from "../../shared/types/breakpoints";
 import type { DataBinding } from "../../shared/types/data";
 import type { ElementCategory } from "../../shared/utils/nesting/types";
 import type { Composer } from "../Composer";
@@ -335,6 +336,15 @@ export class Element {
 
   getCustomData(key: string): unknown {
     return this.data.data?.[key];
+  }
+
+  /**
+   * Set the element's responsive breakpoint styles on the top-level
+   * ElementData field (read by ReactExporter and serialization). Distinct
+   * from setData(), which writes into the custom-data bag (data.data).
+   */
+  setBreakpointStyles(styles: BreakpointStyles): void {
+    this.data.breakpointStyles = styles;
   }
 
   // ============================================

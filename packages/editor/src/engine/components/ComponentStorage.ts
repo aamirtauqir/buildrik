@@ -32,6 +32,10 @@ function getDatabase(): Promise<IDBDatabase> {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
+      // Reset the cache so a later call retries the open. Caching the rejected
+      // promise would permanently disable storage after one transient IDB
+      // failure (until a full page reload).
+      dbPromise = null;
       reject(new Error("Failed to open components database"));
     };
 

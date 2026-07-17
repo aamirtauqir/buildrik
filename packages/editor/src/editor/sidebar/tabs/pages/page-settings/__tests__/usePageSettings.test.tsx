@@ -2,9 +2,9 @@
 /**
  * usePageSettings — drawer state hook: seed-from-page, dirty tracking, save
  * (calls elements.updatePage), and save guards (slug error, empty password,
- * head-code validation). Also corroborates the "score-label lies" KNOWN:
- * indexing is an all-or-nothing gate on the numeric score, not the additive
- * "+40 pts" the SeoTab UI advertises.
+ * head-code validation). Also corroborates the score algorithm: indexing is
+ * an all-or-nothing gate on the numeric score (SeoTab now labels it "Required",
+ * not the former fictional "+40 pts").
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Mock } from "vitest";
@@ -237,11 +237,10 @@ describe("usePageSettings seoScore", () => {
     expect(result.current.seoScore).toBe(100);
   });
 
-  // KNOWN (pin): "score-label lies" — SeoTab advertises "Allow indexing +40 pts"
-  // as if indexing were an additive component, but calculateSeoScore treats it
-  // as an all-or-nothing GATE: turning indexing off zeroes the ENTIRE score
-  // (a 100 → 0 drop, not 100 → 60). The UI's per-check point math is fiction.
-  it("KNOWN (pin): toggling indexing off zeroes the whole score (gate, not +40)", () => {
+  // Indexing is an all-or-nothing GATE in calculateSeoScore: turning it off
+  // zeroes the ENTIRE score (a 100 → 0 drop, not 100 → 60). SeoTab now honestly
+  // labels this row "Required" (a gate) instead of the former fictional "+40 pts".
+  it("toggling indexing off zeroes the whole score (gate, not +40)", () => {
     const composer = createMockComposer({});
     const { result } = setup(
       composer,

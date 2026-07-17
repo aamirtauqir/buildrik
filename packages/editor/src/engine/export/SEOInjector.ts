@@ -7,6 +7,7 @@
  */
 
 import type { PageSEO, SiteSEO, PageData } from "../../shared/types";
+import { slugify } from "../../shared/utils/helpers/string";
 import { sanitizeHeadCode } from "./sanitizeHeadCode";
 
 // ============================================================================
@@ -193,7 +194,10 @@ export class SEOInjector {
   private getPageUrl(page: PageData): string {
     if (!this.options.baseUrl) return "";
 
-    const slug = page.slug || page.name.toLowerCase().replace(/\s+/g, "-");
+    // Reuse the shared slugify so the fallback strips non-URL-safe characters
+    // (&, /, !, ?, …). The old inline `replace(/\s+/g, "-")` only collapsed
+    // whitespace and leaked punctuation into an invalid canonical URL.
+    const slug = page.slug || slugify(page.name);
     return page.isHome ? this.options.baseUrl : `${this.options.baseUrl}/${slug}`;
   }
 

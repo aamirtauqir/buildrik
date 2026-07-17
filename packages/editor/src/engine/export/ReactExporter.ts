@@ -95,9 +95,19 @@ export class ReactExporter {
 
       const files: ReactExportFile[] = [];
       const componentNames: string[] = [];
+      const usedNames = new Set<string>();
 
       for (const page of pages) {
-        const name = this.pageToComponentName(page);
+        // De-dupe colliding component names: two pages named "Home" would emit
+        // two components/Home.tsx files and re-export the same identifier twice
+        // (invalid TS). Suffix later collisions Home -> Home2 -> Home3.
+        let name = this.pageToComponentName(page);
+        if (usedNames.has(name)) {
+          let suffix = 2;
+          while (usedNames.has(`${name}${suffix}`)) suffix++;
+          name = `${name}${suffix}`;
+        }
+        usedNames.add(name);
         componentNames.push(name);
 
         const { jsx, cssClasses } = this.pageToJSX(page);

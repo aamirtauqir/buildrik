@@ -100,6 +100,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   publishJob,
   onVercelPublish,
   onSettingsDirtyChange,
+  onTemplatesSwitchTab,
   onReplayTour,
   onOpenLibrary,
   onOpenImageEditor,
@@ -114,6 +115,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
         <TemplatesTab
           composer={composer}
           onTemplateUsed={onSwitchToAdd}
+          onSwitchTab={onTemplatesSwitchTab}
           onClose={commonTabProps.onClose}
         />
       );

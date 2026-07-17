@@ -237,24 +237,41 @@ describe("AiTrpcClient retry policy", () => {
     expect(mutateMock.content).toHaveBeenCalledTimes(1);
   });
 
-  it("CURRENT BEHAVIOR: options.timeout / DEFAULT_TIMEOUT are never enforced — request hangs past 30s", async () => {
+  it("BUG FIXED: a hung mutation rejects at its timeout with a TIMEOUT error (not a permanent hang)", async () => {
     vi.useFakeTimers();
     mutateMock.content.mockImplementation(() => new Promise(() => {})); // never settles
 
-    let settled = false;
     const pending = client.generateContent(contentInput, { timeout: 30_000 });
-    pending.then(
-      () => (settled = true),
-      () => (settled = true)
-    );
+    const rejection = expect(pending).rejects.toMatchObject({
+      code: "TIMEOUT",
+      isTimeout: true,
+    });
 
-    await vi.advanceTimersByTimeAsync(31_000);
-    expect(settled).toBe(false); // no abort, no TIMEOUT error — option is dead
+    await vi.advanceTimersByTimeAsync(29_999);
+    expect(mutateMock.content).toHaveBeenCalledTimes(1); // one attempt, still pending
+
+    await vi.advanceTimersByTimeAsync(1); // crosses 30s → the timeout fires
+    await rejection;
+    // Timeout is treated as non-retryable (a hung non-idempotent AI mutation may
+    // already have spent credits server-side), so it does NOT re-fire.
+    expect(mutateMock.content).toHaveBeenCalledTimes(1);
   });
 
-  it.todo(
-    "BUG: AIRequestOptions.timeout and DEFAULT_TIMEOUT (30s) are accepted but never wired — execute() ignores timeout and signal, so a hung mutation blocks a concurrency slot forever"
-  );
+  it("BUG FIXED: DEFAULT_TIMEOUT (30s) applies when no timeout option is given, freeing the slot", async () => {
+    vi.useFakeTimers();
+    mutateMock.content.mockImplementation(() => new Promise(() => {})); // never settles
+
+    const first = client.generateContent(contentInput, { skipCache: true });
+    const firstRejection = expect(first).rejects.toMatchObject({ code: "TIMEOUT" });
+    await vi.advanceTimersByTimeAsync(30_000);
+    await firstRejection;
+
+    // Slot freed: a follow-up request can now run (mock resolves this time).
+    mutateMock.content.mockResolvedValueOnce({ content: "ok", tokensUsed: 1 });
+    const second = client.generateContent({ ...contentInput, prompt: "after" }, { skipCache: true });
+    await vi.advanceTimersByTimeAsync(0);
+    await expect(second).resolves.toMatchObject({ data: { content: "ok" } });
+  });
 });
 
 describe("AiTrpcClient rate limiter", () => {
@@ -276,27 +293,25 @@ describe("AiTrpcClient rate limiter", () => {
     expect(client.getRetryAfter()).toBeGreaterThan(0);
   });
 
-  it("CURRENT BEHAVIOR (audit P1-3): a sync burst of 31 calls ALL pass the gate — cap bypassed", async () => {
+  it("BUG P1-3 FIXED: a sync burst of 31 calls rejects the 31st — cap holds at admission", async () => {
     mutateMock.content.mockResolvedValue({ content: "ok", tokensUsed: 1 });
 
-    // canMakeRequest() runs at execute() time, but recordRequest() only fires
-    // inside the queued task. With concurrency 3, at most 3 requests are
-    // recorded during a synchronous burst, so the gate never sees >3.
+    // recordRequest() now fires at execute() time (atomically with the gate
+    // check), so a synchronous burst can't slip past the 30/60s cap.
     const burst = Array.from({ length: 31 }, (_, i) =>
-      client.generateContent({ ...contentInput, prompt: `burst-${i}` }, { skipCache: true })
+      client
+        .generateContent({ ...contentInput, prompt: `burst-${i}` }, { skipCache: true })
+        .catch((e) => e as { code?: string })
     );
 
-    const results = await Promise.all(burst); // nothing rejects
-    expect(results).toHaveLength(31);
-    expect(mutateMock.content).toHaveBeenCalledTimes(31); // all 31 hit the API
-    expect(client.getRateLimitCount()).toBe(31); // window now OVER the 30 cap
+    const results = await Promise.all(burst);
+    const rateLimited = results.filter((r) => (r as { code?: string })?.code === "RATE_LIMITED");
+    expect(rateLimited).toHaveLength(1); // exactly the 31st is capped
+    expect(mutateMock.content).toHaveBeenCalledTimes(30); // only 30 reached the API
+    expect(client.getRateLimitCount()).toBe(30); // window holds AT the cap, not over
   });
 
-  it.todo(
-    "BUG P1-3: rate limiter canMakeRequest() checked at execute-time but recordRequest() only inside queued task — sync burst of 31 calls bypasses the 30/60s cap; record (or reserve) at execute-time"
-  );
-
-  it("CURRENT BEHAVIOR: recordRequest() fires per RETRY attempt — one logical request burns multiple slots", async () => {
+  it("BUG FIXED: one logical request counts once against the cap even across retries", async () => {
     vi.useFakeTimers();
     mutateMock.content
       .mockRejectedValueOnce(trpcError(500))
@@ -306,13 +321,9 @@ describe("AiTrpcClient rate limiter", () => {
     await vi.advanceTimersByTimeAsync(1000);
     await pending;
 
-    expect(mutateMock.content).toHaveBeenCalledTimes(2);
-    expect(client.getRateLimitCount()).toBe(2); // 1 logical request, 2 slots
+    expect(mutateMock.content).toHaveBeenCalledTimes(2); // fired twice (one retry)
+    expect(client.getRateLimitCount()).toBe(1); // recorded once at admission, not per attempt
   });
-
-  it.todo(
-    "BUG: recordRequest() inside the attempt loop double-counts retries against the client-side cap — a request that retries twice consumes 3 of the 30 slots"
-  );
 
   it("getRetryAfter() is 0 when nothing has been recorded", () => {
     expect(client.getRetryAfter()).toBe(0);

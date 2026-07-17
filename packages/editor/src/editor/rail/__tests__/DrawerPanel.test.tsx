@@ -245,7 +245,28 @@ describe("DrawerPanel — scroll-position memory per tab", () => {
     expect((content as HTMLElement).scrollTop).toBe(0);
   });
 
-  it.todo(
-    "BUG: closing and switching tabId in the same render saves the outgoing tab's scrollTop under the NEW tabId — the save effect (DrawerPanel.tsx:69-73, deps [isOpen, tabId]) runs after both props changed, so tab A's position is stored under tab B's key"
-  );
+  it("closing and switching tabId in the same render saves the outgoing tab's scroll under its OWN key", () => {
+    // FIXED: the save effect keys scroll by the previously-displayed tab
+    // (displayedTabId ref), so a simultaneous close + tab switch stores tab A's
+    // position under "A", not under the incoming "B".
+    const { container, rerender } = render(
+      panelUi({ tabId: "layers", isOpen: true, onClose: vi.fn() })
+    );
+    const content = container.querySelector(".drawer-panel__content")!;
+    mockScrollTop(content);
+
+    // Scroll the Layers panel.
+    (content as HTMLElement).scrollTop = 321;
+
+    // Same-render close + switch to "pages": both isOpen and tabId flip at once.
+    rerender(panelUi({ tabId: "pages", isOpen: false, onClose: vi.fn() }));
+
+    // "pages" must have NO saved position (321 belongs to "layers").
+    rerender(panelUi({ tabId: "pages", isOpen: true, onClose: vi.fn() }));
+    expect((content as HTMLElement).scrollTop).toBe(0);
+
+    // Reopen "layers" → its 321 comes back.
+    rerender(panelUi({ tabId: "layers", isOpen: true, onClose: vi.fn() }));
+    expect((content as HTMLElement).scrollTop).toBe(321);
+  });
 });

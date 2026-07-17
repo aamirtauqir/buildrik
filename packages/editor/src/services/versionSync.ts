@@ -19,60 +19,63 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import { loadVersions, saveVersion } from "../engine/storage/VersionHistoryStorage";
 import type { NamedVersion } from "../shared/types/versions";
+import { SyncRetryQueue } from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
 }
 
-const errorSubscribers = new Set<() => void>();
+// A failed mirror used to be console.warn'd (create also one-shot-notified) and
+// then dropped forever. Now it queues + retries on reconnect like cmsSync.
+const queue = new SyncRetryQueue();
 
 /** Subscribe to version-sync failures. Returns an unsubscribe fn. */
 export function onVersionSyncError(cb: () => void): () => void {
-  errorSubscribers.add(cb);
-  return () => {
-    errorSubscribers.delete(cb);
-  };
+  return queue.onError(cb);
 }
 
-function notifyError(): void {
-  errorSubscribers.forEach((cb) => {
-    try {
-      cb();
-    } catch {
-      // A subscriber throwing must not break the sync layer.
-    }
-  });
+/** How many version mirrors are queued for retry (not yet on the server). */
+export function getVersionSyncPendingCount(): number {
+  return queue.pendingCount();
+}
+
+/** Re-attempt every queued version mirror (called on reconnect + on demand). */
+export function retryVersionSync(): Promise<void> {
+  return queue.retry();
 }
 
 /** Mirror a newly-created (named or auto) version to the server. */
 export async function mirrorVersionCreate(version: NamedVersion, isAuto: boolean): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
-  try {
-    await client().siteVersions.create.mutate({
-      siteId,
-      versionId: version.id,
-      name: version.name,
-      isAuto,
-      payload: version as unknown as Record<string, unknown>,
-    });
-  } catch (e) {
+  await queue.run(
+    `versionCreate:${version.id}`,
+    () =>
+      client().siteVersions.create.mutate({
+        siteId,
+        versionId: version.id,
+        name: version.name,
+        isAuto,
+        payload: version as unknown as Record<string, unknown>,
+      }),
     // eslint-disable-next-line no-console
-    console.warn("[version-sync] create mirror failed (kept locally)", e);
-    notifyError();
-  }
+    (e) => console.warn("[version-sync] create mirror failed (kept locally)", e)
+  );
 }
 
 /** Mirror a version deletion to the server. */
 export async function mirrorVersionDelete(versionId: string): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
-  try {
-    await client().siteVersions.delete.mutate({ siteId, versionId });
-  } catch (e) {
+  // A pending create for the same version is moot — deletion wins, so drop it
+  // to avoid resurrecting a deleted version on a reconnect retry.
+  queue.drop(`versionCreate:${versionId}`);
+  await queue.run(
+    `versionDelete:${versionId}`,
+    () => client().siteVersions.delete.mutate({ siteId, versionId }),
     // eslint-disable-next-line no-console
-    console.warn("[version-sync] delete mirror failed", e);
-  }
+    (e) => console.warn("[version-sync] delete mirror failed", e)
+  );
 }
 
 /**

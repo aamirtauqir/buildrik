@@ -118,10 +118,14 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--bd-space-1) 10px", marginTop: "var(--bd-space-2)" }}>
                 {[
-                  { label: "Page title", ok: s.seoChecks.titleSet, pts: "+20 pts" },
-                  { label: "Meta description", ok: s.seoChecks.descSet, pts: "+30 pts" },
-                  { label: "Clean URL slug", ok: s.seoChecks.slugClean, pts: "+10 pts" },
-                  { label: "Allow indexing", ok: s.seoChecks.indexingOn, pts: "+40 pts" },
+                  // Point labels mirror calculateSeoScore's real max weights:
+                  // title 20 (+10 at ≥30 chars) = 30; slug 20 (+10 non-empty) = 30;
+                  // desc 30 (+10 at ≥100 chars) = 40; indexing is an all-or-nothing
+                  // gate (off → whole score 0), not an additive component.
+                  { label: "Page title", ok: s.seoChecks.titleSet, pts: "+30 pts" },
+                  { label: "Meta description", ok: s.seoChecks.descSet, pts: "+40 pts" },
+                  { label: "Clean URL slug", ok: s.seoChecks.slugClean, pts: "+30 pts" },
+                  { label: "Allow indexing", ok: s.seoChecks.indexingOn, pts: "Required" },
                 ].map((c) => (
                   <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 6, font: "400 11px var(--bd-font)", color: c.ok ? "var(--bd-fg-primary)" : "var(--bd-fg-muted)" }}>
                     <span style={{ width: 6, height: 6, borderRadius: "var(--bd-radius-full)", background: c.ok ? "var(--bd-success)" : "var(--bd-fg-muted)", flexShrink: 0 }} />
@@ -169,8 +173,8 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         <Input
           id="seo-title"
           value={s.seoTitle}
-          onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 80))}
-          maxLength={80}
+          onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 60))}
+          maxLength={60}
           aria-describedby="seo-title-hint"
         />
         <HelperText>Aim for 50–60 characters for best Google ranking</HelperText>
@@ -215,7 +219,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           id="seo-desc"
           rows={3}
           value={s.seoDesc}
-          onChange={(e) => s.setSeoDesc(e.target.value.slice(0, 200))}
+          onChange={(e) => s.setSeoDesc(e.target.value.slice(0, 160))}
           placeholder='E.g. "We help small businesses build professional websites. Start free today."'
           aria-describedby="seo-desc-hint"
         />

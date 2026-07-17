@@ -40,7 +40,8 @@ vi.mock("../MediaOptimizer", () => ({
 }));
 
 import { MediaManager } from "../MediaManager";
-import { MEDIA_EVENTS } from "@/shared/constants/media";
+import { MediaQuotaError } from "../MediaStorageTypes";
+import { MEDIA_EVENTS, STORAGE_QUOTA_BYTES } from "@/shared/constants/media";
 import type { MediaAsset, RemoteAssetSync } from "@/shared/types/media";
 
 /** jsdom never loads images — fire onerror so getMediaDimensions resolves undefined. */
@@ -172,12 +173,43 @@ describe("uploadFile — validation (size per type, allowed MIME)", () => {
     expect(result.success).toBe(true);
   });
 
-  it.todo(
-    "AUDIT: quota pre-check is not implemented — MediaQuotaError, MEDIA_EVENTS.QUOTA_EXCEEDED " +
-      "and STORAGE_QUOTA_BYTES all exist (MediaStorageTypes.ts / constants/media.ts) and the UI " +
-      "handles the error by name (useMediaState.ts), but nothing in uploadFile or MediaStorage " +
-      "ever throws MediaQuotaError or emits media:quota:exceeded. Uploads past 1GB are never blocked.",
-  );
+  it("throws MediaQuotaError and emits media:quota:exceeded when the new file would exceed the 1GB cap", async () => {
+    const manager = new MediaManager();
+    const storage = mockStorage(manager);
+    const quotaEvents = captureEvents(manager, MEDIA_EVENTS.QUOTA_EXCEEDED);
+    // Fill the library to the 1GB cap so the next byte trips the gate.
+    seedAsset(manager, { id: "big", size: STORAGE_QUOTA_BYTES });
+
+    await expect(
+      manager.uploadFile(makeFile("i", "one-more.png", "image/png", 4096), {
+        autoOptimize: false,
+        generateThumbnail: false,
+      }),
+    ).rejects.toBeInstanceOf(MediaQuotaError);
+
+    expect(quotaEvents).toHaveLength(1);
+    expect(quotaEvents[0]).toEqual({
+      usedBytes: STORAGE_QUOTA_BYTES,
+      quotaBytes: STORAGE_QUOTA_BYTES,
+      attemptedBytes: 4096,
+    });
+    // Gate runs before any persistence — nothing written.
+    expect(storage.saveAsset).not.toHaveBeenCalled();
+  });
+
+  it("allows an upload that exactly fills the remaining quota (boundary is inclusive)", async () => {
+    const manager = new MediaManager();
+    mockStorage(manager);
+    // Leave exactly 4096 bytes of headroom.
+    seedAsset(manager, { id: "big", size: STORAGE_QUOTA_BYTES - 4096 });
+
+    const result = await manager.uploadFile(
+      makeFile("i", "fits.png", "image/png", 4096),
+      { autoOptimize: false, generateThumbnail: false },
+    );
+
+    expect(result.success).toBe(true);
+  });
 });
 
 describe("uploadFile — SVG sanitize path", () => {

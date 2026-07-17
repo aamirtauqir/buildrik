@@ -126,42 +126,52 @@ export class AssetBundler {
   }
 
   /**
-   * Fetch a single asset and return bundled data
+   * Fetch a single asset and return bundled data. Swallows failures to null
+   * (logged) for direct callers that don't need per-URL failure detail.
+   * bundleAssets uses fetchAssetOrThrow so it can surface failures instead.
    */
   async fetchAsset(url: string): Promise<BundledAsset | null> {
     try {
-      // Handle data URLs - already embedded, skip
-      if (url.startsWith("data:")) {
-        return null;
-      }
-
-      // Fetch the asset
-      const response = await fetch(url, { mode: "cors" });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const content = await response.arrayBuffer();
-      const mimeType = response.headers.get("content-type") || getMimeType(url);
-      const ext = getExtension(url);
-
-      // Generate local path
-      this.assetCounter++;
-      const localPath = `assets/asset-${this.assetCounter}${ext}`;
-
-      // Store mapping for URL rewriting
-      this.urlMap.set(url, localPath);
-
-      return {
-        originalUrl: url,
-        localPath,
-        content,
-        mimeType,
-      };
+      return await this.fetchAssetOrThrow(url);
     } catch (error) {
       devWarn("AssetBundler", `Failed to fetch asset: ${url}`, error);
       return null;
     }
+  }
+
+  /**
+   * Fetch a single asset, THROWING on failure. Returns null only for the
+   * intentional data:-URL skip (already embedded — not an error).
+   */
+  private async fetchAssetOrThrow(url: string): Promise<BundledAsset | null> {
+    // Handle data URLs - already embedded, skip
+    if (url.startsWith("data:")) {
+      return null;
+    }
+
+    // Fetch the asset
+    const response = await fetch(url, { mode: "cors" });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const content = await response.arrayBuffer();
+    const mimeType = response.headers.get("content-type") || getMimeType(url);
+    const ext = getExtension(url);
+
+    // Generate local path
+    this.assetCounter++;
+    const localPath = `assets/asset-${this.assetCounter}${ext}`;
+
+    // Store mapping for URL rewriting
+    this.urlMap.set(url, localPath);
+
+    return {
+      originalUrl: url,
+      localPath,
+      content,
+      mimeType,
+    };
   }
 
   /**
@@ -171,8 +181,10 @@ export class AssetBundler {
     const assets: BundledAsset[] = [];
     const errors: Array<{ url: string; error: string }> = [];
 
-    // Fetch all assets in parallel
-    const results = await Promise.allSettled(urls.map((url) => this.fetchAsset(url)));
+    // Fetch all assets in parallel. fetchAssetOrThrow rejects on failure so
+    // Promise.allSettled captures each error into the errors array (fetchAsset
+    // would swallow them to null and leave errors permanently empty).
+    const results = await Promise.allSettled(urls.map((url) => this.fetchAssetOrThrow(url)));
 
     for (let i = 0; i < results.length; i++) {
       const result = results[i];

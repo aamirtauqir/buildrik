@@ -205,18 +205,22 @@ export class EmailService {
         };
       }
 
-      // Route to appropriate provider
+      // Route to appropriate provider. Each dispatch is awaited INSIDE the try
+      // so a provider that rejects asynchronously (e.g. the cloud proxy throwing
+      // "not configured") is mapped to a structured { success:false, error }
+      // result — returning the promise bare would let the rejection escape the
+      // try/catch and reach the caller raw.
       switch (this.config.provider) {
         case "mock":
-          return this.sendMock(finalMessage);
+          return await this.sendMock(finalMessage);
         case "sendgrid":
-          return this.sendSendGrid(finalMessage);
+          return await this.sendSendGrid(finalMessage);
         case "mailgun":
-          return this.sendMailgun(finalMessage);
+          return await this.sendMailgun(finalMessage);
         case "resend":
-          return this.sendResend(finalMessage);
+          return await this.sendResend(finalMessage);
         case "smtp":
-          return this.sendSMTP(finalMessage);
+          return await this.sendSMTP(finalMessage);
         default:
           return { success: false, error: "Unknown email provider" };
       }

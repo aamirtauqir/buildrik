@@ -27,6 +27,20 @@ function getClient() {
   return _client;
 }
 
+// A redirect target is either a same-site path (single leading slash) or an
+// absolute http(s) URL. Everything else — javascript:/data: schemes,
+// protocol-relative "//host", bare domains, free text — is rejected before it
+// can be persisted and later served to a visitor.
+function isValidRedirectTarget(value: string): boolean {
+  if (value.startsWith("/") && !value.startsWith("//")) return true;
+  try {
+    const { protocol } = new URL(value);
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export const RedirectsScreen: React.FC<ScreenProps> = ({
   projectId,
   onDirtyChange,
@@ -88,6 +102,11 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
     }
     if (!trimmedTo) {
       const msg = "To URL is required.";
+      setSubmitError(msg);
+      throw new Error(msg);
+    }
+    if (!isValidRedirectTarget(trimmedTo)) {
+      const msg = "To URL must be a path (/new-page) or full URL (https://example.com/new).";
       setSubmitError(msg);
       throw new Error(msg);
     }

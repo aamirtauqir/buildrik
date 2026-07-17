@@ -3,11 +3,12 @@
  * SeoTab — pure form renderer. Tests field behavior, counters, slug warning,
  * noIndex banner, and the AI "Write with AI" affordance.
  *
- * Two KNOWN defects are pinned here (assert-current, do NOT fix):
- *   - "SEO counter mismatches": the char counters cap at 60/160 while the
- *     inputs actually accept 80/200.
- *   - "score-label lies": the per-check point annotations (+20/+30/+10/+40)
- *     are hardcoded and do not correspond to calculateSeoScore's real weights.
+ * Two former defects, now FIXED and asserted here:
+ *   - "SEO counter mismatches": the enforced input limits (maxLength/slice)
+ *     now match the shown counters — title 60, description 160.
+ *   - "score-label lies": the per-check point annotations now mirror
+ *     calculateSeoScore's real weights (title/slug +30, desc +40, indexing
+ *     an all-or-nothing gate labelled "Required").
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render as rtlRender, screen, fireEvent, act } from "@testing-library/react";
@@ -85,12 +86,12 @@ beforeEach(() => vi.clearAllMocks());
 // ── Title field ──────────────────────────────────────────────────────────────
 
 describe("SeoTab title field", () => {
-  it("slices title input to 80 chars on change", () => {
+  it("slices title input to 60 chars on change (matches the /60 counter)", () => {
     const s = makeSettings({ seoTitle: "" });
     render(<SeoTab s={s} page={makePage()} />);
     const input = document.getElementById("seo-title") as HTMLInputElement;
     fireEvent.change(input, { target: { value: "x".repeat(90) } });
-    expect(s.setSeoTitle).toHaveBeenCalledWith("x".repeat(80));
+    expect(s.setSeoTitle).toHaveBeenCalledWith("x".repeat(60));
   });
 
   it("appends the range label to the counter (Ideal at 55 chars)", () => {
@@ -99,15 +100,14 @@ describe("SeoTab title field", () => {
     expect(screen.getByText("55/60 · Ideal")).toBeTruthy();
   });
 
-  // KNOWN (pin): "SEO counter mismatches" — the title input's maxLength is 80
-  // and onChange slices to 80, but the counter denominator is hardcoded 60.
-  // A 70-char title is accepted yet the counter reads "70/60" (over its own cap).
-  it("KNOWN (pin): counter caps at /60 while the input accepts up to 80", () => {
-    const s = makeSettings({ seoTitle: "a".repeat(70) });
+  // FIXED: the title input's maxLength and onChange slice now equal the shown
+  // /60 counter, so the enforced limit and the denominator agree.
+  it("counter denominator matches the enforced input maxLength (60)", () => {
+    const s = makeSettings({ seoTitle: "a".repeat(60) });
     render(<SeoTab s={s} page={makePage()} />);
     const input = document.getElementById("seo-title") as HTMLInputElement;
-    expect(input.maxLength).toBe(80); // real limit is 80…
-    expect(screen.getByText(/70\/60/)).toBeTruthy(); // …but counter says /60
+    expect(input.maxLength).toBe(60);
+    expect(screen.getByText(/60\/60/)).toBeTruthy();
   });
 
   it('shows "Write with AI" only when the title is under 10 chars, and it calls the AI service', async () => {
@@ -131,21 +131,20 @@ describe("SeoTab title field", () => {
 // ── Description field ────────────────────────────────────────────────────────
 
 describe("SeoTab meta description field", () => {
-  it("slices description input to 200 chars on change", () => {
+  it("slices description input to 160 chars on change (matches the /160 counter)", () => {
     const s = makeSettings({ seoDesc: "" });
     render(<SeoTab s={s} page={makePage()} />);
     const ta = document.getElementById("seo-desc") as HTMLTextAreaElement;
     fireEvent.change(ta, { target: { value: "y".repeat(250) } });
-    expect(s.setSeoDesc).toHaveBeenCalledWith("y".repeat(200));
+    expect(s.setSeoDesc).toHaveBeenCalledWith("y".repeat(160));
   });
 
-  // KNOWN (pin): "SEO counter mismatches" — description onChange slices to 200
-  // but the counter denominator is hardcoded 160. A 180-char description is
-  // accepted yet the counter reads "180/160".
-  it("KNOWN (pin): description counter caps at /160 while input accepts up to 200", () => {
-    const s = makeSettings({ seoDesc: "z".repeat(180) });
+  // FIXED: the description onChange slice now equals the shown /160 counter, so
+  // a value at the enforced cap reads "160/160" — the two agree.
+  it("description counter denominator matches the enforced slice limit (160)", () => {
+    const s = makeSettings({ seoDesc: "z".repeat(160) });
     render(<SeoTab s={s} page={makePage()} />);
-    expect(screen.getByText("180/160")).toBeTruthy();
+    expect(screen.getByText("160/160")).toBeTruthy();
   });
 });
 
@@ -172,18 +171,20 @@ describe("SeoTab score card", () => {
     expect(screen.getByRole("note")).toHaveTextContent(/add a meta description/);
   });
 
-  // KNOWN (pin): "score-label lies" — the per-check point annotations are
-  // hardcoded (+20 title / +30 desc / +10 slug / +40 indexing, summing to 100)
-  // and do NOT match calculateSeoScore's real weighting (title 10-or-20 +10 at
-  // >=30; slug 20 +10; desc 15-or-30 +10 at >=100; indexing gates to 0 rather
-  // than awarding 40). These strings render regardless of the numeric score.
-  it("KNOWN (pin): check-point annotations are hardcoded and unrelated to the real score", () => {
+  // FIXED: the per-check point annotations now mirror calculateSeoScore's real
+  // max weights — title 20(+10 at ≥30)=30, slug 20(+10)=30, desc 30(+10 at
+  // ≥100)=40 (summing to 100), and indexing is an all-or-nothing gate labelled
+  // "Required", not the fictional "+40 pts".
+  it("check-point annotations reflect calculateSeoScore's real weights", () => {
     const s = makeSettings({ seoScore: 100 });
     render(<SeoTab s={s} page={makePage()} />);
-    expect(screen.getByText("+20 pts")).toBeTruthy(); // Page title
-    expect(screen.getByText("+30 pts")).toBeTruthy(); // Meta description
-    expect(screen.getByText("+10 pts")).toBeTruthy(); // Clean URL slug
-    expect(screen.getByText("+40 pts")).toBeTruthy(); // Allow indexing — never awarded by calculateSeoScore
+    // title +30 and slug +30 both render this label.
+    expect(screen.getAllByText("+30 pts")).toHaveLength(2);
+    expect(screen.getByText("+40 pts")).toBeTruthy(); // Meta description
+    expect(screen.getByText("Required")).toBeTruthy(); // Allow indexing — a gate, not additive
+    // The old fictional labels are gone.
+    expect(screen.queryByText("+20 pts")).toBeNull();
+    expect(screen.queryByText("+10 pts")).toBeNull();
   });
 
   it("hides the score card and shows the noIndex alert when allowIndex is false", () => {

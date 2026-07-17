@@ -8,8 +8,12 @@
  *
  * Policy:
  * - ALLOW:  <meta>, <link>, <script src="...">, <noscript>, <style>, <base>, <title>
+ * - PRESERVE: text content of allowed tags (CSS inside <style>, <title> text)
+ *             and `property`/`itemprop`/`http-equiv` on <meta> (Open Graph +
+ *             microdata + meta-equiv).
  * - BLOCK:  inline <script> (no src), event handlers, javascript: URIs,
- *           <iframe>, srcdoc, any unknown element, any unknown attribute
+ *           <iframe>, srcdoc, data-* attributes, any unknown element,
+ *           any unknown attribute
  * - NORMALIZE: lowercase tag names, collapse whitespace
  *
  * Runtime:
@@ -99,39 +103,16 @@ function getPurify(): DOMPurify {
 
   // DOMPurify's built-in attribute profile for <meta> is stricter than our
   // ALLOWED_ATTR list — it strips `property` (Open Graph) and `itemprop`
-  // (Schema.org microdata) even when explicitly allowed. This hook whitelists
-  // the attribute names we need on meta/link tags without weakening the
-  // overall profile.
-  const ATTR_FORCE_ALLOW = new Set([
-    "property",
-    "itemprop",
-    "http-equiv",
-    "charset",
-    "content",
-    "name",
-    "rel",
-    "href",
-    "hreflang",
-    "type",
-    "media",
-    "sizes",
-    "src",
-    "integrity",
-    "crossorigin",
-    "referrerpolicy",
-    "async",
-    "defer",
-    "nomodule",
-    "as",
-    "target",
-    "id",
-    "lang",
-  ]);
+  // (Schema.org microdata) even when they're in ALLOWED_ATTR. `keepAttr = true`
+  // is NOT enough (DOMPurify re-applies its profile afterward); `forceKeepAttr`
+  // is required. Scoped to these safe, non-URI attributes ONLY — never href/src,
+  // which must retain their URI-scheme validation.
+  const FORCE_KEEP_ATTRS = new Set(["property", "itemprop", "http-equiv"]);
   _purify.addHook(
     "uponSanitizeAttribute",
-    (_node: Node, data: { attrName: string; keepAttr: boolean }) => {
-      if (ATTR_FORCE_ALLOW.has(data.attrName)) {
-        data.keepAttr = true;
+    (_node: Node, data: { attrName: string; forceKeepAttr?: boolean }) => {
+      if (FORCE_KEEP_ATTRS.has(data.attrName)) {
+        data.forceKeepAttr = true;
       }
     }
   );
@@ -166,10 +147,17 @@ export function sanitizeHeadCode(raw: string | undefined | null): string {
       // is the canonical example (required for Open Graph tags).
       ADD_ATTR: ["property", "itemprop", "http-equiv"],
       WHOLE_DOCUMENT: true,
-      // Use DOMPurify's default URI regex, which already blocks javascript:
-      // and other dangerous schemes while allowing relative/absolute paths.
-      // Strip unknown content rather than escape it.
-      KEEP_CONTENT: false,
+      // KEEP_CONTENT: true preserves the text of ALLOWED tags — the CSS inside
+      // a pasted <style> block and the text of <title> (KEEP_CONTENT: false
+      // emptied both, making them useless). Disallowed elements are still
+      // stripped whole: <script> without src is removed via the
+      // uponSanitizeElement hook (el.remove() takes its body with it), and
+      // body-level tags close <head> so they never reach the extracted output —
+      // no inline-script or leaked-text body survives (verified).
+      KEEP_CONTENT: true,
+      // Block data-* attributes to match the module's "any unknown attribute is
+      // BLOCKED" policy (DOMPurify defaults ALLOW_DATA_ATTR: true).
+      ALLOW_DATA_ATTR: false,
     });
     const out = typeof sanitizedDoc === "string" ? sanitizedDoc : String(sanitizedDoc);
 

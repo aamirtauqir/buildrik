@@ -65,10 +65,16 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
   // Remember scroll position per title/tab
   const scrollPositions = React.useRef<Record<string, number>>({});
 
-  // Save scroll position before close
+  // The tabId that is *currently displayed*. On a same-render close+switch
+  // (both isOpen and tabId flip at once) the save effect below would otherwise
+  // key the outgoing tab's scrollTop under the NEW tabId; using the previous
+  // tabId keeps each tab's position under its own key.
+  const displayedTabId = React.useRef(tabId);
+
+  // Save scroll position before close — under the tab that was on screen.
   React.useEffect(() => {
     if (!isOpen && contentRef.current) {
-      scrollPositions.current[tabId] = contentRef.current.scrollTop;
+      scrollPositions.current[displayedTabId.current] = contentRef.current.scrollTop;
     }
   }, [isOpen, tabId]);
 
@@ -79,6 +85,11 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
       contentRef.current.scrollTop = savedPosition;
     }
   }, [isOpen, tabId]);
+
+  // Track the displayed tab AFTER the save/restore effects have run this render.
+  React.useEffect(() => {
+    displayedTabId.current = tabId;
+  });
 
   // Handle close with animation cleanup
   const handleClose = React.useCallback(() => {

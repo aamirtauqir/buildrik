@@ -2,17 +2,13 @@
  * CodePreview tests — tab switching, line counts, line numbers and the
  * clipboard copy path (via CopyButton, which needs ToastProvider).
  *
- * NOTE: CodePreview takes a prop literally named `css`. This test file (like
- * the whole app) compiles with the Emotion jsx runtime, which intercepts any
- * JSX `css` prop — so the component is instantiated with React.createElement
- * to deliver the prop raw. The production ExportModal call site DOES use JSX
- * and is therefore broken; that bug is pinned in ExportModal.test.tsx.
+ * NOTE: the CSS prop is named `cssCode` (not `css`) specifically so the
+ * Emotion jsx runtime does not intercept it. JSX is used directly here.
  *
  * @license BSD-3-Clause
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { createElement } from "react";
 import { ToastProvider } from "@/editor/shared/vibcoder";
 import { CodePreview, type CodePreviewProps } from "../CodePreview";
 
@@ -22,7 +18,7 @@ const CSS_CODE = "body {\ncolor: red;}"; // 2 lines
 function renderPreview(props: Partial<CodePreviewProps> = {}) {
   return render(
     <ToastProvider>
-      {createElement(CodePreview, { html: HTML_CODE, css: CSS_CODE, ...props })}
+      <CodePreview html={HTML_CODE} cssCode={CSS_CODE} {...props} />
     </ToastProvider>
   );
 }

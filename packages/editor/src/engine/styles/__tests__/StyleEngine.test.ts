@@ -257,6 +257,11 @@ function makeElementMock(id: string, seed?: Omit<MockElementData, "id">) {
       if (!data.data) data.data = {};
       data.data[key] = value;
     },
+    // Mirrors the real Element.setBreakpointStyles: writes the TOP-LEVEL
+    // ElementData.breakpointStyles field, NOT the custom-data bag (data.data).
+    setBreakpointStyles: (styles: Record<string, Record<string, string>>) => {
+      data.breakpointStyles = styles;
+    },
   };
 }
 
@@ -502,23 +507,28 @@ describe("StyleEngine.getRulesForSelector", () => {
     expect(rules.map((r) => r.selector).sort()).toEqual([".btn", ".btn:hover"]);
   });
 
-  // Current behavior: matching is startsWith-based, so `.btn` also picks up
-  // `.btn-primary` — a prefix collision, not a pseudo variant.
-  it("prefix collision: .btn currently also matches .btn-primary (startsWith)", () => {
+  // `.btn` matches only the exact class — a longer identifier like
+  // `.btn-primary` is a different class and must not leak in (prefix collision
+  // fixed: matching stops at selector boundaries, not identifier continuation).
+  it("does not match .btn-primary for a .btn lookup (no prefix collision)", () => {
     engine.setRule(".btn", { color: "red" });
     engine.setRule(".btn-primary", { color: "blue" });
 
     const rules = engine.getRulesForSelector(".btn");
-    expect(rules.map((r) => r.selector).sort()).toEqual([".btn", ".btn-primary"]);
+    expect(rules.map((r) => r.selector).sort()).toEqual([".btn"]);
   });
 
-  // getRulesForSelector matches `s.selector.startsWith(selector)`, so any class
-  // that is a string-prefix of another (`.btn` vs `.btn-primary`) leaks the
-  // longer class's properties into computeStyles/getClassStyles for elements
-  // that only carry the shorter class. Should match exact selector OR
-  // selector + pseudo/combinator boundary (e.g. `.btn:hover`, `.btn.active`),
-  // never plain identifier continuation.
-  it.todo("BUG: getRulesForSelector startsWith matching leaks .btn-primary styles into .btn consumers");
+  // Boundary variants (pseudo `:hover`, compound `.active`) still match; only a
+  // plain identifier continuation (`-primary`) is excluded.
+  it("still matches boundary variants (.btn:hover, .btn.active) but not .btn-primary", () => {
+    engine.setRule(".btn", { color: "red" });
+    engine.setRule(".btn", { color: "blue" }, { pseudo: ":hover" });
+    engine.setRule(".btn.active", { color: "green" });
+    engine.setRule(".btn-primary", { color: "purple" });
+
+    const rules = engine.getRulesForSelector(".btn");
+    expect(rules.map((r) => r.selector).sort()).toEqual([".btn", ".btn.active", ".btn:hover"]);
+  });
 });
 
 describe("StyleEngine.setDeviceRule — DIVERGENT media queries (audit B9 drift)", () => {
@@ -643,41 +653,52 @@ describe("StyleEngine breakpoint styles", () => {
     });
   });
 
-  // Current behavior: the mirror write goes through Element.setData(), which
-  // stores into the CUSTOM DATA bag (data.data.breakpointStyles) — top-level
-  // ElementData.breakpointStyles is never populated.
-  it("mirrors styles into the element custom-data bag, not top-level ElementData (current behavior)", () => {
+  // The mirror write now lands on the TOP-LEVEL ElementData.breakpointStyles
+  // field — the one ReactExporter and serialization read — not the custom-data
+  // bag (data.data).
+  it("mirrors styles into top-level ElementData.breakpointStyles, not the custom-data bag", () => {
     const el = makeElementMock("el-1");
     harness.getElement.mockReturnValue(el);
 
     engine.setBreakpointStyle("el-1", "tablet", { color: "red" });
 
-    expect(el.data.data?.breakpointStyles).toEqual({ tablet: { color: "red" } });
-    expect(el.data.breakpointStyles).toBeUndefined();
+    expect(el.data.breakpointStyles).toEqual({ tablet: { color: "red" } });
+    expect(el.data.data?.breakpointStyles).toBeUndefined();
   });
 
-  // Current behavior: the merge base is read from top-level
-  // getData().breakpointStyles (always undefined — see previous test), so
-  // each call rebuilds the mirror from scratch and the previous breakpoint's
-  // mirror is lost.
-  it("clobbers the mirror across breakpoints (current behavior)", () => {
+  // The merge base is read from top-level getData().breakpointStyles, which is
+  // now actually written, so a second breakpoint merges in instead of
+  // clobbering the first.
+  it("preserves the mirror across breakpoints (no clobber)", () => {
     const el = makeElementMock("el-1");
     harness.getElement.mockReturnValue(el);
 
     engine.setBreakpointStyle("el-1", "tablet", { color: "red" });
     engine.setBreakpointStyle("el-1", "mobile", { color: "blue" });
 
-    // tablet mirror is gone — only the latest call survives
-    expect(el.data.data?.breakpointStyles).toEqual({ mobile: { color: "blue" } });
+    // Both breakpoints survive on the top-level field.
+    expect(el.data.breakpointStyles).toEqual({
+      tablet: { color: "red" },
+      mobile: { color: "blue" },
+    });
   });
 
-  // updateElementBreakpointStyles reads the merge base from top-level
-  // getData().breakpointStyles but writes through Element.setData(), which
-  // stores in data.data (custom-data bag). ElementData.breakpointStyles —
-  // the field ReactExporter and serialization read — is never written, and
-  // the read/write mismatch means breakpoint mirrors clobber each other.
-  it.todo("BUG: setBreakpointStyle mirror lands in data.data.breakpointStyles — ElementData.breakpointStyles (read by ReactExporter/serialization) stays undefined");
-  it.todo("BUG: setBreakpointStyle for a second breakpoint clobbers the first breakpoint's mirror (merge base reads top-level breakpointStyles which is never written)");
+  // The mirror is visible through the same getData() path serialization/toJSON
+  // read, so downstream consumers (ReactExporter) actually see the responsive
+  // styles.
+  it("exposes the mirror via getData().breakpointStyles for serialization", () => {
+    const el = makeElementMock("el-1");
+    harness.getElement.mockReturnValue(el);
+
+    engine.setBreakpointStyle("el-1", "tablet", { color: "green", fontSize: "14px" });
+    engine.setBreakpointStyle("el-1", "tablet", { color: "red" });
+
+    // Second write merges into the first breakpoint's mirror rather than
+    // replacing it wholesale.
+    expect(el.getData().breakpointStyles).toEqual({
+      tablet: { color: "red", fontSize: "14px" },
+    });
+  });
 
   it("getBreakpointStyles returns a per-breakpoint map from the rule store", () => {
     const el = makeElementMock("el-1");
@@ -832,20 +853,23 @@ describe("StyleEngine CSS serialization", () => {
     expect(out).toBe(".a {\n  color: red;\n}");
   });
 
-  // Current behavior: optimizeCSS dedupes on TRIMMED LINES across the whole
-  // stylesheet — two different rules sharing a declaration lose the second
-  // occurrence, and every `}` after the first is eaten, producing broken CSS.
-  it("optimizeCSS eats shared declarations and closing braces across different rules (current behavior)", () => {
+  // optimizeCSS now dedupes on whole rules, so two DIFFERENT rules that share a
+  // declaration both survive intact — no eaten declarations or closing braces.
+  it("keeps shared declarations and closing braces across different rules", () => {
     const out = engine.optimizeCSS(".a {\n  color: red;\n}\n\n.b {\n  color: red;\n}");
-    // `.b` loses its `color: red;` line AND its closing brace
-    expect(out).toBe(".a {\n  color: red;\n}\n.b {");
+    expect(out).toBe(".a {\n  color: red;\n}\n.b {\n  color: red;\n}");
   });
 
-  // Line-based dedupe is not rule-aware: `generateCSS({ optimize: true })`
-  // emits structurally invalid CSS whenever two rules share any declaration
-  // line (very common: `display: flex;`, `margin: 0;`). Dedupe must operate
-  // on whole rules (selector + declaration block), not raw lines.
-  it.todo("BUG: optimizeCSS line-based dedupe drops closing braces and shared declarations, corrupting multi-rule CSS");
+  // Rule-aware dedupe drops an identical repeated rule while keeping @media
+  // blocks intact as a single unit — no structural corruption on multi-rule CSS.
+  it("dedupes whole rules and keeps @media blocks intact", () => {
+    const css =
+      ".a {\n  display: flex;\n}\n@media (max-width: 767px) {\n.a {\n  display: flex;\n}\n}\n.a {\n  display: flex;\n}";
+    const out = engine.optimizeCSS(css);
+    expect(out).toBe(
+      ".a {\n  display: flex;\n}\n@media (max-width: 767px) {\n.a {\n  display: flex;\n}\n}"
+    );
+  });
 });
 
 describe("StyleEngine export/import round-trip", () => {

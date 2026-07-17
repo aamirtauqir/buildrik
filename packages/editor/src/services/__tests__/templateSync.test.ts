@@ -14,13 +14,24 @@ vi.mock("../api-client", () => ({
 }));
 vi.mock("../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000" }));
 
-import { mirrorUserTemplate, hydrateUserTemplatesFromServer } from "../templateSync";
+import {
+  mirrorUserTemplate,
+  hydrateUserTemplatesFromServer,
+  onTemplateSyncError,
+  retryTemplateSync,
+  getTemplateSyncPendingCount,
+} from "../templateSync";
 import { STORAGE_KEYS } from "../../shared/constants/storageKeys";
 
-beforeEach(() => {
+beforeEach(async () => {
   window.history.replaceState({}, "", "/edit/site-123");
   localStorage.clear();
   [upsert, list].forEach((m) => m.mockReset());
+  // The retry queue is module-level shared state; flush anything a prior test
+  // left queued (reset mocks now resolve) so each test starts from empty, then
+  // clear the call history the flush incurred so per-test counts start at 0.
+  await retryTemplateSync();
+  upsert.mockClear();
 });
 
 describe("templateSync", () => {
@@ -78,24 +89,66 @@ describe("templateSync", () => {
   });
 });
 
-// AUDIT P1-1 (2026-07-16): templateSync has NO retry queue AND no error-
-// subscriber channel — a failed mirror is console.warn'ed and dropped.
-// Pinning CURRENT behavior.
-describe("templateSync failure semantics (audit P1-1 — no retry queue)", () => {
-  it("a failed mirror warns once, never throws, and does NOT retry", async () => {
+// AUDIT P1-1 (2026-07-16) — FIXED: templateSync now shares cmsSync's retry
+// queue (SyncRetryQueue) and exposes an onTemplateSyncError channel. A failed
+// mirror is queued (not dropped), notified, and replayed on reconnect.
+describe("templateSync failure semantics (audit P1-1 — retry queue)", () => {
+  it("a failed mirror warns, never throws, notifies, and queues", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     upsert.mockRejectedValueOnce(new Error("network down"));
+    const heard: number[] = [];
+    const off = onTemplateSyncError(() => heard.push(1));
     await expect(
       mirrorUserTemplate({ id: "user-1", name: "Hero", html: "<p>" })
     ).resolves.toBeUndefined();
-    expect(upsert).toHaveBeenCalledTimes(1); // no re-attempt — op is dropped
+    expect(upsert).toHaveBeenCalledTimes(1); // queued, not re-fired synchronously
+    expect(heard).toEqual([1]); // no longer fully silent to the UI
+    expect(getTemplateSyncPendingCount()).toBe(1); // kept for retry, not dropped
     expect(warn).toHaveBeenCalledWith("[template-sync] mirror failed (kept locally)", expect.any(Error));
+    off();
     warn.mockRestore();
   });
 
-  it.todo(
-    "BUG P1-1: no retry queue and no onTemplateSyncError channel — a failed template mirror is fully silent to the UI (console.warn only), unlike version/component (notify) and cms (queue+notify)"
-  );
+  it("BUG P1-1 FIXED: a queued failed mirror is replayed on retry, then clears", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    upsert.mockRejectedValueOnce(new Error("network down"));
+    await mirrorUserTemplate({ id: "user-1", name: "Hero", html: "<p>", category: "landing" });
+    expect(getTemplateSyncPendingCount()).toBe(1);
+
+    // upsert now resolves (reset default) — retry re-sends the SAME payload.
+    await retryTemplateSync();
+    expect(upsert).toHaveBeenCalledTimes(2);
+    expect(upsert).toHaveBeenLastCalledWith(
+      expect.objectContaining({ siteId: "site-123", templateId: "user-1", name: "Hero" })
+    );
+    expect(getTemplateSyncPendingCount()).toBe(0);
+    warn.mockRestore();
+  });
+
+  it("BUG P1-1 FIXED: the window 'online' event auto-drains the queue", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    upsert.mockRejectedValueOnce(new Error("offline"));
+    await mirrorUserTemplate({ id: "user-1", name: "Hero", html: "<p>" });
+    expect(getTemplateSyncPendingCount()).toBe(1);
+
+    window.dispatchEvent(new Event("online")); // upsert resolves now → flush
+    await vi.waitFor(() => expect(getTemplateSyncPendingCount()).toBe(0));
+    warn.mockRestore();
+  });
+
+  it("latest-wins: repeated failures for the same template hold ONE queue slot", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    upsert.mockRejectedValueOnce(new Error("down"));
+    await mirrorUserTemplate({ id: "user-1", name: "First", html: "<p>" });
+    upsert.mockRejectedValueOnce(new Error("still down"));
+    await mirrorUserTemplate({ id: "user-1", name: "Second", html: "<p>" });
+    expect(getTemplateSyncPendingCount()).toBe(1); // one slot per target
+
+    await retryTemplateSync(); // upsert resolves now
+    expect(upsert).toHaveBeenLastCalledWith(expect.objectContaining({ name: "Second" }));
+    expect(getTemplateSyncPendingCount()).toBe(0);
+    warn.mockRestore();
+  });
 });
 
 describe("templateSync hydrate edge paths", () => {

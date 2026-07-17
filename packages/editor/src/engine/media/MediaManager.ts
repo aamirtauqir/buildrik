@@ -7,7 +7,13 @@
  */
 
 import DOMPurify from "dompurify";
-import { MEDIA_DEFAULTS, MEDIA_EVENTS, getAssetTypeFromMime } from "../../shared/constants/media";
+import {
+  MEDIA_DEFAULTS,
+  MEDIA_EVENTS,
+  STORAGE_QUOTA_BYTES,
+  getAssetTypeFromMime,
+} from "../../shared/constants/media";
+import { MediaQuotaError } from "./MediaStorageTypes";
 import type {
   MediaAsset,
   MediaAssetType,
@@ -694,6 +700,21 @@ export class MediaManager extends MediaEventEmitter {
     if (!validation.valid) {
       this.emit(MEDIA_EVENTS.UPLOAD_ERROR, { fileName: file.name, error: validation.error });
       return { success: false, error: validation.error, fileName: file.name };
+    }
+
+    // Pre-upload storage gate. Sum the local library's bytes and block when
+    // the new file would push past the 1GB cap. Emits QUOTA_EXCEEDED (the
+    // library banner subscribes) and throws MediaQuotaError so callers see
+    // the typed error by name — thrown before the try so it propagates
+    // instead of being folded into a generic upload:error result.
+    const usedBytes = this.state.assets.reduce((sum, a) => sum + a.size, 0);
+    if (usedBytes + file.size > STORAGE_QUOTA_BYTES) {
+      this.emit(MEDIA_EVENTS.QUOTA_EXCEEDED, {
+        usedBytes,
+        quotaBytes: STORAGE_QUOTA_BYTES,
+        attemptedBytes: file.size,
+      });
+      throw new MediaQuotaError(usedBytes, STORAGE_QUOTA_BYTES, file.size);
     }
 
     try {

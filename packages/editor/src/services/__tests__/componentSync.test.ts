@@ -34,11 +34,18 @@ import {
   mirrorComponentDelete,
   hydrateComponentsFromServer,
   onComponentSyncError,
+  retryComponentSync,
+  getComponentSyncPendingCount,
 } from "../componentSync";
 
-beforeEach(() => {
+beforeEach(async () => {
   window.history.replaceState({}, "", "/edit/site-123");
   [upsert, del, list, get, loadComponents, saveComponent].forEach((m) => m.mockReset());
+  // The retry queue is module-level shared state; flush anything a prior test
+  // left queued (reset mocks now resolve) so each test starts from empty, then
+  // clear the call history the flush incurred so per-test counts start at 0.
+  await retryComponentSync();
+  [upsert, del].forEach((m) => m.mockClear());
 });
 
 const comp = (id: string, name = "Card") => ({ id, name }) as never;
@@ -96,40 +103,85 @@ describe("componentSync", () => {
   });
 });
 
-// AUDIT P1-1 (2026-07-16): componentSync has NO retry queue — a failed mirror
-// is warned + notified once, then dropped. Pinning CURRENT behavior.
-describe("componentSync failure semantics (audit P1-1 — no retry queue)", () => {
-  it("a failed upsert warns once and does NOT retry", async () => {
+// AUDIT P1-1 (2026-07-16) — FIXED: componentSync now shares cmsSync's retry
+// queue (SyncRetryQueue). A failed mirror is queued (not dropped), notified,
+// and replayed on reconnect ('online') / retryComponentSync().
+describe("componentSync failure semantics (audit P1-1 — retry queue)", () => {
+  it("a failed upsert warns, notifies, and queues (no auto-retry until reconnect)", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     upsert.mockRejectedValueOnce(new Error("network down"));
+    const heard: number[] = [];
+    const off = onComponentSyncError(() => heard.push(1));
     await mirrorComponentUpsert(comp("c1"));
-    expect(upsert).toHaveBeenCalledTimes(1); // no re-attempt — op is dropped
+    expect(upsert).toHaveBeenCalledTimes(1); // queued, not re-fired synchronously
+    expect(heard).toEqual([1]);
+    expect(getComponentSyncPendingCount()).toBe(1); // kept for retry, not dropped
     expect(warn).toHaveBeenCalledWith(
       "[component-sync] upsert mirror failed (kept locally)",
       expect.any(Error)
     );
+    off();
     warn.mockRestore();
   });
 
-  it("a failed delete warns + never throws, and (current behavior) does NOT notify subscribers", async () => {
+  it("BUG P1-1 FIXED: a queued failed mirror is replayed on retry, then clears", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    upsert.mockRejectedValueOnce(new Error("network down"));
+    await mirrorComponentUpsert(comp("c1", "Hero"));
+    expect(getComponentSyncPendingCount()).toBe(1);
+
+    // upsert now resolves (reset default) — retry re-sends the SAME payload.
+    await retryComponentSync();
+    expect(upsert).toHaveBeenCalledTimes(2);
+    expect(upsert).toHaveBeenLastCalledWith(
+      expect.objectContaining({ siteId: "site-123", componentId: "c1", name: "Hero" })
+    );
+    expect(getComponentSyncPendingCount()).toBe(0);
+    warn.mockRestore();
+  });
+
+  it("BUG P1-1 FIXED: the window 'online' event auto-drains the queue", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    upsert.mockRejectedValueOnce(new Error("offline"));
+    await mirrorComponentUpsert(comp("c1"));
+    expect(getComponentSyncPendingCount()).toBe(1);
+
+    window.dispatchEvent(new Event("online")); // upsert resolves now → flush
+    await vi.waitFor(() => expect(getComponentSyncPendingCount()).toBe(0));
+    warn.mockRestore();
+  });
+
+  it("BUG FIXED: mirrorComponentDelete failure fires onComponentSyncError + queues", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     del.mockRejectedValueOnce(new Error("network down"));
     const heard: number[] = [];
     const off = onComponentSyncError(() => heard.push(1));
     await expect(mirrorComponentDelete("c9")).resolves.toBeUndefined();
     expect(warn).toHaveBeenCalledWith("[component-sync] delete mirror failed", expect.any(Error));
-    expect(heard).toEqual([]); // delete failures are subscriber-silent today
-    expect(del).toHaveBeenCalledTimes(1); // and never retried
+    expect(heard).toEqual([1]); // delete failures now surface to the toast layer
+    expect(getComponentSyncPendingCount()).toBe(1);
+
+    await retryComponentSync(); // del resolves now → drains
+    expect(del).toHaveBeenLastCalledWith({ siteId: "site-123", componentId: "c9" });
+    expect(getComponentSyncPendingCount()).toBe(0);
     off();
     warn.mockRestore();
   });
 
-  it.todo(
-    "BUG P1-1: no retry queue — a failed component mirror is dropped permanently (console.warn + one-shot notify only); cmsSync's queue + online-listener pattern should be ported"
-  );
-  it.todo(
-    "BUG: mirrorComponentDelete failure never fires onComponentSyncError (upsert does) — a failed delete mirror is silent to the toast layer, leaving a ghost master on the server"
-  );
+  it("a delete drops a pending upsert for the same component (no resurrection on retry)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    upsert.mockRejectedValueOnce(new Error("down"));
+    await mirrorComponentUpsert(comp("cx"));
+    expect(getComponentSyncPendingCount()).toBe(1);
+
+    await mirrorComponentDelete("cx"); // del resolves (reset default)
+    expect(getComponentSyncPendingCount()).toBe(0); // pending upsert dropped
+
+    upsert.mockClear();
+    await retryComponentSync();
+    expect(upsert).not.toHaveBeenCalled(); // deleted master never resurrected
+    warn.mockRestore();
+  });
 
   it("a throwing subscriber does not break the sync layer or other subscribers", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});

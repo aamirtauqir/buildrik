@@ -160,11 +160,22 @@ describe("FormspreeInjector.processHTML", () => {
     expect(out).toContain('action="https://formspree.io/f/abc" method="POST"');
   });
 
-  it.todo(
-    "BUG: form.id is interpolated into a RegExp without escaping — an id containing " +
-      "regex metacharacters (e.g. 'form.1', 'f+1') builds a pattern that can over-match " +
-      "or throw. processHTML should escape the id before `new RegExp(...)`."
-  );
+  it("escapes regex metacharacters in form.id (no over-match, no thrown pattern)", () => {
+    // Unescaped, 'a.c' as a regex matches 'abc' ('.' = any char) and would
+    // rewrite the WRONG form. Escaped, it only matches the literal id="a.c",
+    // so the 'abc' form is left untouched.
+    const overMatch = injector.processHTML('<form id="abc" action="/keep"></form>', [
+      { id: "a.c", formSettings: { provider: "formspree", formId: "xyz" } },
+    ]);
+    expect(overMatch).toBe('<form id="abc" action="/keep"></form>');
+
+    // A metacharacter id ('f+1') must still match literally and be rewritten,
+    // not silently mismatch or throw from `new RegExp`.
+    const matched = injector.processHTML('<form id="f+1"></form>', [
+      { id: "f+1", formSettings: { provider: "formspree", formId: "abc123" } },
+    ]);
+    expect(matched).toContain('action="https://formspree.io/f/abc123" method="POST"');
+  });
 });
 
 describe("FormspreeInjector.getFormAttributes", () => {

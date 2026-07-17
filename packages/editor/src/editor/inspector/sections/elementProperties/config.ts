@@ -322,7 +322,14 @@ export const ELEMENT_PROPERTIES: Record<string, PropertyConfig[]> = {
 
 /**
  * Get properties for an element type
+ *
+ * De-dupes by id: a type-specific field (e.g. image/link/iframe "title")
+ * wins over the shared default of the same id, so the returned list never
+ * carries two fields with the same key.
  */
 export function getPropertiesForType(type: string): PropertyConfig[] {
-  return [...(ELEMENT_PROPERTIES[type] || []), ...ELEMENT_PROPERTIES.default];
+  const specific = ELEMENT_PROPERTIES[type] || [];
+  const specificIds = new Set(specific.map((p) => p.id));
+  const defaults = ELEMENT_PROPERTIES.default.filter((p) => !specificIds.has(p.id));
+  return [...specific, ...defaults];
 }

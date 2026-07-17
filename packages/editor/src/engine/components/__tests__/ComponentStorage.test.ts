@@ -216,20 +216,23 @@ describe("open failure", () => {
     );
   });
 
-  // Pinned: `dbPromise` caches the REJECTED promise, so storage stays broken
-  // for the lifetime of the module even after IndexedDB recovers.
-  it("pins: a failed open is cached forever — later calls fail without retrying", async () => {
+  // A failed open resets the cached dbPromise, so a later call retries the
+  // open and succeeds once IndexedDB recovers.
+  it("a failed open is not cached — a later call retries the open and succeeds", async () => {
     env.openError = new DOMException("nope", "UnknownError");
     await expect(storage.loadComponents("p")).rejects.toThrow();
 
     env.openError = null; // IDB "recovers"
-    await expect(storage.loadComponents("p")).rejects.toThrow(
-      "Failed to open components database"
-    );
-    expect(env.openCalls).toHaveLength(1); // never retried
+    await expect(storage.loadComponents("p")).resolves.toEqual([]);
+    expect(env.openCalls).toHaveLength(2); // retried after the failure
   });
 
-  it.todo(
-    "BUG: getDatabase caches a rejected dbPromise — one transient IndexedDB open failure permanently disables component storage until full page reload; the cache should reset on rejection"
-  );
+  it("recovers fully after a transient open failure — save/load round-trips on retry", async () => {
+    env.openError = new DOMException("nope", "UnknownError");
+    await expect(storage.saveComponent(makeComponent(), "p")).rejects.toThrow();
+
+    env.openError = null; // IDB "recovers"
+    await storage.saveComponent(makeComponent({ id: "after" }), "p");
+    expect((await storage.loadComponents("p")).map((c) => c.id)).toEqual(["after"]);
+  });
 });

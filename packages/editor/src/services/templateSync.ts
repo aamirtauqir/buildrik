@@ -14,9 +14,30 @@ import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import { STORAGE_KEYS } from "../shared/constants/storageKeys";
+import { SyncRetryQueue } from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
+}
+
+// A failed mirror used to be console.warn'd and then dropped forever — with no
+// error channel at all (unlike version/component which at least notified). Now
+// it queues + notifies + retries on reconnect like cmsSync.
+const queue = new SyncRetryQueue();
+
+/** Subscribe to template-sync failures. Returns an unsubscribe fn. */
+export function onTemplateSyncError(cb: () => void): () => void {
+  return queue.onError(cb);
+}
+
+/** How many template mirrors are queued for retry (not yet on the server). */
+export function getTemplateSyncPendingCount(): number {
+  return queue.pendingCount();
+}
+
+/** Re-attempt every queued template mirror (called on reconnect + on demand). */
+export function retryTemplateSync(): Promise<void> {
+  return queue.retry();
 }
 
 /** Shape the editor stores in localStorage MY_TEMPLATES (see handleSaveTemplate). */
@@ -43,21 +64,22 @@ function readLocal(): MyTemplateRow[] {
 export async function mirrorUserTemplate(t: MyTemplateRow): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
-  try {
-    await client().userTemplates.upsert.mutate({
-      siteId,
-      templateId: t.id,
-      name: t.name,
-      category: t.category ?? null,
-      description: t.description ?? null,
-      html: t.html,
-      css: t.css ?? null,
-      thumbnail: t.thumbnail ?? null,
-    });
-  } catch (e) {
+  await queue.run(
+    `templateUpsert:${t.id}`,
+    () =>
+      client().userTemplates.upsert.mutate({
+        siteId,
+        templateId: t.id,
+        name: t.name,
+        category: t.category ?? null,
+        description: t.description ?? null,
+        html: t.html,
+        css: t.css ?? null,
+        thumbnail: t.thumbnail ?? null,
+      }),
     // eslint-disable-next-line no-console
-    console.warn("[template-sync] mirror failed (kept locally)", e);
-  }
+    (e) => console.warn("[template-sync] mirror failed (kept locally)", e)
+  );
 }
 
 /**

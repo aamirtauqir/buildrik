@@ -142,14 +142,14 @@ describe("useImportTokens", () => {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // BUG PIN §2-B13 — the modification path calls `updateToken(t.id, t.value)`,
-  // a (id, value) narrow-band API. An incoming token that carries a darkValue
-  // for an EXISTING id has its darkValue silently dropped: the registry token
-  // keeps its old darkValue (or none), so re-importing a dark-mode-complete
-  // export loses every dark variant on the modify path (adds keep theirs).
+  // §2-B13 (FIXED) — the modification path now calls
+  // `updateToken(t.id, t.value, t.darkValue)`, so an incoming token that
+  // carries a darkValue for an EXISTING id lands its dark variant in the
+  // registry. Re-importing a dark-mode-complete export no longer strips dark
+  // variants on the modify path.
   // ───────────────────────────────────────────────────────────────────────────
-  describe("§2-B13 darkValue drop on the modification path (pinned)", () => {
-    it("documents the bug: importing an existing id with a darkValue updates value but drops darkValue", () => {
+  describe("§2-B13 darkValue carried on the modification path (fixed)", () => {
+    it("importing an existing id with a darkValue updates value AND carries darkValue", () => {
       const useCombined = () => {
         const apply = useImportTokens();
         const color = useColorRegistry();
@@ -164,12 +164,8 @@ describe("useImportTokens", () => {
 
       const updated = result.current.color.tokens.find((t) => t.id === targetId);
       expect(updated?.value).toBe("#FF0000");
-      // ← current behavior: darkValue never reaches the registry.
-      expect(updated?.darkValue).not.toBe("#220000");
+      // darkValue now reaches the registry on the modify path.
+      expect(updated?.darkValue).toBe("#220000");
     });
-
-    it.todo(
-      "§2-B13 fix: modification path must carry darkValue (widen updateToken or add a patch API) — flip the documenting test above when fixed"
-    );
   });
 });

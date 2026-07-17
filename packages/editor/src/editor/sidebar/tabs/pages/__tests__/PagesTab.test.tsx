@@ -321,3 +321,98 @@ describe("PagesTab name conflict error via handleRenameCommit", () => {
     expect(commitRename).toHaveBeenCalledWith("p1", "Home");
   });
 });
+
+// ─── Bulk delete: no silent no-op when all pages selected ─────────────────────
+//
+// Replicates PagesTab.handleBulkDelete (same pattern as the handleRenameCommit
+// tests above). Previously the guard `pages.length > selectedIds.size` made the
+// deletable set empty whenever every page was selected → nothing happened, no
+// toast. The fix spares the home/first page and deletes the rest with feedback.
+
+describe("PagesTab handleBulkDelete", () => {
+  function makeHandler(pages: PageItem[], selectedIds: Set<string>) {
+    const deletePage = vi.fn();
+    const clearSelection = vi.fn();
+    const orderedPageIds = pages.map((pg) => pg.id);
+    const handleBulkDelete = () => {
+      const selected = [...selectedIds];
+      let deletable = selected.filter((id) => {
+        const pg = pages.find((x) => x.id === id);
+        return pg && !pg.isHome;
+      });
+      if (deletable.length >= pages.length && orderedPageIds.length > 0) {
+        const spareId = orderedPageIds[0];
+        deletable = deletable.filter((id) => id !== spareId);
+      }
+      if (deletable.length === 0) {
+        if (selected.length > 0) deletePage(selected[0]);
+        clearSelection();
+        return;
+      }
+      deletable.forEach((id) => deletePage(id));
+      clearSelection();
+    };
+    return { handleBulkDelete, deletePage, clearSelection };
+  }
+
+  it("deletes every non-home page (home spared) when ALL pages are selected", () => {
+    const pages = [
+      makePage({ id: "p1", name: "Home", isHome: true }),
+      makePage({ id: "p2", name: "About" }),
+      makePage({ id: "p3", name: "Contact" }),
+    ];
+    const { handleBulkDelete, deletePage } = makeHandler(
+      pages,
+      new Set(["p1", "p2", "p3"])
+    );
+
+    handleBulkDelete();
+
+    // Home preserved; the two other pages deleted (each toasts via deletePage).
+    expect(deletePage).toHaveBeenCalledTimes(2);
+    expect(deletePage).toHaveBeenCalledWith("p2");
+    expect(deletePage).toHaveBeenCalledWith("p3");
+    expect(deletePage).not.toHaveBeenCalledWith("p1");
+  });
+
+  it("spares the first page when all selected and none is flagged home", () => {
+    const pages = [
+      makePage({ id: "p1", name: "One" }),
+      makePage({ id: "p2", name: "Two" }),
+    ];
+    const { handleBulkDelete, deletePage } = makeHandler(pages, new Set(["p1", "p2"]));
+
+    handleBulkDelete();
+
+    expect(deletePage).toHaveBeenCalledTimes(1);
+    expect(deletePage).toHaveBeenCalledWith("p2");
+    expect(deletePage).not.toHaveBeenCalledWith("p1");
+  });
+
+  it("routes an only-home selection through the guarded single-delete (feedback, not silent)", () => {
+    const pages = [
+      makePage({ id: "p1", name: "Home", isHome: true }),
+      makePage({ id: "p2", name: "About" }),
+    ];
+    const { handleBulkDelete, deletePage } = makeHandler(pages, new Set(["p1"]));
+
+    handleBulkDelete();
+
+    // deletePage("p1") fires so the homepage guard toast surfaces — no silent no-op.
+    expect(deletePage).toHaveBeenCalledWith("p1");
+  });
+
+  it("deletes a normal subset without sparing anything", () => {
+    const pages = [
+      makePage({ id: "p1", name: "Home", isHome: true }),
+      makePage({ id: "p2", name: "About" }),
+      makePage({ id: "p3", name: "Contact" }),
+    ];
+    const { handleBulkDelete, deletePage } = makeHandler(pages, new Set(["p2"]));
+
+    handleBulkDelete();
+
+    expect(deletePage).toHaveBeenCalledTimes(1);
+    expect(deletePage).toHaveBeenCalledWith("p2");
+  });
+});

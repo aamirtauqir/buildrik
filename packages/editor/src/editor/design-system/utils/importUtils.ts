@@ -87,7 +87,10 @@ export function diffTokens(current: DesignToken[], incoming: DesignToken[]): Dif
     const existing = currentById.get(t.id);
     if (!existing) {
       added.push(t);
-    } else if (existing.value !== t.value) {
+    } else if (existing.value !== t.value || existing.darkValue !== t.darkValue) {
+      // §2-B13: a dark-mode-only change (light value identical) must still
+      // count as a modification, else re-importing a dark-complete export
+      // shows "nothing to apply" and the dark variant silently never lands.
       modified.push({ id: t.id, previousValue: existing.value, nextValue: t.value });
     }
   }

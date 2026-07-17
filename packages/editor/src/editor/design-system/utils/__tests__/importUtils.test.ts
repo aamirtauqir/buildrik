@@ -93,22 +93,19 @@ describe("diffTokens", () => {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
-  // BUG PIN §2-B13 — diffTokens compares `value` ONLY. A token whose incoming
-  // darkValue differs (light value identical) is classified as unchanged, so
-  // the import UI shows "0 conflicts / nothing to apply" and the dark variant
-  // silently never lands. Same blind spot for name/description edits.
+  // §2-B13 (FIXED) — diffTokens now compares darkValue alongside value. A
+  // token whose incoming darkValue differs (light value identical) is
+  // classified as modified, so the import UI surfaces the change and the dark
+  // variant lands instead of silently disappearing.
   // ───────────────────────────────────────────────────────────────────────────
-  describe("§2-B13 diffTokens is value-only (pinned)", () => {
-    it("documents the bug: a darkValue-only change is NOT classified as modified", () => {
+  describe("§2-B13 diffTokens compares darkValue (fixed)", () => {
+    it("classifies a darkValue-only change as modified", () => {
       const current = [tok("color-brand", "#0055FF", { darkValue: "#001133" })];
       const incoming = [tok("color-brand", "#0055FF", { darkValue: "#FFFFFF" })];
       const diff = diffTokens(current, incoming);
       expect(diff.added).toEqual([]);
-      expect(diff.modified).toEqual([]); // ← dark variant change invisible to import
+      expect(diff.modified).toHaveLength(1);
+      expect(diff.modified[0].id).toBe("color-brand");
     });
-
-    it.todo(
-      "§2-B13 fix: diffTokens should treat darkValue changes as modifications — flip the documenting test above when fixed"
-    );
   });
 });

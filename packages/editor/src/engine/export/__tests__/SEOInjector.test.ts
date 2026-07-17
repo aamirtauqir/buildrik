@@ -166,22 +166,23 @@ describe("SEOInjector.inject — canonical URL + slug fallback", () => {
     expect(html).toContain('<link rel="canonical" href="https://example.com/about-us">');
   });
 
-  it("CURRENT BEHAVIOR: the local slugifier only replaces whitespace — punctuation leaks into the URL", () => {
-    // getPageUrl's inline slugifier is `name.toLowerCase().replace(/\s+/g, "-")`.
-    // Unlike shared/utils slugify, it does NOT strip non-URL-safe characters.
+  it("strips invalid URL-segment characters from the slug fallback (reuses shared slugify)", () => {
+    // getPageUrl now delegates to shared/utils/helpers slugify(), which drops
+    // non-URL-safe characters (&, /, !, ?) instead of leaking them.
     const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
       makePage({ name: "Q&A / FAQ!" })
     );
-    // '&' is then entity-escaped by this.escape() in the href.
-    expect(html).toContain('<link rel="canonical" href="https://example.com/q&amp;a-/-faq!">');
+    expect(html).toContain('<link rel="canonical" href="https://example.com/qa-faq">');
+    expect(html).toContain('<meta property="og:url" content="https://example.com/qa-faq">');
+    expect(html).not.toContain("q&a");
   });
 
-  it.todo(
-    "BUG: slug fallback should strip invalid URL-segment characters (&, /, !, ?) — " +
-      "the local slugifier in SEOInjector.getPageUrl only replaces whitespace, so a page " +
-      "named 'Q&A / FAQ!' yields the invalid canonical 'https://example.com/q&a-/-faq!'. " +
-      "Should reuse shared/utils/helpers slugify()."
-  );
+  it("collapses punctuation and whitespace runs into single dashes in the slug fallback", () => {
+    const html = new SEOInjector({ baseUrl: "https://example.com" }).inject(
+      makePage({ name: "Hello,  World & More!" })
+    );
+    expect(html).toContain('<link rel="canonical" href="https://example.com/hello-world-more">');
+  });
 
   it("omits canonical and og:url when there is no baseUrl and no canonicalUrl", () => {
     const html = new SEOInjector().inject(makePage({ slug: "about" }));

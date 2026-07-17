@@ -155,6 +155,13 @@ export class ElementCRUD {
 
     if (!element || !newParent) return false;
 
+    // Reject moving an element into itself or one of its own descendants —
+    // that would create a parent cycle (a.parent === b while b.parent === a)
+    // and make tree traversals (getPath, isDescendantOf, ...) loop forever.
+    if (newParent.getId() === element.getId() || newParent.isDescendantOf(element)) {
+      return false;
+    }
+
     const oldParent = element.getParent();
     const movingWithinSameParent = oldParent && oldParent.getId?.() === newParent.getId?.();
 

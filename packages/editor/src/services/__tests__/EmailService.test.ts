@@ -38,14 +38,15 @@ describe("EmailService provider selection", () => {
   });
 
   it.each(["sendgrid", "mailgun", "resend"] as const)(
-    "%s throws 'backend proxy endpoint not yet configured' naming the provider",
+    "%s maps the 'backend proxy not configured' throw to a structured {success:false, error}",
     async (provider) => {
       service.configure({ provider, apiKey: "k", fromEmail: "noreply@site.test" });
 
-      // send()'s try/catch does NOT convert this to {success:false}: the
-      // provider method is returned without await, so its async throw leaves
-      // the try block as a rejected promise and reaches the caller raw.
-      await expect(service.send(baseMessage)).rejects.toThrow(
+      // FIXED: send() awaits the provider dispatch inside its try, so the async
+      // throw is caught and mapped to a structured result — not a raw rejection.
+      const res = await service.send(baseMessage);
+      expect(res.success).toBe(false);
+      expect(res.error).toMatch(
         new RegExp(
           `backend proxy endpoint not yet configured.*to enable ${provider} delivery`,
           "s"
@@ -54,9 +55,11 @@ describe("EmailService provider selection", () => {
     }
   );
 
-  it.todo(
-    "BUG: send() returns provider promises without await, so the catch block meant to map failures to {success:false, error} never fires for async provider throws — callers get raw rejections"
-  );
+  it("BUG FIXED: an async provider throw is caught by send() (no raw rejection reaches the caller)", async () => {
+    service.configure({ provider: "sendgrid", apiKey: "k", fromEmail: "noreply@site.test" });
+    // The promise resolves (never rejects) — the failure is inside the result.
+    await expect(service.send(baseMessage)).resolves.toMatchObject({ success: false });
+  });
 
   it("smtp is unsupported in the browser", async () => {
     service.configure({

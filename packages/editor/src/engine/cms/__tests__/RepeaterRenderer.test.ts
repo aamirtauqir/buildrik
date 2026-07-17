@@ -400,19 +400,53 @@ describe("RepeaterRenderer", () => {
       expect(a.getAttribute("href")).toBe('/x/a"b<c>');
     });
 
-    it.todo(
-      'BUG: escapeHtml() is a no-op round-trip — `div.textContent = text; return div.textContent` ' +
-        "returns its input unchanged (textContent never encodes entities). Rendering is only safe " +
-        "today because values are applied via textContent/setAttribute; any future consumer that " +
-        "trusts the 'escaped' return value in an innerHTML sink becomes an XSS hole. " +
-        "Fix: use `div.innerHTML` on the way out (or a manual entity map)."
-    );
+    it("escapeHtml genuinely escapes bound values so injected markup stays inert (no-op fixed)", async () => {
+      const { composer } = makeComposer({
+        bindings: { rep: makeBinding() },
+        itemsByCollection: {
+          "col-posts": [makeItem("i1", "col-posts", { title: "<script>alert(1)</script>" })],
+        },
+      });
+      const renderer = new RepeaterRenderer(composer);
 
-    it.todo(
-      "BUG: field values are passed to String.replace() as raw replacement strings — a CMS value " +
-        'containing "$&", "$`" or "$\'" triggers JS replacement-pattern substitution (e.g. "$&" ' +
-        "re-inserts the matched placeholder). Values must be inserted via a replacer function."
-    );
+      const out = await renderer.expandRepeaters(
+        '<div data-buildrick-id="rep"><h3>{{item.title}}</h3></div>'
+      );
+      const doc = parse(out);
+      const h3 = doc.querySelector("[data-cms-repeater-item] h3")!;
+
+      // The value renders as inert text, never a live <script> element — this
+      // only holds because escapeHtml now encodes entities before the value
+      // reaches the innerHTML sink (a no-op escapeHtml would build a node).
+      expect(h3.querySelector("script")).toBeNull();
+      expect(h3.textContent).toBe("<script>alert(1)</script>");
+      // Serialized output is single-escaped (entities present, not doubled).
+      expect(out).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+      expect(out).not.toContain("<script>alert(1)");
+      expect(out).not.toContain("&amp;lt;");
+    });
+
+    it("inserts values containing $-substitution patterns literally (replacer function, not raw replacement)", async () => {
+      const { composer } = makeComposer({
+        bindings: { rep: makeBinding() },
+        itemsByCollection: {
+          "col-posts": [makeItem("i1", "col-posts", { title: "A $& B $1 C", slug: "x$&y" })],
+        },
+      });
+      const renderer = new RepeaterRenderer(composer);
+
+      const doc = parse(
+        await renderer.expandRepeaters(
+          '<div data-buildrick-id="rep"><h3>{{item.title}}</h3><a href="/p/{{item.slug}}">go</a></div>'
+        )
+      );
+      const clone = doc.querySelector("[data-cms-repeater-item]")!;
+
+      // "$&" as a raw replacement string would re-insert the matched
+      // "{{item.title}}"; a replacer function keeps the value verbatim.
+      expect(clone.querySelector("h3")!.textContent).toBe("A $& B $1 C");
+      expect(clone.querySelector("a")!.getAttribute("href")).toBe("/p/x$&y");
+    });
   });
 
   describe("multiple repeaters", () => {
@@ -487,12 +521,50 @@ describe("RepeaterRenderer", () => {
       expect(doc.querySelector('[data-buildrick-id="inner-1"]')!.textContent).toBe("Sub B");
     });
 
-    it.todo(
-      "LIMITATION: nested repeaters are not recursively expanded — outer clones copy the inner " +
-        "template markup as-is (expansion order between outer/inner is a microtask race), so inner " +
-        "placeholders can survive inside outer clones. Recursive/nested expansion needs a " +
-        "sequential inner-first pass."
-    );
+    it("recursively expands a nested repeater inside every outer clone", async () => {
+      const { composer } = makeComposer({
+        bindings: {
+          outer: makeBinding({ elementId: "outer", collectionId: "col-outer" }),
+          inner: makeBinding({
+            elementId: "inner",
+            collectionId: "col-inner",
+            itemVar: "sub",
+          }),
+        },
+        itemsByCollection: {
+          "col-outer": [
+            makeItem("o1", "col-outer", { title: "Outer 1" }),
+            makeItem("o2", "col-outer", { title: "Outer 2" }),
+          ],
+          "col-inner": [
+            makeItem("s1", "col-inner", { label: "Sub A" }),
+            makeItem("s2", "col-inner", { label: "Sub B" }),
+          ],
+        },
+      });
+      const renderer = new RepeaterRenderer(composer);
+
+      const doc = parse(
+        await renderer.expandRepeaters(
+          '<div data-buildrick-id="outer"><span>{{item.title}}</span>' +
+            '<ul data-buildrick-id="inner"><li>{{sub.label}}</li></ul></div>'
+        )
+      );
+
+      const outerClones = Array.from(doc.querySelectorAll('[data-buildrick-id^="outer-"]'));
+      expect(outerClones).toHaveLength(2);
+
+      // Each outer clone carries its own fully-expanded inner repeater — the
+      // inner items are present inside the clone (pre-fix, the inner template
+      // was copied unexpanded and no inner items existed inside outer clones).
+      for (const clone of outerClones) {
+        const innerLabels = Array.from(
+          clone.querySelectorAll("[data-cms-repeater-item]")
+        ).map((n) => n.textContent);
+        expect(innerLabels).toContain("Sub A");
+        expect(innerLabels).toContain("Sub B");
+      }
+    });
   });
 
   describe("isRepeaterTemplate / getRepeaterBinding", () => {

@@ -293,7 +293,20 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         loadFromComposer();
       }
     };
-    const handleUndoRedo = () => loadFromComposer();
+    const handleUndoRedo = () => {
+      // Dirty guard (mirrors handleSettingsChange): a global engine undo/redo
+      // is a canvas action that must NOT silently discard unsaved DS-tab token
+      // edits. When the tab has staged changes, keep them and warn instead of
+      // reloading over them from stored settings.
+      if (isDirtyRef.current) {
+        addToast({
+          description: "Canvas undo/redo — your unsaved design token edits were kept.",
+          tone: "info",
+        });
+        return;
+      }
+      loadFromComposer();
+    };
     const bumpUsage = () => setUsageVersion((v) => v + 1);
 
     composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
@@ -357,6 +370,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
   const handleGuardDiscard = () => {
     allRegistries.forEach((r) => r.discardAll());
+    allPresetRegistries.forEach((r) => r.discardAll());
     setShowSectionGuard(false);
     if (pendingSection) { setActiveSection(pendingSection); setPendingSection(null); }
   };
@@ -434,6 +448,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     const count = totalDirty;
 
     allRegistries.forEach((r) => r.discardAll());
+    allPresetRegistries.forEach((r) => r.discardAll());
 
     addToast({
       description: `${count} change${count !== 1 ? "s" : ""} discarded`,

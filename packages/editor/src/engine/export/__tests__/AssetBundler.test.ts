@@ -139,17 +139,33 @@ describe("AssetBundler.bundleAssets", () => {
     expect(result.assets[0].originalUrl).toBe("https://cdn.x/good.png");
   });
 
-  it.todo(
-    "BUG: bundleAssets never reports failures — fetchAsset swallows every error to null, so no promise ever rejects and the `errors` array is always empty even when every fetch fails"
-  );
+  it("reports each failed fetch in the errors array (no longer swallowed to null)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) =>
+        url.includes("good") ? okResponse() : Promise.reject(new Error("network down"))
+      )
+    );
 
-  it("pins current behavior: a failed fetch yields empty assets AND an empty errors array", async () => {
+    const result = await new AssetBundler().bundleAssets([
+      "https://cdn.x/good.png",
+      "https://cdn.x/bad.png",
+    ]);
+
+    expect(result.assets).toHaveLength(1);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].url).toBe("https://cdn.x/bad.png");
+    expect(result.errors[0].error).toContain("network down");
+  });
+
+  it("a failed fetch yields empty assets AND a populated errors array", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => Promise.reject(new Error("network down"))));
 
     const result = await new AssetBundler().bundleAssets(["https://cdn.x/bad.png"]);
 
     expect(result.assets).toEqual([]);
-    expect(result.errors).toEqual([]); // failures are silently dropped
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].url).toBe("https://cdn.x/bad.png");
   });
 });
 

@@ -253,17 +253,15 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         return typeof favicon === "string" && favicon.trim().length > 0;
       } catch { return false; }
     })();
-    // At least 1 page — use elements.getPages if available, otherwise assume true
+    // At least 1 page — read the real pages API (pages live under
+    // composer.elements, NOT a `composer.pages` bag). When the API is
+    // unavailable we can't verify, so this required check stays incomplete
+    // rather than falsely green.
     const hasPages = (() => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const pagesApi = (_composer as any)?.pages;
-        if (pagesApi && typeof pagesApi.getAll === "function") {
-          const pages = pagesApi.getAll();
-          return Array.isArray(pages) && pages.length > 0;
-        }
-        return true; // assume true if API not available
-      } catch { return true; }
+        const pages = _composer?.elements?.getAllPages?.();
+        return Array.isArray(pages) && pages.length > 0;
+      } catch { return false; }
     })();
     const hasSeoTitle = (() => {
       try {
@@ -324,8 +322,10 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <ChecklistItem label="Page title set" ok={checks.hasPageTitle} hint="Settings → Site" />
             <ChecklistItem label="Favicon uploaded" ok={checks.hasFavicon} hint="Settings → Site" />
             <ChecklistItem label="At least 1 page" ok={checks.hasPages} required />
+            <ChecklistItem label="Page has content" ok={checks.hasContent} hint="Add sections" />
             <ChecklistItem label="SEO title set" ok={checks.hasSeoTitle} hint="Pages → SEO" />
             <ChecklistItem label="Meta description added" ok={checks.hasMetaDesc} hint="Pages → SEO" />
+            <ChecklistItem label="Social share image" ok={checks.hasSocialImg} hint="Pages → SEO" />
           </Stack>
           {projectId && (
             <p style={{ ...metaTextStyles, marginTop: 4 }}>

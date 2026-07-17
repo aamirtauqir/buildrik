@@ -34,11 +34,18 @@ import {
   mirrorVersionDelete,
   hydrateVersionsFromServer,
   onVersionSyncError,
+  retryVersionSync,
+  getVersionSyncPendingCount,
 } from "../versionSync";
 
-beforeEach(() => {
+beforeEach(async () => {
   window.history.replaceState({}, "", "/edit/site-123");
   [create, del, list, get, loadVersions, saveVersion].forEach((m) => m.mockReset());
+  // The retry queue is module-level shared state; flush anything a prior test
+  // left queued (reset mocks now resolve) so each test starts from empty, then
+  // clear the call history the flush incurred so per-test counts start at 0.
+  await retryVersionSync();
+  [create, del].forEach((m) => m.mockClear());
 });
 
 const ver = (id: string, name = "V") =>
@@ -97,41 +104,85 @@ describe("versionSync", () => {
   });
 });
 
-// AUDIT P1-1 (2026-07-16): versionSync has NO retry queue — unlike cmsSync,
-// a failed mirror is warned + notified once and then dropped permanently.
-// These tests pin the CURRENT behavior; the todo below tracks the gap.
-describe("versionSync failure semantics (audit P1-1 — no retry queue)", () => {
-  it("a failed create warns once and does NOT retry", async () => {
+// AUDIT P1-1 (2026-07-16) — FIXED: versionSync now shares cmsSync's retry queue
+// (SyncRetryQueue). A failed mirror is queued (not dropped), notified, and
+// replayed on reconnect ('online') / retryVersionSync().
+describe("versionSync failure semantics (audit P1-1 — retry queue)", () => {
+  it("a failed create warns, notifies, and queues (no auto-retry until reconnect)", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     create.mockRejectedValueOnce(new Error("network down"));
+    const heard: number[] = [];
+    const off = onVersionSyncError(() => heard.push(1));
     await mirrorVersionCreate(ver("v1"), false);
-    expect(create).toHaveBeenCalledTimes(1); // no re-attempt — op is dropped
+    expect(create).toHaveBeenCalledTimes(1); // queued, not re-fired synchronously
+    expect(heard).toEqual([1]);
+    expect(getVersionSyncPendingCount()).toBe(1); // kept for retry, not dropped
     expect(warn).toHaveBeenCalledWith(
       "[version-sync] create mirror failed (kept locally)",
       expect.any(Error)
     );
+    off();
     warn.mockRestore();
   });
 
-  it("a failed delete warns + never throws, and (current behavior) does NOT notify subscribers", async () => {
+  it("BUG P1-1 FIXED: a queued failed mirror is replayed on retry, then clears", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    create.mockRejectedValueOnce(new Error("network down"));
+    await mirrorVersionCreate(ver("v1", "First"), false);
+    expect(getVersionSyncPendingCount()).toBe(1);
+
+    // create now resolves (reset default) — retry re-sends the SAME payload.
+    await retryVersionSync();
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(create).toHaveBeenLastCalledWith(
+      expect.objectContaining({ siteId: "site-123", versionId: "v1", name: "First" })
+    );
+    expect(getVersionSyncPendingCount()).toBe(0);
+    warn.mockRestore();
+  });
+
+  it("BUG P1-1 FIXED: the window 'online' event auto-drains the queue", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    create.mockRejectedValueOnce(new Error("offline"));
+    await mirrorVersionCreate(ver("v1"), false);
+    expect(getVersionSyncPendingCount()).toBe(1);
+
+    window.dispatchEvent(new Event("online")); // create resolves now → flush
+    await vi.waitFor(() => expect(getVersionSyncPendingCount()).toBe(0));
+    warn.mockRestore();
+  });
+
+  it("BUG FIXED: mirrorVersionDelete failure fires onVersionSyncError + queues", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     del.mockRejectedValueOnce(new Error("network down"));
     const heard: number[] = [];
     const off = onVersionSyncError(() => heard.push(1));
     await expect(mirrorVersionDelete("v9")).resolves.toBeUndefined();
     expect(warn).toHaveBeenCalledWith("[version-sync] delete mirror failed", expect.any(Error));
-    expect(heard).toEqual([]); // delete failures are subscriber-silent today
-    expect(del).toHaveBeenCalledTimes(1); // and never retried
+    expect(heard).toEqual([1]); // delete failures now surface to the toast layer
+    expect(getVersionSyncPendingCount()).toBe(1);
+
+    await retryVersionSync(); // del resolves now → drains
+    expect(del).toHaveBeenLastCalledWith({ siteId: "site-123", versionId: "v9" });
+    expect(getVersionSyncPendingCount()).toBe(0);
     off();
     warn.mockRestore();
   });
 
-  it.todo(
-    "BUG P1-1: no retry queue — a failed version mirror is dropped permanently (console.warn + one-shot notify only); cmsSync's queue + online-listener pattern should be ported"
-  );
-  it.todo(
-    "BUG: mirrorVersionDelete failure never fires onVersionSyncError (create does) — a failed delete mirror is silent to the toast layer, leaving a ghost version on the server"
-  );
+  it("a delete drops a pending create for the same version (no resurrection on retry)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    create.mockRejectedValueOnce(new Error("down"));
+    await mirrorVersionCreate(ver("vx"), false);
+    expect(getVersionSyncPendingCount()).toBe(1);
+
+    await mirrorVersionDelete("vx"); // del resolves (reset default)
+    expect(getVersionSyncPendingCount()).toBe(0); // pending create dropped
+
+    create.mockClear();
+    await retryVersionSync();
+    expect(create).not.toHaveBeenCalled(); // deleted version never resurrected
+    warn.mockRestore();
+  });
 
   it("an unsubscribed listener stops receiving failures", async () => {
     create.mockRejectedValue(new Error("down"));

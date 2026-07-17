@@ -280,10 +280,10 @@ describe("ElementManager.moveElement", () => {
     expect((moved[0][1] as { index: number }).index).toBe(1);
   });
 
-  // Pinned current behavior: no ancestry guard — moving an element into its
-  // own descendant silently creates a parent cycle (a.parent === b while
-  // b.parent === a). Traversals like getPath() would then loop forever.
-  it("pins: moving an element into its own descendant creates a parent cycle", () => {
+  // moveElement refuses to move an element into its own descendant — that would
+  // create a parent cycle (a.parent === b while b.parent === a) and make
+  // traversals like getPath() loop forever.
+  it("refuses to move an element into its own descendant (no parent cycle)", () => {
     const { manager } = makeEngine();
     const page = manager.createPage("Home");
     const a = manager.createElement("container");
@@ -291,14 +291,21 @@ describe("ElementManager.moveElement", () => {
     manager.addElement(a, page.root.id);
     manager.addElement(b, a.getId());
 
-    expect(manager.moveElement(a.getId(), b.getId())).toBe(true);
-    expect(a.getParent()?.getId()).toBe(b.getId());
+    expect(manager.moveElement(a.getId(), b.getId())).toBe(false);
+    // The tree is unchanged: a stays under the page root, b stays under a.
+    expect(a.getParent()?.getId()).toBe(page.root.id);
     expect(b.getParent()?.getId()).toBe(a.getId());
   });
 
-  it.todo(
-    "BUG: moveElement should refuse to move an element into its own descendant — currently returns true and corrupts the tree with a parent cycle"
-  );
+  it("refuses to move an element into itself", () => {
+    const { manager } = makeEngine();
+    const page = manager.createPage("Home");
+    const box = manager.createElement("container");
+    manager.addElement(box, page.root.id);
+
+    expect(manager.moveElement(box.getId(), box.getId())).toBe(false);
+    expect(box.getParent()?.getId()).toBe(page.root.id);
+  });
 });
 
 describe("ElementManager.duplicateElement / serializeElement / pasteElement", () => {

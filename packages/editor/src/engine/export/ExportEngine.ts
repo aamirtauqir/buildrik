@@ -67,7 +67,7 @@ export interface MultiPageExportFile {
   /** File content */
   content: string;
   /** File type */
-  type: "html" | "css" | "js" | "xml";
+  type: "html" | "css" | "js" | "xml" | "tsx" | "json";
 }
 
 /**
@@ -76,6 +76,16 @@ export interface MultiPageExportFile {
 export interface MultiPageExportResult {
   /** Array of exported files */
   files: MultiPageExportFile[];
+}
+
+/** Bucket a filename into the coarse MultiPageExportFile type tag. */
+function multiPageFileType(name: string): MultiPageExportFile["type"] {
+  if (name.endsWith(".css")) return "css";
+  if (name.endsWith(".tsx") || name.endsWith(".ts")) return "tsx";
+  if (name.endsWith(".json")) return "json";
+  if (name.endsWith(".xml")) return "xml";
+  if (name.endsWith(".js")) return "js";
+  return "html";
 }
 
 // ============================================================================
@@ -441,6 +451,25 @@ export class ExportEngine {
    * @returns Promise resolving to export result with files array
    */
   async exportAllPages(options: MultiPageExportOptions): Promise<MultiPageExportResult> {
+    // Honor the requested format. HTML falls through to the multi-page HTML
+    // pipeline below; react delegates to ReactExporter; vue is not built yet.
+    if (options.format === "react") {
+      const reactResult = new ReactExporter(this.composer).export();
+      if (!reactResult.success || !reactResult.files) {
+        throw new Error(reactResult.error ?? "React export failed");
+      }
+      return {
+        files: reactResult.files.map((f) => ({
+          name: f.name,
+          content: f.content,
+          type: multiPageFileType(f.name),
+        })),
+      };
+    }
+    if (options.format === "vue") {
+      throw new Error("Vue export is not implemented");
+    }
+
     // exportPages() rehydrates root via live Element.toJSON(); getAllPages()
     // returns the stale ctx.pages snapshot, which misses click-to-add children
     // because element mutations only touch Element instances, not page.root JSON.

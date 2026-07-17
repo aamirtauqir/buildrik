@@ -65,7 +65,8 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
   const addAttribute = () => {
     if (!newKey.trim()) return;
 
-    const key = newKey.startsWith("data-") ? newKey : `data-${newKey}`;
+    const key =
+      newKey.startsWith("data-") || newKey.startsWith("aria-") ? newKey : `data-${newKey}`;
 
     if (composer) {
       const el = composer.elements.getElement(elementId);

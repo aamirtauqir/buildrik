@@ -22,7 +22,12 @@ import { Stack } from "@/editor/shared/vibcoder";
 
 export interface CodePreviewProps {
   html: string;
-  css: string;
+  /**
+   * CSS source. NOT named `css` — the app compiles with the Emotion jsx
+   * runtime (jsxImportSource: "@emotion/react"), which intercepts any JSX prop
+   * literally named `css`, so the value never reaches this component.
+   */
+  cssCode: string;
   defaultTab?: CodeTab;
   showLineNumbers?: boolean;
   onCopy?: (content: string, type: "html" | "css") => void;
@@ -244,7 +249,7 @@ const CodeBlock: React.FC<{
 
 export const CodePreview: React.FC<CodePreviewProps> = ({
   html,
-  css,
+  cssCode,
   defaultTab = "html",
   showLineNumbers = true,
   onCopy: _onCopy,
@@ -265,7 +270,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
         <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
           {activeTab === "html"
             ? `${html.split("\n").length} lines`
-            : `${css.split("\n").length} lines`}
+            : `${cssCode.split("\n").length} lines`}
         </span>
       </div>
 
@@ -274,7 +279,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
         <CodeBlock code={html} language="html" showLineNumbers={showLineNumbers} />
       )}
       {activeTab === "css" && (
-        <CodeBlock code={css} language="css" showLineNumbers={showLineNumbers} />
+        <CodeBlock code={cssCode} language="css" showLineNumbers={showLineNumbers} />
       )}
     </Stack>
   );

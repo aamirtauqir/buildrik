@@ -147,9 +147,16 @@ export class StyleEngine {
    * Get all rules for a selector
    */
   getRulesForSelector(selector: string): StyleData[] {
-    return Array.from(this.styles.values()).filter(
-      (s) => s.selector === selector || s.selector.startsWith(selector)
-    );
+    return Array.from(this.styles.values()).filter((s) => {
+      if (s.selector === selector) return true;
+      if (!s.selector.startsWith(selector)) return false;
+      // Only count a match when the prefix ends on a selector boundary — a
+      // pseudo (`:hover`), compound (`.active`), attribute (`[disabled]`), or
+      // combinator/descendant (`> + ~ ,` or whitespace). A plain identifier
+      // continuation (`-`, letters, digits, `_`) is a different class, so
+      // `.btn` must NOT match `.btn-primary`.
+      return /[:.[>+~,\s]/.test(s.selector.charAt(selector.length));
+    });
   }
 
   // ============================================
@@ -328,8 +335,10 @@ export class StyleEngine {
       ...styles,
     };
 
-    // Store back on element via setData
-    element.setData("breakpointStyles", currentBreakpointStyles);
+    // Store back on the TOP-LEVEL ElementData.breakpointStyles field — the one
+    // ReactExporter and serialization read. setData() writes into the
+    // custom-data bag (data.data), which those consumers never look at.
+    element.setBreakpointStyles(currentBreakpointStyles);
   }
 
   /**
@@ -515,23 +524,38 @@ export class StyleEngine {
   }
 
   /**
-   * Optimize CSS (remove duplicates, merge similar rules)
+   * Optimize CSS (remove duplicate rules).
+   *
+   * Dedupes on whole rules (selector + brace block), not raw lines. A
+   * line-based pass would eat declaration lines and closing braces shared
+   * across different rules (`display: flex;`, `margin: 0;`, `}`), corrupting
+   * any multi-rule stylesheet. Brace-depth tracking keeps @media blocks intact
+   * as a single unit.
    */
   optimizeCSS(css: string): string {
-    // Remove duplicate rules
-    const lines = css.split("\n");
     const seen = new Set<string>();
-    const optimized: string[] = [];
+    const rules: string[] = [];
+    let depth = 0;
+    let start = 0;
 
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed && !seen.has(trimmed)) {
-        seen.add(trimmed);
-        optimized.push(line);
+    for (let i = 0; i < css.length; i++) {
+      const ch = css[i];
+      if (ch === "{") {
+        depth++;
+      } else if (ch === "}") {
+        depth--;
+        if (depth === 0) {
+          const rule = css.slice(start, i + 1).trim();
+          if (rule && !seen.has(rule)) {
+            seen.add(rule);
+            rules.push(rule);
+          }
+          start = i + 1;
+        }
       }
     }
 
-    return optimized.join("\n");
+    return rules.join("\n");
   }
 
   /**

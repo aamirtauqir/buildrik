@@ -49,6 +49,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onReplayTour,
   projectId,
   onSettingsDirtyChange,
+  onTemplatesSwitchTab,
 }) => {
   switch (activeTab) {
     case "templates":
@@ -56,6 +57,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
         <TemplatesTab
           composer={composer}
           onTemplateUsed={onSwitchToAdd}
+          onSwitchTab={onTemplatesSwitchTab}
           {...commonTabProps}
         />
       );

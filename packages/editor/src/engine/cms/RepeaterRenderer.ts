@@ -30,12 +30,15 @@ export class RepeaterRenderer {
   }
 
   /**
-   * Escape HTML special characters to prevent XSS
+   * Escape HTML special characters to prevent XSS. Setting textContent stores
+   * the raw string; reading innerHTML serializes it with `&`, `<`, `>` encoded
+   * as entities. (Reading textContent back — the previous implementation —
+   * returned the input untouched, a no-op that only looked like escaping.)
    */
   private escapeHtml(text: string): string {
     const div = document.createElement("div");
     div.textContent = text;
-    return div.textContent || "";
+    return div.innerHTML;
   }
 
   /**
@@ -49,22 +52,27 @@ export class RepeaterRenderer {
     const parser = new DOMParser();
     const doc = parser.parseFromString(rootHtml, "text/html");
 
-    // Find all elements with data-buildrick-id that have collection bindings
-    const elements = doc.querySelectorAll("[data-buildrick-id]");
-    const expansionPromises: Promise<void>[] = [];
-
-    elements.forEach((el) => {
+    // Find all elements bound to a collection (repeater templates).
+    const repeaters = Array.from(doc.querySelectorAll("[data-buildrick-id]")).filter((el) => {
       const elementId = el.getAttribute("data-buildrick-id");
-      if (!elementId) return;
-
-      const binding = this.composer.cms.bindings.getCollectionBinding(elementId);
-      if (!binding) return;
-
-      // Queue expansion for this repeater
-      expansionPromises.push(this.expandRepeater(el as HTMLElement, binding, doc));
+      return !!elementId && !!this.composer.cms.bindings.getCollectionBinding(elementId);
     });
 
-    await Promise.all(expansionPromises);
+    // Only expand top-level repeaters here. A repeater nested inside another
+    // repeater is expanded recursively (inner-first per clone) by
+    // expandRepeater, so expanding it here too would race the outer clone and
+    // leave the copies inside those clones un-expanded.
+    const topLevel = repeaters.filter(
+      (el) => !repeaters.some((other) => other !== el && other.contains(el)),
+    );
+
+    await Promise.all(
+      topLevel.map((el) => {
+        const elementId = el.getAttribute("data-buildrick-id")!;
+        const binding = this.composer.cms.bindings.getCollectionBinding(elementId)!;
+        return this.expandRepeater(el as HTMLElement, binding, doc);
+      }),
+    );
     return doc.body.innerHTML;
   }
 
@@ -97,6 +105,7 @@ export class RepeaterRenderer {
     // Create a fragment to hold all cloned elements
     const fragment = doc.createDocumentFragment();
     const originalId = templateEl.getAttribute("data-buildrick-id");
+    const clones: HTMLElement[] = [];
 
     items.forEach((item, index) => {
       const context: RepeaterContext = {
@@ -117,6 +126,7 @@ export class RepeaterRenderer {
       clonedEl.removeAttribute("data-cms-repeater-template");
 
       fragment.appendChild(clonedEl);
+      clones.push(clonedEl);
     });
 
     // Replace template with expanded items
@@ -128,6 +138,33 @@ export class RepeaterRenderer {
       // Insert expanded items after template
       templateEl.parentNode.insertBefore(fragment, templateEl.nextSibling);
     }
+
+    // Recurse: a nested repeater lives inside each clone with its original
+    // data-buildrick-id intact (applyContext only re-keys the clone's own
+    // id). Expand those now so inner placeholders don't survive in the outer
+    // clones.
+    await this.expandNestedRepeaters(clones, doc);
+  }
+
+  /**
+   * Expand any collection-bound descendants inside freshly-cloned repeater
+   * items. Runs after the parent clones exist so the inner template's markup
+   * is real DOM to clone from, not a raw string in the outer template.
+   */
+  private async expandNestedRepeaters(clones: HTMLElement[], doc: Document): Promise<void> {
+    if (!this.composer.cms.bindings) return;
+
+    const nested: Promise<void>[] = [];
+    for (const clone of clones) {
+      clone.querySelectorAll("[data-buildrick-id]").forEach((el) => {
+        const elementId = el.getAttribute("data-buildrick-id");
+        if (!elementId) return;
+        const binding = this.composer.cms.bindings.getCollectionBinding(elementId);
+        if (!binding) return;
+        nested.push(this.expandRepeater(el as HTMLElement, binding, doc));
+      });
+    }
+    await Promise.all(nested);
   }
 
   /**
@@ -158,23 +195,42 @@ export class RepeaterRenderer {
 
     textNodes.forEach((textNode) => {
       let text = textNode.textContent || "";
+      let injectedValue = false;
 
-      // Replace index variable
+      // Replace index variable (numeric — safe literal)
       const indexPattern = new RegExp(`\\{\\{\\s*${indexVar}\\s*\\}\\}`, "g");
-      text = text.replace(indexPattern, String(index));
+      text = text.replace(indexPattern, () => String(index));
 
-      // Replace item fields (escaped for safety)
+      // Replace item fields. The replacement is a function so a value
+      // containing "$&", "$1", etc. is inserted verbatim rather than being
+      // interpreted as a String.replace substitution pattern. The value is
+      // HTML-escaped so any markup it carries is inert once injected below.
       Object.entries(item.data).forEach(([fieldName, value]) => {
         const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
-        text = text.replace(fieldPattern, this.escapeHtml(String(value ?? "")));
+        text = text.replace(fieldPattern, () => {
+          injectedValue = true;
+          return this.escapeHtml(String(value ?? ""));
+        });
       });
 
-      // Replace context helpers
-      text = text.replace(/\{\{\s*isFirst\s*\}\}/g, String(context.isFirst));
-      text = text.replace(/\{\{\s*isLast\s*\}\}/g, String(context.isLast));
-      text = text.replace(/\{\{\s*total\s*\}\}/g, String(context.total));
+      // Replace context helpers (boolean / count — safe literals)
+      text = text.replace(/\{\{\s*isFirst\s*\}\}/g, () => String(context.isFirst));
+      text = text.replace(/\{\{\s*isLast\s*\}\}/g, () => String(context.isLast));
+      text = text.replace(/\{\{\s*total\s*\}\}/g, () => String(context.total));
 
-      textNode.textContent = text;
+      if (injectedValue) {
+        // A field value was substituted and HTML-escaped. Inject through an
+        // innerHTML sink so the escaped entities decode back to inert text —
+        // a raw "<script>" in a CMS value lands as literal characters, never
+        // a live node. This is the sink escapeHtml exists to protect.
+        const template = (el.ownerDocument ?? document).createElement("template");
+        template.innerHTML = text;
+        textNode.replaceWith(template.content);
+      } else {
+        // Pure literal / index / helper text — assign as text so author
+        // markup stays verbatim (no re-parse of trusted template text).
+        textNode.textContent = text;
+      }
     });
 
     // Process attributes
@@ -187,15 +243,19 @@ export class RepeaterRenderer {
         // Replace index variable
         const indexPattern = new RegExp(`\\{\\{\\s*${indexVar}\\s*\\}\\}`, "g");
         if (indexPattern.test(value)) {
-          value = value.replace(indexPattern, String(index));
+          value = value.replace(indexPattern, () => String(index));
           modified = true;
         }
 
-        // Replace item fields
+        // Replace item fields. Replacer function so a value containing "$&"
+        // etc. is inserted literally. The value is set through setAttribute
+        // (a DOM sink) and serialized by innerHTML on the way out, which
+        // entity-encodes it — no manual escaping needed (and pre-escaping
+        // here would double-encode the attribute).
         Object.entries(item.data).forEach(([fieldName, fieldValue]) => {
           const fieldPattern = new RegExp(`\\{\\{\\s*${itemVar}\\.${fieldName}\\s*\\}\\}`, "g");
           if (fieldPattern.test(value)) {
-            value = value.replace(fieldPattern, this.escapeHtml(String(fieldValue ?? "")));
+            value = value.replace(fieldPattern, () => String(fieldValue ?? ""));
             modified = true;
           }
         });

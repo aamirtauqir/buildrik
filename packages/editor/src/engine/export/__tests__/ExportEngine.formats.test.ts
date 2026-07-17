@@ -402,18 +402,22 @@ describe("ExportEngine.exportAllPages — sitemap & SEO titles", () => {
     expect(html).toContain(".hero{color:pink}");
   });
 
-  it.todo(
-    "BUG: exportAllPages ignores options.format — requesting 'react' (or 'vue') still emits plain HTML files; the format option is declared but never branched on"
-  );
-
-  it("pins current behavior: format 'react' still produces .html files", async () => {
+  it("honors options.format 'react' — delegates to ReactExporter and emits .tsx components, not .html", async () => {
     const pages = [page("Home", { isHome: true })];
     const result = await new ExportEngine(makeComposer({ pages })).exportAllPages({
       format: "react",
     });
 
-    expect(result.files.some((f) => f.name === "index.html")).toBe(true);
-    expect(result.files.some((f) => f.name.endsWith(".tsx"))).toBe(false);
+    expect(result.files.some((f) => f.name === "components/Home.tsx")).toBe(true);
+    expect(result.files.some((f) => f.name.endsWith(".tsx"))).toBe(true);
+    expect(result.files.some((f) => f.name === "index.html")).toBe(false);
+  });
+
+  it("throws a clear not-implemented error for the vue format", async () => {
+    const pages = [page("Home", { isHome: true })];
+    await expect(
+      new ExportEngine(makeComposer({ pages })).exportAllPages({ format: "vue" })
+    ).rejects.toThrow(/not implemented/i);
   });
 });
 

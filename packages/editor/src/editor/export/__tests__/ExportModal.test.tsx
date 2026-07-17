@@ -141,13 +141,20 @@ describe("ExportModal — rendering + export generation", () => {
 });
 
 describe("ExportModal — tab switching", () => {
-  it.todo(
-    "BUG: ExportModal passes a prop literally named `css` to <CodePreview> (ExportModal.tsx:207/404). The app compiles with the Emotion jsx runtime (vite.config.ts jsxImportSource: '@emotion/react'), which intercepts any `css` prop: in dev, rendering the Code tab with non-empty CSS throws 'Strings are not allowed as css prop values'; in all modes Emotion consumes the prop, so CodePreview receives css=undefined and clicking its CSS tab crashes on css.split. Rename the prop (e.g. cssCode)."
-  );
+  it("forwards non-empty CSS to CodePreview via the renamed cssCode prop (no Emotion interception)", async () => {
+    // The prop is now `cssCode`, so the Emotion jsx runtime no longer swallows
+    // it: the Code tab renders and the CSS sub-tab shows the real CSS instead
+    // of crashing on css.split of an undefined value.
+    mocks.exportFn.mockResolvedValue({ ...successResult, css: ".hero { color: green; }" });
+    renderModal();
+    await screen.findByText(/5 elements/);
+
+    fireEvent.click(screen.getByRole("tab", { name: "Code" }));
+    fireEvent.click(screen.getByRole("tab", { name: "CSS" }));
+    expect(screen.getByText(/green/)).toBeInTheDocument();
+  });
 
   it("switches between Preview, Code and Options tabs", async () => {
-    // css must be empty here — non-empty css triggers the Emotion css-prop
-    // bug documented in the it.todo above and crashes the Code tab.
     mocks.exportFn.mockResolvedValue({ ...successResult, css: "" });
     renderModal();
     await screen.findByText(/5 elements/);

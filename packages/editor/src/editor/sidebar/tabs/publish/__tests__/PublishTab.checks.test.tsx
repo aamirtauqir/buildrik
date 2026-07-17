@@ -3,9 +3,9 @@
  * PublishTab — pre-publish readiness checks.
  *
  * Companion to PublishTab.test.tsx (which covers SEO readiness text +
- * canonical publish wiring). This file pins the checks-computation logic:
- * the two KNOWN quirks (always-green "pages" check; 7-computed-vs-5-rendered)
- * plus honest coverage of the settings-driven checks that actually vary.
+ * canonical publish wiring). This file covers the checks-computation logic:
+ * the "pages" check now reads the real pages API, all 7 computed checks
+ * render, plus honest coverage of the settings-driven checks that vary.
  *
  * @license BSD-3-Clause
  */
@@ -50,49 +50,60 @@ function composerWith(
   } as unknown as ComposerProp;
 }
 
-describe("PublishTab — KNOWN §2-B2 (pin): pages check is always green", () => {
-  // KNOWN §2-B2 (pin): pages check is always green — do not fix without product decision.
-  // The check reads `composer.pages.getAll`, an API the real Composer does not
-  // expose (pages live under `composer.elements`), so it falls through to
-  // `return true` regardless of how many pages actually exist — even zero.
-  it("renders 'At least 1 page' as complete even when the project reports zero pages", () => {
-    // getAllPages returns [] here, yet the check never consults it, so it stays green.
+describe("PublishTab — pages check reflects the real page count", () => {
+  // FIXED §2-B2: the check now reads the real pages API
+  // (composer.elements.getAllPages), so an empty project reads "incomplete"
+  // instead of falsely green. The old code read a nonexistent `composer.pages`
+  // bag and fell through to `return true`.
+  it("renders 'At least 1 page' as incomplete when the project reports zero pages", () => {
     const composer = composerWith({}, {
       elements: { getAllPages: () => [], getActivePage: () => null, getElement: () => null },
+    });
+    render(<PublishTab composer={composer} />);
+    expect(screen.getByLabelText("At least 1 page: incomplete")).toBeTruthy();
+  });
+
+  it("renders 'At least 1 page' as complete once the project has pages", () => {
+    const composer = composerWith({}, {
+      elements: {
+        getAllPages: () => [{ id: "p1" }],
+        getActivePage: () => null,
+        getElement: () => null,
+      },
     });
     render(<PublishTab composer={composer} />);
     expect(screen.getByLabelText("At least 1 page: complete")).toBeTruthy();
   });
 
-  it("renders 'At least 1 page' as complete even with no composer at all", () => {
+  it("renders 'At least 1 page' as incomplete with no composer at all", () => {
     render(<PublishTab composer={null} />);
-    expect(screen.getByLabelText("At least 1 page: complete")).toBeTruthy();
+    expect(screen.getByLabelText("At least 1 page: incomplete")).toBeTruthy();
   });
 });
 
-describe("PublishTab — KNOWN (pin): 7 checks computed, 5 rendered", () => {
-  // KNOWN (pin): the checks useMemo computes 7 booleans (hasContent,
-  // hasPageTitle, hasFavicon, hasPages, hasSeoTitle, hasMetaDesc, hasSocialImg)
-  // but the checklist renders only 5 rows — hasContent and hasSocialImg are
-  // computed and then never displayed. Pin the current rendered count.
-  it("renders exactly 5 checklist rows", () => {
+describe("PublishTab — all 7 computed checks are rendered", () => {
+  // FIXED: the checks useMemo computes 7 booleans (hasContent, hasPageTitle,
+  // hasFavicon, hasPages, hasSeoTitle, hasMetaDesc, hasSocialImg) and the
+  // checklist now renders a row for every one — hasContent and hasSocialImg
+  // are no longer computed-then-dropped.
+  it("renders exactly 7 checklist rows", () => {
     const { container } = render(<PublishTab composer={composerWith()} />);
     // Every ChecklistItem carries aria-label `<label>: (in)complete`; both
     // suffixes end in "complete". StatusBadge ends in "Published"/"Draft".
     const rows = container.querySelectorAll('[aria-label$="complete"]');
-    expect(rows.length).toBe(5);
+    expect(rows.length).toBe(7);
   });
 
-  it("renders the 5 known checklist labels and no row for the 2 unrendered checks", () => {
+  it("renders all 7 checklist labels, including the previously-dropped two", () => {
     render(<PublishTab composer={composerWith()} />);
     expect(screen.getByText("Page title set")).toBeTruthy();
     expect(screen.getByText("Favicon uploaded")).toBeTruthy();
     expect(screen.getByText("At least 1 page")).toBeTruthy();
     expect(screen.getByText("SEO title set")).toBeTruthy();
     expect(screen.getByText("Meta description added")).toBeTruthy();
-    // hasContent / hasSocialImg have no checklist row.
-    expect(screen.queryByText(/social image/i)).toBeNull();
-    expect(screen.queryByText(/has content/i)).toBeNull();
+    // hasContent / hasSocialImg now each have a checklist row.
+    expect(screen.getByText("Page has content")).toBeTruthy();
+    expect(screen.getByText("Social share image")).toBeTruthy();
   });
 });
 

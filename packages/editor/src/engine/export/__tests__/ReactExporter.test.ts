@@ -389,11 +389,7 @@ describe("ReactExporter — zip bundle, scaffold, naming fallbacks (extension)",
     expect(tsx.content).not.toContain("<b>");
   });
 
-  it.todo(
-    "BUG: two pages with the same name produce colliding components/<Name>.tsx entries (last one wins inside a zip) and index.tsx re-exports the same identifier twice — invalid TypeScript"
-  );
-
-  it("pins current behavior: duplicate page names emit duplicate file paths and duplicate index exports", () => {
+  it("de-dupes colliding component names so duplicate page names get distinct files + exports", () => {
     const composer = makeTestComposer([
       { id: "page-1", name: "Home", root: makeElement({ id: "el-1", type: "container" }) },
       { id: "page-2", name: "Home", root: makeElement({ id: "el-2", type: "container" }) },
@@ -401,13 +397,37 @@ describe("ReactExporter — zip bundle, scaffold, naming fallbacks (extension)",
 
     const result = new ReactExporter(composer).export();
 
-    const homeFiles = result.files!.filter((f) => f.name === "components/Home.tsx");
-    expect(homeFiles).toHaveLength(2);
+    const names = result.files!.map((f) => f.name);
+    expect(names).toContain("components/Home.tsx");
+    expect(names).toContain("components/Home2.tsx");
+    // Only one file at each path — no last-one-wins collision.
+    expect(names.filter((n) => n === "components/Home.tsx")).toHaveLength(1);
 
     const indexTsx = result.files!.find((f) => f.name === "index.tsx")!;
-    const exportLines = indexTsx.content
+    expect(indexTsx.content).toContain("export { Home }");
+    expect(indexTsx.content).toContain("export { Home2 }");
+    // The `Home` identifier is re-exported exactly once (valid TypeScript).
+    const homeExports = indexTsx.content
       .split("\n")
       .filter((l) => l.includes("export { Home }"));
-    expect(exportLines).toHaveLength(2);
+    expect(homeExports).toHaveLength(1);
+  });
+
+  it("suffixes each further collision incrementally (Home, Home2, Home3)", () => {
+    const composer = makeTestComposer([
+      { id: "page-1", name: "Home", root: makeElement({ id: "el-1", type: "container" }) },
+      { id: "page-2", name: "Home", root: makeElement({ id: "el-2", type: "container" }) },
+      { id: "page-3", name: "Home", root: makeElement({ id: "el-3", type: "container" }) },
+    ]);
+
+    const result = new ReactExporter(composer).export();
+    const names = result.files!.map((f) => f.name);
+
+    expect(names).toContain("components/Home.tsx");
+    expect(names).toContain("components/Home2.tsx");
+    expect(names).toContain("components/Home3.tsx");
+    expect(names.filter((n) => n.startsWith("components/Home") && n.endsWith(".tsx"))).toHaveLength(
+      3
+    );
   });
 });

@@ -17,59 +17,62 @@ import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import { currentSiteId } from "./ReviewService";
 import { loadComponents, saveComponent } from "../engine/components/ComponentStorage";
 import type { ComponentDefinition } from "../shared/types/components";
+import { SyncRetryQueue } from "./syncRetryQueue";
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);
 }
 
-const errorSubscribers = new Set<() => void>();
+// A failed mirror used to be console.warn'd (upsert also one-shot-notified) and
+// then dropped forever. Now it queues + retries on reconnect like cmsSync.
+const queue = new SyncRetryQueue();
 
 /** Subscribe to component-sync failures. Returns an unsubscribe fn. */
 export function onComponentSyncError(cb: () => void): () => void {
-  errorSubscribers.add(cb);
-  return () => {
-    errorSubscribers.delete(cb);
-  };
+  return queue.onError(cb);
 }
 
-function notifyError(): void {
-  errorSubscribers.forEach((cb) => {
-    try {
-      cb();
-    } catch {
-      // A subscriber throwing must not break the sync layer.
-    }
-  });
+/** How many component mirrors are queued for retry (not yet on the server). */
+export function getComponentSyncPendingCount(): number {
+  return queue.pendingCount();
+}
+
+/** Re-attempt every queued component mirror (called on reconnect + on demand). */
+export function retryComponentSync(): Promise<void> {
+  return queue.retry();
 }
 
 /** Mirror a created/updated component master to the server (upsert). */
 export async function mirrorComponentUpsert(component: ComponentDefinition): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
-  try {
-    await client().siteComponents.upsert.mutate({
-      siteId,
-      componentId: component.id,
-      name: component.name,
-      payload: component as unknown as Record<string, unknown>,
-    });
-  } catch (e) {
+  await queue.run(
+    `componentUpsert:${component.id}`,
+    () =>
+      client().siteComponents.upsert.mutate({
+        siteId,
+        componentId: component.id,
+        name: component.name,
+        payload: component as unknown as Record<string, unknown>,
+      }),
     // eslint-disable-next-line no-console
-    console.warn("[component-sync] upsert mirror failed (kept locally)", e);
-    notifyError();
-  }
+    (e) => console.warn("[component-sync] upsert mirror failed (kept locally)", e)
+  );
 }
 
 /** Mirror a component deletion to the server. */
 export async function mirrorComponentDelete(componentId: string): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) return;
-  try {
-    await client().siteComponents.delete.mutate({ siteId, componentId });
-  } catch (e) {
+  // A pending upsert for the same component is moot — deletion wins, so drop it
+  // to avoid resurrecting a deleted master on a reconnect retry.
+  queue.drop(`componentUpsert:${componentId}`);
+  await queue.run(
+    `componentDelete:${componentId}`,
+    () => client().siteComponents.delete.mutate({ siteId, componentId }),
     // eslint-disable-next-line no-console
-    console.warn("[component-sync] delete mirror failed", e);
-  }
+    (e) => console.warn("[component-sync] delete mirror failed", e)
+  );
 }
 
 /**

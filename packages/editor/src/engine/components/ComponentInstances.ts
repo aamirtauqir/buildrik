@@ -228,7 +228,12 @@ export async function syncInstance(
   try {
     const index = parent.getChildIndex(element);
 
-    parent.removeChild(element);
+    // Fully delete the OLD instance subtree from the ElementManager registry —
+    // not just detach it from the tree. removeChild alone leaves every old
+    // clone Element registered, so each sync leaks the previous subtree
+    // (getAllElements / findByMediaSrc keep seeing stale nodes). removeElement
+    // both unlinks from the parent and deregisters the whole subtree.
+    composer.elements.removeElement(elementId);
 
     const clonedData = cloneWithNewIds(component.masterTree);
 

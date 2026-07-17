@@ -33,7 +33,9 @@ export interface ImportStats {
 interface RegistryHandle {
   kind: TokenKind;
   tokens: readonly DesignToken[];
-  updateToken: (id: string, value: string) => void;
+  // darkValue is optional + color-specific; registries that ignore the third
+  // arg (narrower signatures) remain assignable here.
+  updateToken: (id: string, value: string, darkValue?: string) => void;
   addToken?: (token: DesignToken) => void;
 }
 
@@ -93,7 +95,9 @@ export function useImportTokens(): (incoming: DesignToken[]) => ImportStats {
       // Modification path: any registry already has this id.
       const existingHost = registries.find((r) => r.tokens.some((x) => x.id === t.id));
       if (existingHost) {
-        existingHost.updateToken(t.id, t.value);
+        // Carry darkValue so a dark-complete re-import isn't stripped on the
+        // modify path (color registry persists it; other kinds ignore it).
+        existingHost.updateToken(t.id, t.value, t.darkValue);
         stats.modified++;
         continue;
       }
