@@ -2,7 +2,7 @@
 
 @theme inline {
   --font-sans: 'Inter Tight', sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
 
   /* Auth colors — craftwork surface (cobalt accent, auth-only; see DESIGN.md §Auth Surface) */
   --color-auth-cta: #2D6DFF;
