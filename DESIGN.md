@@ -1,17 +1,5 @@
 # Design System — Buildrick
 
-> **Staleness notice (2026-05-24 audit):** Sections §Typography, §Color, §Spacing,
-> §Layout, §Sidebar Panel System are partially stale. Token namespace migrated
-> `--aqb-*` → `--buildrick-*` after this doc was written but not back-patched.
-> Width rule + tab list expanded since 2026-04-16. Canonical sources:
-> - **Token defs:** `packages/editor/src/themes/design-system/*.css`
-> - **Chrome enforcement:** `pnpm --filter @buildrik/editor verify:ds`
-> - **Dashboard enforcement:** `pnpm --filter @buildrik/dashboard gate:ds`
-> - **Architecture decisions:** `Decisions Log` section + memory entries
->   `project_ds_*_20260*.md`
-> See L128-136 (drained tokens), L156 (tabs), L168 (PanelShell→TabFrame) for
-> specific patches landed this audit. Full rewrite deferred.
-
 ## Product Context
 - **What this is:** AI-powered drag-and-drop website builder editor. Three creation modes (drag, templates, AI generate) sharing one element vocabulary.
 - **Who it's for:** Solo designers currently billing clients on Webflow or Framer. Time-constrained power users, not beginners.
@@ -178,18 +166,6 @@ The primary text color matches topbar `.tbBreadcrumb-page` (`#334155`). Secondar
 
 Use for status indicators only (save state, validation, toasts). Never for decoration.
 
-### Removed / Migrated Tokens (DRAINED 2026-04 → 2026-05)
-
-Audit 2026-05-24 verified: all tokens listed below have zero defs remaining
-in `packages/editor/src/themes/`. No "delete on next pass" pending — done.
-
-- ~~`--aqb-bg-dark`, `--aqb-bg-darker`, `--aqb-bg-panel-secondary`, `--aqb-bg-panel-tertiary`, `--aqb-surface-1..5`~~ — drained.
-- ~~Dark-theme `--ls-*` aliases~~ — drained (0 defs).
-- ~~`--aqb-primary*` family~~ — drained (cobalt-only).
-- ~~`--bar`, `--bar2`, `--barStroke`, `--pillStroke`, `--pillStroke2`, `--txt`, `--muted`, `--blue`, `--blue2`, `--green`, `--green2`~~ — drained (0 defs).
-- ~~`--media-img`, `--media-vid`, `--media-ico`, `--media-fnt`~~ — drained.
-- Topbar `.tb*` hex literals — drained (audit verified, gate-enforced).
-
 ## Spacing
 - **Base unit:** 4px.
 - **Density:** Compact. Designers want screen real estate.
@@ -315,21 +291,6 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 2026-04-16 | DESIGN.md created | /design-consultation run after /plan-design-review flagged purple as AI slop. First formal design system for Buildrik. |
-| 2026-04-16 | Rip `--aqb-primary` (indigo) and `--aqb-secondary` (violet) | Existing tokens were the exact AI-slop accents the design review banned. |
-| 2026-04-16 | One accent = cobalt `#2D6DFF` | Reuses existing `--blue2`. Ships immediately without token churn. |
-| 2026-04-16 | Typography: General Sans / Inter Tight or Geist / Geist Mono | No default stacks. Geist Mono required for tabular numbers. |
-| 2026-04-18 | Sidebar Panel System — PanelShell grammar | Per-tab CSS (10K+ lines across 8 tabs) was making consistency impossible. |
-| 2026-04-18 | Three-width rule (240 / 320 / fullpage) | Current widths had no rule. Users relearned spatial expectation per tab. |
-| 2026-04-18 | 28/32/48 row density, never 40 | 40px is the SaaS default. Dropping to 32px is the "professional tool" signal. |
-| 2026-04-18 | **DIRECTION FLIP — editor is now light-chrome, not dark** | User identified that topbar (light) and sidebar (dark) were two parallel systems. Called for unification. Chose LIGHT as canonical because topbar already ships. Inverts previous "dark-only" decision. |
-| 2026-04-18 | **Topbar is the token reference surface** | Topbar's `#F8FAFC` panel, `#CBD5E1` border, `#334155` text, `#64748B` secondary text — all become canonical `--aqb-*` tokens. Every other surface inherits from this. |
-| 2026-04-18 | **NO BLACK rule** | User explicit: "aik bhee black color ni chai hai." Primary text caps at slate-700 (`#334155`). No surface or fill darker than that. Includes legacy `#1F2937` avatar pill. |
-| 2026-04-18 | **Account avatar flips from `#1F2937` to cobalt** | Legacy near-black pill violates NO BLACK. Cobalt + white icon becomes a branded avatar, aligned with single-accent rule. |
-| 2026-04-18 | Font stack fix — drop all system fallbacks | Current `--aqb-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif` violates DESIGN.md explicit "no Roboto/system-ui/Helvetica" rule. Replaced with `"Inter Tight", sans-serif` only. |
-| 2026-04-18 | Delete legacy navbar tokens `--bar`, `--blue`, `--txt`, etc. | Dead tokens from first-gen editor. 11 tokens, used in a handful of legacy places. Replace with `--aqb-*` canonical. |
-| 2026-04-18 | Add Design + Publish to rail | Previously keyboard-only, inconsistent with every other config surface. Goes in Config zone. |
-| 2026-04-19 | **Buildrik DS V1** — supersedes V3 theme unification | V3 shipped ~65% complete. DS V1 locks 7 architecture decisions: strict site/shell namespace, no alias layers, `--accent` alias-then-drain, a11y.css owns all media queries, intent+path hex lint, INSPECTOR_TOKENS codemod (single-commit convergence), full token versioning framework. Aggregator execution (no big-switch). See `docs/superpowers/specs/2026-04-19-buildrik-design-system-v1-design.md`. |
 | 2026-07-10 | **Auth surface → craftwork (cobalt + art rail)** | User-approved reskin of all `app/auth/**` screens to the "craftwork" design language: cobalt `#2D6DFF` accent, two-column floating card with art rail, gray-fill icon inputs. Scoped exception to the red dashboard brand — auth only; settings/billing/onboarding stay red. Business logic unchanged. See §Auth Surface — Craftwork. |
 | 2026-07-12 | **Dashboard accent flip RED → COBALT (brand unification)** | User-approved rebrand: the dashboard chrome's former red `#E42313` accent flips to cobalt `#2D6DFF`, matching the dc-skin and unifying with editor + auth (both already cobalt). Token change: `--color-primary` `#E42313`→`#2D6DFF`, `--color-primary-hover`→`#1950DC`, added `--color-primary-subtle` `#EBF1FF`, `--color-error`→`#DC2626`, focus outline→cobalt. Semantic reds (error/danger/destructive/FAILED) unchanged. Purple stays banned. Two-accent system retired → single cobalt (+ onboarding's scoped blue). Business logic unchanged. |
 | 2026-07-13 | **Onboarding → M2 frame-gallery parity** | The wizard is rebuilt against the M2 frame gallery (`Buildrik Onboarding-taiba`): 180px header with brand tile, 480px column, filled `#EAF1FF` inputs on a `#D3E1FF` ring, slate `#334155` text, 50px/15px/700 CTA, `OnbBack` text links. **The accent stays `#2563EB`** — the user chose to keep the DESIGN.md exception over the gallery's `#2D6DFF`, so onboarding is deliberately *not* pixel-identical to the mockup in accent hue alone. Tokens: added `--color-onb-field` / `--color-onb-field-ring` / `--spacing-onb-header`; removed `--color-onb-ink` (duplicated `--color-onb-text`); `--container-onb` 520→480. `.onb-scope` re-points the cobalt focus ring at the onboarding accent. Business logic unchanged. |
