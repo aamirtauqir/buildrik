@@ -7,7 +7,7 @@ import { Sidebar } from "./sidebar";
  *  1120px max-width with 32/40/60 padding and tabular figures. */
 export function DashboardShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen [font-variant-numeric:tabular-nums]" style={{ backgroundColor: "var(--color-bg-page)" }}>
+    <div className="min-h-screen [font-variant-numeric:tabular-nums]" style={{ backgroundColor: "var(--color-bg-surface)" }}>
       <TopNav />
       <Sidebar />
       <main className="pt-[var(--topnav-h)] lg:ml-[var(--sidebar-w)]">
