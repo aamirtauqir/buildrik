@@ -62,18 +62,20 @@ function ActivityRow({ entry, count }: { entry: ActivityEntry; count: number }) 
           </span>
         );
       })()}
-      <p className="min-w-0 flex-1 truncate text-body" style={{ color: "var(--color-text-primary)" }}>
-        {entry.actorName && <span className="font-medium">{entry.actorName} </span>}
-        {entry.description ?? entry.action}
-        {count > 1 && (
-          <span className="ml-1.5 text-body-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
-            ×{count}
-          </span>
-        )}
-      </p>
-      <span className="shrink-0 font-mono tabular-nums text-body-sm" style={{ color: "var(--color-text-muted)" }}>
-        {timeAgo(entry.createdAt)}
-      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[13.5px]" style={{ color: "var(--color-text-primary)" }}>
+          {entry.actorName && <span className="font-semibold">{entry.actorName} </span>}
+          {entry.description ?? entry.action}
+          {count > 1 && (
+            <span className="ml-1.5 text-body-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
+              ×{count}
+            </span>
+          )}
+        </p>
+        <p className="mt-px text-[12px]" style={{ color: "var(--color-text-muted)" }}>
+          {timeAgo(entry.createdAt)}
+        </p>
+      </div>
     </li>
   );
 }

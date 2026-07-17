@@ -169,7 +169,7 @@ export default function DashboardPage() {
               mono={false}
               value={<><MetricValue>{stats.data?.publishedSites ?? 0}</MetricValue> live</>}
               delta={(stats.data?.publishedSites ?? 0) > 0 ? "live now" : "none published"}
-              visual={<Sparkline data={[4, 3, 4, 3, 4, 3, 4]} color="var(--color-text-muted)" />}
+              visual={<Sparkline data={[3, 3, 4, 4, 4, 5, 5]} color="var(--color-text-muted)" />}
               href="/dashboard/sites?status=published"
             />
             <StatCard
