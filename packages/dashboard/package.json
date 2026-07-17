@@ -7,16 +7,23 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gate:ds": "bash scripts/ds-grep-gates.sh"
+    "gate:ds": "bash scripts/ds-grep-gates.sh",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:cloud": "playwright test --project='bs-*'",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@buildrik/editor": "workspace:*",
     "@emotion/react": "^11.14.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1"
+    "@testing-library/user-event": "^14.6.1",
+    "browserstack-local": "^1.5.13",
+    "dotenv": "^17.4.2"
   }
 }
