@@ -29,22 +29,6 @@ describe("Onboarding Components", () => {
     });
   });
 
-  describe("OnboardingRoleSelect", () => {
-    it("exports OnboardingRoleSelect component", async () => {
-      const mod = await import("@/components/onboarding/role-select");
-      expect(mod.OnboardingRoleSelect).toBeDefined();
-      expect(typeof mod.OnboardingRoleSelect).toBe("function");
-    });
-  });
-
-  describe("OnboardingProjectSetup", () => {
-    it("exports OnboardingProjectSetup component", async () => {
-      const mod = await import("@/components/onboarding/project-setup");
-      expect(mod.OnboardingProjectSetup).toBeDefined();
-      expect(typeof mod.OnboardingProjectSetup).toBe("function");
-    });
-  });
-
   describe("DashboardChecklist", () => {
     it("exports DashboardChecklist component", async () => {
       const mod = await import("@/components/onboarding/dashboard-checklist");

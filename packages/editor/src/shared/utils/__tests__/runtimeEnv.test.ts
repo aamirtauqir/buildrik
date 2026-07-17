@@ -11,8 +11,22 @@ async function loadRuntimeEnv() {
   return import("../runtimeEnv");
 }
 
+// The root vitest config runs from the repo root and auto-loads
+// `.env`/`.env.local`, which set VITE_DASHBOARD_URL + VITE_FEATURE_* for dev.
+// Those would poison the "unset → default/fallback" cases. Clear every key the
+// module reads so the baseline is hermetic no matter which config/cwd runs it;
+// tests that need a value stub it explicitly.
+const READ_KEYS = [
+  "VITE_DASHBOARD_URL", "NEXT_PUBLIC_APP_URL",
+  "VITE_SENTRY_DSN", "NEXT_PUBLIC_SENTRY_DSN",
+  ...["PUBLISH", "COMPONENTS_V2", "DS_AI", "COLLAB"].flatMap((n) => [
+    `VITE_FEATURE_${n}`, `NEXT_PUBLIC_FEATURE_${n}`,
+  ]),
+];
+
 beforeEach(() => {
   vi.resetModules();
+  for (const k of READ_KEYS) vi.stubEnv(k, undefined as unknown as string);
 });
 
 afterEach(() => {
