@@ -55,6 +55,9 @@ export default defineConfig({
     // Auth runs locally (session cookie is for localhost); the cloud browsers
     // reuse the saved state through the tunnel.
     { name: "setup", testMatch: /auth\.setup\.ts/, use: { ...devices["Desktop Chrome"] } },
+    // Separate fixture: authenticates the same QA user but resets OnboardingState
+    // so specs that depend on it land inside the wizard instead of /dashboard.
+    { name: "setup-onboarding", testMatch: /onboarding\.setup\.ts/, use: { ...devices["Desktop Chrome"] } },
 
     ...(isBS
       ? [
