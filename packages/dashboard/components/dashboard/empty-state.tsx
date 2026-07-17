@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Sparkles, LayoutTemplate, FileText, Users, Eye } from "lucide-react";
+import { ButtonLink } from "@/components/dashboard/primitives";
 
 type CTA = {
   label: string;
@@ -92,18 +92,10 @@ export function EmptyState({ variant }: EmptyStateProps) {
       {config.ctas.length > 0 && (
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {config.ctas.map((cta, i) => (
-            <Link
-              key={cta.href}
-              href={cta.href}
-              className={
-                i === 0
-                  ? "flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)]"
-                  : "flex items-center gap-2 rounded-lg border border-[var(--color-border-default)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-bg-subtle)]"
-              }
-            >
+            <ButtonLink key={cta.href} href={cta.href} variant={i === 0 ? "primary" : "ghost"}>
               {cta.icon}
               {cta.label}
-            </Link>
+            </ButtonLink>
           ))}
         </div>
       )}

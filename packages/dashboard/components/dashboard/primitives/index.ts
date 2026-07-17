@@ -5,3 +5,4 @@ export { MetricValue } from "./metric-value";
 export { Pill, type PillTone } from "./pill";
 export { ProgressBar } from "./progress-bar";
 export { DataTable, type Column } from "./data-table";
+export { Button, ButtonLink, type ButtonVariant, type ButtonSize } from "./button";
