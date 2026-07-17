@@ -2,18 +2,7 @@
 
 import Link from "next/link";
 import type { WorkspaceHealth as WorkspaceHealthData } from "@buildrik/shared/schemas/dashboard";
-
-export function getHealthColor(pct: number): "green" | "yellow" | "red" {
-  if (pct >= 85) return "red";
-  if (pct >= 60) return "yellow";
-  return "green";
-}
-
-const COLOR_CLASSES = {
-  green: "bg-green-500",
-  yellow: "bg-yellow-400",
-  red: "bg-red-500",
-};
+import { ProgressBar, MetricValue } from "@/components/dashboard/primitives";
 
 type HealthBarProps = {
   label: string;
@@ -24,24 +13,16 @@ type HealthBarProps = {
 
 function HealthBar({ label, used, limit, unit = "" }: HealthBarProps) {
   const pct = limit > 0 ? Math.min((used / limit) * 100, 100) : 0;
-  const color = getHealthColor(pct);
 
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-[var(--color-text-secondary)]">{label}</span>
-        <span className="font-medium text-[var(--color-text-primary)]">
-          {used}
-          {unit} / {limit}
-          {unit}
+        <span className="text-[var(--color-text-primary)]">
+          <MetricValue>{used}{unit} / {limit}{unit}</MetricValue>
         </span>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border-default)]">
-        <div
-          className={`h-full rounded-full ${COLOR_CLASSES[color]}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
+      <ProgressBar pct={pct} tone="auto" />
     </div>
   );
 }
