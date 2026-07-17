@@ -2,7 +2,7 @@
 
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
-import { PageHeader, SectionCard, MetricValue, ProgressBar, Pill } from "@/components/dashboard/primitives";
+import { SectionCard, MetricValue, ProgressBar, Pill } from "@/components/dashboard/primitives";
 
 type UsageMetric = { key: string; label: string; used: number; limit: number; unit: string; estimated?: boolean };
 
@@ -25,18 +25,19 @@ export default function UsagePage() {
 
   return (
     <div>
-      <PageHeader
-        title="Usage"
-        description={query.data ? `Current billing period · ${query.data.period.label}` : "Track your workspace usage against plan limits."}
-        actions={
-          <span
-            className="inline-flex items-center rounded-pill border px-3 py-1 text-body-sm font-medium"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
-            This month
-          </span>
-        }
-      />
+      {/* The settings layout owns the section PageHeader (D10.4) — this row
+          keeps the billing-period context. */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+          {query.data ? `Current billing period · ${query.data.period.label}` : "Track your workspace usage against plan limits."}
+        </p>
+        <span
+          className="inline-flex shrink-0 items-center rounded-pill border px-3 py-1 text-body-sm font-medium"
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+        >
+          This month
+        </span>
+      </div>
 
       {query.isLoading ? (
         <LoadingSkeleton rows={4} variant="card" />

@@ -1,6 +1,8 @@
 /**
- * reviews router (E4). Verifies submit is gated on site EDITOR access, list +
+ * reviews router. Verifies submit is gated on site EDITOR access, list +
  * resolve are Admin-gated, and a blocked call never reaches the service.
+ * Reviews are also gated by the `agency_layer` flag (IA v2 E1) — mirrors the
+ * clients.ts pattern; the flag-off regression block is the IRON RULE guard.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -9,6 +11,7 @@ const checkWorkspaceRoleMock = vi.fn();
 const submitMock = vi.fn();
 const listMock = vi.fn();
 const resolveMock = vi.fn();
+const isFeatureEnabledMock = vi.fn();
 
 vi.mock("@/server/auth", () => ({ auth: vi.fn().mockResolvedValue(null) }));
 vi.mock("@/server/services/api-token.service", () => ({
@@ -32,6 +35,9 @@ vi.mock("@/server/services/permission.service", () => ({
     }
   },
 }));
+vi.mock("@/server/services/feature-flag.service", () => ({
+  isFeatureEnabled: (...a: unknown[]) => isFeatureEnabledMock(...a),
+}));
 vi.mock("@/server/services/review.service", () => ({
   submitReview: (...a: unknown[]) => submitMock(...a),
   listReviews: (...a: unknown[]) => listMock(...a),
@@ -54,9 +60,11 @@ function makeCtx() {
 }
 
 beforeEach(() => {
-  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock].forEach((m) =>
+  [checkSiteRoleMock, checkWorkspaceRoleMock, submitMock, listMock, resolveMock, isFeatureEnabledMock].forEach((m) =>
     m.mockReset(),
   );
+  // Default: agency layer ON, so the existing role-gate assertions still hold.
+  isFeatureEnabledMock.mockResolvedValue(true);
 });
 
 describe("reviews router", () => {
@@ -88,5 +96,31 @@ describe("reviews router", () => {
     const caller = reviewsRouter.createCaller(makeCtx() as never);
     await expect(caller.resolve({ id: "r1", status: "APPROVED" })).resolves.toMatchObject({ status: "APPROVED" });
     expect(resolveMock).toHaveBeenCalledWith("ws_1", "r1", "APPROVED", "u_1");
+  });
+
+  // IRON RULE (IA v2 E1): with agency_layer off, mutations deny and the list
+  // collapses to empty — no procedure reaches the service.
+  describe("agency_layer gate", () => {
+    beforeEach(() => isFeatureEnabledMock.mockResolvedValue(false));
+
+    it("submit is denied and never submits", async () => {
+      const caller = reviewsRouter.createCaller(makeCtx() as never);
+      await expect(caller.submit({ siteId: "s1" })).rejects.toThrow(/agency layer/i);
+      expect(checkSiteRoleMock).not.toHaveBeenCalled();
+      expect(submitMock).not.toHaveBeenCalled();
+    });
+
+    it("list collapses to empty and never queries", async () => {
+      const caller = reviewsRouter.createCaller(makeCtx() as never);
+      await expect(caller.list()).resolves.toEqual([]);
+      expect(checkWorkspaceRoleMock).not.toHaveBeenCalled();
+      expect(listMock).not.toHaveBeenCalled();
+    });
+
+    it("resolve is denied and never resolves", async () => {
+      const caller = reviewsRouter.createCaller(makeCtx() as never);
+      await expect(caller.resolve({ id: "r1", status: "APPROVED" })).rejects.toThrow(/agency layer/i);
+      expect(resolveMock).not.toHaveBeenCalled();
+    });
   });
 });

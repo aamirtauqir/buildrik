@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { PageHeader, MetricValue } from "@/components/dashboard/primitives";
+import { MetricValue } from "@/components/dashboard/primitives";
 
 type PlanId = "STARTER" | "FREELANCER" | "AGENCY" | "ENTERPRISE";
 
@@ -79,43 +79,41 @@ export default function PlansPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Plans"
-        description="Upgrade, downgrade, or switch billing cycle anytime."
-        actions={
-          <div
-            className="inline-flex shrink-0 rounded-lg border p-0.5"
-            style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
-            role="tablist"
-            aria-label="Billing cycle"
+      {/* The settings layout owns the section PageHeader (D10.4) — this page
+          keeps only its billing-cycle toggle. */}
+      <div className="mb-6 flex justify-end">
+        <div
+          className="inline-flex shrink-0 rounded-lg border p-0.5"
+          style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+          role="tablist"
+          aria-label="Billing cycle"
+        >
+          <button
+            role="tab"
+            aria-selected={!yearly}
+            onClick={() => setYearly(false)}
+            className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+            style={!yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
           >
-            <button
-              role="tab"
-              aria-selected={!yearly}
-              onClick={() => setYearly(false)}
-              className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
-              style={!yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
+            Monthly
+          </button>
+          <button
+            role="tab"
+            aria-selected={yearly}
+            onClick={() => setYearly(true)}
+            className="inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+            style={yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
+          >
+            Yearly
+            <span
+              className="text-xs font-semibold"
+              style={{ color: yearly ? "rgba(255,255,255,0.9)" : "var(--color-success)" }}
             >
-              Monthly
-            </button>
-            <button
-              role="tab"
-              aria-selected={yearly}
-              onClick={() => setYearly(true)}
-              className="inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
-              style={yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
-            >
-              Yearly
-              <span
-                className="text-xs font-semibold"
-                style={{ color: yearly ? "rgba(255,255,255,0.9)" : "var(--color-success)" }}
-              >
-                &minus;20%
-              </span>
-            </button>
-          </div>
-        }
-      />
+              &minus;20%
+            </span>
+          </button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {PLANS.map((plan) => {

@@ -68,13 +68,7 @@ export function ThemeManager() {
 
   return (
     <div>
-      <header className="mb-6">
-        <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Shared theme</h1>
-        <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Capture one site&apos;s design tokens, then push them across your client sites. Locked sites keep their own.
-        </p>
-      </header>
-
+      {/* The agency layout owns the section PageHeader (D10.4). */}
       {sharedQuery.isLoading || targetsQuery.isLoading ? (
         <LoadingSkeleton rows={3} variant="list" />
       ) : forbidden ? (
