@@ -111,8 +111,8 @@ export default function DashboardPage() {
 
       {/* Workspace Deletion Grace Period Banner */}
       {wsData.data?.deletionScheduledAt && (
-        <div className="mb-4 rounded-lg p-4" style={{ backgroundColor: "#FEF2F2", borderLeft: "3px solid #EF4444" }}>
-          <p className="text-sm font-medium" style={{ color: "#991B1B" }}>
+        <div className="mb-4 rounded-lg border p-4" style={{ backgroundColor: "var(--color-error-subtle)", borderColor: "var(--color-error)" }}>
+          <p className="text-sm font-medium" style={{ color: "var(--color-error-text)" }}>
             Your workspace is scheduled for deletion on {new Date(wsData.data.deletionScheduledAt).toLocaleDateString()}.
           </p>
           <button
@@ -128,8 +128,8 @@ export default function DashboardPage() {
 
       {/* Account Deletion Grace Period Banner */}
       {pendingDeletion.data && (
-        <div className="mb-4 rounded-lg p-4" style={{ backgroundColor: "#FEF2F2", borderLeft: "3px solid #EF4444" }}>
-          <p className="text-sm font-medium" style={{ color: "#991B1B" }}>
+        <div className="mb-4 rounded-lg border p-4" style={{ backgroundColor: "var(--color-error-subtle)", borderColor: "var(--color-error)" }}>
+          <p className="text-sm font-medium" style={{ color: "var(--color-error-text)" }}>
             Your account is scheduled for deletion on {new Date(pendingDeletion.data.scheduledAt).toLocaleDateString()}.
           </p>
           <button
