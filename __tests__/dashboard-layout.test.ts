@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { NAV_GROUPS } from "@/components/dashboard/shell/sidebar";
+import { NAV_GROUPS } from "@/components/dashboard/shell/nav";
 
 /**
  * The sidebar moved to `shell/sidebar` in the shell rewrite (ab512dbc) and its

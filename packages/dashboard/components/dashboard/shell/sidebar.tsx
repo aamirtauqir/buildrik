@@ -12,35 +12,15 @@ import { trpc } from "@lib/trpc/client";
 import { MetricValue, ProgressBar } from "@/components/dashboard/primitives";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { CommandPalette } from "@/components/search/command-palette";
+import { NAV_GROUPS, isActiveRoute, type NavGroup, type NavIcon } from "./nav";
 
-const iconMap = {
+const iconMap: Record<NavIcon, typeof LayoutDashboard> = {
   LayoutDashboard, FolderKanban, Image: ImageIcon, Rocket, Briefcase, Library,
   Settings, HelpCircle,
-} as const;
-
-type NavItem = { label: string; href: string; icon: keyof typeof iconMap; agencyOnly?: boolean };
-type NavGroup = { label?: string; items: NavItem[] };
-
-// Sidebar SSOT — IA v2: 6 destinations + 2 support items (spec
-// docs/superpowers/specs/2026-07-16-dashboard-ia-v2-design.md). Top-level product
-// areas (Marketplace/Learn/Resources) live in the top nav, NOT here.
-export const NAV_GROUPS: NavGroup[] = [
-  { items: [
-    { label: "Home", href: "/dashboard", icon: "LayoutDashboard" },
-    { label: "Projects", href: "/dashboard/projects", icon: "FolderKanban" },
-    { label: "Agency", href: "/dashboard/agency", icon: "Briefcase", agencyOnly: true },
-    { label: "Media", href: "/dashboard/media", icon: "Image" },
-    { label: "Templates", href: "/dashboard/templates", icon: "Library" },
-    { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
-  ] },
-  { label: "Support", items: [
-    { label: "Getting started", href: "/dashboard/getting-started", icon: "Rocket" },
-    { label: "Help center", href: "/dashboard/help", icon: "HelpCircle" },
-  ] },
-];
+};
 
 // Mobile carries the same 6 destinations — derived, not a second hardcoded list.
-const MOBILE_ITEMS: NavItem[] = NAV_GROUPS[0].items;
+const MOBILE_ITEMS = NAV_GROUPS[0].items;
 
 function useAgencyEnabled(): boolean {
   const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
@@ -52,13 +32,6 @@ function useVisibleGroups(): NavGroup[] {
   return NAV_GROUPS
     .map((g) => ({ ...g, items: g.items.filter((it) => !it.agencyOnly || agency) }))
     .filter((g) => g.items.length > 0);
-}
-
-export function isActiveRoute(pathname: string, href: string): boolean {
-  if (href === "/dashboard") return pathname === "/dashboard";
-  // Site-detail keeps its /dashboard/sites/[id] URLs; its nav parent is Projects.
-  if (href === "/dashboard/projects" && pathname.startsWith("/dashboard/sites")) return true;
-  return pathname.startsWith(href);
 }
 
 function MobileTabBar() {
