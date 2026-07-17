@@ -111,8 +111,8 @@
   --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 26px -20px rgba(15, 23, 42, 0.28);
 
   /* Dashboard shell + design-system contract (dc parity 2026-07-12).
-     Two-level shell: full-width top nav (60px) above the 272px sidebar. */
-  --topnav-h: 60px;
+     Two-level shell: full-width top nav (56px) above the 272px sidebar. */
+  --topnav-h: 56px;
   --sidebar-w: 272px;
 
   /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 pill). Remaps rounded-* utilities. */
@@ -130,7 +130,7 @@
   --text-page-title--font-weight: 700;
   --text-section-title: 15px;
   --text-section-title--line-height: 1.3;
-  --text-section-title--font-weight: 600;
+  --text-section-title--font-weight: 650;
   --text-eyebrow: 11px;
   --text-eyebrow--line-height: 1.2;
   --text-eyebrow--font-weight: 600;

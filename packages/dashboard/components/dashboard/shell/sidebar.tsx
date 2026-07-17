@@ -135,7 +135,7 @@ export function Sidebar() {
                   return (
                     <li key={item.href}>
                       <Link href={item.href} className={cn(
-                        "flex items-center gap-[11px] rounded-md px-2.5 py-2 text-body transition-colors",
+                        "flex items-center gap-[11px] rounded-lg px-[9px] py-2 text-[13.5px] transition-colors",
                         active ? "bg-[var(--color-primary-subtle)] font-semibold text-[var(--color-primary)]" : "font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
                       )}>
                         <Icon className="h-[18px] w-[18px] shrink-0" />

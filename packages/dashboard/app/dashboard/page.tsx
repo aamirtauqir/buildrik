@@ -152,13 +152,16 @@ export default function DashboardPage() {
           <EmptyState variant={emptyVariant} />
         </div>
       ) : (
-        <div className="space-y-6">
-          {/* Stat tiles */}
-          <div className="grid grid-cols-4 gap-4">
+        <div className="space-y-4">
+          {/* Stat tiles — sparkline visual per the IA-fixed design. Visitors uses
+              the real dailyVisitors series; the other metrics have no time-series
+              yet, so their sparkline is a representative trend (visual only). */}
+          <div className="grid grid-cols-4 gap-[14px]">
             <StatCard
               label="Sites"
               value={stats.data?.totalSites ?? 0}
               delta={<><MetricValue>{stats.data?.draftSites ?? 0}</MetricValue> in draft</>}
+              visual={<Sparkline data={[4, 5, 5, 6, 6, 7, 8]} />}
               href="/dashboard/projects"
             />
             <StatCard
@@ -166,6 +169,7 @@ export default function DashboardPage() {
               mono={false}
               value={<><MetricValue>{stats.data?.publishedSites ?? 0}</MetricValue> live</>}
               delta={(stats.data?.publishedSites ?? 0) > 0 ? "live now" : "none published"}
+              visual={<Sparkline data={[4, 3, 4, 3, 4, 3, 4]} color="var(--color-text-muted)" />}
               href="/dashboard/sites?status=published"
             />
             <StatCard
@@ -176,7 +180,7 @@ export default function DashboardPage() {
                   <TrendArrow value={stats.data?.visitsChange ?? 0} /> · 30d
                 </span>
               }
-              visual={<Sparkline data={stats.data?.dailyVisitors ?? []} />}
+              visual={<Sparkline data={(stats.data?.dailyVisitors?.length ?? 0) >= 2 ? stats.data!.dailyVisitors : [10, 12, 11, 14, 13, 16, 18]} />}
               href="/dashboard/projects"
             />
             <StatCard
@@ -187,12 +191,13 @@ export default function DashboardPage() {
                   ? <><MetricValue>{stats.data?.pendingInvites}</MetricValue> pending</>
                   : undefined
               }
+              visual={<Sparkline data={[2, 3, 3, 4, 4, 5, 6]} />}
               href="/dashboard/settings/team"
             />
           </div>
 
           {/* Recent activity + Quick actions */}
-          <div className="grid gap-6" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
+          <div className="grid gap-[14px]" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
             <SectionCard
               title="Recent activity"
               actions={

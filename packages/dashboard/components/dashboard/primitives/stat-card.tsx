@@ -28,22 +28,32 @@ export function StatCard({
   const inner = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <p className="font-mono text-eyebrow uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>{label}</p>
+        <p className="text-[10.5px] font-bold uppercase tracking-[0.07em]" style={{ color: "var(--color-text-muted)" }}>{label}</p>
         {visual ? (
           <div className="shrink-0">{visual}</div>
         ) : icon ? (
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}>{icon}</span>
         ) : null}
       </div>
-      <p className={cn("mt-1.5 text-metric", mono && "font-mono tabular-nums")} style={{ color: "var(--color-text-primary)" }}>{value}</p>
-      {delta && <div className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{delta}</div>}
+      <p
+        className={cn("mt-[7px] text-[27px] leading-none tracking-[-0.02em]", mono && "tabular-nums")}
+        style={{ color: "var(--color-text-primary)", fontWeight: 730 }}
+      >{value}</p>
+      {delta && <div className="mt-[5px] text-[12px]" style={{ color: "var(--color-text-secondary)" }}>{delta}</div>}
     </>
   );
-  const cardStyle = { borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" };
+  // Artifact stat tile: 10px radius, 15/16/13 padding, subtle two-stop card shadow.
+  const cardStyle = {
+    borderColor: "var(--color-border-default)",
+    backgroundColor: "var(--color-bg-surface)",
+    borderRadius: "10px",
+    padding: "15px 16px 13px",
+    boxShadow: "0 1px 2px rgba(15,23,41,.04), 0 1px 3px rgba(15,23,41,.05)",
+  };
   if (href) {
     return (
-      <Link href={href} className={cn("block rounded-xl border p-4 transition-colors hover:border-[var(--color-primary)]", className)} style={cardStyle}>{inner}</Link>
+      <Link href={href} className={cn("block border transition-colors hover:border-[var(--color-primary)]", className)} style={cardStyle}>{inner}</Link>
     );
   }
-  return <div className={cn("rounded-xl border p-4", className)} style={cardStyle}>{inner}</div>;
+  return <div className={cn("border", className)} style={cardStyle}>{inner}</div>;
 }
