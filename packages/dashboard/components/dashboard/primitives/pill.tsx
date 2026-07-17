@@ -5,9 +5,9 @@ export type PillTone = "neutral" | "success" | "warning" | "error" | "accent";
 
 const TONES: Record<PillTone, { bg: string; color: string }> = {
   neutral: { bg: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" },
-  success: { bg: "var(--color-success-subtle)", color: "#166534" },
-  warning: { bg: "var(--color-warning-subtle)", color: "#854D0E" },
-  error: { bg: "var(--color-error-subtle)", color: "var(--color-error)" },
+  success: { bg: "var(--color-success-subtle)", color: "var(--color-success-text)" },
+  warning: { bg: "var(--color-warning-subtle)", color: "var(--color-warning-text)" },
+  error: { bg: "var(--color-error-subtle)", color: "var(--color-error-text)" },
   accent: { bg: "var(--color-primary-subtle)", color: "var(--color-primary)" },
 };
 

@@ -6,10 +6,10 @@ export const TOAST_AUTO_DISMISS_MS = 5000;
 export const TOAST_MAX_VISIBLE = 4;
 
 export const TOAST_VARIANTS = {
-  success: { border: "var(--color-success)", bg: "#F0FDF4", icon: "CheckCircle", role: "status" as const },
-  error: { border: "#EF4444", bg: "#FEF2F2", icon: "AlertCircle", role: "alert" as const },
-  warning: { border: "#EAB308", bg: "#FEFCE8", icon: "AlertTriangle", role: "alert" as const },
-  info: { border: "#3B82F6", bg: "#EFF6FF", icon: "Info", role: "status" as const },
+  success: { border: "var(--color-success)", bg: "var(--color-success-subtle)", icon: "CheckCircle", role: "status" as const },
+  error: { border: "var(--color-error)", bg: "var(--color-error-subtle)", icon: "AlertCircle", role: "alert" as const },
+  warning: { border: "var(--color-warning)", bg: "var(--color-warning-subtle)", icon: "AlertTriangle", role: "alert" as const },
+  info: { border: "var(--color-info)", bg: "var(--color-primary-subtle)", icon: "Info", role: "status" as const },
 } as const;
 
 const iconMap = { CheckCircle, AlertCircle, AlertTriangle, Info };
