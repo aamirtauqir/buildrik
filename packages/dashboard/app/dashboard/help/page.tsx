@@ -49,7 +49,7 @@ export default function HelpPage() {
           <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Submit Ticket</span>
         </div>
         <div className="max-w-lg">
-          <h1 className="mb-6 text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Submit a Support Ticket</h1>
+          <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Submit a Support Ticket</h1>
           <TicketForm />
         </div>
       </div>
@@ -70,7 +70,7 @@ export default function HelpPage() {
           <span style={{ color: "var(--color-border-default)" }}>/</span>
           <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{category.label}</span>
         </div>
-        <h1 className="mb-6 text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>{category.label}</h1>
+        <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>{category.label}</h1>
         {categoryResults.isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
@@ -107,7 +107,7 @@ export default function HelpPage() {
           <span style={{ color: "var(--color-border-default)" }}>/</span>
           <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Search results for &quot;{searchQuery}&quot;</span>
         </div>
-        <h1 className="mb-6 text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Search Results</h1>
+        <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Search Results</h1>
         {searchResults.isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
@@ -133,7 +133,7 @@ export default function HelpPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Help Center</h1>
+        <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>Help Center</h1>
         <button
           onClick={() => setView("ticket")}
           className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[#FFF5F4]"

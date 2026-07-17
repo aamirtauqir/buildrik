@@ -122,7 +122,7 @@ function NewSitePageInner() {
   if (view === "choose") {
     return (
       <div className="mx-auto max-w-[600px] pt-12 text-center">
-        <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>
+        <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>
           Create New Site
         </h1>
         <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>

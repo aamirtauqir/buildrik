@@ -56,7 +56,7 @@ export function StepPages({ businessType, suggestedPages, onBack, onGenerate }: 
       <button onClick={onBack} className="mb-4 flex items-center gap-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
         <ArrowLeft className="h-4 w-4" />Back
       </button>
-      <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>Choose your pages</h1>
+      <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>Choose your pages</h1>
       <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>Select which pages to include (1-8)</p>
 
       {/* Page list */}

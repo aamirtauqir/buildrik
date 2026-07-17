@@ -62,7 +62,7 @@ export default function ArticleDetailPage() {
         </div>
       ) : article ? (
         <div>
-          <h1 className="mb-2 text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>{article.title}</h1>
+          <h1 className="mb-2 text-page-title" style={{ color: "var(--color-text-primary)" }}>{article.title}</h1>
           <div className="mb-6 flex items-center gap-3">
             <span
               className="rounded-full px-2.5 py-0.5 text-xs font-medium"

@@ -56,7 +56,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2.5">
-              <h1 className="text-[22px] font-bold leading-tight" style={{ color: "var(--color-text-primary)" }}>{site.name}</h1>
+              <h1 className="text-page-title leading-tight" style={{ color: "var(--color-text-primary)" }}>{site.name}</h1>
               <Pill tone={siteStatusTone(site.status)}>{toTitleCase(site.status)}</Pill>
             </div>
             {address === null ? (

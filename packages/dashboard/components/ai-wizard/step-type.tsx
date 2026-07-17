@@ -25,7 +25,7 @@ export function StepType({ selected, onSelect, onNext }: StepTypeProps) {
       <div className="text-center">
         <div className="inline-flex items-center gap-2">
           <Sparkles className="h-6 w-6" style={{ color: "var(--color-primary)" }} />
-          <h1 className="text-[22px] font-bold" style={{ color: "var(--color-text-primary)" }}>What kind of site are you building?</h1>
+          <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>What kind of site are you building?</h1>
         </div>
       </div>
       <div className="mt-8 grid grid-cols-2 gap-3">
