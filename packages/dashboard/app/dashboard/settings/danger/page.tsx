@@ -45,7 +45,7 @@ export default function DangerZonePage() {
         <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
           Workspace
         </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>
           Destructive actions scoped to this workspace.
         </p>
         <div
@@ -53,10 +53,10 @@ export default function DangerZonePage() {
           style={{ borderColor: "var(--color-error)" }}
         >
           <div>
-            <p className="text-sm font-semibold" style={{ color: "var(--color-error)" }}>
+            <p className="text-body font-semibold" style={{ color: "var(--color-error)" }}>
               Delete workspace
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
               Permanently delete this workspace and all its data. This cannot be undone.
             </p>
           </div>
@@ -64,7 +64,7 @@ export default function DangerZonePage() {
             type="button"
             onClick={() => setShowDeleteModal(true)}
             disabled={!wsQuery.data}
-            className="text-sm font-medium px-4 py-2 rounded-md border shrink-0 disabled:opacity-60"
+            className="text-body font-medium px-4 py-2 rounded-md border shrink-0 disabled:opacity-60"
             style={{ borderColor: "var(--color-error)", color: "var(--color-error)" }}
           >
             Delete workspace
@@ -79,7 +79,7 @@ export default function DangerZonePage() {
         <h2 className="text-base font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>
           Your account
         </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body mb-4" style={{ color: "var(--color-text-secondary)" }}>
           Destructive actions scoped to your personal account.
         </p>
         <DangerZoneTab

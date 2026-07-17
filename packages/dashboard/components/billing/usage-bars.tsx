@@ -41,10 +41,10 @@ function BarItem({ item }: { item: UsageItem }) {
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between gap-2">
-        <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+        <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
           {item.label}
         </span>
-        <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+        <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
           <MetricValue>{formatValue(item.used, item.unit)}</MetricValue> / <MetricValue>{formatValue(item.limit, item.unit)}</MetricValue>
         </span>
       </div>
@@ -52,7 +52,7 @@ function BarItem({ item }: { item: UsageItem }) {
       {ctaLabel && ctaHref && (
         <a
           href={ctaHref}
-          className="mt-1 inline-block text-xs font-medium underline-offset-2 hover:underline"
+          className="mt-1 inline-block text-body-sm font-medium underline-offset-2 hover:underline"
           style={{ color: "var(--color-text-secondary)" }}
         >
           {ctaLabel}

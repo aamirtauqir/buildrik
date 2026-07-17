@@ -89,13 +89,13 @@ export function OverviewTab({
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border bg-white py-16" style={{ borderColor: "var(--color-border-default)" }}>
-        <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Failed to load site details</p>
-        <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>Something went wrong. Please try again.</p>
+        <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Failed to load site details</p>
+        <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Something went wrong. Please try again.</p>
         <div className="mt-4 flex items-center gap-3">
           {onRetry && (
             <button
               onClick={onRetry}
-              className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+              className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               <RefreshCw className="h-4 w-4" />
@@ -104,7 +104,7 @@ export function OverviewTab({
           )}
           <Link
             href="/dashboard/projects"
-            className="flex items-center gap-1 rounded-lg border px-4 py-2 text-sm font-medium"
+            className="flex items-center gap-1 rounded-lg border px-4 py-2 text-body font-medium"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -171,8 +171,8 @@ export function OverviewTab({
           className="flex w-full items-center justify-between p-5"
         >
           <div className="flex items-center gap-3">
-            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Health Score</h3>
-            <span className="text-sm font-bold" style={{ color: healthColor }}>{stats.healthScore}/100</span>
+            <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Health Score</h3>
+            <span className="text-body font-bold" style={{ color: healthColor }}>{stats.healthScore}/100</span>
           </div>
           {healthExpanded ? (
             <ChevronDown className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
@@ -208,9 +208,9 @@ export function OverviewTab({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Icon className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
-                        <p className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>{m.label}</p>
+                        <p className="text-body-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>{m.label}</p>
                       </div>
-                      <span className="text-xs font-bold" style={{ color: barColor }}>{score}%</span>
+                      <span className="text-body-sm font-bold" style={{ color: barColor }}>{score}%</span>
                     </div>
                     <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
                       <div
@@ -233,7 +233,7 @@ export function OverviewTab({
           actions={
             <Link
               href={`/dashboard/sites/${siteId}/feedback`}
-              className="text-xs font-medium"
+              className="text-body-sm font-medium"
               style={{ color: "var(--color-primary)" }}
             >
               View all submissions →
@@ -249,10 +249,10 @@ export function OverviewTab({
                 >
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
-                    <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{fb.name}</span>
+                    <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{fb.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                    <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                       <MetricValue>{fb._count.submissions}</MetricValue> submission{fb._count.submissions === 1 ? "" : "s"}
                     </span>
                     {expandedFormId === fb.id ? (
@@ -265,9 +265,9 @@ export function OverviewTab({
                 {expandedFormId === fb.id && (
                   <div className="border-t px-3 py-2" style={{ borderColor: "var(--color-bg-subtle)" }}>
                     {fb._count.submissions === 0 ? (
-                      <p className="py-2 text-xs" style={{ color: "var(--color-text-muted)" }}>No submissions yet.</p>
+                      <p className="py-2 text-body-sm" style={{ color: "var(--color-text-muted)" }}>No submissions yet.</p>
                     ) : (
-                      <p className="py-2 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      <p className="py-2 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                         <MetricValue>{fb._count.submissions}</MetricValue> total submission{fb._count.submissions === 1 ? "" : "s"}.
                       </p>
                     )}
@@ -282,15 +282,15 @@ export function OverviewTab({
       {/* Recent Activity */}
       <SectionCard title="Recent Activity">
         {activity.length === 0 ? (
-          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>No activity yet. Start editing to see updates here.</p>
+          <p className="text-body" style={{ color: "var(--color-text-muted)" }}>No activity yet. Start editing to see updates here.</p>
         ) : (
           <div className="space-y-3">
             {activity.map((a) => (
               <div key={a.id} className="flex items-start gap-2">
                 <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "var(--color-primary)" }} />
                 <div>
-                  <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>{a.description ?? a.action}</p>
-                  <p className="text-xs" style={{ color: "var(--color-text-muted)" }}><MetricValue>{timeAgo(a.createdAt)}</MetricValue></p>
+                  <p className="text-body" style={{ color: "var(--color-text-primary)" }}>{a.description ?? a.action}</p>
+                  <p className="text-body-sm" style={{ color: "var(--color-text-muted)" }}><MetricValue>{timeAgo(a.createdAt)}</MetricValue></p>
                 </div>
               </div>
             ))}

@@ -189,13 +189,13 @@ export default function TeamPage() {
                   <div key={entry.id} className="flex items-start gap-2">
                     <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "var(--color-primary)" }} />
                     <div>
-                      <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                      <p className="text-body" style={{ color: "var(--color-text-primary)" }}>
                         {entry.actorName && (
                           <span className="font-medium">{entry.actorName} </span>
                         )}
                         {entry.description ?? entry.action}
                       </p>
-                      <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                      <p className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                         {new Date(entry.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -203,7 +203,7 @@ export default function TeamPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>No team activity yet</p>
+              <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>No team activity yet</p>
             )}
           </div>
         </div>

@@ -14,7 +14,7 @@ function CardBrandIcon({ brand }: { brand: string }) {
   if (normalized === "visa") {
     return (
       <div
-        className="flex h-8 w-12 items-center justify-center rounded border text-xs font-black tracking-tight"
+        className="flex h-8 w-12 items-center justify-center rounded border text-body-sm font-black tracking-tight"
         style={{ backgroundColor: "#1A1F71", color: "#FFFFFF", borderColor: "#1A1F71" }}
       >
         VISA
@@ -56,10 +56,10 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
         <div className="flex items-center gap-4">
           <CardBrandIcon brand={paymentMethod.brand} />
           <div>
-            <div className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+            <div className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
               &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; {paymentMethod.last4}
             </div>
-            <div className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+            <div className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
               Expires {expMonth}/{expYear}
             </div>
           </div>
@@ -67,7 +67,7 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+            className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)]"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             Update Payment Method
@@ -77,7 +77,7 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
 
       {isEditing && (
         <div className="mt-4 border-t border-[var(--color-border-default)] pt-4">
-          <label className="block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+          <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
             New card details
           </label>
           <div
@@ -87,7 +87,7 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
             <input
               type="text"
               placeholder="4242 4242 4242 4242"
-              className="w-full bg-transparent text-sm outline-none placeholder:text-[var(--color-text-muted)]"
+              className="w-full bg-transparent text-body outline-none placeholder:text-[var(--color-text-muted)]"
               disabled
               style={{ color: "var(--color-text-primary)" }}
             />
@@ -95,34 +95,34 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
               <input
                 type="text"
                 placeholder="MM/YY"
-                className="w-16 bg-transparent text-center text-sm outline-none placeholder:text-[var(--color-text-muted)]"
+                className="w-16 bg-transparent text-center text-body outline-none placeholder:text-[var(--color-text-muted)]"
                 disabled
                 style={{ color: "var(--color-text-primary)" }}
               />
               <input
                 type="text"
                 placeholder="CVC"
-                className="w-12 bg-transparent text-center text-sm outline-none placeholder:text-[var(--color-text-muted)]"
+                className="w-12 bg-transparent text-center text-body outline-none placeholder:text-[var(--color-text-muted)]"
                 disabled
                 style={{ color: "var(--color-text-primary)" }}
               />
             </div>
           </div>
-          <p className="mt-1.5 text-xs" style={{ color: "var(--color-text-muted)" }}>
+          <p className="mt-1.5 text-body-sm" style={{ color: "var(--color-text-muted)" }}>
             Online card updates are coming soon. To change your payment method now,
             contact support.
           </p>
           <div className="mt-4 flex gap-3">
             <button
               onClick={() => setIsEditing(false)}
-              className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+              className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)]"
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               Cancel
             </button>
             <button
               disabled
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-white opacity-50"
+              className="rounded-lg px-4 py-2 text-body font-semibold text-white opacity-50"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               Save Card

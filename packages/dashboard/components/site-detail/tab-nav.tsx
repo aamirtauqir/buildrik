@@ -44,7 +44,7 @@ export function TabNav({ siteId }: { siteId: string }) {
             return (
               <li key={tab.segment} className="shrink-0">
                 <Link href={href} className={cn(
-                  "inline-block px-4 py-2.5 text-sm transition-colors whitespace-nowrap",
+                  "inline-block px-4 py-2.5 text-body transition-colors whitespace-nowrap",
                   isActive
                     ? "border-b-2 border-[var(--color-primary)] font-semibold text-[var(--color-text-primary)]"
                     : "font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
@@ -60,7 +60,7 @@ export function TabNav({ siteId }: { siteId: string }) {
         <select
           value={activeTab.segment}
           onChange={(e) => router.push(getTabHref(base, e.target.value))}
-          className="w-full appearance-none bg-white py-2.5 pl-4 pr-10 text-sm font-medium text-[var(--color-text-primary)] focus:outline-none"
+          className="w-full appearance-none bg-white py-2.5 pl-4 pr-10 text-body font-medium text-[var(--color-text-primary)] focus:outline-none"
         >
           {SITE_DETAIL_TABS.map((tab) => (
             <option key={tab.segment} value={tab.segment}>

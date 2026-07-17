@@ -29,7 +29,7 @@ export default function LearnPage() {
         <div className="mt-2 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Client workflows</h2>
-            <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>
               Lesson <MetricValue>3</MetricValue> of <MetricValue>6</MetricValue>
             </p>
           </div>
@@ -38,7 +38,7 @@ export default function LearnPage() {
             type="button"
             disabled
             title="Coming soon"
-            className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium"
+            className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg px-4 py-2 text-body font-medium"
             style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
           >
             <PlayCircle className="h-4 w-4" />
@@ -48,7 +48,7 @@ export default function LearnPage() {
         <ProgressBar pct={50} className="mt-4" />
       </section>
 
-      <h2 className="mb-3 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Learning paths</h2>
+      <h2 className="mb-3 text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Learning paths</h2>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {COURSES.map(({ title, lessons, minutes, status }) => {
@@ -60,13 +60,13 @@ export default function LearnPage() {
               style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{title}</h3>
+                <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{title}</h3>
                 <Pill tone={tone} className="shrink-0">
                   <Icon className="h-3 w-3" />
                   {label}
                 </Pill>
               </div>
-              <p className="mt-2 inline-flex items-center gap-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="mt-2 inline-flex items-center gap-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
                 <Clock className="h-3.5 w-3.5" />
                 <MetricValue>{lessons}</MetricValue> lessons · <MetricValue>{minutes}</MetricValue> min
               </p>

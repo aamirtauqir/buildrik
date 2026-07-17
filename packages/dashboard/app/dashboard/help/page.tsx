@@ -40,13 +40,13 @@ export default function HelpPage() {
         <div className="mb-6 flex items-center gap-3">
           <button
             onClick={() => setView("home")}
-            className="text-sm transition-colors hover:underline"
+            className="text-body transition-colors hover:underline"
             style={{ color: "var(--color-text-secondary)" }}
           >
             Help Center
           </button>
           <span style={{ color: "var(--color-border-default)" }}>/</span>
-          <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Submit Ticket</span>
+          <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Submit Ticket</span>
         </div>
         <div className="max-w-lg">
           <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Submit a Support Ticket</h1>
@@ -62,13 +62,13 @@ export default function HelpPage() {
         <div className="mb-6 flex items-center gap-3">
           <button
             onClick={() => setView("home")}
-            className="text-sm transition-colors hover:underline"
+            className="text-body transition-colors hover:underline"
             style={{ color: "var(--color-text-secondary)" }}
           >
             Help Center
           </button>
           <span style={{ color: "var(--color-border-default)" }}>/</span>
-          <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{category.label}</span>
+          <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{category.label}</span>
         </div>
         <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>{category.label}</h1>
         {categoryResults.isLoading ? (
@@ -84,7 +84,7 @@ export default function HelpPage() {
         )}
         <button
           onClick={() => setView("home")}
-          className="mt-6 text-sm transition-colors hover:underline"
+          className="mt-6 text-body transition-colors hover:underline"
           style={{ color: "var(--color-primary)" }}
         >
           Back to Help Center
@@ -99,13 +99,13 @@ export default function HelpPage() {
         <div className="mb-6 flex items-center gap-3">
           <button
             onClick={() => setView("home")}
-            className="text-sm transition-colors hover:underline"
+            className="text-body transition-colors hover:underline"
             style={{ color: "var(--color-text-secondary)" }}
           >
             Help Center
           </button>
           <span style={{ color: "var(--color-border-default)" }}>/</span>
-          <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Search results for &quot;{searchQuery}&quot;</span>
+          <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Search results for &quot;{searchQuery}&quot;</span>
         </div>
         <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Search Results</h1>
         {searchResults.isLoading ? (
@@ -121,7 +121,7 @@ export default function HelpPage() {
         )}
         <button
           onClick={() => setView("home")}
-          className="mt-6 text-sm transition-colors hover:underline"
+          className="mt-6 text-body transition-colors hover:underline"
           style={{ color: "var(--color-primary)" }}
         >
           Back to Help Center
@@ -136,7 +136,7 @@ export default function HelpPage() {
         <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>Help Center</h1>
         <button
           onClick={() => setView("ticket")}
-          className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[#FFF5F4]"
+          className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[#FFF5F4]"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-primary)" }}
         >
           Submit a Ticket

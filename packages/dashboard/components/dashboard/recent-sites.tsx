@@ -17,7 +17,7 @@ export function RecentSites({ sites }: RecentSitesProps) {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-section-title text-[var(--color-text-primary)]">Recent Sites</h2>
-        <Link href="/dashboard/projects" className="text-xs text-[var(--color-primary)] hover:underline">
+        <Link href="/dashboard/projects" className="text-body-sm text-[var(--color-primary)] hover:underline">
           View All &rarr;
         </Link>
       </div>
@@ -33,7 +33,7 @@ export function RecentSites({ sites }: RecentSitesProps) {
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-white">
               <Plus className="h-4 w-4 text-[var(--color-text-secondary)]" />
             </span>
-            <span className="text-xs text-[var(--color-text-secondary)]">Create your next project</span>
+            <span className="text-body-sm text-[var(--color-text-secondary)]">Create your next project</span>
           </Link>
         )}
       </div>

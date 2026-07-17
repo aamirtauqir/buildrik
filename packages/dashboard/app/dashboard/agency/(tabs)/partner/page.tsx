@@ -57,23 +57,23 @@ export default function PartnerPage() {
         <>
           <div className="mb-4 flex flex-col gap-4 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-primary-subtle)" }}>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
                 {d.tier.name} Partner · <MetricValue>{d.tier.commissionPct}%</MetricValue> commission
               </p>
               {d.nextTier ? (
                 <>
-                  <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                  <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                     <MetricValue>{usd(influenced)}</MetricValue> of <MetricValue>{usd(nextThreshold)}</MetricValue> to reach {d.nextTier.name} (<MetricValue>{d.nextTier.commissionPct}%</MetricValue>)
                   </p>
                   <ProgressBar pct={pct} className="mt-2 max-w-xs" />
                 </>
               ) : (
-                <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>Top tier reached — max commission.</p>
+                <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Top tier reached — max commission.</p>
               )}
             </div>
             <button
               onClick={copyLink}
-              className="inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
+              className="inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white transition-colors"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -93,8 +93,8 @@ export default function PartnerPage() {
             keyOf={(r) => r.id}
             empty={
               <div className="rounded-xl border p-8 text-center" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
-                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No referrals yet</p>
-                <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>Share your referral link to start earning commission.</p>
+                <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No referrals yet</p>
+                <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>Share your referral link to start earning commission.</p>
               </div>
             }
           />

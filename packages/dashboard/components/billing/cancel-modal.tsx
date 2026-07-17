@@ -42,7 +42,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
             <h2 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Cancel subscription
             </h2>
-            <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
               We're sorry to see you go.
             </p>
           </div>
@@ -55,18 +55,18 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
           </button>
         </div>
 
-        <div className="mb-5 rounded-lg border border-[#FEE2E2] bg-[#FEF2F2] px-4 py-3 text-sm" style={{ color: "#B91C1C" }}>
+        <div className="mb-5 rounded-lg border border-[#FEE2E2] bg-[#FEF2F2] px-4 py-3 text-body" style={{ color: "#B91C1C" }}>
           Your plan features will remain active until <strong>{formatDate(periodEnd)}</strong>. After that, your workspace will be downgraded to Free.
         </div>
 
         {planFeatures.length > 0 && (
           <div className="mb-5">
-            <h3 className="mb-2 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            <h3 className="mb-2 text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Features you'll lose
             </h3>
             <ul className="space-y-1.5">
               {planFeatures.map((feature) => (
-                <li key={feature} className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                <li key={feature} className="flex items-center gap-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
                   <span style={{ color: "#EF4444" }}>✕</span>
                   {feature}
                 </li>
@@ -76,7 +76,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
         )}
 
         <fieldset className="mb-4">
-          <legend className="mb-2 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+          <legend className="mb-2 text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
             Why are you cancelling?
           </legend>
           <div className="space-y-2">
@@ -90,7 +90,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
                   onChange={() => setReason(r.value)}
                   className="accent-[var(--color-primary)]"
                 />
-                <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+                <span className="text-body" style={{ color: "var(--color-text-primary)" }}>
                   {r.label}
                 </span>
               </label>
@@ -99,7 +99,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
         </fieldset>
 
         <div className="mb-5">
-          <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+          <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
             Additional feedback{" "}
             <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>
               (optional)
@@ -111,10 +111,10 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
             maxLength={500}
             rows={3}
             placeholder="Tell us more..."
-            className="w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+            className="w-full resize-none rounded-lg border px-3 py-2.5 text-body outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           />
-          <div className="mt-1 text-right text-xs" style={{ color: "var(--color-text-muted)" }}>
+          <div className="mt-1 text-right text-body-sm" style={{ color: "var(--color-text-muted)" }}>
             {feedback.length}/500
           </div>
         </div>
@@ -122,7 +122,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg border py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="flex-1 rounded-lg border py-2.5 text-body font-semibold text-white transition-opacity hover:opacity-90"
             style={{ backgroundColor: "var(--color-primary)", borderColor: "var(--color-primary)" }}
           >
             Keep My Plan
@@ -130,7 +130,7 @@ export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, 
           <button
             onClick={handleSubmit}
             disabled={!reason || isLoading}
-            className="flex-1 rounded-lg border py-2.5 text-sm font-semibold transition-colors hover:bg-[#FEF2F2] disabled:opacity-40"
+            className="flex-1 rounded-lg border py-2.5 text-body font-semibold transition-colors hover:bg-[#FEF2F2] disabled:opacity-40"
             style={{ borderColor: "#EF4444", color: "#EF4444" }}
           >
             {isLoading ? "Cancelling..." : "Cancel Plan"}

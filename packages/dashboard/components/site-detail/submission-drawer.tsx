@@ -104,13 +104,13 @@ export function SubmissionDrawer({
           {/* Form Fields */}
           <div className="space-y-4">
             <h3
-              className="text-xs font-semibold uppercase tracking-wider"
+              className="text-body-sm font-semibold uppercase tracking-wider"
               style={{ color: "var(--color-text-secondary)" }}
             >
               Form Data
             </h3>
             {fields.length === 0 ? (
-              <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+              <p className="text-body" style={{ color: "var(--color-text-muted)" }}>
                 No fields submitted.
               </p>
             ) : (
@@ -118,13 +118,13 @@ export function SubmissionDrawer({
                 {fields.map(([key, value]) => (
                   <div key={key}>
                     <p
-                      className="text-xs font-medium"
+                      className="text-body-sm font-medium"
                       style={{ color: "var(--color-text-secondary)" }}
                     >
                       {key}
                     </p>
                     <p
-                      className="mt-0.5 text-sm break-words"
+                      className="mt-0.5 text-body break-words"
                       style={{ color: "var(--color-text-primary)" }}
                     >
                       {String(value) || "\u2014"}
@@ -141,7 +141,7 @@ export function SubmissionDrawer({
             style={{ borderColor: "var(--color-bg-subtle)" }}
           >
             <h3
-              className="text-xs font-semibold uppercase tracking-wider"
+              className="text-body-sm font-semibold uppercase tracking-wider"
               style={{ color: "var(--color-text-secondary)" }}
             >
               Metadata
@@ -161,7 +161,7 @@ export function SubmissionDrawer({
             style={{ borderColor: "var(--color-bg-subtle)" }}
           >
             <h3
-              className="text-xs font-semibold uppercase tracking-wider"
+              className="text-body-sm font-semibold uppercase tracking-wider"
               style={{ color: "var(--color-text-secondary)" }}
             >
               Status
@@ -192,7 +192,7 @@ export function SubmissionDrawer({
           >
             <button
               onClick={() => onDelete(submission.id)}
-              className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-colors hover:opacity-90"
+              className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-body font-medium text-white transition-colors hover:opacity-90"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               <Trash2 className="h-4 w-4" />
@@ -208,11 +208,11 @@ export function SubmissionDrawer({
 function MetaRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <p className="text-xs font-medium shrink-0" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="text-body-sm font-medium shrink-0" style={{ color: "var(--color-text-secondary)" }}>
         {label}
       </p>
       <p
-        className="text-xs text-right break-words"
+        className="text-body-sm text-right break-words"
         style={{ color: "var(--color-text-primary)" }}
       >
         {value}
@@ -232,7 +232,7 @@ function ToggleRow({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+      <span className="text-body" style={{ color: "var(--color-text-primary)" }}>
         {label}
       </span>
       <button

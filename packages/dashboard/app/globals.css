@@ -138,8 +138,10 @@
   --text-eyebrow: 11px;
   --text-eyebrow--line-height: 1.2;
   --text-eyebrow--font-weight: 600;
-  --text-body: 13px;
+  --text-body: 14px;
+  --text-body--line-height: 1.45;
   --text-body-sm: 12px;
+  --text-body-sm--line-height: 1.35;
 
   /* Onboarding (M2 wizard) — its own primary blue #2563EB, an approved scoped
      exception (DESIGN.md §Onboarding Surface). Geometry and neutrals track the

@@ -36,7 +36,7 @@ export function NeedsAttention() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-base font-bold leading-none" style={{ color: "var(--color-text-primary)" }}>{item.count}</span>
-                <span className="block truncate text-xs" style={{ color: "var(--color-text-secondary)" }}>{item.label}</span>
+                <span className="block truncate text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{item.label}</span>
               </span>
               <ArrowRight className="h-4 w-4 shrink-0 text-neutral-300 transition-colors group-hover:text-[var(--color-primary)]" />
             </Link>

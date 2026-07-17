@@ -52,13 +52,13 @@ const COLUMNS: Column<Invoice>[] = [
           href={inv.pdfUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-medium underline-offset-2 hover:underline"
+          className="text-body-sm font-medium underline-offset-2 hover:underline"
           style={{ color: "var(--color-primary)" }}
         >
           PDF
         </a>
       ) : (
-        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>—</span>
+        <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>—</span>
       ),
   },
 ];
@@ -72,7 +72,7 @@ export function InvoiceTable({ invoices, page = 1, totalPages = 1, onPageChange 
         keyOf={(inv) => inv.id}
         empty={
           <div
-            className="rounded-xl border px-6 py-12 text-center text-sm"
+            className="rounded-xl border px-6 py-12 text-center text-body"
             style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-secondary)" }}
           >
             No invoices yet.
@@ -85,18 +85,18 @@ export function InvoiceTable({ invoices, page = 1, totalPages = 1, onPageChange 
           <button
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
-            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-40"
+            className="rounded-lg border px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-40"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             Previous
           </button>
-          <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+          <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
             Page <MetricValue>{page}</MetricValue> of <MetricValue>{totalPages}</MetricValue>
           </span>
           <button
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
-            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-40"
+            className="rounded-lg border px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-40"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             Next

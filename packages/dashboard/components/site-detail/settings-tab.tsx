@@ -154,7 +154,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border px-3 py-2 text-sm"
+              className="w-full rounded-lg border px-3 py-2 text-body"
               style={{ borderColor: "var(--color-border-default)" }}
             />
           </Field>
@@ -163,7 +163,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               type="text"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
-              className="w-full rounded-lg border px-3 py-2 text-sm"
+              className="w-full rounded-lg border px-3 py-2 text-body"
               style={{ borderColor: "var(--color-border-default)" }}
             />
           </Field>
@@ -177,7 +177,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               <button
                 type="button"
                 onClick={() => faviconInputRef.current?.click()}
-                className="rounded-lg border px-4 py-2 text-sm font-medium"
+                className="rounded-lg border px-4 py-2 text-body font-medium"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Upload Favicon
@@ -203,7 +203,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
               <button
                 type="button"
                 onClick={() => touchIconInputRef.current?.click()}
-                className="rounded-lg border px-4 py-2 text-sm font-medium"
+                className="rounded-lg border px-4 py-2 text-body font-medium"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Upload Touch Icon
@@ -247,7 +247,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 style={{ transform: passwordEnabled ? "translateX(20px)" : "translateX(0)" }}
               />
             </button>
-            <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+            <span className="text-body" style={{ color: "var(--color-text-primary)" }}>
               Require password to view published site
             </span>
           </div>
@@ -258,7 +258,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter site password"
-                className="w-full rounded-lg border px-3 py-2 text-sm"
+                className="w-full rounded-lg border px-3 py-2 text-body"
                 style={{ borderColor: "var(--color-border-default)" }}
               />
             </div>
@@ -276,7 +276,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 setHeadCode(e.target.value);
               }}
               rows={4}
-              className="w-full rounded-lg border px-3 py-2 text-sm font-mono"
+              className="w-full rounded-lg border px-3 py-2 text-body font-mono"
               style={{ borderColor: "var(--color-border-default)" }}
               disabled={!isPro}
             />
@@ -289,7 +289,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 setBodyCode(e.target.value);
               }}
               rows={4}
-              className="w-full rounded-lg border px-3 py-2 text-sm font-mono"
+              className="w-full rounded-lg border px-3 py-2 text-body font-mono"
               style={{ borderColor: "var(--color-border-default)" }}
               disabled={!isPro}
             />
@@ -301,7 +301,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
         <div className="space-y-3">
           {visiblePlatforms.map((platform) => (
             <div key={platform} className="flex items-center gap-2">
-              <label className="w-28 shrink-0 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+              <label className="w-28 shrink-0 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 {PLATFORM_LABELS[platform]}
               </label>
               <input
@@ -309,13 +309,13 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
                 value={socialLinks[platform] ?? ""}
                 onChange={(e) => updateSocialLink(platform, e.target.value)}
                 placeholder={`https://${platform}.com/...`}
-                className="flex-1 rounded-lg border px-3 py-2 text-sm"
+                className="flex-1 rounded-lg border px-3 py-2 text-body"
                 style={{ borderColor: "var(--color-border-default)" }}
               />
               <button
                 type="button"
                 onClick={() => removePlatform(platform)}
-                className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium"
+                className="shrink-0 rounded-lg px-2 py-1 text-body-sm font-medium"
                 style={{ color: "var(--color-primary)" }}
               >
                 Remove
@@ -326,7 +326,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
             <button
               type="button"
               onClick={addPlatform}
-              className="rounded-lg border px-4 py-2 text-sm font-medium"
+              className="rounded-lg border px-4 py-2 text-body font-medium"
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               + Add Social Link
@@ -337,7 +337,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
 
       <button
         onClick={handleSave}
-        className="rounded-lg px-6 py-2 text-sm font-medium text-white"
+        className="rounded-lg px-6 py-2 text-body font-medium text-white"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
         Save Changes
@@ -349,11 +349,11 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+      <label className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
         {label}
       </label>
       {hint && (
-        <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+        <p className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
           {hint}
         </p>
       )}
@@ -368,7 +368,7 @@ function ProGate({ isPro, children }: { isPro: boolean; children: React.ReactNod
       {!isPro && (
         <div className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2" style={{ backgroundColor: "#FFF8F7" }}>
           <LockIcon />
-          <span className="text-xs font-medium" style={{ color: "var(--color-primary)" }}>
+          <span className="text-body-sm font-medium" style={{ color: "var(--color-primary)" }}>
             Available on Pro
           </span>
         </div>

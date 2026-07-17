@@ -112,13 +112,13 @@ export default function DashboardPage() {
       {/* Workspace Deletion Grace Period Banner */}
       {wsData.data?.deletionScheduledAt && (
         <div className="mb-4 rounded-lg border p-4" style={{ backgroundColor: "var(--color-error-subtle)", borderColor: "var(--color-error)" }}>
-          <p className="text-sm font-medium" style={{ color: "var(--color-error-text)" }}>
+          <p className="text-body font-medium" style={{ color: "var(--color-error-text)" }}>
             Your workspace is scheduled for deletion on {new Date(wsData.data.deletionScheduledAt).toLocaleDateString()}.
           </p>
           <button
             onClick={() => cancelWsDelete.mutate()}
             disabled={cancelWsDelete.isPending}
-            className="mt-2 text-sm font-semibold underline"
+            className="mt-2 text-body font-semibold underline"
             style={{ color: "var(--color-primary)" }}
           >
             {cancelWsDelete.isPending ? "Cancelling..." : "Cancel Deletion"}
@@ -129,13 +129,13 @@ export default function DashboardPage() {
       {/* Account Deletion Grace Period Banner */}
       {pendingDeletion.data && (
         <div className="mb-4 rounded-lg border p-4" style={{ backgroundColor: "var(--color-error-subtle)", borderColor: "var(--color-error)" }}>
-          <p className="text-sm font-medium" style={{ color: "var(--color-error-text)" }}>
+          <p className="text-body font-medium" style={{ color: "var(--color-error-text)" }}>
             Your account is scheduled for deletion on {new Date(pendingDeletion.data.scheduledAt).toLocaleDateString()}.
           </p>
           <button
             onClick={() => cancelAcctDelete.mutate()}
             disabled={cancelAcctDelete.isPending}
-            className="mt-2 text-sm font-semibold underline"
+            className="mt-2 text-body font-semibold underline"
             style={{ color: "var(--color-primary)" }}
           >
             {cancelAcctDelete.isPending ? "Cancelling..." : "Cancel Deletion"}

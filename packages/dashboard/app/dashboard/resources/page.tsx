@@ -28,10 +28,10 @@ export default function ResourcesPage() {
               <Icon className="h-5 w-5" />
             </div>
             <div className="flex items-center gap-1">
-              <h2 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{title}</h2>
+              <h2 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{title}</h2>
               <ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" style={{ color: "var(--color-primary)" }} />
             </div>
-            <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>{description}</p>
+            <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>{description}</p>
           </Link>
         ))}
       </div>

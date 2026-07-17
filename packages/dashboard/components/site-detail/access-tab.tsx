@@ -109,17 +109,17 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
       <SectionCard
         title="Share Links"
         actions={
-          <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}><Plus className="h-3 w-3" />New Link</button>
+          <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}><Plus className="h-3 w-3" />New Link</button>
         }
       >
-        <p className="mb-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
+        <p className="mb-4 text-body-sm" style={{ color: "var(--color-text-muted)" }}>
           Share links control who you hand the URL to. To actually restrict who can
           open a published site, set a published-site password in Settings — that is
           enforced on the live URL by the host.
         </p>
         {showCreate && (
           <div className="mb-4 rounded-lg border p-4 space-y-3" style={{ borderColor: "var(--color-border-default)" }}>
-            <input type="text" value={linkName} onChange={(e) => setLinkName(e.target.value)} placeholder="Link name (e.g. Client Review)" className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
+            <input type="text" value={linkName} onChange={(e) => setLinkName(e.target.value)} placeholder="Link name (e.g. Client Review)" className="w-full rounded-lg border px-3 py-2 text-body" style={{ borderColor: "var(--color-border-default)" }} />
             <div className="relative">
               <input
                 type="password"
@@ -127,12 +127,12 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                 onChange={(e) => setLinkPw(e.target.value)}
                 placeholder={allowPasswords ? "Password (optional)" : "Password (upgrade to PRO)"}
                 disabled={!allowPasswords}
-                className="w-full rounded-lg border px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-lg border px-3 py-2 text-body disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ borderColor: "var(--color-border-default)" }}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>Expiry</label>
+              <label className="block text-body-sm font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>Expiry</label>
               <div className="flex flex-wrap gap-2">
                 {EXPIRY_OPTIONS.map((opt) => {
                   const disabled = opt.days > 0 && maxExpiryDays > 0 && opt.days > maxExpiryDays;
@@ -142,7 +142,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                       key={opt.days}
                       disabled={disabled}
                       onClick={() => setLinkExpiry(selected ? "" : String(opt.days))}
-                      className="rounded-md border px-2 py-1 text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="rounded-md border px-2 py-1 text-body-sm disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{
                         borderColor: selected ? "var(--color-primary)" : "var(--color-border-default)",
                         color: selected ? "var(--color-primary)" : "var(--color-text-secondary)",
@@ -155,11 +155,11 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                 })}
               </div>
             </div>
-            <button onClick={handleCreate} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Create Link</button>
+            <button onClick={handleCreate} className="rounded-lg px-4 py-2 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Create Link</button>
           </div>
         )}
         {shareLinks.length === 0 ? (
-          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>No share links yet. Create one to share this site with clients.</p>
+          <p className="text-body" style={{ color: "var(--color-text-muted)" }}>No share links yet. Create one to share this site with clients.</p>
         ) : (
           <div className="space-y-2">
             {shareLinks.map((link) => {
@@ -168,12 +168,12 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                 <div key={link.id} className="rounded-lg border p-3" style={{ borderColor: "var(--color-border-default)" }}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{link.name}</p>
-                      <div className="mt-1 flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{link.name}</p>
+                      <div className="mt-1 flex items-center gap-3 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                         <span className="flex items-center gap-1"><Eye className="h-3 w-3" /><MetricValue>{link.viewCount}</MetricValue> views</span>
                         {link.passwordHash && <span className="flex items-center gap-1"><Lock className="h-3 w-3" />Password</span>}
                         {link.expiresAt && <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />Expires <MetricValue>{new Date(link.expiresAt).toLocaleDateString()}</MetricValue></span>}
-                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>Created <MetricValue>{new Date(link.createdAt).toLocaleDateString()}</MetricValue></span>
+                        <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>Created <MetricValue>{new Date(link.createdAt).toLocaleDateString()}</MetricValue></span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
@@ -185,7 +185,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                   {showQr === link.id && (
                     <div className="mt-3 flex flex-col items-center gap-2 rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
                       <QrCodeCanvas url={url} />
-                      <p className="text-xs font-mono" style={{ color: "var(--color-text-secondary)" }}>{url}</p>
+                      <p className="text-body-sm font-mono" style={{ color: "var(--color-text-secondary)" }}>{url}</p>
                     </div>
                   )}
                 </div>

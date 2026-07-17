@@ -57,7 +57,7 @@ export function WorkspaceSwitcher() {
         aria-haspopup="menu"
         aria-expanded={open}
       >
-        <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-md text-xs font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(current?.name)}</span>
+        <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-md text-body-sm font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(current?.name)}</span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13.5px] font-bold leading-tight" style={{ color: "var(--color-text-primary)" }}>{current?.name ?? "Workspace"}</span>
           <span className="block text-eyebrow" style={{ color: "var(--color-text-secondary)" }}>
@@ -72,7 +72,7 @@ export function WorkspaceSwitcher() {
           <div className="max-h-72 overflow-y-auto p-1">
             {workspaces.map((ws) => (
               <button key={ws.id} onClick={() => switchTo(ws.id)} disabled={!!switching} className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-60">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(ws.name)}</span>
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-body-sm font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(ws.name)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{ws.name}</span>
                   <span className="block text-eyebrow" style={{ color: "var(--color-text-secondary)" }}>{ws.memberCount} member{ws.memberCount === 1 ? "" : "s"}</span>

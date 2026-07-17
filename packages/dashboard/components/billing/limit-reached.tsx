@@ -52,12 +52,12 @@ export function LimitReached({
           <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
             {resource} limit reached
           </h3>
-          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
             You've used {formatValue(used, unit)} of your {formatValue(limit, unit)} {resource.toLowerCase()} allowance.
           </p>
 
           <div className="mt-4">
-            <div className="mb-1 flex items-center justify-between text-xs" style={{ color: "var(--color-text-secondary)" }}>
+            <div className="mb-1 flex items-center justify-between text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
               <span>{formatValue(used, unit)} used</span>
               <span>{formatValue(limit, unit)} limit</span>
             </div>
@@ -75,7 +75,7 @@ export function LimitReached({
                 {onUpgrade && (
                   <button
                     onClick={onUpgrade}
-                    className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    className="rounded-lg px-5 py-2.5 text-body font-semibold text-white transition-opacity hover:opacity-90"
                     style={{ backgroundColor: "var(--color-primary)" }}
                   >
                     Upgrade to {upgradePlanName} &mdash; {upgradePlanPrice}
@@ -84,7 +84,7 @@ export function LimitReached({
                 {onComparePlans && (
                   <button
                     onClick={onComparePlans}
-                    className="text-sm font-medium underline-offset-2 hover:underline"
+                    className="text-body font-medium underline-offset-2 hover:underline"
                     style={{ color: "var(--color-text-secondary)" }}
                   >
                     Compare plans
@@ -92,7 +92,7 @@ export function LimitReached({
                 )}
               </>
             ) : (
-              <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
                 Contact your workspace admin to upgrade.
               </p>
             )}

@@ -44,21 +44,21 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
   if (invites.length === 0) {
     return (
       <div className="rounded-xl border border-[var(--color-border-default)] bg-white px-6 py-10 text-center">
-        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>No pending invitations.</p>
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>No pending invitations.</p>
       </div>
     );
   }
 
   return (
     <div className="overflow-x-auto rounded-xl border border-[var(--color-border-default)] bg-white">
-      <table className="w-full text-sm">
+      <table className="w-full text-body">
         <thead>
           <tr className="border-b border-[var(--color-border-default)]" style={{ backgroundColor: "var(--color-bg-page)" }}>
             {["Email", "Role", "Sent", "Expires In", "Resends", ""].map((h) => (
               <th
                 key={h}
                 className={cn(
-                  "px-4 py-3 text-xs font-semibold uppercase tracking-wide",
+                  "px-4 py-3 text-body-sm font-semibold uppercase tracking-wide",
                   h === "" ? "text-right" : "text-left"
                 )}
                 style={{ color: "var(--color-text-secondary)" }}
@@ -82,13 +82,13 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                 <td className="px-4 py-3">
                   <Pill tone={ROLE_TONE[invite.role as Role] ?? "neutral"}>{roleLabel(invite.role)}</Pill>
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                <td className="px-4 py-3 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                   <MetricValue>{formatDate(invite.createdAt)}</MetricValue>
                 </td>
-                <td className="px-4 py-3 text-xs font-medium" style={{ color: expiringSoon ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
+                <td className="px-4 py-3 text-body-sm font-medium" style={{ color: expiringSoon ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
                   {days === 0 ? "Expires today" : <>Expires in <MetricValue>{days}d</MetricValue></>}
                 </td>
-                <td className="px-4 py-3 text-xs" style={{ color: resendDisabled ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
+                <td className="px-4 py-3 text-body-sm" style={{ color: resendDisabled ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
                   Resent <MetricValue>{invite.resendCount}/{MAX_RESENDS}</MetricValue> times
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -96,7 +96,7 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                     <button
                       onClick={() => onResend(invite.id)}
                       disabled={!!resendingId || resendDisabled}
-                      className="rounded-lg border border-[var(--color-border-default)] px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-50"
+                      className="rounded-lg border border-[var(--color-border-default)] px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-50"
                       style={{ color: "var(--color-text-primary)" }}
                       title={resendDisabled ? "Maximum resends reached" : undefined}
                     >
@@ -105,7 +105,7 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                     <button
                       onClick={() => onRevoke(invite.id)}
                       disabled={!!revokingId}
-                      className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-red-50 disabled:opacity-50"
+                      className="rounded-lg border px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-red-50 disabled:opacity-50"
                       style={{ borderColor: "var(--color-primary)", color: "var(--color-primary)" }}
                     >
                       {revokingId === invite.id ? "Revoking..." : "Revoke"}

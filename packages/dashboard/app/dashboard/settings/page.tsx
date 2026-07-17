@@ -71,7 +71,7 @@ export default function WorkspaceSettingsPage() {
         <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
           Transfer ownership
         </h2>
-        <p className="text-sm mt-1 mb-3" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body mt-1 mb-3" style={{ color: "var(--color-text-secondary)" }}>
           Hand this workspace to another person. They&apos;ll get an email invitation and become the owner once they accept; you stay on as a member.
         </p>
 
@@ -81,10 +81,10 @@ export default function WorkspaceSettingsPage() {
             style={{ borderColor: "var(--color-border-default)" }}
           >
             <div>
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Transfer pending to {pendingTransferQuery.data.toEmail}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
                 Waiting for them to accept the email invitation.
               </p>
             </div>
@@ -92,7 +92,7 @@ export default function WorkspaceSettingsPage() {
               type="button"
               onClick={() => cancelTransferMutation.mutate()}
               disabled={cancelTransferMutation.isPending}
-              className="text-sm px-3 py-2 rounded-md border disabled:opacity-60"
+              className="text-body px-3 py-2 rounded-md border disabled:opacity-60"
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
             >
               {cancelTransferMutation.isPending ? "Cancelling…" : "Cancel transfer"}
@@ -112,7 +112,7 @@ export default function WorkspaceSettingsPage() {
             }}
           >
             <div className="flex-1">
-              <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 New owner&apos;s email
               </label>
               <input
@@ -121,14 +121,14 @@ export default function WorkspaceSettingsPage() {
                 onChange={(e) => setTransferEmail(e.target.value)}
                 required
                 placeholder="owner@example.com"
-                className="w-full px-3 py-2 text-sm rounded-md border outline-none"
+                className="w-full px-3 py-2 text-body rounded-md border outline-none"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               />
             </div>
             <button
               type="submit"
               disabled={initiateTransferMutation.isPending}
-              className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60 whitespace-nowrap"
+              className="px-4 py-2 text-body font-medium rounded-md text-white disabled:opacity-60 whitespace-nowrap"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               {initiateTransferMutation.isPending ? "Sending…" : "Transfer"}

@@ -62,14 +62,14 @@ export function SiteCard({ site }: SiteCardProps) {
             siteId={site.id}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--color-primary-hover)] transition-colors"
+            className="flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-body-sm font-medium text-white hover:bg-[var(--color-primary-hover)] transition-colors"
           >
             <Pencil className="h-3 w-3" />
             Edit
           </EditorLink>
           <Link
             href={`/dashboard/sites/${site.id}`}
-            className="flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-body-sm font-medium text-white hover:bg-white/20 transition-colors"
           >
             Manage
             <ArrowRight className="h-3 w-3" />
@@ -104,12 +104,12 @@ export function SiteCard({ site }: SiteCardProps) {
       {/* Info */}
       <div className="p-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-sm font-medium text-[var(--color-text-primary)]">{site.name}</p>
+          <p className="truncate text-body font-medium text-[var(--color-text-primary)]">{site.name}</p>
           <Pill tone={STATUS_TONE[site.status] ?? "neutral"} className="shrink-0 capitalize">
             {site.status}
           </Pill>
         </div>
-        <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+        <p className="mt-1 text-body-sm text-[var(--color-text-muted)]">
           Edited {timeAgo(site.lastEditedAt)} · <MetricValue>{site.pages}</MetricValue> page{site.pages !== 1 ? "s" : ""}
         </p>
       </div>

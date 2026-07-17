@@ -69,14 +69,14 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
       />
       <SectionCard title="Connect Domain">
         <div className="flex gap-2">
-          <input type="text" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="www.example.com" className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
-          <button onClick={handleConnect} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Connect</button>
+          <input type="text" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="www.example.com" className="flex-1 rounded-lg border px-3 py-2 text-body" style={{ borderColor: "var(--color-border-default)" }} />
+          <button onClick={handleConnect} className="rounded-lg px-4 py-2 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Connect</button>
         </div>
         <div className="mt-3">
-          <p className="text-xs font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>DNS provider guides:</p>
+          <p className="text-body-sm font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>DNS provider guides:</p>
           <div className="flex flex-wrap gap-2">
             {PROVIDER_GUIDES.map((g) => (
-              <a key={g.name} href={g.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+              <a key={g.name} href={g.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-body-sm hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
                 {g.name}<ExternalLink className="h-3 w-3" />
               </a>
             ))}
@@ -86,7 +86,7 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
 
       {domains.length > 0 && (
         <SectionCard padding="none">
-          <table className="w-full text-sm">
+          <table className="w-full text-body">
             <thead><tr className="border-b" style={{ borderColor: "var(--color-border-default)" }}>
               <th className="px-5 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Domain</th>
               <th className="px-5 py-3 text-left font-medium" style={{ color: "var(--color-text-secondary)" }}>Status</th>
@@ -109,11 +109,11 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
                     className="flex items-center gap-1"
                   >
                     <Shield className="h-3 w-3" style={{ color: d.sslStatus === "ACTIVE" ? "var(--color-success)" : "var(--color-text-secondary)" }} />
-                    <span className="text-sm">{d.sslStatus.toLowerCase()}</span>
+                    <span className="text-body">{d.sslStatus.toLowerCase()}</span>
                     {expandedSsl === d.id ? <ChevronUp className="h-3 w-3" style={{ color: "var(--color-text-secondary)" }} /> : <ChevronDown className="h-3 w-3" style={{ color: "var(--color-text-secondary)" }} />}
                   </button>
                   {expandedSsl === d.id && (
-                    <div className="mt-2 rounded-lg border p-3 text-xs space-y-1" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+                    <div className="mt-2 rounded-lg border p-3 text-body-sm space-y-1" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
                       {/* Only fields the backend actually supplies — the
                           issuer/expiry/auto-renew lines were fabricated. */}
                       <p><span className="font-medium">Status:</span> {d.sslStatus === "ACTIVE" ? "Active — certificate issued" : "Provisioning — issued automatically once the domain verifies"}</p>
@@ -128,7 +128,7 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
                   ) : (
                     <button
                       onClick={() => onSetPrimary(d.id)}
-                      className="rounded-md border px-2 py-1 text-xs hover:bg-[var(--color-bg-subtle)]"
+                      className="rounded-md border px-2 py-1 text-body-sm hover:bg-[var(--color-bg-subtle)]"
                       style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                     >
                       Set as Primary
@@ -147,10 +147,10 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
                 row,
                 <tr key={`${d.id}-dns`} style={{ backgroundColor: "var(--color-bg-page)" }}>
                   <td colSpan={5} className="px-5 py-3">
-                    <p className="mb-2 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
+                    <p className="mb-2 text-body-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
                       Add these DNS records at your registrar, then verification runs automatically:
                     </p>
-                    <table className="w-full text-xs">
+                    <table className="w-full text-body-sm">
                       <thead>
                         <tr style={{ color: "var(--color-text-muted)" }}>
                           <th className="py-1 text-left font-medium">Type</th>

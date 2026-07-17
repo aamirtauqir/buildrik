@@ -72,7 +72,7 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
       >
         {!loading && (
           <>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-bold text-white">{initials}</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-primary)] text-body font-bold text-white">{initials}</span>
             <span className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Account</span>
             <ChevronDown className="h-4 w-4" style={{ color: "var(--color-text-muted)" }} />
           </>
@@ -82,8 +82,8 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
       {open && (
         <div className="absolute right-0 top-11 z-50 w-56 rounded-xl border border-[var(--color-border-default)] bg-white shadow-lg">
           <div className="border-b border-[var(--color-border-default)] px-4 py-3">
-            <p className="text-sm font-medium text-[var(--color-text-primary)]">{name}</p>
-            <p className="text-xs text-[var(--color-text-muted)]">{email}</p>
+            <p className="text-body font-medium text-[var(--color-text-primary)]">{name}</p>
+            <p className="text-body-sm text-[var(--color-text-muted)]">{email}</p>
           </div>
           <ul className="py-1">
             {AVATAR_MENU_ITEMS.map((item) => {
@@ -93,7 +93,7 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
                   <li key={item.label}>
                     <button
                       onClick={handleLogout}
-                      className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-subtle)]"
+                      className="flex w-full items-center gap-3 px-4 py-2 text-body text-[var(--color-text-primary)] hover:bg-[var(--color-bg-subtle)]"
                     >
                       <Icon className="h-4 w-4 text-[var(--color-text-secondary)]" />
                       {item.label}
@@ -106,7 +106,7 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-subtle)]"
+                    className="flex items-center gap-3 px-4 py-2 text-body text-[var(--color-text-primary)] hover:bg-[var(--color-bg-subtle)]"
                   >
                     <Icon className="h-4 w-4 text-[var(--color-text-secondary)]" />
                     {item.label}

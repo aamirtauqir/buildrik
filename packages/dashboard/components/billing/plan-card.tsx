@@ -58,7 +58,7 @@ export function PlanCard({
 
       <ul className="mt-5 space-y-2">
         {features.map((feature) => (
-          <li key={feature} className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text-primary)" }}>
+          <li key={feature} className="flex items-center gap-2 text-body" style={{ color: "var(--color-text-primary)" }}>
             <span style={{ color: "var(--color-success)" }}>&#10003;</span>
             {feature}
           </li>
@@ -68,7 +68,7 @@ export function PlanCard({
       {!isCurrent && onChangePlan && (
         <button
           onClick={onChangePlan}
-          className="mt-6 w-full rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="mt-6 w-full rounded-lg py-2.5 text-body font-semibold text-white transition-opacity hover:opacity-90"
           style={{ backgroundColor: "var(--color-primary)" }}
         >
           Change Plan
@@ -76,7 +76,7 @@ export function PlanCard({
       )}
       {isCurrent && (
         <div
-          className="mt-6 w-full rounded-lg py-2.5 text-center text-sm font-semibold"
+          className="mt-6 w-full rounded-lg py-2.5 text-center text-body font-semibold"
           style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}
         >
           Active

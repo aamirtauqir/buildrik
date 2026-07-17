@@ -547,14 +547,14 @@ export default function ProjectsPage() {
             No sites yet
           </p>
           <p
-            className="mt-1 text-sm"
+            className="mt-1 text-body"
             style={{ color: "var(--color-text-secondary)" }}
           >
             Create your first site to get started.
           </p>
           <button
             onClick={() => setCreateOpen(true)}
-            className="mt-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            className="mt-4 flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             <Plus className="h-4 w-4" />
@@ -588,14 +588,14 @@ export default function ProjectsPage() {
       {/* Pagination */}
       {sitesQuery.data && sitesQuery.data.totalPages > 1 && (
         <div className="flex items-center justify-between mt-6">
-          <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
             Page {page} of {sitesQuery.data.totalPages} ({sitesQuery.data.total} sites)
           </p>
           <div className="flex gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage(p => p - 1)}
-              className="px-3 py-1.5 text-sm rounded-lg border disabled:opacity-50"
+              className="px-3 py-1.5 text-body rounded-lg border disabled:opacity-50"
               style={{ borderColor: "var(--color-border-default)" }}
             >
               Previous
@@ -603,7 +603,7 @@ export default function ProjectsPage() {
             <button
               disabled={page >= sitesQuery.data.totalPages}
               onClick={() => setPage(p => p + 1)}
-              className="px-3 py-1.5 text-sm rounded-lg border disabled:opacity-50"
+              className="px-3 py-1.5 text-body rounded-lg border disabled:opacity-50"
               style={{ borderColor: "var(--color-border-default)" }}
             >
               Next
@@ -711,13 +711,13 @@ export default function ProjectsPage() {
               }}
               placeholder="Folder name"
               autoFocus
-              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+              className="mt-4 w-full rounded-lg border px-3 py-2 text-body outline-none focus:border-[var(--color-primary)]"
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             />
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => { setCreateFolderOpen(false); setNewFolderName(""); }}
-                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                className="flex-1 rounded-lg border py-2.5 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)]"
                 style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               >
                 Cancel
@@ -727,7 +727,7 @@ export default function ProjectsPage() {
                   if (newFolderName.trim()) createFolderMutation.mutate({ name: newFolderName.trim() });
                 }}
                 disabled={!newFolderName.trim() || createFolderMutation.isPending}
-                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="flex-1 rounded-lg py-2.5 text-body font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {createFolderMutation.isPending ? "Creating..." : "Create Folder"}

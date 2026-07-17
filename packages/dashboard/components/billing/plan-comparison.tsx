@@ -89,7 +89,7 @@ export function PlanComparison({
   return (
     <div>
       <div className="mb-6 flex items-center justify-center gap-3">
-        <span className="text-sm font-medium" style={{ color: yearly ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}>
+        <span className="text-body font-medium" style={{ color: yearly ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}>
           Monthly
         </span>
         <button
@@ -108,10 +108,10 @@ export function PlanComparison({
             )}
           />
         </button>
-        <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: yearly ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>
+        <span className="flex items-center gap-1.5 text-body font-medium" style={{ color: yearly ? "var(--color-text-primary)" : "var(--color-text-secondary)" }}>
           Yearly
           <span
-            className="rounded-full px-2 py-0.5 text-xs font-semibold"
+            className="rounded-full px-2 py-0.5 text-body-sm font-semibold"
             style={{ backgroundColor: "#F0FDF4", color: "var(--color-success)" }}
           >
             Save 20%
@@ -120,10 +120,10 @@ export function PlanComparison({
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[var(--color-border-default)]">
-        <table className="w-full text-sm">
+        <table className="w-full text-body">
           <thead>
             <tr style={{ backgroundColor: "var(--color-bg-page)" }}>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
+              <th className="px-6 py-4 text-left text-body-sm font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
                 Feature
               </th>
               {plans.map((plan) => {
@@ -146,7 +146,7 @@ export function PlanComparison({
                         </span>
                       )}
                       <span
-                        className="rounded-full px-2.5 py-1 text-xs font-semibold"
+                        className="rounded-full px-2.5 py-1 text-body-sm font-semibold"
                         style={{ backgroundColor: badge.bg, color: badge.color }}
                       >
                         {badge.label}
@@ -202,7 +202,7 @@ export function PlanComparison({
                     return (
                       <td
                         key={key}
-                        className={cn("px-6 py-3 text-center text-sm", isCurrent && "bg-[var(--color-primary-subtle)]")}
+                        className={cn("px-6 py-3 text-center text-body", isCurrent && "bg-[var(--color-primary-subtle)]")}
                         style={{ color: "var(--color-text-secondary)" }}
                       >
                         {row[key]}
@@ -228,7 +228,7 @@ export function PlanComparison({
                           disabled={upgradesDisabled}
                           title={upgradesDisabled ? "Payment processing is coming soon" : undefined}
                           className={cn(
-                            "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity",
+                            "rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity",
                             upgradesDisabled
                               ? "cursor-not-allowed opacity-50"
                               : "hover:opacity-90",
@@ -244,7 +244,7 @@ export function PlanComparison({
                         </button>
                       )}
                       {isCurrent && (
-                        <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
+                        <span className="text-body font-semibold" style={{ color: "var(--color-primary)" }}>
                           Current Plan
                         </span>
                       )}

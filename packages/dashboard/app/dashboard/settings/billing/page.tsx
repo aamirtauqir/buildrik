@@ -139,7 +139,7 @@ export default function BillingPage() {
           </p>
           <button
             onClick={() => setShowPlans(false)}
-            className="shrink-0 rounded-lg border px-4 py-2 text-sm font-medium"
+            className="shrink-0 rounded-lg border px-4 py-2 text-body font-medium"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
           >
             Back to Billing
@@ -150,10 +150,10 @@ export default function BillingPage() {
             className="rounded-xl border p-4 text-center"
             style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
           >
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+            <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
               Payment processing coming soon
             </p>
-            <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
               We&apos;re integrating Stripe. Upgrades will be available here once it&apos;s ready.
             </p>
           </div>
@@ -174,7 +174,7 @@ export default function BillingPage() {
         <div className="mb-6 flex justify-end">
           <button
             onClick={() => setShowPlans(true)}
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity hover:opacity-90"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             View Plans
@@ -202,13 +202,13 @@ export default function BillingPage() {
           className="mb-4 flex items-center justify-between rounded-xl border px-5 py-3"
           style={{ borderColor: "#F59E0B", backgroundColor: "#FFFBEB" }}
         >
-          <p className="text-sm font-medium" style={{ color: "#92400E" }}>
+          <p className="text-body font-medium" style={{ color: "#92400E" }}>
             Your plan cancels on <MetricValue>{formatDate(overview.currentPeriodEnd)}</MetricValue>
           </p>
           <button
             onClick={() => reactivateMutation.mutate()}
             disabled={reactivateMutation.isPending}
-            className="ml-4 shrink-0 rounded-lg px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="ml-4 shrink-0 rounded-lg px-4 py-1.5 text-body font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             {reactivateMutation.isPending ? "Reactivating..." : "Reactivate"}
@@ -245,16 +245,16 @@ export default function BillingPage() {
                 style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
               >
                 <div>
-                  <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                  <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                     Cancel subscription
                   </p>
-                  <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                  <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                     Stays active until the end of your billing period
                   </p>
                 </div>
                 <button
                   onClick={() => setShowCancel(true)}
-                  className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-page)]"
+                  className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)]"
                   style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                 >
                   Cancel subscription

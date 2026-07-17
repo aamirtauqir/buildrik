@@ -48,13 +48,13 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
   };
 
   const columns: Column<RedirectRow>[] = [
-    { key: "fromPath", header: "From", render: (r) => <MetricValue className="text-xs">{r.fromPath}</MetricValue> },
+    { key: "fromPath", header: "From", render: (r) => <MetricValue className="text-body-sm">{r.fromPath}</MetricValue> },
     {
       key: "toUrl",
       header: "To",
       render: (r) => (
         <span style={{ color: "var(--color-text-secondary)" }}>
-          <MetricValue className="text-xs">{r.toUrl}</MetricValue>
+          <MetricValue className="text-body-sm">{r.toUrl}</MetricValue>
         </span>
       ),
     },
@@ -65,7 +65,7 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
       align: "right",
       render: (r) =>
         canEdit ? (
-          <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-xs text-neutral-500 hover:text-red-600">
+          <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-red-600">
             <Trash2 size={13} /> Delete
           </button>
         ) : null,
@@ -77,16 +77,16 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Redirects</h2>
-          <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
             Forward old URLs to new ones. 301 = permanent (SEO), 302 = temporary.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={onExport} className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+          <button type="button" onClick={onExport} className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
             <Download size={14} /> Export
           </button>
           {canEdit && (
-            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
               <Upload size={14} /> Import CSV
               <input type="file" accept=".csv,text/csv" className="hidden" onChange={handleFile} />
             </label>
@@ -105,25 +105,25 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
       {canEdit && (
         <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
           {atLimit ? (
-            <p className="text-sm text-amber-700">
+            <p className="text-body text-amber-700">
               You&apos;ve hit your plan&apos;s redirect limit. <a href="/dashboard/settings/billing" className="font-medium underline">Upgrade</a> to add more.
             </p>
           ) : (
             <div className="flex flex-wrap items-end gap-2">
               <div className="flex-1 min-w-[140px]">
-                <label className="block text-xs font-medium text-neutral-500">From</label>
-                <input value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="mt-1 w-full rounded-md border px-2.5 py-1.5 text-sm font-mono outline-none focus:border-[var(--color-primary)]" style={{ borderColor: "var(--color-border-default)" }} />
+                <label className="block text-body-sm font-medium text-neutral-500">From</label>
+                <input value={fromPath} onChange={(e) => setFromPath(e.target.value)} placeholder="/old-page" className="mt-1 w-full rounded-md border px-2.5 py-1.5 text-body font-mono outline-none focus:border-[var(--color-primary)]" style={{ borderColor: "var(--color-border-default)" }} />
               </div>
               <ArrowRight size={16} className="mb-2 text-neutral-400" />
               <div className="flex-1 min-w-[140px]">
-                <label className="block text-xs font-medium text-neutral-500">To</label>
-                <input value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="mt-1 w-full rounded-md border px-2.5 py-1.5 text-sm font-mono outline-none focus:border-[var(--color-primary)]" style={{ borderColor: "var(--color-border-default)" }} />
+                <label className="block text-body-sm font-medium text-neutral-500">To</label>
+                <input value={toUrl} onChange={(e) => setToUrl(e.target.value)} placeholder="/new-page" className="mt-1 w-full rounded-md border px-2.5 py-1.5 text-body font-mono outline-none focus:border-[var(--color-primary)]" style={{ borderColor: "var(--color-border-default)" }} />
               </div>
-              <select value={type} onChange={(e) => setType(e.target.value as "301" | "302")} className="rounded-md border px-2 py-1.5 text-sm" style={{ borderColor: "var(--color-border-default)" }}>
+              <select value={type} onChange={(e) => setType(e.target.value as "301" | "302")} className="rounded-md border px-2 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)" }}>
                 <option value="301">301</option>
                 <option value="302">302</option>
               </select>
-              <button type="button" onClick={submit} disabled={saving || !fromPath.trim() || !toUrl.trim()} className="inline-flex items-center gap-1 rounded-md bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50">
+              <button type="button" onClick={submit} disabled={saving || !fromPath.trim() || !toUrl.trim()} className="inline-flex items-center gap-1 rounded-md bg-[var(--color-primary)] px-3 py-1.5 text-body font-medium text-white hover:opacity-90 disabled:opacity-50">
                 <Plus size={14} /> Add
               </button>
             </div>
@@ -138,8 +138,8 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
         keyOf={(r) => r.id}
         empty={
           <div className="rounded-xl border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No redirects yet</p>
-            <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>Renaming a page slug auto-creates one, or add yours above.</p>
+            <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No redirects yet</p>
+            <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>Renaming a page slug auto-creates one, or add yours above.</p>
           </div>
         }
       />

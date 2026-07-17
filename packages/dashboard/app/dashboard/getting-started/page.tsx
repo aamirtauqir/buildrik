@@ -100,7 +100,7 @@ export default function GettingStartedPage() {
                     {isCurrent && (
                       <Link
                         href={step.href}
-                        className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
+                        className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-body-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
                       >
                         Start
                       </Link>

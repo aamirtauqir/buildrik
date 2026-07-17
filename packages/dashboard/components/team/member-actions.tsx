@@ -54,7 +54,7 @@ export function MemberActions({ memberId, isOwner, isCurrentUser, onAction }: Me
                   onAction(item.action, memberId);
                   setOpen(false);
                 }}
-                className="flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex w-full items-center px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-40"
                 style={{ color: isDestructive ? "var(--color-primary)" : "var(--color-text-primary)" }}
               >
                 {item.label}

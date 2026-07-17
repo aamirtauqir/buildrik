@@ -46,12 +46,12 @@ export function SeoTab({ site }: SeoTabProps) {
         className="flex items-center justify-between rounded-xl border bg-white p-4"
         style={{ borderColor: "var(--color-border-default)" }}
       >
-        <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
           SEO content is edited in the editor. This is a live preview.
         </p>
         <Link
           href={editorHref}
-          className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white"
+          className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-body font-medium text-white"
           style={{ backgroundColor: "var(--color-primary)" }}
         >
           <Pencil className="h-4 w-4" />
@@ -61,14 +61,14 @@ export function SeoTab({ site }: SeoTabProps) {
 
       <SectionCard title="Google Search Preview">
         <div className="rounded-lg border p-4" style={{ borderColor: "var(--color-border-default)" }}>
-          <p className="text-sm" style={{ color: "#1a0dab" }}>{metaTitle || "Page Title"}</p>
-          <p className="text-xs" style={{ color: "#006621" }}>{SERP_PLACEHOLDER_HOST}</p>
-          <p className="text-xs" style={{ color: "#545454" }}>{metaDesc || "No description set"}</p>
+          <p className="text-body" style={{ color: "#1a0dab" }}>{metaTitle || "Page Title"}</p>
+          <p className="text-body-sm" style={{ color: "#006621" }}>{SERP_PLACEHOLDER_HOST}</p>
+          <p className="text-body-sm" style={{ color: "#545454" }}>{metaDesc || "No description set"}</p>
         </div>
       </SectionCard>
 
       <SectionCard title="Current Meta Tags">
-        <dl className="space-y-3 text-sm">
+        <dl className="space-y-3 text-body">
           <Row label="Meta title" value={metaTitle} empty="Not set" />
           <Row label="Meta description" value={metaDesc} empty="Not set" />
           <Row label="Title template" value={site.metaTitleTemplate ?? ""} empty="{page_title} | {site_name}" />
@@ -124,21 +124,21 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
       ) : (
         <div className="space-y-5">
           <div>
-            <label className="block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Canonical domain</label>
-            <p className="mb-1.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>The preferred URL search engines should index (e.g. https://www.example.com).</p>
+            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Canonical domain</label>
+            <p className="mb-1.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>The preferred URL search engines should index (e.g. https://www.example.com).</p>
             <input
               value={canonical}
               onChange={(e) => setCanonicalUrl(e.target.value)}
               placeholder="https://www.example.com"
-              className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+              className="w-full rounded-md border px-3 py-2 text-body outline-none focus:border-[var(--color-primary)]"
               style={{ borderColor: "var(--color-border-default)" }}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Allow search engines to index this site</p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Off adds a noindex directive — useful for staging.</p>
+              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Allow search engines to index this site</p>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Off adds a noindex directive — useful for staging.</p>
             </div>
             <button
               type="button"
@@ -152,14 +152,14 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>robots.txt</label>
-            <p className="mb-1.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>Leave blank for the sensible default. Custom rules override it.</p>
+            <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>robots.txt</label>
+            <p className="mb-1.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Leave blank for the sensible default. Custom rules override it.</p>
             <textarea
               value={robots}
               onChange={(e) => setRobotsTxt(e.target.value)}
               rows={4}
               placeholder={"User-agent: *\nAllow: /"}
-              className="w-full rounded-md border px-3 py-2 font-mono text-xs outline-none focus:border-[var(--color-primary)]"
+              className="w-full rounded-md border px-3 py-2 font-mono text-body-sm outline-none focus:border-[var(--color-primary)]"
               style={{ borderColor: "var(--color-border-default)" }}
             />
           </div>
@@ -169,7 +169,7 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
               type="button"
               onClick={save}
               disabled={update.isPending}
-              className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+              className="rounded-md px-4 py-2 text-body font-medium text-white disabled:opacity-60"
               style={{ backgroundColor: "var(--color-primary)" }}
             >
               {update.isPending ? "Saving…" : "Save technical SEO"}
@@ -205,7 +205,7 @@ function SocialCardPreview({
 }) {
   return (
     <div>
-      <p className="mb-1 text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="mb-1 text-body-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
         {variant === "twitter" ? "Twitter / X Preview" : "Facebook Preview"}
       </p>
       <div
@@ -217,12 +217,12 @@ function SocialCardPreview({
           style={{ backgroundImage: `url(${imageUrl})`, height: variant === "twitter" ? 252 : 274 }}
         />
         <div className="p-3" style={{ backgroundColor: variant === "twitter" ? "#fff" : "#F0F2F5" }}>
-          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>{SERP_PLACEHOLDER_HOST}</p>
-          <p className="truncate text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{SERP_PLACEHOLDER_HOST}</p>
+          <p className="truncate text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>
             {title || "Page Title"}
           </p>
           {variant === "facebook" && (
-            <p className="truncate text-xs" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="truncate text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
               {description || "No description set"}
             </p>
           )}

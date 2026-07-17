@@ -33,20 +33,20 @@ export default function DashboardError({
         >
           Failed to load this page
         </h2>
-        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
           Something went wrong while loading this section.
         </p>
         <div className="mt-6 flex gap-3 justify-center">
           <button
             onClick={reset}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white cursor-pointer"
+            className="px-4 py-2 rounded-lg text-body font-medium text-white cursor-pointer"
             style={{ backgroundColor: "var(--color-primary)" }}
           >
             Retry
           </button>
           <Link
             href="/dashboard"
-            className="px-4 py-2 rounded-lg text-sm font-medium border"
+            className="px-4 py-2 rounded-lg text-body font-medium border"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
           >
             Back to Dashboard

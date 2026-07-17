@@ -125,16 +125,16 @@ function NewSitePageInner() {
         <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>
           Create New Site
         </h1>
-        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>
           Choose how you want to get started
         </p>
         <div className="mt-6 text-left">
-          <label className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>Site name</label>
+          <label className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}>Site name</label>
           <input
             type="text"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
-            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-body outline-none focus:border-[var(--color-primary)]"
             style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             placeholder="My New Site"
           />
@@ -149,8 +149,8 @@ function NewSitePageInner() {
               <LayoutTemplate className="h-6 w-6" style={{ color: "var(--color-text-secondary)" }} />
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Use a Template</p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ professionally designed templates</p>
+              <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Use a Template</p>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ professionally designed templates</p>
             </div>
           </button>
           <button
@@ -162,8 +162,8 @@ function NewSitePageInner() {
               <Sparkles className="h-6 w-6" style={{ color: "var(--color-primary)" }} />
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Describe your site and let AI build it</p>
+              <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Generate with AI</p>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Describe your site and let AI build it</p>
             </div>
           </button>
           <button
@@ -176,8 +176,8 @@ function NewSitePageInner() {
               <FileText className="h-6 w-6" style={{ color: "var(--color-text-secondary)" }} />
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Full creative control from the first pixel</p>
+              <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Start from Scratch</p>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Full creative control from the first pixel</p>
             </div>
           </button>
         </div>

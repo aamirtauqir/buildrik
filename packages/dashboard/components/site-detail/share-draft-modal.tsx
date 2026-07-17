@@ -82,42 +82,42 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
 
         {createdUrl ? (
           <>
-            <p className="mt-3 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="mt-3 text-body" style={{ color: "var(--color-text-secondary)" }}>
               Anyone with this link can preview the current draft.
             </p>
             <div className="mt-4 flex items-center gap-2 rounded-lg border px-3 py-2" style={{ borderColor: "var(--color-border-default)" }}>
-              <span className="flex-1 truncate text-sm font-mono" style={{ color: "var(--color-text-primary)" }}>{createdUrl}</span>
-              <button onClick={handleCopy} className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
+              <span className="flex-1 truncate text-body font-mono" style={{ color: "var(--color-text-primary)" }}>{createdUrl}</span>
+              <button onClick={handleCopy} className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-body-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
                 {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
             <div className="mt-4 flex justify-end">
-              <button onClick={handleClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Done</button>
+              <button onClick={handleClose} className="rounded-lg border px-4 py-2 text-body" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Done</button>
             </div>
           </>
         ) : (
           <>
-            <p className="mt-3 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="mt-3 text-body" style={{ color: "var(--color-text-secondary)" }}>
               Generate a private preview link to share the current draft with clients or teammates.
             </p>
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Link name</label>
+                <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Link name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   maxLength={100}
                   placeholder="Draft preview"
-                  className="w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+                  className="w-full rounded-lg border px-3 py-2 text-body outline-none transition-colors focus:border-[var(--color-primary)]"
                   style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                 />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                   Password{" "}
                   <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>(optional)</span>
                 </label>
@@ -127,13 +127,13 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={!allowPasswords}
                   placeholder={allowPasswords ? "Min 6 characters" : "Password links require PRO"}
-                  className="w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors focus:border-[var(--color-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg border px-3 py-2 text-body outline-none transition-colors focus:border-[var(--color-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                 />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Expiry</label>
+                <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>Expiry</label>
                 <div className="flex flex-wrap gap-2">
                   {EXPIRY_OPTIONS.map((opt) => {
                     const disabled = opt.days > 0 && maxExpiryDays > 0 && opt.days > maxExpiryDays;
@@ -143,7 +143,7 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
                         key={opt.days}
                         disabled={disabled}
                         onClick={() => setExpiryDays(String(opt.days))}
-                        className="rounded-md border px-2.5 py-1 text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="rounded-md border px-2.5 py-1 text-body-sm disabled:opacity-40 disabled:cursor-not-allowed"
                         style={{
                           borderColor: selected ? "var(--color-primary)" : "var(--color-border-default)",
                           color: selected ? "var(--color-primary)" : "var(--color-text-secondary)",
@@ -159,11 +159,11 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
             </div>
 
             <div className="mt-5 flex gap-2 justify-end">
-              <button onClick={handleClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
+              <button onClick={handleClose} className="rounded-lg border px-4 py-2 text-body" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
               <button
                 disabled={!name.trim() || (!!password && password.length < 6) || createMutation.isPending}
                 onClick={() => createMutation.mutate({ siteId, name: name.trim(), password: password || undefined, expiresInDays })}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="rounded-lg px-4 py-2 text-body font-medium text-white disabled:opacity-50"
                 style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {createMutation.isPending ? "Creating..." : "Create draft link"}

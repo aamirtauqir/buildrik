@@ -50,13 +50,13 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
       <h2 className="text-xl font-semibold" style={{ color: "var(--color-text-primary)" }}>
         No team members yet
       </h2>
-      <p className="mt-2 max-w-sm text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
+      <p className="mt-2 max-w-sm text-center text-body" style={{ color: "var(--color-text-secondary)" }}>
         Invite your colleagues to collaborate. Choose the right role for each person based on what they need to do.
       </p>
 
       <button
         onClick={onInvite}
-        className="mt-6 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        className="mt-6 rounded-lg px-5 py-2.5 text-body font-semibold text-white transition-colors hover:opacity-90"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
         Invite Team Members
@@ -74,10 +74,10 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
             >
               <card.Icon className="h-4 w-4" style={{ color: card.color }} />
             </div>
-            <p className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+            <p className="text-body font-bold" style={{ color: "var(--color-text-primary)" }}>
               {card.role}
             </p>
-            <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
               {card.description}
             </p>
           </div>

@@ -108,8 +108,8 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
     return (
       <div className="rounded-xl border border-dashed p-10 text-center" style={{ borderColor: "var(--color-border-default)" }}>
         <Inbox className="mx-auto h-6 w-6" style={{ color: "var(--color-text-muted)" }} />
-        <p className="mt-2 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No forms on this site yet</p>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>Add a form block in the editor to start collecting submissions.</p>
+        <p className="mt-2 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No forms on this site yet</p>
+        <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>Add a form block in the editor to start collecting submissions.</p>
       </div>
     );
   }
@@ -123,7 +123,7 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
       key: "createdAt",
       header: "Submitted",
       render: (s) => (
-        <MetricValue className="text-xs">
+        <MetricValue className="text-body-sm">
           {new Date(s.createdAt).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -172,7 +172,7 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
             setFilterFormBlockId(e.target.value || undefined);
             setPage(1);
           }}
-          className="rounded-lg border px-3 py-1.5 text-xs"
+          className="rounded-lg border px-3 py-1.5 text-body-sm"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
         >
           <option value="">All Forms</option>
@@ -183,7 +183,7 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
         <button
           onClick={handleExportCsv}
           disabled={exporting || rows.length === 0}
-          className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-40"
           style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
         >
           <Download className="h-3.5 w-3.5" />
@@ -206,8 +206,8 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
             onRowClick={handleOpenDrawer}
             empty={
               <div className="rounded-xl border border-dashed p-10 text-center" style={{ borderColor: "var(--color-border-default)" }}>
-                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No submissions found</p>
-                <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No submissions found</p>
+                <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>
                   {filterFormBlockId ? "Try clearing the form filter." : "Submissions from your published site will appear here."}
                 </p>
               </div>
@@ -216,7 +216,7 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
 
           {total > PER_PAGE && (
             <div className="flex items-center justify-between">
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                 Page <MetricValue>{submissionsQuery.data?.page ?? page}</MetricValue> of <MetricValue>{totalPages}</MetricValue>{" "}
                 (<MetricValue>{total}</MetricValue> total)
               </p>

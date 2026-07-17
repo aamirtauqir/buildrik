@@ -38,7 +38,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       {/* Date range picker */}
       <div className="flex items-center gap-2">
         {DATE_RANGE_OPTIONS.map((opt) => (
-          <button key={opt.value} onClick={() => onRangeChange(opt.value)} className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors" style={{ backgroundColor: range === opt.value ? "var(--color-primary-subtle)" : "transparent", color: range === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
+          <button key={opt.value} onClick={() => onRangeChange(opt.value)} className="rounded-lg px-3 py-1.5 text-body-sm font-medium transition-colors" style={{ backgroundColor: range === opt.value ? "var(--color-primary-subtle)" : "transparent", color: range === opt.value ? "var(--color-primary)" : "var(--color-text-secondary)" }}>
             {opt.label}
           </button>
         ))}
@@ -54,7 +54,7 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <BarChart3 className="h-10 w-10 mb-4" style={{ color: "var(--color-text-muted)" }} />
           <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>No analytics data yet</h3>
-          <p className="text-sm mt-1 max-w-sm" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body mt-1 max-w-sm" style={{ color: "var(--color-text-secondary)" }}>
             Analytics will appear here once your site starts receiving visitors.
           </p>
         </div>
@@ -82,16 +82,16 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
                   <SectionCard title="Traffic Sources">
                     {data.trafficSources.map((s) => (
                       <div key={s.source} className="flex items-center justify-between py-2">
-                        <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{s.source}</span>
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{pct(s.count, sourceTotal)}</MetricValue>%</span>
+                        <span className="text-body" style={{ color: "var(--color-text-primary)" }}>{s.source}</span>
+                        <span className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{pct(s.count, sourceTotal)}</MetricValue>%</span>
                       </div>
                     ))}
                   </SectionCard>
                   <SectionCard title="Top Countries">
                     {data.countries.map((c) => (
                       <div key={c.country} className="flex items-center justify-between py-2">
-                        <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{c.country}</span>
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{c.count}</MetricValue> (<MetricValue>{pct(c.count, countryTotal)}</MetricValue>%)</span>
+                        <span className="text-body" style={{ color: "var(--color-text-primary)" }}>{c.country}</span>
+                        <span className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{c.count}</MetricValue> (<MetricValue>{pct(c.count, countryTotal)}</MetricValue>%)</span>
                       </div>
                     ))}
                   </SectionCard>
@@ -101,8 +101,8 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
                   <SectionCard title="Devices">
                     {data.devices.map((d) => (
                       <div key={d.device} className="flex items-center justify-between py-2">
-                        <span className="text-sm capitalize" style={{ color: "var(--color-text-primary)" }}>{d.device}</span>
-                        <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{d.count}</MetricValue> (<MetricValue>{pct(d.count, deviceTotal)}</MetricValue>%)</span>
+                        <span className="text-body capitalize" style={{ color: "var(--color-text-primary)" }}>{d.device}</span>
+                        <span className="text-body font-medium" style={{ color: "var(--color-text-secondary)" }}><MetricValue>{d.count}</MetricValue> (<MetricValue>{pct(d.count, deviceTotal)}</MetricValue>%)</span>
                       </div>
                     ))}
                   </SectionCard>
@@ -115,8 +115,8 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
 
       {!isLoading && !data && (
         <div className="rounded-xl border-2 border-dashed py-16 text-center" style={{ borderColor: "var(--color-border-default)" }}>
-          <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No analytics data yet</p>
-          <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>Publish your site to start tracking visitors.</p>
+          <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>No analytics data yet</p>
+          <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Publish your site to start tracking visitors.</p>
         </div>
       )}
     </div>

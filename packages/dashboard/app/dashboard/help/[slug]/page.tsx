@@ -35,7 +35,7 @@ export default function ArticleDetailPage() {
       <div className="mb-6 flex items-center gap-3">
         <button
           onClick={() => router.push("/dashboard/help")}
-          className="flex items-center gap-1.5 text-sm transition-colors hover:underline"
+          className="flex items-center gap-1.5 text-body transition-colors hover:underline"
           style={{ color: "var(--color-text-secondary)" }}
         >
           <ArrowLeft className="h-3.5 w-3.5" />
@@ -55,8 +55,8 @@ export default function ArticleDetailPage() {
         </div>
       ) : articleQuery.error ? (
         <div className="py-12 text-center">
-          <p className="text-sm font-medium" style={{ color: "var(--color-primary)" }}>Article not found</p>
-          <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+          <p className="text-body font-medium" style={{ color: "var(--color-primary)" }}>Article not found</p>
+          <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
             This article may have been moved or deleted.
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function ArticleDetailPage() {
           <h1 className="mb-2 text-page-title" style={{ color: "var(--color-text-primary)" }}>{article.title}</h1>
           <div className="mb-6 flex items-center gap-3">
             <span
-              className="rounded-full px-2.5 py-0.5 text-xs font-medium"
+              className="rounded-full px-2.5 py-0.5 text-body-sm font-medium"
               style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}
             >
               {article.category}
@@ -73,31 +73,31 @@ export default function ArticleDetailPage() {
             {article.readTime > 0 && (
               <div className="flex items-center gap-1" style={{ color: "var(--color-text-muted)" }}>
                 <Clock className="h-3 w-3" />
-                <span className="text-xs">{article.readTime} min read</span>
+                <span className="text-body-sm">{article.readTime} min read</span>
               </div>
             )}
           </div>
 
-          <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: "#4A4A4A" }}>
+          <div className="text-body leading-relaxed whitespace-pre-wrap" style={{ color: "#4A4A4A" }}>
             {article.content ?? article.excerpt ?? ""}
           </div>
 
           {/* Was this helpful? */}
           <div className="mt-10 rounded-xl border p-6 text-center" style={{ borderColor: "var(--color-border-default)" }}>
             {feedbackGiven ? (
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Thanks for your feedback!
               </p>
             ) : (
               <>
-                <p className="mb-4 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                <p className="mb-4 text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                   Was this article helpful?
                 </p>
                 <div className="flex items-center justify-center gap-3">
                   <button
                     onClick={() => handleFeedback(true)}
                     disabled={feedbackMutation.isPending}
-                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:border-green-300 hover:bg-green-50"
+                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:border-green-300 hover:bg-green-50"
                     style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                   >
                     <ThumbsUp className="h-4 w-4" />
@@ -106,7 +106,7 @@ export default function ArticleDetailPage() {
                   <button
                     onClick={() => handleFeedback(false)}
                     disabled={feedbackMutation.isPending}
-                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-subtle)]"
+                    className="flex items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-subtle)]"
                     style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                   >
                     <ThumbsDown className="h-4 w-4" />

@@ -16,7 +16,7 @@ function HealthBar({ label, used, limit, unit = "" }: HealthBarProps) {
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs">
+      <div className="flex items-center justify-between text-body-sm">
         <span className="text-[var(--color-text-secondary)]">{label}</span>
         <span className="text-[var(--color-text-primary)]">
           <MetricValue>{used}{unit} / {limit}{unit}</MetricValue>
@@ -51,7 +51,7 @@ export function WorkspaceHealth({ data }: WorkspaceHealthProps) {
     <div className="rounded-xl border border-[var(--color-border-default)] bg-white p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-section-title text-[var(--color-text-primary)]">Workspace Usage</h3>
-        <Link href="/dashboard/settings/billing" className="text-xs text-[var(--color-primary)] hover:underline">
+        <Link href="/dashboard/settings/billing" className="text-body-sm text-[var(--color-primary)] hover:underline">
           Manage plan →
         </Link>
       </div>

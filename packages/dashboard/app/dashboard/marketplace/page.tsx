@@ -46,7 +46,7 @@ export default function MarketplacePage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search apps & templates…"
-          className="w-full rounded-xl border py-2.5 pl-9 pr-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+          className="w-full rounded-xl border py-2.5 pl-9 pr-3 text-body outline-none transition-colors focus:border-[var(--color-primary)]"
           style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-primary)" }}
         />
       </div>
@@ -59,7 +59,7 @@ export default function MarketplacePage() {
               key={filter}
               type="button"
               onClick={() => setCategory(filter)}
-              className="rounded-full border px-3 py-1.5 text-sm font-medium transition-colors"
+              className="rounded-full border px-3 py-1.5 text-body font-medium transition-colors"
               style={
                 selected
                   ? { borderColor: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }
@@ -77,16 +77,16 @@ export default function MarketplacePage() {
         style={{ borderColor: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }}
       >
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-primary)" }}>Featured</span>
+          <span className="text-body-sm font-semibold uppercase tracking-wide" style={{ color: "var(--color-primary)" }}>Featured</span>
           <h2 className="mt-1 text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>{FEATURED_APP.name}</h2>
-          <p className="mt-1 max-w-xl text-sm" style={{ color: "var(--color-text-secondary)" }}>{FEATURED_APP.description}</p>
+          <p className="mt-1 max-w-xl text-body" style={{ color: "var(--color-text-secondary)" }}>{FEATURED_APP.description}</p>
         </div>
         {/* No marketplace backend yet — inert rather than a silent no-op. */}
         <button
           type="button"
           disabled
           title="Coming soon"
-          className="shrink-0 cursor-not-allowed rounded-lg px-4 py-2.5 text-sm font-semibold"
+          className="shrink-0 cursor-not-allowed rounded-lg px-4 py-2.5 text-body font-semibold"
           style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.6)" }}
         >
           Coming soon
@@ -94,7 +94,7 @@ export default function MarketplacePage() {
       </div>
 
       {apps.length === 0 ? (
-        <p className="rounded-xl border p-8 text-center text-sm" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-secondary)" }}>
+        <p className="rounded-xl border p-8 text-center text-body" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-secondary)" }}>
           No apps match your search.
         </p>
       ) : (
@@ -110,16 +110,16 @@ export default function MarketplacePage() {
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }}>
                   <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{app.name}</h3>
+                <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{app.name}</h3>
                 <div className="mt-1.5">
                   <Pill tone="neutral">{app.category}</Pill>
                 </div>
-                <p className="mt-2 flex-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>
+                <p className="mt-2 flex-1 text-body" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>
                 <button
                   type="button"
                   disabled
                   title="Coming soon"
-                  className="mt-4 self-start cursor-not-allowed rounded-lg border px-3.5 py-1.5 text-sm font-semibold"
+                  className="mt-4 self-start cursor-not-allowed rounded-lg border px-3.5 py-1.5 text-body font-semibold"
                   style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-muted)" }}
                 >
                   Coming soon

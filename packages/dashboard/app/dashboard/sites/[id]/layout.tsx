@@ -45,7 +45,7 @@ export default function SiteDetailLayout({
         <p className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
           Site not found
         </p>
-        <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
           This site may have been deleted or you don&apos;t have access.
         </p>
       </div>

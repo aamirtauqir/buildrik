@@ -41,7 +41,7 @@ export function VercelTeamPickerForm({
           checked={selected === null}
           onChange={() => setSelected(null)}
         />
-        <span className="text-sm font-medium">Personal account</span>
+        <span className="text-body font-medium">Personal account</span>
       </label>
 
       {candidateTeams.map((t) => (
@@ -57,7 +57,7 @@ export function VercelTeamPickerForm({
             checked={selected === t.id}
             onChange={() => setSelected(t.id)}
           />
-          <span className="text-sm">
+          <span className="text-body">
             <span className="font-medium">{t.name}</span>{" "}
             <span className="text-neutral-500">({t.slug})</span>
           </span>
@@ -68,14 +68,14 @@ export function VercelTeamPickerForm({
         <button
           type="submit"
           disabled={finish.isPending}
-          className="rounded-md bg-black px-4 py-2 text-sm text-white hover:bg-neutral-800 disabled:opacity-50"
+          className="rounded-md bg-black px-4 py-2 text-body text-white hover:bg-neutral-800 disabled:opacity-50"
         >
           {finish.isPending ? "Connecting…" : "Connect"}
         </button>
       </div>
 
       {finish.error && (
-        <p className="text-sm text-red-600">{finish.error.message}</p>
+        <p className="text-body text-red-600">{finish.error.message}</p>
       )}
     </form>
   );

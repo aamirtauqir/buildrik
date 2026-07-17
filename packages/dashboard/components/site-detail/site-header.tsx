@@ -19,7 +19,7 @@ function toTitleCase(status: string) {
   return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 }
 
-const outlineButton = "flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]";
+const outlineButton = "flex items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]";
 
 export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -46,7 +46,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
 
   return (
     <div>
-      <Link href="/dashboard/projects" className="mb-3 inline-flex items-center gap-1 text-sm transition-colors hover:underline" style={{ color: "var(--color-text-secondary)" }}>
+      <Link href="/dashboard/projects" className="mb-3 inline-flex items-center gap-1 text-body transition-colors hover:underline" style={{ color: "var(--color-text-secondary)" }}>
         <ArrowLeft className="h-4 w-4" />Back to projects
       </Link>
       <div className="flex items-center justify-between gap-4">
@@ -85,7 +85,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
             </a>
           ) : (
             <span
-              className="flex cursor-not-allowed items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium opacity-50"
+              className="flex cursor-not-allowed items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium opacity-50"
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
               title="Publish your site first"
             >
@@ -100,17 +100,17 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
             <Send className="h-4 w-4" />Send for review
           </button>
           {site.status === "DRAFT" && onPublish && (
-            <button onClick={onPublish} className="rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]">Publish</button>
+            <button onClick={onPublish} className="rounded-lg px-4 py-2 text-body font-medium text-white transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]">Publish</button>
           )}
           {site.status === "PUBLISHED" && onUnpublish && (
-            <button onClick={onUnpublish} className="rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]">Unpublish</button>
+            <button onClick={onUnpublish} className="rounded-lg px-4 py-2 text-body font-medium text-white transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]">Unpublish</button>
           )}
           <div ref={menuRef} className="relative">
             <button
               onClick={() => setMenuOpen((o) => !o)}
               aria-haspopup="menu"
               aria-expanded={menuOpen}
-              className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+              className="flex items-center gap-2 rounded-lg border px-3 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               <MoreHorizontal className="h-4 w-4" />More
@@ -122,14 +122,14 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMenuOpen(false)}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
                   style={{ color: "var(--color-text-primary)" }}
                 >
                   <Pencil className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />Edit in Editor
                 </EditorLink>
                 <button
                   onClick={() => { setShareOpen(true); setMenuOpen(false); }}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
                   style={{ color: "var(--color-text-primary)" }}
                 >
                   <Share2 className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />Share draft

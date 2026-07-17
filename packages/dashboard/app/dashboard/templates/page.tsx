@@ -39,7 +39,7 @@ export default function LibrariesPage() {
               role="tab"
               aria-selected={active}
               onClick={() => setTab(t.value)}
-              className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+              className="rounded-md px-4 py-1.5 text-body font-medium transition-colors"
               style={{
                 backgroundColor: active ? "var(--color-primary-subtle)" : "transparent",
                 color: active ? "var(--color-primary)" : "var(--color-text-secondary)",
@@ -63,7 +63,7 @@ export default function LibrariesPage() {
                 <Icon className="h-9 w-9" style={{ color: "var(--color-text-muted)" }} />
               </div>
               <div className="p-4">
-                <h2 className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{name}</h2>
+                <h2 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{name}</h2>
                 <div className="mt-2 flex items-center justify-between">
                   <Pill tone="neutral">{category}</Pill>
                   {/* No template-apply backend yet — inert rather than a silent no-op. */}
@@ -71,7 +71,7 @@ export default function LibrariesPage() {
                     type="button"
                     disabled
                     title="Coming soon"
-                    className="cursor-not-allowed rounded-lg px-3 py-1.5 text-xs font-semibold"
+                    className="cursor-not-allowed rounded-lg px-3 py-1.5 text-body-sm font-semibold"
                     style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
                   >
                     Coming soon

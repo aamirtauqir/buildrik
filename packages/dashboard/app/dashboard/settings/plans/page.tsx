@@ -92,7 +92,7 @@ export default function PlansPage() {
             role="tab"
             aria-selected={!yearly}
             onClick={() => setYearly(false)}
-            className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+            className="rounded-md px-4 py-1.5 text-body font-medium transition-colors"
             style={!yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
           >
             Monthly
@@ -101,12 +101,12 @@ export default function PlansPage() {
             role="tab"
             aria-selected={yearly}
             onClick={() => setYearly(true)}
-            className="inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-body font-medium transition-colors"
             style={yearly ? { backgroundColor: "var(--color-primary)", color: "#FFFFFF" } : { color: "var(--color-text-secondary)" }}
           >
             Yearly
             <span
-              className="text-xs font-semibold"
+              className="text-body-sm font-semibold"
               style={{ color: yearly ? "rgba(255,255,255,0.9)" : "var(--color-success)" }}
             >
               &minus;20%
@@ -161,22 +161,22 @@ export default function PlansPage() {
                   <MetricValue className="text-3xl font-extrabold">{price.amount}</MetricValue>
                 </span>
                 {price.suffix && (
-                  <span className="text-sm" style={{ color: secondaryColor }}>
+                  <span className="text-body" style={{ color: secondaryColor }}>
                     {price.suffix}
                   </span>
                 )}
               </div>
-              <div className="mt-1 h-4 text-xs" style={{ color: secondaryColor }}>
+              <div className="mt-1 h-4 text-body-sm" style={{ color: secondaryColor }}>
                 {price.note}
               </div>
 
-              <p className="mt-2 text-sm" style={{ color: secondaryColor }}>
+              <p className="mt-2 text-body" style={{ color: secondaryColor }}>
                 {plan.tagline}
               </p>
 
               <ul className="mt-5 space-y-2.5">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm" style={{ color: featureColor }}>
+                  <li key={feature} className="flex items-center gap-2 text-body" style={{ color: featureColor }}>
                     <Check className="h-4 w-4 shrink-0" style={{ color: checkColor }} />
                     {feature}
                   </li>
@@ -199,7 +199,7 @@ function PlanCta({ plan, isCurrent, currentPlanId }: { plan: Plan; isCurrent: bo
     return (
       <button
         disabled
-        className="w-full cursor-not-allowed rounded-lg py-2.5 text-center text-sm font-semibold"
+        className="w-full cursor-not-allowed rounded-lg py-2.5 text-center text-body font-semibold"
         style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
       >
         Current plan
@@ -211,7 +211,7 @@ function PlanCta({ plan, isCurrent, currentPlanId }: { plan: Plan; isCurrent: bo
     return (
       <a
         href="mailto:sales@buildrick.com"
-        className="block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-opacity hover:opacity-90"
+        className="block w-full rounded-lg py-2.5 text-center text-body font-semibold transition-opacity hover:opacity-90"
         style={{ backgroundColor: "#FFFFFF", color: "var(--color-ink)" }}
       >
         Contact sales
@@ -226,7 +226,7 @@ function PlanCta({ plan, isCurrent, currentPlanId }: { plan: Plan; isCurrent: bo
     return (
       <Link
         href="/dashboard/settings/billing"
-        className="block w-full rounded-lg py-2.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        className="block w-full rounded-lg py-2.5 text-center text-body font-semibold text-white transition-opacity hover:opacity-90"
         style={{ backgroundColor: "var(--color-primary)" }}
       >
         {label}
@@ -237,7 +237,7 @@ function PlanCta({ plan, isCurrent, currentPlanId }: { plan: Plan; isCurrent: bo
   return (
     <Link
       href="/dashboard/settings/billing"
-      className="block w-full rounded-lg border py-2.5 text-center text-sm font-semibold transition-colors"
+      className="block w-full rounded-lg border py-2.5 text-center text-body font-semibold transition-colors"
       style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)" }}
     >
       {label}
