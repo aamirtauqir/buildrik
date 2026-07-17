@@ -73,7 +73,7 @@ The dashboard is built as ONE system, not per-screen markup. Enforced by a shell
 
 **Two-level shell** (`DashboardShell`):
 - **Top nav** (full-width, `--topnav-h: 52px`): brand · the four product areas `Dashboard · Marketplace · Learn · Resources` · ⌘K search · notifications · help · workspace switcher (`Plan · N seats` in mono) · account. These four areas live ONLY in the top nav.
-- **Sidebar** (`--sidebar-w: 262px`, below the top nav): workspace/operational destinations only (Home, All projects, Sites, Media, Getting started, Agency group, Extend = Apps/Libraries, Workspace = Team/Billing/Plans/Usage/Domains/Settings/Help). Never repeats the top-nav areas.
+- **Sidebar** (`--sidebar-w: 262px`, below the top nav): workspace/operational destinations only — IA v2 (2026-07-17) trimmed 19 items to **6 + 2**: `Home · Projects · Agency (agency-only) · Media · Templates · Settings` plus a labeled Support group (`Getting started · Help center`). SSOT is `components/dashboard/shell/nav.ts` (`NAV_GROUPS`); mobile tab bar and the ⌘K palette's nav entries derive from it. Agency tabs (Clients · Reviews · Shared theme · Partner) and the Settings rail (WORKSPACE / PLATFORM / BILLING / PERSONAL + Danger) live inside their sections, not in the sidebar. Never repeats the top-nav areas.
 
 **Token contract** (`globals.css @theme`): radius scale `--radius-xs 4 / sm 6 / md 8 / lg 10 / xl 12 / pill`; `--font-mono` Geist Mono for all data (counts, $, sizes, seats, dates) with `tabular-nums`; named text tokens `--text-page-title 22 / section 15 / eyebrow 11 / metric 24 / body 13`. No arbitrary `text-[22px]` or freehand `rounded-*` in new work.
 
