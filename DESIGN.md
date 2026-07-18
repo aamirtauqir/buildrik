@@ -72,6 +72,15 @@ The dashboard is built as ONE system, not per-screen markup. Enforced by a shell
 
 **Primitives** (`components/dashboard/primitives/`, use these — do NOT hand-roll): `PageHeader`, `SectionCard`, `StatCard` (+ `visual`/`href`), `DataTable`, `Pill` (tones neutral/success/warning/error/accent), `ProgressBar`, `MetricValue`. Screens compose primitives; they don't style surfaces directly. Data-viz helpers (donut/sparkline/avatars) live in `dataviz.tsx`.
 
+**Explicitly allowed on the dashboard** (2026-07-18 — the editor-chrome
+[Anti-Slop Rules](#anti-slop-rules--editor-chrome-only-enforce-in-qa-and-code-review)
+do NOT apply here):
+- **Elevation shadows on cards** — `shadow-card` / `shadow-card-hover` on stat, section, table and app cards. Depth is hairline border + soft shadow, not flat-only.
+- **Ink surfaces** — `--color-ink` `#141924` for hero/featured cards and filled pills (e.g. the Marketplace featured card and its active filter chip). The NO BLACK RULE is editor-chrome only.
+- **Per-app brand tile colours** — third-party branding on Marketplace/Apps tiles, sourced from `lib/marketplace-catalog.ts`. These are illustrative data, not accents; cobalt stays the only accent for CTAs, links, focus and active states.
+- **Multi-column card grids with coloured icon tiles** — the Marketplace/Apps grid is exactly this shape and is intended.
+- **A named font fallback** — the dashboard sets `'Inter', 'Inter Tight', sans-serif` on the shell root so Inter is scoped to the dashboard while auth/onboarding/editor keep Inter Tight.
+
 ## Aesthetic Direction
 - **Direction:** Industrial / Utilitarian, **light chrome**. Premium tool, not premium marketing. "Webflow meets Linear, daylight edition."
 - **Decoration level:** Minimal. Surfaces communicate depth through layered warm neutrals and hairline borders. No gradients, no blobs, no grain, no decorative texture, no shadows beyond subtle elevation on modals.
@@ -106,7 +115,7 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 --aqb-font-mono:   "Geist Mono", monospace;
 ```
 
-The only fallback allowed is the CSS generic (`sans-serif` / `monospace`). Never name a specific fallback font. If `Inter Tight` fails to load, the user gets the system generic — which is acceptable because `font-display: swap` means Inter Tight replaces it as soon as it loads.
+In **editor chrome**, the only fallback allowed is the CSS generic (`sans-serif` / `monospace`) — never name a specific fallback font. If `Inter Tight` fails to load, the user gets the system generic, which is acceptable because `font-display: swap` swaps Inter Tight in as soon as it loads. (The **dashboard** is the one exception: it sets `'Inter', 'Inter Tight', sans-serif` on the shell root so Inter is scoped to the dashboard and everything outside it keeps Inter Tight.)
 
 **Scale (px):** 11 / 12 / 13 / 14 / 16 / 20 / 24 / 32 / 48. Editor chrome lives mostly at 12–14. Breadcrumb project = 13/400, page = 13/500. Panel titles = 14/600. Row labels = 13/400. Mono data = 11/500.
 
@@ -260,7 +269,16 @@ Never 40px. Desktop power users want density.
 
 Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / Config) separated by `--aqb-border` hairlines. Active button has a 3px cobalt left bar AND `--accent-tint` background. Every tab has a rail button — Design and Publish get buttons (previously keyboard-only).
 
-## Anti-Slop Rules (enforce in QA and code review)
+## Anti-Slop Rules — **editor chrome only** (enforce in QA and code review)
+
+> **Scope, set 2026-07-18.** These rules govern the **editor chrome** (rail, panels,
+> inspector, canvas chrome) — they were written alongside the Rail/Composition specs
+> above. They are **not binding on the dashboard**, which follows the dc/Figma design
+> language (see [Dashboard Shell + Design System](#dashboard-shell--design-system-2026-07-12)
+> for what it explicitly allows). Previously this list sat at top level and read as
+> global, which put it in direct conflict with shipped dashboard code (card shadows,
+> ink hero surfaces, brand-coloured app tiles, multi-column card grids). The doc was
+> wrong, not the code. Auth and onboarding follow their own scoped sections.
 
 1. **NO black or near-black surfaces.** No `#000`, `#14141f`, `#1F2937`. Primary text caps at `#334155` slate-700.
 2. No purple, violet, indigo gradients. Ever.
@@ -297,6 +315,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-07-18 | **Anti-Slop Rules scoped to editor chrome; dashboard allowances made explicit** | The 12 anti-slop rules sat at top level and read as global, but were written alongside the editor Rail/Composition specs. As global rules they contradicted shipped dashboard code on four counts — card elevation shadows (#10), the ink `#141924` featured surface and filter chip (#1), per-app brand tile colours (#11), and the multi-column grid of coloured icon tiles (#3) — and the Dashboard section already prescribed `shadow-card`, so the doc contradicted itself. Rules retitled editor-chrome-only; the dashboard section now lists what it explicitly allows. The editor keeps the guard (light chrome / no-black is a real decision there). Cobalt remains the single accent everywhere — brand tile colours are illustrative data, never accents. Also scoped the "never name a specific fallback font" typography rule to the editor, since the dashboard deliberately sets `'Inter', 'Inter Tight', sans-serif` on its shell root. No code change. |
 | 2026-07-10 | **Auth surface → craftwork (cobalt + art rail)** | User-approved reskin of all `app/auth/**` screens to the "craftwork" design language: cobalt `#2D6DFF` accent, two-column floating card with art rail, gray-fill icon inputs. Scoped exception to the red dashboard brand — auth only; settings/billing/onboarding stay red. Business logic unchanged. See §Auth Surface — Craftwork. |
 | 2026-07-12 | **Dashboard accent flip RED → COBALT (brand unification)** | User-approved rebrand: the dashboard chrome's former red `#E42313` accent flips to cobalt `#2D6DFF`, matching the dc-skin and unifying with editor + auth (both already cobalt). Token change: `--color-primary` `#E42313`→`#2D6DFF`, `--color-primary-hover`→`#1950DC`, added `--color-primary-subtle` `#EBF1FF`, `--color-error`→`#DC2626`, focus outline→cobalt. Semantic reds (error/danger/destructive/FAILED) unchanged. Purple stays banned. Two-accent system retired → single cobalt (+ onboarding's scoped blue). Business logic unchanged. |
 | 2026-07-13 | **Onboarding → M2 frame-gallery parity** | The wizard is rebuilt against the M2 frame gallery (`Buildrik Onboarding-taiba`): 180px header with brand tile, 480px column, filled `#EAF1FF` inputs on a `#D3E1FF` ring, slate `#334155` text, 50px/15px/700 CTA, `OnbBack` text links. **The accent stays `#2563EB`** — the user chose to keep the DESIGN.md exception over the gallery's `#2D6DFF`, so onboarding is deliberately *not* pixel-identical to the mockup in accent hue alone. Tokens: added `--color-onb-field` / `--color-onb-field-ring` / `--spacing-onb-header`; removed `--color-onb-ink` (duplicated `--color-onb-text`); `--container-onb` 520→480. `.onb-scope` re-points the cobalt focus ring at the onboarding accent. Business logic unchanged. |
