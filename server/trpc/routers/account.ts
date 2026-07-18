@@ -156,7 +156,17 @@ export const accountRouter = router({
       // F3: workspace settings are admin-scoped. checkWorkspaceRole already exists;
       // these mutations just weren't calling it — any ACTIVE member could edit.
       await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
-      return updateWorkspaceSettings(workspaceId, input);
+      try {
+        return await updateWorkspaceSettings(workspaceId, input, ctx.session.user.id);
+      } catch (e) {
+        // Same CONFLICT translation as workspace.create — lets the M2 onboarding
+        // workspace step show its designed "name exists" state instead of a
+        // generic failure.
+        if (e instanceof WorkspaceNameTakenError) {
+          throw new TRPCError({ code: "CONFLICT", message: e.message });
+        }
+        throw e;
+      }
     }),
     sharing: protectedProcedure.input(workspaceSharingSettingsSchema).mutation(async ({ ctx, input }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);

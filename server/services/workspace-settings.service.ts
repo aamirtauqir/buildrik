@@ -117,7 +117,30 @@ export async function listUserWorkspaces(userId: string) {
   }));
 }
 
-export async function updateWorkspaceSettings(workspaceId: string, data: UpdateWorkspaceInput) {
+/**
+ * Renaming a workspace had no duplicate-name guard — only `createWorkspace` did
+ * — so the M2 onboarding "name exists" state (workspace-setup frame) had no
+ * server signal to key off. Scoped the same way as create: per-user (a
+ * different user's workspace of the same name is fine), excluding the
+ * workspace being renamed (renaming to your own current name is a no-op).
+ */
+export async function updateWorkspaceSettings(
+  workspaceId: string,
+  data: UpdateWorkspaceInput,
+  userId: string,
+) {
+  if (data.name) {
+    const clash = await prisma.workspaceMember.findFirst({
+      where: {
+        userId,
+        status: "ACTIVE",
+        workspaceId: { not: workspaceId },
+        workspace: { name: { equals: data.name.trim(), mode: "insensitive" } },
+      },
+      select: { id: true },
+    });
+    if (clash) throw new WorkspaceNameTakenError();
+  }
   return prisma.workspace.update({
     where: { id: workspaceId },
     data,
