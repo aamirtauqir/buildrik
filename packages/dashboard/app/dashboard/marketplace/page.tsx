@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, type LucideIcon } from "lucide-react";
-import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory, type CatalogApp } from "@/lib/marketplace-catalog";
-import { PageHeader } from "@/components/dashboard/primitives";
+import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory } from "@/lib/marketplace-catalog";
+import { PageHeader, IconChip, InputField } from "@/components/dashboard/primitives";
 import { trpc } from "@lib/trpc/client";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -22,18 +22,6 @@ type Filter = "All" | AppCategory;
 /** Third-party apps aren't installed here — their OAuth connections live in
  *  Settings › Integrations, so the card links there instead of faking a connect. */
 const INTEGRATIONS_HREF = "/dashboard/settings/integrations";
-
-/** Brand tile: the app's colour at low alpha behind a solid glyph. */
-function AppTile({ app, Icon }: { app: CatalogApp; Icon: LucideIcon }) {
-  return (
-    <div
-      className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg"
-      style={{ backgroundColor: `color-mix(in srgb, ${app.color} 14%, white)`, color: app.color }}
-    >
-      <Icon className="h-5 w-5" />
-    </div>
-  );
-}
 
 export default function MarketplacePage() {
   const [query, setQuery] = useState("");
@@ -72,17 +60,15 @@ export default function MarketplacePage() {
     <div>
       <PageHeader title="Marketplace" description="Apps, integrations and templates to extend your sites." />
 
-      <div className="relative mb-4">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "var(--color-text-secondary)" }} />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search apps & templates…"
-          className="w-full rounded-xl border py-2.5 pl-9 pr-3 text-body outline-none transition-colors focus:border-[var(--color-primary)]"
-          style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-primary)" }}
-        />
-      </div>
+      <InputField
+        wrapperClassName="mb-4"
+        leading={<Search className="h-4 w-4" />}
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search apps & templates…"
+        aria-label="Search apps and templates"
+      />
 
       <div className="mb-6 flex flex-wrap gap-2">
         {filters.map((filter) => {
@@ -155,7 +141,9 @@ export default function MarketplacePage() {
                 className="flex flex-col rounded-xl border p-5 shadow-card"
                 style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
               >
-                <AppTile app={app} Icon={Icon} />
+                <IconChip color={app.color} className="mb-3">
+                  <Icon className="h-5 w-5" />
+                </IconChip>
                 <h3 className="text-body font-bold" style={{ color: "var(--color-text-primary)" }}>{app.name}</h3>
                 <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{app.category}</p>
                 <p className="mt-3 flex-1 text-body" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>

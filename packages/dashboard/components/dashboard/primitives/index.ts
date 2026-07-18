@@ -6,3 +6,5 @@ export { Pill, type PillTone } from "./pill";
 export { ProgressBar } from "./progress-bar";
 export { DataTable, type Column } from "./data-table";
 export { Button, ButtonLink, type ButtonVariant, type ButtonSize } from "./button";
+export { IconChip } from "./icon-chip";
+export { InputField } from "./input-field";
