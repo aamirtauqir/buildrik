@@ -232,3 +232,50 @@ test.describe("onboarding · path", () => {
     await expect(page).toHaveURL(/\/onboarding\/blank/, { timeout: 15_000 });
   });
 });
+
+// A1-A5 · AI-draft flow — Business basics / Goal & audience / Brand style /
+// Generating / Draft ready frames. Each of the 3 form steps is reachable by
+// direct navigation (WizardBoot doesn't gate on prior-step data), matching
+// how the frame gallery + S3's "Start AI Draft" card land here.
+//
+// Real generation calls the configured AI provider (OPENAI_API_KEY) and can
+// take minutes, so only the deterministic portion — basics → goal → brand
+// advancing, and the generating spinner appearing — runs by default. The
+// completed-draft assertion needs a live provider and is gated behind
+// PW_ONB_AI (unset in CI, so that test is skipped by default).
+test.describe("onboarding · AI draft", () => {
+  async function fillBasicsGoalBrand(page: import("@playwright/test").Page) {
+    await page.goto("/onboarding/ai/basics");
+    await page.getByRole("button", { name: "Restaurant", exact: true }).click();
+    await page.getByPlaceholder("Bright Events").fill("Sunrise Bakery");
+    await page.getByPlaceholder("Event planning and coordination services").fill("Fresh bread and pastries daily");
+    await page.getByRole("button", { name: /^continue$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/ai\/goal/, { timeout: 15_000 });
+
+    await page.getByRole("button", { name: "Get leads", exact: true }).click();
+    await page.getByRole("button", { name: /^continue$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/ai\/brand/, { timeout: 15_000 });
+
+    await page.getByRole("button", { name: /^generate site draft$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/ai\/generating/, { timeout: 15_000 });
+  }
+
+  test("AI flow: basics → goal → brand advances to the generating spinner", async ({ page }) => {
+    await fillBasicsGoalBrand(page);
+
+    await expect(page.getByRole("heading", { name: /creating your site draft/i })).toBeVisible();
+    await expect(page.getByText(/creating sitemap/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /^cancel and go back$/i })).toBeVisible();
+  });
+
+  (process.env.PW_ONB_AI ? test : test.skip)(
+    "AI flow: a completed generation lands on the draft-ready preview",
+    async ({ page }) => {
+      await fillBasicsGoalBrand(page);
+
+      await expect(page).toHaveURL(/\/onboarding\/ai\/preview/, { timeout: 180_000 });
+      await expect(page.getByRole("heading", { name: /your first draft is ready/i })).toBeVisible();
+      await expect(page.getByRole("button", { name: /^open in editor$/i })).toBeVisible();
+    },
+  );
+});
