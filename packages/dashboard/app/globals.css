@@ -85,12 +85,12 @@
   --color-primary-hover: #1950DC;
   --color-primary-subtle: #EBF1FF;
   --color-destructive: #7F1D1D;
-  --color-bg-page: #F9FAFC;
+  --color-bg-page: #FAFAFC;
   --color-bg-surface: #FFFFFF;
-  --color-bg-subtle: #F3F5F8;
-  --color-border-default: #E8EAEF;
-  --color-border-strong: #D6DAE1;
-  --color-text-primary: #1C212C;
+  --color-bg-subtle: #F1F5F9;
+  --color-border-default: #E5E8ED;
+  --color-border-strong: #CCD1DB;
+  --color-text-primary: #334155;
   --color-text-secondary: #6B7380;
   --color-text-muted: #8A91A0;
   --color-text-placeholder: #8A91A0;
@@ -110,25 +110,45 @@
   --color-amber: #EA8E1E;
   --color-pink: #DB508C;
   --color-ink: #141924;
+  /* Sidebar nav item states (design: Shell.dc.html) */
+  --color-nav-item-active-bg: #EBF1FF;
+  --color-nav-label: #475569;
+  --color-nav-label-active: #1950DC;
+  /* Status fg/bg — status.live=success, review=warning, failed=error, draft=neutral */
+  --color-status-live-bg: #DCFCE7;   --color-status-live-fg: #15803D;
+  --color-status-review-bg: #FEF3C7; --color-status-review-fg: #D97706;
+  --color-status-failed-bg: #FEE2E2; --color-status-failed-fg: #DC2626;
+  --color-status-draft-bg: #F7FAFA;  --color-status-draft-fg: #6B7380;
 
-  /* dc card shadow — soft depth on surface cards / tiles / tables */
-  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 26px -20px rgba(15, 23, 42, 0.28);
+  /* dc card shadow — soft depth on surface cards / tiles / tables.
+     Premium shadow set (dc reskin 2026-07-18): ring + card + card-hover +
+     panel + modal, replacing the single flat --shadow-card. */
+  --shadow-ring: inset 0 0 0 1px var(--color-border-default);
+  --shadow-card: inset 0 0 0 1px var(--color-border-default), 0 1px 1px rgba(16,24,40,0.04), 0 2px 4px -2px rgba(16,24,40,0.07);
+  --shadow-card-hover: inset 0 0 0 1px var(--color-border-strong), 0 4px 10px -4px rgba(16,24,40,0.12), 0 1px 3px rgba(16,24,40,0.07);
+  --shadow-panel: 0 0 0 1px rgba(15,23,42,0.10), 0 18px 40px -24px rgba(15,23,42,0.16);
+  --shadow-modal: 0 24px 60px -12px rgba(15,23,42,0.35);
 
   /* Dashboard shell + design-system contract (dc parity 2026-07-12).
-     Two-level shell: full-width top nav (56px) above the 272px sidebar. */
+     Two-level shell: full-width top nav (56px) above the 244px sidebar
+     (narrowed from 272px in the reskin, 2026-07-18). */
   --topnav-h: 56px;
-  --sidebar-w: 272px;
+  --sidebar-w: 244px;
 
-  /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 pill). Remaps rounded-* utilities. */
+  /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 2xl16 pill). Remaps rounded-* utilities. */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 10px;
   --radius-xl: 12px;
+  --radius-2xl: 16px;
   --radius-pill: 9999px;
 
-  /* Named text tokens — page/section/eyebrow/metric/body. Kills arbitrary
-     text-[22px]. dc scale: body 13, page title 22, section 15, metric 24. */
+  /* Named text tokens — page/section/eyebrow/metric/body/display. Kills arbitrary
+     text-[22px]. dc scale: body 13, page title 22, section 15, metric 24, display 28. */
+  --text-display: 28px;
+  --text-display--line-height: 1.2;
+  --text-display--font-weight: 700;
   --text-page-title: 24px;
   --text-page-title--line-height: 1.2;
   --text-page-title--font-weight: 700;
