@@ -69,7 +69,7 @@ function EditorPreview() {
 export default function ReadyPage() {
   const router = useRouter();
   const { data } = useWizard();
-  const { openEditor, busy } = useOnboardingComplete();
+  const { openEditor, busy, skipSetup, skipping } = useOnboardingComplete();
 
   // No site means someone deep-linked here — send them back to the path chooser.
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function ReadyPage() {
     method === "ai" ? String(data.ai?.pages?.length ?? "—") : method === "blank" ? "1" : "—";
 
   return (
-    <WizardShell chrome={{ variant: "simple" }} wide>
+    <WizardShell chrome={{ variant: "simple" }} onSkip={skipSetup} skipping={skipping} wide>
       <div className="flex flex-col items-center gap-12">
         <div className="flex flex-col items-center gap-3 text-center">
           <h1 className="text-onb-title font-bold text-onb-text">Ready to edit</h1>

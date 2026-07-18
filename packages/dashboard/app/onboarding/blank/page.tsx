@@ -59,7 +59,7 @@ export default function BlankPage() {
 
   const [siteName, setSiteName] = useState(data.site?.name ?? "");
   const [startingPage, setStartingPage] = useState(data.blank?.startingPage ?? "Home page");
-  const [layoutStarter, setLayoutStarter] = useState(data.blank?.layoutStarter ?? "");
+  const [layoutStarter, setLayoutStarter] = useState(data.blank?.layoutStarter ?? "Header only");
   const [siteErr, setSiteErr] = useState<string>();
   const [netErr, setNetErr] = useState<string>();
 

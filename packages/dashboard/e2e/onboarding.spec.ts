@@ -330,3 +330,58 @@ test.describe("onboarding · template", () => {
     await expect(page.getByRole("button", { name: /^open in editor$/i })).toBeVisible();
   });
 });
+
+// B1/E1 · blank canvas → editor ready. Unlike the template flow above (which
+// stops short of "Use this template"'s createAndAdvance call), this flow's own
+// CTA — "Open Blank Canvas" — IS the site-creation step, so a real
+// trpc.sites.create round-trip is unavoidable to reach /onboarding/ready.
+// The QA fixture user's workspace is FREE-plan (3-site cap) and accumulates
+// real sites across e2e runs (AI-draft / template-flow specs, manual QA), so
+// it drifts past the cap over time — softDelete its existing sites first,
+// mirroring sites.service's own soft-delete (`deletedAt`), so SITE_LIMIT
+// never masks a real regression here.
+test.describe("onboarding · blank + ready", () => {
+  test("blank path creates a site, reaches ready, and the editor-ready CTA is wired", async ({ page }) => {
+    const prisma = new PrismaClient();
+    try {
+      const email = process.env.PW_ONB_EMAIL ?? "qa@buildrik.local";
+      const user = await prisma.user.findFirst({ where: { email }, select: { id: true } });
+      if (!user) throw new Error(`No user "${email}" in the DB — seed it before running e2e.`);
+      const membership = await prisma.workspaceMember.findFirst({
+        where: { userId: user.id },
+        select: { workspaceId: true },
+      });
+      if (membership) {
+        await prisma.site.updateMany({
+          where: { workspaceId: membership.workspaceId, deletedAt: null },
+          data: { deletedAt: new Date() },
+        });
+      }
+    } finally {
+      await prisma.$disconnect();
+    }
+
+    await page.goto("/onboarding/blank");
+    await expect(page.getByRole("heading", { name: /^start with a blank canvas$/i })).toBeVisible();
+
+    // B1's default state: "Home page" + "Header only" both pre-selected, per
+    // the frame gallery (not blank, despite "Layout starter" being optional).
+    await expect(page.getByRole("button", { name: "Home page", exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    await expect(page.getByRole("button", { name: "Header only", exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+
+    await page.getByPlaceholder("e.g. Bright Events Website").fill(`E2E Blank ${randomUUID().slice(0, 8)}`);
+    await page.getByRole("button", { name: /^open blank canvas$/i }).click();
+
+    await expect(page).toHaveURL(/\/onboarding\/ready/, { timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: /^ready to edit$/i })).toBeVisible();
+    // E1 (unlike T2) DOES carry "Skip setup" in the frame gallery.
+    await expect(page.getByRole("button", { name: /^skip setup$/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^open editor$/i })).toBeVisible();
+  });
+});
