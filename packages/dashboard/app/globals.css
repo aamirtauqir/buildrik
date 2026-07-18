@@ -143,19 +143,19 @@
   --text-body-sm: 12px;
   --text-body-sm--line-height: 1.35;
 
-  /* Onboarding (M2 wizard) — its own primary blue #2563EB, an approved scoped
-     exception (DESIGN.md §Onboarding Surface). Geometry and neutrals track the
-     M2 frame gallery; only the accent diverges from it. */
-  --color-onb-primary: #2563EB;
-  --color-onb-primary-hover: #1D4FD7;
-  --color-onb-primary-tint: #EFF6FF;
+  /* Onboarding (M2 wizard) — accent unified to cobalt #2D6DFF to match the v3
+     frame gallery (2026-07-18, reverses the earlier scoped-blue #2563EB). Fields
+     are white/outlined; the numbered stepper + neutrals track the v3 gallery. */
+  --color-onb-primary: #2D6DFF;
+  --color-onb-primary-hover: #1950DC;
+  --color-onb-primary-tint: #EBF1FF;
   --color-onb-text: #334155;
   --color-onb-muted: #63748B;
   --color-onb-subtle: #94A3B8;
   --color-onb-line: #E3E8F0;
   /* Inputs are filled, not outlined: pale blue field on a 1px ring. */
-  --color-onb-field: #EAF1FF;
-  --color-onb-field-ring: #D3E1FF;
+  --color-onb-field: #FFFFFF;
+  --color-onb-field-ring: #E3E8F0;
   --color-onb-surface: #F8FAFC;
   --color-onb-success: #21966B;
   --color-onb-error: #DC2626;

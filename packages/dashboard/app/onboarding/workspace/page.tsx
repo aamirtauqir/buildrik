@@ -117,7 +117,7 @@ export default function WorkspacePage() {
           />
 
           <OnbButton type="submit" loading={busy} disabled={busy}>
-            {busy ? "Creating workspace…" : "Create workspace"}
+            {busy ? "Continuing…" : "Continue"}
           </OnbButton>
 
           {networkError ? (

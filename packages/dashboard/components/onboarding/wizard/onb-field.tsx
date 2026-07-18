@@ -23,8 +23,8 @@ export const OnbField = forwardRef<HTMLInputElement, OnbFieldProps>(
           "w-full h-onb-input px-4 rounded-onb text-[13.5px] text-onb-text",
           "transition-colors outline-none placeholder:text-onb-muted",
           error
-            ? "bg-white shadow-[inset_0_0_0_1.5px_var(--color-onb-error)] focus:shadow-[inset_0_0_0_1.5px_var(--color-onb-error),0_0_0_3px_rgb(37_99_235_/_0.12)]"
-            : "bg-onb-field shadow-[inset_0_0_0_1px_var(--color-onb-field-ring)] focus:shadow-[inset_0_0_0_1.5px_var(--color-onb-primary),0_0_0_3px_rgb(37_99_235_/_0.12)]",
+            ? "bg-white shadow-[inset_0_0_0_1.5px_var(--color-onb-error)] focus:shadow-[inset_0_0_0_1.5px_var(--color-onb-error),0_0_0_3px_rgb(45_109_255_/_0.12)]"
+            : "bg-onb-field shadow-[inset_0_0_0_1px_var(--color-onb-field-ring)] focus:shadow-[inset_0_0_0_1.5px_var(--color-onb-primary),0_0_0_3px_rgb(45_109_255_/_0.12)]",
           className
         )}
         {...props}

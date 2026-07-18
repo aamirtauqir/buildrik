@@ -59,7 +59,7 @@ test.describe("onboarding · workspace", () => {
   // (no htmlFor/id), so target the field by its exact placeholder instead.
   const nameField = (page: import("@playwright/test").Page) => page.getByPlaceholder("My Workspace");
   const continueBtn = (page: import("@playwright/test").Page) =>
-    page.getByRole("button", { name: /^create workspace$/i });
+    page.getByRole("button", { name: /^continue$/i });
 
   test("empty name blocks + shows inline error", async ({ page }) => {
     await page.goto("/onboarding/workspace");
@@ -139,7 +139,7 @@ test.describe("onboarding · workspace", () => {
     await nameField(page).fill(`Acme Loading ${randomUUID().slice(0, 6)}`);
     await continueBtn(page).click();
 
-    const loadingBtn = page.getByRole("button", { name: /creating workspace…/i });
+    const loadingBtn = page.getByRole("button", { name: /continuing…/i });
     await expect(loadingBtn).toBeVisible();
     await expect(loadingBtn).toBeDisabled();
 
@@ -452,7 +452,7 @@ test.describe("onboarding · full walkthroughs", () => {
   async function completeWorkspaceAndSiteSteps(page: import("@playwright/test").Page, label: string) {
     await page.goto("/onboarding/workspace");
     await page.getByPlaceholder("My Workspace").fill(`E2E ${label} WS ${randomUUID().slice(0, 6)}`);
-    await page.getByRole("button", { name: /^create workspace$/i }).click();
+    await page.getByRole("button", { name: /^continue$/i }).click();
     await expect(page).toHaveURL(/\/onboarding\/site/, { timeout: 15_000 });
 
     await page.getByPlaceholder("e.g. Bright Events Website").fill(`E2E ${label} Site ${randomUUID().slice(0, 6)}`);

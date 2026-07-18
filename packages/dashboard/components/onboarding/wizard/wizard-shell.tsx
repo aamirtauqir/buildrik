@@ -22,21 +22,40 @@ interface WizardShellProps {
   children: React.ReactNode;
 }
 
+const STEP_LABELS = ["Workspace", "Site", "Start"] as const;
+
+/** v3 numbered stepper: filled cobalt circle + label for done/active steps,
+ *  outlined slate circle + muted label for upcoming ones, hairline connectors. */
 function StepperDots({ step }: { step: number }) {
   return (
-    <div className="flex flex-col items-center gap-3.5">
-      <div className="flex items-center gap-2">
-        {[1, 2, 3].map((i) => (
-          <span
-            key={i}
-            className={cn(
-              "h-[9px] w-[9px] rounded-full transition-colors",
-              i <= step ? "bg-onb-primary" : "bg-onb-line"
-            )}
-          />
-        ))}
-      </div>
-      <span className="text-[11px] text-onb-muted">Step {step} of 3</span>
+    <div className="flex items-center">
+      {STEP_LABELS.map((label, i) => {
+        const n = i + 1;
+        const reached = n <= step;
+        return (
+          <div key={label} className="flex items-center">
+            <span className="flex items-center gap-2">
+              <span
+                className={cn(
+                  "flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-semibold transition-colors",
+                  reached ? "bg-onb-primary text-white" : "border border-onb-subtle text-onb-subtle"
+                )}
+              >
+                {n}
+              </span>
+              <span
+                className={cn(
+                  "text-[13px] transition-colors",
+                  n === step ? "font-semibold text-onb-text" : reached ? "font-medium text-onb-text" : "font-medium text-onb-subtle"
+                )}
+              >
+                {label}
+              </span>
+            </span>
+            {i < STEP_LABELS.length - 1 && <span className="mx-3 h-px w-10 bg-onb-line" />}
+          </div>
+        );
+      })}
     </div>
   );
 }
