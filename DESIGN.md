@@ -23,7 +23,12 @@ Buildrick runs on **one brand accent: cobalt `#2D6DFF`** across editor, auth, an
 Rules:
 - **Cobalt `#2D6DFF` is the single accent** for CTAs, links, active states, focus rings across editor + auth + dashboard.
 - **Red means error/danger/destructive only** (delete confirm, FAILED status, validation, over-limit, dunning) — on every surface. Never a red CTA or accent.
-- Purple/violet/indigo remain **banned** as accents (AI-slop guard).
+- Purple/violet/indigo remain **banned** as accents (AI-slop guard). **One narrow
+  exception (user-approved 2026-07-18):** third-party *brand* colours on the
+  Marketplace app tiles may be purple (e.g. Commerce `#7C5CF6`) — these are
+  per-app branding data in `lib/marketplace-catalog.ts`, never an accent, never a
+  gradient, and never applied to CTAs, links, focus, or active states. The
+  "no purple gradients, ever" rule below is unaffected.
 - The **NO BLACK RULE** below applies to **editor chrome only**. Dashboard may use `#0D0D0D` for primary text.
 
 ### Auth Surface — Craftwork (2026-07-10)

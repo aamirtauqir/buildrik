@@ -173,8 +173,26 @@ model Workspace {
   themeSnapshots  SiteThemeSnapshot[]
   themePresets    WorkspacePreset[]
   referrals       Referral[]
+  apps            WorkspaceApp[]
 
   @@map("workspaces")
+}
+
+// Per-workspace marketplace install. Only "Install"-action catalog apps are
+// written here (Connect-type apps are third-party OAuth and live in
+// WorkspaceIntegration). A row's existence == installed; uninstall deletes it.
+// appId matches CatalogApp.id in lib/marketplace-catalog.ts.
+model WorkspaceApp {
+  id          String   @id @default(cuid())
+  workspaceId String
+  appId       String
+  installedAt DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, appId])
+  @@index([workspaceId])
+  @@map("workspace_apps")
 }
 
 // Partner-program referral. A workspace refers others; each signed-up referral
