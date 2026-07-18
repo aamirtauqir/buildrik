@@ -6,7 +6,7 @@ export type ButtonVariant = "primary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md";
 
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-[9px] font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 rounded-[6px] font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none";
 
 const SIZES: Record<ButtonSize, string> = {
   sm: "px-3 py-1.5 text-[13px]",
@@ -14,7 +14,7 @@ const SIZES: Record<ButtonSize, string> = {
 };
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]",
+  primary: "bg-[var(--color-primary)] text-white shadow-[0_1px_2px_rgba(45,109,255,0.28)] hover:bg-[var(--color-primary-hover)] hover:shadow-[0_4px_10px_rgba(45,109,255,0.32)]",
   ghost:
     "border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:text-[var(--color-text-primary)]",
   danger: "bg-[var(--color-error)] text-white hover:bg-[var(--color-error-text)]",
