@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { FolderPlus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@lib/utils";
 
 interface FolderTab {
@@ -13,7 +13,6 @@ interface FolderTabsProps {
   tabs: FolderTab[];
   activeId: string | null;
   onSelect: (id: string | null) => void;
-  onCreateFolder: () => void;
   /** Folder management (E4 parity) — surfaces on the active folder tab only. */
   onRenameFolder: (id: string, name: string) => void;
   onDeleteFolder: (id: string, name: string) => void;
@@ -47,7 +46,7 @@ function Tab({ active, onClick, name, count }: { active: boolean; onClick: () =>
   );
 }
 
-export function FolderTabs({ tabs, activeId, onSelect, onCreateFolder, onRenameFolder, onDeleteFolder, archivedCount, showArchived, onToggleArchived }: FolderTabsProps) {
+export function FolderTabs({ tabs, activeId, onSelect, onRenameFolder, onDeleteFolder, archivedCount, showArchived, onToggleArchived }: FolderTabsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -133,13 +132,6 @@ export function FolderTabs({ tabs, activeId, onSelect, onCreateFolder, onRenameF
         );
       })}
       <Tab active={showArchived} onClick={onToggleArchived} name="Archived" count={archivedCount} />
-      <button
-        onClick={onCreateFolder}
-        className="ml-auto rounded-md p-1.5 transition-colors hover:bg-[var(--color-bg-subtle)]"
-        aria-label="Create folder"
-      >
-        <FolderPlus className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
-      </button>
     </div>
   );
 }

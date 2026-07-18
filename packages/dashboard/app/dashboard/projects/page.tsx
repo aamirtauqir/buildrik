@@ -16,7 +16,7 @@ import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
 import { Button, PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
-import { Plus, Search, CheckSquare } from "lucide-react";
+import { Plus, Search, CheckSquare, Folder } from "lucide-react";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 export default function ProjectsPage() {
@@ -412,21 +412,25 @@ export default function ProjectsPage() {
         description="Manage, edit, and publish every site in your workspace."
         actions={
           <>
-            <button
+            <Button
+              variant="ghost"
               onClick={handleSelectAll}
-              className="flex items-center gap-1.5 rounded-md border px-3.5 py-2 text-body-sm font-medium transition-colors"
               style={selectedIds.size > 0
                 ? { borderColor: "var(--color-primary)", color: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }
-                : { borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}
+                : undefined}
             >
               <CheckSquare className="h-4 w-4" />
               Select
-            </button>
+            </Button>
             <ViewToggle value={viewMode} onChange={(mode) => {
               setViewMode(mode);
               updatePrefs.mutate({ siteViewMode: mode as "grid" | "list" });
             }} />
-            <Button onClick={() => setCreateOpen(true)} className="gap-1.5">
+            <Button variant="ghost" onClick={() => setCreateFolderOpen(true)}>
+              <Folder className="h-4 w-4" />
+              New folder
+            </Button>
+            <Button onClick={() => setCreateOpen(true)}>
               <Plus className="h-4 w-4" />
               New site
             </Button>
@@ -444,7 +448,6 @@ export default function ProjectsPage() {
             setShowArchived(false);
             setPage(1);
           }}
-          onCreateFolder={() => setCreateFolderOpen(true)}
           onRenameFolder={(id, name) => setRenameFolderTarget({ id, name })}
           onDeleteFolder={handleDeleteFolder}
           archivedCount={archivedQuery.data?.total ?? 0}
