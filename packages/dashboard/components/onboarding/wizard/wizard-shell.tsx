@@ -13,11 +13,9 @@ interface WizardShellProps {
   skipping?: boolean;
   /** Widen the content column for gallery-style frames (T1, A5, E1). */
   wide?: boolean;
-  /** "full" = 180px closed by a hairline (setup + template frames); "compact" =
-   *  110px, no rule (the whole AI-draft flow). Not derivable from `chrome` —
-   *  A4/A5 carry no indicator yet still use the compact header. */
-  header?: "full" | "compact";
-  /** Content padding, top and bottom. Frames vary (40–100px); 80 is the default. */
+  /** Minimum vertical padding around the centered content column. Frames vary
+   *  (40–100px); 40 is the default. Content that outgrows the viewport keeps
+   *  this as top/bottom breathing room and scrolls instead of centering. */
   padY?: number;
   children: React.ReactNode;
 }
@@ -31,6 +29,7 @@ function StepperDots({ step }: { step: number }) {
     <div className="flex items-center">
       {STEP_LABELS.map((label, i) => {
         const n = i + 1;
+        const done = n < step;
         const reached = n <= step;
         return (
           <div key={label} className="flex items-center">
@@ -41,7 +40,13 @@ function StepperDots({ step }: { step: number }) {
                   reached ? "bg-onb-primary text-white" : "border border-onb-subtle text-onb-subtle"
                 )}
               >
-                {n}
+                {done ? (
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                ) : (
+                  n
+                )}
               </span>
               <span
                 className={cn(
@@ -73,56 +78,42 @@ function ProgressBar({ step, label }: { step: number; label: string }) {
   );
 }
 
-/** M2 onboarding wizard chrome. Two header geometries, per the frame gallery:
- *  the setup + template frames use a 180px header closed by a hairline, while
- *  the AI-draft flow uses a shorter 110px header with no rule under it. Header
- *  children are absolutely placed to hit the frames' fixed offsets. */
+/** M2 onboarding wizard chrome. Per the v3 frame gallery every frame shares one
+ *  geometry: a compact 64px header (brand left, "Skip setup" right) closed by a
+ *  hairline, above a vertically-centered content column. The step indicator is
+ *  NOT part of the header — it renders as the first row of the content column,
+ *  below the divider, so it reads as belonging to the page, not the chrome. */
 export function WizardShell({
   chrome,
   onSkip,
   skipping,
   wide,
-  header = "full",
-  padY = 80,
+  padY = 40,
   children,
 }: WizardShellProps) {
-  const compact = header === "compact";
+  const indicator =
+    chrome.variant === "stepper" ? (
+      <StepperDots step={chrome.step} />
+    ) : chrome.variant === "progress" ? (
+      <ProgressBar step={chrome.step} label={chrome.label} />
+    ) : null;
 
   return (
     <div className="min-h-dvh bg-white flex flex-col">
-      <header
-        className={cn(
-          "relative shrink-0",
-          compact ? "h-[110px]" : "h-onb-header border-b border-onb-line"
-        )}
-      >
-        <span className={cn("absolute left-12 flex items-center gap-3", compact ? "top-[38px]" : "top-10")}>
+      <header className="h-onb-header shrink-0 border-b border-onb-line flex items-center justify-between px-12">
+        <span className="flex items-center gap-3">
           <span className="flex h-8 w-8 items-center justify-center rounded-onb bg-onb-primary text-[17px] font-bold text-white">
             B
           </span>
           <span className="text-lg font-bold text-onb-text">Buildrick</span>
         </span>
 
-        {chrome.variant === "stepper" ? (
-          <div className="absolute left-1/2 top-[92px] -translate-x-1/2">
-            <StepperDots step={chrome.step} />
-          </div>
-        ) : null}
-        {chrome.variant === "progress" ? (
-          <div className="absolute left-1/2 top-[34px] -translate-x-1/2">
-            <ProgressBar step={chrome.step} label={chrome.label} />
-          </div>
-        ) : null}
-
         {onSkip ? (
           <button
             type="button"
             onClick={onSkip}
             disabled={skipping}
-            className={cn(
-              "absolute right-12 text-[13px] font-medium text-onb-muted hover:text-onb-text disabled:opacity-50",
-              compact ? "top-[44px]" : "top-[46px]"
-            )}
+            className="text-[13px] font-medium text-onb-muted hover:text-onb-text disabled:opacity-50"
           >
             {skipping ? "Skipping…" : "Skip setup"}
           </button>
@@ -130,9 +121,10 @@ export function WizardShell({
       </header>
 
       <main
-        className="flex flex-1 justify-center px-4"
+        className="flex flex-1 flex-col items-center justify-center px-4"
         style={{ paddingTop: padY, paddingBottom: padY }}
       >
+        {indicator ? <div className="mb-14">{indicator}</div> : null}
         <div className={cn("w-full", wide ? "max-w-[900px]" : "max-w-onb")}>{children}</div>
       </main>
     </div>

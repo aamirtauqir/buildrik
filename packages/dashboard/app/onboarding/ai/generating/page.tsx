@@ -146,7 +146,7 @@ export default function AiGeneratingPage() {
   }
 
   return (
-    <WizardShell chrome={{ variant: "simple" }} header="compact" padY={100}>
+    <WizardShell chrome={{ variant: "simple" }} padY={100}>
       {error ? (
         <div className="flex flex-col items-center gap-6 text-center">
           <div className="flex flex-col items-center gap-3">

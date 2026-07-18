@@ -50,7 +50,6 @@ export default function AiGoalPage() {
       chrome={{ variant: "progress", step: 2, label: "AI Draft" }}
       onSkip={skipSetup}
       skipping={skipping}
-      header="compact"
       padY={40}
     >
       <div className="-mx-[30px] flex flex-col items-center gap-10">

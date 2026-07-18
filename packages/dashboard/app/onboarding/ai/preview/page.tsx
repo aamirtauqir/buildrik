@@ -45,7 +45,7 @@ export default function AiPreviewPage() {
   const previewTitle = [data.site?.name, ai?.name].filter(Boolean).join(" — ");
 
   return (
-    <WizardShell chrome={{ variant: "simple" }} wide header="compact" padY={40}>
+    <WizardShell chrome={{ variant: "simple" }} wide padY={40}>
       <div className="flex flex-col items-center gap-10">
         <div className="flex flex-col items-center gap-3 text-center">
           <h1 className="text-onb-title font-bold text-onb-text">Your first draft is ready</h1>

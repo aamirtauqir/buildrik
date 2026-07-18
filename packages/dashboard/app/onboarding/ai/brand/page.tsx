@@ -40,7 +40,6 @@ export default function AiBrandPage() {
       chrome={{ variant: "progress", step: 3, label: "AI Draft" }}
       onSkip={skipSetup}
       skipping={skipping}
-      header="compact"
       padY={40}
     >
       <div className="-mx-[30px] flex flex-col items-center gap-10">

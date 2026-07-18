@@ -160,7 +160,11 @@
   --color-onb-success: #21966B;
   --color-onb-error: #DC2626;
   --radius-onb: 8px;
-  --spacing-onb-header: 180px;
+  /* v3 header is a compact 64px bar (brand left + skip right) closed by a 1px
+     onb-line divider; the stepper/progress indicator sits OUTSIDE it, in the
+     vertically-centered content column below. Was 180px with the indicator
+     placed inside — corrected 2026-07-18 to match the v3 gallery. */
+  --spacing-onb-header: 64px;
   --spacing-onb-input: 46px;
   /* The gallery draws the CTA at 46/50px across frames; 50 is the majority and
      the one primary size we standardise on. */
