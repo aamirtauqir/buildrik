@@ -5,7 +5,7 @@ import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageO
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { PageHeader, MetricValue, ProgressBar } from "@/components/dashboard/primitives";
+import { Button, PageHeader, MetricValue, ProgressBar } from "@/components/dashboard/primitives";
 
 type MediaType = "image" | "video" | "icon" | "font";
 
@@ -138,15 +138,9 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
         title="Media"
         description="Images, logos and assets across your sites."
         actions={
-          <button
-            type="button"
-            onClick={onPickFiles}
-            disabled={uploading}
-            className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-body-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-hover)] disabled:opacity-60"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          <Button type="button" size="sm" onClick={onPickFiles} disabled={uploading} className="gap-1.5">
             <Upload size={15} /> {uploading ? "Uploading…" : "Upload"}
-          </button>
+          </Button>
         }
       />
       <input ref={fileRef} type="file" multiple accept="image/*,video/*,.woff,.woff2,.ttf,.otf" className="hidden" onChange={handleFiles} />
@@ -320,21 +314,16 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             />
             <div className="mt-6 flex gap-3">
-              <button
-                onClick={() => setCreateOpen(false)}
-                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-              >
+              <Button variant="ghost" onClick={() => setCreateOpen(false)} className="flex-1">
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => { if (createValue.trim()) createFolder.mutate({ name: createValue.trim() }); }}
                 disabled={!createValue.trim() || createFolder.isPending}
-                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: "var(--color-primary)" }}
+                className="flex-1"
               >
                 {createFolder.isPending ? "Creating…" : "Create"}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -362,21 +351,16 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             />
             <div className="mt-6 flex gap-3">
-              <button
-                onClick={() => setRenameTarget(null)}
-                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-              >
+              <Button variant="ghost" onClick={() => setRenameTarget(null)} className="flex-1">
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => { if (renameValue.trim()) renameFolder.mutate({ folderId: renameTarget.id, name: renameValue.trim() }); }}
                 disabled={!renameValue.trim() || renameValue.trim() === renameTarget.name || renameFolder.isPending}
-                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: "var(--color-primary)" }}
+                className="flex-1"
               >
                 {renameFolder.isPending ? "Saving…" : "Save"}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -397,10 +381,10 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               </p>
             </div>
             <div className="mt-4 flex justify-end gap-2">
-              <button onClick={() => setDeleteTarget(null)} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
-              <button onClick={() => deleteFolder.mutate({ folderId: deleteTarget.id })} disabled={deleteFolder.isPending} className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50" style={{ backgroundColor: "var(--color-error)" }}>
+              <Button variant="ghost" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+              <Button variant="danger" onClick={() => deleteFolder.mutate({ folderId: deleteTarget.id })} disabled={deleteFolder.isPending}>
                 {deleteFolder.isPending ? "Deleting…" : "Delete folder"}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

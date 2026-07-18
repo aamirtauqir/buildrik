@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { X } from "lucide-react";
+import { Button } from "@/components/dashboard/primitives";
 
 interface RenameModalProps {
   open: boolean;
@@ -23,8 +24,8 @@ export function RenameModal({ open, currentName, title = "Rename Site", onClose,
         </div>
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-4 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} autoFocus />
         <div className="mt-4 flex gap-2 justify-end">
-          <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
-          <button onClick={() => onSubmit(name)} className="rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Save</button>
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button onClick={() => onSubmit(name)}>Save</Button>
         </div>
       </div>
     </div>

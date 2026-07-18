@@ -6,6 +6,7 @@ import { trpc } from "@lib/trpc/client";
 import { PrePublishChecks } from "@/components/publish/pre-publish-checks";
 import { PublishProgress } from "@/components/publish/publish-progress";
 import { PublishSuccess } from "@/components/publish/publish-success";
+import { Button } from "@/components/dashboard/primitives";
 
 type Phase = "checks" | "publishing" | "success" | "error";
 
@@ -96,13 +97,9 @@ export default function PublishPage() {
         <div className="mx-auto max-w-lg text-center">
           <p className="text-body font-semibold" style={{ color: "var(--color-error)" }}>Publish Error</p>
           <p className="mt-2 text-body" style={{ color: "var(--color-text-secondary)" }}>{publishError ?? "Something went wrong."}</p>
-          <button
-            onClick={handleRetryFromError}
-            className="mt-4 rounded-xl px-4 py-2.5 text-body font-semibold text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          <Button onClick={handleRetryFromError} className="mt-4">
             Try Again
-          </button>
+          </Button>
         </div>
       </div>
     );

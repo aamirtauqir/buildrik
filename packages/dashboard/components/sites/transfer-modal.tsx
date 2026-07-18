@@ -3,6 +3,7 @@ import { useState } from "react";
 import { X, ChevronDown } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { Button } from "@/components/dashboard/primitives";
 
 interface TransferModalProps {
   open: boolean;
@@ -96,17 +97,15 @@ export function TransferModal({ open, onClose, siteId, siteName }: TransferModal
 
         {/* Actions */}
         <div className="mt-4 flex gap-2 justify-end">
-          <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+          <Button variant="ghost" onClick={onClose}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             disabled={!selectedMemberId || transferMutation.isPending}
             onClick={() => transferMutation.mutate({ siteId, newOwnerId: selectedMemberId })}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {transferMutation.isPending ? "Transferring..." : "Transfer"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

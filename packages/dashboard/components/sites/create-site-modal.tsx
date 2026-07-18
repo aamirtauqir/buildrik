@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { X, Plus, LayoutTemplate, Sparkles, Check, Lock, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@lib/trpc/client";
+import { Button } from "@/components/dashboard/primitives";
 
 interface CreateSiteModalProps {
   open: boolean;
@@ -113,7 +114,7 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
             </button>
           </div>
         )}
-        <button onClick={onClose} className="mt-4 w-full rounded-lg border py-2 text-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)]" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
+        <Button variant="ghost" onClick={onClose} className="mt-4 w-full">Cancel</Button>
       </div>
     </div>
   );

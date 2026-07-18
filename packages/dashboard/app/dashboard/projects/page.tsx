@@ -13,7 +13,7 @@ import { RenameModal } from "@/components/sites/rename-modal";
 import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
 import { TransferModal } from "@/components/sites/transfer-modal";
 import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
-import { PageHeader } from "@/components/dashboard/primitives";
+import { Button, PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
 import { Plus, Search, CheckSquare } from "lucide-react";
@@ -426,14 +426,10 @@ export default function ProjectsPage() {
               setViewMode(mode);
               updatePrefs.mutate({ siteViewMode: mode as "grid" | "list" });
             }} />
-            <button
-              onClick={() => setCreateOpen(true)}
-              className="flex items-center gap-1.5 rounded-md px-4 py-2 text-body-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
+            <Button onClick={() => setCreateOpen(true)} className="gap-1.5">
               <Plus className="h-4 w-4" />
               New site
-            </button>
+            </Button>
           </>
         }
       />
@@ -552,14 +548,10 @@ export default function ProjectsPage() {
           >
             Create your first site to get started.
           </p>
-          <button
-            onClick={() => setCreateOpen(true)}
-            className="mt-4 flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          <Button onClick={() => setCreateOpen(true)} className="mt-4 gap-2">
             <Plus className="h-4 w-4" />
             Create a site
-          </button>
+          </Button>
         </div>
       )}
 
@@ -592,22 +584,12 @@ export default function ProjectsPage() {
             Page {page} of {sitesQuery.data.totalPages} ({sitesQuery.data.total} sites)
           </p>
           <div className="flex gap-2">
-            <button
-              disabled={page <= 1}
-              onClick={() => setPage(p => p - 1)}
-              className="px-3 py-1.5 text-body rounded-lg border disabled:opacity-50"
-              style={{ borderColor: "var(--color-border-default)" }}
-            >
+            <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
               Previous
-            </button>
-            <button
-              disabled={page >= sitesQuery.data.totalPages}
-              onClick={() => setPage(p => p + 1)}
-              className="px-3 py-1.5 text-body rounded-lg border disabled:opacity-50"
-              style={{ borderColor: "var(--color-border-default)" }}
-            >
+            </Button>
+            <Button variant="ghost" size="sm" disabled={page >= sitesQuery.data.totalPages} onClick={() => setPage(p => p + 1)}>
               Next
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -715,23 +697,22 @@ export default function ProjectsPage() {
               style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             />
             <div className="mt-6 flex gap-3">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => { setCreateFolderOpen(false); setNewFolderName(""); }}
-                className="flex-1 rounded-lg border py-2.5 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)]"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   if (newFolderName.trim()) createFolderMutation.mutate({ name: newFolderName.trim() });
                 }}
                 disabled={!newFolderName.trim() || createFolderMutation.isPending}
-                className="flex-1 rounded-lg py-2.5 text-body font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: "var(--color-primary)" }}
+                className="flex-1"
               >
                 {createFolderMutation.isPending ? "Creating..." : "Create Folder"}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
