@@ -9,7 +9,7 @@ export default async function globalSetup() {
 
   const bsLocal = new Local();
   await new Promise<void>((resolve, reject) => {
-    bsLocal.start({ key, force: "true", forceLocal: "true" }, (err?: Error) =>
+    bsLocal.start({ key, force: true, forceLocal: true }, (err?: Error) =>
       err ? reject(err) : resolve(),
     );
   });
