@@ -8,6 +8,7 @@ import { OnbSelect } from "@/components/onboarding/wizard/onb-select";
 import { OnbCard } from "@/components/onboarding/wizard/onb-card";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { OnbBack } from "@/components/onboarding/wizard/onb-back";
+import { OnbBanner } from "@/components/onboarding/wizard/onb-banner";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
@@ -19,11 +20,20 @@ const ORG_CARDS: { value: OrgType; title: string; description: string }[] = [
   { value: "new", title: "New client", description: "Add client details now. You can invite them later." },
 ];
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Existing-client picker's trailing option (S2 · Existing client frame) — picking
+// it swaps the branch to "New client" rather than creating anything itself; the
+// New-client fields + submit flow (below) own the actual capture.
+const ADD_NEW_CLIENT = "__new__";
+
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const EMAIL_ERROR_MSG = "Enter a valid email, like client@example.com.";
+const NETWORK_ERROR_MSG = "Something went wrong. Check your connection and try again.";
 
 /** S2 · Set up your first site. Captures the site name + who it belongs to into
  *  wizardData; the actual site (and any client) is created at path completion so
- *  the method (blank/template/ai) is known. → S3. Back → S1. */
+ *  the method (blank/template/ai) is known — createSiteSchema requires `method`,
+ *  which isn't picked until S3, so this step can never call sites.create itself.
+ *  → S3. Back → S1. */
 export default function SitePage() {
   const { data, saveAndGo, saving } = useWizard();
   const { skipSetup, skipping } = useOnboardingComplete();
@@ -37,10 +47,22 @@ export default function SitePage() {
 
   const [siteErr, setSiteErr] = useState<string>();
   const [clientNameErr, setClientNameErr] = useState<string>();
-  const [emailErr, setEmailErr] = useState<string>();
+  // Email is validated live (not just on submit) — S2 · Email error / Focused
+  // error frames both need to render before the user ever clicks Continue.
+  // `emailTouched` gates it so the field doesn't error while still being typed
+  // for the first time; OnbField's own `focus:` ring handles the visual
+  // difference between the two frames (plain red ring vs. red ring + glow).
+  const [emailTouched, setEmailTouched] = useState(false);
   const [pickErr, setPickErr] = useState<string>();
 
-  const clientOptions = (clients.data ?? []).map((c) => ({ value: c.id, label: c.name }));
+  const trimmedEmail = clientEmail.trim();
+  const emailInvalid = trimmedEmail.length > 0 && !EMAIL_RE.test(trimmedEmail);
+  const emailErr = emailTouched && emailInvalid ? EMAIL_ERROR_MSG : undefined;
+
+  const clientOptions = [
+    ...(clients.data ?? []).map((c) => ({ value: c.id, label: c.name })),
+    { value: ADD_NEW_CLIENT, label: "+ Add new client" },
+  ];
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,10 +77,10 @@ export default function SitePage() {
         setClientNameErr("Client name is required.");
         bad = true;
       } else setClientNameErr(undefined);
-      if (clientEmail.trim() && !EMAIL_RE.test(clientEmail.trim())) {
-        setEmailErr("Enter a valid email, like client@example.com.");
+      if (emailInvalid) {
+        setEmailTouched(true); // surfaces the error even if the field was never blurred
         bad = true;
-      } else setEmailErr(undefined);
+      }
     }
     if (orgType === "existing" && !clientId) {
       setPickErr("Select a client.");
@@ -136,27 +158,39 @@ export default function SitePage() {
                   type="email"
                   placeholder="client@example.com"
                   value={clientEmail}
-                  onChange={(e) => {
-                    setClientEmail(e.target.value);
-                    if (emailErr) setEmailErr(undefined);
-                  }}
+                  onChange={(e) => setClientEmail(e.target.value)}
+                  onBlur={() => setEmailTouched(true)}
                   error={emailErr}
                   hint="Used for review and approval links. We won't email them until you send a link."
                 />
               </>
             ) : orgType === "existing" ? (
-              <OnbSelect
-                label="Select client"
-                placeholder="Select a client"
-                options={clientOptions}
-                value={clientId}
-                onChange={(e) => {
-                  setClientId(e.target.value);
-                  if (pickErr) setPickErr(undefined);
-                }}
-                error={pickErr}
-                hint={clientOptions.length === 0 ? "No clients in this workspace yet." : undefined}
-              />
+              clients.isError ? (
+                <OnbBanner
+                  message={NETWORK_ERROR_MSG}
+                  onRetry={() => clients.refetch()}
+                  retrying={clients.isFetching}
+                />
+              ) : (
+                <OnbSelect
+                  label="Select client"
+                  placeholder="Select a client"
+                  options={clientOptions}
+                  value={clientId}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    if (next === ADD_NEW_CLIENT) {
+                      setOrgType("new");
+                      setClientId("");
+                      return;
+                    }
+                    setClientId(next);
+                    if (pickErr) setPickErr(undefined);
+                  }}
+                  error={pickErr}
+                  hint={(clients.data ?? []).length === 0 ? "No clients in this workspace yet." : undefined}
+                />
+              )
             ) : null}
 
             <OnbButton type="submit" loading={saving} disabled={saving}>
