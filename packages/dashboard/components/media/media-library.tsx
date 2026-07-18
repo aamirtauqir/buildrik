@@ -1,13 +1,63 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageOff, MoreHorizontal, Pencil, X, AlertTriangle } from "lucide-react";
+import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageOff, MoreHorizontal, Pencil, X, AlertTriangle, Plus } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { Button, PageHeader, MetricValue, ProgressBar } from "@/components/dashboard/primitives";
+import { Button, PageHeader, MetricValue, ProgressBar, InputField } from "@/components/dashboard/primitives";
 
 type MediaType = "image" | "video" | "icon" | "font";
+
+const TYPE_FILTERS = [
+  { value: "all", label: "All" },
+  { value: "image", label: "Images" },
+  { value: "icon", label: "Logos" },
+] as const;
+type TypeFilter = (typeof TYPE_FILTERS)[number]["value"];
+
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest" },
+  { value: "name", label: "Name" },
+] as const;
+type SortOption = (typeof SORT_OPTIONS)[number]["value"];
+
+const PAGE_SIZE = 24;
+
+/** UI kit — segmented tab control (grey track, white active pill). Used here
+ *  for the type filter and the sort toggle; write-once, reused twice. */
+function FilterTabs<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (value: T) => void;
+  options: readonly { value: T; label: string }[];
+}) {
+  return (
+    <div className="flex items-center gap-0.5 rounded-lg p-1" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
+      {options.map((opt) => {
+        const active = opt.value === value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className="rounded-md px-3.5 py-1.5 text-[13px] transition-colors"
+            style={{
+              backgroundColor: active ? "var(--color-bg-surface)" : "transparent",
+              color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+              fontWeight: active ? 600 : 500,
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 function mediaTypeFromMime(mime: string): MediaType {
   if (mime === "image/svg+xml") return "icon";
@@ -30,6 +80,9 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [search, setSearch] = useState("");
   const [folderId, setFolderId] = useState<string | null | undefined>(undefined);
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [limit, setLimit] = useState(PAGE_SIZE);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -40,7 +93,12 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [createValue, setCreateValue] = useState("");
   const folderMenuRef = useRef<HTMLDivElement>(null);
 
-  const assets = trpc.media.listAssets.useQuery({ search: search || undefined, folderId, limit: 60 });
+  const assets = trpc.media.listAssets.useQuery({
+    search: search || undefined,
+    folderId,
+    type: typeFilter === "all" ? undefined : typeFilter,
+    limit,
+  });
   const folders = trpc.media.listFolders.useQuery({});
   const quota = trpc.media.checkStorageQuota.useQuery({});
 
@@ -128,22 +186,43 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
     setTimeout(() => setCopiedId((c) => (c === id ? null : c)), 1500);
   };
 
-  const items = assets.data?.items ?? [];
+  const rawItems = assets.data?.items ?? [];
+  const items = sortBy === "name" ? [...rawItems].sort((a, b) => a.filename.localeCompare(b.filename)) : rawItems;
+  const hasMore = Boolean(assets.data?.nextCursor);
   const q = quota.data;
   const usedPct = q && q.totalBytes > 0 ? Math.min((q.usedBytes / q.totalBytes) * 100, 100) : 0;
 
   return (
     <div>
       <PageHeader
-        title="Media"
+        title="Media library"
         description="Images, logos and assets across your sites."
         actions={
-          <Button type="button" size="sm" onClick={onPickFiles} disabled={uploading} className="gap-1.5">
+          <Button type="button" onClick={onPickFiles} disabled={uploading} className="gap-1.5">
             <Upload size={15} /> {uploading ? "Uploading…" : "Upload"}
           </Button>
         }
       />
       <input ref={fileRef} type="file" multiple accept="image/*,video/*,.woff,.woff2,.ttf,.otf" className="hidden" onChange={handleFiles} />
+
+      {/* Full-width search + filters row, above the rail/grid split */}
+      <div className="mb-5 flex flex-wrap items-center gap-2.5">
+        <InputField
+          wrapperClassName="w-[280px]"
+          leading={<Search size={15} />}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search assets…"
+          aria-label="Search assets"
+        />
+        <FilterTabs value={typeFilter} onChange={setTypeFilter} options={TYPE_FILTERS} />
+        <FilterTabs value={sortBy} onChange={setSortBy} options={SORT_OPTIONS} />
+        {!assets.isLoading && (
+          <span className="ml-auto shrink-0 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            {items.length} asset{items.length === 1 ? "" : "s"}
+          </span>
+        )}
+      </div>
 
       <div className="flex items-start gap-6">
         {/* Left category rail */}
@@ -152,11 +231,11 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
             <button
               type="button"
               onClick={() => setFolderId(undefined)}
-              className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-body-sm font-medium transition-colors"
+              className="flex items-center gap-2 rounded-md px-2.5 py-2 text-left text-[13.5px] transition-colors"
               style={
                 folderId === undefined
-                  ? { backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)" }
-                  : { color: "var(--color-text-secondary)" }
+                  ? { backgroundColor: "var(--color-primary-subtle)", color: "var(--color-primary)", fontWeight: 600 }
+                  : { color: "var(--color-text-secondary)", fontWeight: 500 }
               }
             >
               <Images size={14} /> All media
@@ -168,8 +247,8 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
                   <button
                     type="button"
                     onClick={() => setFolderId(f.id)}
-                    className="flex min-w-0 flex-1 items-center gap-2 rounded-md py-1.5 pl-2.5 pr-1 text-left text-body-sm font-medium transition-colors"
-                    style={{ color: active ? "var(--color-primary)" : "var(--color-text-secondary)" }}
+                    className="flex min-w-0 flex-1 items-center gap-2 rounded-md py-2 pl-2.5 pr-1 text-left text-[13.5px] transition-colors"
+                    style={{ color: active ? "var(--color-primary)" : "var(--color-text-secondary)", fontWeight: active ? 600 : 500 }}
                   >
                     <Folder size={14} className="shrink-0" /> <span className="truncate">{f.name}</span>
                   </button>
@@ -198,7 +277,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
             <button
               type="button"
               onClick={() => { setCreateValue(""); setCreateOpen(true); }}
-              className="mt-1 flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-body-sm transition-colors hover:text-[var(--color-primary)]"
+              className="mt-1 flex items-center gap-2 rounded-md px-2.5 py-2 text-left text-[13.5px] transition-colors hover:text-[var(--color-primary)]"
               style={{ color: "var(--color-text-muted)" }}
             >
               <FolderPlus size={14} /> New folder
@@ -225,21 +304,10 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           )}
         </aside>
 
-        {/* Right column: search + grid */}
+        {/* Right column: grid */}
         <div className="min-w-0 flex-1">
-          <div className="relative mb-4">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--color-text-placeholder)" }} />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search assets…"
-              className="w-full rounded-md border py-2 pl-9 pr-3 text-body outline-none focus:border-[var(--color-primary)]"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }}
-            />
-          </div>
-
           {assets.isLoading ? (
-            <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
+            <div className="grid gap-3.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
               {Array.from({ length: 12 }).map((_, i) => (
                 <div key={i} className="animate-pulse rounded-lg" style={{ height: 140, backgroundColor: "var(--color-bg-subtle)" }} />
               ))}
@@ -251,20 +319,25 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>{search ? "Try a different term." : "Upload images, video, or fonts to use across your sites."}</p>
             </div>
           ) : (
-            <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
-              {items.map((a) => (
-                <div key={a.id} className="group relative overflow-hidden rounded-lg border shadow-card" style={{ borderColor: "var(--color-border-default)" }}>
-                  <div className="flex items-center justify-center" style={{ height: 140, backgroundColor: "var(--color-bg-subtle)" }}>
-                    {a.type === "image" || a.type === "icon" ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={a.url} alt={a.altText ?? a.filename} className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="text-body-sm font-medium uppercase" style={{ color: "var(--color-text-muted)" }}>{a.type}</span>
-                    )}
-                  </div>
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
-                    <span className="truncate text-[11px] text-white">{a.filename}</span>
-                    <div className="flex shrink-0 gap-1">
+            <>
+              <div className="grid gap-3.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
+                {items.map((a) => (
+                  <div key={a.id} className="group relative overflow-hidden rounded-lg border shadow-card" style={{ borderColor: "var(--color-border-default)" }}>
+                    <div className="flex items-center justify-center" style={{ height: 140, backgroundColor: "var(--color-bg-subtle)" }}>
+                      {a.type === "image" || a.type === "icon" ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={a.url} alt={a.altText ?? a.filename} className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-body-sm font-medium uppercase" style={{ color: "var(--color-text-muted)" }}>{a.type}</span>
+                      )}
+                    </div>
+                    {/* Always-on filename/size caption */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-2 pt-5" style={{ background: "linear-gradient(rgba(15,23,42,0), rgba(15,23,42,0.55))" }}>
+                      <p className="truncate text-[11.5px] font-semibold text-white">{a.filename}</p>
+                      <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.78)" }}>{formatBytes(a.bytes)}</p>
+                    </div>
+                    {/* Hover actions */}
+                    <div className="absolute right-1.5 top-1.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                       <button type="button" onClick={() => copyUrl(a.id, a.url)} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-text-primary)" }} title="Copy URL">
                         {copiedId === a.id ? <Check size={12} /> : <Copy size={12} />}
                       </button>
@@ -273,20 +346,28 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
                       </button>
                     </div>
                   </div>
+                ))}
+                {/* Trailing upload tile */}
+                <button
+                  type="button"
+                  onClick={onPickFiles}
+                  disabled={uploading}
+                  className="flex items-center justify-center rounded-lg border-dashed transition-colors hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] disabled:opacity-60"
+                  style={{ height: 140, borderWidth: 1.5, borderColor: "var(--color-border-strong)", color: "var(--color-text-muted)" }}
+                  aria-label={uploading ? "Uploading" : "Upload files"}
+                  title="Upload files"
+                >
+                  <Plus size={20} />
+                </button>
+              </div>
+              {hasMore && (
+                <div className="mt-5 flex justify-center">
+                  <Button type="button" variant="ghost" onClick={() => setLimit((l) => l + PAGE_SIZE)} disabled={assets.isFetching}>
+                    {assets.isFetching ? "Loading…" : "Load more assets"}
+                  </Button>
                 </div>
-              ))}
-              {/* Trailing upload tile */}
-              <button
-                type="button"
-                onClick={onPickFiles}
-                disabled={uploading}
-                className="flex flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed text-body-sm transition-colors hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] disabled:opacity-60"
-                style={{ height: 140, borderColor: "var(--color-border-strong)", color: "var(--color-text-muted)" }}
-              >
-                <Upload size={18} />
-                {uploading ? "Uploading…" : "Upload"}
-              </button>
-            </div>
+              )}
+            </>
           )}
         </div>
       </div>
