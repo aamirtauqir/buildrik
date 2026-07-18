@@ -54,6 +54,18 @@ The UI kit adopted earlier was evidently derived from this artifact — the foun
 - **C3 — No states in the design.** The prototype shows a single populated state per screen. No hover / focus / disabled / loading / empty / error / success variants, and no tablet/mobile breakpoints. The goal requires these pixel-perfect; the design does not define them. They will follow the existing kit rules (documented in `docs/design/dashboard-ui-kit.md` §6) rather than being invented.
 - **C4 — Design uses mock data** (Taiba's Workspace, 6 projects, 24.8k visitors, named activity rows). App renders real data; layouts must tolerate empty/long values. Real data wins (goal rule 8).
 
+- **C5 — "All projects" is a different feature in the design.** The design's Projects screen is a **folder/project-group grid** (4 cards: Marketing Sites / Client Work / Product & App / Experiments, each an icon tile + ⋯ menu + name + sites/live/views stat row) above a non-clickable "All sites / Apps" pill toggle. The app's `/dashboard/projects` is a **flat site list** with real search, sort, filter, bulk actions and grid/list views — and the design defines no drill-down target for its folder cards. Restyling the list into the folder grid would delete working functionality to match a mockup. Per rule 12 the site list is preserved; only the comparable header/button row was matched. **Folder grouping already exists in the app** (`folder-tabs.tsx`) — if the founder wants the design's folder-grid landing, that is a product decision needing its own spec, not a restyle.
+
+## Progress
+
+| Step | Commit | Status |
+|---|---|---|
+| Design inventory + mapping + conflicts | `b37317d7` | ✅ |
+| Shell geometry pixel-match (S1–S3) | `2d102c5e` | ✅ sidebar 293=293, h1 x=333=333, nav 30=30 |
+| Screen 1 — Home | `17414b37` | ✅ stat cards, LIVE pill, activity rows |
+| Screen 2 — Projects | `b323d82a` | ✅ header matched; grid preserved (C5) |
+| Screens 3–11 | — | pending |
+
 ## Order of work
 
 1. Shell deltas S1–S3 (touches every screen — verify no regressions first, goal rule 11)
