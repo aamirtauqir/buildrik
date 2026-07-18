@@ -6,7 +6,7 @@ export function PageHeader({ title, description, actions }: { title: string; des
   return (
     <header className="mb-6 flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="text-page-title font-[720] tracking-[-0.02em]" style={{ color: "var(--color-text-primary)" }}>{title}</h1>
+        <h1 className="text-[28px] font-bold leading-[1.2] tracking-[-0.02em]" style={{ color: "var(--color-text-primary)" }}>{title}</h1>
         {description && (
           <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>{description}</p>
         )}

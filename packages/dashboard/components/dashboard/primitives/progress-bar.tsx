@@ -10,7 +10,7 @@ export function ProgressBar({ pct, tone = "accent", className }: { pct: number; 
   const color =
     resolved === "error" ? "var(--color-error)" : resolved === "warning" ? "var(--color-warning)" : resolved === "success" ? "var(--color-success)" : "var(--color-primary)";
   return (
-    <div className={cn("h-1.5 w-full overflow-hidden rounded-pill", className)} style={{ backgroundColor: "var(--color-border-default)" }}>
+    <div className={cn("h-[5px] w-full overflow-hidden rounded-pill", className)} style={{ backgroundColor: "var(--color-bg-subtle)" }}>
       <div className="h-full rounded-pill transition-all" style={{ width: `${clamped}%`, backgroundColor: color }} />
     </div>
   );
