@@ -21,7 +21,10 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className="min-h-screen [font-variant-numeric:tabular-nums]" style={{ backgroundColor: "var(--color-bg-surface)" }}>
+    <div
+      className="min-h-screen [font-variant-numeric:tabular-nums]"
+      style={{ backgroundColor: "var(--color-bg-surface)", fontFamily: "'Inter', 'Inter Tight', sans-serif" }}
+    >
       <TopNav onSearch={() => setPaletteOpen(true)} />
       <Sidebar />
       <main className="pt-[var(--topnav-h)] lg:ml-[var(--sidebar-w)]">

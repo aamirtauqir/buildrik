@@ -30,7 +30,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.bunny.net" />
         <link
           rel="stylesheet"
-          href="https://fonts.bunny.net/css?family=inter-tight:400,500,600,700|geist-mono:400,500&display=swap"
+          href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800|inter-tight:400,500,600,700|geist-mono:400,500&display=swap"
         />
       </head>
       <body className="font-sans antialiased">

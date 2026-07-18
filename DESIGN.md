@@ -92,6 +92,7 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 - **Body + Editor UI (primary workhorse):** `Inter Tight`. Tight letter-spacing, reads as "tool" not "document." Used for every label, button, input, breadcrumb, panel title, row label in the editor.
 - **Data / Inspector values / mono content:** `Geist Mono` with `font-variant-numeric: tabular-nums`. Required for dimensions, timestamps, slugs, file sizes, page counts.
 - **Loading:** Bunny Fonts CDN with `font-display: swap` in dev. Self-host in production. No `@font-face` redefinitions in individual components.
+- **Dashboard UI (scoped exception):** `Inter` is loaded alongside Inter Tight and applied only on the dashboard shell root (`DashboardShell`), cascading to dashboard content. Auth and onboarding keep `Inter Tight`; Geist Mono remains the data face everywhere.
 
 **Canonical CSS:**
 
