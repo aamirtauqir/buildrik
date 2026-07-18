@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { cn } from "@lib/utils";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
-import { PageHeader, SectionCard, MetricValue, ProgressBar } from "@/components/dashboard/primitives";
+import { PageHeader, SectionCard, ProgressBar, ButtonLink } from "@/components/dashboard/primitives";
 
 const STEPS = [
   { id: "workspace", title: "Create your workspace", href: "/dashboard" },
@@ -55,14 +54,16 @@ export default function GettingStartedPage() {
       ) : (
         <>
           <SectionCard className="mb-5">
-            <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
-              <MetricValue>{doneCount}</MetricValue> of <MetricValue>{STEPS.length}</MetricValue> complete
-              <span style={{ color: "var(--color-text-secondary)" }}> · <MetricValue>{pct}%</MetricValue></span>
-            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-body font-bold" style={{ color: "var(--color-text-primary)" }}>
+                {doneCount} of {STEPS.length} complete
+              </span>
+              <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{pct}%</span>
+            </div>
             <ProgressBar pct={pct} className="mt-3" />
           </SectionCard>
 
-          <SectionCard title="Setup checklist" padding="none">
+          <SectionCard padding="none">
             <ul>
               {STEPS.map((step) => {
                 const done = completion[step.id];
@@ -78,7 +79,7 @@ export default function GettingStartedPage() {
                   >
                     {done ? (
                       <span
-                        className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+                        className="flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-full"
                         style={{ backgroundColor: "var(--color-success)" }}
                         aria-hidden
                       >
@@ -86,24 +87,21 @@ export default function GettingStartedPage() {
                       </span>
                     ) : (
                       <span
-                        className="h-5 w-5 flex-shrink-0 rounded-full border-2"
+                        className="h-[22px] w-[22px] flex-shrink-0 rounded-full border-2"
                         style={{ borderColor: isCurrent ? "var(--color-primary)" : "var(--color-border-strong)" }}
                         aria-hidden
                       />
                     )}
                     <span
-                      className={cn("flex-1 text-body font-medium", done && "line-through")}
+                      className={cn("flex-1 text-body", isCurrent ? "font-semibold" : "font-normal", done && "line-through")}
                       style={{ color: done ? "var(--color-text-muted)" : "var(--color-text-primary)" }}
                     >
                       {step.title}
                     </span>
                     {isCurrent && (
-                      <Link
-                        href={step.href}
-                        className="rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-body-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-hover)]"
-                      >
+                      <ButtonLink href={step.href} size="sm">
                         Start
-                      </Link>
+                      </ButtonLink>
                     )}
                   </li>
                 );
