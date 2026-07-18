@@ -9,6 +9,7 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const BASE_URL = process.env.PW_BASE_URL ?? "http://localhost:3000";
 const AUTH_STATE = path.resolve(__dirname, "e2e/.auth/user.json");
+const ONBOARDING_AUTH_STATE = path.resolve(__dirname, "e2e/.auth/onboarding.json");
 const isBS = !!(process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY);
 
 function bsConnect(caps: Record<string, unknown>) {
@@ -87,6 +88,18 @@ export default defineConfig({
             name: "chromium",
             use: { ...devices["Desktop Chrome"], storageState: AUTH_STATE },
             dependencies: ["setup"],
+            // onboarding.spec.ts needs the onboarding-reset session (below), not
+            // this project's regular dashboard one — never run it here.
+            testIgnore: /onboarding\.spec\.ts/,
+          },
+          // Mirrors "chromium" but authenticates via setup-onboarding (resets
+          // OnboardingState so the QA user lands back in the wizard) instead of
+          // "setup" — for onboarding.spec.ts's workspace-step tests.
+          {
+            name: "chromium-onboarding",
+            testMatch: /onboarding\.spec\.ts/,
+            use: { ...devices["Desktop Chrome"], storageState: ONBOARDING_AUTH_STATE },
+            dependencies: ["setup-onboarding"],
           },
         ]),
   ],

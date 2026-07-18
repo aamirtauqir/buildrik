@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { TRPCClientError } from "@trpc/client";
 import { trpc } from "@lib/trpc/client";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbField } from "@/components/onboarding/wizard/onb-field";
 import { OnbSelect } from "@/components/onboarding/wizard/onb-select";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
+import { OnbBanner } from "@/components/onboarding/wizard/onb-banner";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
@@ -27,6 +29,14 @@ const TEAM_SIZES = [
 
 const MAX = 40;
 
+/** The service surfaces this as a plain TRPCError({code:"CONFLICT"}) — the
+ *  only source of CONFLICT on this mutation is WorkspaceNameTakenError, so the
+ *  code alone is enough to key off (the display copy is composed here, not
+ *  read off the error, since it needs the name the user actually typed). */
+function isNameTakenError(e: unknown): boolean {
+  return e instanceof TRPCClientError && e.data?.code === "CONFLICT";
+}
+
 /** S1 · Create your workspace. Renames the workspace created at signup (never
  *  .create — that throws the free-tier limit) and records role/teamSize for the
  *  S3 recommendation. → S2. */
@@ -39,8 +49,7 @@ export default function WorkspacePage() {
   const [role, setRole] = useState(data.workspace?.role ?? "");
   const [teamSize, setTeamSize] = useState(data.workspace?.teamSize ?? "just-me");
   const [nameError, setNameError] = useState<string>();
-  const [roleError, setRoleError] = useState<string>();
-  const [netError, setNetError] = useState<string>();
+  const [networkError, setNetworkError] = useState<string>();
 
   const trimmed = name.trim();
   const liveNameError =
@@ -48,30 +57,24 @@ export default function WorkspacePage() {
 
   const busy = renameWorkspace.isPending || saving;
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setNetError(undefined);
-    let bad = false;
+  async function submit(e?: React.FormEvent) {
+    e?.preventDefault();
+    setNetworkError(undefined);
     if (!trimmed) {
       setNameError("Workspace name is required.");
-      bad = true;
-    } else if (trimmed.length > MAX) {
-      bad = true; // liveNameError already shows the too-long message
-    } else {
-      setNameError(undefined);
+      return;
     }
-    if (!role) {
-      setRoleError("Please select your role.");
-      bad = true;
-    } else {
-      setRoleError(undefined);
-    }
-    if (bad) return;
+    if (trimmed.length > MAX) return; // liveNameError already shows the too-long message
+    setNameError(undefined);
 
     try {
       await renameWorkspace.mutateAsync({ name: trimmed });
-    } catch {
-      setNetError("Couldn't save your workspace. Check your connection and try again.");
+    } catch (err) {
+      if (isNameTakenError(err)) {
+        setNameError(`A workspace named “${trimmed}” already exists — try “${trimmed} Studio”.`);
+      } else {
+        setNetworkError("Something went wrong. Check your connection and try again.");
+      }
       return;
     }
     await saveAndGo("/onboarding/site", { workspace: { name: trimmed, role, teamSize } });
@@ -104,11 +107,7 @@ export default function WorkspacePage() {
             placeholder="Select your role"
             options={ROLES}
             value={role}
-            onChange={(e) => {
-              setRole(e.target.value);
-              if (roleError) setRoleError(undefined);
-            }}
-            error={roleError}
+            onChange={(e) => setRole(e.target.value)}
           />
           <OnbSelect
             label="Team size (optional)"
@@ -120,17 +119,12 @@ export default function WorkspacePage() {
           <OnbButton type="submit" loading={busy} disabled={busy}>
             {busy ? "Creating workspace…" : "Create workspace"}
           </OnbButton>
+
+          {networkError ? (
+            <OnbBanner message={networkError} onRetry={() => submit()} retrying={busy} />
+          ) : null}
         </form>
       </div>
-
-      {netError ? (
-        <div
-          role="alert"
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-[10px] border border-onb-error bg-white px-[18px] py-3 text-[13px] font-medium text-onb-error shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
-        >
-          ⚠ {netError}
-        </div>
-      ) : null}
     </WizardShell>
   );
 }
