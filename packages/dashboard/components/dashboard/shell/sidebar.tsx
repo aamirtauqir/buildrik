@@ -128,7 +128,7 @@ export function Sidebar() {
                       <Link
                         href={item.href}
                         className={cn(
-                          "flex h-11 items-center gap-[14px] rounded-lg px-[15px] text-[13.5px] transition-colors",
+                          "flex items-center gap-[11px] rounded-lg px-[9px] py-2 text-[13.5px] transition-colors",
                           active ? "font-semibold" : "font-normal hover:bg-[var(--color-bg-subtle)]"
                         )}
                         style={{
