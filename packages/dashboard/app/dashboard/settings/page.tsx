@@ -4,6 +4,7 @@ import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { WorkspaceForm } from "@/components/settings/workspace-form";
+import { SectionCard, Button, InputField } from "@/components/dashboard/primitives";
 
 /** Settings index = the Workspace section (IA v2 D6 card mapping). Carries
  *  workspace name + branding + sharing (WorkspaceForm) and the transfer-ownership
@@ -65,13 +66,8 @@ export default function WorkspaceSettingsPage() {
         saving={updateMutation.isPending || sharingMutation.isPending}
       />
 
-      <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
-
-      <div>
-        <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-          Transfer ownership
-        </h2>
-        <p className="text-body mt-1 mb-3" style={{ color: "var(--color-text-secondary)" }}>
+      <SectionCard title="Transfer ownership">
+        <p className="text-body-sm mb-3" style={{ color: "var(--color-text-secondary)" }}>
           Hand this workspace to another person. They&apos;ll get an email invitation and become the owner once they accept; you stay on as a member.
         </p>
 
@@ -88,15 +84,15 @@ export default function WorkspaceSettingsPage() {
                 Waiting for them to accept the email invitation.
               </p>
             </div>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => cancelTransferMutation.mutate()}
               disabled={cancelTransferMutation.isPending}
-              className="text-body px-3 py-2 rounded-md border disabled:opacity-60"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
             >
               {cancelTransferMutation.isPending ? "Cancelling…" : "Cancel transfer"}
-            </button>
+            </Button>
           </div>
         ) : (
           <form
@@ -115,27 +111,20 @@ export default function WorkspaceSettingsPage() {
               <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 New owner&apos;s email
               </label>
-              <input
+              <InputField
                 type="email"
                 value={transferEmail}
                 onChange={(e) => setTransferEmail(e.target.value)}
                 required
                 placeholder="owner@example.com"
-                className="w-full px-3 py-2 text-body rounded-md border outline-none"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
               />
             </div>
-            <button
-              type="submit"
-              disabled={initiateTransferMutation.isPending}
-              className="px-4 py-2 text-body font-medium rounded-md text-white disabled:opacity-60 whitespace-nowrap"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
+            <Button type="submit" disabled={initiateTransferMutation.isPending} className="whitespace-nowrap">
               {initiateTransferMutation.isPending ? "Sending…" : "Transfer"}
-            </button>
+            </Button>
           </form>
         )}
-      </div>
+      </SectionCard>
     </div>
   );
 }

@@ -2,7 +2,13 @@
 
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { SectionCard, Button } from "@/components/dashboard/primitives";
+import { SectionCard, Button, InputField } from "@/components/dashboard/primitives";
+
+// Shared field chrome for native <select> controls, matched to InputField's
+// 42px / radius-lg / inset-ring look (no Select primitive exists yet — see
+// components/dashboard/primitives/index.ts).
+const SELECT_FIELD_CLASS =
+  "h-[42px] w-full rounded-lg px-[13px] text-[13.5px] shadow-[var(--shadow-ring)] outline-none transition-shadow focus:shadow-[inset_0_0_0_1.5px_var(--color-primary)]";
 
 // Canonical product accent (DESIGN.md §Surface Scope). Must be a real hex — the
 // workspace update schema validates accentColor against /^#[0-9A-Fa-f]{6}$/, so
@@ -159,28 +165,32 @@ export function WorkspaceForm({
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Workspace name
             </label>
-            <input
+            <InputField
               type="text"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="Acme Inc."
-              className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             />
-            <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
               Visible to all workspace members.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Workspace URL
             </label>
-            <div className="flex items-center rounded-md border overflow-hidden" style={{ borderColor: "var(--color-border-default)" }}>
-              <span className="px-3 py-2 text-sm border-r" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)", color: "var(--color-text-secondary)" }}>
+            <div
+              className="flex h-[42px] items-center overflow-hidden rounded-lg shadow-[var(--shadow-ring)] transition-shadow focus-within:shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
+              style={{ backgroundColor: "var(--color-bg-surface)" }}
+            >
+              <span
+                className="flex h-full shrink-0 items-center border-r px-[13px] text-[13.5px]"
+                style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)", color: "var(--color-text-secondary)" }}
+              >
                 buildrik.io/
               </span>
               <input
@@ -188,12 +198,12 @@ export function WorkspaceForm({
                 value={slug}
                 onChange={(e) => setSlug(slugify(e.target.value))}
                 placeholder="acme"
-                className="flex-1 px-3 py-2 text-sm outline-none"
+                className="h-full flex-1 bg-transparent px-[13px] text-[13.5px] outline-none"
                 style={{ color: "var(--color-text-primary)" }}
               />
             </div>
             {slug && (
-              <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
                 Preview: buildrik.io/{slug}
               </p>
             )}
@@ -202,14 +212,14 @@ export function WorkspaceForm({
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Default language
             </label>
             <select
               value={defaultLanguage}
               onChange={(e) => setDefaultLanguage(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              className={SELECT_FIELD_CLASS}
+              style={{ backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-primary)" }}
             >
               {LANGUAGES.map((l) => (
                 <option key={l.value} value={l.value}>
@@ -220,14 +230,14 @@ export function WorkspaceForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Timezone
             </label>
             <select
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              className={SELECT_FIELD_CLASS}
+              style={{ backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-primary)" }}
             >
               {TIMEZONES.map((tz) => (
                 <option key={tz.value} value={tz.value}>
@@ -239,12 +249,12 @@ export function WorkspaceForm({
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
+          <h3 className="text-body font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
             Branding
           </h3>
           <div className="flex items-start gap-6">
             <div>
-              <p className="text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Workspace icon
               </p>
               <input
@@ -262,21 +272,21 @@ export function WorkspaceForm({
                 style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
               >
                 {iconUploading ? (
-                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>…</span>
+                  <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>…</span>
                 ) : iconUrl ? (
                   <img src={iconUrl} alt="Workspace icon" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>
                     64x64
                   </span>
                 )}
               </button>
-              <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
                 PNG or JPG. Max 1 MB.
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
                 Accent color
               </p>
               <div className="flex items-center gap-2">
@@ -287,7 +297,7 @@ export function WorkspaceForm({
                     setAccentColor(e.target.value);
                     setHexInput(e.target.value);
                   }}
-                  className="w-9 h-9 rounded border cursor-pointer"
+                  className="w-9 h-9 rounded-md border cursor-pointer"
                   style={{ borderColor: "var(--color-border-default)" }}
                 />
                 <input
@@ -295,19 +305,20 @@ export function WorkspaceForm({
                   value={hexInput.toUpperCase()}
                   onChange={(e) => handleHexChange(e.target.value)}
                   maxLength={7}
-                  className="w-24 px-2 py-1.5 text-sm font-mono rounded-md border outline-none"
+                  className="w-24 h-9 px-2.5 text-[13.5px] font-mono rounded-lg shadow-[var(--shadow-ring)] outline-none transition-shadow focus:shadow-[inset_0_0_0_1.5px_var(--color-primary)]"
                   style={{
-                    borderColor: isValidHex(hexInput) ? "var(--color-border-default)" : "#ef4444",
+                    boxShadow: isValidHex(hexInput) ? undefined : "inset 0 0 0 1.5px var(--color-error)",
+                    backgroundColor: "var(--color-bg-surface)",
                     color: "var(--color-text-primary)",
                   }}
                 />
                 <div
-                  className="w-9 h-9 rounded border"
+                  className="w-9 h-9 rounded-md border"
                   style={{ backgroundColor: accentColor, borderColor: "var(--color-border-default)" }}
                 />
               </div>
               {!isValidHex(hexInput) && (
-                <p className="text-xs mt-1" style={{ color: "#ef4444" }}>
+                <p className="text-body-sm mt-1" style={{ color: "var(--color-error)" }}>
                   Enter a valid hex color (e.g. #FF5500)
                 </p>
               )}
@@ -316,15 +327,15 @@ export function WorkspaceForm({
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
+          <h3 className="text-body font-semibold mb-3" style={{ color: "var(--color-text-primary)" }}>
             Collaboration
           </h3>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Edits need approval before publishing
               </p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                 Content editors send changes for review instead of publishing directly. An admin approves to go live.
               </p>
             </div>
@@ -355,14 +366,14 @@ export function WorkspaceForm({
       <form onSubmit={handleSharingSubmit} className="space-y-4">
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
+            <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
               Link expiration
             </label>
             <select
               value={defaultExpiration ?? ""}
               onChange={(e) => setDefaultExpiration(e.target.value || null)}
-              className="w-full max-w-xs px-3 py-2 text-sm rounded-md border outline-none"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+              className={`${SELECT_FIELD_CLASS} max-w-xs`}
+              style={{ backgroundColor: "var(--color-bg-surface)", color: "var(--color-text-primary)" }}
             >
               {EXPIRY_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -370,17 +381,17 @@ export function WorkspaceForm({
                 </option>
               ))}
             </select>
-            <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
               Default expiration for new shared links.
             </p>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Require password on shared links
               </p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                 New shared links will require a password by default.
               </p>
             </div>
@@ -399,10 +410,10 @@ export function WorkspaceForm({
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Allow editors to share
               </p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                 Editors can create and manage shared links.
               </p>
             </div>
@@ -421,10 +432,10 @@ export function WorkspaceForm({
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
                 Activity summary emails
               </p>
-              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
                 Receive weekly summaries of workspace activity.
               </p>
             </div>
