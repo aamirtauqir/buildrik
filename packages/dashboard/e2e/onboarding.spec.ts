@@ -2,6 +2,52 @@ import { randomUUID } from "node:crypto";
 import { test, expect } from "@playwright/test";
 import { PrismaClient } from "@prisma/client";
 
+// Shared by the full-walkthrough tests (bottom of file) and the blank+ready
+// test below — mirrors onboarding.setup.ts's OnboardingState reset plus the
+// site soft-delete pattern. Every full walkthrough ends by creating a REAL
+// site, and the QA workspace is FREE-plan (3-site cap), so existing sites must
+// be cleared before each run or SITE_LIMIT masks whatever the walkthrough is
+// actually meant to prove. Resetting OnboardingState too keeps each walkthrough
+// starting from a clean wizardData blob instead of whatever the previous test
+// left behind.
+async function resetOnboardingUser() {
+  const prisma = new PrismaClient();
+  try {
+    const email = process.env.PW_ONB_EMAIL ?? "qa@buildrik.local";
+    const user = await prisma.user.findFirst({ where: { email }, select: { id: true } });
+    if (!user) throw new Error(`No user "${email}" in the DB — seed it before running e2e.`);
+
+    await prisma.onboardingState.upsert({
+      where: { userId: user.id },
+      update: { completed: false, dismissed: false, wizardData: {}, step: "ROLE_SELECT" },
+      create: { userId: user.id, completed: false, dismissed: false, wizardData: {}, step: "ROLE_SELECT" },
+    });
+
+    const membership = await prisma.workspaceMember.findFirst({
+      where: { userId: user.id },
+      select: { workspaceId: true },
+    });
+    if (membership) {
+      await prisma.site.updateMany({
+        where: { workspaceId: membership.workspaceId, deletedAt: null },
+        data: { deletedAt: new Date() },
+      });
+      // FREE plan also caps AI generations at 3/month (+ a 3/hour anti-abuse
+      // throttle), per workspace — createGenerationJob (ai-generation.service.ts)
+      // counts every non-cancelled ai_generation_jobs row. Every AI-flow test
+      // below fires a REAL createJob.mutateAsync, so without clearing prior rows
+      // the count silently exceeds the cap after a handful of runs and the
+      // mutation rejects with AI_MONTHLY_LIMIT — the generating page then
+      // renders its *error* branch ("Couldn't create your draft") instead of
+      // the spinner. That read as a timing flake; it wasn't one — reproduced by
+      // querying ai_generation_jobs directly (3 already this month, cap is 3).
+      await prisma.aIGenerationJob.deleteMany({ where: { workspaceId: membership.workspaceId } });
+    }
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 // S1 · workspace-setup — the 5 states from the frame gallery (EMPTY NAME,
 // NAME EXISTS, NAME TOO LONG, NETWORK ERROR, LOADING) plus the happy path.
 // Runs under the "chromium-onboarding" project (setup-onboarding auth state,
@@ -243,35 +289,53 @@ test.describe("onboarding · path", () => {
 // advancing, and the generating spinner appearing — runs by default. The
 // completed-draft assertion needs a live provider and is gated behind
 // PW_ONB_AI (unset in CI, so that test is skipped by default).
+//
+// Module-scoped (not local to the describe block below) so the full AI
+// walkthrough at the bottom of the file can reuse it without re-navigating —
+// `navigate: false` skips the initial goto when the caller already clicked
+// its way onto /onboarding/ai/basics.
+async function fillAiBasicsGoalBrand(
+  page: import("@playwright/test").Page,
+  opts: { navigate?: boolean } = {},
+) {
+  if (opts.navigate !== false) await page.goto("/onboarding/ai/basics");
+  await page.getByRole("button", { name: "Restaurant", exact: true }).click();
+  await page.getByPlaceholder("Bright Events").fill("Sunrise Bakery");
+  await page.getByPlaceholder("Event planning and coordination services").fill("Fresh bread and pastries daily");
+  await page.getByRole("button", { name: /^continue$/i }).click();
+  await expect(page).toHaveURL(/\/onboarding\/ai\/goal/, { timeout: 15_000 });
+
+  await page.getByRole("button", { name: "Get leads", exact: true }).click();
+  await page.getByRole("button", { name: /^continue$/i }).click();
+  await expect(page).toHaveURL(/\/onboarding\/ai\/brand/, { timeout: 15_000 });
+
+  await page.getByRole("button", { name: /^generate site draft$/i }).click();
+  await expect(page).toHaveURL(/\/onboarding\/ai\/generating/, { timeout: 15_000 });
+}
+
 test.describe("onboarding · AI draft", () => {
-  async function fillBasicsGoalBrand(page: import("@playwright/test").Page) {
-    await page.goto("/onboarding/ai/basics");
-    await page.getByRole("button", { name: "Restaurant", exact: true }).click();
-    await page.getByPlaceholder("Bright Events").fill("Sunrise Bakery");
-    await page.getByPlaceholder("Event planning and coordination services").fill("Fresh bread and pastries daily");
-    await page.getByRole("button", { name: /^continue$/i }).click();
-    await expect(page).toHaveURL(/\/onboarding\/ai\/goal/, { timeout: 15_000 });
-
-    await page.getByRole("button", { name: "Get leads", exact: true }).click();
-    await page.getByRole("button", { name: /^continue$/i }).click();
-    await expect(page).toHaveURL(/\/onboarding\/ai\/brand/, { timeout: 15_000 });
-
-    await page.getByRole("button", { name: /^generate site draft$/i }).click();
-    await expect(page).toHaveURL(/\/onboarding\/ai\/generating/, { timeout: 15_000 });
-  }
-
   test("AI flow: basics → goal → brand advances to the generating spinner", async ({ page }) => {
-    await fillBasicsGoalBrand(page);
+    await resetOnboardingUser(); // clears stale ai_generation_jobs — see the comment on the function
+    await fillAiBasicsGoalBrand(page);
 
-    await expect(page.getByRole("heading", { name: /creating your site draft/i })).toBeVisible();
-    await expect(page.getByText(/creating sitemap/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: /^cancel and go back$/i })).toBeVisible();
+    // Previously flaked on the implicit 10s default: /onboarding/ai/generating
+    // is a route Turbopack hasn't compiled yet on a cold dev server (same class
+    // of lag the onboarding fixture calls out for the auth callback), so the
+    // heading can take longer than the default expect timeout to paint even
+    // though nothing is actually broken. Wait on the real spinner/progress
+    // elements with generous explicit timeouts instead of a fixed sleep.
+    await expect(page.getByRole("heading", { name: /creating your site draft/i })).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.getByText(/creating sitemap/i)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: /^cancel and go back$/i })).toBeVisible({ timeout: 30_000 });
   });
 
   (process.env.PW_ONB_AI ? test : test.skip)(
     "AI flow: a completed generation lands on the draft-ready preview",
     async ({ page }) => {
-      await fillBasicsGoalBrand(page);
+      await resetOnboardingUser();
+      await fillAiBasicsGoalBrand(page);
 
       await expect(page).toHaveURL(/\/onboarding\/ai\/preview/, { timeout: 180_000 });
       await expect(page.getByRole("heading", { name: /your first draft is ready/i })).toBeVisible();
@@ -342,24 +406,7 @@ test.describe("onboarding · template", () => {
 // never masks a real regression here.
 test.describe("onboarding · blank + ready", () => {
   test("blank path creates a site, reaches ready, and the editor-ready CTA is wired", async ({ page }) => {
-    const prisma = new PrismaClient();
-    try {
-      const email = process.env.PW_ONB_EMAIL ?? "qa@buildrik.local";
-      const user = await prisma.user.findFirst({ where: { email }, select: { id: true } });
-      if (!user) throw new Error(`No user "${email}" in the DB — seed it before running e2e.`);
-      const membership = await prisma.workspaceMember.findFirst({
-        where: { userId: user.id },
-        select: { workspaceId: true },
-      });
-      if (membership) {
-        await prisma.site.updateMany({
-          where: { workspaceId: membership.workspaceId, deletedAt: null },
-          data: { deletedAt: new Date() },
-        });
-      }
-    } finally {
-      await prisma.$disconnect();
-    }
+    await resetOnboardingUser();
 
     await page.goto("/onboarding/blank");
     await expect(page.getByRole("heading", { name: /^start with a blank canvas$/i })).toBeVisible();
@@ -382,6 +429,104 @@ test.describe("onboarding · blank + ready", () => {
     await expect(page.getByRole("heading", { name: /^ready to edit$/i })).toBeVisible();
     // E1 (unlike T2) DOES carry "Skip setup" in the frame gallery.
     await expect(page.getByRole("button", { name: /^skip setup$/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^open editor$/i })).toBeVisible();
+  });
+});
+
+// Full-flow walkthroughs — one per build path (AI / Template / Blank), each
+// driven start-to-finish through client-side navigation (workspace → site →
+// path → the path's own flow → ready), unlike the per-step describes above
+// which each open a single frame directly. Every walkthrough ends by creating
+// a real site, so `resetOnboardingUser` (soft-delete + OnboardingState reset)
+// runs before each one — same FREE-plan 3-site-cap reasoning as the blank+
+// ready test above.
+test.describe("onboarding · full walkthroughs", () => {
+  test.beforeEach(async () => {
+    await resetOnboardingUser();
+  });
+
+  // Shared workspace → site prefix for all three walkthroughs below. "My own
+  // business" is picked at S2 purely to avoid the New-client field validation
+  // (already covered by the S2 describe block above) — org type isn't what
+  // these tests are about.
+  async function completeWorkspaceAndSiteSteps(page: import("@playwright/test").Page, label: string) {
+    await page.goto("/onboarding/workspace");
+    await page.getByPlaceholder("My Workspace").fill(`E2E ${label} WS ${randomUUID().slice(0, 6)}`);
+    await page.getByRole("button", { name: /^create workspace$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/site/, { timeout: 15_000 });
+
+    await page.getByPlaceholder("e.g. Bright Events Website").fill(`E2E ${label} Site ${randomUUID().slice(0, 6)}`);
+    // Not `$`-anchored — the button's accessible name is the card's title AND
+    // description text concatenated, same as the S2 describe block above.
+    await page.getByRole("button", { name: /^my own business/i }).click();
+    await page.getByRole("button", { name: /^continue$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/path/, { timeout: 15_000 });
+  }
+
+  test("AI full path: workspace → site → path → AI draft → generating spinner (draft-ready gated behind PW_ONB_AI)", async ({
+    page,
+  }) => {
+    await completeWorkspaceAndSiteSteps(page, "AI");
+
+    await page.getByRole("button", { name: /^start ai draft$/i }).first().click();
+    await expect(page).toHaveURL(/\/onboarding\/ai\/basics/, { timeout: 15_000 });
+
+    // Already on /onboarding/ai/basics via the click above — skip the helper's
+    // own goto so this walkthrough exercises the real client-side transitions.
+    await fillAiBasicsGoalBrand(page, { navigate: false });
+
+    await expect(page.getByRole("heading", { name: /creating your site draft/i })).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.getByText(/creating sitemap/i)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: /^cancel and go back$/i })).toBeVisible({ timeout: 30_000 });
+
+    // Real generation takes minutes — only assert the completed draft when a
+    // live AI provider is explicitly opted into.
+    if (process.env.PW_ONB_AI) {
+      await expect(page).toHaveURL(/\/onboarding\/ai\/preview/, { timeout: 180_000 });
+      await expect(page.getByRole("heading", { name: /your first draft is ready/i })).toBeVisible();
+      await expect(page.getByRole("button", { name: /^open in editor$/i })).toBeVisible();
+    }
+  });
+
+  test("Template full path: workspace → site → path → template gallery → preview → selected → ready", async ({
+    page,
+  }) => {
+    await completeWorkspaceAndSiteSteps(page, "Template");
+
+    await page.getByRole("button", { name: /browse templates/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/template/, { timeout: 15_000 });
+
+    // "Studio Portfolio" (prisma/seed.ts) — same seeded template the T1-T3
+    // describe above picks.
+    await page.getByRole("button", { name: /studio portfolio/i }).first().click();
+    await expect(page).toHaveURL(/\/onboarding\/template\/preview/, { timeout: 15_000 });
+
+    await page.getByRole("button", { name: /^use this template$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/template\/selected/, { timeout: 15_000 });
+
+    // Unlike the T1-T3 describe above (which stops here to avoid creating a
+    // site), the full walkthrough clicks through: this IS the createAndAdvance
+    // call, a real trpc.sites.create round-trip to /onboarding/ready.
+    await page.getByRole("button", { name: /^open in editor$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/ready/, { timeout: 20_000 });
+
+    await expect(page.getByRole("heading", { name: /^ready to edit$/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^open editor$/i })).toBeVisible();
+  });
+
+  test("Blank full path: workspace → site → path → blank canvas → ready", async ({ page }) => {
+    await completeWorkspaceAndSiteSteps(page, "Blank");
+
+    await page.getByRole("button", { name: /open blank canvas/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/blank/, { timeout: 15_000 });
+
+    await page.getByPlaceholder("e.g. Bright Events Website").fill(`E2E Blank Full ${randomUUID().slice(0, 8)}`);
+    await page.getByRole("button", { name: /^open blank canvas$/i }).click();
+
+    await expect(page).toHaveURL(/\/onboarding\/ready/, { timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: /^ready to edit$/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /^open editor$/i })).toBeVisible();
   });
 });
