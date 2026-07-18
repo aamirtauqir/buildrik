@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Library, Rocket, LayoutGrid, ShoppingBag, Newspaper } from "lucide-react";
 import { StateEmpty } from "@/components/states";
-import { PageHeader, Pill } from "@/components/dashboard/primitives";
+import { PageHeader, FilterTabs } from "@/components/dashboard/primitives";
 
 const TABS = [
   { value: "templates", label: "Templates" },
@@ -13,10 +13,10 @@ const TABS = [
 type Tab = (typeof TABS)[number]["value"];
 
 const TEMPLATES = [
-  { name: "SaaS Landing", category: "Marketing", icon: Rocket },
-  { name: "Portfolio Grid", category: "Personal", icon: LayoutGrid },
-  { name: "Store Starter", category: "Commerce", icon: ShoppingBag },
-  { name: "Blog & News", category: "Content", icon: Newspaper },
+  { name: "SaaS Landing", category: "Marketing", icon: Rocket, color: "var(--color-primary)" },
+  { name: "Portfolio Grid", category: "Personal", icon: LayoutGrid, color: "var(--color-purple)" },
+  { name: "Store Starter", category: "Commerce", icon: ShoppingBag, color: "var(--color-amber)" },
+  { name: "Blog & News", category: "Content", icon: Newspaper, color: "var(--color-teal)" },
 ] as const;
 
 export default function LibrariesPage() {
@@ -26,57 +26,40 @@ export default function LibrariesPage() {
     <div>
       <PageHeader title="Libraries & Templates" description="Reusable starting points and shared design systems." />
 
-      <div
-        className="mb-6 inline-flex gap-1 rounded-lg border p-1"
-        style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-subtle)" }}
-        role="tablist"
-      >
-        {TABS.map((t) => {
-          const active = tab === t.value;
-          return (
-            <button
-              key={t.value}
-              role="tab"
-              aria-selected={active}
-              onClick={() => setTab(t.value)}
-              className="rounded-md px-4 py-1.5 text-body font-medium transition-colors"
-              style={{
-                backgroundColor: active ? "var(--color-primary-subtle)" : "transparent",
-                color: active ? "var(--color-primary)" : "var(--color-text-secondary)",
-              }}
-            >
-              {t.label}
-            </button>
-          );
-        })}
+      <div className="mb-5">
+        <FilterTabs value={tab} onChange={setTab} options={TABS} />
       </div>
 
       {tab === "templates" ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {TEMPLATES.map(({ name, category, icon: Icon }) => (
+        <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
+          {TEMPLATES.map(({ name, category, icon: Icon, color }) => (
             <div
               key={name}
-              className="overflow-hidden rounded-xl border"
+              className="overflow-hidden rounded-xl border shadow-card"
               style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
             >
-              <div className="flex h-32 items-center justify-center" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
-                <Icon className="h-9 w-9" style={{ color: "var(--color-text-muted)" }} />
+              <div
+                className="flex h-[196px] items-center justify-center"
+                style={{ background: `linear-gradient(140deg, color-mix(in srgb, ${color} 8%, white), color-mix(in srgb, ${color} 20%, white))` }}
+              >
+                <Icon className="h-10 w-10" style={{ color }} />
               </div>
-              <div className="p-4">
-                <h2 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{name}</h2>
-                <div className="mt-2 flex items-center justify-between">
-                  <Pill tone="neutral">{category}</Pill>
-                  {/* No template-apply backend yet — inert rather than a silent no-op. */}
-                  <button
-                    type="button"
-                    disabled
-                    title="Coming soon"
-                    className="cursor-not-allowed rounded-lg px-3 py-1.5 text-body-sm font-semibold"
-                    style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}
-                  >
-                    Coming soon
-                  </button>
+              <div className="flex items-start justify-between gap-3 px-3.5 py-3">
+                <div>
+                  <h2 className="text-[13.5px] font-semibold" style={{ color: "var(--color-text-primary)" }}>{name}</h2>
+                  <p className="mt-0.5 text-[11.5px]" style={{ color: "var(--color-text-secondary)" }}>{category}</p>
                 </div>
+                {/* No template-apply backend wired on this route — inert rather than a
+                    silent no-op. The real browse/apply flow is /dashboard/sites/new?method=template. */}
+                <button
+                  type="button"
+                  disabled
+                  title="Coming soon"
+                  className="shrink-0 cursor-not-allowed text-body-sm font-semibold"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
+                  Coming soon
+                </button>
               </div>
             </div>
           ))}

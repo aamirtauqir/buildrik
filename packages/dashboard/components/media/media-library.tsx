@@ -5,7 +5,7 @@ import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageO
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { Button, PageHeader, MetricValue, ProgressBar, InputField } from "@/components/dashboard/primitives";
+import { Button, PageHeader, MetricValue, ProgressBar, InputField, FilterTabs } from "@/components/dashboard/primitives";
 
 type MediaType = "image" | "video" | "icon" | "font";
 
@@ -23,41 +23,6 @@ const SORT_OPTIONS = [
 type SortOption = (typeof SORT_OPTIONS)[number]["value"];
 
 const PAGE_SIZE = 24;
-
-/** UI kit — segmented tab control (grey track, white active pill). Used here
- *  for the type filter and the sort toggle; write-once, reused twice. */
-function FilterTabs<T extends string>({
-  value,
-  onChange,
-  options,
-}: {
-  value: T;
-  onChange: (value: T) => void;
-  options: readonly { value: T; label: string }[];
-}) {
-  return (
-    <div className="flex items-center gap-0.5 rounded-lg p-1" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
-      {options.map((opt) => {
-        const active = opt.value === value;
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => onChange(opt.value)}
-            className="rounded-md px-3.5 py-1.5 text-[13px] transition-colors"
-            style={{
-              backgroundColor: active ? "var(--color-bg-surface)" : "transparent",
-              color: active ? "var(--color-text-primary)" : "var(--color-text-secondary)",
-              fontWeight: active ? 600 : 500,
-            }}
-          >
-            {opt.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 function mediaTypeFromMime(mime: string): MediaType {
   if (mime === "image/svg+xml") return "icon";

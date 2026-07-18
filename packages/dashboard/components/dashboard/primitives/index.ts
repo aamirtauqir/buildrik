@@ -8,3 +8,4 @@ export { DataTable, type Column } from "./data-table";
 export { Button, ButtonLink, type ButtonVariant, type ButtonSize } from "./button";
 export { IconChip } from "./icon-chip";
 export { InputField } from "./input-field";
+export { FilterTabs } from "./filter-tabs";
