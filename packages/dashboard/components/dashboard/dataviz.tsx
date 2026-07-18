@@ -25,8 +25,8 @@ export function Sparkline({ data, color = "var(--color-success)" }: { data: numb
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
-  const width = 78;
-  const height = 34;
+  const width = 76;
+  const height = 30;
   const padding = 4;
   const points = data.map((v, i) => {
     const x = (i / (data.length - 1)) * width;
@@ -70,7 +70,7 @@ export function TrendArrow({ value }: { value: number }) {
   const arrow = isZero ? "" : isPositive ? "↑" : "↓";
   const sign = isPositive ? "+" : "";
   return (
-    <span className="flex items-center gap-0.5 text-body-sm font-medium" style={{ color }}>
+    <span className="flex items-center gap-0.5 text-body-sm" style={{ color }}>
       {arrow && <span>{arrow}</span>}
       <span className="font-mono tabular-nums">{sign}{value}%</span>
     </span>

@@ -1,7 +1,8 @@
 "use client";
 
-import { CheckCircle2, AlertTriangle, Settings2, UserPlus, Rocket, Activity, type LucideIcon } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Settings2, UserPlus, Rocket, Activity, ChevronDown, type LucideIcon } from "lucide-react";
 import type { ActivityFeed as ActivityFeedData, ActivityEntry } from "@buildrik/shared/schemas/dashboard";
+import { cn } from "@lib/utils";
 
 // Map an activity to a colored icon chip by keyword in its action/description.
 // Real audit-log entries have no `type` enum, so we classify on the visible
@@ -48,21 +49,24 @@ export function collapseEntries(entries: ActivityEntry[]): Array<{ entry: Activi
   return out;
 }
 
-function ActivityRow({ entry, count }: { entry: ActivityEntry; count: number }) {
+function ActivityRow({ entry, count, isLast }: { entry: ActivityEntry; count: number; isLast: boolean }) {
   return (
-    <li className="flex items-center gap-3">
+    <li
+      className={cn("flex items-center gap-[11px] px-[18px] py-[13px]", !isLast && "border-b")}
+      style={{ borderColor: "var(--color-border-default)" }}
+    >
       {(() => {
         const { Icon, tone } = activityVisual(`${entry.action} ${entry.description ?? ""}`);
         return (
           <span
-            className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg"
+            className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[8px]"
             style={{ backgroundColor: `color-mix(in srgb, ${tone} 12%, transparent)`, color: tone }}
           >
-            <Icon className="h-[17px] w-[17px]" strokeWidth={2} />
+            <Icon className="h-4 w-4" strokeWidth={2} />
           </span>
         );
       })()}
-      <div className="min-w-0 flex-1">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="truncate text-[13.5px]" style={{ color: "var(--color-text-primary)" }}>
           {entry.actorName && <span className="font-semibold">{entry.actorName} </span>}
           {entry.description ?? entry.action}
@@ -72,10 +76,11 @@ function ActivityRow({ entry, count }: { entry: ActivityEntry; count: number }) 
             </span>
           )}
         </p>
-        <p className="mt-px text-[12px]" style={{ color: "var(--color-text-muted)" }}>
+        <p className="text-[12px]" style={{ color: "var(--color-text-secondary)" }}>
           {timeAgo(entry.createdAt)}
         </p>
       </div>
+      <ChevronDown className="h-[15px] w-[15px] shrink-0" style={{ color: "var(--color-text-muted)" }} />
     </li>
   );
 }
@@ -92,16 +97,16 @@ export function ActivityFeed({ feed }: ActivityFeedProps) {
 
   if (rows.length === 0) {
     return (
-      <p className="py-8 text-center text-body" style={{ color: "var(--color-text-muted)" }}>
+      <p className="px-5 py-8 text-center text-body" style={{ color: "var(--color-text-muted)" }}>
         No activity yet.
       </p>
     );
   }
 
   return (
-    <ul className="space-y-3.5">
-      {rows.map(({ entry, count }) => (
-        <ActivityRow key={entry.id} entry={entry} count={count} />
+    <ul>
+      {rows.map(({ entry, count }, i) => (
+        <ActivityRow key={entry.id} entry={entry} count={count} isLast={i === rows.length - 1} />
       ))}
     </ul>
   );

@@ -166,10 +166,24 @@ export default function DashboardPage() {
             />
             <StatCard
               label="Published"
-              mono={false}
-              value={<><MetricValue>{stats.data?.publishedSites ?? 0}</MetricValue> live</>}
-              delta={(stats.data?.publishedSites ?? 0) > 0 ? "live now" : "none published"}
-              visual={<Sparkline data={[3, 3, 4, 4, 4, 5, 5]} color="var(--color-text-muted)" />}
+              value={stats.data?.publishedSites ?? 0}
+              delta={
+                (stats.data?.publishedSites ?? 0) > 0 ? (
+                  <span
+                    className="inline-flex items-center gap-1 rounded-full text-[10px] font-bold tracking-[0.03em]"
+                    style={{ color: "var(--color-success)", backgroundColor: "var(--color-success-subtle)", padding: "2px 8px 2px 6px" }}
+                  >
+                    <span
+                      className="h-[6px] w-[6px] rounded-full"
+                      style={{ backgroundColor: "var(--color-success)", boxShadow: "0 0 0 3px color-mix(in srgb, var(--color-success) 18%, transparent)" }}
+                    />
+                    LIVE
+                  </span>
+                ) : (
+                  "none published"
+                )
+              }
+              visual={<Sparkline data={[3, 3, 4, 4, 4, 5, 5]} />}
               href="/dashboard/sites?status=published"
             />
             <StatCard
@@ -200,6 +214,7 @@ export default function DashboardPage() {
           <div className="grid gap-[14px]" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
             <SectionCard
               title="Recent activity"
+              padding="none"
               actions={
                 <Link href="/dashboard/notifications" className="text-body-sm font-medium" style={{ color: "var(--color-primary)" }}>
                   View all
