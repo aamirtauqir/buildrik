@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Rocket, Globe, Users, CreditCard, Link, Pencil, Mail, Printer } from "lucide-react";
+import { Search, Rocket, Globe, Users, CreditCard, Link, Pencil, MessageSquare, Printer } from "lucide-react";
 import { HELP_CATEGORIES } from "@buildrik/shared/schemas/help";
+import { SectionCard, Pill, IconChip, InputField, Button } from "@/components/dashboard/primitives";
 
 export const HELP_CATEGORY_LIST = HELP_CATEGORIES.map((c) => ({ ...c }));
 
@@ -26,6 +27,19 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?:
   Link,
   Pencil,
 };
+
+// Accent + blurb per category — presentation-only, so it stays out of the
+// shared schema (HELP_CATEGORIES is still the SSOT for key/label/icon).
+const CATEGORY_STYLE: Record<string, { color: string; description: string }> = {
+  "getting-started": { color: "var(--color-primary)", description: "Build and publish your first site in minutes." },
+  sites: { color: "var(--color-teal)", description: "Publish, organize, and manage every site in your workspace." },
+  team: { color: "var(--color-purple)", description: "Roles, invites, reviews, and permissions." },
+  billing: { color: "var(--color-amber)", description: "Upgrade, invoices, and payment methods." },
+  domains: { color: "var(--color-pink)", description: "Connect a custom domain and manage DNS records." },
+  editor: { color: "var(--color-success)", description: "Sections, styles, AI drafting, and components." },
+};
+
+const POPULAR_CATEGORY_KEY = "getting-started";
 
 interface HelpCenterProps {
   onSearch: (query: string) => void;
@@ -61,110 +75,103 @@ export function HelpCenter({ onSearch, onSelectCategory, onContactSupport, searc
 
   return (
     <div className="space-y-8">
-      {/* Search */}
-      <form onSubmit={handleSearchSubmit}>
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" style={{ color: "var(--color-text-secondary)" }} />
-          <input
-            type="text"
-            placeholder="Search help articles..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-xl border py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2"
-            style={{
-              borderColor: "var(--color-border-default)",
-              color: "var(--color-text-primary)",
-            }}
-          />
-          {query && (
-            <button
-              type="submit"
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1 text-xs font-medium text-white"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              Search
-            </button>
-          )}
-        </div>
+      {/* Hero */}
+      <div className="text-center">
+        <h1 className="text-[30px] font-extrabold leading-tight tracking-[-0.02em]" style={{ color: "var(--color-text-primary)" }}>
+          How can we help?
+        </h1>
+        <p className="mt-1.5 text-body" style={{ color: "var(--color-text-secondary)" }}>
+          Search the docs or browse by topic.
+        </p>
+      </div>
+
+      <form onSubmit={handleSearchSubmit} className="mx-auto max-w-[560px]">
+        <InputField
+          leading={<Search className="h-4 w-4" />}
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search help articles..."
+          aria-label="Search help articles"
+        />
       </form>
 
       {/* Categories */}
-      <section>
-        <h2 className="mb-4 text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Browse by Category</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {HELP_CATEGORY_LIST.map((cat) => {
-            const Icon = ICON_MAP[cat.icon];
-            return (
-              <button
-                key={cat.key}
-                type="button"
-                onClick={() => onSelectCategory(cat.key, cat.label)}
-                className="flex cursor-pointer flex-col gap-2 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
-                style={{ borderColor: "var(--color-border-default)" }}
-              >
-                {Icon && <Icon className="h-5 w-5" style={{ color: "var(--color-primary)" }} />}
-                <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{cat.label}</p>
-                <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Browse articles</p>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {HELP_CATEGORY_LIST.map((cat) => {
+          const Icon = ICON_MAP[cat.icon];
+          const style = CATEGORY_STYLE[cat.key];
+          return (
+            <button
+              key={cat.key}
+              type="button"
+              onClick={() => onSelectCategory(cat.key, cat.label)}
+              className="flex cursor-pointer flex-col rounded-xl border p-5 text-left shadow-card transition-colors hover:border-[var(--color-border-strong)]"
+              style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+            >
+              <IconChip color={style?.color} className="mb-3">
+                {Icon && <Icon className="h-5 w-5" />}
+              </IconChip>
+              <div className="flex items-center gap-2">
+                <h3 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{cat.label}</h3>
+                {cat.key === POPULAR_CATEGORY_KEY && <Pill tone="warning">Popular</Pill>}
+              </div>
+              <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{style?.description}</p>
+            </button>
+          );
+        })}
+      </div>
 
       {/* Contact Support */}
-      <section>
-        <h2 className="mb-4 text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Contact Support</h2>
-        <button
-          onClick={onContactSupport}
-          className="flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[var(--color-primary)]/30 hover:bg-[#FFF5F4]"
-          style={{ borderColor: "var(--color-border-default)" }}
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
-            <Mail className="h-5 w-5" style={{ color: "var(--color-primary)" }} />
-          </div>
-          <div>
-            <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>Submit a Ticket</p>
-            <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>Response time depends on your plan</p>
-          </div>
-        </button>
-      </section>
+      <button
+        type="button"
+        onClick={onContactSupport}
+        className="flex w-full cursor-pointer items-center gap-4 rounded-xl border p-5 text-left shadow-card transition-colors hover:border-[var(--color-border-strong)]"
+        style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+      >
+        <IconChip color="var(--color-text-secondary)">
+          <MessageSquare className="h-5 w-5" />
+        </IconChip>
+        <div>
+          <p className="text-section-title" style={{ color: "var(--color-text-primary)" }}>Contact support</p>
+          <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+            Still stuck? Reach the team directly — response time depends on your plan.
+          </p>
+        </div>
+      </button>
 
       {/* Keyboard Shortcuts */}
-      <section>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Keyboard Shortcuts</h2>
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
+      <SectionCard
+        title="Keyboard Shortcuts"
+        actions={
+          <Button variant="ghost" size="sm" onClick={handlePrint}>
             <Printer className="h-3.5 w-3.5" />
             Print
-          </button>
-        </div>
-        <div className="rounded-xl border" style={{ borderColor: "var(--color-border-default)" }}>
-          {KEYBOARD_SHORTCUTS.map((shortcut, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between px-4 py-3"
-              style={{ borderBottom: i < KEYBOARD_SHORTCUTS.length - 1 ? "1px solid var(--color-border-default)" : "none" }}
-            >
-              <span className="text-sm" style={{ color: "var(--color-text-primary)" }}>{shortcut.description}</span>
-              <div className="flex items-center gap-1">
-                {shortcut.keys.map((key, ki) => (
-                  <kbd
-                    key={ki}
-                    className="rounded border px-1.5 py-0.5 text-xs font-medium"
-                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}
-                  >
-                    {key}
-                  </kbd>
-                ))}
-              </div>
+          </Button>
+        }
+        padding="none"
+      >
+        {KEYBOARD_SHORTCUTS.map((shortcut, i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between border-b px-4 py-3 last:border-0"
+            style={{ borderColor: "var(--color-border-default)" }}
+          >
+            <span className="text-body" style={{ color: "var(--color-text-primary)" }}>{shortcut.description}</span>
+            <div className="flex items-center gap-1">
+              {shortcut.keys.map((key, ki) => (
+                <kbd
+                  key={ki}
+                  className="rounded border px-1.5 py-0.5 text-body-sm font-medium"
+                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}
+                >
+                  {key}
+                </kbd>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+        ))}
+      </SectionCard>
     </div>
   );
 }

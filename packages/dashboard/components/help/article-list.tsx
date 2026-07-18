@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Clock, BookOpen } from "lucide-react";
 import type { HelpArticleData } from "@buildrik/shared/schemas/help";
+import { StateEmpty } from "@/components/states";
 
 interface ArticleListProps {
   articles: HelpArticleData[];
@@ -13,11 +14,11 @@ export function ArticleList({ articles }: ArticleListProps) {
 
   if (articles.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <BookOpen className="mb-3 h-10 w-10" style={{ color: "var(--color-border-default)" }} />
-        <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>No articles found</p>
-        <p className="mt-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>Try a different search term or browse by category</p>
-      </div>
+      <StateEmpty
+        icon={<BookOpen className="h-8 w-8" />}
+        title="No articles found"
+        description="Try a different search term or browse by category."
+      />
     );
   }
 
@@ -27,7 +28,7 @@ export function ArticleList({ articles }: ArticleListProps) {
         <button
           key={article.id}
           onClick={() => router.push(`/dashboard/help/${article.slug}`)}
-          className="flex w-full flex-col gap-2 px-1 py-4 text-left transition-colors hover:bg-[#FFF5F4]"
+          className="flex w-full flex-col gap-2 px-1 py-4 text-left transition-colors hover:bg-[var(--color-primary-subtle)]"
         >
           <div className="flex items-start justify-between gap-3">
             <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{article.title}</p>

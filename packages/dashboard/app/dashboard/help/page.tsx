@@ -5,7 +5,7 @@ import { trpc } from "@lib/trpc/client";
 import { HelpCenter } from "@/components/help/help-center";
 import { ArticleList } from "@/components/help/article-list";
 import { TicketForm } from "@/components/help/ticket-form";
-import { ErrorState } from "@/components/states";
+import { ErrorState, LoadingSkeleton } from "@/components/states";
 
 type View = "home" | "search" | "category" | "ticket";
 
@@ -72,11 +72,7 @@ export default function HelpPage() {
         </div>
         <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>{category.label}</h1>
         {categoryResults.isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-            ))}
-          </div>
+          <LoadingSkeleton rows={3} variant="list" />
         ) : categoryResults.isError ? (
           <ErrorState title="Couldn't load articles" onRetry={() => categoryResults.refetch()} />
         ) : (
@@ -109,11 +105,7 @@ export default function HelpPage() {
         </div>
         <h1 className="mb-6 text-page-title" style={{ color: "var(--color-text-primary)" }}>Search Results</h1>
         {searchResults.isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
-            ))}
-          </div>
+          <LoadingSkeleton rows={3} variant="list" />
         ) : searchResults.isError ? (
           <ErrorState title="Couldn't run your search" onRetry={() => searchResults.refetch()} />
         ) : (
@@ -131,22 +123,10 @@ export default function HelpPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-page-title" style={{ color: "var(--color-text-primary)" }}>Help Center</h1>
-        <button
-          onClick={() => setView("ticket")}
-          className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[#FFF5F4]"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-primary)" }}
-        >
-          Submit a Ticket
-        </button>
-      </div>
-      <HelpCenter
-        onSearch={handleSearch}
-        onSelectCategory={handleSelectCategory}
-        onContactSupport={() => setView("ticket")}
-      />
-    </div>
+    <HelpCenter
+      onSearch={handleSearch}
+      onSelectCategory={handleSelectCategory}
+      onContactSupport={() => setView("ticket")}
+    />
   );
 }
