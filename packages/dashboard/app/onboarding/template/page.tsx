@@ -6,6 +6,7 @@ import { trpc } from "@lib/trpc/client";
 import { cn } from "@lib/utils";
 import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbBack } from "@/components/onboarding/wizard/onb-back";
+import { OnbEmpty } from "@/components/onboarding/wizard/onb-empty";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
@@ -73,22 +74,24 @@ export default function TemplateGalleryPage() {
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-onb-line border-t-onb-primary" />
           </div>
         ) : templates.length === 0 ? (
-          <div className="flex min-h-[300px] flex-col items-center justify-center gap-4 self-stretch py-[60px]">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[14px] bg-slate-100">
-              <Search className="h-4 w-4 text-onb-muted" strokeWidth={1.8} />
-            </div>
-            <p className="text-base font-semibold text-onb-text">No templates found</p>
-            <p className="text-[13px] text-onb-muted">Try a different category, or clear the search.</p>
-            <button
-              type="button"
-              onClick={() => {
-                setSearch("");
-                setCategory("ALL");
-              }}
-              className="mt-2 flex h-10 items-center rounded-onb px-5 text-[13px] font-semibold text-onb-text shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-colors hover:bg-onb-surface"
-            >
-              Clear filters
-            </button>
+          <div className="flex min-h-[300px] items-center justify-center self-stretch">
+            <OnbEmpty
+              icon={<Search className="h-4 w-4 text-onb-muted" strokeWidth={1.8} />}
+              title="No templates found"
+              body="Try a different category, or clear the search."
+              action={
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch("");
+                    setCategory("ALL");
+                  }}
+                  className="mt-2 flex h-10 items-center rounded-onb px-5 text-[13px] font-semibold text-onb-text shadow-[inset_0_0_0_1px_var(--color-onb-line)] transition-colors hover:bg-onb-surface"
+                >
+                  Clear filters
+                </button>
+              }
+            />
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-6 self-stretch">

@@ -7,16 +7,16 @@ import { trpc } from "@lib/trpc/client";
 import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
-import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
 
 /** T2 · Template preview. Full-bleed split frame: the template rendered inside a
  *  browser mock on the left, its details + CTA in the right rail. Confirms into
  *  T3; back → gallery. (No wizard header here — the frame puts the brand tile in
- *  the rail, so this page owns its own chrome.) */
+ *  the rail, so this page owns its own chrome. Unlike every other onboarding
+ *  frame, T2 has no "Skip setup" escape hatch — verified against the frame,
+ *  not an oversight — so this page doesn't pull in useOnboardingComplete.) */
 export default function TemplatePreviewPage() {
   const router = useRouter();
   const { data, saveAndGo, saving } = useWizard();
-  const { skipSetup, skipping } = useOnboardingComplete();
   const templateId = data.template?.id;
 
   useEffect(() => {
@@ -66,22 +66,12 @@ export default function TemplatePreviewPage() {
 
       <aside className="flex w-[504px] shrink-0 flex-col justify-between border-l border-onb-line bg-white p-10">
         <div className="flex flex-col gap-8">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-onb bg-onb-primary text-[17px] font-bold text-white">
-                B
-              </span>
-              <span className="text-lg font-bold text-onb-text">Buildrick</span>
+          <span className="flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-onb bg-onb-primary text-[17px] font-bold text-white">
+              B
             </span>
-            <button
-              type="button"
-              onClick={skipSetup}
-              disabled={skipping}
-              className="text-[13px] font-medium text-onb-muted transition-colors hover:text-onb-text disabled:opacity-50"
-            >
-              {skipping ? "Skipping…" : "Skip setup"}
-            </button>
-          </div>
+            <span className="text-lg font-bold text-onb-text">Buildrick</span>
+          </span>
 
           <div className="flex flex-col gap-3">
             <h1 className="text-2xl font-bold text-onb-text">{t.name}</h1>

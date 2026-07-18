@@ -279,3 +279,54 @@ test.describe("onboarding · AI draft", () => {
     },
   );
 });
+
+// T1-T3 · template flow — Gallery / No-results / Preview / Selected frames.
+// The gallery is seeded with real templates (prisma/seed.ts: Studio Portfolio,
+// Local Business, Agency, Bistro), so a real trpc.templates.list round-trip is
+// exercised rather than mocked data. Search input has no programmatic label
+// (same OnbField gap as workspace/site above), so it's targeted by placeholder
+// rather than getByRole("searchbox") — that role also isn't safe here, per the
+// dev-tooling-overlay note on `nameField` above.
+test.describe("onboarding · template", () => {
+  const searchField = (page: import("@playwright/test").Page) => page.getByPlaceholder("Search templates...");
+
+  test("template search with no matches shows the no-results empty state, and clearing it restores the gallery", async ({
+    page,
+  }) => {
+    await page.goto("/onboarding/template");
+    await expect(page.getByRole("heading", { name: /^choose a template$/i })).toBeVisible();
+
+    await searchField(page).fill("zzzzznomatch");
+    await expect(page.getByText(/no templates found/i)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/try a different category, or clear the search\./i)).toBeVisible();
+
+    const clearBtn = page.getByRole("button", { name: /clear filters/i });
+    await expect(clearBtn).toBeVisible();
+
+    await clearBtn.click();
+    await expect(searchField(page)).toHaveValue("");
+    await expect(page.getByText(/no templates found/i)).toHaveCount(0);
+  });
+
+  test("picking a template from the gallery opens its preview, and confirming lands on the selected screen", async ({
+    page,
+  }) => {
+    await page.goto("/onboarding/template");
+    // "Studio Portfolio" (prisma/seed.ts) — matched by its full name so this
+    // can't collide with the "Portfolio" category filter chip, which shares
+    // the same substring but not the full card name.
+    await page.getByRole("button", { name: /studio portfolio/i }).first().click();
+    await expect(page).toHaveURL(/\/onboarding\/template\/preview/, { timeout: 15_000 });
+
+    // T2 has no "Skip setup" — unlike every other onboarding frame, verified
+    // against the frame gallery, not a missing feature.
+    await expect(page.getByRole("button", { name: /skip setup/i })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Studio Portfolio" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^use this template$/i })).toBeVisible();
+
+    await page.getByRole("button", { name: /^use this template$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/template\/selected/, { timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: /^template selected$/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^open in editor$/i })).toBeVisible();
+  });
+});
