@@ -81,19 +81,22 @@
      Unified with editor + auth 2026-07-12; replaces the former red #E42313 accent
      AND the pure-gray neutrals with the mockup's slate-tinted scale. Error and
      destructive stay red: red now means error/danger only. */
-  --color-primary: #2D6DFF;
-  --color-primary-hover: #1950DC;
+  /* UI-kit tokens (docs/design/dashboard-ui-kit.md, adopted 2026-07-18 —
+     founder chose the kit over the prior cobalt reskin values). Dashboard only:
+     auth (--color-auth-*) and onboarding (--color-onb-*) keep cobalt #2D6DFF. */
+  --color-primary: #406ED6;
+  --color-primary-hover: #2E56B8;
   --color-primary-subtle: #EBF1FF;
   --color-destructive: #7F1D1D;
-  --color-bg-page: #FAFAFC;
+  --color-bg-page: #F9FAFC;
   --color-bg-surface: #FFFFFF;
-  --color-bg-subtle: #F1F5F9;
-  --color-border-default: #E5E8ED;
-  --color-border-strong: #CCD1DB;
-  --color-text-primary: #334155;
+  --color-bg-subtle: #F3F5F8;
+  --color-border-default: #E8EAEF;
+  --color-border-strong: #D6DAE1;
+  --color-text-primary: #1C212C;
   --color-text-secondary: #6B7380;
-  --color-text-muted: #8A91A0;
-  --color-text-placeholder: #8A91A0;
+  --color-text-muted: #98A0AF;
+  --color-text-placeholder: #98A0AF;
   --color-success: #059669;
   --color-success-subtle: #DCFCE7;
   --color-warning: #D97706;
@@ -104,9 +107,11 @@
   --color-success-text: #166534;
   --color-warning-text: #854D0E;
   --color-error-text: #991B1B;
-  --color-info: #2D6DFF;
-  /* dc categorical/illustrative colors — charts, avatars, app icons */
+  --color-info: #406ED6;
+  /* Categorical/illustrative colors — charts, avatars, app icon chips.
+     Decorative tints only, never actions (UI kit §7.2). */
   --color-teal: #0D94A6;
+  --color-purple: #7C5CF6;
   --color-amber: #EA8E1E;
   --color-pink: #DB508C;
   --color-ink: #141924;
@@ -124,7 +129,7 @@
      Premium shadow set (dc reskin 2026-07-18): ring + card + card-hover +
      panel + modal, replacing the single flat --shadow-card. */
   --shadow-ring: inset 0 0 0 1px var(--color-border-default);
-  --shadow-card: inset 0 0 0 1px var(--color-border-default), 0 1px 1px rgba(16,24,40,0.04), 0 2px 4px -2px rgba(16,24,40,0.07);
+  --shadow-card: 0 1px 2px rgba(15,23,42,0.04), 0 10px 26px -20px rgba(15,23,42,0.28);
   --shadow-card-hover: inset 0 0 0 1px var(--color-border-strong), 0 4px 10px -4px rgba(16,24,40,0.12), 0 1px 3px rgba(16,24,40,0.07);
   --shadow-panel: 0 0 0 1px rgba(15,23,42,0.10), 0 18px 40px -24px rgba(15,23,42,0.16);
   --shadow-modal: 0 24px 60px -12px rgba(15,23,42,0.35);
@@ -132,8 +137,8 @@
   /* Dashboard shell + design-system contract (dc parity 2026-07-12).
      Two-level shell: full-width top nav (56px) above the 244px sidebar
      (narrowed from 272px in the reskin, 2026-07-18). */
-  --topnav-h: 56px;
-  --sidebar-w: 244px;
+  --topnav-h: 60px;
+  --sidebar-w: 272px;
 
   /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 2xl16 pill). Remaps rounded-* utilities. */
   --radius-xs: 4px;
@@ -195,10 +200,17 @@
   --text-onb-title--font-weight: 700;
 }
 
-/* Focus indicators — cobalt (unified accent 2026-07-12) */
+/* Focus indicators. Base stays cobalt for auth + editor, whose accents are
+   still #2D6DFF; the dashboard and onboarding re-point it at their own scoped
+   accent below so only one blue is ever on a given surface. */
 *:focus-visible {
   outline: 2px solid #2D6DFF;
   outline-offset: 2px;
+}
+
+/* Dashboard runs the UI-kit accent (#406ED6), so its focus ring follows it. */
+.dash-scope *:focus-visible {
+  outline-color: var(--color-primary);
 }
 
 /* The onboarding wizard runs a scoped blue (DESIGN.md §Onboarding Surface), so

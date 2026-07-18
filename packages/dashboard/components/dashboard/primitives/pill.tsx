@@ -17,7 +17,8 @@ export function Pill({ tone = "neutral", children, className }: { tone?: PillTon
   const t = TONES[tone];
   return (
     <span
-      className={cn("inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-eyebrow font-semibold", className)}
+      // UI kit §4 — Status pill: 11px / 600, radius-pill, padding 3px 9px.
+      className={cn("inline-flex items-center gap-1 rounded-pill px-[9px] py-[3px] text-eyebrow font-semibold", className)}
       style={{ backgroundColor: t.bg, color: t.color }}
     >
       {children}

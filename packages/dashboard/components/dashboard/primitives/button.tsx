@@ -5,18 +5,19 @@ import { cn } from "@lib/utils";
 export type ButtonVariant = "primary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md";
 
+// UI kit §4 — Primary/Secondary button: 38px tall, radius-lg, 13px/600.
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-[6px] font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 rounded-[10px] font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none";
 
 const SIZES: Record<ButtonSize, string> = {
-  sm: "px-3 py-1.5 text-[13px]",
-  md: "px-[14px] py-[11px] text-[13.5px]",
+  sm: "h-8 px-3 text-[13px]",
+  md: "h-[38px] px-4 text-[13px]",
 };
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: "bg-[var(--color-primary)] text-white shadow-[0_1px_2px_rgba(45,109,255,0.28)] hover:bg-[var(--color-primary-hover)] hover:shadow-[0_4px_10px_rgba(45,109,255,0.32)]",
+  primary: "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]",
   ghost:
-    "border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:text-[var(--color-text-primary)]",
+    "border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] shadow-[var(--shadow-ring)] hover:border-[var(--color-border-strong)]",
   danger: "bg-[var(--color-error)] text-white hover:bg-[var(--color-error-text)]",
 };
 
