@@ -140,7 +140,7 @@
      Two-level shell: full-width top nav (56px) above the 244px sidebar
      (narrowed from 272px in the reskin, 2026-07-18). */
   --topnav-h: 60px;
-  --sidebar-w: 272px;
+  --sidebar-w: 293px;
 
   /* Radius scale (dc: xs4 sm6 md8 lg10 xl12 2xl16 pill). Remaps rounded-* utilities. */
   --radius-xs: 4px;

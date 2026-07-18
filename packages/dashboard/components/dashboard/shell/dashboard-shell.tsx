@@ -29,7 +29,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       <TopNav onSearch={() => setPaletteOpen(true)} />
       <Sidebar />
       <main className="pt-[var(--topnav-h)] lg:ml-[var(--sidebar-w)]">
-        <div className="mx-auto max-w-[1120px] px-10 pb-[60px] pt-8">{children}</div>
+        <div className="px-10 pb-[60px] pt-8">{children}</div>
       </main>
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
