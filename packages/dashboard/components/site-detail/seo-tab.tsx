@@ -6,7 +6,7 @@ import { Pencil } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
-import { SectionCard } from "@/components/dashboard/primitives";
+import { Button, SectionCard } from "@/components/dashboard/primitives";
 
 /**
  * SEO content (meta title/description, social image) has ONE edit home: the
@@ -165,15 +165,9 @@ function TechnicalSeoSection({ siteId }: { siteId: string }) {
           </div>
 
           <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={save}
-              disabled={update.isPending}
-              className="rounded-md px-4 py-2 text-body font-medium text-white disabled:opacity-60"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
+            <Button type="button" onClick={save} disabled={update.isPending}>
               {update.isPending ? "Saving…" : "Save technical SEO"}
-            </button>
+            </Button>
           </div>
         </div>
       )}

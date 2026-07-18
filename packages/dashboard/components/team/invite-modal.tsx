@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
+import { Button } from "@/components/dashboard/primitives";
 
 export const ROLE_OPTIONS = [
   { value: "ADMIN", label: "Admin", description: "Can manage everything except billing" },
@@ -242,26 +243,20 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
 
           {/* Actions */}
           <div className="flex gap-3 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 rounded-lg border border-[var(--color-border-default)] py-2.5 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-              style={{ color: "var(--color-text-secondary)" }}
-            >
+            <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={validCount === 0 || tooMany || hasInvalid || isLoading}
-              className="flex-1 rounded-lg py-2.5 text-body font-semibold text-white transition-colors disabled:opacity-50"
-              style={{ backgroundColor: "var(--color-primary)" }}
+              className="flex-1"
             >
               {isLoading
                 ? "Sending..."
                 : validCount > 1
                 ? `Send ${validCount} Invitations`
                 : "Send Invitation"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

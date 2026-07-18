@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, AlertTriangle, XCircle, X, ArrowUpRight } from "lucide-react";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
+import { Button } from "@/components/dashboard/primitives";
 
 const STATUS_ICON = {
   pass: <CheckCircle2 className="h-5 w-5" style={{ color: "var(--color-success)" }} />,
@@ -63,21 +64,12 @@ export function PrePublishChecks({ checks, onPublish, onCancel }: PrePublishChec
         </label>
 
         <div className="mt-6 flex justify-end gap-3">
-          <button
-            onClick={onCancel}
-            className="rounded-xl px-4 py-2 text-sm font-medium"
-            style={{ color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}
-          >
+          <Button variant="ghost" onClick={onCancel}>
             Cancel
-          </button>
-          <button
-            onClick={() => onPublish(notifyTeam)}
-            disabled={!checks.ready}
-            className="rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          </Button>
+          <Button onClick={() => onPublish(notifyTeam)} disabled={!checks.ready}>
             Publish
-          </button>
+          </Button>
         </div>
       </div>
     </div>

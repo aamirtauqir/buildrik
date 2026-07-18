@@ -5,7 +5,7 @@ import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal } from "l
 import { siteAddress } from "@lib/utils";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone } from "@/components/sites/site-status";
-import { Pill, MetricValue } from "@/components/dashboard/primitives";
+import { Button, Pill, MetricValue } from "@/components/dashboard/primitives";
 import { SendReviewModal } from "@/components/reviews/send-review-modal";
 import { ShareDraftModal } from "@/components/site-detail/share-draft-modal";
 
@@ -92,18 +92,14 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
               <ExternalLink className="h-4 w-4" />View site
             </span>
           )}
-          <button
-            onClick={() => setReviewOpen(true)}
-            className={outlineButton}
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-          >
+          <Button variant="ghost" onClick={() => setReviewOpen(true)}>
             <Send className="h-4 w-4" />Send for review
-          </button>
+          </Button>
           {site.status === "DRAFT" && onPublish && (
-            <button onClick={onPublish} className="rounded-lg px-4 py-2 text-body font-medium text-white transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]">Publish</button>
+            <Button onClick={onPublish}>Publish</Button>
           )}
           {site.status === "PUBLISHED" && onUnpublish && (
-            <button onClick={onUnpublish} className="rounded-lg px-4 py-2 text-body font-medium text-white transition-colors bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]">Unpublish</button>
+            <Button onClick={onUnpublish}>Unpublish</Button>
           )}
           <div ref={menuRef} className="relative">
             <button

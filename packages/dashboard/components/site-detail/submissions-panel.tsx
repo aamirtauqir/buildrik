@@ -7,7 +7,7 @@ import {
   SubmissionDrawer,
   type FormSubmissionData,
 } from "@/components/site-detail/submission-drawer";
-import { DataTable, Pill, MetricValue, type Column } from "@/components/dashboard/primitives";
+import { Button, DataTable, Pill, MetricValue, type Column } from "@/components/dashboard/primitives";
 
 interface FormBlock {
   id: string;
@@ -180,15 +180,10 @@ export function SubmissionsPanel({ siteId, formBlocks, isLoading }: SubmissionsP
             <option key={fb.id} value={fb.id}>{fb.name}</option>
           ))}
         </select>
-        <button
-          onClick={handleExportCsv}
-          disabled={exporting || rows.length === 0}
-          className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-40"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-        >
+        <Button variant="ghost" size="sm" onClick={handleExportCsv} disabled={exporting || rows.length === 0} className="gap-1.5">
           <Download className="h-3.5 w-3.5" />
           {exporting ? "Exporting…" : "Export CSV"}
-        </button>
+        </Button>
       </div>
 
       {isLoading || submissionsQuery.isLoading ? (

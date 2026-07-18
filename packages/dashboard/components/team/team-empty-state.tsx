@@ -1,6 +1,7 @@
 "use client";
 
 import { Users, Crown, ShieldCheck, Pencil, Eye } from "lucide-react";
+import { Button } from "@/components/dashboard/primitives";
 
 const ROLE_CARDS = [
   {
@@ -54,13 +55,9 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
         Invite your colleagues to collaborate. Choose the right role for each person based on what they need to do.
       </p>
 
-      <button
-        onClick={onInvite}
-        className="mt-6 rounded-lg px-5 py-2.5 text-body font-semibold text-white transition-colors hover:opacity-90"
-        style={{ backgroundColor: "var(--color-primary)" }}
-      >
+      <Button onClick={onInvite} className="mt-6">
         Invite Team Members
-      </button>
+      </Button>
 
       <div className="mt-10 grid w-full max-w-2xl gap-3 grid-cols-2 sm:grid-cols-4">
         {ROLE_CARDS.map((card) => (

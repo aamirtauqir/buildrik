@@ -5,6 +5,7 @@ import { trpc } from "@lib/trpc/client";
 import { shareUrl } from "@lib/utils";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
+import { Button } from "@/components/dashboard/primitives";
 
 interface ShareDraftModalProps {
   open: boolean;
@@ -87,13 +88,13 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
             </p>
             <div className="mt-4 flex items-center gap-2 rounded-lg border px-3 py-2" style={{ borderColor: "var(--color-border-default)" }}>
               <span className="flex-1 truncate text-body font-mono" style={{ color: "var(--color-text-primary)" }}>{createdUrl}</span>
-              <button onClick={handleCopy} className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-body-sm font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>
+              <Button size="sm" onClick={handleCopy} className="shrink-0 gap-1">
                 {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                 {copied ? "Copied" : "Copy"}
-              </button>
+              </Button>
             </div>
             <div className="mt-4 flex justify-end">
-              <button onClick={handleClose} className="rounded-lg border px-4 py-2 text-body" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Done</button>
+              <Button variant="ghost" onClick={handleClose}>Done</Button>
             </div>
           </>
         ) : (
@@ -159,15 +160,13 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
             </div>
 
             <div className="mt-5 flex gap-2 justify-end">
-              <button onClick={handleClose} className="rounded-lg border px-4 py-2 text-body" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
-              <button
+              <Button variant="ghost" onClick={handleClose}>Cancel</Button>
+              <Button
                 disabled={!name.trim() || (!!password && password.length < 6) || createMutation.isPending}
                 onClick={() => createMutation.mutate({ siteId, name: name.trim(), password: password || undefined, expiresInDays })}
-                className="rounded-lg px-4 py-2 text-body font-medium text-white disabled:opacity-50"
-                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {createMutation.isPending ? "Creating..." : "Create draft link"}
-              </button>
+              </Button>
             </div>
           </>
         )}

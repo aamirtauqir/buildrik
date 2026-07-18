@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { CheckCircle2, Loader2, Circle, XCircle, RotateCcw } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { usePublishSSE } from "@lib/hooks/use-publish-sse";
+import { Button } from "@/components/dashboard/primitives";
 
 export const PUBLISH_STEPS = [
   "Generating pages",
@@ -71,14 +72,10 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
               <p className="mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 {job?.error ?? "An unexpected error occurred during publishing."}
               </p>
-              <button
-                onClick={onRetry}
-                className="mt-3 flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-white"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
+              <Button onClick={onRetry} className="mt-3">
                 <RotateCcw className="h-4 w-4" />
                 Retry
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -157,21 +154,12 @@ export function PublishProgress({ jobId, onComplete, onCancel, onRetry }: Publis
           {showConfirm ? (
             <div className="flex items-center gap-3 rounded-xl border p-3" style={{ borderColor: "var(--color-border-default)" }}>
               <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Cancel this publish?</p>
-              <button
-                onClick={handleCancelPublish}
-                disabled={cancelMutation.isPending}
-                className="rounded-lg px-3 py-1 text-sm font-medium text-white"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
+              <Button size="sm" onClick={handleCancelPublish} disabled={cancelMutation.isPending}>
                 {cancelMutation.isPending ? "Cancelling..." : "Yes, cancel"}
-              </button>
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="rounded-lg px-3 py-1 text-sm font-medium"
-                style={{ color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}
-              >
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowConfirm(false)}>
                 No
-              </button>
+              </Button>
             </div>
           ) : (
             <button

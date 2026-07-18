@@ -2,7 +2,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Copy, Eye, Trash2, Plus, Lock, Calendar, QrCode } from "lucide-react";
 import { shareUrl } from "@lib/utils";
-import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
+import { Button, SectionCard, MetricValue } from "@/components/dashboard/primitives";
 
 interface ShareLinkEntry { id: string; name: string; token: string; viewCount: number; isActive: boolean; expiresAt: Date | null; passwordHash: string | null; createdAt: Date; }
 
@@ -109,7 +109,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
       <SectionCard
         title="Share Links"
         actions={
-          <button onClick={() => setShowCreate(!showCreate)} className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}><Plus className="h-3 w-3" />New Link</button>
+          <Button size="sm" onClick={() => setShowCreate(!showCreate)} className="gap-1"><Plus className="h-3 w-3" />New Link</Button>
         }
       >
         <p className="mb-4 text-body-sm" style={{ color: "var(--color-text-muted)" }}>
@@ -155,7 +155,7 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                 })}
               </div>
             </div>
-            <button onClick={handleCreate} className="rounded-lg px-4 py-2 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Create Link</button>
+            <Button onClick={handleCreate}>Create Link</Button>
           </div>
         )}
         {shareLinks.length === 0 ? (

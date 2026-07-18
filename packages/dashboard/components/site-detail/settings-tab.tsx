@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { SectionCard } from "@/components/dashboard/primitives";
+import { Button, SectionCard } from "@/components/dashboard/primitives";
 
 const SOCIAL_PLATFORMS = ["twitter", "instagram", "linkedin", "youtube", "github"] as const;
 type SocialPlatform = (typeof SOCIAL_PLATFORMS)[number];
@@ -174,14 +174,9 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
         <div className="space-y-4">
           <Field label="Favicon" hint="ICO, PNG, or SVG. Max 500KB.">
             <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={() => faviconInputRef.current?.click()}
-                className="rounded-lg border px-4 py-2 text-body font-medium"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-              >
+              <Button type="button" variant="ghost" onClick={() => faviconInputRef.current?.click()}>
                 Upload Favicon
-              </button>
+              </Button>
               <input
                 ref={faviconInputRef}
                 type="file"
@@ -200,14 +195,9 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
           </Field>
           <Field label="Touch Icon (180x180 PNG)" hint="Auto-generated from favicon if not set">
             <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={() => touchIconInputRef.current?.click()}
-                className="rounded-lg border px-4 py-2 text-body font-medium"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-              >
+              <Button type="button" variant="ghost" onClick={() => touchIconInputRef.current?.click()}>
                 Upload Touch Icon
-              </button>
+              </Button>
               <input
                 ref={touchIconInputRef}
                 type="file"
@@ -323,25 +313,16 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
             </div>
           ))}
           {visiblePlatforms.length < SOCIAL_PLATFORMS.length && (
-            <button
-              type="button"
-              onClick={addPlatform}
-              className="rounded-lg border px-4 py-2 text-body font-medium"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-            >
+            <Button type="button" variant="ghost" onClick={addPlatform}>
               + Add Social Link
-            </button>
+            </Button>
           )}
         </div>
       </SectionCard>
 
-      <button
-        onClick={handleSave}
-        className="rounded-lg px-6 py-2 text-body font-medium text-white"
-        style={{ backgroundColor: "var(--color-primary)" }}
-      >
+      <Button onClick={handleSave}>
         Save Changes
-      </button>
+      </Button>
     </div>
   );
 }

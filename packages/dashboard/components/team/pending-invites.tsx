@@ -2,7 +2,7 @@
 
 import { cn } from "@lib/utils";
 import { roleLabel } from "@lib/constants/enums";
-import { Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
+import { Button, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 
 type Role = "ADMIN" | "EDITOR" | "VIEWER";
 
@@ -93,15 +93,15 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onResend(invite.id)}
                       disabled={!!resendingId || resendDisabled}
-                      className="rounded-lg border border-[var(--color-border-default)] px-3 py-1.5 text-body-sm font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-50"
-                      style={{ color: "var(--color-text-primary)" }}
                       title={resendDisabled ? "Maximum resends reached" : undefined}
                     >
                       {resendingId === invite.id ? "Sending..." : "Resend"}
-                    </button>
+                    </Button>
                     <button
                       onClick={() => onRevoke(invite.id)}
                       disabled={!!revokingId}

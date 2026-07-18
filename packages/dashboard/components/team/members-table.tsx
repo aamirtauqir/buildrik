@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@lib/utils";
 import { roleLabel } from "@lib/constants/enums";
-import { Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
+import { Button, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 import { MemberActions, type MemberAction } from "./member-actions";
 
 type Role = "OWNER" | "ADMIN" | "EDITOR" | "DESIGNER" | "VIEWER";
@@ -122,13 +122,9 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
           </div>
         </div>
 
-        <button
-          onClick={onClose}
-          className="mt-5 w-full rounded-lg border py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-        >
+        <Button variant="ghost" onClick={onClose} className="mt-5 w-full">
           Close
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -159,13 +155,9 @@ function BulkBar({
         <button onClick={onSelectAll} className="text-body-sm font-medium text-white/80 transition-colors hover:text-white">
           {allSelected ? "Clear all" : "Select all"}
         </button>
-        <button
-          onClick={onRemove}
-          className="rounded-md px-2.5 py-1 text-body-sm font-medium text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "var(--color-error)" }}
-        >
+        <Button variant="danger" size="sm" onClick={onRemove}>
           Remove
-        </button>
+        </Button>
         <button onClick={onCancel} className="text-body-sm font-medium text-white/60 transition-colors hover:text-white">
           Cancel
         </button>
@@ -360,13 +352,9 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
                 );
               })}
             </div>
-            <button
-              onClick={() => setRoleEditMember(null)}
-              className="mt-4 w-full rounded-lg border py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-            >
+            <Button variant="ghost" onClick={() => setRoleEditMember(null)} className="mt-4 w-full">
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       )}

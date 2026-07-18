@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ArrowRight, Plus, Trash2, Download, Upload } from "lucide-react";
-import { StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
+import { Button, StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
 
 export interface RedirectRow {
   id: string;
@@ -82,9 +82,9 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={onExport} className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
+          <Button type="button" variant="ghost" size="sm" onClick={onExport} className="gap-1.5">
             <Download size={14} /> Export
-          </button>
+          </Button>
           {canEdit && (
             <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-body" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
               <Upload size={14} /> Import CSV
@@ -123,9 +123,9 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
                 <option value="301">301</option>
                 <option value="302">302</option>
               </select>
-              <button type="button" onClick={submit} disabled={saving || !fromPath.trim() || !toUrl.trim()} className="inline-flex items-center gap-1 rounded-md bg-[var(--color-primary)] px-3 py-1.5 text-body font-medium text-white hover:opacity-90 disabled:opacity-50">
+              <Button type="button" size="sm" onClick={submit} disabled={saving || !fromPath.trim() || !toUrl.trim()} className="gap-1">
                 <Plus size={14} /> Add
-              </button>
+              </Button>
             </div>
           )}
         </div>

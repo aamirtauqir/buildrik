@@ -6,7 +6,7 @@ import { Briefcase, Plus, Pencil, Trash2, X, MoreHorizontal } from "lucide-react
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
-import { StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
+import { Button, StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
 
 interface ClientRow {
   id: string;
@@ -64,21 +64,12 @@ function NameDialog({
           }}
         />
         <div className="mt-4 flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="rounded-lg border px-4 py-2 text-sm"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
+          <Button variant="ghost" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            onClick={() => trimmed && onSubmit(trimmed)}
-            disabled={!trimmed}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          </Button>
+          <Button onClick={() => trimmed && onSubmit(trimmed)} disabled={!trimmed}>
             {submitLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -109,20 +100,12 @@ function ConfirmDeleteDialog({
           You can reassign them to another client later.
         </p>
         <div className="mt-5 flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="rounded-lg border px-4 py-2 text-sm"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
+          <Button variant="ghost" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          </Button>
+          <Button onClick={onConfirm}>
             Delete client
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -247,14 +230,10 @@ export function ClientsView() {
   ];
 
   const addButton = agencyEnabled ? (
-    <button
-      onClick={() => setCreating(true)}
-      className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white"
-      style={{ backgroundColor: "var(--color-primary)" }}
-    >
+    <Button onClick={() => setCreating(true)} className="gap-1.5">
       <Plus className="h-4 w-4" />
       Add client
-    </button>
+    </Button>
   ) : undefined;
 
   return (

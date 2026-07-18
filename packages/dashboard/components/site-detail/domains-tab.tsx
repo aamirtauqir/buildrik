@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Globe, Shield, Trash2, Star, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { PaywallModal } from "@/components/billing/paywall-modal";
-import { SectionCard, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
+import { Button, SectionCard, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
 
 interface DnsRecordEntry {
   id?: string;
@@ -70,7 +70,7 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
       <SectionCard title="Connect Domain">
         <div className="flex gap-2">
           <input type="text" value={newDomain} onChange={(e) => setNewDomain(e.target.value)} placeholder="www.example.com" className="flex-1 rounded-lg border px-3 py-2 text-body" style={{ borderColor: "var(--color-border-default)" }} />
-          <button onClick={handleConnect} className="rounded-lg px-4 py-2 text-body font-medium text-white" style={{ backgroundColor: "var(--color-primary)" }}>Connect</button>
+          <Button onClick={handleConnect}>Connect</Button>
         </div>
         <div className="mt-3">
           <p className="text-body-sm font-medium mb-1" style={{ color: "var(--color-text-secondary)" }}>DNS provider guides:</p>
@@ -126,13 +126,9 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
                       <Star className="h-3 w-3" />Primary
                     </Pill>
                   ) : (
-                    <button
-                      onClick={() => onSetPrimary(d.id)}
-                      className="rounded-md border px-2 py-1 text-body-sm hover:bg-[var(--color-bg-subtle)]"
-                      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => onSetPrimary(d.id)}>
                       Set as Primary
-                    </button>
+                    </Button>
                   )}
                 </td>
                 <td className="px-5 py-3">

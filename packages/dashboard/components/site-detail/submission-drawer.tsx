@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { X, Trash2 } from "lucide-react";
+import { Button } from "@/components/dashboard/primitives";
 
 export interface FormSubmissionData {
   id: string;
@@ -190,14 +191,10 @@ export function SubmissionDrawer({
             className="border-t px-6 py-4"
             style={{ borderColor: "var(--color-border-default)" }}
           >
-            <button
-              onClick={() => onDelete(submission.id)}
-              className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-body font-medium text-white transition-colors hover:opacity-90"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
+            <Button onClick={() => onDelete(submission.id)} className="w-full">
               <Trash2 className="h-4 w-4" />
               Delete Submission
-            </button>
+            </Button>
           </div>
         )}
       </div>

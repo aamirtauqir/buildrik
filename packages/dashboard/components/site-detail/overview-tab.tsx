@@ -18,7 +18,7 @@ import {
   Search,
   FileCheck,
 } from "lucide-react";
-import { StatCard, SectionCard, MetricValue, Pill } from "@/components/dashboard/primitives";
+import { Button, StatCard, SectionCard, MetricValue, Pill } from "@/components/dashboard/primitives";
 
 export const HEALTH_METRICS = [
   { label: "SEO", key: "seo" as const, icon: Search, tab: "settings" },
@@ -93,14 +93,10 @@ export function OverviewTab({
         <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Something went wrong. Please try again.</p>
         <div className="mt-4 flex items-center gap-3">
           {onRetry && (
-            <button
-              onClick={onRetry}
-              className="flex items-center gap-2 rounded-lg px-4 py-2 text-body font-medium text-white"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
+            <Button onClick={onRetry}>
               <RefreshCw className="h-4 w-4" />
               Retry
-            </button>
+            </Button>
           )}
           <Link
             href="/dashboard/projects"

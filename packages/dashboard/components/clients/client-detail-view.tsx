@@ -6,6 +6,7 @@ import { ArrowLeft, Globe, Plus, Palette, UserPlus, X } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
+import { Button } from "@/components/dashboard/primitives";
 
 interface Branding {
   logoUrl: string | null;
@@ -66,15 +67,13 @@ function BrandingDialog({
           </label>
         </div>
         <div className="mt-5 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
-          <button
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button
             onClick={() => onSave({ logoUrl: orNull(logoUrl), brandColor: orNull(brandColor), customDomain: orNull(customDomain), hideBuildrik })}
             disabled={saving}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            style={{ backgroundColor: "var(--color-primary)" }}
           >
             {saving ? "Saving…" : "Save branding"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -154,16 +153,14 @@ function InviteEditorDialog({
           style={{ borderColor: "var(--color-border-default)" }}
         />
         <div className="mt-5 flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
-          <button
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button
             onClick={() => valid && onSubmit(email.trim(), message.trim())}
             disabled={!valid || saving || siteCount === 0}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            style={{ backgroundColor: "var(--color-primary)" }}
             title={siteCount === 0 ? "Assign at least one site first" : undefined}
           >
             {saving ? "Sending…" : "Send invite"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -268,30 +265,18 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setEditingBranding(true)}
-            className="flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-sm font-medium"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
+          <Button variant="ghost" onClick={() => setEditingBranding(true)} className="gap-1.5">
             <Palette className="h-4 w-4" />
             Branding
-          </button>
-          <button
-            onClick={() => setInviting(true)}
-            className="flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-sm font-medium"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
+          </Button>
+          <Button variant="ghost" onClick={() => setInviting(true)} className="gap-1.5">
             <UserPlus className="h-4 w-4" />
             Invite editor
-          </button>
-          <button
-            onClick={() => setPicking(true)}
-            className="flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          </Button>
+          <Button onClick={() => setPicking(true)} className="gap-1.5">
             <Plus className="h-4 w-4" />
             Assign sites
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -381,13 +366,9 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
                       name={s.name}
                       status={s.status}
                       right={
-                        <button
-                          onClick={() => assignMut.mutate({ siteId: s.id, clientId })}
-                          className="rounded-md px-2.5 py-1 text-xs font-medium text-white"
-                          style={{ backgroundColor: "var(--color-primary)" }}
-                        >
+                        <Button size="sm" onClick={() => assignMut.mutate({ siteId: s.id, clientId })}>
                           Assign
-                        </button>
+                        </Button>
                       }
                     />
                   ))}
