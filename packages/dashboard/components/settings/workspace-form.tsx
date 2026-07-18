@@ -4,10 +4,10 @@ import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
 import { SectionCard } from "@/components/dashboard/primitives";
 
-// Canonical cobalt accent (DESIGN.md). Must be a real hex — the workspace
-// update schema validates accentColor against /^#[0-9A-Fa-f]{6}$/, so the
-// old "var(--color-primary)" default failed validation on any unchanged save.
-const DEFAULT_ACCENT = "#2D6DFF";
+// Canonical product accent (DESIGN.md §Surface Scope). Must be a real hex — the
+// workspace update schema validates accentColor against /^#[0-9A-Fa-f]{6}$/, so
+// a "var(--color-primary)" default failed validation on any unchanged save.
+const DEFAULT_ACCENT = "#406ED6";
 
 const LANGUAGES = [
   { value: "en", label: "English" },

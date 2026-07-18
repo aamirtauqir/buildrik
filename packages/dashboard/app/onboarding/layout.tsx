@@ -4,7 +4,7 @@ import { WizardBoot } from "@/components/onboarding/wizard/wizard-boot";
  *  every frame; it lives here so the provider persists across frame routes. */
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="onb-scope">
+    <div>
       <WizardBoot>{children}</WizardBoot>
     </div>
   );

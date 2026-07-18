@@ -76,7 +76,7 @@ export function EditorErrorScreen({
           padding: "8px 16px",
           fontSize: 14,
           fontWeight: 500,
-          background: "#2D6DFF",
+          background: "var(--color-primary)",
           color: "#FFFFFF",
           border: "none",
           borderRadius: 6,

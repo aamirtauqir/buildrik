@@ -8,20 +8,22 @@
 
 ## Surface Scope (which brand applies where)
 
-Buildrick runs on **one brand accent: cobalt `#2D6DFF`** across editor, auth, and dashboard chrome. Onboarding runs its own scoped blue. Red is reserved for error/danger/destructive everywhere. (Unified 2026-07-12 — the dashboard's former red `#E42313` accent was flipped to cobalt as a deliberate rebrand matching the dc-skin; see changelog.)
+Buildrick runs on **one brand accent: `#406ED6`** across dashboard, auth and onboarding — no scoped exceptions, one blue on screen anywhere. Red is reserved for error/danger/destructive everywhere. (Adopted 2026-07-18 from the founder-supplied UI kit, `docs/design/dashboard-ui-kit.md`; supersedes the cobalt `#2D6DFF` unification of 2026-07-12, which itself had replaced the dashboard's red `#E42313`. See Decisions Log.)
+
+**Editor chrome is the one surface still on cobalt `#2D6DFF`** — it carries its own `--buildrick-*` design system in `packages/editor/`, with its own token contract and CI gates, so it is a separate migration and not yet flipped.
 
 | Surface | Lives in | Accent | Display font | Body font | Audience |
 |---|---|---|---|---|---|
-| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **Cobalt `#2D6DFF`** | General Sans | Inter Tight | Power user mid-flow. Quiet. |
-| **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | **Cobalt `#2D6DFF`** (`--color-primary`, hover `#1950DC`, subtle `#EBF1FF`) | Inter Tight | Inter Tight | Signed-in workspace tasks. |
-| **Auth chrome** (signed-out craftwork) | `app/auth/` | **Cobalt `#2D6DFF`** (`--color-auth-cta`, hover `#1E58D9`) + art rail | Inter Tight | Inter Tight | New visitor / signed-out. |
-| **Onboarding wizard** (scoped exception) | `app/onboarding/` | **Blue `#2563EB`** (`--color-onb-primary`) | Inter | Inter | Post-verification setup. |
+| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **Cobalt `#2D6DFF`** (own `--buildrick-*` DS — not yet migrated) | General Sans | Inter Tight | Power user mid-flow. Quiet. |
+| **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | **`#406ED6`** (`--color-primary`, hover `#2E56B8`, subtle `#EBF1FF`) | Inter | Inter | Signed-in workspace tasks. |
+| **Auth chrome** (signed-out craftwork) | `app/auth/` | **`#406ED6`** (`--color-auth-cta`, hover `#2E56B8`) + art rail | Inter Tight | Inter Tight | New visitor / signed-out. |
+| **Onboarding wizard** | `app/onboarding/` | **`#406ED6`** (`--color-onb-primary`) — no longer a scoped exception | Inter | Inter | Post-verification setup. |
 | **Marketing site** (separate repo) | n/a in this repo | Own brand; not governed here | General Sans | Inter Tight | Cold traffic. |
 
 **Why one accent:** editor, auth, and dashboard are one continuous signed-in-adjacent product; a single cobalt accent reads as one brand. Onboarding keeps its blue per the M2 spec.
 
 Rules:
-- **Cobalt `#2D6DFF` is the single accent** for CTAs, links, active states, focus rings across editor + auth + dashboard.
+- **`#406ED6` is the single accent** for CTAs, links, active states and focus rings across dashboard + auth + onboarding. (Editor chrome still runs cobalt `#2D6DFF` in its own DS — separate migration.)
 - **Red means error/danger/destructive only** (delete confirm, FAILED status, validation, over-limit, dunning) — on every surface. Never a red CTA or accent.
 - Purple/violet/indigo remain **banned** as accents (AI-slop guard). **One narrow
   exception (user-approved 2026-07-18):** third-party *brand* colours on the
@@ -35,7 +37,7 @@ Rules:
 
 The **`app/auth/**` screens** (login, signup, 2FA, OTP, magic-link, forgot/reset, verify-email, workspace, invite, error/state screens) run a distinct **craftwork** visual language on the shared cobalt accent.
 
-- **Accent = cobalt `#2D6DFF`** (`--color-auth-cta`, hover `#1E58D9`). Same accent as the rest of the dashboard now; the craftwork treatment below is what's auth-specific.
+- **Accent = `#406ED6`** (`--color-auth-cta`, hover `#2E56B8`). Same accent as the rest of the product; the craftwork treatment below is what's auth-specific.
 - **Art rail** — a two-column floating white card (`AuthCard`) with a cobalt illustration (`AuthArt`) left, form right. The "no gradients / no decorative illustration" aesthetic rule does **not** apply to the auth art rail; it still applies to the rest of the dashboard.
 - **Gray-fill icon inputs** — `--color-auth-input-fill`, left icon, cobalt focus.
 - Source of truth: `app/globals.css` `--color-auth-*` tokens + `components/auth/*`.
@@ -48,13 +50,13 @@ The **`app/auth/**` screens** (login, signup, 2FA, OTP, magic-link, forgot/reset
 - **Deliberate deviations from the frames** (user-confirmed 2026-07-13): sign-in keeps the **GitHub button** and the **"Remember me"** checkbox. The frames omit both, but GitHub OAuth is live and `rememberMe` really drives session lifetime — dropping the checkbox would silently pin every session short.
 - **Not implemented, by design:** the frames' "N attempts remaining" counters. Login/2FA errors are generic *on purpose* to deny a user-enumeration oracle; surfacing counts would reverse that. Likewise the lockout countdown, workspace site counts and the device-alert Device/Location/Time table have no backing data (the device fingerprint is a one-way hash). Do not fabricate them.
 
-### Onboarding Surface — M2 Wizard (2026-07-11, scoped exception)
+### Onboarding Surface — M2 Wizard (2026-07-11; scoped exception RETIRED 2026-07-18)
 
-The **`app/onboarding/**` wizard** (post-verification setup: workspace → first site → path chooser → AI/template/blank → editor) runs its own **primary blue `#2563EB`**, distinct from the cobalt `#2D6DFF` used everywhere else. This is an approved scoped exception, re-confirmed by the user on 2026-07-13.
+The **`app/onboarding/**` wizard** (post-verification setup: workspace → first site → path chooser → AI/template/blank → editor) **no longer runs a scoped blue.** It now uses the single product accent `#406ED6`, like the dashboard and auth. History: it shipped on `#2563EB`, was flipped to cobalt `#2D6DFF` on 2026-07-18 to match the v3 frame gallery, and moved to `#406ED6` with the UI-kit adoption the same day. The `.onb-scope` focus-ring override was removed with the exception — there is nothing left to scope.
 
-- Accent = `--color-onb-primary` `#2563EB` (hover `#1D4FD7`, tint `#EFF6FF`). Primary CTAs, active stepper dot, progress fill, selected cards, links inside onboarding.
+- Accent = `--color-onb-primary` `#406ED6` (hover `#2E56B8`, tint `#EBF1FF`). Primary CTAs, active stepper dot, progress fill, selected cards, links inside onboarding.
 - Full token set: `--color-onb-*` + `--radius-onb` / `--spacing-onb-*` / `--container-onb` / `--text-onb-*` in `app/globals.css`. Inter type scale (titles 26/700).
-- Scoped to `app/onboarding/` only. Do not spread `#2563EB` past it. Editor, auth, and the dashboard proper are all cobalt `#2D6DFF`. Because the global `*:focus-visible` ring is cobalt, `.onb-scope` (set on the onboarding layout) re-points it at `--color-onb-primary` so only one blue is ever on screen.
+- The `--color-onb-*` token set still exists and still owns onboarding's geometry/neutrals/type; only the accent stopped diverging. The global `*:focus-visible` ring resolves to `--color-primary`, which onboarding now shares, so one blue is on screen without any scoping.
 - **The accent is the only thing that diverges from the M2 frame gallery.** Geometry, neutrals, and type are taken from it literally: 180px header (brand tile 48/40, Skip 48/46, step indicator at 92), 480px content column, 46px inputs, 50px CTA (15px/700).
 - Text is slate, not black: `onb-text` `#334155` is the darkest tone (titles, labels *and* body). There is deliberately **no** near-black `onb-ink` token — it was removed 2026-07-13 as a duplicate.
 - Inputs are **filled, not outlined**: `onb-field` `#EAF1FF` on a 1px `onb-field-ring` `#D3E1FF` inset ring; the error state drops to a white fill with a 1.5px `onb-error` ring. Rings are inset shadows so state changes never shift layout.
@@ -315,6 +317,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-07-18 | **Single accent → `#406ED6` (UI kit); onboarding's scoped blue retired** | Founder adopted the supplied UI kit (`docs/design/dashboard-ui-kit.md`) over the cobalt reskin values, and chose to flip auth + onboarding with the dashboard so the kit's "one blue" rule (§7.2) actually holds. `--color-primary`, `--color-auth-cta` and `--color-onb-primary` all → `#406ED6` (hover `#2E56B8`); `--color-nav-label-active` → `#2E56B8`. The `.onb-scope` focus override and the short-lived `.dash-scope` override were both deleted — with one accent there is nothing to scope, and the global ring now resolves to `--color-primary`. Supersedes the 2026-07-12 RED→COBALT unification for these three surfaces. **Editor chrome remains cobalt `#2D6DFF`** in its own `--buildrick-*` DS (separate token contract + CI gates) and is a pending migration — until it lands, editor and app chrome differ. |
 | 2026-07-18 | **Anti-Slop Rules scoped to editor chrome; dashboard allowances made explicit** | The 12 anti-slop rules sat at top level and read as global, but were written alongside the editor Rail/Composition specs. As global rules they contradicted shipped dashboard code on four counts — card elevation shadows (#10), the ink `#141924` featured surface and filter chip (#1), per-app brand tile colours (#11), and the multi-column grid of coloured icon tiles (#3) — and the Dashboard section already prescribed `shadow-card`, so the doc contradicted itself. Rules retitled editor-chrome-only; the dashboard section now lists what it explicitly allows. The editor keeps the guard (light chrome / no-black is a real decision there). Cobalt remains the single accent everywhere — brand tile colours are illustrative data, never accents. Also scoped the "never name a specific fallback font" typography rule to the editor, since the dashboard deliberately sets `'Inter', 'Inter Tight', sans-serif` on its shell root. No code change. |
 | 2026-07-10 | **Auth surface → craftwork (cobalt + art rail)** | User-approved reskin of all `app/auth/**` screens to the "craftwork" design language: cobalt `#2D6DFF` accent, two-column floating card with art rail, gray-fill icon inputs. Scoped exception to the red dashboard brand — auth only; settings/billing/onboarding stay red. Business logic unchanged. See §Auth Surface — Craftwork. |
 | 2026-07-12 | **Dashboard accent flip RED → COBALT (brand unification)** | User-approved rebrand: the dashboard chrome's former red `#E42313` accent flips to cobalt `#2D6DFF`, matching the dc-skin and unifying with editor + auth (both already cobalt). Token change: `--color-primary` `#E42313`→`#2D6DFF`, `--color-primary-hover`→`#1950DC`, added `--color-primary-subtle` `#EBF1FF`, `--color-error`→`#DC2626`, focus outline→cobalt. Semantic reds (error/danger/destructive/FAILED) unchanged. Purple stays banned. Two-accent system retired → single cobalt (+ onboarding's scoped blue). Business logic unchanged. |

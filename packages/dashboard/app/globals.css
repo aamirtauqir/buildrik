@@ -5,10 +5,10 @@
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
   /* Auth colors — craftwork surface (cobalt accent, auth-only; see DESIGN.md §Auth Surface) */
-  --color-auth-cta: #2D6DFF;
-  --color-auth-cta-hover: #1E58D9;
+  --color-auth-cta: #406ED6;
+  --color-auth-cta-hover: #2E56B8;
   --color-auth-input-border: #E2E8F0;
-  --color-auth-input-focus: #2D6DFF;
+  --color-auth-input-focus: #406ED6;
   --color-auth-input-error: #E5484D;
   --color-auth-error-text: #C0343A;
   --color-auth-input-fill: #EAF1FF;
@@ -23,7 +23,7 @@
   --color-auth-text-secondary: #111113;
   --color-auth-text-muted: #6B6B70;
   --color-auth-text-placeholder: #9A9AA0;
-  --color-auth-link: #2D6DFF;
+  --color-auth-link: #406ED6;
   /* Banner fills are tinted inline (9% of the status colour); the frames carry
      no border, so the old bg/border pairs are gone rather than left dead. */
   --color-auth-success-text: #12805C;
@@ -82,8 +82,10 @@
      AND the pure-gray neutrals with the mockup's slate-tinted scale. Error and
      destructive stay red: red now means error/danger only. */
   /* UI-kit tokens (docs/design/dashboard-ui-kit.md, adopted 2026-07-18 —
-     founder chose the kit over the prior cobalt reskin values). Dashboard only:
-     auth (--color-auth-*) and onboarding (--color-onb-*) keep cobalt #2D6DFF. */
+     founder chose the kit over the prior cobalt reskin values). #406ED6 is now
+     the single product accent: dashboard, auth and onboarding all run it, so
+     only one blue is on screen anywhere. Editor chrome still ships cobalt in
+     its own --buildrick-* DS and is a separate migration. */
   --color-primary: #406ED6;
   --color-primary-hover: #2E56B8;
   --color-primary-subtle: #EBF1FF;
@@ -118,7 +120,7 @@
   /* Sidebar nav item states (design: Shell.dc.html) */
   --color-nav-item-active-bg: #EBF1FF;
   --color-nav-label: #475569;
-  --color-nav-label-active: #1950DC;
+  --color-nav-label-active: #2E56B8;
   /* Status fg/bg — status.live=success, review=warning, failed=error, draft=neutral */
   --color-status-live-bg: #DCFCE7;   --color-status-live-fg: #15803D;
   --color-status-review-bg: #FEF3C7; --color-status-review-fg: #D97706;
@@ -168,11 +170,12 @@
   --text-body-sm: 12px;
   --text-body-sm--line-height: 1.35;
 
-  /* Onboarding (M2 wizard) — accent unified to cobalt #2D6DFF to match the v3
-     frame gallery (2026-07-18, reverses the earlier scoped-blue #2563EB). Fields
-     are white/outlined; the numbered stepper + neutrals track the v3 gallery. */
-  --color-onb-primary: #2D6DFF;
-  --color-onb-primary-hover: #1950DC;
+  /* Onboarding (M2 wizard) — no longer a scoped blue. It tracked the v3 gallery
+     at cobalt #2D6DFF (2026-07-18, which had already reversed the earlier
+     #2563EB), and now follows the single product accent #406ED6. Fields are
+     white/outlined; the numbered stepper + neutrals track the v3 gallery. */
+  --color-onb-primary: #406ED6;
+  --color-onb-primary-hover: #2E56B8;
   --color-onb-primary-tint: #EBF1FF;
   --color-onb-text: #334155;
   --color-onb-muted: #63748B;
@@ -200,23 +203,11 @@
   --text-onb-title--font-weight: 700;
 }
 
-/* Focus indicators. Base stays cobalt for auth + editor, whose accents are
-   still #2D6DFF; the dashboard and onboarding re-point it at their own scoped
-   accent below so only one blue is ever on a given surface. */
+/* Focus indicators — one accent for every surface (UI kit §6: never remove the
+   ring). Dashboard, auth and onboarding all resolve to #406ED6. */
 *:focus-visible {
-  outline: 2px solid #2D6DFF;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-}
-
-/* Dashboard runs the UI-kit accent (#406ED6), so its focus ring follows it. */
-.dash-scope *:focus-visible {
-  outline-color: var(--color-primary);
-}
-
-/* The onboarding wizard runs a scoped blue (DESIGN.md §Onboarding Surface), so
-   the cobalt focus ring above would show a second, conflicting accent there. */
-.onb-scope *:focus-visible {
-  outline-color: var(--color-onb-primary);
 }
 
 /* Reduced motion */

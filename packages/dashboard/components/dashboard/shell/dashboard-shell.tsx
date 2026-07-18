@@ -23,7 +23,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className="dash-scope min-h-screen [font-variant-numeric:tabular-nums]"
+      className="min-h-screen [font-variant-numeric:tabular-nums]"
       style={{ backgroundColor: "var(--color-bg-surface)", fontFamily: "'Inter', 'Inter Tight', sans-serif" }}
     >
       <TopNav onSearch={() => setPaletteOpen(true)} />
