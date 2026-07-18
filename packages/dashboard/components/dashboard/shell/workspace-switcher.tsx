@@ -5,17 +5,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ChevronsUpDown, Check, Plus } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { MetricValue } from "@/components/dashboard/primitives";
-
-const PLAN_LABELS: Record<string, string> = { FREE: "Free", PRO: "Pro", BUSINESS: "Business" };
 
 function initials(name?: string) {
   if (!name) return "W";
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 }
 
-/** Workspace switcher — the first card in the sidebar (dc mockup): ink tile +
- *  name + "Plan · N seats" mono + chevrons, opening a full-width dropdown. */
+/** Workspace switcher — the first card in the sidebar: ink tile + workspace
+ *  name + chevrons, opening a full-width dropdown. */
 export function WorkspaceSwitcher() {
   const { data: session, update } = useSession();
   const router = useRouter();
@@ -24,13 +21,10 @@ export function WorkspaceSwitcher() {
   const ref = useRef<HTMLDivElement>(null);
 
   const list = trpc.account.workspace.listMine.useQuery();
-  const health = trpc.dashboard.health.useQuery(undefined, { staleTime: 60_000 });
 
   const currentId = (session?.user as { workspaceId?: string | null } | undefined)?.workspaceId ?? null;
   const workspaces = list.data ?? [];
   const current = workspaces.find((w) => w.id === currentId) ?? workspaces[0];
-  const plan = health.data?.plan ?? "FREE";
-  const seats = current?.memberCount ?? 1;
 
   useEffect(() => {
     if (!open) return;
@@ -60,9 +54,6 @@ export function WorkspaceSwitcher() {
         <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-md text-body-sm font-bold text-white" style={{ backgroundColor: "var(--color-ink)" }}>{initials(current?.name)}</span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13.5px] font-bold leading-tight" style={{ color: "var(--color-text-primary)" }}>{current?.name ?? "Workspace"}</span>
-          <span className="block text-eyebrow" style={{ color: "var(--color-text-secondary)" }}>
-            <MetricValue>{PLAN_LABELS[plan] ?? plan} · {seats} seat{seats === 1 ? "" : "s"}</MetricValue>
-          </span>
         </span>
         <ChevronsUpDown className="h-4 w-4 shrink-0" style={{ color: "var(--color-text-muted)" }} />
       </button>

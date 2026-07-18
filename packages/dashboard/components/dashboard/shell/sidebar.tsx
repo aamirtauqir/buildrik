@@ -8,12 +8,9 @@ import {
 } from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
-import { PLAN_LIMITS } from "@lib/constants/plan-limits";
-import { MetricValue, Pill, ProgressBar } from "@/components/dashboard/primitives";
+import { MetricValue, ProgressBar } from "@/components/dashboard/primitives";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { NAV_GROUPS, isActiveRoute, type NavGroup, type NavIcon } from "./nav";
-
-const PLAN_LABELS: Record<string, string> = { FREE: "Free", PRO: "Pro", BUSINESS: "Business" };
 
 const iconMap: Record<NavIcon, typeof Home> = {
   Home, LayoutGrid, Users, Image: ImageIcon, LayoutTemplate,
@@ -55,37 +52,28 @@ function MobileTabBar() {
   );
 }
 
-// Bottom-pinned plan card (design: Shell.dc.html). Plan comes from the same
-// dashboard.usage query the old storage card read; site usage reuses the
-// totalSites count the sidebar already fetches for the Projects nav badge —
-// no new query, just PLAN_LIMITS (existing client-side constant) for the cap.
-function PlanCard({ totalSites }: { totalSites: number | undefined }) {
+function StorageCard() {
   const usage = trpc.dashboard.usage.useQuery(undefined, { staleTime: 60_000 });
+  const storage = usage.data?.metrics.find((m) => m.key === "storage");
   const plan = usage.data?.plan ?? "FREE";
-  const limit = PLAN_LIMITS[plan].sites as number;
-  const used = totalSites ?? 0;
+  const used = storage?.used ?? 0;
+  const limit = storage?.limit ?? 0;
   const pct = limit > 0 ? Math.min((used / limit) * 100, 100) : 0;
 
   return (
-    <div className="border-t px-5 pt-3.5 pb-4" style={{ borderColor: "var(--color-border-default)" }}>
+    <div className="rounded-lg p-3" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
       <div className="flex items-center justify-between">
-        <p className="text-[13px] font-semibold" style={{ color: "var(--color-text-primary)" }}>Plan</p>
-        <Pill tone="neutral">{PLAN_LABELS[plan] ?? plan}</Pill>
-      </div>
-      <div className="mt-2.5 flex items-center justify-between">
-        <span className="text-[11px]" style={{ color: "var(--color-text-secondary)" }}>Sites</span>
-        <span className="text-[12px] font-medium" style={{ color: "var(--color-text-primary)" }}>
-          <MetricValue>{used} / {limit > 0 ? limit : "∞"}</MetricValue>
+        <p className="text-body-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>Storage</p>
+        <span className="text-eyebrow" style={{ color: "var(--color-text-secondary)" }}>
+          <MetricValue>{used} / {limit > 0 ? limit : "∞"} GB</MetricValue>
         </span>
       </div>
-      <ProgressBar pct={pct} className="mt-1.5" />
-      <Link
-        href="/dashboard/settings/plans"
-        className="mt-2.5 inline-flex items-center gap-1 text-[12px] font-medium hover:underline"
-        style={{ color: "var(--color-primary)" }}
-      >
-        Upgrade <ArrowUpRight className="h-3 w-3" />
-      </Link>
+      <ProgressBar pct={pct} tone="accent" className="mt-2" />
+      {plan === "FREE" && (
+        <Link href="/dashboard/settings/plans" className="mt-2 flex items-center gap-1 text-body-sm font-semibold hover:underline" style={{ color: "var(--color-primary)" }}>
+          Upgrade plan <ArrowUpRight className="h-3 w-3" />
+        </Link>
+      )}
     </div>
   );
 }
@@ -125,22 +113,11 @@ export function Sidebar() {
                   const count = navCount[item.href];
                   return (
                     <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          "flex items-center gap-[11px] rounded-lg px-[9px] py-2 text-[13.5px] transition-colors",
-                          active ? "font-semibold" : "font-normal hover:bg-[var(--color-bg-subtle)]"
-                        )}
-                        style={{
-                          backgroundColor: active ? "var(--color-nav-item-active-bg)" : "transparent",
-                          boxShadow: active ? "inset 3px 0 0 var(--color-primary)" : undefined,
-                          color: active ? "var(--color-nav-label-active)" : "var(--color-nav-label)",
-                        }}
-                      >
-                        <Icon
-                          className="h-[18px] w-[18px] shrink-0"
-                          style={{ color: active ? "var(--color-primary)" : "var(--color-text-primary)" }}
-                        />
+                      <Link href={item.href} className={cn(
+                        "flex items-center gap-[11px] rounded-lg px-[9px] py-2 text-[13.5px] transition-colors",
+                        active ? "bg-[var(--color-primary-subtle)] font-semibold text-[var(--color-primary)]" : "font-[520] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-text-primary)]"
+                      )}>
+                        <Icon className="h-[18px] w-[18px] shrink-0" />
                         {item.label}
                         {count != null && count > 0 && (
                           <span
@@ -159,8 +136,8 @@ export function Sidebar() {
           ))}
         </nav>
 
-        <div className="shrink-0">
-          <PlanCard totalSites={stats.data?.totalSites} />
+        <div className="shrink-0 p-3.5">
+          <StorageCard />
         </div>
       </aside>
 
