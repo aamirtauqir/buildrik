@@ -28,7 +28,7 @@ export function StatCard({
   const inner = (
     <>
       <div className="flex items-start justify-between gap-2">
-        <p className="text-[10.5px] font-bold uppercase tracking-[0.07em]" style={{ color: "var(--color-text-muted)" }}>{label}</p>
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ color: "var(--color-text-secondary)" }}>{label}</p>
         {visual ? (
           <div className="shrink-0">{visual}</div>
         ) : icon ? (
@@ -42,17 +42,17 @@ export function StatCard({
       {delta && <div className="mt-[5px] text-[12px]" style={{ color: "var(--color-text-secondary)" }}>{delta}</div>}
     </>
   );
-  // Artifact stat tile: 10px radius, 15/16/13 padding, subtle two-stop card shadow.
+  // Artifact stat tile: 12px radius, 15/16/13 padding, inset-ring + soft card shadow.
   const cardStyle = {
     borderColor: "var(--color-border-default)",
     backgroundColor: "var(--color-bg-surface)",
-    borderRadius: "10px",
+    borderRadius: "12px",
     padding: "15px 16px 13px",
-    boxShadow: "0 1px 2px rgba(15,23,41,.04), 0 1px 3px rgba(15,23,41,.05)",
+    boxShadow: "var(--shadow-card)",
   };
   if (href) {
     return (
-      <Link href={href} className={cn("block border transition-colors hover:border-[var(--color-primary)]", className)} style={cardStyle}>{inner}</Link>
+      <Link href={href} className={cn("block border transition-colors hover:[box-shadow:var(--shadow-card-hover)]", className)} style={cardStyle}>{inner}</Link>
     );
   }
   return <div className={cn("border", className)} style={cardStyle}>{inner}</div>;
