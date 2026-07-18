@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SectionCard, MetricValue } from "@/components/dashboard/primitives";
+import { SectionCard, MetricValue, Button } from "@/components/dashboard/primitives";
 
 interface PreviousExport {
   id: string;
@@ -146,15 +146,9 @@ export function DangerZoneTab({
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={onExport}
-          disabled={isExporting}
-          className="px-4 py-2 text-sm font-medium rounded-md border disabled:opacity-60"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-        >
+        <Button type="button" variant="ghost" onClick={onExport} disabled={isExporting}>
           {isExporting ? "Preparing export..." : "Export My Data"}
-        </button>
+        </Button>
       </section>
 
       <div style={{ borderTop: "1px solid var(--color-border-default)" }} />
@@ -216,14 +210,9 @@ export function DangerZoneTab({
         </p>
 
         {!showDeleteForm ? (
-          <button
-            type="button"
-            onClick={() => setShowDeleteForm(true)}
-            className="px-4 py-2 text-sm font-medium rounded-md text-white"
-            style={{ backgroundColor: "#7F1D1D" }}
-          >
+          <Button type="button" variant="danger" onClick={() => setShowDeleteForm(true)}>
             I want to delete my account
-          </button>
+          </Button>
         ) : (
           <form onSubmit={handleDelete} className="space-y-4 max-w-sm">
             <div>
@@ -263,26 +252,20 @@ export function DangerZoneTab({
             </div>
 
             <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={!canDelete}
-                className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-50"
-                style={{ backgroundColor: "#dc2626" }}
-              >
+              <Button type="submit" variant="danger" disabled={!canDelete}>
                 Delete Account
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => {
                   setShowDeleteForm(false);
                   setConfirmText("");
                   setReason("");
                 }}
-                className="px-4 py-2 text-sm font-medium rounded-md border"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         )}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MailCheck } from "lucide-react";
-import { SectionCard, Pill } from "@/components/dashboard/primitives";
+import { SectionCard, Pill, Button } from "@/components/dashboard/primitives";
 
 interface ConnectedAccount {
   provider: "google" | "github";
@@ -210,14 +210,9 @@ export function AccountTab({
             )}
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          <Button type="submit" disabled={saving}>
             {saving ? "Saving..." : isSocialOnly ? "Set password" : "Update password"}
-          </button>
+          </Button>
         </form>
       </SectionCard>
 
@@ -304,14 +299,9 @@ export function AccountTab({
             </p>
           )}
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          <Button type="submit" disabled={saving}>
             {saving ? "Sending..." : "Send confirmation link"}
-          </button>
+          </Button>
         </form>
         </>
         )}
@@ -341,23 +331,13 @@ export function AccountTab({
                   )}
                 </div>
                 {connected ? (
-                  <button
-                    type="button"
-                    onClick={() => onDisconnectAccount?.(provider)}
-                    className="text-sm px-3 py-1 rounded-md border"
-                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-                  >
+                  <Button type="button" variant="ghost" size="sm" onClick={() => onDisconnectAccount?.(provider)}>
                     Disconnect
-                  </button>
+                  </Button>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => onConnectAccount?.(provider)}
-                    className="text-sm px-3 py-1 rounded-md border"
-                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-                  >
+                  <Button type="button" variant="ghost" size="sm" onClick={() => onConnectAccount?.(provider)}>
                     Connect
-                  </button>
+                  </Button>
                 )}
               </div>
             );

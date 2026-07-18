@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/dashboard/primitives";
 
 /** Confirm-by-typing modal for irreversible workspace deletion. Shared by the
  *  consolidated settings page and the /settings/workspace sub-route so the
@@ -56,23 +57,12 @@ export function DeleteWorkspaceModal({
         </div>
 
         <div className="flex justify-end gap-2 mt-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-sm rounded-md border"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-          >
+          <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={!matches || deleting}
-            className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-            style={{ backgroundColor: "var(--color-error)" }}
-          >
+          </Button>
+          <Button type="button" variant="danger" onClick={onConfirm} disabled={!matches || deleting}>
             {deleting ? "Deleting…" : "Delete workspace"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

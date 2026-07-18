@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
-import { Pill, MetricValue } from "@/components/dashboard/primitives";
+import { Pill, MetricValue, Button } from "@/components/dashboard/primitives";
 
 function parseUserAgent(ua: string | null | undefined): string {
   if (!ua) return "Unknown device";
@@ -201,14 +201,9 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                 {setupData.secret}
               </code>
             </div>
-            <button
-              type="button"
-              onClick={() => setSetupStep("backup")}
-              className="text-sm px-3 py-1.5 rounded-md font-medium text-white"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
+            <Button type="button" size="sm" onClick={() => setSetupStep("backup")}>
               Next: View backup codes
-            </button>
+            </Button>
           </div>
         )}
 
@@ -234,14 +229,9 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                 </code>
               ))}
             </div>
-            <button
-              type="button"
-              onClick={() => setSetupStep("verify")}
-              className="text-sm px-3 py-1.5 rounded-md font-medium text-white"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
+            <Button type="button" size="sm" onClick={() => setSetupStep("verify")}>
               Next: Verify setup
-            </button>
+            </Button>
           </div>
         )}
 
@@ -272,15 +262,14 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                 className="text-sm px-3 py-1.5 rounded-md border w-32 font-mono"
                 style={{ borderColor: "var(--color-border-default)" }}
               />
-              <button
+              <Button
                 type="button"
+                size="sm"
                 onClick={handleConfirm}
                 disabled={verifyCode.length !== 6 || confirmMutation.isPending}
-                className="text-sm px-3 py-1.5 rounded-md font-medium text-white disabled:opacity-60"
-                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {confirmMutation.isPending ? "Verifying..." : "Verify & Enable"}
-              </button>
+              </Button>
             </div>
             <button
               type="button"
@@ -328,15 +317,14 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                 className="text-sm px-3 py-1.5 rounded-md border w-48"
                 style={{ borderColor: "var(--color-border-default)" }}
               />
-              <button
+              <Button
                 type="button"
+                size="sm"
                 onClick={handleDisable}
                 disabled={disableMutation.isPending}
-                className="text-sm px-3 py-1.5 rounded-md font-medium text-white disabled:opacity-60"
-                style={{ backgroundColor: "var(--color-primary)" }}
               >
                 {disableMutation.isPending ? "Disabling..." : "Disable 2FA"}
-              </button>
+              </Button>
             </div>
             <button
               type="button"

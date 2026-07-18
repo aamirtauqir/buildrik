@@ -6,7 +6,7 @@ import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { INTEGRATION_CONFIGS } from "@/components/settings/integrations-tab";
-import { SectionCard, Pill, MetricValue } from "@/components/dashboard/primitives";
+import { SectionCard, Pill, MetricValue, Button } from "@/components/dashboard/primitives";
 
 /** dc categorical tints cycled across the integration tiles (teal→amber→primary→pink). */
 const TILE_TINTS = ["var(--color-teal)", "var(--color-amber)", "var(--color-primary)", "var(--color-pink)"];
@@ -85,14 +85,9 @@ function IntegrationCard({
 
 function ConnectButton({ onClick, children }: { onClick: (e: React.MouseEvent) => void; children: ReactNode }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="rounded-md border px-3 py-1.5 text-sm font-medium hover:bg-[var(--color-bg-subtle)]"
-      style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }}
-    >
+    <Button type="button" variant="ghost" size="sm" onClick={onClick}>
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -165,15 +160,16 @@ function VercelCard({ workspaceId }: { workspaceId: string }) {
             </p>
           )}
         </div>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
+          className="shrink-0"
           onClick={() => disconnect.mutate({ workspaceId })}
           disabled={disconnect.isPending}
-          className="shrink-0 rounded-md border px-3 py-1.5 text-sm font-medium disabled:opacity-60"
-          style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}
         >
           {disconnect.isPending ? "Disconnecting…" : "Disconnect"}
-        </button>
+        </Button>
       </div>
     </IntegrationCard>
   );
@@ -303,55 +299,44 @@ export function IntegrationsContent() {
                 <div className="flex flex-wrap items-center gap-2 pt-1">
                   {connection ? (
                     <>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => updateMutation.mutate({ id: connection.id, config: { ...existing, ...(drafts[cfg.provider] ?? {}) } })}
                         disabled={saving}
-                        className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-                        style={{ backgroundColor: "var(--color-primary)" }}
                       >
                         {saving ? "Saving…" : "Save changes"}
-                      </button>
+                      </Button>
                       {hasWebhook && (
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
                           onClick={() => testEventMutation.mutate({ id: connection.id })}
                           disabled={saving}
-                          className="rounded-md border px-3 py-2 text-sm font-medium disabled:opacity-60"
-                          style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }}
                         >
                           Send test event
-                        </button>
+                        </Button>
                       )}
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
                         onClick={() => removeMutation.mutate({ id: connection.id })}
                         disabled={saving}
-                        className="rounded-md border px-3 py-2 text-sm font-medium disabled:opacity-60"
-                        style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}
                       >
                         Disconnect
-                      </button>
+                      </Button>
                     </>
                   ) : (
                     <>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => addMutation.mutate({ provider: cfg.provider, config: drafts[cfg.provider] ?? {} })}
                         disabled={saving}
-                        className="rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-                        style={{ backgroundColor: "var(--color-primary)" }}
                       >
                         {saving ? "Connecting…" : "Save & connect"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setExpandedProvider(null)}
-                        className="rounded-md border px-3 py-2 text-sm font-medium"
-                        style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-surface)" }}
-                      >
+                      </Button>
+                      <Button type="button" variant="ghost" onClick={() => setExpandedProvider(null)}>
                         Cancel
-                      </button>
+                      </Button>
                     </>
                   )}
                 </div>

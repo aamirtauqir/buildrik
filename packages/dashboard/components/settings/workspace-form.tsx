@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
-import { SectionCard } from "@/components/dashboard/primitives";
+import { SectionCard, Button } from "@/components/dashboard/primitives";
 
 // Canonical product accent (DESIGN.md §Surface Scope). Must be a real hex — the
 // workspace update schema validates accentColor against /^#[0-9A-Fa-f]{6}$/, so
@@ -344,14 +344,9 @@ export function WorkspaceForm({
         </div>
 
         <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          <Button type="submit" disabled={saving}>
             {saving ? "Saving\u2026" : "Save changes"}
-          </button>
+          </Button>
         </div>
       </form>
       </SectionCard>
@@ -448,14 +443,9 @@ export function WorkspaceForm({
         </div>
 
         <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
+          <Button type="submit" disabled={saving}>
             {saving ? "Saving\u2026" : "Save sharing settings"}
-          </button>
+          </Button>
         </div>
       </form>
       </SectionCard>

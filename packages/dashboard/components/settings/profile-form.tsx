@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
+import { Button } from "@/components/dashboard/primitives";
 
 const LANGUAGES = [
   { value: "en", label: "English" },
@@ -146,24 +147,19 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
         )}
         <div>
           <div className="flex items-center gap-2">
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="text-sm font-medium px-3 py-1.5 rounded-md border disabled:opacity-60"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
             >
               {uploading ? "Uploading…" : "Upload photo"}
-            </button>
+            </Button>
             {avatarShown && (
-              <button
-                type="button"
-                onClick={handleRemovePhoto}
-                className="text-sm font-medium px-3 py-1.5 rounded-md border"
-                style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-              >
+              <Button type="button" variant="ghost" size="sm" onClick={handleRemovePhoto}>
                 Remove photo
-              </button>
+              </Button>
             )}
           </div>
           <input
@@ -297,14 +293,9 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
       </div>
 
       <div className="flex justify-end pt-2">
-        <button
-          type="submit"
-          disabled={saving}
-          className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
-          style={{ backgroundColor: "var(--color-primary)" }}
-        >
+        <Button type="submit" disabled={saving}>
           {saving ? "Saving..." : "Save changes"}
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Key, Plus, Copy, Check, Trash2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { Pill, MetricValue } from "@/components/dashboard/primitives";
+import { Pill, MetricValue, Button } from "@/components/dashboard/primitives";
 
 const SCOPE_LABELS: Record<string, string> = {
   "sites:read": "Read sites",
@@ -83,13 +83,9 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
             For scripting and CI. Scoped, revocable, and never expire unless you set an expiry.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => { resetForm(); setCreating(true); }}
-          className="inline-flex items-center gap-1.5 rounded-md bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
-        >
+        <Button type="button" size="sm" onClick={() => { resetForm(); setCreating(true); }}>
           <Plus size={15} /> New token
-        </button>
+        </Button>
       </div>
 
       {/* Token list */}
@@ -211,15 +207,15 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
               </div>
             </div>
             <div className="mt-5 flex justify-end gap-2">
-              <button type="button" onClick={() => setCreating(false)} className="rounded-md border px-3 py-1.5 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>Cancel</button>
-              <button
+              <Button type="button" variant="ghost" size="sm" onClick={() => setCreating(false)}>Cancel</Button>
+              <Button
                 type="button"
+                size="sm"
                 onClick={submitCreate}
                 disabled={!name.trim() || scopes.length === 0 || create.isPending}
-                className="rounded-md bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
               >
                 {create.isPending ? "Creating…" : "Create token"}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -245,13 +241,9 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
               </button>
             </div>
             <div className="mt-5 flex justify-end">
-              <button
-                type="button"
-                onClick={() => { setPlaintext(null); setCopied(false); }}
-                className="rounded-md bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
-              >
+              <Button type="button" size="sm" onClick={() => { setPlaintext(null); setCopied(false); }}>
                 Done
-              </button>
+              </Button>
             </div>
           </div>
         </div>

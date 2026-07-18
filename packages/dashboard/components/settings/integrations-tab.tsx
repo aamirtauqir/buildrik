@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pill } from "@/components/dashboard/primitives";
+import { Pill, Button } from "@/components/dashboard/primitives";
 
 export const INTEGRATION_CONFIGS = [
   {
@@ -240,14 +240,9 @@ function ZapierConfig({
         </div>
       </div>
       {values["webhookUrl"] && onTestEvent && (
-        <button
-          type="button"
-          onClick={onTestEvent}
-          className="text-xs px-3 py-1.5 rounded-md border font-medium"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={onTestEvent}>
           Send test event
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -386,37 +381,36 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onUpdate, onT
               <div className="flex items-center gap-2">
                 {connection ? (
                   <>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() =>
                         setExpandedProvider(isExpanded ? null : cfg.provider)
                       }
-                      className="text-sm px-3 py-1.5 rounded-md border"
-                      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
                     >
                       {isExpanded ? "Hide" : "Configure"}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onRemove?.(connection.id)}
                       disabled={saving}
-                      className="text-sm px-3 py-1.5 rounded-md border disabled:opacity-60"
-                      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                     >
                       Disconnect
-                    </button>
+                    </Button>
                   </>
                 ) : (
-                  <button
+                  <Button
                     type="button"
+                    size="sm"
                     onClick={() =>
                       setExpandedProvider(isExpanded ? null : cfg.provider)
                     }
-                    className="text-sm px-3 py-1.5 rounded-md font-medium text-white"
-                    style={{ backgroundColor: "var(--color-primary)" }}
                   >
                     Connect
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -434,35 +428,26 @@ export function IntegrationsTab({ connected = [], onAdd, onRemove, onUpdate, onT
                 />
                 <div className="flex gap-2 pt-1">
                   {!connection && (
-                    <button
+                    <Button
                       type="button"
                       onClick={() => handleConnect(cfg.provider)}
                       disabled={saving}
-                      className="text-sm px-4 py-2 rounded-md font-medium text-white disabled:opacity-60"
-                      style={{ backgroundColor: "var(--color-primary)" }}
                     >
                       {saving ? "Connecting\u2026" : "Save & connect"}
-                    </button>
+                    </Button>
                   )}
                   {connection && (
-                    <button
+                    <Button
                       type="button"
                       onClick={() => onUpdate?.(connection.id, values)}
                       disabled={saving}
-                      className="text-sm px-4 py-2 rounded-md font-medium text-white disabled:opacity-60"
-                      style={{ backgroundColor: "var(--color-primary)" }}
                     >
                       {saving ? "Saving\u2026" : "Save changes"}
-                    </button>
+                    </Button>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => setExpandedProvider(null)}
-                    className="text-sm px-4 py-2 rounded-md border"
-                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-                  >
+                  <Button type="button" variant="ghost" onClick={() => setExpandedProvider(null)}>
                     {connection ? "Close" : "Cancel"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
