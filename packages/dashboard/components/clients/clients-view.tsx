@@ -103,7 +103,7 @@ function ConfirmDeleteDialog({
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={onConfirm}>
+          <Button variant="danger" onClick={onConfirm}>
             Delete client
           </Button>
         </div>
