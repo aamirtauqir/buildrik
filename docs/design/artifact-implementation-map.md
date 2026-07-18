@@ -64,7 +64,17 @@ The UI kit adopted earlier was evidently derived from this artifact — the foun
 | Shell geometry pixel-match (S1–S3) | `2d102c5e` | ✅ sidebar 293=293, h1 x=333=333, nav 30=30 |
 | Screen 1 — Home | `17414b37` | ✅ stat cards, LIVE pill, activity rows |
 | Screen 2 — Projects | `b323d82a` | ✅ header matched; grid preserved (C5) |
-| Screens 3–11 | — | pending |
+| Screen 9 — Marketplace | `64bdf06d` | ✅ hero + cards matched; install flow live-verified |
+| Screens 3–8, 10–11 | — | pending |
+
+### Dev-environment note (cost me a full debugging cycle)
+
+After the Marketplace edits the whole app 404'd — every page **and** `/api/auth/session`
+— with no compile error. Route files were on disk, cwd correct, no competing
+`src/app`. Cause: Turbopack's persistent filesystem cache held a module graph with
+no route entries (log ended `✓ Finished filesystem cache database compaction`).
+Fix: stop dev, `rm -rf .next`, restart. It is not a code bug — do not go looking
+for one in the page you just edited.
 
 ## Order of work
 
