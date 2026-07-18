@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, type LucideIcon } from "lucide-react";
 import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory } from "@/lib/marketplace-catalog";
-import { PageHeader, IconChip, InputField } from "@/components/dashboard/primitives";
+import { PageHeader, IconChip, InputField, Button, ButtonLink } from "@/components/dashboard/primitives";
 import { trpc } from "@lib/trpc/client";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -61,7 +61,7 @@ export default function MarketplacePage() {
       <PageHeader title="Marketplace" description="Apps, integrations and templates to extend your sites." />
 
       <InputField
-        wrapperClassName="mb-4"
+        wrapperClassName="mb-6"
         leading={<Search className="h-4 w-4" />}
         type="text"
         value={query}
@@ -78,7 +78,7 @@ export default function MarketplacePage() {
               key={filter}
               type="button"
               onClick={() => setCategory(filter)}
-              className="rounded-full border px-3.5 py-1.5 text-body font-semibold transition-colors"
+              className="rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors"
               style={
                 selected
                   ? { borderColor: "var(--color-ink)", backgroundColor: "var(--color-ink)", color: "#fff" }
@@ -93,28 +93,33 @@ export default function MarketplacePage() {
 
       {/* Featured hero — ink card per the design. */}
       <div
-        className="mb-6 flex flex-col gap-6 rounded-2xl p-8 sm:flex-row sm:items-center sm:justify-between"
+        className="mb-6 flex flex-col gap-6 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between"
         style={{ backgroundColor: "var(--color-ink)" }}
       >
         <div className="min-w-0">
-          <span className="text-eyebrow font-bold uppercase tracking-wide" style={{ color: "var(--color-amber)" }}>Featured</span>
-          <h2 className="mt-2 text-[26px] font-bold leading-tight text-white">{FEATURED_APP.name}</h2>
-          <p className="mt-2 max-w-md text-body" style={{ color: "rgba(255,255,255,0.66)" }}>{FEATURED_APP.description}</p>
+          <span className="text-eyebrow font-bold uppercase" style={{ color: "var(--color-amber)", letterSpacing: "0.66px" }}>Featured</span>
+          <h2 className="mt-2 text-[20px] font-bold leading-tight text-white">{FEATURED_APP.name}</h2>
+          <p className="mt-2 max-w-[420px] text-[13px]" style={{ color: "rgba(255,255,255,0.6)" }}>{FEATURED_APP.description}</p>
           <Link
             href={INTEGRATIONS_HREF}
-            className="mt-5 inline-flex rounded-lg bg-white px-4 py-2.5 text-body font-bold transition-opacity hover:opacity-90"
+            className="mt-3 inline-flex h-[38px] items-center justify-center rounded-[10px] bg-white px-4 text-[13px] font-semibold transition-opacity hover:opacity-90"
             style={{ color: "var(--color-ink)" }}
           >
             {FEATURED_APP.cta}
           </Link>
         </div>
         <div
-          className="hidden h-[150px] w-[260px] shrink-0 items-end justify-center gap-2.5 rounded-xl p-6 sm:flex"
+          className="hidden h-[128px] w-[178px] shrink-0 items-end justify-center gap-[5px] rounded-xl p-[14px] sm:flex"
           style={{ background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%)" }}
           aria-hidden
         >
-          {[42, 74, 30, 92].map((h, i) => (
-            <span key={i} className="w-7 rounded-md" style={{ height: `${h}%`, backgroundColor: `rgba(255,255,255,${i === 3 ? 0.95 : 0.45 + i * 0.1})` }} />
+          {[
+            { h: 34, o: 0.5 },
+            { h: 52, o: 0.8 },
+            { h: 24, o: 0.4 },
+            { h: 44, o: 1 },
+          ].map((bar, i) => (
+            <span key={i} className="w-3.5 rounded-[3px]" style={{ height: `${bar.h}%`, backgroundColor: `rgba(255,255,255,${bar.o})` }} />
           ))}
         </div>
       </div>
@@ -138,43 +143,39 @@ export default function MarketplacePage() {
             return (
               <div
                 key={app.id}
-                className="flex flex-col rounded-xl border p-5 shadow-card"
+                className="flex flex-col gap-3 rounded-xl border p-4 shadow-card"
                 style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
               >
-                <IconChip color={app.color} className="mb-3">
-                  <Icon className="h-5 w-5" />
-                </IconChip>
-                <h3 className="text-body font-bold" style={{ color: "var(--color-text-primary)" }}>{app.name}</h3>
-                <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{app.category}</p>
-                <p className="mt-3 flex-1 text-body" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>
+                <div className="flex items-center gap-3">
+                  <IconChip color={app.color}>
+                    <Icon className="h-5 w-5" />
+                  </IconChip>
+                  <div className="flex min-w-0 flex-col gap-px">
+                    <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{app.name}</h3>
+                    <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{app.category}</p>
+                  </div>
+                </div>
+                <p className="flex-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{app.description}</p>
 
                 {app.action === "Connect" ? (
-                  <Link
-                    href={INTEGRATIONS_HREF}
-                    className="mt-4 rounded-lg border py-2 text-center text-body font-semibold transition-colors hover:bg-[var(--color-bg-subtle)]"
-                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-                  >
+                  <ButtonLink href={INTEGRATIONS_HREF} variant="ghost" className="w-full">
                     Connect
-                  </Link>
+                  </ButtonLink>
                 ) : (
-                  <button
+                  <Button
                     type="button"
+                    variant={isInstalled ? "ghost" : "primary"}
                     disabled={busy}
                     onClick={() => {
                       setActionError(undefined);
                       if (isInstalled) uninstall.mutate({ appId: app.id });
                       else install.mutate({ appId: app.id });
                     }}
-                    className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-lg border py-2 text-body font-semibold transition-colors disabled:opacity-60"
-                    style={
-                      isInstalled
-                        ? { borderColor: "var(--color-border-default)", color: "var(--color-text-primary)", backgroundColor: "var(--color-bg-surface)" }
-                        : { borderColor: "var(--color-primary)", backgroundColor: "var(--color-primary)", color: "#fff" }
-                    }
+                    className="w-full"
                   >
                     {isInstalled && <Check className="h-4 w-4" />}
                     {busy ? "…" : isInstalled ? "Installed" : "Install"}
-                  </button>
+                  </Button>
                 )}
               </div>
             );
