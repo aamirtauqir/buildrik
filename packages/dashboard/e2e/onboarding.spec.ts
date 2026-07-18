@@ -206,3 +206,29 @@ test.describe("onboarding · site", () => {
     await expect(page.getByRole("combobox")).toBeVisible({ timeout: 20_000 });
   });
 });
+
+// S3 · path-chooser — 3 build-path cards (AI / Template / Blank), each routing
+// via saveAndGo to its own flow. On a freshly-reset wizard (no workspace.role
+// captured yet) the "ai" path is the default recommendation, so its per-card
+// CTA ("Start AI Draft") is duplicated by the page's bottom recommended-path
+// CTA — both trigger the identical choose("ai") handler, so `.first()` is a
+// safe, deterministic way to hit the (leftmost, per-card) one.
+test.describe("onboarding · path", () => {
+  test("AI Draft card routes to the AI-draft flow", async ({ page }) => {
+    await page.goto("/onboarding/path");
+    await page.getByRole("button", { name: /^start ai draft$/i }).first().click();
+    await expect(page).toHaveURL(/\/onboarding\/ai\/basics/, { timeout: 15_000 });
+  });
+
+  test("Template card routes to the template flow", async ({ page }) => {
+    await page.goto("/onboarding/path");
+    await page.getByRole("button", { name: /browse templates/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/template/, { timeout: 15_000 });
+  });
+
+  test("Blank Canvas card routes to the blank flow", async ({ page }) => {
+    await page.goto("/onboarding/path");
+    await page.getByRole("button", { name: /open blank canvas/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/blank/, { timeout: 15_000 });
+  });
+});
