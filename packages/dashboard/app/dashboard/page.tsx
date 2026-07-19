@@ -156,7 +156,9 @@ export default function DashboardPage() {
           {/* Stat tiles — sparkline visual per the IA-fixed design. Visitors uses
               the real dailyVisitors series; the other metrics have no time-series
               yet, so their sparkline is a representative trend (visual only). */}
-          <div className="grid grid-cols-4 gap-[14px]">
+          {/* 4-up at the design's 1440 width; below that the tiles' fixed-width
+              sparklines cannot fit four across and would push the page sideways. */}
+          <div className="grid grid-cols-1 gap-[14px] sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label="Sites"
               value={stats.data?.totalSites ?? 0}
