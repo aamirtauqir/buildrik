@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@lib/prisma";
 import {
   handleChargeFailed,
+  handleCheckoutCompleted,
   handleSubscriptionUpdated,
   handleSubscriptionDeleted,
   handleInvoicePaid,
@@ -80,6 +81,10 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (event.type) {
+      case "checkout.session.completed": {
+        await handleCheckoutCompleted(event.data.object);
+        break;
+      }
       case "charge.failed": {
         const subscriptionId = event.data.object.subscription;
         if (subscriptionId) await handleChargeFailed(subscriptionId);

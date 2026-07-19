@@ -202,6 +202,26 @@ Sites deploy into **the workspace's own Vercel account** via per-workspace OAuth
 
 **There is no `VERCEL_OAUTH_REDIRECT_URI`.** The callback is registered with Vercel at integration-registration time, and the callback route derives its own `redirect_uri` from the request (`${url.protocol}//${url.host}/api/integrations/vercel/callback`). Setting this var does nothing.
 
+### Payments (Stripe)
+
+Subscriptions are hosted Stripe Checkout + Customer Portal — we never touch a card
+number. `billing.createCheckoutSession` resolves/creates a Stripe customer and
+returns a Checkout URL; the plan is flipped to ACTIVE **only** by the verified
+`checkout.session.completed` webhook (`handleCheckoutCompleted` in
+`stripe-webhook.service.ts`), never by the session-creation call itself — see the
+security invariant documented at `billing.service.ts:158` (now `createCheckoutSession`).
+
+| Var | Purpose | Required? |
+|-----|---------|-----------|
+| `STRIPE_SECRET_KEY` | Server-side Stripe API key. Without it, `getStripe()` throws `PAYMENTS_NOT_CONFIGURED` — Checkout/Portal session creation fails cleanly (tRPC `PRECONDITION_FAILED`), it does not crash. | Yes for billing |
+| `STRIPE_WEBHOOK_SECRET` | HMAC secret for the raw-signature verification in `app/api/webhooks/stripe/route.ts` (no Stripe SDK involved in verification — see the 5-min replay-window check there). Now load-bearing: without it every webhook 500s (`route.ts:47-51`) and no plan ever reaches ACTIVE, no matter how many customers pay. | Yes for billing |
+| `STRIPE_PRICE_PRO_MONTHLY` / `STRIPE_PRICE_PRO_YEARLY` | Stripe Price ids for the Pro plan (created in the Stripe dashboard from `lib/constants/plan-limits.ts`'s PRO pricing — $29/mo, $23/mo billed yearly). Also used in reverse by the webhook to map an incoming Stripe price id back to `plan: "PRO"`. | Yes for billing |
+| `STRIPE_PRICE_BUSINESS_MONTHLY` / `STRIPE_PRICE_BUSINESS_YEARLY` | Same, for Business ($79/mo, $63/mo billed yearly). | Yes for billing |
+
+**No Stripe Products/Prices exist yet.** Creating them (and copying the resulting
+Price ids into the four vars above) is a founder step in the Stripe dashboard —
+nothing in this repo can do it without live API credentials.
+
 ### AI
 
 | Var | Purpose | Required? |
@@ -223,7 +243,6 @@ Sites deploy into **the workspace's own Vercel account** via per-workspace OAuth
 | Var | Purpose | Required? |
 |-----|---------|-----------|
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob. Only `del()` is used — uploads do not go through it. Without it, deleted assets leave orphan blobs behind; nothing user-facing breaks. | No |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signature check. Stripe is not fully wired (no `STRIPE_SECRET_KEY` is read anywhere, and Checkout is still a TODO), so this is inert today. | No — not until billing is finished |
 | `PEXELS_API_KEY` / `UNSPLASH_ACCESS_KEY` | Stock-photo search in the media library. | Only for stock search |
 
 ### Before you deploy

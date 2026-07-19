@@ -3,7 +3,8 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
   getBillingOverview, getUsageDetails, listInvoices,
-  upgradePlan, cancelSubscription, reactivateSubscription, getPlans,
+  createCheckoutSession, createPortalSession,
+  cancelSubscription, reactivateSubscription, getPlans,
 } from "@/server/services/billing.service";
 import { upgradeSchema, cancelSchema } from "@buildrik/shared/schemas/billing";
 import { type PlanName } from "@/lib/constants/plan-limits";
@@ -26,11 +27,22 @@ export const billingRouter = router({
       const wsId = await getWorkspaceId(ctx);
       return listInvoices(wsId, input.page, input.perPage);
     }),
-  upgrade: protectedProcedure.input(upgradeSchema).mutation(async ({ ctx, input }) => {
+  createCheckoutSession: protectedProcedure.input(upgradeSchema).mutation(async ({ ctx, input }) => {
     const wsId = await getWorkspaceId(ctx);
-    try { return await upgradePlan(wsId, input); }
+    try { return await createCheckoutSession(wsId, input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "PAYMENTS_NOT_CONFIGURED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
+      if (e instanceof Error && e.message === "ALREADY_SUBSCRIBED") throw new TRPCError({ code: "CONFLICT", message: "You already have a subscription — manage your plan from the billing portal." });
+      if (e instanceof Error && e.message.startsWith("STRIPE_PRICE_NOT_CONFIGURED")) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "That plan isn't available for checkout yet." });
+      throw e;
+    }
+  }),
+  createPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
+    const wsId = await getWorkspaceId(ctx);
+    try { return await createPortalSession(wsId); }
+    catch (e: unknown) {
+      if (e instanceof Error && e.message === "PAYMENTS_NOT_CONFIGURED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
+      if (e instanceof Error && e.message === "NO_STRIPE_CUSTOMER") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "No billing account yet — upgrade a plan first." });
       throw e;
     }
   }),

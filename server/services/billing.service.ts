@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { UpgradeInput, CancelInput } from "@buildrik/shared/schemas/billing";
+import { getStripe, isStripeConfigured, getStripePriceId } from "@/server/services/stripe.client";
 
 async function getUsageCounts(workspaceId: string) {
   const now = new Date();
@@ -155,22 +156,99 @@ export async function listInvoices(
   return { data, total };
 }
 
-export async function upgradePlan(_workspaceId: string, _input: UpgradeInput) {
-  // HARD-DISABLED. This procedure receives only { planId, interval } — no
-  // proof of payment — so it can never legitimately grant a paid plan. The
-  // previous implementation gated on STRIPE_SECRET_KEY *presence* and then
-  // wrote placeholder_* Stripe IDs while flipping the plan to ACTIVE: the
-  // moment a key existed in prod, ANY authenticated user could self-grant a
-  // paid plan for free by calling billing.upgrade directly.
-  //
-  // Real upgrades must flow through Stripe Checkout: the client is sent to a
-  // hosted checkout session, and the plan is flipped to ACTIVE only by the
-  // verified `invoice.paid` / `customer.subscription.updated` webhook
-  // (handleInvoicePaid / handleSubscriptionUpdated in
-  // stripe-webhook.service.ts). Until that checkout-session creation is
-  // wired (needs the Stripe SDK), this path stays closed — no DB write, no
-  // self-grant surface.
-  throw new Error("PAYMENTS_NOT_CONFIGURED");
+/**
+ * Resolve the workspace's Stripe customer, creating one on first use. Writing
+ * `stripeCustomerId` here is safe under the self-grant invariant this file
+ * guards: a Stripe customer id carries no entitlement by itself — it is a
+ * billing-identity mapping, not a plan. Only the verified webhook (below,
+ * `handleCheckoutCompleted` et al. in stripe-webhook.service.ts) may write
+ * `Subscription.plan` / `Workspace.plan`.
+ */
+async function resolveStripeCustomerId(workspaceId: string): Promise<string> {
+  const workspace = await prisma.workspace.findUniqueOrThrow({
+    where: { id: workspaceId },
+    select: { stripeCustomerId: true, ownerId: true, name: true },
+  });
+  if (workspace.stripeCustomerId) return workspace.stripeCustomerId;
+
+  const owner = await prisma.user.findUnique({
+    where: { id: workspace.ownerId },
+    select: { email: true },
+  });
+  const customer = await getStripe().customers.create({
+    email: owner?.email ?? undefined,
+    name: workspace.name,
+    metadata: { workspaceId },
+  });
+  await prisma.workspace.update({
+    where: { id: workspaceId },
+    data: { stripeCustomerId: customer.id },
+  });
+  return customer.id;
+}
+
+/**
+ * Creates a hosted Stripe Checkout session and returns its URL — nothing
+ * more. This is the replacement for the old `upgradePlan()`, which used to
+ * throw unconditionally (see the git history / the audit that found the
+ * self-grant hole this file is named for). The throw is preserved in spirit:
+ * this function still writes no plan state. `client_reference_id` carries the
+ * workspace id so the webhook (the only writer of `Subscription.plan` /
+ * `Workspace.plan`) can resolve which workspace to upgrade once Stripe
+ * confirms payment.
+ */
+export async function createCheckoutSession(
+  workspaceId: string,
+  input: UpgradeInput,
+): Promise<{ url: string }> {
+  if (!isStripeConfigured()) throw new Error("PAYMENTS_NOT_CONFIGURED");
+
+  // Subscription.workspaceId is @unique — an existing, non-cancelled row
+  // means a second Checkout session would collide. Tier changes for an
+  // existing subscriber go through the Portal (createPortalSession below),
+  // which lands back as customer.subscription.updated.
+  const existing = await prisma.subscription.findUnique({ where: { workspaceId } });
+  if (existing && existing.status !== "CANCELLED") {
+    throw new Error("ALREADY_SUBSCRIBED");
+  }
+
+  const priceId = getStripePriceId(input.planId, input.interval);
+  const customerId = await resolveStripeCustomerId(workspaceId);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+  const session = await getStripe().checkout.sessions.create({
+    mode: "subscription",
+    customer: customerId,
+    client_reference_id: workspaceId,
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${appUrl}/dashboard/settings/plans?checkout=success`,
+    cancel_url: `${appUrl}/dashboard/settings/plans?checkout=cancel`,
+  });
+
+  if (!session.url) throw new Error("STRIPE_SESSION_NO_URL");
+  return { url: session.url };
+}
+
+/**
+ * Creates a Stripe Customer Portal session for card changes, cancellation,
+ * and invoice history — all handled by Stripe, so no PAN or plan-mutation
+ * surface exists in our app.
+ */
+export async function createPortalSession(workspaceId: string): Promise<{ url: string }> {
+  if (!isStripeConfigured()) throw new Error("PAYMENTS_NOT_CONFIGURED");
+
+  const workspace = await prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { stripeCustomerId: true },
+  });
+  if (!workspace?.stripeCustomerId) throw new Error("NO_STRIPE_CUSTOMER");
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const session = await getStripe().billingPortal.sessions.create({
+    customer: workspace.stripeCustomerId,
+    return_url: `${appUrl}/dashboard/settings/billing`,
+  });
+  return { url: session.url };
 }
 
 /**

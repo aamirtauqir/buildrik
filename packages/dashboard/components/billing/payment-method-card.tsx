@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { trpc } from "@lib/trpc/client";
+import { useToast } from "@/components/dashboard/toast-provider";
 
 export interface PaymentMethod {
   brand: string;
@@ -46,9 +47,14 @@ interface PaymentMethodCardProps {
 }
 
 export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const { addToast } = useToast();
   const expMonth = String(paymentMethod.expMonth).padStart(2, "0");
   const expYear = String(paymentMethod.expYear).slice(-2);
+
+  const portalMutation = trpc.billing.createPortalSession.useMutation({
+    onSuccess: (data) => window.location.assign(data.url),
+    onError: (err) => addToast("error", "Couldn't open billing portal", err.message),
+  });
 
   return (
     <div className="rounded-xl border border-[var(--color-border-default)] bg-white px-5 py-4">
@@ -64,72 +70,17 @@ export function PaymentMethodCard({ paymentMethod }: PaymentMethodCardProps) {
             </div>
           </div>
         </div>
-        {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-          >
-            Update Payment Method
-          </button>
-        )}
+        {/* Stripe hosts the Portal — a raw card form in our DOM is exactly
+            what Checkout + Portal exists to avoid (no PAN ever touches us). */}
+        <button
+          onClick={() => portalMutation.mutate()}
+          disabled={portalMutation.isPending}
+          className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)] disabled:opacity-50"
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+        >
+          {portalMutation.isPending ? "Opening…" : "Manage payment method"}
+        </button>
       </div>
-
-      {isEditing && (
-        <div className="mt-4 border-t border-[var(--color-border-default)] pt-4">
-          <label className="block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
-            New card details
-          </label>
-          <div
-            className="mt-2 flex items-center rounded-lg border px-4 py-3"
-            style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
-          >
-            <input
-              type="text"
-              placeholder="4242 4242 4242 4242"
-              className="w-full bg-transparent text-body outline-none placeholder:text-[var(--color-text-muted)]"
-              disabled
-              style={{ color: "var(--color-text-primary)" }}
-            />
-            <div className="ml-3 flex gap-2">
-              <input
-                type="text"
-                placeholder="MM/YY"
-                className="w-16 bg-transparent text-center text-body outline-none placeholder:text-[var(--color-text-muted)]"
-                disabled
-                style={{ color: "var(--color-text-primary)" }}
-              />
-              <input
-                type="text"
-                placeholder="CVC"
-                className="w-12 bg-transparent text-center text-body outline-none placeholder:text-[var(--color-text-muted)]"
-                disabled
-                style={{ color: "var(--color-text-primary)" }}
-              />
-            </div>
-          </div>
-          <p className="mt-1.5 text-body-sm" style={{ color: "var(--color-text-muted)" }}>
-            Online card updates are coming soon. To change your payment method now,
-            contact support.
-          </p>
-          <div className="mt-4 flex gap-3">
-            <button
-              onClick={() => setIsEditing(false)}
-              className="rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-page)]"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-            >
-              Cancel
-            </button>
-            <button
-              disabled
-              className="rounded-lg px-4 py-2 text-body font-semibold text-white opacity-50"
-              style={{ backgroundColor: "var(--color-primary)" }}
-            >
-              Save Card
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

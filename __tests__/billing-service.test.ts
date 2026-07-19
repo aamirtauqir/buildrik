@@ -12,12 +12,21 @@ vi.mock("@/lib/prisma", () => ({
     formSubmission: { count: vi.fn() },
     redirect: { count: vi.fn() },
     mediaAsset: { aggregate: vi.fn() },
-    workspace: { findUnique: vi.fn(), update: vi.fn() },
+    workspace: { findUnique: vi.fn(), findUniqueOrThrow: vi.fn(), update: vi.fn() },
+    user: { findUnique: vi.fn() },
     $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
   },
 }));
 
+vi.mock("@/server/services/stripe.client", () => ({
+  getStripe: vi.fn(),
+  isStripeConfigured: vi.fn(),
+  getStripePriceId: vi.fn(),
+  resolvePlanFromPriceId: vi.fn(),
+}));
+
 import { prisma } from "@/lib/prisma";
+import { getStripe, isStripeConfigured, getStripePriceId } from "@/server/services/stripe.client";
 
 describe("Billing Service", () => {
   beforeEach(() => {
@@ -125,36 +134,131 @@ describe("Billing Service", () => {
     });
   });
 
-  describe("upgradePlan", () => {
+  describe("createCheckoutSession", () => {
     it("refuses when Stripe is not configured (no free upgrades)", async () => {
-      const { upgradePlan } = await import(
+      const { createCheckoutSession } = await import(
         "@/server/services/billing.service"
       );
-      vi.stubEnv("STRIPE_SECRET_KEY", "");
+      vi.mocked(isStripeConfigured).mockReturnValue(false);
       await expect(
-        upgradePlan("ws1", { planId: "PRO", interval: "MONTHLY" }),
-      ).rejects.toThrow("PAYMENTS_NOT_CONFIGURED");
-      expect(prisma.subscription.create).not.toHaveBeenCalled();
-      vi.unstubAllEnvs();
-    });
-
-    it("refuses to self-grant even when STRIPE_SECRET_KEY is set (no placeholder write)", async () => {
-      // Regression guard for the audit's sharpest billing finding: the old
-      // gate keyed off key *presence*, so a key in prod let any user write a
-      // placeholder subscription and flip their plan to PRO for free. The
-      // procedure has no payment proof, so it must never grant — real
-      // upgrades arrive via the Stripe webhook only.
-      const { upgradePlan } = await import(
-        "@/server/services/billing.service"
-      );
-      vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_stub");
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null);
-      await expect(
-        upgradePlan("ws1", { planId: "PRO", interval: "MONTHLY" }),
+        createCheckoutSession("ws1", { planId: "PRO", interval: "MONTHLY" }),
       ).rejects.toThrow("PAYMENTS_NOT_CONFIGURED");
       expect(prisma.subscription.create).not.toHaveBeenCalled();
       expect(prisma.workspace.update).not.toHaveBeenCalled();
-      vi.unstubAllEnvs();
+    });
+
+    it("self-grant regression: never writes Subscription or Workspace.plan itself, even when Stripe is configured and the session succeeds", async () => {
+      // Regression guard for the audit's sharpest billing finding: the old
+      // upgradePlan() gate keyed off STRIPE_SECRET_KEY *presence*, so a key in
+      // prod let any authenticated user write a placeholder subscription and
+      // flip their plan to PRO for free by calling billing.upgrade directly.
+      // This function only ever returns a Checkout URL — Subscription.plan
+      // and Workspace.plan are written nowhere here, only by the verified
+      // webhook (handleCheckoutCompleted in stripe-webhook.service.ts).
+      const { createCheckoutSession } = await import(
+        "@/server/services/billing.service"
+      );
+      vi.mocked(isStripeConfigured).mockReturnValue(true);
+      vi.mocked(getStripePriceId).mockReturnValue("price_pro_monthly");
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null);
+      vi.mocked(prisma.workspace.findUniqueOrThrow).mockResolvedValue({
+        stripeCustomerId: "cus_123",
+        ownerId: "u1",
+        name: "Acme",
+      } as any);
+      const createSession = vi.fn().mockResolvedValue({ url: "https://checkout.stripe.com/pay/xyz" });
+      vi.mocked(getStripe).mockReturnValue({
+        checkout: { sessions: { create: createSession } },
+      } as any);
+
+      const result = await createCheckoutSession("ws1", { planId: "PRO", interval: "MONTHLY" });
+
+      expect(result.url).toBe("https://checkout.stripe.com/pay/xyz");
+      expect(createSession).toHaveBeenCalledWith(
+        expect.objectContaining({ mode: "subscription", client_reference_id: "ws1" }),
+      );
+      expect(prisma.subscription.create).not.toHaveBeenCalled();
+      expect(prisma.subscription.update).not.toHaveBeenCalled();
+      expect(prisma.workspace.update).not.toHaveBeenCalled();
+    });
+
+    it("creates a Stripe customer on first use without ever touching Workspace.plan", async () => {
+      const { createCheckoutSession } = await import(
+        "@/server/services/billing.service"
+      );
+      vi.mocked(isStripeConfigured).mockReturnValue(true);
+      vi.mocked(getStripePriceId).mockReturnValue("price_pro_monthly");
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null);
+      vi.mocked(prisma.workspace.findUniqueOrThrow).mockResolvedValue({
+        stripeCustomerId: null,
+        ownerId: "u1",
+        name: "Acme",
+      } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ email: "owner@acme.com" } as any);
+      vi.mocked(prisma.workspace.update).mockResolvedValue({} as any);
+      const createCustomer = vi.fn().mockResolvedValue({ id: "cus_new" });
+      const createSession = vi.fn().mockResolvedValue({ url: "https://checkout.stripe.com/pay/new" });
+      vi.mocked(getStripe).mockReturnValue({
+        customers: { create: createCustomer },
+        checkout: { sessions: { create: createSession } },
+      } as any);
+
+      const result = await createCheckoutSession("ws1", { planId: "PRO", interval: "MONTHLY" });
+
+      expect(result.url).toBe("https://checkout.stripe.com/pay/new");
+      // The only workspace write here is the billing-identity mapping — no
+      // `plan` field anywhere in it. Stripe customer ids carry no entitlement.
+      expect(prisma.workspace.update).toHaveBeenCalledWith({
+        where: { id: "ws1" },
+        data: { stripeCustomerId: "cus_new" },
+      });
+      expect(prisma.subscription.create).not.toHaveBeenCalled();
+    });
+
+    it("refuses a second Checkout session for an already-subscribed workspace (routes tier changes to the Portal instead)", async () => {
+      const { createCheckoutSession } = await import(
+        "@/server/services/billing.service"
+      );
+      vi.mocked(isStripeConfigured).mockReturnValue(true);
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({ status: "ACTIVE" } as any);
+
+      await expect(
+        createCheckoutSession("ws1", { planId: "BUSINESS", interval: "MONTHLY" }),
+      ).rejects.toThrow("ALREADY_SUBSCRIBED");
+      expect(prisma.workspace.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("createPortalSession", () => {
+    it("refuses when Stripe is not configured", async () => {
+      const { createPortalSession } = await import(
+        "@/server/services/billing.service"
+      );
+      vi.mocked(isStripeConfigured).mockReturnValue(false);
+      await expect(createPortalSession("ws1")).rejects.toThrow("PAYMENTS_NOT_CONFIGURED");
+    });
+
+    it("refuses when the workspace has no Stripe customer yet", async () => {
+      const { createPortalSession } = await import(
+        "@/server/services/billing.service"
+      );
+      vi.mocked(isStripeConfigured).mockReturnValue(true);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ stripeCustomerId: null } as any);
+      await expect(createPortalSession("ws1")).rejects.toThrow("NO_STRIPE_CUSTOMER");
+    });
+
+    it("returns the Portal session URL", async () => {
+      const { createPortalSession } = await import(
+        "@/server/services/billing.service"
+      );
+      vi.mocked(isStripeConfigured).mockReturnValue(true);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ stripeCustomerId: "cus_123" } as any);
+      vi.mocked(getStripe).mockReturnValue({
+        billingPortal: { sessions: { create: vi.fn().mockResolvedValue({ url: "https://billing.stripe.com/session/abc" }) } },
+      } as any);
+
+      const result = await createPortalSession("ws1");
+      expect(result.url).toBe("https://billing.stripe.com/session/abc");
     });
   });
 

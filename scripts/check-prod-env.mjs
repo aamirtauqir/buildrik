@@ -195,6 +195,18 @@ requirePresent("VERCEL_INTEGRATION_ID");
 requirePresent("VERCEL_CLIENT_ID");
 requirePresent("VERCEL_CLIENT_SECRET");
 
+// Payments. Without STRIPE_SECRET_KEY, checkout/portal session creation fails
+// (cleanly — PRECONDITION_FAILED, not a crash) but billing.ts CLAUDE.md still
+// documents these as required once billing ships, and this script's whole
+// point is catching "documented but never enforced" (see GOOGLE_CLIENT_ID /
+// GITHUB_CLIENT_ID / OPENAI_API_KEY, missing in prod for months).
+requirePresent("STRIPE_SECRET_KEY");
+requirePresent("STRIPE_WEBHOOK_SECRET");
+requirePresent("STRIPE_PRICE_PRO_MONTHLY");
+requirePresent("STRIPE_PRICE_PRO_YEARLY");
+requirePresent("STRIPE_PRICE_BUSINESS_MONTHLY");
+requirePresent("STRIPE_PRICE_BUSINESS_YEARLY");
+
 // AI. Absent → every ai-generate-worker job fails on "Missing credentials", the
 // AI onboarding path is dead, and in-editor AI + alt-text throw.
 requirePresent("OPENAI_API_KEY");

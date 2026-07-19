@@ -100,6 +100,11 @@ export default function BillingPage() {
     onError: (err) => addToast("error", "Reactivation failed", err.message),
   });
 
+  const checkoutMutation = trpc.billing.createCheckoutSession.useMutation({
+    onSuccess: (data) => window.location.assign(data.url),
+    onError: (err) => addToast("error", "Couldn't start checkout", err.message),
+  });
+
   const overview = overviewQuery.data;
   const isLoading = overviewQuery.isLoading;
   const isDunning = overview?.status === "PAST_DUE";
@@ -146,20 +151,12 @@ export default function BillingPage() {
           </button>
         </div>
         <div className="space-y-4">
-          <div
-            className="rounded-xl border p-4 text-center"
-            style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-page)" }}
-          >
-            <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
-              Payment processing coming soon
-            </p>
-            <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-              We&apos;re integrating Stripe. Upgrades will be available here once it&apos;s ready.
-            </p>
-          </div>
           <PlanComparison
             currentPlan={planKey}
-            upgradesDisabled
+            onSelectPlan={(plan, interval) => {
+              if (plan === "FREE") return;
+              checkoutMutation.mutate({ planId: plan, interval });
+            }}
           />
         </div>
       </div>

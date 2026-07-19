@@ -6,76 +6,79 @@ import { Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { MetricValue } from "@/components/dashboard/primitives";
 
-type PlanId = "STARTER" | "FREELANCER" | "AGENCY" | "ENTERPRISE";
+type PlanName = "FREE" | "PRO" | "BUSINESS";
 
-interface Plan {
-  id: PlanId;
+interface PlanEntry {
   name: string;
-  priceMonthly: number | null; // null = custom
-  tagline: string;
-  features: string[];
-  popular?: boolean;
+  sites: number;
+  customDomains: number;
+  teamMembers: number;
+  priceMonthly: number;
+  priceYearly: number;
 }
 
-const PLANS: Plan[] = [
-  {
-    id: "STARTER",
-    name: "Starter",
-    priceMonthly: 0,
-    tagline: "For trying things out",
-    features: ["2 sites", "Buildrick subdomain", "Community support"],
-  },
-  {
-    id: "FREELANCER",
-    name: "Freelancer",
-    priceMonthly: 18,
-    tagline: "For solo builders",
-    features: ["10 sites", "Custom domains", "Remove Buildrick badge"],
-    popular: true,
-  },
-  {
-    id: "AGENCY",
-    name: "Agency",
-    priceMonthly: 58,
-    tagline: "For studios & teams",
-    features: ["Unlimited sites", "Client billing", "Priority support"],
-  },
-  {
-    id: "ENTERPRISE",
-    name: "Enterprise",
-    priceMonthly: null,
-    tagline: "For large orgs",
-    features: ["SSO & SAML", "SLA & DPA", "Dedicated CSM"],
-  },
-];
+const PLAN_ORDER: PlanName[] = ["FREE", "PRO", "BUSINESS"];
 
-const PLAN_ORDER: PlanId[] = ["STARTER", "FREELANCER", "AGENCY", "ENTERPRISE"];
+const PLAN_LABEL: Record<PlanName, string> = {
+  FREE: "Free",
+  PRO: "Pro",
+  BUSINESS: "Business",
+};
 
-// The billing query speaks FREE/PRO/BUSINESS; map onto the display plans.
-const BILLING_TO_PLAN: Record<string, PlanId> = {
-  FREE: "STARTER",
-  PRO: "FREELANCER",
-  BUSINESS: "AGENCY",
+const PLAN_TAGLINE: Record<PlanName, string> = {
+  FREE: "For trying things out",
+  PRO: "For solo builders",
+  BUSINESS: "For studios & teams",
 };
 
 function formatMoney(n: number): string {
   return n % 1 === 0 ? String(n) : n.toFixed(2);
 }
 
-function priceLabel(plan: Plan, yearly: boolean): { amount: string; suffix: string | null; note: string | null } {
-  if (plan.priceMonthly === null) return { amount: "Custom", suffix: null, note: null };
+function priceLabel(plan: PlanEntry, yearly: boolean): { amount: string; suffix: string | null; note: string | null } {
   if (plan.priceMonthly === 0) return { amount: "$0", suffix: "/mo", note: null };
-  const perMonth = yearly ? plan.priceMonthly * 0.8 : plan.priceMonthly;
+  const perMonth = yearly ? plan.priceYearly : plan.priceMonthly;
   return { amount: `$${formatMoney(perMonth)}`, suffix: "/mo", note: yearly ? "billed yearly" : null };
+}
+
+function siteLabel(n: number): string {
+  return n === -1 ? "Unlimited sites" : `${n} sites`;
+}
+
+function domainLabel(n: number): string {
+  if (n === -1) return "Unlimited custom domains";
+  if (n === 0) return "No custom domains";
+  return `${n} custom domain${n === 1 ? "" : "s"}`;
+}
+
+function teamLabel(n: number): string {
+  return n === -1 ? "Unlimited team members" : `${n} team member${n === 1 ? "" : "s"}`;
+}
+
+// Real limit values only (PLAN_LIMITS is the SSOT) — no invented marketing
+// claims like "priority support" that no limit backs.
+function planFeatures(plan: PlanEntry): string[] {
+  return [siteLabel(plan.sites), domainLabel(plan.customDomains), teamLabel(plan.teamMembers)];
 }
 
 export default function PlansPage() {
   const [yearly, setYearly] = useState(false);
   const overviewQuery = trpc.billing.overview.useQuery(undefined, { retry: false });
+  const plansQuery = trpc.billing.plans.useQuery();
 
-  const currentPlanId: PlanId = overviewQuery.data?.plan
-    ? BILLING_TO_PLAN[overviewQuery.data.plan] ?? "STARTER"
-    : "STARTER";
+  const currentPlanId = (overviewQuery.data?.plan as PlanName) ?? "FREE";
+
+  const plans: PlanEntry[] = PLAN_ORDER.map((name) => {
+    const found = plansQuery.data?.find((p) => p.name === name);
+    return {
+      name,
+      sites: Number(found?.sites ?? 0),
+      customDomains: Number(found?.customDomains ?? 0),
+      teamMembers: Number(found?.teamMembers ?? 0),
+      priceMonthly: Number(found?.priceMonthly ?? 0),
+      priceYearly: Number(found?.priceYearly ?? 0),
+    };
+  });
 
   return (
     <div>
@@ -115,15 +118,17 @@ export default function PlansPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {PLANS.map((plan) => {
-          const isCurrent = plan.id === currentPlanId;
-          const isInk = plan.id === "ENTERPRISE";
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {plans.map((plan) => {
+          const planId = plan.name as PlanName;
+          const isCurrent = planId === currentPlanId;
+          const isInk = planId === "BUSINESS";
+          const popular = planId === "PRO";
           const price = priceLabel(plan, yearly);
 
           const cardStyle = isInk
             ? { backgroundColor: "var(--color-ink)", borderColor: "var(--color-ink)", boxShadow: "var(--shadow-card)" }
-            : plan.popular
+            : popular
               ? {
                   backgroundColor: "var(--color-bg-surface)",
                   borderColor: "var(--color-primary)",
@@ -142,8 +147,8 @@ export default function PlansPage() {
           const checkColor = isInk ? "var(--color-teal)" : "var(--color-success)";
 
           return (
-            <div key={plan.id} className="relative flex flex-col rounded-xl border p-5" style={cardStyle}>
-              {plan.popular && (
+            <div key={plan.name} className="relative flex flex-col rounded-xl border p-5" style={cardStyle}>
+              {popular && (
                 <span
                   className="absolute -top-2.5 left-5 rounded-pill px-2.5 py-0.5 text-eyebrow font-semibold text-white"
                   style={{ backgroundColor: "var(--color-primary)" }}
@@ -153,7 +158,7 @@ export default function PlansPage() {
               )}
 
               <h2 className="text-section-title" style={{ color: nameColor }}>
-                {plan.name}
+                {PLAN_LABEL[planId]}
               </h2>
 
               <div className="mt-3 flex items-baseline gap-1">
@@ -171,11 +176,11 @@ export default function PlansPage() {
               </div>
 
               <p className="mt-2 text-body" style={{ color: secondaryColor }}>
-                {plan.tagline}
+                {PLAN_TAGLINE[planId]}
               </p>
 
               <ul className="mt-5 space-y-2.5">
-                {plan.features.map((feature) => (
+                {planFeatures(plan).map((feature) => (
                   <li key={feature} className="flex items-center gap-2 text-body" style={{ color: featureColor }}>
                     <Check className="h-4 w-4 shrink-0" style={{ color: checkColor }} />
                     {feature}
@@ -184,7 +189,7 @@ export default function PlansPage() {
               </ul>
 
               <div className="mt-auto pt-6">
-                <PlanCta plan={plan} isCurrent={isCurrent} currentPlanId={currentPlanId} />
+                <PlanCta planId={planId} popular={popular} isCurrent={isCurrent} currentPlanId={currentPlanId} />
               </div>
             </div>
           );
@@ -194,7 +199,17 @@ export default function PlansPage() {
   );
 }
 
-function PlanCta({ plan, isCurrent, currentPlanId }: { plan: Plan; isCurrent: boolean; currentPlanId: PlanId }) {
+function PlanCta({
+  planId,
+  popular,
+  isCurrent,
+  currentPlanId,
+}: {
+  planId: PlanName;
+  popular: boolean;
+  isCurrent: boolean;
+  currentPlanId: PlanName;
+}) {
   if (isCurrent) {
     return (
       <button
@@ -207,22 +222,10 @@ function PlanCta({ plan, isCurrent, currentPlanId }: { plan: Plan; isCurrent: bo
     );
   }
 
-  if (plan.id === "ENTERPRISE") {
-    return (
-      <a
-        href="mailto:sales@buildrick.com"
-        className="block w-full rounded-lg py-2.5 text-center text-body font-semibold transition-opacity hover:opacity-90"
-        style={{ backgroundColor: "#FFFFFF", color: "var(--color-ink)" }}
-      >
-        Contact sales
-      </a>
-    );
-  }
-
-  const isUpgrade = PLAN_ORDER.indexOf(plan.id) > PLAN_ORDER.indexOf(currentPlanId);
+  const isUpgrade = PLAN_ORDER.indexOf(planId) > PLAN_ORDER.indexOf(currentPlanId);
   const label = isUpgrade ? "Upgrade" : "Downgrade";
 
-  if (plan.popular) {
+  if (popular) {
     return (
       <Link
         href="/dashboard/settings/billing"
