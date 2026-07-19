@@ -77,14 +77,14 @@ export function SettingsRail() {
       style={{ borderColor: "var(--color-border-default)" }}
     >
       {RAIL_GROUPS.map((group) => (
-        <div key={group.label} className="flex items-center gap-1">
+        <div key={group.label} className="flex flex-wrap items-center gap-1">
           <span
             className="shrink-0 px-1 text-eyebrow font-semibold uppercase tracking-wide"
             style={{ color: "var(--color-text-muted)" }}
           >
             {group.label}
           </span>
-          <ul className="flex items-center gap-1">
+          <ul className="flex flex-wrap items-center gap-1">
             {group.items.map((item) => (
               <li key={item.href} className="shrink-0">
                 <RailLink item={item} />

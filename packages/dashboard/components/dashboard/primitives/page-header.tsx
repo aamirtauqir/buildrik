@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
  *  Replaces the per-screen hand-rolled <header> blocks. */
 export function PageHeader({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
   return (
-    <header className="mb-6 flex items-start justify-between gap-4">
+    <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
         {/* UI kit §2 — Page H1: 24px / 700 / -.01em */}
         <h1 className="text-[24px] font-bold leading-[1.25] tracking-[-0.01em]" style={{ color: "var(--color-text-primary)" }}>{title}</h1>
@@ -12,7 +12,9 @@ export function PageHeader({ title, description, actions }: { title: string; des
           <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>{description}</p>
         )}
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {/* max-w-full lets a crowded action row wrap on narrow screens; shrink-0
+          alone would hold it at max-content and push the page sideways. */}
+      {actions && <div className="flex max-w-full shrink-0 flex-wrap items-center gap-2">{actions}</div>}
     </header>
   );
 }
