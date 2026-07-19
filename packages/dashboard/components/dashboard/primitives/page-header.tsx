@@ -9,7 +9,7 @@ export function PageHeader({ title, description, actions }: { title: string; des
         {/* UI kit §2 — Page H1: 24px / 700 / -.01em */}
         <h1 className="text-[24px] font-bold leading-[1.25] tracking-[-0.01em]" style={{ color: "var(--color-text-primary)" }}>{title}</h1>
         {description && (
-          <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>{description}</p>
+          <p className="mt-0.5 text-[13px]" style={{ color: "var(--color-text-secondary)" }}>{description}</p>
         )}
       </div>
       {/* max-w-full lets a crowded action row wrap on narrow screens; shrink-0

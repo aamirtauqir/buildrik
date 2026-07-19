@@ -60,7 +60,7 @@ export default function GettingStartedPage() {
               </span>
               <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{pct}%</span>
             </div>
-            <ProgressBar pct={pct} className="mt-3" />
+            <ProgressBar pct={pct} size="lg" className="mt-3" />
           </SectionCard>
 
           <SectionCard padding="none">

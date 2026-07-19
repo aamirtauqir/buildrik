@@ -35,24 +35,35 @@ for (const vp of VIEWPORTS) {
         // settles. The h1 is the first thing every matched screen renders.
         await page.locator("h1").first().waitFor({ state: "visible", timeout: 30_000 });
 
-        const { scrollWidth, clientWidth, widest } = await page.evaluate(() => {
+        // Poll rather than measure once: data arriving mid-render can leave an
+        // element transiently wide, which is not the settled layout we care about.
+        await expect
+          .poll(
+            async () =>
+              page.evaluate(() => {
+                const de = document.documentElement;
+                return de.scrollWidth - de.clientWidth;
+              }),
+            { timeout: 15_000, message: `${route} still overflows once settled` }
+          )
+          .toBeLessThanOrEqual(1);
+
+        // Name the widest offender when it did settle wide, so a failure is actionable.
+        const widest = await page.evaluate(() => {
           const de = document.documentElement;
-          let widest = "";
-          if (de.scrollWidth > de.clientWidth + 1) {
-            // Name the widest offender so a failure is actionable.
-            let max = 0;
-            for (const el of Array.from(document.body.querySelectorAll<HTMLElement>("*"))) {
-              const right = el.getBoundingClientRect().right;
-              if (right > max) {
-                max = right;
-                widest = `${el.tagName.toLowerCase()}.${el.className?.toString().slice(0, 60)} right=${Math.round(right)}`;
-              }
+          if (de.scrollWidth <= de.clientWidth + 1) return "";
+          let max = 0;
+          let who = "";
+          for (const el of Array.from(document.body.querySelectorAll<HTMLElement>("*"))) {
+            const right = el.getBoundingClientRect().right;
+            if (right > max) {
+              max = right;
+              who = `${el.tagName.toLowerCase()}.${el.className?.toString().slice(0, 60)} right=${Math.round(right)}`;
             }
           }
-          return { scrollWidth: de.scrollWidth, clientWidth: de.clientWidth, widest };
+          return who;
         });
-
-        expect(scrollWidth, `overflows by ${scrollWidth - clientWidth}px — widest: ${widest}`).toBeLessThanOrEqual(clientWidth + 1);
+        expect(widest, `settled overflow — widest: ${widest}`).toBe("");
       });
     }
   });
