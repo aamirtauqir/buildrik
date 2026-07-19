@@ -2,7 +2,7 @@ import { Folder, Sparkle, Globe, MessageSquare } from "lucide-react";
 import { PageHeader, ProgressBar, Button } from "@/components/dashboard/primitives";
 
 const COURSES = [
-  { title: "Getting started with Buildrik", lessons: 5, minutes: 20, status: "Completed", pct: 100, icon: Folder, color: "var(--color-primary)" },
+  { title: "Getting started with Buildrick", lessons: 5, minutes: 20, status: "Completed", pct: 100, icon: Folder, color: "var(--color-primary)" },
   { title: "Designing with AI generation", lessons: 4, minutes: 16, status: null, pct: 25, icon: Sparkle, color: "var(--color-purple)" },
   { title: "Custom domains & DNS", lessons: 3, minutes: 12, status: "Not started", pct: 0, icon: Globe, color: "var(--color-teal)" },
   { title: "Client review & sign-off", lessons: 6, minutes: 24, status: null, pct: 50, icon: MessageSquare, color: "var(--color-amber)" },

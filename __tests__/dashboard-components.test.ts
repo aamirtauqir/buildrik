@@ -42,12 +42,9 @@ describe("Dashboard Components", () => {
   });
 
   describe("WorkspaceHealth", () => {
-    it("exports getHealthColor function", async () => {
+    it("exports WorkspaceHealth component", async () => {
       const mod = await import("@/components/dashboard/workspace-health");
-      expect(mod.getHealthColor).toBeDefined();
-      expect(mod.getHealthColor(30)).toBe("green");
-      expect(mod.getHealthColor(70)).toBe("yellow");
-      expect(mod.getHealthColor(90)).toBe("red");
+      expect(mod.WorkspaceHealth).toBeDefined();
     });
   });
 

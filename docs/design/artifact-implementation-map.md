@@ -56,6 +56,17 @@ The UI kit adopted earlier was evidently derived from this artifact — the foun
 
 - **C5 — "All projects" is a different feature in the design.** The design's Projects screen is a **folder/project-group grid** (4 cards: Marketing Sites / Client Work / Product & App / Experiments, each an icon tile + ⋯ menu + name + sites/live/views stat row) above a non-clickable "All sites / Apps" pill toggle. The app's `/dashboard/projects` is a **flat site list** with real search, sort, filter, bulk actions and grid/list views — and the design defines no drill-down target for its folder cards. Restyling the list into the folder grid would delete working functionality to match a mockup. Per rule 12 the site list is preserved; only the comparable header/button row was matched. **Folder grouping already exists in the app** (`folder-tabs.tsx`) — if the founder wants the design's folder-grid landing, that is a product decision needing its own spec, not a restyle.
 
+- **C6 — Settings is a directory in the design, a live form in the app.** The design's
+  Settings screen is a card-grid of ~13 links across 5 groups (Workspace, Plan &
+  billing, Sites & clients, Developer, Danger zone) — and three of them (Add-ons,
+  Review & comments, Partner program) point at routes that do not exist. The app's
+  `/dashboard/settings` is the real Workspace form (name, slug, language, timezone,
+  branding, collaboration, sharing, transfer-ownership), with navigation to the other
+  settings destinations already handled by `SettingsRail` — the IA `DESIGN.md` calls
+  canonical. Building the card grid would bury a working form behind an extra click and
+  link to dead routes, so per rule 12 the form was restyled in place. **Founder decision
+  needed** if the directory landing is actually wanted; it is a product change, not a restyle.
+
 ## Progress
 
 | Step | Commit | Status |
