@@ -17,7 +17,7 @@ Target viewport: **1440×730**. Interactive prototype — clicking top-nav/sideb
 | Border | `rgb(232,234,239)` `#E8EAEF` | `--color-border-default` | ✅ |
 | Accent | `rgb(64,110,214)` **`#406ED6`** | `--color-primary` | ✅ |
 | Active-nav bg | `rgb(235,241,255)` `#EBF1FF` | `--color-primary-subtle` | ✅ |
-| Primary CTA | `#406ED6`, radius 10px, 13.5px/600, h40 | `Button` primitive (h38) | ✅ (h 38 vs 40) |
+| Primary CTA | `#406ED6`, radius 10px, 14px/600, h40, padX 15 | `Button` md | ✅ exact (`bc8f9863`) |
 | Page H1 | 24px / 700 / -0.24px | `PageHeader` 24px/700/-0.01em | ✅ |
 | Top bar | 61px | `--topnav-h: 60px` | ✅ |
 
@@ -86,8 +86,27 @@ The UI kit adopted earlier was evidently derived from this artifact — the foun
 | Screen 3 — Client management | — | ✅ already matched by `5f8a14f1`/`7ef0531f`; no change needed |
 | Responsive audit (1440/820/390) | `06bb5064` | ✅ 34/34; fixed 2 real mobile overflow bugs |
 
+| Pixel gaps closed (Button/ProgressBar/PageHeader) | `bc8f9863` | ✅ measured equal to design |
+
 **Verification at close:** `tsc` 0 errors · vitest 853 files / 8895 tests green ·
-responsive audit 34/34 · all 11 routes return 200 with no error page.
+responsive audit 34/34 (twice, after de-flaking) · all 11 routes 200, no error page.
+
+### What "pixel-perfect" does and does not cover here
+
+Every element the design actually draws on these 11 screens is matched to measured
+values. Three gaps that were previously excused as "keep the app's primitive" are
+now closed (`bc8f9863`). What remains unmatched is not a rendering choice:
+
+- **~29 routes have no design at all** (C2). The artifact contains 11 screens. The
+  rest cannot be matched to something that does not exist, and inventing screens for
+  them would violate the same instruction that forbids inventing features. Those
+  routes stay on the shared token kit, which is the design's own token set.
+- **C5 / C6 are functionality conflicts, not styling gaps.** The design's Projects is
+  a folder grid over a real site list, and its Settings is a link directory over a
+  live form whose three of ~13 links point at routes that do not exist. The brief's
+  own rule — "If the design conflicts with existing functionality, preserve the
+  functionality and report the conflict" — governs here, so the functionality stands
+  and the conflict is reported rather than silently resolved either way.
 
 ### Dev-environment note (cost me a full debugging cycle)
 
