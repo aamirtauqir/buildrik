@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import { X, Copy, Check } from "lucide-react";
+import { useState } from "react";
+import { Copy, Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { shareUrl } from "@lib/utils";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
-import { Button } from "@/components/dashboard/primitives";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 interface ShareDraftModalProps {
   open: boolean;
@@ -44,15 +44,6 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
     onError: (err) => addToast("error", "Couldn't create draft link", err.message),
   });
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
   function handleClose() {
     setName("Draft preview");
     setPassword("");
@@ -69,21 +60,33 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
     addToast("success", "Link copied");
   }
 
-  if (!open) return null;
-
   const expiresInDays = expiryDays && expiryDays !== "0" ? Number(expiryDays) : undefined;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={handleClose}>
-      <div className="w-[440px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Share Draft</h2>
-          <button onClick={handleClose}><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
-        </div>
-
+    <Modal
+      open={open}
+      onClose={handleClose}
+      title="Share Draft"
+      width={440}
+      footer={
+        createdUrl ? (
+          <Button variant="ghost" onClick={handleClose}>Done</Button>
+        ) : (
+          <>
+            <Button variant="ghost" onClick={handleClose}>Cancel</Button>
+            <Button
+              disabled={!name.trim() || (!!password && password.length < 6) || createMutation.isPending}
+              onClick={() => createMutation.mutate({ siteId, name: name.trim(), password: password || undefined, expiresInDays })}
+            >
+              {createMutation.isPending ? "Creating..." : "Create draft link"}
+            </Button>
+          </>
+        )
+      }
+    >
         {createdUrl ? (
           <>
-            <p className="mt-3 text-body" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
               Anyone with this link can preview the current draft.
             </p>
             <div className="mt-4 flex items-center gap-2 rounded-lg border px-3 py-2" style={{ borderColor: "var(--color-border-default)" }}>
@@ -93,13 +96,10 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
                 {copied ? "Copied" : "Copy"}
               </Button>
             </div>
-            <div className="mt-4 flex justify-end">
-              <Button variant="ghost" onClick={handleClose}>Done</Button>
-            </div>
           </>
         ) : (
           <>
-            <p className="mt-3 text-body" style={{ color: "var(--color-text-secondary)" }}>
+            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
               Generate a private preview link to share the current draft with clients or teammates.
             </p>
 
@@ -158,19 +158,8 @@ export function ShareDraftModal({ open, onClose, siteId }: ShareDraftModalProps)
                 </div>
               </div>
             </div>
-
-            <div className="mt-5 flex gap-2 justify-end">
-              <Button variant="ghost" onClick={handleClose}>Cancel</Button>
-              <Button
-                disabled={!name.trim() || (!!password && password.length < 6) || createMutation.isPending}
-                onClick={() => createMutation.mutate({ siteId, name: name.trim(), password: password || undefined, expiresInDays })}
-              >
-                {createMutation.isPending ? "Creating..." : "Create draft link"}
-              </Button>
-            </div>
           </>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }

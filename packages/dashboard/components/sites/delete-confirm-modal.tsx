@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { AlertTriangle, X } from "lucide-react";
-import { Button } from "@/components/dashboard/primitives";
+import { AlertTriangle } from "lucide-react";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 interface DeleteConfirmModalProps {
   open: boolean;
@@ -15,25 +15,25 @@ interface DeleteConfirmModalProps {
 
 export function DeleteConfirmModal({ open, siteName, title = "Delete Site", onClose, onConfirm }: DeleteConfirmModalProps) {
   const [input, setInput] = useState("");
-  if (!open) return null;
   const matches = input === siteName;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
-      <div className="w-[420px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-primary)" }}>{title}</h2>
-          <button onClick={onClose}><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
-        </div>
-        <div className="mt-4 flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "#FEF2F2" }}>
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
-          <p className="text-sm" style={{ color: "#991B1B" }}>This action cannot be undone. Type <strong>{siteName}</strong> to confirm.</p>
-        </div>
-        <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder={`Type "${siteName}" to confirm`} className="mt-4 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: matches ? "var(--color-success)" : "var(--color-border-default)" }} autoFocus />
-        <div className="mt-4 flex gap-2 justify-end">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={title}
+      width={420}
+      footer={
+        <>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button variant="danger" onClick={() => matches && onConfirm(input)} disabled={!matches}>{title}</Button>
-        </div>
+        </>
+      }
+    >
+      <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "#FEF2F2" }}>
+        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
+        <p className="text-sm" style={{ color: "#991B1B" }}>This action cannot be undone. Type <strong>{siteName}</strong> to confirm.</p>
       </div>
-    </div>
+      <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder={`Type "${siteName}" to confirm`} className="mt-4 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: matches ? "var(--color-success)" : "var(--color-border-default)" }} autoFocus />
+    </Modal>
   );
 }

@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
-import { Button } from "@/components/dashboard/primitives";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 export const ROLE_OPTIONS = [
   { value: "ADMIN", label: "Admin", description: "Can manage everything except billing" },
@@ -52,8 +51,6 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
     { enabled: open }
   );
 
-  if (!open) return null;
-
   const emails = parseEmails(emailsRaw);
   const validCount = emails.length;
   const tooMany = validCount > 10;
@@ -81,24 +78,36 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--color-border-default)] bg-white p-6 shadow-2xl">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded p-1 hover:bg-[var(--color-bg-subtle)]"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />
-        </button>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Invite Team Members"
+      width={512}
+      footer={
+        <>
+          <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            form="invite-modal-form"
+            disabled={validCount === 0 || tooMany || hasInvalid || isLoading}
+            className="flex-1"
+          >
+            {isLoading
+              ? "Sending..."
+              : validCount > 1
+              ? `Send ${validCount} Invitations`
+              : "Send Invitation"}
+          </Button>
+        </>
+      }
+    >
+      <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+        Add up to 10 email addresses separated by commas or new lines.
+      </p>
 
-        <h2 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
-          Invite Team Members
-        </h2>
-        <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
-          Add up to 10 email addresses separated by commas or new lines.
-        </p>
-
-        <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
+      <form id="invite-modal-form" onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
           {/* Email input */}
           <div>
             <label className="mb-1.5 block text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -241,25 +250,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
             />
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-1">
-            <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={validCount === 0 || tooMany || hasInvalid || isLoading}
-              className="flex-1"
-            >
-              {isLoading
-                ? "Sending..."
-                : validCount > 1
-                ? `Send ${validCount} Invitations`
-                : "Send Invitation"}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }
