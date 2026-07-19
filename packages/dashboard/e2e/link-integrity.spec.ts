@@ -20,7 +20,7 @@ const ROUTES = [
 
 test.use({ viewport: { width: 1440, height: 900 } });
 
-test("every internal link on the designed screens resolves to a real route", async ({ page, request }) => {
+test("every internal link on the designed screens resolves to a real route", async ({ page }) => {
   const hrefs = new Set<string>();
 
   for (const route of ROUTES) {
@@ -38,8 +38,10 @@ test("every internal link on the designed screens resolves to a real route", asy
 
   const dead: string[] = [];
   for (const href of hrefs) {
+    // page.request, not the standalone `request` fixture: that one gets disposed
+    // after this many navigations and fails the run for an infra reason.
     // 307 is the auth redirect and means the route exists; only 404 is a dead link.
-    const res = await request.get(href, { maxRedirects: 0, failOnStatusCode: false });
+    const res = await page.request.get(href, { maxRedirects: 0, failOnStatusCode: false });
     if (res.status() === 404) dead.push(href);
   }
 

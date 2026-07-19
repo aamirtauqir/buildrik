@@ -45,6 +45,9 @@ const LIVE_ROUTES = new Set([
   "/dashboard/getting-started",
   "/dashboard/help",
   "/dashboard/settings",
+  // The settings index became the design's directory of section cards; the
+  // workspace form it used to render moved to its own route.
+  "/dashboard/settings/workspace",
   "/dashboard/settings/team",
   "/dashboard/settings/domains",
   "/dashboard/settings/integrations",

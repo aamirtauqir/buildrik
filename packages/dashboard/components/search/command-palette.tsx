@@ -37,7 +37,7 @@ interface ResultItem {
 }
 
 const SETTINGS_ITEMS: ResultItem[] = [
-  { id: "s-workspace", label: "Workspace", description: "Workspace settings & branding", href: "/dashboard/settings", scope: "settings" },
+  { id: "s-workspace", label: "Workspace", description: "Workspace settings & branding", href: "/dashboard/settings/workspace", scope: "settings" },
   { id: "s-team", label: "Team", description: "Members & invites", href: "/dashboard/settings/team", scope: "settings" },
   { id: "s-domains", label: "Domains", description: "Custom domains", href: "/dashboard/settings/domains", scope: "settings" },
   { id: "s-integrations", label: "Integrations", description: "Connected services", href: "/dashboard/settings/integrations", scope: "settings" },

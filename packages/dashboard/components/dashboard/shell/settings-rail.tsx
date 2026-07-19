@@ -11,7 +11,7 @@ const RAIL_GROUPS: { label: string; items: RailItem[] }[] = [
   {
     label: "Workspace",
     items: [
-      { label: "Workspace", href: "/dashboard/settings", index: true },
+      { label: "Workspace", href: "/dashboard/settings/workspace" },
       { label: "Team", href: "/dashboard/settings/team" },
       { label: "Domains", href: "/dashboard/settings/domains" },
     ],

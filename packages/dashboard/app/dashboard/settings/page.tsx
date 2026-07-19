@@ -1,130 +1,110 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { ChevronRight, Building2, Shield, Bell, Users, Gauge, Activity, CreditCard, Globe, MessageSquare, Star, LayoutGrid, KeyRound, Sparkles, User, UserCircle, Trash2, type LucideIcon } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { useToast } from "@/components/dashboard/toast-provider";
-import { WorkspaceForm } from "@/components/settings/workspace-form";
-import { SectionCard, Button, InputField } from "@/components/dashboard/primitives";
+import { IconChip } from "@/components/dashboard/primitives";
 
-/** Settings index = the Workspace section (IA v2 D6 card mapping). Carries
- *  workspace name + branding + sharing (WorkspaceForm) and the transfer-ownership
- *  control. Workspace deletion lives on the Danger page (workspace scope); the
- *  settings layout owns the section PageHeader. */
-export default function WorkspaceSettingsPage() {
-  const { addToast } = useToast();
-  const [transferEmail, setTransferEmail] = useState("");
-  const wsQuery = trpc.account.workspace.get.useQuery();
-  const pendingTransferQuery = trpc.account.workspace.transfer.pending.useQuery();
+type Entry = { label: string; description: string; href: string; icon: LucideIcon; agencyOnly?: boolean };
 
-  const initiateTransferMutation = trpc.account.workspace.transfer.initiate.useMutation({
-    onSuccess: () => {
-      setTransferEmail("");
-      pendingTransferQuery.refetch();
-      addToast("success", "Transfer invitation sent — the new owner must accept it by email");
-    },
-    onError: (err) => addToast("error", "Couldn't start transfer", err.message),
-  });
+/** Settings index = the design's directory of section cards. Every card points at
+ *  a route that exists — the design also draws an "Add-ons" card, which this app
+ *  has no route for, so it is omitted rather than shipped as a dead link. The
+ *  workspace form this index used to render now lives at
+ *  /dashboard/settings/workspace, reached from the first card. */
+const GROUPS: { label: string; items: Entry[] }[] = [
+  {
+    label: "Workspace",
+    items: [
+      { label: "Workspace & branding", description: "Name, URL, logo & accent color", href: "/dashboard/settings/workspace", icon: Building2 },
+      { label: "Security", description: "2FA, active sessions & sign-in", href: "/dashboard/settings/security", icon: Shield },
+      { label: "Notifications", description: "Emails, digests & alerts", href: "/dashboard/settings/notifications", icon: Bell },
+      { label: "Team", description: "Members, roles & seats", href: "/dashboard/settings/team", icon: Users },
+    ],
+  },
+  {
+    label: "Plan & billing",
+    items: [
+      { label: "Plans", description: "Compare & change your plan", href: "/dashboard/settings/plans", icon: Gauge },
+      { label: "Usage & AI credits", description: "Bandwidth, storage & credits", href: "/dashboard/settings/usage", icon: Activity },
+      { label: "Billing", description: "Invoices & payment method", href: "/dashboard/settings/billing", icon: CreditCard },
+    ],
+  },
+  {
+    label: "Sites & clients",
+    items: [
+      { label: "Domains", description: "Connected domains & DNS", href: "/dashboard/settings/domains", icon: Globe },
+      { label: "Review & comments", description: "Client sign-off queue", href: "/dashboard/agency/reviews", icon: MessageSquare, agencyOnly: true },
+      { label: "Partner program", description: "Referrals & partner tier", href: "/dashboard/agency/partner", icon: Star, agencyOnly: true },
+      { label: "Apps & Integrations", description: "Connect external tools", href: "/dashboard/settings/integrations", icon: LayoutGrid },
+    ],
+  },
+  {
+    label: "Developer",
+    items: [
+      { label: "API tokens", description: "Personal access tokens", href: "/dashboard/settings/api-tokens", icon: KeyRound },
+      { label: "AI & credits", description: "Model provider & credit usage", href: "/dashboard/settings/ai", icon: Sparkles },
+    ],
+  },
+  {
+    label: "Personal",
+    items: [
+      { label: "Account", description: "Email, password & sessions", href: "/dashboard/settings/account", icon: User },
+      { label: "Profile", description: "Your name and avatar", href: "/dashboard/settings/profile", icon: UserCircle },
+    ],
+  },
+  {
+    label: "Danger zone",
+    items: [
+      { label: "Delete workspace", description: "Permanently remove this workspace", href: "/dashboard/settings/danger", icon: Trash2 },
+    ],
+  },
+];
 
-  const cancelTransferMutation = trpc.account.workspace.transfer.cancel.useMutation({
-    onSuccess: () => { pendingTransferQuery.refetch(); addToast("success", "Transfer cancelled"); },
-    onError: (err) => addToast("error", "Couldn't cancel transfer", err.message),
-  });
+function SettingsCard({ entry }: { entry: Entry }) {
+  const Icon = entry.icon;
+  return (
+    <Link
+      href={entry.href}
+      className="flex items-center gap-3.5 rounded-xl border px-[18px] py-4 transition-colors hover:border-[var(--color-border-strong)]"
+      style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+    >
+      <IconChip>
+        <Icon className="h-5 w-5" />
+      </IconChip>
+      <div className="min-w-0 flex-1">
+        <p className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{entry.label}</p>
+        <p className="mt-0.5 text-[13px]" style={{ color: "var(--color-text-secondary)" }}>{entry.description}</p>
+      </div>
+      <ChevronRight className="h-4 w-4 shrink-0" style={{ color: "var(--color-text-muted)" }} />
+    </Link>
+  );
+}
 
-  const updateMutation = trpc.account.workspace.update.useMutation({
-    onSuccess: () => { wsQuery.refetch(); addToast("success", "Workspace updated"); },
-    onError: (err) => addToast("error", "Failed", err.message),
-  });
-
-  const sharingMutation = trpc.account.workspace.sharing.useMutation({
-    onSuccess: () => { wsQuery.refetch(); addToast("success", "Sharing settings updated"); },
-    onError: (err) => addToast("error", "Failed", err.message),
-  });
-
-  if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
-  if (!wsQuery.data) return null;
-
-  const ws = wsQuery.data;
+export default function SettingsIndexPage() {
+  // Reviews and the partner program live behind the agency layer; hiding those
+  // cards keeps every card on this page a destination the user can actually open.
+  const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
+  const agency = !!features.data?.agency_layer;
 
   return (
-    <div className="space-y-8">
-      <WorkspaceForm
-        initialData={{
-          name: ws.name ?? undefined,
-          slug: ws.slug ?? undefined,
-          defaultLanguage: ws.defaultLanguage ?? undefined,
-          timezone: ws.timezone ?? undefined,
-          iconUrl: ws.iconUrl,
-          accentColor: ws.accentColor ?? undefined,
-          editsRequireApproval: ws.editsRequireApproval ?? false,
-          defaultExpiration: ws.sharingSettings?.defaultExpiration ?? null,
-          requirePw: ws.sharingSettings?.requirePw ?? false,
-          allowEditors: ws.sharingSettings?.allowEditors ?? false,
-          notify: ws.sharingSettings?.notify ?? true,
-        }}
-        onSave={(data) => updateMutation.mutate(data)}
-        onSaveSharing={(data) => sharingMutation.mutate(data)}
-        saving={updateMutation.isPending || sharingMutation.isPending}
-      />
-
-      <SectionCard title="Transfer ownership">
-        <p className="text-body-sm mb-3" style={{ color: "var(--color-text-secondary)" }}>
-          Hand this workspace to another person. They&apos;ll get an email invitation and become the owner once they accept; you stay on as a member.
-        </p>
-
-        {pendingTransferQuery.data ? (
-          <div
-            className="rounded-lg border p-4 flex items-center justify-between"
-            style={{ borderColor: "var(--color-border-default)" }}
-          >
-            <div>
-              <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>
-                Transfer pending to {pendingTransferQuery.data.toEmail}
-              </p>
-              <p className="text-body-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
-                Waiting for them to accept the email invitation.
-              </p>
+    <div className="flex flex-col gap-8">
+      {GROUPS.map((group) => {
+        const items = group.items.filter((i) => !i.agencyOnly || agency);
+        if (items.length === 0) return null;
+        return (
+          <section key={group.label}>
+            <h2 className="mb-3 text-eyebrow font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
+              {group.label}
+            </h2>
+            <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-2">
+              {items.map((item) => (
+                <SettingsCard key={item.href} entry={item} />
+              ))}
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => cancelTransferMutation.mutate()}
-              disabled={cancelTransferMutation.isPending}
-            >
-              {cancelTransferMutation.isPending ? "Cancelling…" : "Cancel transfer"}
-            </Button>
-          </div>
-        ) : (
-          <form
-            className="flex items-end gap-2 max-w-md"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const email = transferEmail.trim().toLowerCase();
-              if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-                addToast("error", "Enter a valid email address");
-                return;
-              }
-              initiateTransferMutation.mutate({ toEmail: email });
-            }}
-          >
-            <div className="flex-1">
-              <label className="block text-body font-medium mb-1" style={{ color: "var(--color-text-primary)" }}>
-                New owner&apos;s email
-              </label>
-              <InputField
-                type="email"
-                value={transferEmail}
-                onChange={(e) => setTransferEmail(e.target.value)}
-                required
-                placeholder="owner@example.com"
-              />
-            </div>
-            <Button type="submit" disabled={initiateTransferMutation.isPending} className="whitespace-nowrap">
-              {initiateTransferMutation.isPending ? "Sending…" : "Transfer"}
-            </Button>
-          </form>
-        )}
-      </SectionCard>
+          </section>
+        );
+      })}
     </div>
   );
 }

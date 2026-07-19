@@ -36,8 +36,12 @@ describe("settings rail routes", () => {
     }
   });
 
-  it("keeps the index (Workspace) at /dashboard/settings", () => {
-    expect(SETTINGS_RAIL_HREFS[0]).toBe("/dashboard/settings");
+  it("points Workspace at its own route, with the index kept as the directory", () => {
+    // The settings index is now the design's directory of section cards, so the
+    // workspace form lives at its own route and the rail leads there. Both pages
+    // must exist: the directory is still the section landing.
+    expect(SETTINGS_RAIL_HREFS[0]).toBe("/dashboard/settings/workspace");
+    expect(existsSync(pageFileFor("/dashboard/settings/workspace"))).toBe(true);
     expect(existsSync(pageFileFor("/dashboard/settings"))).toBe(true);
   });
 
