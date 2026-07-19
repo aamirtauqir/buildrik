@@ -76,7 +76,18 @@ The UI kit adopted earlier was evidently derived from this artifact — the foun
 | Screen 1 — Home | `17414b37` | ✅ stat cards, LIVE pill, activity rows |
 | Screen 2 — Projects | `b323d82a` | ✅ header matched; grid preserved (C5) |
 | Screen 9 — Marketplace | `64bdf06d` | ✅ hero + cards matched; install flow live-verified |
-| Screens 3–8, 10–11 | — | pending |
+| Screen 4 — Media library | `6f80d2c3` | ✅ real folders kept over the mock's fixed rail |
+| Screen 5 — Templates | `92c5e3d6` | ✅ `FilterTabs` extracted as a shared primitive |
+| Screen 6 — General settings | `dba60ba0` | ✅ form restyled in place — see C6 |
+| Screen 7 — Getting started | `3c2d3e4b` | ✅ real completion signals kept live |
+| Screen 8 — Help centre | `47cbc199` | ✅ tests 16/16; no support channel invented |
+| Screen 10 — Learn | `36e77670` | ✅ design's blue→purple banner re-done single-hue |
+| Screen 11 — Resources | `12cb164b` | ✅ all 6 links verified; 3 mislabelled (pre-existing) |
+| Screen 3 — Client management | — | ✅ already matched by `5f8a14f1`/`7ef0531f`; no change needed |
+| Responsive audit (1440/820/390) | `06bb5064` | ✅ 34/34; fixed 2 real mobile overflow bugs |
+
+**Verification at close:** `tsc` 0 errors · vitest 853 files / 8895 tests green ·
+responsive audit 34/34 · all 11 routes return 200 with no error page.
 
 ### Dev-environment note (cost me a full debugging cycle)
 
