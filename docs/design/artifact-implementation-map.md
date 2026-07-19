@@ -115,12 +115,30 @@ the design never covers — without inventing screens for them. Audited and foun
 - banned Arial/Helvetica/Roboto stacks: **none**
 - hand-rolled primary CTAs bypassing `Button`: **1**
 - dialogs hand-rolling their own scrim + panel instead of the design's modal
-  chrome: **25 → 19**. The six simple confirm/form dialogs (rename, delete-site,
+  chrome: **25 → 13** (`20e52b81`, `47c62b11`). The six simple confirm/form dialogs (rename, delete-site,
   transfer, delete-workspace, invite, share-draft) now use the primitive and so
-  gained Escape, focus handling and `role="dialog"` they never had. The remaining
-  18 are not plain dialogs — command palette, drawers, progress overlays, template
-  preview/gallery, legal modal, pre-publish checks — and each needs its own
-  judgement rather than a blanket sweep.
+  gained Escape, focus handling and `role="dialog"` they never had. A second batch
+  took billing paywall/cancel, send-review, the API-token create + reveal-once
+  dialogs, the team member detail/change-role dialogs, and the client
+  create/rename/delete dialogs.
+
+  **The 13 that remain are deliberately not migrated**, because they are not plain
+  dialogs and forcing them into a dialog primitive would be wrong: the command
+  palette (top-anchored, own keyboard model), the submission drawer and media
+  library panels (edge-anchored), the AI generation progress overlay, the
+  full-screen template gallery and preview, the cookie-consent banner, and the
+  legal modal (it renders on the auth/onboarding surface, which has its own scoped
+  tokens, not the dashboard's). `create-site-modal`, `pre-publish-checks`,
+  `client-detail-view` and the Projects folder dialog are multi-step or embedded
+  flows worth their own pass.
+
+Two real bugs fell out of this work, neither cosmetic:
+- **Team member removal has no confirmation.** "Remove Member" fires the delete
+  mutation straight from the row menu, while every other destructive action in the
+  app confirms first. Reported, not silently "fixed" — adding a gate is a product call.
+- **Home's stat tiles were `grid-cols-4` at every breakpoint** (`82398f71`): on a
+  390px phone the tiles' fixed-width sparklines pushed the page 15px sideways.
+  Latent, because the sparkline only draws once a workspace has data.
 
 **Verification at close:** `tsc` 0 errors · vitest 853 files / 8895 tests green ·
 responsive audit 34/34 (twice, after de-flaking) · all 11 routes 200, no error page.
