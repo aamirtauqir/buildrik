@@ -115,7 +115,13 @@ the design never covers — without inventing screens for them. Audited and foun
 - banned Arial/Helvetica/Roboto stacks: **none**
 - hand-rolled primary CTAs bypassing `Button`: **1**
 - dialogs hand-rolling their own scrim + panel instead of the design's modal
-  chrome: **25 → 13** (`20e52b81`, `47c62b11`). The six simple confirm/form dialogs (rename, delete-site,
+  chrome: **25 → 9** (`20e52b81`, `47c62b11`, `916e9ab3`).
+- native browser `window.confirm` dialogs: **1 → 0** (`3d9dd12b`, folder delete on
+  Projects — the last browser-default UI on a designed screen).
+
+**Every dialog on the 11 designed screens now carries the design's modal chrome.**
+The 9 files that still hand-roll an overlay are all on undesigned surfaces or are
+not dialogs at all (see below). The six simple confirm/form dialogs (rename, delete-site,
   transfer, delete-workspace, invite, share-draft) now use the primitive and so
   gained Escape, focus handling and `role="dialog"` they never had. A second batch
   took billing paywall/cancel, send-review, the API-token create + reveal-once
