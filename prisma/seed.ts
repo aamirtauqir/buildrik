@@ -209,12 +209,12 @@ const HELP_ARTICLES: Array<{
 }> = [
   {
     slug: "getting-started-overview",
-    title: "Getting started with Buildrik",
+    title: "Getting started with Buildrick",
     category: "getting-started",
     excerpt: "Create your first site, pick a starting point, and publish in minutes.",
     readTime: 4,
     content:
-      "Welcome to Buildrik. Start from the dashboard by clicking New Site. You can begin from a blank canvas, choose a template, or let AI generate a first draft from a short description. Once the editor opens, add and arrange blocks, edit content inline, and use the inspector on the right to adjust styles. When you're happy, open the Publish panel to push your site live on a buildrik.app subdomain or your own connected domain.",
+      "Welcome to Buildrick. Start from the dashboard by clicking New Site. You can begin from a blank canvas, choose a template, or let AI generate a first draft from a short description. Once the editor opens, add and arrange blocks, edit content inline, and use the inspector on the right to adjust styles. When you're happy, open the Publish panel to deploy it to your connected Vercel account, on your own domain.",
   },
   {
     slug: "creating-your-first-site",
@@ -241,7 +241,7 @@ const HELP_ARTICLES: Array<{
     excerpt: "How publishing works, pre-publish checks, and taking a site offline.",
     readTime: 4,
     content:
-      "Open the Publish panel to run pre-publish checks (pages present, SEO configured, domain status, favicon) and deploy. Your site goes live on a buildrik.app subdomain unless you've connected and verified a custom domain. Republishing redeploys the latest content; the previous version keeps serving until the new deploy is ready. To take a site offline, use Unpublish — your content stays saved as a draft.",
+      "Open the Publish panel to run pre-publish checks (pages present, SEO configured, domain status, favicon) and deploy. Your site deploys into the Vercel account you connected in Settings › Integrations — publishing is blocked until that connection exists. Republishing redeploys the latest content; the previous version keeps serving until the new deploy is ready. To take a site offline, use Unpublish — your content stays saved as a draft.",
   },
   {
     slug: "inviting-team-members",
@@ -259,7 +259,7 @@ const HELP_ARTICLES: Array<{
     excerpt: "What Owner, Admin, Editor, and Viewer can each do.",
     readTime: 3,
     content:
-      "Buildrik has four roles. Owner is the workspace creator and has full control including transfer and deletion. Admin manages members, billing, and settings. Editor creates, edits, and publishes sites but can't manage billing or members. Viewer can view content but not change it. Roles are set when you invite someone and can be changed from the member actions menu by an Admin or Owner.",
+      "Buildrick has four roles. Owner is the workspace creator and has full control including transfer and deletion. Admin manages members, billing, and settings. Editor creates, edits, and publishes sites but can't manage billing or members. Viewer can view content but not change it. Roles are set when you invite someone and can be changed from the member actions menu by an Admin or Owner.",
   },
   {
     slug: "choosing-a-plan",
@@ -268,7 +268,7 @@ const HELP_ARTICLES: Array<{
     excerpt: "Compare Free, Pro, and Business limits.",
     readTime: 3,
     content:
-      "Free is for trying Buildrik and small personal sites, with limits on sites, pages, AI generations, and storage. Pro raises every limit and unlocks custom domains, share-link passwords, and longer analytics retention. Business adds the highest limits, unlimited AI generations, and the most team seats. You can see exact limits on the Billing page, which also tracks your current usage against your plan.",
+      "Free is for trying Buildrick and small personal sites, with limits on sites, pages, AI generations, and storage. Pro raises every limit and unlocks custom domains, share-link passwords, and longer analytics retention. Business adds the highest limits, unlimited AI generations, and the most team seats. You can see exact limits on the Billing page, which also tracks your current usage against your plan.",
   },
   {
     slug: "managing-billing",
@@ -283,10 +283,10 @@ const HELP_ARTICLES: Array<{
     slug: "connecting-a-domain",
     title: "Connecting a custom domain",
     category: "domains",
-    excerpt: "Point your domain at Buildrik and verify DNS.",
+    excerpt: "Point your domain at Buildrick and verify DNS.",
     readTime: 5,
     content:
-      "On a Pro or Business plan, open a site's Domains settings and add your domain. Buildrik shows the DNS records to add at your registrar — typically an A record for the apex and a CNAME for www. After you add them, verification runs automatically and can take from a few minutes to a few hours depending on DNS propagation. Once verified, your published site serves from the custom domain with SSL provisioned automatically.",
+      "On a Pro or Business plan, open a site's Domains settings and add your domain. Buildrick shows the DNS records to add at your registrar — typically an A record for the apex and a CNAME for www. After you add them, verification runs automatically and can take from a few minutes to a few hours depending on DNS propagation. Once verified, your published site serves from the custom domain with SSL provisioned automatically.",
   },
   {
     slug: "dns-and-ssl-troubleshooting",
@@ -313,7 +313,7 @@ const HELP_ARTICLES: Array<{
     excerpt: "Keep a site consistent with shared design tokens.",
     readTime: 4,
     content:
-      "Rather than styling each element by hand, Buildrik lets you define tokens — reusable colors, type scales, and spacing values — and bind elements to them. Update a token once and every element using it updates everywhere. This keeps a site visually consistent and makes global restyles fast. Manage tokens and presets from the Styles section of the editor.",
+      "Rather than styling each element by hand, Buildrick lets you define tokens — reusable colors, type scales, and spacing values — and bind elements to them. Update a token once and every element using it updates everywhere. This keeps a site visually consistent and makes global restyles fast. Manage tokens and presets from the Styles section of the editor.",
   },
 ];
 
