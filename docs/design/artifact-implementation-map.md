@@ -47,6 +47,29 @@ The UI kit adopted earlier was evidently derived from this artifact — the foun
 | 10 | Learn | top nav | `/dashboard/learn` | exists |
 | 11 | Resources | top nav | `/dashboard/resources` | exists |
 
+## C5 / C6 / C7 — ALL RESOLVED 2026-07-19
+
+The founder ruled on Settings by sending the design screenshot. Re-examining the
+other two against the actual data showed **two of my three conflict reports were
+wrong**, and the third was a product call the founder has now made:
+
+| # | What I reported | What was actually true | Built |
+|---|---|---|---|
+| C6 Settings | design directory has 3 dead links | only **Add-ons** lacks a route; Reviews and Partner live under `/dashboard/agency/` | `35e4aaf2` — directory built, Add-ons omitted, form moved to `/settings/workspace` |
+| C5 Projects | only 1 of 3 folder stats is real | **all three** are real: `_count.sites`, `status="PUBLISHED"`, 30-day `SiteAnalytics.visitors` | `e0f18662` — folder grid, list preserved |
+| C7 Learn | "no article data exists" | the data is the **Help centre's** seeded articles; the design's reader shows them verbatim | `25bfc845` — real categories + real reader |
+
+Two real bugs surfaced while building these:
+- **"All sites" hid every foldered site** (`e0f18662`). It passed `folderId: null`,
+  which the service reads as `where.folderId = null` — i.e. only sites with NO
+  folder. Byte-identical in HEAD, so it predates the redesign; it was invisible
+  until a site lived in a folder.
+- Home's stat tiles were `grid-cols-4` at every breakpoint (`82398f71`).
+
+What is still NOT built, for want of a data source, and is not invented:
+Add-ons (no route), Learn's "Continue learning" banner and per-card progress bars
+(no progress or enrolment model).
+
 ## CONFLICTS / GAPS — reported, not assumed (goal rules 10 & 12)
 
 - **C1 — Clients vs Agency.** Design puts **Clients (3)** as a flat sidebar item. The app has **Agency** (feature-gated by `agency_layer`) containing Clients / Reviews / Shared theme / Partner tabs. The design has no Agency concept and no Reviews/Shared-theme/Partner screens. Per rule 12, functionality is preserved — Agency stays; its Clients screen adopts the design's "Client management" layout.
