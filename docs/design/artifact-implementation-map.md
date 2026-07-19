@@ -102,6 +102,25 @@ The UI kit adopted earlier was evidently derived from this artifact — the foun
 | Responsive audit (1440/820/390) | `06bb5064` | ✅ 34/34; fixed 2 real mobile overflow bugs |
 
 | Pixel gaps closed (Button/ProgressBar/PageHeader) | `bc8f9863` | ✅ measured equal to design |
+| Design modal states (Modal primitive + 2 wired) | `fc3f576c` | ✅ 460/16px/scrim measured equal |
+| Confirm dialogs onto the Modal primitive | `20e52b81`, `60f68535` | ✅ 6 migrated; hand-rolled scrims 25 → 19 |
+
+### Outdated-UI drain (undesigned routes)
+
+The brief also forbids leaving outdated UI anywhere, which *is* actionable on routes
+the design never covers — without inventing screens for them. Audited and found:
+
+- banned purple/violet/indigo accents: **none**
+- legacy `#E42313` red accent: **none** (only a comment in `globals.css`)
+- banned Arial/Helvetica/Roboto stacks: **none**
+- hand-rolled primary CTAs bypassing `Button`: **1**
+- dialogs hand-rolling their own scrim + panel instead of the design's modal
+  chrome: **25 → 19**. The six simple confirm/form dialogs (rename, delete-site,
+  transfer, delete-workspace, invite, share-draft) now use the primitive and so
+  gained Escape, focus handling and `role="dialog"` they never had. The remaining
+  18 are not plain dialogs — command palette, drawers, progress overlays, template
+  preview/gallery, legal modal, pre-publish checks — and each needs its own
+  judgement rather than a blanket sweep.
 
 **Verification at close:** `tsc` 0 errors · vitest 853 files / 8895 tests green ·
 responsive audit 34/34 (twice, after de-flaking) · all 11 routes 200, no error page.
