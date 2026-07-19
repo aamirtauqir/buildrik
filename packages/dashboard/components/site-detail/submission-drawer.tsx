@@ -75,7 +75,8 @@ export function SubmissionDrawer({
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/30"
+        className="absolute inset-0"
+        style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}
         onClick={onClose}
       />
 
