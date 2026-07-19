@@ -146,6 +146,29 @@ Two real bugs fell out of this work, neither cosmetic:
   390px phone the tiles' fixed-width sparklines pushed the page 15px sideways.
   Latent, because the sparkline only draws once a workspace has data.
 
+### States and accessibility (brief's states clause), verified not assumed
+
+`e2e/a11y-states-audit.spec.ts` (`11a23c05`) asserts per designed screen that Tab
+reaches a real control and that no disabled control is a positive tab stop, plus
+that the focus ring still resolves to `#406ED6` — 24/24.
+
+State branches audited by reading each screen: every designed screen backed by a
+query has loading, empty and error paths (Home, Projects, Marketplace, Media, Help,
+Clients, Getting started). Templates, Learn and Resources render static lists with
+no query, so they correctly have none; adding them would be dead code. Help's
+branches live in `app/dashboard/help/page.tsx` and `components/help/article-list.tsx`,
+not in `help-center.tsx`.
+
+### Why C5 cannot be built from real data
+
+Revisited rather than re-asserted. The design's folder cards carry three stats —
+sites, live, views. `listFolders` returns `name` + `_count.sites`, so **one of the
+three is real**; "live" and "views" have no per-folder source. Building the grid
+would mean either inventing two stats per card or extending backend queries the
+brief puts off-limits — and it would demote a working list (search, sort, filter,
+bulk actions, view toggle, pagination) to a mockup. The brief's own conflict clause
+governs: preserve the functionality, report the conflict.
+
 **Verification at close:** `tsc` 0 errors · vitest 853 files / 8895 tests green ·
 responsive audit 34/34 (twice, after de-flaking) · all 11 routes 200, no error page.
 
