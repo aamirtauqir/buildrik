@@ -20,9 +20,10 @@ const ROUTES = [
 
 test.use({ viewport: { width: 1440, height: 900 } });
 
-// Walks 11 screens and then HEADs every distinct link. The Settings directory
-// alone contributes ~15, so this runs well past the default per-test timeout.
-test.setTimeout(180_000);
+// Walks 11 screens and then requests every distinct link — ~40 routes once the
+// Settings directory is counted. Against `next dev` each of those is a cold
+// on-demand compile, so the wall-clock here is compile cost, not test logic.
+test.setTimeout(300_000);
 
 test("every internal link on the designed screens resolves to a real route", async ({ page }) => {
   const hrefs = new Set<string>();

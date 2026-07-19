@@ -1,34 +1,39 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/primitives";
-import { SettingsRail } from "@/components/dashboard/shell/settings-rail";
+import { findSettingsSection } from "@/components/dashboard/shell/settings-sections";
 
-/** Settings section chrome (IA v2, D6): the layout owns the PageHeader
- *  (D10.4 — sub-route pages provide content only) and the section tabs.
- *
- *  The index is the design's directory of section cards, where the cards are the
- *  navigation — so the rail is suppressed there and shown on every sub-route,
- *  which still needs a way back and across. */
+/** Settings chrome. The index is the design's directory of section cards; a
+ *  sub-page drills in from it, so it gets a back link to the directory and is
+ *  titled with the section you actually opened — not a generic "Settings" plus a
+ *  tab rail repeating the directory that is one click away. */
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isIndex = pathname === "/dashboard/settings";
+  const section = findSettingsSection(pathname);
+
+  if (!section) {
+    return (
+      <div>
+        <PageHeader title="General settings" description="Workspace name, branding, and defaults." />
+        <div className="min-w-0">{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <PageHeader
-        title={isIndex ? "General settings" : "Settings"}
-        description={
-          isIndex
-            ? "Workspace name, branding, and defaults."
-            : "Workspace, platform, billing, and personal preferences."
-        }
-      />
-      {!isIndex && (
-        <div className="mb-6 mt-1">
-          <SettingsRail />
-        </div>
-      )}
+      <Link
+        href="/dashboard/settings"
+        className="mb-3 inline-flex items-center gap-1 text-body-sm font-semibold transition-colors hover:text-[var(--color-text-primary)]"
+        style={{ color: "var(--color-text-secondary)" }}
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Settings
+      </Link>
+      <PageHeader title={section.label} description={section.description} />
       <div className="min-w-0">{children}</div>
     </div>
   );

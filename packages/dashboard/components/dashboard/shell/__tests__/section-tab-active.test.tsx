@@ -3,7 +3,7 @@ import { renderHook } from "@testing-library/react";
 
 /**
  * Section-tab active-rule (spec 2026-07-16 §Section tabs, E7, test #2). The
- * helper is the SSOT for both SettingsRail and AgencyTabs: a segment-safe prefix
+ * helper is the SSOT for the section tab rows (AgencyTabs): a segment-safe prefix
  * match, with an exact-match exception for a section's index href so the index
  * doesn't light on every sibling and nested survivors keep their parent lit.
  */

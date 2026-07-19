@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 /**
  * Section-tab SSOT (IA v2, E7): the active rule and the token classes live
- * here; SettingsRail and AgencyTabs are thin renderers over them.
+ * here; AgencyTabs is a thin renderer over them.
  *
  * Active rule: segment-safe prefix match, with an exact-match exception for a
  * section's index href — the index must not light on every sibling route, and
