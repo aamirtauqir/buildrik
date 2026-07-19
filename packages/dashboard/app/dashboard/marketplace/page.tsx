@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, type LucideIcon } from "lucide-react";
-import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory } from "@/lib/marketplace-catalog";
-import { PageHeader, IconChip, InputField, Button, ButtonLink } from "@/components/dashboard/primitives";
+import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory, type CatalogApp } from "@/lib/marketplace-catalog";
+import { PageHeader, IconChip, InputField, Button, ButtonLink, Modal } from "@/components/dashboard/primitives";
 import { trpc } from "@lib/trpc/client";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -27,6 +27,8 @@ export default function MarketplacePage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Filter>("All");
   const [actionError, setActionError] = useState<string>();
+  // The design confirms an install in a dialog before it runs; uninstall stays direct.
+  const [confirming, setConfirming] = useState<CatalogApp>();
 
   const utils = trpc.useUtils();
   const installed = trpc.marketplace.listInstalled.useQuery(undefined, { staleTime: 30_000 });
@@ -169,7 +171,7 @@ export default function MarketplacePage() {
                     onClick={() => {
                       setActionError(undefined);
                       if (isInstalled) uninstall.mutate({ appId: app.id });
-                      else install.mutate({ appId: app.id });
+                      else setConfirming(app);
                     }}
                     className="w-full"
                   >
@@ -182,6 +184,42 @@ export default function MarketplacePage() {
           })}
         </div>
       )}
+
+      <Modal
+        open={confirming !== undefined}
+        onClose={() => setConfirming(undefined)}
+        title={confirming ? `Install ${confirming.name}` : ""}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setConfirming(undefined)}>Cancel</Button>
+            <Button
+              disabled={install.isPending}
+              onClick={() => {
+                if (!confirming) return;
+                install.mutate({ appId: confirming.id });
+                setConfirming(undefined);
+              }}
+            >
+              {install.isPending ? "Installing…" : "Install"}
+            </Button>
+          </>
+        }
+      >
+        {confirming && (
+          <div className="flex items-start gap-3">
+            <IconChip color={confirming.color}>
+              {(() => {
+                const Icon = iconMap[confirming.icon] ?? FileText;
+                return <Icon className="h-5 w-5" />;
+              })()}
+            </IconChip>
+            <div className="min-w-0">
+              <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{confirming.name}</p>
+              <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{confirming.description}</p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
