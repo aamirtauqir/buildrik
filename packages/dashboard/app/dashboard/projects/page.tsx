@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
 import { ViewToggle } from "@/components/sites/view-toggle";
 import { SiteFilters } from "@/components/sites/site-filters";
-import { FolderTabs } from "@/components/sites/folder-tabs";
+import { FolderCardGrid } from "@/components/sites/folder-card-grid";
 import { SiteGrid } from "@/components/sites/site-grid";
 import { SiteListView } from "@/components/sites/site-list-view";
 import { BulkActionBar, BULK_SELECTION_CAP } from "@/components/sites/bulk-action-bar";
@@ -109,7 +109,10 @@ export default function ProjectsPage() {
       | "pages"
       | "published",
     search: search || undefined,
-    folderId: showArchived ? undefined : folderId,
+    // null is the "All sites" selection, which must not filter at all. Passing it
+    // through reached the service as `where.folderId = null`, i.e. only sites with
+    // NO folder — so any site inside a folder vanished from "All sites".
+    folderId: showArchived ? undefined : (folderId ?? undefined),
     createdBy,
     dateRange,
     templateUsed,
@@ -361,20 +364,17 @@ export default function ProjectsPage() {
     [selectedIds, bulkMutation, moveMutation]
   );
 
-  // Folder tabs — every folder appears, count 0 included: empty folders stay
-  // visible (E4), exactly like the old projects page guaranteed.
-  const folderTabs = [
-    {
-      id: null,
-      name: "All Sites",
-      count: sitesQuery.data?.total ?? 0,
-    },
-    ...(foldersQuery.data?.map((f: { id: string; name: string; _count?: { sites: number } }) => ({
+  // Folder cards — every folder appears, count 0 included: empty folders stay
+  // visible (E4), exactly like the old folder tabs guaranteed.
+  const folderCards = (foldersQuery.data ?? []).map(
+    (f: { id: string; name: string; _count?: { sites: number }; liveCount?: number; views?: number }) => ({
       id: f.id,
       name: f.name,
       count: f._count?.sites ?? 0,
-    })) ?? []),
-  ];
+      liveCount: f.liveCount ?? 0,
+      views: f.views ?? 0,
+    })
+  );
 
   const folders = (foldersQuery.data ?? []).map((f: { id: string; name: string }) => ({
     id: f.id,
@@ -439,11 +439,12 @@ export default function ProjectsPage() {
         }
       />
 
-      {/* Folder tabs — hidden when the folders query fails; the list still renders */}
+      {/* Folder cards — hidden when the folders query fails; the list still renders */}
       {!foldersQuery.isError && (
-        <FolderTabs
-          tabs={folderTabs}
+        <FolderCardGrid
+          folders={folderCards}
           activeId={folderId}
+          totalCount={sitesQuery.data?.total ?? 0}
           onSelect={(id) => {
             setFolderId(id);
             setShowArchived(false);
@@ -458,6 +459,7 @@ export default function ProjectsPage() {
             setFolderId(null);
             setPage(1);
           }}
+          onNewFolder={() => setCreateFolderOpen(true)}
         />
       )}
 

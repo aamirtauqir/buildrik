@@ -35,6 +35,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** 24800 → "24.8k", 1_200_000 → "1.2m". Keeps big visitor/view counts compact. */
+export function formatCompact(n: number): string {
+  if (n < 1000) return String(n);
+  if (n < 1_000_000) {
+    const k = n / 1000;
+    return `${k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)}k`;
+  }
+  const m = n / 1_000_000;
+  return `${m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)}m`;
+}
+
 /**
  * Draft share links are served by the dashboard itself, at `/share/<token>`.
  * They used to be built against `preview.buildrick.app`, a host that has no DNS

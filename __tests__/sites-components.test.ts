@@ -66,10 +66,12 @@ describe("Sites Components", () => {
     });
   });
 
-  describe("FolderTabs", () => {
-    it("exports FolderTabs component", async () => {
-      const mod = await import("@/components/sites/folder-tabs");
-      expect(mod.FolderTabs).toBeDefined();
+  describe("FolderCardGrid", () => {
+    // Replaced FolderTabs: Projects now navigates folders through the design's
+    // card grid instead of a tab row.
+    it("exports FolderCardGrid component", async () => {
+      const mod = await import("@/components/sites/folder-card-grid");
+      expect(mod.FolderCardGrid).toBeDefined();
     });
   });
 });

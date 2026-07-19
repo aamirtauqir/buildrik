@@ -20,6 +20,9 @@ vi.mock("@/lib/prisma", () => {
       create: vi.fn(),
       delete: vi.fn(),
     },
+    siteAnalytics: {
+      groupBy: vi.fn().mockResolvedValue([]),
+    },
     workspaceMember: {
       findFirst: vi.fn(),
     },
@@ -280,7 +283,7 @@ describe("Sites Service", () => {
   });
 
   describe("Folder Service", () => {
-    it("listFolders returns folders with site counts", async () => {
+    it("listFolders returns folders with site counts, live counts and 30d views", async () => {
       const { listFolders } = await import(
         "@/server/services/folder.service"
       );
@@ -292,10 +295,23 @@ describe("Sites Service", () => {
           workspaceId: "ws_123",
           createdAt: new Date(),
           _count: { sites: 3 },
+          sites: [
+            { id: "s1", status: "PUBLISHED" },
+            { id: "s2", status: "DRAFT" },
+            { id: "s3", status: "PUBLISHED" },
+          ],
         },
+      ] as any);
+      vi.mocked(prisma.siteAnalytics.groupBy).mockResolvedValue([
+        { siteId: "s1", _sum: { visitors: 800 } },
+        { siteId: "s3", _sum: { visitors: 400 } },
       ] as any);
       const folders = await listFolders("ws_123");
       expect(folders).toHaveLength(1);
+      expect(folders[0]._count.sites).toBe(3);
+      expect(folders[0].liveCount).toBe(2);
+      expect(folders[0].views).toBe(1200);
+      expect((folders[0] as any).sites).toBeUndefined();
     });
 
     it("createFolder validates unique name", async () => {

@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { trpc } from "@lib/trpc/client";
+import { formatCompact } from "@lib/utils";
 import { StatCard, PageHeader, SectionCard, MetricValue } from "@/components/dashboard/primitives";
 import { TrendArrow, Sparkline } from "@/components/dashboard/dataviz";
 import { QuickActions } from "@/components/dashboard/quick-actions";
@@ -12,17 +13,6 @@ import { DunningBanner } from "@/components/dashboard/dunning-banner";
 import { DashboardChecklist } from "@/components/onboarding/dashboard-checklist";
 import { NeedsAttention } from "@/components/dashboard/needs-attention";
 import { ErrorState } from "@/components/states";
-
-/** 24800 → "24.8k", 1_200_000 → "1.2m". Keeps big visitor counts compact. */
-function formatCompact(n: number): string {
-  if (n < 1000) return String(n);
-  if (n < 1_000_000) {
-    const k = n / 1000;
-    return `${k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)}k`;
-  }
-  const m = n / 1_000_000;
-  return `${m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)}m`;
-}
 
 export default function DashboardPage() {
   const { data: session } = useSession();

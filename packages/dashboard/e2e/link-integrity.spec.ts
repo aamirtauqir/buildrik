@@ -20,6 +20,10 @@ const ROUTES = [
 
 test.use({ viewport: { width: 1440, height: 900 } });
 
+// Walks 11 screens and then HEADs every distinct link. The Settings directory
+// alone contributes ~15, so this runs well past the default per-test timeout.
+test.setTimeout(180_000);
+
 test("every internal link on the designed screens resolves to a real route", async ({ page }) => {
   const hrefs = new Set<string>();
 
