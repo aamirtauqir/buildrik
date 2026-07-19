@@ -51,7 +51,22 @@ The UI kit adopted earlier was evidently derived from this artifact — the foun
 
 - **C1 — Clients vs Agency.** Design puts **Clients (3)** as a flat sidebar item. The app has **Agency** (feature-gated by `agency_layer`) containing Clients / Reviews / Shared theme / Partner tabs. The design has no Agency concept and no Reviews/Shared-theme/Partner screens. Per rule 12, functionality is preserved — Agency stays; its Clients screen adopts the design's "Client management" layout.
 - **C2 — ~29 app screens have no design.** The design covers 11 of ~40 routes. Undesigned: all site-detail tabs (overview/traffic/SEO/forms/redirects/sharing/settings/domains), billing, plans, usage, team, domains, integrations, API tokens, security, profile, notifications, danger zone, reviews, comments, shared theme, partner, AI wizard, onboarding (14 frames), auth (12+), editor. "No old-design elements remain" is not achievable for these — they stay on the current kit-aligned styling, which shares the design's tokens.
-- **C3 — No states in the design.** The prototype shows a single populated state per screen. No hover / focus / disabled / loading / empty / error / success variants, and no tablet/mobile breakpoints. The goal requires these pixel-perfect; the design does not define them. They will follow the existing kit rules (documented in `docs/design/dashboard-ui-kit.md` §6) rather than being invented.
+- **C3 — CORRECTED 2026-07-19.** This originally read "no states in the design",
+  which was wrong: it was written after exploring the nav only. A programmatic
+  crawl (click every control, watch for `h1` change / fixed overlay) confirms
+  **exactly 11 screens** and finds **3 modals**: *Create a new site* (Home),
+  *Install <app>* (Marketplace), and an article reader (Learn). The first two are
+  implemented in `fc3f576c`. The third is a conflict — see C7. What the design
+  still does not define is hover / focus / disabled / loading / empty / error
+  variants, and no tablet or mobile breakpoints; those follow the kit rules and
+  are covered by `e2e/responsive-audit.spec.ts`.
+- **C7 — Learn's article reader has no data source.** The design opens a reading
+  modal ("Connecting a custom domain · 4 min read"). Learn's course list is
+  hardcoded placeholder content — there is no course or lesson model in Prisma and
+  no article body to render. Building the reader would mean inventing article copy,
+  which the brief forbids. Help centre *does* have real seeded articles; if Learn
+  should read from it, that is a product decision.
+- **C3 (original text, superseded) — No states in the design.** The prototype shows a single populated state per screen. No hover / focus / disabled / loading / empty / error / success variants, and no tablet/mobile breakpoints. The goal requires these pixel-perfect; the design does not define them. They will follow the existing kit rules (documented in `docs/design/dashboard-ui-kit.md` §6) rather than being invented.
 - **C4 — Design uses mock data** (Taiba's Workspace, 6 projects, 24.8k visitors, named activity rows). App renders real data; layouts must tolerate empty/long values. Real data wins (goal rule 8).
 
 - **C5 — "All projects" is a different feature in the design.** The design's Projects screen is a **folder/project-group grid** (4 cards: Marketing Sites / Client Work / Product & App / Experiments, each an icon tile + ⋯ menu + name + sites/live/views stat row) above a non-clickable "All sites / Apps" pill toggle. The app's `/dashboard/projects` is a **flat site list** with real search, sort, filter, bulk actions and grid/list views — and the design defines no drill-down target for its folder cards. Restyling the list into the folder grid would delete working functionality to match a mockup. Per rule 12 the site list is preserved; only the comparable header/button row was matched. **Folder grouping already exists in the app** (`folder-tabs.tsx`) — if the founder wants the design's folder-grid landing, that is a product decision needing its own spec, not a restyle.
