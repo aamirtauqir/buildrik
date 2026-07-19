@@ -30,7 +30,10 @@ export function Modal({
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", onKey);
-    panelRef.current?.focus();
+    // Only pull focus in if the panel's own content did not already claim it —
+    // dialogs that autoFocus a field must keep that field focused.
+    const panel = panelRef.current;
+    if (panel && !panel.contains(document.activeElement)) panel.focus();
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
