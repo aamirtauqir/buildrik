@@ -61,7 +61,7 @@ export function CookieConsent() {
     return (
       <div
         className="fixed inset-0 z-[9998] flex items-center justify-center"
-        style={{ backgroundColor: "#0000004D" }}
+        style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}
       >
         <div className="w-[480px] rounded-xl bg-white p-6 shadow-xl">
           <div className="flex items-center justify-between">

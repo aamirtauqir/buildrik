@@ -230,7 +230,7 @@ export function GenerationProgress({
 
       {/* Cancel confirmation modal */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}>
           <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
             <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
               Cancel generation?
@@ -260,7 +260,7 @@ export function GenerationProgress({
 
       {/* Credits exhausted modal */}
       {showCreditsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}>
           <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
             <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
               AI credits used up

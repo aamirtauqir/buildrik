@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, AlertTriangle, XCircle, X, ArrowUpRight } from "lucide-react";
+import { CheckCircle2, AlertTriangle, XCircle, ArrowUpRight } from "lucide-react";
 import { VERCEL_CHECK_LABEL, type PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
-import { Button } from "@/components/dashboard/primitives";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 const STATUS_ICON = {
   pass: <CheckCircle2 className="h-5 w-5" style={{ color: "var(--color-success)" }} />,
@@ -22,16 +22,24 @@ export function PrePublishChecks({ checks, onPublish, onCancel }: PrePublishChec
   const [notifyTeam, setNotifyTeam] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>Pre-Publish Checks</h2>
-          <button onClick={onCancel} className="rounded-lg p-1 hover:bg-gray-100">
-            <X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} />
-          </button>
-        </div>
-
-        <div className="mt-5 space-y-3">
+    <Modal
+      open={true}
+      onClose={onCancel}
+      title="Pre-Publish Checks"
+      width={512}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button onClick={() => onPublish(notifyTeam)} disabled={!checks.ready}>
+            Publish
+          </Button>
+        </>
+      }
+    >
+      <div>
+        <div className="space-y-3">
           {checks.checks.map((check) => (
             <div key={check.label} className="flex items-start gap-3 rounded-xl border p-3" style={{ borderColor: "var(--color-border-default)" }}>
               <div className="mt-0.5 shrink-0">{STATUS_ICON[check.status]}</div>
@@ -62,16 +70,7 @@ export function PrePublishChecks({ checks, onPublish, onCancel }: PrePublishChec
           />
           <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>Notify team members when published</span>
         </label>
-
-        <div className="mt-6 flex justify-end gap-3">
-          <Button variant="ghost" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button onClick={() => onPublish(notifyTeam)} disabled={!checks.ready}>
-            Publish
-          </Button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

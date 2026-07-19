@@ -40,7 +40,7 @@ interface TemplateGalleryProps {
 export function TemplateGallery({ open, onClose, templates, isLoading, category, onCategoryChange, sort, onSortChange, onPreview, onUse, onLoadMore, hasMore, onStartBlank }: TemplateGalleryProps) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: "#0000004D" }}>
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: "rgba(18, 22, 32, 0.45)" }}>
       <div className="flex flex-1 flex-col bg-white">
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4" style={{ borderColor: "var(--color-border-default)" }}>
