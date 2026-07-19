@@ -13,7 +13,7 @@ import { RenameModal } from "@/components/sites/rename-modal";
 import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
 import { TransferModal } from "@/components/sites/transfer-modal";
 import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
-import { Button, PageHeader } from "@/components/dashboard/primitives";
+import { Button, Modal, PageHeader } from "@/components/dashboard/primitives";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
 import { Plus, Search, CheckSquare, Folder } from "lucide-react";
@@ -678,48 +678,47 @@ export default function ProjectsPage() {
         />
       )}
 
-      {createFolderOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>New Folder</h2>
-            <input
-              type="text"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && newFolderName.trim()) {
-                  createFolderMutation.mutate({ name: newFolderName.trim() });
-                } else if (e.key === "Escape") {
-                  setCreateFolderOpen(false);
-                  setNewFolderName("");
-                }
+      <Modal
+        open={createFolderOpen}
+        onClose={() => { setCreateFolderOpen(false); setNewFolderName(""); }}
+        title="New Folder"
+        width={384}
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => { setCreateFolderOpen(false); setNewFolderName(""); }}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (newFolderName.trim()) createFolderMutation.mutate({ name: newFolderName.trim() });
               }}
-              placeholder="Folder name"
-              autoFocus
-              className="mt-4 w-full rounded-lg border px-3 py-2 text-body outline-none focus:border-[var(--color-primary)]"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-            />
-            <div className="mt-6 flex gap-3">
-              <Button
-                variant="ghost"
-                onClick={() => { setCreateFolderOpen(false); setNewFolderName(""); }}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  if (newFolderName.trim()) createFolderMutation.mutate({ name: newFolderName.trim() });
-                }}
-                disabled={!newFolderName.trim() || createFolderMutation.isPending}
-                className="flex-1"
-              >
-                {createFolderMutation.isPending ? "Creating..." : "Create Folder"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+              disabled={!newFolderName.trim() || createFolderMutation.isPending}
+              className="flex-1"
+            >
+              {createFolderMutation.isPending ? "Creating..." : "Create Folder"}
+            </Button>
+          </>
+        }
+      >
+        <input
+          type="text"
+          value={newFolderName}
+          onChange={(e) => setNewFolderName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && newFolderName.trim()) {
+              createFolderMutation.mutate({ name: newFolderName.trim() });
+            }
+          }}
+          placeholder="Folder name"
+          autoFocus
+          className="w-full rounded-lg border px-3 py-2 text-body outline-none focus:border-[var(--color-primary)]"
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+        />
+      </Modal>
     </div>
   );
 }

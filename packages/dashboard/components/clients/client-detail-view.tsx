@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Globe, Plus, Palette, UserPlus, X } from "lucide-react";
+import { ArrowLeft, Globe, Plus, Palette, UserPlus } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
-import { Button } from "@/components/dashboard/primitives";
+import { Button, Modal } from "@/components/dashboard/primitives";
 
 interface Branding {
   logoUrl: string | null;
@@ -39,34 +39,12 @@ function BrandingDialog({
   const field = "mt-1 w-full rounded-lg border px-3 py-2 text-sm";
   const label = "text-xs font-semibold";
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
-      <div className="w-[460px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>White-label branding</h2>
-          <button onClick={onClose} aria-label="Close"><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
-        </div>
-        <div className="mt-4 space-y-3">
-          <div>
-            <label className={label} style={{ color: "var(--color-text-secondary)" }}>Brand color</label>
-            <div className="mt-1 flex items-center gap-2">
-              <input type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="h-9 w-12 rounded border" style={{ borderColor: "var(--color-border-default)" }} aria-label="Brand color" />
-              <input type="text" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
-            </div>
-          </div>
-          <div>
-            <label className={label} style={{ color: "var(--color-text-secondary)" }}>Logo URL</label>
-            <input type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} className={field} style={{ borderColor: "var(--color-border-default)" }} />
-          </div>
-          <div>
-            <label className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
-            <input type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} className={field} style={{ borderColor: "var(--color-border-default)" }} />
-          </div>
-          <label className="flex items-center gap-2 pt-1 text-sm" style={{ color: "var(--color-text-primary)" }}>
-            <input type="checkbox" checked={hideBuildrik} onChange={(e) => setHideBuildrik(e.target.checked)} className="accent-[var(--color-primary)]" />
-            Hide Buildrick branding for this client
-          </label>
-        </div>
-        <div className="mt-5 flex justify-end gap-2">
+    <Modal
+      open={true}
+      onClose={onClose}
+      title="White-label branding"
+      footer={
+        <>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button
             onClick={() => onSave({ logoUrl: orNull(logoUrl), brandColor: orNull(brandColor), customDomain: orNull(customDomain), hideBuildrik })}
@@ -74,9 +52,31 @@ function BrandingDialog({
           >
             {saving ? "Saving…" : "Save branding"}
           </Button>
+        </>
+      }
+    >
+      <div className="space-y-3">
+        <div>
+          <label className={label} style={{ color: "var(--color-text-secondary)" }}>Brand color</label>
+          <div className="mt-1 flex items-center gap-2">
+            <input type="color" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="h-9 w-12 rounded border" style={{ borderColor: "var(--color-border-default)" }} aria-label="Brand color" />
+            <input type="text" value={brandColor} onChange={(e) => setBrandColor(e.target.value)} className="flex-1 rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "var(--color-border-default)" }} />
+          </div>
         </div>
+        <div>
+          <label className={label} style={{ color: "var(--color-text-secondary)" }}>Logo URL</label>
+          <input type="text" value={logoUrl} placeholder="https://…/logo.svg" onChange={(e) => setLogoUrl(e.target.value)} className={field} style={{ borderColor: "var(--color-border-default)" }} />
+        </div>
+        <div>
+          <label className={label} style={{ color: "var(--color-text-secondary)" }}>Custom domain</label>
+          <input type="text" value={customDomain} placeholder="clients.agency.com" onChange={(e) => setCustomDomain(e.target.value)} className={field} style={{ borderColor: "var(--color-border-default)" }} />
+        </div>
+        <label className="flex items-center gap-2 pt-1 text-sm" style={{ color: "var(--color-text-primary)" }}>
+          <input type="checkbox" checked={hideBuildrik} onChange={(e) => setHideBuildrik(e.target.checked)} className="accent-[var(--color-primary)]" />
+          Hide Buildrick branding for this client
+        </label>
       </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -125,34 +125,13 @@ function InviteEditorDialog({
   const [message, setMessage] = useState("");
   const valid = /.+@.+\..+/.test(email.trim());
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
-      <div className="w-[440px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Invite a content editor</h2>
-          <button onClick={onClose} aria-label="Close"><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
-        </div>
-        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          They&apos;ll join as a <strong>Content editor</strong> with access to {clientName}&apos;s{" "}
-          {siteCount} {siteCount === 1 ? "site" : "sites"} — and nothing else.
-        </p>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="name@client.com"
-          className="mt-4 w-full rounded-lg border px-3 py-2 text-sm"
-          style={{ borderColor: "var(--color-border-default)" }}
-          autoFocus
-        />
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Add a note (optional)"
-          rows={2}
-          className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
-          style={{ borderColor: "var(--color-border-default)" }}
-        />
-        <div className="mt-5 flex justify-end gap-2">
+    <Modal
+      open={true}
+      onClose={onClose}
+      title="Invite a content editor"
+      width={440}
+      footer={
+        <>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button
             onClick={() => valid && onSubmit(email.trim(), message.trim())}
@@ -161,9 +140,31 @@ function InviteEditorDialog({
           >
             {saving ? "Sending…" : "Send invite"}
           </Button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        They&apos;ll join as a <strong>Content editor</strong> with access to {clientName}&apos;s{" "}
+        {siteCount} {siteCount === 1 ? "site" : "sites"} — and nothing else.
+      </p>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="name@client.com"
+        className="mt-4 w-full rounded-lg border px-3 py-2 text-sm"
+        style={{ borderColor: "var(--color-border-default)" }}
+        autoFocus
+      />
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Add a note (optional)"
+        rows={2}
+        className="mt-2 w-full rounded-lg border px-3 py-2 text-sm"
+        style={{ borderColor: "var(--color-border-default)" }}
+      />
+    </Modal>
   );
 }
 
@@ -338,46 +339,32 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
         />
       )}
 
-      {picking && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ backgroundColor: "#0000004D" }}
-          onClick={() => setPicking(false)}
-        >
-          <div className="max-h-[80vh] w-[460px] overflow-hidden rounded-xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: "var(--color-border-default)" }}>
-              <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Assign sites</h2>
-              <button onClick={() => setPicking(false)} aria-label="Close">
-                <X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} />
-              </button>
+      <Modal open={picking} onClose={() => setPicking(false)} title="Assign sites">
+        <div className="max-h-[60vh] overflow-y-auto p-3">
+          {unassignedQuery.isLoading ? (
+            <LoadingSkeleton rows={3} variant="list" />
+          ) : unassigned.length === 0 ? (
+            <p className="px-2 py-6 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              No unassigned sites. Every site already belongs to a client.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {unassigned.map((s) => (
+                <SiteRow
+                  key={s.id}
+                  name={s.name}
+                  status={s.status}
+                  right={
+                    <Button size="sm" onClick={() => assignMut.mutate({ siteId: s.id, clientId })}>
+                      Assign
+                    </Button>
+                  }
+                />
+              ))}
             </div>
-            <div className="max-h-[60vh] overflow-y-auto p-3">
-              {unassignedQuery.isLoading ? (
-                <LoadingSkeleton rows={3} variant="list" />
-              ) : unassigned.length === 0 ? (
-                <p className="px-2 py-6 text-center text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                  No unassigned sites. Every site already belongs to a client.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {unassigned.map((s) => (
-                    <SiteRow
-                      key={s.id}
-                      name={s.name}
-                      status={s.status}
-                      right={
-                        <Button size="sm" onClick={() => assignMut.mutate({ siteId: s.id, clientId })}>
-                          Assign
-                        </Button>
-                      }
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          )}
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

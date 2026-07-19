@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageOff, MoreHorizontal, Pencil, X, AlertTriangle, Plus } from "lucide-react";
+import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageOff, MoreHorizontal, Pencil, AlertTriangle, Plus } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { Button, PageHeader, MetricValue, ProgressBar, InputField, FilterTabs } from "@/components/dashboard/primitives";
+import { Button, Modal, PageHeader, MetricValue, ProgressBar, InputField, FilterTabs } from "@/components/dashboard/primitives";
 
 type MediaType = "image" | "video" | "icon" | "font";
 
@@ -338,103 +338,106 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
       </div>
 
       {/* Create folder */}
-      {createOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setCreateOpen(false)}>
-          <div className="w-full max-w-sm rounded-2xl p-6 shadow-xl" style={{ backgroundColor: "var(--color-bg-surface)" }} onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>New folder</h2>
-            <input
-              type="text"
-              value={createValue}
-              onChange={(e) => setCreateValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && createValue.trim()) {
-                  createFolder.mutate({ name: createValue.trim() });
-                } else if (e.key === "Escape") {
-                  setCreateOpen(false);
-                }
-              }}
-              placeholder="Folder name"
-              autoFocus
-              maxLength={80}
-              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-            />
-            <div className="mt-6 flex gap-3">
-              <Button variant="ghost" onClick={() => setCreateOpen(false)} className="flex-1">
-                Cancel
-              </Button>
-              <Button
-                onClick={() => { if (createValue.trim()) createFolder.mutate({ name: createValue.trim() }); }}
-                disabled={!createValue.trim() || createFolder.isPending}
-                className="flex-1"
-              >
-                {createFolder.isPending ? "Creating…" : "Create"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        title="New folder"
+        width={384}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setCreateOpen(false)} className="flex-1">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => { if (createValue.trim()) createFolder.mutate({ name: createValue.trim() }); }}
+              disabled={!createValue.trim() || createFolder.isPending}
+              className="flex-1"
+            >
+              {createFolder.isPending ? "Creating…" : "Create"}
+            </Button>
+          </>
+        }
+      >
+        <input
+          type="text"
+          value={createValue}
+          onChange={(e) => setCreateValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && createValue.trim()) {
+              createFolder.mutate({ name: createValue.trim() });
+            }
+          }}
+          placeholder="Folder name"
+          autoFocus
+          maxLength={80}
+          className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+        />
+      </Modal>
 
       {/* Rename folder */}
-      {renameTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setRenameTarget(null)}>
-          <div className="w-full max-w-sm rounded-2xl p-6 shadow-xl" style={{ backgroundColor: "var(--color-bg-surface)" }} onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>Rename folder</h2>
-            <input
-              type="text"
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && renameValue.trim()) {
-                  renameFolder.mutate({ folderId: renameTarget.id, name: renameValue.trim() });
-                } else if (e.key === "Escape") {
-                  setRenameTarget(null);
-                }
-              }}
-              placeholder="Folder name"
-              autoFocus
-              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-            />
-            <div className="mt-6 flex gap-3">
-              <Button variant="ghost" onClick={() => setRenameTarget(null)} className="flex-1">
-                Cancel
-              </Button>
-              <Button
-                onClick={() => { if (renameValue.trim()) renameFolder.mutate({ folderId: renameTarget.id, name: renameValue.trim() }); }}
-                disabled={!renameValue.trim() || renameValue.trim() === renameTarget.name || renameFolder.isPending}
-                className="flex-1"
-              >
-                {renameFolder.isPending ? "Saving…" : "Save"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={renameTarget !== null}
+        onClose={() => setRenameTarget(null)}
+        title="Rename folder"
+        width={384}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setRenameTarget(null)} className="flex-1">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => { if (renameTarget && renameValue.trim()) renameFolder.mutate({ folderId: renameTarget.id, name: renameValue.trim() }); }}
+              disabled={!renameValue.trim() || renameValue.trim() === renameTarget?.name || renameFolder.isPending}
+              className="flex-1"
+            >
+              {renameFolder.isPending ? "Saving…" : "Save"}
+            </Button>
+          </>
+        }
+      >
+        <input
+          type="text"
+          value={renameValue}
+          onChange={(e) => setRenameValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && renameTarget && renameValue.trim()) {
+              renameFolder.mutate({ folderId: renameTarget.id, name: renameValue.trim() });
+            }
+          }}
+          placeholder="Folder name"
+          autoFocus
+          className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+        />
+      </Modal>
 
       {/* Delete folder — assets are un-assigned to All, not deleted */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setDeleteTarget(null)}>
-          <div className="w-[420px] rounded-xl p-6 shadow-xl" style={{ backgroundColor: "var(--color-bg-surface)" }} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold" style={{ color: "var(--color-error)" }}>Delete folder?</h2>
-              <button onClick={() => setDeleteTarget(null)}><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
-            </div>
-            <div className="mt-4 flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "var(--color-error-subtle)" }}>
-              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
-              <p className="text-sm" style={{ color: "var(--color-error)" }}>
-                Delete <strong>{deleteTarget.name}</strong>? Assets in this folder stay in your library and move to <strong>All</strong>. This can’t be undone.
-              </p>
-            </div>
-            <div className="mt-4 flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setDeleteTarget(null)}>Cancel</Button>
-              <Button variant="danger" onClick={() => deleteFolder.mutate({ folderId: deleteTarget.id })} disabled={deleteFolder.isPending}>
-                {deleteFolder.isPending ? "Deleting…" : "Delete folder"}
-              </Button>
-            </div>
-          </div>
+      <Modal
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete folder?"
+        width={420}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button
+              variant="danger"
+              onClick={() => deleteTarget && deleteFolder.mutate({ folderId: deleteTarget.id })}
+              disabled={deleteFolder.isPending}
+            >
+              {deleteFolder.isPending ? "Deleting…" : "Delete folder"}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "var(--color-error-subtle)" }}>
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
+          <p className="text-sm" style={{ color: "var(--color-error)" }}>
+            Delete <strong>{deleteTarget?.name}</strong>? Assets in this folder stay in your library and move to <strong>All</strong>. This can’t be undone.
+          </p>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }
