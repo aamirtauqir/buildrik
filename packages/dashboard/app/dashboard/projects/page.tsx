@@ -81,6 +81,10 @@ export default function ProjectsPage() {
     id: string;
     name: string;
   } | null>(null);
+  const [deleteFolderTarget, setDeleteFolderTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{
     id: string;
     name: string;
@@ -214,12 +218,9 @@ export default function ProjectsPage() {
     onError: (err) => addToast("error", "Couldn't delete folder", err.message),
   });
 
-  const handleDeleteFolder = (id: string, name: string) => {
-    // Sites in the folder are not deleted — they stay under All Sites.
-    if (window.confirm(`Delete the folder "${name}"? Its sites are kept and stay under All Sites.`)) {
-      deleteFolderMutation.mutate({ id });
-    }
-  };
+  // Sites in the folder are not deleted — they stay under All Sites. This is a
+  // single-confirm action, so it does not use DeleteConfirmModal's typed gate.
+  const handleDeleteFolder = (id: string, name: string) => setDeleteFolderTarget({ id, name });
 
   // Selection handler with shift+click range selection
   const handleSelect = useCallback((id: string, event?: React.MouseEvent) => {
@@ -640,6 +641,33 @@ export default function ProjectsPage() {
             renameFolderMutation.mutate({ id: renameFolderTarget.id, name })
           }
         />
+      )}
+
+      {deleteFolderTarget && (
+        <Modal
+          open={true}
+          onClose={() => setDeleteFolderTarget(null)}
+          title="Delete folder"
+          width={420}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setDeleteFolderTarget(null)}>Cancel</Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  deleteFolderMutation.mutate({ id: deleteFolderTarget.id });
+                  setDeleteFolderTarget(null);
+                }}
+              >
+                Delete folder
+              </Button>
+            </>
+          }
+        >
+          <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+            Delete the folder &ldquo;{deleteFolderTarget.name}&rdquo;? Its sites are kept and stay under All Sites.
+          </p>
+        </Modal>
       )}
 
       {deleteTarget && (
