@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Briefcase, Plus, Pencil, Trash2, X, MoreHorizontal } from "lucide-react";
+import { Briefcase, Plus, Pencil, Trash2, MoreHorizontal } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
-import { Button, StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
+import { Button, StatCard, MetricValue, DataTable, Pill, Modal, type Column } from "@/components/dashboard/primitives";
 
 interface ClientRow {
   id: string;
@@ -39,40 +39,35 @@ function NameDialog({
   const [name, setName] = useState(initial);
   const trimmed = name.trim();
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: "#0000004D" }}
-      onClick={onClose}
-    >
-      <div className="w-[400px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>{title}</h2>
-          <button onClick={onClose} aria-label="Close">
-            <X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} />
-          </button>
-        </div>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Client name"
-          className="mt-4 w-full rounded-lg border px-3 py-2 text-sm"
-          style={{ borderColor: "var(--color-border-default)" }}
-          autoFocus
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && trimmed) onSubmit(trimmed);
-          }}
-        />
-        <div className="mt-4 flex justify-end gap-2">
+    <Modal
+      open={true}
+      onClose={onClose}
+      title={title}
+      width={400}
+      footer={
+        <>
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
           <Button onClick={() => trimmed && onSubmit(trimmed)} disabled={!trimmed}>
             {submitLabel}
           </Button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Client name"
+        className="w-full rounded-lg border px-3 py-2 text-sm"
+        style={{ borderColor: "var(--color-border-default)" }}
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && trimmed) onSubmit(trimmed);
+        }}
+      />
+    </Modal>
   );
 }
 
@@ -86,29 +81,27 @@ function ConfirmDeleteDialog({
   onConfirm: () => void;
 }) {
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: "#0000004D" }}
-      onClick={onClose}
-    >
-      <div className="w-[420px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-          Delete {client.name}?
-        </h2>
-        <p className="mt-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Its {client.siteCount} {client.siteCount === 1 ? "site" : "sites"} become unassigned, not deleted.
-          You can reassign them to another client later.
-        </p>
-        <div className="mt-5 flex justify-end gap-2">
+    <Modal
+      open={true}
+      onClose={onClose}
+      title={`Delete ${client.name}?`}
+      width={420}
+      footer={
+        <>
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
           <Button variant="danger" onClick={onConfirm}>
             Delete client
           </Button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        Its {client.siteCount} {client.siteCount === 1 ? "site" : "sites"} become unassigned, not deleted.
+        You can reassign them to another client later.
+      </p>
+    </Modal>
   );
 }
 

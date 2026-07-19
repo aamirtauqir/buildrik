@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@lib/utils";
 import { roleLabel } from "@lib/constants/enums";
-import { Button, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
+import { Button, Pill, MetricValue, Modal, type PillTone } from "@/components/dashboard/primitives";
 import { MemberActions, type MemberAction } from "./member-actions";
 
 type Role = "OWNER" | "ADMIN" | "EDITOR" | "DESIGNER" | "VIEWER";
@@ -73,60 +73,51 @@ function Avatar({ name, size = 32 }: { name: string; size?: number }) {
 }
 
 function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [onClose]);
-
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-      <div ref={ref} className="w-full max-w-sm rounded-2xl border p-6 shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
-        <div className="flex items-center gap-4">
-          {member.avatar ? (
-            <img src={member.avatar} alt={member.fullName} className="h-14 w-14 rounded-full object-cover" />
-          ) : (
-            <Avatar name={member.fullName} size={56} />
-          )}
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>{member.fullName}</h3>
-              {isOnline(member.lastActiveAt) && (
-                <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--color-success)" }} />
-              )}
-            </div>
-            <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>{member.email}</p>
-          </div>
-        </div>
-
-        <div className="mt-5 space-y-3">
-          <div className="flex justify-between text-body">
-            <span style={{ color: "var(--color-text-secondary)" }}>Role</span>
-            <Pill tone={ROLE_TONE[member.role as Role] ?? "neutral"}>{roleLabel(member.role)}</Pill>
-          </div>
-          <div className="flex justify-between text-body">
-            <span style={{ color: "var(--color-text-secondary)" }}>Sites access</span>
-            <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{member.sitesAccess}</MetricValue></span>
-          </div>
-          <div className="flex justify-between text-body">
-            <span style={{ color: "var(--color-text-secondary)" }}>Last active</span>
-            <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{relativeTime(member.lastActiveAt)}</MetricValue></span>
-          </div>
-          <div className="flex justify-between text-body">
-            <span style={{ color: "var(--color-text-secondary)" }}>Joined</span>
-            <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{formatDate(member.joinedAt)}</MetricValue></span>
-          </div>
-        </div>
-
-        <Button variant="ghost" onClick={onClose} className="mt-5 w-full">
+    <Modal
+      open={true}
+      onClose={onClose}
+      title={member.fullName}
+      width={384}
+      footer={
+        <Button variant="ghost" onClick={onClose} className="w-full">
           Close
         </Button>
+      }
+    >
+      <div className="flex items-center gap-4">
+        {member.avatar ? (
+          <img src={member.avatar} alt={member.fullName} className="h-14 w-14 rounded-full object-cover" />
+        ) : (
+          <Avatar name={member.fullName} size={56} />
+        )}
+        <div className="flex items-center gap-2">
+          <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>{member.email}</p>
+          {isOnline(member.lastActiveAt) && (
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--color-success)" }} />
+          )}
+        </div>
       </div>
-    </div>
+
+      <div className="mt-5 space-y-3">
+        <div className="flex justify-between text-body">
+          <span style={{ color: "var(--color-text-secondary)" }}>Role</span>
+          <Pill tone={ROLE_TONE[member.role as Role] ?? "neutral"}>{roleLabel(member.role)}</Pill>
+        </div>
+        <div className="flex justify-between text-body">
+          <span style={{ color: "var(--color-text-secondary)" }}>Sites access</span>
+          <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{member.sitesAccess}</MetricValue></span>
+        </div>
+        <div className="flex justify-between text-body">
+          <span style={{ color: "var(--color-text-secondary)" }}>Last active</span>
+          <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{relativeTime(member.lastActiveAt)}</MetricValue></span>
+        </div>
+        <div className="flex justify-between text-body">
+          <span style={{ color: "var(--color-text-secondary)" }}>Joined</span>
+          <span style={{ color: "var(--color-text-primary)" }}><MetricValue>{formatDate(member.joinedAt)}</MetricValue></span>
+        </div>
+      </div>
+    </Modal>
   );
 }
 
@@ -322,41 +313,43 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
       )}
 
       {roleEditMember && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-          <div className="w-full max-w-sm rounded-2xl border p-6 shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
-            <h3 className="text-section-title" style={{ color: "var(--color-text-primary)" }}>
-              Change role
-            </h3>
-            <p className="mt-1 text-body" style={{ color: "var(--color-text-secondary)" }}>
-              {roleEditMember.fullName} — currently {roleLabel(roleEditMember.role)}
-            </p>
-            <div className="mt-4 space-y-2">
-              {ASSIGNABLE_ROLES.map((role) => {
-                const isCurrent = roleEditMember.role === role;
-                return (
-                  <button
-                    key={role}
-                    disabled={isCurrent}
-                    onClick={() => {
-                      onChangeRole?.(roleEditMember.id, role);
-                      setRoleEditMember(null);
-                    }}
-                    className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-                  >
-                    <span>{roleLabel(role)}</span>
-                    {isCurrent && (
-                      <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>current</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            <Button variant="ghost" onClick={() => setRoleEditMember(null)} className="mt-4 w-full">
+        <Modal
+          open={true}
+          onClose={() => setRoleEditMember(null)}
+          title="Change role"
+          width={384}
+          footer={
+            <Button variant="ghost" onClick={() => setRoleEditMember(null)} className="w-full">
               Cancel
             </Button>
+          }
+        >
+          <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+            {roleEditMember.fullName} — currently {roleLabel(roleEditMember.role)}
+          </p>
+          <div className="mt-4 space-y-2">
+            {ASSIGNABLE_ROLES.map((role) => {
+              const isCurrent = roleEditMember.role === role;
+              return (
+                <button
+                  key={role}
+                  disabled={isCurrent}
+                  onClick={() => {
+                    onChangeRole?.(roleEditMember.id, role);
+                    setRoleEditMember(null);
+                  }}
+                  className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)] disabled:cursor-not-allowed disabled:opacity-50"
+                  style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+                >
+                  <span>{roleLabel(role)}</span>
+                  {isCurrent && (
+                    <span className="text-body-sm" style={{ color: "var(--color-text-muted)" }}>current</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-        </div>
+        </Modal>
       )}
     </>
   );

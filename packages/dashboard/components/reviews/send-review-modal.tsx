@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { Modal } from "@/components/dashboard/primitives";
 
 interface SendReviewModalProps {
   open: boolean;
@@ -27,47 +27,14 @@ export function SendReviewModal({ open, onClose, siteId, siteName }: SendReviewM
     onError: (err) => addToast("error", "Couldn't send for review", err.message),
   });
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
-      <div className="w-[440px] rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>Send for Review</h2>
-          <button onClick={onClose}><X className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>
-        </div>
-
-        <p className="mt-3 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          Submit &apos;{siteName}&apos; for admin review. Reviewers approve it for publishing or ask for changes.
-        </p>
-
-        <div className="mt-4">
-          <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
-            Note{" "}
-            <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>(optional)</span>
-          </label>
-          <textarea
-            rows={3}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            maxLength={500}
-            placeholder="Add context for the reviewer, e.g. what changed since last time..."
-            className="w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
-            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
-            autoFocus
-          />
-        </div>
-
-        <div className="mt-4 flex gap-2 justify-end">
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Send for Review"
+      width={440}
+      footer={
+        <>
           <button onClick={onClose} className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}>
             Cancel
           </button>
@@ -79,8 +46,29 @@ export function SendReviewModal({ open, onClose, siteId, siteName }: SendReviewM
           >
             {submitMutation.isPending ? "Sending..." : "Send for Review"}
           </button>
-        </div>
+        </>
+      }
+    >
+      <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+        Submit &apos;{siteName}&apos; for admin review. Reviewers approve it for publishing or ask for changes.
+      </p>
+
+      <div className="mt-4">
+        <label className="mb-1.5 block text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+          Note{" "}
+          <span className="font-normal" style={{ color: "var(--color-text-muted)" }}>(optional)</span>
+        </label>
+        <textarea
+          rows={3}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          maxLength={500}
+          placeholder="Add context for the reviewer, e.g. what changed since last time..."
+          className="w-full resize-none rounded-lg border px-3 py-2.5 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-primary)" }}
+          autoFocus
+        />
       </div>
-    </div>
+    </Modal>
   );
 }
