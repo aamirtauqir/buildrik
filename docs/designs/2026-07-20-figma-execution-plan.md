@@ -1,5 +1,20 @@
 # Figma execution plan — from empty file to 56 screens
 
+> ## ⛔ CLOSED 2026-07-20 — do not execute this
+>
+> This planned six weeks of work to build the Figma file from empty. **That file
+> is built** — 309/309, verified by querying the live file rather than reading a
+> checklist. Following this plan now means redoing finished work.
+>
+> **The live plan is `2026-07-20-ship-plan.md`** (Part I of the book).
+>
+> Kept because the gates were the useful part and two of them earned their place:
+> **Gate A** caught a first PASS that was false (collapsed pills hiding rather
+> than fitting), and **Gate B**'s arithmetic check is what surfaced that all five
+> shells were empty geometry with no content in them. **Gate C has still not been
+> run** and is the only gate outstanding — it moved to the ship plan.
+
+
 > **The schedule, not the spec.** `DESIGNER-BRIEF.md` says what to draw; `2026-07-20-figma-working-rules.md` says how to work. This says **in what order, with what checkpoints, and where it can go wrong.**
 >
 > Written 2026-07-20. Assumes **one full-time designer**. Day counts are planning estimates for sequencing, not commitments — the useful thing about them is their *ratio*, not their absolute value.

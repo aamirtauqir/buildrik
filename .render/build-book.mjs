@@ -20,8 +20,10 @@ const ROOT = "/Users/shahg/Desktop/pencil/buildrik/";
 // If not, it belongs somewhere else.
 const PARTS = [
   { part: "0", label: "Orientation", file: null, intro: true },
-  { part: "I", label: "Execution plan — the order, the gates, the schedule",
-    file: "docs/designs/2026-07-20-figma-execution-plan.md" },
+  { part: "I", label: "The plan — from a finished design file to a shipped wedge",
+    file: "docs/designs/2026-07-20-ship-plan.md" },
+  { part: "I-b", label: "Build checklist — every item, traceable, tickable",
+    file: "docs/designs/2026-07-20-figma-build-checklist.md" },
   { part: "II", label: "Designer brief — read this second",
     file: "docs/designs/DESIGNER-BRIEF.md" },
   { part: "III", label: "System contracts — the five rules that decide behaviour",
@@ -48,6 +50,8 @@ const PARTS = [
     file: "docs/designs/2026-07-19-portfolio-wireframes.md" },
   { part: "XIV", label: "Per-screen briefs (PRD Ch.14)",
     file: "docs/prd/editor/14-screen-specs.md" },
+  { part: "XV", label: "Archive — how the Figma file was built (closed 2026-07-20)",
+    file: "docs/designs/2026-07-20-figma-execution-plan.md" },
 ];
 
 const INTRO = `# Buildrick Editor — The Designer's Book
@@ -56,7 +60,9 @@ const INTRO = `# Buildrick Editor — The Designer's Book
 
 ## How to read this
 
-**Part I is the plan** — six weeks, ten phases, three gates. Read it once to see the shape, then work from it.
+**Part I is the plan** — where the product actually is, and the order to ship it in. It replaced a six-week plan for *building this Figma file*, which is now done (309/309) and would have sent someone to redo finished work. Read it first; the single most useful thing in it is that the wedge is one unpassed argument away from working.
+
+**Part I-b is the checklist** — every item, each pointing at the spec that defines it, each with a status. The plan says *when*; this says *what*. Read its P10–P13 sections before trusting any completion number in it: this checklist reported "complete" three separate times while requirements it had no row for sat undone.
 
 **Part II is the brief** — what you are designing, for whom, the craft rules, the traps, and the three obligations: follow the documents, verify what you build on, ask the moment something is unclear.
 
