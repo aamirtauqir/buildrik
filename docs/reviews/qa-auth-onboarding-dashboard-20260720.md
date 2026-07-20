@@ -10,8 +10,8 @@ Method: the repo's own Playwright suite, run against local Chromium.
 | Area | Verified | Evidence |
 |---|---|---|
 | Onboarding | **yes — 26 / 26** | all three paths (AI, template, blank), plus the three full walkthroughs |
-| Auth | **partly** | magic-link login works; the fixture never reaches `/dashboard` |
-| Dashboard | **no** | 81 tests never ran |
+| Auth | **yes** | suite fixture fails, but a manual browser walkthrough proves login + redirect are correct (see below) |
+| Dashboard | **no** | 81 tests never ran; loads manually, but nothing beyond that was exercised |
 | a11y / link-integrity / responsive / settings-drill-in | **no** | same 81 |
 
 `26 passed · 1 failed · 81 did not run (3.0m)`
@@ -85,13 +85,32 @@ Auth itself works — the token is accepted, the session is created, the redirec
 chain runs. Sending a not-yet-onboarded user to the wizard is correct product
 behaviour.
 
-**Open question, not yet answered:** the redirect landed on `/onboarding/ready`
-while the DB row said `step: ROLE_SELECT`, so the destination is computed by
-`useOnboardingFlow`, not read from that column. Whether a real user who finishes
-the wizard gets `completed: true` written — and therefore is not sent back into
-onboarding on their next login — was **not** tested here. If that write is
-missing, it is a genuine product bug and a bad one. It needs a user-level check:
-complete onboarding as a fresh user, sign out, sign in, see where you land.
+### Open question — now answered, in the browser
+
+The concern was: the wizard never writes `completed: true`, so a real user who
+finishes onboarding gets dumped back into it on their next login. That would be
+a bad product bug.
+
+**It is not happening.** Walked it as a user against local dev:
+
+| Step | Observed |
+|---|---|
+| Sign in (`completed:false, step:ROLE_SELECT`) | lands `/onboarding/ready` |
+| Click **Open Editor** (the wizard's final CTA) | `step` → `CHECKLIST`; `completed` stays `false` |
+| Sign in again, fresh magic link | lands **`/dashboard`** |
+
+So `completed` is a red herring — it is **not** what gates the redirect. `step`
+is. `CHECKLIST` reads as "past the wizard" and routes to the dashboard;
+`ROLE_SELECT` reads as "still in it" and routes to the wizard. A real user is
+never sent backwards.
+
+This also closes the loop on Finding 2: `onboarding.setup.ts` sets
+`step: "ROLE_SELECT"`, and the login redirect then does exactly what it should —
+send that user into the wizard. The fixture is not fighting a bug; it is getting
+the behaviour it asked for, on a user another fixture also depends on.
+
+**Conclusion: no product defect in auth or onboarding on this evidence.** The
+failure is entirely test-fixture ownership.
 
 ## How to get full coverage
 
