@@ -10,7 +10,7 @@
 
 Buildrick runs on **one brand accent: `#406ED6`** across dashboard, auth and onboarding — no scoped exceptions, one blue on screen anywhere. Red is reserved for error/danger/destructive everywhere. (Adopted 2026-07-18 from the founder-supplied UI kit, `docs/design/dashboard-ui-kit.md`; supersedes the cobalt `#2D6DFF` unification of 2026-07-12, which itself had replaced the dashboard's red `#E42313`. See Decisions Log.)
 
-**Editor chrome is the one surface still on cobalt `#2D6DFF`** — it carries its own `--buildrick-*` design system in `packages/editor/`, with its own token contract and CI gates, so it is a separate migration and not yet flipped.
+**Editor chrome is the one surface still on cobalt `#2D6DFF` IN CODE** — it carries its own `--buildrick-*` design system in `packages/editor/`, with its own token contract and CI gates, so it is a separate migration. **The design is already flipped**: the Figma file (`g4GzQFqzNYz5sosz1QtZXC`) moved the editor accent to `#406ED6` on 2026-07-20, because the file specifies the *next* editor and drawing it in a colour scheduled for retirement means drawing it twice. It also cleared the last contrast failure — white on cobalt was 4.43:1, under the 4.5 bar; white on `#406ED6` is 4.75:1. The code migration is still owed.
 
 | Surface | Lives in | Accent | Display font | Body font | Audience |
 |---|---|---|---|---|---|

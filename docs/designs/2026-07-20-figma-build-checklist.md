@@ -170,28 +170,32 @@ Not a lab. One agency, one link, one honest reaction: *would you send this to a 
 
 ---
 
-### Open founder call — one contrast failure I did not fix
+### RESOLVED — the contrast failure, and how it actually got fixed
 
-`color/accent-on` on `color/accent` (white on cobalt `#2D6DFF`) is **4.43:1**, just
-under the 4.5:1 body-text bar. That is the label on every primary button.
+`color/accent-on` on cobalt `#2D6DFF` was **4.43:1**, under the 4.5 bar, on the
+label of every primary button. I framed the fix as a brand edit and left it to the
+founder.
 
-I did not fix it because the fix is to darken cobalt, and cobalt is the brand —
-locked in DESIGN.md, not mine to move. Three ways out:
+Reading DESIGN.md properly changed the answer. Cobalt was never the locked brand —
+the Decisions Log for 2026-07-18 sets the single accent to `#406ED6` and records
+editor cobalt as a **pending migration**. So the fix was not to invent a darker
+cobalt; it was to do the migration that was already decided, in the file that
+specifies the *next* editor rather than the shipped one.
 
-1. **Darken the accent** to ~`#2A66F0`. Clears 4.5:1. Nobody will see the change; it is a brand edit all the same.
-2. **Leave it.** 4.43 vs 4.5 is a 1.5% miss and no automated audit outside this file will flag it.
-3. ~~**Raise button labels to 14px semibold**~~ — **this option was wrong.** WCAG large
-   text is 18.66px bold or 24px regular; 14px semibold is not large text and still
-   owes 4.5:1. Reaching the large-text bar would need ~19px bold button labels,
-   which is absurd in a compact editor. Ignore this option.
+Flipped 2026-07-20. `accent-on` on accent is now **4.75:1**, and the whole palette
+passes 48/48. Three things the flip surfaced:
 
-**Recommended: option 1, at the minimum value.** `#2D6DFF` → `#2D6CFC` clears the
-bar at exactly 4.50 and is a change of 3/255 on blue and 1/255 on green — not
-perceptible side by side. It is one token in one package mode: the Dashboard accent
-`#406ED6` already passes at 4.75. Requires a DESIGN.md amendment, which is why it
-is not applied.
+- **hover and pressed collapsed onto the same value.** DESIGN.md gives `#406ED6` a
+  hover but no pressed, so copying the dashboard wholesale made two button
+  variants render identically. Pressed now sits a clear step below hover.
+- **11 hex captions and 6 swatches were frozen strings**, written at build time,
+  so they kept claiming the retired colour. Rebound to the live variables.
+- **Scope is not just a picker filter — it blocks resolution.** A `TEXT_FILL`
+  variable bound to a frame fill reports the binding correctly and renders the
+  black fallback. That is why the `-text` and `border-*` chips came out black.
+  Text tokens are now shown as text and border tokens as borders, which is what
+  their specimens should have been anyway.
 
-Everything else in the palette now passes.
 
 ---
 
