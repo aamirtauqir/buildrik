@@ -180,7 +180,16 @@ locked in DESIGN.md, not mine to move. Three ways out:
 
 1. **Darken the accent** to ~`#2A66F0`. Clears 4.5:1. Nobody will see the change; it is a brand edit all the same.
 2. **Leave it.** 4.43 vs 4.5 is a 1.5% miss and no automated audit outside this file will flag it.
-3. **Raise button labels to 14px semibold**, which makes them large text at the 3:1 bar. Passes without touching the brand, but changes button density everywhere.
+3. ~~**Raise button labels to 14px semibold**~~ — **this option was wrong.** WCAG large
+   text is 18.66px bold or 24px regular; 14px semibold is not large text and still
+   owes 4.5:1. Reaching the large-text bar would need ~19px bold button labels,
+   which is absurd in a compact editor. Ignore this option.
+
+**Recommended: option 1, at the minimum value.** `#2D6DFF` → `#2D6CFC` clears the
+bar at exactly 4.50 and is a change of 3/255 on blue and 1/255 on green — not
+perceptible side by side. It is one token in one package mode: the Dashboard accent
+`#406ED6` already passes at 4.75. Requires a DESIGN.md amendment, which is why it
+is not applied.
 
 Everything else in the palette now passes.
 
@@ -274,6 +283,59 @@ a checklist reaches 80/81 while a designer still cannot open the screen.
 
 ---
 
+---
+
+## P11 · The 91 enumerated states — the gap I dismissed
+
+The codex pass reported most state sets as `0/N`. I put that down to having
+handed it a summary-level inventory rather than the file, and moved on.
+
+**I never checked.** A direct query for `<Set> · <state>` naming returned
+**0 of 91**. Some states existed as shapes — Compare's mode strip, five of the
+AI panel's eleven — but none was findable by name, and a state a designer cannot
+search for is a state that was not handed over. Codex was right; my dismissal was
+the error.
+
+| Set | States | Spec |
+|---|---|---|
+| Versions | 7 | floating §2 |
+| Compare | 8 | floating §3 |
+| Command palette | 6 | floating §4 |
+| Issues | 5 | floating §5 |
+| AI | 11 | floating §6 |
+| Notifications | 5 | floating §6a |
+| Integrations | 5 | site §6.2 |
+| Shape-1 detail | 6 | site §6.3 |
+| Webhooks · Zapier | 5 | site §6.4 |
+| Export | 7 | site §7 |
+| Portfolio Sites | 7 | portfolio §3 |
+| Brand push | 10 | portfolio §4 |
+| Handover | 4 | portfolio §5 |
+| Shared library | 5 | portfolio §6 |
+| **Total** | **91** | all named `<Set> · <state>`, verified 91/91 |
+
+**The states that earn their place.** Most are cheap; a handful are the design:
+
+- `BrandPush · blast-radius` — three sites carry their own accent, and the push
+  would replace it. Everything else in that flow is confirmation theatre next to
+  knowing this.
+- `BrandPush · partial-failure` — 5 of 7 wrote. Reporting that as success is how a
+  client site silently keeps the old brand.
+- `AI · step-gate` — the run pauses before anything destructive and waits rather
+  than guessing. This is the line between an assistant and something that edits a
+  client's site unattended.
+- `AI · not-configured` — not hypothetical. A dev fallback that quietly succeeded
+  is why AI was dead in production for months while it worked locally.
+- `Shape1detail · saved-not-yet-published` — an injector only exists in the built
+  output. Without this line a user edits an endpoint, tests nothing, and assumes
+  the live site changed.
+- `SharedLibrary · in-use-blocked-delete` — blocked, not warned. Seven sites lose
+  the section otherwise.
+- `CmdK · disabled-command` — shown with its reason. Hide it and the shortcut
+  someone memorised silently vanishes.
+
+---
+
 ## P9 · Cross-cutting — do not skip
 
 | Item | Status | Why |
@@ -303,7 +365,8 @@ a checklist reaches 80/81 while a designer still cannot open the screen.
 | P9 Cross-cutting | 6 | 6 |
 | P4b Shell states | 12 | 12 |
 | P0b Foundations specimens | 1 | 1 |
-| **Total** | **93** | **94** |
+| P11 Enumerated states | 91 | 91 |
+| **Total** | **184** | **185** |
 
 ---
 
