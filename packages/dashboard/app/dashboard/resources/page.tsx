@@ -9,7 +9,7 @@ import { PageHeader, IconChip } from "@/components/dashboard/primitives";
 const RESOURCES = [
   { icon: FileText, title: "Documentation", description: "Guides for building, publishing and managing sites.", href: "/dashboard/help", color: "var(--color-primary)" },
   { icon: Code2, title: "API reference", description: "Endpoints, tokens and webhooks for developers.", href: "/dashboard/settings/api-tokens", color: "var(--color-text-secondary)" },
-  { icon: CheckSquare, title: "Brand kit", description: "Logos, colors and usage guidelines to download.", href: "/dashboard/templates", color: "var(--color-purple)" },
+  { icon: CheckSquare, title: "Brand kit", description: "Logos, colors and usage guidelines to download.", href: "/dashboard/templates", color: "var(--color-amber)" },
   { icon: LayoutTemplate, title: "Template gallery", description: "Starter designs for every kind of site.", href: "/dashboard/templates", color: "var(--color-teal)" },
   { icon: Download, title: "Changelog", description: "What's new — features, fixes and improvements.", href: "/dashboard/help", color: "var(--color-success)" },
   { icon: Users, title: "Community", description: "Ask questions and share work with other builders.", href: "/dashboard/help", color: "var(--color-pink)" },

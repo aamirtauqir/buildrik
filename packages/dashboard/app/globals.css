@@ -113,7 +113,6 @@
   /* Categorical/illustrative colors — charts, avatars, app icon chips.
      Decorative tints only, never actions (UI kit §7.2). */
   --color-teal: #0D94A6;
-  --color-purple: #7C5CF6;
   --color-amber: #EA8E1E;
   --color-pink: #DB508C;
   --color-ink: #141924;

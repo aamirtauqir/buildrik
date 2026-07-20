@@ -33,7 +33,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?:
 const CATEGORY_STYLE: Record<string, { color: string; description: string }> = {
   "getting-started": { color: "var(--color-primary)", description: "Build and publish your first site in minutes." },
   sites: { color: "var(--color-teal)", description: "Publish, organize, and manage every site in your workspace." },
-  team: { color: "var(--color-purple)", description: "Roles, invites, reviews, and permissions." },
+  team: { color: "var(--color-primary)", description: "Roles, invites, reviews, and permissions." },
   billing: { color: "var(--color-amber)", description: "Upgrade, invoices, and payment methods." },
   domains: { color: "var(--color-pink)", description: "Connect a custom domain and manage DNS records." },
   editor: { color: "var(--color-success)", description: "Sections, styles, AI drafting, and components." },

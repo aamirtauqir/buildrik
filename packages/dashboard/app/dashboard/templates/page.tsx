@@ -14,7 +14,7 @@ type Tab = (typeof TABS)[number]["value"];
 
 const TEMPLATES = [
   { name: "SaaS Landing", category: "Marketing", icon: Rocket, color: "var(--color-primary)" },
-  { name: "Portfolio Grid", category: "Personal", icon: LayoutGrid, color: "var(--color-purple)" },
+  { name: "Portfolio Grid", category: "Personal", icon: LayoutGrid, color: "var(--color-pink)" },
   { name: "Store Starter", category: "Commerce", icon: ShoppingBag, color: "var(--color-amber)" },
   { name: "Blog & News", category: "Content", icon: Newspaper, color: "var(--color-teal)" },
 ] as const;

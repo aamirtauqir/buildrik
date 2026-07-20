@@ -24,7 +24,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
 const CATEGORY_TINTS: Record<string, string> = {
   "getting-started": "var(--color-primary)",
   sites: "var(--color-teal)",
-  team: "var(--color-purple)",
+  team: "var(--color-primary)",
   billing: "var(--color-amber)",
   domains: "var(--color-pink)",
   editor: "var(--color-primary)",

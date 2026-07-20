@@ -67,16 +67,19 @@ pass "D2: no purple/violet/indigo bleed in dashboard chrome"
 
 # ─────────────────────────────────────────────────────────────
 # Gate D3 — --color-primary must be the brand accent.
-# Cobalt #2D6DFF since the 2026-07-12 RED → COBALT flip (DESIGN.md §Product
-# Context + changelog). Still a sentinel for accidental accent drift; it just
-# guards the current accent instead of the retired red #E42313.
+# #406ED6 since the 2026-07-18 single-product-accent flip (DESIGN.md L26:
+# "#406ED6 is the single accent ... across dashboard + auth + onboarding").
+# Editor chrome keeps cobalt #2D6DFF in its own DS — separate migration, not
+# guarded here. This gate guarded #2D6DFF from 2026-07-13 and was not updated
+# when the accent flipped, so it went red on 07-18 and blocked every push after
+# it. DESIGN.md is the SSOT; when they disagree, the gate is what's stale.
 # ─────────────────────────────────────────────────────────────
-if ! grep -qE "^\s*--color-primary:\s*#2D6DFF\s*;" packages/dashboard/app/globals.css 2>/dev/null; then
-  echo "GATE FAIL: D3 — --color-primary in globals.css must be #2D6DFF (DESIGN.md §Product Context)"
+if ! grep -qE "^\s*--color-primary:\s*#406ED6\s*;" packages/dashboard/app/globals.css 2>/dev/null; then
+  echo "GATE FAIL: D3 — --color-primary in globals.css must be #406ED6 (DESIGN.md L26)"
   grep -nE "^\s*--color-primary:" packages/dashboard/app/globals.css 2>/dev/null
   exit 1
 fi
-pass "D3: --color-primary = #2D6DFF (DESIGN.md single cobalt accent)"
+pass "D3: --color-primary = #406ED6 (DESIGN.md single product accent)"
 
 # ─────────────────────────────────────────────────────────────
 # Gate D4 — NO BLACK rule.
@@ -104,15 +107,23 @@ pass "D4: no NO-BLACK violations in dashboard chrome (emails exempt)"
 
 # ─────────────────────────────────────────────────────────────
 # Gate D5 — Layout token sentinel.
-# globals.css must define --sidebar-width + --topbar-height. Used by dashboard
-# shell. Deletion would silently break layout.
+# globals.css must define --sidebar-w + --topnav-h. dashboard-shell.tsx sizes
+# the whole app off them (`lg:ml-[var(--sidebar-w)]`, `pt-[var(--topnav-h)]`),
+# so deletion would silently break layout.
+#
+# Guarded --sidebar-width/--topbar-height until 2026-07-20 — names that had been
+# renamed, so the grep matched nothing. `grep -c` exits 1 on zero matches, so
+# `|| echo 0` appended a second "0" to grep's own "0"; D5_COUNT became "0\n0",
+# `[ -lt ]` errored, and a failed test read as a pass. The gate reported PASS
+# while its invariant was unverifiable. Count with grep -o | wc -l, which does
+# not need the || fallback.
 # ─────────────────────────────────────────────────────────────
-D5_COUNT=$(grep -cE "^\s*--(sidebar-width|topbar-height):" packages/dashboard/app/globals.css 2>/dev/null || echo 0)
-if [ "$D5_COUNT" -lt 2 ]; then
-  echo "GATE FAIL: D5 — globals.css must define --sidebar-width + --topbar-height (found $D5_COUNT/2)"
+D5_COUNT=$(grep -oE "^\s*--(sidebar-w|topnav-h):" packages/dashboard/app/globals.css 2>/dev/null | wc -l | tr -d ' ')
+if [ "${D5_COUNT:-0}" -lt 2 ]; then
+  echo "GATE FAIL: D5 — globals.css must define --sidebar-w + --topnav-h (found ${D5_COUNT:-0}/2)"
   exit 1
 fi
-pass "D5: layout tokens --sidebar-width + --topbar-height present"
+pass "D5: layout tokens --sidebar-w + --topnav-h present"
 
 # ─────────────────────────────────────────────────────────────
 # Gate D6 — @theme block sentinel.
