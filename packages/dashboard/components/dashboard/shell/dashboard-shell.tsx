@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useEffect, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { cn } from "@lib/utils";
 import { TopNav } from "./top-nav";
 import { Sidebar } from "./sidebar";
+import { isEcosystemRoute } from "./nav";
 import { CommandPalette } from "@/components/search/command-palette";
 
 /** The dashboard app shell: a full-width top nav above a fixed var(--sidebar-w)
@@ -12,6 +15,11 @@ import { CommandPalette } from "@/components/search/command-palette";
  *  (per the design). */
 export function DashboardShell({ children }: { children: ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const pathname = usePathname();
+  // Ecosystem areas (Marketplace/Learn/Resources) are not workspace destinations,
+  // so they drop the workspace sidebar and go full-width. Every other route keeps
+  // it. isEcosystemRoute is the SSOT shared with the topbar's Dashboard link.
+  const showSidebar = !isEcosystemRoute(pathname);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -27,8 +35,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       style={{ backgroundColor: "var(--color-bg-surface)", fontFamily: "'Inter', 'Inter Tight', sans-serif" }}
     >
       <TopNav onSearch={() => setPaletteOpen(true)} />
-      <Sidebar />
-      <main className="pt-[var(--topnav-h)] lg:ml-[var(--sidebar-w)]">
+      {showSidebar && <Sidebar />}
+      <main className={cn("pt-[var(--topnav-h)]", showSidebar && "lg:ml-[var(--sidebar-w)]")}>
         <div className="px-10 pb-[60px] pt-8">{children}</div>
       </main>
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />

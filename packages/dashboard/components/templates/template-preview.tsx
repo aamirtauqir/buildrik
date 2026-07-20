@@ -19,8 +19,12 @@ interface TemplatePreviewProps {
 
 export function TemplatePreview({ template, onBack, onUse }: TemplatePreviewProps) {
   const [device, setDevice] = useState("desktop");
+  // Starts below the topbar (not inset-0) so the real dashboard topbar — with its
+  // Dashboard link back to the workspace — stays visible above this full-width
+  // preview. z-30 sits over the sidebar but under the topbar (z-40), so the
+  // preview covers the sidebar while the topbar stays interactive.
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+    <div className="fixed inset-x-0 bottom-0 top-[var(--topnav-h)] z-30 flex flex-col bg-white">
       <div className="flex items-center justify-between border-b px-6 py-3" style={{ borderColor: "var(--color-border-default)" }}>
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="rounded-lg p-2 hover:bg-[var(--color-bg-subtle)]"><ArrowLeft className="h-5 w-5" style={{ color: "var(--color-text-secondary)" }} /></button>

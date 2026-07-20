@@ -7,15 +7,13 @@ import { Search } from "lucide-react";
 import { cn } from "@lib/utils";
 import { AvatarDropdown } from "@/components/dashboard/avatar-dropdown";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
+import { ECOSYSTEM_NAV, isEcosystemRoute } from "./nav";
 
-// The top bar carries the brand, an EXPLORE cluster of ecosystem areas, the ⌘K
-// search box, notifications and the account pill (per the IA-fixed design). The
-// workspace's own destinations (Home, Projects, …) live in the sidebar.
-const TOP_NAV = [
-  { label: "Marketplace", href: "/dashboard/marketplace" },
-  { label: "Learn", href: "/dashboard/learn" },
-  { label: "Resources", href: "/dashboard/resources" },
-] as const;
+// The top bar carries the brand, a "Dashboard" link back to the workspace, an
+// EXPLORE cluster of ecosystem areas, the ⌘K search box, notifications and the
+// account pill. The workspace's own destinations (Home, Projects, …) live in the
+// sidebar; "Dashboard" here is the way back to that workspace from an ecosystem
+// page, which otherwise renders full-width with no sidebar.
 
 function isTopActive(pathname: string, href: string): boolean {
   return pathname.startsWith(href);
@@ -49,8 +47,19 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
         <span className="text-[15.5px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>Buildrick</span>
       </Link>
       <nav className="flex items-center gap-1">
+        {/* Dashboard — back to the workspace. Active on any workspace page, i.e.
+            wherever the sidebar is showing; the ecosystem tabs own the rest. */}
+        <Link
+          href="/dashboard"
+          className={cn("relative rounded-lg px-3 py-1.5 text-[13.5px] font-[530] transition-colors", isEcosystemRoute(pathname) ? "hover:bg-[var(--color-bg-subtle)]" : "")}
+          style={{ color: isEcosystemRoute(pathname) ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}
+        >
+          Dashboard
+          {!isEcosystemRoute(pathname) && <span className="absolute inset-x-3 -bottom-[calc((var(--topnav-h)-100%)/2)] h-0.5 rounded-pill" style={{ backgroundColor: "var(--color-text-primary)" }} />}
+        </Link>
+        <span className="mx-1 h-4 w-px" style={{ backgroundColor: "var(--color-border-default)" }} />
         <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.11em]" style={{ color: "var(--color-text-muted)" }}>Explore</span>
-        {TOP_NAV.map((item) => {
+        {ECOSYSTEM_NAV.map((item) => {
           const active = isTopActive(pathname, item.href);
           return (
             <Link

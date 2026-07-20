@@ -38,3 +38,22 @@ export function isActiveRoute(pathname: string, href: string): boolean {
   if (href === "/dashboard/projects" && pathname.startsWith("/dashboard/sites")) return true;
   return pathname.startsWith(href);
 }
+
+// The ecosystem areas — top-level product surfaces that are NOT workspace
+// destinations. They live in the top nav, and (unlike every workspace page) they
+// render full-width with no sidebar. Declared here, not in top-nav.tsx, because
+// two consumers need it: the top nav (labels + the Dashboard link's active state)
+// and DashboardShell (whether to show the sidebar). One list, no drift.
+export const ECOSYSTEM_NAV = [
+  { label: "Marketplace", href: "/dashboard/marketplace" },
+  { label: "Learn", href: "/dashboard/learn" },
+  { label: "Resources", href: "/dashboard/resources" },
+] as const;
+
+/** True on an ecosystem page (Marketplace/Learn/Resources). These go full-width;
+ *  everything else under /dashboard keeps the workspace sidebar. The single
+ *  predicate behind both the sidebar's visibility and the topbar's "Dashboard"
+ *  active state, so the two can never disagree about what "the workspace" is. */
+export function isEcosystemRoute(pathname: string): boolean {
+  return ECOSYSTEM_NAV.some((item) => pathname === item.href || pathname.startsWith(item.href + "/"));
+}
