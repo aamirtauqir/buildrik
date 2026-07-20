@@ -91,7 +91,7 @@ Media (folder row · type pills · 2-col grid · quota · upload) and Brand (DS-
 | Editor shell 1280 · transient | ✅ | canvas 920 |
 | Editor shell · no page tabs | ✅ | band 812 |
 | **Gate B — arithmetic** | ✅ **verified** | auto-layout produced 1080/760/920/812 unprompted |
-| Shell states as variants (12) | ⬜ | shell §4 |
+| Shell states as variants (12) | ✅ | built as named frames rather than one variant set — 12 full shells in one component would be unusable at 1440 each |
 | Site / Portfolio shell | ✅ | 720 form vs 1000 grid; accent resolves by mode — verified |
 | Client review page frame | ✅ | dashboard mode, agency name leads |
 
@@ -126,7 +126,7 @@ Not a lab. One agency, one link, one honest reaction: *would you send this to a 
 | **Review panel** (conditional 7th) | ✅ | detached group · round history · compare |
 | Inspector — CONTAINER profile, section order | ✅ | 6 remaining profiles reuse the same anatomy |
 | Inspector — control anatomy at 268 | ✅ | **label 88 + gap 8 + control 172**, zero overflow |
-| Inspector — 10 column states | ⬜ | inspector §5 |
+| Inspector — 10 column states | ✅ | `Inspector · <state>`, all 10 |
 
 ---
 
@@ -289,13 +289,17 @@ a checklist reaches 80/81 while a designer still cannot open the screen.
 
 ---
 
-## P11 · The 91 enumerated states — the gap I dismissed
+## P11 · The 171 enumerated states — the gap I dismissed twice
 
 The codex pass reported most state sets as `0/N`. I put that down to having
 handed it a summary-level inventory rather than the file, and moved on.
 
 **I never checked.** A direct query for `<Set> · <state>` naming returned
-**0 of 91**. Some states existed as shapes — Compare's mode strip, five of the
+**0 of 91**. Then, having built those, I reported the file complete — and the
+checklist agreed, because the checklist still had no row for the six rail panels'
+states, the Review panel's, or the inspector column's. A second sweep of every
+`**States:**` line in the specs found **25 sets, not 14**: another 80 states, on
+the surfaces a designer spends the entire day in. Some states existed as shapes — Compare's mode strip, five of the
 AI panel's eleven — but none was findable by name, and a state a designer cannot
 search for is a state that was not handed over. Codex was right; my dismissal was
 the error.
@@ -316,7 +320,13 @@ the error.
 | Brand push | 10 | portfolio §4 |
 | Handover | 4 | portfolio §5 |
 | Shared library | 5 | portfolio §6 |
-| **Total** | **91** | all named `<Set> · <state>`, verified 91/91 |
+| **Subtotal** | **91** | first pass |
+| Insert · Pages · Layers | 22 | cargo-sheets §1-3 |
+| Media · Content · Brand | 25 | cargo-sheets §4-6 |
+| **Review panel** | 11 | cargo-sheets §6.5 — the wedge's work surface |
+| Inspector column | 10 | inspector §5 |
+| Modal generic · Rollback · Orphan comments | 12 | floating §7 · contracts §4, §6.4 |
+| **Total** | **171** | all named `<Set> · <state>`, verified 171/171 |
 
 **The states that earn their place.** Most are cheap; a handful are the design:
 
@@ -369,8 +379,8 @@ the error.
 | P9 Cross-cutting | 6 | 6 |
 | P4b Shell states | 12 | 12 |
 | P0b Foundations specimens | 1 | 1 |
-| P11 Enumerated states | 91 | 91 |
-| **Total** | **184** | **185** |
+| P11 Enumerated states | 171 | 171 |
+| **Total** | **264** | **267** |
 
 ---
 
