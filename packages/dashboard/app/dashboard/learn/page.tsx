@@ -1,178 +1,238 @@
 "use client";
 
 import { useState } from "react";
-import { Rocket, Globe, Users, CreditCard, Link2, Pencil, BookOpen, type LucideIcon } from "lucide-react";
+import { Play, Check, Clock } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { PageHeader, Modal, Button } from "@/components/dashboard/primitives";
+import { PageHeader, Modal, Button, Pill, ProgressBar } from "@/components/dashboard/primitives";
 import { ErrorState, LoadingSkeleton, StateEmpty } from "@/components/states";
+import { COURSES, lessonEmbedUrl } from "@buildrik/shared/schemas/learn";
+import type { CourseProgressData, CurrentLessonData } from "@buildrik/shared/schemas/learn";
 
-/** Learn reads the Help centre's real articles. It used to render a hardcoded
- *  course list with invented lesson counts and progress percentages; there is no
- *  course or progress model behind any of that, so it is gone. The design's
- *  reading modal is real: it shows an actual article, its category and its real
- *  read time. What the design also draws — a "Continue learning · Lesson 3 of 6"
- *  banner and a per-card progress bar — has no data source and is not invented. */
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  "getting-started": Rocket,
-  sites: Globe,
-  team: Users,
-  billing: CreditCard,
-  domains: Link2,
-  editor: Pencil,
-};
+/** Learn is a library of video courses. Courses/lessons are code constants
+ *  (schemas/learn.ts); the per-user completion state comes from the `learn.list`
+ *  query. This replaces the earlier version that mirrored Help's articles and
+ *  drew a progress banner with no data behind it — the banner is real now. */
 
-const CATEGORY_TINTS: Record<string, string> = {
-  "getting-started": "var(--color-primary)",
-  sites: "var(--color-teal)",
-  team: "var(--color-primary)",
-  billing: "var(--color-amber)",
-  domains: "var(--color-pink)",
-  editor: "var(--color-primary)",
-};
+function fmtDuration(sec: number): string {
+  const m = Math.round(sec / 60);
+  return `${m} min`;
+}
 
-function CategoryCard({
-  categoryKey,
-  label,
-  onOpen,
+/** Look up a lesson's video URL from the constant by slug. The list query
+ *  intentionally does not ship videoUrl (it is not per-user and does not belong
+ *  in a progress payload); the player reads it from the same constant the server
+ *  built the list from. */
+function videoUrlFor(lessonSlug: string): string | undefined {
+  for (const c of COURSES) {
+    const l = c.lessons.find((x) => x.slug === lessonSlug);
+    if (l) return l.videoUrl;
+  }
+  return undefined;
+}
+
+function courseStatus(c: CourseProgressData): { tone: "success" | "accent" | "neutral"; label: string } {
+  if (c.completedCount === 0) return { tone: "neutral", label: "Not started" };
+  if (c.completedCount === c.total) return { tone: "success", label: "Completed" };
+  return { tone: "accent", label: `${c.completedCount} of ${c.total}` };
+}
+
+function ContinueHero({
+  current,
+  onResume,
 }: {
-  categoryKey: string;
-  label: string;
-  onOpen: (key: string, label: string) => void;
+  current: CurrentLessonData;
+  onResume: (lessonSlug: string) => void;
 }) {
-  const articles = trpc.help.byCategory.useQuery({ category: categoryKey }, { staleTime: 60_000 });
-  const Icon = CATEGORY_ICONS[categoryKey] ?? BookOpen;
-  const tint = CATEGORY_TINTS[categoryKey] ?? "var(--color-primary)";
-  const count = articles.data?.length ?? 0;
-  const minutes = (articles.data ?? []).reduce((sum, a) => sum + a.readTime, 0);
+  // Everything finished — no lesson to point at. A finished state, not an empty one.
+  if (!current) {
+    return (
+      <div
+        className="mb-8 flex items-center gap-3 rounded-2xl border px-6 py-5"
+        style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+      >
+        <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "var(--color-success-bg, #DCFCE7)" }}>
+          <Check className="h-5 w-5" style={{ color: "var(--color-success)" }} strokeWidth={3} />
+        </span>
+        <div>
+          <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>You're all caught up</p>
+          <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>You've completed every course. New ones land here.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(categoryKey, label)}
-      disabled={count === 0}
-      className="overflow-hidden rounded-xl border text-left shadow-card transition-colors hover:border-[var(--color-border-strong)] disabled:opacity-60"
-      style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+    <div
+      className="mb-8 flex flex-col gap-4 rounded-2xl border p-6 sm:flex-row sm:items-center sm:justify-between"
+      style={{
+        borderColor: "var(--color-border-default)",
+        background: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 6%, white), color-mix(in srgb, var(--color-primary) 14%, white))",
+      }}
     >
-      <div
-        className="flex h-[188px] items-center justify-center"
-        style={{ background: `linear-gradient(135deg, color-mix(in srgb, ${tint} 8%, white), color-mix(in srgb, ${tint} 20%, white))` }}
-      >
-        <Icon className="h-[34px] w-[34px]" style={{ color: tint }} />
-      </div>
-      <div className="px-4 py-3.5">
-        <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{label}</h3>
-        <p className="mt-1.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-          {articles.isLoading
-            ? "Loading…"
-            : count === 0
-              ? "No articles yet"
-              : `${count} ${count === 1 ? "article" : "articles"} · ${minutes} min`}
+      <div>
+        <p className="text-eyebrow font-semibold uppercase tracking-wide" style={{ color: "var(--color-primary)" }}>
+          Continue learning
+        </p>
+        <h2 className="mt-1.5 text-section-title" style={{ color: "var(--color-text-primary)" }}>
+          {current.lessonTitle}
+        </h2>
+        <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+          {current.courseTitle} · Lesson {current.index} of {current.courseTotal}
         </p>
       </div>
-    </button>
+      <Button onClick={() => onResume(current.lessonSlug)}>
+        <Play className="h-4 w-4" />
+        Resume
+      </Button>
+    </div>
+  );
+}
+
+function CourseCard({
+  course,
+  onOpenLesson,
+}: {
+  course: CourseProgressData;
+  onOpenLesson: (lessonSlug: string) => void;
+}) {
+  const status = courseStatus(course);
+  const pct = course.total === 0 ? 0 : Math.round((course.completedCount / course.total) * 100);
+
+  return (
+    <div
+      className="flex flex-col overflow-hidden rounded-xl border shadow-card"
+      style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+    >
+      <div className="flex items-start justify-between gap-3 px-5 pt-5">
+        <div>
+          <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{course.title}</h3>
+          <p className="mt-1 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{course.description}</p>
+        </div>
+        <Pill tone={status.tone}>{status.label}</Pill>
+      </div>
+
+      <div className="px-5 pb-3 pt-4">
+        <ProgressBar pct={pct} tone={pct === 100 ? "success" : "accent"} />
+      </div>
+
+      <ul className="flex flex-col border-t" style={{ borderColor: "var(--color-border-subtle, var(--color-border-default))" }}>
+        {course.lessons.map((l) => (
+          <li key={l.slug}>
+            <button
+              type="button"
+              onClick={() => onOpenLesson(l.slug)}
+              className="flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-[var(--color-bg-page)]"
+            >
+              <span
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                style={{
+                  backgroundColor: l.completed ? "var(--color-success-bg, #DCFCE7)" : "transparent",
+                  boxShadow: l.completed ? "none" : "inset 0 0 0 1.5px var(--color-border-strong)",
+                }}
+              >
+                {l.completed ? (
+                  <Check className="h-3.5 w-3.5" style={{ color: "var(--color-success)" }} strokeWidth={3} />
+                ) : (
+                  <Play className="h-3 w-3" style={{ color: "var(--color-text-muted)" }} />
+                )}
+              </span>
+              <span className="flex-1 text-body-sm" style={{ color: "var(--color-text-primary)" }}>{l.title}</span>
+              <span className="flex items-center gap-1 text-eyebrow" style={{ color: "var(--color-text-muted)" }}>
+                <Clock className="h-3 w-3" />
+                {fmtDuration(l.durationSec)}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 export default function LearnPage() {
-  const categories = trpc.help.categories.useQuery(undefined, { staleTime: 300_000 });
-  const [openCategory, setOpenCategory] = useState<{ key: string; label: string }>();
-  const [openSlug, setOpenSlug] = useState<string>();
+  const learn = trpc.learn.list.useQuery(undefined, { staleTime: 30_000 });
+  const utils = trpc.useUtils();
+  const complete = trpc.learn.complete.useMutation({
+    onSuccess: () => utils.learn.list.invalidate(),
+  });
 
-  const categoryArticles = trpc.help.byCategory.useQuery(
-    { category: openCategory?.key ?? "" },
-    { enabled: !!openCategory }
-  );
-  const article = trpc.help.article.useQuery({ slug: openSlug ?? "" }, { enabled: !!openSlug });
+  const [openLesson, setOpenLesson] = useState<string>();
 
-  const closeAll = () => {
-    setOpenSlug(undefined);
-    setOpenCategory(undefined);
-  };
+  const lessonMeta = openLesson
+    ? COURSES.flatMap((c) => c.lessons).find((l) => l.slug === openLesson)
+    : undefined;
+  const embedUrl = lessonMeta ? lessonEmbedUrl(lessonMeta.videoUrl) : null;
+  const isDone =
+    !!openLesson &&
+    (learn.data?.courses ?? []).some((c) => c.lessons.some((l) => l.slug === openLesson && l.completed));
 
   return (
     <div>
-      <PageHeader title="Learn" description="Buildrick Academy — guides, tutorials and best practices." />
+      <PageHeader title="Learn" description="Buildrick Academy — video courses for getting the most out of Buildrick." />
 
-      {categories.isLoading ? (
+      {learn.isLoading ? (
         <LoadingSkeleton rows={3} variant="list" />
-      ) : categories.isError ? (
+      ) : learn.isError ? (
         <ErrorState
-          title="Couldn't load learning paths"
+          title="Couldn't load your courses"
           description="Something went wrong on our end. Refresh to try again."
-          onRetry={() => categories.refetch()}
+          onRetry={() => learn.refetch()}
         />
-      ) : (categories.data ?? []).length === 0 ? (
-        <StateEmpty title="No learning paths yet" description="Guides will appear here once they're published." />
+      ) : (learn.data?.courses ?? []).length === 0 ? (
+        <StateEmpty title="No courses yet" description="Video courses will appear here once they're published." />
       ) : (
         <>
-          <h2 className="mb-5 text-section-title" style={{ color: "var(--color-text-primary)" }}>Learning paths</h2>
-          <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
-            {(categories.data ?? []).map((c) => (
-              <CategoryCard
-                key={c.key}
-                categoryKey={c.key}
-                label={c.label}
-                onOpen={(key, label) => setOpenCategory({ key, label })}
-              />
+          <ContinueHero current={learn.data!.current} onResume={(slug) => setOpenLesson(slug)} />
+          <h2 className="mb-5 text-section-title" style={{ color: "var(--color-text-primary)" }}>Courses</h2>
+          <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-2">
+            {learn.data!.courses.map((c) => (
+              <CourseCard key={c.slug} course={c} onOpenLesson={(slug) => setOpenLesson(slug)} />
             ))}
           </div>
         </>
       )}
 
-      {/* Reader — the article list for a path, then the article itself. */}
       <Modal
-        open={!!openCategory && !openSlug}
-        onClose={closeAll}
-        title={openCategory?.label ?? ""}
-        width={560}
+        open={!!openLesson}
+        onClose={() => setOpenLesson(undefined)}
+        title={lessonMeta?.title ?? "Lesson"}
+        width={720}
+        footer={
+          <div className="flex items-center justify-between gap-3">
+            <Button variant="ghost" onClick={() => setOpenLesson(undefined)}>Close</Button>
+            {isDone ? (
+              <span className="flex items-center gap-1.5 text-body-sm font-medium" style={{ color: "var(--color-success)" }}>
+                <Check className="h-4 w-4" strokeWidth={3} /> Completed
+              </span>
+            ) : (
+              <Button
+                onClick={() => openLesson && complete.mutate({ lessonSlug: openLesson })}
+                disabled={complete.isPending}
+              >
+                {complete.isPending ? "Saving…" : "Mark as complete"}
+              </Button>
+            )}
+          </div>
+        }
       >
-        {categoryArticles.isLoading ? (
-          <LoadingSkeleton rows={3} variant="list" />
+        {embedUrl ? (
+          <div className="overflow-hidden rounded-xl" style={{ aspectRatio: "16 / 9" }}>
+            <iframe
+              src={embedUrl}
+              title={lessonMeta?.title ?? "Lesson video"}
+              className="h-full w-full"
+              style={{ border: 0 }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
         ) : (
-          <ul className="flex flex-col gap-2">
-            {(categoryArticles.data ?? []).map((a) => (
-              <li key={a.slug}>
-                <button
-                  type="button"
-                  onClick={() => setOpenSlug(a.slug)}
-                  className="w-full rounded-lg border px-4 py-3 text-left transition-colors hover:border-[var(--color-border-strong)]"
-                  style={{ borderColor: "var(--color-border-default)" }}
-                >
-                  <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>{a.title}</p>
-                  <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-                    {a.readTime} min read
-                  </p>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Modal>
-
-      <Modal
-        open={!!openSlug}
-        onClose={() => setOpenSlug(undefined)}
-        title={article.data?.title ?? "Article"}
-        width={640}
-        footer={<Button variant="ghost" onClick={() => setOpenSlug(undefined)}>Back</Button>}
-      >
-        {article.isLoading ? (
-          <LoadingSkeleton rows={4} variant="list" />
-        ) : article.isError ? (
-          <ErrorState
-            title="Couldn't load this article"
-            description="Something went wrong on our end."
-            onRetry={() => article.refetch()}
-          />
-        ) : (
-          <>
-            <p className="text-eyebrow font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
-              {openCategory?.label} · {article.data?.readTime} min read
-            </p>
-            <div className="mt-3 whitespace-pre-wrap text-body" style={{ color: "var(--color-text-secondary)" }}>
-              {article.data?.content}
-            </div>
-          </>
+          <div
+            className="rounded-xl border px-6 py-12 text-center text-body"
+            style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+          >
+            This video isn't available right now.
+          </div>
         )}
       </Modal>
     </div>

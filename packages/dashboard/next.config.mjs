@@ -14,6 +14,14 @@ const isDev = process.env.NODE_ENV !== "production";
 const scriptSrc = isDev
   ? "'self' 'unsafe-inline' 'unsafe-eval'"
   : "'self' 'unsafe-inline'";
+// Learn embeds course videos in an <iframe>. With no frame-src the browser
+// falls back to default-src 'self' and blocks every embed, so these hosts must
+// be allowed explicitly. Kept narrow — only the two cookie-reduced video hosts,
+// not a blanket https: — and hardcoded rather than imported: this .mjs is loaded
+// by the Next config loader before path aliases resolve, so it cannot pull the
+// shared VIDEO_EMBED_HOSTS constant. The learn schema documents that the two
+// must stay in sync; a test asserts it.
+const videoFrameSrc = "https://www.youtube-nocookie.com https://player.vimeo.com";
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src ${scriptSrc}`,
@@ -22,6 +30,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: https:",
   "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net",
   "connect-src 'self' https://fonts.bunny.net",
+  `frame-src 'self' ${videoFrameSrc}`,
 ].join("; ");
 
 const nextConfig = {

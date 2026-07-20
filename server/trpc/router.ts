@@ -8,6 +8,7 @@ import { teamRouter } from "./routers/team";
 import { billingRouter } from "./routers/billing";
 import { accountRouter } from "./routers/account";
 import { helpRouter } from "./routers/help";
+import { learnRouter } from "./routers/learn";
 import { notificationsRouter } from "./routers/notifications";
 import { onboardingRouter } from "./routers/onboarding";
 import { pagesRouter } from "./routers/pages";
@@ -40,6 +41,7 @@ export const appRouter = router({
   billing: billingRouter,
   account: accountRouter,
   help: helpRouter,
+  learn: learnRouter,
   notifications: notificationsRouter,
   onboarding: onboardingRouter,
   pages: pagesRouter,

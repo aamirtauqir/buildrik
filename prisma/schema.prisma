@@ -42,8 +42,28 @@ model User {
   aiUsage          AIUsage[]
   apiTokens        ApiToken[]
   knownDevices     KnownDevice[]
+  lessonProgress   LessonProgress[]
 
   @@map("users")
+}
+
+/// Which Learn lessons a user has finished. The lessons themselves are code
+/// constants (packages/shared/schemas/learn.ts COURSES), not rows, so this joins
+/// to them by `lessonSlug` — a plain string, deliberately not a foreign key.
+/// A lesson removed from the constant leaves an orphan row here that no read
+/// surfaces; the alternative (a Lesson table) would mean a migration every time
+/// a video is added, which is exactly the overhead the code-constant model avoids.
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonSlug  String
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonSlug])
+  @@index([userId])
+  @@map("lesson_progress")
 }
 
 /// A device/location the user has successfully signed in from before. Stored as
