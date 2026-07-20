@@ -69,7 +69,7 @@
 
 | Tab | Feature set | Status | Evidence |
 |---|---|---|---|
-| Insert (A) | 53 elements / 6 categories; search 150ms; exclusive accordion; drag+click insert | ✅ | `catalog.ts:10-482` — favorites plumbing orphaned (`useBuildTab.ts:260-287`); ecommerce blocks not in catalog |
+| Insert (A) | 53 elements / 6 categories; search 150ms; exclusive accordion; drag+click insert | ✅ | `catalog.ts:10-482` — favorites plumbing orphaned/DEAD (`useBuildTab.ts:260-287` — defect N3); ecommerce blocks ARE reachable under "Advanced" via CATEGORY_REMAP |
 | Pages (P) | CRUD, rename-dup-check, duplicate, delete+8s undo, set-home, copy link, bulk ops, folders (⚪ localStorage), SEO table view, ⌘K | ✅ | `usePages.ts:34-333`; page persistence rides sites.saveProject blob |
 | Page settings drawer | SEO/Social/Advanced; autosave 500ms; slug validate+history; visibility live/hidden/password; head-code guard | ✅ | ⚠ SEO counter lies (80 vs /60, 200 vs /160); score UI weights ≠ algorithm (`seoScore.ts:10-22` vs `SeoTab.tsx:120-124`) |
 | Templates (T) | 10 site templates + sections; 2-stage filters; page-size 6; detail 320→700; apply/add-as-page/replace+backup; premium 🔒 upgrade modal; usage drawer | ✅ | `templatesData.ts:160-285`, apply FSM 15s timeout |
@@ -140,7 +140,7 @@
 | Alt-text + AI generate + provenance | ✅ | ≤125 chars; haiku; TOCTOU server guard |
 | Replace-across (atomic + per-page) | ✅ | `AssetDetailsPanel.tsx:311-415`, `ReplaceAcrossModal.tsx` |
 | Stock search (Unsplash/Pexels/Pixabay proxy) | ✅ env-gated | keys unset → silent `[]` |
-| Icon picker (Lucide 369) | ✅ | `IconPickerModal.tsx` |
+| Icon picker (Lucide 370, 17 categories) | ✅ | `IconPickerModal.tsx` |
 | Modal library "From URL" tab | 🔵 stub | vs working LibraryManager import — two inconsistent UIs |
 | Trash | 🔵 toast stub | `LibraryManager.tsx:318-319` |
 | "This device only" pill | ⚠ misleading | assets do mirror to server |
@@ -166,7 +166,7 @@
 
 ## 12.7 Counts snapshot
 
-Blocks **63** (registry) / build catalog shows **53** (ecommerce+some excluded) · element types **48** · inspector sections **18** · element profiles **7** · sidebar tabs **11** (4-tool folded) · templates **10** (tab) + **15** (TemplateLibrary modal) + **11** section quick-inserts — ⚠ three template surfaces (§12 #F2 collapse "won't do") · DS token kinds **14** · presets **18** seeded / **11** categories · starter themes **6** · catalog components **27-30** (`catalog.ts`; count drifts by tier filter `[TBC exact]`) · Lucide icons **369** · interaction triggers **13** × presets **42** · animation presets **25** · events catalog **~293** · settings screens **10** + 3 deep-links · shortcuts: full map Ch.04 §4.2.
+Blocks **63** (registry) / build catalog shows **53** *(divergent from the 63 registry — defect N2; ecommerce blocks ARE reachable under "Advanced", the earlier "excluded" note was wrong)* · element types **48** · inspector sections **18** · element profiles **7** · sidebar tabs **11** (4-tool folded) · templates **10** (tab) + **15** (TemplateLibrary modal) + **11** section quick-inserts — ⚠ three template surfaces (§12 #F2 collapse "won't do") · DS token kinds **14** · presets **18** seeded / **11** categories · starter themes **6** · catalog components **27** (8 atoms / 11 molecules / 8 organisms, `catalog.ts`) *(corrected 2026-07-18; was "27-30 [TBC]")* · Lucide icons **370** (17 categories) *(corrected 2026-07-18)* · interaction triggers **14** (element 5 · page 3 · scroll 3 · mouse 3) × presets **39** *(corrected 2026-07-18; was 13 × 42 — the prose enumeration already summed to 14)* · animation presets **25** · events catalog **~293** · settings screens **10** + 3 deep-links · shortcuts: full map Ch.04 §4.2.
 
 ## 12.8 New drift found this pass (feeds §13 as E/F rows)
 

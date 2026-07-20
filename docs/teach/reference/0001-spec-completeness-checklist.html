@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reference — Spec completeness checklist</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<div class="wrap">
+
+<p class="eyebrow">Reference 01 · Print me</p>
+<h1>Spec completeness checklist</h1>
+<p class="standfirst">Har screen spec ship karne se pehle isse guzaaro. Agar koi row khaali hai, wo screen designable nahi — chahe uska product decision kitna hi sahi ho.</p>
+
+<h2>The one test</h2>
+<div class="callout">
+<p style="margin:0"><strong>"Kya do qaabil designers ye line padhkar do alag cheezein bana sakte hain?"</strong></p>
+<p style="margin:.5rem 0 0">Haan → decision. Nahi → spec.</p>
+</div>
+
+<h2>A · Per-screen — 10 rows</h2>
+
+<table>
+<tr><th>#</th><th>Row</th><th>Fail lagta hai</th><th>Pass lagta hai</th></tr>
+<tr><td>1</td><td><strong>Size</strong></td><td>"a panel"</td><td>320w · header 44h · rows 32h</td></tr>
+<tr><td>2</td><td><strong>Position</strong></td><td>"sits with the canvas"</td><td>bottom-centred, 24 from bottom</td></tr>
+<tr><td>3</td><td><strong>Hierarchy</strong></td><td>feature ki list</td><td>pehle kya, dusra kya, teesra kya</td></tr>
+<tr><td>4</td><td><strong>States</strong></td><td>"empty · loading · error"</td><td>har state ki asli copy + layout</td></tr>
+<tr><td>5</td><td><strong>Behaviour</strong></td><td>"click swaps the drawer"</td><td>active pe dobara click = band</td></tr>
+<tr><td>6</td><td><strong>Real content</strong></td><td>"Page name"</td><td>"Bella Cucina — Menu"</td></tr>
+<tr><td>7</td><td><strong>Content stress</strong></td><td>—</td><td>40 pages · 200 layers · lamba naam</td></tr>
+<tr><td>8</td><td><strong>Entry → Exit</strong></td><td>"users can access it"</td><td>kahan se aata, kahan jaata</td></tr>
+<tr><td>9</td><td><strong>Roles</strong></td><td>"OW/AD/DE" har jagah</td><td>DE kya <em>nahi</em> kar sakta</td></tr>
+<tr><td>10</td><td><strong>Copy</strong></td><td>button labels</td><td>empty-state + error ki asli lines</td></tr>
+</table>
+
+<h2>B · Arithmetic — hamesha jodo</h2>
+
+<p>Dimension likhna kaafi nahi. Har layout ka jod milna chahiye. Ye teen check har baar chalao:</p>
+
+<pre><code>VERTICAL     sab bands ka jod  =  viewport height
+             56 + 36 + BAND + 32 = 900   →  BAND = 776  ✓
+
+HORIZONTAL   chrome + canvas   =  viewport width
+             60 + 320 + CANVAS + 300 = 1440  →  CANVAS = 760  ✓
+
+MONOTONIC    viewport chhoti karo → koi region BADA nahi hona chahiye
+             1440 → canvas 760 ;  1439 → canvas 1079   ✗ TOOT GAYA</code></pre>
+
+<div class="callout evidence">
+<span class="callout-label">Ye galti asli hai</span>
+<p style="margin:0">Shell wireframe v1 ne likha <code>band = 768</code>. Jod: 56 + 40 + 36 + 768 + 32 = <strong>932</strong>, viewport 900. Footer hi drop ho gaya tha. Har number "reasonable" lag raha tha — jod nahi mil raha tha.</p>
+</div>
+
+<h2>C · Doc-level — 6 checks</h2>
+
+<table>
+<tr><th>Check</th><th>Kyun</th></tr>
+<tr><td><strong>Ek fact, ek jagah</strong></td><td>Copy ki hui fact drift karti hai. Doosri jagah link karo, dobara mat likho.</td></tr>
+<tr><td><strong>Superseded = marked</strong></td><td>Purana faisla bina marker ke live spec jaisa padha jaata hai.</td></tr>
+<tr><td><strong>Counts sirf owner doc mein</strong></td><td>"370 icons" chaar docs mein likha = teen jagah stale hone ka intezaar.</td></tr>
+<tr><td><strong>Har citation resolve ho</strong></td><td>Rename ke baad <code>Ch.13</code> kahin point nahi kar raha tha.</td></tr>
+<tr><td><strong>ID series takraaye nahi</strong></td><td>R1 do alag cheezein, S1.1 vs S1 — grep karne wala galat jagah pahunchta hai.</td></tr>
+<tr><td><strong>Correction owner tak jaaye</strong></td><td>Correction §5.10 mein likhi par Ch.12 (owner) mein nahi — wahan se dobara copy hoti rahi.</td></tr>
+</table>
+
+<h2>D · Frame pehle — ye order bacha leta hai</h2>
+
+<ol>
+<li><strong>Viewport chuno</strong> (design + minimum). Arithmetic yahin se shuru.</li>
+<li><strong>Shell banao</strong> asli size pe — har region labelled.</li>
+<li><strong>Reusable frame banao</strong> (drawer, modal, panel) — ek baar.</li>
+<li><strong>Cargo bharo</strong> — 6 panels ab ek hi frame ke bachche hain.</li>
+<li><strong>States</strong> har screen ke liye.</li>
+<li><strong>Copy + stress</strong> aakhir mein.</li>
+</ol>
+<p>Ulta karoge to har screen alag se design hogi aur aapas mein match nahi karegi.</p>
+
+<h2>E · Buildrick — abhi kya khula hai</h2>
+
+<p>Halat 2026-07-18 shaam tak. <span class="verdict-yes">Band</span> = spec likh diya gaya.</p>
+
+<table>
+<tr><th>Gap</th><th>Halat</th></tr>
+<tr><td>Empty-state copy — 11 surfaces</td><td class="verdict-yes">Band — shell §5.7, asli copy likhi</td></tr>
+<tr><td>Control states — focus · hover · disabled · loading</td><td class="verdict-yes">Band — shell §5.8</td></tr>
+<tr><td>Z-index contract — 5 floating layers</td><td class="verdict-yes">Band — shell §5.9, 10-level order</td></tr>
+<tr><td>Device frame widths + breakpoint set</td><td class="verdict-yes">Band — shell §5.5, 1023/767 chuna</td></tr>
+<tr><td>"6→2 density" quantify</td><td class="verdict-yes">Band — shell §5.6, acceptance test ke saath</td></tr>
+<tr><td>Site full-page — ~15 destinations</td><td class="verdict-yes">Band — apna file, brand-push flow samet</td></tr>
+<tr><td>DESIGN.md layout sections stale</td><td class="verdict-yes">Band — supersede banner + scope note</td></tr>
+<tr><td>Issues panel · Versions+Compare · review bar · AI panel — internals</td><td class="verdict-no">Khula — Compare hi wedge ka asli kaam</td></tr>
+<tr><td>Content stress — 40 pages · 200 layers · lambe naam</td><td class="verdict-no">Khula</td></tr>
+<tr><td>Permissions per surface — DESIGNER kya nahi kar sakta</td><td class="verdict-no">Khula</td></tr>
+<tr><td>Focus order + keyboard traversal</td><td class="verdict-no">Khula</td></tr>
+<tr><td>Scrollbar treatment — 3 scroll regions</td><td class="verdict-no">Khula</td></tr>
+</table>
+
+<div class="lesson-foot">
+<p>Lesson: <a href="../lessons/0001-decision-record-vs-design-brief.html">01 — Decision record vs design brief</a> · Mission: <a href="../MISSION.md">MISSION.md</a></p>
+</div>
+
+</div>
+</body>
+</html>

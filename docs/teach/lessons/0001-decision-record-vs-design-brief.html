@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lesson 01 — Decision record vs design brief</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<div class="wrap">
+
+<p class="eyebrow">Lesson 01 · Specification</p>
+<h1>Decision record vs design brief</h1>
+<p class="standfirst">Tumhara doc product ke baare mein <em>sahi</em> hai. Phir bhi designer usse design nahi kar sakta. Ye lesson batata hai ki dono cheezein alag kyun hain — aur ek test deta hai jisse tum apni kisi bhi line ko khud judge kar sako.</p>
+
+<h2>1. Ek doc 100% sahi ho sakta hai aur 0% buildable</h2>
+
+<p>2026-07-18 ko chaar independent audits tumhare editor docs pe chale. Chaaron ne alag-alag lens use kiya — contradictions, placement, designer-usability, cross-doc SSOT. Designer-lens wale ka verdict:</p>
+
+<blockquote>"You cannot start designing tomorrow. This is an excellent <strong>product decision record</strong> and a poor <strong>design brief</strong>."</blockquote>
+
+<div class="callout evidence">
+<span class="callout-label">Evidence — tumhare apne doc se</span>
+<ul>
+<li>912 lines mein <strong>exactly ek dimension</strong> — "4px base spacing"</li>
+<li><strong>6 of 47 screens</strong> designable — sirf J5, kyunki sirf uske real wireframes the</li>
+<li>Chrome arithmetic kabhi ki hi nahi gayi — shell apne hi viewport mein fit nahi hota tha</li>
+</ul>
+</div>
+
+<p>Gaur karo: in mein se koi bhi <em>galat product decision</em> nahi hai. Rail mein kya jaayega, wedge kya hai, kaunsa feature kahan rahega — sab sahi tha. Jo missing tha wo alag kism ki information hai.</p>
+
+<h3>Designer teen sawaal poochta hai. Tum sirf pehle ka jawab de rahe the.</h3>
+
+<table>
+<tr><th>Sawaal</th><th>Kaun jawab deta</th><th>Tumhare doc mein tha?</th></tr>
+<tr><td><strong>Kahan</strong> rahega?</td><td>Decision record / IA</td><td class="verdict-yes">Haan — bohat achhe se</td></tr>
+<tr><td><strong>Kitna bada</strong> hai?</td><td>Design brief</td><td class="verdict-no">Nahi — ek dimension</td></tr>
+<tr><td><strong>Kya hota hai</strong> jab khaali / load / error / 40 pages?</td><td>Design brief</td><td class="verdict-no">Nahi — states sirf naam the</td></tr>
+</table>
+
+<p>Isiliye doc "complete" mehsoos hota tha. Ek poora sawaal shaandaar tareeke se answer ho raha tha — aur baaki do ka wajood hi nahi tha.</p>
+
+<h2>2. The test — ek hi sawaal jo sab decide karta hai</h2>
+
+<div class="callout">
+<span class="callout-label">The two-designer test</span>
+<p style="margin:0"><strong>"Kya do qaabil designers ye line padhkar do alag cheezein bana sakte hain?"</strong></p>
+<p style="margin:.6rem 0 0">Agar <strong>haan</strong> → ye spec nahi hai, ye decision hai. Agar <strong>nahi</strong> → ye spec hai.</p>
+</div>
+
+<p>Ye test isliye kaam karta hai kyunki wo tumhari niyat ko ignore karta hai. Tumhe pata hai tumhara matlab kya tha. Designer ko nahi. Test sirf ye poochta hai ki likhe hue lafz kitne rasta chhodte hain.</p>
+
+<p>Audit ne tumhare doc mein <strong>9</strong> aisi lines nikaali (A1–A9). Ek misaal:</p>
+
+<pre><code>"Sits with the canvas"          ← canvas toolbar ke baare mein
+
+Designer A padhta hai: canvas ke neeche full-width bar
+Designer B padhta hai: canvas ke upar floating pill (Figma jaisa)
+
+Do alag product. Ek hi line se.</code></pre>
+
+<h2>3. Ab tum karo — 6 asli lines</h2>
+
+<p>Har line tumhare apne docs se hai. Faisla karo: <strong>BUILDABLE</strong> ya <strong>AMBIGUOUS</strong>.</p>
+
+<div id="quiz"></div>
+<div class="score" id="score"></div>
+
+<h2>4. Ambiguous ko buildable kaise banate ho</h2>
+
+<p>Har baar wahi paanch cheezein missing hoti hain. Ye tumhari checklist hai:</p>
+
+<table>
+<tr><th>#</th><th>Add karo</th><th>Test</th></tr>
+<tr><td>1</td><td><strong>Number</strong> — width, height, row density, gap</td><td>Kya main ise graph paper pe naap sakta hoon?</td></tr>
+<tr><td>2</td><td><strong>States</strong> — empty · loading · error · full · gated</td><td>Har state ke liye ek line copy likhi hai?</td></tr>
+<tr><td>3</td><td><strong>Behaviour</strong> — click pe kya, dobara click pe kya</td><td>Toggle hai ya nahi? Likha hai?</td></tr>
+<tr><td>4</td><td><strong>Real content</strong> — asli naam, asli lambai</td><td>40-page site mein kya hota hai?</td></tr>
+<tr><td>5</td><td><strong>Position</strong> — kis cheez ke relative, kitna door</td><td>"Ke saath" nahi — "bottom-centred, 24 from bottom"</td></tr>
+</table>
+
+<div class="callout">
+<span class="callout-label">Sabse bada leverage — frame pehle</span>
+<p>Doc ke 41 undesignable screens mein se zyadatar ek hi cheez ke bachche hain: <strong>drawer</strong>. Insert · Layers · Pages · Media · Content · Brand — sab wahi 320px frame hai, andar alag saamaan.</p>
+<p style="margin-bottom:0">Isliye ek shell wireframe (asli viewport pe, har dimension labelled) ne akele 6 panels ko designable bana diya. <strong>Pehle frame settle karo, phir cargo.</strong> Ye Brad Frost ka atomic-design principle hai — chhoti cheez pehle, badi usse bani.</p>
+</div>
+
+<h2>5. Ek warning — numbers jhoot bolte hain</h2>
+
+<p>Maine shell wireframe likha jisme har dimension thi. Audit ne usme bhi galti nikaali:</p>
+
+<pre><code>topbar 56 + banner 40 + tabs 36 + band 768 + footer 32 = 932
+viewport = 900
+
+...footer hi drop kar diya tha.</code></pre>
+
+<p>Sabak: <strong>dimension likhna kaafi nahi — jodna bhi padta hai.</strong> Har layout number ka ek arithmetic check hota hai. Vertical: sab bands ka jod = viewport height. Horizontal: chrome + canvas = viewport width. Agar jod nahi milta, spec jhooth hai — chahe har number "reasonable" lage.</p>
+
+<div class="lesson-foot">
+<h3>Aage kya</h3>
+<ul>
+<li><strong>Reference:</strong> <a href="../reference/0001-spec-completeness-checklist.html">Spec completeness checklist</a> — har screen ship karne se pehle isse guzaaro.</li>
+<li><strong>Primary source:</strong> Brad Frost, <em>Atomic Design</em> — free online at <a href="https://atomicdesign.bradfrost.com/">atomicdesign.bradfrost.com</a>. Chapter 2 padho (the atomic methodology). Wahi "frame pehle, cargo baad mein" wala idea hai jo tumhare 6 panels ko ek saath unlock karta hai.</li>
+<li><strong>Agla lesson:</strong> states — har screen ke liye empty/loading/error likhna. Ye wo cheez hai jo tumhare docs mein sirf <em>naam</em> tha, spec nahi.</li>
+</ul>
+<p><strong>Kuch bhi clear na ho to poochho.</strong> Main tumhara teacher hoon — koi bhi line utha kar poochho "ye buildable hai ya nahi", main uspe chalunga.</p>
+</div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  { src: "shell wireframes §5 A2 (pehle)",
+    q: "Persistent 6-icon rail; click swaps the drawer.",
+    a: "AMBIGUOUS",
+    why: "Active icon pe dobara click karne se drawer band hota hai ya nahi? Framer band nahi karta, Webflow karta. Do alag product. Ab resolve ho chuka: toggle." },
+  { src: "shell wireframes §2 region table",
+    q: "Rail 60w; icon 24 in a 44 hit-target, 8 vertical gap.",
+    a: "BUILDABLE",
+    why: "Naapa ja sakta hai. Designer graph paper pe seedha bana sakta hai — koi rasta nahi chhoda." },
+  { src: "redesign doc §4.3 canvas toolbar",
+    q: "Canvas toolbar sits with the canvas.",
+    a: "AMBIGUOUS",
+    why: "Canvas ke neeche full-width bar, ya upar floating pill? Code ka naam CanvasFooterToolbar neeche kheenchta hai; usme device-switcher hona upar kheenchta hai. Ab resolve: floating pill." },
+  { src: "shell wireframes §2 canvas toolbar",
+    q: "Floating pill 44h, bottom-centred, 24 from the bottom.",
+    a: "BUILDABLE",
+    why: "Position kis cheez ke relative aur kitni door — dono likhe. Isiliye ye spec hai aur upar wali nahi." },
+  { src: "redesign doc S16 · roadmap",
+    q: "Inspector 6 to 2 density simplification target.",
+    a: "AMBIGUOUS",
+    why: "Kaunse 6 levels, aur kaunse 2 bachenge? Roadmap ka headline J3 task hai aur kisi doc mein quantify nahi hua. Abhi bhi khula hai." },
+  { src: "redesign doc §4.3 comments",
+    q: "A comments thread list slides in on demand.",
+    a: "AMBIGUOUS",
+    why: "Kis kinaare se? Inspector ki jagah leta hai ya uske upar? Kholta kya hai? Comment-mode band karne pe kya hota hai? Chaar sawaal, ek line." }
+];
+
+const quiz = document.getElementById('quiz');
+const scoreEl = document.getElementById('score');
+let answered = 0, correct = 0;
+
+QUESTIONS.forEach((item, i) => {
+  const box = document.createElement('div');
+  box.className = 'quiz';
+  box.innerHTML =
+    '<p class="quiz-q">' + (i + 1) + '. &ldquo;' + item.q + '&rdquo;</p>' +
+    '<p class="quiz-src">' + item.src + '</p>' +
+    '<div class="quiz-opts">' +
+      '<button data-v="BUILDABLE">BUILDABLE</button>' +
+      '<button data-v="AMBIGUOUS">AMBIGUOUS</button>' +
+    '</div>' +
+    '<p class="quiz-fb"></p>';
+
+  const btns = box.querySelectorAll('button');
+  const fb = box.querySelector('.quiz-fb');
+
+  btns.forEach(btn => btn.addEventListener('click', () => {
+    if (btn.disabled) return;
+    const picked = btn.dataset.v;
+    const isRight = picked === item.a;
+    btns.forEach(b => {
+      b.disabled = true;
+      if (b.dataset.v === item.a) b.classList.add('right');
+      else if (b === btn) b.classList.add('wrong');
+    });
+    fb.innerHTML = (isRight ? '<strong>Sahi.</strong> ' : '<strong>Nahi — ' + item.a + '.</strong> ') + item.why;
+    fb.classList.add('show');
+    answered++; if (isRight) correct++;
+    if (answered === QUESTIONS.length) {
+      scoreEl.innerHTML = '<strong>' + correct + ' / ' + QUESTIONS.length + '.</strong> ' +
+        (correct >= 5
+          ? 'Test tumhare haath mein aa gaya. Ab isse apni har nayi spec-line pe chalao — likhte waqt, baad mein nahi.'
+          : 'Dobara dekho jo galat hue. Pattern ek hi hai: agar line position, size, ya "phir kya hota hai" chhod deti hai, wo decision hai — spec nahi.');
+      scoreEl.classList.add('show');
+    }
+  }));
+
+  quiz.appendChild(box);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+/* Buildrick teaching workspace — shared lesson stylesheet.
+   Every lesson and reference doc links this. Tufte-ish: quiet, readable, prints well. */
+
+:root {
+  --ink: #1a1a1a;
+  --ink-soft: #5b6472;
+  --rule: #e5e7eb;
+  --bg: #fffffc;
+  --accent: #2D6DFF;        /* Buildrick cobalt — the product's one accent */
+  --good: #167a4a;
+  --bad: #b4232a;
+  --wash: #f7f8fa;
+  --code: #f4f6f8;
+  --maxw: 46rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e6e8eb; --ink-soft: #9aa4b2; --rule: #232a33; --bg: #0f1216;
+    --accent: #6ea8ff; --good: #4ec98a; --bad: #ff8a8a; --wash: #161b22; --code: #161b22;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.62 "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 4rem 1.5rem 8rem; }
+
+/* ---- masthead ---------------------------------------------------------- */
+.eyebrow {
+  font: 600 11px/1 "Geist Mono", ui-monospace, Menlo, monospace;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
+  margin: 0 0 .9rem;
+}
+h1 { font-size: 2.05rem; line-height: 1.15; letter-spacing: -.022em; margin: 0 0 .5rem; font-weight: 650; }
+.standfirst { font-size: 1.12rem; color: var(--ink-soft); margin: 0 0 2.5rem; line-height: 1.5; }
+
+h2 {
+  font-size: 1.22rem; letter-spacing: -.01em; font-weight: 650;
+  margin: 3rem 0 .8rem; padding-top: 1.2rem; border-top: 1px solid var(--rule);
+}
+h3 { font-size: 1rem; font-weight: 650; margin: 2rem 0 .5rem; }
+
+p { margin: 0 0 1.1rem; }
+ul, ol { margin: 0 0 1.1rem; padding-left: 1.3rem; }
+li { margin-bottom: .45rem; }
+strong { font-weight: 650; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); }
+a:hover { border-bottom-color: var(--accent); }
+
+code, .mono { font: 13.5px/1.5 "Geist Mono", ui-monospace, Menlo, monospace; background: var(--code); padding: .1em .4em; border-radius: 4px; }
+pre { background: var(--code); padding: 1rem 1.1rem; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.55; }
+pre code { background: none; padding: 0; }
+
+/* ---- editorial furniture ---------------------------------------------- */
+blockquote {
+  margin: 1.6rem 0; padding: .1rem 0 .1rem 1.2rem;
+  border-left: 3px solid var(--accent); color: var(--ink-soft); font-style: italic;
+}
+
+.callout {
+  background: var(--wash); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 1.1rem 1.2rem; margin: 1.6rem 0;
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout-label {
+  font: 600 10.5px/1 "Geist Mono", ui-monospace, monospace;
+  letter-spacing: .13em; text-transform: uppercase; color: var(--ink-soft);
+  display: block; margin-bottom: .6rem;
+}
+
+.evidence { border-left-color: var(--bad); }
+.evidence .callout-label { color: var(--bad); }
+
+table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; font-size: 14.5px; }
+th, td { border: 1px solid var(--rule); padding: .55rem .7rem; text-align: left; vertical-align: top; }
+th { background: var(--wash); font-weight: 650; }
+
+.verdict-yes { color: var(--good); font-weight: 650; }
+.verdict-no  { color: var(--bad);  font-weight: 650; }
+
+/* ---- quiz -------------------------------------------------------------- */
+.quiz { border: 1px solid var(--rule); border-radius: 10px; padding: 1.2rem; margin: 1.4rem 0; background: var(--bg); }
+.quiz-q { font-weight: 650; margin: 0 0 .35rem; }
+.quiz-src { font: 13px/1.5 "Geist Mono", ui-monospace, monospace; color: var(--ink-soft); margin: 0 0 .9rem; }
+.quiz-opts { display: flex; gap: .5rem; flex-wrap: wrap; }
+.quiz-opts button {
+  font: 500 14px/1 "Inter Tight", sans-serif; color: var(--ink);
+  background: var(--wash); border: 1px solid var(--rule); border-radius: 7px;
+  padding: .6rem .9rem; cursor: pointer; transition: none;
+}
+.quiz-opts button:hover { border-color: var(--accent); }
+.quiz-opts button[disabled] { cursor: default; opacity: .55; }
+.quiz-opts button.right { background: color-mix(in srgb, var(--good) 14%, transparent); border-color: var(--good); opacity: 1; }
+.quiz-opts button.wrong { background: color-mix(in srgb, var(--bad) 12%, transparent); border-color: var(--bad); opacity: 1; }
+.quiz-fb { margin: .9rem 0 0; font-size: 14.5px; color: var(--ink-soft); display: none; }
+.quiz-fb.show { display: block; }
+
+.score {
+  margin: 2rem 0 0; padding: 1rem 1.2rem; border-radius: 10px;
+  background: var(--wash); border: 1px solid var(--rule);
+  font-size: 15px; display: none;
+}
+.score.show { display: block; }
+
+/* ---- footer ------------------------------------------------------------ */
+.lesson-foot { margin-top: 4rem; padding-top: 1.4rem; border-top: 1px solid var(--rule); font-size: 14.5px; color: var(--ink-soft); }
+.lesson-foot h3 { margin-top: 0; color: var(--ink); }
+
+@media print {
+  body { background: #fff; color: #000; font-size: 11pt; }
+  .wrap { max-width: none; padding: 0; }
+  .quiz-opts, .score { display: none; }
+  a { border: 0; color: #000; }
+  h2 { page-break-after: avoid; }
+}

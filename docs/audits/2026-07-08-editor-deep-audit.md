@@ -2,6 +2,25 @@
 
 > `main` @ `e5624ca1` (+uncommitted working tree) · 2026-07-08
 > Method: full mechanical pass (tsc, eslint, vitest 830 files/6118 tests, DS gates, SSOT scanner) + 7 parallel module audits (engine, shell/canvas/rail, sidebar, inspector/DS, media/services/ai/blocks, cross-cutting duplication, event-graph) + spot re-verification of every P1 by second reader. Every finding cites `file:line`. CONFIRMED = traced in code; PLAUSIBLE = strong signal, needs a runtime check. KNOWN items from PRD §13/§13b excluded unless status changed.
+>
+> **Read §0.5 first.** Sections 1-13 are organized **by module** (engine, sidebar, inspector…) — a technical decomposition, good for *fixing* but it hides *what to build next*. §0.5 re-cuts every finding **by user job** (the 6 jobs an agency designer hires this editor for). A module-clean audit can still ship jobs that don't work end-to-end — that's the gap §0.5 exists to surface.
+
+## 0.5 By JOB — the primary lens (added 2026-07-17)
+
+The module sections say "47 bugs fixed, tsc 0, 15,634 green — healthy." True per module. But an agency designer doesn't hire a *module*, they hire a *job*: build a client site → make it on-brand → get sign-off → ship it. Rated **end-to-end** (does the whole job work), not module-bug-free:
+
+| Job | E2E health | Works / breaks |
+|---|---|---|
+| **J1 · Discover & onboard** | 🟡 5/10 | Checklist works; **PageWizard "AI" is simulated** (inputs discarded, fake delays — `wizard/PageWizard.tsx:53-135`); **spotlight/coach-mark orphaned** (WelcomeModal + SpotlightOverlay dead = missing first-run "aha"). Boot/load solid. |
+| **J2 · AI-draft a site** | 🔴 4/10 | Edit-AI (AITab) real + hardened this pass (30s timeout wired, rate-limiter fixed, 3→1 surface consolidation). **But "prompt → whole site" is a STUB** (no AI branch → blank site, §13-A7); image-gen fake (picsum, `openai.ts:150`). The headline promise doesn't run. |
+| **J3 · Build the page** | 🟢 9/10 | The one complete job (journey-audit confirmed). **Hardened:** moveElement cycle-guard, StyleEngine breakpoint-mirror + optimizeCSS + selector-collision, inline-edit, duplicate-`title` field, aria-prefix. Rock-solid. |
+| **J4 · Make it on-brand** | 🟡 6/10 | DS strong + hardened (undo dirty-guard, color id-diff, discard-covers-presets, import darkValue, persistAll 14/14). **But: component "reset to master" STILL lies** — path-scheme mismatch open, `ComponentInstance.ts:72` parses `#/…` vs `:177-179` builds `/elements/…` (§13-A2, NOT fixed this pass); **cross-site brand push absent** (link-out only — the agency wedge). |
+| **J5 · Get client sign-off** | 🔴 3/10 | **Worst job = the wedge.** Approval gate now *enforced* (D1) but rollout-unsafe + **edits-after-approval leak** (client approves → agency edits → publishes unseen). **The external client/approver has NO screen.** Comments backend complete, **zero editor UI** (§13-A4). Share link decorative. Backend moved; front door absent. |
+| **J6 · Ship & run** | 🟡 7/10 | Publish core solid + hardened (export-format honored, ReactExporter dup-names, AssetBundler errors, SEOInjector slug, sanitizeHeadCode, **media quota now enforced**). **But: Redirects/Headers/Localization saved-not-enforced (§13b B8); forms in-memory; publish worker fakes "Optimizing images" steps (§13b A20); custom-domain untested e2e.** |
+
+**Job-lens verdict:** only **J3 (build) is complete.** The 3 headline promises are broken: **J2** whole-site AI-draft is fake · **J5** sign-off has backend but no UI + is gameable · **J4** cross-site brand push is absent. Eng + design cross-review *independently* converged on the same #1: **the next real work is J5 (the wedge), not more bug-fixing.** The module audit structurally hid this — hence the job lens leads.
+
+**How to use both lenses:** module sections (below) = *how to fix a given defect*. This job table = *which job to invest in next*. Every module finding maps to a job via its §13 register id. When picking work: start from a job's health here, then drop into the module section for the file:line.
 
 ## 0. Coverage statement
 

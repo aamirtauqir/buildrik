@@ -189,7 +189,7 @@ Use for status indicators only (save state, validation, toasts). Never for decor
 - **Scale:** 2 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64.
 
 ## Layout
-- **Editor:** Grid-disciplined. Topbar (56px) / Left rail (60px) / Left sidebar panel (240 nav / 320 authoring / fullpage) / canvas (flex) / right inspector (320px).
+- **Editor:** Grid-disciplined. Topbar (56px) / Left rail (60px) / **Drawer 320px — all six panels** / canvas (flex) / **right inspector 300px**. *(Corrected 2026-07-19: read "240 nav / 320 authoring" and "inspector 320px". Both were the previous IA and both were outside the supersede banner below, so they read as live. The canonical source for every chrome dimension is `docs/designs/2026-07-18-editor-shell-wireframes.md` — this line exists only so it does not contradict it.)*
 - **Border radius scale:** `sm: 4px` (inputs, row corners), `md: 8px` (buttons, panels, cards — matches topbar), `lg: 12px` (modals), `full: 9999px` (pills, avatars, compact-state buttons).
 - **Topbar height:** 56px — canonical. All other chrome heights flow from this rhythm.
 - **Panel header height:** 44px — matches sidebar contract.
@@ -199,6 +199,35 @@ Use for status indicators only (save state, validation, toasts). Never for decor
 - **Easing:** `enter: ease-out`, `exit: ease-in`, `move: ease-in-out`.
 - **Duration:** hover `120ms` (matches topbar), panel open `200ms`, modal enter `200ms`. No spring physics. No scroll choreography. No entrance animations on first paint.
 - **Reduced motion:** respect `prefers-reduced-motion: reduce` — disable all non-essential transitions.
+
+## ⚠ Editor layout sections — SUPERSEDED 2026-07-18
+
+**The sections from "Sidebar Panel System" through "Rail Rules" describe the PREVIOUS editor IA.**
+They document an 11-tab sidebar, a 3-zone rail (Creation/Structure/Config), an 8-tab Composition
+Map including Templates · Settings · History, and the old `A/T/M/Z/P/⇧A/D/S/U/H` shortcut map.
+**None of that is the editor being built.** A designer who follows them builds the previous product.
+
+The live editor layout is:
+
+| Concern | Now |
+|---|---|
+| Rail | **6 flat tool icons**, no zones, frequency-ordered: Insert · Layers · Pages · Media · Content · Brand |
+| Retired from the rail | Templates (dissolved into the New-Page flow + Insert) · AI (⌘K + canvas selection toolbar) · Settings & Publish (the separate Site full-page) · History (the save-status pill → Versions) |
+| Comments | a canvas **mode** (💬, key `C`), not a panel |
+| Shortcuts | `A` Insert · `P` Pages · `L` Layers · `M` Media · `D` Content · `B` Brand · `C` comment · `⌘P` preview · `⌘K` palette |
+| Panel width | **320 for all six** (declared override of the 240/320 Width Rule below — 240 cannot hold the Pages SEO table or a deep Layers tree) |
+
+**Authoritative layout specs — build from these, not from the sections below:**
+- `docs/designs/2026-07-17-editor-product-redesign-complete.md` **§4.3** — the placement map (what goes where)
+- `docs/designs/2026-07-18-editor-shell-wireframes.md` — dimensions, states, drawer spec, z-index, empty states, device frames
+- `docs/designs/2026-07-18-site-fullpage-wireframes.md` — the Site full-page area
+- `docs/prd/editor/14-screen-specs.md` — per-screen specs
+
+**What in DESIGN.md still holds and is still SSOT:** every *value* — colour, typography, spacing scale, motion timings, row density (28h dense / 32h standard), the NO BLACK rule, accent, semantic colours, token namespace, chrome axioms, anti-slop rules, accessibility. Only the *layout* sections below are stale.
+
+*Note: these sections already contradict each other — "11 rail-visible tabs" at Sidebar Panel System vs "Composition Map — 8 Tabs" — which is part of why they should not be built from.*
+
+---
 
 ## Sidebar Panel System
 
