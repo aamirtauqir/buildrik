@@ -41,6 +41,20 @@ consciously not done, not when they were forgotten.
   `PW_BS=1`, or drop the projects. Never derive an expensive default from a
   credential being present.
 
+## Onboarding
+
+- [ ] **The AI draft preview has no visual preview.** `/onboarding/ai/preview`
+  now lists the pages and section counts the generator actually produced, but a
+  user cannot see the site before opening the editor. Rendering an unpublished
+  draft needs a renderer the app does not have: `/share/[token]` redirects to
+  `publishedUrl`, and a fresh draft has none. Either add a render route that can
+  take a siteId, or generate a thumbnail during the job.
+
+- [ ] **No field in the AI wizard has a `maxLength`.** The fold now budgets so a
+  long answer cannot starve the others, but "One-line description" still accepts
+  a paragraph with no hint that only ~500 characters of the whole brief reach the
+  model. A counter or a cap would tell the user before the truncation does.
+
 ## Auth (surfaced by the 2026-07-20 flow investigation)
 
 - [ ] **Auth forms have no inline per-field validation.** Nine screens pass the

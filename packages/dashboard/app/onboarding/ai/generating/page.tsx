@@ -10,56 +10,7 @@ import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import type { WizardData } from "@buildrik/shared/schemas/onboarding";
-
-const INDUSTRY_TO_TYPE: Record<string, "PORTFOLIO" | "BUSINESS" | "BLOG" | "RESTAURANT" | "AGENCY" | "ECOMMERCE"> = {
-  restaurant: "RESTAURANT",
-  clinic: "BUSINESS",
-  agency: "AGENCY",
-  shop: "ECOMMERCE",
-  portfolio: "PORTFOLIO",
-  events: "BUSINESS",
-  saas: "BUSINESS",
-  other: "BUSINESS",
-};
-
-const TONE_MAP: Record<string, "professional" | "casual" | "creative" | "minimal" | "bold" | "playful"> = {
-  professional: "professional",
-  friendly: "casual",
-  premium: "creative",
-  bold: "bold",
-  minimal: "minimal",
-};
-
-const GOAL_LABEL: Record<string, string> = {
-  leads: "get leads",
-  calls: "book calls",
-  sell: "sell products",
-  portfolio: "show portfolio",
-  inform: "share information",
-};
-
-// Fold the rich A2/A3 answers the generate schema doesn't take (goal, audience,
-// CTA, location, style, colors) into the description so the AI still uses them.
-function buildInput(ai: NonNullable<WizardData["ai"]>) {
-  const parts = [ai.desc];
-  if (ai.goal) parts.push(`Goal: ${GOAL_LABEL[ai.goal] ?? ai.goal}.`);
-  if (ai.audience) parts.push(`Audience: ${ai.audience}.`);
-  if (ai.cta) parts.push(`Primary CTA: ${ai.cta}.`);
-  if (ai.location) parts.push(`Location: ${ai.location}.`);
-  if (ai.style) parts.push(`Visual style: ${ai.style}.`);
-  if (ai.color) parts.push(`Colors: ${ai.color}.`);
-  if (ai.refs) parts.push(`Reference sites: ${ai.refs}.`);
-  return {
-    name: (ai.name ?? "My Site").slice(0, 100),
-    businessType: INDUSTRY_TO_TYPE[ai.industry ?? "other"] ?? "BUSINESS",
-    pages: (ai.pages && ai.pages.length ? ai.pages : ["Home", "About", "Contact"]).slice(0, 8),
-    description: parts.filter(Boolean).join(" ").slice(0, 500),
-    tone: TONE_MAP[ai.tone ?? "professional"] ?? "professional",
-    content: "generate" as const,
-    // Real seeded photos so the first AI draft looks finished, not grey-boxed.
-    images: "stock" as const,
-  };
-}
+import { buildGenerateInput } from "@lib/onboarding/ai-input";
 
 // Turn backend error codes into something a person can read.
 function friendlyError(msg: string): string {
@@ -105,7 +56,7 @@ export default function AiGeneratingPage() {
       return;
     }
     createJob
-      .mutateAsync(buildInput(data.ai))
+      .mutateAsync(buildGenerateInput(data.ai))
       .then((job) => setJobId(job.id))
       .catch((e) => setError(e instanceof Error ? friendlyError(e.message) : "Couldn't start generation."));
   }, [data.ai, createJob, router]);

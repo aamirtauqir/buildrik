@@ -6,6 +6,7 @@ import { WizardShell } from "@/components/onboarding/wizard/wizard-shell";
 import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
+import { trpc } from "@lib/trpc/client";
 
 const TONE_LABEL: Record<string, string> = {
   professional: "Professional",
@@ -25,15 +26,39 @@ function SummaryCard({ label, children }: { label: string; children: React.React
   );
 }
 
+/** Count the sections the AI actually emitted for a page.
+ *  The worker wraps each generated section as a child of the page root
+ *  (`ai-generate/[jobId]/route.ts:40-53`), so the child count is the section
+ *  count. Returns 0 for a page whose blocks are missing or shaped unexpectedly
+ *  rather than throwing — a preview must never be the thing that breaks. */
+function sectionCount(blocks: unknown): number {
+  const root = blocks as { children?: unknown[] } | null | undefined;
+  return Array.isArray(root?.children) ? root.children.length : 0;
+}
+
 /** A5 · Draft preview. Summarizes what the AI generated, then opens the editor.
- *  Only reachable after a COMPLETED job (siteId present). The site preview panel
- *  is a placeholder: no thumbnail/render of the generated site exists yet. */
+ *  Only reachable after a COMPLETED job (siteId present).
+ *
+ *  The summary used to read back the wizard's own answers — the pages the user
+ *  ASKED for, not the ones that came out — under a heading telling them to
+ *  "review what Buildrick created", next to an empty grey box labelled "Site
+ *  preview". There was nothing to review. It now reports what the generator
+ *  actually produced, read from the site.
+ *
+ *  Still not a visual preview: rendering an unpublished draft needs a renderer
+ *  the app does not have (the share route redirects to a published URL, which a
+ *  draft has no such thing). Tracked in TODOS.md. */
 export default function AiPreviewPage() {
   const router = useRouter();
   const { data } = useWizard();
   const { openEditor, busy } = useOnboardingComplete();
   const ai = data.ai;
-  const pages = ai?.pages ?? [];
+  // What the generator actually produced, not what the wizard asked for.
+  const pagesQ = trpc.pages.list.useQuery(
+    { siteId: data.siteId! },
+    { enabled: !!data.siteId }
+  );
+  const generated = pagesQ.data ?? [];
 
   useEffect(() => {
     if (!data.siteId) router.replace("/onboarding/ai/basics");
@@ -56,11 +81,13 @@ export default function AiPreviewPage() {
 
         <div className="flex items-start justify-center gap-3">
           <SummaryCard label="Pages created">
-            <span className="text-[28px] font-bold text-onb-text">{pages.length}</span>
+            <span className="text-[28px] font-bold text-onb-text">
+              {pagesQ.isLoading ? "—" : generated.length}
+            </span>
             <div className="mt-0.5 flex flex-col gap-1">
-              {pages.map((p) => (
-                <span key={p} className="text-xs text-onb-muted">
-                  • {p}
+              {generated.map((p) => (
+                <span key={p.id} className="text-xs text-onb-muted">
+                  • {p.name}
                 </span>
               ))}
             </div>
@@ -79,8 +106,28 @@ export default function AiPreviewPage() {
 
         <div className="flex w-[600px] flex-col items-center gap-4">
           {previewTitle ? <span className="text-[13px] font-semibold text-onb-muted">{previewTitle}</span> : null}
-          <div className="flex h-[300px] w-full items-center justify-center rounded-xl bg-onb-surface shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
-            <span className="text-base font-semibold text-onb-muted opacity-40">Site preview</span>
+          <div className="flex min-h-[300px] w-full flex-col gap-3 rounded-xl bg-onb-surface p-6 shadow-[inset_0_0_0_1px_var(--color-onb-line)]">
+            {pagesQ.isLoading ? (
+              <span className="m-auto text-base font-semibold text-onb-muted opacity-40">
+                Loading your draft…
+              </span>
+            ) : generated.length === 0 ? (
+              <span className="m-auto text-base font-semibold text-onb-muted opacity-40">
+                No pages came back. Open the editor to start from here.
+              </span>
+            ) : (
+              generated.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-baseline justify-between gap-4 border-b border-onb-line pb-2 last:border-0"
+                >
+                  <span className="text-sm font-semibold text-onb-text">{p.name}</span>
+                  <span className="text-xs text-onb-muted">
+                    {sectionCount(p.blocks)} sections
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
