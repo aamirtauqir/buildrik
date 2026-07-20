@@ -47,13 +47,13 @@ The plan answers *when*. This answers *what*, and it is the thing that stops som
 | **Input** | 5 states | ✅ | 36h |
 | **Status dot** | 5 site states | ✅ | Portfolio §3 |
 | **Icons** — 6 rail | real Lucide | ✅ | Insert · Layers · Pages · Media · Content · Brand |
-| Icons — the rest | ~20 common | ⬜ | pull from Lucide as screens need them, never redraw |
+| **Icons — the rest** | 30 | ✅ | geometry extracted from the installed `lucide-react@0.562.0`, not redrawn. Strokes bound to `color/ink-soft`; the 6 original rail icons were literal and are now bound too |
 | **Badge / pill** | neutral · success · warning · danger · pro | ✅ | 12% tint, coloured text does the work |
 | **Checkbox** | 5 states incl. indeterminate | ✅ | bulk selection needs indeterminate |
 | **Toggle** | 4 states | ✅ | off is border-strong, must read as OFF |
 | **Radio** | 4 states | ✅ | one-of-many that cannot be unset |
 | **Select** | 4 states | ✅ | chevron flips on `open` |
-| Slider | rest · dragging · disabled | ⬜ | build with the inspector controls, P5 |
+| **Slider** | rest · dragging · disabled | ✅ | 118 track + 8 + 46 field = 172, the inspector control width. Value bubble on drag — the eye is on the thumb, not the field |
 | **Tooltip** (standalone) | 1 | ✅ | names the ROLE required |
 | **Avatar** | sm · md, initials | ✅ | initials are the normal case — client reviewers have no account |
 
@@ -380,7 +380,7 @@ the error.
 | P4b Shell states | 12 | 12 |
 | P0b Foundations specimens | 1 | 1 |
 | P11 Enumerated states | 171 | 171 |
-| **Total** | **264** | **267** |
+| **Total** | **266** | **267** |
 
 ---
 
