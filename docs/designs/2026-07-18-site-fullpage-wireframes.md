@@ -74,7 +74,7 @@ Site is a **full-page takeover** of the editor viewport. Not a modal (too much c
 | | Headers | 🟡 saved-not-live | CSP · HSTS · X-Frame · Referrer · Permissions |
 | | Localization | 🟡 saved-not-live | default + enabled locales (24 common). Engine is locale-unaware. |
 | **DATA** | Forms | ✅ works | inbox · filters (inbox/unread/spam/archived) · CSV export |
-| | Integrations | 🔵 → **BUILD** | 6 connections in **three shapes** — §6. Netlify Forms replaced by Slack (Netlify Forms needs Netlify hosting; we publish to Vercel). |
+| | Integrations | 🔵 → **BUILD** | 6 rows in **two groups** — §6.1. Split by when a thing takes effect, not how it authenticates. Netlify Forms replaced by Slack (Netlify Forms needs Netlify hosting; we publish to Vercel). |
 | **SHIP** | Publish history | ✅ | job list · status · live URL · **rollback** — full flow at `2026-07-19-system-contracts.md` §5. Row 56h, exactly one live entry, rollbacks labelled `↩ from vN`. Footnote: *"Last 20 publishes. Approved ones are always kept."* |
 | | Export | ✅ → **BUILD** | HTML · ZIP · React ship. **Vue + Next.js to build** (§7.5). Two intent groups: publish-anywhere vs hand-off-to-a-developer. |
 | **WORKSPACE** | Members ↗ | ✅ | dashboard |
@@ -380,7 +380,7 @@ Not a settings form — an inbox. Left: form picker (32h rows, unread count). Ri
 
 ## 8. Still open
 
-1. ~~Integrations~~ — **BUILD, decided 2026-07-19.** Specced in §6: three connection shapes, six cards. Netlify Forms → Slack.
+1. ~~Integrations~~ — **BUILD, decided 2026-07-19.** Specced in §6: **two groups** (baked-in-at-publish · connected-for-all-sites), six rows. Netlify Forms → Slack.
 2. ~~Per-screen permissions~~ — **settled**, `2026-07-19-system-contracts.md` §2. A DESIGNER may open every Site screen but cannot act on **Domains** or **Publish history rollback**; both render disabled with the reason. Members and Billing leave for the dashboard and are OWNER-only there.
 3. ~~Publish history rollback~~ — **settled**, `2026-07-19-system-contracts.md` §5: rollback is a *new publish of an old version*, never a mutation of history; the draft is never touched; a failed build offers `Retry`, not `Rollback`.
 4. ~~Export~~ — **BUILD Vue + Next.js, decided 2026-07-19.** Specced in §7.5 › Export: six formats in two intent groups, per-format options, preview for code formats.

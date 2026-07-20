@@ -51,7 +51,7 @@ Everything else you will draw — Site, Portfolio, integrations, export — has 
 | 10 | **Review panel** — the rail's conditional 7th item | The wedge's work surface: what you still owe the client. Draw it after step 6 while the sign-off flow is fresh. | `2026-07-18-drawer-cargo-sheets.md` §6.5 |
 | 11 | **Notifications panel** | Third occupant of the same right-side frame as Versions and Issues — instance it, do not redraw. | `2026-07-18-floating-panels-spec.md` §6 |
 | 12 | **The modal kit** — one frame, three widths, ~8 instances | Do the frame before any instance. Eight modals drawn independently is eight different modals. | `2026-07-18-floating-panels-spec.md` §7 |
-| 13 | **Integrations** — hub + three connection shapes | Six cards, but only **three** detail screens: paste-a-key, OAuth, copy-a-URL. Drawing six is the mistake. | `2026-07-18-site-fullpage-wireframes.md` §6 |
+| 13 | **Integrations** — two groups, not connection shapes | Split by **when a thing takes effect**, not how you authenticate it: *baked in at publish* (Formspree, Stripe) vs *connected once, used everywhere* (Slack, Mailchimp, ConvertKit, Zapier). Stripe has **no OAuth flow** — drawing one invents a system that does not exist. Vercel is the only real OAuth and lives under Publishing. | `2026-07-18-site-fullpage-wireframes.md` §6.0-6.2 |
 
 **Everything above has a drawn layout to work from. Start any of it today.** Seven places where source docs contradicted each other were found and settled on 2026-07-19 — see §6a for what changed, in case you are reading an older copy of anything.
 
@@ -284,7 +284,7 @@ These are genuinely undecided. If your screen touches one, ask first.
 4. ~~Review history~~ — **settled**: yes. The Review panel carries `‹ Round 2 of 3 ›`, older rounds read-only (`drawer-cargo-sheets.md` §6.5). Without it a client who repeats feedback looks unreasonable when they are not.
 5. ~~Template library~~ — **settled**: Portfolio › Templates (`2026-07-19-portfolio-wireframes.md` §6), with `used in N sites` — the number a site-scoped library structurally cannot show.
 6. **Cut-or-build calls** — two were decided on 2026-07-19, both **BUILD**, both specced:
-   - **Integrations** → `2026-07-18-site-fullpage-wireframes.md` §6. Six connections in **three shapes** (paste-a-key · OAuth · copy-a-URL), not six of the same card. Netlify Forms was replaced by **Slack** — Netlify Forms only works on Netlify hosting and we publish to Vercel, so it could never have shipped.
+   - **Integrations** → `2026-07-18-site-fullpage-wireframes.md` §6.0-6.2. Six rows in **two groups** — *baked in at publish* (Formspree, Stripe: an injector is configured, not connected) and *connected once, used everywhere* (Slack, Mailchimp, ConvertKit, Zapier: workspace-level, so the per-site control is a checkbox, never a disconnect). Netlify Forms was replaced by **Slack** — Netlify Forms only works on Netlify hosting and we publish to Vercel, so it could never have shipped.
    - **Vue + Next.js export** → same file, §7.5 › Export. Six formats in two intent groups.
 
    Still undecided, none blocking a step: PageWizard · whole-site AI · AllCSS · Figma export · catalog drop · collaboration · plugin manager.

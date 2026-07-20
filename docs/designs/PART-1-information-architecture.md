@@ -282,7 +282,7 @@ These exist in some form: stubbed, demo-only, gated, or saved-but-not-enforced. 
 | **Real-time team collaboration** | presence avatars → **topbar** · live cursors → **canvas** · live comments → **already the canvas comment mode** |
 | **Third-party integrations** | **Site › DATA › Integrations** — a connection list, one row per service |
 | **AI image generation** | **Media › Generate** · the Insert image element's empty state · a step in an AI panel run |
-| **Advanced ecommerce** | **Insert › Ecommerce** (blocks) · **Content › Products** (the collection) · **Site › Integrations › Stripe** (keys and checkout) · inspector (per-block settings) |
+| **Advanced ecommerce** | **Insert › Ecommerce** (blocks) · **Content › Products** (the collection) · **Site › Integrations › Stripe** (keys, compiled in at publish — not a connection) · inspector (per-block settings) |
 | Whole-site AI draft | ⌘K brief → AI panel run → canvas result |
 | Redirects · Headers · Localization | Site › DISTRIBUTION |
 | Forms | Site › DATA › Forms |
@@ -330,13 +330,15 @@ These exist in some form: stubbed, demo-only, gated, or saved-but-not-enforced. 
 
 Dimensions, states, copy and control anatomy — those are Parts 2+. This part answers only *where*.
 
-Open questions that will change structure if they resolve differently:
-1. **Integrations** — cut the six coming-soon cards or build one real integration. Affects whether DATA has one row or two.
+Open questions that will change structure if they resolve differently.
+
+⚠ **Four of these were decided after this file was written and are marked RESOLVED below** (found 2026-07-20 by an outside review of the whole doc set). A question left standing here after it has been answered elsewhere is worse than one that was never asked — a designer reading this file plans for a fork that no longer exists.
+1. ~~**Integrations**~~ — **RESOLVED 2026-07-19: build.** And the shape is not what this line assumed: `2026-07-18-site-fullpage-wireframes.md` §6.0-6.2 splits the six by *when they take effect* — baked in at publish (Formspree, Stripe) vs connected once, used everywhere (Slack, Mailchimp, ConvertKit, Zapier). Stripe has no OAuth flow; Vercel, the only real OAuth, lives under Publishing.
 2. **AllCSS** — Pro-gate and sanitise, or delete. Affects whether the inspector has 18 sections or 17.
 3. **Plugin manager** — implemented, flag-dead, never used. Affects whether Site gains a row.
-4. **Comment ↔ version ↔ element anchoring.** A client can comment at 11pm mid-edit. Does the review link render a snapshot or the live draft? If live, they comment on work that no longer exists; if a snapshot, their pins anchor to elements the current draft may have deleted. The IA has no concept of an **orphaned comment**, and "click a comment → canvas scrolls to its pin" has no target when the element is gone. This is an IA question, not a token-security one.
+4. ~~**Comment ↔ version ↔ element anchoring.**~~ — **RESOLVED: the client sees a snapshot frozen at send**, not the live draft (`2026-07-19-system-contracts.md` §1.6). The orphaned-comment consequence this line correctly predicted is specced at contracts §6.4: a pin whose element is gone becomes **detached** and is grouped rather than silently dropped.
 5. **Review history.** The pill and the Review panel carry *the current* round. Round 3 has no way to see rounds 1 and 2 — a review loop with no memory.
-6. **Which package owns Site.** The dashboard already ships settings, domains, redirects, SEO, analytics and publish for a site; the editor's Site region would duplicate them. Pick one before building either.
+6. ~~**Which package owns Site.**~~ — **RESOLVED: the editor owns it**, as a full-page takeover inside the editor package (`2026-07-18-site-fullpage-wireframes.md` §1; `DESIGNER-BRIEF.md` §7). Members and Billing stay in the workspace and link out.
 7. **Inspector tabs — three sources, three answers.** This doc says no tabs; the screen specs say Look/Layout/Effects; the code says Style/Element/Effects. The no-tabs call stands, but the other two must be corrected.
 8. **Reach strip** — "All like this" works; "This item" and "Whole site" are decorative today. Decide whether the target keeps all three.
-9. **Templates need a library.** Portfolio now homes shared templates, but nothing yet specifies where you *see, rename, organise and delete* them. Insert's `▸ MINE` collapses once an agency has thirty saved sections.
+9. ~~**Templates need a library.**~~ — **RESOLVED:** `2026-07-19-portfolio-wireframes.md` §6 specifies the shared library — three collections (templates · components · brand kits) on the same 232 card geometry as Sites, with edit/delete ADMIN-only and create open to DESIGNER.

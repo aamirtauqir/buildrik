@@ -140,7 +140,7 @@ Not a lab. One agency, one link, one honest reaction: *would you send this to a 
 | Issues panel | ✅ | 3 severities, Fix › where auto-fixable |
 | AI panel | ✅ | proposes a diff, never writes; Apply is one undo step |
 | **Notifications panel** | ✅ | unread bar + tint, grouped by day |
-| Modal instances ×13 | ✅ | 3 widths + the 4 non-open states. ⚠ was ×8 — three files named three different sets, reconciled in floating §7 |
+| Modal instances ×13 | ✅ | ⚠ **this row was false when first ticked** — only 6 of 13 existed. The kit (3 widths + 4 states) had been mistaken for the instances. recovery · template apply · optimise images · collection setup · record editor · paste HTML added 2026-07-20 |
 
 ---
 
@@ -153,7 +153,7 @@ Not a lab. One agency, one link, one honest reaction: *would you send this to a 
 | Site shell + nav + badges | ✅ | built in P3 |
 | 12 in-app destinations | ✅ | all 12 on the one 720 column and one field pattern |
 | Domains guided connect | ✅ | 3 steps · real CNAME from domain.service.ts |
-| **Integrations** — hub + 2 shapes | ✅ | 5 cards · OAuth vs pasted key · Forms→Slack recorded on canvas |
+| **Integrations** — two groups | ✅ | ⚠ **rebuilt 2026-07-20.** First version implemented OAuth-vs-pasted-key — the exact model site-fullpage §6.0 says an outside review corrected away. Now: baked-in-at-publish vs connected-for-all-sites, per §6.2 |
 | Publish history + rollback | ✅ | rollback appends (v12 ↩ from v9) · failed offers Retry not Rollback |
 | "Saved but not live" banner ×3 | ✅ | uses `color/warning-tint`, not frame opacity |
 
@@ -205,6 +205,75 @@ all three were in surfaces that looked finished:
    all four shells** when the spec scopes them to the canvas column so they do not
    read as global nav (§5 A5). Both fixed in every shell.
 
+---
+
+## P4b · Shell states — the requirement the checklist itself was missing
+
+`editor-shell-wireframes.md` §4 enumerates **12 shell states**. Nothing in this
+checklist ever asked for them, so "80/81" was counted against a list that did not
+include them. Five were incidentally covered by other screens; seven were absent.
+
+| # | State | Status | Where |
+|---|---|---|---|
+| 1 | First run | ✅ | rail icons only, no drawer, coach mark, empty-canvas CTA |
+| 2 | Returning (default) | ✅ | `S1 · Editor — ASSEMBLED` |
+| 3 | Element selected | ✅ | same frame — hero selected, inspector populated |
+| 4 | Multi-select | ✅ | inspector becomes align/distribute; per-element props hidden |
+| 5 | Drawer closed | ✅ | the transient shells |
+| 6 | Comment mode | ✅ | `S5.3` — rail and inspector stay live |
+| 7 | Preview | ✅ | all chrome but the topbar hides; Done pill |
+| 8 | Review active | ✅ | `S5.2` review bar in J5 |
+| 9 | AI agent run | ✅ | AI takes the inspector column, back arrow, selection preserved |
+| 10 | Offline | ✅ | amber save pill, CTA disabled with reason |
+| 11 | Saving / conflict | ✅ | pill cycling + conflict modal over a live scrim |
+| 12 | Loading | ✅ | canvas skeleton, rail present but disabled, no drawer |
+
+**Cloning a mid-session shell carries its state with it.** First run initially
+showed "In review · 3 open" and a selected element on a site that does not exist
+yet. Every state frame needs its topbar, inspector and footer checked for
+coherence, not just the one region the state is about.
+
+---
+
+## P0b · Foundations page — was empty
+
+53 variables and 11 text styles existed as file assets with **nothing on the
+Foundations page**. Tokens you cannot see are tokens a designer re-picks by eye.
+Now holds live specimens: colour grouped by role (surfaces · the 3-level ink ramp
+· borders · semantic fill/text/tint), the accent shown in both package modes side
+by side, all 11 type styles set in themselves, and the spacing / radius / size
+scales.
+
+---
+
+---
+
+## P10 · Found by an outside review of the whole doc set — 2026-07-20
+
+A codex pass read every spec against a programmatic dump of the live Figma file.
+It found things this checklist could not, because **the checklist was checking
+itself**. Three of its findings were my own false claims.
+
+| Finding | Severity | Resolution |
+|---|---|---|
+| **Integrations built on the wrong architecture** | BLOCKER | The screen implemented *OAuth vs pasted key* — the exact model `site-fullpage` §6.0 records an outside review correcting away. Stripe has no OAuth flow; drawing one invents a system that does not exist. Vercel, the only real OAuth, lives under Publishing. **Rebuilt** on §6.2: two groups split by *when a thing takes effect*. Four stale "three shapes" lines drained from three files. |
+| **7 inspector profiles required, 1 existed** | BLOCKER | `inspector-spec` §2 gives an exact section order per profile. TEXT · FLEX · GRID · MEDIA · BUTTON · INPUT **built**, two open by default, 88+8+172 control anatomy. |
+| **13 modal instances claimed, 6 existed** | BLOCKER | The three-width kit had been counted as the instances. Six **built**. |
+| **12 shell states, none tracked by this checklist** | GAP | The checklist never asked for them, so 80/81 was measured against a list missing a whole requirement. All 12 now present. |
+| **Media / Brand drill-ins were entry rows pointing nowhere** | GAP | 5 Media + 4 Brand destinations **built**. |
+| **Orphan comments** (contracts §6.4) | GAP | anchored · detached · resolved-while-detached **built**, with the detached group pinned above the healthy pins. |
+| **AI tier-2 states** | GAP | entry · generating · result · unavailable · chat **built**. |
+| **Chrome modals** project settings · shortcuts | GAP | **Built**. |
+| **PART-1 carried 4 answered questions as still open** | CONFLICT | Integrations · snapshot-vs-live · which package owns Site · templates library — all decided elsewhere, all marked RESOLVED with pointers. A question left standing after it is answered makes a designer plan for a fork that no longer exists. |
+| Foundations page empty | MINOR | No spec demanded visible specimens, so codex would not call it a violation. Built anyway — tokens you cannot see are tokens a designer re-picks by eye. |
+
+**The lesson worth keeping:** every false claim here was a *category error* — a kit
+counted as its instances, entry rows counted as destinations, a widths-and-states
+matrix counted as named modals. Ticking a row because the machinery exists is how
+a checklist reaches 80/81 while a designer still cannot open the screen.
+
+---
+
 ## P9 · Cross-cutting — do not skip
 
 | Item | Status | Why |
@@ -232,7 +301,9 @@ all three were in surfaces that looked finished:
 | P7 Site | 6 | 6 |
 | P8 Portfolio | 4 | 4 |
 | P9 Cross-cutting | 6 | 6 |
-| **Total** | **80** | **81** |
+| P4b Shell states | 12 | 12 |
+| P0b Foundations specimens | 1 | 1 |
+| **Total** | **93** | **94** |
 
 ---
 
