@@ -53,3 +53,6 @@ packages.zip
 # .render/ — build scripts are sources, not output. They generate
 # docs/designs/*.html and docs/designs/GENERATED-inventory.md.
 .render/*.log
+
+# gstack QA artifacts
+packages/dashboard/.gstack/

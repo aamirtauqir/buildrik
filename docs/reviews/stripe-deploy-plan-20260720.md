@@ -193,3 +193,29 @@ down, or `env:check:prod` regressing below its current 28.
 - **The uncommitted working tree** (DESIGN.md, `docs/`, `newdeisgn/`,
   `local.log`). Confirmed no app source is dirty, so none of it reaches the
   build. It neither blocks nor rides along.
+
+## 7. Correction — the e2e suite does run locally
+
+Earlier notes on this work (and the commit messages for `0436c405` and
+`a341ca59`) say Playwright was not run because "this repo defines only
+BrowserStack projects, which are remote and billable". **That is wrong.**
+
+`playwright.config.ts:13` gates the project list on
+`BROWSERSTACK_USERNAME && BROWSERSTACK_ACCESS_KEY`. Both are in `.env.local`,
+which Playwright loads, so `isBS` is always true and the local `chromium` /
+`chromium-onboarding` projects are swapped out. Unset them and the local suite
+is right there, free:
+
+```bash
+BROWSERSTACK_USERNAME= BROWSERSTACK_ACCESS_KEY= npx playwright test
+```
+
+Run that way it is 109 tests. As of 2026-07-20 it does **not** pass: 26 onboarding
+tests pass, `auth.setup.ts` fails, and the 81 tests that depend on it are skipped
+— a shared QA user between two fixtures with opposite state requirements. Details
+and the two ways to unblock it are in
+`docs/reviews/qa-auth-onboarding-dashboard-20260720.md`.
+
+Consequence for this plan: **the dashboard-side e2e coverage is currently
+unverified**, and Phase D's manual checks are carrying more weight than they
+should. Fixing the fixture before deploying would make Phase D much stronger.
