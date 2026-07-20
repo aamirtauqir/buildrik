@@ -321,8 +321,33 @@ describe("Topbar", () => {
         target: { value: "please check copy" },
       });
       fireEvent.click(within(dialog).getByText("Send"));
-      expect(submitForReview).toHaveBeenCalledWith("please check copy", "new hero");
+      expect(submitForReview).toHaveBeenCalledWith("please check copy", "new hero", undefined);
       // resolves → button becomes the sent-confirmation
+      expect(await screen.findByText("Sent for review ✓")).toBeInTheDocument();
+    });
+
+    it("sends the client's email through, which is what issues the review link", async () => {
+      render(<Topbar {...makeProps()} />);
+      fireEvent.click(screen.getByLabelText("Send for review"));
+      const dialog = screen.getByRole("dialog", { name: "Send for review" });
+      fireEvent.change(within(dialog).getByLabelText("Client email"), {
+        target: { value: "sara@bellacucina.com" },
+      });
+      fireEvent.change(within(dialog).getByPlaceholderText(/What changed/), {
+        target: { value: "new hero" },
+      });
+      fireEvent.click(within(dialog).getByText("Send"));
+      expect(submitForReview).toHaveBeenCalledWith(undefined, "new hero", "sara@bellacucina.com");
+    });
+
+    // Both paths are real: an address invites the client, no address keeps the
+    // request internal. Blank must stay valid, not become a validation error.
+    it("still submits with no email, keeping the request internal", async () => {
+      render(<Topbar {...makeProps()} />);
+      fireEvent.click(screen.getByLabelText("Send for review"));
+      const dialog = screen.getByRole("dialog", { name: "Send for review" });
+      fireEvent.click(within(dialog).getByText("Send"));
+      expect(submitForReview).toHaveBeenCalledWith(undefined, undefined, undefined);
       expect(await screen.findByText("Sent for review ✓")).toBeInTheDocument();
     });
   });

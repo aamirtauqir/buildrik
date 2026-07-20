@@ -24,12 +24,32 @@ describe("submitForReview", () => {
       siteId: "site-123",
       note: "please check the hero",
       changeSummary: "hero copy, 2 images",
+      clientEmail: undefined,
+    });
+  });
+
+  // The wedge lives on this argument: with it, `submitReview` mints a token and
+  // emails the client a signable link; without it the request never leaves the
+  // internal queue. It was typed, validated and handled downstream for months
+  // while this call dropped it — so the test asserts the address specifically.
+  it("passes clientEmail through, which is what issues the review link", async () => {
+    await submitForReview("have a look", "hero copy", "sara@bellacucina.com");
+    expect(mutate).toHaveBeenCalledWith({
+      siteId: "site-123",
+      note: "have a look",
+      changeSummary: "hero copy",
+      clientEmail: "sara@bellacucina.com",
     });
   });
 
   it("omits the optional fields when not provided", async () => {
     await submitForReview();
-    expect(mutate).toHaveBeenCalledWith({ siteId: "site-123", note: undefined, changeSummary: undefined });
+    expect(mutate).toHaveBeenCalledWith({
+      siteId: "site-123",
+      note: undefined,
+      changeSummary: undefined,
+      clientEmail: undefined,
+    });
   });
 
   it("throws when the URL has no site", async () => {

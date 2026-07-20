@@ -17,8 +17,26 @@ export function currentSiteId(): string | null {
   return new URLSearchParams(window.location.search).get("siteId");
 }
 
-export async function submitForReview(note?: string, changeSummary?: string): Promise<void> {
+/**
+ * Submit the current site for review.
+ *
+ * `clientEmail` is what turns this from an internal request into a client
+ * sign-off: `submitReview` mints a review token when it receives one and emails
+ * the client the `/review/<token>` link. Omitted, the submission goes to the
+ * internal admin queue only and no link is ever issued — the two paths the
+ * `submitReviewInput` schema documents.
+ */
+export async function submitForReview(
+  note?: string,
+  changeSummary?: string,
+  clientEmail?: string,
+): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) throw new Error("No site to send for review");
-  await getBuildrikClient(DASHBOARD_URL).reviews.submit.mutate({ siteId, note, changeSummary });
+  await getBuildrikClient(DASHBOARD_URL).reviews.submit.mutate({
+    siteId,
+    note,
+    changeSummary,
+    clientEmail,
+  });
 }

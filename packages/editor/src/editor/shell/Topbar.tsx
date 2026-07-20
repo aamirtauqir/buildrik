@@ -192,18 +192,26 @@ export const Topbar: React.FC<TopbarProps> = ({
   const [reviewOpen, setReviewOpen] = React.useState(false);
   const [reviewNote, setReviewNote] = React.useState("");
   const [reviewSummary, setReviewSummary] = React.useState("");
+  const [reviewEmail, setReviewEmail] = React.useState("");
   const reviewRef = React.useRef<HTMLDivElement | null>(null);
   useClickOutside(reviewRef, () => setReviewOpen(false), { enabled: reviewOpen });
   const sendForReview = React.useCallback(async () => {
     setReviewState("sending");
     try {
-      await submitForReview(reviewNote.trim() || undefined, reviewSummary.trim() || undefined);
+      // With an address the client is invited and gets a signable link; without
+      // one this stays an internal request. Both are real paths (see
+      // `submitReviewInput`), so an empty field is not an error here.
+      await submitForReview(
+        reviewNote.trim() || undefined,
+        reviewSummary.trim() || undefined,
+        reviewEmail.trim() || undefined,
+      );
       setReviewState("sent");
       setReviewOpen(false);
     } catch {
       setReviewState("error");
     }
-  }, [reviewNote, reviewSummary]);
+  }, [reviewNote, reviewSummary, reviewEmail]);
   const [cmdOpen, setCmdOpen] = React.useState(false);
 
   // Redesign: the "Status + Ship" zone keeps only the common actions; the rare
@@ -413,6 +421,15 @@ export const Topbar: React.FC<TopbarProps> = ({
                   <div style={{ fontSize: 12, fontWeight: 600, color: "var(--bd-fg)", marginBottom: 8 }}>
                     Send for review
                   </div>
+                  <Input
+                    type="email"
+                    value={reviewEmail}
+                    onChange={(e) => setReviewEmail(e.target.value)}
+                    placeholder="Client's email — leave blank to keep it internal"
+                    maxLength={320}
+                    aria-label="Client email"
+                    style={{ marginBottom: 8 }}
+                  />
                   <Input
                     value={reviewSummary}
                     onChange={(e) => setReviewSummary(e.target.value)}
