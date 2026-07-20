@@ -530,6 +530,41 @@ the drawer floating over it, and the toast the behaviour actually ships with.
 Editor 166 · Site 31 · Portfolio 26 · Client review 16. (166 = the 152 batch
 states + 12 shell states + the 1280 overlay + the reach frame added earlier.)
 
+---
+
+## 6f. Component-instancing pass — the honest 80/20
+
+The whole file was built **hand-crafted, 0 component instances** — a real debt
+against the working-rule "instance everything, never detach." Verified: 239
+frames, 0 instances. Change the Row component and nothing would have updated.
+
+**Panel header retrofitted: 0 → 74 instances.** Every rail panel, review panel
+and comment-mode drawer now instances the one `Panel header` component. This was
+the single highest-leverage, lowest-risk target: uniformly named, uniform 320×44
+structure, ~74 consumers. One change now propagates to all of them. 0 fails, 0
+overflow, 0 collisions after.
+
+**Why the pass stopped there, honestly.** Panel header was the only element
+hand-built uniformly enough for a safe sweep. The rest are scattered:
+
+- Section headers live under **8+ different names** (`Group ·…` ×21,
+  `Table header`, `Day ·…` ×6, `Active/Missing/Export/Import header`,
+  `Round header`, `Plan header` ×6) — only 5 were named `Section header`.
+- The atoms are hundreds of inline nodes: **333 `control`, 407 `input`,
+  225 `row`**, each hand-built with varying structure and content.
+
+Retrofitting those means per-pattern visual matching across 239 verified frames:
+high volume, fragile, real breakage risk — for a payoff (component-change
+propagation) that only materialises if those components change. For a
+design-to-handoff artifact that is a poor trade; for a living design system that
+will be maintained in Figma long-term it is the right investment, done
+deliberately, not force-swept.
+
+**The library components are sound and property-driven** (Row: Size/State;
+Button: Kind/Size/State; Input/Nav/Comment-row: variant props). Nothing about
+them needs rebuilding — the debt is purely that the screen frames don't yet
+instance them, and the highest-leverage seam (panel chrome) now does.
+
 ### The bug that verification kept missing
 
 Batch 1b passed every check I ran — sizes, overflow, captions — while sitting on
