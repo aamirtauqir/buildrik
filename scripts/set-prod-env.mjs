@@ -105,15 +105,26 @@ function main() {
   console.log(`Verified: ${Object.keys(after).length} vars, all ${keys.length} incoming stored.`);
 
   if (process.argv.includes("--restart")) {
-    // cloudlinux-selector does not kill the running workers itself — an orphan
-    // node process keeps the port and the app crashloops under LVE. Kill this
-    // app's workers by cwd first (the same user also runs an unrelated app).
-    console.log("\nRestarting …");
+    // Restart is kill-then-respawn, not a selector subcommand. `restart` does
+    // appear in cloudlinux-selector's usage on this host, but the recorded
+    // experience of invoking it is that it does not restart the app; LiteSpeed
+    // lsnode respawning the process on the next request is what actually works.
+    // So: kill this app's workers, then poke the site to bring them back.
+    //
+    // Filter by cwd — the same cPanel user also runs an unrelated app, so an
+    // untargeted `pkill node` takes that one down too.
+    console.log("\nRestarting (kill by cwd → lsnode respawn) …");
     ssh(
       `for pid in $(pgrep -u $USER node); do ls -l /proc/$pid/cwd 2>/dev/null | grep -q buildrik && kill $pid; done; true`,
     );
-    ssh(`cloudlinux-selector restart --json --interpreter nodejs --app-root ${APP_ROOT}`);
-    console.log("Restarted. Run: npm run env:check:prod");
+    const code = ssh(
+      `sleep 3; curl -s -o /dev/null -w '%{http_code}' https://app.buildrick.io/auth || true`,
+    ).trim();
+    console.log(`Respawn probe: HTTP ${code}`);
+    if (!/^(200|30\d)$/.test(code)) {
+      console.log("Not a healthy response — check the app before trusting the restart.");
+    }
+    console.log("Then run: npm run env:check:prod");
   } else {
     console.log("\nNot restarted — the app reads env at boot, so the new vars are");
     console.log("not live yet. Re-run with --restart, or restart from cPanel.");
