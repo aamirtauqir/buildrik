@@ -103,9 +103,33 @@ schema currently documents.
 
 ---
 
+## It is a clickable prototype now — press ▶ Present
+
+The S5.5 client journey is wired as a Figma prototype (11 reactions, reviewed).
+Open the **👤 Client review** page and hit **Present** — you can click the real
+flow in front of the client instead of scrolling frames. Two flow entries:
+
+- **"Client review — Gate C (valid path)"** — starts at A0, the client's real
+  journey: identity → Start reviewing → the site → **Approve** (→ post-approval,
+  read-only) *or* **Request changes** (→ send → the read-only "asked for changes"
+  state) *or* **Comment** (place a pin → exit). This is the walk that tests all
+  three questions.
+- **"Gate C — bad-email path"** — starts at A0 typing → Start → validation-error,
+  which **cannot proceed** (a wrong address is blocked). Use this to test
+  question 2: does the identity step help or wall?
+
+Wired so the frozen-snapshot story holds: after **Approve → View site** you land
+on `post-approval-unchanged` (read-only), never back on the editable-looking
+landing — so pressing Approve visibly means "I signed *this version*."
+
+Edge/system states are **not** in the click-through (show them by hand if asked):
+`post-approval-edited-since` (a later revisit), `expired-token`, `load-error`,
+`loading`, and the two `brand-colour` variants.
+
 ## The frames to walk, in order
 
-All on page **👤 Client review**, all 1280×900.
+All on page **👤 Client review**, all 1280×900. (The prototype above walks the
+interactive subset; this is the full state list for reference.)
 
 ```
 S5.5 · loading                  the agency's name renders first
