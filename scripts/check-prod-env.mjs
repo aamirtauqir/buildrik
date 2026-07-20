@@ -207,6 +207,23 @@ requirePresent("STRIPE_PRICE_PRO_YEARLY");
 requirePresent("STRIPE_PRICE_BUSINESS_MONTHLY");
 requirePresent("STRIPE_PRICE_BUSINESS_YEARLY");
 
+// Uploads. Both upload routes read BLOB_READ_WRITE_TOKEN through @vercel/blob:
+// app/api/asset-upload (media library — handleUpload mints the client token from
+// it) and app/api/upload/[fileId] (favicon/og-image — put() directly). This app
+// deploys to cPanel, not Vercel, so the token is NOT auto-injected the way a
+// Vercel-hosted Blob store would provide it — it must be set by hand or every
+// upload 500s. CLAUDE.md long documented this as "uploads do not go through it…
+// nothing user-facing breaks; Required? No", which is the exact "documented but
+// never enforced" gap this script exists for.
+if (requirePresent("BLOB_READ_WRITE_TOKEN")) {
+  // Presence is the load-bearing check; shape is a soft nudge. Vercel Blob tokens
+  // are `vercel_blob_rw_…`; a value that isn't is almost certainly the wrong
+  // secret pasted in, but warn rather than fail in case the format ever changes.
+  if (!/^vercel_blob_rw_/.test(env.BLOB_READ_WRITE_TOKEN)) {
+    warn("BLOB_READ_WRITE_TOKEN", "does not start with `vercel_blob_rw_` — likely the wrong secret");
+  }
+}
+
 // AI. Absent → every ai-generate-worker job fails on "Missing credentials", the
 // AI onboarding path is dead, and in-editor AI + alt-text throw.
 requirePresent("OPENAI_API_KEY");

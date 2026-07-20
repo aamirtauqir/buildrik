@@ -95,6 +95,7 @@ below).
 | `CRON_SECRET` | `openssl rand -hex 32` | Worker route auth |
 | `RESEND_API_KEY` | Resend project API key | Transactional email |
 | `EMAIL_FROM` | `noreply@buildrik.com` | Must be on verified domain |
+| `BLOB_READ_WRITE_TOKEN` | `vercel_blob_rw_…` | **Every upload route reads it** (media library + favicon/og-image). Not auto-injected on cPanel — set it by hand or uploads 500 |
 | `GOOGLE_CLIENT_ID` | Google OAuth web client id | Separate prod credentials |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth secret | |
 | `GITHUB_CLIENT_ID` | GitHub OAuth App id | Separate prod credentials |
