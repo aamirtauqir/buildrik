@@ -63,7 +63,13 @@ export const reviewsRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      return submitReview(input.siteId, ctx.session.user.id, input.note, input.changeSummary);
+      return submitReview(
+        input.siteId,
+        ctx.session.user.id,
+        input.note,
+        input.changeSummary,
+        input.clientEmail,
+      );
     }),
 
   // Admins see the review queue + resolve it. Flag off → [] so the UI collapses

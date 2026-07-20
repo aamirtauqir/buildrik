@@ -3,7 +3,9 @@ import type { ReviewStatus } from "@buildrik/shared/schemas/reviews";
 import {
   sendReviewRequestedEmail,
   sendReviewResolvedEmail,
+  sendReviewInviteEmail,
 } from "@/server/services/email.service";
+import { issueReviewToken } from "@/server/services/client-review.service";
 
 /**
  * Invited-client review workflow (E4) — the ONLY layer that reads/writes the
@@ -32,6 +34,9 @@ export async function submitReview(
   requestedById: string,
   note?: string,
   changeSummary?: string,
+  /** Where to send the link. Omit to submit without inviting anyone —
+   *  the internal admin queue still works exactly as before. */
+  clientEmail?: string,
 ) {
   const open = await prisma.reviewRequest.findFirst({
     where: { siteId, status: "PENDING" },
@@ -46,7 +51,15 @@ export async function submitReview(
         data: { siteId, requestedById, note: note ?? null, changeSummary: changeSummary ?? null, status: "PENDING" },
       });
 
+  // Every submit — first send OR re-send — mints a fresh token and kills the
+  // previous one. Without this, round 1's link stays live forever and a client
+  // who bookmarked it keeps approving a site that has moved on.
+  const { token } = await issueReviewToken(request.id);
+
   await notifyReviewSubmitted(siteId, requestedById, note, changeSummary);
+  if (clientEmail && token) {
+    await notifyClientInvited(siteId, requestedById, clientEmail, token, note, changeSummary);
+  }
   return request;
 }
 
@@ -109,6 +122,47 @@ export async function resolveReview(
 
   await notifyReviewResolved(id, resolverId, status);
   return resolved;
+}
+
+/**
+ * Best-effort: send the client their review link.
+ *
+ * This is the email the wedge runs on. It is separate from the admin
+ * notification below rather than replacing it: an admin seeing the internal
+ * queue and a client getting a link are two different events with two
+ * different audiences, and collapsing them was the original mistake — for a
+ * long time only the admin one existed, so "send for review" never actually
+ * reached a client.
+ */
+async function notifyClientInvited(
+  siteId: string,
+  requesterId: string,
+  clientEmail: string,
+  token: string,
+  note?: string,
+  changeSummary?: string,
+) {
+  try {
+    const site = await prisma.site.findUnique({
+      where: { id: siteId },
+      select: { name: true, workspace: { select: { name: true } } },
+    });
+    if (!site) return;
+    const designer = await prisma.user.findUnique({
+      where: { id: requesterId },
+      select: { fullName: true, displayName: true },
+    });
+    await sendReviewInviteEmail(clientEmail, {
+      siteName: site.name,
+      agencyName: site.workspace?.name ?? "Your design team",
+      designerName: designer?.displayName || designer?.fullName || "Your designer",
+      token,
+      note,
+      changeSummary,
+    });
+  } catch (e) {
+    console.error("[review] client invite failed", { siteId, error: e });
+  }
 }
 
 /**

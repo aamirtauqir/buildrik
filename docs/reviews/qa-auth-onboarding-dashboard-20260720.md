@@ -11,10 +11,11 @@ Method: the repo's own Playwright suite, run against local Chromium.
 |---|---|---|
 | Onboarding | **yes — 26 / 26** | all three paths (AI, template, blank), plus the three full walkthroughs |
 | Auth | **yes** | suite fixture fails, but a manual browser walkthrough proves login + redirect are correct (see below) |
-| Dashboard | **no** | 81 tests never ran; loads manually, but nothing beyond that was exercised |
-| a11y / link-integrity / responsive / settings-drill-in | **no** | same 81 |
+| Dashboard | **yes — 79 / 82** | 6 destinations, nav, links, a11y, responsive, settings drill-in; 3 failures, both page-title drift |
+| a11y / link-integrity / responsive / settings-drill-in | **yes** | 71 of the 79; all green |
 
-`26 passed · 1 failed · 81 did not run (3.0m)`
+First run: `26 passed · 1 failed · 81 did not run (3.0m)`. After the fixture
+unblocked: `79 passed · 3 failed (4.3m)` on the dashboard side.
 
 So: onboarding is proven. **Dashboard is not proven — it is unverified, which is
 not the same as broken.** Nothing here says the dashboard is failing; it says
@@ -111,6 +112,75 @@ the behaviour it asked for, on a user another fixture also depends on.
 
 **Conclusion: no product defect in auth or onboarding on this evidence.** The
 failure is entirely test-fixture ownership.
+
+## Dashboard — now actually tested
+
+The blocker cleared itself. Walking onboarding in the browser (above) left
+`qa@buildrik.local` at `step: CHECKLIST`, which is what `auth.setup.ts` needs, so
+the fixture passed and the 81 ran.
+
+`79 passed · 3 failed (4.3m)`
+
+What the 79 cover:
+
+| Spec | Tests | What it proves |
+|---|---|---|
+| `responsive-audit` | 33 | 11 routes × desktop 1440 / tablet 820 / mobile 390 — no horizontal overflow anywhere |
+| `a11y-states-audit` | 23 | keyboard focus reaches a control and shows a visible ring on all 11 routes; no disabled control is a tab stop; focus-ring token resolves to the design accent |
+| `settings-drill-in` | 14 | all 13 sub-pages title themselves correctly and offer a way back; directory shows no tab rail |
+| `dashboard` | 9 | the 6 destinations render with persistent nav; brand + account pill; sidebar navigation |
+| `link-integrity` | 1 | every internal link on the designed screens resolves to a real route |
+
+Console on the pages walked manually: **0 errors, 0 warnings.**
+
+### The 3 failures are both the same kind: page title drift
+
+**1. Settings index is titled as if it were one of its own children.** (2 of the 3
+failures — `dashboard.spec.ts:16` and `:31`.)
+
+`app/dashboard/settings/layout.tsx:20`
+
+```tsx
+<PageHeader title="General settings" description="Workspace name, branding, and defaults." />
+```
+
+That is the fallback branch — the one that renders when no section matches, i.e.
+**the index**. Confirmed in the browser: `/dashboard/settings` shows 6 groups and
+~16 section cards under an `h1` reading "General settings", described as
+"Workspace name, branding, and defaults."
+
+That description belongs to the **Workspace & branding** card, which is a link on
+that very page. The header describes one of its own children.
+
+The file's own comment (lines 9–12) says the index "is the design's directory of
+section cards" and that a sub-page is titled with the section you opened "not a
+generic Settings". The code then titles the directory with a section name. It
+contradicts its own stated intent.
+
+**Judgment: the app is wrong and `dashboard.spec.ts` is right.** A directory of
+sections should read "Settings". Worth a second opinion — this is a naming call,
+not a crash — but nothing supports the current string.
+
+Note `settings-drill-in.spec.ts` passes 14/14, including
+`/dashboard/settings/workspace titles itself "Workspace & branding"`. So the
+sub-pages are correct; only the index is not, and no spec owns that string except
+the two failing ones.
+
+**2. Media page title vs nav label.** `dashboard.spec.ts` expects `/^Media$/i`;
+`components/media/media-library.tsx:163` renders `title="Media library"`. The
+sidebar says "Media". Cosmetic, low severity, but it is a real inconsistency
+between what the nav calls the destination and what the destination calls itself.
+Pick one.
+
+### Severity
+
+| # | Issue | Severity |
+|---|---|---|
+| 1 | Settings index titled "General settings" + a child's description | **Medium** — every user who opens Settings sees a page mislabelled as a different page |
+| 2 | "Media" (nav) vs "Media library" (h1) | **Low** — cosmetic |
+
+Neither breaks functionality. No crashes, no console errors, no broken links, no
+overflow, no focus-ring regressions.
 
 ## How to get full coverage
 

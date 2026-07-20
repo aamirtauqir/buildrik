@@ -21,6 +21,7 @@ import FormSubmission from "@/emails/form-submission";
 import SiteTransferred from "@/emails/site-transferred";
 import TicketReceived from "@/emails/ticket-received";
 import ReviewRequested from "@/emails/review-requested";
+import ReviewInvite from "@/emails/review-invite";
 import ReviewResolved from "@/emails/review-resolved";
 
 /** cPanel/Passenger pipes env vars through a shell, so a `$` in the password is
@@ -221,6 +222,30 @@ export async function sendReviewRequestedEmail(
 ) {
   const html = await render(ReviewRequested({ ...opts, reviewsUrl: `${BASE_URL}/dashboard/agency/reviews` }));
   await sendEmail(to, `${opts.requesterName} sent "${opts.siteName}" for review — Buildrick`, html);
+}
+
+/**
+ * The client's review link. The ONE email in this file whose recipient is not
+ * a Buildrick user — it goes to an account-less client, so it leads with the
+ * agency's name and never mentions signing up.
+ */
+export async function sendReviewInviteEmail(
+  to: string,
+  opts: {
+    siteName: string;
+    agencyName: string;
+    designerName: string;
+    token: string;
+    note?: string;
+    changeSummary?: string;
+    expiresInDays?: number;
+  }
+) {
+  const { token, ...rest } = opts;
+  const html = await render(
+    ReviewInvite({ ...rest, reviewUrl: `${BASE_URL}/review/${encodeURIComponent(token)}` })
+  );
+  await sendEmail(to, `${opts.siteName} is ready for you to look at`, html);
 }
 
 export async function sendReviewResolvedEmail(

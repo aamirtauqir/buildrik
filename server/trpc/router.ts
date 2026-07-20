@@ -21,6 +21,7 @@ import { actionsRouter } from "./routers/actions";
 import { featuresRouter } from "./routers/features";
 import { clientsRouter } from "./routers/clients";
 import { reviewsRouter } from "./routers/reviews";
+import { clientReviewRouter } from "./routers/client-review";
 import { commentsRouter } from "./routers/comments";
 import { cmsRouter } from "./routers/cms";
 import { themeRouter } from "./routers/theme";
@@ -52,6 +53,7 @@ export const appRouter = router({
   features: featuresRouter,
   clients: clientsRouter,
   reviews: reviewsRouter,
+  clientReview: clientReviewRouter,
   comments: commentsRouter,
   cms: cmsRouter,
   theme: themeRouter,

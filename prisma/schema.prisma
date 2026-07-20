@@ -336,6 +336,7 @@ model Site {
   analyticsEvents AnalyticsEvent[]
   reviewRequests  ReviewRequest[]
   comments        Comment[]
+  reviewers       Reviewer[]
   cmsCollections  CmsCollection[]
   versions        SiteVersion[]
   components      SiteComponent[]
@@ -419,10 +420,15 @@ model CmsEntry {
 // agency resolves it. Pin coordinates are page-relative fractions (0..1) so they
 // survive viewport changes. Deleting a site removes its comments.
 model Comment {
-  id             String    @id @default(cuid())
-  siteId         String
-  pageId         String?
-  authorId       String
+  id     String  @id @default(cuid())
+  siteId String
+  pageId String?
+  /// Internal author (a workspace member). Exactly ONE of authorId /
+  /// reviewerId is set — enforced by a CHECK constraint on the `comments`
+  /// table, because a comment has one author and an orphan has neither.
+  authorId       String?
+  /// External author — an account-less client reviewing via a token link.
+  reviewerId     String?
   body           String
   x              Float?
   y              Float?
@@ -433,9 +439,11 @@ model Comment {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  site     Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  reviewer Reviewer? @relation(fields: [reviewerId], references: [id], onDelete: SetNull)
 
   @@index([siteId, status])
+  @@index([reviewerId])
   @@map("comments")
 }
 
@@ -454,13 +462,49 @@ model ReviewRequest {
   changeSummary String?
   resolvedById  String?
   resolvedAt    DateTime?
+  /// Opaque token the client's /review/<token> link carries. Unique and
+  /// indexed because it is the lookup key on every unauthenticated request.
+  /// Null on legacy rows created before the client loop existed.
+  token         String?   @unique
+  /// 90 days from send. Past this the link renders the expired screen —
+  /// not a 404, not a login prompt.
+  expiresAt     DateTime?
+  /// Set when a re-send supersedes this link, or when the designer revokes
+  /// it by hand. A revoked token is dead immediately; it is never reissued.
+  revokedAt     DateTime?
+  /// Who reviewed. Captured on first visit (name + email, no password) and
+  /// carried forward when a later round re-sends to the same person.
+  reviewerId    String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  site     Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  reviewer Reviewer? @relation(fields: [reviewerId], references: [id], onDelete: SetNull)
 
   @@index([siteId, status])
+  @@index([reviewerId])
   @@map("review_requests")
+}
+
+/// An account-less client who reviews a site. Deliberately NOT a `User`:
+/// the wedge dies if a restaurant owner has to create an account to say yes.
+/// Scoped to the site rather than to a token, so that round 2 recognises the
+/// same person after a re-send issues a fresh token.
+model Reviewer {
+  id          String   @id @default(cuid())
+  siteId      String
+  name        String   @db.VarChar(120)
+  email       String   @db.VarChar(320)
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  site     Site            @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  reviews  ReviewRequest[]
+  comments Comment[]
+
+  @@unique([siteId, email])
+  @@index([siteId])
+  @@map("reviewers")
 }
 
 model Page {
