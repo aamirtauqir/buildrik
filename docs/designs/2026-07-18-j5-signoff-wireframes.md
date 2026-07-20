@@ -72,6 +72,23 @@ S5.6 Post-approval guard → approval marked stale → publish with acknowledgem
 ```
 States: `compose` · `sending` · `sent` · `error (email failed → link still copyable)`.
 
+⚠ **This section was stale — corrected 2026-07-21.** The ASCII above draws one
+optional `Message` field. The schema has **two**, and has since it was written:
+
+```ts
+// packages/shared/schemas/reviews.ts:14-17
+note:          z.string().max(500).optional(),
+// "Lightweight human summary of what changed (e.g. 'hero copy, 2 images'),
+//  supplied by the editor when sending for review. Rendered as a mini-diff."
+changeSummary: z.string().max(500).optional(),
+```
+
+`note` is the message to the client; `changeSummary` is what changed, and it is
+what the review bar's Compare view and the S5.6 acknowledgement render. **Draw
+both fields.** An outside review flagged the second field as invented because no
+design doc mentioned it — the doc was wrong, not the drawing, and this note exists
+so the next reader does not remove it again.
+
 ---
 
 ## S5.2 · Review status — designer, TOPBAR review-status pill → review bar (§4.3)
@@ -241,10 +258,21 @@ Mode strip `‹💬 Comment›` active → clicking any element drops a pin + in
 │ │ Menu prices are wrong and │ │        │   18 Jul 2026, 3:42pm          │
 │ │ the hero photo's too dark │ │        │                                │
 │ └───────────────────────────┘ │        │   Ali can now publish it live. │
-│ 3 pinned comments included    │        │                                │
-│   ( Cancel )  [ Send to Ali ] │        │   ( View site )                │
+│ 3 pinned comments included    │        │   Signed as Sara Khan          │
+│   ( Cancel )  [ Send to Ali ] │        │   · sara@bellacucina.com       │
+│                               │        │   ( View site )                │
 └───────────────────────────────┘        └────────────────────────────────┘
 ```
+
+**The `Signed as …` line is required** (added 2026-07-21, founder-approved). The
+approval record already carries name and email (State A0 above, contracts §1.1);
+this puts it in front of the person who just signed. It is the difference between
+"a button was pressed" and "Sara Khan signed this, and both sides can still read
+that six weeks later" — which is what makes this a wedge rather than a feature
+(`2026-07-20-ship-plan.md` §5, step 5).
+
+**After State C sends, the client lands on `changes-requested`** — see the state
+list below. State C is the compose modal only.
 
 ### State E — post-approval revisit        ### State F — expired / invalid token
 ```
@@ -257,7 +285,21 @@ Mode strip `‹💬 Comment›` active → clicking any element drops a pin + in
 │                                 │        │                                │
 └─────────────────────────────────┘        └────────────────────────────────┘
 ```
-States: `landing/viewing` · `commenting` · `request-changes` · `approved` · `post-approval (unchanged)` · `post-approval (edited-since → E)` · `expired-token (F)` · `loading` · `load-error`.
+States: `landing/viewing` · `commenting` · `request-changes` · `changes-requested` · `approved` · `post-approval (unchanged)` · `post-approval (edited-since → E)` · `expired-token (F)` · `loading` · `load-error`.
+
+⚠ **`changes-requested` added 2026-07-21** (founder-approved). It is the terminal
+of State C, not part of it: `request-changes` is the *compose* modal, and
+`changes-requested` is what the client sees **after** sending — read-only, comment
+mode withdrawn, **their own pins still visible**, and a band reading *"You asked
+for changes / Your notes are with your designer. They'll send a new link when the
+changes are ready."*
+
+The behaviour was never in doubt — `2026-07-19-system-contracts.md` §1.3 already
+said the client's view goes read-only until re-sent. What was missing was the
+state itself, so this list said 9 main states while the contract described 10.
+**Main page is 10, A0 is 4, S5.5 totals 14.** Without this frame a client cannot
+tell whether their feedback sent, which is the one moment the whole loop depends
+on being obvious.
 
 ---
 
