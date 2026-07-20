@@ -713,6 +713,34 @@ Integrations detail rows. **A component used a handful of times in one screen is
 over-abstraction, not maturity.** The line held: componentize cross-surface
 reuse, keep single-use compositions inline.
 
+### Instancing pass — final state
+
+**15 components, ~1169 instances (from 0). 239/239 frames: 0 overflow,
+0 collisions, 0 collapsed containers, 239/239 captions.**
+
+| Component | Instances | | Component | Instances |
+|---|---|---|---|---|
+| Nav item | 642 | | Section header | 36 |
+| Button | 102 | | Card / media | 34 |
+| Panel header | 74 | | Comment row | 33 |
+| List row | 73 | | Version row | 24 |
+| Tree row | 49 | | Integrations row | 24 |
+| Format row | 35 | | Checkbox | 23 |
+| Input | 14 | | Record row | 4 |
+| | | | Toggle | 2 |
+
+Six of these were authored or extended this arc: **List row, Tree row, Version
+row, Record row, Integrations row, Format row** — the row family the label-only
+`Row` component could never hold — plus slot/variant surgery on **Card** (Badge),
+**Section header** (Tint + Count), **Version row** (STRETCH tint), and **Tree
+row** (depth spacer + truncation).
+
+Everything with cross-surface or cross-state reuse now resolves from a component.
+The remaining hand-built elements are single-panel compositions (inspector
+control cells, Brand sub-screen rows, Content field/var/cond rows, Pages rows,
+empty states) where a component would add indirection without reuse — left inline
+by design, not omission.
+
 ### The bug that verification kept missing
 
 Batch 1b passed every check I ran — sizes, overflow, captions — while sitting on
