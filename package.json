@@ -17,6 +17,7 @@
     "env:check": "node scripts/check-prod-env.mjs",
     "env:check:local": "node scripts/check-prod-env.mjs --file .env.local --dev",
     "env:check:prod": "bash scripts/check-prod-env-live.sh",
+    "env:set:prod": "node scripts/set-prod-env.mjs",
     "stripe:setup": "tsx --tsconfig packages/dashboard/tsconfig.json scripts/stripe-setup.ts",
     "dev:clean": "node scripts/dev-clean.mjs",
     "dev:reset": "node scripts/dev-clean.mjs && rm -rf packages/dashboard/.next packages/editor/dist packages/editor/node_modules/.vite",
