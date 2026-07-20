@@ -83,7 +83,7 @@ Conflating them is the trap: a beautiful decluttered shell around jobs that stil
 ## 3. Design-system & craft direction (per DESIGN.md)
 
 Non-negotiables the redesign inherits (already the codebase rule, enforce in every new surface):
-- **One accent: cobalt `#2D6DFF`.** Purple/violet/indigo banned. No black (`#000`) — use slate-700.
+- **One accent: `#406ED6`.** (Was cobalt `#2D6DFF` until the 2026-07-20 flip; the editor code still renders cobalt, the design does not.) Purple/violet/indigo banned. No black (`#000`) — use slate-700.
 - **Type:** General Sans (display), Inter Tight / Geist (body/UI), Geist Mono (data). No Arial/Helvetica/Roboto fallbacks.
 - **4px base spacing, compact density.** Minimal motion — no spring physics, no scroll choreography.
 - **Light theme canonical** (desktop-only). The removed AIAssistantBar's dark-glass was a DESIGN.md violation — don't reintroduce dark surfaces.

@@ -38,7 +38,7 @@ This product has **two accents, and which one applies depends on the package, no
 
 | Package | Surfaces | Accent |
 |---|---|---|
-| **editor** | shell · rail · drawer · inspector · canvas · footer · **Site** | cobalt `#2D6DFF` |
+| **editor** | shell · rail · drawer · inspector · canvas · footer · **Site** | `#406ED6` (was cobalt `#2D6DFF` until 2026-07-20) |
 | **dashboard** | **Portfolio** · **the client review page** | `#406ED6` |
 
 ⚠ **Do not make two variables called `accent-editor` and `accent-dashboard`.** Someone will pick the wrong one, and the mistake is invisible — a blue that looks right on a blue-adjacent screen. This already happened once in the written spec: the client review page was documented as cobalt for a day.

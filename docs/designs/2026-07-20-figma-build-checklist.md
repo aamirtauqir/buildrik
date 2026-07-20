@@ -32,7 +32,7 @@ The plan answers *when*. This answers *what*, and it is the thing that stops som
 | Text styles — `ui/*` ×8 | ✅ ⚠ placeholder | Inter, pending Inter Tight |
 | Text styles — `data/*` ×3 | ✅ final | Geist Mono, real |
 | Text styles — `display/*` | — n/a | General Sans unavailable; marketing-only |
-| **Accent guard verified** (`#2D6DFF` ↔ `#406ED6`) | ✅ proven | two instances, one component, modes only |
+| **Accent guard verified** | ✅ proven | two instances, one component, modes only. Both modes now `#406ED6`; the mechanism is what is proven, not a colour difference |
 
 ⚠ **Carried debt:** `ui/*` is Inter, not Inter Tight. Swap on the STYLE when the font lands — never per-layer. Inter is wider, so the swap only gains slack.
 
@@ -376,6 +376,31 @@ had no row for either.
 
 ---
 
+---
+
+## P13 · Second codex audit — what a fresh pair of eyes still found
+
+Run after the file already read complete at 268/269. Findings that were real:
+
+| Finding | Severity | Resolution |
+|---|---|---|
+| **The accent flip was half-applied to the docs** | BLOCKER | I corrected the one DESIGN.md line that described the flip and left **nine** other places still instructing cobalt — including the DESIGNER-BRIEF surface table, which is the document a designer actually follows. They would have rebuilt the retired colour system. All nine corrected; code-token blocks now say `CODE ONLY` rather than reading as design instruction. |
+| **J5 states were never counted** | BLOCKER | S5.1 4 · S5.2 6 · S5.3 5 · S5.5 A0 4 · S5.5 main 9 · S5.6 3 = **31 states**, of which ~7 existed. All built. |
+| **Domains' 6 states missing** | GAP | Built. |
+| **Export had 7 of 8** | GAP | `Export · empty (no pages)` built. |
+| **Forms was built as the wrong thing** | GAP | I drew two settings fields. The spec's opening line is *"Not a settings form — an inbox."* Rebuilt as picker + submission list + drill-in + empty. |
+| **The checklist's own total was wrong** | CONFLICT | Rows summed to 263/267 while the header claimed 268/269. The header had been retyped by hand each pass and drifted. Recomputed from the rows. |
+| Compare contract self-contradicts | CONFLICT | contracts §3.1 calls the approved side *full page HTML*; §3.3 says the stored snapshot is *ProjectData JSON* rendered through the same renderer. Different artifacts, different fidelity. Left open — this is an engineering decision about what gets stored, not a drawing decision. |
+| Foundations specimens not spec-mandated | OVERBUILD | Kept. Tokens a designer cannot see are tokens they re-pick by eye, and this file has already been through one accent migration where the invisible captions silently lied. |
+
+**Why two audits found different things.** Both gaps that mattered most came from
+the same habit: a sweep that assumes a format. The first pass searched for
+`**States:**` and so missed every set written as plain `States:` — which is how
+J5's 31 and Domains' 6 stayed invisible while I reported 171/171. The fix is not
+a better regex; it is to grep for the loosest form and read the misses.
+
+---
+
 ## P9 · Cross-cutting — do not skip
 
 | Item | Status | Why |
@@ -394,11 +419,11 @@ had no row for either.
 | Phase | Done | Total |
 |---|---|---|
 | P0 Foundations | 9 | 9 |
-| P1 Atoms | 12 | 14 |
+| P1 Atoms | 14 | 14 |
 | P2 Molecules | 11 | 11 |
-| P3 Shells | 7 | 8 |
+| P3 Shells | 8 | 8 |
 | P4 Wedge | 6 | 6 |
-| P5 Editor screens | 9 | 10 |
+| P5 Editor screens | 10 | 10 |
 | P6 Floating + modals | 7 | 7 |
 | P7 Site | 6 | 6 |
 | P8 Portfolio | 4 | 4 |
@@ -407,7 +432,8 @@ had no row for either.
 | P0b Foundations specimens | 1 | 1 |
 | P11 Enumerated states | 171 | 171 |
 | P12 Device frames + control states | 2 | 2 |
-| **Total** | **268** | **269** |
+| P13 J5 states + Domains + Forms rebuild | 42 | 42 |
+| **Total** | **309** | **309** |
 
 ---
 

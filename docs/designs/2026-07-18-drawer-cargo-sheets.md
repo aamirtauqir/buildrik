@@ -213,7 +213,7 @@ ROOT                            DRILL-IN (Tokens → a token)
 ├───────────────────────┤      │ ‹ Tokens · color      │  36
 │ ▦ Tokens        14  › │  32  ├───────────────────────┤
 │ ◫ Presets       18  › │  32  │ ● primary             │  32
-│ ✧ Starters       6  › │  32  │   #2D6DFF             │
+│ ✧ Starters       6  › │  32  │   #406ED6             │
 │ ⬚ Classes       12  › │  32  │ ● surface             │  32
 │ ⬡ Components    27  › │  32  │ ● ink                 │  32
 │ Aa Typography       › │  32  │ ─────────────────────  │

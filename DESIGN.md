@@ -14,7 +14,7 @@ Buildrick runs on **one brand accent: `#406ED6`** across dashboard, auth and onb
 
 | Surface | Lives in | Accent | Display font | Body font | Audience |
 |---|---|---|---|---|---|
-| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **Cobalt `#2D6DFF`** (own `--buildrick-*` DS — not yet migrated) | General Sans | Inter Tight | Power user mid-flow. Quiet. |
+| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **`#406ED6` in design** · cobalt `#2D6DFF` still in code (own `--buildrick-*` DS — migration owed) | General Sans | Inter Tight | Power user mid-flow. Quiet. |
 | **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | **`#406ED6`** (`--color-primary`, hover `#2E56B8`, subtle `#EBF1FF`) | Inter | Inter | Signed-in workspace tasks. |
 | **Auth chrome** (signed-out craftwork) | `app/auth/` | **`#406ED6`** (`--color-auth-cta`, hover `#2E56B8`) + art rail | Inter Tight | Inter Tight | New visitor / signed-out. |
 | **Onboarding wizard** | `app/onboarding/` | **`#406ED6`** (`--color-onb-primary`) — no longer a scoped exception | Inter | Inter | Post-verification setup. |
@@ -23,7 +23,7 @@ Buildrick runs on **one brand accent: `#406ED6`** across dashboard, auth and onb
 **Why one accent:** editor, auth, and dashboard are one continuous signed-in-adjacent product; a single cobalt accent reads as one brand. Onboarding keeps its blue per the M2 spec.
 
 Rules:
-- **`#406ED6` is the single accent** for CTAs, links, active states and focus rings across dashboard + auth + onboarding. (Editor chrome still runs cobalt `#2D6DFF` in its own DS — separate migration.)
+- **`#406ED6` is the single accent** for CTAs, links, active states and focus rings — everywhere, including the editor. (Editor chrome still *runs* cobalt `#2D6DFF` in its own DS; the design is already flipped and the code migration is owed. Draw `#406ED6`.)
 - **Red means error/danger/destructive only** (delete confirm, FAILED status, validation, over-limit, dunning) — on every surface. Never a red CTA or accent.
 - Purple/violet/indigo remain **banned** as accents (AI-slop guard). **One narrow
   exception (user-approved 2026-07-18):** third-party *brand* colours on the
@@ -144,7 +144,7 @@ Depth is communicated by nesting + hairline borders, not shadows. Modals get one
 --aqb-border:         #E2E8F0   /* slate-200, default hairline */
 --aqb-border-medium:  #CBD5E1   /* slate-300, inputs + buttons — matches topbar */
 --aqb-border-strong:  #94A3B8   /* slate-400, hover — matches topbar hover */
---aqb-border-focus:   #2D6DFF   /* cobalt focus ring */
+--aqb-border-focus:   #2D6DFF   /* cobalt focus ring — CODE ONLY, design is #406ED6 */
 ```
 
 ### Text (no black, ever)
@@ -162,7 +162,7 @@ The primary text color matches topbar `.tbBreadcrumb-page` (`#334155`). Secondar
 ### Accent (cobalt, single, unchanged)
 
 ```
---accent:         #2D6DFF
+--accent:         #2D6DFF   /* CODE ONLY, design is #406ED6 */
 --accent-hover:   #4B8DFF
 --accent-pressed: #1E58D9
 --accent-tint:    rgba(45, 109, 255, 0.10)   /* selection bg on light surfaces */
@@ -178,7 +178,7 @@ The primary text color matches topbar `.tbBreadcrumb-page` (`#334155`). Secondar
 --success: #16A34A   /* green-600 */
 --warning: #D97706   /* amber-600 */
 --error:   #DC2626   /* red-600 */
---info:    #2D6DFF   /* = accent */
+--info:    #2D6DFF   /* CODE ONLY — design accent is #406ED6 */
 ```
 
 Use for status indicators only (save state, validation, toasts). Never for decoration.
@@ -435,7 +435,7 @@ Panel chrome must be visually restrained. Canvas (user content) owns decoration;
 
 Restates and sharpens the existing §Color rules.
 
-1. **Cobalt `#2D6DFF` is used ONLY where §Color §Accent Usage Rules already allow** — primary CTA, selection outlines and selected-row tint, active rail/tab indicator, focus rings, account avatar. Nowhere else in chrome.
+1. **The accent is used ONLY where §Color §Accent Usage Rules already allow** — primary CTA, selection outlines and selected-row tint, active rail/tab indicator, focus rings, account avatar. Nowhere else in chrome. (`#406ED6` in design; the editor code still emits cobalt `#2D6DFF` until the migration lands.)
 2. **Semantic colors (`--success`, `--warning`, `--error`, `--info`) are used ONLY in functional status indicators** — Toast, SyncStatusIndicator, save-state badges, validation messages. Never as decoration elsewhere in chrome.
 3. **No decorative tint** in panel headers, sidebar section backgrounds, toolbar fills. Chrome uses the neutral surface tokens (`--aqb-bg-*` / `--buildrick-bg-panel*`) only.
 4. **Chrome must survive any user canvas color.** A user building a hot-pink brand site and a user building a forest-green one must see the same chrome affordances.

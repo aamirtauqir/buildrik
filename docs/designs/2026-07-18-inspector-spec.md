@@ -112,7 +112,7 @@ Label column **88**, control column **172**, gap 8. Label 12px `--ink-soft`, rig
 
 5 · Colour                    6 · Box model (spacing)
   Fill  ┌──┐┌──────────┐◈      ┌──────────────────────┐
-        │▓ ││ #2D6DFF  │       │   ┌──────────────┐   │
+        │▓ ││ #406ED6  │       │   ┌──────────────┐   │
         └──┘└──────────┘       │ 16│   ┌──────┐   │16 │  120h
   swatch 28 · hex 108 ·        │   │ 8 │ elem │ 8 │   │
   binding chip ◈ 24            │   │   └──────┘   │   │

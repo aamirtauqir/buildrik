@@ -2,7 +2,8 @@
 
 > The third surface. `2026-07-18-editor-shell-wireframes.md` specs the editor; this specs **Site** — the full-page area opened from the editor's topbar `⋯ → Site`. It exists because ~14 destinations were being carried in a single line of the redesign doc (§4.3), and because none of them touch the canvas, which is the rule that decides rail membership.
 >
-> Same craft as the editor: cobalt `#2D6DFF` · no pure black · General Sans / Inter Tight · 4px grid · light theme · minimal motion.
+> Same craft as the editor: accent `#406ED6` · no pure black · General Sans / Inter Tight · 4px grid · light theme · minimal motion.
+> *(Was cobalt `#2D6DFF` until 2026-07-20. The editor's accent flipped with the rest of the product; the code migration is still owed, so the running app will look different from what you draw.)*
 
 ---
 

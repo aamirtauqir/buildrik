@@ -168,14 +168,14 @@ This is not pedantry — three separate drafts of the spec shipped numbers that 
 
 **From `DESIGN.md`** (that file is the source of truth for *values* — colour, type, spacing, motion):
 
-- **Two accents, one per surface — do not mix them.** Buildrick's product accent is **`#406ED6`** (adopted 2026-07-18 from the founder's UI kit). **Editor chrome is the one surface still on cobalt `#2D6DFF`**, because it carries its own `--buildrick-*` token system and has not been migrated yet.
+- **One accent, everywhere: `#406ED6`.** Adopted 2026-07-18 from the founder's UI kit. The editor used to be the exception — it carried cobalt `#2D6DFF` in its own `--buildrick-*` token system — and the Figma file was flipped to `#406ED6` on 2026-07-20. **Draw `#406ED6` on every surface.** The running editor still renders cobalt because the code migration is owed; that is a difference you will see and should ignore, not copy.
 
   **Which accent follows the package, not the screen's distance from the canvas.** Site looks like it is "outside the editor" but ships inside the editor app, so it stays cobalt.
 
   | You are drawing | Ships in | Accent |
   |---|---|---|
-  | Editor chrome — rail, drawer, topbar, inspector, canvas, footer | editor | **cobalt `#2D6DFF`** |
-  | **Site** — settings, domains, publish, export | editor | **cobalt `#2D6DFF`** |
+  | Editor chrome — rail, drawer, topbar, inspector, canvas, footer | editor | **`#406ED6`** (code still cobalt — migration owed) |
+  | **Site** — settings, domains, publish, export | editor | **`#406ED6`** (code still cobalt — migration owed) |
   | **Portfolio** — sites, shared assets, brand push | dashboard | **`#406ED6`** |
   | **Client review page** | dashboard | **`Client.brandColor`, else `#406ED6`** |
 

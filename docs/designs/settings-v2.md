@@ -162,7 +162,7 @@ All values match DESIGN.md. No new tokens introduced.
 | Text primary | `--bd-text-1` | `#1A1A1A` |
 | Text secondary | `--bd-text-2` | `#6B7280` |
 | Text tertiary | `--bd-text-3` | `#9CA3AF` |
-| Accent | `--bd-accent` | `#2D6DFF` (cobalt) |
+| Accent | `--bd-accent` | `#406ED6` in design; the token still emits cobalt `#2D6DFF` until the editor migration lands |
 | Accent soft (active row, focus ring) | `--bd-accent-soft` | `rgba(45, 109, 255, 0.08)` |
 | Danger | `--bd-danger` | `#EF4444` |
 

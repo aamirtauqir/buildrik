@@ -37,7 +37,7 @@
 | Deliverable | Detail |
 |---|---|
 | Variable collection `Package` | two modes: `Editor` · `Dashboard` |
-| `color/accent` | **one variable, two modes** — cobalt `#2D6DFF` / `#406ED6` |
+| `color/accent` | **one variable, two modes** — both `#406ED6` since 2026-07-20. The modes survive as the guard against a second blue reappearing, not because the values differ. |
 | Remaining colour, spacing, radius, size variables | `figma-working-rules.md` §2 Tier 0 |
 | Text styles | General Sans · Inter Tight · Geist Mono, the 9-step scale |
 | Icon library | **real Lucide**, not redrawn |
