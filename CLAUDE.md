@@ -223,7 +223,7 @@ are in `.env.local`). Live mode is still empty — creating the live Products an
 copying those Price ids into the four vars above is a founder step in the Stripe
 dashboard.
 
-**The webhook endpoint must subscribe to exactly these four events:**
+**The webhook endpoint must subscribe to exactly these five events:**
 `checkout.session.completed`, `customer.subscription.updated`,
 `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`.
 Note the last one — dunning used to hang off `charge.failed`, which cannot work:
