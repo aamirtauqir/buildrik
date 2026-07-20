@@ -466,8 +466,34 @@ plan table said 53; the specs' `States:` lines sum to 42 (Versions 7 · Compare 
 ⌘K 6 · Issues 5 · AI 11 · Notifications 5). Corrected rather than padded — the
 whole point of this arc is that the number follows the spec, not the reverse.
 
-**Final: 225 frames, 225 captions, 0 overflow, 0 collisions** across four pages —
-Editor 152 · Site 31 · Portfolio 26 · Client review 16.
+**Final: 226 frames, 226 captions, 0 overflow, 0 collisions** across four pages —
+Editor 153 · Site 31 · Portfolio 26 · Client review 16.
+
+### Counts verified externally, 24 of 24
+
+An outside pass grepped the loose `States:` form across the five spec files and
+checked every surface count independently. **All 24 match**, including the two
+recounts this arc argued for — Media 14 (`drill-in ×5` expanded) and Brand 14
+(`any of 9 sections` expanded). Spec-enumerated total across those surfaces is
+**184**; the file's 226 is that plus J5 18, S5.5 14, rollback 4, orphan comments
+3, two `Client.brandColor` variants, and the reach frame below.
+
+### The reach model is three wide, and only two were drawn
+
+The same pass found `ReachScopeStrip.tsx` — the shipped inspector strip offers
+**This item · All like this · Whole site**, a 3-reach model. Both
+`inspector-spec` §5.8 and my frame described only the middle one, using
+vocabulary (`all items`) that matches neither the code nor the spec.
+
+- `Inspector · reach-all-items` → renamed **`reach-all-like-this`**, matching the
+  shipped label, and its note now carries the peer count.
+- **`Inspector · reach-whole-site` added** — the third reach, and the only one
+  with no count, because "every page" cannot be tallied the way peers can.
+  `ReachScopeStrip` routes it to the Styles tab rather than editing in place, so
+  the frame documents a hand-off, not an edit.
+
+Same lesson as the `changeSummary` finding in 1b, from the other direction: the
+spec was narrower than the code, and only reading both caught it.
 
 ### The bug that verification kept missing
 
