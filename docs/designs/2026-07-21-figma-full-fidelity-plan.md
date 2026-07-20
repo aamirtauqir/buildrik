@@ -629,9 +629,45 @@ is the correct call, not an omission:
 | 8px status dots · pin circles | ~21 | Plain ellipses, not the Status-dot / Badge *pill* components. |
 | Multi-line textareas · 28h search | ~15 | Different height/element than the 36h single-line Input. |
 
-**The Row family is the one substantial piece left**, and it is genuinely a
-design decision (how many row molecules, what slots each) rather than mechanical
-retrofit. Everything mechanically instanceable without regression now is.
+**The Row family is the one substantial piece left** — and rather than defer it,
+it is being built molecule by molecule (below).
+
+### Pass 4 — the Row family, authored not deferred
+
+The 177 list rows are ~13 anatomies, so the honest fix is a small family of row
+molecules, each authored then instanced. Started with the dominant one:
+
+**`List row`** — a new component (icon + label + optional count + optional
+chevron, three booleans). Instanced the **73** uniform 32h list rows across
+Insert, Content, Brand, Media drill-ins and Brand token-detail. Icon/count/chevron
+mapped per row; counts recovered where the override failed (see below).
+
+**Two regressions, both caught and fully recovered — same root cause twice:**
+
+1. *Read-before-remove.* The count text was read *after* its parent row was
+   removed, so ~29 rows kept the default "0". Recovered from a deterministic
+   label→count map (Tokens 14, Presets 18, Menu items 24 …). This is the identical
+   mistake the Section-header pass made — noted now as a standing rule: **capture
+   all content before removing the source node.**
+2. *Over-broad match.* `Row ·` also matched the **Inspector · multi-select**
+   control rows (Background/Radius/Padding…), stripping their control boxes and
+   overflowing the frame. Caught by the overflow check, reverted, and the 5 control
+   rows rebuilt from spec.
+
+Both recovered to **0 overflow, 0 collisions**. The lesson is concrete: a broad
+name match plus destructive removal is where these passes break; match precisely,
+read before removing, and let the overflow/collision check be the backstop.
+
+### Current instancing total
+
+**10 components, ~1019+ instances, 0 → this, 239/239 frames clean:**
+Nav item 664 · Button 102 · Panel header 74 · List row 73 · Section header 36 ·
+Card 34 · Comment row 33 · Checkbox 23 · Input 14 · Toggle 2.
+
+**Still to author** (each a distinct row molecule, being worked in order of
+count): Layer/tree row (~49) · Version row (~24) · Page row (~15) · Record row
+(~4) · Export-format row (~5). Plus the intentionally-not-instanced set from the
+table above (inspector control cells, empty states, dots).
 
 ### The bug that verification kept missing
 
