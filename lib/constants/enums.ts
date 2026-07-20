@@ -75,11 +75,24 @@ export const BillingInterval = {
   YEARLY: "YEARLY",
 } as const;
 
+/**
+ * Stripe's invoice statuses, uppercased — `stripe-webhook.service.ts` writes
+ * `invoiceData.status.toUpperCase()` straight into the column, so these are the
+ * only values that ever land there.
+ *
+ * This list previously read PAID / FAILED / PENDING / REFUNDED, which Stripe does
+ * not use. Only PAID overlapped with reality, and the invoice table indexed a map
+ * keyed on those names and read a property off the result — so every other real
+ * invoice threw and took the billing page down. Anything reading this must still
+ * tolerate an unrecognised value: the column is a bare String and Stripe can add
+ * statuses.
+ */
 export const InvoiceStatus = {
+  DRAFT: "DRAFT",
+  OPEN: "OPEN",
   PAID: "PAID",
-  FAILED: "FAILED",
-  PENDING: "PENDING",
-  REFUNDED: "REFUNDED",
+  UNCOLLECTIBLE: "UNCOLLECTIBLE",
+  VOID: "VOID",
 } as const;
 
 export const DomainStatus = {

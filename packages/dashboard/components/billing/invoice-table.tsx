@@ -2,13 +2,12 @@
 
 import { DataTable, Pill, MetricValue, type Column, type PillTone } from "@/components/dashboard/primitives";
 
-type InvoiceStatus = "PAID" | "FAILED" | "PENDING" | "REFUNDED";
-
 export interface Invoice {
   id: string;
   amount: number;
   currency: string;
-  status: InvoiceStatus;
+  /** Whatever the column holds. See STATUS below for why this is not a union. */
+  status: string;
   pdfUrl: string | null;
   periodStart: Date;
   periodEnd: Date;
@@ -23,12 +22,33 @@ interface InvoiceTableProps {
   onPageChange?: (page: number) => void;
 }
 
-const STATUS: Record<InvoiceStatus, { tone: PillTone; label: string }> = {
+/**
+ * Keyed on the statuses Stripe actually sends (see `InvoiceStatus` in
+ * lib/constants/enums.ts), with labels written for the person paying rather than
+ * Stripe's internal wording — "Unpaid" says what an `open` invoice means to them.
+ *
+ * Deliberately a partial map read through `statusPill`, not a total Record: the
+ * column is a plain String, Stripe can add statuses, and existing rows may hold
+ * values from before this list was corrected. A billing page showing an
+ * unfamiliar label beats one that will not load.
+ */
+const STATUS: Record<string, { tone: PillTone; label: string }> = {
+  DRAFT: { tone: "neutral", label: "Draft" },
+  OPEN: { tone: "warning", label: "Unpaid" },
   PAID: { tone: "success", label: "Paid" },
-  FAILED: { tone: "error", label: "Failed" },
-  PENDING: { tone: "warning", label: "Pending" },
-  REFUNDED: { tone: "neutral", label: "Refunded" },
+  UNCOLLECTIBLE: { tone: "error", label: "Uncollectible" },
+  VOID: { tone: "neutral", label: "Void" },
 };
+
+/** UNKNOWN_STATUS → "Unknown status", so an unmapped value still reads as words. */
+function humanise(status: string): string {
+  const words = status.replace(/_/g, " ").toLowerCase().trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+function statusPill(status: string): { tone: PillTone; label: string } {
+  return STATUS[status] ?? { tone: "neutral", label: humanise(status) };
+}
 
 function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
@@ -41,7 +61,14 @@ function formatAmount(amount: number, currency: string): string {
 const COLUMNS: Column<Invoice>[] = [
   { key: "date", header: "Date", render: (inv) => <MetricValue>{formatDate(inv.createdAt)}</MetricValue> },
   { key: "amount", header: "Amount", className: "font-medium", render: (inv) => <MetricValue>{formatAmount(inv.amount, inv.currency)}</MetricValue> },
-  { key: "status", header: "Status", render: (inv) => <Pill tone={STATUS[inv.status].tone}>{STATUS[inv.status].label}</Pill> },
+  {
+    key: "status",
+    header: "Status",
+    render: (inv) => {
+      const { tone, label } = statusPill(inv.status);
+      return <Pill tone={tone}>{label}</Pill>;
+    },
+  },
   {
     key: "download",
     header: "Invoice",

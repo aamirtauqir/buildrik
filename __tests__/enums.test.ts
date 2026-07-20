@@ -29,7 +29,13 @@ describe("Enums", () => {
   it("SubscriptionPlan has 3 values", () => { expect(Object.values(SubscriptionPlan)).toHaveLength(3); });
   it("SubscriptionStatus has 4 values", () => { expect(Object.values(SubscriptionStatus)).toHaveLength(4); });
   it("BillingInterval has 2 values", () => { expect(Object.values(BillingInterval)).toHaveLength(2); });
-  it("InvoiceStatus has 4 values", () => { expect(Object.values(InvoiceStatus)).toHaveLength(4); });
+  // Counting was the whole assertion here, and a count is happy to be wrong: this
+  // read "has 4 values" while the four were PAID / FAILED / PENDING / REFUNDED,
+  // three of which Stripe never sends. Name them, so the next edit has to be
+  // deliberate.
+  it("InvoiceStatus matches Stripe's invoice statuses", () => {
+    expect(Object.values(InvoiceStatus)).toEqual(["DRAFT", "OPEN", "PAID", "UNCOLLECTIBLE", "VOID"]);
+  });
   it("DomainStatus has 3 values", () => { expect(Object.values(DomainStatus)).toHaveLength(3); });
   it("SslStatus has 3 values", () => { expect(Object.values(SslStatus)).toHaveLength(3); });
   it("NotificationType has 21 values", () => {
