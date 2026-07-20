@@ -67,7 +67,7 @@ function TemplatesTab() {
         return (
           <Link
             key={t.id}
-            href="/dashboard/sites/new?method=template"
+            href={`/dashboard/sites/new?method=template&template=${t.id}`}
             className="group overflow-hidden rounded-xl border shadow-card transition-shadow hover:shadow-md"
             style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
           >

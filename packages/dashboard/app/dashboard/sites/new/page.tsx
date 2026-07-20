@@ -7,13 +7,14 @@ import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { TemplateGallery } from "@/components/templates/template-gallery";
 import { TemplatePreview } from "@/components/templates/template-preview";
+import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { WizardProgress } from "@/components/ai-wizard/wizard-progress";
 import { StepType, BUSINESS_TYPES } from "@/components/ai-wizard/step-type";
 import { StepPages } from "@/components/ai-wizard/step-pages";
 import { GenerationProgress } from "@/components/ai-wizard/generation-progress";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
-type View = "choose" | "templates" | "preview" | "ai-type" | "ai-pages" | "ai-progress";
+import { initialViewFor, type NewSiteView as View } from "./initial-view";
 
 // Wraps NewSitePageInner in Suspense because useSearchParams() requires it
 // in Next.js 16 production builds (causes CSR bailout error otherwise).
@@ -31,10 +32,14 @@ function NewSitePageInner() {
   const { addToast } = useToast();
   const unified = useUnifiedEditorFlag();
 
-  const initialMethod = searchParams.get("method");
-  const [view, setView] = useState<View>(
-    initialMethod === "template" ? "templates" : initialMethod === "ai" ? "ai-type" : "choose"
-  );
+  // Deep link into one template's preview (from the Templates tab cards) via
+  // ?template=<id>, instead of `?method=template` which only lands on the full
+  // gallery. See initial-view.ts for the routing.
+  const initial = initialViewFor({
+    method: searchParams.get("method"),
+    template: searchParams.get("template"),
+  });
+  const [view, setView] = useState<View>(initial.view);
 
   const [siteName, setSiteName] = useState(searchParams.get("name") ?? "My New Site");
 
@@ -42,7 +47,7 @@ function NewSitePageInner() {
   const [templateCategory, setTemplateCategory] = useState("ALL");
   const [templateSort, setTemplateSort] = useState("popular");
   const [templatePage, setTemplatePage] = useState(1);
-  const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(null);
+  const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(initial.previewTemplateId);
 
   // AI wizard state
   const [businessType, setBusinessType] = useState<string | null>(null);
@@ -206,8 +211,30 @@ function NewSitePageInner() {
     );
   }
 
-  // Template preview
-  if (view === "preview" && previewQuery.data) {
+  // Template preview. On a deep link (?template=<id>) this is the first view, so
+  // it has to cover the cold-load states the in-app path never hit: the data is
+  // still fetching, or the id is bad. Without this the page fell through to the
+  // final `return null` and showed a blank screen.
+  if (view === "preview") {
+    if (previewQuery.isLoading) {
+      return (
+        <div className="pt-8">
+          <LoadingSkeleton rows={3} variant="card" />
+        </div>
+      );
+    }
+    if (previewQuery.isError || !previewQuery.data) {
+      return (
+        <div className="pt-8">
+          <ErrorState
+            title="Couldn't load that template"
+            description="It may have been removed. Browse the full gallery instead."
+            retryLabel="Browse templates"
+            onRetry={() => setView("templates")}
+          />
+        </div>
+      );
+    }
     return (
       <TemplatePreview
         template={previewQuery.data as any}
