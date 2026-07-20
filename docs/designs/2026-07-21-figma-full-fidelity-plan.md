@@ -664,10 +664,54 @@ read before removing, and let the overflow/collision check be the backstop.
 Nav item 664 · Button 102 · Panel header 74 · List row 73 · Section header 36 ·
 Card 34 · Comment row 33 · Checkbox 23 · Input 14 · Toggle 2.
 
-**Still to author** (each a distinct row molecule, being worked in order of
-count): Layer/tree row (~49) · Version row (~24) · Page row (~15) · Record row
-(~4) · Export-format row (~5). Plus the intentionally-not-instanced set from the
-table above (inspector control cells, empty states, dots).
+### Pass 5 — the row family completed, and a serious latent bug found
+
+Authored and instanced the rest of the reusable row molecules:
+
+| Molecule | Instances | Notes |
+|---|---|---|
+| Tree row | 49 | Layers — depth indent via a resizable spacer, chevron/Selected booleans, label truncates |
+| Version row | 24 | dot + time/author + delta + ⋯, Current variant; tint-bg set to STRETCH so it fits the 320 drawer |
+| Format row | 35 | Export — radio + name + desc, Selected boolean |
+| Record row | 4 | publish dot + label + chevron |
+
+**14 components, ~1145 instances, from 0. Final file: 239/239 frames, 0 overflow,
+0 collisions, 0 collapsed containers.**
+
+**The bug that mattered most — and that every prior "0 overflow" check had
+missed.** `node.resize()` sets an auto-layout frame's `primaryAxisSizingMode` to
+`FIXED`. Across the Site/Portfolio build and the instancing passes, **40 content
+Columns had silently collapsed to a fixed height and were clipping their own
+content** — Domains, Integrations, Shape 1/2, Export, Portfolio Sites, BrandPush.
+The frames looked empty below their heading.
+
+The overflow check never caught it because **clipped content stays *inside* the
+frame** — it does not exceed the frame bounds, it is hidden by the container. The
+check measured the wrong boundary. All 40 restored to `AUTO` (hug); a
+container-collapse scan is now part of the standing verification:
+
+> A frame passes only when: nothing exceeds its bounds (overflow), nothing
+> overlaps a sibling (collision), **and every auto-layout container hugs or
+> contains its children (no FIXED-height container clipping content).** The third
+> was the blind spot.
+
+### Three regressions across the instancing, all recovered, one root cause
+
+Section-header labels, List-row counts, and Format-row content all broke the same
+way: **content read or a property set *after* the source node was removed**, or a
+non-boolean passed to `setProperties`. Each recovered from a deterministic map.
+The rule earned three times over: **capture everything before removing, coerce
+property values, and never trust a green check that only measures frame bounds.**
+
+### What is NOT componentized, and why that is correct
+
+Beyond the reused set above: inspector control cells (~407, single-context
+anatomy), empty states (heterogeneous sizes), 8px dots and pin circles (not the
+pill components), and the long tail of single-panel rows — Brand sub-screen rows
+(Kind/Token/Preset/Class/Component/Font), Content Field/Var/Cond rows, Pages rows,
+Integrations detail rows. **A component used a handful of times in one screen is
+over-abstraction, not maturity.** The line held: componentize cross-surface
+reuse, keep single-use compositions inline.
 
 ### The bug that verification kept missing
 
