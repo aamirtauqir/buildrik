@@ -495,6 +495,41 @@ vocabulary (`all items`) that matches neither the code nor the spec.
 Same lesson as the `changeSummary` finding in 1b, from the other direction: the
 spec was narrower than the code, and only reading both caught it.
 
+### The shell state set was 7 of 12 — now complete
+
+The build checklist claimed "Shell states as variants (12) ✅". The page held
+**7** standalone frames (1 · 4 · 7 · 9 · 10 · 11 · 12). The same over-count
+pattern as the rest of the arc, found only by listing what exists rather than
+reading the tick.
+
+Five states had no frame — built now against shell §4:
+
+- **2 · Returning (default)** — transient drawer overlays (canvas keeps 1080),
+  inspector shows nothing-selected. The actual landing state.
+- **3 · Element selected** — selection box + label on canvas, floating selection
+  toolbar, inspector populated.
+- **5 · Drawer closed** — drawer gone, canvas regains 320 (because it was pinned;
+  a transient drawer leaves no gap), no rail item active.
+- **6 · Comment mode** — pins on canvas, pin cursor, and the load-bearing
+  correction drawn explicitly: **rail + inspector stay fully live**, not dimmed.
+- **8 · Review active** — the 44h review bar under the topbar; band shrinks
+  812→768, `56+44+768+32 = 900`.
+
+**The four dead empty shells my own plan §5 flagged were still on the page** —
+`Shell / 1440 · transient/pinned`, `1280 · transient`, `single page` — I had
+never archived them. Moved to 🗃️ Archive now (six nodes including the stray
+1280-overlay box and its floating caption).
+
+That last box covered the **1280 width** and the pin-auto-release-below-1380
+behaviour (working-rules §3.6), but only as an empty labelled shell. Archiving it
+would have left §3.6 with zero live coverage, so it was replaced with a real
+`Shell · 1280 · pin auto-released (overlay)` frame: canvas measured at **920**,
+the drawer floating over it, and the toast the behaviour actually ships with.
+
+**Whole file now: 239 frames, all captioned, 0 overflow, 0 collisions** —
+Editor 166 · Site 31 · Portfolio 26 · Client review 16. (166 = the 152 batch
+states + 12 shell states + the 1280 overlay + the reach frame added earlier.)
+
 ### The bug that verification kept missing
 
 Batch 1b passed every check I ran — sizes, overflow, captions — while sitting on
