@@ -8,7 +8,40 @@ const STRIPE_STATUS_MAP: Record<string, string> = {
   canceled: "CANCELLED",
 };
 
-export async function handleChargeFailed(stripeSubscriptionId: string): Promise<void> {
+/** The subscription back-reference every invoice webhook payload now carries. */
+type InvoiceParent = {
+  parent?: { subscription_details?: { subscription?: string | null } | null } | null;
+};
+
+/**
+ * The subscription an invoice belongs to, or null for a one-off invoice.
+ *
+ * `invoice.subscription` no longer exists — Stripe moved the link to
+ * `parent.subscription_details.subscription` (verified against a live payload
+ * on API 2026-01-28.clover). Reading the old field returned `undefined` for
+ * every real delivery, so `invoice.paid` threw every time and no Invoice row
+ * was ever written, while the unit tests — which hand-build a payload with a
+ * top-level `subscription` — stayed green. Read the link through this helper
+ * so the next shape change has one place to fix.
+ */
+function invoiceSubscriptionId(invoice: InvoiceParent): string | null {
+  return invoice.parent?.subscription_details?.subscription ?? null;
+}
+
+/**
+ * Dunning entry point, driven by `invoice.payment_failed`.
+ *
+ * It used to hang off `charge.failed`, reading `charge.subscription` — a field
+ * the Charge object does not have (its only link is `payment_intent`; verified
+ * against a live payload). That read was always `undefined`, so the route
+ * skipped the call entirely and no failed payment ever reached PAST_DUE, sent
+ * a notification, or sent an email. `invoice.payment_failed` is the
+ * subscription-level event and carries the subscription reference directly.
+ */
+export async function handleInvoicePaymentFailed(invoiceData: InvoiceParent): Promise<void> {
+  const stripeSubscriptionId = invoiceSubscriptionId(invoiceData);
+  if (!stripeSubscriptionId) return;
+
   const subscription = await prisma.subscription.findUnique({
     where: { stripeSubscriptionId },
   });
@@ -104,10 +137,19 @@ export async function handleSubscriptionUpdated(
   stripeSubscriptionId: string,
   data: {
     status: string;
-    current_period_start: number;
-    current_period_end: number;
     cancel_at_period_end: boolean;
-    items: { data: Array<{ price: { id: string; unit_amount: number | null } }> };
+    // The billing period lives on the subscription *item*, not the
+    // subscription — `subscription.current_period_start` / `_end` were removed
+    // (verified against a live payload on API 2026-01-28.clover). Reading them
+    // off `data` produced `new Date(NaN)`, which Prisma rejects, so every
+    // Portal tier change and every renewal threw instead of landing.
+    items: {
+      data: Array<{
+        price: { id: string; unit_amount: number | null };
+        current_period_start: number;
+        current_period_end: number;
+      }>;
+    };
   },
 ): Promise<void> {
   const subscription = await prisma.subscription.findUnique({
@@ -125,9 +167,19 @@ export async function handleSubscriptionUpdated(
   }
 
   const status = STRIPE_STATUS_MAP[data.status] ?? data.status.toUpperCase();
-  const price = data.items.data[0]?.price;
+  const item = data.items.data[0];
+  const price = item?.price;
   const priceId = price?.id ?? subscription.stripePriceId;
   const resolved = resolvePlanFromPriceId(priceId);
+
+  // Keep the stored period when the payload carries no item to read it from,
+  // rather than writing an Invalid Date over a good one.
+  const periodStart = item
+    ? new Date(item.current_period_start * 1000)
+    : subscription.stripeCurrentPeriodStart;
+  const periodEnd = item
+    ? new Date(item.current_period_end * 1000)
+    : subscription.stripeCurrentPeriodEnd;
 
   // Workspace.plan is written in the same transaction as Subscription.plan —
   // a Portal tier change used to update period/status/priceId but never the
@@ -138,8 +190,8 @@ export async function handleSubscriptionUpdated(
       where: { stripeSubscriptionId },
       data: {
         status,
-        stripeCurrentPeriodStart: new Date(data.current_period_start * 1000),
-        stripeCurrentPeriodEnd: new Date(data.current_period_end * 1000),
+        stripeCurrentPeriodStart: periodStart,
+        stripeCurrentPeriodEnd: periodEnd,
         cancelAtPeriodEnd: data.cancel_at_period_end,
         stripePriceId: priceId,
         plan: resolved?.plan ?? subscription.plan,
@@ -172,18 +224,24 @@ export async function handleSubscriptionDeleted(stripeSubscriptionId: string): P
   });
 }
 
-export async function handleInvoicePaid(invoiceData: {
-  id: string;
-  subscription: string;
-  amount_paid: number;
-  currency: string;
-  status: string;
-  invoice_pdf: string | null;
-  period_start: number;
-  period_end: number;
-}): Promise<void> {
+export async function handleInvoicePaid(
+  invoiceData: {
+    id: string;
+    amount_paid: number;
+    currency: string;
+    status: string;
+    invoice_pdf: string | null;
+    period_start: number;
+    period_end: number;
+  } & InvoiceParent,
+): Promise<void> {
+  const stripeSubscriptionId = invoiceSubscriptionId(invoiceData);
+  // A one-off invoice has no subscription parent — there is no plan period to
+  // record against, and throwing would make Stripe redeliver it forever.
+  if (!stripeSubscriptionId) return;
+
   const subscription = await prisma.subscription.findUnique({
-    where: { stripeSubscriptionId: invoiceData.subscription },
+    where: { stripeSubscriptionId },
   });
 
   if (!subscription) {

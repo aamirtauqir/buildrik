@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@lib/prisma";
 import {
-  handleChargeFailed,
+  handleInvoicePaymentFailed,
   handleCheckoutCompleted,
   handleSubscriptionUpdated,
   handleSubscriptionDeleted,
@@ -63,8 +63,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Idempotency: record the event id before handling. Stripe redelivers until
-  // it gets a 2xx, so without this a retried charge.failed would re-flip the
-  // subscription to PAST_DUE and spam a fresh payment-failed notification +
+  // it gets a 2xx, so without this a retried invoice.payment_failed would
+  // re-flip the subscription to PAST_DUE and spam a fresh notification +
   // email every attempt. A duplicate insert (P2002) means already handled.
   if (event.id) {
     try {
@@ -85,9 +85,8 @@ export async function POST(req: NextRequest) {
         await handleCheckoutCompleted(event.data.object);
         break;
       }
-      case "charge.failed": {
-        const subscriptionId = event.data.object.subscription;
-        if (subscriptionId) await handleChargeFailed(subscriptionId);
+      case "invoice.payment_failed": {
+        await handleInvoicePaymentFailed(event.data.object);
         break;
       }
       case "customer.subscription.updated": {

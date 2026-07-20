@@ -23,12 +23,29 @@ vi.mock("@/server/services/stripe.client", () => ({
 import { prisma } from "@/lib/prisma";
 import { getStripe, resolvePlanFromPriceId } from "@/server/services/stripe.client";
 
+// These two builders mirror the shape Stripe actually sends (verified against
+// live payloads on API 2026-01-28.clover). Three handlers shipped broken
+// because this suite hand-wrote the pre-2025 shape instead — a top-level
+// `invoice.subscription` and a top-level `subscription.current_period_*`,
+// neither of which exists any more. Build payloads through these, not inline.
+function invoiceParent(subscriptionId: string | null) {
+  return { parent: { subscription_details: { subscription: subscriptionId } } };
+}
+
+function subItem(priceId: string, unitAmount: number | null) {
+  return {
+    price: { id: priceId, unit_amount: unitAmount },
+    current_period_start: 1711900800,
+    current_period_end: 1714579200,
+  };
+}
+
 describe("Stripe Webhook Service", () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
-  describe("handleChargeFailed", () => {
+  describe("handleInvoicePaymentFailed", () => {
     it("updates subscription to PAST_DUE and creates notification", async () => {
-      const { handleChargeFailed } = await import("@/server/services/stripe-webhook.service");
+      const { handleInvoicePaymentFailed } = await import("@/server/services/stripe-webhook.service");
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
         id: "sub1", workspaceId: "ws1", status: "ACTIVE",
       } as any);
@@ -36,11 +53,22 @@ describe("Stripe Webhook Service", () => {
       vi.mocked(prisma.workspace.findFirst).mockResolvedValue({ ownerId: "u1" } as any);
       vi.mocked(prisma.notification.create).mockResolvedValue({} as any);
 
-      await handleChargeFailed("sub_123");
+      await handleInvoicePaymentFailed(invoiceParent("sub_123"));
       expect(prisma.subscription.update).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({ status: "PAST_DUE" }),
       }));
       expect(prisma.notification.create).toHaveBeenCalled();
+    });
+
+    // Regression: dunning used to hang off charge.failed reading
+    // `charge.subscription`, a field the Charge object has never had. The read
+    // was always undefined, so nothing ever went PAST_DUE in production while
+    // this suite passed a subscription id in by hand.
+    it("does nothing for an invoice with no subscription parent", async () => {
+      const { handleInvoicePaymentFailed } = await import("@/server/services/stripe-webhook.service");
+      await handleInvoicePaymentFailed({ parent: null });
+      expect(prisma.subscription.findUnique).not.toHaveBeenCalled();
+      expect(prisma.subscription.update).not.toHaveBeenCalled();
     });
   });
 
@@ -140,10 +168,8 @@ describe("Stripe Webhook Service", () => {
       await expect(
         handleSubscriptionUpdated("sub_123", {
           status: "active",
-          current_period_start: 1711900800,
-          current_period_end: 1714579200,
           cancel_at_period_end: false,
-          items: { data: [{ price: { id: "price_pro_monthly", unit_amount: 2900 } }] },
+          items: { data: [subItem("price_pro_monthly", 2900)] },
         }),
       ).rejects.toThrow("SUBSCRIPTION_NOT_FOUND");
       expect(prisma.$transaction).not.toHaveBeenCalled();
@@ -158,10 +184,8 @@ describe("Stripe Webhook Service", () => {
 
       await handleSubscriptionUpdated("sub_123", {
         status: "active",
-        current_period_start: 1711900800,
-        current_period_end: 1714579200,
         cancel_at_period_end: false,
-        items: { data: [{ price: { id: "price_business_monthly", unit_amount: 7900 } }] },
+        items: { data: [subItem("price_business_monthly", 7900)] },
       });
 
       expect(prisma.$transaction).toHaveBeenCalledTimes(1);
@@ -184,10 +208,8 @@ describe("Stripe Webhook Service", () => {
 
       await handleSubscriptionUpdated("sub_123", {
         status: "active",
-        current_period_start: 1711900800,
-        current_period_end: 1714579200,
         cancel_at_period_end: false,
-        items: { data: [{ price: { id: "price_unrecognized", unit_amount: null } }] },
+        items: { data: [subItem("price_unrecognized", null)] },
       });
 
       expect(prisma.workspace.update).toHaveBeenCalledWith({ where: { id: "ws1" }, data: { plan: "PRO" } });
@@ -219,7 +241,7 @@ describe("Stripe Webhook Service", () => {
       await expect(
         handleInvoicePaid({
           id: "in_123",
-          subscription: "sub_123",
+          ...invoiceParent("sub_123"),
           amount_paid: 2900,
           currency: "usd",
           status: "paid",
@@ -231,6 +253,29 @@ describe("Stripe Webhook Service", () => {
       expect(prisma.invoice.upsert).not.toHaveBeenCalled();
     });
 
+    // Regression: the handler read `invoice.subscription`, which Stripe
+    // removed. Every real delivery therefore looked up `undefined` and threw,
+    // so no Invoice row was ever written and the billing page's invoice
+    // history stayed permanently empty. A one-off invoice legitimately has no
+    // subscription parent and must be a silent no-op, not a forever-retry.
+    it("ignores a one-off invoice that has no subscription parent", async () => {
+      const { handleInvoicePaid } = await import("@/server/services/stripe-webhook.service");
+
+      await handleInvoicePaid({
+        id: "in_oneoff",
+        ...invoiceParent(null),
+        amount_paid: 500,
+        currency: "usd",
+        status: "paid",
+        invoice_pdf: null,
+        period_start: 1711900800,
+        period_end: 1714579200,
+      });
+
+      expect(prisma.subscription.findUnique).not.toHaveBeenCalled();
+      expect(prisma.invoice.upsert).not.toHaveBeenCalled();
+    });
+
     it("upserts invoice record once the Subscription exists", async () => {
       const { handleInvoicePaid } = await import("@/server/services/stripe-webhook.service");
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue({ id: "sub1", workspaceId: "ws1" } as any);
@@ -238,7 +283,7 @@ describe("Stripe Webhook Service", () => {
 
       await handleInvoicePaid({
         id: "in_123",
-        subscription: "sub_123",
+        ...invoiceParent("sub_123"),
         amount_paid: 2900,
         currency: "usd",
         status: "paid",
@@ -264,7 +309,7 @@ describe("Stripe Webhook Service", () => {
 
       await handleInvoicePaid({
         id: "in_123",
-        subscription: "sub_new",
+        ...invoiceParent("sub_new"),
         amount_paid: 2900,
         currency: "usd",
         status: "paid",

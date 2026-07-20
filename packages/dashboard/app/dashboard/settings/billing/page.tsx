@@ -219,7 +219,7 @@ export default function BillingPage() {
             <PlanCard
               planId={planKey}
               name={PLAN_NAMES[planKey] ?? planKey}
-              price={overview.price}
+              priceMinor={overview.price}
               interval={currentInterval}
               currency={overview.currency}
               features={PLAN_FEATURES_MAP[planKey] ?? []}

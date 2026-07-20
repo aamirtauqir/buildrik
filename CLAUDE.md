@@ -218,9 +218,34 @@ security invariant documented at `billing.service.ts:158` (now `createCheckoutSe
 | `STRIPE_PRICE_PRO_MONTHLY` / `STRIPE_PRICE_PRO_YEARLY` | Stripe Price ids for the Pro plan (created in the Stripe dashboard from `lib/constants/plan-limits.ts`'s PRO pricing — $29/mo, $23/mo billed yearly). Also used in reverse by the webhook to map an incoming Stripe price id back to `plan: "PRO"`. | Yes for billing |
 | `STRIPE_PRICE_BUSINESS_MONTHLY` / `STRIPE_PRICE_BUSINESS_YEARLY` | Same, for Business ($79/mo, $63/mo billed yearly). | Yes for billing |
 
-**No Stripe Products/Prices exist yet.** Creating them (and copying the resulting
-Price ids into the four vars above) is a founder step in the Stripe dashboard —
-nothing in this repo can do it without live API credentials.
+**Test-mode Products/Prices exist** (created 2026-07-19; the four test Price ids
+are in `.env.local`). Live mode is still empty — creating the live Products and
+copying those Price ids into the four vars above is a founder step in the Stripe
+dashboard.
+
+**The webhook endpoint must subscribe to exactly these four events:**
+`checkout.session.completed`, `customer.subscription.updated`,
+`customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`.
+Note the last one — dunning used to hang off `charge.failed`, which cannot work:
+the Charge object carries no subscription link at all (its only reference is
+`payment_intent`), so the handler was never reached and no failed payment ever
+reached PAST_DUE. An endpoint still subscribed to `charge.failed` gets deliveries
+this app ignores.
+
+**Stripe payload shapes drifted and the old fields are gone** (this account is on
+API `2026-01-28.clover`). Two fields the handlers used to read no longer exist:
+
+| Was | Is now |
+|-----|--------|
+| `invoice.subscription` | `invoice.parent.subscription_details.subscription` |
+| `subscription.current_period_start` / `_end` | `subscription.items.data[N].current_period_start` / `_end` |
+
+Both shipped broken because the unit tests hand-build payloads. A test that
+invents its own Stripe payload proves nothing about Stripe — build them through
+the `invoiceParent()` / `subItem()` helpers in
+`__tests__/stripe-webhook-service.test.ts`, which mirror verified live payloads,
+and re-verify against a real webhook delivery (`stripe listen`) before believing
+a green suite.
 
 ### AI
 

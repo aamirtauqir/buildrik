@@ -9,7 +9,14 @@ type Interval = "MONTHLY" | "YEARLY";
 export interface PlanCardProps {
   planId: PlanId;
   name: string;
-  price: number;
+  /**
+   * Minor units (cents) — this is `Subscription.price`, stored straight from
+   * Stripe's `unit_amount`. Named for the unit because rendering it raw
+   * printed "$2900/mo" on a $29 plan; the value read 0 for every workspace
+   * until real subscriptions existed, so the bug was invisible until the
+   * first payment landed.
+   */
+  priceMinor: number;
   interval: Interval;
   currency: string;
   features: string[];
@@ -18,15 +25,18 @@ export interface PlanCardProps {
   onChangePlan?: () => void;
 }
 
-function formatPrice(price: number, currency: string, interval: Interval): string {
-  const symbol = currency.toUpperCase() === "USD" ? "$" : currency;
+function formatPrice(priceMinor: number, currency: string, interval: Interval): string {
+  const symbol = currency.toUpperCase() === "USD" ? "$" : `${currency.toUpperCase()} `;
   const suffix = interval === "MONTHLY" ? "/mo" : "/yr";
-  return `${symbol}${price}${suffix}`;
+  const major = priceMinor / 100;
+  // Whole amounts stay "$29", not "$29.00" — plan pricing is whole-dollar.
+  const amount = Number.isInteger(major) ? String(major) : major.toFixed(2);
+  return `${symbol}${amount}${suffix}`;
 }
 
 export function PlanCard({
   name,
-  price,
+  priceMinor,
   interval,
   currency,
   features,
@@ -52,7 +62,7 @@ export function PlanCard({
 
       <div className="mt-4">
         <span className="text-3xl font-bold" style={{ color: "var(--color-text-primary)" }}>
-          <MetricValue>{formatPrice(price, currency, interval)}</MetricValue>
+          <MetricValue>{formatPrice(priceMinor, currency, interval)}</MetricValue>
         </span>
       </div>
 
