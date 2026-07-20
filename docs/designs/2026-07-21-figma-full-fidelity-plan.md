@@ -586,16 +586,52 @@ each. Nav proof verified by read-back (grid intact, 0 overflow, 0 collisions);
 the 0.5× screenshot that looked empty was grey-on-white at low detail, not a
 regression.
 
-### What a full instancing would still need, and why it is a separate job
+### Pass 3 — the full pass, done properly: 0 → ~982 instances
 
-The remaining atoms cannot be swept without regression because the components
-lack the slots the hand-built frames use (Card's source badge, Row's
-icon/meta/trailing content, Section header's tint) — the honest fix is to
-**author those slots/variants into the components first, then instance**, which
-is component-design work, not a find-and-replace. Doing it wrong (blind swap)
-would strip content from verified frames. It is the right investment for a
-long-lived system and a poor one for a handoff artifact, so it is left as a
-named, deliberate next phase rather than forced now.
+The founder chose the full instancing. Done component-by-component, authoring the
+missing slots/variants first where needed, verifying each, recovering from the one
+regression it caused. Final: **8 components, ~982 instances, 0 overflow, 0
+collisions across all 239 frames.**
+
+| Component | Instances | Slot/variant authored | Notes |
+|---|---|---|---|
+| Nav item | 664 | — | Site 456 + Portfolio 208, State by active |
+| Button | 102 | — | Kind by fill, Size by height, label hug |
+| Panel header | 74 | — | pass 1 |
+| Section header | 36 | **+Tint, +Count booleans** | see regression below |
+| Card / media | 34 | **+Badge boolean + badge node** | STOCK/AI per card |
+| Comment row | 33 | — | Author=client, quote+meta override |
+| Checkbox | 23 | — | State by tick/fill |
+| Input | 14 | — | single-line 36h form fields, State by stroke |
+| Toggle | 2 | — | State=on |
+
+**The one regression, caught and recovered.** Adding a `tint-bg` rectangle to the
+Section header component — which is *horizontal auto-layout* — made the rectangle a
+flex child; it shoved every label off-frame (x=344, w=1) and overflowed 6 frames.
+Fix: `layoutPositioning = 'ABSOLUTE'` on the background. The labels were also
+scrambled by the failed override, and were recovered by re-applying a
+**deterministic per-frame map** (Review = OPEN·HOME/2 + MENU/1; Brand = EXPORT +
+IMPORT; etc.) in top-to-bottom order — 36/36, 0 mismatches, which also confirmed
+the map was exact. Lesson: a background inside an auto-layout component must be
+absolute.
+
+### What is deliberately NOT instanced, and the precise reason
+
+Not "skipped" — instancing these would *regress* verified frames, so leaving them
+is the correct call, not an omission:
+
+| Element | Count | Why not |
+|---|---|---|
+| **Row** | ~225 | The component has **only a Label slot**; the frames use 6+ distinct row anatomies (Insert icon+label, Layers chevron+icon+eye+lock, Pages checkbox+home+dirty, Content icon+label+count, Media dot+meta+⋯). One component cannot hold them without becoming a mega-component. This needs a **row-component family** — a design decision, not a sweep. |
+| Inspector control cells | ~407 | Inspector-specific anatomy (label + control), not a library atom. |
+| Empty state | 11 | 8 different hand-sizes; one component size regresses them. |
+| Stock-browser card | 4 | Carries a legally-required provider credit — a different molecule. |
+| 8px status dots · pin circles | ~21 | Plain ellipses, not the Status-dot / Badge *pill* components. |
+| Multi-line textareas · 28h search | ~15 | Different height/element than the 36h single-line Input. |
+
+**The Row family is the one substantial piece left**, and it is genuinely a
+design decision (how many row molecules, what slots each) rather than mechanical
+retrofit. Everything mechanically instanceable without regression now is.
 
 ### The bug that verification kept missing
 
