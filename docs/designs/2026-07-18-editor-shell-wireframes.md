@@ -254,9 +254,13 @@ An empty state is a feature. Each is: icon 32 muted · one line of what-this-is 
 
 **Content's line is load-bearing** — it is the only place a designer discovers that Buildrick does CMS at all, which is exactly why the panel is permanent rather than conditional (§4.3).
 
-## 5.8 Control states — the four every control needs
+## 5.8 Control states — the five every control needs
 
-The shell has 12 states; individual controls need four, and they were unspecified.
+The shell has 12 states; individual controls need five, and they were unspecified.
+
+*(Corrected 2026-07-20: this said "four" and then listed five. The count matters —
+a component set built to the heading ships without `loading`, which is the one
+state a control needs while the thing it triggers is in flight.)*
 
 | State | Treatment |
 |---|---|

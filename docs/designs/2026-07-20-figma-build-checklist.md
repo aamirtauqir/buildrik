@@ -350,6 +350,32 @@ the error.
 
 ---
 
+---
+
+## P12 · Two spec sections nobody had checked
+
+Found by auditing §5.5 and §5.8 directly rather than trusting the checklist, which
+had no row for either.
+
+- **§5.5 device frames + zoom — entirely absent.** Four devices (Wide 1920 ·
+  Desktop 1440 · Tablet 768 · Mobile 375), the 1023/767 breakpoint set the spec
+  picked, the zoom-to-fit formula and the manual zoom steps. None of it drawn.
+  The assembled shell's footer already read `Desktop · 100%` with no control
+  behind it. **Easy to mistake for out-of-scope**: the editor is desktop-only,
+  but the *sites it builds* are responsive, and this picker is how a designer
+  checks their work at tablet and phone. Built.
+
+- **§5.8 disabled opacity — three different values in the file.** Spec fixes it
+  at 55%; the file had 40% (×4), 60% (×4) and 50% (×1), all chosen by eye, so two
+  controls side by side disagreed about what disabled looks like. 24 nodes
+  normalised.
+
+- **§5.8's own heading said "four" and listed five.** A component set built to
+  the heading ships without `loading` — the one state a control needs while the
+  thing it triggers is in flight. Corrected in the spec.
+
+---
+
 ## P9 · Cross-cutting — do not skip
 
 | Item | Status | Why |
@@ -380,7 +406,8 @@ the error.
 | P4b Shell states | 12 | 12 |
 | P0b Foundations specimens | 1 | 1 |
 | P11 Enumerated states | 171 | 171 |
-| **Total** | **266** | **267** |
+| P12 Device frames + control states | 2 | 2 |
+| **Total** | **268** | **269** |
 
 ---
 
