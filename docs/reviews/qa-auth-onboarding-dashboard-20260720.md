@@ -17,9 +17,11 @@ Method: the repo's own Playwright suite, run against local Chromium.
 First run: `26 passed · 1 failed · 81 did not run (3.0m)`. After the fixture
 unblocked: `79 passed · 3 failed (4.3m)` on the dashboard side.
 
-So: onboarding is proven. **Dashboard is not proven — it is unverified, which is
-not the same as broken.** Nothing here says the dashboard is failing; it says
-nobody has looked.
+All three areas are now proven. The first run could only prove onboarding —
+Findings 1 and 2 below are why, and they are worth reading even though the
+coverage gap they caused is closed, because both will recur.
+
+Nothing found breaks functionality. The two real defects are page titles.
 
 ## Finding 1 — the e2e suite has been running in the cloud, not locally
 
@@ -54,7 +56,8 @@ Both setup projects default to the **same** account:
   **resets** that user's `OnboardingState` to `completed:false, step:ROLE_SELECT`
   so the wizard shows.
 
-Nothing restores it afterwards. Current DB state for `qa@buildrik.local`:
+Nothing restores it afterwards. DB state for `qa@buildrik.local` at the time of
+the first run:
 
 ```
 OnboardingState: { completed: false, dismissed: false, step: 'ROLE_SELECT' }
@@ -62,6 +65,11 @@ OnboardingState: { completed: false, dismissed: false, step: 'ROLE_SELECT' }
 
 `auth.setup.ts` then cannot pass, and because `chromium` declares
 `dependencies: ["setup"]`, every dashboard-side test is skipped.
+
+The user is currently at `step: CHECKLIST` — nudged there by the manual
+walkthrough below, not by a fix — which is why the second run got through. **The
+next `onboarding.setup.ts` run puts it back to `ROLE_SELECT` and re-breaks the
+81.** This is unresolved.
 
 **It is not a within-run race.** First run (both setups) failed at
 `/onboarding/workspace`. Second run, with `setup-onboarding` excluded entirely,
