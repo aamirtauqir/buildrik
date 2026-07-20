@@ -113,6 +113,16 @@ is. `CHECKLIST` reads as "past the wizard" and routes to the dashboard;
 `ROLE_SELECT` reads as "still in it" and routes to the wizard. A real user is
 never sent backwards.
 
+**Correction (2026-07-20, later):** calling `completed` a red herring was half
+right and the reason given was wrong. It is not vestigial — it means "finished
+all of onboarding", not "finished the wizard". `completeWizard()` leaves it
+false on purpose so `dashboard/page.tsx:35` keeps showing the dashboard
+checklist; `completeDashboardTask` flips `step: COMPLETED` and `completed: true`
+once the last of the 7 required tasks lands. Walked the lifecycle end to end:
+after the wizard the checklist shows, after all 7 tasks it hides. The one place
+gating on the flag uses it correctly, so the worry recorded here — that future
+code gating on `completed` alone would misbehave — does not hold.
+
 This also closes the loop on Finding 2: `onboarding.setup.ts` sets
 `step: "ROLE_SELECT"`, and the login redirect then does exactly what it should —
 send that user into the wizard. The fixture is not fighting a bug; it is getting

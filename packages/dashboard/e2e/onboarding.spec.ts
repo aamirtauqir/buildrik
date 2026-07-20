@@ -531,3 +531,36 @@ test.describe("onboarding · full walkthroughs", () => {
     await expect(page.getByRole("button", { name: /^open editor$/i })).toBeVisible();
   });
 });
+
+test.describe("onboarding · resume", () => {
+  // `wizardData` exists to make this work: the schema comment promises "a refresh
+  // resumes at `route` with inputs intact". Nothing tested it — not this file,
+  // not onboarding-service.test.ts. The wizard deliberately does NOT advance
+  // `OnboardingState.step` as you move through it (step stays ROLE_SELECT until
+  // completeWizard), so resume depends entirely on `wizardData.route`. If that
+  // write or read broke, a user who closed the tab mid-wizard would silently
+  // start over, and every existing test would still pass.
+  test("a returning user lands back on the step they left, with inputs kept", async ({ page }) => {
+    const name = `Resume WS ${randomUUID().slice(0, 8)}`;
+
+    await page.goto("/onboarding/workspace");
+    await page.getByPlaceholder("My Workspace").fill(name);
+    await page.getByRole("combobox").first().selectOption("Agency");
+    await page.getByRole("button", { name: /^continue$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/site/, { timeout: 15_000 });
+
+    // Leaving the wizard entirely, the way closing a tab does.
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/dashboard/);
+
+    // Coming back: the saved route decides, not the step machine.
+    await page.goto("/onboarding");
+    await expect(page).toHaveURL(/\/onboarding\/site/, { timeout: 15_000 });
+
+    // And the earlier answers survived the round trip.
+    await page.getByRole("button", { name: /^back$/i }).click();
+    await expect(page).toHaveURL(/\/onboarding\/workspace/, { timeout: 15_000 });
+    await expect(page.getByPlaceholder("My Workspace")).toHaveValue(name);
+    await expect(page.getByRole("combobox").first()).toHaveValue("agency");
+  });
+});
