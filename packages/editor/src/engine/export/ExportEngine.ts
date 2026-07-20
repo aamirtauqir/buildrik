@@ -34,7 +34,7 @@ import { SitemapGenerator } from "./SitemapGenerator";
 import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
 import { buildInteractionRuntimeScript, INTERACTION_ATTR } from "./interactionRuntime";
-import { isSafeAttrValue } from "../../shared/utils/html/sanitization";
+import { isSafeAttrValue, sanitizeHTML } from "../../shared/utils/html/sanitization";
 
 // ============================================================================
 // MULTI-PAGE EXPORT TYPES
@@ -201,6 +201,7 @@ export class ExportEngine {
     const id = element.getId?.() || "";
     const type = element.getType?.() || "div";
     const content = element.getContent?.() || "";
+    const contentFormat = element.getData?.().contentFormat as "text" | "html" | undefined;
     const attrs = element.getAttributes?.() || {};
     const styles = element.getStyles?.() || {};
     const children = element.getChildren?.() || [];
@@ -246,7 +247,7 @@ export class ExportEngine {
         children.map((child) => this.elementToHTML(child, config, indent + 1)).join("") +
         indentStr;
     } else if (content) {
-      childContent = escapeHTML(content);
+      childContent = this.renderContent(content, contentFormat);
     }
 
     return `${indentStr}<${tag}${attrStr}>${childContent}</${tag}>${newline}`;
@@ -664,6 +665,24 @@ ${bodyContent}${interactionScript}
   /**
    * Render a page element to HTML string (simplified for multi-page export)
    */
+  /**
+   * Emit an element's `content` for export.
+   *
+   * Plain text is escaped. That is what every hand-authored element relies on —
+   * without it a user who types `<script>` gets markup on their published site.
+   *
+   * `contentFormat: "html"` means `content` is already markup. AI site
+   * generation stores whole generated sections that way and the canvas mounts
+   * them un-escaped, so escaping them here published every AI-generated site as
+   * visible angle brackets. Those are emitted as markup — but sanitized first,
+   * because model output is untrusted input like any other. Export runs in the
+   * editor client, so DOMPurify has a real DOM here.
+   */
+  private renderContent(content: string, contentFormat?: "text" | "html"): string {
+    if (contentFormat !== "html") return escapeHTML(content);
+    return sanitizeHTML(content);
+  }
+
   private renderPageElement(element: PageData["root"], indent = 1): string {
     if (!element) return "";
 
@@ -671,6 +690,7 @@ ${bodyContent}${interactionScript}
     const indentStr = "  ".repeat(indent);
     const children = element.children ?? [];
     const content = element.content ?? "";
+    const contentFormat = (element as { contentFormat?: "text" | "html" }).contentFormat;
 
     // Build attributes
     const attrParts: string[] = [];
@@ -729,7 +749,7 @@ ${bodyContent}${interactionScript}
         children.map((child) => this.renderPageElement(child, indent + 1)).join("") +
         indentStr;
     } else if (content) {
-      childContent = escapeHTML(content);
+      childContent = this.renderContent(content, contentFormat);
     }
 
     return `${indentStr}<${tag}${attrStr}>${childContent}</${tag}>\n`;

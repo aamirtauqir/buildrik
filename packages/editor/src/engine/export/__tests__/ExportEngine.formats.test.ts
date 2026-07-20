@@ -23,6 +23,7 @@ interface LiveNode {
   type?: string;
   tagName?: string;
   content?: string;
+  contentFormat?: "text" | "html";
   attributes?: Record<string, string>;
   styles?: Record<string, string>;
   children?: LiveNode[];
@@ -35,7 +36,7 @@ interface LiveElement {
   getAttributes: () => Record<string, string>;
   getStyles: () => Record<string, string>;
   getChildren: () => LiveElement[];
-  getData: () => { tagName?: string };
+  getData: () => { tagName?: string; contentFormat?: "text" | "html" };
 }
 
 function live(node: LiveNode): LiveElement {
@@ -46,7 +47,9 @@ function live(node: LiveNode): LiveElement {
     getAttributes: () => node.attributes ?? {},
     getStyles: () => node.styles ?? {},
     getChildren: () => (node.children ?? []).map(live),
-    getData: () => ({ tagName: node.tagName }),
+    // Mirror what the real element exposes. Dropping contentFormat here made
+    // the mock disagree with production and hid the export-escaping bug.
+    getData: () => ({ tagName: node.tagName, contentFormat: node.contentFormat }),
   };
 }
 
@@ -291,11 +294,9 @@ describe("ExportEngine.generateHTML — config knobs", () => {
     expect(engine.generateHTML()).toContain(".hero{color:pink}");
   });
 
-  it.todo(
-    "BUG: raw HTML stored in element content (AI-generated sites) is escaped on export — escapeHTML() turns '<b>bold</b>' into visible markup text on the published site (memory: feedback_ai_sites_raw_html_export_escaped)"
-  );
-
-  it("pins current behavior: element content is HTML-escaped verbatim", () => {
+  // Text content stays escaped. This is the safe default and the reason the
+  // escape exists: a user who types markup must not get markup on their site.
+  it("escapes plain text content verbatim", () => {
     const root: LiveNode = {
       id: "root",
       children: [{ id: "t1", type: "text", content: '<b>bold</b> & "quotes"' }],
@@ -304,6 +305,44 @@ describe("ExportEngine.generateHTML — config knobs", () => {
 
     expect(html).toContain("&lt;b&gt;bold&lt;/b&gt; &amp; &quot;quotes&quot;");
     expect(html).not.toContain("<b>bold</b>");
+  });
+
+  // Regression: every AI-generated site published as visible angle brackets.
+  // The AI worker stores a whole generated section as markup in `content` and
+  // the canvas mounts it un-escaped, but export escaped it like plain text.
+  // A test that asserted the escaped output pinned the bug in place and passed.
+  it("emits contentFormat:html content as markup, not escaped text", () => {
+    const root: LiveNode = {
+      id: "root",
+      children: [
+        { id: "s1", type: "container", contentFormat: "html", content: "<h1>Hero</h1><p>Copy</p>" },
+      ],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+
+    expect(html).toContain("<h1>Hero</h1>");
+    expect(html).not.toContain("&lt;h1&gt;");
+  });
+
+  // Emitting it as markup is not the same as trusting it. Model output is
+  // untrusted input; the export path sanitizes before it emits.
+  it("sanitizes contentFormat:html content before emitting it", () => {
+    const root: LiveNode = {
+      id: "root",
+      children: [
+        {
+          id: "s2",
+          type: "container",
+          contentFormat: "html",
+          content: '<p>ok</p><script>alert(1)</script><img src=x onerror="alert(2)">',
+        },
+      ],
+    };
+    const html = new ExportEngine(makeComposer({ root })).generateHTML();
+
+    expect(html).toContain("<p>ok</p>");
+    expect(html).not.toContain("<script>");
+    expect(html).not.toContain("onerror");
   });
 });
 

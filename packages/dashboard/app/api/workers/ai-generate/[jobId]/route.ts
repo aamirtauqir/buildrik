@@ -48,6 +48,9 @@ function sectionsToBlocks(sections: Array<{ type: string; html: string }>): Pris
       type: "container",
       tagName: "section",
       classes: [`ai-section-${sec.type}`],
+      // Whole generated sections are markup, not text. Without this the export
+      // path escapes them and the published site shows angle brackets.
+      contentFormat: "html" as const,
       content: sec.html,
       children: [],
     })),
