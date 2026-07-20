@@ -73,6 +73,10 @@ describe("ai-generate worker", () => {
     expect(genPage).toHaveBeenCalledTimes(2); // one per selected page
     // bold tone → bold style passed to generatePage
     expect(genPage.mock.calls[0][0].style).toBe("bold");
+    // ...and the tone itself travels on its own field. This handoff had no
+    // coverage: removing `tone: safeTone` from the worker left all five worker
+    // tests green while the model stopped hearing the answer.
+    expect(genPage.mock.calls[0][0].tone).toBe("bold");
 
     // claim writes the wizard's first real status, not BUILDING
     const claim = p.aIGenerationJob.updateMany.mock.calls[0][0];
@@ -90,6 +94,34 @@ describe("ai-generate worker", () => {
     expect(completed.data.siteId).toBe("site-1");
     // a CANCELLED job must not be overwritten by COMPLETED
     expect(completed.where.status).toEqual({ not: "CANCELLED" });
+  });
+
+  /**
+   * The regression, at the seam it happened. `style` has three values, the job's
+   * tone has six. professional, casual, creative and playful have no style to
+   * collapse onto, so they all became "modern" and the model could not tell them
+   * apart. Style still collapses — that is correct for a visual axis — but tone
+   * now rides its own field.
+   */
+  it("forwards a tone the 3-value style cannot express", async () => {
+    p.aIGenerationJob.findUnique.mockResolvedValue({
+      id: "j2", status: "QUEUED", workspaceId: "w1", userId: "u1",
+      businessType: "BUSINESS", selectedPages: ["landing"], description: "A bakery",
+      metadata: { tone: "playful" },
+    });
+    p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
+    p.site.findMany.mockResolvedValue([]);
+    txSiteCreate.mockResolvedValue({ id: "site-2" });
+    txPageCreateMany.mockResolvedValue({ count: 1 });
+    txJobUpdateMany.mockResolvedValue({ count: 1 });
+    genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
+
+    await POST(req("secret"), ctx);
+
+    const arg = genPage.mock.calls[0][0];
+    expect(arg.tone).toBe("playful");
+    // Style still falls back — "playful" names no visual treatment.
+    expect(arg.style).toBe("modern");
   });
 
   it("marks FAILED when generation throws, without creating any site", async () => {

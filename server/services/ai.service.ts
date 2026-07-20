@@ -141,7 +141,18 @@ export interface ContentGenerationResult {
 export interface PageGenerationInput {
   pageType: "landing" | "portfolio" | "product" | "pricing" | "blog";
   description: string;
+  /** Visual treatment. Three values on purpose — it drives layout weight. */
   style: "modern" | "minimal" | "bold";
+  /**
+   * Voice, which is a different axis from `style` and used to be squeezed
+   * through it. The AI-generate worker mapped the job's six-value tone onto the
+   * three-value style — `minimal`/`bold` passed through and professional,
+   * casual, creative and playful all became "modern" — so four of the wizard's
+   * five tone choices reached the model identical. Widening `style` to take
+   * tone words would have made one field mean two things; tone gets its own.
+   * Matches `generateSiteSchema.tone`, which already carries all six.
+   */
+  tone?: "professional" | "casual" | "creative" | "minimal" | "bold" | "playful";
 }
 
 export interface PageSection {
@@ -201,7 +212,7 @@ export async function generatePage(
     if (!schema) continue;
 
     const systemPrompt = `You are a web designer generating a ${sectionType} section for a ${input.pageType} page.
-Style: ${input.style}.
+Style: ${input.style}.${input.tone ? `\nTone: ${input.tone}.` : ""}
 Required fields: ${schema.fields.join(", ")}.
 Constraints: ${schema.constraints}
 

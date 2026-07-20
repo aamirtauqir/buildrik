@@ -119,7 +119,6 @@ export async function POST(
   });
   if (claim.count === 0) return new Response("Already claimed", { status: 409 });
 
-  // generatePage takes a 3-value style; the job stores a richer `tone`. Map it.
   const meta = job.metadata as Record<string, unknown> | null;
   const tone = (meta?.tone as string) ?? "";
   // Prefer the name the user typed; older jobs (no name in metadata) fall back
@@ -128,8 +127,19 @@ export async function POST(
     (meta?.name as string)?.trim() ||
     job.businessType.charAt(0) + job.businessType.slice(1).toLowerCase()
   ).slice(0, 100);
+  // Two axes, not one. `style` is the visual treatment generatePage takes in
+  // three values; `tone` is voice and now travels on its own field.
+  //
+  // This used to be the only thing tone fed, so professional, casual, creative
+  // and playful all collapsed to "modern" and four of the wizard's five tone
+  // choices reached the model identical. The collapse is still right FOR STYLE —
+  // only minimal and bold name a visual treatment — but it is no longer where
+  // tone goes to die.
   const safeStyle: "modern" | "minimal" | "bold" =
     tone === "minimal" ? "minimal" : tone === "bold" ? "bold" : "modern";
+  const safeTone = (["professional", "casual", "creative", "minimal", "bold", "playful"] as const).find(
+    (t) => t === tone
+  );
   const pages = job.selectedPages.length > 0 ? job.selectedPages : ["landing"];
   const description = job.description || job.businessType;
   // "placeholders" (labelled grey boxes) is the safe default when unset.
@@ -151,6 +161,7 @@ export async function POST(
         pageType: asPageType(pageName),
         description,
         style: safeStyle,
+        tone: safeTone,
       });
       const withImages = result.sections.map((s) => ({ ...s, html: rewriteImageSources(s.html, imagesPref) }));
       generated.push({ name: pageName, blocks: sectionsToBlocks(withImages) });

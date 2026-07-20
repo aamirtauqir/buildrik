@@ -27,15 +27,6 @@ const TONE_MAP: Record<string, "professional" | "casual" | "creative" | "minimal
   minimal: "minimal",
 };
 
-/** Human labels for the tone dropdown, for the folded clause. */
-const TONE_LABEL: Record<string, string> = {
-  professional: "professional",
-  friendly: "friendly",
-  premium: "premium",
-  bold: "bold",
-  minimal: "minimal",
-};
-
 const GOAL_LABEL: Record<string, string> = {
   leads: "get leads",
   calls: "book calls",
@@ -61,6 +52,12 @@ export const DESCRIPTION_BUDGET = 500;
  * answers, every one from the brand step among them. The user filled in three
  * screens of questions and the model saw two of them.
  *
+ * `tone` is deliberately NOT folded. It briefly was, because the worker used to
+ * collapse the job's six-value tone onto a three-value style and four of the
+ * five wizard choices arrived identical. `PageGenerationInput` now carries tone
+ * on its own field, so folding it too would say the same thing twice and spend
+ * description budget doing it.
+ *
  * Structured answers win the tie because the user picked them deliberately, they
  * are short, and they carry more signal per character than prose. Losing the tail
  * of a description shows up in the output; losing "Colors: deep green and cream"
@@ -72,15 +69,6 @@ export function buildGenerateInput(ai: NonNullable<WizardData["ai"]>) {
   if (ai.audience) clauses.push(`Audience: ${ai.audience}.`);
   if (ai.cta) clauses.push(`Primary CTA: ${ai.cta}.`);
   if (ai.location) clauses.push(`Location: ${ai.location}.`);
-  // Tone is folded even though `tone` is also a top-level schema field, because
-  // that field does not survive the trip. The worker collapses it to a 3-value
-  // style — `tone === "minimal" ? "minimal" : tone === "bold" ? "bold" : "modern"`
-  // (ai-generate/[jobId]/route.ts:131) — so professional, casual, creative and
-  // playful all arrive at the model as "modern", indistinguishable from each
-  // other. Four of the wizard's five tone choices meant nothing. Folding it puts
-  // the actual answer in the prompt. Placed before style because both come from
-  // the brand step and a deliberate dropdown choice outranks free-text refs.
-  if (ai.tone) clauses.push(`Tone: ${TONE_LABEL[ai.tone] ?? ai.tone}.`);
   if (ai.style) clauses.push(`Visual style: ${ai.style}.`);
   if (ai.color) clauses.push(`Colors: ${ai.color}.`);
   if (ai.refs) clauses.push(`Reference sites: ${ai.refs}.`);

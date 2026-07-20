@@ -53,7 +53,10 @@ const contentInputSchema = z.object({
 const pageInputSchema = z.object({
   pageType: z.enum(["landing", "portfolio", "product", "pricing", "blog"]),
   description: z.string().min(1).max(5000),
+  /** Visual treatment. */
   style: z.enum(["modern", "minimal", "bold"]),
+  /** Voice — a separate axis from style, matching `generateSiteSchema.tone`. */
+  tone: z.enum(["professional", "casual", "creative", "minimal", "bold", "playful"]).optional(),
 });
 
 const layoutInputSchema = z.object({

@@ -55,7 +55,6 @@ describe("buildGenerateInput", () => {
     expect(description).toContain("Audience:");
     expect(description).toContain("Primary CTA:");
     expect(description).toContain("Location:");
-    expect(description).toContain("Tone:");
     expect(description).toContain("Visual style:");
     expect(description).toContain("Colors:");
     expect(description).toContain("Reference sites:");
@@ -95,15 +94,14 @@ describe("buildGenerateInput", () => {
   });
 
   /**
-   * `tone` has a schema field of its own, and it still has to be folded. The
-   * worker collapses that field to a 3-value style — professional, casual,
-   * creative and playful all become "modern" — so four of the five wizard
-   * choices reached the model identical. The clause carries the real answer.
+   * Tone rides its own field all the way to the prompt now (PageGenerationInput
+   * .tone), so it must NOT also be folded — that would duplicate it and spend
+   * description budget saying the same thing twice.
    */
-  it("folds tone into the prompt even though the schema has a tone field", () => {
+  it("puts tone on its own field and keeps it out of the description", () => {
     const { description, tone } = buildGenerateInput({ desc: "A bakery", tone: "premium" });
     expect(tone).toBe("creative");
-    expect(description).toContain("Tone: premium.");
+    expect(description).not.toContain("Tone:");
   });
 
   it("maps the non-folded answers onto their own schema fields", () => {
