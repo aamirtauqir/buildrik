@@ -565,6 +565,38 @@ Button: Kind/Size/State; Input/Nav/Comment-row: variant props). Nothing about
 them needs rebuilding — the debt is purely that the screen frames don't yet
 instance them, and the highest-leverage seam (panel chrome) now does.
 
+### Pass 2 — Nav item, the other clean high-volume seam: 0 → 738 total
+
+Audited every component's consumer set for *safe* instanceability (uniform name,
+uniform size, content the component can hold via override, no missing slots):
+
+| Target | Consumers | Verdict |
+|---|---|---|
+| **Panel header** | 74 | ✅ done (pass 1) |
+| **Nav item** | **664** (Site 456 + Portfolio 208) | ✅ done — uniform 240×32, State variants (rest/active), single label override |
+| Empty state | 11 | ✗ skip — 8 different hand-sizes; one component size would regress them |
+| Progress row | 1 | ✗ not worth a pass |
+| Card / media | 38 | ✗ carries a source badge the component has no slot for |
+| Section header | ~40 real | ✗ needs variant surgery — tint on/off + count on/off, and the labels collide with inspector hex rows (`#406ED6`) under a naive match |
+| Row · Input · Button | 225 · 407 · many | ✗ carry varied content the components lack slots for; retrofit is per-node content re-application |
+
+**Total: 738 instances, 0 → 738.** The two highest-volume uniform seams — all
+panel chrome and every Site/Portfolio nav row — now resolve from one component
+each. Nav proof verified by read-back (grid intact, 0 overflow, 0 collisions);
+the 0.5× screenshot that looked empty was grey-on-white at low detail, not a
+regression.
+
+### What a full instancing would still need, and why it is a separate job
+
+The remaining atoms cannot be swept without regression because the components
+lack the slots the hand-built frames use (Card's source badge, Row's
+icon/meta/trailing content, Section header's tint) — the honest fix is to
+**author those slots/variants into the components first, then instance**, which
+is component-design work, not a find-and-replace. Doing it wrong (blind swap)
+would strip content from verified frames. It is the right investment for a
+long-lived system and a poor one for a handoff artifact, so it is left as a
+named, deliberate next phase rather than forced now.
+
 ### The bug that verification kept missing
 
 Batch 1b passed every check I ran — sizes, overflow, captions — while sitting on
