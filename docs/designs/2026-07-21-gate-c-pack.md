@@ -53,29 +53,41 @@ different claims, and the product only sells the second.
 
 ---
 
-## What blocks B, precisely
+## What blocks B — ~~one argument~~ one flag
 
-One argument.
+**The argument is fixed** (commit `d147664d`). `submitForReview` now takes and
+forwards `clientEmail`, the compose popover has the field, and the tests assert
+the address specifically rather than the call shape — the old test passed while
+the feature was dead, which is how it survived.
 
-```ts
-// packages/editor/src/services/ReviewService.ts:20
-export async function submitForReview(note?: string, changeSummary?: string) {
-  await client.reviews.submit.mutate({ siteId, note, changeSummary });
-  //                                                              ^
-  //                                            clientEmail is never passed
-}
-```
+Everything downstream was always ready (ship plan §1): `submitReviewInput`
+accepts `clientEmail`, `submitReview` mints a token when it gets one, the invite
+email sends, and `/review/<token>` renders, identifies, comments and approves
+against the real database.
 
-Everything downstream already works and is walked end to end (ship plan §1):
-`submitReviewInput` accepts `clientEmail`, `submitReview` mints a token when it
-gets one, the invite email sends, and `/review/<token>` renders, identifies,
-comments and approves against the real database.
+**What remains is one founder decision:** `reviews.submit` is gated on the
+`agency_layer` flag (`reviews.ts:32`). Turn it on for the pilot workspace, or
+lift the gate. Client review is deliberately *not* gated, so a legitimately
+issued link keeps working either way.
 
-Also needed for B: **decide the `agency_layer` flag** (`reviews.ts:32`) — turn it
-on for the pilot workspace, or lift the gate. Client review is deliberately not
-gated, so a legitimately issued link keeps working either way.
+Until that flag is decided, nothing has changed in production — the code is
+ready and inert.
 
-Neither is design work. Both are small. Neither is done.
+### One product decision the fix deliberately did not make
+
+`clientEmail` is kept **optional**, because the schema documents two real paths:
+
+> `clientEmail` — *"Omitted = submit to the internal admin queue only, without
+> inviting a client."*
+
+The **S5.1 drawing marks the field required** ("a link sent to nobody can never
+be signed"). Those disagree, and making it required would delete the internal
+path rather than fix a typo. **Founder's call:**
+
+- **Required** — every submission invites a client; the internal admin queue path
+  goes away. Matches the drawing and the wedge's story.
+- **Optional** — both paths stay; the field explains itself ("leave blank to keep
+  it internal"). Matches the schema and today's behaviour. **Currently shipped.**
 
 ---
 
