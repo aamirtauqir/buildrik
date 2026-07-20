@@ -54,7 +54,7 @@ export async function submitReview(
   // Every submit — first send OR re-send — mints a fresh token and kills the
   // previous one. Without this, round 1's link stays live forever and a client
   // who bookmarked it keeps approving a site that has moved on.
-  const { token } = await issueReviewToken(request.id);
+  const { token } = await issueReviewToken(request.id, clientEmail);
 
   await notifyReviewSubmitted(siteId, requestedById, note, changeSummary);
   if (clientEmail && token) {

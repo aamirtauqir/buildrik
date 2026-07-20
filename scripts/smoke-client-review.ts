@@ -35,8 +35,8 @@ async function main() {
     data: { siteId: site.id, requestedById: user!.id, status: "PENDING", changeSummary: "smoke" },
   });
 
-  // 1. token
-  const { token } = await issueReviewToken(review.id);
+  // 1. token — issued against the address the link was sent to
+  const { token } = await issueReviewToken(review.id, "sara@bella.test");
   token && token.length >= 40 ? ok(`token minted (${token.length} chars)`) : bad("token too short");
 
   // 2. load before identity
@@ -50,13 +50,26 @@ async function main() {
   await expectFail("NOT_IDENTIFIED", "approve before identity", () =>
     resolveReviewByToken(token!, "APPROVED"));
 
+  // 3b. ATTACK: read comments without identifying.
+  //     Before the fix this returned every comment on the site, internal ones
+  //     included, because `reviewerId ?? undefined` made Prisma drop the filter.
+  const internal = await prisma.comment.create({
+    data: { siteId: site.id, authorId: user!.id, body: "INTERNAL: do not show the client", status: "OPEN" },
+  });
+  await expectFail("NOT_IDENTIFIED", "list comments without identifying", () =>
+    listClientComments(token!));
+
+  // 3c. ATTACK: sign as someone the link was never sent to.
+  await expectFail("EMAIL_MISMATCH", "identify with a different address", () =>
+    identifyReviewer(token!, "Mallory", "mallory@evil.test"));
+
   // 4. identify
   const sara = await identifyReviewer(token!, "  Sara Khan ", "  SARA@Bella.test ");
   sara.email === "sara@bella.test" ? ok("email normalised + trimmed") : bad(`email = ${sara.email}`);
   sara.name === "Sara Khan" ? ok("name trimmed") : bad(`name = "${sara.name}"`);
 
   // 5. same person on a NEW token (the re-send case)
-  const round2 = await issueReviewToken(review.id);
+  const round2 = await issueReviewToken(review.id, "sara@bella.test");
   const sara2 = await identifyReviewer(round2.token!, "Sara Khan", "sara@bella.test");
   sara2.id === sara.id ? ok("round 2 recognises the same reviewer") : bad("duplicate reviewer created");
   await expectFail("INVALID_TOKEN", "round 1 token is dead after re-send", () =>
@@ -78,13 +91,19 @@ async function main() {
   await expectFail("ALREADY_RESOLVED", "double approve", () =>
     resolveReviewByToken(round2.token!, "APPROVED"));
 
+  // 7b. the client sees ONLY their own comments, never the internal one
+  const visible = await listClientComments(round2.token!);
+  visible.some((c) => c.body.startsWith("INTERNAL:"))
+    ? bad("internal comment leaked to the client")
+    : ok("internal comment not visible to the client");
+
   // 8. revoke
-  const r3 = await issueReviewToken(review.id);
+  const r3 = await issueReviewToken(review.id, "sara@bella.test");
   await revokeReviewToken(site.workspaceId, review.id);
   await expectFail("REVOKED", "revoked token", () => getReviewByToken(r3.token!));
 
   // 9. expiry
-  const r4 = await issueReviewToken(review.id);
+  const r4 = await issueReviewToken(review.id, "sara@bella.test");
   await prisma.reviewRequest.update({
     where: { id: review.id }, data: { expiresAt: new Date(Date.now() - 1000), revokedAt: null },
   });
@@ -93,7 +112,17 @@ async function main() {
   // 10. garbage
   await expectFail("INVALID_TOKEN", "unknown token", () => getReviewByToken("not-a-real-token-xxxxxxxxxxxxx"));
 
+  // 11. a review with no invited address: nobody may sign it
+  const uninvited = await prisma.reviewRequest.create({
+    data: { siteId: site.id, requestedById: user!.id, status: "PENDING" },
+  });
+  const ut = await issueReviewToken(uninvited.id);
+  await expectFail("NOT_INVITED", "sign a link sent to nobody", () =>
+    identifyReviewer(ut.token!, "Anyone", "anyone@test.test"));
+  await prisma.reviewRequest.delete({ where: { id: uninvited.id } });
+
   // cleanup
+  await prisma.comment.delete({ where: { id: internal.id } });
   await prisma.comment.deleteMany({ where: { reviewerId: sara.id } });
   await prisma.reviewRequest.delete({ where: { id: review.id } });
   await prisma.reviewer.delete({ where: { id: sara.id } });

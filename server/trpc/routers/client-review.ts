@@ -45,7 +45,12 @@ function translate(e: unknown): never {
         : e.code === "NOT_IDENTIFIED"
           ? "UNAUTHORIZED"
           : e.code === "ALREADY_RESOLVED"
-            ? "CONFLICT"
+          ? "CONFLICT"
+          : e.code === "EMAIL_MISMATCH" || e.code === "NOT_INVITED"
+            ? // Deliberately BAD_REQUEST, not FORBIDDEN: the page shows this
+              // inline under the email field, and it must not read as "your
+              // link is dead" when the link is fine and the address is wrong.
+              "BAD_REQUEST"
             : // EXPIRED and REVOKED are both "this link is dead" — FORBIDDEN, so
               // the page can render the expired screen rather than a 404.
               "FORBIDDEN";

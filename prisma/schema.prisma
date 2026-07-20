@@ -472,6 +472,11 @@ model ReviewRequest {
   /// Set when a re-send supersedes this link, or when the designer revokes
   /// it by hand. A revoked token is dead immediately; it is never reissued.
   revokedAt     DateTime?
+  /// The address the link was actually sent to. Identity capture must match
+  /// it — otherwise the token holder can sign as anyone, and an approval that
+  /// can be forged is worth less than no approval at all because it looks
+  /// authoritative. Null means no client was invited, and no client may sign.
+  invitedEmail  String?   @db.VarChar(320)
   /// Who reviewed. Captured on first visit (name + email, no password) and
   /// carried forward when a later round re-sends to the same person.
   reviewerId    String?
