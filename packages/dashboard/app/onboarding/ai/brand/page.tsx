@@ -9,9 +9,8 @@ import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
+import { TONES, STYLES } from "@lib/onboarding/wizard-options";
 
-const TONES = ["Professional", "Friendly", "Premium", "Bold", "Minimal"].map((t) => ({ value: t.toLowerCase(), label: t }));
-const STYLES = ["Clean SaaS", "Agency", "Local business", "Portfolio", "E-commerce"].map((s) => ({ value: s, label: s }));
 
 /** A3 · Brand style (AI Draft 3/3). Captures tone/style/color/reference sites,
  *  then fires the draft generation on A4. → A4.

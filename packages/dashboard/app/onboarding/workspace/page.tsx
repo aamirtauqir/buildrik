@@ -10,14 +10,8 @@ import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { OnbBanner } from "@/components/onboarding/wizard/onb-banner";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
+import { ROLES } from "@lib/onboarding/wizard-options";
 
-const ROLES = [
-  { value: "freelancer", label: "Freelancer" },
-  { value: "agency", label: "Agency" },
-  { value: "in-house", label: "In-house" },
-  { value: "student", label: "Student" },
-  { value: "other", label: "Other" },
-];
 
 const TEAM_SIZES = [
   { value: "just-me", label: "Just me" },

@@ -8,19 +8,7 @@ import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
-
-const GOALS = [
-  { value: "leads", label: "Get leads" },
-  { value: "calls", label: "Book calls" },
-  { value: "sell", label: "Sell products" },
-  { value: "portfolio", label: "Show portfolio" },
-  { value: "inform", label: "Share information" },
-];
-
-const PAGES = ["About", "Services", "Pricing", "Portfolio", "Contact", "Blog", "FAQ"].map((p) => ({
-  value: p,
-  label: p,
-}));
+import { GOALS, SUGGESTED_PAGES } from "@lib/onboarding/wizard-options";
 
 /** A2 · Goal, audience & pages (AI Draft 2/3). Home is always included. → A3. */
 export default function AiGoalPage() {
@@ -72,7 +60,7 @@ export default function AiGoalPage() {
             <OnbField label="Main CTA text" placeholder="Book a call" value={cta} onChange={(e) => setCta(e.target.value)} />
             <OnbChips
               label="Pages (Home is always included)"
-              options={PAGES}
+              options={SUGGESTED_PAGES}
               value={pages}
               onChange={(v) => setPages(v as string[])}
               multi

@@ -8,17 +8,8 @@ import { OnbButton } from "@/components/onboarding/wizard/onb-button";
 import { OnbBack } from "@/components/onboarding/wizard/onb-back";
 import { useWizard } from "@/components/onboarding/wizard/wizard-context";
 import { useOnboardingComplete } from "@/components/onboarding/wizard/use-onboarding-complete";
+import { INDUSTRIES } from "@lib/onboarding/wizard-options";
 
-const INDUSTRIES = [
-  { value: "restaurant", label: "Restaurant" },
-  { value: "clinic", label: "Clinic / Medical" },
-  { value: "agency", label: "Agency / Services" },
-  { value: "shop", label: "Shop" },
-  { value: "portfolio", label: "Portfolio" },
-  { value: "events", label: "Events" },
-  { value: "saas", label: "SaaS" },
-  { value: "other", label: "Other" },
-];
 
 /** A1 · Business basics (AI Draft 1/3). Captures industry + name + description
  *  into wizardData.ai. → A2. Back → S3.
