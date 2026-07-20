@@ -58,6 +58,13 @@ beforeEach(() => {
   userFindUnique.mockResolvedValue({ fullName: "Edie Editor", displayName: null, email: "edie@x.com" });
   memberFindMany.mockResolvedValue([{ user: { email: "admin@x.com" } }]);
   reviewFindUnique.mockResolvedValue({ note: "looks good", requestedById: "u1", site: { id: "s1", name: "Acme" } });
+  // submitReview issues a fresh share token on every submit (389e2c39 — each
+  // round must invalidate the previous link). That runs through
+  // issueReviewToken → prisma.reviewRequest.update, which this file mocks, so
+  // the default has to return a row carrying a token or submitReview throws
+  // destructuring it. Individual tests still override `update` with
+  // mockResolvedValueOnce for the assertions they care about.
+  update.mockResolvedValue({ id: "r1", token: "tok-default" });
 });
 
 describe("submitReview", () => {
@@ -72,7 +79,9 @@ describe("submitReview", () => {
 
   it("is idempotent — refreshes the open PENDING request instead of duplicating", async () => {
     findFirst.mockResolvedValueOnce({ id: "r-open" });
+    // Two update calls now: the idempotent refresh, then the token issue.
     update.mockResolvedValueOnce({ id: "r-open" });
+    update.mockResolvedValueOnce({ id: "r-open", token: "tok-refresh" });
     await submitReview("s1", "u1", "again");
     expect(create).not.toHaveBeenCalled();
     expect(update).toHaveBeenCalledWith({ where: { id: "r-open" }, data: { note: "again", changeSummary: null, requestedById: "u1" } });

@@ -80,7 +80,9 @@ describe("reviews router", () => {
     submitMock.mockResolvedValueOnce({ id: "r1", status: "PENDING" });
     const caller = reviewsRouter.createCaller(makeCtx() as never);
     await expect(caller.submit({ siteId: "s1", note: "ready" })).resolves.toMatchObject({ id: "r1" });
-    expect(submitMock).toHaveBeenCalledWith("s1", "u_1", "ready", undefined);
+    // 5 args since 389e2c39 added the optional clientEmail — omitted here, which
+    // is the "submit without inviting anyone" path.
+    expect(submitMock).toHaveBeenCalledWith("s1", "u_1", "ready", undefined, undefined);
   });
 
   it("list is Admin-gated and never queries if denied", async () => {
