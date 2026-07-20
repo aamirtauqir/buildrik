@@ -1,0 +1,119 @@
+name: Dashboard tests
+
+# Nothing ran the test suites on push. 8,900+ vitest tests and 109 Playwright
+# tests existed and were only ever executed by hand, so a red suite stayed red
+# until someone happened to look. Two of today's bugs (a webhook handler reading
+# a field Stripe removed, a DS gate that could not fail) were green locally for
+# the same reason: nobody was watching.
+#
+# Two jobs, deliberately split. `unit` needs no infrastructure and gates every
+# push. `e2e-smoke` needs Postgres and a built app, so it runs the dashboard
+# smoke floor rather than all 109 — a floor that always runs beats full coverage
+# that never does.
+
+on:
+  pull_request:
+    paths:
+      - "packages/dashboard/**"
+      - "packages/editor/**"
+      - "packages/shared/**"
+      - "server/**"
+      - "lib/**"
+      - "prisma/**"
+      - "__tests__/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+  push:
+    branches: [main]
+
+jobs:
+  unit:
+    name: vitest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Run vitest
+        run: pnpm vitest run
+        env:
+          DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
+          NEXTAUTH_SECRET: "ci-test-only"
+
+  e2e-smoke:
+    name: playwright smoke
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: buildrik_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: "postgresql://ci:ci@localhost:5432/buildrik_ci"
+      NEXTAUTH_SECRET: "ci-test-only"
+      NEXTAUTH_URL: "http://localhost:3000"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      NEXT_PUBLIC_UNIFIED_EDITOR: "true"
+      # Deliberately absent: BROWSERSTACK_USERNAME / BROWSERSTACK_ACCESS_KEY.
+      # playwright.config.ts derives `isBS` from those two, and when they are set
+      # it swaps the local chromium projects out for the paid cloud grid. Leaving
+      # them unset is what selects the local projects. Do not add them here.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Migrate + seed
+        run: |
+          pnpm db:generate
+          pnpm exec prisma migrate deploy
+          pnpm exec tsx prisma/seed.ts
+
+      - name: Install Chromium
+        working-directory: packages/dashboard
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Dashboard smoke floor
+        working-directory: packages/dashboard
+        # dashboard.spec.ts is the floor: every destination renders its own h1
+        # with the persistent nav. The `setup` project is pulled in by
+        # `dependencies`, so this also proves the auth fixture still works.
+        run: pnpm exec playwright test --project=chromium e2e/dashboard.spec.ts
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: packages/dashboard/playwright-report/
+          retention-days: 7

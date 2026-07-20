@@ -6,6 +6,18 @@ const prisma = new PrismaClient();
 const QA_EMAIL = "qa@buildrik.local";
 const QA_PASSWORD = "qa-test-1234";
 
+// A SECOND e2e account, for the onboarding fixture only.
+//
+// auth.setup.ts needs a user past the wizard; onboarding.setup.ts needs one
+// inside it, and resets OnboardingState to get there. Both Playwright setup
+// projects run concurrently, so while they shared one account they wrote the
+// same row in opposite directions and whichever lost took its dependents with
+// it — 81 tests skipped, silently, depending on who won the race.
+//
+// Self-provisioning alone does not fix that; it makes both fixtures write, so
+// they race harder. They need separate accounts AND to own their own state.
+const QA_ONB_EMAIL = "qa-onboarding@buildrik.local";
+
 async function main() {
   const passwordHash = await bcrypt.hash(QA_PASSWORD, 10);
 
@@ -44,7 +56,45 @@ async function main() {
     },
   });
 
+  // The onboarding fixture's own account. Its OnboardingState is deliberately
+  // NOT seeded — onboarding.setup.ts upserts the state it needs on each run.
+  const onbUser = await prisma.user.upsert({
+    where: { email: QA_ONB_EMAIL },
+    update: { passwordHash, emailVerified: new Date() },
+    create: {
+      email: QA_ONB_EMAIL,
+      fullName: "QA Onboarding Tester",
+      displayName: "qa-onb",
+      passwordHash,
+      emailVerified: new Date(),
+      provider: "email",
+    },
+  });
+
+  const onbWorkspace = await prisma.workspace.upsert({
+    where: { slug: "qa-onboarding-workspace" },
+    update: {},
+    create: {
+      name: "QA Onboarding Workspace",
+      slug: "qa-onboarding-workspace",
+      ownerId: onbUser.id,
+      plan: "FREE",
+    },
+  });
+
+  await prisma.workspaceMember.upsert({
+    where: { userId_workspaceId: { userId: onbUser.id, workspaceId: onbWorkspace.id } },
+    update: { role: "OWNER", status: "ACTIVE" },
+    create: {
+      userId: onbUser.id,
+      workspaceId: onbWorkspace.id,
+      role: "OWNER",
+      status: "ACTIVE",
+    },
+  });
+
   console.log(`Seeded user ${QA_EMAIL} / ${QA_PASSWORD}`);
+  console.log(`Seeded user ${QA_ONB_EMAIL} / ${QA_PASSWORD} (onboarding fixture)`);
 
   await seedHelpArticles();
   await seedTemplates();

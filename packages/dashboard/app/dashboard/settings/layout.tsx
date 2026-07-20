@@ -17,7 +17,11 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   if (!section) {
     return (
       <div>
-        <PageHeader title="General settings" description="Workspace name, branding, and defaults." />
+        {/* The index is the directory, so it is titled for the directory. It
+            used to carry "General settings" and the Workspace & branding
+            blurb — the name and description of one of the cards listed on this
+            very page, which read as if the user had already drilled in. */}
+        <PageHeader title="Settings" description="Manage your workspace, plan, sites and account." />
         <div className="min-w-0">{children}</div>
       </div>
     );

@@ -159,8 +159,10 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
 
   return (
     <div>
+      {/* Title matches the nav label. `shell/nav.ts:25` is the SSOT for what
+          this destination is called; the page had drifted to "Media library". */}
       <PageHeader
-        title="Media library"
+        title="Media"
         description="Images, logos and assets across your sites."
         actions={
           <Button type="button" onClick={onPickFiles} disabled={uploading} className="gap-1.5">

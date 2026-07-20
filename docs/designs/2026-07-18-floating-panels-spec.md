@@ -208,7 +208,7 @@ Chat is inline in ⌘K. A **run** promotes here, because you watch a multi-step 
 
 ---
 
-## 6. Notifications — opened from the topbar bell
+## 6a. Notifications — opened from the topbar bell
 
 The third occupant of the §1 frame. **The bell sits in the topbar, right of the save pill, left of the CTA** — 32 × 32 in the 56h band, unread shown as an 8px accent dot (top-right, no number under 10, `9+` above).
 
@@ -242,9 +242,9 @@ Backend already exists: `Notification` + `NotificationPref` models and a router 
 
 ---
 
-## 7. The modal kit — one frame, eight instances
+## 7. The modal kit — one frame, thirteen instances
 
-Modals were the last surface drawn independently eight times. One frame, three widths, one set of rules.
+Modals were the last surface drawn independently every time. One frame, three widths, one set of rules.
 
 ```
 ┌─ W ─────────────────────────────────┐
@@ -262,17 +262,19 @@ Modals were the last surface drawn independently eight times. One frame, three w
 
 | Width | For | Instances |
 |---|---|---|
-| **440** | a question | confirm · delete · conflict · recovery · new page · template apply |
+| **440** | a question | confirm · delete · conflict · recovery · new page · template apply · optimise images |
 | **560** | a short flow | brand push (5 steps) · collection setup · publish progress |
-| **580** | a form | page settings · record editor |
+| **580** | a form | page settings · record editor · paste HTML |
 | *full-bleed* | direct manipulation | image editor · replace-across — these are **not modals**, they are takeovers with their own chrome |
+
+*(Reconciled 2026-07-20: three files named three different modal sets — this table listed eleven under a heading that said eight, `drawer-cargo-sheets.md` named eight including two takeovers, and the rendered summary repeated that. `paste HTML` and `optimise images` were real omissions and are now in the table; `image editor` and `replace-across` stay out of the count because they are takeovers. **This table is the SSOT for the modal set.**)*
 
 **Rules that apply to every instance:**
 
-- **Scrim** `rgba(15,23,42,.32)`, click-to-close **only when nothing is unsaved**. A dirty form ignores the scrim click and pulses the frame once — losing a filled form to a stray click is the cheapest possible way to lose trust.
+- **Scrim** `rgba(15,23,42,.4)`, click-to-close **only when nothing is unsaved**. A dirty form ignores the scrim click and pulses the frame once — losing a filled form to a stray click is the cheapest possible way to lose trust.
 - **Esc closes**, with the same dirty rule. Enter confirms only when the primary is non-destructive.
 - **Focus traps inside**, first focusable on open, returns to the trigger on close.
-- **Radius 12** (`lg`), shadow `0 12px 32px rgba(15,23,42,.16)`, **z-index 100** — the top of the stack, above ⌘K (90) and toasts (80). Scrim `rgba(15,23,42,.4)` per `editor-shell-wireframes.md` §5.9. *(Corrected 2026-07-19: this said 80, which is the toast layer — a modal would have opened underneath its own toasts.)*
+- **Radius 12** (`lg`), shadow `0 12px 32px rgba(15,23,42,.16)`, **z-index 100** — the top of the stack, above ⌘K (90) and toasts (80). Scrim is `rgba(15,23,42,.4)` per `editor-shell-wireframes.md` §5.9, stated once above. *(Corrected 2026-07-20: this section carried `.32` three lines earlier and `.4` here — the shell wireframes are the authority, so `.4` wins and the outlier is gone.)* *(Corrected 2026-07-19: this said 80, which is the toast layer — a modal would have opened underneath its own toasts.)*
 - **Vertically centred**, and **never resizes between steps** — a multi-step modal fixes its body height to its tallest step. A frame that jumps as you advance reads as a bug.
 - **Destructive primaries are red and named**: `Delete 3 pages`, not `Confirm`. Typed confirmation only for brand push (contracts §5) — everywhere else a named button is enough friction.
 - **One modal at a time.** A modal that opens a modal is a flow that wanted to be a drill-in.

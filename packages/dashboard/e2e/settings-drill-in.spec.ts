@@ -14,7 +14,12 @@ test("the directory lists sections and does not show a tab rail", async ({ page 
   await page.goto("/dashboard/settings");
   await page.locator("h1").first().waitFor({ state: "visible", timeout: 30_000 });
 
-  await expect(page.locator("h1")).toHaveText("General settings");
+  // The index is the directory of section cards, so it is titled for the
+  // directory. It used to read "General settings" — the name of one of the cards
+  // listed on this very page — and this test asserted that, while
+  // dashboard.spec.ts asserted /^Settings$/i. Two specs contradicted each other
+  // and the code could only satisfy one.
+  await expect(page.locator("h1")).toHaveText("Settings");
   await expect(page.locator('nav[aria-label="Settings sections"]')).toHaveCount(0);
   // Every settings-owned section should be reachable as a card. Scoped to <main>:
   // the sidebar's "Upgrade plan" also links to /settings/plans, so an unscoped

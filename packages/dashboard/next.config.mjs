@@ -2,6 +2,28 @@ import { withSentryConfig } from "@sentry/nextjs";
 import { IA_V2_REDIRECTS } from "../../lib/ia-v2-redirects.mjs";
 
 /** @type {import('next').NextConfig} */
+// `unsafe-eval` is a Turbopack dev requirement, not a production one: there is
+// no `eval(` or `new Function(` anywhere in packages/editor/src, so nothing the
+// app ships needs it. Dropping it in production costs nothing and removes the
+// primitive most exploit chains reach for first.
+//
+// `unsafe-inline` stays for now. Next's hydration inlines bootstrap scripts, and
+// removing it needs a nonce middleware that does not exist yet — that is a
+// separate task, not a one-line config edit. Tracked in TODOS.md.
+const isDev = process.env.NODE_ENV !== "production";
+const scriptSrc = isDev
+  ? "'self' 'unsafe-inline' 'unsafe-eval'"
+  : "'self' 'unsafe-inline'";
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src ${scriptSrc}`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net",
+  "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net",
+  "img-src 'self' data: https:",
+  "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net",
+  "connect-src 'self' https://fonts.bunny.net",
+].join("; ");
+
 const nextConfig = {
   // Standalone output for cPanel / LiteSpeed Node-app deploys.
   // Produces .next/standalone/ — a self-contained portable Node server
@@ -51,7 +73,7 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
           { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
-          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; img-src 'self' data: https:; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://fonts.bunny.net; connect-src 'self' https://fonts.bunny.net" },
+          { key: "Content-Security-Policy", value: contentSecurityPolicy },
         ],
       },
       {

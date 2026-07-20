@@ -288,6 +288,6 @@ This is the wedge's address. Sign-off *status* stays ambient — topbar pill, ca
 ## 7. What this file does NOT cover
 
 - **Inspector** — separate spec needed (ordered section list per profile + control anatomy). Highest-traffic surface; the shell doc's §2-vs-§5.6 contradiction is now fixed but the section order is still unwritten.
-- **The modal kit** — this file names ~8 modals (paste-HTML · page-settings 580 · collection setup · record editor · image editor · optimise · replace-across · starters-apply confirm). They need one shared modal frame + per-instance layouts.
+- **The modal kit** — the modals this file reaches for (paste HTML · page settings · collection setup · record editor · optimise images · template apply) are all instances of the one frame in `2026-07-18-floating-panels-spec.md` §7, which is the SSOT for the set and its three widths. Image editor and replace-across are **takeovers, not modals** — they carry their own chrome.
 - **The four floating panels** — ⌘K palette · Versions+Compare · Issues panel · AI panel.
 - **Content stress** — 40-page tree, 200-node layer tree, 12 overlapping pins.

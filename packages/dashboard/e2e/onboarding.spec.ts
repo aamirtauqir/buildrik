@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { QA_ONBOARDING_EMAIL } from "./accounts";
 import { test, expect } from "@playwright/test";
 import { PrismaClient } from "@prisma/client";
 
@@ -13,7 +14,7 @@ import { PrismaClient } from "@prisma/client";
 async function resetOnboardingUser() {
   const prisma = new PrismaClient();
   try {
-    const email = process.env.PW_ONB_EMAIL ?? "qa@buildrik.local";
+    const email = QA_ONBOARDING_EMAIL;
     const user = await prisma.user.findFirst({ where: { email }, select: { id: true } });
     if (!user) throw new Error(`No user "${email}" in the DB — seed it before running e2e.`);
 
@@ -79,7 +80,7 @@ test.describe("onboarding · workspace", () => {
 
   test("a name that collides with another of the user's workspaces shows the exists error", async ({ page }) => {
     const prisma = new PrismaClient();
-    const email = process.env.PW_ONB_EMAIL ?? "qa@buildrik.local";
+    const email = QA_ONBOARDING_EMAIL;
     const clashName = `E2E Clash ${randomUUID().slice(0, 8)}`;
     let clashWorkspaceId: string;
     try {

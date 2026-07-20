@@ -2,11 +2,12 @@ import path from "node:path";
 import { randomUUID, createHash } from "node:crypto";
 import { test as setup, expect } from "@playwright/test";
 import { PrismaClient } from "@prisma/client";
+import { QA_ONBOARDING_EMAIL } from "./accounts";
 
 // Mirrors auth.setup.ts's magic-link mint, but also resets OnboardingState so
 // the post-login redirect lands the user in the wizard instead of /dashboard.
 const AUTH_FILE = path.resolve(__dirname, ".auth/onboarding.json");
-const EMAIL = process.env.PW_ONB_EMAIL ?? "qa@buildrik.local";
+const EMAIL = QA_ONBOARDING_EMAIL;
 
 setup("authenticate into an incomplete wizard", async ({ page }) => {
   const prisma = new PrismaClient();
@@ -24,6 +25,33 @@ setup("authenticate into an incomplete wizard", async ({ page }) => {
       update: { completed: false, dismissed: false, wizardData: {}, step: "ROLE_SELECT" },
       create: { userId: user.id, completed: false, dismissed: false, wizardData: {}, step: "ROLE_SELECT" },
     });
+
+    // Drop every workspace this user picked up beyond the seeded one.
+    //
+    // The wizard's workspace step creates a real workspace, so each walkthrough
+    // leaves another one behind. Once the user has more than one membership the
+    // post-login redirect stops at /auth/workspace-select
+    // (`app/auth/redirect/page.tsx:35`) instead of continuing into the wizard,
+    // and this fixture times out. It passes on a fresh seed and fails on every
+    // run after — the same accumulate-until-broken shape as the OnboardingState
+    // reset above, which is why both are handled here rather than in the seed.
+    const seeded = await prisma.workspace.findUnique({
+      where: { slug: "qa-onboarding-workspace" },
+      select: { id: true },
+    });
+    if (seeded) {
+      const strays = await prisma.workspaceMember.findMany({
+        where: { userId: user.id, workspaceId: { not: seeded.id } },
+        select: { workspaceId: true },
+      });
+      if (strays.length > 0) {
+        const ids = strays.map((s) => s.workspaceId);
+        await prisma.workspaceMember.deleteMany({ where: { userId: user.id, workspaceId: { in: ids } } });
+        // Only remove workspaces this user owns — never one they were invited to.
+        await prisma.workspace.deleteMany({ where: { id: { in: ids }, ownerId: user.id } });
+      }
+    }
+
     token = randomUUID();
     await prisma.verificationToken.create({
       data: {
