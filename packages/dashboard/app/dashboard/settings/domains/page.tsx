@@ -54,8 +54,8 @@ export default function WorkspaceDomainsPage() {
                 <tr className="border-b text-left text-body-sm uppercase tracking-wide text-neutral-500" style={{ borderColor: "var(--color-border-default)" }}>
                   <th className="px-4 py-2.5 font-medium">Domain</th>
                   <th className="px-4 py-2.5 font-medium">Site</th>
-                  <th className="px-4 py-2.5 font-medium">Status</th>
                   <th className="px-4 py-2.5 font-medium">SSL</th>
+                  <th className="px-4 py-2.5 font-medium">Status</th>
                   <th className="px-4 py-2.5" />
                 </tr>
               </thead>
@@ -73,17 +73,17 @@ export default function WorkspaceDomainsPage() {
                         <Link href={`/dashboard/sites/${d.siteId}/domains`} className="text-[var(--color-primary)] hover:underline">{d.siteName}</Link>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-body-sm font-medium" style={{ color: s.color, backgroundColor: s.bg }}>
-                          {d.status === "PENDING" && <Clock className="h-3 w-3" />}
-                          {s.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
                         {sslOk ? (
                           <span className="inline-flex items-center gap-1 text-body-sm text-[var(--color-success)]"><ShieldCheck className="h-3.5 w-3.5" /> Secured</span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-body-sm text-neutral-400"><ShieldAlert className="h-3.5 w-3.5" /> Pending</span>
                         )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-body-sm font-medium" style={{ color: s.color, backgroundColor: s.bg }}>
+                          {d.status === "PENDING" && <Clock className="h-3 w-3" />}
+                          {s.label}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         {d.status === "VERIFIED" && (

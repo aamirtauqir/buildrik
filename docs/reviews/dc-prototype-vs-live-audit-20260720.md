@@ -49,25 +49,35 @@ one deviating — it simply never loaded the right family.
 ### Home
 - Live carries a floating "Getting Started 0/7" panel and a FAB the prototype has no
   equivalent for.
-- **Storage widget is visually broken** — "Upgrade plan" clips to "ade plan" and a
-  floating avatar overlaps it. This is a live bug, not a prototype difference.
+- ~~Storage widget is visually broken~~ — **retracted, this was a tool artifact.**
+  The first pass read a screenshot in which "Upgrade plan" appeared clipped to "ade
+  plan" under a dark circular badge. The badge is `nextjs-portal`, Next.js's own
+  dev-tools indicator, which sits at the bottom-left in development and never ships.
+  Measured directly on a FREE-plan workspace the widget is intact: the link sits at
+  x 0–292 inside a 293px sidebar, `fitsHorizontally` and `fitsVertically` both true,
+  `scrollWidth === clientWidth`, and the only element over it is its own container.
+  Nothing to fix.
 
 ### Projects
-- Title: "All projects" → live "Projects".
-- Primary CTA: "New project" → live "New site".
+- ~~Title: "All projects" → live "Projects"~~ — **retracted, see the title section below.**
+- ~~Primary CTA: "New project" → live "New site"~~ — **retracted.** Live's entity is
+  Site end to end: the model, `/dashboard/sites/[id]`, the site-detail page, and the
+  home quick action "Create a site". The prototype is not consistent here either — its
+  own home screen also says "Create a site" while its Projects screen says "New
+  project". Renaming one button would import that split for no gain.
 - Tabs: prototype "All sites | Apps", live "All sites | Archived". The **Apps tab has
   no live counterpart**.
 - Live has a "Select" bulk-mode affordance the prototype does not show.
 
 ### Media
-- Title: "Media library" → live "Media".
+- ~~Title: "Media library" → live "Media"~~ — **retracted, see below.**
 
 ### Templates
 - Template cards offer **"Use"**; live shows **"Coming soon"** — the templates are not
   wired up.
 
 ### Settings
-- Title: "General settings" → live "Settings".
+- ~~Title: "General settings" → live "Settings"~~ — **retracted, see below.**
 - Prototype rows with no live equivalent *in settings*: **Review & comments**,
   **Partner program**. Both features exist in live, but under `/dashboard/agency/*`.
   This is an information-architecture difference, not missing functionality.
@@ -100,7 +110,7 @@ limits are plan tier, not design).
 
 ## Do NOT implement
 
-Three places where following the prototype would make the product worse:
+Four places where following the prototype would make the product worse:
 
 1. **Plans pricing.** Prototype: Starter $0 / Freelancer $18 / Agency $58 /
    Enterprise. Live: Free $0 / Pro $29 / Business $79. Live is the real model — it is
@@ -109,6 +119,25 @@ Three places where following the prototype would make the product worse:
 2. **Body font.** Prototype uses Inter; live uses Inter Tight per DESIGN.md.
 3. **Settings → Notifications and Settings → Add-ons.** Both are dead links in the
    prototype itself — clicking them does not navigate. There is nothing to copy.
+4. **The three page titles.** The first pass listed "All projects", "Media library"
+   and "General settings" as trivial copy fixes. They were applied, then reverted:
+   they are not three loose strings but one shipped IA v2 rule — each of the six
+   workspace destinations is titled with its own nav label.
+
+   | nav label | h1 |
+   |---|---|
+   | Projects | Projects |
+   | Agency | Agency |
+   | Media | Media |
+   | Templates | Templates |
+   | Settings | Settings |
+
+   `e2e/dashboard.spec.ts:5` states it outright ("The 6 workspace destinations
+   (IA v2). Each must render its own h1"), and Settings has its own written history:
+   `e2e/settings-drill-in.spec.ts:18` records that it *used* to read "General
+   settings" — the name of one of the cards on that very page — that two specs
+   contradicted each other over it, and that "Settings" was the resolution. The
+   prototype breaks the rule in all three places.
 
 ## Second pass — after seeding
 
@@ -196,13 +225,11 @@ no folders were seeded, so whether live renders folder cards when they exist is
    any non-`PAID` invoice lose the billing page entirely. Fix the vocabulary at the
    source (one list, derived from what Stripe actually sends) rather than patching
    the map, and make the unknown case render a neutral pill instead of throwing.
-2. **Storage widget** — clipped label, overlapping avatar. Cheap.
-3. **Copy deltas** — three titles and one CTA (Projects, Media, Settings). Trivial.
-4. **Learn screen** — the only screen with genuinely missing structure: the
+2. **Learn screen** — the only screen with genuinely missing structure: the
    "Continue learning" hero card with Resume and progress, plus the per-path
    status chips. Largest single piece of UI work here.
-5. **Domains column order** — swap SSL and Status. One line.
-6. **Decide, do not assume.** Four places where the prototype and the shipped
+3. **Domains column order** — swap SSL and Status. One line.
+4. **Decide, do not assume.** Four places where the prototype and the shipped
    product genuinely disagree and someone has to choose: the Projects **Apps tab**,
    Help category naming, whether Projects should group into **folder cards**, and
    whether the prototype's flat sidebar should override the shipped Agency IA.
