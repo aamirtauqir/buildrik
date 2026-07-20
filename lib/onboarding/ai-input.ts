@@ -27,6 +27,15 @@ const TONE_MAP: Record<string, "professional" | "casual" | "creative" | "minimal
   minimal: "minimal",
 };
 
+/** Human labels for the tone dropdown, for the folded clause. */
+const TONE_LABEL: Record<string, string> = {
+  professional: "professional",
+  friendly: "friendly",
+  premium: "premium",
+  bold: "bold",
+  minimal: "minimal",
+};
+
 const GOAL_LABEL: Record<string, string> = {
   leads: "get leads",
   calls: "book calls",
@@ -63,6 +72,15 @@ export function buildGenerateInput(ai: NonNullable<WizardData["ai"]>) {
   if (ai.audience) clauses.push(`Audience: ${ai.audience}.`);
   if (ai.cta) clauses.push(`Primary CTA: ${ai.cta}.`);
   if (ai.location) clauses.push(`Location: ${ai.location}.`);
+  // Tone is folded even though `tone` is also a top-level schema field, because
+  // that field does not survive the trip. The worker collapses it to a 3-value
+  // style — `tone === "minimal" ? "minimal" : tone === "bold" ? "bold" : "modern"`
+  // (ai-generate/[jobId]/route.ts:131) — so professional, casual, creative and
+  // playful all arrive at the model as "modern", indistinguishable from each
+  // other. Four of the wizard's five tone choices meant nothing. Folding it puts
+  // the actual answer in the prompt. Placed before style because both come from
+  // the brand step and a deliberate dropdown choice outranks free-text refs.
+  if (ai.tone) clauses.push(`Tone: ${TONE_LABEL[ai.tone] ?? ai.tone}.`);
   if (ai.style) clauses.push(`Visual style: ${ai.style}.`);
   if (ai.color) clauses.push(`Colors: ${ai.color}.`);
   if (ai.refs) clauses.push(`Reference sites: ${ai.refs}.`);
