@@ -41,6 +41,23 @@ consciously not done, not when they were forgotten.
   `PW_BS=1`, or drop the projects. Never derive an expensive default from a
   credential being present.
 
+## Auth (surfaced by the 2026-07-20 flow investigation)
+
+- [ ] **Auth forms have no inline per-field validation.** Nine screens pass the
+  server error straight to a banner (`setError(err.message)` in page, signup,
+  magic-link, forgot-password, reset-password, invite, join-workspace,
+  workspace-setup). `trpc.ts:58` already rewrites Zod failures from raw JSON to
+  `field: message`, so the output is readable — but submitting an empty login
+  puts `"email: Please enter a valid email address; password: Password must be
+  at least 8 characters"` in a banner above the OAuth buttons, when onboarding
+  would have shown each error under its own field on blur. Not broken; visibly
+  less finished than the flow next to it, on the product's front door.
+
+- [ ] **No e2e coverage of auth interactions.** 15 auth screens carry forms and
+  mutations; the suite only uses the magic-link path programmatically to mint a
+  session. Login, signup, 2FA, invite, reset-password, verify-email,
+  change-email and join-workspace have never been exercised by a test.
+
 ## Product (surfaced by the 2026-07-20 CEO review, not yet scheduled)
 
 - [ ] **No product analytics.** `sidebarAnalytics.ts` is a console.log stub.
