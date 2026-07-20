@@ -21,10 +21,11 @@ export function currentSiteId(): string | null {
  * Submit the current site for review.
  *
  * `clientEmail` is what turns this from an internal request into a client
- * sign-off: `submitReview` mints a review token when it receives one and emails
- * the client the `/review/<token>` link. Omitted, the submission goes to the
- * internal admin queue only and no link is ever issued — the two paths the
- * `submitReviewInput` schema documents.
+ * sign-off. `submitReview` always mints (or, on re-send, replaces) a review
+ * token; supplying `clientEmail` additionally records the invited address and
+ * emails the client the `/review/<token>` link. Omitted, a token is still
+ * created but no invite is sent and the review page rejects unidentified
+ * visitors — effectively internal, though a tokenised record exists.
  */
 export async function submitForReview(
   note?: string,

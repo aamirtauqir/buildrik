@@ -61,8 +61,10 @@ the address specifically rather than the call shape — the old test passed whil
 the feature was dead, which is how it survived.
 
 Everything downstream was always ready (ship plan §1): `submitReviewInput`
-accepts `clientEmail`, `submitReview` mints a token when it gets one, the invite
-email sends, and `/review/<token>` renders, identifies, comments and approves
+accepts `clientEmail`; `submitReview` **always mints (and on re-send replaces) a
+review token** (`review.service.ts:54`), and *when a `clientEmail` is supplied* it
+additionally records the invited address and sends the `/review/<token>` invite
+email (`review.service.ts:60`). The page renders, identifies, comments and approves
 against the real database.
 
 **What remains is one founder decision:** `reviews.submit` is gated on the
@@ -73,21 +75,31 @@ issued link keeps working either way.
 Until that flag is decided, nothing has changed in production — the code is
 ready and inert.
 
-### One product decision the fix deliberately did not make
+### The no-email path, described honestly
 
-`clientEmail` is kept **optional**, because the schema documents two real paths:
+`clientEmail` is **optional** — consistently, in three places: the schema
+(`reviews.ts:20`), the shipped compose field (*"leave blank to keep it
+internal"*), and the current S5.1 drawing, which no longer marks it required.
+There is no contradiction to resolve; the earlier "required vs optional" framing
+is retired.
 
-> `clientEmail` — *"Omitted = submit to the internal admin queue only, without
-> inviting a client."*
+**What actually happens with no email — precisely, because a founder will assume
+"internal = nothing exists":**
 
-The **S5.1 drawing marks the field required** ("a link sent to nobody can never
-be signed"). Those disagree, and making it required would delete the internal
-path rather than fix a typo. **Founder's call:**
+- `submitReview` **still mints a token** (`review.service.ts:54`) — a review record
+  with a live `/review/<token>` exists.
+- But **no invite email is sent** (`review.service.ts:60`), so nobody is handed the
+  link.
+- And if someone did reach the page, `identifyReviewer` rejects them `NOT_INVITED`
+  (`client-review.service.ts:173`) because no address was invited.
 
-- **Required** — every submission invites a client; the internal admin queue path
-  goes away. Matches the drawing and the wedge's story.
-- **Optional** — both paths stay; the field explains itself ("leave blank to keep
-  it internal"). Matches the schema and today's behaviour. **Currently shipped.**
+Net: with no email it is **effectively internal** — no client can get in — but a
+tokenised record does exist. It is *not* "no link is ever issued." (Earlier
+drafts of this pack and the `ReviewService` comment said that; both corrected.)
+
+If the founder wants **invite-only** — every submit must name a client — that is a
+product choice, not a bug fix, and it would remove the internal-queue path the
+schema currently documents.
 
 ---
 
