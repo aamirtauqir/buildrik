@@ -741,6 +741,31 @@ control cells, Brand sub-screen rows, Content field/var/cond rows, Pages rows,
 empty states) where a component would add indirection without reuse — left inline
 by design, not omission.
 
+---
+
+## 8. Colour QA — every chrome fill is token-bound
+
+A final sweep for the class of bug the structural checks cannot see: unbound /
+raw-hex fills (the `setBoundVariableForPaint` black-fill trap, wrong colours,
+mode-resolution misses). **11,272 solid fills scanned; no rendering bug found.**
+
+- **95.6% were already bound** to variables.
+- The unbound remainder split into two legitimate kinds and one gap:
+  - **Mock site content** — the Bella Cucina site rendered *inside* the editor
+    canvas uses its own colours, not editor tokens. Correct; left raw.
+  - **Token swatches** (Brand token-detail) — a swatch showing `#406ED6` *is* the
+    literal value, like the Foundations specimens. Correct; left raw.
+  - **Container backgrounds** — 1,401 structural `#FFFFFF` fills
+    (Body/Content/Column/Group) were unbound. Invisible (white-on-white), but they
+    failed the DESIGN.md "bind fills to variables" gate. **All bound to
+    `color/bg-card`** — zero visual change, verified. 0 unbound white chrome fills
+    remain.
+
+**Final file state: 239 frames · 239 captions · 15 components · ~1169 instances ·
+0 overflow · 0 collisions · 0 collapsed containers · every chrome fill
+token-bound.** Design-side, the file is complete and clean; what remains
+(`agency_layer` flag, Gate C with a real client) is founder-side.
+
 ### The bug that verification kept missing
 
 Batch 1b passed every check I ran — sizes, overflow, captions — while sitting on
