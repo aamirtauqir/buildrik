@@ -34,7 +34,14 @@ const TOKEN_TTL_DAYS = 90;
 
 export class ClientReviewError extends Error {
   constructor(
-    public code: "INVALID_TOKEN" | "EXPIRED" | "REVOKED" | "ALREADY_RESOLVED" | "NOT_IDENTIFIED",
+    public code:
+    | "INVALID_TOKEN"
+    | "EXPIRED"
+    | "REVOKED"
+    | "ALREADY_RESOLVED"
+    | "NOT_IDENTIFIED"
+    | "NOT_INVITED"
+    | "EMAIL_MISMATCH",
     message: string,
   ) {
     super(message);
@@ -60,11 +67,16 @@ export function tokenExpiry(from: Date = new Date()): Date {
  * old link — otherwise every round a designer ever sent stays live forever,
  * and a client who bookmarked round 1 keeps approving a site that has moved on.
  */
-export async function issueReviewToken(reviewId: string) {
+export async function issueReviewToken(reviewId: string, invitedEmail?: string) {
   return prisma.reviewRequest.update({
     where: { id: reviewId },
-    data: { token: mintToken(), expiresAt: tokenExpiry(), revokedAt: null },
-    select: { id: true, token: true, expiresAt: true, siteId: true },
+    data: {
+      token: mintToken(),
+      expiresAt: tokenExpiry(),
+      revokedAt: null,
+      ...(invitedEmail ? { invitedEmail: invitedEmail.trim().toLowerCase() } : {}),
+    },
+    select: { id: true, token: true, expiresAt: true, siteId: true, invitedEmail: true },
   });
 }
 
@@ -101,6 +113,7 @@ async function requireLiveReview(token: string) {
       expiresAt: true,
       revokedAt: true,
       reviewerId: true,
+      invitedEmail: true,
       createdAt: true,
       site: { select: { id: true, name: true, workspaceId: true } },
     },
@@ -152,6 +165,21 @@ export async function identifyReviewer(token: string, name: string, email: strin
   const review = await requireLiveReview(token);
   const normalised = email.trim().toLowerCase();
 
+  // The signature must belong to the person the link was sent to. Without this
+  // the token holder can sign as anyone — including as an existing reviewer on
+  // the same site, overwriting their name — and a forgeable approval is worse
+  // than none, because it reads as authoritative in the dispute it exists to
+  // settle. No invited address means no client was invited, so nobody may sign.
+  if (!review.invitedEmail) {
+    throw new ClientReviewError("NOT_INVITED", "This link was not sent to anyone.");
+  }
+  if (normalised !== review.invitedEmail) {
+    throw new ClientReviewError(
+      "EMAIL_MISMATCH",
+      "That is not the address this link was sent to.",
+    );
+  }
+
   const reviewer = await prisma.reviewer.upsert({
     where: { siteId_email: { siteId: review.siteId, email: normalised } },
     create: { siteId: review.siteId, name: name.trim(), email: normalised },
@@ -196,11 +224,20 @@ export async function createClientComment(
   });
 }
 
-/** The client's own comments on this review's site, oldest first. */
+/**
+ * The client's own comments, oldest first.
+ *
+ * Requires identity, and the reviewerId filter is a concrete id — never
+ * `undefined`. An earlier version read `review.reviewerId ?? undefined`, and
+ * Prisma treats `undefined` as "omit this filter", so an unidentified token
+ * holder received EVERY comment on the site, internal team ones included.
+ * Verified exploitable before the fix; a probe read back an internal note
+ * about the client. Do not reintroduce `?? undefined` in a where clause.
+ */
 export async function listClientComments(token: string) {
-  const review = await requireLiveReview(token);
+  const { review, reviewerId } = await requireIdentifiedReview(token);
   return prisma.comment.findMany({
-    where: { siteId: review.siteId, reviewerId: review.reviewerId ?? undefined },
+    where: { siteId: review.siteId, reviewerId },
     orderBy: { createdAt: "asc" },
     select: { id: true, body: true, x: true, y: true, pageId: true, status: true, createdAt: true },
   });
