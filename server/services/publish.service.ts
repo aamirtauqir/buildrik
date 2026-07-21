@@ -4,7 +4,7 @@ import { VERCEL_CHECK_LABEL, type PrePublishChecksResult, type PublishPage } fro
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { appendDynamicPagesToPublish } from "@/server/services/cms.service";
 import { getActiveVercelConnection, markInactive } from "@server/services/integrations.service";
-import { isPublishBlockedByApproval } from "@server/services/publish-approval";
+import { publishApprovalBlock } from "@server/services/publish-approval";
 import {
   createVercelDeployment,
   waitForDeploymentReady,
@@ -135,6 +135,9 @@ export async function startPublish(
   workspaceId: string,
   userId: string,
   pages?: PublishPage[],
+  /** Set when the publisher has seen and accepted that the approval is stale
+   *  (the site changed since it was approved) and wants to publish anyway. */
+  acknowledgeStale?: boolean,
 ) {
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
@@ -175,7 +178,7 @@ export async function startPublish(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { name: true, deletedAt: true, publishedUrl: true, workspaceId: true },
+    select: { name: true, deletedAt: true, publishedUrl: true, workspaceId: true, lastEditedAt: true },
   });
   if (!site || site.deletedAt) throw new Error("SITE_NOT_FOUND");
 
@@ -201,17 +204,20 @@ export async function startPublish(
       const latestReview = await prisma.reviewRequest.findFirst({
         where: { siteId },
         orderBy: { createdAt: "desc" },
-        select: { status: true },
+        select: { status: true, resolvedAt: true },
       });
-      if (
-        isPublishBlockedByApproval({
-          editsRequireApproval: true,
-          role: member?.role ?? "EDITOR",
-          latestReviewStatus: latestReview?.status ?? null,
-        })
-      ) {
-        throw new Error("APPROVAL_REQUIRED");
-      }
+      const block = publishApprovalBlock({
+        editsRequireApproval: true,
+        role: member?.role ?? "EDITOR",
+        latestReviewStatus: latestReview?.status ?? null,
+        latestReviewResolvedAt: latestReview?.resolvedAt ?? null,
+        siteLastEditedAt: site.lastEditedAt,
+        acknowledgeStale,
+      });
+      // Distinct errors: "not-approved" needs a review; "stale" was approved but
+      // the site changed since, so the publisher must re-send or acknowledge.
+      if (block === "not-approved") throw new Error("APPROVAL_REQUIRED");
+      if (block === "stale-unacknowledged") throw new Error("APPROVAL_STALE");
     }
   }
 

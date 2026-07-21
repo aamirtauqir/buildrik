@@ -14,9 +14,15 @@
  * Pure decision function (no DB) so it is trivially unit-testable; the DB reads
  * live in startPublish, which calls this with the fetched values.
  *
- * Known limitation (documented, not a bug): approval is validated against the
- * LATEST ReviewRequest. Edits made AFTER an approval are not auto-invalidated —
- * closing that needs change-since-approval tracking, a separate feature.
+ * Stale-approval (contracts §1.5): an approval covers the version that was
+ * approved, not later edits. If the site was edited after it was approved
+ * (`siteLastEditedAt > latestReviewResolvedAt`), the approval is STALE — the
+ * client signed off on something that has since changed. A stale approval does
+ * not silently pass: publish is blocked until the publisher either re-sends for
+ * review or explicitly acknowledges the staleness (`acknowledgeStale`). It is
+ * not revoked — the acknowledgement path keeps publish possible, per the
+ * contract, but makes "I am shipping something the client did not approve" a
+ * deliberate act rather than an accident.
  *
  * @license BSD-3-Clause
  */
@@ -34,16 +40,51 @@ export interface ApprovalGateInput {
   role: string;
   /** Status of the site's most recent ReviewRequest, or null if none exists. */
   latestReviewStatus: string | null;
+  /** When that review was resolved (approved). Null if never resolved. */
+  latestReviewResolvedAt?: Date | null;
+  /** The site's last content edit — used to detect edits-after-approval. */
+  siteLastEditedAt?: Date | null;
+  /** The publisher explicitly acknowledged a stale approval and wants to ship anyway. */
+  acknowledgeStale?: boolean;
 }
 
 /**
- * True when this publish must be blocked pending approval.
- *   - gate off                       → never blocked
- *   - actor is OWNER                 → never blocked (exempt)
- *   - otherwise (ADMIN and below)    → blocked unless latest review is APPROVED
+ * True when the site was edited after its approval, so the approval no longer
+ * covers the current version (contracts §1.5). Only meaningful for an APPROVED
+ * review; false when the timestamps are absent (older callers that don't pass
+ * them get the prior behaviour).
+ */
+export function isApprovalStale(input: ApprovalGateInput): boolean {
+  if (input.latestReviewStatus !== "APPROVED") return false;
+  const approvedAt = input.latestReviewResolvedAt;
+  const editedAt = input.siteLastEditedAt;
+  if (!approvedAt || !editedAt) return false;
+  return editedAt.getTime() > approvedAt.getTime();
+}
+
+/** Why a publish is blocked by the approval gate, or null when it is allowed. */
+export type PublishApprovalBlock = "not-approved" | "stale-unacknowledged" | null;
+
+/**
+ * The reason this publish is blocked, or null if it may proceed.
+ *   - gate off / actor is OWNER      → allowed
+ *   - latest review not APPROVED     → "not-approved"
+ *   - approved but edited-since, not acknowledged → "stale-unacknowledged"
+ *   - approved and current (or acknowledged stale) → allowed
+ */
+export function publishApprovalBlock(input: ApprovalGateInput): PublishApprovalBlock {
+  if (!input.editsRequireApproval) return null;
+  if (APPROVAL_EXEMPT_ROLES.has(input.role)) return null;
+  if (input.latestReviewStatus !== "APPROVED") return "not-approved";
+  if (isApprovalStale(input) && !input.acknowledgeStale) return "stale-unacknowledged";
+  return null;
+}
+
+/**
+ * True when this publish must be blocked pending approval. Thin back-compat
+ * wrapper over publishApprovalBlock; callers that want to distinguish
+ * not-approved from stale should use publishApprovalBlock directly.
  */
 export function isPublishBlockedByApproval(input: ApprovalGateInput): boolean {
-  if (!input.editsRequireApproval) return false;
-  if (APPROVAL_EXEMPT_ROLES.has(input.role)) return false;
-  return input.latestReviewStatus !== "APPROVED";
+  return publishApprovalBlock(input) !== null;
 }

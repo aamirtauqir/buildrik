@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isPublishBlockedByApproval } from "../publish-approval";
+import { isPublishBlockedByApproval, isApprovalStale, publishApprovalBlock } from "../publish-approval";
 
 /**
  * Publish approval gate (m-approval) — enforcement policy.
@@ -61,5 +61,70 @@ describe("isPublishBlockedByApproval", () => {
     expect(
       isPublishBlockedByApproval({ editsRequireApproval: true, role: "VIEWER", latestReviewStatus: null }),
     ).toBe(true);
+  });
+
+  it("back-compat: without timestamps, APPROVED is still allowed (no stale info)", () => {
+    expect(
+      isPublishBlockedByApproval({ editsRequireApproval: true, role: "EDITOR", latestReviewStatus: "APPROVED" }),
+    ).toBe(false);
+  });
+});
+
+/**
+ * Stale-approval (contracts §1.5): an approval covers the version approved, not
+ * later edits. Edited-since-approval must not silently pass — it blocks until
+ * the publisher re-sends or acknowledges. Not revoked; acknowledgement ships it.
+ */
+describe("isApprovalStale / publishApprovalBlock — edited-since-approval", () => {
+  const approvedAt = new Date("2026-07-21T10:00:00Z");
+  const before = new Date("2026-07-21T09:00:00Z");
+  const after = new Date("2026-07-21T11:00:00Z");
+
+  it("isApprovalStale: edited AFTER approval → true", () => {
+    expect(isApprovalStale({
+      editsRequireApproval: true, role: "EDITOR", latestReviewStatus: "APPROVED",
+      latestReviewResolvedAt: approvedAt, siteLastEditedAt: after,
+    })).toBe(true);
+  });
+
+  it("isApprovalStale: edited BEFORE approval → false (approval still current)", () => {
+    expect(isApprovalStale({
+      editsRequireApproval: true, role: "EDITOR", latestReviewStatus: "APPROVED",
+      latestReviewResolvedAt: approvedAt, siteLastEditedAt: before,
+    })).toBe(false);
+  });
+
+  it("isApprovalStale: not APPROVED → never stale", () => {
+    expect(isApprovalStale({
+      editsRequireApproval: true, role: "EDITOR", latestReviewStatus: "CHANGES_REQUESTED",
+      latestReviewResolvedAt: approvedAt, siteLastEditedAt: after,
+    })).toBe(false);
+  });
+
+  it("block: approved but edited-since, NOT acknowledged → 'stale-unacknowledged'", () => {
+    expect(publishApprovalBlock({
+      editsRequireApproval: true, role: "EDITOR", latestReviewStatus: "APPROVED",
+      latestReviewResolvedAt: approvedAt, siteLastEditedAt: after,
+    })).toBe("stale-unacknowledged");
+  });
+
+  it("block: approved, edited-since, acknowledged → allowed (null)", () => {
+    expect(publishApprovalBlock({
+      editsRequireApproval: true, role: "EDITOR", latestReviewStatus: "APPROVED",
+      latestReviewResolvedAt: approvedAt, siteLastEditedAt: after, acknowledgeStale: true,
+    })).toBeNull();
+  });
+
+  it("block: OWNER is exempt even when stale", () => {
+    expect(publishApprovalBlock({
+      editsRequireApproval: true, role: "OWNER", latestReviewStatus: "APPROVED",
+      latestReviewResolvedAt: approvedAt, siteLastEditedAt: after,
+    })).toBeNull();
+  });
+
+  it("block: no review → 'not-approved' (distinct from stale)", () => {
+    expect(publishApprovalBlock({
+      editsRequireApproval: true, role: "EDITOR", latestReviewStatus: null,
+    })).toBe("not-approved");
   });
 });

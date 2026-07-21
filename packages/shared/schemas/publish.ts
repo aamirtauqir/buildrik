@@ -38,6 +38,10 @@ export const publishInputSchema = z
   .object({
     siteId: z.string(),
     pages: z.array(publishPageSchema).max(MAX_PUBLISH_PAGES).optional(),
+    /** The publisher saw that the approval is stale (the site changed since it
+     *  was approved) and chose to publish anyway (contracts §1.5). Without it, a
+     *  stale approval blocks the publish with APPROVAL_STALE. */
+    acknowledgeStale: z.boolean().optional(),
   })
   .refine(
     (input) => {

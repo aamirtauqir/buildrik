@@ -286,7 +286,13 @@ export const sitesRouter = router({
       }
       const workspaceId = await getWorkspaceId(ctx);
       try {
-        return await startPublish(input.siteId, workspaceId, ctx.session.user.id, input.pages);
+        return await startPublish(
+          input.siteId,
+          workspaceId,
+          ctx.session.user.id,
+          input.pages,
+          input.acknowledgeStale,
+        );
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "ALREADY_PUBLISHING")
           throw new TRPCError({
@@ -308,6 +314,15 @@ export const sitesRouter = router({
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
             message: "This site needs an approved review before it can be published.",
+          });
+        // Stale approval (contracts §1.5): approved, but the site changed since.
+        // The client signed off on an earlier version — re-send for review, or
+        // publish again with acknowledgeStale to ship it deliberately.
+        if (e instanceof Error && e.message === "APPROVAL_STALE")
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message:
+              "This site changed after it was approved. Re-send it for review, or acknowledge to publish the un-approved changes.",
           });
         throw e;
       }
