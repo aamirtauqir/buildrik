@@ -117,6 +117,12 @@ export function ReviewClient({ token }: { token: string }) {
   const identify = trpc.clientReview.identify.useMutation();
   const comment = trpc.clientReview.comment.useMutation();
   const resolve = trpc.clientReview.resolve.useMutation();
+  // The client's own notes, so the page isn't write-only — they see what they
+  // already said. Only fetched once identified (the router requires it).
+  const comments = trpc.clientReview.comments.useQuery(
+    { token },
+    { enabled: Boolean(review.data?.reviewer), retry: false },
+  );
   const utils = trpc.useUtils();
 
   const [name, setName] = useState("");
@@ -151,7 +157,9 @@ export function ReviewClient({ token }: { token: string }) {
   }
 
   const data = review.data!;
-  const agency = data.siteName;
+  // The agency (workspace) name leads the header — the client hired them, not us.
+  // Falls back to a neutral label if the workspace has no name.
+  const agency = data.agencyName ?? "Your design team";
   const signedIn = Boolean(data.reviewer);
 
   // A0 · first visit. A signature, not a login — there is no password field
@@ -309,7 +317,14 @@ export function ReviewClient({ token }: { token: string }) {
               onClick={() =>
                 comment.mutate(
                   { token, body: draft },
-                  { onSuccess: () => setDraft("") },
+                  {
+                    onSuccess: () => {
+                      setDraft("");
+                      // Show the note we just posted — otherwise the page is
+                      // write-only and the client can't tell it landed.
+                      void utils.clientReview.comments.invalidate({ token });
+                    },
+                  },
                 )
               }
               disabled={!draft.trim() || comment.isPending}
@@ -319,6 +334,18 @@ export function ReviewClient({ token }: { token: string }) {
             </button>
             {comment.error ? (
               <p className="mt-2 text-[12px] text-[#DC2626]">{comment.error.message}</p>
+            ) : null}
+            {comments.data && comments.data.length > 0 ? (
+              <ul className="mt-4 space-y-3 border-t border-[#E2E8F0] pt-4">
+                {comments.data.map((c) => (
+                  <li key={c.id} className="text-[13px] leading-relaxed text-[#334155]">
+                    <p className="whitespace-pre-wrap">{c.body}</p>
+                    <p className="mt-1 text-[11px] text-[#94A3B8]">
+                      {new Date(c.createdAt).toLocaleString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
             ) : null}
           </div>
         </aside>
@@ -331,7 +358,7 @@ export function ReviewClient({ token }: { token: string }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(15,23,42,0.4)] p-6">
           <div className="w-full max-w-[440px] rounded-xl bg-white p-6">
             <h2 className="text-[16px] font-semibold text-[#0F172A]">
-              Approve {agency}?
+              Approve {data.siteName}?
             </h2>
             <p className="mt-2 text-[13px] leading-relaxed text-[#475569]">
               This tells your designer the design is settled and they can put it

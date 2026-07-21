@@ -116,7 +116,16 @@ async function requireLiveReview(token: string) {
       invitedEmail: true,
       snapshotPages: true,
       createdAt: true,
-      site: { select: { id: true, name: true, workspaceId: true } },
+      site: {
+        select: {
+          id: true,
+          name: true,
+          workspaceId: true,
+          // The agency's name leads the client page ("<agency> is asking for
+          // your feedback"), not the site name — the client hired the agency.
+          workspace: { select: { name: true } },
+        },
+      },
     },
   });
   if (!review) throw new ClientReviewError("INVALID_TOKEN", "This review link is not valid.");
@@ -145,6 +154,9 @@ export async function getReviewByToken(token: string) {
     reviewId: review.id,
     siteId: review.siteId,
     siteName: review.site.name,
+    /** The agency (workspace) name — leads the page header. The client hired the
+     *  agency, not us. Null falls back to a neutral label on the page. */
+    agencyName: review.site.workspace?.name ?? null,
     status: review.status,
     note: review.note,
     changeSummary: review.changeSummary,
