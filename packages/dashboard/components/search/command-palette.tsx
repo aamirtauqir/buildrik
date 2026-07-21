@@ -103,8 +103,10 @@ const SCOPE_ICONS: Record<string, typeof Globe> = {
 };
 
 // Primary nav destinations. Sidebar entries DERIVE from NAV_GROUPS (the SSOT) so
-// nav drift is structurally impossible; only the topbar's own destinations
-// (Marketplace/Learn/Resources) are hand-written here.
+// nav drift is structurally impossible; the ecosystem topbar destinations
+// (Marketplace/Learn/Resources/Templates) are hand-written here with richer
+// descriptions. Notifications is a routed inbox reachable from the bell — it has
+// no nav home, so the palette is where it's searchable.
 const NAV_ITEMS: Array<ResultItem & { agencyOnly?: boolean }> = [
   ...NAV_GROUPS.flatMap((g) => g.items).map((it) => ({
     id: `nav-${it.href === "/dashboard" ? "home" : it.href.slice("/dashboard/".length)}`,
@@ -116,6 +118,8 @@ const NAV_ITEMS: Array<ResultItem & { agencyOnly?: boolean }> = [
   { id: "nav-marketplace", label: "Marketplace", description: "Apps & integrations", href: "/dashboard/marketplace", scope: "navigate" },
   { id: "nav-learn", label: "Learn", description: "Academy", href: "/dashboard/learn", scope: "navigate" },
   { id: "nav-resources", label: "Resources", description: "Docs & guides", href: "/dashboard/resources", scope: "navigate" },
+  { id: "nav-templates", label: "Templates", description: "Browse the template gallery", href: "/dashboard/templates", scope: "navigate" },
+  { id: "nav-notifications", label: "Notifications", description: "Your notification inbox", href: "/dashboard/notifications", scope: "navigate" },
 ];
 
 export const SEARCH_SCOPES = [

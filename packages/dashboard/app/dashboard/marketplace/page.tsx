@@ -161,7 +161,7 @@ export default function MarketplacePage() {
 
                 {app.action === "Connect" ? (
                   <ButtonLink href={INTEGRATIONS_HREF} variant="ghost" className="w-full">
-                    Connect
+                    Set up in Integrations
                   </ButtonLink>
                 ) : (
                   <Button

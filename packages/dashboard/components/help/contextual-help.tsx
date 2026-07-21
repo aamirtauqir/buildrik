@@ -30,6 +30,7 @@ const ARTICLE_META: Record<string, ContextualArticle> = {
 const CONTEXT_MAP: Record<string, string[]> = {
   "/dashboard": ["getting-started-overview", "creating-your-first-site"],
   "/dashboard/projects": ["managing-sites-dashboard", "publishing-and-unpublishing", "editor-basics"],
+  "/dashboard/sites": ["managing-sites-dashboard", "publishing-and-unpublishing", "editor-basics"],
   "/dashboard/settings/team": ["inviting-team-members", "roles-and-permissions"],
   "/dashboard/settings/billing": ["choosing-a-plan", "managing-billing"],
   "/dashboard/settings": ["connecting-a-domain", "roles-and-permissions"],
@@ -41,7 +42,17 @@ const DEFAULT_ARTICLES: ContextualArticle[] = [
 ];
 
 function getArticlesForRoute(pathname: string): ContextualArticle[] {
-  const slugs = CONTEXT_MAP[pathname];
+  // Exact match, else the LONGEST path-prefix in the map — so a nested route
+  // (…/settings/domains, …/sites/[id]/publish) inherits its section's help
+  // instead of falling through to the generic default. Was exact-only, which
+  // left most of the app on the getting-started pair.
+  const key =
+    pathname in CONTEXT_MAP
+      ? pathname
+      : Object.keys(CONTEXT_MAP)
+          .filter((p) => pathname === p || pathname.startsWith(`${p}/`))
+          .sort((a, b) => b.length - a.length)[0];
+  const slugs = key ? CONTEXT_MAP[key] : undefined;
   if (!slugs) return DEFAULT_ARTICLES;
   return slugs
     .map((s) => ARTICLE_META[s])
