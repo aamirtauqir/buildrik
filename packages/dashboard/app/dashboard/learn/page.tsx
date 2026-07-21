@@ -167,7 +167,7 @@ export default function LearnPage() {
     (learn.data?.courses ?? []).some((c) => c.lessons.some((l) => l.slug === openLesson && l.completed));
 
   return (
-    <div>
+    <div className="mx-auto max-w-[1200px] px-6">
       <PageHeader title="Learn" description="Buildrick Academy — video courses for getting the most out of Buildrick." />
 
       {learn.isLoading ? (

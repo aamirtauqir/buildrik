@@ -68,7 +68,7 @@ function TemplatesBrowserInner() {
   const pages = paginationRange(filters.page, totalPages);
 
   return (
-    <div className="mx-auto max-w-[1180px] px-6 py-6">
+    <div className="mx-auto max-w-[1200px] px-6 py-6">
       {/* Top row — this is an ecosystem tab (like Marketplace); the topbar's
           "Dashboard" link is the way back to the workspace, so no in-page back. */}
       <div className="mb-5 flex items-center gap-4">

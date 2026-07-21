@@ -16,7 +16,7 @@ const RESOURCES = [
 
 export default function ResourcesPage() {
   return (
-    <div>
+    <div className="mx-auto max-w-[1200px] px-6 py-6">
       <PageHeader title="Resources" description="Help, guides and developer tools — reference material for building on Buildrick." />
 
       <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3">

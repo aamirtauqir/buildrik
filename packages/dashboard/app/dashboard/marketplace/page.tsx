@@ -59,7 +59,7 @@ export default function MarketplacePage() {
   }, [query, category]);
 
   return (
-    <div>
+    <div className="mx-auto max-w-[1200px] px-6">
       <PageHeader title="Marketplace" description="Apps and integrations to extend your sites." />
 
       <InputField
