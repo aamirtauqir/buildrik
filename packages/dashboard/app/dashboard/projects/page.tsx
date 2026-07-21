@@ -47,7 +47,6 @@ export default function ProjectsPage() {
     const upper = param.toUpperCase();
     if (upper === "PUBLISHED" || upper === "DRAFT" || upper === "ARCHIVED") setStatus(upper);
   }, []);
-  const [showArchived, setShowArchived] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const lastSelectedIdRef = useRef<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -112,7 +111,7 @@ export default function ProjectsPage() {
   const sitesQuery = trpc.sites.list.useQuery({
     page,
     perPage: 12,
-    status: showArchived ? "ARCHIVED" as const : status as "PUBLISHED" | "DRAFT" | "ARCHIVED" | undefined,
+    status: status as "PUBLISHED" | "DRAFT" | "ARCHIVED" | undefined,
     sort: sort as
       | "lastEdited"
       | "name"
@@ -124,7 +123,7 @@ export default function ProjectsPage() {
     // null is the "All sites" selection, which must not filter at all. Passing it
     // through reached the service as `where.folderId = null`, i.e. only sites with
     // NO folder — so any site inside a folder vanished from "All sites".
-    folderId: showArchived ? undefined : (folderId ?? undefined),
+    folderId: status === "ARCHIVED" ? undefined : (folderId ?? undefined),
     createdBy,
     dateRange,
     templateUsed,
@@ -401,7 +400,7 @@ export default function ProjectsPage() {
   // ("nothing HERE"), never the true-empty ("no sites at all").
   const hasActiveFilters = Boolean(
     search || status || createdBy || dateRange || templateUsed ||
-    hasCustomDomain !== undefined || hasTraffic || folderId !== null || showArchived
+    hasCustomDomain !== undefined || hasTraffic || folderId !== null
   );
 
   const clearFilters = () => {
@@ -413,7 +412,6 @@ export default function ProjectsPage() {
     setHasCustomDomain(undefined);
     setHasTraffic(undefined);
     setFolderId(null);
-    setShowArchived(false);
     setPage(1);
   };
 
@@ -456,22 +454,12 @@ export default function ProjectsPage() {
         <FolderCardGrid
           folders={folderCards}
           activeId={folderId}
-          totalCount={sitesQuery.data?.total ?? 0}
           onSelect={(id) => {
             setFolderId(id);
-            setShowArchived(false);
             setPage(1);
           }}
           onRenameFolder={(id, name) => setRenameFolderTarget({ id, name })}
           onDeleteFolder={handleDeleteFolder}
-          archivedCount={archivedQuery.data?.total ?? 0}
-          showArchived={showArchived}
-          onToggleArchived={() => {
-            setShowArchived(!showArchived);
-            setFolderId(null);
-            setPage(1);
-          }}
-          onNewFolder={() => setCreateFolderOpen(true)}
         />
       )}
 
@@ -498,6 +486,7 @@ export default function ProjectsPage() {
         <SiteFilters
           status={status}
           onStatusChange={(val) => { setStatus(val); setPage(1); }}
+          archivedCount={archivedQuery.data?.total ?? 0}
           sort={sort}
           onSortChange={(val) => {
             setSort(val);

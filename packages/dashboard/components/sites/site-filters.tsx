@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, ToggleLeft, ToggleRight } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@lib/utils";
 import { trpc } from "@lib/trpc/client";
+import { MetricValue } from "@/components/dashboard/primitives";
 
 export const SORT_OPTIONS = [
   { value: "lastEdited", label: "Last edited" },
@@ -47,6 +48,7 @@ interface SiteFiltersProps {
   onHasCustomDomainChange: (v: boolean | undefined) => void;
   hasTraffic: "none" | "1-100" | "100-1000" | "1000+" | undefined;
   onHasTrafficChange: (v: "none" | "1-100" | "100-1000" | "1000+" | undefined) => void;
+  archivedCount?: number;
 }
 
 // Segmented pill used across the status / date / traffic quick-filters.
@@ -74,6 +76,7 @@ export function SiteFilters({
   templateUsed, onTemplateUsedChange,
   hasCustomDomain, onHasCustomDomainChange,
   hasTraffic, onHasTrafficChange,
+  archivedCount,
 }: SiteFiltersProps) {
   const [sortOpen, setSortOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -95,7 +98,11 @@ export function SiteFilters({
         <div className="flex gap-1.5">
           {STATUS_FILTER_OPTIONS.map((opt) => (
             <ChipButton key={opt.value} active={status === opt.value} onClick={() => onStatusChange(status === opt.value ? undefined : opt.value)}>
-              {opt.label}
+              {opt.value === "ARCHIVED" && archivedCount !== undefined ? (
+                <>{opt.label} · <MetricValue>{archivedCount}</MetricValue></>
+              ) : (
+                opt.label
+              )}
             </ChipButton>
           ))}
         </div>

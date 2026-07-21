@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Folder, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Folder, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { cn, formatCompact } from "@lib/utils";
 import { Pill, MetricValue } from "@/components/dashboard/primitives";
 
@@ -15,14 +15,9 @@ interface FolderCardData {
 interface FolderCardGridProps {
   folders: FolderCardData[];
   activeId: string | null;
-  showArchived: boolean;
-  totalCount: number;
-  archivedCount: number;
   onSelect: (id: string | null) => void;
-  onToggleArchived: () => void;
   onRenameFolder: (id: string, name: string) => void;
   onDeleteFolder: (id: string, name: string) => void;
-  onNewFolder: () => void;
 }
 
 function FolderCardMenu({ onRename, onDelete }: { onRename: () => void; onDelete: () => void }) {
@@ -87,40 +82,32 @@ function FolderCardMenu({ onRename, onDelete }: { onRename: () => void; onDelete
   );
 }
 
-/** Folder card grid — replaces the folder tab row. Each card selects a folder
- *  exactly like the old tab did (filters the site list below); "All sites" and
- *  "Archived" stay as pills since this app has no "Apps" concept to pair them
- *  with. */
+/** Folder card grid — folder navigation only. Each card selects a folder
+ *  (filters the site list below); the "All sites" pill clears the folder
+ *  selection. Archived is a status filter now (see SiteFilters), not a pill
+ *  here. The whole row is hidden when there are no folders. */
 export function FolderCardGrid({
   folders,
   activeId,
-  showArchived,
-  totalCount,
-  archivedCount,
   onSelect,
-  onToggleArchived,
   onRenameFolder,
   onDeleteFolder,
-  onNewFolder,
 }: FolderCardGridProps) {
+  if (folders.length === 0) return null;
+
   return (
     <div>
       <div className="flex items-center gap-2">
         <button type="button" onClick={() => onSelect(null)}>
-          <Pill tone={!showArchived && activeId === null ? "accent" : "neutral"}>
-            All sites · <MetricValue>{totalCount}</MetricValue>
-          </Pill>
-        </button>
-        <button type="button" onClick={onToggleArchived}>
-          <Pill tone={showArchived ? "accent" : "neutral"}>
-            Archived · <MetricValue>{archivedCount}</MetricValue>
+          <Pill tone={activeId === null ? "accent" : "neutral"}>
+            All sites
           </Pill>
         </button>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {folders.map((folder) => {
-          const active = !showArchived && activeId === folder.id;
+          const active = activeId === folder.id;
           return (
             <div
               key={folder.id}
@@ -153,16 +140,6 @@ export function FolderCardGrid({
             </div>
           );
         })}
-
-        <button
-          type="button"
-          onClick={onNewFolder}
-          className="flex min-h-[167px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition-colors hover:bg-[var(--color-bg-subtle)]"
-          style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
-        >
-          <Plus className="h-5 w-5" />
-          <span className="text-body font-medium">New folder</span>
-        </button>
       </div>
     </div>
   );
