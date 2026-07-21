@@ -35,14 +35,6 @@ function tokenStorageKey(projectId: string | null | undefined): string {
   return `buildrick-design-tokens-${projectId ?? "default"}-v1`;
 }
 
-function readSeen(projectId: string | null | undefined): boolean {
-  try {
-    return localStorage.getItem(seenKey(projectId)) === "1";
-  } catch {
-    return true; // private browsing → don't show modal
-  }
-}
-
 function markSeen(projectId: string | null | undefined): void {
   try {
     localStorage.setItem(seenKey(projectId), "1");
@@ -65,22 +57,13 @@ export const StarterGalleryMount: React.FC<StarterGalleryMountProps> = ({ projec
   const spacingRegistry = useSpacingRegistry();
   const typeRegistry = useTypeRegistry();
 
-  // 2026-05-22 design plan review D3: starter gallery NO LONGER auto-opens
-  // on first project load. Decision: AI generator (PageWizard) is the
-  // content-first default surface. Theme picker stays available but
-  // discoverable rather than blocking — user opens it via Design tab's
-  // "Browse starter themes" button (shipped commit 70bdceee, emits
-  // UI_OPEN_STARTERS which this Mount subscribes to below).
-  //
-  // Mark seen on first mount so the PageWizard's dependent check
-  // (`if starter-gallery-seen → skip wizard re-show after dismiss`) still
-  // works correctly. Without this mark, the wizard logic would never
-  // detect that starter gallery had been "shown" and could re-show wizard
-  // forever even after user dismissed.
+  // 2026-05-22 design plan review D3: starter gallery does NOT auto-open on
+  // first project load. The theme picker stays available but discoverable
+  // rather than blocking — the user opens it via the Design tab's "Browse
+  // starter themes" button (shipped commit 70bdceee, emits UI_OPEN_STARTERS
+  // which this Mount subscribes to below). The seen-flag is written only on
+  // real interaction (Apply/Skip), not on mount.
   const [open, setOpen] = React.useState<boolean>(false);
-  React.useEffect(() => {
-    if (!readSeen(projectId)) markSeen(projectId);
-  }, [projectId]);
 
   // Imperative re-open hook — Design tab "Browse themes" button emits
   // UI_OPEN_STARTERS, mount listens and flips open. Subscriber lives here

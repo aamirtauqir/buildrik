@@ -76,7 +76,6 @@ interface MockOpts {
     setShowGuides: ReturnType<typeof vi.fn>;
     setShowGrid: ReturnType<typeof vi.fn>;
   };
-  setShowWizard: ReturnType<typeof vi.fn>;
   hasManuallyToggledSpacingRef: { current: boolean };
 }
 
@@ -96,7 +95,6 @@ function makeOpts(overrides: Partial<MockOpts> = {}): MockOpts {
       setShowGuides: vi.fn(),
       setShowGrid: vi.fn(),
     },
-    setShowWizard: overrides.setShowWizard ?? vi.fn(),
     hasManuallyToggledSpacingRef:
       overrides.hasManuallyToggledSpacingRef ?? { current: false },
   };
@@ -109,7 +107,6 @@ function mount(opts: MockOpts) {
         composer: opts.composer,
         modals: opts.modals,
         state: opts.state,
-        setShowWizard: opts.setShowWizard,
         hasManuallyToggledSpacingRef: opts.hasManuallyToggledSpacingRef,
       } as unknown) as UseEditorEventListenersOptions,
     ),
@@ -128,45 +125,7 @@ describe("useEditorEventListeners", () => {
     vi.useRealTimers();
   });
 
-  // 1) WIZARD HIDE ------------------------------------------------------------
-  describe("PROJECT_LOADED → setShowWizard(false)", () => {
-    it("does not call setShowWizard if elements are empty", () => {
-      mount(opts);
-      expect(opts.setShowWizard).not.toHaveBeenCalled();
-    });
-
-    it("immediately hides wizard if elements already exist (returning user)", () => {
-      const composer = makeComposer([{ id: "e1" }]);
-      const o = makeOpts({ composer });
-      mount(o);
-      expect(o.setShowWizard).toHaveBeenCalledWith(false);
-    });
-
-    it("hides wizard after PROJECT_LOADED event when elements present", () => {
-      mount(opts);
-      // Now mutate the elements list; emit PROJECT_LOADED triggers re-check.
-      opts.composer.elements.getAllElements.mockReturnValueOnce([{ id: "added" }]);
-      act(() => {
-        opts.composer._fire(EVENTS.PROJECT_LOADED);
-      });
-      expect(opts.setShowWizard).toHaveBeenCalledWith(false);
-    });
-
-    it("registers + cleans up the PROJECT_LOADED listener", () => {
-      const { unmount } = mount(opts);
-      expect(opts.composer.on).toHaveBeenCalledWith(
-        EVENTS.PROJECT_LOADED,
-        expect.any(Function),
-      );
-      unmount();
-      expect(opts.composer.off).toHaveBeenCalledWith(
-        EVENTS.PROJECT_LOADED,
-        expect.any(Function),
-      );
-    });
-  });
-
-  // 2) COMPONENT_CREATE_REQUESTED ---------------------------------------------
+  // 1) COMPONENT_CREATE_REQUESTED ---------------------------------------------
   describe("COMPONENT_CREATE_REQUESTED → modals.openCreateComponent", () => {
     it("opens create-component modal with payload elementId", () => {
       mount(opts);
@@ -288,7 +247,6 @@ describe("useEditorEventListeners", () => {
             composer: null,
             modals: opts.modals,
             state: opts.state,
-            setShowWizard: opts.setShowWizard,
             hasManuallyToggledSpacingRef: opts.hasManuallyToggledSpacingRef,
           } as unknown) as UseEditorEventListenersOptions,
         ),
@@ -296,7 +254,6 @@ describe("useEditorEventListeners", () => {
       // Cannot register anything — composer.on doesn't exist.
       expect(opts.modals.openCreateComponent).not.toHaveBeenCalled();
       expect(opts.state.setLeftPanelTab).not.toHaveBeenCalled();
-      expect(opts.setShowWizard).not.toHaveBeenCalled();
       expect(opts.state.setShowSpacingIndicators).not.toHaveBeenCalled();
     });
   });

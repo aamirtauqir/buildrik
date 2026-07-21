@@ -1,16 +1,14 @@
 /**
  * useEditorEventListeners — extracted from AquibraStudio (Phase D D2
- * split, stage 3). Owns the 4 composer-driven side-effects that lived
+ * split, stage 3). Owns the composer-driven side-effects that lived
  * as scattered useEffects in the orchestrator:
  *
- *   1. PROJECT_LOADED  → hide wizard if canvas already has content
- *      (returning users on reload).
- *   2. COMPONENT_CREATE_REQUESTED → open the Create-Component modal
+ *   1. COMPONENT_CREATE_REQUESTED → open the Create-Component modal
  *      with the requested element id.
- *   3. SHOW_IN_LAYERS  → switch to Layers tab + open left drawer +
+ *   2. SHOW_IN_LAYERS  → switch to Layers tab + open left drawer +
  *      emit LAYERS_SCROLL_TO_SELECTION (delayed 100ms so the tab
  *      switch lands first).
- *   4. Overlay defaults init → seed the overlay toggles from
+ *   3. Overlay defaults init → seed the overlay toggles from
  *      composer.canvasIndicators.getOverlay() once the composer is
  *      ready.
  *
@@ -46,8 +44,6 @@ export interface UseEditorEventListenersOptions {
     "openCreateComponent" | "openSaveAsComponent" | "openCMSRecords" | "openSaveTemplate"
   >;
   state: EditorEventListenerStateSetters;
-  /** Hide the first-run wizard once the project has any content. */
-  setShowWizard: (v: boolean) => void;
   /** Tracks whether the user has manually toggled spacing indicators
    *  (so we don't clobber their choice when overlay defaults arrive). */
   hasManuallyToggledSpacingRef: React.MutableRefObject<boolean>;
@@ -57,24 +53,9 @@ export function useEditorEventListeners({
   composer,
   modals,
   state,
-  setShowWizard,
   hasManuallyToggledSpacingRef,
 }: UseEditorEventListenersOptions): void {
-  // 1) Hide wizard when canvas already has content.
-  React.useEffect(() => {
-    if (!composer) return;
-    const checkContent = () => {
-      const existing = composer.elements?.getAllElements?.() ?? [];
-      if (existing.length > 0) setShowWizard(false);
-    };
-    checkContent();
-    composer.on(EVENTS.PROJECT_LOADED, checkContent);
-    return () => {
-      composer.off?.(EVENTS.PROJECT_LOADED, checkContent);
-    };
-  }, [composer, setShowWizard]);
-
-  // 2) COMPONENT_CREATE_REQUESTED → open the create-component modal.
+  // 1) COMPONENT_CREATE_REQUESTED → open the create-component modal.
   const { openCreateComponent, openSaveAsComponent, openCMSRecords, openSaveTemplate } = modals;
   React.useEffect(() => {
     if (!composer) return;

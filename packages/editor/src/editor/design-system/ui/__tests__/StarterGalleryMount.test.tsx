@@ -39,18 +39,18 @@ describe("StarterGalleryMount", () => {
   });
 
   // D3 onboarding fix (commit 1704d690 + 70bdceee): modal NO LONGER auto-opens
-  // on first run. Auto-open dropped because PageWizard owns the content-first
-  // path; theme picker becomes discoverable via Design tab "Browse themes"
-  // button which emits UI_OPEN_STARTERS.
+  // on first run. The theme picker is discoverable via the Design tab "Browse
+  // themes" button which emits UI_OPEN_STARTERS. The seen-flag is written only
+  // on real interaction (Apply/Skip), never on mount.
   it("stays closed on first run (no auto-open)", () => {
     const { queryByText } = render(wrap(<StarterGalleryMount projectId={projectId} />));
     expect(queryByText("Pick a starter design system")).toBeNull();
   });
 
-  it("marks seen flag on first mount so PageWizard re-show check stays correct", () => {
+  it("does not write the seen flag on mount — only on interaction", () => {
     expect(localStorage.getItem(seenKey)).toBeNull();
     render(wrap(<StarterGalleryMount projectId={projectId} />));
-    expect(localStorage.getItem(seenKey)).toBe("1");
+    expect(localStorage.getItem(seenKey)).toBeNull();
   });
 
   it("opens when UI_OPEN_STARTERS event fires (Design tab Browse-themes button)", () => {
