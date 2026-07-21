@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { FileText, Pencil, Settings, Users, Clock } from "lucide-react";
+import { FileText, Pencil, Settings, Users, Clock, Globe } from "lucide-react";
 import { cn, siteAddress } from "@lib/utils";
 import { ContextMenu } from "./context-menu";
 import { EditorLink } from "@/components/editor-route/EditorLink";
@@ -39,11 +39,13 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
         <input type="checkbox" checked={selected} onChange={() => {}} className="h-4 w-4 rounded border-gray-300 accent-[var(--color-primary)]" onClick={(e) => { e.stopPropagation(); onSelect(site.id, e); }} />
       </div>
       <Link href={`/dashboard/sites/${site.id}`}>
-        {/* 16:10 gradient preview placeholder */}
+        {/* 16:10 preview placeholder (no thumbnail rendered yet) */}
         <div
-          className="aspect-[16/10] w-full"
-          style={{ background: "linear-gradient(135deg, var(--color-primary-subtle) 0%, var(--color-bg-subtle) 100%)" }}
-        />
+          className="flex aspect-[16/10] w-full items-center justify-center"
+          style={{ backgroundColor: "var(--color-bg-subtle)" }}
+        >
+          <Globe className="h-8 w-8" style={{ color: "var(--color-text-muted)" }} />
+        </div>
         <div className="p-4">
           <div className="flex items-center justify-between gap-2">
             <h3 className="truncate text-[14px] font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{site.name}</h3>
