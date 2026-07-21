@@ -60,7 +60,7 @@ export default function MarketplacePage() {
 
   return (
     <div>
-      <PageHeader title="Marketplace" description="Apps, integrations and templates to extend your sites." />
+      <PageHeader title="Marketplace" description="Apps and integrations to extend your sites." />
 
       <InputField
         wrapperClassName="mb-6"
@@ -68,8 +68,8 @@ export default function MarketplacePage() {
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search apps & templates…"
-        aria-label="Search apps and templates"
+        placeholder="Search apps & integrations…"
+        aria-label="Search apps and integrations"
       />
 
       <div className="mb-6 flex flex-wrap gap-2">

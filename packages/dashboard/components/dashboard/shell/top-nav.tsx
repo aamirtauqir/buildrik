@@ -47,10 +47,10 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
         <span className="text-[15.5px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>Buildrick</span>
       </Link>
       <nav className="flex items-center gap-1">
-        <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.11em]" style={{ color: "var(--color-text-muted)" }}>Explore</span>
-        {/* Dashboard — back to the workspace. Sits at the head of the cluster,
-            before Marketplace. Active on any workspace page, i.e. wherever the
-            sidebar is showing; the ecosystem tabs own the rest. */}
+        {/* Dashboard is the main working mode, not something you "explore" — so it
+            sits OUTSIDE the Explore cluster as the workspace anchor, before the
+            label, with a rule separating it from the ecosystem tabs. Active on any
+            workspace page (wherever the sidebar is showing). */}
         <Link
           href="/dashboard"
           className={cn("relative rounded-lg px-3 py-1.5 text-[13.5px] font-[530] transition-colors", isEcosystemRoute(pathname) ? "hover:bg-[var(--color-bg-subtle)]" : "")}
@@ -59,6 +59,8 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
           Dashboard
           {!isEcosystemRoute(pathname) && <span className="absolute inset-x-3 -bottom-[calc((var(--topnav-h)-100%)/2)] h-0.5 rounded-pill" style={{ backgroundColor: "var(--color-text-primary)" }} />}
         </Link>
+        <span className="mx-1.5 h-4 w-px" style={{ backgroundColor: "var(--color-border-default)" }} />
+        <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.11em]" style={{ color: "var(--color-text-muted)" }}>Explore</span>
         {ECOSYSTEM_NAV.map((item) => {
           const active = isTopActive(pathname, item.href);
           return (

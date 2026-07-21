@@ -18,7 +18,11 @@ const iconMap: Record<NavIcon, typeof Home> = {
 };
 
 // Mobile carries the same 6 destinations — derived, not a second hardcoded list.
-const MOBILE_ITEMS = NAV_GROUPS[0].items;
+// The mobile bottom bar shows the core destinations only. Getting started lives
+// in the desktop sidebar (near Home) but is excluded here — a first-run step does
+// not earn a permanent bottom-bar tab, and adding it would push the bar to 7 tabs
+// (over the ~5 a phone bottom bar can hold).
+const MOBILE_ITEMS = NAV_GROUPS[0].items.filter((it) => it.href !== "/dashboard/getting-started");
 
 function useAgencyEnabled(): boolean {
   const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });

@@ -409,7 +409,7 @@ export default function ProjectsPage() {
     <div>
       {/* Header */}
       <PageHeader
-        title="Projects"
+        title="Sites"
         description="Manage, edit, and publish every site in your workspace."
         actions={
           <>

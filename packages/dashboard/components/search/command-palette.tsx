@@ -70,7 +70,8 @@ interface MovedItem extends ResultItem {
   agencyOnly?: boolean;
 }
 const MOVED_ITEMS: MovedItem[] = [
-  { id: "m-sites", label: "Sites", description: "Moved → Projects", href: "/dashboard/projects", scope: "moved", aliases: ["sites", "my sites", "websites", "all projects"] },
+  // "Sites" is a real nav label again (reverted from "Projects"), so it is no
+  // longer a "moved" alias — the NAV_GROUPS-derived nav entry covers it.
   { id: "m-apps", label: "Apps", description: "Moved → Marketplace", href: "/dashboard/marketplace", scope: "moved", aliases: ["apps", "applications", "integrations marketplace"] },
   { id: "m-libraries", label: "Libraries & Templates", description: "Moved → Templates", href: "/dashboard/templates", scope: "moved", aliases: ["libraries", "library", "templates"] },
   { id: "m-clients", label: "Clients", description: "Moved → Agency › Clients", href: "/dashboard/agency", scope: "moved", aliases: ["clients", "client management"], agencyOnly: true },
@@ -299,7 +300,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             id: `team-${m.id}`,
             label: m.fullName || m.email,
             description: m.role,
-            href: "/dashboard/team",
+            href: "/dashboard/settings/team",
             scope: "team",
           })),
         });

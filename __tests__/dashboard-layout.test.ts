@@ -60,21 +60,25 @@ describe("Sidebar navigation", () => {
   // IA v2 contract (spec 2026-07-16): 6 destinations + labeled 2-item Support
   // group. This IS a frozen list — the whole point of the redesign was the
   // count, so growing it is a design decision, not a one-line test edit.
-  it("carries exactly the IA v2 six destinations plus the Support pair", () => {
+  it("carries the workspace destinations, with setup near Home and only Help under Support", () => {
+    // Getting started moved OUT of Support into the main group: setup is part of
+    // the product, not support. It sits right under Home. Support is now just the
+    // Help centre.
     expect(NAV_GROUPS).toHaveLength(2);
     expect(NAV_GROUPS[0].items.map((i) => i.href)).toEqual([
       "/dashboard",
+      "/dashboard/getting-started",
       "/dashboard/projects",
       "/dashboard/agency",
       "/dashboard/media",
       "/dashboard/templates",
       "/dashboard/settings",
     ]);
+    // The list route is still /dashboard/projects, but its label reverted to
+    // "Sites" — the vocabulary the rest of the product never stopped using.
+    expect(NAV_GROUPS[0].items.find((i) => i.href === "/dashboard/projects")?.label).toBe("Sites");
     expect(NAV_GROUPS[1].label).toBe("Support");
-    expect(NAV_GROUPS[1].items.map((i) => i.href)).toEqual([
-      "/dashboard/getting-started",
-      "/dashboard/help",
-    ]);
+    expect(NAV_GROUPS[1].items.map((i) => i.href)).toEqual(["/dashboard/help"]);
   });
 
   it("marks Agency — and ONLY Agency — agencyOnly", () => {
@@ -82,16 +86,19 @@ describe("Sidebar navigation", () => {
     expect(flagged).toEqual(["/dashboard/agency"]);
   });
 
-  // MobileTabBar filter (spec §Responsive, test #5). The mobile bar renders the
-  // six primary destinations with the same agencyOnly filter: solo sees 5,
-  // agency sees 6. The bar derives from NAV_GROUPS[0].items, so assert the
-  // filter arithmetic at the source.
-  it("filters the mobile destinations to 5 solo / 6 agency", () => {
-    const primary = NAV_GROUPS[0].items;
-    expect(primary).toHaveLength(6);
-    const solo = primary.filter((i) => !i.agencyOnly);
+  // MobileTabBar filter (spec §Responsive). The mobile bar shows the core
+  // destinations: the main group MINUS Getting started (a first-run step, not a
+  // permanent bottom-bar tab), then the same agencyOnly filter. So the bar stays
+  // at 6 (solo 5), unchanged by the getting-started move — a phone bottom bar
+  // can't hold 7. Mirror sidebar.tsx's MOBILE_ITEMS derivation here.
+  it("keeps the mobile bar at 6 dest / 5 solo, excluding Getting started", () => {
+    const mobile = NAV_GROUPS[0].items.filter((i) => i.href !== "/dashboard/getting-started");
+    expect(mobile).toHaveLength(6);
+    const solo = mobile.filter((i) => !i.agencyOnly);
     expect(solo).toHaveLength(5);
     expect(solo.some((i) => i.href === "/dashboard/agency")).toBe(false);
+    // getting-started must not leak into the mobile bar
+    expect(mobile.some((i) => i.href === "/dashboard/getting-started")).toBe(false);
   });
 });
 

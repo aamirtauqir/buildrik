@@ -20,14 +20,19 @@ export type NavGroup = { label?: string; items: NavItem[] };
 export const NAV_GROUPS: NavGroup[] = [
   { items: [
     { label: "Home", href: "/dashboard", icon: "Home" },
-    { label: "Projects", href: "/dashboard/projects", icon: "LayoutGrid" },
+    // Setup is part of the product, not "support" — it lives in the main group,
+    // right under Home, rather than filed away beside Help.
+    { label: "Getting started", href: "/dashboard/getting-started", icon: "Shield" },
+    // "Sites", not "Projects": the rest of the product never stopped saying site
+    // (create site, publish site, /dashboard/sites/[id], help copy). The list
+    // route stays /dashboard/projects; only the vocabulary reverts.
+    { label: "Sites", href: "/dashboard/projects", icon: "LayoutGrid" },
     { label: "Agency", href: "/dashboard/agency", icon: "Users", agencyOnly: true },
     { label: "Media", href: "/dashboard/media", icon: "Image" },
     { label: "Templates", href: "/dashboard/templates", icon: "LayoutTemplate" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ] },
   { label: "Support", items: [
-    { label: "Getting started", href: "/dashboard/getting-started", icon: "Shield" },
     { label: "Help center", href: "/dashboard/help", icon: "HelpCircle" },
   ] },
 ];

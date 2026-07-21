@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 // the persistent sidebar — the smoke floor across every browser/device.
 const ROUTES = [
   { path: "/dashboard", name: "Home", heading: /Good (morning|afternoon|evening)/i },
-  { path: "/dashboard/projects", name: "Projects", heading: /^Projects$/i },
+  { path: "/dashboard/projects", name: "Sites", heading: /^Sites$/i },
   { path: "/dashboard/agency", name: "Agency", heading: /^Agency$/i },
   { path: "/dashboard/media", name: "Media", heading: /^Media$/i },
   { path: "/dashboard/templates", name: "Templates", heading: /Templates/i },
@@ -28,11 +28,11 @@ test.describe("dashboard smoke", () => {
     await expect(page.getByText("Account").first()).toBeVisible();
   });
 
-  test("sidebar navigation: Home → Projects → Settings", async ({ page }) => {
+  test("sidebar navigation: Home → Sites → Settings", async ({ page }) => {
     await page.goto("/dashboard");
-    await page.getByRole("link", { name: "Projects" }).first().click();
+    await page.getByRole("link", { name: "Sites" }).first().click();
     await expect(page).toHaveURL(/\/dashboard\/projects/);
-    await expect(page.locator("h1").first()).toHaveText(/^Projects$/i);
+    await expect(page.locator("h1").first()).toHaveText(/^Sites$/i);
 
     await page.getByRole("link", { name: "Settings" }).first().click();
     await expect(page).toHaveURL(/\/dashboard\/settings/);

@@ -103,7 +103,7 @@ export default function LibrariesPage() {
 
   return (
     <div>
-      <PageHeader title="Libraries & Templates" description="Reusable starting points and shared design systems." />
+      <PageHeader title="Templates" description="Reusable starting points and shared design systems." />
 
       <div className="mb-5">
         <FilterTabs value={tab} onChange={setTab} options={TABS} />

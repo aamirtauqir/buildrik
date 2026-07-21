@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText, Code2, CheckSquare, LayoutTemplate, Download, Users, ArrowUpRight } from "lucide-react";
+import { FileText, Code2, CheckSquare, Download, Users, ArrowUpRight } from "lucide-react";
 import { PageHeader, IconChip } from "@/components/dashboard/primitives";
 
 // Buildrick has no external docs site, changelog or community forum today —
@@ -10,7 +10,8 @@ const RESOURCES = [
   { icon: FileText, title: "Documentation", description: "Guides for building, publishing and managing sites.", href: "/dashboard/help", color: "var(--color-primary)" },
   { icon: Code2, title: "API reference", description: "Endpoints, tokens and webhooks for developers.", href: "/dashboard/settings/api-tokens", color: "var(--color-text-secondary)" },
   { icon: CheckSquare, title: "Brand kit", description: "Logos, colors and usage guidelines to download.", href: "/dashboard/templates", color: "var(--color-amber)" },
-  { icon: LayoutTemplate, title: "Template gallery", description: "Starter designs for every kind of site.", href: "/dashboard/templates", color: "var(--color-teal)" },
+  // "Template gallery" removed — it duplicated the Templates sidebar destination,
+  // one of the three places "templates" used to mean different things.
   { icon: Download, title: "Changelog", description: "What's new — features, fixes and improvements.", href: "/dashboard/help", color: "var(--color-success)" },
   { icon: Users, title: "Community", description: "Ask questions and share work with other builders.", href: "/dashboard/help", color: "var(--color-pink)" },
 ] as const;
