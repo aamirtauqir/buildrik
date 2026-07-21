@@ -4,6 +4,7 @@ import { useState } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { WorkspaceForm } from "@/components/settings/workspace-form";
+import { AgencyLayerToggle } from "@/components/settings/agency-layer-toggle";
 import { SectionCard, Button, InputField } from "@/components/dashboard/primitives";
 
 /** Settings index = the Workspace section (IA v2 D6 card mapping). Carries
@@ -65,6 +66,8 @@ export default function WorkspaceSettingsPage() {
         onSaveSharing={(data) => sharingMutation.mutate(data)}
         saving={updateMutation.isPending || sharingMutation.isPending}
       />
+
+      <AgencyLayerToggle />
 
       <SectionCard title="Transfer ownership">
         <p className="text-body-sm mb-3" style={{ color: "var(--color-text-secondary)" }}>
