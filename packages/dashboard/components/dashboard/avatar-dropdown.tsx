@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Settings, CreditCard, HelpCircle, LogOut, ChevronDown, type LucideIcon } from "lucide-react";
+import { Settings, CreditCard, LogOut, ChevronDown, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type MenuItem = {
@@ -14,7 +14,7 @@ type MenuItem = {
 export const AVATAR_MENU_ITEMS: MenuItem[] = [
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
   { label: "Billing", href: "/dashboard/settings/billing", icon: CreditCard },
-  { label: "Help", href: "/dashboard/help", icon: HelpCircle },
+  // Help removed — it now lives in Resources, not in the account menu.
   { label: "Logout", href: "#", icon: LogOut },
 ];
 

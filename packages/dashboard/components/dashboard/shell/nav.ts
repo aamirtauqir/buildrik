@@ -56,10 +56,17 @@ export const ECOSYSTEM_NAV = [
   { label: "Resources", href: "/dashboard/resources" },
 ] as const;
 
-/** True on an ecosystem page (Marketplace/Learn/Resources). These go full-width;
- *  everything else under /dashboard keeps the workspace sidebar. The single
- *  predicate behind both the sidebar's visibility and the topbar's "Dashboard"
- *  active state, so the two can never disagree about what "the workspace" is. */
-export function isEcosystemRoute(pathname: string): boolean {
-  return ECOSYSTEM_NAV.some((item) => pathname === item.href || pathname.startsWith(item.href + "/"));
+// Every route that renders FULL-WIDTH with no workspace sidebar: the ecosystem
+// tabs above, plus reference pages reached from them. Help is full-width but is
+// NOT a topbar tab — it lives inside Resources — so it belongs here and not in
+// ECOSYSTEM_NAV. Keeping the two lists separate is the point: what shows in the
+// topbar and what drops the sidebar are related but not the same set.
+const FULL_WIDTH_ROUTES = [...ECOSYSTEM_NAV.map((n) => n.href), "/dashboard/help"];
+
+/** True on a full-width page (the ecosystem tabs + Help). These drop the workspace
+ *  sidebar; everything else under /dashboard keeps it. The single predicate behind
+ *  both the sidebar's visibility and the topbar's "Dashboard" active state, so the
+ *  two can never disagree about what "the workspace" is. */
+export function isFullWidthRoute(pathname: string): boolean {
+  return FULL_WIDTH_ROUTES.some((href) => pathname === href || pathname.startsWith(href + "/"));
 }

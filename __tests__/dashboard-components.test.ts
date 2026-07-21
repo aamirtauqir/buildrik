@@ -20,13 +20,13 @@ describe("Dashboard Components", () => {
   });
 
   describe("AvatarDropdown", () => {
-    // Profile entry removed — Settings doubles as the profile page.
-    // Update + alignment confirmed against the canonical export.
-    it("exports AVATAR_MENU_ITEMS with 4 items (no separate Profile entry)", async () => {
+    // Profile entry removed earlier (Settings doubles as the profile page), and
+    // Help removed too — it now lives in Resources, not the account menu.
+    it("exports AVATAR_MENU_ITEMS as Settings/Billing/Logout — no Profile, no Help", async () => {
       const mod = await import("@/components/dashboard/avatar-dropdown");
-      expect(mod.AVATAR_MENU_ITEMS).toHaveLength(4);
+      expect(mod.AVATAR_MENU_ITEMS).toHaveLength(3);
       const labels = mod.AVATAR_MENU_ITEMS.map((i: { label: string }) => i.label);
-      expect(labels).toEqual(["Settings", "Billing", "Help", "Logout"]);
+      expect(labels).toEqual(["Settings", "Billing", "Logout"]);
     });
   });
 

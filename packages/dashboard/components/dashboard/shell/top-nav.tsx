@@ -7,7 +7,7 @@ import { Search } from "lucide-react";
 import { cn } from "@lib/utils";
 import { AvatarDropdown } from "@/components/dashboard/avatar-dropdown";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
-import { ECOSYSTEM_NAV, isEcosystemRoute } from "./nav";
+import { ECOSYSTEM_NAV, isFullWidthRoute } from "./nav";
 
 // The top bar carries the brand, a "Dashboard" link back to the workspace, an
 // EXPLORE cluster of ecosystem areas, the ⌘K search box, notifications and the
@@ -53,11 +53,11 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
             workspace page (wherever the sidebar is showing). */}
         <Link
           href="/dashboard"
-          className={cn("relative rounded-lg px-3 py-1.5 text-[13.5px] font-[530] transition-colors", isEcosystemRoute(pathname) ? "hover:bg-[var(--color-bg-subtle)]" : "")}
-          style={{ color: isEcosystemRoute(pathname) ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}
+          className={cn("relative rounded-lg px-3 py-1.5 text-[13.5px] font-[530] transition-colors", isFullWidthRoute(pathname) ? "hover:bg-[var(--color-bg-subtle)]" : "")}
+          style={{ color: isFullWidthRoute(pathname) ? "var(--color-text-secondary)" : "var(--color-text-primary)" }}
         >
           Dashboard
-          {!isEcosystemRoute(pathname) && <span className="absolute inset-x-3 -bottom-[calc((var(--topnav-h)-100%)/2)] h-0.5 rounded-pill" style={{ backgroundColor: "var(--color-text-primary)" }} />}
+          {!isFullWidthRoute(pathname) && <span className="absolute inset-x-3 -bottom-[calc((var(--topnav-h)-100%)/2)] h-0.5 rounded-pill" style={{ backgroundColor: "var(--color-text-primary)" }} />}
         </Link>
         <span className="mx-1.5 h-4 w-px" style={{ backgroundColor: "var(--color-border-default)" }} />
         <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.11em]" style={{ color: "var(--color-text-muted)" }}>Explore</span>
