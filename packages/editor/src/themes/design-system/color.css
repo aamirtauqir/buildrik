@@ -27,14 +27,16 @@
   --buildrick-border-medium: #CBD5E1;
   --buildrick-border-strong: #94A3B8;
   --buildrick-border-hover: #94A3B8;
-  --buildrick-border-focus: #2D6DFF;
+  --buildrick-border-focus: #406ED6;
 
-  /* ACCENT (cobalt — single accent per DESIGN.md) */
-  --buildrick-accent: #2D6DFF;
-  --buildrick-accent-hover: #4B8DFF;
-  --buildrick-accent-pressed: #1E58D9;
-  --buildrick-accent-subtle: rgba(45, 109, 255, 0.05);
-  --buildrick-accent-tint: rgba(45, 109, 255, 0.10);
+  /* ACCENT (#406ED6 — single product accent per DESIGN.md; migrated from cobalt
+     #2D6DFF 2026-07-21 to match the Figma file + dashboard. White on #406ED6 is
+     4.75:1, clearing the 4.5 AA bar cobalt missed at 4.43:1.) */
+  --buildrick-accent: #406ED6;
+  --buildrick-accent-hover: #5E86E0;
+  --buildrick-accent-pressed: #2E56B8;
+  --buildrick-accent-subtle: rgba(64, 110, 214, 0.05);
+  --buildrick-accent-tint: rgba(64, 110, 214, 0.10);
 
   /* SEMANTIC STATUS */
   --buildrick-error: #DC2626;
@@ -57,8 +59,8 @@
   --buildrick-warning-strong: #854D0E;        /* T9: amber-900 — WCAG AA text on warning-soft (5.61:1 vs 4.5 required) */
   --buildrick-warning-border: rgba(180, 83, 9, 0.30);
   --buildrick-warning-bg: rgba(180, 83, 9, 0.05);
-  --buildrick-info: #2D6DFF;
-  --buildrick-info-light: rgba(45, 109, 255, 0.08);
+  --buildrick-info: #406ED6;
+  --buildrick-info-light: rgba(64, 110, 214, 0.08);
   --buildrick-info-soft: #EFF4FF;             /* light fill for info chips/badges (used by beginner-mode hint) */
   --buildrick-info-strong: #1F4FBF;           /* WCAG AA text on info-soft */
 

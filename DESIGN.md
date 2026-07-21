@@ -10,11 +10,11 @@
 
 Buildrick runs on **one brand accent: `#406ED6`** across dashboard, auth and onboarding — no scoped exceptions, one blue on screen anywhere. Red is reserved for error/danger/destructive everywhere. (Adopted 2026-07-18 from the founder-supplied UI kit, `docs/design/dashboard-ui-kit.md`; supersedes the cobalt `#2D6DFF` unification of 2026-07-12, which itself had replaced the dashboard's red `#E42313`. See Decisions Log.)
 
-**Editor chrome is the one surface still on cobalt `#2D6DFF` IN CODE** — it carries its own `--buildrick-*` design system in `packages/editor/`, with its own token contract and CI gates, so it is a separate migration. **The design is already flipped**: the Figma file (`g4GzQFqzNYz5sosz1QtZXC`) moved the editor accent to `#406ED6` on 2026-07-20, because the file specifies the *next* editor and drawing it in a colour scheduled for retirement means drawing it twice. It also cleared the last contrast failure — white on cobalt was 4.43:1, under the 4.5 bar; white on `#406ED6` is 4.75:1. The code migration is still owed.
+**Editor chrome is now on `#406ED6` in code too** (migrated 2026-07-21, M4) — it carries its own `--buildrick-*` design system in `packages/editor/` with its own token contract and CI gates, so it was a separate migration. The flip is the single `--buildrick-accent` token in `themes/design-system/color.css` (+ `border-focus`/`info` and the `accent-hover`/`pressed`/`subtle`/`tint` shades); every chrome consumer follows via the `--bd-accent` / `--bd-cobalt` aliases, so no per-component edits were needed. The Figma file (`g4GzQFqzNYz5sosz1QtZXC`) had already moved to `#406ED6` on 2026-07-20; code now matches. `#406ED6` also cleared the last contrast failure — white on cobalt was 4.43:1, under the 4.5 bar; white on `#406ED6` is 4.75:1. (The user-facing site-builder default tokens in `editor/design-system/` stay their own palette — that is user output, not chrome.)
 
 | Surface | Lives in | Accent | Display font | Body font | Audience |
 |---|---|---|---|---|---|
-| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **`#406ED6` in design** · cobalt `#2D6DFF` still in code (own `--buildrick-*` DS — migration owed) | General Sans | Inter Tight | Power user mid-flow. Quiet. |
+| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **`#406ED6`** (own `--buildrick-*` DS; code migrated 2026-07-21) | General Sans | Inter Tight | Power user mid-flow. Quiet. |
 | **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | **`#406ED6`** (`--color-primary`, hover `#2E56B8`, subtle `#EBF1FF`) | Inter | Inter | Signed-in workspace tasks. |
 | **Auth chrome** (signed-out craftwork) | `app/auth/` | **`#406ED6`** (`--color-auth-cta`, hover `#2E56B8`) + art rail | Inter Tight | Inter Tight | New visitor / signed-out. |
 | **Onboarding wizard** | `app/onboarding/` | **`#406ED6`** (`--color-onb-primary`) — no longer a scoped exception | Inter | Inter | Post-verification setup. |
@@ -23,7 +23,7 @@ Buildrick runs on **one brand accent: `#406ED6`** across dashboard, auth and onb
 **Why one accent:** editor, auth, and dashboard are one continuous signed-in-adjacent product; a single cobalt accent reads as one brand. Onboarding keeps its blue per the M2 spec.
 
 Rules:
-- **`#406ED6` is the single accent** for CTAs, links, active states and focus rings — everywhere, including the editor. (Editor chrome still *runs* cobalt `#2D6DFF` in its own DS; the design is already flipped and the code migration is owed. Draw `#406ED6`.)
+- **`#406ED6` is the single accent** for CTAs, links, active states and focus rings — everywhere, including the editor. (Editor chrome code migrated to `#406ED6` on 2026-07-21; design and code now match.)
 - **Red means error/danger/destructive only** (delete confirm, FAILED status, validation, over-limit, dunning) — on every surface. Never a red CTA or accent.
 - Purple/violet/indigo remain **banned** as accents (AI-slop guard). **One narrow
   exception (user-approved 2026-07-18):** third-party *brand* colours on the

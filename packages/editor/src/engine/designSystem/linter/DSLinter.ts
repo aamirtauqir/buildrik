@@ -28,7 +28,7 @@ const MAX_ALIAS_DEPTH = 3;
  *
  * Rules (initial set; more can be added as DESIGN.md grows):
  *   banned-hue   — color token whose value is in the purple/violet/indigo
- *                  family. DESIGN.md mandates cobalt #2D6DFF as sole accent.
+ *                  family. DESIGN.md mandates #406ED6 as sole accent.
  *   pure-black   — color token with #000 or near-black. DESIGN.md NO BLACK.
  *   empty-value  — non-color token with empty `value` string. Empty `value`
  *                  for a color token is allowed only when the consumer treats
@@ -107,7 +107,7 @@ export class DSLinter {
           rule: "banned-hue",
           severity: "error",
           tokenId: t.id,
-          message: `Token "${t.id}" uses a purple/violet/indigo hue ("${t.value}"). DESIGN.md bans these — use cobalt #2D6DFF or a slate neutral.`,
+          message: `Token "${t.id}" uses a purple/violet/indigo hue ("${t.value}"). DESIGN.md bans these — use the accent #406ED6 or a slate neutral.`,
         });
       }
       if (t.darkValue !== undefined && isBannedHue(t.darkValue)) {

@@ -431,7 +431,8 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 #     rgba(139, 92, 246, x)   — violet-500 alpha (E-arc)
 #     rgba(168, 85, 247, x)   — purple-500 alpha (E-arc)
 #   - Words: indigo, violet, purple (case-insensitive, word-boundary).
-# Canonical accent: --buildrick-accent #2D6DFF (cobalt). See color.css:33-37.
+# Canonical accent: --buildrick-accent #406ED6 (migrated from cobalt #2D6DFF
+# 2026-07-21 to the single product accent, DESIGN.md). See color.css:32-37.
 # Allowlist (paths with legitimate non-chrome usage):
 #   Original (H-arc):
 #     shared/utils/parsers/colorTypes.ts          — CSS color-name parser data
@@ -474,7 +475,7 @@ GATE18_VIOLATIONS=$(echo "$GATE18_RAW" | grep -vE \
 if [ -n "$GATE18_VIOLATIONS" ]; then
   echo "$GATE18_VIOLATIONS" | head -20
   echo ""
-  echo "Gate 18 explanation: cobalt --buildrick-accent (#2D6DFF) is the canonical accent."
+  echo "Gate 18 explanation: --buildrick-accent (#406ED6) is the canonical accent."
   echo "Banned: stale Tailwind blue/indigo/purple hex + Tailwind blue/azure rgba families"
   echo "        + indigo/violet/purple words in chrome paths."
   echo "If your case is legitimate (debug tooling, color-name parser, user-facing"
