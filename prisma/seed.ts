@@ -124,6 +124,9 @@ function pageBlocks(sections: SeedSection[]) {
       type: "container",
       tagName: "section",
       classes: [`section-${sec.type}`],
+      // Whole sections are markup, not text. Without this the export path
+      // escapes them and the published site shows angle brackets.
+      contentFormat: "html" as const,
       content: sec.html,
       children: [],
     })),
