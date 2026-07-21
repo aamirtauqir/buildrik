@@ -13,7 +13,7 @@ import { useToast } from "@/components/dashboard/toast-provider";
 // dialog rather than navigating, per the design.
 const ACTIONS = [
   { label: "Invite teammate", href: "/dashboard/settings/team", icon: UserPlus },
-  { label: "Browse templates", href: "/dashboard/sites/new?method=template", icon: LayoutTemplate },
+  { label: "Browse templates", href: "/dashboard/templates", icon: LayoutTemplate },
 ];
 
 export function QuickActions() {

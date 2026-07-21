@@ -1,20 +1,17 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LayoutTemplate, Sparkles, FileText } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { TemplateGallery } from "@/components/templates/template-gallery";
-import { TemplatePreview } from "@/components/templates/template-preview";
-import { LoadingSkeleton, ErrorState } from "@/components/states";
 import { WizardProgress } from "@/components/ai-wizard/wizard-progress";
 import { StepType, BUSINESS_TYPES } from "@/components/ai-wizard/step-type";
 import { StepPages } from "@/components/ai-wizard/step-pages";
 import { GenerationProgress } from "@/components/ai-wizard/generation-progress";
 import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
-import { initialViewFor, type NewSiteView as View } from "./initial-view";
+import { initialViewFor, isTemplateRedirect, type NewSiteView as View } from "./initial-view";
 
 // Wraps NewSitePageInner in Suspense because useSearchParams() requires it
 // in Next.js 16 production builds (causes CSR bailout error otherwise).
@@ -32,59 +29,27 @@ function NewSitePageInner() {
   const { addToast } = useToast();
   const unified = useUnifiedEditorFlag();
 
-  // Deep link into one template's preview (from the Templates tab cards) via
-  // ?template=<id>, instead of `?method=template` which only lands on the full
-  // gallery. See initial-view.ts for the routing.
-  const initial = initialViewFor({
-    method: searchParams.get("method"),
-    template: searchParams.get("template"),
-  });
-  const [view, setView] = useState<View>(initial.view);
+  // Templates live in their own full browser now. A template-shaped URL
+  // (?method=template from empty-state / quick-actions / the create modal, or a
+  // bare ?template=<id>) redirects there instead of opening a view here — the
+  // single canonical template surface.
+  const redirectToTemplates = isTemplateRedirect(searchParams.get("method"), searchParams.get("template"));
+  useEffect(() => {
+    if (redirectToTemplates) router.replace("/dashboard/templates");
+  }, [redirectToTemplates, router]);
 
+  const [view, setView] = useState<View>(initialViewFor(searchParams.get("method")));
   const [siteName, setSiteName] = useState(searchParams.get("name") ?? "My New Site");
-
-  // Template state
-  const [templateCategory, setTemplateCategory] = useState("ALL");
-  const [templateSort, setTemplateSort] = useState("popular");
-  const [templatePage, setTemplatePage] = useState(1);
-  const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(initial.previewTemplateId);
 
   // AI wizard state
   const [businessType, setBusinessType] = useState<string | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
   const [creditsExhausted, setCreditsExhausted] = useState(false);
 
-  // Queries
-  const templatesQuery = trpc.templates.list.useQuery(
-    {
-      category: templateCategory as "ALL" | "PORTFOLIO" | "BUSINESS" | "BLOG" | "AGENCY" | "ECOMMERCE" | "RESTAURANT",
-      page: templatePage,
-      perPage: 6,
-      sort: templateSort as "popular" | "newest" | "alphabetical",
-    },
-    { enabled: view === "templates" }
-  );
-
-  const previewQuery = trpc.templates.get.useQuery(
-    { id: previewTemplateId! },
-    { enabled: !!previewTemplateId && view === "preview" }
-  );
-
   const jobStatusQuery = trpc.templates.generate.status.useQuery(
     { jobId: jobId! },
     { enabled: !!jobId && view === "ai-progress", refetchInterval: 2000 }
   );
-
-  // Mutations
-  const useTemplateMutation = trpc.templates.use.useMutation({
-    onSuccess: (site) => {
-      addToast("success", "Site created from template");
-      const href = getEditorHref(site.id, unified);
-      if (unified) router.push(href);
-      else window.location.href = href;
-    },
-    onError: (err) => addToast("error", "Failed", err.message),
-  });
 
   const createSiteMutation = trpc.sites.create.useMutation({
     onSuccess: (site) => {
@@ -123,6 +88,9 @@ function NewSitePageInner() {
     onError: (err) => addToast("error", "Couldn't cancel", err.message),
   });
 
+  // Mid-redirect (template URL): render nothing rather than flashing the chooser.
+  if (redirectToTemplates) return null;
+
   // Choose method view (default)
   if (view === "choose") {
     return (
@@ -146,7 +114,7 @@ function NewSitePageInner() {
         </div>
         <div className="mt-6 space-y-3">
           <button
-            onClick={() => setView("templates")}
+            onClick={() => router.push("/dashboard/templates")}
             className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[var(--color-bg-page)]"
             style={{ borderColor: "var(--color-border-default)" }}
           >
@@ -155,7 +123,7 @@ function NewSitePageInner() {
             </div>
             <div>
               <p className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Use a Template</p>
-              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Browse 50+ professionally designed templates</p>
+              <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>Browse the full template gallery</p>
             </div>
           </button>
           <button
@@ -187,60 +155,6 @@ function NewSitePageInner() {
           </button>
         </div>
       </div>
-    );
-  }
-
-  // Template gallery
-  if (view === "templates") {
-    return (
-      <TemplateGallery
-        open={true}
-        onClose={() => setView("choose")}
-        templates={templatesQuery.data?.data ?? []}
-        isLoading={templatesQuery.isLoading}
-        category={templateCategory}
-        onCategoryChange={(cat) => { setTemplateCategory(cat); setTemplatePage(1); }}
-        sort={templateSort}
-        onSortChange={setTemplateSort}
-        onPreview={(id) => { setPreviewTemplateId(id); setView("preview"); }}
-        onUse={(id) => useTemplateMutation.mutate({ templateId: id, siteName })}
-        onLoadMore={() => setTemplatePage((p) => p + 1)}
-        hasMore={(templatesQuery.data?.page ?? 0) < (templatesQuery.data?.totalPages ?? 0)}
-        onStartBlank={() => createSiteMutation.mutate({ name: siteName, method: "blank" })}
-      />
-    );
-  }
-
-  // Template preview. On a deep link (?template=<id>) this is the first view, so
-  // it has to cover the cold-load states the in-app path never hit: the data is
-  // still fetching, or the id is bad. Without this the page fell through to the
-  // final `return null` and showed a blank screen.
-  if (view === "preview") {
-    if (previewQuery.isLoading) {
-      return (
-        <div className="pt-8">
-          <LoadingSkeleton rows={3} variant="card" />
-        </div>
-      );
-    }
-    if (previewQuery.isError || !previewQuery.data) {
-      return (
-        <div className="pt-8">
-          <ErrorState
-            title="Couldn't load that template"
-            description="It may have been removed. Browse the full gallery instead."
-            retryLabel="Browse templates"
-            onRetry={() => setView("templates")}
-          />
-        </div>
-      );
-    }
-    return (
-      <TemplatePreview
-        template={previewQuery.data as any}
-        onBack={() => setView("templates")}
-        onUse={() => useTemplateMutation.mutate({ templateId: previewQuery.data!.id, siteName })}
-      />
     );
   }
 
@@ -299,11 +213,7 @@ function NewSitePageInner() {
           siteId={status?.siteId ?? null}
           creditsExhausted={creditsExhausted}
           onUpgrade={() => router.push("/dashboard/settings/billing")}
-          onUseTemplate={() => {
-            setCreditsExhausted(false);
-            setJobId(null);
-            setView("templates");
-          }}
+          onUseTemplate={() => router.push("/dashboard/templates")}
           onStartBlank={() => {
             setCreditsExhausted(false);
             setJobId(null);

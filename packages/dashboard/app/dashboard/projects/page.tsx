@@ -627,6 +627,9 @@ export default function ProjectsPage() {
         onSubmit={(data) => {
           if (data.method === "blank") {
             createMutation.mutate({ name: data.name, method: "blank" });
+          } else if (data.method === "template") {
+            setCreateOpen(false);
+            router.push("/dashboard/templates");
           } else {
             setCreateOpen(false);
             router.push(`/dashboard/sites/new?method=${data.method}&name=${encodeURIComponent(data.name)}`);
