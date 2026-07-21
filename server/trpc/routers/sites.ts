@@ -272,8 +272,14 @@ export const sitesRouter = router({
   publish: protectedProcedure
     .input(publishInputSchema)
     .mutation(async ({ ctx, input }) => {
+      // The gate is the approval, not the role (contracts §2, decided 2026-07-19):
+      // a DESIGNER (EDITOR site-role) may publish. The real control is the
+      // approval gate in startPublish, which throws APPROVAL_REQUIRED for a
+      // member in an approval-required workspace without an APPROVED review
+      // (OWNER exempt). Requiring ADMIN here contradicted the design, which
+      // draws Publish as Allowed for a designer.
       try {
-        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;

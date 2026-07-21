@@ -40,11 +40,13 @@ describe("privileged-action registry", () => {
     expect(d.consequence).toMatch(/cannot be undone|deploy/i);
   });
 
-  it("execute re-checks ADMIN via checkSiteRole BEFORE publishing (token is not a role grant)", async () => {
+  it("execute re-checks the site role via checkSiteRole BEFORE publishing (token is not a role grant)", async () => {
     const ctx = { prisma: {} } as never;
     const claims = { actorId: "u1", siteId: "s1", actionId: "site.publish", argsHash: "x", exp: Date.now() + 1000 };
     await getAction("site.publish")!.execute(ctx, claims, { pages: [] });
-    expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u1", "s1", "ADMIN");
+    // M3: a designer (EDITOR) may publish, same as the sites.publish route; the
+    // approval gate in startPublish is the real control below OWNER.
+    expect(checkSiteRoleMock).toHaveBeenCalledWith(expect.anything(), "u1", "s1", "EDITOR");
     expect(startPublishMock).toHaveBeenCalledWith("s1", "ws-1", "u1", []);
   });
 

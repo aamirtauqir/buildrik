@@ -45,7 +45,12 @@ export interface ActionDef {
 
 const PRIVILEGED_ACTIONS: Record<string, ActionDef> = {
   "site.publish": {
-    minRole: "ADMIN",
+    // A designer (EDITOR site-role) may publish — same rule as the sites.publish
+    // route (contracts §2, M3). The approval gate in startPublish is the real
+    // control below OWNER; the role check here only enforces "at least an editor",
+    // matching the UI so agent-native parity holds (an action a user can take, the
+    // agent can take).
+    minRole: "EDITOR",
     schema: z.object({}).strip(), // publish takes no AI-supplied args
     payloadSchema: z.object({ pages: z.array(publishPageSchema).max(500).optional() }),
     describe: () => ({
@@ -55,8 +60,8 @@ const PRIVILEGED_ACTIONS: Record<string, ActionDef> = {
       undoable: false,
     }),
     execute: async (ctx, claims, payload) => {
-      // Re-check ADMIN via the domain path — the token is not a role grant.
-      await checkSiteRole(ctx.prisma, claims.actorId, claims.siteId, "ADMIN");
+      // Re-check the site role via the domain path — the token is not a role grant.
+      await checkSiteRole(ctx.prisma, claims.actorId, claims.siteId, "EDITOR");
       const workspaceId = await resolveWorkspaceId(ctx);
       const { pages } = payload as { pages?: PublishPage[] };
       return startPublish(claims.siteId, workspaceId, claims.actorId, pages);

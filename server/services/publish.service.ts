@@ -181,9 +181,11 @@ export async function startPublish(
 
   // m-approval gate: in a workspace that requires approval, a publish is blocked
   // unless the site's latest review is APPROVED. Only the OWNER is exempt; ADMINs
-  // are gated too (§13-C1 — sites.publish already requires ADMIN+, so exempting
-  // ADMIN would gate nobody). Previously `editsRequireApproval` was read only in
-  // settings and never enforced.
+  // AND designers (EDITOR site-role) are gated. As of the M3 permission change
+  // `sites.publish` requires EDITOR, not ADMIN (contracts §2 — a designer may
+  // publish once approved), so this gate is now the real control for everyone
+  // below OWNER, which is exactly its point. Previously `editsRequireApproval`
+  // was read only in settings and never enforced.
   {
     const [workspace, member] = await Promise.all([
       prisma.workspace.findUnique({
