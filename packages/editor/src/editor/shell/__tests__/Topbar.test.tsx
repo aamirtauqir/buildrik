@@ -38,6 +38,7 @@ vi.mock("../../../shared/utils/editorViewMode", () => ({
 
 vi.mock("../../../services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),
+  fetchReviewStatus: vi.fn(() => Promise.resolve({ state: "none", reviewerName: null, at: null })),
 }));
 
 vi.mock("../PublishDropdown", () => ({
@@ -321,7 +322,7 @@ describe("Topbar", () => {
         target: { value: "please check copy" },
       });
       fireEvent.click(within(dialog).getByText("Send"));
-      expect(submitForReview).toHaveBeenCalledWith("please check copy", "new hero", undefined);
+      expect(submitForReview).toHaveBeenCalledWith("please check copy", "new hero", undefined, undefined);
       // resolves → button becomes the sent-confirmation
       expect(await screen.findByText("Sent for review ✓")).toBeInTheDocument();
     });
@@ -337,7 +338,7 @@ describe("Topbar", () => {
         target: { value: "new hero" },
       });
       fireEvent.click(within(dialog).getByText("Send"));
-      expect(submitForReview).toHaveBeenCalledWith(undefined, "new hero", "sara@bellacucina.com");
+      expect(submitForReview).toHaveBeenCalledWith(undefined, "new hero", "sara@bellacucina.com", undefined);
     });
 
     // Both paths are real: an address invites the client, no address keeps the
@@ -347,7 +348,7 @@ describe("Topbar", () => {
       fireEvent.click(screen.getByLabelText("Send for review"));
       const dialog = screen.getByRole("dialog", { name: "Send for review" });
       fireEvent.click(within(dialog).getByText("Send"));
-      expect(submitForReview).toHaveBeenCalledWith(undefined, undefined, undefined);
+      expect(submitForReview).toHaveBeenCalledWith(undefined, undefined, undefined, undefined);
       expect(await screen.findByText("Sent for review ✓")).toBeInTheDocument();
     });
   });

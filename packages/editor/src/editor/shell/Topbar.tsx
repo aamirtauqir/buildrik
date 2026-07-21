@@ -30,8 +30,22 @@ import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { useClickOutside } from "@/shared/hooks";
 import { Sparkles, MoreHorizontal } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
-import { submitForReview } from "../../services/ReviewService";
+import { submitForReview, fetchReviewStatus, type ReviewStatus } from "../../services/ReviewService";
 import { exportPublishPages } from "./exportPublishPages";
+
+/** S5.2 review-status pill copy + tone, keyed by the derived review state.
+ *  `none` renders nothing (no review in flight). */
+const REVIEW_PILL: Record<
+  ReviewStatus["state"],
+  { label: string; bg: string; fg: string } | null
+> = {
+  none: null,
+  pending: { label: "In review", bg: "var(--buildrick-accent-subtle)", fg: "var(--buildrick-accent)" },
+  "opened-not-acted": { label: "Opened · no reply", bg: "var(--buildrick-accent-subtle)", fg: "var(--buildrick-accent)" },
+  "changes-requested": { label: "Changes requested", bg: "var(--buildrick-warning-soft)", fg: "var(--buildrick-warning-strong)" },
+  approved: { label: "Approved", bg: "var(--buildrick-success-soft)", fg: "var(--buildrick-success-strong)" },
+  "approved-edited-since": { label: "Approved · edited since", bg: "var(--buildrick-warning-soft)", fg: "var(--buildrick-warning-strong)" },
+};
 import type { Issue } from "./hooks/useStudioState";
 import { CommandPalette } from "./modals/CommandPalette";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
@@ -196,6 +210,20 @@ export const Topbar: React.FC<TopbarProps> = ({
   const [reviewEmail, setReviewEmail] = React.useState("");
   const reviewRef = React.useRef<HTMLDivElement | null>(null);
   useClickOutside(reviewRef, () => setReviewOpen(false), { enabled: reviewOpen });
+  // S5.2: the persistent review-status pill — distinct from `reviewState` (the
+  // send flow). Fetched on mount; refreshed after a send lands.
+  const [reviewStatus, setReviewStatus] = React.useState<ReviewStatus>({
+    state: "none",
+    reviewerName: null,
+    at: null,
+  });
+  const refreshReviewStatus = React.useCallback(() => {
+    fetchReviewStatus().then(setReviewStatus);
+  }, []);
+  React.useEffect(() => {
+    // The pill only shows in client view; don't poll review status otherwise.
+    if (viewMode.clientView) refreshReviewStatus();
+  }, [refreshReviewStatus, viewMode.clientView]);
   const sendForReview = React.useCallback(async () => {
     setReviewState("sending");
     try {
@@ -222,10 +250,11 @@ export const Topbar: React.FC<TopbarProps> = ({
       );
       setReviewState("sent");
       setReviewOpen(false);
+      refreshReviewStatus();
     } catch {
       setReviewState("error");
     }
-  }, [reviewNote, reviewSummary, reviewEmail, composer]);
+  }, [reviewNote, reviewSummary, reviewEmail, composer, refreshReviewStatus]);
   const [cmdOpen, setCmdOpen] = React.useState(false);
 
   // Redesign: the "Status + Ship" zone keeps only the common actions; the rare
@@ -397,6 +426,31 @@ export const Topbar: React.FC<TopbarProps> = ({
               <TooltipContent>Preview <TooltipKbd>⌘P</TooltipKbd></TooltipContent>
             </TooltipPortal>
           </Tooltip>
+
+          {viewMode.clientView && REVIEW_PILL[reviewStatus.state] ? (
+            <span
+              title={
+                reviewStatus.reviewerName
+                  ? `${REVIEW_PILL[reviewStatus.state]!.label} — ${reviewStatus.reviewerName}`
+                  : REVIEW_PILL[reviewStatus.state]!.label
+              }
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                height: 24,
+                padding: "0 10px",
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+                background: REVIEW_PILL[reviewStatus.state]!.bg,
+                color: REVIEW_PILL[reviewStatus.state]!.fg,
+              }}
+            >
+              {REVIEW_PILL[reviewStatus.state]!.label}
+            </span>
+          ) : null}
 
           {viewMode.clientView ? (
             <div style={{ position: "relative" }} ref={reviewRef}>

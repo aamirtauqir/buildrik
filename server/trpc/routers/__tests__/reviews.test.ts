@@ -82,7 +82,7 @@ describe("reviews router", () => {
     await expect(caller.submit({ siteId: "s1", note: "ready" })).resolves.toMatchObject({ id: "r1" });
     // 5 args since 389e2c39 added the optional clientEmail — omitted here, which
     // is the "submit without inviting anyone" path.
-    expect(submitMock).toHaveBeenCalledWith("s1", "u_1", "ready", undefined, undefined);
+    expect(submitMock).toHaveBeenCalledWith("s1", "u_1", "ready", undefined, undefined, undefined);
   });
 
   it("list is Admin-gated and never queries if denied", async () => {

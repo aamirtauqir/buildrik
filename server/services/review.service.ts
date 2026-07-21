@@ -1,12 +1,13 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { ReviewStatus } from "@buildrik/shared/schemas/reviews";
+import type { ReviewStatus, ReviewPillState } from "@buildrik/shared/schemas/reviews";
 import {
   sendReviewRequestedEmail,
   sendReviewResolvedEmail,
   sendReviewInviteEmail,
 } from "@/server/services/email.service";
 import { issueReviewToken } from "@/server/services/client-review.service";
+import { isApprovalStale } from "@/server/services/publish-approval";
 
 /**
  * Invited-client review workflow (E4) — the ONLY layer that reads/writes the
@@ -97,6 +98,55 @@ export interface ReviewRow {
   resolvedById: string | null;
   resolvedAt: Date | null;
   createdAt: Date;
+}
+
+export interface ReviewPillStatus {
+  state: ReviewPillState;
+  /** The client's name, once they've identified themselves. */
+  reviewerName: string | null;
+  /** When the review was sent (createdAt) or resolved, depending on state. */
+  at: Date | null;
+}
+
+/**
+ * The editor's review-status pill (S5.2) for one site. Derives the two states
+ * the raw ReviewRequest.status can't express:
+ *   - `opened-not-acted`: PENDING and the client has identified (reviewerId set)
+ *     but not yet approved or asked for changes.
+ *   - `approved-edited-since`: APPROVED but the site was edited after (isApprovalStale) —
+ *     the approval no longer covers what's on the canvas.
+ * Returns `none` when the site has never been sent for review.
+ */
+export async function getReviewStatusForSite(siteId: string): Promise<ReviewPillStatus> {
+  const r = await prisma.reviewRequest.findFirst({
+    where: { siteId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      status: true,
+      resolvedAt: true,
+      reviewerId: true,
+      createdAt: true,
+      reviewer: { select: { name: true } },
+    },
+  });
+  if (!r) return { state: "none", reviewerName: null, at: null };
+  const reviewerName = r.reviewer?.name ?? null;
+  if (r.status === "CHANGES_REQUESTED") {
+    return { state: "changes-requested", reviewerName, at: r.resolvedAt };
+  }
+  if (r.status === "APPROVED") {
+    const site = await prisma.site.findUnique({ where: { id: siteId }, select: { lastEditedAt: true } });
+    const stale = isApprovalStale({
+      editsRequireApproval: true,
+      role: "EDITOR",
+      latestReviewStatus: "APPROVED",
+      latestReviewResolvedAt: r.resolvedAt,
+      siteLastEditedAt: site?.lastEditedAt ?? null,
+    });
+    return { state: stale ? "approved-edited-since" : "approved", reviewerName, at: r.resolvedAt };
+  }
+  // PENDING: opened (identified) vs sent-but-untouched.
+  return { state: r.reviewerId ? "opened-not-acted" : "pending", reviewerName, at: r.createdAt };
 }
 
 /** All review requests across a workspace's sites, newest first. */

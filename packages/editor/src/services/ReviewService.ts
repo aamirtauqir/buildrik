@@ -8,6 +8,7 @@
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
 import type { PublishPage } from "../editor/shell/exportPublishPages";
+import type { ReviewPillState } from "@buildrik/shared/schemas/reviews";
 
 /** The site being edited, read from the unified-editor URL (/edit/<siteId>) or
  *  the legacy ?siteId param. */
@@ -16,6 +17,27 @@ export function currentSiteId(): string | null {
   const path = window.location.pathname.match(/\/edit\/([^/?#]+)/);
   if (path) return decodeURIComponent(path[1]);
   return new URLSearchParams(window.location.search).get("siteId");
+}
+
+export interface ReviewStatus {
+  state: ReviewPillState;
+  reviewerName: string | null;
+  at: string | Date | null;
+}
+
+/**
+ * The current review status for the pill (S5.2). Returns `none` when there is no
+ * site, the agency layer is off, or the site was never sent for review — the
+ * editor then shows no pill. Never throws; a failed fetch is treated as `none`.
+ */
+export async function fetchReviewStatus(): Promise<ReviewStatus> {
+  const siteId = currentSiteId();
+  if (!siteId) return { state: "none", reviewerName: null, at: null };
+  try {
+    return await getBuildrikClient(DASHBOARD_URL).reviews.status.query({ siteId });
+  } catch {
+    return { state: "none", reviewerName: null, at: null };
+  }
 }
 
 /**

@@ -12,11 +12,13 @@ import {
   submitReview,
   listReviews,
   resolveReview,
+  getReviewStatusForSite,
   ReviewError,
 } from "@/server/services/review.service";
 import {
   submitReviewInput,
   resolveReviewInput,
+  reviewStatusForSiteInput,
   reviewStatusSchema,
 } from "@buildrik/shared/schemas/reviews";
 
@@ -82,6 +84,24 @@ export const reviewsRouter = router({
       if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return [];
       await requireAdmin(ctx, workspaceId);
       return listReviews(workspaceId, input?.status);
+    }),
+
+  // The editor's review-status pill (S5.2) for the current site. Flag off →
+  // { state: "none" } so the editor simply shows no pill (mirrors list). Any
+  // EDITOR of the site may read it — it's their own review status.
+  status: protectedProcedure
+    .input(reviewStatusForSiteInput)
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      if (!(await isFeatureEnabled(workspaceId, "agency_layer")))
+        return { state: "none" as const, reviewerName: null, at: null };
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getReviewStatusForSite(input.siteId);
     }),
 
   resolve: protectedProcedure

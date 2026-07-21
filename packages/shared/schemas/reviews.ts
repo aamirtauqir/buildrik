@@ -8,6 +8,25 @@ import { publishPageSchema, MAX_PUBLISH_PAGES } from "./publish";
  */
 export const REVIEW_STATUSES = ["PENDING", "APPROVED", "CHANGES_REQUESTED"] as const;
 export const reviewStatusSchema = z.enum(REVIEW_STATUSES);
+
+/**
+ * The editor's review-status pill (S5.2). Richer than the raw ReviewRequest
+ * status because two of these ("opened-not-acted", "approved-edited-since") are
+ * derived — one from whether the client identified themselves on a PENDING
+ * review, the other from whether the site was edited after approval. "she hasn't
+ * opened it" and "she opened it and said nothing" are different conversations.
+ */
+export const REVIEW_PILL_STATES = [
+  "none",
+  "pending",
+  "opened-not-acted",
+  "changes-requested",
+  "approved",
+  "approved-edited-since",
+] as const;
+export type ReviewPillState = (typeof REVIEW_PILL_STATES)[number];
+
+export const reviewStatusForSiteInput = z.object({ siteId: z.string().min(1) });
 export type ReviewStatus = z.infer<typeof reviewStatusSchema>;
 
 export const submitReviewInput = z.object({
