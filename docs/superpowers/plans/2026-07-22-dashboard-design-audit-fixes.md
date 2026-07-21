@@ -63,48 +63,62 @@ git commit -m "fix(dashboard): constrain ecosystem pages to max-w-1200 (design a
 ### Task 2: F2 — Sites list: one filter bar
 
 **Files:**
-- Modify: `packages/dashboard/components/sites/folder-card-grid.tsx` (remove the Archived pill + the dashed New-folder tile)
-- Modify: `packages/dashboard/app/dashboard/projects/page.tsx` (drop `showArchived` state + wiring; simplify the list query; drop `archivedQuery`)
+- Modify: `packages/dashboard/components/sites/folder-card-grid.tsx` (remove the Archived pill + the dashed New-folder tile; hide the pill row when there are no folders)
+- Modify: `packages/dashboard/app/dashboard/projects/page.tsx` (drop `showArchived`; keep Archived a GLOBAL filter; keep the archived count, route it to the status chip)
+- Modify: `packages/dashboard/components/sites/site-filters.tsx` (render the archived count on the ARCHIVED chip — per the spec)
 
 **Interfaces:**
-- Consumes: `SiteFilters` (unchanged — its `STATUS_FILTER_OPTIONS` already includes `ARCHIVED`).
+- Consumes: `SiteFilters` — `STATUS_FILTER_OPTIONS` already includes `ARCHIVED`. Gains an optional `archivedCount?: number` prop shown on the ARCHIVED chip.
 - Produces: `FolderCardGrid` no longer takes `showArchived` / `archivedCount` / `onToggleArchived` / `onNewFolder`. Archived is reached only via the status filter.
 
-- [ ] **Step 1: Read both files fully** — `folder-card-grid.tsx` and `projects/page.tsx` — to see the exact JSX for the pill row (`All sites` / `Archived` pills, ~lines 108-118), the folder cards loop, the dashed "New folder" tile (~line 155-162), and the page's `showArchived` usages (state ~line 50, query ~lines 115/127, FolderCardGrid props ~lines 467-474, `hasActiveFilters` ~line 404).
+> **Codex plan-review corrections (2026-07-22) folded in below — three real bugs the naive merge would ship:**
+> 1. **Keep Archived GLOBAL.** Today `showArchived` drops `folderId` so Archived spans all folders. Naively passing `folderId` always would silently turn Archived into "archived *inside the selected folder*" — an undeclared behaviour change. Preserve the global semantics.
+> 2. **Don't lose the archived count.** The spec moves the count onto the Archived chip; do that (keep `archivedQuery`), don't drop it.
+> 3. **Hide the folder pill row when there are 0 folders.** Otherwise a lone "All sites" pill survives with a status-filtered count (`?status=published` → the false label "All sites · <publishedCount>").
 
-- [ ] **Step 2: In `folder-card-grid.tsx`, remove the Archived pill and the dashed New-folder tile.**
+- [ ] **Step 1: Read all three files fully** — `folder-card-grid.tsx`, `projects/page.tsx`, `site-filters.tsx` — to see the pill row (`All sites` / `Archived` pills, ~lines 108-118), the folder cards loop, the dashed "New folder" tile (~line 155-162), the page's `showArchived` usages (state ~line 50, query ~lines 115/127/136, FolderCardGrid props ~lines 467-474, `hasActiveFilters` ~line 404), and `SiteFilters`' `STATUS_FILTER_OPTIONS` + the ARCHIVED chip render.
+
+- [ ] **Step 2: In `folder-card-grid.tsx`, remove the Archived pill + dashed tile, and hide the pill row when folderless.**
   - Delete the `Archived · {archivedCount}` pill button (the whole `<button onClick={onToggleArchived}>…</button>`).
-  - Delete the "New folder" dashed tile block (the element rendered via `onNewFolder`).
-  - Keep the `All sites · {totalCount}` pill (it is the folder-clear affordance: `activeId === null`) and the folder cards.
+  - Delete the "New folder" dashed tile block (rendered via `onNewFolder`).
+  - **Render the whole component (pill row + folder cards) only when `folders.length > 0`.** With zero folders, return `null` — the status filter below is the only filter UI. This kills the lonely "All sites" pill + its false count.
+  - Keep the `All sites` pill (folder-clear, `activeId === null`) in the folders-exist case. Its count should be the workspace's UNFILTERED total, not the status-filtered `sitesQuery.data.total` — if only the filtered total is available, drop the count from this pill rather than show a misleading number.
   - Remove from the props type + destructure: `showArchived`, `archivedCount`, `onToggleArchived`, `onNewFolder`.
-  - Where a folder card's `active` was `!showArchived && activeId === folder.id`, drop the `!showArchived &&` (now just `activeId === folder.id`). Same for the `All sites` pill tone: `activeId === null`.
-  - Update the component's doc comment (lines ~91-92) — the "'Archived' stays as a pill" note no longer holds; Archived is a status filter now.
+  - Where a folder card's `active` was `!showArchived && activeId === folder.id`, drop `!showArchived &&`. Same for the `All sites` pill tone: `activeId === null`.
+  - Update the doc comment (lines ~91-92): Archived is a status filter now; the pill row is folder-nav only and hidden when folderless.
 
-- [ ] **Step 3: In `projects/page.tsx`, drop `showArchived` and simplify.**
+- [ ] **Step 3: In `projects/page.tsx`, drop `showArchived`, keep Archived global, keep the count.**
   - Remove `const [showArchived, setShowArchived] = useState(false);`.
-  - List query `status`: change `status: showArchived ? "ARCHIVED" as const : status as …` → `status: status as "PUBLISHED" | "DRAFT" | "ARCHIVED" | undefined,`.
-  - List query `folderId`: change `folderId: showArchived ? undefined : (folderId ?? undefined)` → `folderId: folderId ?? undefined,`.
+  - List query `status`: `status: showArchived ? "ARCHIVED" as const : status as …` → `status: status as "PUBLISHED" | "DRAFT" | "ARCHIVED" | undefined,`.
+  - List query `folderId` — **preserve global Archived**: `folderId: showArchived ? undefined : (folderId ?? undefined)` → `folderId: status === "ARCHIVED" ? undefined : (folderId ?? undefined),`. (When the Archived status is active, ignore any selected folder, exactly as `showArchived` did.)
   - Remove `showArchived` from `hasActiveFilters` (line ~404).
-  - Remove the `archivedQuery` (line ~136) and any `archivedCount` it fed (no count is shown on the status chip — YAGNI).
-  - `FolderCardGrid` usage: drop the `showArchived` / `archivedCount` / `onToggleArchived` / `onNewFolder` props; in `onSelect`, drop `setShowArchived(false)`.
-  - Any `setShowArchived(false)` in `clearFilters` / folder-select handlers: delete those lines.
+  - **Keep `archivedQuery`** (line ~136); pass its `total` to `SiteFilters` as `archivedCount` (see Step 4).
+  - `FolderCardGrid` usage: drop `showArchived` / `archivedCount` / `onToggleArchived` / `onNewFolder`; in `onSelect`, drop `setShowArchived(false)`.
+  - Delete any remaining `setShowArchived(false)` in `clearFilters` / handlers.
 
-- [ ] **Step 4: Typecheck**
+- [ ] **Step 4: In `site-filters.tsx`, show the archived count on the ARCHIVED chip.**
+  - Add an optional prop `archivedCount?: number` to `SiteFilters`.
+  - Where the status chips render (`STATUS_FILTER_OPTIONS.map`), for the `ARCHIVED` option append the count when provided (e.g. label → `Archived · {archivedCount}` via `MetricValue`, or a small trailing count). Keep Published/Draft unchanged.
+  - Wire `archivedCount={archivedQuery.data?.total ?? 0}` from `projects/page.tsx`.
+
+- [ ] **Step 5: Typecheck**
 
 Run: `cd /Users/shahg/Desktop/pencil/buildrik && npx tsc --noEmit -p packages/dashboard/tsconfig.json`
-Expected: clean (TS will flag any missed `showArchived`/prop reference — fix each).
+Expected: clean (TS flags any missed `showArchived` / prop reference — fix each).
 
-- [ ] **Step 5: Live-verify (authed browser)** at `/dashboard/projects`:
-  - One filter bar only: search + `Published · Draft · Archived` chips + sort. No separate "All sites / Archived" tab pair, no dashed "New folder" tile (the top-right "New folder" button remains).
-  - Selecting the **Archived** status chip returns archived sites.
-  - `/dashboard/projects?status=published` still auto-selects Published.
-  - If folders exist, opening a folder still filters the list; the "All sites" pill clears the folder.
+- [ ] **Step 6: Live-verify (authed browser)** at `/dashboard/projects`:
+  - One filter bar: search + `Published · Draft · Archived (· N)` chips + sort. No "All sites / Archived" tab pair, no dashed "New folder" tile (top-right "New folder" button remains).
+  - Archived chip returns archived sites **globally** (even with a folder previously selected — folder is ignored while Archived is active).
+  - The Archived chip shows the archived count.
+  - With **zero folders**, no folder pill row renders at all.
+  - `/dashboard/projects?status=published` still auto-selects Published (and no false "All sites · N" label appears).
+  - If folders exist, opening a folder filters the list; "All sites" clears the folder.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add packages/dashboard/components/sites/folder-card-grid.tsx packages/dashboard/app/dashboard/projects/page.tsx
-git commit -m "fix(sites): single filter bar — drop redundant Archived tab + New-folder tile (design audit F2)"
+git add packages/dashboard/components/sites/folder-card-grid.tsx packages/dashboard/components/sites/site-filters.tsx packages/dashboard/app/dashboard/projects/page.tsx
+git commit -m "fix(sites): single filter bar — Archived (global) + count on chip, drop redundant tab + New-folder tile (design audit F2)"
 ```
 
 ---
@@ -177,14 +191,16 @@ git commit -m "fix(marketplace): flat featured tile, neutral eyebrow, uniform ca
 
 ---
 
-### Task 5: F6 — Confirm Learn "Continue learning" surface is a flat tint
+### Task 5: F6 — Flatten Learn "Continue learning" gradient
 
 **Files:**
-- Inspect (modify only if a gradient): `packages/dashboard/app/dashboard/learn/page.tsx` (the "Continue learning" card, ~line 40-64)
+- Modify: `packages/dashboard/app/dashboard/learn/page.tsx` (the "Continue learning" hero card `style` block, ~line 67)
 
-- [ ] **Step 1: Read the "Continue learning" card's background style.** If it uses `linear-gradient(...)`, replace with a flat `backgroundColor: "var(--color-primary-subtle)"`. If it is already a flat tint (`--color-primary-subtle` / `#EBF1FF`), no change — record "already flat" and skip the commit.
+> Codex plan-review confirmed this card **is** a gradient (not "maybe") — flatten it.
 
-- [ ] **Step 2 (only if changed): Typecheck + commit**
+- [ ] **Step 1: Replace the gradient background with a flat tint.** In the hero card's `style={{ … }}` (~line 67), replace the `background: linear-gradient(...)` with `backgroundColor: "var(--color-primary-subtle)"` (flat `#EBF1FF`). Keep the border + padding.
+
+- [ ] **Step 2: Typecheck + commit**
 
 ```bash
 git add packages/dashboard/app/dashboard/learn/page.tsx
@@ -202,10 +218,14 @@ git commit -m "fix(learn): flatten continue-learning card tint (design audit F6)
 
 - [ ] **Step 1: Read lines ~160-175 and ~280-330** to find how the top-right Upload button triggers the file picker (ref to a hidden input, or an `onClick`). Reuse that exact trigger.
 
-- [ ] **Step 2: Add a primary Upload button inside the empty state**, only for the no-assets case (not the "no search results" case — searching shouldn't prompt an upload). After the empty-state description (line ~286), when `!search`:
+- [ ] **Step 2: Add a primary Upload button — only in the GENUINELY-empty case.**
+
+> Codex plan-review flag: the empty branch (`media-library.tsx:282`, `items.length === 0`) covers more than true-empty and search-empty — it also fires for **an empty folder** (`folderId` set) and **an empty type filter** (`typeFilter !== "all"`). An Upload CTA there ("this folder is empty" / "no images match") is wrong. Gate it to the real "library is empty" state.
+
+The media state (lines 46-48): `search`, `folderId` (`string | null | undefined`, no selection = `undefined`), `typeFilter` (default `"all"`). Show the Upload CTA only when none of those are narrowing the view:
 
 ```tsx
-              {!search && (
+              {!search && !folderId && typeFilter === "all" && (
                 <div className="mt-4">
                   <Button onClick={/* the same trigger the top-right Upload uses */}>
                     <Upload size={15} /> Upload
@@ -214,9 +234,9 @@ git commit -m "fix(learn): flatten continue-learning card tint (design audit F6)
               )}
 ```
 
-Wire `onClick` to the existing upload trigger (ref.current?.click() or the handler). Use the `Button` primitive already imported in the file; `Upload` icon is already imported (line 4).
+Wire `onClick` to the existing upload trigger (the ref/handler behind the top-right Upload button, ~line 169). Use the `Button` primitive already imported; `Upload` icon already imported (line 4). Confirm the "no selection" value of `folderId` while reading (it is `undefined` by default; if a root/"All media" selection uses `null`, treat both `undefined` and `null` as "no folder").
 
-- [ ] **Step 3: Typecheck + live-verify** — `/dashboard/media` empty state shows a working Upload button that opens the file picker (same as the top-right button). The "no search results" state does NOT show it.
+- [ ] **Step 3: Typecheck + live-verify** — `/dashboard/media` truly-empty state shows a working Upload button (opens the file picker). It does NOT appear for a search-empty, an empty folder, or an empty type-filter result.
 
 Run: `cd /Users/shahg/Desktop/pencil/buildrik && npx tsc --noEmit -p packages/dashboard/tsconfig.json`
 
