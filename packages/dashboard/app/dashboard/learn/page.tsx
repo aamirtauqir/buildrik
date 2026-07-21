@@ -66,7 +66,7 @@ function ContinueHero({
       className="mb-8 flex flex-col gap-4 rounded-2xl border p-6 sm:flex-row sm:items-center sm:justify-between"
       style={{
         borderColor: "var(--color-border-default)",
-        background: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 6%, white), color-mix(in srgb, var(--color-primary) 14%, white))",
+        backgroundColor: "var(--color-primary-subtle)",
       }}
     >
       <div>
