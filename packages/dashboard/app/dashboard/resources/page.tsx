@@ -1,24 +1,23 @@
 import Link from "next/link";
-import { FileText, GraduationCap, Code2, Rocket, ArrowRight } from "lucide-react";
+import { FileText, Code2, ArrowRight } from "lucide-react";
 import { PageHeader, IconChip } from "@/components/dashboard/primitives";
 
-// An honest in-app launcher. Buildrick has no external docs site, changelog,
-// community forum or downloadable brand kit today, so this used to fabricate
-// those as cards that all redirected to Help — and dressed every card with an
-// external-link arrow that lied about where it went. Every card here now points
-// at a real, distinct in-app destination, labelled for where it actually goes,
-// with an internal arrow. Nothing pretends to be something it isn't.
+// An honest launcher — and only for destinations that DON'T already have a
+// prominent home elsewhere. It used to carry Learn and Getting started too, but
+// those are top-level nav (Learn is an Explore tab, Getting started is a sidebar
+// item), so the cards were pure duplication. Removed. What's left is what
+// Resources genuinely surfaces: Help (which lives only here) and API & tokens
+// (buried three levels deep in Settings, worth a shortcut). No card here
+// duplicates a prominent nav destination.
 const RESOURCES = [
   { icon: FileText, title: "Help center", description: "Guides and articles for building, publishing and managing sites.", href: "/dashboard/help", color: "var(--color-primary)" },
-  { icon: GraduationCap, title: "Learn", description: "Video courses to get the most out of Buildrick.", href: "/dashboard/learn", color: "var(--color-teal)" },
   { icon: Code2, title: "API & tokens", description: "Tokens and webhooks for scripting and integrations.", href: "/dashboard/settings/api-tokens", color: "var(--color-text-secondary)" },
-  { icon: Rocket, title: "Getting started", description: "Set up your workspace and publish your first site.", href: "/dashboard/getting-started", color: "var(--color-amber)" },
 ] as const;
 
 export default function ResourcesPage() {
   return (
     <div>
-      <PageHeader title="Resources" description="Guides, courses, developer tools and setup — everything to get the most out of Buildrick." />
+      <PageHeader title="Resources" description="Help, guides and developer tools — reference material for building on Buildrick." />
 
       <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
         {RESOURCES.map(({ icon: Icon, title, description, href, color }) => (
