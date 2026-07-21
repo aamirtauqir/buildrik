@@ -136,6 +136,7 @@ export async function useTemplate(
       workspaceId,
       createdBy: userId,
       creationMethod: "TEMPLATE",
+      templateId: template.id,
       pages: templatePages.length,
       lastEditedAt: new Date(),
     },
