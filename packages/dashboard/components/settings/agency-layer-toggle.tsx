@@ -29,7 +29,12 @@ export function AgencyLayerToggle() {
   });
 
   const enabled = !!features.data?.agency_layer;
-  const busy = setFeature.isPending || features.isLoading;
+  // isFetching (not isLoading) keeps the switch disabled through the post-success
+  // refetch, so it can't be clicked again while `enabled` still reads the stale
+  // cache. A failed list read must not render as a clickable "Disabled" — that
+  // would let a click flip a flag whose real state we never loaded.
+  const loadFailed = features.isError;
+  const busy = setFeature.isPending || features.isFetching || loadFailed;
 
   return (
     <SectionCard title="Agency layer">
@@ -54,8 +59,12 @@ export function AgencyLayerToggle() {
             style={{ transform: enabled ? "translateX(20px)" : "translateX(0)" }}
           />
         </button>
-        <span className="text-body" style={{ color: "var(--color-text-primary)" }}>
-          {enabled ? "Enabled for this workspace" : "Disabled"}
+        <span className="text-body" style={{ color: loadFailed ? "var(--color-error-text)" : "var(--color-text-primary)" }}>
+          {loadFailed
+            ? "Couldn't load — reload the page"
+            : enabled
+              ? "Enabled for this workspace"
+              : "Disabled"}
         </span>
       </div>
     </SectionCard>
