@@ -20,6 +20,11 @@ export const generateSiteSchema = z.object({
   images: z.enum(["stock", "placeholders", "none"]).optional(),
 });
 
+export const applyTemplateToSiteSchema = z.object({
+  siteId: z.string(),
+  templateId: z.string(),
+});
+
 export const templateSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -43,5 +48,6 @@ export const aiJobStatusSchema = z.object({
 
 export type ListTemplatesInput = z.infer<typeof listTemplatesSchema>;
 export type GenerateSiteInput = z.infer<typeof generateSiteSchema>;
+export type ApplyTemplateToSiteInput = z.infer<typeof applyTemplateToSiteSchema>;
 export type TemplateData = z.infer<typeof templateSchema>;
 export type AIJobStatus = z.infer<typeof aiJobStatusSchema>;

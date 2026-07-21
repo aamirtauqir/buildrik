@@ -89,6 +89,32 @@ export async function getTemplate(id: string) {
   return prisma.template.findUnique({ where: { id } });
 }
 
+type TemplatePageInput = {
+  name: string;
+  slug: string;
+  position: number;
+  isHomePage: boolean;
+  blocks: Prisma.InputJsonValue;
+};
+
+/**
+ * Map a template's stored `pages[]` (Json) into `page.createMany` rows bound to
+ * a target site. Shared by both template→site paths — useTemplate (brand-new
+ * site) and applyTemplateToSite (existing site) — so the clone shape lives in
+ * exactly one place.
+ */
+function pagesFromTemplate(template: { pages: Prisma.JsonValue }, siteId: string) {
+  const templatePages = (template.pages ?? []) as unknown as TemplatePageInput[];
+  return templatePages.map((p, i) => ({
+    siteId,
+    name: p.name,
+    slug: p.slug,
+    position: p.position ?? i,
+    isHomePage: p.isHomePage ?? i === 0,
+    blocks: p.blocks ?? [],
+  }));
+}
+
 export async function useTemplate(
   workspaceId: string,
   userId: string,
@@ -120,13 +146,7 @@ export async function useTemplate(
   }
 
   const slug = await generateUniqueSlug(siteName, workspaceId);
-  const templatePages = (template.pages ?? []) as Array<{
-    name: string;
-    slug: string;
-    position: number;
-    isHomePage: boolean;
-    blocks: Prisma.InputJsonValue;
-  }>;
+  const templatePageCount = ((template.pages ?? []) as unknown[]).length;
 
   const site = await prisma.site.create({
     data: {
@@ -137,22 +157,14 @@ export async function useTemplate(
       createdBy: userId,
       creationMethod: "TEMPLATE",
       templateId: template.id,
-      pages: templatePages.length,
+      pages: templatePageCount,
       lastEditedAt: new Date(),
     },
   });
 
-  if (templatePages.length > 0) {
-    await prisma.page.createMany({
-      data: templatePages.map((p, i) => ({
-        siteId: site.id,
-        name: p.name,
-        slug: p.slug,
-        position: p.position ?? i,
-        isHomePage: p.isHomePage ?? i === 0,
-        blocks: p.blocks ?? [],
-      })),
-    });
+  const pageRows = pagesFromTemplate(template, site.id);
+  if (pageRows.length > 0) {
+    await prisma.page.createMany({ data: pageRows });
   }
 
   await prisma.template.update({
@@ -161,6 +173,54 @@ export async function useTemplate(
   });
 
   return site;
+}
+
+/**
+ * Part ③ — apply a template to an EXISTING site. DESTRUCTIVE: replaces the
+ * site's pages with the template's (delete-then-recreate), records the source
+ * template, and refreshes the page count + edit timestamp. Workspace-scoped:
+ * the site must belong to `workspaceId` and the template must be visible to it
+ * (a global built-in or one of the workspace's own clones — same scope
+ * listTemplates uses). The delete + recreate + update run in one transaction so
+ * a failure can never strand the site with zero pages.
+ */
+export async function applyTemplateToSite(
+  workspaceId: string,
+  userId: string,
+  siteId: string,
+  templateId: string
+) {
+  const site = await prisma.site.findFirst({
+    where: { id: siteId, workspaceId, deletedAt: null },
+    select: { id: true },
+  });
+  if (!site) throw new TemplateError("SITE_NOT_FOUND", "Site not found in this workspace");
+
+  const template = await prisma.template.findFirst({
+    where: {
+      id: templateId,
+      isActive: true,
+      OR: [{ workspaceId: null }, { workspaceId }],
+    },
+  });
+  if (!template) throw new Error("TEMPLATE_NOT_FOUND");
+
+  const pageRows = pagesFromTemplate(template, siteId);
+
+  return prisma.$transaction(async (tx) => {
+    await tx.page.deleteMany({ where: { siteId } });
+    if (pageRows.length > 0) {
+      await tx.page.createMany({ data: pageRows });
+    }
+    return tx.site.update({
+      where: { id: siteId },
+      data: {
+        templateId: template.id,
+        pages: pageRows.length,
+        lastEditedAt: new Date(),
+      },
+    });
+  });
 }
 
 export class TemplateError extends Error {

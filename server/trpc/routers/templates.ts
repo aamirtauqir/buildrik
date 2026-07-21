@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { listTemplates, getTemplate, useTemplate, cloneSiteAsTemplate, TemplateError } from "@/server/services/template.service";
+import { listTemplates, getTemplate, useTemplate, cloneSiteAsTemplate, applyTemplateToSite, TemplateError } from "@/server/services/template.service";
 import { createGenerationJob, getJobStatus, cancelJob } from "@/server/services/ai-generation.service";
-import { listTemplatesSchema, generateSiteSchema } from "@buildrik/shared/schemas/templates";
+import { listTemplatesSchema, generateSiteSchema, applyTemplateToSiteSchema } from "@buildrik/shared/schemas/templates";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 
 export const templatesRouter = router({
@@ -41,6 +41,22 @@ export const templatesRouter = router({
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "SITE_LIMIT")
           throw new TRPCError({ code: "FORBIDDEN", message: "Site limit reached." });
+        if (e instanceof Error && e.message === "TEMPLATE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Template not found." });
+        throw e;
+      }
+    }),
+
+  // Part ③: destructively replace an existing site's pages with a template's.
+  applyToSite: protectedProcedure
+    .input(applyTemplateToSiteSchema)
+    .mutation(async ({ ctx, input }) => {
+      const workspaceId = await getWorkspaceId(ctx);
+      try {
+        return await applyTemplateToSite(workspaceId, ctx.session.user.id, input.siteId, input.templateId);
+      } catch (e: unknown) {
+        if (e instanceof TemplateError && e.code === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
         if (e instanceof Error && e.message === "TEMPLATE_NOT_FOUND")
           throw new TRPCError({ code: "NOT_FOUND", message: "Template not found." });
         throw e;

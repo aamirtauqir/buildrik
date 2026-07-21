@@ -7,29 +7,62 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const siteFindFirst = vi.fn();
+const siteUpdate = vi.fn();
 const pageFindMany = vi.fn();
+const pageDeleteMany = vi.fn();
+const pageCreateMany = vi.fn();
 const tplFindUnique = vi.fn();
+const tplFindFirst = vi.fn();
 const tplCreate = vi.fn();
 const tplCount = vi.fn();
 const tplFindMany = vi.fn();
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    site: { findFirst: (...a: unknown[]) => siteFindFirst(...a) },
-    page: { findMany: (...a: unknown[]) => pageFindMany(...a) },
+vi.mock("@/lib/prisma", () => {
+  const client = {
+    site: {
+      findFirst: (...a: unknown[]) => siteFindFirst(...a),
+      update: (...a: unknown[]) => siteUpdate(...a),
+    },
+    page: {
+      findMany: (...a: unknown[]) => pageFindMany(...a),
+      deleteMany: (...a: unknown[]) => pageDeleteMany(...a),
+      createMany: (...a: unknown[]) => pageCreateMany(...a),
+    },
     template: {
       findUnique: (...a: unknown[]) => tplFindUnique(...a),
+      findFirst: (...a: unknown[]) => tplFindFirst(...a),
       create: (...a: unknown[]) => tplCreate(...a),
       count: (...a: unknown[]) => tplCount(...a),
       findMany: (...a: unknown[]) => tplFindMany(...a),
     },
-  },
-}));
+    // Interactive-transaction form: run the callback against the same mocked
+    // client so applyTemplateToSite's deleteMany/createMany/update route to the
+    // vi.fn()s above and their call order can be asserted.
+    $transaction: (cb: (tx: unknown) => unknown) => cb(client),
+  };
+  return { prisma: client };
+});
 
-import { cloneSiteAsTemplate, listTemplates, TemplateError } from "@server/services/template.service";
+import {
+  applyTemplateToSite,
+  cloneSiteAsTemplate,
+  listTemplates,
+  TemplateError,
+} from "@server/services/template.service";
 
 beforeEach(() => {
-  [siteFindFirst, pageFindMany, tplFindUnique, tplCreate, tplCount, tplFindMany].forEach((m) => m.mockReset());
+  [
+    siteFindFirst,
+    siteUpdate,
+    pageFindMany,
+    pageDeleteMany,
+    pageCreateMany,
+    tplFindUnique,
+    tplFindFirst,
+    tplCreate,
+    tplCount,
+    tplFindMany,
+  ].forEach((m) => m.mockReset());
 });
 
 describe("cloneSiteAsTemplate (T4)", () => {
@@ -120,5 +153,73 @@ describe("listTemplates difficulty filter", () => {
     );
     const where = tplFindMany.mock.calls[0][0].where;
     expect(where.difficulty).toBeUndefined();
+  });
+});
+
+describe("applyTemplateToSite (Part ③ — replace an existing site's pages)", () => {
+  it("refuses a site outside the workspace (IDOR guard)", async () => {
+    siteFindFirst.mockResolvedValueOnce(null);
+    await expect(applyTemplateToSite("w1", "u1", "other", "tpl1")).rejects.toBeInstanceOf(TemplateError);
+    expect(pageDeleteMany).not.toHaveBeenCalled();
+  });
+
+  it("refuses a template not visible to the workspace", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    tplFindFirst.mockResolvedValueOnce(null);
+    await expect(applyTemplateToSite("w1", "u1", "s1", "tplX")).rejects.toThrow("TEMPLATE_NOT_FOUND");
+    expect(pageDeleteMany).not.toHaveBeenCalled();
+  });
+
+  it("replaces the site's pages with the template's (2 pages → the template's 3), sets templateId", async () => {
+    // Site currently has 2 pages; the template being applied has 3.
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    tplFindFirst.mockResolvedValueOnce({
+      id: "tpl1",
+      pages: [
+        { name: "Home", slug: "home", position: 0, isHomePage: true, blocks: [{ id: "root" }] },
+        { name: "About", slug: "about", position: 1, isHomePage: false, blocks: [] },
+        { name: "Contact", slug: "contact", position: 2, isHomePage: false, blocks: [] },
+      ],
+    });
+    siteUpdate.mockImplementation((args: { where: unknown; data: { templateId: string; pages: number } }) =>
+      Promise.resolve({ id: "s1", templateId: args.data.templateId, pages: args.data.pages })
+    );
+
+    const site = await applyTemplateToSite("w1", "u1", "s1", "tpl1");
+
+    // The site's existing 2 pages are deleted first.
+    expect(pageDeleteMany).toHaveBeenCalledWith({ where: { siteId: "s1" } });
+
+    // Exactly the template's 3 pages are recreated, all bound to the site.
+    const created = pageCreateMany.mock.calls[0][0].data;
+    expect(created).toHaveLength(3);
+    expect(created.every((p: { siteId: string }) => p.siteId === "s1")).toBe(true);
+    expect(created.map((p: { slug: string }) => p.slug)).toEqual(["home", "about", "contact"]);
+    expect(created[0]).toMatchObject({ name: "Home", isHomePage: true });
+
+    // delete ran before create (both inside the transaction, no empty-pages window).
+    expect(pageDeleteMany.mock.invocationCallOrder[0]).toBeLessThan(pageCreateMany.mock.invocationCallOrder[0]);
+
+    // The site now records the source template + refreshed page count + touch.
+    const updateArg = siteUpdate.mock.calls[0][0];
+    expect(updateArg.where).toEqual({ id: "s1" });
+    expect(updateArg.data.templateId).toBe("tpl1");
+    expect(updateArg.data.pages).toBe(3);
+    expect(updateArg.data.lastEditedAt).toBeInstanceOf(Date);
+
+    // Returned site is linked to the template it came from.
+    expect(site.templateId).toBe("tpl1");
+  });
+
+  it("applies a template with zero pages without calling createMany", async () => {
+    siteFindFirst.mockResolvedValueOnce({ id: "s1" });
+    tplFindFirst.mockResolvedValueOnce({ id: "tpl0", pages: [] });
+    siteUpdate.mockResolvedValueOnce({ id: "s1", templateId: "tpl0", pages: 0 });
+
+    await applyTemplateToSite("w1", "u1", "s1", "tpl0");
+
+    expect(pageDeleteMany).toHaveBeenCalledWith({ where: { siteId: "s1" } });
+    expect(pageCreateMany).not.toHaveBeenCalled();
+    expect(siteUpdate.mock.calls[0][0].data.pages).toBe(0);
   });
 });
