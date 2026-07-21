@@ -7,6 +7,7 @@ import { PrePublishChecks } from "@/components/publish/pre-publish-checks";
 import { PublishProgress } from "@/components/publish/publish-progress";
 import { PublishSuccess } from "@/components/publish/publish-success";
 import { Button } from "@/components/dashboard/primitives";
+import { ErrorState } from "@/components/states";
 
 type Phase = "checks" | "publishing" | "success" | "error";
 
@@ -68,12 +69,12 @@ export default function PublishPage() {
         </div>
       );
     }
-    if (!checks.data) return null;
+    if (!checks.data) return <ErrorState title="Couldn't run publish checks" onRetry={() => checks.refetch()} />;
     return (
       <PrePublishChecks
         checks={checks.data}
         onPublish={handlePublish}
-        onCancel={() => router.back()}
+        onCancel={() => router.push(`/dashboard/sites/${siteId}`)}
       />
     );
   }

@@ -6,6 +6,7 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { WorkspaceForm } from "@/components/settings/workspace-form";
 import { AgencyLayerToggle } from "@/components/settings/agency-layer-toggle";
 import { SectionCard, Button, InputField } from "@/components/dashboard/primitives";
+import { ErrorState } from "@/components/states";
 
 /** Settings index = the Workspace section (IA v2 D6 card mapping). Carries
  *  workspace name + branding + sharing (WorkspaceForm) and the transfer-ownership
@@ -42,7 +43,7 @@ export default function WorkspaceSettingsPage() {
   });
 
   if (wsQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
-  if (!wsQuery.data) return null;
+  if (!wsQuery.data) return <ErrorState title="Couldn't load workspace settings" onRetry={() => wsQuery.refetch()} />;
 
   const ws = wsQuery.data;
 

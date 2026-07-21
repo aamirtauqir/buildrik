@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { SettingsTab } from "@/components/site-detail/settings-tab";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { ErrorState } from "@/components/states";
 
 export default function SiteSettingsPage() {
   const params = useParams();
@@ -23,7 +24,7 @@ export default function SiteSettingsPage() {
     return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   }
 
-  if (!settingsQuery.data) return null;
+  if (!settingsQuery.data) return <ErrorState title="Couldn't load site settings" onRetry={() => settingsQuery.refetch()} />;
 
   return (
     <SettingsTab

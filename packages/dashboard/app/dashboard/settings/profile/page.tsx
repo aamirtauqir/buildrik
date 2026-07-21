@@ -3,6 +3,7 @@
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { ProfileForm } from "@/components/settings/profile-form";
+import { ErrorState } from "@/components/states";
 
 /** Personal › Profile (IA v2 D6 card mapping). Reuses the shared ProfileForm +
  *  its account.profile handlers; the settings layout owns the section header. */
@@ -15,7 +16,7 @@ export default function ProfilePage() {
   });
 
   if (profileQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
-  if (!profileQuery.data) return null;
+  if (!profileQuery.data) return <ErrorState title="Couldn't load your profile" onRetry={() => profileQuery.refetch()} />;
 
   const profile = profileQuery.data;
 
