@@ -40,7 +40,15 @@ import { featuresRouter } from "@/server/trpc/routers/features";
 import { PermissionError } from "@/server/services/permission.service";
 
 function makeCtx(userId: string | null) {
-  return { session: userId ? { user: { id: userId } } : null, prisma: {} as never };
+  // resolveWorkspaceId (workspace-ctx) reads prisma from the tRPC CONTEXT
+  // (ctx.prisma), not the imported singleton — that is the pattern since the
+  // getWorkspaceId consolidation refactor. So the context must carry the
+  // workspaceMember.findFirst the resolver calls; an empty {} made every test
+  // that resolves a workspace crash on `undefined.findFirst`.
+  return {
+    session: userId ? { user: { id: userId } } : null,
+    prisma: { workspaceMember: { findFirst: (...a: unknown[]) => memberFindFirstMock(...a) } } as never,
+  };
 }
 
 describe("features router", () => {
