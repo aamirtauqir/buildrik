@@ -1,4 +1,4 @@
-import { Building2, Shield, Bell, Users, Gauge, Activity, CreditCard, Globe, MessageSquare, Star, LayoutGrid, KeyRound, Sparkles, User, UserCircle, Trash2, type LucideIcon } from "lucide-react";
+import { Building2, Shield, Bell, Users, Gauge, Activity, CreditCard, Globe, LayoutGrid, KeyRound, Sparkles, User, UserCircle, Trash2, type LucideIcon } from "lucide-react";
 
 export type SettingsSection = {
   label: string;
@@ -37,8 +37,6 @@ export const SETTINGS_GROUPS: { label: string; items: SettingsSection[] }[] = [
     label: "Sites & clients",
     items: [
       { label: "Domains", description: "Connected domains & DNS", href: "/dashboard/settings/domains", icon: Globe },
-      { label: "Review & comments", description: "Client sign-off queue", href: "/dashboard/agency/reviews", icon: MessageSquare, agencyOnly: true },
-      { label: "Partner program", description: "Referrals & partner tier", href: "/dashboard/agency/partner", icon: Star, agencyOnly: true },
       { label: "Apps & Integrations", description: "Connect external tools", href: "/dashboard/settings/integrations", icon: LayoutGrid },
     ],
   },
@@ -66,8 +64,10 @@ export const SETTINGS_GROUPS: { label: string; items: SettingsSection[] }[] = [
 
 export const SETTINGS_SECTIONS: SettingsSection[] = SETTINGS_GROUPS.flatMap((g) => g.items);
 
-/** Only the sections that live under /dashboard/settings — Reviews and Partner
- *  are agency routes the directory links out to, not settings pages. */
+/** The sections that live under /dashboard/settings. Every entry is a settings
+ *  route now that the agency cross-links (Reviews, Partner) have moved out to the
+ *  Agency section — the filter stays as a guard against a future cross-domain
+ *  link sneaking into settings-active detection. */
 export const SETTINGS_OWN_HREFS: string[] = SETTINGS_SECTIONS
   .map((s) => s.href)
   .filter((h) => h.startsWith("/dashboard/settings/"));
