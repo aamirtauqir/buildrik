@@ -47,7 +47,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
   return (
     <div>
       <Link href="/dashboard/projects" className="mb-3 inline-flex items-center gap-1 text-body transition-colors hover:underline" style={{ color: "var(--color-text-secondary)" }}>
-        <ArrowLeft className="h-4 w-4" />Back to projects
+        <ArrowLeft className="h-4 w-4" />Back to sites
       </Link>
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
