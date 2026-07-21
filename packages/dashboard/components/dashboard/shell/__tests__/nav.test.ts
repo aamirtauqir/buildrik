@@ -33,7 +33,6 @@ describe("isFullWidthRoute", () => {
       "/dashboard",
       "/dashboard/projects",
       "/dashboard/media",
-      "/dashboard/templates",
       "/dashboard/settings",
       "/dashboard/settings/billing",
       "/dashboard/agency",
@@ -54,10 +53,21 @@ describe("isFullWidthRoute", () => {
     expect(isFullWidthRoute("/dashboard/helpful")).toBe(false);
   });
 
-  it("keeps the sidebar's Templates destination full-width-free", () => {
-    // Templates is a workspace destination (sidebar), not a full-width page.
+  it("renders the sidebar's Templates destination full-width", () => {
+    // Templates stays a sidebar nav entry, but opens a full-width Envato-style
+    // browser — navigating to it collapses the sidebar.
     const templates = NAV_GROUPS.flatMap((g) => g.items).find((i) => i.label === "Templates");
     expect(templates).toBeTruthy();
-    expect(isFullWidthRoute(templates!.href)).toBe(false);
+    expect(isFullWidthRoute(templates!.href)).toBe(true);
+  });
+
+  it("treats the templates browser and detail as full-width", () => {
+    expect(isFullWidthRoute("/dashboard/templates")).toBe(true);
+    expect(isFullWidthRoute("/dashboard/templates/abc123")).toBe(true);
+  });
+
+  it("keeps other workspace pages non-full-width", () => {
+    expect(isFullWidthRoute("/dashboard/projects")).toBe(false);
+    expect(isFullWidthRoute("/dashboard/media")).toBe(false);
   });
 });

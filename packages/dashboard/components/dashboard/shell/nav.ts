@@ -57,11 +57,11 @@ export const ECOSYSTEM_NAV = [
 ] as const;
 
 // Every route that renders FULL-WIDTH with no workspace sidebar: the ecosystem
-// tabs above, plus reference pages reached from them. Help is full-width but is
-// NOT a topbar tab — it lives inside Resources — so it belongs here and not in
-// ECOSYSTEM_NAV. Keeping the two lists separate is the point: what shows in the
-// topbar and what drops the sidebar are related but not the same set.
-const FULL_WIDTH_ROUTES = [...ECOSYSTEM_NAV.map((n) => n.href), "/dashboard/help"];
+// tabs above, plus reference pages reached from them (Help) and the Templates
+// browser. Templates is a *sidebar* entry that opens a full-width Envato-style
+// browser — navigating to it collapses the sidebar, mirroring the ecosystem
+// pages; its own "← Dashboard" control is the way back.
+const FULL_WIDTH_ROUTES = [...ECOSYSTEM_NAV.map((n) => n.href), "/dashboard/help", "/dashboard/templates"];
 
 /** True on a full-width page (the ecosystem tabs + Help). These drop the workspace
  *  sidebar; everything else under /dashboard keeps it. The single predicate behind
