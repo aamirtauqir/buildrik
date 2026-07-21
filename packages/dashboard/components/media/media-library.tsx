@@ -284,6 +284,13 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
               <ImageOff size={26} className="mx-auto mb-2" style={{ color: "var(--color-text-placeholder)" }} />
               <p className="text-body font-medium" style={{ color: "var(--color-text-primary)" }}>{search ? "No assets match your search" : "No assets yet"}</p>
               <p className="mt-0.5 text-body" style={{ color: "var(--color-text-secondary)" }}>{search ? "Try a different term." : "Upload images, video, or fonts to use across your sites."}</p>
+              {!search && !folderId && typeFilter === "all" && (
+                <div className="mt-4">
+                  <Button onClick={onPickFiles} className="gap-1.5">
+                    <Upload size={15} /> Upload
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
             <>
