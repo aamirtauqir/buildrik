@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, LayoutGrid, Image as ImageIcon, Shield, Users, LayoutTemplate,
+  Home, LayoutGrid, Image as ImageIcon, Shield, Users,
   Settings, HelpCircle, ArrowUpRight,
 } from "lucide-react";
 import { cn } from "@lib/utils";
@@ -13,11 +13,11 @@ import { WorkspaceSwitcher } from "./workspace-switcher";
 import { NAV_GROUPS, isActiveRoute, type NavGroup, type NavIcon } from "./nav";
 
 const iconMap: Record<NavIcon, typeof Home> = {
-  Home, LayoutGrid, Users, Image: ImageIcon, LayoutTemplate,
+  Home, LayoutGrid, Users, Image: ImageIcon,
   Settings, Shield, HelpCircle,
 };
 
-// Mobile carries the same 6 destinations — derived, not a second hardcoded list.
+// Mobile carries the same workspace destinations — derived, not a second hardcoded list.
 // The mobile bottom bar shows the core destinations only. Getting started lives
 // in the desktop sidebar (near Home) but is excluded here — a first-run step does
 // not earn a permanent bottom-bar tab, and adding it would push the bar to 7 tabs

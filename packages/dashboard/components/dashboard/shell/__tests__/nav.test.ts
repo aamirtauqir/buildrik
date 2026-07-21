@@ -53,10 +53,11 @@ describe("isFullWidthRoute", () => {
     expect(isFullWidthRoute("/dashboard/helpful")).toBe(false);
   });
 
-  it("renders the sidebar's Templates destination full-width", () => {
-    // Templates stays a sidebar nav entry, but opens a full-width Envato-style
-    // browser — navigating to it collapses the sidebar.
-    const templates = NAV_GROUPS.flatMap((g) => g.items).find((i) => i.label === "Templates");
+  it("Templates is an ecosystem tab, not a workspace sidebar item", () => {
+    // Templates is a browse-the-catalog surface, so it lives in the top nav with
+    // the other ecosystem tabs (full-width, no sidebar) — NOT in NAV_GROUPS.
+    expect(NAV_GROUPS.flatMap((g) => g.items).some((i) => i.label === "Templates")).toBe(false);
+    const templates = ECOSYSTEM_NAV.find((n) => n.label === "Templates");
     expect(templates).toBeTruthy();
     expect(isFullWidthRoute(templates!.href)).toBe(true);
   });

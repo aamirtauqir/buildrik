@@ -3,7 +3,7 @@
 import { Suspense, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Globe, Search } from "lucide-react";
+import { Globe, Search } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { cn } from "@lib/utils";
 import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
@@ -69,15 +69,9 @@ function TemplatesBrowserInner() {
 
   return (
     <div className="mx-auto max-w-[1180px] px-6 py-6">
-      {/* Top row */}
+      {/* Top row — this is an ecosystem tab (like Marketplace); the topbar's
+          "Dashboard" link is the way back to the workspace, so no in-page back. */}
       <div className="mb-5 flex items-center gap-4">
-        <Link
-          href="/dashboard"
-          className="flex items-center gap-1.5 text-[13px] font-medium transition-colors hover:text-[var(--color-text-primary)]"
-          style={{ color: "var(--color-text-secondary)" }}
-        >
-          <ArrowLeft className="h-4 w-4" /> Dashboard
-        </Link>
         <h1 className="text-[19px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>
           Templates
         </h1>

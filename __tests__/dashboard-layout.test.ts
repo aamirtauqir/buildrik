@@ -73,9 +73,11 @@ describe("Sidebar navigation", () => {
       "/dashboard/projects",
       "/dashboard/agency",
       "/dashboard/media",
-      "/dashboard/templates",
       "/dashboard/settings",
     ]);
+    // Templates moved OUT of the sidebar into the ecosystem top nav (a
+    // browse-the-catalog surface, not a workspace destination).
+    expect(NAV_GROUPS.flatMap((g) => g.items).some((i) => i.href === "/dashboard/templates")).toBe(false);
     // The list route is still /dashboard/projects, but its label reverted to
     // "Sites" — the vocabulary the rest of the product never stopped using.
     expect(NAV_GROUPS[0].items.find((i) => i.href === "/dashboard/projects")?.label).toBe("Sites");
@@ -90,14 +92,14 @@ describe("Sidebar navigation", () => {
 
   // MobileTabBar filter (spec §Responsive). The mobile bar shows the core
   // destinations: the main group MINUS Getting started (a first-run step, not a
-  // permanent bottom-bar tab), then the same agencyOnly filter. So the bar stays
-  // at 6 (solo 5), unchanged by the getting-started move — a phone bottom bar
-  // can't hold 7. Mirror sidebar.tsx's MOBILE_ITEMS derivation here.
-  it("keeps the mobile bar at 6 dest / 5 solo, excluding Getting started", () => {
+  // permanent bottom-bar tab), then the same agencyOnly filter. With Templates
+  // moved to the ecosystem top nav, the bar is 5 (solo 4). Mirror sidebar.tsx's
+  // MOBILE_ITEMS derivation here.
+  it("keeps the mobile bar at 5 dest / 4 solo, excluding Getting started", () => {
     const mobile = NAV_GROUPS[0].items.filter((i) => i.href !== "/dashboard/getting-started");
-    expect(mobile).toHaveLength(6);
+    expect(mobile).toHaveLength(5);
     const solo = mobile.filter((i) => !i.agencyOnly);
-    expect(solo).toHaveLength(5);
+    expect(solo).toHaveLength(4);
     expect(solo.some((i) => i.href === "/dashboard/agency")).toBe(false);
     // getting-started must not leak into the mobile bar
     expect(mobile.some((i) => i.href === "/dashboard/getting-started")).toBe(false);
