@@ -344,6 +344,26 @@ describe("ExportEngine.generateHTML — config knobs", () => {
     expect(html).not.toContain("<script>");
     expect(html).not.toContain("onerror");
   });
+
+  // Regression: template & AI page seeds store raw HTML in a container's
+  // `content` WITHOUT stamping contentFormat:"html", so export escaped it and
+  // the published site showed literal `&lt;h1&gt;`. Tag-shaped content on a
+  // container with no explicit format is treated as markup (sanitized), the same
+  // way the canvas mounts it — while hand-authored text elements stay escaped.
+  it("renders raw-HTML content that omits contentFormat (template/AI seed shape)", async () => {
+    const root: LiveNode = {
+      id: "root",
+      children: [{ id: "sec1", type: "container", tagName: "section", content: "<h1>Hi</h1>" }],
+    };
+    const result = await new ExportEngine(makeComposer({ root })).export({
+      format: "zip",
+      cssStyle: "embedded",
+    });
+    const html = result.files!.find((f) => f.name === "index.html")!.content;
+
+    expect(html).toContain("<h1>Hi</h1>");
+    expect(html).not.toContain("&lt;h1&gt;");
+  });
 });
 
 describe("ExportEngine.generateCSS — reset & keyframes", () => {

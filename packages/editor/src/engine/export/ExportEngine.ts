@@ -247,7 +247,7 @@ export class ExportEngine {
         children.map((child) => this.elementToHTML(child, config, indent + 1)).join("") +
         indentStr;
     } else if (content) {
-      childContent = this.renderContent(content, contentFormat);
+      childContent = this.renderContent(content, contentFormat, type);
     }
 
     return `${indentStr}<${tag}${attrStr}>${childContent}</${tag}>${newline}`;
@@ -678,9 +678,18 @@ ${bodyContent}${interactionScript}
    * because model output is untrusted input like any other. Export runs in the
    * editor client, so DOMPurify has a real DOM here.
    */
-  private renderContent(content: string, contentFormat?: "text" | "html"): string {
-    if (contentFormat !== "html") return escapeHTML(content);
-    return sanitizeHTML(content);
+  private renderContent(content: string, contentFormat?: "text" | "html", type?: string): string {
+    // A real tag (`<h1>…`), not plain text like "a < b". Template & AI page
+    // seeds store raw HTML in a container's `content` without stamping
+    // contentFormat, so an unset format on a container with tag-shaped content
+    // is treated as markup. The type gate is load-bearing: a hand-authored
+    // `text` element that literally contains `<script>` must still be escaped,
+    // never rendered — that is the safety guarantee the escape default exists for.
+    const looksLikeHtml = /<[a-z][\s\S]*>/i.test(content);
+    if (contentFormat === "html" || (contentFormat == null && type === "container" && looksLikeHtml)) {
+      return sanitizeHTML(content);
+    }
+    return escapeHTML(content);
   }
 
   private renderPageElement(element: PageData["root"], indent = 1): string {
@@ -749,7 +758,7 @@ ${bodyContent}${interactionScript}
         children.map((child) => this.renderPageElement(child, indent + 1)).join("") +
         indentStr;
     } else if (content) {
-      childContent = this.renderContent(content, contentFormat);
+      childContent = this.renderContent(content, contentFormat, element.type);
     }
 
     return `${indentStr}<${tag}${attrStr}>${childContent}</${tag}>\n`;
