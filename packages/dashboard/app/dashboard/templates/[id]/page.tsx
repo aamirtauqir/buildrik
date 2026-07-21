@@ -1,0 +1,119 @@
+"use client";
+
+import { use } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ExternalLink, Globe } from "lucide-react";
+import { trpc } from "@lib/trpc/client";
+import { useToast } from "@/components/dashboard/toast-provider";
+import { LoadingSkeleton, ErrorState } from "@/components/states";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+
+const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
+  BEGINNER: { bg: "#DCFCE7", text: "#166534", label: "Beginner" },
+  INTERMEDIATE: { bg: "#DBEAFE", text: "#1E40AF", label: "Intermediate" },
+  ADVANCED: { bg: "#FEF3C7", text: "#92400E", label: "Advanced" },
+};
+
+export default function TemplateDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const router = useRouter();
+  const { addToast } = useToast();
+  const unified = useUnifiedEditorFlag();
+
+  const query = trpc.templates.get.useQuery({ id }, { staleTime: 30_000 });
+
+  const useMutation = trpc.templates.use.useMutation({
+    onSuccess: (site) => {
+      addToast("success", "Site created from template");
+      const href = getEditorHref(site.id, unified);
+      if (unified) router.push(href);
+      else window.location.href = href;
+    },
+    onError: (err) => addToast("error", "Couldn't create site", err.message),
+  });
+
+  function goBack() {
+    if (window.history.length > 1) router.back();
+    else router.push("/dashboard/templates");
+  }
+
+  return (
+    <div className="mx-auto max-w-[1000px] px-6 py-6">
+      <button
+        onClick={goBack}
+        className="mb-5 flex items-center gap-1.5 text-[13px] font-medium transition-colors hover:text-[var(--color-text-primary)]"
+        style={{ color: "var(--color-text-secondary)" }}
+      >
+        <ArrowLeft className="h-4 w-4" /> Back to templates
+      </button>
+
+      {query.isLoading ? (
+        <LoadingSkeleton rows={3} variant="card" />
+      ) : query.isError || !query.data ? (
+        <ErrorState
+          title="Couldn't load that template"
+          description="It may have been removed. Browse the full gallery instead."
+          retryLabel="Browse templates"
+          onRetry={() => router.push("/dashboard/templates")}
+        />
+      ) : (
+        (() => {
+          const t = query.data;
+          const diff = DIFFICULTY_STYLES[t.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
+          return (
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.4fr_1fr]">
+              <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-subtle)" }}>
+                {t.previewUrl ? (
+                  <iframe src={t.previewUrl} title={t.name} className="h-[520px] w-full" />
+                ) : (
+                  <div className="flex h-[520px] items-center justify-center">
+                    <Globe className="h-12 w-12" style={{ color: "var(--color-text-muted)" }} />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h1 className="text-[22px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>{t.name}</h1>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full px-2.5 py-0.5 text-[12px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
+                    {t.category.toLowerCase()}
+                  </span>
+                  <span className="rounded-full px-2.5 py-0.5 text-[12px] font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>
+                    {diff.label}
+                  </span>
+                  <span className="text-[12px]" style={{ color: "var(--color-text-muted)" }}>{t.usageCount} sites</span>
+                </div>
+
+                {t.description && (
+                  <p className="mt-4 text-[13.5px] leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{t.description}</p>
+                )}
+
+                <div className="mt-6 flex flex-col gap-2.5">
+                  <button
+                    onClick={() => useMutation.mutate({ templateId: t.id, siteName: t.name })}
+                    disabled={useMutation.isPending}
+                    className="flex h-11 items-center justify-center rounded-lg text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                    style={{ backgroundColor: "var(--color-primary)" }}
+                  >
+                    {useMutation.isPending ? "Creating…" : "Use this template →"}
+                  </button>
+                  {t.previewUrl && (
+                    <a
+                      href={t.previewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex h-11 items-center justify-center gap-1.5 rounded-lg border text-[14px] font-medium transition-colors hover:bg-[var(--color-bg-subtle)]"
+                      style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+                    >
+                      Live preview <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })()
+      )}
+    </div>
+  );
+}
