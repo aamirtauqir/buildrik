@@ -440,7 +440,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                 gap: 6,
                 height: 24,
                 padding: "0 10px",
-                borderRadius: 999,
+                borderRadius: "var(--bd-radius-full)",
                 fontSize: 12,
                 fontWeight: 500,
                 whiteSpace: "nowrap",
