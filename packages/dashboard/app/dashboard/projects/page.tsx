@@ -35,6 +35,18 @@ export default function ProjectsPage() {
   const [sort, setSort] = useState("lastEdited");
   const [page, setPage] = useState(1);
   const [folderId, setFolderId] = useState<string | null>(null);
+
+  // Honour a ?status=published deep link (e.g. the Home "Published" stat card).
+  // The page's status filter holds the uppercase enum; the incoming param is
+  // lowercase. Read it once on mount via window (not useSearchParams, which would
+  // force a Suspense boundary) and apply it if valid. Without this the param was
+  // silently ignored and the list showed every site regardless of the deep link.
+  useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get("status");
+    if (!param) return;
+    const upper = param.toUpperCase();
+    if (upper === "PUBLISHED" || upper === "DRAFT" || upper === "ARCHIVED") setStatus(upper);
+  }, []);
   const [showArchived, setShowArchived] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const lastSelectedIdRef = useRef<string | null>(null);

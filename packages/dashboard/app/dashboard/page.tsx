@@ -176,8 +176,11 @@ export default function DashboardPage() {
                 )
               }
               visual={<Sparkline data={[3, 3, 4, 4, 4, 5, 5]} />}
-              href="/dashboard/sites?status=published"
+              href="/dashboard/projects?status=published"
             />
+            {/* No href: there is no workspace-level analytics view to link to.
+                Linking to the sites list was a weak, misleading destination for a
+                traffic metric, so this stays a display-only tile. */}
             <StatCard
               label="Visitors"
               value={formatCompact(stats.data?.monthlyVisits ?? 0)}
@@ -187,10 +190,13 @@ export default function DashboardPage() {
                 </span>
               }
               visual={<Sparkline data={(stats.data?.dailyVisitors?.length ?? 0) >= 2 ? stats.data!.dailyVisitors : [10, 12, 11, 14, 13, 16, 18]} />}
-              href="/dashboard/projects"
             />
+            {/* This is the team metric — collaborator count + pending invites,
+                linking to Team settings. It was mislabeled "Form leads", which has
+                no data behind it (the dashboard stats carry no form-submission
+                aggregate); the label now matches what the card actually shows. */}
             <StatCard
-              label="Form leads"
+              label="Team"
               value={stats.data?.collaborators ?? 0}
               delta={
                 (stats.data?.pendingInvites ?? 0) > 0
