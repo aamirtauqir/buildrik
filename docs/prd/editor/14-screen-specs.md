@@ -70,6 +70,13 @@
 
 ## J2 · AI-draft
 
+> ⚠ **BUILD-OR-CUT DECISION REQUIRED before coding S2.1–S2.3** (2026-07-21, see the
+> code-truth brief). Whole-site AI generation is an **L0 stub** — `ai/index.ts:8`
+> ("AIPageGenerator … not yet implemented") and `wizard/PageWizard.tsx:1`
+> (`@deprecated DEAD/SIMULATED` — no model called, static templates, setTimeout steps).
+> Only **edit-AI** (`AITab`, S2.5) is real. Coding S2.1–S2.3 as if generation exists is a
+> dead end: either build a real server AI job (brief → ProjectData) or cut J2 to edit-AI.
+
 ### S2.1 — AI brief entry
 - **Job/IA/Build:** J2 · CREATE › AI · REDESIGN
 - **Purpose:** Capture a real brief (industry/pages/tone) for whole-site draft.
@@ -339,6 +346,17 @@
 > Full wireframes: `docs/designs/2026-07-18-j5-signoff-wireframes.md`. Specs condensed here.
 
 ### J5 — architecture reality (code-verified 2026-07-18) — READ FIRST
+
+> ⚠ **STALE as of 2026-07-21 — superseded by `docs/designs/2026-07-21-code-truth-implementation-brief.md`.**
+> The "Genuinely MISSING for the external wedge" list below is **no longer true**: the
+> external reviewer identity, token→review binding, public token API, the `/review/<token>`
+> page, and the frozen snapshot **now all exist** (`prisma/schema.prisma`,
+> `server/services/client-review.service.ts`, `server/trpc/routers/client-review.ts:62`,
+> `packages/dashboard/app/review/[token]/review-client.tsx`). Do NOT build them again.
+> The **real** remaining J5 gaps are: (1) post-approval stale-edit tracking (S5.6,
+> `publish-approval.ts:45` only checks latest status — unbuilt), (2) the editor
+> review-status pill (S5.2 — `Topbar` has only send-state), (3) pins-vs-plain-notes in the
+> public UI (`review-client.tsx:311` posts a plain body; backend supports pins). See the brief.
 
 **J5 spans THREE packages, not one.** The editor-only redesign doc under-scoped it.
 
