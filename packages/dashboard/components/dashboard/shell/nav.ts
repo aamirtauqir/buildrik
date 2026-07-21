@@ -32,9 +32,10 @@ export const NAV_GROUPS: NavGroup[] = [
     { label: "Templates", href: "/dashboard/templates", icon: "LayoutTemplate" },
     { label: "Settings", href: "/dashboard/settings", icon: "Settings" },
   ] },
-  { label: "Support", items: [
-    { label: "Help center", href: "/dashboard/help", icon: "HelpCircle" },
-  ] },
+  // No Support group: Help centre moved out of the workspace sidebar into
+  // Resources (the ecosystem launcher), where it sits beside Learn, API & tokens
+  // and Getting started. Help is reference material, not a workspace destination.
+  // /dashboard/help still exists; Resources links to it.
 ];
 
 export function isActiveRoute(pathname: string, href: string): boolean {

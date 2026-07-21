@@ -60,11 +60,13 @@ describe("Sidebar navigation", () => {
   // IA v2 contract (spec 2026-07-16): 6 destinations + labeled 2-item Support
   // group. This IS a frozen list — the whole point of the redesign was the
   // count, so growing it is a design decision, not a one-line test edit.
-  it("carries the workspace destinations, with setup near Home and only Help under Support", () => {
-    // Getting started moved OUT of Support into the main group: setup is part of
-    // the product, not support. It sits right under Home. Support is now just the
-    // Help centre.
-    expect(NAV_GROUPS).toHaveLength(2);
+  it("is a single workspace group — no Support group, setup near Home, Help moved to Resources", () => {
+    // The sidebar is now one group of workspace destinations. Getting started
+    // moved out of Support into the main group (setup is product, not support),
+    // and Help centre moved out of the sidebar entirely into Resources (the
+    // ecosystem launcher) — reference material, not a workspace destination. With
+    // both gone the Support group is empty and dropped, so there is one group.
+    expect(NAV_GROUPS).toHaveLength(1);
     expect(NAV_GROUPS[0].items.map((i) => i.href)).toEqual([
       "/dashboard",
       "/dashboard/getting-started",
@@ -77,8 +79,8 @@ describe("Sidebar navigation", () => {
     // The list route is still /dashboard/projects, but its label reverted to
     // "Sites" — the vocabulary the rest of the product never stopped using.
     expect(NAV_GROUPS[0].items.find((i) => i.href === "/dashboard/projects")?.label).toBe("Sites");
-    expect(NAV_GROUPS[1].label).toBe("Support");
-    expect(NAV_GROUPS[1].items.map((i) => i.href)).toEqual(["/dashboard/help"]);
+    // Help is no longer a sidebar destination; it lives in Resources.
+    expect(NAV_GROUPS.flatMap((g) => g.items).some((i) => i.href === "/dashboard/help")).toBe(false);
   });
 
   it("marks Agency — and ONLY Agency — agencyOnly", () => {
