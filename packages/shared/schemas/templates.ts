@@ -5,6 +5,7 @@ export const listTemplatesSchema = z.object({
   page: z.number().min(1).default(1),
   perPage: z.number().min(1).max(20).default(6),
   sort: z.enum(["popular", "newest", "alphabetical"]).default("popular"),
+  difficulty: z.enum(["ALL", "BEGINNER", "INTERMEDIATE", "ADVANCED"]).default("ALL"),
   // T2: free-text search over template name + description.
   search: z.string().max(100).optional(),
 });

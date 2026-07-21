@@ -36,7 +36,7 @@ async function generateUniqueSlug(
 }
 
 export async function listTemplates(input: ListTemplatesInput, workspaceId?: string) {
-  const { category, page, perPage, sort, search } = input;
+  const { category, page, perPage, sort, search, difficulty } = input;
   const skip = (page - 1) * perPage;
 
   // Gallery = global built-ins (workspaceId null) + the caller's own cloned
@@ -47,6 +47,9 @@ export async function listTemplates(input: ListTemplatesInput, workspaceId?: str
   };
   if (category !== "ALL") {
     where.category = category;
+  }
+  if (difficulty !== "ALL") {
+    where.difficulty = difficulty;
   }
   // T2: free-text search over name + description (case-insensitive). AND-ed with
   // the workspace OR-scope above so search never leaks other agencies' templates.

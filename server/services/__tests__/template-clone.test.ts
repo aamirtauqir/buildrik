@@ -61,7 +61,7 @@ describe("listTemplates workspace scope (T4)", () => {
   it("shows built-ins OR the caller's own clones, never other agencies'", async () => {
     tplCount.mockResolvedValueOnce(0);
     tplFindMany.mockResolvedValueOnce([]);
-    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular" }, "w1");
+    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular", difficulty: "ALL" }, "w1");
     const where = tplCount.mock.calls[0][0].where;
     expect(where.isActive).toBe(true);
     expect(where.OR).toEqual([{ workspaceId: null }, { workspaceId: "w1" }]);
@@ -70,14 +70,14 @@ describe("listTemplates workspace scope (T4)", () => {
   it("with no workspace context, shows only global built-ins", async () => {
     tplCount.mockResolvedValueOnce(0);
     tplFindMany.mockResolvedValueOnce([]);
-    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular" });
+    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular", difficulty: "ALL" });
     expect(tplCount.mock.calls[0][0].where.OR).toEqual([{ workspaceId: null }]);
   });
 
   it("T2 search filters name+description (AND-ed with the workspace scope)", async () => {
     tplCount.mockResolvedValueOnce(0);
     tplFindMany.mockResolvedValueOnce([]);
-    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular", search: "  bistro  " }, "w1");
+    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular", difficulty: "ALL", search: "  bistro  " }, "w1");
     const where = tplCount.mock.calls[0][0].where;
     expect(where.OR).toEqual([{ workspaceId: null }, { workspaceId: "w1" }]); // scope kept
     expect(where.AND).toEqual([
@@ -91,7 +91,34 @@ describe("listTemplates workspace scope (T4)", () => {
   it("blank search is ignored (no AND filter added)", async () => {
     tplCount.mockResolvedValueOnce(0);
     tplFindMany.mockResolvedValueOnce([]);
-    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular", search: "   " }, "w1");
+    await listTemplates({ category: "ALL", page: 1, perPage: 6, sort: "popular", difficulty: "ALL", search: "   " }, "w1");
     expect(tplCount.mock.calls[0][0].where.AND).toBeUndefined();
+  });
+});
+
+describe("listTemplates difficulty filter", () => {
+  beforeEach(() => {
+    tplFindMany.mockReset();
+    tplCount.mockReset();
+    tplFindMany.mockResolvedValue([]);
+    tplCount.mockResolvedValue(0);
+  });
+
+  it("adds where.difficulty when a specific level is requested", async () => {
+    await listTemplates(
+      { category: "ALL", page: 1, perPage: 6, sort: "popular", difficulty: "ADVANCED" },
+      undefined
+    );
+    const where = tplFindMany.mock.calls[0][0].where;
+    expect(where.difficulty).toBe("ADVANCED");
+  });
+
+  it("omits difficulty from where when ALL", async () => {
+    await listTemplates(
+      { category: "ALL", page: 1, perPage: 6, sort: "popular", difficulty: "ALL" },
+      undefined
+    );
+    const where = tplFindMany.mock.calls[0][0].where;
+    expect(where.difficulty).toBeUndefined();
   });
 });
