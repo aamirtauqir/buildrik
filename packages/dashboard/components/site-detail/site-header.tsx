@@ -1,13 +1,14 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal, LayoutTemplate } from "lucide-react";
 import { siteAddress } from "@lib/utils";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone } from "@/components/sites/site-status";
 import { Button, Pill, MetricValue } from "@/components/dashboard/primitives";
 import { SendReviewModal } from "@/components/reviews/send-review-modal";
 import { ShareDraftModal } from "@/components/site-detail/share-draft-modal";
+import { ApplyTemplateModal } from "@/components/site-detail/apply-template-modal";
 
 interface SiteHeaderProps {
   site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null; domain?: string | null };
@@ -24,6 +25,7 @@ const outlineButton = "flex items-center gap-2 rounded-lg border px-4 py-2 text-
 export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [applyTemplateOpen, setApplyTemplateOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -130,6 +132,13 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
                 >
                   <Share2 className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />Share draft
                 </button>
+                <button
+                  onClick={() => { setApplyTemplateOpen(true); setMenuOpen(false); }}
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-body transition-colors hover:bg-[var(--color-bg-subtle)]"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  <LayoutTemplate className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />Apply template
+                </button>
               </div>
             )}
           </div>
@@ -137,6 +146,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
       </div>
       <ShareDraftModal open={shareOpen} onClose={() => setShareOpen(false)} siteId={site.id} />
       <SendReviewModal open={reviewOpen} onClose={() => setReviewOpen(false)} siteId={site.id} siteName={site.name} />
+      <ApplyTemplateModal open={applyTemplateOpen} onClose={() => setApplyTemplateOpen(false)} siteId={site.id} siteName={site.name} />
     </div>
   );
 }
