@@ -469,8 +469,14 @@ model Comment {
 
 // Invited-client review workflow (redesign E4). A content editor "sends for
 // review" instead of publishing; an admin approves or asks for changes. One
-// PENDING request per site at a time (the service enforces it). Deleting a site
-// removes its review history.
+// PENDING request per site at a time. Deleting a site removes its review history.
+//
+/// Hand-authored partial UNIQUE index — see
+/// migrations/20260721130000_review_pending_unique. Enforces at most one row
+/// per `siteId` with status 'PENDING'. Prisma's schema language can't express
+/// partial unique indexes, so the constraint lives only in SQL. Do NOT add an
+/// `@@unique([siteId])` here — that would create a separate, conflicting full
+/// unique index on next migrate.
 model ReviewRequest {
   id            String    @id @default(cuid())
   siteId        String

@@ -1,39 +1,18 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { prisma } from "@/lib/prisma";
+import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { listWorkspaceFeatures, setFeature } from "@/server/services/feature-flag.service";
 import { featureKeySchema } from "@buildrik/shared/schemas/feature-flags";
 import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
 
-interface SessionCtx {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  session: { user: any } | null;
-}
-
-// Resolve the actor's workspace (scopes every flag op to it — IDOR guard).
-async function requireWorkspace(ctx: SessionCtx): Promise<string> {
-  if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
-  const userId = ctx.session.user.id;
-  // Honor the session's active workspace (set on switch) when it's a valid
-  // ACTIVE membership; else fall back to the first membership.
-  const activeId = ctx.session.user.workspaceId as string | null | undefined;
-  const member =
-    (await prisma.workspaceMember.findFirst({
-      where: activeId ? { userId, workspaceId: activeId, status: "ACTIVE" } : { userId },
-      select: { workspaceId: true },
-    })) ??
-    (activeId
-      ? await prisma.workspaceMember.findFirst({ where: { userId }, select: { workspaceId: true } })
-      : null);
-  if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
-  return member.workspaceId;
-}
-
 export const featuresRouter = router({
   // Any workspace member may read which flags are on (drives conditional UI).
+  // Scoped through the shared resolveWorkspaceId, which only resolves an ACTIVE
+  // membership — a removed member's stale session can't read another workspace's
+  // flags. (This router used to carry its own looser lookup; consolidated.)
   list: protectedProcedure.query(async ({ ctx }) => {
-    const workspaceId = await requireWorkspace(ctx as unknown as SessionCtx);
+    const workspaceId = await resolveWorkspaceId(ctx);
     return listWorkspaceFeatures(workspaceId);
   }),
 
@@ -41,10 +20,9 @@ export const featuresRouter = router({
   set: protectedProcedure
     .input(z.object({ key: featureKeySchema, enabled: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
-      const c = ctx as unknown as SessionCtx;
-      const workspaceId = await requireWorkspace(c);
+      const workspaceId = await resolveWorkspaceId(ctx);
       try {
-        await checkWorkspaceRole(prisma, c.session!.user.id, workspaceId, "ADMIN");
+        await checkWorkspaceRole(ctx.prisma, ctx.session!.user.id, workspaceId, "ADMIN");
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;

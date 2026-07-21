@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { ReviewStatus } from "@buildrik/shared/schemas/reviews";
 import {
@@ -38,18 +39,33 @@ export async function submitReview(
    *  the internal admin queue still works exactly as before. */
   clientEmail?: string,
 ) {
-  const open = await prisma.reviewRequest.findFirst({
-    where: { siteId, status: "PENDING" },
-    select: { id: true },
-  });
-  const request = open
-    ? await prisma.reviewRequest.update({
-        where: { id: open.id },
-        data: { note: note ?? null, changeSummary: changeSummary ?? null, requestedById },
-      })
-    : await prisma.reviewRequest.create({
+  const updateData = { note: note ?? null, changeSummary: changeSummary ?? null, requestedById };
+  const openId = async () =>
+    (await prisma.reviewRequest.findFirst({ where: { siteId, status: "PENDING" }, select: { id: true } }))?.id;
+
+  let request;
+  const existing = await openId();
+  if (existing) {
+    request = await prisma.reviewRequest.update({ where: { id: existing }, data: updateData });
+  } else {
+    try {
+      request = await prisma.reviewRequest.create({
         data: { siteId, requestedById, note: note ?? null, changeSummary: changeSummary ?? null, status: "PENDING" },
       });
+    } catch (err) {
+      // Lost a concurrent submit: the partial unique index
+      // review_requests_pending_unique rejected the second PENDING row. Re-read
+      // the winner and update it instead of erroring, so both callers converge
+      // on one review.
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+        const winner = await openId();
+        if (!winner) throw err;
+        request = await prisma.reviewRequest.update({ where: { id: winner }, data: updateData });
+      } else {
+        throw err;
+      }
+    }
+  }
 
   // Every submit — first send OR re-send — mints a fresh token and kills the
   // previous one. Without this, round 1's link stays live forever and a client
