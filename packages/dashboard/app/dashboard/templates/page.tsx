@@ -1,123 +1,178 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useMemo } from "react";
 import Link from "next/link";
-import { Library, Globe } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, Globe, Search } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { StateEmpty, LoadingSkeleton, ErrorState } from "@/components/states";
-import { PageHeader, FilterTabs } from "@/components/dashboard/primitives";
+import { cn } from "@lib/utils";
+import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
+import { TemplateFilterRail } from "@/components/templates/template-filter-rail";
+import { paginationRange } from "@/components/templates/pagination-range";
+import {
+  type TemplateFilters,
+  templateFiltersFromParams,
+  templateFiltersToQuery,
+} from "./filters";
 
-const TABS = [
-  { value: "templates", label: "Templates" },
-  { value: "libraries", label: "Libraries" },
-] as const;
+const PER_PAGE = 12;
 
-type Tab = (typeof TABS)[number]["value"];
-
-function formatCount(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
-  return String(n);
-}
-
-// Mirrors the create-flow gallery's card (components/templates/template-card.tsx)
-// so a template reads the same in both places.
 const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
   BEGINNER: { bg: "#DCFCE7", text: "#166534", label: "Beginner" },
   INTERMEDIATE: { bg: "#DBEAFE", text: "#1E40AF", label: "Intermediate" },
   ADVANCED: { bg: "#FEF3C7", text: "#92400E", label: "Advanced" },
 };
 
-/** The Templates tab used to render four hardcoded cards (SaaS Landing, Portfolio
- *  Grid…) that matched no real template, under a permanently-disabled "Coming
- *  soon" button. The real templates and the apply flow already exist at
- *  /dashboard/sites/new?method=template; this tab now reads the same list and
- *  links each card straight into that flow, so the nav destination is real
- *  rather than a decorative dead end. The Libraries tab is unchanged. */
-function TemplatesTab() {
-  const templates = trpc.templates.list.useQuery(
-    { category: "ALL", page: 1, perPage: 20, sort: "popular" },
-    { staleTime: 60_000 }
-  );
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
+  return String(n);
+}
 
-  if (templates.isLoading) return <LoadingSkeleton rows={2} variant="card" />;
-  if (templates.isError) {
-    return (
-      <ErrorState
-        title="Couldn't load templates"
-        description="Something went wrong on our end. Refresh to try again."
-        onRetry={() => templates.refetch()}
-      />
-    );
-  }
-
-  const items = templates.data?.data ?? [];
-  if (items.length === 0) {
-    return (
-      <StateEmpty
-        title="No templates yet"
-        description="Starter templates will appear here once they're published."
-      />
-    );
-  }
-
+export default function TemplatesBrowserPage() {
   return (
-    <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-4">
-      {items.map((t) => {
-        const diff = DIFFICULTY_STYLES[t.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
-        return (
-          <Link
-            key={t.id}
-            href={`/dashboard/sites/new?method=template&template=${t.id}`}
-            className="group overflow-hidden rounded-xl border shadow-card transition-shadow hover:shadow-md"
-            style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
-          >
-            <div className="flex h-[196px] items-center justify-center" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
-              <Globe className="h-10 w-10" style={{ color: "var(--color-text-muted)" }} />
-            </div>
-            <div className="px-3.5 py-3">
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-[13.5px] font-semibold" style={{ color: "var(--color-text-primary)" }}>{t.name}</h2>
-                <span className="shrink-0 text-body-sm font-semibold opacity-0 transition-opacity group-hover:opacity-100" style={{ color: "var(--color-primary)" }}>
-                  Use →
-                </span>
-              </div>
-              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
-                  {t.category.toLowerCase()}
-                </span>
-                <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>
-                  {diff.label}
-                </span>
-                <span className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>{formatCount(t.usageCount)} sites</span>
-              </div>
-            </div>
-          </Link>
-        );
-      })}
-    </div>
+    <Suspense fallback={null}>
+      <TemplatesBrowserInner />
+    </Suspense>
   );
 }
 
-export default function LibrariesPage() {
-  const [tab, setTab] = useState<Tab>("templates");
+function TemplatesBrowserInner() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const filters = useMemo<TemplateFilters>(
+    () => templateFiltersFromParams(new URLSearchParams(searchParams.toString())),
+    [searchParams]
+  );
+
+  function applyFilters(patch: Partial<TemplateFilters>) {
+    const next = { ...filters, ...patch };
+    router.replace(pathname + templateFiltersToQuery(next), { scroll: false });
+  }
+
+  const list = trpc.templates.list.useQuery(
+    {
+      category: filters.category as "ALL" | "PORTFOLIO" | "BUSINESS" | "BLOG" | "AGENCY" | "ECOMMERCE" | "RESTAURANT",
+      difficulty: filters.difficulty as "ALL" | "BEGINNER" | "INTERMEDIATE" | "ADVANCED",
+      sort: filters.sort as "popular" | "newest" | "alphabetical",
+      search: filters.search || undefined,
+      page: filters.page,
+      perPage: PER_PAGE,
+    },
+    { staleTime: 30_000 }
+  );
+
+  const items = list.data?.data ?? [];
+  const totalPages = list.data?.totalPages ?? 0;
+  const pages = paginationRange(filters.page, totalPages);
 
   return (
-    <div>
-      <PageHeader title="Templates" description="Reusable starting points and shared design systems." />
-
-      <div className="mb-5">
-        <FilterTabs value={tab} onChange={setTab} options={TABS} />
+    <div className="mx-auto max-w-[1180px] px-6 py-6">
+      {/* Top row */}
+      <div className="mb-5 flex items-center gap-4">
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-1.5 text-[13px] font-medium transition-colors hover:text-[var(--color-text-primary)]"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
+          <ArrowLeft className="h-4 w-4" /> Dashboard
+        </Link>
+        <h1 className="text-[19px] font-[680] tracking-tight" style={{ color: "var(--color-text-primary)" }}>
+          Templates
+        </h1>
+        <div className="ml-auto flex h-9 w-[280px] items-center gap-2 rounded-lg border px-3"
+          style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
+          <Search className="h-4 w-4" style={{ color: "var(--color-text-muted)" }} />
+          <input
+            value={filters.search}
+            onChange={(e) => applyFilters({ search: e.target.value, page: 1 })}
+            placeholder="Search templates…"
+            className="w-full bg-transparent text-[13px] outline-none"
+            style={{ color: "var(--color-text-primary)" }}
+          />
+        </div>
       </div>
 
-      {tab === "templates" ? (
-        <TemplatesTab />
-      ) : (
-        <StateEmpty
-          icon={<Library className="h-7 w-7" />}
-          title="No shared libraries yet"
-          description="Capture a site's colors, type and components as a shared design system to reuse across every Buildrick site in this workspace."
-        />
-      )}
+      <div className="flex gap-8">
+        <TemplateFilterRail filters={filters} onChange={applyFilters} />
+
+        <div className="flex-1">
+          {list.isLoading ? (
+            <LoadingSkeleton rows={3} variant="card" />
+          ) : list.isError ? (
+            <ErrorState
+              title="Couldn't load templates"
+              description="Something went wrong on our end. Refresh to try again."
+              onRetry={() => list.refetch()}
+            />
+          ) : items.length === 0 ? (
+            <StateEmpty
+              title="No templates match these filters"
+              description="Try clearing a filter or searching for something else."
+            />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {items.map((t) => {
+                  const diff = DIFFICULTY_STYLES[t.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
+                  return (
+                    <Link
+                      key={t.id}
+                      href={`/dashboard/templates/${t.id}`}
+                      className="group overflow-hidden rounded-xl border shadow-card transition-shadow hover:shadow-md"
+                      style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
+                    >
+                      <div className="flex h-[172px] items-center justify-center" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
+                        <Globe className="h-9 w-9" style={{ color: "var(--color-text-muted)" }} />
+                      </div>
+                      <div className="px-3.5 py-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <h2 className="text-[13.5px] font-semibold" style={{ color: "var(--color-text-primary)" }}>{t.name}</h2>
+                          <span className="shrink-0 text-body-sm font-semibold opacity-0 transition-opacity group-hover:opacity-100" style={{ color: "var(--color-primary)" }}>
+                            View →
+                          </span>
+                        </div>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                          <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
+                            {t.category.toLowerCase()}
+                          </span>
+                          <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>
+                            {diff.label}
+                          </span>
+                          <span className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>{formatCount(t.usageCount)} sites</span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="mt-6 flex items-center justify-center gap-1">
+                  {pages.map((p, i) =>
+                    p === "…" ? (
+                      <span key={`gap-${i}`} className="px-2 text-[13px]" style={{ color: "var(--color-text-muted)" }}>…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        onClick={() => applyFilters({ page: p })}
+                        className={cn(
+                          "min-w-8 rounded-lg px-2.5 py-1.5 text-[13px] font-medium transition-colors",
+                          p === filters.page ? "bg-[var(--color-primary)] text-white" : "hover:bg-[var(--color-bg-subtle)]"
+                        )}
+                        style={p === filters.page ? undefined : { color: "var(--color-text-secondary)" }}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
