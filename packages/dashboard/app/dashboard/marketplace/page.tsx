@@ -99,7 +99,7 @@ export default function MarketplacePage() {
         style={{ backgroundColor: "var(--color-ink)" }}
       >
         <div className="min-w-0">
-          <span className="text-eyebrow font-bold uppercase" style={{ color: "var(--color-amber)", letterSpacing: "0.66px" }}>Featured</span>
+          <span className="text-eyebrow font-bold uppercase" style={{ color: "rgba(255,255,255,0.6)", letterSpacing: "0.66px" }}>Featured</span>
           <h2 className="mt-2 text-[20px] font-bold leading-tight text-white">{FEATURED_APP.name}</h2>
           <p className="mt-2 max-w-[420px] text-[13px]" style={{ color: "rgba(255,255,255,0.6)" }}>{FEATURED_APP.description}</p>
           <Link
@@ -112,7 +112,7 @@ export default function MarketplacePage() {
         </div>
         <div
           className="hidden h-[128px] w-[178px] shrink-0 items-end justify-center gap-[5px] rounded-xl p-[14px] sm:flex"
-          style={{ background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%)" }}
+          style={{ backgroundColor: "var(--color-primary)" }}
           aria-hidden
         >
           {[
@@ -166,7 +166,7 @@ export default function MarketplacePage() {
                 ) : (
                   <Button
                     type="button"
-                    variant={isInstalled ? "ghost" : "primary"}
+                    variant="ghost"
                     disabled={busy}
                     onClick={() => {
                       setActionError(undefined);
