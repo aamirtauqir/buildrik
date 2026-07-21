@@ -11,7 +11,7 @@ import { ShareDraftModal } from "@/components/site-detail/share-draft-modal";
 import { ApplyTemplateModal } from "@/components/site-detail/apply-template-modal";
 
 interface SiteHeaderProps {
-  site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null; domain?: string | null };
+  site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null; domain?: string | null; sourceTemplate?: { id: string; name: string } | null };
   onPublish?: () => void;
   onUnpublish?: () => void;
 }
@@ -71,6 +71,16 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
               <span className="mt-0.5 inline-block" style={{ color: "var(--color-text-muted)" }}>
                 <MetricValue className="text-body-sm">{address}</MetricValue>
               </span>
+            )}
+            {site.sourceTemplate && (
+              <Link
+                href={`/dashboard/templates/${site.sourceTemplate.id}`}
+                className="mt-1 inline-flex items-center gap-1 text-body-sm transition-colors hover:underline"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                <LayoutTemplate className="h-3.5 w-3.5" />
+                Made from {site.sourceTemplate.name}
+              </Link>
             )}
           </div>
         </div>

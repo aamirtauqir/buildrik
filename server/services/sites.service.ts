@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { sanitizeBlocks } from "@/lib/sanitize-blocks";
+import { pagesFromTemplate } from "@/server/services/template.service";
 import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
 import type {
   CreateSiteInput,
@@ -189,6 +190,8 @@ export async function createSite(
     });
     if (!template) throw new Error("TEMPLATE_NOT_FOUND");
 
+    const templatePageCount = ((template.pages ?? []) as unknown[]).length;
+
     const site = await prisma.$transaction(async (tx) => {
       const created = await tx.site.create({
         data: {
@@ -198,38 +201,16 @@ export async function createSite(
           workspaceId,
           createdBy: userId,
           creationMethod: "TEMPLATE",
-          template: input.templateId,
-          pages: 0,
+          templateId: input.templateId,
+          pages: templatePageCount,
           lastEditedAt: new Date(),
         },
       });
 
-      const templatePages =
-        (template.pages as Array<{
-          name: string;
-          slug: string;
-          blocks: unknown;
-          isHomePage?: boolean;
-        }>) ?? [];
-
-      for (let i = 0; i < templatePages.length; i++) {
-        const tp = templatePages[i];
-        await tx.page.create({
-          data: {
-            siteId: created.id,
-            name: tp.name,
-            slug: tp.slug,
-            position: i,
-            blocks: sanitizeBlocks(tp.blocks ?? []),
-            isHomePage: tp.isHomePage ?? i === 0,
-          },
-        });
+      const pageRows = pagesFromTemplate(template, created.id);
+      if (pageRows.length > 0) {
+        await tx.page.createMany({ data: pageRows });
       }
-
-      await tx.site.update({
-        where: { id: created.id },
-        data: { pages: templatePages.length },
-      });
 
       await tx.template.update({
         where: { id: input.templateId! },
@@ -334,7 +315,7 @@ export async function transferSite(
 export async function getSite(siteId: string) {
   return prisma.site.findFirst({
     where: { id: siteId, deletedAt: null },
-    include: { folder: true },
+    include: { folder: true, sourceTemplate: { select: { id: true, name: true } } },
   });
 }
 

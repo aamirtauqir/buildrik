@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
+import { sanitizeBlocks } from "@/lib/sanitize-blocks";
 import type { ListTemplatesInput } from "@buildrik/shared/schemas/templates";
 
 const SORT_MAP: Record<string, Record<string, string>> = {
@@ -99,11 +100,15 @@ type TemplatePageInput = {
 
 /**
  * Map a template's stored `pages[]` (Json) into `page.createMany` rows bound to
- * a target site. Shared by both template→site paths — useTemplate (brand-new
- * site) and applyTemplateToSite (existing site) — so the clone shape lives in
- * exactly one place.
+ * a target site. Shared by all three template→site paths — useTemplate (brand-new
+ * site), applyTemplateToSite (existing site), and sites.create's onboarding
+ * template branch — so the clone shape lives in exactly one place.
+ *
+ * Runs each page's blocks through sanitizeBlocks: the write-boundary XSS guard is
+ * applied on every clone path, not just onboarding. DOMPurify preserves safe HTML,
+ * so container blocks stamped `contentFormat:"html"` still render.
  */
-function pagesFromTemplate(template: { pages: Prisma.JsonValue }, siteId: string) {
+export function pagesFromTemplate(template: { pages: Prisma.JsonValue }, siteId: string) {
   const templatePages = (template.pages ?? []) as unknown as TemplatePageInput[];
   return templatePages.map((p, i) => ({
     siteId,
@@ -111,7 +116,7 @@ function pagesFromTemplate(template: { pages: Prisma.JsonValue }, siteId: string
     slug: p.slug,
     position: p.position ?? i,
     isHomePage: p.isHomePage ?? i === 0,
-    blocks: p.blocks ?? [],
+    blocks: sanitizeBlocks(p.blocks ?? []),
   }));
 }
 
