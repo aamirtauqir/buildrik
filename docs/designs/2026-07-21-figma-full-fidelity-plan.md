@@ -16,9 +16,13 @@
 
 ---
 
-## 0. What the live file actually holds
+## 0. What the live file actually holds — at arc START
 
-Queried through the Plugin API on 2026-07-21, not read from a checklist.
+Queried through the Plugin API on 2026-07-21 (the morning this arc began), not read
+from a checklist. **This table is the *before* snapshot — the state that launched
+the arc, not the finished file.** The final state (239 frames, 15 components,
+1,191 instances, page counts Editor 346 · Site 64 · Portfolio 52 · Client review
+32 · Components 23 · Archive 31) is in §6f and §8 below.
 
 | Page | Top-level nodes | Verdict |
 |---|---|---|
@@ -715,8 +719,14 @@ reuse, keep single-use compositions inline.
 
 ### Instancing pass — final state
 
-**15 components, ~1169 instances (from 0). 239/239 frames: 0 overflow,
+**15 components, 1,191 instances (from 0). 239/239 frames: 0 overflow,
 0 collisions, 0 collapsed containers, 239/239 captions.**
+
+*(The per-component table below sums to 1,169 — every instance inside the 239
+promoted state frames. The full live total is 1,191: the extra 22 are `Nav item`
+instances inside the two base shell templates — `Site shell` 14 + `Portfolio
+shell` 8 — which the state frames instance from. Verified against a fresh API
+dump 2026-07-21.)*
 
 | Component | Instances | | Component | Instances |
 |---|---|---|---|---|
@@ -761,7 +771,7 @@ mode-resolution misses). **11,272 solid fills scanned; no rendering bug found.**
     `color/bg-card`** — zero visual change, verified. 0 unbound white chrome fills
     remain.
 
-**Final file state: 239 frames · 239 captions · 15 components · ~1169 instances ·
+**Final file state: 239 frames · 239 captions · 15 components · 1,191 instances ·
 0 overflow · 0 collisions · 0 collapsed containers · every chrome fill
 token-bound.** Design-side, the file is complete and clean; what remains
 (`agency_layer` flag, Gate C with a real client) is founder-side.
@@ -791,9 +801,11 @@ sixth drill-in when cargo-sheets §4 lists it under *"Modals, not drill-in"*, an
 ## 7. Honest count
 
 **Before:** 309 named things, ~99 of them real frames, ~210 annotation cards.
-**After:** **225 real full-size frames**, each captioned with the reasoning its
+**After:** **239 real full-size frames**, each captioned with the reasoning its
 card carried, plus the component library and foundations that were already sound.
+(This section originally said 225 — a mid-arc figure, before the 12 shell states,
+the 1280 width frame, and the reach frame landed. Final is 239.)
 
 The two numbers are not comparable, and that is the finding. 309 counted cards,
-kit entries, and multipliers as though they were screens. 225 counts frames a
+kit entries, and multipliers as though they were screens. 239 counts frames a
 developer can build from. **The old number was bigger and meant less.**
