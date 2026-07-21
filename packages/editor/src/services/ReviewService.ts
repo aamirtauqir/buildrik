@@ -7,6 +7,7 @@
  */
 import { getBuildrikClient } from "./api-client";
 import { DASHBOARD_URL } from "../shared/utils/runtimeEnv";
+import type { PublishPage } from "../editor/shell/exportPublishPages";
 
 /** The site being edited, read from the unified-editor URL (/edit/<siteId>) or
  *  the legacy ?siteId param. */
@@ -26,11 +27,16 @@ export function currentSiteId(): string | null {
  * emails the client the `/review/<token>` link. Omitted, a token is still
  * created but no invite is sent and the review page rejects unidentified
  * visitors — effectively internal, though a tokenised record exists.
+ *
+ * `snapshotPages` is the site rendered to HTML at send time (same ExportEngine
+ * payload publish uses). Stored frozen so the client reviews the version they
+ * were sent, never the live draft (frozen-snapshot contract §1.6).
  */
 export async function submitForReview(
   note?: string,
   changeSummary?: string,
   clientEmail?: string,
+  snapshotPages?: PublishPage[],
 ): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) throw new Error("No site to send for review");
@@ -39,5 +45,6 @@ export async function submitForReview(
     note,
     changeSummary,
     clientEmail,
+    snapshotPages,
   });
 }

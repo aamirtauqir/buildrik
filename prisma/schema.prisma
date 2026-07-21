@@ -486,6 +486,13 @@ model ReviewRequest {
   // m-approval: human-readable summary of what changed in this submission
   // (e.g. "hero copy, 2 images"), shown to the reviewer as a lightweight diff.
   changeSummary String?
+  /// The site's rendered HTML **frozen at send** (contracts §1.6): an array of
+  /// { path, html } produced by the editor's ExportEngine at submit time — the
+  /// same page payload publish deploys. The client review page renders THIS, not
+  /// the live draft, so the client always sees the version they were sent.
+  /// Re-sending re-renders and overwrites it (a new token, a new snapshot).
+  /// Null on internal submits with no editor render.
+  snapshotPages Json?
   resolvedById  String?
   resolvedAt    DateTime?
   /// Opaque token the client's /review/<token> link carries. Unique and

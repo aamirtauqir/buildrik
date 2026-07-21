@@ -114,6 +114,7 @@ async function requireLiveReview(token: string) {
       revokedAt: true,
       reviewerId: true,
       invitedEmail: true,
+      snapshotPages: true,
       createdAt: true,
       site: { select: { id: true, name: true, workspaceId: true } },
     },
@@ -148,6 +149,10 @@ export async function getReviewByToken(token: string) {
     note: review.note,
     changeSummary: review.changeSummary,
     sentAt: review.createdAt,
+    /** The site frozen at send — [{ path, html }] the page renders in a
+     *  sandboxed iframe. Null on internal submits with no editor render; the
+     *  page then shows the "preview unavailable" state instead of the site. */
+    snapshotPages: (review.snapshotPages as { path: string; html: string }[] | null) ?? null,
     /** Null until the client signs. The page shows the capture form when null. */
     reviewer,
   };

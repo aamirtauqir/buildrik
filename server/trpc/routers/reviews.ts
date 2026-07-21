@@ -69,6 +69,7 @@ export const reviewsRouter = router({
         input.note,
         input.changeSummary,
         input.clientEmail,
+        input.snapshotPages,
       );
     }),
 

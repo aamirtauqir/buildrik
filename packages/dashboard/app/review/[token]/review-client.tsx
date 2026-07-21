@@ -31,6 +31,48 @@ const DEAD_LINK_COPY: Record<string, { title: string; body: string }> = {
   },
 };
 
+/** The frozen site, rendered in a fully-sandboxed iframe (no scripts, unique
+ *  origin) so the reviewed site's markup can never touch the review page. Shows
+ *  the snapshot taken at send, never the live draft (contracts §1.6). Multi-page
+ *  snapshots get a tab per page; a missing snapshot degrades to an honest note. */
+function SitePreview({ pages }: { pages: { path: string; html: string }[] | null }) {
+  const [active, setActive] = useState(0);
+  if (!pages || pages.length === 0) {
+    return (
+      <div className="flex h-[420px] items-center justify-center rounded-lg border border-dashed border-[#CBD5E1]">
+        <p className="text-[13px] text-[#64748B]">Preview unavailable for this version.</p>
+      </div>
+    );
+  }
+  const idx = Math.min(active, pages.length - 1);
+  const label = (p: string) => p.replace(/\.html$/, "").replace(/^index$/, "Home") || "Home";
+  return (
+    <div className="overflow-hidden rounded-lg border border-[#E2E8F0]">
+      {pages.length > 1 ? (
+        <div className="flex gap-1 overflow-x-auto border-b border-[#E2E8F0] bg-[#F8FAFC] px-2 py-1.5">
+          {pages.map((p, i) => (
+            <button
+              key={p.path}
+              onClick={() => setActive(i)}
+              className={`shrink-0 rounded px-2.5 py-1 text-[12px] ${
+                i === idx ? "bg-white font-semibold text-[#0F172A] shadow-sm" : "text-[#64748B]"
+              }`}
+            >
+              {label(p.path)}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      <iframe
+        title="Site preview"
+        srcDoc={pages[idx].html}
+        sandbox=""
+        className="h-[600px] w-full bg-white"
+      />
+    </div>
+  );
+}
+
 function Shell({
   agency,
   children,
@@ -244,17 +286,11 @@ export function ReviewClient({ token }: { token: string }) {
               <p className="mt-1 text-[13px] text-[#475569]">{data.changeSummary}</p>
             </div>
           ) : null}
-          {/* PLACEHOLDER — the snapshot renderer is not wired yet. See the note
-              in the commit: SiteVersion.payload holds the frozen ProjectData,
-              but turning it into HTML lives in the editor's ExportEngine, which
-              has not been proven to run inside Next. Until it is, this page is
-              honest about what it cannot show rather than embedding the live
-              draft, which would break the frozen-snapshot contract. */}
-          <div className="flex h-[420px] items-center justify-center rounded-lg border border-dashed border-[#CBD5E1]">
-            <p className="text-[13px] text-[#64748B]">
-              Site preview — not wired yet
-            </p>
-          </div>
+          {/* The site frozen at send, rendered by the editor's ExportEngine and
+              stored on the review request. ExportEngine runs in the editor (not
+              Next), so the HTML is produced at send time and served here as a
+              static, sandboxed snapshot — never the live draft (contracts §1.6). */}
+          <SitePreview pages={data.snapshotPages} />
         </section>
 
         <aside className="w-[320px] shrink-0 rounded-xl border border-[#E2E8F0] bg-white">

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publishPageSchema, MAX_PUBLISH_PAGES } from "./publish";
 
 /**
  * Invited-client review workflow (redesign E4). SSOT for the submit/resolve
@@ -18,6 +19,11 @@ export const submitReviewInput = z.object({
   /** Where to send the review link. Omitted = submit to the internal admin
    *  queue only, without inviting a client. */
   clientEmail: z.string().trim().toLowerCase().email().max(320).optional(),
+  /** The site's rendered pages ({ path, html }) frozen at send — the same
+   *  ExportEngine payload publish uses. The client review page renders these,
+   *  never the live draft (frozen-snapshot contract §1.6). Omitted on an
+   *  internal submit with no editor render. */
+  snapshotPages: z.array(publishPageSchema).max(MAX_PUBLISH_PAGES).optional(),
 });
 export type SubmitReviewInput = z.infer<typeof submitReviewInput>;
 

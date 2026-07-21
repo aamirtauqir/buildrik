@@ -31,6 +31,7 @@ import { useClickOutside } from "@/shared/hooks";
 import { Sparkles, MoreHorizontal } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import { submitForReview } from "../../services/ReviewService";
+import { exportPublishPages } from "./exportPublishPages";
 import type { Issue } from "./hooks/useStudioState";
 import { CommandPalette } from "./modals/CommandPalette";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
@@ -198,6 +199,18 @@ export const Topbar: React.FC<TopbarProps> = ({
   const sendForReview = React.useCallback(async () => {
     setReviewState("sending");
     try {
+      // Freeze the site at send: render every page to HTML (the same ExportEngine
+      // payload publish uses) so the client reviews THIS version, not the live
+      // draft (contracts §1.6). Best-effort — a render glitch must not block the
+      // send, since the link works with or without a preview.
+      let snapshotPages;
+      if (composer) {
+        try {
+          snapshotPages = await exportPublishPages(composer);
+        } catch (e) {
+          console.warn("[review] snapshot render failed; sending without preview", e);
+        }
+      }
       // With an address the client is invited and gets a signable link; without
       // one this stays an internal request. Both are real paths (see
       // `submitReviewInput`), so an empty field is not an error here.
@@ -205,13 +218,14 @@ export const Topbar: React.FC<TopbarProps> = ({
         reviewNote.trim() || undefined,
         reviewSummary.trim() || undefined,
         reviewEmail.trim() || undefined,
+        snapshotPages,
       );
       setReviewState("sent");
       setReviewOpen(false);
     } catch {
       setReviewState("error");
     }
-  }, [reviewNote, reviewSummary, reviewEmail]);
+  }, [reviewNote, reviewSummary, reviewEmail, composer]);
   const [cmdOpen, setCmdOpen] = React.useState(false);
 
   // Redesign: the "Status + Ship" zone keeps only the common actions; the rare

@@ -38,8 +38,15 @@ export async function submitReview(
   /** Where to send the link. Omit to submit without inviting anyone —
    *  the internal admin queue still works exactly as before. */
   clientEmail?: string,
+  /** The site's rendered pages ({ path, html }) frozen at send. Stored on the
+   *  request so the client review page shows the version they were sent, not the
+   *  live draft (contracts §1.6). Every submit re-renders and overwrites it. */
+  snapshotPages?: { path: string; html: string }[],
 ) {
-  const updateData = { note: note ?? null, changeSummary: changeSummary ?? null, requestedById };
+  // Only overwrite the snapshot when the caller rendered one — an internal
+  // submit with no editor render leaves any existing snapshot untouched.
+  const snapshot = snapshotPages ? { snapshotPages: snapshotPages as Prisma.InputJsonValue } : {};
+  const updateData = { note: note ?? null, changeSummary: changeSummary ?? null, requestedById, ...snapshot };
   const openId = async () =>
     (await prisma.reviewRequest.findFirst({ where: { siteId, status: "PENDING" }, select: { id: true } }))?.id;
 
@@ -50,7 +57,7 @@ export async function submitReview(
   } else {
     try {
       request = await prisma.reviewRequest.create({
-        data: { siteId, requestedById, note: note ?? null, changeSummary: changeSummary ?? null, status: "PENDING" },
+        data: { siteId, requestedById, note: note ?? null, changeSummary: changeSummary ?? null, status: "PENDING", ...snapshot },
       });
     } catch (err) {
       // Lost a concurrent submit: the partial unique index
