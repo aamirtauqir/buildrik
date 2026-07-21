@@ -42,8 +42,15 @@ export interface PublishStatus {
 export async function publishSite(
   siteId: string,
   pages: PublishPagePayload[],
+  acknowledgeStale?: boolean,
 ): Promise<{ jobId: string }> {
-  const result = await getClient().sites.publish.mutate({ siteId, pages });
+  // acknowledgeStale is the deliberate over-ride for a stale approval
+  // (contracts §1.5): the site changed after the client signed off, and the
+  // publisher is choosing to ship the un-approved changes. Omitted on a normal
+  // publish so the server gate can still block.
+  const result = await getClient().sites.publish.mutate(
+    acknowledgeStale ? { siteId, pages, acknowledgeStale: true } : { siteId, pages },
+  );
   return { jobId: result.id };
 }
 

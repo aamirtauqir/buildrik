@@ -193,10 +193,14 @@ describe("useExportHandlers", () => {
       await act(async () => {
         await result.current.handleVercelPublish();
       });
-      expect(result.current.publishJob.publish).toHaveBeenCalledWith("site-123", [
-        { path: "index.html", html: "<html />" },
-        { path: "about.html", html: "<html>about</html>" },
-      ]);
+      expect(result.current.publishJob.publish).toHaveBeenCalledWith(
+        "site-123",
+        [
+          { path: "index.html", html: "<html />" },
+          { path: "about.html", html: "<html>about</html>" },
+        ],
+        { acknowledgeStale: false },
+      );
     });
 
     it("toasts error when export throws", async () => {

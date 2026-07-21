@@ -433,4 +433,67 @@ describe("usePublishJob", () => {
       expect(mockFetchStatus).toHaveBeenCalledTimes(pollCount);
     });
   });
+
+  describe("approval gate (contracts §1.5 / §2)", () => {
+    it("classifies a stale-approval rejection into blockedReason, not error", async () => {
+      mockPublishSite.mockRejectedValueOnce(
+        new Error(
+          "This site changed after it was approved. Re-send it for review, or acknowledge to publish the un-approved changes.",
+        ),
+      );
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      expect(result.current.blockedReason).toBe("stale-approval");
+      expect(result.current.error).toBeNull();
+      expect(result.current.uiState).toBe("idle");
+    });
+
+    it("classifies a needs-approval rejection into blockedReason", async () => {
+      mockPublishSite.mockRejectedValueOnce(
+        new Error("This site needs an approved review before it can be published."),
+      );
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      expect(result.current.blockedReason).toBe("needs-approval");
+      expect(result.current.error).toBeNull();
+    });
+
+    it("a non-approval rejection still lands in error, not blockedReason", async () => {
+      mockPublishSite.mockRejectedValueOnce(new Error("Something else went wrong"));
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      expect(result.current.blockedReason).toBeNull();
+      expect(result.current.error).toBe("Something else went wrong");
+    });
+
+    it("acknowledgeStale passes the third arg through to publishSite", async () => {
+      mockPublishSite.mockResolvedValueOnce({ jobId: "job-ack" });
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES, { acknowledgeStale: true });
+      });
+      expect(mockPublishSite).toHaveBeenCalledWith("site-1", PAGES, true);
+    });
+
+    it("dismissBlock clears the block without publishing", async () => {
+      mockPublishSite.mockRejectedValueOnce(
+        new Error("This site changed after it was approved. …acknowledge…"),
+      );
+      const { result } = renderHook(() => usePublishJob());
+      await act(async () => {
+        await result.current.publish("site-1", PAGES);
+      });
+      expect(result.current.blockedReason).toBe("stale-approval");
+      await act(async () => {
+        result.current.dismissBlock();
+      });
+      expect(result.current.blockedReason).toBeNull();
+    });
+  });
 });

@@ -19,6 +19,7 @@ import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types"
 import { TooltipProvider, ToastProvider, useToast } from "@/editor/shared/vibcoder";
 import { StudioSkeleton } from "@/shared/extensions/SkeletonCompounds";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
+import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
@@ -260,6 +261,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const {
     handleExportHTML,
     handleVercelPublish,
+    handlePublishAcknowledged,
     publishJob,
   } = useExportHandlers({
     composer,
@@ -518,6 +520,21 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       {/* First-time onboarding checklist (gated to new users by the orchestrator). */}
       <OnboardingMount composer={composer} />
+
+      {/* Stale-approval gate (contracts §1.5): the site changed after the client
+          approved it. Publish is not revoked — it is blocked behind a deliberate
+          acknowledgement. "Publish anyway" ships the un-approved changes; Cancel
+          keeps the sign-off intact so the designer can re-send for review. */}
+      <ConfirmDialog
+        isOpen={publishJob.blockedReason === "stale-approval"}
+        onClose={publishJob.dismissBlock}
+        onConfirm={handlePublishAcknowledged}
+        title="Publish changes your client hasn't approved?"
+        message="This design changed after your client approved it. Publishing now ships changes they haven't signed off on. To keep their sign-off, re-send it for review from the top bar first — or publish these un-approved changes deliberately."
+        confirmText="Publish anyway"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </Stack>
   );
 };

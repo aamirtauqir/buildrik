@@ -31,7 +31,8 @@ const composer = {
 function makeJob(over: Partial<UsePublishJobResult> = {}): UsePublishJobResult {
   return {
     uiState: "idle", jobId: null, progress: 0, publishedUrl: null, error: null,
-    publish: vi.fn(), cancel: vi.fn(), reset: vi.fn(), ...over,
+    blockedReason: null,
+    publish: vi.fn(), cancel: vi.fn(), reset: vi.fn(), dismissBlock: vi.fn(), ...over,
   };
 }
 

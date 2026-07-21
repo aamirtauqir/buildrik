@@ -29,21 +29,50 @@ export type PublishUiState =
   | "failed"
   | "cancelled";
 
+/**
+ * Why the approval gate stopped a publish before a job was even created
+ * (contracts §1.5 / §2). Kept separate from `error` because these are not
+ * failures to surface as a red toast — they need a decision from the user:
+ * `stale-approval` offers an acknowledge-and-ship path, `needs-approval` does
+ * not (there is no review to over-ride).
+ */
+export type PublishBlockReason = "stale-approval" | "needs-approval" | null;
+
+/**
+ * Classify the server's approval-gate rejection from its message. Both come
+ * back as tRPC PRECONDITION_FAILED (`server/trpc/routers/sites.ts`), so the
+ * message is the only discriminator. Anything else is a real error.
+ */
+function classifyPublishBlock(msg: string): PublishBlockReason {
+  if (/acknowledge|changed after it was approved/i.test(msg)) return "stale-approval";
+  if (/needs an approved review/i.test(msg)) return "needs-approval";
+  return null;
+}
+
 export interface UsePublishJobResult {
   uiState: PublishUiState;
   jobId: string | null;
   progress: number;
   publishedUrl: string | null;
   error: string | null;
-  publish: (siteId: string, pages: PublishPagePayload[]) => Promise<void>;
+  /** Set when the approval gate blocked the publish; drives the acknowledge UX. */
+  blockedReason: PublishBlockReason;
+  publish: (
+    siteId: string,
+    pages: PublishPagePayload[],
+    opts?: { acknowledgeStale?: boolean },
+  ) => Promise<void>;
   cancel: () => Promise<void>;
   reset: () => void;
+  /** Dismiss an approval block without publishing (Cancel / after a toast). */
+  dismissBlock: () => void;
 }
 
 export function usePublishJob(): UsePublishJobResult {
   const [jobId, setJobId] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<PublishStatus | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [blockedReason, setBlockedReason] = React.useState<PublishBlockReason>(null);
   // Server-hydrated state separate from in-session job state so a returning
   // user sees the correct "Published" Topbar without poisoning the publish()
   // re-entrancy guard (which keys on jobId).
@@ -90,13 +119,22 @@ export function usePublishJob(): UsePublishJobResult {
   }, [stopPolling, tick]);
 
   const publish = React.useCallback(
-    async (siteId: string, pages: PublishPagePayload[]) => {
+    async (
+      siteId: string,
+      pages: PublishPagePayload[],
+      opts?: { acknowledgeStale?: boolean },
+    ) => {
       // Block only when a job is still in-flight. After a terminal state
       // (COMPLETED/FAILED/CANCELLED), allow republish.
       if (jobId && statusRef.current && !TERMINAL.has(statusRef.current.status)) return;
       setError(null);
+      setBlockedReason(null);
       try {
-        const { jobId: id } = await publishSite(siteId, pages);
+        // Only pass the 3rd arg when acknowledging — a normal publish stays a
+        // two-arg call so the server gate can still block.
+        const { jobId: id } = opts?.acknowledgeStale
+          ? await publishSite(siteId, pages, true)
+          : await publishSite(siteId, pages);
         setJobId(id);
         setStatus({
           jobId: id,
@@ -106,11 +144,19 @@ export function usePublishJob(): UsePublishJobResult {
         startPolling(id);
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Publish failed";
-        setError(msg);
+        // An approval-gate block is a decision to surface, not a red error.
+        // Without this, the pre-job rejection landed in `error` while uiState
+        // stayed "idle", so the toast effect never fired and Publish appeared
+        // to do nothing at all.
+        const reason = classifyPublishBlock(msg);
+        if (reason) setBlockedReason(reason);
+        else setError(msg);
       }
     },
     [jobId, startPolling],
   );
+
+  const dismissBlock = React.useCallback(() => setBlockedReason(null), []);
 
   const cancel = React.useCallback(async () => {
     if (!jobId) return;
@@ -128,6 +174,7 @@ export function usePublishJob(): UsePublishJobResult {
     setJobId(null);
     setStatus(null);
     setError(null);
+    setBlockedReason(null);
   }, [stopPolling]);
 
   // Cleanup on unmount.
@@ -177,8 +224,10 @@ export function usePublishJob(): UsePublishJobResult {
     progress: status?.progress ?? 0,
     publishedUrl: status?.publishedUrl ?? hydratedUrl,
     error,
+    blockedReason,
     publish,
     cancel,
     reset,
+    dismissBlock,
   };
 }

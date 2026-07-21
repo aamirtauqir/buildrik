@@ -39,6 +39,12 @@ export interface UseExportHandlersOptions {
 export interface UseExportHandlersResult {
   handleExportHTML: () => Promise<void>;
   handleVercelPublish: () => Promise<void>;
+  /**
+   * Re-run publish acknowledging a stale approval (contracts §1.5) — the
+   * "Publish anyway" action on the stale-approval dialog. Re-exports the
+   * current pages so it ships what's on the canvas now, not a stale payload.
+   */
+  handlePublishAcknowledged: () => Promise<void>;
   publishJob: UsePublishJobResult;
 }
 
@@ -72,36 +78,59 @@ export function useExportHandlers({
     }
   }, [composer, addToast, setExportLoading]);
 
-  const handleVercelPublish = React.useCallback(async () => {
-    const siteId = getSiteIdFromUrl();
-    if (!siteId) {
-      addToast({
-        title: "Cannot publish",
-        description: "Open this editor from a site URL with ?siteId=… to publish.",
-        tone: "error",
-      });
-      return;
-    }
-    try {
-      if (!composer) throw new Error("Composer not ready");
-      const pages = await exportPublishPages(composer);
-      if (pages.length === 0) {
+  const runPublish = React.useCallback(
+    async (acknowledgeStale: boolean) => {
+      const siteId = getSiteIdFromUrl();
+      if (!siteId) {
         addToast({
-          title: "Nothing to publish",
-          description: "Add at least one page before publishing.",
-          tone: "warning",
+          title: "Cannot publish",
+          description: "Open this editor from a site URL with ?siteId=… to publish.",
+          tone: "error",
         });
         return;
       }
-      await publishJob.publish(siteId, pages);
-    } catch (err) {
+      try {
+        if (!composer) throw new Error("Composer not ready");
+        const pages = await exportPublishPages(composer);
+        if (pages.length === 0) {
+          addToast({
+            title: "Nothing to publish",
+            description: "Add at least one page before publishing.",
+            tone: "warning",
+          });
+          return;
+        }
+        await publishJob.publish(siteId, pages, { acknowledgeStale });
+      } catch (err) {
+        addToast({
+          title: "Publish failed",
+          description: err instanceof Error ? err.message : "Could not start publish.",
+          tone: "error",
+        });
+      }
+    },
+    [composer, publishJob, addToast],
+  );
+
+  const handleVercelPublish = React.useCallback(() => runPublish(false), [runPublish]);
+  const handlePublishAcknowledged = React.useCallback(() => runPublish(true), [runPublish]);
+
+  // needs-approval has no acknowledge path — there is no review to over-ride —
+  // so surface it as an informational toast, not a dialog. Clear the block after
+  // so it doesn't re-fire. (stale-approval is handled by the dialog in the shell.)
+  const dismissBlock = publishJob.dismissBlock;
+  React.useEffect(() => {
+    if (publishJob.blockedReason === "needs-approval") {
       addToast({
-        title: "Publish failed",
-        description: err instanceof Error ? err.message : "Could not start publish.",
-        tone: "error",
+        title: "Approval needed",
+        description:
+          "This site needs an approved review before it can be published. Send it for review from the top bar.",
+        tone: "warning",
+        duration: 6000,
       });
+      dismissBlock();
     }
-  }, [composer, publishJob, addToast]);
+  }, [publishJob.blockedReason, dismissBlock, addToast]);
 
   // Surface publish completion / failure as toasts.
   React.useEffect(() => {
@@ -138,5 +167,5 @@ export function useExportHandlers({
     }
   }, [publishJob.uiState, publishJob.publishedUrl, publishJob.error, addToast]);
 
-  return { handleExportHTML, handleVercelPublish, publishJob };
+  return { handleExportHTML, handleVercelPublish, handlePublishAcknowledged, publishJob };
 }
