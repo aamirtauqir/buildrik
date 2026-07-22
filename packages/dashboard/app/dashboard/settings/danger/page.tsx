@@ -26,6 +26,10 @@ export default function DangerZonePage() {
     onError: (err) => addToast("error", "Could not delete workspace", err.message),
   });
 
+  // Eligibility drives the warning block + disabled state in DangerZoneTab —
+  // the props existed but were never passed, so the guard block never rendered.
+  const eligibilityQuery = trpc.account.dangerZone.deletionEligibility.useQuery();
+
   const exportMutation = trpc.account.dangerZone.exportData.useMutation({
     onSuccess: () => addToast("success", "Data export started. You'll be notified when ready."),
     onError: (err) => addToast("error", "Export failed", err.message),
@@ -87,6 +91,8 @@ export default function DangerZonePage() {
           onDelete={(reason) => deleteMutation.mutate({ reason })}
           isExporting={exportMutation.isPending}
           estimatedSize="~2 MB"
+          isSoleOwner={eligibilityQuery.data?.isSoleOwner}
+          hasActiveSubscription={eligibilityQuery.data?.hasActiveSubscription}
         />
       </section>
 

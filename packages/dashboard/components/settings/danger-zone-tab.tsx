@@ -64,7 +64,10 @@ export function DangerZoneTab({
   const [reason, setReason] = useState("");
   const [showDeleteForm, setShowDeleteForm] = useState(false);
 
-  const canDelete = confirmText === "DELETE";
+  // Blocked = a prerequisite (sole ownership / live subscription) isn't cleared.
+  // The backend enforces this too; disabling here just avoids a doomed submit.
+  const blocked = !!isSoleOwner || !!hasActiveSubscription;
+  const canDelete = confirmText === "DELETE" && !blocked;
 
   function handleDelete(e: React.FormEvent) {
     e.preventDefault();
@@ -210,7 +213,7 @@ export function DangerZoneTab({
         </p>
 
         {!showDeleteForm ? (
-          <Button type="button" variant="danger" onClick={() => setShowDeleteForm(true)}>
+          <Button type="button" variant="danger" disabled={blocked} onClick={() => setShowDeleteForm(true)}>
             I want to delete my account
           </Button>
         ) : (
