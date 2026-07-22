@@ -34,11 +34,11 @@ Accent `#406ED6` via `--bd-*`; Gate 24 (no inline form elements — use vibcoder
 - `revokeReviewRound(workspaceId, reviewId, expectedRevision): Promise<{ revoked: boolean; reason?: "token-changed" | "already-revoked" | "not-found" }>` — `updateMany where { id, site:{workspaceId}, revokedAt:null, updatedAt: new Date(expectedRevision) }` set `revokedAt`. count 1 → revoked; count 0 → disambiguate (find row: absent→not-found, revokedAt set→already-revoked, else→token-changed i.e. a re-send bumped updatedAt).
 - Router: `reviews.currentRound` (flag-gated, EDITOR, flag-off → null) + `reviews.revoke` (flag-gated, EDITOR, activity-logged via `recordForSite`).
 
-- [ ] A1 write failing service tests (getCurrentRound none/pending/resolved/revoked + openCommentCount; revoke match→revoked, stale-revision→token-changed, revoked→already-revoked, cross-ws→not-found)
-- [ ] A2 run → fail
-- [ ] A3 implement schemas + service fns + delete dead `revokeReviewToken` + router procs
-- [ ] A4 run → pass; tsc 0
-- [ ] A5 commit
+- [x] A1 write failing service tests (getCurrentRound none/pending/resolved/revoked + openCommentCount; revoke match→revoked, stale-revision→token-changed, revoked→already-revoked, cross-ws→not-found)
+- [x] A2 run → fail
+- [x] A3 implement schemas + service fns + delete dead `revokeReviewToken` + router procs
+- [x] A4 run → pass; tsc 0
+- [x] A5 commit
 
 ### Slice B — Server: comments.list enrichment
 
@@ -46,11 +46,11 @@ Accent `#406ED6` via `--bd-*`; Gate 24 (no inline form elements — use vibcoder
 
 **Produces:** `listComments` rows gain `reviewer: { name } | null`. Return type documents authorKind derivation. Dashboard consumer unaffected (additive).
 
-- [ ] B1 failing test: listComments includes reviewer name for a client comment, null for internal
-- [ ] B2 run → fail
-- [ ] B3 add `include: { reviewer: { select: { name: true } } }`
-- [ ] B4 run → pass; tsc 0
-- [ ] B5 commit
+- [x] B1 failing test: listComments includes reviewer name for a client comment, null for internal
+- [x] B2 run → fail
+- [x] B3 add `include: { reviewer: { select: { name: true } } }`
+- [x] B4 run → pass; tsc 0
+- [x] B5 commit
 
 ### Slice C — Editor service layer
 
@@ -63,8 +63,8 @@ Accent `#406ED6` via `--bd-*`; Gate 24 (no inline form elements — use vibcoder
 - `postReply(body, pageId?): Promise<void>` — `comments.create` (authorId server-side).
 - `resolveReviewComment(id, status): Promise<void>` — `comments.resolve`.
 
-- [ ] C1 failing tests (mock getBuildrikClient; map shapes; fail-closed)
-- [ ] C2 run → fail · C3 implement · C4 pass; tsc 0 · C5 commit
+- [x] C1 failing tests (mock getBuildrikClient; map shapes; fail-closed)
+- [x] C2 run → fail · C3 implement · C4 pass; tsc 0 · C5 commit
 
 ### Slice D — Editor UI: ReviewTab (sidebar, below divider)
 
@@ -72,13 +72,26 @@ Accent `#406ED6` via `--bd-*`; Gate 24 (no inline form elements — use vibcoder
 
 **Produces:** `ReviewTab` — current-round header (status + invited email + round N of M) + open-count badge; thread list grouped per page, each row labels client/internal + name + relative time + "Home · pinned"/"General note"; reply composer (rest/pending/failed-retry); resolve/unresolve; show-resolved toggle; **Re-send** (primary → `submitForReview` re-send path) with confirm; **Revoke** behind ⋯ overflow + named confirm; states loading · empty ("No feedback yet") · **error+retry (never fake-empty)** · never-sent. DS primitives only (Gate 24). Flag-gated: tab hidden when `agency_layer` off (currentRound null + status none).
 
-- [ ] D1 failing RTL tests (loading→list; empty; error+retry not fake-empty; reply calls service; resolve calls service; revoke behind overflow + confirm; re-send primary)
-- [ ] D2 run → fail · D3 implement ReviewTab + config + router case · D4 pass; tsc 0 · D5 commit
+- [x] D1 failing RTL tests (loading→list; empty; error+retry not fake-empty; reply calls service; resolve calls service; revoke behind overflow + confirm; re-send primary)
+- [x] D2 run → fail · D3 implement ReviewTab + config + router case · D4 pass; tsc 0 · D5 commit
 
 ### Slice E — Verify
 
-- [ ] E1 full editor vitest green + full dashboard/server vitest green for touched files
-- [ ] E2 tsc 0 both packages
-- [ ] E3 gates: Gate 24, ds-ssot, buildrick-baseline
-- [ ] E4 live dev-DB integration: seed site+review+client comment → getCurrentRound → revoke (revision match) → re-send bumps revision → stale revoke → token-changed. Cascade-clean.
-- [ ] E5 commit verification notes; update memory
+- [x] E1 full editor vitest green + full dashboard/server vitest green for touched files
+- [x] E2 tsc 0 both packages
+- [x] E3 gates: Gate 24, ds-ssot, buildrick-baseline
+- [x] E4 live dev-DB integration: seed site+review+client comment → getCurrentRound → revoke (revision match) → re-send bumps revision → stale revoke → token-changed. Cascade-clean.
+- [x] E5 commit verification notes; update memory
+
+## Verification results (2026-07-23)
+- tsc gate: PASS (0 errors, editor + dashboard).
+- Unit/RTL: review.service.round 7 · comment.service 6 · ReviewService.p0 12 · ReviewTab 8 · 4 tab-config baselines updated — all green.
+- Live dev-DB: smoke-review-round 13/13 (incl. the race — fresh link survives a stale revoke); smoke-client-review 20/20.
+- ds-ssot gate: GREEN (new component DS-SSOT compliant).
+- **FLAG (pre-existing, NOT P0):** `gate:buildrick` baseline is stale (canvas 17→~69 etc.) from a prior arc; P0 adds **0** `buildrick-*` refs (ReviewTab is fully DS-composed / Gate-24 clean). The gate was already red at HEAD before slice D. Left for the owner to reconcile — masking it in the baseline would defeat the gate.
+
+## Corrections made vs the master plan (folded into this plan + code)
+- No `reviews.comments` proc — extended `comments.list` (additive `include`).
+- No server REVIEW_REVOKED reject on internal replies — comments outlive rounds (§6.4); the client composer is already REVOKED-gated server-side. Documented in `ReviewService.postReply`.
+- Revoke is race-safe via `updatedAt` optimistic concurrency (not the token), deletes dead `revokeReviewToken`.
+- Editor UI = Review sidebar tab only; canvas pin overlay stays the pins fast-follow (locked decision).
