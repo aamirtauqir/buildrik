@@ -163,6 +163,9 @@ export const authConfig: NextAuthConfig = {
       }
       session.user.workspaceId =
         typeof token.workspaceId === "string" ? token.workspaceId : null;
+      // The DB session id (baked at create-session) — lets the Security tab
+      // identify THIS session across JWT rotation.
+      session.user.sessionId = typeof token.sid === "string" ? token.sid : null;
       return session;
     },
   },

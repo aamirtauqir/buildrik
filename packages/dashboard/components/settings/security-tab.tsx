@@ -29,7 +29,7 @@ function parseUserAgent(ua: string | null | undefined): string {
 
 type SetupStep = "idle" | "qr" | "backup" | "verify";
 
-export function SecurityTab({ currentSessionId }: { currentSessionId?: string }) {
+export function SecurityTab() {
   const [setupStep, setSetupStep] = useState<SetupStep>("idle");
   const [setupData, setSetupData] = useState<{
     otpauth: string;
@@ -48,6 +48,12 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
   const profile = trpc.account.profile.get.useQuery();
   const sessions = trpc.account.sessions.list.useQuery();
   const loginHistory = trpc.account.loginHistory.useQuery();
+
+  // The current session id comes from the query now (each row carries isCurrent,
+  // computed server-side by hashing the request cookie). The old `currentSessionId`
+  // prop was never passed by the page, so "Revoke all others" no-op'd, no "Current"
+  // badge ever rendered, and the user could revoke their own live session.
+  const currentSessionId = sessions.data?.find((s) => s.isCurrent)?.id;
 
   const is2FAEnabled = profile.data?.twoFactorEnabled ?? false;
 

@@ -125,14 +125,21 @@ export async function updateProfile(userId: string, data: UpdateProfileInput) {
   });
 }
 
-export async function getActiveSessions(userId: string) {
+export async function getActiveSessions(userId: string, currentSessionId?: string | null) {
   // "Active" means unexpired — expired rows linger until the cleanup cron
   // runs and must not appear in the Security tab's Active sessions list.
-  return prisma.session.findMany({
+  const rows = await prisma.session.findMany({
     where: { userId, expires: { gt: new Date() } },
     orderBy: { createdAt: "desc" },
     take: 50,
   });
+  // Flag the request's own session (id carried in the JWT `sid` claim) so the UI
+  // can badge it "Current" and offer "Revoke all others". sessionToken is an
+  // internal column — stripped, never shipped to the client.
+  return rows.map(({ sessionToken: _sessionToken, ...s }) => ({
+    ...s,
+    isCurrent: currentSessionId != null && s.id === currentSessionId,
+  }));
 }
 
 export async function revokeSession(sessionId: string, userId: string) {
@@ -182,7 +189,42 @@ export async function updateNotificationPref(userId: string, input: Notification
   });
 }
 
+/**
+ * Blockers that must be cleared before an account can be deleted. A sole owner
+ * of a shared workspace, or an owner of a workspace with a live subscription,
+ * would orphan that workspace (and keep a paying subscription running) — so the
+ * UI disables the button and the mutation refuses.
+ */
+export async function getAccountDeletionEligibility(userId: string) {
+  const owned = await prisma.workspace.findMany({
+    where: { ownerId: userId, deletedAt: null },
+    select: {
+      subscription: { select: { status: true } },
+      _count: { select: { members: { where: { status: "ACTIVE" } } } },
+    },
+  });
+  // Sole owner of a workspace that has OTHER active members — deleting strands them.
+  const isSoleOwner = owned.some((w) => w._count.members > 1);
+  const hasActiveSubscription = owned.some(
+    (w) => w.subscription != null && ["ACTIVE", "PAST_DUE"].includes(w.subscription.status),
+  );
+  return { isSoleOwner, hasActiveSubscription, blocked: isSoleOwner || hasActiveSubscription };
+}
+
+export class AccountDeletionBlockedError extends Error {
+  constructor(public reasonCode: "SOLE_OWNER" | "ACTIVE_SUBSCRIPTION") {
+    super(reasonCode);
+    this.name = "AccountDeletionBlockedError";
+  }
+}
+
 export async function requestAccountDeletion(userId: string, reason?: string) {
+  // Enforce the same guard the UI shows — the UI check is advisory, this is
+  // authoritative. Was missing entirely, so a sole owner could delete anyway.
+  const eligibility = await getAccountDeletionEligibility(userId);
+  if (eligibility.isSoleOwner) throw new AccountDeletionBlockedError("SOLE_OWNER");
+  if (eligibility.hasActiveSubscription) throw new AccountDeletionBlockedError("ACTIVE_SUBSCRIPTION");
+
   const scheduledAt = new Date();
   scheduledAt.setDate(scheduledAt.getDate() + 30);
 

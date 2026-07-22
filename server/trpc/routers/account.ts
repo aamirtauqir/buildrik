@@ -20,6 +20,7 @@ import {
   disconnectProvider, revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
+  getAccountDeletionEligibility, AccountDeletionBlockedError,
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion, listUserWorkspaces, createWorkspace, WorkspaceLimitError, WorkspaceNameTakenError } from "@/server/services/workspace-settings.service";
 import { checkWorkspaceRole } from "@/server/services/permission.service";
@@ -111,7 +112,12 @@ export const accountRouter = router({
       }),
   }),
   sessions: router({
-    list: protectedProcedure.query(({ ctx }) => getActiveSessions(ctx.session.user.id)),
+    list: protectedProcedure.query(({ ctx }) => {
+      // Bearer sessions carry only { id }; cookie sessions carry sessionId.
+      const u = ctx.session.user;
+      const sid = "sessionId" in u ? u.sessionId : null;
+      return getActiveSessions(ctx.session.user.id, sid);
+    }),
     revoke: protectedProcedure.input(z.object({ sessionId: z.string() })).mutation(({ ctx, input }) => revokeSession(input.sessionId, ctx.session.user.id)),
     revokeAll: protectedProcedure.input(z.object({ currentSessionId: z.string() })).mutation(({ ctx, input }) => revokeAllOtherSessions(ctx.session.user.id, input.currentSessionId)),
   }),
@@ -280,8 +286,23 @@ export const accountRouter = router({
         select: { id: true, scheduledAt: true },
       });
     }),
+    deletionEligibility: protectedProcedure.query(({ ctx }) => getAccountDeletionEligibility(ctx.session.user.id)),
     exportData: protectedProcedure.mutation(({ ctx }) => requestDataExport(ctx.session.user.id)),
-    deleteAccount: protectedProcedure.input(deleteAccountSchema).mutation(({ ctx, input }) => requestAccountDeletion(ctx.session.user.id, input.reason)),
+    deleteAccount: protectedProcedure.input(deleteAccountSchema).mutation(async ({ ctx, input }) => {
+      try {
+        return await requestAccountDeletion(ctx.session.user.id, input.reason);
+      } catch (e) {
+        if (e instanceof AccountDeletionBlockedError) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: e.reasonCode === "SOLE_OWNER"
+              ? "Transfer or delete your workspaces before deleting your account."
+              : "Cancel your active subscription before deleting your account.",
+          });
+        }
+        throw e;
+      }
+    }),
     cancelAccountDeletion: protectedProcedure.mutation(({ ctx }) => {
       return ctx.prisma.accountDeletionReq.updateMany({
         where: { userId: ctx.session.user.id, processedAt: null, cancelledAt: null },

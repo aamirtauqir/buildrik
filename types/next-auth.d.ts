@@ -11,6 +11,10 @@ declare module "next-auth" {
        *  Null for users with no workspace membership (shouldn't happen in
        *  normal flows — sign-up creates a workspace transactionally). */
       workspaceId: string | null;
+      /** The DB Session row id for THIS login, baked into the JWT at
+       *  create-session (sid claim). Stable across JWT rotation, so the
+       *  Security tab can flag the current session + offer "revoke others". */
+      sessionId?: string | null;
     } & DefaultSession["user"];
   }
 }
@@ -23,6 +27,7 @@ declare module "@auth/core/jwt" {
   interface JWT {
     userId?: string;
     workspaceId?: string | null;
+    sid?: string;
   }
 }
 
@@ -30,5 +35,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     userId?: string;
     workspaceId?: string | null;
+    sid?: string;
   }
 }
