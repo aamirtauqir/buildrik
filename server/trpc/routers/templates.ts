@@ -5,6 +5,7 @@ import { listTemplates, getTemplate, useTemplate, cloneSiteAsTemplate, applyTemp
 import { createGenerationJob, getJobStatus, cancelJob } from "@/server/services/ai-generation.service";
 import { listTemplatesSchema, generateSiteSchema, applyTemplateToSiteSchema } from "@buildrik/shared/schemas/templates";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
+import { checkSiteRole, checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
 
 export const templatesRouter = router({
   list: protectedProcedure
@@ -16,6 +17,14 @@ export const templatesRouter = router({
     .input(z.object({ siteId: z.string(), name: z.string().min(2).max(100), category: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
+      // Creating a template from a site is an editor-level action, not a
+      // read — a VIEWER shouldn't mint workspace templates.
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await cloneSiteAsTemplate(workspaceId, input.siteId, input.name, input.category);
       } catch (e: unknown) {
@@ -26,8 +35,9 @@ export const templatesRouter = router({
 
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input }) => {
-      const template = await getTemplate(input.id);
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await getWorkspaceId(ctx);
+      const template = await getTemplate(input.id, workspaceId);
       if (!template) throw new TRPCError({ code: "NOT_FOUND" });
       return template;
     }),
@@ -36,6 +46,13 @@ export const templatesRouter = router({
     .input(z.object({ templateId: z.string(), siteName: z.string().min(2).max(100) }))
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
+      // Creating a site consumes plan quota — gate to EDITOR+ (not VIEWER).
+      try {
+        await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await useTemplate(workspaceId, ctx.session.user.id, input.templateId, input.siteName);
       } catch (e: unknown) {
@@ -52,6 +69,15 @@ export const templatesRouter = router({
     .input(applyTemplateToSiteSchema)
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
+      // This wipes every page of the site — destructive, so ADMIN, matching the
+      // archive/delete tier. Was ungated: any ACTIVE member incl. VIEWER could
+      // wipe any workspace site.
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await applyTemplateToSite(workspaceId, ctx.session.user.id, input.siteId, input.templateId);
       } catch (e: unknown) {

@@ -86,8 +86,13 @@ export async function listTemplates(input: ListTemplatesInput, workspaceId?: str
   };
 }
 
-export async function getTemplate(id: string) {
-  return prisma.template.findUnique({ where: { id } });
+export async function getTemplate(id: string, workspaceId: string) {
+  // Scoped read: a template is visible only if it's global (workspaceId null)
+  // or belongs to this workspace. An unscoped findUnique leaked another
+  // workspace's private template (incl. full page content) by id.
+  return prisma.template.findFirst({
+    where: { id, OR: [{ workspaceId: null }, { workspaceId }] },
+  });
 }
 
 type TemplatePageInput = {
