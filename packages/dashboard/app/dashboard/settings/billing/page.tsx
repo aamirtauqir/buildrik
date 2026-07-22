@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { PLAN_LIMITS } from "@lib/constants/plan-limits";
 import { useToast } from "@/components/dashboard/toast-provider";
@@ -76,12 +77,28 @@ function formatDate(date: Date | string): string {
 
 export default function BillingPage() {
   const { addToast } = useToast();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPlans, setShowPlans] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
   const [invoicePage, setInvoicePage] = useState(1);
 
   const overviewQuery = trpc.billing.overview.useQuery();
   const invoicesQuery = trpc.billing.invoices.useQuery({ page: invoicePage, perPage: 10 });
+
+  // Post-Stripe-Checkout return. The success plan only lands once the webhook
+  // fires, so refetch — the row may still be flipping when the user gets back.
+  const checkoutResult = searchParams.get("checkout");
+  useEffect(() => {
+    if (checkoutResult === "success") {
+      addToast("success", "Payment received", "Your plan is being updated — this can take a few seconds.");
+      overviewQuery.refetch();
+    } else if (checkoutResult === "cancel") {
+      addToast("info", "Checkout cancelled", "No changes were made to your plan.");
+    }
+    if (checkoutResult) router.replace("/dashboard/settings/billing");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkoutResult]);
 
   const cancelMutation = trpc.billing.cancel.useMutation({
     onSuccess: () => {
@@ -103,6 +120,14 @@ export default function BillingPage() {
   const checkoutMutation = trpc.billing.createCheckoutSession.useMutation({
     onSuccess: (data) => window.location.assign(data.url),
     onError: (err) => addToast("error", "Couldn't start checkout", err.message),
+  });
+
+  // Existing subscribers change tier (and card/cancel) through the Stripe
+  // Portal — createCheckoutSession throws ALREADY_SUBSCRIBED for them, so the
+  // PlanComparison/checkout path is FREE→paid only.
+  const portalMutation = trpc.billing.createPortalSession.useMutation({
+    onSuccess: (data) => window.location.assign(data.url),
+    onError: (err) => addToast("error", "Couldn't open billing portal", err.message),
   });
 
   const overview = overviewQuery.data;
@@ -166,18 +191,21 @@ export default function BillingPage() {
   return (
     <div>
       {/* The settings layout owns the section PageHeader (D10.4) — this page
-          keeps its "View Plans" action for FREE workspaces. */}
-      {planKey === "FREE" && (
-        <div className="mb-6 flex justify-end">
-          <button
-            onClick={() => setShowPlans(true)}
-            className="rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ backgroundColor: "var(--color-primary)" }}
-          >
-            View Plans
-          </button>
-        </div>
-      )}
+          keeps a plan-change action. This MUST render for paid plans too:
+          it is the only reachable trigger for PlanComparison, which is the only
+          caller of createCheckoutSession. Gating it to FREE (the prior bug) left
+          PRO/BUSINESS with no in-app path to change tier — the PlanCard's own
+          "Change Plan" button never renders because that card is always isCurrent. */}
+      <div className="mb-6 flex justify-end">
+        <button
+          onClick={() => (planKey === "FREE" ? setShowPlans(true) : portalMutation.mutate())}
+          disabled={portalMutation.isPending}
+          className="rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          style={{ backgroundColor: "var(--color-primary)" }}
+        >
+          {planKey === "FREE" ? "View Plans" : portalMutation.isPending ? "Opening…" : "Change plan"}
+        </button>
+      </div>
 
       {/* D) Dunning countdown — grace end matches the billing-downgrade cron
           (7 days after the period end). */}

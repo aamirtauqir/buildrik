@@ -221,8 +221,10 @@ export async function createCheckoutSession(
     customer: customerId,
     client_reference_id: workspaceId,
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${appUrl}/dashboard/settings/plans?checkout=success`,
-    cancel_url: `${appUrl}/dashboard/settings/plans?checkout=cancel`,
+    // Return to Billing (where the flow launched and the new plan shows), not
+    // Plans — the ?checkout= param is handled there to confirm + refetch.
+    success_url: `${appUrl}/dashboard/settings/billing?checkout=success`,
+    cancel_url: `${appUrl}/dashboard/settings/billing?checkout=cancel`,
   });
 
   if (!session.url) throw new Error("STRIPE_SESSION_NO_URL");
