@@ -6,6 +6,7 @@ import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Button, Modal, PageHeader, MetricValue, ProgressBar, InputField, FilterTabs } from "@/components/dashboard/primitives";
+import { ErrorState } from "@/components/states";
 
 type MediaType = "image" | "video" | "icon" | "font";
 
@@ -54,6 +55,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleteAssetTarget, setDeleteAssetTarget] = useState<{ id: string; name: string } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [createValue, setCreateValue] = useState("");
   const folderMenuRef = useRef<HTMLDivElement>(null);
@@ -68,8 +70,8 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const quota = trpc.media.checkStorageQuota.useQuery({});
 
   const deleteAsset = trpc.media.deleteAsset.useMutation({
-    onSuccess: () => { assets.refetch(); quota.refetch(); addToast("success", "Asset deleted"); },
-    onError: (err) => addToast("error", "Failed", err.message),
+    onSuccess: () => { assets.refetch(); quota.refetch(); setDeleteAssetTarget(null); addToast("success", "Asset deleted"); },
+    onError: (err) => addToast("error", "Couldn't delete asset", err.message),
   });
   const createAsset = trpc.media.createAsset.useMutation();
 
@@ -133,7 +135,9 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           clientPayload: JSON.stringify({ bytes: file.size, type, mimeType: file.type, filename: file.name }),
         });
         // Idempotent upsert-by-url; pairs with the server completion webhook.
-        await createAsset.mutateAsync({ url: blob.url, bytes: file.size, type, mimeType: file.type, filename: file.name });
+        // Carry the active folder so uploads land where the user is looking —
+        // without this, files always went to root and folders stayed unfillable.
+        await createAsset.mutateAsync({ url: blob.url, bytes: file.size, type, mimeType: file.type, filename: file.name, folderId: folderId ?? null });
       }
       addToast("success", files.length > 1 ? `${files.length} files uploaded` : "File uploaded");
       assets.refetch();
@@ -279,6 +283,9 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
                 <div key={i} className="animate-pulse rounded-lg" style={{ height: 140, backgroundColor: "var(--color-bg-subtle)" }} />
               ))}
             </div>
+          ) : assets.isError ? (
+            // Was "No assets yet" on a failed query — a fake-empty hiding the error.
+            <ErrorState title="Couldn't load your media" description="Something went wrong on our end." onRetry={() => assets.refetch()} />
           ) : items.length === 0 ? (
             <div className="rounded-xl border border-dashed p-12 text-center" style={{ borderColor: "var(--color-border-default)" }}>
               <ImageOff size={26} className="mx-auto mb-2" style={{ color: "var(--color-text-placeholder)" }} />
@@ -315,7 +322,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
                       <button type="button" onClick={() => copyUrl(a.id, a.url)} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-text-primary)" }} title="Copy URL">
                         {copiedId === a.id ? <Check size={12} /> : <Copy size={12} />}
                       </button>
-                      <button type="button" onClick={() => deleteAsset.mutate({ assetId: a.id })} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-error)" }} title="Delete">
+                      <button type="button" onClick={() => setDeleteAssetTarget({ id: a.id, name: a.filename })} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-error)" }} title="Delete" aria-label={`Delete ${a.filename}`}>
                         <Trash2 size={12} />
                       </button>
                     </div>
@@ -444,6 +451,33 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
           <p className="text-sm" style={{ color: "var(--color-error)" }}>
             Delete <strong>{deleteTarget?.name}</strong>? Assets in this folder stay in your library and move to <strong>All</strong>. This can’t be undone.
+          </p>
+        </div>
+      </Modal>
+
+      {/* Delete asset — the file may be referenced by a live site, so confirm. */}
+      <Modal
+        open={deleteAssetTarget !== null}
+        onClose={() => setDeleteAssetTarget(null)}
+        title="Delete asset?"
+        width={420}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDeleteAssetTarget(null)}>Cancel</Button>
+            <Button
+              variant="danger"
+              onClick={() => deleteAssetTarget && deleteAsset.mutate({ assetId: deleteAssetTarget.id })}
+              disabled={deleteAsset.isPending}
+            >
+              {deleteAsset.isPending ? "Deleting…" : "Delete asset"}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex items-start gap-3 rounded-lg p-3" style={{ backgroundColor: "var(--color-error-subtle)" }}>
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--color-error)" }} />
+          <p className="text-sm" style={{ color: "var(--color-error)" }}>
+            Delete <strong>{deleteAssetTarget?.name}</strong>? If a published site uses this file, it will break. This can’t be undone.
           </p>
         </div>
       </Modal>

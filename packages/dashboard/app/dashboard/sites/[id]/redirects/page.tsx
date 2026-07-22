@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { RedirectsTab } from "@/components/site-detail/redirects-tab";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { ErrorState } from "@/components/states";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
 
 export default function SiteRedirectsPage() {
@@ -23,6 +24,7 @@ export default function SiteRedirectsPage() {
   });
   const deleteMutation = trpc.siteDetail.redirects.delete.useMutation({
     onSuccess: () => { listQuery.refetch(); addToast("success", "Redirect removed"); },
+    onError: (err) => addToast("error", "Couldn't remove redirect", err.message),
   });
   const importMutation = trpc.siteDetail.redirects.import_csv.useMutation({
     onSuccess: () => { listQuery.refetch(); addToast("success", "Redirects imported"); },
@@ -41,6 +43,17 @@ export default function SiteRedirectsPage() {
 
   if (listQuery.isLoading) {
     return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+  }
+
+  // Query error used to fall into `?? []` and render "No redirects yet".
+  if (listQuery.isError) {
+    return (
+      <ErrorState
+        title="Couldn't load redirects"
+        description="Something went wrong on our end."
+        onRetry={() => listQuery.refetch()}
+      />
+    );
   }
 
   return (

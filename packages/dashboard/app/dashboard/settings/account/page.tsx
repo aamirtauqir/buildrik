@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { trpc } from "@lib/trpc/client";
 import { AccountTab } from "@/components/settings/account-tab";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { ErrorState } from "@/components/states";
 
 export default function AccountPage() {
   const { addToast } = useToast();
@@ -36,6 +37,18 @@ export default function AccountPage() {
           <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
         ))}
       </div>
+    );
+  }
+
+  // Without this, a failed profile query fell through to `email=""` /
+  // `hasPassword=false` defaults and rendered a broken, actionable-looking form.
+  if (profileQuery.isError) {
+    return (
+      <ErrorState
+        title="Couldn't load your account"
+        description="Something went wrong on our end."
+        onRetry={() => profileQuery.refetch()}
+      />
     );
   }
 

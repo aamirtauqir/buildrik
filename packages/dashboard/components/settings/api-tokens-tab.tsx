@@ -5,6 +5,7 @@ import { Key, Plus, Copy, Check, Trash2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { Pill, MetricValue, Button, Modal } from "@/components/dashboard/primitives";
+import { ErrorState } from "@/components/states";
 
 const SCOPE_LABELS: Record<string, string> = {
   "sites:read": "Read sites",
@@ -58,9 +59,11 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
   });
   const revoke = trpc.apiTokens.revoke.useMutation({
     onSuccess: () => { list.refetch(); addToast("success", "Token revoked"); },
+    onError: (err) => addToast("error", "Couldn't revoke token", err.message),
   });
   const del = trpc.apiTokens.delete.useMutation({
     onSuccess: () => { list.refetch(); addToast("success", "Token deleted"); },
+    onError: (err) => addToast("error", "Couldn't delete token", err.message),
   });
 
   const toggleScope = (s: string) =>
@@ -91,6 +94,9 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
       {/* Token list */}
       {list.isLoading ? (
         <div className="h-40 animate-pulse rounded-xl bg-neutral-100" />
+      ) : list.isError ? (
+        // Was "No API tokens yet" on a failed query — a fake-empty that hid the error.
+        <ErrorState title="Couldn't load API tokens" description="Something went wrong on our end." onRetry={() => list.refetch()} />
       ) : (list.data?.length ?? 0) === 0 ? (
         <div className="rounded-xl border border-dashed p-8 text-center" style={{ borderColor: "var(--color-border-default)" }}>
           <Key size={22} className="mx-auto mb-2 text-neutral-400" />

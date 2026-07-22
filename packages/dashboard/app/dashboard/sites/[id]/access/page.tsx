@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { AccessTab } from "@/components/site-detail/access-tab";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { ErrorState } from "@/components/states";
 import { PLAN_LIMITS, type PlanName } from "@lib/constants/plan-limits";
 
 export default function SiteAccessPage() {
@@ -32,10 +33,22 @@ export default function SiteAccessPage() {
       linksQuery.refetch();
       addToast("success", "Share link revoked");
     },
+    onError: (err) => addToast("error", "Couldn't revoke link", err.message),
   });
 
   if (linksQuery.isLoading) {
     return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+  }
+
+  // Query error used to fall into `?? []` and render "No share links yet".
+  if (linksQuery.isError) {
+    return (
+      <ErrorState
+        title="Couldn't load share links"
+        description="Something went wrong on our end."
+        onRetry={() => linksQuery.refetch()}
+      />
+    );
   }
 
   return (

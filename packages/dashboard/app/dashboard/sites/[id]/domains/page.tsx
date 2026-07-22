@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { DomainsTab } from "@/components/site-detail/domains-tab";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { ErrorState } from "@/components/states";
 
 export default function SiteDomainsPage() {
   const params = useParams();
@@ -33,6 +34,7 @@ export default function SiteDomainsPage() {
       domainsQuery.refetch();
       addToast("success", "Domain removed");
     },
+    onError: (err) => addToast("error", "Couldn't remove domain", err.message),
   });
 
   const setPrimaryMutation = trpc.siteDetail.domains.setPrimary.useMutation({
@@ -45,6 +47,18 @@ export default function SiteDomainsPage() {
 
   if (domainsQuery.isLoading) {
     return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
+  }
+
+  // Without this the query error fell into `?? []` and the tab rendered as if
+  // there were simply no domains — a failure disguised as an empty state.
+  if (domainsQuery.isError) {
+    return (
+      <ErrorState
+        title="Couldn't load domains"
+        description="Something went wrong on our end."
+        onRetry={() => domainsQuery.refetch()}
+      />
+    );
   }
 
   return (
