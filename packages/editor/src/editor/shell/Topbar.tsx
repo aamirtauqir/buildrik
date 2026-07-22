@@ -221,9 +221,11 @@ export const Topbar: React.FC<TopbarProps> = ({
     fetchReviewStatus().then(setReviewStatus);
   }, []);
   React.useEffect(() => {
-    // The pill only shows in client view; don't poll review status otherwise.
-    if (viewMode.clientView) refreshReviewStatus();
-  }, [refreshReviewStatus, viewMode.clientView]);
+    // S5.2: the pill is the designer's own status surface — fetch on every
+    // mount. Fails closed to "none" (flag off / no review), which renders
+    // nothing, so this is safe for non-agency workspaces too.
+    refreshReviewStatus();
+  }, [refreshReviewStatus]);
   const sendForReview = React.useCallback(async () => {
     setReviewState("sending");
     try {
@@ -427,7 +429,7 @@ export const Topbar: React.FC<TopbarProps> = ({
             </TooltipPortal>
           </Tooltip>
 
-          {viewMode.clientView && REVIEW_PILL[reviewStatus.state] ? (
+          {REVIEW_PILL[reviewStatus.state] ? (
             <span
               title={
                 reviewStatus.reviewerName

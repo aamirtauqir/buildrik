@@ -68,7 +68,7 @@ vi.mock("@/editor/design-system/ui/ColorModeIconCycle", () => ({
 import { Topbar, type TopbarProps } from "../Topbar";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 import { getEditorViewMode } from "../../../shared/utils/editorViewMode";
-import { submitForReview } from "../../../services/ReviewService";
+import { submitForReview, fetchReviewStatus } from "../../../services/ReviewService";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -272,6 +272,35 @@ describe("Topbar", () => {
       vi.mocked(isFeatureEnabled).mockReturnValue(true);
       render(<Topbar {...makeProps({ isOffline: true })} />);
       expect(screen.getByText("Cannot publish while offline")).toBeInTheDocument();
+    });
+  });
+
+  // ── S5.2 review-status pill (designer-facing, default view) ────────────────
+  describe("review-status pill in default view", () => {
+    it("shows the pill in the normal editor when a review is pending", async () => {
+      vi.mocked(fetchReviewStatus).mockResolvedValueOnce({
+        state: "pending",
+        reviewerName: "Sara",
+        at: null,
+      });
+      render(<Topbar {...makeProps()} />);
+      expect(await screen.findByText("In review")).toBeInTheDocument();
+    });
+
+    it("shows the stale-approval pill state in the normal editor", async () => {
+      vi.mocked(fetchReviewStatus).mockResolvedValueOnce({
+        state: "approved-edited-since",
+        reviewerName: "Sara",
+        at: null,
+      });
+      render(<Topbar {...makeProps()} />);
+      expect(await screen.findByText("Approved · edited since")).toBeInTheDocument();
+    });
+
+    it("renders no pill when there is no review in flight", async () => {
+      render(<Topbar {...makeProps()} />);
+      expect(fetchReviewStatus).toHaveBeenCalled();
+      expect(screen.queryByText("In review")).not.toBeInTheDocument();
     });
   });
 
