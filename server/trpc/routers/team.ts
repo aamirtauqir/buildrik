@@ -16,15 +16,21 @@ import { inviteMembersSchema, listMembersSchema, changeRoleSchema } from "@build
 import { type PlanName } from "@/lib/constants/plan-limits";
 import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
 import { record as recordActivity, listWorkspaceActivity } from "@/server/services/activity-log.service";
+import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 
+// Resolve via the shared helper so team ops act on the session's ACTIVE
+// workspace — not the first membership row. The old findFirst({userId}) with no
+// status filter let SUSPENDED members read team data and, for multi-workspace
+// admins, targeted mutations at the wrong workspace.
 async function getWorkspaceCtx(ctx: WorkspaceCtx): Promise<{ workspaceId: string; plan: PlanName }> {
-  if (!ctx.session?.user) throw new TRPCError({ code: "UNAUTHORIZED" });
-  const member = await ctx.prisma.workspaceMember.findFirst({
-    where: { userId: ctx.session.user.id },
-    include: { workspace: { select: { plan: true } } },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const workspaceId = await resolveWorkspaceId(ctx as any);
+  const workspace = await ctx.prisma.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { plan: true },
   });
-  if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
-  return { workspaceId: member.workspaceId, plan: member.workspace.plan as PlanName };
+  if (!workspace) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
+  return { workspaceId, plan: workspace.plan as PlanName };
 }
 
 // Team-management mutations require ADMIN/OWNER. Returns the actor's workspace
