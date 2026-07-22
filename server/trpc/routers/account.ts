@@ -234,6 +234,10 @@ export const accountRouter = router({
     }),
     add: protectedProcedure.input(addIntegrationSchema).mutation(async ({ ctx, input }) => {
       const { workspaceId, plan } = await getWorkspaceCtx(ctx);
+      // Registering an outbound webhook is a data-exfil surface — ADMIN, to
+      // match remove/update/testEvent (which the service already gates). Was
+      // member-open, so a VIEWER could add a webhook they couldn't then remove.
+      await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "ADMIN");
       try { return await addIntegration(workspaceId, input, plan); }
       catch (e: unknown) {
         if (e instanceof Error && e.message === "INTEGRATION_LIMIT") throw new TRPCError({ code: "FORBIDDEN", message: "Integration limit reached." });

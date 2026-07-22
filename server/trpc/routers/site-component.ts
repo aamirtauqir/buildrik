@@ -21,15 +21,16 @@ import {
   deleteSiteComponentSchema,
   componentUsageSchema,
 } from "@buildrik/shared/schemas/site-component";
-import { guardSiteAccess as guardSite } from "@/server/trpc/guards";
+import { guardSiteAccess as guardSite, guardSiteRole } from "@/server/trpc/guards";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 
 export const siteComponentsRouter = router({
   upsert: protectedProcedure
     .input(upsertSiteComponentSchema)
     .mutation(async ({ ctx, input }) => {
-      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return upsertSiteComponent({ ...input, createdBy: input.createdBy ?? ctx.session.user.id });
+      await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
+      // Stamp the caller — never trust a client-supplied createdBy.
+      return upsertSiteComponent({ ...input, createdBy: ctx.session.user.id });
     }),
 
   list: protectedProcedure
@@ -49,7 +50,7 @@ export const siteComponentsRouter = router({
   delete: protectedProcedure
     .input(deleteSiteComponentSchema)
     .mutation(async ({ ctx, input }) => {
-      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+      await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
       return deleteSiteComponent(input.siteId, input.componentId);
     }),
 

@@ -16,14 +16,15 @@ import {
   listUserTemplatesSchema,
   deleteUserTemplateSchema,
 } from "@buildrik/shared/schemas/user-template";
-import { guardSiteAccess as guardSite } from "@/server/trpc/guards";
+import { guardSiteAccess as guardSite, guardSiteRole } from "@/server/trpc/guards";
 
 export const userTemplatesRouter = router({
   upsert: protectedProcedure
     .input(upsertUserTemplateSchema)
     .mutation(async ({ ctx, input }) => {
-      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return upsertUserTemplate({ ...input, createdBy: input.createdBy ?? ctx.session.user.id });
+      await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
+      // Stamp the caller — never trust a client-supplied createdBy.
+      return upsertUserTemplate({ ...input, createdBy: ctx.session.user.id });
     }),
 
   list: protectedProcedure
@@ -36,7 +37,7 @@ export const userTemplatesRouter = router({
   delete: protectedProcedure
     .input(deleteUserTemplateSchema)
     .mutation(async ({ ctx, input }) => {
-      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+      await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
       return deleteUserTemplate(input.siteId, input.templateId);
     }),
 });

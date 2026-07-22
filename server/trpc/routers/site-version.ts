@@ -18,14 +18,16 @@ import {
   getSiteVersionSchema,
   deleteSiteVersionSchema,
 } from "@buildrik/shared/schemas/site-version";
-import { guardSiteAccess as guardSite } from "@/server/trpc/guards";
+import { guardSiteAccess as guardSite, guardSiteRole } from "@/server/trpc/guards";
 
 export const siteVersionsRouter = router({
   create: protectedProcedure
     .input(createSiteVersionSchema)
     .mutation(async ({ ctx, input }) => {
-      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
-      return createSiteVersion({ ...input, createdBy: input.createdBy ?? ctx.session.user.id });
+      await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
+      // Always stamp the caller — never trust a client-supplied createdBy
+      // (attribution spoofing in version history).
+      return createSiteVersion({ ...input, createdBy: ctx.session.user.id });
     }),
 
   list: protectedProcedure
@@ -45,7 +47,7 @@ export const siteVersionsRouter = router({
   delete: protectedProcedure
     .input(deleteSiteVersionSchema)
     .mutation(async ({ ctx, input }) => {
-      await guardSite(ctx.prisma, ctx.session.user.id, input.siteId);
+      await guardSiteRole(ctx.prisma, ctx.session.user.id, input.siteId);
       return deleteSiteVersion(input.siteId, input.versionId);
     }),
 });

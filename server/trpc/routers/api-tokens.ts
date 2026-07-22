@@ -9,6 +9,7 @@ import {
   ALL_SCOPES,
   type Scope,
 } from "@/server/services/api-token.service";
+import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
 
 const scopeSchema = z.enum(ALL_SCOPES as [Scope, ...Scope[]]);
 
@@ -26,6 +27,22 @@ async function assertWorkspaceMember(
   });
   if (!member) {
     throw new TRPCError({ code: "FORBIDDEN", message: "Not a member of this workspace." });
+  }
+}
+
+// Minting/revoking API tokens grants programmatic access to the workspace —
+// ADMIN, not any member. (Tokens are deny-all today because no scopedProcedure
+// consumes them, but gate now so it's not a live hole the day one ships.)
+async function assertWorkspaceAdmin(
+  prisma: typeof import("@/lib/prisma").prisma,
+  userId: string,
+  workspaceId: string,
+): Promise<void> {
+  try {
+    await checkWorkspaceRole(prisma, userId, workspaceId, "ADMIN");
+  } catch (e) {
+    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+    throw e;
   }
 }
 
@@ -47,7 +64,7 @@ export const apiTokensRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await assertWorkspaceMember(ctx.prisma, ctx.session.user!.id!, input.workspaceId);
+      await assertWorkspaceAdmin(ctx.prisma, ctx.session.user!.id!, input.workspaceId);
       const result = await createApiToken({
         userId: ctx.session.user!.id!,
         workspaceId: input.workspaceId,
@@ -67,7 +84,7 @@ export const apiTokensRouter = router({
         select: { workspaceId: true, name: true },
       });
       if (!token) throw new TRPCError({ code: "NOT_FOUND" });
-      await assertWorkspaceMember(ctx.prisma, ctx.session.user!.id!, token.workspaceId);
+      await assertWorkspaceAdmin(ctx.prisma, ctx.session.user!.id!, token.workspaceId);
       const result = await revokeApiToken(input.id);
       // Log via the workspace's activity feed (no specific siteId).
       await ctx.prisma.activityLog.create({
@@ -92,7 +109,7 @@ export const apiTokensRouter = router({
         select: { workspaceId: true, name: true },
       });
       if (!token) throw new TRPCError({ code: "NOT_FOUND" });
-      await assertWorkspaceMember(ctx.prisma, ctx.session.user!.id!, token.workspaceId);
+      await assertWorkspaceAdmin(ctx.prisma, ctx.session.user!.id!, token.workspaceId);
       return deleteApiToken(input.id);
     }),
 });
