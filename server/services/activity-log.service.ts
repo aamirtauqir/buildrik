@@ -5,6 +5,7 @@ export type ActivityAction =
   | "site.published"
   | "site.publish_failed"
   | "site.unpublished"
+  | "site.rolled_back"
   | "site.share_link.created"
   | "site.share_link.revoked"
   | "site.domain.connected"

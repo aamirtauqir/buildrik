@@ -31,6 +31,8 @@ import {
   getPublishStatus,
   cancelPublish,
   unpublishSite,
+  getPublishHistory,
+  rollbackPublish,
 } from "@/server/services/publish.service";
 import {
   listSitesSchema,
@@ -42,7 +44,7 @@ import {
   getProjectDataSchema,
   editorSaveProjectSchema,
 } from "@buildrik/shared/schemas/sites";
-import { prePublishCheckSchema, publishInputSchema } from "@buildrik/shared/schemas/publish";
+import { prePublishCheckSchema, publishInputSchema, publishHistoryInput, rollbackInput } from "@buildrik/shared/schemas/publish";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
 
@@ -395,6 +397,58 @@ export const sitesRouter = router({
         targetType: "site",
         targetId: input.siteId,
         description: "Site unpublished",
+      });
+      return result;
+    }),
+
+  // P1: a site's published-version history (contract §5). EDITOR — reading your
+  // own site's history. Never returns the HTML payload (service strips it).
+  publishHistory: protectedProcedure
+    .input(publishHistoryInput)
+    .query(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getPublishHistory(input.siteId);
+    }),
+
+  // P1: roll back = re-publish a prior version as a NEW job (contract §5).
+  // ADMIN — a destructive/cross-history action (§2). Bypasses the approval gate
+  // in the service (restoring an already-shipped version). Activity-logged.
+  rollback: protectedProcedure
+    .input(rollbackInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      const workspaceId = await getWorkspaceId(ctx);
+      let result;
+      try {
+        result = await rollbackPublish(workspaceId, input.siteId, input.jobId, ctx.session.user!.id!);
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : "";
+        if (msg === "NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "That version was not found." });
+        if (msg === "NOT_ROLLBACKABLE")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: "That version can no longer be rolled back to." });
+        if (msg === "ALREADY_PUBLISHING")
+          throw new TRPCError({ code: "CONFLICT", message: "A publish is already in progress." });
+        if (msg === "VERCEL_NOT_CONNECTED")
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Connect Vercel before rolling back." });
+        throw e;
+      }
+      await recordForSite({
+        siteId: input.siteId,
+        actorId: ctx.session.user!.id!,
+        action: "site.rolled_back",
+        targetType: "site",
+        targetId: input.siteId,
+        description: `Rolled back from version ${input.jobId}`,
       });
       return result;
     }),

@@ -138,6 +138,10 @@ export async function startPublish(
   /** Set when the publisher has seen and accepted that the approval is stale
    *  (the site changed since it was approved) and wants to publish anyway. */
   acknowledgeStale?: boolean,
+  /** P1 rollback: `bypassApproval` skips the approval gate — an ADMIN restoring
+   *  a previously-shipped version is not a new change needing sign-off.
+   *  `rolledBackFrom` tags the new job with the version it re-deployed. */
+  opts?: { bypassApproval?: boolean; rolledBackFrom?: string },
 ) {
   const staleCutoff = new Date(Date.now() - STALE_QUEUED_AFTER_MS);
   const buildingCutoff = new Date(Date.now() - STALE_BUILDING_AFTER_MS);
@@ -189,7 +193,7 @@ export async function startPublish(
   // publish once approved), so this gate is now the real control for everyone
   // below OWNER, which is exactly its point. Previously `editsRequireApproval`
   // was read only in settings and never enforced.
-  {
+  if (!opts?.bypassApproval) {
     const [workspace, member] = await Promise.all([
       prisma.workspace.findUnique({
         where: { id: workspaceId },
@@ -256,6 +260,7 @@ export async function startPublish(
         progress: 0,
         steps: [],
         log: finalPages ? { pages: finalPages } : undefined,
+        ...(opts?.rolledBackFrom ? { rolledBackFrom: opts.rolledBackFrom } : {}),
       },
     });
   } catch (err) {
@@ -340,6 +345,11 @@ export async function cancelPublish(jobId: string) {
   return updated;
 }
 
+/** How many COMPLETED publishes keep their re-deployable payload, per site
+ *  (contract §5: keep 20 published versions). Older ones are pruned to bound
+ *  the HTML-at-rest; the most-recent (the live version) is always retained. */
+const PUBLISH_HISTORY_RETAINED = 20;
+
 export async function completePublish(jobId: string, publicUrl: string) {
   const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
   if (!job) throw new Error("JOB_NOT_FOUND");
@@ -347,7 +357,9 @@ export async function completePublish(jobId: string, publicUrl: string) {
   const [updated] = await prisma.$transaction([
     prisma.publishBuildJob.update({
       where: { id: jobId },
-      data: { status: "COMPLETED", completedAt: new Date(), log: Prisma.DbNull },
+      // P1: KEEP the log payload (was `log: Prisma.DbNull`) so this version can
+      // be rolled back later. Storage is bounded by the prune below.
+      data: { status: "COMPLETED", completedAt: new Date() },
     }),
     prisma.site.update({
       where: { id: job.siteId },
@@ -359,7 +371,83 @@ export async function completePublish(jobId: string, publicUrl: string) {
     }),
   ]);
 
+  // Prune: null the payload on COMPLETED jobs older than the 20 most recent for
+  // this site, so retained HTML never grows unbounded.
+  const stale = await prisma.publishBuildJob.findMany({
+    where: { siteId: job.siteId, status: "COMPLETED", log: { not: Prisma.DbNull } },
+    orderBy: { completedAt: "desc" },
+    skip: PUBLISH_HISTORY_RETAINED,
+    select: { id: true },
+  });
+  if (stale.length > 0) {
+    await prisma.publishBuildJob.updateMany({
+      where: { id: { in: stale.map((j) => j.id) } },
+      data: { log: Prisma.DbNull },
+    });
+  }
+
   return updated;
+}
+
+export interface PublishHistoryRow {
+  id: string;
+  /** Ascending version number within the returned window (oldest = 1). */
+  version: number;
+  completedAt: Date | null;
+  deploymentId: string | null;
+  /** True when the payload is still retained (this version can be re-deployed). */
+  rollbackable: boolean;
+  /** The version this publish re-deployed, if it was itself a rollback. */
+  rolledBackFrom: string | null;
+}
+
+/**
+ * A site's published-version history (contract §5), newest first, capped at the
+ * retained window. Reads `log` ONLY to derive `rollbackable`; the raw HTML
+ * payload NEVER leaves the service (mirrors getPublishStatus's discipline).
+ */
+export async function getPublishHistory(siteId: string): Promise<PublishHistoryRow[]> {
+  const jobs = await prisma.publishBuildJob.findMany({
+    where: { siteId, status: "COMPLETED" },
+    orderBy: { completedAt: "desc" },
+    take: PUBLISH_HISTORY_RETAINED,
+    select: { id: true, completedAt: true, deploymentId: true, rolledBackFrom: true, log: true },
+  });
+  return jobs.map((j, i) => ({
+    id: j.id,
+    version: jobs.length - i,
+    completedAt: j.completedAt,
+    deploymentId: j.deploymentId,
+    rollbackable: j.log != null,
+    rolledBackFrom: j.rolledBackFrom,
+  }));
+}
+
+/**
+ * Roll back to a prior COMPLETED version by RE-PUBLISHING its stored payload as
+ * a NEW job (contract §5: rollback is a new publish, never a mutation of
+ * history). Bypasses the approval gate — an ADMIN restoring a version that was
+ * already shipped is not a new change to sign off — and refuses a target that
+ * isn't completed or whose payload was pruned.
+ */
+export async function rollbackPublish(
+  workspaceId: string,
+  siteId: string,
+  jobId: string,
+  userId: string,
+) {
+  const target = await prisma.publishBuildJob.findFirst({
+    where: { id: jobId, siteId, site: { workspaceId } },
+    select: { id: true, status: true, log: true },
+  });
+  if (!target) throw new Error("NOT_FOUND");
+  if (target.status !== "COMPLETED") throw new Error("NOT_ROLLBACKABLE");
+  const pages = (target.log as { pages?: PublishPage[] } | null)?.pages;
+  if (!pages) throw new Error("NOT_ROLLBACKABLE");
+  return startPublish(siteId, workspaceId, userId, pages, false, {
+    bypassApproval: true,
+    rolledBackFrom: jobId,
+  });
 }
 
 export async function unpublishSite(siteId: string) {

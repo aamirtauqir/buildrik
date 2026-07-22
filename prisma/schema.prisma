@@ -1313,14 +1313,24 @@ model PublishBuildJob {
   status       String    @default("QUEUED")
   progress     Int       @default(0)
   steps        Json?
+  /// The deploy payload — { pages: {path,html}[] } written at startPublish.
+  /// RETAINED on COMPLETED (P1) so a prior version can be re-deployed; nulled
+  /// on CANCELLED/FAILED and pruned to the 20 most-recent COMPLETED per site.
   log          Json?
   deploymentId String?
   error        String?
+  /// Rollback provenance (P1): the COMPLETED job id this publish re-deployed,
+  /// so the history can label it "↩ from vN". Null for a normal publish.
+  rolledBackFrom String?
   startedAt    DateTime?
   completedAt  DateTime?
   createdAt    DateTime  @default(now())
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Partial unique index publish_build_jobs_active_unique (raw SQL migration
+  // 20260607000001) — at most one ACTIVE (QUEUED/BUILDING/DEPLOYING) job per
+  // site. Prisma can't express partial unique indexes; do not diff-drop it.
 
   @@map("publish_build_jobs")
 }

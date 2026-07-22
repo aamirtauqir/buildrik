@@ -86,3 +86,10 @@ export const prePublishChecksResultSchema = z.object({
 
 export type PublishResult = z.infer<typeof publishResultSchema>;
 export type PrePublishChecksResult = z.infer<typeof prePublishChecksResultSchema>;
+
+/** P1 — publish history + rollback (contract §5). */
+export const publishHistoryInput = z.object({ siteId: z.string().min(1) });
+export type PublishHistoryInput = z.infer<typeof publishHistoryInput>;
+
+export const rollbackInput = z.object({ siteId: z.string().min(1), jobId: z.string().min(1) });
+export type RollbackInput = z.infer<typeof rollbackInput>;
