@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Palette, UploadCloud, Lock, Unlock, Check, X, AlertTriangle } from "lucide-react";
+import { Palette, UploadCloud, Lock, Unlock, Check, X, AlertTriangle, Undo2 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { LoadingSkeleton, ErrorState, DeniedState, StateEmpty } from "@/components/states";
 
 type PushResultRow = { siteId: string; name: string; status: "pushed" | "skipped-locked" | "failed"; error?: string };
+type PushPreviewRow = { siteId: string; name: string; status: "would-push" | "skipped-locked"; willChange: boolean };
 
 function timeAgo(d: Date | string): string {
   const diff = Date.now() - new Date(d).getTime();
@@ -23,6 +24,8 @@ export function ThemeManager() {
   const [source, setSource] = useState("");
   const [confirming, setConfirming] = useState(false);
   const [pushResults, setPushResults] = useState<PushResultRow[] | null>(null);
+  const [preview, setPreview] = useState<PushPreviewRow[] | null>(null);
+  const [rollingBack, setRollingBack] = useState<string | null>(null);
 
   // Both reads are agency-gated server-side; FORBIDDEN = flag off for this workspace.
   const sharedQuery = trpc.theme.getShared.useQuery(undefined, { retry: false });
@@ -46,9 +49,24 @@ export function ThemeManager() {
     onError: (e) => addToast("error", "Couldn't change lock", e.message),
   });
 
+  // Dry-run: the accurate blast radius (which following sites would actually
+  // change vs already match), computed server-side. Was an orphaned backend.
+  const previewMut = trpc.theme.previewPush.useMutation({
+    onSuccess: (rows) => setPreview((rows ?? []) as PushPreviewRow[]),
+    onError: (e) => addToast("error", "Couldn't preview push", e.message),
+  });
+
+  const openConfirm = () => {
+    setPushResults(null);
+    setPreview(null);
+    setConfirming(true);
+    previewMut.mutate({});
+  };
+
   const pushMut = trpc.theme.push.useMutation({
     onSuccess: (res) => {
       setConfirming(false);
+      setPreview(null);
       setPushResults((res ?? []) as PushResultRow[]);
       const pushed = res?.filter((r) => r.status === "pushed").length ?? 0;
       const failed = res?.filter((r) => r.status === "failed").length ?? 0;
@@ -56,6 +74,17 @@ export function ThemeManager() {
       targetsQuery.refetch();
     },
     onError: (e) => { setConfirming(false); addToast("error", "Couldn't push theme", e.message); },
+  });
+
+  // Undo a push on one site — restores its pre-push tokens (was an orphan too).
+  const rollbackMut = trpc.theme.rollback.useMutation({
+    onSuccess: (_r, vars) => {
+      addToast("success", "Reverted to previous theme");
+      setPushResults((prev) => prev?.filter((r) => r.siteId !== vars.siteId) ?? null);
+      setRollingBack(null);
+      targetsQuery.refetch();
+    },
+    onError: (e) => { setRollingBack(null); addToast("error", "Couldn't undo", e.message); },
   });
 
   const forbidden =
@@ -95,7 +124,7 @@ export function ThemeManager() {
                 </span>
               </div>
               <button
-                onClick={() => { setPushResults(null); setConfirming(true); }}
+                onClick={openConfirm}
                 disabled={!theme || busy || followingCount === 0}
                 className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
                 style={{ backgroundColor: "var(--color-primary)" }}
@@ -114,10 +143,21 @@ export function ThemeManager() {
                     <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                       Re-style {followingCount} following site{followingCount === 1 ? "" : "s"}?
                     </p>
-                    <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                      Every following site adopts this theme&apos;s tokens.
-                      {lockedCount > 0 && ` ${lockedCount} locked site${lockedCount === 1 ? "" : "s"} keep their own and won't change.`}
-                    </p>
+                    {previewMut.isPending ? (
+                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>Checking impact…</p>
+                    ) : preview ? (
+                      // Accurate blast radius from the server dry-run.
+                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                        <strong>{preview.filter((p) => p.status === "would-push" && p.willChange).length}</strong> will change ·{" "}
+                        {preview.filter((p) => p.status === "would-push" && !p.willChange).length} already match ·{" "}
+                        {preview.filter((p) => p.status === "skipped-locked").length} locked (kept)
+                      </p>
+                    ) : (
+                      <p className="mt-0.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                        Every following site adopts this theme&apos;s tokens.
+                        {lockedCount > 0 && ` ${lockedCount} locked site${lockedCount === 1 ? "" : "s"} keep their own and won't change.`}
+                      </p>
+                    )}
                     <div className="mt-2 flex gap-2">
                       <button
                         onClick={() => pushMut.mutate({})}
@@ -128,7 +168,7 @@ export function ThemeManager() {
                         {pushMut.isPending ? "Pushing…" : `Push to ${followingCount} site${followingCount === 1 ? "" : "s"}`}
                       </button>
                       <button
-                        onClick={() => setConfirming(false)}
+                        onClick={() => { setConfirming(false); setPreview(null); }}
                         className="rounded-md border px-3 py-1.5 text-xs font-medium"
                         style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
                       >
@@ -152,7 +192,18 @@ export function ThemeManager() {
                     <li key={r.siteId} className="flex items-center justify-between border-b px-3 py-1.5 text-xs last:border-0" style={{ borderColor: "var(--color-border-default)" }}>
                       <span style={{ color: "var(--color-text-primary)" }}>{r.name}</span>
                       {r.status === "pushed" ? (
-                        <span className="inline-flex items-center gap-1 text-[var(--color-success)]"><Check className="h-3 w-3" /> Updated</span>
+                        <span className="inline-flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 text-[var(--color-success)]"><Check className="h-3 w-3" /> Updated</span>
+                          <button
+                            onClick={() => { setRollingBack(r.siteId); rollbackMut.mutate({ siteId: r.siteId }); }}
+                            disabled={rollingBack === r.siteId}
+                            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium transition-colors hover:bg-[var(--color-bg-subtle)] disabled:opacity-50"
+                            style={{ color: "var(--color-text-secondary)" }}
+                            title="Undo — restore this site's previous theme"
+                          >
+                            <Undo2 className="h-3 w-3" /> {rollingBack === r.siteId ? "Undoing…" : "Undo"}
+                          </button>
+                        </span>
                       ) : r.status === "skipped-locked" ? (
                         <span className="inline-flex items-center gap-1 text-neutral-400"><Lock className="h-3 w-3" /> Locked — kept own</span>
                       ) : (
