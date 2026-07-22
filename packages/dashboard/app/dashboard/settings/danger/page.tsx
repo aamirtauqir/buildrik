@@ -30,10 +30,28 @@ export default function DangerZonePage() {
   // the props existed but were never passed, so the guard block never rendered.
   const eligibilityQuery = trpc.account.dangerZone.deletionEligibility.useQuery();
 
-  const exportMutation = trpc.account.dangerZone.exportData.useMutation({
-    onSuccess: () => addToast("success", "Data export started. You'll be notified when ready."),
-    onError: (err) => addToast("error", "Export failed", err.message),
-  });
+  // Synchronous export → download JSON. Replaces the old mutation that created a
+  // job nobody processed while the UI claimed "you'll be notified when ready".
+  const utils = trpc.useUtils();
+  const [isExporting, setIsExporting] = useState(false);
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const data = await utils.account.dangerZone.exportData.fetch();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `buildrick-data-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      addToast("success", "Your data has been downloaded");
+    } catch (err) {
+      addToast("error", "Export failed", err instanceof Error ? err.message : "Try again");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const deleteMutation = trpc.account.dangerZone.deleteAccount.useMutation({
     onSuccess: () => addToast("info", "Account deletion scheduled. You have 30 days to cancel."),
@@ -87,9 +105,9 @@ export default function DangerZonePage() {
           Destructive actions scoped to your personal account.
         </p>
         <DangerZoneTab
-          onExport={() => exportMutation.mutate()}
+          onExport={handleExport}
           onDelete={(reason) => deleteMutation.mutate({ reason })}
-          isExporting={exportMutation.isPending}
+          isExporting={isExporting}
           estimatedSize="~2 MB"
           isSoleOwner={eligibilityQuery.data?.isSoleOwner}
           hasActiveSubscription={eligibilityQuery.data?.hasActiveSubscription}

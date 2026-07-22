@@ -18,7 +18,7 @@ interface WorkspaceCtx {
 import {
   getProfile, updateProfile, changePassword, setPassword, requestEmailChange, getActiveSessions, revokeSession,
   disconnectProvider, revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
-  updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
+  updateNotificationPref, requestAccountDeletion, getUserDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
   getAccountDeletionEligibility, AccountDeletionBlockedError,
 } from "@/server/services/account.service";
@@ -287,7 +287,9 @@ export const accountRouter = router({
       });
     }),
     deletionEligibility: protectedProcedure.query(({ ctx }) => getAccountDeletionEligibility(ctx.session.user.id)),
-    exportData: protectedProcedure.mutation(({ ctx }) => requestDataExport(ctx.session.user.id)),
+    // Synchronous export — returns the data the client downloads as JSON (was a
+    // fire-and-forget job with no processor).
+    exportData: protectedProcedure.query(({ ctx }) => getUserDataExport(ctx.session.user.id)),
     deleteAccount: protectedProcedure.input(deleteAccountSchema).mutation(async ({ ctx, input }) => {
       try {
         return await requestAccountDeletion(ctx.session.user.id, input.reason);

@@ -244,13 +244,47 @@ export async function requestAccountDeletion(userId: string, reason?: string) {
   return req;
 }
 
-export async function requestDataExport(userId: string) {
-  return prisma.exportJob.create({
-    data: {
-      userId,
-      status: "PENDING",
+/**
+ * Synchronous personal-data export. Returns the user's account, their workspace
+ * memberships, and the sites in those workspaces as a plain object the client
+ * downloads as JSON. Replaces the old fire-and-forget exportJob that had no
+ * processor — the UI promised "you'll be notified when ready" and never was.
+ */
+export async function getUserDataExport(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true, email: true, fullName: true, displayName: true, bio: true,
+      createdAt: true, emailVerified: true,
     },
   });
+  if (!user) throw new Error("USER_NOT_FOUND");
+
+  const memberships = await prisma.workspaceMember.findMany({
+    where: { userId, status: "ACTIVE" },
+    select: {
+      role: true, joinedAt: true,
+      workspace: { select: { id: true, name: true, slug: true, plan: true } },
+    },
+  });
+
+  const workspaceIds = memberships.map((m) => m.workspace.id);
+  const sites = workspaceIds.length
+    ? await prisma.site.findMany({
+        where: { workspaceId: { in: workspaceIds }, deletedAt: null },
+        select: { id: true, name: true, slug: true, status: true, workspaceId: true, createdAt: true },
+      })
+    : [];
+
+  const preferences = await prisma.userPreference.findUnique({ where: { userId } });
+
+  return {
+    exportedAt: new Date().toISOString(),
+    account: user,
+    preferences,
+    workspaces: memberships.map((m) => ({ ...m.workspace, role: m.role, joinedAt: m.joinedAt })),
+    sites,
+  };
 }
 
 export async function getPreferences(userId: string) {
