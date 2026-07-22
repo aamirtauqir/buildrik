@@ -3,7 +3,17 @@ import type { NextRequest } from "next/server";
 import { decode } from "next-auth/jwt";
 
 // Auth routes that REQUIRE a session (logged-out → login).
-const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/workspace-setup", "/auth/success", "/auth/redirect"];
+const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/workspace-setup", "/auth/redirect"];
+
+// Pre-IA-v2 URLs kept alive so stale links (old emails, bookmarks, external
+// references) degrade to the current route instead of a hard 404. Exact-match
+// only — `/dashboard/sites/[id]` and `/dashboard/sites/new` are real routes and
+// must not be caught, so `/dashboard/sites` maps but `/dashboard/sites/...` does not.
+const LEGACY_REDIRECTS: Record<string, string> = {
+  "/dashboard/sites": "/dashboard/projects",
+  "/dashboard/team": "/dashboard/settings/team",
+  "/dashboard/billing": "/dashboard/settings/billing",
+};
 
 // Token-consuming auth routes that must run for BOTH logged-in and logged-out
 // users (invite accept, email verify, password reset, magic-link callback,
@@ -103,6 +113,13 @@ export async function middleware(req: NextRequest) {
   // Onboarding: redirect unauthenticated users to login
   if (pathname.startsWith("/onboarding") && !isLoggedIn) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
+  }
+
+  // Legacy-URL rewrites (exact match) — after the login gate so a logged-out
+  // user still lands on login, and a logged-in user reaches the new location.
+  const legacyTarget = LEGACY_REDIRECTS[pathname];
+  if (legacyTarget) {
+    return NextResponse.redirect(new URL(legacyTarget, req.url));
   }
 
   return NextResponse.next();
