@@ -155,6 +155,98 @@ export async function getReviewStatusForSite(siteId: string): Promise<ReviewPill
   return { state: r.reviewerId ? "opened-not-acted" : "pending", reviewerName, at: r.createdAt };
 }
 
+export interface CurrentRound {
+  id: string;
+  status: string;
+  invitedEmail: string | null;
+  reviewerName: string | null;
+  revoked: boolean;
+  resolvedAt: Date | null;
+  createdAt: Date;
+  /** The round's `updatedAt` as an ISO string — the optimistic-concurrency
+   *  token the editor passes back to revokeReviewRound. */
+  revision: string;
+  roundNumber: number;
+  totalRounds: number;
+  openCommentCount: number;
+}
+
+/**
+ * The current (latest) review round for a site — the editor Review panel's
+ * data source. Null when the site was never sent for review. Round count is
+ * the number of ReviewRequest rows for the site (a re-send reuses the open
+ * PENDING row; a new submit after a resolved round adds one), so the current
+ * round is always the latest, i.e. roundNumber === totalRounds.
+ */
+export async function getCurrentRound(siteId: string): Promise<CurrentRound | null> {
+  const r = await prisma.reviewRequest.findFirst({
+    where: { siteId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      status: true,
+      invitedEmail: true,
+      reviewer: { select: { name: true } },
+      revokedAt: true,
+      resolvedAt: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  if (!r) return null;
+  const [totalRounds, openCommentCount] = await Promise.all([
+    prisma.reviewRequest.count({ where: { siteId } }),
+    prisma.comment.count({ where: { siteId, status: "OPEN" } }),
+  ]);
+  return {
+    id: r.id,
+    status: r.status,
+    invitedEmail: r.invitedEmail,
+    reviewerName: r.reviewer?.name ?? null,
+    revoked: r.revokedAt !== null,
+    resolvedAt: r.resolvedAt,
+    createdAt: r.createdAt,
+    revision: r.updatedAt.toISOString(),
+    roundNumber: totalRounds,
+    totalRounds,
+    openCommentCount,
+  };
+}
+
+/**
+ * Revoke the current round, race-safe. The updateMany is guarded on the
+ * revision (`updatedAt`) the editor last saw AND on `revokedAt: null`, so it
+ * matches exactly one row only when nothing has changed since. On zero matches
+ * we disambiguate (workspace-scoped, so a cross-workspace id reads as
+ * not-found — IDOR-safe):
+ *   - row absent / wrong workspace → "not-found"
+ *   - row already revoked          → "already-revoked" (idempotent)
+ *   - row live but revision moved   → "token-changed" (a re-send happened)
+ */
+export async function revokeReviewRound(
+  workspaceId: string,
+  reviewId: string,
+  expectedRevision: string,
+): Promise<{ revoked: boolean; reason?: "token-changed" | "already-revoked" | "not-found" }> {
+  const { count } = await prisma.reviewRequest.updateMany({
+    where: {
+      id: reviewId,
+      site: { workspaceId },
+      revokedAt: null,
+      updatedAt: new Date(expectedRevision),
+    },
+    data: { revokedAt: new Date() },
+  });
+  if (count === 1) return { revoked: true };
+  const row = await prisma.reviewRequest.findFirst({
+    where: { id: reviewId, site: { workspaceId } },
+    select: { revokedAt: true },
+  });
+  if (!row) return { revoked: false, reason: "not-found" };
+  if (row.revokedAt) return { revoked: false, reason: "already-revoked" };
+  return { revoked: false, reason: "token-changed" };
+}
+
 /** All review requests across a workspace's sites, newest first. */
 export async function listReviews(
   workspaceId: string,

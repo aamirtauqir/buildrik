@@ -11,6 +11,8 @@ export type ActivityAction =
   | "site.domain.removed"
   | "site.redirect.created"
   | "site.redirect.deleted"
+  // Client review round — revoked from the editor Review panel (P0).
+  | "review.revoked"
   // Team actions — the team activity feed (getTeamActivity) queries these, but
   // nothing recorded them, so the feed was always empty.
   | "MEMBER_INVITED"

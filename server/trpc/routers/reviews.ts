@@ -13,13 +13,18 @@ import {
   listReviews,
   resolveReview,
   getReviewStatusForSite,
+  getCurrentRound,
+  revokeReviewRound,
   ReviewError,
 } from "@/server/services/review.service";
+import { recordForSite } from "@/server/services/activity-log.service";
 import {
   submitReviewInput,
   resolveReviewInput,
   reviewStatusForSiteInput,
   reviewStatusSchema,
+  currentRoundInput,
+  revokeReviewInput,
 } from "@buildrik/shared/schemas/reviews";
 
 function translateReviewError(e: unknown): never {
@@ -115,5 +120,49 @@ export const reviewsRouter = router({
       } catch (e) {
         translateReviewError(e);
       }
+    }),
+
+  // The editor Review panel's data source (P0). Flag off → null so the editor
+  // shows no panel; any EDITOR of the site may read their own round.
+  currentRound: protectedProcedure
+    .input(currentRoundInput)
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return null;
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getCurrentRound(input.siteId);
+    }),
+
+  // Revoke the current round from the editor. EDITOR-gated (the sender manages
+  // their own round — distinct from the ADMIN-gated internal `resolve`).
+  // Race-safe: revokeReviewRound only lands when `expectedRevision` still
+  // matches, so a concurrent re-send is never silently killed.
+  revoke: protectedProcedure
+    .input(revokeReviewInput)
+    .mutation(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      await requireAgencyLayer(workspaceId);
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      const result = await revokeReviewRound(workspaceId, input.reviewId, input.expectedRevision);
+      if (result.revoked) {
+        await recordForSite({
+          siteId: input.siteId,
+          actorId: ctx.session.user.id,
+          action: "review.revoked",
+          targetType: "review",
+          targetId: input.reviewId,
+        });
+      }
+      return result;
     }),
 });

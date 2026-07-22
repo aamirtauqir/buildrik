@@ -11,8 +11,9 @@ import { prisma } from "@/lib/prisma";
 import {
   issueReviewToken, getReviewByToken, identifyReviewer,
   createClientComment, listClientComments, resolveReviewByToken,
-  revokeReviewToken, ClientReviewError,
+  ClientReviewError,
 } from "@/server/services/client-review.service";
+import { revokeReviewRound } from "@/server/services/review.service";
 
 const ok = (m: string) => console.log(`  ✅ ${m}`);
 const bad = (m: string) => { console.error(`  ❌ ${m}`); process.exitCode = 1; };
@@ -97,9 +98,13 @@ async function main() {
     ? bad("internal comment leaked to the client")
     : ok("internal comment not visible to the client");
 
-  // 8. revoke
+  // 8. revoke (race-safe: guarded on the round's current revision)
   const r3 = await issueReviewToken(review.id, "sara@bella.test");
-  await revokeReviewToken(site.workspaceId, review.id);
+  const live = await prisma.reviewRequest.findUnique({
+    where: { id: review.id }, select: { updatedAt: true },
+  });
+  const revokeRes = await revokeReviewRound(site.workspaceId, review.id, live!.updatedAt.toISOString());
+  revokeRes.revoked ? ok("round revoked") : bad(`revoke failed: ${revokeRes.reason}`);
   await expectFail("REVOKED", "revoked token", () => getReviewByToken(r3.token!));
 
   // 9. expiry

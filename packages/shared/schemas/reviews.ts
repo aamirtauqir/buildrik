@@ -29,6 +29,23 @@ export type ReviewPillState = (typeof REVIEW_PILL_STATES)[number];
 export const reviewStatusForSiteInput = z.object({ siteId: z.string().min(1) });
 export type ReviewStatus = z.infer<typeof reviewStatusSchema>;
 
+/** The editor Review panel's data source — the current (latest) round for a site. */
+export const currentRoundInput = z.object({ siteId: z.string().min(1) });
+export type CurrentRoundInput = z.infer<typeof currentRoundInput>;
+
+/**
+ * Revoke the current round from the editor. `expectedRevision` is the round's
+ * `updatedAt` ISO string the editor last read — the revoke only lands if it
+ * still matches, so a revoke can never kill a link a concurrent re-send just
+ * minted (the re-send bumps updatedAt → revision mismatch → "token-changed").
+ */
+export const revokeReviewInput = z.object({
+  siteId: z.string().min(1),
+  reviewId: z.string().min(1),
+  expectedRevision: z.string().min(1),
+});
+export type RevokeReviewInput = z.infer<typeof revokeReviewInput>;
+
 export const submitReviewInput = z.object({
   siteId: z.string().min(1),
   note: z.string().max(500).optional(),

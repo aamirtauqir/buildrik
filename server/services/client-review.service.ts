@@ -80,20 +80,6 @@ export async function issueReviewToken(reviewId: string, invitedEmail?: string) 
   });
 }
 
-/** Kill a link by hand. A revoked token is never reissued — re-send mints a new one. */
-export async function revokeReviewToken(workspaceId: string, reviewId: string) {
-  const owned = await prisma.reviewRequest.findFirst({
-    where: { id: reviewId, site: { workspaceId } },
-    select: { id: true },
-  });
-  if (!owned) throw new ClientReviewError("INVALID_TOKEN", "Review not found");
-  return prisma.reviewRequest.update({
-    where: { id: reviewId },
-    data: { revokedAt: new Date() },
-    select: { id: true, revokedAt: true },
-  });
-}
-
 /**
  * Resolve a token to its review, or say precisely why not.
  *
