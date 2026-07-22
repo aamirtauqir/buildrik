@@ -29,6 +29,7 @@ import { useVersionSync } from "./hooks/useVersionSync";
 import { useComponentSync } from "./hooks/useComponentSync";
 import { hydrateUserTemplatesFromServer } from "@/services/templateSync";
 import { useComposerInit } from "./hooks/useComposerInit";
+import { RecoveryBanner } from "./RecoveryBanner";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
@@ -296,6 +297,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         ...style,
       }}
     >
+      <RecoveryBanner pageCount={composer?.elements.getAllPages().length} />
       <header role="banner" aria-label="Editor toolbar">
         <StudioHeader
           composer={composer}
