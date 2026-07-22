@@ -207,10 +207,20 @@ export async function resendInvite(inviteId: string, workspaceId: string) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
-  return prisma.invite.update({
+  const updated = await prisma.invite.update({
     where: { id: inviteId },
     data: { expiresAt, resendCount: { increment: 1 } },
   });
+
+  // Actually re-send the email — the whole point of "resend". Without this the
+  // UI toasted "Invitation resent" while the invitee received nothing.
+  const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { name: true } });
+  const inviter = await prisma.user.findUnique({ where: { id: invite.invitedBy }, select: { fullName: true } });
+  try {
+    await sendTeamInviteEmail(invite.email, workspace?.name ?? "Workspace", inviter?.fullName ?? "A team member", invite.token);
+  } catch { /* Email failure shouldn't block the resend bookkeeping */ }
+
+  return updated;
 }
 
 export async function getTeamActivity(workspaceId: string, limit = 5) {
