@@ -22,7 +22,8 @@ export type GroupedTabId =
   | "design"
   | "settings"
   | "publish"
-  | "history";
+  | "history"
+  | "review";
 
 export type TabSection = "top" | "bottom";
 export type TabPattern = "card-drill-in" | "standalone";
@@ -243,6 +244,22 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     mode: "panel",
     panelWidth: 280,
     zone: "config",
+  },
+  {
+    // P0 wedge: the editor-side review loop. Sits BELOW a divider, not in the
+    // locked 6-tool rail order (cargo-sheets §6.5); agency_layer-gated. No
+    // `zone` → the zone-driven rail render leaves it out; the below-divider
+    // rail button is a follow-up (the panel is routable today via TabRouter).
+    id: "review",
+    tool: "site",
+    iconName: "MessageSquare",
+    label: "Review",
+    ariaLabel: "Client review — comments, approval, and the review link",
+    section: "bottom",
+    pattern: "standalone",
+    shortcut: "R",
+    mode: "panel",
+    panelWidth: 320,
   },
 ];
 

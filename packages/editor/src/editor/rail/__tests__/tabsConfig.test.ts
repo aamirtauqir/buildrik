@@ -93,8 +93,9 @@ describe("tabsConfig helpers", () => {
   });
 
   describe("GROUPED_TABS_CONFIG integrity", () => {
-    it("has 11 tabs defined", () => {
-      expect(GROUPED_TABS_CONFIG).toHaveLength(11);
+    it("has 12 tabs defined", () => {
+      // 11 + review (P0 wedge loop, off-rail below-divider agency surface)
+      expect(GROUPED_TABS_CONFIG).toHaveLength(12);
     });
 
     it("every tab has required fields", () => {

@@ -35,8 +35,9 @@ describe("tabsConfig — Figma rail", () => {
     expect(getFigmaRailGroups().flatMap((g) => g.tabs)).toHaveLength(5);
   });
 
-  it("the six off-rail panels still exist in config (re-route, never delete)", () => {
-    const offRail = ["ai", "templates", "design", "settings", "publish", "history"] as const;
+  it("the off-rail panels still exist in config (re-route, never delete)", () => {
+    // +review: the P0 wedge loop, an agency-gated surface below a divider (§6.5)
+    const offRail = ["ai", "templates", "design", "settings", "publish", "history", "review"] as const;
     for (const id of offRail) {
       expect(RAIL_FIGMA_IDS.has(id), `"${id}" must NOT be in the rail`).toBe(false);
       expect(
@@ -47,7 +48,7 @@ describe("tabsConfig — Figma rail", () => {
   });
 
   it("rail + off-rail partition every tab (nothing stranded, nothing invented)", () => {
-    const offRail = ["ai", "templates", "design", "settings", "publish", "history"];
+    const offRail = ["ai", "templates", "design", "settings", "publish", "history", "review"];
     const all = GROUPED_TABS_CONFIG.map((t) => t.id).sort();
     const accounted = [...RAIL_FIGMA_IDS, ...offRail].sort();
     expect(accounted).toEqual(all);

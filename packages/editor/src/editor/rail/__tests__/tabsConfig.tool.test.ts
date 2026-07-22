@@ -22,7 +22,7 @@ describe("tabsConfig — E3 tool mapping", () => {
     }
   });
 
-  it("maps all 11 tabs exactly as designed", () => {
+  it("maps all 12 tabs exactly as designed", () => {
     const map = Object.fromEntries(GROUPED_TABS_CONFIG.map((t) => [t.id, t.tool]));
     expect(map).toEqual({
       add: "insert",
@@ -34,6 +34,7 @@ describe("tabsConfig — E3 tool mapping", () => {
       settings: "site",
       publish: "site",
       history: "site",
+      review: "site", // P0 wedge loop — folds under the site tool, off-rail
       ai: "assistant",
       layers: "structure",
     });

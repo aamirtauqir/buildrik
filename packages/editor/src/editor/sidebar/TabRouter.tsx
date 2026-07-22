@@ -43,6 +43,7 @@ const MediaTab = React.lazy(() =>
 );
 const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
 const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
+const ReviewTab = React.lazy(() => import("./tabs/review/ReviewTab"));
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 const AITab = React.lazy(() =>
   import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
@@ -83,6 +84,9 @@ export interface TabRouterProps {
     currentIcon: import("../../shared/types/media").IconConfig | undefined,
     onSelect: (icon: import("../../shared/types/media").IconConfig) => void,
   ) => void;
+  /** P0 review loop: full re-send (re-render snapshot + mint fresh token) for
+   *  the Review panel — provided by the shell (same path as the topbar send). */
+  onResendReview?: () => Promise<void>;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -105,6 +109,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onOpenLibrary,
   onOpenImageEditor,
   onOpenIconPicker,
+  onResendReview,
 }) => {
   switch (activeTab) {
     case "add":
@@ -186,6 +191,9 @@ export const TabRouter: React.FC<TabRouterProps> = ({
 
     case "history":
       return <HistoryTab composer={composer} projectId={projectId} {...commonTabProps} />;
+
+    case "review":
+      return <ReviewTab {...commonTabProps} onResend={onResendReview} />;
 
     case "settings":
       return (
