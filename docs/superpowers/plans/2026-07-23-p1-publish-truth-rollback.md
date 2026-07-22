@@ -29,8 +29,8 @@ DS primitives (Gate 24); inline-style chrome; flag-independent (publish isn't ag
 - `startPublish` gains `opts?: { bypassApproval?: boolean; rolledBackFrom?: string }` — when `bypassApproval`, skip the approval-gate block; set `rolledBackFrom` on the created job.
 - Router: `sites.publishHistory` (EDITOR — own-site read) · `sites.rollback` (ADMIN — destructive §2, activity-logged `site.rolled_back`).
 
-- [ ] A1 failing service tests (retention: complete keeps log + prunes >20; history: newest-first, rollbackable flag, no log leak; rollback: NOT_ROLLBACKABLE on pruned/non-complete, bypasses approval, sets rolledBackFrom, ALREADY_PUBLISHING when active)
-- [ ] A2 fail · A3 implement (schema+migration+service+schemas+router) · A4 pass; tsc · A5 commit
+- [x] A1 failing service tests (retention: complete keeps log + prunes >20; history: newest-first, rollbackable flag, no log leak; rollback: NOT_ROLLBACKABLE on pruned/non-complete, bypasses approval, sets rolledBackFrom, ALREADY_PUBLISHING when active)
+- [x] A2 fail · A3 implement (schema+migration+service+schemas+router) · A4 pass; tsc · A5 commit
 
 ### Slice B — Editor UI: deploy states + publish history/rollback
 **Files:** `packages/editor/src/services/PublishService.ts` (fetchPublishHistory, rollbackPublish) · a `PublishHistory` surface (modal/section) · wire into PublishDropdown/StudioModals · tests.
@@ -39,9 +39,17 @@ DS primitives (Gate 24); inline-style chrome; flag-independent (publish isn't ag
 - ServerPublishService: `fetchPublishHistory()` + `rollbackPublish(jobId)` (fail-closed reads / throwing writes, per P0 convention).
 - Publish-history surface (S6.1 drawn): list versions (v1..vN, live badge on latest, rollbackable), rollback pick → confirm ("↩ from vN" + names: draft untouched · prior approver · creates new version) → publishing (usePublishJob progress) → done. Non-rollbackable rows disabled with a reason (payload pruned). Deploy states (connect-vercel/publishing/live/failed) surfaced via the existing usePublishJob polling.
 
-- [ ] B1 failing tests · B2 fail · B3 implement + wire · B4 pass; tsc · B5 commit
+- [x] B1 failing tests · B2 fail · B3 implement + wire · B4 pass; tsc · B5 commit
 
 ### Slice C — Verify
-- [ ] C1 vitest green (touched) · tsc gate · verify:ds green
-- [ ] C2 live dev-DB: publish→complete (log retained) → history shows it rollbackable → rollback (new job, bypasses approval, rolledBackFrom set) → 21st publish prunes the oldest's log → that one now NOT_ROLLBACKABLE. Cascade-clean.
-- [ ] C3 commit notes; update memory
+- [x] C1 vitest green (touched) · tsc gate · verify:ds green
+- [x] C2 live dev-DB: publish→complete (log retained) → history shows it rollbackable → rollback (new job, bypasses approval, rolledBackFrom set) → 21st publish prunes the oldest's log → that one now NOT_ROLLBACKABLE. Cascade-clean.
+- [x] C3 commit notes; update memory
+
+## Verification results (2026-07-23)
+- tsc gate PASS (0 both) · **verify:ds exit 0 (all DS gates green — 0 ghost aliases, box-shadow at baseline)**.
+- Unit: publish.service.rollback 7 · publish-service (dashboard) 34 (fixed the old test's missing findMany mock — my prune reads it) · PublishHistory 12 · PublishTab/PublishService green.
+- **Live dev-DB** (`smoke-publish-rollback.ts`, 9/9): completePublish RETAINS payload (was nulled) · history rollbackable + never leaks HTML · prune nulls the oldest beyond 20 · rollback refuses pruned/non-completed/cross-workspace (NOT_ROLLBACKABLE / NOT_FOUND-IDOR). Migration `rolledBackFrom` + active-unique index applied to dev.
+- **Deploy states (connect-vercel/publishing/live/failed) already surfaced** — not rebuilt. `usePublishJob` polls job status (BUILDING/DEPLOYING=publishing, COMPLETED=live, FAILED=failed) and the server throws `VERCEL_NOT_CONNECTED` → PublishTab renders the status + error + connect path. P1 added history/rollback on top.
+- Deferred (documented): version numbering is window-relative (oldest of the 20 = v1), not an absolute lifetime sequence — a refinement (needs a count); prior-approver name in the rollback confirm (not on the history row). The rollback→worker-dispatch happy path is unit-covered (no Next server in the smoke).
+- NOT deployed — P1 rides a later deploy (needs the `rolledBackFrom` migration + the still-missing prod `publish_build_jobs_active_unique` index, CONCURRENTLY per P7).
