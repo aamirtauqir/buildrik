@@ -3,9 +3,10 @@
  *
  * When a workspace has `editsRequireApproval` on, a publish is blocked unless the
  * site's latest review is APPROVED. Only the workspace OWNER is exempt (the policy
- * owner / approver-of-last-resort keeps an escape hatch). ADMINs are NOT exempt:
- * `sites.publish` already requires ADMIN+, so exempting ADMIN would make the gate
- * block nobody — exactly the §13-C1 bug ("any ADMIN publishes even when the
+ * owner / approver-of-last-resort keeps an escape hatch). ADMINs are NOT exempt —
+ * since M3, `sites.publish` gates at EDITOR (a DESIGNER may publish; the approval
+ * is the real control), so the gate must hold for everyone below OWNER or it
+ * blocks nobody — exactly the §13-C1 bug ("any ADMIN publishes even when the
  * workspace demands review"). Gating ADMIN is the whole point of the setting.
  *
  * This is the enforcement that was missing: `editsRequireApproval` was read only
