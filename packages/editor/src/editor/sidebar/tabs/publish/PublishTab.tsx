@@ -15,6 +15,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { TabFrame } from "@/shared/extensions/TabFrame";
 import { Stack, useToast } from "@/editor/shared/vibcoder";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { PublishHistory } from "../../../shell/PublishHistory";
 
 // ============================================
 // Types
@@ -406,6 +407,13 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               </svg>
             </Button>
           </div>
+        )}
+
+        {/* P1: published-version history + rollback (contract §5) */}
+        {projectId && (
+          <section style={sectionStyles}>
+            <PublishHistory siteId={projectId} onRollbackStarted={() => publishJob?.reset?.()} />
+          </section>
         )}
       </div>
       {/* Privacy & Terms footer */}

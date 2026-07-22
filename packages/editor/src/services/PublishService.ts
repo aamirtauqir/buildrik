@@ -110,3 +110,31 @@ export async function fetchSitePublishState(
     publishedUrl: site.publishedUrl ?? null,
   };
 }
+
+/* ── P1 publish history + rollback ────────────────────────────────────────── */
+
+export interface PublishHistoryRow {
+  id: string;
+  version: number;
+  completedAt: string | Date | null;
+  deploymentId: string | null;
+  rollbackable: boolean;
+  rolledBackFrom: string | null;
+}
+
+/**
+ * A site's published-version history (contract §5). THROWS on a fetch error so
+ * the panel can show "couldn't load · Retry" rather than a fake-empty list
+ * (DF5) — the same rule as the P0 review thread.
+ */
+export async function fetchPublishHistory(siteId: string): Promise<PublishHistoryRow[]> {
+  return getClient().sites.publishHistory.query({ siteId });
+}
+
+/**
+ * Roll back to a prior version — re-publishes it as a NEW job. Throws on
+ * failure (NOT_ROLLBACKABLE / already-publishing) so the UI can show the reason.
+ */
+export async function rollbackToVersion(siteId: string, jobId: string): Promise<void> {
+  await getClient().sites.rollback.mutate({ siteId, jobId });
+}
