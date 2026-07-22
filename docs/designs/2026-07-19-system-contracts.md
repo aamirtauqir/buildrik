@@ -143,6 +143,17 @@ So: the approval stands, the count of changes since it is always visible, and th
 
 Four roles. **The matrix below is settled** — the two rows that traded safety against friction (DESIGNER publish, DESIGNER shared-library rights) were decided by the founder on 2026-07-19; the reasoning follows the table.
 
+**DECIDED 2026-07-22 — VIEWER is the fifth role (read-only).** The code has always
+had it (`lib/constants/enums.ts` UserRole, rank 0 in `permission.service.ts`) and
+the 2026-07-22 audit found it absent from this contract. Adopted as-is: a VIEWER
+holds a real workspace seat, may open every surface, and can never be the target
+of a permission gate (`checkSiteRole`/`checkWorkspaceRole` exclude it from
+`minRole`). Every column below is ❌ for VIEWER except reading; the
+"disabled, never hidden" rule applies to every control they see. Figma:
+"Permissions — signed in as a VIEWER" board on the Editor page. Not to be
+confused with CLIENT — the account-less token reviewer (`Reviewer` model), which
+stays a non-role.
+
 | Action | OWNER | ADMIN | DESIGNER | CLIENT |
 |---|---|---|---|---|
 | Edit canvas, pages, media, content | ✅ | ✅ | ✅ | ❌ |

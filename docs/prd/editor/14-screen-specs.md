@@ -70,12 +70,17 @@
 
 ## J2 · AI-draft
 
-> ⚠ **BUILD-OR-CUT DECISION REQUIRED before coding S2.1–S2.3** (2026-07-21, see the
-> code-truth brief). Whole-site AI generation is an **L0 stub** — `ai/index.ts:8`
-> ("AIPageGenerator … not yet implemented") and `wizard/PageWizard.tsx:1`
-> (`@deprecated DEAD/SIMULATED` — no model called, static templates, setTimeout steps).
-> Only **edit-AI** (`AITab`, S2.5) is real. Coding S2.1–S2.3 as if generation exists is a
-> dead end: either build a real server AI job (brief → ProjectData) or cut J2 to edit-AI.
+> ✅ **DECIDED 2026-07-22 — CUT editor-side whole-site drafting; J2 = edit-AI only.**
+> Whole-site AI drafting already exists as a REAL path at dashboard onboarding
+> (`/onboarding/ai/*` → `templates.generate.create` → `createGenerationJob`, real
+> OpenAI job, live-verified 2026-07-11). Building a second whole-site generator
+> inside the editor duplicates it against an L0 stub (`ai/index.ts:8`;
+> `PageWizard.tsx:1` `@deprecated DEAD/SIMULATED` — delete on next cleanup).
+> Consequences: do NOT code S2.1–S2.3 editor-side; "new site with AI" routes to the
+> onboarding path; the editor keeps **edit-AI** (`AITab`, S2.5) as its only AI
+> surface. The S2.1–S2.3 frames (incl. streaming/cancel) stay in Figma as the
+> reference spec for the onboarding surface — they describe that flow's states,
+> not an editor build target.
 
 ### S2.1 — AI brief entry
 - **Job/IA/Build:** J2 · CREATE › AI · REDESIGN

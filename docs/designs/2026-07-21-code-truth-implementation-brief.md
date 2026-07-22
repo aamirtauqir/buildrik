@@ -113,3 +113,53 @@ The **real** J5 gaps (what to actually build):
 and the J2/J5 decisions are made.* The wireframes/prototypes/UI are not the gap — the
 code-truth is. Build J5's real gaps (stale-approval, status pill), decide J2, and the
 rest is assembly.
+
+---
+
+## 4. Addendum — 2026-07-22 three-way audit (PRD ↔ Figma ↔ code)
+
+Full-file audit + fix pass run 2026-07-22 (Figma `g4GzQFqzNYz5sosz1QtZXC`). Figma-side
+defects were fixed in the file (Badge contrast at component source, ~68 semantic
+prototype rewires, publish/gate backdrop, S6.4 dirty state, hidden `Integrations · some`
+board, S2.2 streaming/cancel, VIEWER permissions board, dashboard-spine page). The
+following are the **code-side** findings — engineering items, cited and re-checkable:
+
+1. **Bulk publish still gates ADMIN** (`sites.ts:177` `minRole` map) while single
+   `sites.publish` is EDITOR (`sites.ts:282`, M3). Contract §2 says a DESIGNER may
+   publish; the bulk path contradicts it. Also the comment at `publish-approval.ts:6-9`
+   still assumes "sites.publish already requires ADMIN+" — stale since M3.
+2. **`templates.applyToSite` has no role gate** (`templates.ts:52-56` —
+   protectedProcedure + workspace-scoping only). It replaces every page on a site;
+   contract §2 puts destructive actions at ADMIN+. The Figma permissions boards now
+   document the intended admin-only rule.
+3. **VIEWER role exists in code** (`lib/constants/enums.ts:7`, rank 0 in
+   `permission.service.ts:4`) but is absent from contracts §2's 4-role model. Figma now
+   carries a "Permissions — signed in as a VIEWER" board; contracts §2 should either
+   adopt VIEWER (read-only, never a gate target) or code should stop offering it.
+4. **§1.J5.3 "review-status pill MISSING" is now PARTLY STALE:** `Topbar.tsx` has a
+   `reviewStatus`/`REVIEW_PILL` pill (L43/L215) beyond the send-state — but it renders
+   only in `viewMode.clientView` (L430-451). Remaining real gap: the designer-facing
+   6-state pill (S5.2). Narrower than §1.J5.3 claims.
+5. **§1.J5.2 partly stale too:** `addComment` accepts and stores pin fields
+   (`{ body, pageId?, x?, y?, targetSelector? }`, `client-review.service.ts:222-240`)
+   and the UI wires `clientReview.comment` (`review-client.tsx:318`). The
+   pins-vs-plain-notes decision is still the founder's, but the backend/UI seam is
+   closer to pins than this brief said.
+
+### §4.1 Decisions closed 2026-07-22 (audit sign-off — every §4 item terminal)
+
+- **Pins vs plain notes → v1 SHIPS PLAIN NOTES; pins are a fast-follow.** Gate C
+  tests client comprehension, and plain notes already work end-to-end. The backend
+  stores pin coords today, so adding the pin UI later is additive and non-breaking.
+  Figma S5.5 · commenting stays as the pin-target reference; its caption marks the
+  v1 scope. No code change required for v1.
+- **J2 build-or-cut → CUT editor-side; J2 = edit-AI (S2.5) only.** Whole-site
+  drafting is the dashboard onboarding AI path (real, live-verified 2026-07-11).
+  `PageWizard.tsx` stub is delete-on-sight in the next cleanup arc. Banner in
+  `14-screen-specs.md` updated to DECIDED.
+- **VIEWER role → adopted into contracts §2 as the fifth role** (read-only, never
+  a gate target, disabled-never-hidden). Contract amended; Figma board exists.
+- **Item #1 (bulk publish) → WITHDRAWN:** re-verified 2026-07-22 — no bulk publish
+  action exists (`bulkActionSchema` = archive/delete/unarchive); the finding was a
+  misread. Item #2 (applyToSite gate) and item #4's pill (designer-facing,
+  `e09fa3af`) are fixed in code; the stale comment (`47ba46e0`) too.
