@@ -91,6 +91,13 @@ export function ApiTokensTab({ workspaceId }: { workspaceId: string }) {
         </Button>
       </div>
 
+      {/* Honesty note: the public API that consumes these tokens isn't live yet
+          (no scopedProcedure consumers). Don't imply a working integration. */}
+      <div className="rounded-lg border px-3 py-2.5 text-sm" style={{ borderColor: "#fbbf24", backgroundColor: "#fffbeb", color: "#92400e" }}>
+        The public API is coming soon. You can create and manage tokens now, but
+        they won&apos;t authenticate requests until the API launches.
+      </div>
+
       {/* Token list */}
       {list.isLoading ? (
         <div className="h-40 animate-pulse rounded-xl bg-neutral-100" />
