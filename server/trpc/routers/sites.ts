@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { assertSiteAccess, checkSiteRole, PermissionError } from "@/server/services/permission.service";
+import { assertSiteAccess, checkSiteRole, checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
 import {
   listSites,
   createSite,
@@ -72,6 +72,14 @@ export const sitesRouter = router({
     .input(createSiteSchema)
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
+      // Creating a site consumes plan quota and mutates the workspace — EDITOR+,
+      // never a VIEWER.
+      try {
+        await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await createSite(workspaceId, ctx.session.user.id, input);
       } catch (e: unknown) {
@@ -174,7 +182,7 @@ export const sitesRouter = router({
       const workspaceId = await getWorkspaceId(ctx);
 
       const minRole = input.action === "delete" ? "OWNER"
-        : ["archive", "unarchive", "publish", "unpublish"].includes(input.action) ? "ADMIN"
+        : ["archive", "unarchive"].includes(input.action) ? "ADMIN"
         : "EDITOR";
 
       try {
@@ -437,6 +445,13 @@ export const sitesRouter = router({
       .input(z.object({ name: z.string().min(1).max(50) }))
       .mutation(async ({ ctx, input }) => {
         const workspaceId = await getWorkspaceId(ctx);
+        // Organizing the workspace is an EDITOR action, not a VIEWER one.
+        try {
+          await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
         try {
           return await createFolder(workspaceId, input.name);
         } catch (e: unknown) {

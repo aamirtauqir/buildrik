@@ -38,8 +38,12 @@ export const createSiteFolderSchema = z.object({
   name: z.string().min(1).max(50),
 });
 
+// publish/unpublish are intentionally NOT bulk actions: a bulk status-flip
+// bypasses the deploy pipeline (no build/teardown) and the approval gate, so it
+// lies — the row says PUBLISHED while the live site never changes. Per-site
+// publish goes through the real pipeline. See sites.service bulkAction.
 export const bulkActionSchema = z.object({
-  action: z.enum(["archive", "delete", "unarchive", "publish", "unpublish"]),
+  action: z.enum(["archive", "delete", "unarchive"]),
   siteIds: z.array(z.string()).min(1).max(25),
 });
 

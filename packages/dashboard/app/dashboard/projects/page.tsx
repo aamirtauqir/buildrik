@@ -365,9 +365,11 @@ export default function ProjectsPage() {
         if (ids.length > 0) setBulkDeleteCount(ids.length);
         return;
       }
-      if (action === "publish" || action === "unpublish" || action === "archive" || action === "unarchive") {
+      // publish/unpublish are not bulk actions (they'd bypass the deploy
+      // pipeline); the bulk bar only offers archive/unarchive/move/delete.
+      if (action === "archive" || action === "unarchive") {
         bulkMutation.mutate({
-          action: action as "archive" | "unarchive" | "publish" | "unpublish",
+          action: action as "archive" | "unarchive",
           siteIds: ids,
         });
       }

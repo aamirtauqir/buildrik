@@ -561,20 +561,9 @@ export async function bulkAction(
       });
       return { succeeded: siteIds.slice(0, result.count), failed: [] };
     }
-    case "publish": {
-      const result = await prisma.site.updateMany({
-        where: { id: { in: siteIds }, workspaceId, deletedAt: null },
-        data: { status: "PUBLISHED" },
-      });
-      return { succeeded: siteIds.slice(0, result.count), failed: [] };
-    }
-    case "unpublish": {
-      const result = await prisma.site.updateMany({
-        where: { id: { in: siteIds }, workspaceId, deletedAt: null },
-        data: { status: "DRAFT" },
-      });
-      return { succeeded: siteIds.slice(0, result.count), failed: [] };
-    }
+    // publish/unpublish removed — a bulk status-flip never ran the deploy
+    // pipeline or the approval gate, so it reported success while the live site
+    // was untouched. Publishing is per-site through the real pipeline.
     case "delete": {
       const result = await prisma.site.updateMany({
         where: { id: { in: siteIds }, workspaceId, deletedAt: null },
