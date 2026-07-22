@@ -313,7 +313,7 @@ export const authRouter = router({
         type: "MEMBER_JOINED",
         message: `${user.email} joined the workspace`,
         actorId: userId,
-        actionUrl: "/dashboard/team",
+        actionUrl: "/dashboard/settings/team",
       }).catch(() => {});
 
       // Activity-log entry so the team activity feed (getTeamActivity) reflects

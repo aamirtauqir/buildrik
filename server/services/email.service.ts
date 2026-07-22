@@ -137,17 +137,17 @@ export async function sendEmailChangedEmail(to: string, token: string) {
 }
 
 export async function sendPaymentFailedEmail(to: string) {
-  const html = await render(PaymentFailed({ updateUrl: `${BASE_URL}/settings/billing` }));
+  const html = await render(PaymentFailed({ updateUrl: `${BASE_URL}/dashboard/settings/billing` }));
   await sendEmail(to, "Your payment failed — Buildrick", html);
 }
 
 export async function sendDunningReminderEmail(to: string, daysLeft: number) {
-  const html = await render(DunningReminder({ daysLeft, updateUrl: `${BASE_URL}/settings/billing` }));
+  const html = await render(DunningReminder({ daysLeft, updateUrl: `${BASE_URL}/dashboard/settings/billing` }));
   await sendEmail(to, `${daysLeft} days until downgrade — Buildrick`, html);
 }
 
 export async function sendAutoDowngradeEmail(to: string) {
-  const html = await render(AutoDowngrade({ reactivateUrl: `${BASE_URL}/settings/billing` }));
+  const html = await render(AutoDowngrade({ reactivateUrl: `${BASE_URL}/dashboard/settings/billing` }));
   await sendEmail(to, "Your plan has been downgraded — Buildrick", html);
 }
 
@@ -157,7 +157,7 @@ export async function sendExportReadyEmail(to: string, downloadUrl: string) {
 }
 
 export async function sendAccountDeletionEmail(to: string, deletionDate: string) {
-  const html = await render(AccountDeletion({ deletionDate, cancelUrl: `${BASE_URL}/settings/danger-zone` }));
+  const html = await render(AccountDeletion({ deletionDate, cancelUrl: `${BASE_URL}/dashboard/settings/danger` }));
   await sendEmail(to, "Account deletion scheduled — Buildrick", html);
 }
 
@@ -167,12 +167,12 @@ export async function sendTicketReceivedEmail(to: string, ticketNumber: number, 
 }
 
 export async function sendAICompleteEmail(to: string, siteName: string, siteId: string) {
-  const html = await render(AiComplete({ siteName, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
+  const html = await render(AiComplete({ siteName, viewUrl: `${BASE_URL}/dashboard/sites/${encodeURIComponent(siteId)}` }));
   await sendEmail(to, `Your site "${siteName}" is ready — Buildrick`, html);
 }
 
 export async function sendAIFailedEmail(to: string) {
-  const html = await render(AiFailed({ retryUrl: `${BASE_URL}/sites/new` }));
+  const html = await render(AiFailed({ retryUrl: `${BASE_URL}/dashboard/sites/new` }));
   await sendEmail(to, "Site generation failed — Buildrick", html);
 }
 
@@ -182,17 +182,19 @@ export async function sendWSTransferOutEmail(to: string, workspaceName: string, 
 }
 
 export async function sendWSTransferInEmail(to: string, workspaceName: string) {
-  const html = await render(WsTransferIn({ workspaceName, manageUrl: `${BASE_URL}/settings/workspace` }));
+  const html = await render(WsTransferIn({ workspaceName, manageUrl: `${BASE_URL}/dashboard/settings/workspace` }));
   await sendEmail(to, `You now own "${workspaceName}" — Buildrick`, html);
 }
 
 export async function sendSSLExpiringEmail(to: string, domain: string, domainId: string) {
-  const html = await render(SslExpiring({ domain, renewUrl: `${BASE_URL}/domains/${encodeURIComponent(domainId)}` }));
+  // No /domains/[id] route exists; the workspace domain monitor is the real
+  // landing page. domainId is kept in the query for deep-link context.
+  const html = await render(SslExpiring({ domain, renewUrl: `${BASE_URL}/dashboard/settings/domains?domain=${encodeURIComponent(domainId)}` }));
   await sendEmail(to, `SSL certificate expiring for ${domain} — Buildrick`, html);
 }
 
 export async function sendPlanLimitWarningEmail(to: string, resource: string) {
-  const html = await render(PlanLimitWarning({ resource, upgradeUrl: `${BASE_URL}/settings/billing` }));
+  const html = await render(PlanLimitWarning({ resource, upgradeUrl: `${BASE_URL}/dashboard/settings/billing` }));
   await sendEmail(to, `You're approaching your ${resource} limit — Buildrick`, html);
 }
 
@@ -205,14 +207,15 @@ export async function sendFormSubmissionEmail(
   to: string,
   siteName: string,
   fields: { label: string; value: string }[],
-  submissionId: string
+  siteId: string
 ) {
-  const html = await render(FormSubmission({ siteName, fields, viewUrl: `${BASE_URL}/forms/${encodeURIComponent(submissionId)}` }));
+  // Submissions live on the site's feedback tab; there is no /forms/[id] route.
+  const html = await render(FormSubmission({ siteName, fields, viewUrl: `${BASE_URL}/dashboard/sites/${encodeURIComponent(siteId)}/feedback` }));
   await sendEmail(to, `New form submission on ${siteName} — Buildrick`, html);
 }
 
 export async function sendSiteTransferredEmail(to: string, fromName: string, siteName: string, siteId: string) {
-  const html = await render(SiteTransferred({ fromName, siteName, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
+  const html = await render(SiteTransferred({ fromName, siteName, viewUrl: `${BASE_URL}/dashboard/sites/${encodeURIComponent(siteId)}` }));
   await sendEmail(to, `Site "${siteName}" transferred to you — Buildrick`, html);
 }
 
@@ -253,7 +256,7 @@ export async function sendReviewResolvedEmail(
   opts: { siteName: string; approved: boolean; resolverName: string; note?: string; siteId: string }
 ) {
   const { siteId, ...rest } = opts;
-  const html = await render(ReviewResolved({ ...rest, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
+  const html = await render(ReviewResolved({ ...rest, viewUrl: `${BASE_URL}/dashboard/sites/${encodeURIComponent(siteId)}` }));
   const subject = opts.approved
     ? `"${opts.siteName}" was approved — Buildrick`
     : `Changes requested on "${opts.siteName}" — Buildrick`;

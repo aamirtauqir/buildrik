@@ -69,7 +69,7 @@ export async function submitForm(
     const fields = Object.entries((input.data ?? {}) as Record<string, unknown>).map(
       ([label, value]) => ({ label, value: String(value) }),
     );
-    return sendFormSubmissionEmail(owner.user.email, site!.name, fields, submission.id);
+    return sendFormSubmissionEmail(owner.user.email, site!.name, fields, siteId);
   }).catch(() => {});
 
   return submission;
