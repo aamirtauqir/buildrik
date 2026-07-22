@@ -83,3 +83,10 @@ consciously not done, not when they were forgotten.
   comment backend exists; `app/review/[token]/` does not. `app/share/[token]/`
   already ships the pattern to copy. Either build it or revoke the lock — do not
   let it decay by neglect.
+
+- [ ] **Origin-pin `/api/asset-upload` (and the other cookie-authenticated non-tRPC
+  routes).** The tRPC endpoint checks `EDITOR_ORIGIN`; `asset-upload` accepts
+  cookie-authenticated mutations with no origin check while the editor calls it with
+  `credentials:"include"`. Same treatment as the token-surface audit above — check
+  Origin against the allowlist, reject loudly. Surfaced by /autoplan eng phase
+  2026-07-22.
