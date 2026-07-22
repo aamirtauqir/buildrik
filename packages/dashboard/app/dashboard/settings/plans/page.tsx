@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { MetricValue } from "@/components/dashboard/primitives";
+import { ErrorState } from "@/components/states";
 
 type PlanName = "FREE" | "PRO" | "BUSINESS";
 
@@ -67,6 +68,28 @@ export default function PlansPage() {
   const plansQuery = trpc.billing.plans.useQuery();
 
   const currentPlanId = (overviewQuery.data?.plan as PlanName) ?? "FREE";
+
+  // Without this, `?? 0` fallbacks below render every plan as $0 / 0-limit
+  // while the query is in flight or errored — false pricing on the money page.
+  if (plansQuery.isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-80 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />
+        ))}
+      </div>
+    );
+  }
+
+  if (plansQuery.isError) {
+    return (
+      <ErrorState
+        title="Couldn't load plans"
+        description="Something went wrong fetching pricing. Your current plan is unaffected."
+        onRetry={() => plansQuery.refetch()}
+      />
+    );
+  }
 
   const plans: PlanEntry[] = PLAN_ORDER.map((name) => {
     const found = plansQuery.data?.find((p) => p.name === name);
