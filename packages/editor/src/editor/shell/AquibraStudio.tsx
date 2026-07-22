@@ -30,6 +30,8 @@ import { useComponentSync } from "./hooks/useComponentSync";
 import { hydrateUserTemplatesFromServer } from "@/services/templateSync";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { RecoveryBanner } from "./RecoveryBanner";
+import { LoadErrorBanner, type LoadErrorKind } from "./LoadErrorBanner";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useExportHandlers } from "./hooks/useExportHandlers";
@@ -138,6 +140,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const modals = useStudioModals();
   const blocks: BlockData[] = React.useMemo(() => getBlockDefinitions(), []);
 
+  // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).
+  const [loadError, setLoadError] = React.useState<LoadErrorKind>(null);
+
   // Initialize composer with hooks
   const composer = useComposerInit({
     options,
@@ -156,6 +161,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setIsDirty: state.setIsDirty,
     setSaveState: state.setSaveState,
     openCollectionSetup: modals.openCollectionSetup,
+    onLoadError: setLoadError,
   });
 
   // 4 composer-driven side-effects (wizard hide, COMPONENT_CREATE_REQUESTED,
@@ -298,6 +304,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       }}
     >
       <RecoveryBanner pageCount={composer?.elements.getAllPages().length} />
+      <LoadErrorBanner
+        kind={loadError}
+        onRetry={() => window.location.reload()}
+        onSignIn={() => { window.location.href = `${DASHBOARD_URL}/auth`; }}
+        onDismiss={() => setLoadError(null)}
+      />
       <header role="banner" aria-label="Editor toolbar">
         <StudioHeader
           composer={composer}

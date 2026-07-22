@@ -57,6 +57,10 @@ export interface UseComposerInitParams {
     }>
   >;
   openCollectionSetup?: (onConfirm: (includeSampleData: boolean) => Promise<void>) => void;
+  /** S1.5: surface a dashboard load failure as a persistent banner instead of
+   *  a transient toast. `auth` = session expired, `network` = generic failure.
+   *  When wired, it replaces the toast; when omitted, the toast is kept (back-compat). */
+  onLoadError?: (kind: "auth" | "network") => void;
 }
 
 export function useComposerInit(params: UseComposerInitParams): Composer | null {
@@ -78,6 +82,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     setIsDirty,
     setSaveState,
     openCollectionSetup,
+    onLoadError,
   } = params;
 
   // Codex P2 (2026-05-21): mount-only init effect previously captured
@@ -97,6 +102,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
   const onUpdateRef = React.useRef(onUpdate);
   const addToastRef = React.useRef(addToast);
   const openCollectionSetupRef = React.useRef(openCollectionSetup);
+  const onLoadErrorRef = React.useRef(onLoadError);
   React.useEffect(() => {
     optionsRef.current = options;
     onReadyRef.current = onReady;
@@ -104,6 +110,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     onUpdateRef.current = onUpdate;
     addToastRef.current = addToast;
     openCollectionSetupRef.current = openCollectionSetup;
+    onLoadErrorRef.current = onLoadError;
   });
 
   // Initialize composer
@@ -206,7 +213,11 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // see because they are signed out. Point them at sign-in instead.
             const isAuth =
               err instanceof Error && /unauthorized/i.test(err.message);
-            if (isAuth) {
+            // S1.5: prefer a persistent banner over a transient toast when the
+            // shell wired onLoadError; the toast stays as the back-compat path.
+            if (onLoadErrorRef.current) {
+              onLoadErrorRef.current(isAuth ? "auth" : "network");
+            } else if (isAuth) {
               addToastRef.current({
                 title: "Session expired",
                 description:
