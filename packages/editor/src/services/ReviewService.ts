@@ -70,3 +70,113 @@ export async function submitForReview(
     snapshotPages,
   });
 }
+
+/* ── P0 review panel — data + actions ─────────────────────────────────────── */
+
+/** One comment in the editor Review thread list. `authorKind` is derived: a
+ *  comment with a reviewerId is the CLIENT's, otherwise it's an INTERNAL reply. */
+export interface ReviewComment {
+  id: string;
+  body: string;
+  pageId: string | null;
+  x: number | null;
+  y: number | null;
+  status: "OPEN" | "RESOLVED";
+  authorKind: "client" | "internal";
+  authorName: string | null;
+  createdAt: string | Date;
+}
+
+/** The current review round for the panel header (status, invited email, round
+ *  count, open-comment count, revision for a race-safe revoke). */
+export interface CurrentRound {
+  id: string;
+  status: string;
+  invitedEmail: string | null;
+  reviewerName: string | null;
+  revoked: boolean;
+  resolvedAt: string | Date | null;
+  createdAt: string | Date;
+  revision: string;
+  roundNumber: number;
+  totalRounds: number;
+  openCommentCount: number;
+}
+
+/**
+ * The comments on the current site for the Review panel thread list.
+ *
+ * Throws on a fetch error — deliberately NOT fail-closed. The panel must tell
+ * "no feedback yet" (empty, success) apart from "couldn't load" (error+retry);
+ * rendering a failed fetch as the empty state is the fake-empty anti-pattern
+ * (design review DF5). Returns [] only when there is genuinely no site.
+ */
+export async function fetchReviewComments(status?: "OPEN" | "RESOLVED"): Promise<ReviewComment[]> {
+  const siteId = currentSiteId();
+  if (!siteId) return [];
+  const rows = await getBuildrikClient(DASHBOARD_URL).comments.list.query({ siteId, status });
+  return rows.map((r) => ({
+    id: r.id,
+    body: r.body,
+    pageId: r.pageId,
+    x: r.x,
+    y: r.y,
+    status: r.status as "OPEN" | "RESOLVED",
+    authorKind: r.reviewerId ? "client" : "internal",
+    authorName: r.reviewer?.name ?? null,
+    createdAt: r.createdAt,
+  }));
+}
+
+/**
+ * The current round for the panel header. Returns null for a never-sent site
+ * (the server returns null) — but THROWS on a fetch error, so the panel can
+ * tell "never sent" apart from "couldn't load" (DF5). Returns null only when
+ * there is genuinely no site.
+ */
+export async function fetchCurrentRound(): Promise<CurrentRound | null> {
+  const siteId = currentSiteId();
+  if (!siteId) return null;
+  return getBuildrikClient(DASHBOARD_URL).reviews.currentRound.query({ siteId });
+}
+
+/**
+ * Revoke the current round. Passes the revision the panel last read so a revoke
+ * can't kill a link a concurrent re-send just minted. Never throws — a failure
+ * comes back as `{ revoked: false, reason: "error" }` for the panel to show.
+ */
+export async function revokeReview(
+  reviewId: string,
+  expectedRevision: string,
+): Promise<{ revoked: boolean; reason?: string }> {
+  const siteId = currentSiteId();
+  if (!siteId) return { revoked: false, reason: "error" };
+  try {
+    return await getBuildrikClient(DASHBOARD_URL).reviews.revoke.mutate({
+      siteId,
+      reviewId,
+      expectedRevision,
+    });
+  } catch {
+    return { revoked: false, reason: "error" };
+  }
+}
+
+/**
+ * Post an internal reply to the thread. Throws on failure so the composer can
+ * show a retry — unlike the reads, a dropped write must not look like success.
+ * Internal replies are NOT review-gated: comments outlive review rounds
+ * (contracts §6.4), so the designer can always answer feedback before re-sending.
+ */
+export async function postReply(body: string, pageId?: string): Promise<void> {
+  const siteId = currentSiteId();
+  if (!siteId) throw new Error("No site to reply on");
+  await getBuildrikClient(DASHBOARD_URL).comments.create.mutate({ siteId, body, pageId });
+}
+
+/** Resolve / reopen a comment. Throws on failure for a retry. */
+export async function resolveReviewComment(id: string, status: "OPEN" | "RESOLVED"): Promise<void> {
+  const siteId = currentSiteId();
+  if (!siteId) throw new Error("No site to resolve on");
+  await getBuildrikClient(DASHBOARD_URL).comments.resolve.mutate({ id, siteId, status });
+}
