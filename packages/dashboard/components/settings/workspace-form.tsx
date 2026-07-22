@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
+import { useUnsavedChanges } from "@lib/hooks/use-unsaved-changes";
 import { SectionCard, Button, InputField } from "@/components/dashboard/primitives";
 
 // Shared field chrome for native <select> controls, matched to InputField's
@@ -109,6 +110,16 @@ export function WorkspaceForm({
   const [allowEditors, setAllowEditors] = useState(initialData?.allowEditors ?? false);
   const [notify, setNotify] = useState(initialData?.notify ?? true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Guard against losing workspace edits on an accidental reload.
+  const dirty =
+    name !== (initialData?.name ?? "") ||
+    slug !== (initialData?.slug ?? "") ||
+    defaultLanguage !== (initialData?.defaultLanguage ?? "en") ||
+    timezone !== (initialData?.timezone ?? "UTC") ||
+    accentColor !== (initialData?.accentColor ?? DEFAULT_ACCENT) ||
+    editsRequireApproval !== (initialData?.editsRequireApproval ?? false);
+  useUnsavedChanges(dirty);
 
   function handleNameChange(value: string) {
     setName(value);

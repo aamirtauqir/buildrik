@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
+import { useUnsavedChanges } from "@lib/hooks/use-unsaved-changes";
 import { Button, SectionCard } from "@/components/dashboard/primitives";
 
 const SOCIAL_PLATFORMS = ["twitter", "instagram", "linkedin", "youtube", "github"] as const;
@@ -56,6 +57,17 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
   const touchIconInputRef = useRef<HTMLInputElement>(null);
 
   const isPro = site.plan !== "FREE";
+
+  // Warn before losing edits — worst case here is pasted custom head/body code
+  // vanishing on an accidental reload.
+  const dirty =
+    name !== site.name ||
+    slug !== site.slug ||
+    headCode !== (site.headCode ?? "") ||
+    bodyCode !== (site.bodyCode ?? "") ||
+    passwordEnabled !== site.hasPublishedPassword ||
+    password.length > 0;
+  useUnsavedChanges(dirty);
 
   const presignMutation = trpc.upload.presign.useMutation();
   const confirmMutation = trpc.upload.confirm.useMutation();
