@@ -175,6 +175,11 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
   // switch ignored — a silent dead end. Intercept it here and open a role
   // picker that calls the (already-wired) onChangeRole mutation.
   const [roleEditMember, setRoleEditMember] = useState<Member | null>(null);
+  // Removal (revoke/delete) is irreversible and was firing on a single click —
+  // including one-click BULK removal. Gate every removal behind a confirm here,
+  // so both per-row and bulk paths are covered without the page popping N
+  // dialogs for a bulk action.
+  const [confirm, setConfirm] = useState<{ action: MemberAction; ids: string[]; heading: string; body: string } | null>(null);
 
   // Leaving select mode drops the pending selection so it can't linger and
   // apply to a later action.
@@ -188,7 +193,13 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
       if (m) setRoleEditMember(m);
       return;
     }
-    onAction(action, memberId);
+    const m = members.find((x) => x.id === memberId);
+    const who = m?.fullName || m?.email || "this member";
+    setConfirm(
+      action === "delete"
+        ? { action, ids: [memberId], heading: "Remove member?", body: `${who} will lose all access to this workspace. This can't be undone.` }
+        : { action, ids: [memberId], heading: "Revoke access?", body: `${who}'s access will be suspended immediately.` }
+    );
   }
 
   function toggleOne(id: string) {
@@ -211,8 +222,22 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
   }
 
   function removeSelected() {
-    selected.forEach((id) => onAction("delete", id));
-    onExitSelectMode();
+    const ids = [...selected];
+    if (ids.length === 0) return;
+    setConfirm({
+      action: "delete",
+      ids,
+      heading: `Remove ${ids.length} member${ids.length === 1 ? "" : "s"}?`,
+      body: `${ids.length === 1 ? "This member" : "These members"} will lose all access to this workspace. This can't be undone.`,
+    });
+  }
+
+  function runConfirm() {
+    if (!confirm) return;
+    const isBulk = confirm.ids.length > 1 || selectMode;
+    confirm.ids.forEach((id) => onAction(confirm.action, id));
+    setConfirm(null);
+    if (isBulk) onExitSelectMode();
   }
 
   function handleRowClick(member: Member) {
@@ -310,6 +335,29 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
 
       {detailMember && (
         <MemberDetailCard member={detailMember} onClose={() => setDetailMember(null)} />
+      )}
+
+      {confirm && (
+        <Modal
+          open={true}
+          onClose={() => setConfirm(null)}
+          title={confirm.heading}
+          width={400}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setConfirm(null)}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={runConfirm}>
+                {confirm.action === "delete" ? "Remove" : "Revoke"}
+              </Button>
+            </>
+          }
+        >
+          <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+            {confirm.body}
+          </p>
+        </Modal>
       )}
 
       {roleEditMember && (
