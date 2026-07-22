@@ -18,8 +18,10 @@ const DEFAULT_USAGE_ITEMS: Pick<UsageItem, "label" | "ctaLabel" | "ctaHref">[] =
   { label: "Custom domains", ctaLabel: "Connect domain", ctaHref: "/dashboard/settings/domains" },
   { label: "Storage", ctaLabel: "Manage files", ctaHref: "/dashboard/settings/billing" },
   { label: "AI credits", ctaLabel: "View usage", ctaHref: "/dashboard/settings/billing" },
-  { label: "Form submissions", ctaLabel: "View forms", ctaHref: "/dashboard/forms" },
-  { label: "Redirects", ctaLabel: "Manage redirects", ctaHref: "/dashboard/redirects" },
+  // Form submissions + Redirects are per-site, not workspace-level — the old
+  // /dashboard/forms and /dashboard/redirects fallbacks both 404, so no CTA.
+  { label: "Form submissions" },
+  { label: "Redirects" },
 ];
 
 interface UsageBarsProps {
@@ -27,12 +29,16 @@ interface UsageBarsProps {
 }
 
 function formatValue(value: number, unit?: string): string {
+  // -1 is the "unlimited" sentinel from PLAN_LIMITS — never surface the raw -1.
+  if (value === -1) return "Unlimited";
   if (!unit) return String(value);
   return `${value} ${unit}`;
 }
 
 function BarItem({ item }: { item: UsageItem }) {
-  const pct = item.limit === 0 ? 0 : Math.min(100, Math.round((item.used / item.limit) * 100));
+  const isUnlimited = item.limit === -1;
+  // Unlimited plans never fill the bar; 0-limit avoids divide-by-zero.
+  const pct = isUnlimited || item.limit === 0 ? 0 : Math.min(100, Math.round((item.used / item.limit) * 100));
 
   const defaultCta = DEFAULT_USAGE_ITEMS.find((d) => d.label === item.label);
   const ctaLabel = item.ctaLabel ?? defaultCta?.ctaLabel;
