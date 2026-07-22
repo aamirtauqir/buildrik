@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Globe, Shield, Trash2, Star, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { PaywallModal } from "@/components/billing/paywall-modal";
-import { Button, SectionCard, Pill, MetricValue, type PillTone } from "@/components/dashboard/primitives";
+import { Button, SectionCard, Pill, MetricValue, Modal, type PillTone } from "@/components/dashboard/primitives";
 
 interface DnsRecordEntry {
   id?: string;
@@ -51,6 +51,7 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
   const [newDomain, setNewDomain] = useState("");
   const [expandedSsl, setExpandedSsl] = useState<string | null>(null);
   const [paywall, setPaywall] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<{ id: string; domain: string } | null>(null);
   const isFree = plan === "FREE";
 
   const handleConnect = () => {
@@ -132,7 +133,9 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
                   )}
                 </td>
                 <td className="px-5 py-3">
-                  <button onClick={() => onRemove(d.id)}><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
+                  <button onClick={() => setRemoveTarget({ id: d.id, domain: d.domain })} aria-label={`Remove ${d.domain}`} title="Remove domain">
+                    <Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} />
+                  </button>
                 </td>
               </tr>
             )).flatMap((row, i) => {
@@ -171,6 +174,29 @@ export function DomainsTab({ domains, onConnect, onRemove, onSetPrimary, plan }:
           </table>
         </SectionCard>
       )}
+
+      {/* Removing a connected domain breaks its live DNS — confirm first. */}
+      <Modal
+        open={removeTarget !== null}
+        onClose={() => setRemoveTarget(null)}
+        title="Remove domain?"
+        width={420}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setRemoveTarget(null)}>Cancel</Button>
+            <Button
+              variant="danger"
+              onClick={() => { if (removeTarget) { onRemove(removeTarget.id); setRemoveTarget(null); } }}
+            >
+              Remove
+            </Button>
+          </>
+        }
+      >
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+          Remove <strong>{removeTarget?.domain}</strong>? If it points at this site, the live domain will stop working until reconnected.
+        </p>
+      </Modal>
     </div>
   );
 }

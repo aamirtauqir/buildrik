@@ -5,7 +5,7 @@ import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal, LayoutTe
 import { siteAddress } from "@lib/utils";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone } from "@/components/sites/site-status";
-import { Button, Pill, MetricValue } from "@/components/dashboard/primitives";
+import { Button, Pill, MetricValue, Modal } from "@/components/dashboard/primitives";
 import { SendReviewModal } from "@/components/reviews/send-review-modal";
 import { ShareDraftModal } from "@/components/site-detail/share-draft-modal";
 import { ApplyTemplateModal } from "@/components/site-detail/apply-template-modal";
@@ -26,6 +26,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [applyTemplateOpen, setApplyTemplateOpen] = useState(false);
+  const [confirmUnpublish, setConfirmUnpublish] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -111,7 +112,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
             <Button onClick={onPublish}>Publish</Button>
           )}
           {site.status === "PUBLISHED" && onUnpublish && (
-            <Button onClick={onUnpublish}>Unpublish</Button>
+            <Button onClick={() => setConfirmUnpublish(true)}>Unpublish</Button>
           )}
           <div ref={menuRef} className="relative">
             <button
@@ -157,6 +158,24 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
       <ShareDraftModal open={shareOpen} onClose={() => setShareOpen(false)} siteId={site.id} />
       <SendReviewModal open={reviewOpen} onClose={() => setReviewOpen(false)} siteId={site.id} siteName={site.name} />
       <ApplyTemplateModal open={applyTemplateOpen} onClose={() => setApplyTemplateOpen(false)} siteId={site.id} siteName={site.name} />
+
+      {/* Unpublishing takes the live site down — confirm, don't fire on a click. */}
+      <Modal
+        open={confirmUnpublish}
+        onClose={() => setConfirmUnpublish(false)}
+        title="Unpublish site?"
+        width={420}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setConfirmUnpublish(false)}>Cancel</Button>
+            <Button variant="danger" onClick={() => { setConfirmUnpublish(false); onUnpublish?.(); }}>Unpublish</Button>
+          </>
+        }
+      >
+        <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>
+          <strong>{site.name}</strong> will be taken offline and its public URL will stop working until you publish again.
+        </p>
+      </Modal>
     </div>
   );
 }
