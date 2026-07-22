@@ -33,9 +33,16 @@ vi.mock("@/lib/prisma", () => ({
 
 const sendReviewRequestedEmail = vi.fn();
 const sendReviewResolvedEmail = vi.fn();
+const sendReviewInviteEmail = vi.fn();
 vi.mock("@/server/services/email.service", () => ({
   sendReviewRequestedEmail: (...a: unknown[]) => sendReviewRequestedEmail(...a),
   sendReviewResolvedEmail: (...a: unknown[]) => sendReviewResolvedEmail(...a),
+  sendReviewInviteEmail: (...a: unknown[]) => sendReviewInviteEmail(...a),
+}));
+
+const issueReviewToken = vi.fn();
+vi.mock("@/server/services/client-review.service", () => ({
+  issueReviewToken: (...a: unknown[]) => issueReviewToken(...a),
 }));
 
 import {
@@ -48,7 +55,8 @@ import {
 const allMocks = [
   findFirst, create, update, findMany, reviewFindUnique,
   siteFindUnique, userFindUnique, memberFindMany,
-  sendReviewRequestedEmail, sendReviewResolvedEmail,
+  sendReviewRequestedEmail, sendReviewResolvedEmail, sendReviewInviteEmail,
+  issueReviewToken,
 ];
 
 beforeEach(() => {
@@ -58,13 +66,10 @@ beforeEach(() => {
   userFindUnique.mockResolvedValue({ fullName: "Edie Editor", displayName: null, email: "edie@x.com" });
   memberFindMany.mockResolvedValue([{ user: { email: "admin@x.com" } }]);
   reviewFindUnique.mockResolvedValue({ note: "looks good", requestedById: "u1", site: { id: "s1", name: "Acme" } });
-  // submitReview issues a fresh share token on every submit (389e2c39 — each
-  // round must invalidate the previous link). That runs through
-  // issueReviewToken → prisma.reviewRequest.update, which this file mocks, so
-  // the default has to return a row carrying a token or submitReview throws
-  // destructuring it. Individual tests still override `update` with
-  // mockResolvedValueOnce for the assertions they care about.
-  update.mockResolvedValue({ id: "r1", token: "tok-default" });
+  update.mockResolvedValue({ id: "r1" });
+  // A client invite (clientEmail present) rotates the token; an internal submit
+  // (no email) must NOT call this at all — see the M23 test.
+  issueReviewToken.mockResolvedValue({ token: "tok-default" });
 });
 
 describe("submitReview", () => {
@@ -79,12 +84,26 @@ describe("submitReview", () => {
 
   it("is idempotent — refreshes the open PENDING request instead of duplicating", async () => {
     findFirst.mockResolvedValueOnce({ id: "r-open" });
-    // Two update calls now: the idempotent refresh, then the token issue.
     update.mockResolvedValueOnce({ id: "r-open" });
-    update.mockResolvedValueOnce({ id: "r-open", token: "tok-refresh" });
     await submitReview("s1", "u1", "again");
     expect(create).not.toHaveBeenCalled();
     expect(update).toHaveBeenCalledWith({ where: { id: "r-open" }, data: { note: "again", changeSummary: null, requestedById: "u1" } });
+  });
+
+  it("M23: an internal submit (no client email) does NOT rotate the client token", async () => {
+    findFirst.mockResolvedValueOnce(null);
+    create.mockResolvedValueOnce({ id: "r1" });
+    await submitReview("s1", "u1", "ready");
+    expect(issueReviewToken).not.toHaveBeenCalled();
+    expect(sendReviewInviteEmail).not.toHaveBeenCalled();
+  });
+
+  it("a client invite (email present) rotates the token and emails the client", async () => {
+    findFirst.mockResolvedValueOnce(null);
+    create.mockResolvedValueOnce({ id: "r1" });
+    await submitReview("s1", "u1", "ready", undefined, "client@acme.com");
+    expect(issueReviewToken).toHaveBeenCalledWith("r1", "client@acme.com");
+    expect(sendReviewInviteEmail).toHaveBeenCalledOnce();
   });
 
   it("emails workspace admins (not the requester) on submit", async () => {
@@ -127,15 +146,22 @@ describe("listReviews", () => {
 
 describe("resolveReview", () => {
   it("approves a PENDING review in the workspace", async () => {
-    findFirst.mockResolvedValueOnce({ id: "r1", status: "PENDING" });
+    findFirst.mockResolvedValueOnce({ id: "r1", status: "PENDING", requestedById: "u1" });
     update.mockResolvedValueOnce({ id: "r1", status: "APPROVED" });
     await resolveReview("ws-1", "r1", "APPROVED", "admin");
-    expect(findFirst).toHaveBeenCalledWith({ where: { id: "r1", site: { workspaceId: "ws-1" } }, select: { id: true, status: true } });
+    expect(findFirst).toHaveBeenCalledWith({ where: { id: "r1", site: { workspaceId: "ws-1" } }, select: { id: true, status: true, requestedById: true } });
     expect(update.mock.calls[0][0].data).toMatchObject({ status: "APPROVED", resolvedById: "admin" });
   });
 
+  it("M12: refuses to resolve a review you submitted (no update)", async () => {
+    findFirst.mockResolvedValueOnce({ id: "r1", status: "PENDING", requestedById: "admin" });
+    await expect(resolveReview("ws-1", "r1", "APPROVED", "admin")).rejects.toBeInstanceOf(ReviewError);
+    expect(update).not.toHaveBeenCalled();
+    expect(sendReviewResolvedEmail).not.toHaveBeenCalled();
+  });
+
   it("emails the original requester when resolved", async () => {
-    findFirst.mockResolvedValueOnce({ id: "r1", status: "PENDING" });
+    findFirst.mockResolvedValueOnce({ id: "r1", status: "PENDING", requestedById: "u1" });
     update.mockResolvedValueOnce({ id: "r1", status: "APPROVED" });
     await resolveReview("ws-1", "r1", "APPROVED", "admin");
     expect(sendReviewResolvedEmail).toHaveBeenCalledWith("edie@x.com", {

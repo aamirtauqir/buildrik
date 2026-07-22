@@ -75,10 +75,16 @@ export async function submitReview(
     }
   }
 
-  // Every submit — first send OR re-send — mints a fresh token and kills the
-  // previous one. Without this, round 1's link stays live forever and a client
-  // who bookmarked it keeps approving a site that has moved on.
-  const { token } = await issueReviewToken(request.id, clientEmail);
+  // Only rotate the client token when we're actually inviting a client (a
+  // clientEmail is present). A rotation mints a fresh token AND kills the
+  // previous one — correct on a real re-send (a bookmarked link shouldn't keep
+  // approving a moved-on site), but destructive for an INTERNAL submit: the
+  // dashboard "Send for review" carries no email, so rotating there silently
+  // killed the client's live link and the new token went nowhere.
+  let token: string | null | undefined;
+  if (clientEmail) {
+    ({ token } = await issueReviewToken(request.id, clientEmail));
+  }
 
   await notifyReviewSubmitted(siteId, requestedById, note, changeSummary);
   if (clientEmail && token) {
@@ -182,11 +188,17 @@ export async function resolveReview(
 ) {
   const review = await prisma.reviewRequest.findFirst({
     where: { id, site: { workspaceId } },
-    select: { id: true, status: true },
+    select: { id: true, status: true, requestedById: true },
   });
   if (!review) throw new ReviewError("NOT_FOUND", "Review not found");
   if (review.status !== "PENDING") {
     throw new ReviewError("BAD_REQUEST", "Review is already resolved");
+  }
+  // You can't approve your own submission — the whole point of the gate is a
+  // second pair of eyes. Applies to every role, including an ADMIN who both
+  // submitted and holds resolve rights.
+  if (review.requestedById === resolverId) {
+    throw new ReviewError("BAD_REQUEST", "You can't resolve a review you submitted");
   }
   const resolved = await prisma.reviewRequest.update({
     where: { id },

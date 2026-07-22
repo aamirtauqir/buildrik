@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Pencil, ExternalLink, Send, Share2, MoreHorizontal, LayoutTemplate } from "lucide-react";
+import { trpc } from "@lib/trpc/client";
 import { siteAddress } from "@lib/utils";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone } from "@/components/sites/site-status";
@@ -23,6 +24,10 @@ function toTitleCase(status: string) {
 const outlineButton = "flex items-center gap-2 rounded-lg border px-4 py-2 text-body font-medium transition-colors hover:bg-[var(--color-bg-subtle)]";
 
 export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
+  // Review is an agency-layer feature — the submit procedure requires the flag
+  // and throws FORBIDDEN otherwise, so don't offer the button when it's off.
+  const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
+  const reviewEnabled = !!features.data?.agency_layer;
   const [reviewOpen, setReviewOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [applyTemplateOpen, setApplyTemplateOpen] = useState(false);
@@ -105,9 +110,11 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
               <ExternalLink className="h-4 w-4" />View site
             </span>
           )}
-          <Button variant="ghost" onClick={() => setReviewOpen(true)}>
-            <Send className="h-4 w-4" />Send for review
-          </Button>
+          {reviewEnabled && (
+            <Button variant="ghost" onClick={() => setReviewOpen(true)}>
+              <Send className="h-4 w-4" />Send for review
+            </Button>
+          )}
           {site.status === "DRAFT" && onPublish && (
             <Button onClick={onPublish}>Publish</Button>
           )}
