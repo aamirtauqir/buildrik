@@ -31,6 +31,7 @@ vi.mock("@/lib/prisma", () => ({
     publishBuildJob: {
       findFirst: vi.fn(),
       findUnique: vi.fn(),
+      findMany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
@@ -264,6 +265,8 @@ describe("Publish Service", () => {
         status: "COMPLETED",
       } as any);
       vi.mocked(prisma.site.update).mockResolvedValue({ id: "s1" } as any);
+      // P1: completePublish now reads findMany for the retention-prune pass.
+      vi.mocked(prisma.publishBuildJob.findMany).mockResolvedValue([] as any);
 
       const job = await completePublish("job1", "https://example.buildrik.com");
       expect(job.status).toBe("COMPLETED");
