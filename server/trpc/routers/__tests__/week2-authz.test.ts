@@ -135,7 +135,7 @@ describe("billing mutations authz (C2)", () => {
   it("cancel: non-owner is blocked, service never runs", async () => {
     checkWorkspaceRoleMock.mockRejectedValueOnce(new PermissionErrorMock("FORBIDDEN"));
     const caller = billingRouter.createCaller(makeCtx() as never);
-    await expect(caller.cancel({ reason: "x" })).rejects.toThrow();
+    await expect(caller.cancel({ reason: "OTHER" })).rejects.toThrow();
     expect(cancelSubscriptionMock).not.toHaveBeenCalled();
   });
 
