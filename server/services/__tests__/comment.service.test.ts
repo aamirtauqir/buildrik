@@ -43,10 +43,27 @@ describe("createComment", () => {
 });
 
 describe("listComments", () => {
-  it("scopes by site, optional status, oldest first", async () => {
+  it("scopes by site, optional status, oldest first, joins the reviewer name", async () => {
     findMany.mockResolvedValueOnce([]);
     await listComments("s1", "OPEN");
-    expect(findMany).toHaveBeenCalledWith({ where: { siteId: "s1", status: "OPEN" }, orderBy: { createdAt: "asc" } });
+    expect(findMany).toHaveBeenCalledWith({
+      where: { siteId: "s1", status: "OPEN" },
+      orderBy: { createdAt: "asc" },
+      include: { reviewer: { select: { name: true } } },
+    });
+  });
+
+  it("passes through the reviewer name for a client comment (authorKind derivable)", async () => {
+    findMany.mockResolvedValueOnce([
+      { id: "c1", authorId: null, reviewerId: "rv1", body: "hero too dark", reviewer: { name: "Sara Khan" } },
+      { id: "c2", authorId: "u1", reviewerId: null, body: "on it", reviewer: null },
+    ]);
+    const rows = await listComments("s1");
+    // client comment carries the reviewer's name; internal comment does not
+    expect(rows[0].reviewer?.name).toBe("Sara Khan");
+    expect(rows[0].reviewerId).toBe("rv1");
+    expect(rows[1].reviewer).toBeNull();
+    expect(rows[1].authorId).toBe("u1");
   });
 });
 

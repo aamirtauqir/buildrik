@@ -37,11 +37,19 @@ export async function createComment(
   });
 }
 
-/** Comments on a site (oldest first — pins read top-to-bottom of the thread). */
+/**
+ * Comments on a site (oldest first — pins read top-to-bottom of the thread).
+ *
+ * The `reviewer` join is what the editor Review panel (P0) needs to label each
+ * comment: a row with `reviewerId` set is a CLIENT comment (name = reviewer.name),
+ * one with `authorId` set is an INTERNAL comment. Additive — the dashboard
+ * comment-preview consumer reads only the scalar pin fields.
+ */
 export async function listComments(siteId: string, status?: "OPEN" | "RESOLVED") {
   return prisma.comment.findMany({
     where: { siteId, ...(status ? { status } : {}) },
     orderBy: { createdAt: "asc" },
+    include: { reviewer: { select: { name: true } } },
   });
 }
 
