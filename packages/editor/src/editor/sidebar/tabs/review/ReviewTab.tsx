@@ -67,7 +67,7 @@ const S: Record<string, React.CSSProperties> = {
   meta: { fontSize: 12, color: "var(--bd-text-muted)", lineHeight: 1.4 },
   actions: { display: "flex", alignItems: "center", gap: 6 },
   more: { position: "relative" },
-  menu: { position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 10, background: "var(--bd-surface)", border: "1px solid var(--bd-border)", borderRadius: 8, padding: 4, boxShadow: "0 8px 24px rgba(15,23,41,.12)", minWidth: 160 },
+  menu: { position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 10, background: "var(--bd-surface)", border: "1px solid var(--bd-border)", borderRadius: 8, padding: 4, minWidth: 160 },
   scroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "8px 12px" },
   group: { marginBottom: 12 },
   groupHead: { fontSize: 11, fontWeight: 600, letterSpacing: ".4px", textTransform: "uppercase", color: "var(--bd-text-muted)", margin: "6px 0" },
