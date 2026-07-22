@@ -27,7 +27,9 @@ export function DataTable<T>({
 }) {
   if (rows.length === 0 && empty) return <>{empty}</>;
   return (
-    <div className="overflow-hidden rounded-[12px] border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
+    // overflow-x-auto (not overflow-hidden): a wide table must scroll, not clip.
+    // Inherited by every DataTable consumer (domains/partner/invoices/redirects).
+    <div className="overflow-x-auto rounded-[12px] border shadow-card" style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}>
       <table className="w-full text-body">
         <thead>
           <tr className="border-b text-left text-eyebrow uppercase tracking-wide" style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-bg-subtle)" }}>

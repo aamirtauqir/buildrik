@@ -319,7 +319,7 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
                     </div>
                     {/* Hover actions */}
                     <div className="absolute right-1.5 top-1.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                      <button type="button" onClick={() => copyUrl(a.id, a.url)} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-text-primary)" }} title="Copy URL">
+                      <button type="button" onClick={() => copyUrl(a.id, a.url)} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-text-primary)" }} title="Copy URL" aria-label={`Copy URL for ${a.filename}`}>
                         {copiedId === a.id ? <Check size={12} /> : <Copy size={12} />}
                       </button>
                       <button type="button" onClick={() => setDeleteAssetTarget({ id: a.id, name: a.filename })} className="rounded p-1 hover:bg-white" style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "var(--color-error)" }} title="Delete" aria-label={`Delete ${a.filename}`}>

@@ -94,7 +94,10 @@ function MemberDetailCard({ member, onClose }: { member: Member; onClose: () => 
         <div className="flex items-center gap-2">
           <p className="text-body" style={{ color: "var(--color-text-secondary)" }}>{member.email}</p>
           {isOnline(member.lastActiveAt) && (
-            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--color-success)" }} />
+            <span className="inline-flex items-center" title="Online">
+              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--color-success)" }} />
+              <span className="sr-only">Online</span>
+            </span>
           )}
         </div>
       </div>

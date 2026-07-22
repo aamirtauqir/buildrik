@@ -177,9 +177,9 @@ export function AccessTab({ shareLinks, onCreateLink, onRevokeLink, maxExpiryDay
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="QR Code"><QrCode className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
-                      <button onClick={() => navigator.clipboard.writeText(url)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
-                      <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Revoke"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
+                      <button onClick={() => setShowQr(showQr === link.id ? null : link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="QR Code" aria-label="Show QR code"><QrCode className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                      <button onClick={() => navigator.clipboard.writeText(url)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Copy link" aria-label="Copy share link"><Copy className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} /></button>
+                      <button onClick={() => onRevokeLink(link.id)} className="rounded p-1.5 hover:bg-[var(--color-bg-subtle)]" title="Revoke" aria-label="Revoke share link"><Trash2 className="h-4 w-4" style={{ color: "var(--color-primary)" }} /></button>
                     </div>
                   </div>
                   {showQr === link.id && (
