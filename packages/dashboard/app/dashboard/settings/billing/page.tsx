@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "@lib/trpc/client";
 import { PLAN_LIMITS } from "@lib/constants/plan-limits";
@@ -75,7 +75,7 @@ function formatDate(date: Date | string): string {
   });
 }
 
-export default function BillingPage() {
+function BillingPageInner() {
   const { addToast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -323,5 +323,15 @@ export default function BillingPage() {
       )}
 
     </div>
+  );
+}
+
+export default function BillingPage() {
+  // useSearchParams (?checkout=success post-Stripe-return) needs a Suspense
+  // boundary to prerender — matches every other useSearchParams page here.
+  return (
+    <Suspense fallback={<div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />}>
+      <BillingPageInner />
+    </Suspense>
   );
 }
