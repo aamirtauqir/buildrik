@@ -99,17 +99,29 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
     },
   });
 
+  // try/finally: without it a failed revoke left the button stuck on "Revoking…"
+  // forever and threw an unhandled rejection. Surface the error and always reset.
   async function handleRevoke(sessionId: string) {
     setRevoking(sessionId);
-    await revokeMutation.mutateAsync({ sessionId });
-    setRevoking(null);
+    try {
+      await revokeMutation.mutateAsync({ sessionId });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't revoke session");
+    } finally {
+      setRevoking(null);
+    }
   }
 
   async function handleRevokeAll() {
     if (!currentSessionId) return;
     setRevokingAll(true);
-    await revokeAllMutation.mutateAsync({ currentSessionId });
-    setRevokingAll(false);
+    try {
+      await revokeAllMutation.mutateAsync({ currentSessionId });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't revoke sessions");
+    } finally {
+      setRevokingAll(false);
+    }
   }
 
   function handleEnable() {

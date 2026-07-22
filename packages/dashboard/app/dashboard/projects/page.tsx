@@ -192,6 +192,7 @@ export default function ProjectsPage() {
       setSelectedIds(new Set());
       addToast("success", "Bulk action completed");
     },
+    onError: (err) => addToast("error", "Bulk action failed", err.message),
   });
 
   const moveMutation = trpc.sites.folders.moveSite.useMutation({

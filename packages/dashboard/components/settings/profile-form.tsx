@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
 import { Button } from "@/components/dashboard/primitives";
+import { useToast } from "@/components/dashboard/toast-provider";
 
 const LANGUAGES = [
   { value: "en", label: "English" },
@@ -63,6 +64,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
+  const { addToast } = useToast();
   const [fullName, setFullName] = useState(initialData?.fullName ?? "");
   const [displayName, setDisplayName] = useState(initialData?.displayName ?? "");
   const [bio, setBio] = useState(initialData?.bio ?? "");
@@ -111,6 +113,10 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
       });
       const confirmed = await confirmMutation.mutateAsync({ fileId: result.fileId });
       setAvatarUrl(confirmed.cdnUrl);
+    } catch (err) {
+      // Was a bare try/finally — an upload failure threw an unhandled rejection
+      // with zero user feedback. Toast it and drop the optimistic preview.
+      addToast("error", "Couldn't upload photo", err instanceof Error ? err.message : "Try again");
     } finally {
       setUploading(false);
       setPreview(null);
