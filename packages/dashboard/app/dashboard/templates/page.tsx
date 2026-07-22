@@ -134,7 +134,7 @@ function TemplatesBrowserInner() {
                           <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>
                             {diff.label}
                           </span>
-                          <span className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>{formatCount(t.usageCount)} sites</span>
+                          <span className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>{formatCount(t.usageCount)} {t.usageCount === 1 ? "site" : "sites"}</span>
                         </div>
                       </div>
                     </Link>
