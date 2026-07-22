@@ -9,6 +9,23 @@ import {
 import { upgradeSchema, cancelSchema } from "@buildrik/shared/schemas/billing";
 import { type PlanName } from "@/lib/constants/plan-limits";
 import { resolveWorkspaceId as getWorkspaceId } from "@/server/trpc/workspace-ctx";
+import { checkWorkspaceRole, PermissionError } from "@/server/services/permission.service";
+
+// Billing mutations (checkout, portal, cancel, interval, reactivate) move money
+// and change the workspace's plan — OWNER only. Reads stay member-visible so the
+// dashboard home dunning banner and usage bars work for everyone.
+async function requireOwner(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ctx: any,
+  workspaceId: string,
+): Promise<void> {
+  try {
+    await checkWorkspaceRole(ctx.prisma, ctx.session.user.id, workspaceId, "OWNER");
+  } catch (e) {
+    if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+    throw e;
+  }
+}
 
 export const billingRouter = router({
   overview: protectedProcedure.query(async ({ ctx }) => {
@@ -29,6 +46,7 @@ export const billingRouter = router({
     }),
   createCheckoutSession: protectedProcedure.input(upgradeSchema).mutation(async ({ ctx, input }) => {
     const wsId = await getWorkspaceId(ctx);
+    await requireOwner(ctx, wsId);
     try { return await createCheckoutSession(wsId, input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "PAYMENTS_NOT_CONFIGURED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
@@ -39,6 +57,7 @@ export const billingRouter = router({
   }),
   createPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
     const wsId = await getWorkspaceId(ctx);
+    await requireOwner(ctx, wsId);
     try { return await createPortalSession(wsId); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "PAYMENTS_NOT_CONFIGURED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
@@ -48,6 +67,7 @@ export const billingRouter = router({
   }),
   cancel: protectedProcedure.input(cancelSchema).mutation(async ({ ctx, input }) => {
     const wsId = await getWorkspaceId(ctx);
+    await requireOwner(ctx, wsId);
     try { return await cancelSubscription(wsId, input); }
     catch (e: unknown) {
       if (e instanceof Error && e.message === "ALREADY_CANCELLED") throw new TRPCError({ code: "BAD_REQUEST", message: "Already cancelled." });
@@ -58,6 +78,7 @@ export const billingRouter = router({
     .input(z.object({ interval: z.enum(["MONTHLY", "YEARLY"]) }))
     .mutation(async ({ ctx, input }) => {
       const wsId = await getWorkspaceId(ctx);
+      await requireOwner(ctx, wsId);
       const subscription = await ctx.prisma.subscription.findUnique({ where: { workspaceId: wsId } });
       if (!subscription) throw new TRPCError({ code: "NOT_FOUND", message: "No subscription" });
       return ctx.prisma.subscription.update({
@@ -67,6 +88,7 @@ export const billingRouter = router({
     }),
   reactivate: protectedProcedure.mutation(async ({ ctx }) => {
     const wsId = await getWorkspaceId(ctx);
+    await requireOwner(ctx, wsId);
     return reactivateSubscription(wsId);
   }),
 });
