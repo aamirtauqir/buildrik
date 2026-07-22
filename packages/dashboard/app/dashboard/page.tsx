@@ -214,7 +214,7 @@ export default function DashboardPage() {
               title="Recent activity"
               padding="none"
               actions={
-                <Link href="/dashboard/notifications" className="text-body-sm font-medium" style={{ color: "var(--color-primary)" }}>
+                <Link href="/dashboard/activity" className="text-body-sm font-medium" style={{ color: "var(--color-primary)" }}>
                   View all
                 </Link>
               }
