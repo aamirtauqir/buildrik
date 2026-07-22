@@ -26,15 +26,47 @@ export function Modal({
 
   useEffect(() => {
     if (!open) return;
+    // Restore focus to whatever opened the dialog when it closes, so keyboard
+    // users aren't dropped at the top of the page.
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    function focusables(): HTMLElement[] {
+      const panel = panelRef.current;
+      if (!panel) return [];
+      return Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.offsetParent !== null);
+    }
+
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      // Trap Tab within the panel — otherwise focus escapes into the blocked
+      // background page behind the scrim.
+      const items = focusables();
+      if (items.length === 0) { e.preventDefault(); panelRef.current?.focus(); return; }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === panelRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
     document.addEventListener("keydown", onKey);
     // Only pull focus in if the panel's own content did not already claim it —
     // dialogs that autoFocus a field must keep that field focused.
     const panel = panelRef.current;
     if (panel && !panel.contains(document.activeElement)) panel.focus();
-    return () => document.removeEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      previouslyFocused?.focus?.();
+    };
   }, [open, onClose]);
 
   if (!open) return null;
