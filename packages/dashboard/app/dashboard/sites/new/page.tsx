@@ -202,14 +202,18 @@ function NewSitePageInner() {
   // modal, which can fire before any job exists)
   if (view === "ai-progress" && (jobId || creditsExhausted)) {
     const status = jobStatusQuery.data;
+    // A polling error (e.g. the job row vanished → NOT_FOUND) used to be
+    // swallowed, leaving the user stuck on "Queued 0%" forever. Surface it as a
+    // failure so the error path (retry / use a template / start blank) shows.
+    const pollErrored = jobId && !creditsExhausted && jobStatusQuery.isError;
     return (
       <div className="pt-8">
         <WizardProgress step={3} total={3} />
         <GenerationProgress
-          status={status?.status ?? "QUEUED"}
+          status={pollErrored ? "FAILED" : (status?.status ?? "QUEUED")}
           progress={status?.progress ?? 0}
           steps={(status?.steps ?? null) as { step: string; status: string }[] | null}
-          error={status?.error ?? null}
+          error={pollErrored ? "We lost track of this generation. Please try again." : (status?.error ?? null)}
           siteId={status?.siteId ?? null}
           creditsExhausted={creditsExhausted}
           onUpgrade={() => router.push("/dashboard/settings/billing")}
