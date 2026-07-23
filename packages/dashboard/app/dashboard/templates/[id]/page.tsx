@@ -1,12 +1,11 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ExternalLink, Globe } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { useToast } from "@/components/dashboard/toast-provider";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
-import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
+import { UseTemplateModal } from "@/components/templates/use-template-modal";
 
 const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
   BEGINNER: { bg: "#DCFCE7", text: "#166534", label: "Beginner" },
@@ -17,20 +16,9 @@ const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: strin
 export default function TemplateDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { addToast } = useToast();
-  const unified = useUnifiedEditorFlag();
+  const [useOpen, setUseOpen] = useState(false);
 
   const query = trpc.templates.get.useQuery({ id }, { staleTime: 30_000 });
-
-  const useMutation = trpc.templates.use.useMutation({
-    onSuccess: (site) => {
-      addToast("success", "Site created from template");
-      const href = getEditorHref(site.id, unified);
-      if (unified) router.push(href);
-      else window.location.href = href;
-    },
-    onError: (err) => addToast("error", "Couldn't create site", err.message),
-  });
 
   function goBack() {
     if (window.history.length > 1) router.back();
@@ -111,12 +99,11 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
 
                 <div className="mt-6 flex flex-col gap-2.5">
                   <button
-                    onClick={() => useMutation.mutate({ templateId: t.id, siteName: t.name })}
-                    disabled={useMutation.isPending}
-                    className="flex h-11 items-center justify-center rounded-lg text-[14px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                    onClick={() => setUseOpen(true)}
+                    className="flex h-11 items-center justify-center rounded-lg text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
                     style={{ backgroundColor: "var(--color-primary)" }}
                   >
-                    {useMutation.isPending ? "Creating…" : "Use this template →"}
+                    Use this template →
                   </button>
                   {t.previewUrl && (
                     <a
@@ -130,6 +117,8 @@ export default function TemplateDetailPage({ params }: { params: Promise<{ id: s
                     </a>
                   )}
                 </div>
+
+                <UseTemplateModal templateId={t.id} templateName={t.name} open={useOpen} onClose={() => setUseOpen(false)} />
               </div>
             </div>
           );
