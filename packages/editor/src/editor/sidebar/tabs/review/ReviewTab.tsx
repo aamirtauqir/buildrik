@@ -20,9 +20,12 @@ import * as React from "react";
 import { Button, Icon, Badge, Textarea, Spinner, Switch } from "@/editor/shared/vibcoder";
 import { PanelHeader } from "@/shared/extensions/PanelHeader";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
+import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
   fetchCurrentRound,
   fetchReviewComments,
+  fetchApprovedSnapshot,
   postReply,
   resolveReviewComment,
   revokeReview,
@@ -38,6 +41,9 @@ export interface ReviewTabProps {
   /** Full re-send (re-renders the snapshot, mints a fresh token) — provided by
    *  the shell so ReviewTab stays decoupled from the composer/export path. */
   onResend?: () => Promise<void>;
+  /** Live-render the current site to pages for the §3 Compare — same decoupling
+   *  as onResend (the shell owns the composer/export path). Absent → no Compare. */
+  onExportCurrentPages?: () => Promise<PublishPage[]>;
 }
 
 type LoadState = "loading" | "ready" | "error";
@@ -83,6 +89,7 @@ const S: Record<string, React.CSSProperties> = {
   centerHint: { fontSize: 12, color: "var(--bd-text-muted)", maxWidth: 240 },
   toolbar: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid var(--bd-border)" },
   toggle: { fontSize: 12, color: "var(--bd-text-muted)", display: "flex", alignItems: "center", gap: 6 },
+  compareBar: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderBottom: "1px solid var(--bd-border)" },
 };
 
 interface Group { key: string; label: string; comments: ReviewComment[]; }
@@ -106,6 +113,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   onHelpClick,
   onClose,
   onResend,
+  onExportCurrentPages,
 }) => {
   const [state, setState] = React.useState<LoadState>("loading");
   const [round, setRound] = React.useState<CurrentRound | null>(null);
@@ -118,6 +126,10 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [confirmRevoke, setConfirmRevoke] = React.useState(false);
   const [resending, setResending] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
+  const [compareOpen, setCompareOpen] = React.useState(false);
+  const [compareState, setCompareState] = React.useState<LoadState>("loading");
+  const [approvedSnap, setApprovedSnap] = React.useState<PublishPage[] | null>(null);
+  const [currentPages, setCurrentPages] = React.useState<PublishPage[] | null>(null);
 
   const load = React.useCallback(async () => {
     setState("loading");
@@ -201,6 +213,24 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     }
   };
 
+  const openCompare = React.useCallback(async () => {
+    if (!onExportCurrentPages) return;
+    setCompareOpen(true);
+    setCompareState("loading");
+    setCurrentPages(null);
+    // Export the current side in parallel — it can resolve after the approved
+    // side (the per-side loading asymmetry the view is built for).
+    void onExportCurrentPages().then(setCurrentPages).catch(() => setCurrentPages([]));
+    try {
+      // The approved read throws on transport failure (DF5) → error state,
+      // never a fake "nothing changed". A real null = no stored snapshot.
+      setApprovedSnap(await fetchApprovedSnapshot());
+      setCompareState("ready");
+    } catch {
+      setCompareState("error");
+    }
+  }, [onExportCurrentPages]);
+
   const header = (
     <PanelHeader
       title="Review"
@@ -247,6 +277,39 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     );
   }
 
+  if (compareOpen) {
+    return (
+      <div style={S.body}>
+        <div style={S.compareBar}>
+          <Button variant="ghost" size="sm" onClick={() => setCompareOpen(false)}>
+            <Icon name="chevron-left" size="sm" /> Back
+          </Button>
+          <span style={S.who}>Compare with approved</span>
+        </div>
+        {compareState === "loading" ? (
+          <div style={S.center}><Spinner size="lg" /><span>Loading approved snapshot…</span></div>
+        ) : compareState === "error" ? (
+          <div style={S.center}>
+            <Icon name="alert-circle" size="lg" />
+            <div style={S.centerTitle}>Couldn't load the approved snapshot</div>
+            <div style={S.centerHint}>The dashboard didn't answer. Try again.</div>
+            <Button variant="secondary" size="sm" onClick={() => void openCompare()}>Retry</Button>
+          </div>
+        ) : (
+          <ApprovedCompareView
+            approvedPages={approvedSnap}
+            currentPages={currentPages}
+            onRefreshCurrent={
+              onExportCurrentPages
+                ? () => { setCurrentPages(null); void onExportCurrentPages().then(setCurrentPages).catch(() => setCurrentPages([])); }
+                : undefined
+            }
+          />
+        )}
+      </div>
+    );
+  }
+
   const tone = STATUS_TONE[round.status] ?? { label: round.status, variant: "syncing" as const };
   const visible = showResolved ? comments : comments.filter((c) => c.status === "OPEN");
   const groups = groupByPage(visible);
@@ -262,6 +325,11 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             {round.openCommentCount > 0 && <Badge variant="count">{round.openCommentCount} open</Badge>}
           </div>
           <div style={S.actions}>
+            {round.status === "APPROVED" && onExportCurrentPages && (
+              <Button variant="ghost" size="sm" onClick={() => void openCompare()}>
+                <Icon name="history" size="sm" /> Compare
+              </Button>
+            )}
             <Button variant="primary" size="sm" busy={resending} onClick={() => void doResend()}>Re-send</Button>
             <div style={S.more}>
               <Button variant="ghost" size="sm" aria-label="More options" onClick={() => setMoreOpen((v) => !v)}>⋯</Button>

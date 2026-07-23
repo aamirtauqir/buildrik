@@ -141,6 +141,18 @@ export async function fetchCurrentRound(): Promise<CurrentRound | null> {
 }
 
 /**
+ * The pages frozen at the last approval — the "approved side" of the §3
+ * Compare. Throws on transport failure (DF5: a dropped read must surface as a
+ * retryable error, never a fake-empty diff). A real `null` means the round has
+ * no stored snapshot — a state the Compare view renders explicitly.
+ */
+export async function fetchApprovedSnapshot(): Promise<PublishPage[] | null> {
+  const siteId = currentSiteId();
+  if (!siteId) return null;
+  return getBuildrikClient(DASHBOARD_URL).reviews.approvedSnapshot.query({ siteId });
+}
+
+/**
  * Revoke the current round. Passes the revision the panel last read so a revoke
  * can't kill a link a concurrent re-send just minted. Never throws — a failure
  * comes back as `{ revoked: false, reason: "error" }` for the panel to show.

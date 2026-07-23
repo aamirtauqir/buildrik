@@ -14,6 +14,7 @@ import {
   resolveReview,
   getReviewStatusForSite,
   getCurrentRound,
+  getApprovedSnapshot,
   revokeReviewRound,
   ReviewError,
 } from "@/server/services/review.service";
@@ -136,6 +137,23 @@ export const reviewsRouter = router({
         throw e;
       }
       return getCurrentRound(input.siteId);
+    }),
+
+  // The approved snapshot for the §3 Compare — the pages frozen at the last
+  // approval. Lazy (full-HTML rows), so it's its own query, not folded into
+  // currentRound. Flag off → null; any EDITOR of the site may read it.
+  approvedSnapshot: protectedProcedure
+    .input(currentRoundInput)
+    .query(async ({ ctx, input }) => {
+      const workspaceId = await resolveWorkspaceId(ctx);
+      if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return null;
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getApprovedSnapshot(input.siteId);
     }),
 
   // Revoke the current round from the editor. EDITOR-gated (the sender manages

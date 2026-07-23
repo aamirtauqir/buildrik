@@ -98,6 +98,14 @@ export {
 
 export { parseHTML, parseHTMLToElementData, parseStyleString, type ParsedNode } from "./parsing";
 
+export {
+  compareApprovedToCurrent,
+  type ComparePage,
+  type CompareChange,
+  type CompareChangeKind,
+  type ApprovedCompareResult,
+} from "./approvedCompare";
+
 // =============================================================================
 // DOM UTILITIES
 // =============================================================================

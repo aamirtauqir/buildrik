@@ -8,7 +8,7 @@
  * instead of silently killing the fresh link. Cleans up after itself.
  */
 import { prisma } from "@/lib/prisma";
-import { getCurrentRound, revokeReviewRound } from "@/server/services/review.service";
+import { getCurrentRound, revokeReviewRound, getApprovedSnapshot } from "@/server/services/review.service";
 import { issueReviewToken } from "@/server/services/client-review.service";
 
 const ok = (m: string) => console.log(`  ✅ ${m}`);
@@ -80,6 +80,21 @@ async function main() {
       : bad(`raced = ${JSON.stringify(raced)}`);
     const stillLive = await prisma.reviewRequest.findUnique({ where: { id: review.id }, select: { revokedAt: true } });
     stillLive?.revokedAt === null ? ok("fresh link is still live after the raced revoke") : bad("fresh link was killed by a stale revoke!");
+
+    // 7. §3 Compare source: no approved round yet → null (a state, not an error).
+    const noSnap = await getApprovedSnapshot(site.id);
+    noSnap === null ? ok("getApprovedSnapshot null before any approval") : bad(`expected null, got ${JSON.stringify(noSnap)?.slice(0, 60)}`);
+
+    // 8. approve a round WITH a snapshot → getApprovedSnapshot returns those pages.
+    const snapPages = [{ path: "home", html: "<div class='buildrick-root'><section class='buildrick-hero'>Hi</section></div>" }];
+    await prisma.reviewRequest.update({
+      where: { id: review.id },
+      data: { status: "APPROVED", snapshotPages: snapPages },
+    });
+    const snap = await getApprovedSnapshot(site.id);
+    Array.isArray(snap) && snap[0]?.path === "home" && snap[0]?.html.includes("buildrick-hero")
+      ? ok("getApprovedSnapshot returns the frozen approved pages")
+      : bad(`approved snapshot = ${JSON.stringify(snap)?.slice(0, 80)}`);
   } finally {
     await prisma.comment.deleteMany({ where: { siteId: site.id } });
     await prisma.reviewRequest.deleteMany({ where: { siteId: site.id } });

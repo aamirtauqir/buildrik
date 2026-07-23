@@ -214,6 +214,27 @@ export async function getCurrentRound(siteId: string): Promise<CurrentRound | nu
 }
 
 /**
+ * The pages frozen at the latest APPROVED round — the "approved side" of the
+ * §3 Compare. Null when the site has no approved round, or when an older
+ * approval predates snapshot capture (the editor renders that as an explicit
+ * "no approved snapshot" state, not an error). Lazy by design: snapshotPages is
+ * full-HTML-per-page, so it's fetched only when Compare opens, never in the
+ * currentRound/list payloads.
+ */
+export async function getApprovedSnapshot(
+  siteId: string,
+): Promise<{ path: string; html: string }[] | null> {
+  const r = await prisma.reviewRequest.findFirst({
+    where: { siteId, status: "APPROVED" },
+    orderBy: { createdAt: "desc" },
+    select: { snapshotPages: true },
+  });
+  const pages = r?.snapshotPages;
+  if (!pages || !Array.isArray(pages)) return null;
+  return pages as { path: string; html: string }[];
+}
+
+/**
  * Revoke the current round, race-safe. The updateMany is guarded on the
  * revision (`updatedAt`) the editor last saw AND on `revokedAt: null`, so it
  * matches exactly one row only when nothing has changed since. On zero matches

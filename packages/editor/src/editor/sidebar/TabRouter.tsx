@@ -26,6 +26,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
+import { exportPublishPages } from "../shell/exportPublishPages";
 
 // Lazy-loaded panel tab components (code splitting)
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
@@ -193,7 +194,13 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       return <HistoryTab composer={composer} projectId={projectId} {...commonTabProps} />;
 
     case "review":
-      return <ReviewTab {...commonTabProps} onResend={onResendReview} />;
+      return (
+        <ReviewTab
+          {...commonTabProps}
+          onResend={onResendReview}
+          onExportCurrentPages={composer ? () => exportPublishPages(composer) : undefined}
+        />
+      );
 
     case "settings":
       return (

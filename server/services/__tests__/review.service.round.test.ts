@@ -27,7 +27,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { getCurrentRound, revokeReviewRound } from "@server/services/review.service";
+import { getCurrentRound, revokeReviewRound, getApprovedSnapshot } from "@server/services/review.service";
 
 beforeEach(() => {
   [rrFindFirst, rrCount, rrUpdateMany, rrFindUnique, commentCount].forEach((m) => m.mockReset());
@@ -84,6 +84,30 @@ describe("getCurrentRound", () => {
     const round = await getCurrentRound("s1");
     expect(round?.revoked).toBe(true);
     expect(round?.reviewerName).toBeNull();
+  });
+});
+
+describe("getApprovedSnapshot", () => {
+  it("returns the stored pages from the latest APPROVED round", async () => {
+    const pages = [{ path: "home", html: "<div>hi</div>" }];
+    rrFindFirst.mockResolvedValue({ snapshotPages: pages });
+    expect(await getApprovedSnapshot("s1")).toEqual(pages);
+    // scoped to APPROVED, newest first
+    expect(rrFindFirst).toHaveBeenCalledWith({
+      where: { siteId: "s1", status: "APPROVED" },
+      orderBy: { createdAt: "desc" },
+      select: { snapshotPages: true },
+    });
+  });
+
+  it("returns null when there is no approved round", async () => {
+    rrFindFirst.mockResolvedValue(null);
+    expect(await getApprovedSnapshot("s1")).toBeNull();
+  });
+
+  it("returns null when an approved round predates snapshot capture", async () => {
+    rrFindFirst.mockResolvedValue({ snapshotPages: null });
+    expect(await getApprovedSnapshot("s1")).toBeNull();
   });
 });
 
