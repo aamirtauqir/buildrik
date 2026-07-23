@@ -29,6 +29,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { PremiumBadge } from "@/shared/extensions/PremiumBadge";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 
 export interface UpgradeModalProps {
   /** Controlled open state (optional — also responds to events) */
@@ -69,10 +70,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
     // Absolute dashboard billing URL — editor runs on its own origin and
     // "/dashboard/settings/subscription" was a wrong-origin 404. Billing is
     // at /dashboard/settings/billing.
-    const dashboardUrl =
-      (import.meta as { env?: { VITE_DASHBOARD_URL?: string } }).env?.VITE_DASHBOARD_URL ||
-      "http://localhost:3000";
-    window.open(`${dashboardUrl}/dashboard/settings/billing`, "_blank");
+    window.open(`${DASHBOARD_URL}/dashboard/settings/billing`, "_blank");
     handleClose();
   };
 

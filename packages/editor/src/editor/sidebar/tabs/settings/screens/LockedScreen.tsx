@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { PremiumBadge } from "@/shared/extensions/PremiumBadge";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import {
   LockedContainer,
   LockedIcon,
@@ -58,10 +59,7 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
       // (port 5050), and "/dashboard/settings/subscription" was both a
       // wrong-origin relative link AND a 404 (no such page). Billing lives
       // at /dashboard/settings/billing.
-      const dashboardUrl =
-        (import.meta as { env?: { VITE_DASHBOARD_URL?: string } }).env?.VITE_DASHBOARD_URL ||
-        "http://localhost:3000";
-      window.open(`${dashboardUrl}/dashboard/settings/billing`, "_blank");
+      window.open(`${DASHBOARD_URL}/dashboard/settings/billing`, "_blank");
     }
   };
 

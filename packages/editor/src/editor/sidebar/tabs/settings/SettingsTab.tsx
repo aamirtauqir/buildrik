@@ -40,6 +40,7 @@ import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import "./settings.css";
 
 // ─── Nav definition ──────────────────────────────────────────────────────────
@@ -99,8 +100,6 @@ const GROUP_LABELS: Record<NavGroupId, string> = {
 // Billing under /dashboard/settings/billing). API tokens / Webhooks / Environments /
 // Audit log / Versions are deferred until their dashboard pages exist —
 // linking to 404s silently is worse than not linking at all.
-const DASHBOARD_URL = (import.meta as { env?: { VITE_DASHBOARD_URL?: string } }).env?.VITE_DASHBOARD_URL || "http://localhost:3000";
-
 interface WorkspaceLink {
   id: string;
   title: string;
