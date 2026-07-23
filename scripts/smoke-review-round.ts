@@ -11,6 +11,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRound, revokeReviewRound, getApprovedSnapshot, listReviews } from "@/server/services/review.service";
 import { issueReviewToken } from "@/server/services/client-review.service";
 import { getHandoverRollup } from "@/server/services/handover.service";
+import { renameWorkspaceComponent, deleteWorkspaceComponent, listWorkspaceComponents } from "@/server/services/site-component.service";
 
 const ok = (m: string) => console.log(`  ✅ ${m}`);
 const bad = (m: string) => { console.error(`  ❌ ${m}`); process.exitCode = 1; };
@@ -120,6 +121,20 @@ async function main() {
     row && publishItem?.status === "pending" && row.ready === false
       ? ok("handover rollup: draft site → publish pending, not ready")
       : bad(`handover row = ${JSON.stringify(row)?.slice(0, 100)}`);
+
+    // 11. shared library — workspace rename/delete of a component master, over
+    //     the real `site: { workspaceId }` join (mocks can't prove the join).
+    await prisma.siteComponent.create({ data: { siteId: site.id, componentId: "smoke-comp", name: "Old name", payload: {} } });
+    const ren = await renameWorkspaceComponent(site.workspaceId, "smoke-comp", "New name");
+    const afterRename = await listWorkspaceComponents(site.workspaceId);
+    ren.updated === 1 && afterRename.find((c) => c.componentId === "smoke-comp")?.name === "New name"
+      ? ok("renameWorkspaceComponent renamed the master workspace-wide")
+      : bad(`rename = ${JSON.stringify(ren)}, list=${JSON.stringify(afterRename)?.slice(0, 80)}`);
+    const del = await deleteWorkspaceComponent(site.workspaceId, "smoke-comp");
+    const afterDelete = await listWorkspaceComponents(site.workspaceId);
+    del.deleted === 1 && !afterDelete.find((c) => c.componentId === "smoke-comp")
+      ? ok("deleteWorkspaceComponent removed the master workspace-wide")
+      : bad(`delete = ${JSON.stringify(del)}, still present=${!!afterDelete.find((c) => c.componentId === "smoke-comp")}`);
   } finally {
     await prisma.comment.deleteMany({ where: { siteId: site.id } });
     await prisma.reviewRequest.deleteMany({ where: { siteId: site.id } });

@@ -23,6 +23,11 @@ export const getSiteComponentSchema = z.object({ siteId: z.string(), componentId
 export const deleteSiteComponentSchema = z.object({ siteId: z.string(), componentId: z.string() });
 // C1/C3: blast-radius for a component master (which sites carry it).
 export const componentUsageSchema = z.object({ componentId: z.string() });
+// P6 shared library: rename a component master across the workspace (ADMIN).
+export const renameWorkspaceComponentSchema = z.object({
+  componentId: z.string(),
+  name: z.string().min(1).max(200),
+});
 
 export type UpsertSiteComponentInput = z.infer<typeof upsertSiteComponentSchema>;
 export type ListSiteComponentsInput = z.infer<typeof listSiteComponentsSchema>;

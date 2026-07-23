@@ -4,6 +4,7 @@ const upsert = vi.fn();
 const findMany = vi.fn();
 const findUnique = vi.fn();
 const deleteMany = vi.fn();
+const updateMany = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -12,6 +13,7 @@ vi.mock("@/lib/prisma", () => ({
       findMany: (...a: unknown[]) => findMany(...a),
       findUnique: (...a: unknown[]) => findUnique(...a),
       deleteMany: (...a: unknown[]) => deleteMany(...a),
+      updateMany: (...a: unknown[]) => updateMany(...a),
     },
   },
 }));
@@ -21,9 +23,11 @@ import {
   listSiteComponents,
   getSiteComponent,
   deleteSiteComponent,
+  renameWorkspaceComponent,
+  deleteWorkspaceComponent,
 } from "@server/services/site-component.service";
 
-beforeEach(() => [upsert, findMany, findUnique, deleteMany].forEach((m) => m.mockReset()));
+beforeEach(() => [upsert, findMany, findUnique, deleteMany, updateMany].forEach((m) => m.mockReset()));
 
 describe("site-component.service", () => {
   it("upsertSiteComponent upserts on (siteId, componentId) carrying the payload", async () => {
@@ -63,5 +67,22 @@ describe("site-component.service", () => {
     deleteMany.mockResolvedValueOnce({ count: 0 });
     expect(await deleteSiteComponent("s1", "gone")).toEqual({ ok: true });
     expect(deleteMany).toHaveBeenCalledWith({ where: { siteId: "s1", componentId: "gone" } });
+  });
+
+  it("renameWorkspaceComponent renames the master on every site in the workspace", async () => {
+    updateMany.mockResolvedValueOnce({ count: 3 });
+    expect(await renameWorkspaceComponent("ws-1", "c1", "Hero v2")).toEqual({ updated: 3 });
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { componentId: "c1", site: { workspaceId: "ws-1", deletedAt: null } },
+      data: { name: "Hero v2" },
+    });
+  });
+
+  it("deleteWorkspaceComponent removes the master from every site in the workspace", async () => {
+    deleteMany.mockResolvedValueOnce({ count: 2 });
+    expect(await deleteWorkspaceComponent("ws-1", "c1")).toEqual({ deleted: 2 });
+    expect(deleteMany).toHaveBeenCalledWith({
+      where: { componentId: "c1", site: { workspaceId: "ws-1", deletedAt: null } },
+    });
   });
 });

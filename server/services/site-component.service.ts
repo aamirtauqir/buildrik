@@ -99,6 +99,41 @@ export async function listWorkspaceComponents(
  * component master. Powers "used on N sites" with a drill-down, and "editing this
  * master affects these N sites — preview before propagate". Workspace-scoped.
  */
+/**
+ * P6 shared library: rename a component master across the whole workspace. A
+ * master is one SiteComponent row per site (unique [siteId, componentId]), so
+ * the "master name" is renamed on every site that carries it, in one write.
+ * Workspace-scoped (never client-supplied) so a crafted componentId can't touch
+ * another agency's components. Returns how many site-rows were renamed.
+ */
+export async function renameWorkspaceComponent(
+  workspaceId: string,
+  componentId: string,
+  name: string
+): Promise<{ updated: number }> {
+  const res = await prisma.siteComponent.updateMany({
+    where: { componentId, site: { workspaceId, deletedAt: null } },
+    data: { name },
+  });
+  return { updated: res.count };
+}
+
+/**
+ * P6 shared library: delete a component master from the whole workspace —
+ * removes it from every site that carries it. Destructive and confirmed at the
+ * UI (the library surfaces "used on N sites" first). Workspace-scoped. Returns
+ * how many site-rows were removed.
+ */
+export async function deleteWorkspaceComponent(
+  workspaceId: string,
+  componentId: string
+): Promise<{ deleted: number }> {
+  const res = await prisma.siteComponent.deleteMany({
+    where: { componentId, site: { workspaceId, deletedAt: null } },
+  });
+  return { deleted: res.count };
+}
+
 export async function getComponentUsage(
   workspaceId: string,
   componentId: string

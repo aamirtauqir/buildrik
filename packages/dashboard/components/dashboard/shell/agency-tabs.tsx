@@ -11,6 +11,7 @@ const AGENCY_TABS: AgencyTab[] = [
   { label: "Clients", href: "/dashboard/agency", index: true },
   { label: "Reviews", href: "/dashboard/agency/reviews" },
   { label: "Handover", href: "/dashboard/agency/handover" },
+  { label: "Library", href: "/dashboard/agency/library" },
   { label: "Shared theme", href: "/dashboard/agency/theme" },
   { label: "Partner", href: "/dashboard/agency/partner" },
 ];
