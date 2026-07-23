@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { CreateCommentInput } from "@buildrik/shared/schemas/comments";
+import type { Paginated, PaginationInput } from "@buildrik/shared/schemas/pagination";
 
 /**
  * Client comments (E7) — the ONLY layer that reads/writes the comments table.
@@ -62,15 +63,23 @@ export interface WorkspaceCommentRow {
   createdAt: Date;
 }
 
+const WORKSPACE_COMMENTS_PAGE_SIZE = 50;
+
 /** All comments across a workspace's sites (newest first) — the agency triage
- *  view. Scoped via site.workspaceId so it never leaks another workspace's. */
+ *  view. Scoped via site.workspaceId so it never leaks another workspace's.
+ *  Cursor-paginated (G7 perf guard) so a busy workspace never scans the full
+ *  comment table in one query. */
 export async function listWorkspaceComments(
   workspaceId: string,
   status?: "OPEN" | "RESOLVED",
-): Promise<WorkspaceCommentRow[]> {
+  page?: PaginationInput,
+): Promise<Paginated<WorkspaceCommentRow>> {
+  const take = Math.min(Math.max(page?.limit ?? WORKSPACE_COMMENTS_PAGE_SIZE, 1), 100);
   const rows = await prisma.comment.findMany({
     where: { site: { workspaceId }, ...(status ? { status } : {}) },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: take + 1,
+    ...(page?.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
     select: {
       id: true,
       siteId: true,
@@ -80,7 +89,12 @@ export async function listWorkspaceComments(
       site: { select: { name: true } },
     },
   });
-  return rows.map(({ site, ...c }) => ({ ...c, siteName: site.name }));
+  const hasMore = rows.length > take;
+  const slice = hasMore ? rows.slice(0, take) : rows;
+  return {
+    items: slice.map(({ site, ...c }) => ({ ...c, siteName: site.name })),
+    nextCursor: hasMore ? slice[slice.length - 1].id : null,
+  };
 }
 
 export async function resolveComment(

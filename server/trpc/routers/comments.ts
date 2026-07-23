@@ -20,6 +20,7 @@ import {
   listCommentsInput,
   resolveCommentInput,
 } from "@buildrik/shared/schemas/comments";
+import { paginationInput } from "@buildrik/shared/schemas/pagination";
 
 function translatePermission(e: unknown): never {
   if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
@@ -52,7 +53,7 @@ export const commentsRouter = router({
 
   // Agency triage view — every comment across the workspace's sites. Admin-gated.
   workspaceList: protectedProcedure
-    .input(z.object({ status: z.enum(["OPEN", "RESOLVED"]).optional() }).optional())
+    .input(z.object({ status: z.enum(["OPEN", "RESOLVED"]).optional() }).merge(paginationInput).optional())
     .query(async ({ ctx, input }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
       try {
@@ -60,7 +61,7 @@ export const commentsRouter = router({
       } catch (e) {
         translatePermission(e);
       }
-      return listWorkspaceComments(workspaceId, input?.status);
+      return listWorkspaceComments(workspaceId, input?.status, { limit: input?.limit, cursor: input?.cursor });
     }),
 
   // Resolving/reopening is an editorial action — the agency, not the commenter.

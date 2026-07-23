@@ -8,7 +8,7 @@
  * instead of silently killing the fresh link. Cleans up after itself.
  */
 import { prisma } from "@/lib/prisma";
-import { getCurrentRound, revokeReviewRound, getApprovedSnapshot } from "@/server/services/review.service";
+import { getCurrentRound, revokeReviewRound, getApprovedSnapshot, listReviews } from "@/server/services/review.service";
 import { issueReviewToken } from "@/server/services/client-review.service";
 
 const ok = (m: string) => console.log(`  ✅ ${m}`);
@@ -95,6 +95,21 @@ async function main() {
     Array.isArray(snap) && snap[0]?.path === "home" && snap[0]?.html.includes("buildrick-hero")
       ? ok("getApprovedSnapshot returns the frozen approved pages")
       : bad(`approved snapshot = ${JSON.stringify(snap)?.slice(0, 80)}`);
+
+    // 9. cursor pagination against real Postgres (mocks can't prove cursor/skip).
+    //    Two more non-PENDING rounds (pending-unique index allows one PENDING) →
+    //    workspace has 3 reviews total (1 approved + 2). limit 2 → page + cursor.
+    await prisma.reviewRequest.create({ data: { siteId: site.id, requestedById: owner.id, status: "CHANGES_REQUESTED" } });
+    await prisma.reviewRequest.create({ data: { siteId: site.id, requestedById: owner.id, status: "CHANGES_REQUESTED" } });
+    const p1 = await listReviews(site.workspaceId, undefined, { limit: 2 });
+    p1.items.length === 2 && p1.nextCursor !== null
+      ? ok("listReviews page 1 → 2 items + a nextCursor")
+      : bad(`page1 = ${p1.items.length} items, cursor ${p1.nextCursor}`);
+    const p2 = await listReviews(site.workspaceId, undefined, { limit: 2, cursor: p1.nextCursor! });
+    const noOverlap = !p2.items.some((r) => p1.items.some((a) => a.id === r.id));
+    p2.items.length === 1 && p2.nextCursor === null && noOverlap
+      ? ok("listReviews page 2 → remaining item, no cursor, no overlap")
+      : bad(`page2 = ${p2.items.length} items, cursor ${p2.nextCursor}, overlap=${!noOverlap}`);
   } finally {
     await prisma.comment.deleteMany({ where: { siteId: site.id } });
     await prisma.reviewRequest.deleteMany({ where: { siteId: site.id } });

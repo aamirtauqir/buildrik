@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type { ReviewStatus, ReviewPillState } from "@buildrik/shared/schemas/reviews";
+import type { Paginated, PaginationInput } from "@buildrik/shared/schemas/pagination";
 import {
   sendReviewRequestedEmail,
   sendReviewResolvedEmail,
@@ -90,7 +91,29 @@ export async function submitReview(
   if (clientEmail && token) {
     await notifyClientInvited(siteId, requestedById, clientEmail, token, note, changeSummary);
   }
+  await pruneSupersededSnapshots(siteId);
   return request;
+}
+
+/**
+ * snapshotPages is full-HTML-per-page — an unbounded row per round would pile up
+ * across a site's review history. Retention (G7 perf guard): keep the snapshot
+ * on the latest round and on every APPROVED round (the §3 Compare reads the
+ * latest approved snapshot, and history should stay auditable), and null it on
+ * every superseded, non-approved round. Idempotent — re-nulling an already-null
+ * row is a harmless no-op.
+ */
+async function pruneSupersededSnapshots(siteId: string): Promise<void> {
+  const latest = await prisma.reviewRequest.findFirst({
+    where: { siteId },
+    orderBy: { createdAt: "desc" },
+    select: { id: true },
+  });
+  if (!latest) return;
+  await prisma.reviewRequest.updateMany({
+    where: { siteId, status: { not: "APPROVED" }, id: { not: latest.id } },
+    data: { snapshotPages: Prisma.DbNull },
+  });
 }
 
 export interface ReviewRow {
@@ -269,13 +292,20 @@ export async function revokeReviewRound(
 }
 
 /** All review requests across a workspace's sites, newest first. */
+const REVIEW_PAGE_SIZE = 50;
+
 export async function listReviews(
   workspaceId: string,
   status?: ReviewStatus,
-): Promise<ReviewRow[]> {
+  page?: PaginationInput,
+): Promise<Paginated<ReviewRow>> {
+  const take = Math.min(Math.max(page?.limit ?? REVIEW_PAGE_SIZE, 1), 100);
   const rows = await prisma.reviewRequest.findMany({
     where: { site: { workspaceId }, ...(status ? { status } : {}) },
-    orderBy: { createdAt: "desc" },
+    // Tie-break on id so the cursor is stable when two rows share a createdAt.
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: take + 1, // one extra row tells us whether a next page exists
+    ...(page?.cursor ? { cursor: { id: page.cursor }, skip: 1 } : {}),
     select: {
       id: true,
       siteId: true,
@@ -289,7 +319,12 @@ export async function listReviews(
       site: { select: { name: true } },
     },
   });
-  return rows.map(({ site, ...r }) => ({ ...r, siteName: site.name }));
+  const hasMore = rows.length > take;
+  const slice = hasMore ? rows.slice(0, take) : rows;
+  return {
+    items: slice.map(({ site, ...r }) => ({ ...r, siteName: site.name })),
+    nextCursor: hasMore ? slice[slice.length - 1].id : null,
+  };
 }
 
 /** Approve / request-changes on a review. Workspace-scoped; only a PENDING one. */

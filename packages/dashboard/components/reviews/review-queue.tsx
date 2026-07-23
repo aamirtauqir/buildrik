@@ -30,7 +30,11 @@ const STATUS_META: Record<string, { label: string; tone: PillTone }> = {
 export function ReviewQueue() {
   const { addToast } = useToast();
   // list is Admin-gated server-side; a FORBIDDEN means this member can't review.
-  const reviewsQuery = trpc.reviews.list.useQuery({ status: "PENDING" }, { retry: false });
+  // Cursor-paginated (bounded pages) so the queue never scans the full table.
+  const reviewsQuery = trpc.reviews.list.useInfiniteQuery(
+    { status: "PENDING" },
+    { retry: false, getNextPageParam: (last) => last.nextCursor ?? undefined },
+  );
 
   const resolveMut = trpc.reviews.resolve.useMutation({
     onSuccess: (_d, vars) => {
@@ -40,7 +44,7 @@ export function ReviewQueue() {
     onError: (err) => addToast("error", "Couldn't resolve", err.message),
   });
 
-  const reviews = reviewsQuery.data ?? [];
+  const reviews = reviewsQuery.data?.pages.flatMap((p) => p.items) ?? [];
   const forbidden = reviewsQuery.error?.data?.code === "FORBIDDEN";
 
   return (
@@ -123,6 +127,16 @@ export function ReviewQueue() {
               </div>
             );
           })}
+          {reviewsQuery.hasNextPage && (
+            <button
+              onClick={() => reviewsQuery.fetchNextPage()}
+              disabled={reviewsQuery.isFetchingNextPage}
+              className="mt-3 w-full rounded-md border py-2 text-body-sm font-medium disabled:opacity-50"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+            >
+              {reviewsQuery.isFetchingNextPage ? "Loading…" : "Load more"}
+            </button>
+          )}
         </div>
       )}
     </SectionCard>

@@ -27,6 +27,7 @@ import {
   currentRoundInput,
   revokeReviewInput,
 } from "@buildrik/shared/schemas/reviews";
+import { paginationInput } from "@buildrik/shared/schemas/pagination";
 
 function translateReviewError(e: unknown): never {
   if (e instanceof ReviewError) throw new TRPCError({ code: e.code, message: e.message });
@@ -84,12 +85,13 @@ export const reviewsRouter = router({
   // Admins see the review queue + resolve it. Flag off → [] so the UI collapses
   // to an empty queue rather than erroring (mirrors clients.list).
   list: protectedProcedure
-    .input(z.object({ status: reviewStatusSchema.optional() }).optional())
+    .input(z.object({ status: reviewStatusSchema.optional() }).merge(paginationInput).optional())
     .query(async ({ ctx, input }) => {
       const workspaceId = await resolveWorkspaceId(ctx);
-      if (!(await isFeatureEnabled(workspaceId, "agency_layer"))) return [];
+      if (!(await isFeatureEnabled(workspaceId, "agency_layer")))
+        return { items: [], nextCursor: null };
       await requireAdmin(ctx, workspaceId);
-      return listReviews(workspaceId, input?.status);
+      return listReviews(workspaceId, input?.status, { limit: input?.limit, cursor: input?.cursor });
     }),
 
   // The editor's review-status pill (S5.2) for the current site. Flag off →

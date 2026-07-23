@@ -23,9 +23,13 @@ function initials(name: string): string {
 export function CommentQueue() {
   // Read-only feed of the most recent open client comments (newest first,
   // server-ordered). Admin-gated server-side; FORBIDDEN means this member can't see them.
-  const commentsQuery = trpc.comments.workspaceList.useQuery({ status: "OPEN" }, { retry: false });
+  // Cursor-paginated (bounded pages) so a busy workspace never scans every comment.
+  const commentsQuery = trpc.comments.workspaceList.useInfiniteQuery(
+    { status: "OPEN" },
+    { retry: false, getNextPageParam: (last) => last.nextCursor ?? undefined },
+  );
 
-  const comments = commentsQuery.data ?? [];
+  const comments = commentsQuery.data?.pages.flatMap((p) => p.items) ?? [];
   const forbidden = commentsQuery.error?.data?.code === "FORBIDDEN";
 
   return (
@@ -76,6 +80,16 @@ export function CommentQueue() {
               </div>
             </div>
           ))}
+          {commentsQuery.hasNextPage && (
+            <button
+              onClick={() => commentsQuery.fetchNextPage()}
+              disabled={commentsQuery.isFetchingNextPage}
+              className="mt-3 w-full rounded-md border py-2 text-body-sm font-medium disabled:opacity-50"
+              style={{ borderColor: "var(--color-border-default)", color: "var(--color-text-secondary)" }}
+            >
+              {commentsQuery.isFetchingNextPage ? "Loading…" : "Load more"}
+            </button>
+          )}
         </div>
       )}
     </SectionCard>

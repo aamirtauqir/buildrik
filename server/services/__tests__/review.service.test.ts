@@ -10,6 +10,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const findFirst = vi.fn();
 const create = vi.fn();
 const update = vi.fn();
+const updateMany = vi.fn();
 const findMany = vi.fn();
 const reviewFindUnique = vi.fn();
 const siteFindUnique = vi.fn();
@@ -22,6 +23,7 @@ vi.mock("@/lib/prisma", () => ({
       findFirst: (...a: unknown[]) => findFirst(...a),
       create: (...a: unknown[]) => create(...a),
       update: (...a: unknown[]) => update(...a),
+      updateMany: (...a: unknown[]) => updateMany(...a),
       findMany: (...a: unknown[]) => findMany(...a),
       findUnique: (...a: unknown[]) => reviewFindUnique(...a),
     },
@@ -53,7 +55,7 @@ import {
 } from "@server/services/review.service";
 
 const allMocks = [
-  findFirst, create, update, findMany, reviewFindUnique,
+  findFirst, create, update, updateMany, findMany, reviewFindUnique,
   siteFindUnique, userFindUnique, memberFindMany,
   sendReviewRequestedEmail, sendReviewResolvedEmail, sendReviewInviteEmail,
   issueReviewToken,
@@ -79,6 +81,19 @@ describe("submitReview", () => {
     await submitReview("s1", "u1", "ready");
     expect(create).toHaveBeenCalledWith({
       data: { siteId: "s1", requestedById: "u1", note: "ready", changeSummary: null, status: "PENDING" },
+    });
+  });
+
+  it("prunes snapshots on superseded, non-approved rounds after a submit (retention)", async () => {
+    findFirst.mockResolvedValueOnce(null); // openId → no open PENDING
+    create.mockResolvedValueOnce({ id: "r-new" });
+    findFirst.mockResolvedValueOnce({ id: "r-new" }); // prune → latest round
+    updateMany.mockResolvedValueOnce({ count: 2 });
+    await submitReview("s1", "u1", "ready");
+    // keeps the latest round + every APPROVED round; nulls the rest
+    expect(updateMany).toHaveBeenCalledWith({
+      where: { siteId: "s1", status: { not: "APPROVED" }, id: { not: "r-new" } },
+      data: { snapshotPages: expect.anything() },
     });
   });
 
@@ -134,13 +149,28 @@ describe("submitReview", () => {
 });
 
 describe("listReviews", () => {
-  it("flattens site.name into siteName, scoped to the workspace", async () => {
+  it("flattens site.name into siteName, scoped to the workspace, single bounded page", async () => {
     findMany.mockResolvedValueOnce([
       { id: "r1", siteId: "s1", requestedById: "u1", status: "PENDING", note: null, changeSummary: null, resolvedById: null, resolvedAt: null, createdAt: new Date(0), site: { name: "Acme" } },
     ]);
     const out = await listReviews("ws-1", "PENDING");
-    expect(out[0]).toMatchObject({ id: "r1", siteName: "Acme" });
+    expect(out.items[0]).toMatchObject({ id: "r1", siteName: "Acme" });
+    // fewer rows than the page size → last page, no cursor
+    expect(out.nextCursor).toBeNull();
     expect(findMany.mock.calls[0][0].where).toEqual({ site: { workspaceId: "ws-1" }, status: "PENDING" });
+  });
+
+  it("returns a nextCursor when a full page + 1 comes back, trimming the extra row", async () => {
+    // limit 2 → the service fetches take+1 (3); the 3rd row signals "more".
+    const rows = [1, 2, 3].map((n) => ({
+      id: `r${n}`, siteId: "s1", requestedById: "u1", status: "PENDING", note: null,
+      changeSummary: null, resolvedById: null, resolvedAt: null, createdAt: new Date(0), site: { name: "Acme" },
+    }));
+    findMany.mockResolvedValueOnce(rows);
+    const out = await listReviews("ws-1", "PENDING", { limit: 2 });
+    expect(out.items).toHaveLength(2);
+    expect(out.nextCursor).toBe("r2"); // last item of the trimmed page
+    expect(findMany.mock.calls[0][0].take).toBe(3);
   });
 });
 

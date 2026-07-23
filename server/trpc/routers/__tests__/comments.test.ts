@@ -107,6 +107,6 @@ describe("comments router", () => {
     wsListMock.mockResolvedValueOnce([{ id: "c1", siteName: "Acme", body: "fix", status: "OPEN" }]);
     const caller = commentsRouter.createCaller(makeCtx() as never);
     await expect(caller.workspaceList({ status: "OPEN" })).resolves.toMatchObject([{ id: "c1", siteName: "Acme" }]);
-    expect(wsListMock).toHaveBeenCalledWith("ws_1", "OPEN");
+    expect(wsListMock).toHaveBeenCalledWith("ws_1", "OPEN", { limit: undefined, cursor: undefined });
   });
 });

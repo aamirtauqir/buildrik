@@ -112,9 +112,9 @@ describe("reviews router", () => {
       expect(submitMock).not.toHaveBeenCalled();
     });
 
-    it("list collapses to empty and never queries", async () => {
+    it("list collapses to an empty page and never queries", async () => {
       const caller = reviewsRouter.createCaller(makeCtx() as never);
-      await expect(caller.list()).resolves.toEqual([]);
+      await expect(caller.list()).resolves.toEqual({ items: [], nextCursor: null });
       expect(checkWorkspaceRoleMock).not.toHaveBeenCalled();
       expect(listMock).not.toHaveBeenCalled();
     });
