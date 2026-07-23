@@ -470,6 +470,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             composer={composer}
             onClose={handleFullPageClose}
             onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
+            onSwitchToDesign={() => onLeftPanelTabChange?.("design")}
             onReplayTour={undefined}
             projectId={projectId}
             onOpenImageEditor={onOpenImageEditor}

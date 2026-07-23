@@ -15,6 +15,7 @@ const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
 const LibraryManager = React.lazy(() =>
   import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))
 );
+const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 
 /** Props shared across all fullpage tabs (no pin concept in fullpage mode) */
 export interface FullPageCommonProps {
@@ -35,6 +36,7 @@ export interface FullPageRouterProps {
   composer: Composer | null;
   commonTabProps: FullPageCommonProps;
   onSwitchToAdd?: () => void;
+  onSwitchToDesign?: () => void;
   onReplayTour?: () => void;
   projectId?: string | null;
   onSettingsDirtyChange?: (dirty: boolean) => void;
@@ -46,6 +48,7 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   composer,
   commonTabProps,
   onSwitchToAdd,
+  onSwitchToDesign,
   onReplayTour,
   projectId,
   onSettingsDirtyChange,
@@ -71,6 +74,23 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
           onOpenIconPicker={commonTabProps.onOpenIconPicker}
         />
       ) : null;
+
+    // P5: Site settings graduated from the narrow drawer to a full-page surface
+    // (authoritative IA 14-screen-specs.md:8 — "Site full-page = settings…").
+    // SettingsTab is the same snav+pane component; it ignores the pin props, so
+    // it renders unchanged at full width. FullPageView supplies the back/close.
+    case "settings":
+      return (
+        <SettingsTab
+          composer={composer}
+          projectId={projectId}
+          onReplayTour={onReplayTour}
+          onDirtyChange={onSettingsDirtyChange}
+          onOpenDesignTab={onSwitchToDesign}
+          onClose={commonTabProps.onClose}
+          onHelpClick={commonTabProps.onHelpClick}
+        />
+      );
 
     default:
       return null;

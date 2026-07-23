@@ -207,12 +207,11 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     section: "bottom",
     pattern: "card-drill-in",
     shortcut: "S",
-    mode: "panel",
-    // 2026-05-22 design plan review D1: normalized 700px outlier → 320px.
-    // Matches Media + Design + AI + Templates panel widths. Drill-in
-    // pattern stays — root shows category cards, drilled-in screens
-    // (SEO, Headers, Redirects, Locale) wrap form fields to the narrower
-    // 320px column.
+    // P5: graduated from a 320px drawer to a full-page surface (authoritative
+    // IA 14-screen-specs.md:8 — "Site full-page = settings×11 …"). SettingsTab's
+    // 140px-snav + 1fr-pane now renders full-width via FullPageRouter; the drawer
+    // path is retired. panelWidth kept as the fallback the width helper reads.
+    mode: "fullpage",
     panelWidth: 320,
     zone: "config",
   },

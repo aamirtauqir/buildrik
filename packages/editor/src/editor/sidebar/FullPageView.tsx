@@ -19,6 +19,7 @@ export interface FullPageViewProps {
   composer: Composer | null;
   onClose: () => void;
   onSwitchToAdd?: () => void;
+  onSwitchToDesign?: () => void;
   onReplayTour?: () => void;
   projectId?: string | null;
   onSettingsDirtyChange?: (dirty: boolean) => void;
@@ -38,6 +39,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   composer,
   onClose,
   onSwitchToAdd,
+  onSwitchToDesign,
   onReplayTour,
   projectId,
   onSettingsDirtyChange,
@@ -67,6 +69,7 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
             composer={composer}
             commonTabProps={commonTabProps}
             onSwitchToAdd={onSwitchToAdd}
+            onSwitchToDesign={onSwitchToDesign}
             onReplayTour={onReplayTour}
             projectId={projectId}
             onSettingsDirtyChange={onSettingsDirtyChange}

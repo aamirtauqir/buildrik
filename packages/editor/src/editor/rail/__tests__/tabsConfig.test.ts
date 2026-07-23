@@ -17,8 +17,8 @@ describe("tabsConfig helpers", () => {
       expect(getTabMode("templates")).toBe("panel");
     });
 
-    it("returns 'panel' for Settings tab", () => {
-      expect(getTabMode("settings")).toBe("panel");
+    it("returns 'fullpage' for Settings tab (P5 — graduated from the 320px drawer)", () => {
+      expect(getTabMode("settings")).toBe("fullpage");
     });
 
     it("returns 'panel' for History tab", () => {
