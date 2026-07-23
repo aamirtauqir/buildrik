@@ -228,6 +228,45 @@ describe("CommandPalette", () => {
     });
   });
 
+  // ── S3.14 B8: registry-backed commands reachable via ⌘K ──────────────────
+  describe("registry merge (B8)", () => {
+    function composerWithRegistry() {
+      const run = vi.fn();
+      return {
+        ...makeComposer(),
+        commands: {
+          run,
+          getAll: () => [
+            { id: "export-html", label: "Export HTML", run: vi.fn() },
+            { id: "undo", label: "Undo", run: vi.fn() }, // dup label — must be skipped
+          ],
+        },
+      };
+    }
+
+    it("surfaces registry commands the hardcoded list never had (Export HTML)", () => {
+      const composer = composerWithRegistry();
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
+      expect(screen.getByText("Export HTML")).toBeInTheDocument();
+      expect(screen.getByText("Commands")).toBeInTheDocument(); // the registry group
+    });
+
+    it("runs a registry command through the CommandCenter", () => {
+      const composer = composerWithRegistry();
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
+      fireEvent.click(screen.getByText("Export HTML"));
+      expect(composer.commands.run).toHaveBeenCalledWith("export-html");
+    });
+
+    it("dedupes by label — an already-hardcoded command (Undo) is not doubled by the registry", () => {
+      const composer = composerWithRegistry();
+      render(<CommandPalette onClose={vi.fn()} composer={composer as unknown as Composer} />);
+      // The hardcoded Edit group has one exact "Undo"; the registry's dup "Undo"
+      // is skipped, so it stays 1 (would be 2 without dedup).
+      expect(screen.getAllByText("Undo")).toHaveLength(1);
+    });
+  });
+
   describe("recents (S3.14)", () => {
     it("shows a Recent group on open after a command has been run", () => {
       // First mount: run Undo (records it to localStorage).

@@ -152,6 +152,26 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
     }
   );
 
+  // 5. Registry-backed commands (S3.14 B8 fix). The CommandCenter holds ~39
+  // commands the hardcoded list never surfaced — Export HTML/JSON, Open
+  // Exporter, device switches — so ⌘K couldn't reach them. Append the ones not
+  // already covered (dedup by label), run through the registry. Additive: the
+  // hardcoded commands above keep their exact behavior.
+  const registry = composer.commands?.getAll?.() ?? [];
+  const seenLabels = new Set(commands.map((c) => c.label.toLowerCase()));
+  for (const cmd of registry) {
+    const label = cmd.label ?? cmd.id;
+    if (seenLabels.has(label.toLowerCase())) continue;
+    seenLabels.add(label.toLowerCase());
+    commands.push({
+      id: `cmd-${cmd.id}`,
+      label,
+      group: "Commands",
+      shortcut: cmd.shortcut,
+      handler: () => { composer.commands.run(cmd.id); onClose(); },
+    });
+  }
+
   return commands;
 }
 
