@@ -82,6 +82,8 @@ export interface LeftSidebarProps {
   onVercelPublish?: () => Promise<void>;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
+  /** P4.2 — opens the CMS collection-setup modal from the Content tab (data-first). */
+  onCreateCollection?: () => void;
   /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
   onOpenImageEditor?: (
     imageSrc: string,
@@ -336,6 +338,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   publishJob,
   onVercelPublish,
   onOpenLibrary,
+  onCreateCollection,
   onOpenImageEditor,
   onOpenIconPicker,
 }) => {
@@ -596,6 +599,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onOpenLibrary={onOpenLibrary}
                   onOpenImageEditor={onOpenImageEditor}
                   onOpenIconPicker={onOpenIconPicker}
+                  onCreateCollection={onCreateCollection}
                 />
               </React.Suspense>
             </div>

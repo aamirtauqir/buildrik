@@ -38,6 +38,7 @@ describe("tabsConfig — drawer width rule", () => {
       design: 320,
       settings: 320, // normalized from the 700px outlier 2026-05-22 (D1)
       review: 320, // browse/thread surface — same 320 as AI/Media/Design
+      content: 320, // P4.2 data front-door — browse/list surface, 320
     });
   });
 });

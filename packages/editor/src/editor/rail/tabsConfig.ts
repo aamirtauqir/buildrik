@@ -23,7 +23,8 @@ export type GroupedTabId =
   | "settings"
   | "publish"
   | "history"
-  | "review";
+  | "review"
+  | "content";
 
 export type TabSection = "top" | "bottom";
 export type TabPattern = "card-drill-in" | "standalone";
@@ -258,6 +259,22 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     section: "bottom",
     pattern: "standalone",
     shortcut: "R",
+    mode: "panel",
+    panelWidth: 320,
+  },
+  {
+    // P4.2 data front-door. Off-rail like review (no `zone`), so it doesn't
+    // disturb the locked 6-tool rail order; reachable via ⌘K ("Open Content
+    // panel") + routable. The authoritative IA (14-screen-specs.md:8) promotes
+    // it to a first-class rail tab in the pending 6-tab redesign.
+    id: "content",
+    tool: "site",
+    iconName: "LayoutGrid",
+    label: "Content",
+    ariaLabel: "Data sources and collections for dynamic content",
+    section: "bottom",
+    pattern: "standalone",
+    shortcut: "C",
     mode: "panel",
     panelWidth: 320,
   },

@@ -400,6 +400,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             publishJob={publishJob}
             onVercelPublish={onVercelPublish}
             onOpenLibrary={handleOpenLibrary}
+            onCreateCollection={onOpenCreateCollection}
             onOpenImageEditor={onOpenImageEditor}
             onOpenIconPicker={onOpenIconPicker}
           />

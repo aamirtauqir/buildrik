@@ -45,6 +45,7 @@ const MediaTab = React.lazy(() =>
 const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
 const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
 const ReviewTab = React.lazy(() => import("./tabs/review/ReviewTab"));
+const ContentTab = React.lazy(() => import("./tabs/content/ContentTab"));
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 const AITab = React.lazy(() =>
   import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
@@ -88,6 +89,9 @@ export interface TabRouterProps {
   /** P0 review loop: full re-send (re-render snapshot + mint fresh token) for
    *  the Review panel — provided by the shell (same path as the topbar send). */
   onResendReview?: () => Promise<void>;
+  /** P4.2 Content tab: opens the shell CMS collection-setup modal (data-first
+   *  create, no element selection). Absent → the Content create button hides. */
+  onCreateCollection?: () => void;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -111,6 +115,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onOpenImageEditor,
   onOpenIconPicker,
   onResendReview,
+  onCreateCollection,
 }) => {
   switch (activeTab) {
     case "add":
@@ -200,6 +205,11 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           onResend={onResendReview}
           onExportCurrentPages={composer ? () => exportPublishPages(composer) : undefined}
         />
+      );
+
+    case "content":
+      return (
+        <ContentTab composer={composer} onCreateCollection={onCreateCollection} {...commonTabProps} />
       );
 
     case "settings":

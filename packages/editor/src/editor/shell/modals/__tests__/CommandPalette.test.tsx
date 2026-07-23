@@ -53,13 +53,13 @@ describe("CommandPalette", () => {
   describe("command list", () => {
     // PIN §2-B8: registry bypass — commands hardcoded here, not from a registry.
     // buildCommands() inlines the Edit (5) / View (4) / History (2) commands in
-    // this file; only Navigation (12) derives from GROUPED_TABS_CONFIG (every
-    // tab with a shortcut — the `review` tab (P0) added one, so nav is 12).
-    // Total with a composer: 23. If a command registry ever lands, this pin
+    // this file; only Navigation (13) derives from GROUPED_TABS_CONFIG (every
+    // tab with a shortcut — the `review` tab (P0) added one, so nav is 13).
+    // Total with a composer: 24. If a command registry ever lands, this pin
     // should break and be replaced.
-    it("with a composer: exactly 23 commands in 4 hardcoded groups", () => {
+    it("with a composer: exactly 24 commands in 4 hardcoded groups", () => {
       renderPalette();
-      expect(commandButtons()).toHaveLength(23);
+      expect(commandButtons()).toHaveLength(24);
       // Group section headers (hardcoded `group:` strings, not registry data).
       for (const group of ["Navigation", "Edit", "View", "History"]) {
         expect(screen.getByText(group)).toBeInTheDocument();
@@ -77,12 +77,12 @@ describe("CommandPalette", () => {
       expect(screen.getByText("Undo last action")).toBeInTheDocument();
     });
 
-    // PIN §2-B8 (continued): without a composer only the 12 navigation
+    // PIN §2-B8 (continued): without a composer only the 13 navigation
     // commands survive — Edit/View/History are appended after an early
     // `if (!composer) return commands;`.
-    it("without a composer: only the 12 navigation commands", () => {
+    it("without a composer: only the 13 navigation commands", () => {
       renderPalette(null);
-      expect(commandButtons()).toHaveLength(12);
+      expect(commandButtons()).toHaveLength(13);
       expect(screen.getByText("Navigation")).toBeInTheDocument();
       expect(screen.queryByText("Edit")).toBeNull();
       expect(screen.queryByText("View")).toBeNull();
@@ -129,7 +129,7 @@ describe("CommandPalette", () => {
       renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zoom" } });
       fireEvent.change(searchInput(), { target: { value: "" } });
-      expect(commandButtons()).toHaveLength(23);
+      expect(commandButtons()).toHaveLength(24);
     });
   });
 
