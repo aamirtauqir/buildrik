@@ -10,6 +10,7 @@ type AgencyTab = { label: string; href: string; index?: boolean };
 const AGENCY_TABS: AgencyTab[] = [
   { label: "Clients", href: "/dashboard/agency", index: true },
   { label: "Reviews", href: "/dashboard/agency/reviews" },
+  { label: "Handover", href: "/dashboard/agency/handover" },
   { label: "Shared theme", href: "/dashboard/agency/theme" },
   { label: "Partner", href: "/dashboard/agency/partner" },
 ];

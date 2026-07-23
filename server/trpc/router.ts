@@ -22,6 +22,7 @@ import { actionsRouter } from "./routers/actions";
 import { featuresRouter } from "./routers/features";
 import { clientsRouter } from "./routers/clients";
 import { reviewsRouter } from "./routers/reviews";
+import { handoverRouter } from "./routers/handover";
 import { clientReviewRouter } from "./routers/client-review";
 import { commentsRouter } from "./routers/comments";
 import { cmsRouter } from "./routers/cms";
@@ -55,6 +56,7 @@ export const appRouter = router({
   features: featuresRouter,
   clients: clientsRouter,
   reviews: reviewsRouter,
+  handover: handoverRouter,
   clientReview: clientReviewRouter,
   comments: commentsRouter,
   cms: cmsRouter,

@@ -10,6 +10,7 @@
 import { prisma } from "@/lib/prisma";
 import { getCurrentRound, revokeReviewRound, getApprovedSnapshot, listReviews } from "@/server/services/review.service";
 import { issueReviewToken } from "@/server/services/client-review.service";
+import { getHandoverRollup } from "@/server/services/handover.service";
 
 const ok = (m: string) => console.log(`  ✅ ${m}`);
 const bad = (m: string) => { console.error(`  ❌ ${m}`); process.exitCode = 1; };
@@ -110,6 +111,15 @@ async function main() {
     p2.items.length === 1 && p2.nextCursor === null && noOverlap
       ? ok("listReviews page 2 → remaining item, no cursor, no overlap")
       : bad(`page2 = ${p2.items.length} items, cursor ${p2.nextCursor}, overlap=${!noOverlap}`);
+
+    // 10. handover rollup — the draft site (never published, no domain/forms)
+    //     rolls up to publish=pending → not ready to hand over.
+    const rollup = await getHandoverRollup(site.workspaceId);
+    const row = rollup.find((r) => r.siteId === site.id);
+    const publishItem = row?.items.find((i) => i.key === "publish");
+    row && publishItem?.status === "pending" && row.ready === false
+      ? ok("handover rollup: draft site → publish pending, not ready")
+      : bad(`handover row = ${JSON.stringify(row)?.slice(0, 100)}`);
   } finally {
     await prisma.comment.deleteMany({ where: { siteId: site.id } });
     await prisma.reviewRequest.deleteMany({ where: { siteId: site.id } });
