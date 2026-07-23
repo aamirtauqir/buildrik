@@ -31,6 +31,7 @@ import { hydrateUserTemplatesFromServer } from "@/services/templateSync";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { RecoveryBanner } from "./RecoveryBanner";
 import { LoadErrorBanner, type LoadErrorKind } from "./LoadErrorBanner";
+import { IssuesPanel } from "./IssuesPanel";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
@@ -142,6 +143,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // S1.5: a dashboard load failure surfaces as a persistent banner (not a toast).
   const [loadError, setLoadError] = React.useState<LoadErrorKind>(null);
+  // P3: the Issues panel (the topbar issue pill opens it — was a settings stub).
+  const [issuesOpen, setIssuesOpen] = React.useState(false);
 
   // Initialize composer with hooks
   const composer = useComposerInit({
@@ -363,7 +366,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenPublish={() => state.openLeftPanelToTab("publish")}
           onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
-          onOpenIssues={() => state.openLeftPanelToTab("settings")}
+          onOpenIssues={() => setIssuesOpen(true)}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
@@ -430,6 +433,32 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         publishJob={publishJob}
         onVercelPublish={handleVercelPublish}
       />
+
+      {/* P3: Issues panel — opened by the topbar issue pill */}
+      {issuesOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: 56,
+            right: 0,
+            bottom: 0,
+            width: 360,
+            zIndex: 45,
+            background: "var(--bd-surface)",
+            borderLeft: "1px solid var(--bd-border)",
+          }}
+        >
+          <IssuesPanel
+            issues={state.issues}
+            onClose={() => setIssuesOpen(false)}
+            // Jump-to-element is a refinement: an Issue id is the issue's id,
+            // not reliably an element id (lint/link/alt issues aren't 1:1 with
+            // a node), so v1 just closes. Wiring a real jump needs each issue
+            // to carry its target elementId — a follow-up.
+            onSelectElement={() => setIssuesOpen(false)}
+          />
+        </div>
+      )}
       {/* Tour overlay removed — onboarding handled by orchestrator */}
 
       <StudioModals
