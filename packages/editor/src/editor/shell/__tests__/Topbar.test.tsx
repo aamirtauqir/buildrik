@@ -41,6 +41,13 @@ vi.mock("../../../services/ReviewService", () => ({
   fetchReviewStatus: vi.fn(() => Promise.resolve({ state: "none", reviewerName: null, at: null })),
 }));
 
+vi.mock("../../../services/NotificationService", () => ({
+  fetchRecentNotifications: vi.fn(() => Promise.resolve([])),
+  fetchUnreadCount: vi.fn(() => Promise.resolve(0)),
+  markNotificationRead: vi.fn(() => Promise.resolve()),
+  markAllNotificationsRead: vi.fn(() => Promise.resolve()),
+}));
+
 vi.mock("../PublishDropdown", () => ({
   PublishDropdown: (props: { onPublish: () => void; onSave: () => void }) => (
     <div data-testid="publish-dropdown">

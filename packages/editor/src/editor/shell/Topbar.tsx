@@ -31,6 +31,7 @@ import { useClickOutside } from "@/shared/hooks";
 import { Sparkles, MoreHorizontal } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import { submitForReview, fetchReviewStatus, type ReviewStatus } from "../../services/ReviewService";
+import { NotificationBell } from "./NotificationBell";
 import { exportPublishPages } from "./exportPublishPages";
 
 /** S5.2 review-status pill copy + tone, keyed by the derived review state.
@@ -453,6 +454,8 @@ export const Topbar: React.FC<TopbarProps> = ({
               {REVIEW_PILL[reviewStatus.state]!.label}
             </span>
           ) : null}
+
+          <NotificationBell />
 
           {viewMode.clientView ? (
             <div style={{ position: "relative" }} ref={reviewRef}>
