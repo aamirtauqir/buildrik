@@ -38,6 +38,10 @@ describe("CommandPalette", () => {
     (document as Document & { execCommand: (c: string) => boolean }).execCommand = vi.fn(
       () => true
     );
+    // Recents are localStorage-backed (S3.14); clear so a command run in one
+    // test doesn't add a "Recent" group to the next (which would break the
+    // exact-count pins).
+    localStorage.clear();
   });
 
   afterEach(() => {
@@ -49,12 +53,13 @@ describe("CommandPalette", () => {
   describe("command list", () => {
     // PIN §2-B8: registry bypass — commands hardcoded here, not from a registry.
     // buildCommands() inlines the Edit (5) / View (4) / History (2) commands in
-    // this file; only Navigation (11) derives from GROUPED_TABS_CONFIG (every
-    // tab carries a shortcut today). Total with a composer: 22. If a command
-    // registry ever lands, this pin should break and be replaced.
-    it("with a composer: exactly 22 commands in 4 hardcoded groups", () => {
+    // this file; only Navigation (12) derives from GROUPED_TABS_CONFIG (every
+    // tab with a shortcut — the `review` tab (P0) added one, so nav is 12).
+    // Total with a composer: 23. If a command registry ever lands, this pin
+    // should break and be replaced.
+    it("with a composer: exactly 23 commands in 4 hardcoded groups", () => {
       renderPalette();
-      expect(commandButtons()).toHaveLength(22);
+      expect(commandButtons()).toHaveLength(23);
       // Group section headers (hardcoded `group:` strings, not registry data).
       for (const group of ["Navigation", "Edit", "View", "History"]) {
         expect(screen.getByText(group)).toBeInTheDocument();
@@ -72,12 +77,12 @@ describe("CommandPalette", () => {
       expect(screen.getByText("Undo last action")).toBeInTheDocument();
     });
 
-    // PIN §2-B8 (continued): without a composer only the 11 navigation
+    // PIN §2-B8 (continued): without a composer only the 12 navigation
     // commands survive — Edit/View/History are appended after an early
     // `if (!composer) return commands;`.
-    it("without a composer: only the 11 navigation commands", () => {
+    it("without a composer: only the 12 navigation commands", () => {
       renderPalette(null);
-      expect(commandButtons()).toHaveLength(11);
+      expect(commandButtons()).toHaveLength(12);
       expect(screen.getByText("Navigation")).toBeInTheDocument();
       expect(screen.queryByText("Edit")).toBeNull();
       expect(screen.queryByText("View")).toBeNull();
@@ -112,18 +117,19 @@ describe("CommandPalette", () => {
       expect(commandButtons()).toHaveLength(1);
     });
 
-    it("shows the empty state when nothing matches", () => {
+    it("offers Ask AI (not a dead end) when nothing matches a non-empty query", () => {
       renderPalette();
       fireEvent.change(searchInput(), { target: { value: "xyzzy" } });
-      expect(screen.getByText("No commands found")).toBeInTheDocument();
-      expect(commandButtons()).toHaveLength(0);
+      // No command rows, but the ai-offer replaces the old "No commands found".
+      expect(screen.queryByText("No commands found")).toBeNull();
+      expect(screen.getByText(/Ask AI:/)).toBeInTheDocument();
     });
 
     it("clearing the query restores the full list", () => {
       renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zoom" } });
       fireEvent.change(searchInput(), { target: { value: "" } });
-      expect(commandButtons()).toHaveLength(22);
+      expect(commandButtons()).toHaveLength(23);
     });
   });
 
@@ -199,6 +205,45 @@ describe("CommandPalette", () => {
       const { onClose } = renderPalette(null);
       fireEvent.click(screen.getByText("Open Pages panel"));
       expect(onClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  // ── S3.14: ai-offer + recents ────────────────────────────────────────────
+  describe("ai-offer (no results)", () => {
+    it("offers Ask AI on a query that matches nothing, and opens the AI panel", () => {
+      const { composer, onClose } = renderPalette();
+      fireEvent.change(searchInput(), { target: { value: "zzzznotacommand" } });
+      const askAI = screen.getByText(/Ask AI:/);
+      expect(askAI).toBeInTheDocument();
+      fireEvent.click(askAI);
+      expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "ai" });
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("Enter triggers Ask AI when the query matches nothing", () => {
+      const { composer } = renderPalette();
+      fireEvent.change(searchInput(), { target: { value: "zzzznope" } });
+      fireEvent.keyDown(searchInput(), { key: "Enter" });
+      expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "ai" });
+    });
+  });
+
+  describe("recents (S3.14)", () => {
+    it("shows a Recent group on open after a command has been run", () => {
+      // First mount: run Undo (records it to localStorage).
+      const first = renderPalette();
+      fireEvent.click(screen.getByText("Undo"));
+      first.unmount();
+      // Second mount reads recents → a Recent group with Undo, before the rest.
+      renderPalette();
+      expect(screen.getByText("Recent")).toBeInTheDocument();
+      // Undo now appears twice: once under Recent, once under its real group.
+      expect(screen.getAllByText("Undo").length).toBeGreaterThanOrEqual(2);
+    });
+
+    it("no Recent group when nothing has run yet", () => {
+      renderPalette();
+      expect(screen.queryByText("Recent")).not.toBeInTheDocument();
     });
   });
 });

@@ -14,6 +14,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";
+import { getRecentCommandIds, recordCommandRun } from "./commandRecents";
 
 // =============================================================================
 // TYPES
@@ -200,6 +201,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
     [composer]
   );
 
+  // Run a command AND record it as recent (S3.14), so the next ⌘K surfaces it.
+  const runCommand = React.useCallback((cmd: PaletteCommand) => {
+    recordCommandRun(cmd.id);
+    cmd.handler();
+  }, []);
+
+  // Opens the AI panel when the query matches no command (ai-offer). Read once
+  // per open — recents don't change mid-session in a way the palette must track.
+  const recentIds = React.useMemo(() => getRecentCommandIds(), []);
+
   // Focus input on open
   React.useEffect(() => {
     const timer = setTimeout(() => inputRef.current?.focus(), 30);
@@ -215,6 +226,26 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
     );
   }, [commands, query]);
 
+  // What actually renders: on an empty query, a "Recent" group of the last-run
+  // commands is prepended (S3.14). Recents are clones (distinct object identity)
+  // so list indexing stays correct even though they repeat a real command.
+  const displayCommands = React.useMemo(() => {
+    if (query.trim()) return filteredCommands;
+    if (recentIds.length === 0) return commands;
+    const recents = recentIds
+      .map((id) => commands.find((c) => c.id === id))
+      .filter((c): c is PaletteCommand => Boolean(c))
+      .map((c) => ({ ...c, group: "Recent" }));
+    return [...recents, ...commands];
+  }, [query, filteredCommands, commands, recentIds]);
+
+  // ai-offer: a query that matches nothing → offer the AI panel instead of a
+  // dead end (contracts §2, no-results never a nothing-state).
+  const askAI = React.useCallback(() => {
+    composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "ai" });
+    onClose();
+  }, [composer, onClose]);
+
   // Reset selection when query changes
   React.useEffect(() => {
     setSelectedIndex(0);
@@ -228,22 +259,22 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
     item?.scrollIntoView({ block: "nearest" });
   }, [selectedIndex]);
 
-  // Group filtered commands
+  // Group display commands (recents first when present)
   const grouped = React.useMemo(() => {
     const groups: Record<string, PaletteCommand[]> = {};
-    for (const cmd of filteredCommands) {
+    for (const cmd of displayCommands) {
       if (!groups[cmd.group]) groups[cmd.group] = [];
       groups[cmd.group].push(cmd);
     }
     return groups;
-  }, [filteredCommands]);
+  }, [displayCommands]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setSelectedIndex((i) => Math.min(i + 1, filteredCommands.length - 1));
+          setSelectedIndex((i) => Math.min(i + 1, displayCommands.length - 1));
           break;
         case "ArrowUp":
           e.preventDefault();
@@ -251,7 +282,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           break;
         case "Enter":
           e.preventDefault();
-          filteredCommands[selectedIndex]?.handler();
+          if (displayCommands.length === 0 && query.trim()) askAI();
+          else {
+            const cmd = displayCommands[selectedIndex];
+            if (cmd) runCommand(cmd);
+          }
           break;
         case "Escape":
           e.preventDefault();
@@ -259,7 +294,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           break;
       }
     },
-    [filteredCommands, selectedIndex, onClose]
+    [displayCommands, selectedIndex, onClose, query, askAI, runCommand]
   );
 
   return (
@@ -353,17 +388,41 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             scrollbarColor: "var(--buildrick-surface-5) transparent",
           }}
         >
-          {filteredCommands.length === 0 ? (
-            <div
-              style={{
-                padding: "24px 16px",
-                textAlign: "center",
-                color: "var(--buildrick-text-muted)",
-                fontSize: 13,
-              }}
-            >
-              No commands found
-            </div>
+          {displayCommands.length === 0 ? (
+            query.trim() ? (
+              <Button
+                onClick={askAI}
+                data-idx={0}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  width: "100%",
+                  height: 52,
+                  padding: "0 16px",
+                  background: "var(--buildrick-accent-tint)",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  color: "var(--buildrick-text-primary)",
+                  fontSize: 14,
+                }}
+              >
+                <span aria-hidden="true">✨</span>
+                Ask AI: “{query.trim()}”
+              </Button>
+            ) : (
+              <div
+                style={{
+                  padding: "24px 16px",
+                  textAlign: "center",
+                  color: "var(--buildrick-text-muted)",
+                  fontSize: 13,
+                }}
+              >
+                No commands found
+              </div>
+            )
           ) : (
             Object.entries(grouped).map(([group, cmds]) => {
               return (
@@ -386,14 +445,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                   </div>
                   {/* Items */}
                   {cmds.map((cmd) => {
-                    const globalIdx = filteredCommands.indexOf(cmd);
+                    const globalIdx = displayCommands.indexOf(cmd);
                     const isSelected = globalIdx === selectedIndex;
 
                     return (
                       <Button
-                        key={cmd.id}
+                        key={`${group}-${cmd.id}`}
                         data-idx={globalIdx}
-                        onClick={cmd.handler}
+                        onClick={() => runCommand(cmd)}
                         onMouseEnter={() => setSelectedIndex(globalIdx)}
                         style={{
                           display: "flex",
