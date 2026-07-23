@@ -41,6 +41,8 @@ import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
 import type { ProjectSettings } from "@/shared/types/project";
 import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
+import { PublishHistory } from "@/editor/shell/PublishHistory";
+import { EVENTS } from "@/shared/constants/events";
 import "./settings.css";
 
 // ─── Nav definition ──────────────────────────────────────────────────────────
@@ -58,7 +60,8 @@ import "./settings.css";
 type InTabNavId =
   | "general" | "branding" | "seo"
   | "analytics" | "localization"
-  | "custom-code" | "redirects" | "headers" | "forms" | "integrations";
+  | "custom-code" | "redirects" | "headers" | "forms" | "integrations"
+  | "publish-history" | "export";
 
 type NavGroupId = "site" | "distribution" | "plumbing";
 
@@ -76,6 +79,8 @@ const NAV: NavDef[] = [
   { id: "branding", title: "Branding", subtitle: "Colors, type, favicon", group: "site", icon: DesignSystemIcon },
   { id: "seo", title: "SEO", subtitle: "Search & social preview", group: "site", icon: SeoIcon },
   // DISTRIBUTION
+  { id: "publish-history", title: "Publish history", subtitle: "Past deploys + rollback", group: "distribution", icon: IntegrationsIcon },
+  { id: "export", title: "Export", subtitle: "Download the site as code", group: "distribution", icon: IntegrationsIcon },
   { id: "analytics", title: "Analytics", subtitle: "GA4, Plausible, PostHog, Pixel", group: "distribution", icon: IntegrationsIcon },
   { id: "localization", title: "Localization", subtitle: "Locale claim and preview", group: "distribution", icon: IntegrationsIcon },
   // PLUMBING
@@ -672,6 +677,30 @@ export const SettingsTab: React.FC<
         );
       case "forms":
         return <FormsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
+      // P5: publish history + export graduate into the full-page settings snav
+      // (authoritative IA — "Site full-page = settings + export + publish history").
+      case "publish-history":
+        return projectId ? (
+          <PublishHistory siteId={projectId} />
+        ) : (
+          <div className="bd-set-section">
+            <h3 className="bd-set-section-h">Publish history</h3>
+            <div className="bd-set-section-d">Publish the site once to start a version history.</div>
+          </div>
+        );
+      case "export":
+        return (
+          <div className="bd-set-section">
+            <h3 className="bd-set-section-h">Export</h3>
+            <div className="bd-set-section-d">
+              Download the whole site as clean HTML/CSS you can host anywhere. Opens the exporter
+              with format and scope options.
+            </div>
+            <Button variant="secondary" size="sm" onClick={() => composer?.emit(EVENTS.UI_TOGGLE_EXPORTER, undefined)}>
+              Open exporter
+            </Button>
+          </div>
+        );
       default:
         return null;
     }
