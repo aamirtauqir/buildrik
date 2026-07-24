@@ -12,20 +12,23 @@
   --buildrick-bg-elevated: #FFFFFF;
   --buildrick-bg-hover: rgba(15, 23, 42, 0.04);
   --buildrick-bg-subtle: #F1F5F9;
+  --buildrick-bg-app: #F1F5F9;                /* Figma 32-2 bg-app (= bg-subtle; the app shell backdrop) */
 
-  /* TEXT */
-  --buildrick-text-primary: #334155;
-  --buildrick-text-secondary: #64748B;
-  --buildrick-text-muted: #94A3B8;
-  --buildrick-text-tertiary: #94A3B8;
-  --buildrick-text-on-accent: #FFFFFF;
-  --buildrick-text-heading: #0F172A;
+  /* TEXT — ink scale (Figma 32-2: ink #0F172A / ink-soft #485465 / ink-muted #656F7E).
+     Darkened 2026-07-24 from slate-700/500/400 to match Figma foundations. */
+  --buildrick-text-primary: #0F172A;          /* Figma ink */
+  --buildrick-text-secondary: #485465;        /* Figma ink-soft */
+  --buildrick-text-muted: #656F7E;            /* Figma ink-muted */
+  --buildrick-text-tertiary: #656F7E;         /* aligned to Figma ink-muted */
+  --buildrick-text-on-accent: #FFFFFF;        /* Figma accent-on */
+  --buildrick-text-heading: #0F172A;          /* Figma ink */
 
   /* BORDERS */
   --buildrick-border: #E2E8F0;
   --buildrick-border-light: #94A3B8;
   --buildrick-border-medium: #CBD5E1;
   --buildrick-border-strong: #94A3B8;
+  --buildrick-border-input: #8D949C;          /* Figma 32-2 border-input */
   --buildrick-border-hover: #94A3B8;
   --buildrick-border-focus: #406ED6;
 
@@ -33,10 +36,12 @@
      #2D6DFF 2026-07-21 to match the Figma file + dashboard. White on #406ED6 is
      4.75:1, clearing the 4.5 AA bar cobalt missed at 4.43:1.) */
   --buildrick-accent: #406ED6;
+  --buildrick-accent-text: #3C68C9;           /* Figma 32-2 accent-text (AA text on light) */
   --buildrick-accent-hover: #5E86E0;
   --buildrick-accent-pressed: #2E56B8;
   --buildrick-accent-subtle: rgba(64, 110, 214, 0.05);
   --buildrick-accent-tint: rgba(64, 110, 214, 0.10);
+  --buildrick-accent-tint-solid: #ECF0FB;     /* Figma 32-2 accent-tint (opaque; for fills that can't use alpha) */
 
   /* SEMANTIC STATUS */
   --buildrick-error: #DC2626;

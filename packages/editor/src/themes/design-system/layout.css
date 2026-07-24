@@ -16,12 +16,30 @@
    * D1-D6's 320px was aspirational; 280px is what editor/shell/chrome.css
    * and editor/rail/LayoutShell.css consume.
    */
-  --buildrick-sidebar-width: 48px;
-  --buildrick-sidebar-panel-width: 280px;
-  --buildrick-right-panel-width: 280px;
-  --buildrick-header-height: 56px;
-  --buildrick-footer-height: 40px;
+  --buildrick-sidebar-width: 48px;            /* shipped rail; Figma 32-2 rail=60 — see FLAG below */
+  --buildrick-sidebar-panel-width: 280px;     /* shipped drawer; Figma 32-2 drawer=320 — FLAG */
+  --buildrick-right-panel-width: 280px;       /* shipped inspector; Figma 32-2 inspector=300 — FLAG */
+  --buildrick-header-height: 56px;            /* = Figma 32-2 topbar */
+  --buildrick-footer-height: 32px;            /* Figma 32-2 footer (was 40) */
   --buildrick-layout-gap: 0px;
+
+  /* Figma 32-2 committed size tokens — canonical values from the foundations file.
+     Non-conflicting ones are live now; the rail/drawer/inspector WIDENING
+     (48->60, 280->320/300, +panel-right 360) reverses a documented prior
+     decision ("320px was aspirational; 280px is shipped reality") and is a
+     material layout change, so it is FLAGGED for founder sign-off before P2
+     migrates consumers. See docs/audits/2026-07-24-editor-figma-32-2-drift-audit.md §2. */
+  --buildrick-size-rail: 60px;                /* Figma target (shell still on 48 pending FLAG) */
+  --buildrick-size-drawer: 320px;             /* Figma target */
+  --buildrick-size-inspector: 300px;          /* Figma target */
+  --buildrick-size-panel-right: 360px;        /* Figma (no current equivalent) */
+  --buildrick-size-nav: 240px;                /* Figma (no current equivalent) */
+  --buildrick-size-topbar: 56px;              /* = header-height */
+  --buildrick-size-header: 44px;              /* Figma secondary header (no current equivalent) */
+  --buildrick-size-footer: 32px;              /* Figma footer */
+  --buildrick-size-row: 32px;                 /* Figma row */
+  --buildrick-size-row-dense: 28px;           /* Figma row-dense */
+  --buildrick-size-row-tall: 64px;            /* Figma row-tall */
 
   /* PANEL INTERNALS */
   --buildrick-panel-input-height: 32px;
