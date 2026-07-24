@@ -88,18 +88,20 @@
      its own --buildrick-* DS and is a separate migration. */
   --color-primary: #406ED6;
   --color-primary-hover: #2E56B8;
-  --color-primary-subtle: #EBF1FF;
+  --color-primary-subtle: #ECF0FB;      /* Figma 32-2 accent-tint (was #EBF1FF) */
   --color-destructive: #7F1D1D;
-  --color-bg-page: #F9FAFC;
-  --color-bg-surface: #FFFFFF;
-  --color-bg-subtle: #F3F5F8;
-  --color-border-default: #E8EAEF;
-  --color-border-strong: #D6DAE1;
-  --color-text-primary: #1C212C;
-  --color-text-secondary: #6B7380;
-  --color-text-muted: #98A0AF;
-  --color-text-placeholder: #98A0AF;
-  --color-success: #059669;
+  /* Neutral scale reconciled to Figma 32-2 foundations 2026-07-24 — unifies the
+     dashboard with the editor on one slate scale (ink darkened, surfaces cooler). */
+  --color-bg-page: #F1F5F9;             /* Figma bg-app (was #F9FAFC) */
+  --color-bg-surface: #FFFFFF;          /* Figma bg-card */
+  --color-bg-subtle: #F8FAFC;           /* Figma bg-panel (was #F3F5F8) */
+  --color-border-default: #E2E8F0;      /* Figma border (was #E8EAEF) */
+  --color-border-strong: #CBD5E1;       /* Figma border-medium (was #D6DAE1) */
+  --color-text-primary: #0F172A;        /* Figma ink (was #1C212C) */
+  --color-text-secondary: #485465;      /* Figma ink-soft (was #6B7380) */
+  --color-text-muted: #656F7E;          /* Figma ink-muted (was #98A0AF) */
+  --color-text-placeholder: #656F7E;    /* Figma ink-muted (was #98A0AF) */
+  --color-success: #16A34A;             /* Figma success (was #059669 emerald) */
   --color-success-subtle: #DCFCE7;
   --color-warning: #D97706;
   --color-warning-subtle: #FEF3C7;
@@ -115,10 +117,10 @@
   --color-teal: #0D94A6;
   --color-amber: #EA8E1E;
   --color-pink: #DB508C;
-  --color-ink: #141924;
+  --color-ink: #0F172A;                 /* Figma ink (was #141924) */
   /* Sidebar nav item states (design: Shell.dc.html) */
-  --color-nav-item-active-bg: #EBF1FF;
-  --color-nav-label: #475569;
+  --color-nav-item-active-bg: #ECF0FB;  /* Figma accent-tint */
+  --color-nav-label: #485465;           /* Figma ink-soft */
   --color-nav-label-active: #2E56B8;
   /* Status fg/bg — status.live=success, review=warning, failed=error, draft=neutral */
   --color-status-live-bg: #DCFCE7;   --color-status-live-fg: #15803D;
