@@ -16,7 +16,6 @@
 import { describe, expect, it } from "vitest";
 import {
   ALL_PROFILE_ELEMENT_TYPES,
-  getDefaultTab,
   getProfileFor,
   PROFILE_MAP,
 } from "../config/elementProfiles";
@@ -66,16 +65,6 @@ describe("element profiles — structural coverage", () => {
     expect(missing).toEqual([]);
   });
 
-  it("every profile declares a defaultTab that is one of the 3 known tabs", () => {
-    const validTabs: TabId[] = ["style", "element", "effects"];
-    for (const [elementType, profile] of Object.entries(PROFILE_MAP)) {
-      expect(
-        validTabs.includes(profile.defaultTab),
-        `${elementType}.defaultTab must be style/element/effects, got "${profile.defaultTab}"`
-      ).toBe(true);
-    }
-  });
-
   it("profile map is non-empty — we need real profiles, not just a fallback", () => {
     expect(ALL_PROFILE_ELEMENT_TYPES.length).toBeGreaterThan(10);
   });
@@ -93,7 +82,6 @@ describe("element profiles — public API", () => {
   it("getProfileFor falls back to container profile for unknown types", () => {
     const unknown = getProfileFor("some-unregistered-widget-type-xyz");
     const container = getProfileFor("container");
-    expect(unknown.defaultTab).toBe(container.defaultTab);
     expect(unknown.style.order).toEqual(container.style.order);
   });
 
@@ -103,15 +91,6 @@ describe("element profiles — public API", () => {
     expect(lower.style.order).toEqual(upper.style.order);
   });
 
-  it("getDefaultTab returns the profile's defaultTab for known types", () => {
-    expect(getDefaultTab("heading")).toBe("style");
-    expect(getDefaultTab("container")).toBe("style");
-    expect(getDefaultTab("button")).toBe("style");
-  });
-
-  it("getDefaultTab falls back to container's defaultTab for unknown types", () => {
-    expect(getDefaultTab("totally-made-up-element")).toBe("style");
-  });
 });
 
 describe("element profiles — contextual ordering sanity", () => {

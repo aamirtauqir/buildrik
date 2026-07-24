@@ -5,7 +5,6 @@
 
 export { useInspectorState } from "./useInspectorState";
 export type {
-  TabName,
   SelectedElement,
   InspectorState,
 } from "./useInspectorState";

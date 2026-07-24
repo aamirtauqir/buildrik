@@ -80,6 +80,12 @@ export interface InspectorTabContentProps {
    *  inspector to its primary + secondary sections, hiding tertiary (advanced)
    *  ones; "full" shows everything. Row heights are unaffected (density learning). */
   density?: "full" | "fewer";
+  /** S3.9 flat inspector: render EVERY section from all three tab groups
+   *  (style → element → effects) in one scrolling column, dropping the
+   *  Look/Layout/Effects tab strip. When set, `tabId` is ignored for section
+   *  selection (it's still forwarded to sections that read it, none do today).
+   *  Ordered per the element profile, per S3.9. */
+  flat?: boolean;
 }
 
 // ============================================================================
@@ -103,10 +109,22 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
     onOpenIconPicker,
     devMode,
     density = "full",
+    flat = false,
   } = props;
 
   const profile = getProfileFor(selectedElement.type);
-  const orderedIds = profile[tabId].order;
+  // S3.9: flat mode concatenates all three tab groups into one column, ordered
+  // per the profile (style → element → effects), deduped so a section listed in
+  // two groups renders once. Tabbed mode renders just the active tab's order.
+  // Memoized so the flat concat doesn't hand `visibleIds` a fresh array every
+  // render (which would defeat its filter memo).
+  const orderedIds = React.useMemo<SectionId[]>(
+    () =>
+      flat
+        ? [...new Set([...profile.style.order, ...profile.element.order, ...profile.effects.order])]
+        : profile[tabId].order,
+    [flat, profile, tabId]
+  );
 
   // Stable per-section toggle factories. Without `useCallback`, each render
   // produces new closures, which defeats downstream React.memo on section

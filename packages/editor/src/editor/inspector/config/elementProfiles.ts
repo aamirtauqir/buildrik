@@ -17,7 +17,7 @@
  * @license BSD-3-Clause
  */
 
-import type { SectionId, TabId } from "../sections/registry";
+import type { SectionId } from "../sections/registry";
 
 // ============================================================================
 // TYPES
@@ -32,8 +32,6 @@ import type { SectionId, TabId } from "../sections/registry";
  * element is actually a flex container or item).
  */
 export interface ElementProfile {
-  /** Tab the inspector opens to when this element is selected. */
-  defaultTab: TabId;
   /** Ordered section ids for the Style tab. First entry is visually primary. */
   style: { order: SectionId[] };
   /** Ordered section ids for the Element tab. */
@@ -50,7 +48,6 @@ export interface ElementProfile {
  *  element type not explicitly registered below. Starts with the quick-actions
  *  row so users can switch display modes in one click. */
 const CONTAINER_PROFILE: ElementProfile = {
-  defaultTab: "style",
   style: {
     order: [
       "quick-actions",
@@ -71,7 +68,6 @@ const CONTAINER_PROFILE: ElementProfile = {
 
 /** Text-like elements — Typography is the first thing users want. */
 const TEXT_PROFILE: ElementProfile = {
-  defaultTab: "style",
   style: {
     order: [
       "typography",
@@ -90,7 +86,6 @@ const TEXT_PROFILE: ElementProfile = {
 /** Explicit flex container — prioritizes Layout and Flex over everything
  *  else. Keeps quick-actions at the top so users can switch away from flex. */
 const FLEX_PROFILE: ElementProfile = {
-  defaultTab: "style",
   style: {
     order: [
       "quick-actions",
@@ -111,7 +106,6 @@ const FLEX_PROFILE: ElementProfile = {
 /** Explicit grid container — same idea as flex but grid leads. Columns is
  *  semantically a grid under the hood, so it reuses this profile. */
 const GRID_PROFILE: ElementProfile = {
-  defaultTab: "style",
   style: {
     order: [
       "quick-actions",
@@ -132,7 +126,6 @@ const GRID_PROFILE: ElementProfile = {
 /** Image / video / icon / lottie / svg / audio / embeds — Size (with
  *  object-fit) and Element Properties (src, alt, etc.) matter first. */
 const MEDIA_PROFILE: ElementProfile = {
-  defaultTab: "style",
   style: { order: ["size", "layout", "spacing", "border", "corner-radius", "background"] },
   element: { order: ["element-properties", "css-classes", "all-css"] },
   effects: { order: ["effects", "animation", "visibility", "interactions"] },
@@ -142,7 +135,6 @@ const MEDIA_PROFILE: ElementProfile = {
  *  link settings live in the Element tab; interactions get promoted in
  *  Effects because buttons are the most common interaction target. */
 const BUTTON_PROFILE: ElementProfile = {
-  defaultTab: "style",
   style: {
     order: [
       "typography",
@@ -162,7 +154,6 @@ const BUTTON_PROFILE: ElementProfile = {
  *  form aesthetics; element-properties (name, placeholder, validation)
  *  dominates the Element tab. */
 const INPUT_PROFILE: ElementProfile = {
-  defaultTab: "style",
   style: {
     order: [
       "typography",
@@ -298,15 +289,6 @@ export function getProfileFor(elementType: string): ElementProfile {
  */
 export function getUnknownElementTypes(): ReadonlySet<string> {
   return unknownElementTypes;
-}
-
-/**
- * The default tab for an element type — used by `useInspectorState` to
- * auto-switch the active tab on selection. Preserves the existing
- * auto-switch behavior from the pre-restructure inspector.
- */
-export function getDefaultTab(elementType: string): TabId {
-  return getProfileFor(elementType).defaultTab;
 }
 
 /**

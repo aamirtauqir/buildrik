@@ -38,7 +38,6 @@ describe("elementProfiles — warn-once fallback", () => {
     const unknown = getProfileFor("totally-unknown-widget-beta");
     const container = getProfileFor("container");
     expect(unknown.style.order).toEqual(container.style.order);
-    expect(unknown.defaultTab).toBe(container.defaultTab);
   });
 
   it("does NOT warn for a known type", () => {

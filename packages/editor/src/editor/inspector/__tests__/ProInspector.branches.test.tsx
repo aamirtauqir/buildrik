@@ -2,7 +2,7 @@
  * ProInspector — top-level branch selection:
  *   - no selection → InspectorEmptyState
  *   - 2+ selected  → MultiSelectToolbar (single-element inspector body skipped)
- *   - 1 selected   → full inspector body (tabs + tab content)
+ *   - 1 selected   → full inspector body (flat tab content, no tab strip)
  *
  * The heavy children are mocked as probes (same pattern as
  * ProInspector.createCollectionThreading.test.tsx) so we assert which branch
@@ -97,7 +97,8 @@ describe("ProInspector — branch selection", () => {
       />
     );
     expect(screen.getByTestId("tab-content")).toBeInTheDocument();
-    expect(screen.getByRole("tablist")).toBeInTheDocument();
+    // S3.9: inspector flattened — no tab strip; body is one scrolling region.
+    expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
     expect(screen.queryByTestId("multi-toolbar")).not.toBeInTheDocument();
     expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
   });

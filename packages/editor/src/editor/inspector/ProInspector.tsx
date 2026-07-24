@@ -11,7 +11,6 @@ import { Crosshair, CornerLeftUp } from "lucide-react";
 import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
-import { InspectorTabs } from "./components/InspectorTabs";
 import { ReachScopeStrip } from "./components/ReachScopeStrip";
 import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
 import { StatePills } from "./components/StatePills";
@@ -87,9 +86,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     : "desktop";
 
   const {
-    activeTab,
     currentPseudoState,
-    setActiveTab,
     setCurrentPseudoState,
   } = useInspectorState(selectedElement);
   const devMode = false;
@@ -379,9 +376,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       {/* 40/41/59 — the 3-reach picker, the inspector's primary decision: This
           item / All like this / Whole site. Sits right under "You are editing". */}
       <ReachScopeStrip composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} />
-      {/* Tabs — relabeled to job groups (Look / Layout / Effects) so the body
-          reads by user intent, not CSS axis. */}
-      <InspectorTabs activeTab={activeTab} onChange={setActiveTab} />
+      {/* S3.9: no tab strip — the body is one flat scrolling column ordered per
+          element profile. The Look/Layout/Effects tabs were removed. */}
       {/* Breakpoint + state strip (mock pattern: pill + states + size right) */}
       <div className="bdi-bpr">
         <BreakpointPill
@@ -420,14 +416,14 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       <div
         ref={contentRef}
         className="bdi-panel-scroll"
-        role="tabpanel"
-        id={`inspector-tabpanel-${activeTab}`}
-        aria-labelledby={`inspector-tab-${activeTab}`}
+        role="region"
+        aria-label="Element properties"
       >
         <div className="bdi-body">
           <InspectorErrorBoundary>
             <InspectorTabContent
-              tabId={activeTab}
+              flat
+              tabId="style"
               composer={composer}
               selectedElement={selectedElement}
               styles={styles_state}
@@ -443,7 +439,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               devMode={devMode}
               density={inspectorDensity}
             />
-            {activeTab === "style" && selectedElement && (
+            {selectedElement && (
               <VariantSection
                 composer={composer ?? null}
                 elementId={selectedElement.id ?? null}

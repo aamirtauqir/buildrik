@@ -10,7 +10,6 @@
 // per-tab section order for the contextual InspectorTabContent renderer.
 export {
   getProfileFor,
-  getDefaultTab,
   ALL_PROFILE_ELEMENT_TYPES,
   PROFILE_MAP,
 } from "./elementProfiles";
