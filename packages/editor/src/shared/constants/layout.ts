@@ -25,14 +25,14 @@ export const SIDEBAR_W = 240;
 
 /**
  * Left sidebar panel width in AUTHORING mode (Add, Templates, Media, Build).
- * Drift note: live CSS currently uses 280 via `--layout-drawer-width` fallback
- * in LayoutShell.css:27. DESIGN.md §Layout says 320 for authoring. Week 3
- * PanelShell migration converges to 320.
+ * Converged 2026-07-24 (founder-approved): LayoutShell.css `--layout-drawer-width`
+ * now sources `--buildrick-size-drawer` (320), matching this + Figma 32-2 drawer.
  */
 export const SIDEBAR_WIDE = 320;
 
-/** Right inspector panel width. Matches DESIGN.md §Layout and LayoutShell.css. */
-export const INSPECTOR_W = 320;
+/** Right inspector panel width. Figma 32-2 inspector = 300 (was 320; converged
+ *  with LayoutShell.css `--layout-inspector-width` = `--buildrick-size-inspector`). */
+export const INSPECTOR_W = 300;
 
 // ============================================================================
 // VERTICAL — bars, headers, footers
@@ -52,8 +52,9 @@ export const HEADER_H = 44;
 /** Panel toolbar height. Per DESIGN.md §Sidebar Panel System. */
 export const TOOLBAR_H = 36;
 
-/** Panel footer height. Matches DESIGN.md + LayoutShell.css. */
-export const FOOTER_H = 40;
+/** Status-bar footer height. Figma 32-2 footer = 32 (was 40; converged with
+ *  LayoutShell.css `--layout-footer-height` = `--buildrick-size-footer`). */
+export const FOOTER_H = 32;
 
 // ============================================================================
 // ROW DENSITY — sidebar + inspector rows

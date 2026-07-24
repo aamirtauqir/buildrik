@@ -72,6 +72,10 @@ const FIGMA_SIZE: Record<string, string> = {
   "--buildrick-size-row-dense": "28PX",
   "--buildrick-size-row-tall": "64PX",
   "--buildrick-footer-height": "32PX", // shipped footer now matches Figma
+  // shell widths — widened to Figma 32-2 (founder-approved 2026-07-24)
+  "--buildrick-sidebar-width": "60PX", // Figma rail
+  "--buildrick-sidebar-panel-width": "320PX", // Figma drawer
+  "--buildrick-right-panel-width": "300PX", // Figma inspector
 };
 
 /** Deliberate deviations — Figma value would regress accessibility. */
@@ -83,8 +87,6 @@ const A11Y_KEEPS: Record<string, { value: string; figma: string; why: string }> 
   },
 };
 
-/** Deliberate deviations — shipped shell width, Figma widen pending founder sign-off. */
-const SHIPPED_KEEPS = ["--buildrick-sidebar-width", "--buildrick-sidebar-panel-width", "--buildrick-right-panel-width"];
 
 describe("Figma 32-2 foundation conformance", () => {
   const color = parseTokens("color.css");
@@ -115,8 +117,5 @@ describe("Figma 32-2 foundation conformance", () => {
         expect(color[token]).not.toBe(dev.figma.toUpperCase());
       });
     }
-    it("shipped shell widths still present (widen deferred)", () => {
-      for (const t of SHIPPED_KEEPS) expect(layout[t], `${t} missing`).toBeDefined();
-    });
   });
 });

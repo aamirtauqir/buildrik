@@ -2,13 +2,13 @@
  * LayoutShell CSS - CSS Grid based editor layout
  * Uses V2 semantic design tokens from default.css
  *
- * Grid Structure (IA Redesign 2026, chrome-ssot Stage 1/3 2026-04-26):
+ * Grid Structure (IA Redesign 2026; widened to Figma 32-2 foundations 2026-07-24):
  * ┌─────────────────────────────────────────────────────────┐
  * │                      TopBar (56px)                       │
  * ├──────┬──────────┬───────────────────────────┬───────────┤
  * │ Rail │  Drawer  │         Canvas            │ Inspector │
- * │ 48px │  280px   │          1fr              │   280px   │
- * │      │ (or 0)   │      + footer 40px        │  (or 0)   │
+ * │ 60px │  320px   │          1fr              │   300px   │
+ * │      │ (or 0)   │      + footer 32px        │  (or 0)   │
  * └──────┴──────────┴───────────────────────────┴───────────┘
  *
  * Drawer modes:
@@ -23,11 +23,13 @@
    These can be overridden by default.css tokens
    ============================================ */
 :root {
-  --layout-rail-width: 48px;
-  --layout-drawer-width: 280px;
-  --layout-inspector-width: 280px;
-  --layout-topbar-height: 56px;
-  --layout-footer-height: 40px;
+  /* Widened to Figma 32-2 committed size tokens (2026-07-24, founder-approved).
+     These now source from the design-system size tokens — one place to change. */
+  --layout-rail-width: var(--buildrick-size-rail);
+  --layout-drawer-width: var(--buildrick-size-drawer);
+  --layout-inspector-width: var(--buildrick-size-inspector);
+  --layout-topbar-height: var(--buildrick-size-topbar);
+  --layout-footer-height: var(--buildrick-size-footer);
   --layout-gap: var(--buildrick-space-3);
   --layout-touch-min: var(--buildrick-touch-min, 44px);
 }
