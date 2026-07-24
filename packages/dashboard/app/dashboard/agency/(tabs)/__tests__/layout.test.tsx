@@ -17,6 +17,7 @@ const redirectMock = vi.fn((url: string) => {
 vi.mock("next/navigation", () => ({
   redirect: (url: string) => redirectMock(url),
   usePathname: () => "/dashboard/agency",
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
 let featuresState: {
