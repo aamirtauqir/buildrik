@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    template: { findMany: vi.fn(), findUnique: vi.fn(), count: vi.fn(), update: vi.fn() },
+    template: { findMany: vi.fn(), findUnique: vi.fn(), findFirst: vi.fn(), count: vi.fn(), update: vi.fn() },
     site: { create: vi.fn(), count: vi.fn(), findFirst: vi.fn() },
     page: { createMany: vi.fn() },
     aIGenerationJob: { create: vi.fn(), findFirst: vi.fn(), update: vi.fn(), count: vi.fn() },
@@ -32,7 +32,9 @@ describe("Template Service", () => {
   describe("getTemplate", () => {
     it("returns template by id", async () => {
       const { getTemplate } = await import("@/server/services/template.service");
-      vi.mocked(prisma.template.findUnique).mockResolvedValue({
+      // getTemplate uses a workspace-scoped findFirst (not findUnique) so a
+      // private template can't leak by id across workspaces.
+      vi.mocked(prisma.template.findFirst).mockResolvedValue({
         id: "t1", name: "Portfolio Pro", slug: "portfolio-pro", category: "PORTFOLIO",
         description: "A pro portfolio", thumbnail: null, previewUrl: null, pages: [{ name: "Home", slug: "home", blocks: [] }],
         usageCount: 500, isActive: true, createdAt: new Date(), updatedAt: new Date(),

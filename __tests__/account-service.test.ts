@@ -6,13 +6,14 @@ vi.mock("@/lib/prisma", () => ({
     account: { deleteMany: vi.fn() },
     session: { findMany: vi.fn(), deleteMany: vi.fn(), delete: vi.fn() },
     loginAttempt: { findMany: vi.fn() },
-    workspace: { findUnique: vi.fn(), update: vi.fn() },
-    workspaceMember: { findFirst: vi.fn() },
+    workspace: { findUnique: vi.fn(), update: vi.fn(), findMany: vi.fn() },
+    workspaceMember: { findFirst: vi.fn(), findMany: vi.fn() },
     wSSharingSettings: { upsert: vi.fn(), findUnique: vi.fn() },
     workspaceIntegration: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn() },
     notificationPref: { findMany: vi.fn(), upsert: vi.fn() },
     accountDeletionReq: { create: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
-    exportJob: { create: vi.fn() },
+    site: { findMany: vi.fn() },
+    userPreference: { findUnique: vi.fn() },
     aIGenerationJob: { findMany: vi.fn(), count: vi.fn() },
   },
 }));
@@ -150,22 +151,32 @@ describe("Account Service", () => {
   describe("requestAccountDeletion", () => {
     it("creates deletion request with 30-day grace", async () => {
       const { requestAccountDeletion } = await import("@/server/services/account.service");
+      // Eligible: owns no workspace that would strand members or hold a sub.
+      vi.mocked(prisma.workspace.findMany).mockResolvedValue([] as any);
       vi.mocked(prisma.accountDeletionReq.create).mockResolvedValue({
         id: "del1", userId: "u1", scheduledAt: new Date(),
       } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ email: "u1@test.com" } as any);
       const result = await requestAccountDeletion("u1", "Not using anymore");
       expect(result.userId).toBe("u1");
     });
   });
 
-  describe("requestDataExport", () => {
-    it("creates export job", async () => {
-      const { requestDataExport } = await import("@/server/services/account.service");
-      vi.mocked(prisma.exportJob.create).mockResolvedValue({
-        id: "exp1", userId: "u1", status: "PENDING",
+  // The old fire-and-forget exportJob (requestDataExport) had no processor and
+  // was replaced by a synchronous getUserDataExport that returns the data inline.
+  describe("getUserDataExport", () => {
+    it("returns the user's account, workspaces and sites", async () => {
+      const { getUserDataExport } = await import("@/server/services/account.service");
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        id: "u1", email: "u1@test.com", fullName: "Ali Khan",
       } as any);
-      const result = await requestDataExport("u1");
-      expect(result.status).toBe("PENDING");
+      vi.mocked(prisma.workspaceMember.findMany).mockResolvedValue([] as any);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([] as any);
+      vi.mocked(prisma.userPreference.findUnique).mockResolvedValue(null as any);
+      const result = await getUserDataExport("u1");
+      expect(result.account.id).toBe("u1");
+      expect(result.exportedAt).toBeTruthy();
+      expect(Array.isArray(result.workspaces)).toBe(true);
     });
   });
 });
