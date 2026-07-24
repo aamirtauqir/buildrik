@@ -327,6 +327,16 @@ export async function renameSite(siteId: string, name: string) {
 }
 
 /**
+ * Assert the caller may edit this site. Callers that write a side effect keyed
+ * by siteId BEFORE persisting (e.g. the thumbnail route uploads a blob to a
+ * predictable per-site key) must gate on this first, so a non-member can't
+ * clobber another site's blob just because the DB write would later fail.
+ */
+export async function assertSiteEditAccess(userId: string, siteId: string) {
+  await checkSiteRole(prisma, userId, siteId, "EDITOR");
+}
+
+/**
  * Store a preview thumbnail URL on a site. Written by the editor's best-effort
  * capture at publish/save time (client screenshots the rendered page → Blob →
  * here), so the sites grid and template detail can show a real preview instead

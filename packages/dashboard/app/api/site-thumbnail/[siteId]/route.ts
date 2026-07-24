@@ -16,11 +16,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { auth } from "@server/auth";
-import { setSiteThumbnail } from "@server/services/sites.service";
+import { assertSiteEditAccess, setSiteThumbnail } from "@server/services/sites.service";
 import { PermissionError } from "@server/services/permission.service";
 
 // A page screenshot is small; cap so a runaway capture can't push a huge blob.
 const MAX_BYTES = 3 * 1024 * 1024;
+// Site ids are cuids. Constrain the shape before it reaches the blob key so a
+// crafted siteId can't shape the storage path (e.g. traversal-looking keys).
+const SITE_ID_RE = /^[a-z0-9]{20,32}$/;
 
 export async function POST(
   req: NextRequest,
@@ -31,6 +34,24 @@ export async function POST(
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+  }
+
+  if (!SITE_ID_RE.test(siteId)) {
+    return NextResponse.json({ error: "Invalid site id" }, { status: 400 });
+  }
+
+  // Authorize BEFORE the blob write. The blob key is a predictable per-site path
+  // (sites/<id>/thumbnail.png), so writing first would let any authenticated
+  // user overwrite another site's thumbnail blob even though the DB update would
+  // then fail. Gate on edit access up front.
+  try {
+    await assertSiteEditAccess(session.user.id, siteId);
+  } catch (e) {
+    if (e instanceof PermissionError) {
+      const status = e.code === "NOT_FOUND" ? 404 : 403;
+      return NextResponse.json({ error: e.message }, { status });
+    }
+    throw e;
   }
 
   const contentType = req.headers.get("content-type") || "";
