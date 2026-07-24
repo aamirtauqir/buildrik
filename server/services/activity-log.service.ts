@@ -19,6 +19,7 @@ export type ActivityAction =
   | "MEMBER_INVITED"
   | "MEMBER_JOINED"
   | "MEMBER_REMOVED"
+  | "MEMBER_REACTIVATED"
   | "MEMBER_ROLE_CHANGED";
 
 interface RecordInput {

@@ -3,22 +3,29 @@
 import { useState, useRef, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 
-export const MEMBER_ACTIONS = [
+export type MemberAction = "changeRole" | "revoke" | "reactivate" | "delete";
+
+const ACTIVE_ACTIONS: { label: string; action: MemberAction }[] = [
   { label: "Change Role", action: "changeRole" },
   { label: "Revoke Access", action: "revoke" },
   { label: "Remove Member", action: "delete" },
-] as const;
-
-export type MemberAction = (typeof MEMBER_ACTIONS)[number]["action"];
+];
+// A suspended member can only be restored or removed — Change Role / Revoke are
+// meaningless (and used to be offered as confusing no-ops).
+const SUSPENDED_ACTIONS: { label: string; action: MemberAction }[] = [
+  { label: "Reactivate", action: "reactivate" },
+  { label: "Remove Member", action: "delete" },
+];
 
 interface MemberActionsProps {
   memberId: string;
   isOwner?: boolean;
   isCurrentUser?: boolean;
+  isSuspended?: boolean;
   onAction: (action: MemberAction, memberId: string) => void;
 }
 
-export function MemberActions({ memberId, isOwner, isCurrentUser, onAction }: MemberActionsProps) {
+export function MemberActions({ memberId, isOwner, isCurrentUser, isSuspended, onAction }: MemberActionsProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -43,9 +50,11 @@ export function MemberActions({ memberId, isOwner, isCurrentUser, onAction }: Me
       </button>
       {open && (
         <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-[var(--color-border-default)] bg-white shadow-lg">
-          {MEMBER_ACTIONS.map((item) => {
+          {(isSuspended ? SUSPENDED_ACTIONS : ACTIVE_ACTIONS).map((item) => {
             const isDestructive = item.action === "delete" || item.action === "revoke";
-            const disabled = isCurrentUser && item.action === "delete";
+            // Never let a member act destructively on their own row — no
+            // self-delete, self-revoke, or self-demote (all one-way strandings).
+            const disabled = isCurrentUser && (item.action === "delete" || item.action === "revoke" || item.action === "changeRole");
             return (
               <button
                 key={item.action}

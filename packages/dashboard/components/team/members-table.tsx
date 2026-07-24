@@ -316,6 +316,7 @@ export function MembersTable({ members, currentUserId, onAction, onChangeRole, s
                       memberId={member.id}
                       isOwner={isOwner}
                       isCurrentUser={isCurrentUser}
+                      isSuspended={member.status === "SUSPENDED"}
                       onAction={handleMemberAction}
                     />
                   </td>

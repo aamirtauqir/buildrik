@@ -103,8 +103,16 @@ describe("Team Service", () => {
       vi.mocked(prisma.workspaceMember.update).mockResolvedValue({
         id: "m1", role: "ADMIN",
       } as any);
-      const result = await changeRole("m1", "ADMIN", "ws1");
+      const result = await changeRole("m1", "ADMIN", "ws1", "actor1");
       expect(result.role).toBe("ADMIN");
+    });
+
+    it("prevents an admin from changing their own role", async () => {
+      const { changeRole } = await import("@/server/services/team.service");
+      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
+        id: "m1", role: "ADMIN", userId: "self", workspaceId: "ws1",
+      } as any);
+      await expect(changeRole("m1", "VIEWER", "ws1", "self")).rejects.toThrow("CANNOT_MODIFY_SELF");
     });
 
     it("prevents changing owner role", async () => {
@@ -112,7 +120,7 @@ describe("Team Service", () => {
       vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
         id: "m1", role: "OWNER", userId: "u1", workspaceId: "ws1",
       } as any);
-      await expect(changeRole("m1", "EDITOR", "ws1")).rejects.toThrow("CANNOT_CHANGE_OWNER");
+      await expect(changeRole("m1", "EDITOR", "ws1", "actor1")).rejects.toThrow("CANNOT_CHANGE_OWNER");
     });
 
     it("prevents demoting last admin", async () => {
@@ -121,7 +129,7 @@ describe("Team Service", () => {
         id: "m1", role: "ADMIN", userId: "u2", workspaceId: "ws1",
       } as any);
       vi.mocked(prisma.workspaceMember.count).mockResolvedValue(1);
-      await expect(changeRole("m1", "EDITOR", "ws1")).rejects.toThrow("LAST_ADMIN");
+      await expect(changeRole("m1", "EDITOR", "ws1", "actor1")).rejects.toThrow("LAST_ADMIN");
     });
   });
 
@@ -129,13 +137,41 @@ describe("Team Service", () => {
     it("sets member status to SUSPENDED", async () => {
       const { revokeMember } = await import("@/server/services/team.service");
       vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "EDITOR", workspaceId: "ws1",
+        id: "m1", role: "EDITOR", userId: "u2", workspaceId: "ws1",
       } as any);
       vi.mocked(prisma.workspaceMember.update).mockResolvedValue({
         id: "m1", status: "SUSPENDED",
       } as any);
-      const result = await revokeMember("m1", "ws1");
+      const result = await revokeMember("m1", "ws1", "actor1");
       expect(result.status).toBe("SUSPENDED");
+    });
+
+    it("prevents self-revoke (would strand the actor)", async () => {
+      const { revokeMember } = await import("@/server/services/team.service");
+      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
+        id: "m1", role: "ADMIN", userId: "self", workspaceId: "ws1",
+      } as any);
+      await expect(revokeMember("m1", "ws1", "self")).rejects.toThrow("CANNOT_MODIFY_SELF");
+    });
+  });
+
+  describe("reactivateMember", () => {
+    it("restores a SUSPENDED member to ACTIVE", async () => {
+      const { reactivateMember } = await import("@/server/services/team.service");
+      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
+        id: "m1", status: "SUSPENDED", workspaceId: "ws1",
+      } as any);
+      vi.mocked(prisma.workspaceMember.update).mockResolvedValue({ id: "m1", status: "ACTIVE" } as any);
+      const result = await reactivateMember("m1", "ws1");
+      expect(result.status).toBe("ACTIVE");
+    });
+
+    it("rejects reactivating a member who isn't suspended", async () => {
+      const { reactivateMember } = await import("@/server/services/team.service");
+      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
+        id: "m1", status: "ACTIVE", workspaceId: "ws1",
+      } as any);
+      await expect(reactivateMember("m1", "ws1")).rejects.toThrow("NOT_SUSPENDED");
     });
   });
 

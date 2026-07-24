@@ -62,6 +62,15 @@ export default function TeamPage() {
     onError: (err) => addToast("error", "Failed", err.message),
   });
 
+  const reactivateMutation = trpc.team.reactivate.useMutation({
+    onSuccess: () => {
+      membersQuery.refetch();
+      statsQuery.refetch();
+      addToast("success", "Member reactivated");
+    },
+    onError: (err) => addToast("error", "Failed to reactivate", err.message),
+  });
+
   const revokeInviteMutation = trpc.team.revokeInvite.useMutation({
     onSuccess: () => {
       pendingQuery.refetch();
@@ -85,12 +94,15 @@ export default function TeamPage() {
         case "revoke":
           revokeMutation.mutate({ memberId });
           break;
+        case "reactivate":
+          reactivateMutation.mutate({ memberId });
+          break;
         case "delete":
           deleteMutation.mutate({ memberId });
           break;
       }
     },
-    [revokeMutation, deleteMutation]
+    [revokeMutation, reactivateMutation, deleteMutation]
   );
 
   const isLoading = statsQuery.isLoading || membersQuery.isLoading;

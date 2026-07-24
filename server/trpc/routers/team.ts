@@ -10,7 +10,7 @@ interface WorkspaceCtx {
 }
 import {
   getTeamStats, listMembers, inviteMembers, changeRole,
-  revokeMember, deleteMember, listPendingInvites, revokeInvite, resendInvite, getTeamActivity,
+  revokeMember, reactivateMember, deleteMember, listPendingInvites, revokeInvite, resendInvite, getTeamActivity,
 } from "@/server/services/team.service";
 import { inviteMembersSchema, listMembersSchema, changeRoleSchema } from "@buildrik/shared/schemas/team";
 import { type PlanName } from "@/lib/constants/plan-limits";
@@ -94,7 +94,7 @@ export const teamRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { workspaceId } = await requireAdmin(ctx);
       try {
-        const result = await changeRole(input.memberId, input.role, workspaceId);
+        const result = await changeRole(input.memberId, input.role, workspaceId, ctx.session.user.id);
         await recordActivity({
           workspaceId,
           actorId: ctx.session.user.id,
@@ -105,6 +105,7 @@ export const teamRouter = router({
         });
         return result;
       } catch (e: unknown) {
+        if (e instanceof Error && e.message === "CANNOT_MODIFY_SELF") throw new TRPCError({ code: "FORBIDDEN", message: "You can't change your own role." });
         if (e instanceof Error && e.message === "CANNOT_CHANGE_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Cannot change owner role." });
         if (e instanceof Error && e.message === "LAST_ADMIN") throw new TRPCError({ code: "FORBIDDEN", message: "Cannot demote last admin." });
         throw e;
@@ -112,15 +113,37 @@ export const teamRouter = router({
     }),
   revoke: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ ctx, input }) => {
     const { workspaceId } = await requireAdmin(ctx);
-    const result = await revokeMember(input.memberId, workspaceId);
-    await recordActivity({
-      workspaceId,
-      actorId: ctx.session.user.id,
-      action: "MEMBER_REMOVED",
-      targetType: "member",
-      targetId: input.memberId,
-    });
-    return result;
+    try {
+      const result = await revokeMember(input.memberId, workspaceId, ctx.session.user.id);
+      await recordActivity({
+        workspaceId,
+        actorId: ctx.session.user.id,
+        action: "MEMBER_REMOVED",
+        targetType: "member",
+        targetId: input.memberId,
+      });
+      return result;
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message === "CANNOT_MODIFY_SELF") throw new TRPCError({ code: "FORBIDDEN", message: "You can't revoke your own access." });
+      throw e;
+    }
+  }),
+  reactivate: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ ctx, input }) => {
+    const { workspaceId } = await requireAdmin(ctx);
+    try {
+      const result = await reactivateMember(input.memberId, workspaceId);
+      await recordActivity({
+        workspaceId,
+        actorId: ctx.session.user.id,
+        action: "MEMBER_REACTIVATED",
+        targetType: "member",
+        targetId: input.memberId,
+      });
+      return result;
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message === "NOT_SUSPENDED") throw new TRPCError({ code: "BAD_REQUEST", message: "Member isn't suspended." });
+      throw e;
+    }
   }),
   delete: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ ctx, input }) => {
     const { workspaceId } = await requireAdmin(ctx);

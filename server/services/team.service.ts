@@ -131,6 +131,7 @@ export async function changeRole(
   memberId: string,
   role: string,
   workspaceId: string,
+  actorUserId: string,
 ) {
   const member = await prisma.workspaceMember.findUnique({
     where: { id: memberId },
@@ -138,6 +139,9 @@ export async function changeRole(
   // Scope to the actor's workspace: a valid memberId from another workspace
   // must not be mutable here (IDOR guard).
   if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
+  // No self-demotion — an admin could otherwise strand themselves as VIEWER
+  // with no way back (there is no self re-promote path).
+  if (member.userId === actorUserId) throw new Error("CANNOT_MODIFY_SELF");
   if (member.role === "OWNER") throw new Error("CANNOT_CHANGE_OWNER");
 
   if (member.role === "ADMIN" && role !== "ADMIN") {
@@ -156,11 +160,14 @@ export async function changeRole(
   });
 }
 
-export async function revokeMember(memberId: string, workspaceId: string) {
+export async function revokeMember(memberId: string, workspaceId: string, actorUserId: string) {
   const member = await prisma.workspaceMember.findUnique({
     where: { id: memberId },
   });
   if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
+  // No self-revoke — it deletes the actor's own sessions (instant lockout) with
+  // no self-reactivate path.
+  if (member.userId === actorUserId) throw new Error("CANNOT_MODIFY_SELF");
   if (member.role === "OWNER") throw new Error("CANNOT_REVOKE_OWNER");
 
   const updated = await prisma.workspaceMember.update({
@@ -171,6 +178,21 @@ export async function revokeMember(memberId: string, workspaceId: string) {
   // per-request resolveWorkspaceId also revokes their workspace access).
   await prisma.session.deleteMany({ where: { userId: member.userId } });
   return updated;
+}
+
+/**
+ * Restore a suspended member to ACTIVE. Revoke ("Revoke Access") set SUSPENDED
+ * with no way back — re-invite was skipped as an existing member and re-accept
+ * threw CONFLICT, so a mis-click stranded the person. This is the reverse.
+ */
+export async function reactivateMember(memberId: string, workspaceId: string) {
+  const member = await prisma.workspaceMember.findUnique({ where: { id: memberId } });
+  if (!member || member.workspaceId !== workspaceId) throw new Error("MEMBER_NOT_FOUND");
+  if (member.status !== "SUSPENDED") throw new Error("NOT_SUSPENDED");
+  return prisma.workspaceMember.update({
+    where: { id: memberId },
+    data: { status: "ACTIVE", suspendedAt: null },
+  });
 }
 
 export async function deleteMember(memberId: string, workspaceId: string) {
