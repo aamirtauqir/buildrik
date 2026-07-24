@@ -8,6 +8,30 @@
 
 ---
 
+## Resolution — 2026-07-24 (all fixed + shipped to main)
+
+Every actionable finding is fixed, typechecked (0 errors), and browser-verified. Two findings were dismissed after verification as tool artifacts, not product bugs.
+
+| # | Status | Commit |
+|---|---|---|
+| G1 fake sparklines | ✅ Fixed — visuals reflect real data (Sites donut, Visitors flat-on-zero, counts no spark) | `428ea964` |
+| G3 StatCard consistency | ✅ Fixed — one rule (spark = real time-series only) | `428ea964` |
+| G4 duplicate storage meter | ✅ Fixed — shell meter is SSOT; media keeps only the near-full nudge | `428ea964` |
+| G5 "Explore" dead-link label | ✅ Fixed — replaced with a divider rule | `428ea964` |
+| A3 orphaned "Add client" | ✅ Fixed — moved into the section PageHeader (`?new=1`) | `428ea964` |
+| A1 all-dash Contact column | ✅ Fixed — shown only when a client has a domain; relabelled "Domain" | `428ea964` |
+| H1 vague activity rows | ✅ Fixed — rows name the site; feed resolves `siteName` | `428ea964` |
+| B1 no content previews | ✅ Fixed (interim) — thumbnail when present, else deterministic tinted cover with initial | `83ec40e3` |
+| T2 template card jitter | ✅ Fixed — two fixed meta rows, equal card heights | `83ec40e3` |
+| SD2 health "why" hidden | ✅ Fixed — weakest area shown inline in the collapsed header | `83ec40e3` |
+| B2 soft 0→1 activation | ✅ Fixed — publish-activation banner above the stat grid when drafts exist but nothing is live | `83ec40e3` |
+| G2 "N" clips storage | ⛔ Dismissed — the "N" + "1"-badge circles are **Next.js dev-mode overlays**, not product; gone in prod. No product FAB exists in the shell. |
+| S2 draft vs published cards | ⛔ Dismissed — `SiteCardFull` is consistent (metadata always shown + hover-reveal action bar). The screenshot difference was a hover state on the card under the cursor. |
+
+**Real screenshot thumbnails** (screenshot-on-publish) remain the full B1 win — the `thumbnail` column is already wired end-to-end and now rendered when populated; generating the actual screenshots is separate infra work, not blocked.
+
+---
+
 ## 1. Scorecard (0–10)
 
 | Dimension | Score | One-line reason |
