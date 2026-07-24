@@ -11,11 +11,11 @@ import { Crosshair, CornerLeftUp } from "lucide-react";
 import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
-import { ReachScopeStrip } from "./components/ReachScopeStrip";
+import { ScopeDropdown } from "./components/ScopeDropdown";
 import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
-import { StatePills } from "./components/StatePills";
+import { StateDropdown } from "./components/StateDropdown";
 import type { Composer } from "../../engine";
-import { BREAKPOINTS, isValidBreakpoint } from "../../shared/constants/breakpoints";
+import { isValidBreakpoint } from "../../shared/constants/breakpoints";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
@@ -63,9 +63,6 @@ export interface ProInspectorProps {
   ) => void;
   onOpenCreateCollection?: () => void;
 }
-
-// BreakpointPill + StatePills moved to ./components/BreakpointPill.tsx
-// + ./components/StatePills.tsx (D6 Stage 1, audit-remediation 2026-05-08).
 
 // ============================================================================
 // MAIN COMPONENT
@@ -141,13 +138,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   // Canvas signals pick completion/cancellation — clear pickActive so the
   // header button leaves its pressed state without another click.
   usePickModeReset(composer, setPickActive);
-
-  // Show pseudo-state pills only when non-normal / overrides exist / user opts in
-  const [stateSelectorManuallyShown, setStateSelectorManuallyShown] = React.useState(false);
-  React.useEffect(() => {
-    setStateSelectorManuallyShown(false);
-  }, [selectedElement?.id]);
-
 
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
 
@@ -254,43 +244,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return <InspectorEmptyState composer={composer} />;
   }
 
-  const showStatePills =
-    currentPseudoState !== "normal" ||
-    statesWithOverrides.size > 0 ||
-    stateSelectorManuallyShown;
-
-  const visibleStates: readonly PseudoStateId[] = showStatePills
-    ? (["normal", "hover", "focus", "active", "disabled"] as const)
-    : (["normal"] as const);
-
-  // Build ancestor breadcrumb path from composer. Walks parent chain and
-  // caps at 4 segments so a deep tree doesn't overflow the strip.
-  const breadcrumbPath: { label: string; isCurrent: boolean }[] = (() => {
-    const path: { label: string; isCurrent: boolean }[] = [];
-    if (!composer?.elements || !selectedElement?.id) return path;
-    let current: Element | null =
-      composer.elements.getElement(selectedElement.id) ?? null;
-    let depth = 0;
-    while (current && depth < 8) {
-      const tag = (current.getTagName() || current.getType() || "").toLowerCase();
-      const cls = current.getClasses()[0];
-      const label = cls ? `${tag}.${cls}` : tag || "element";
-      path.unshift({ label, isCurrent: current.getId() === selectedElement.id });
-      current = current.getParent();
-      depth++;
-    }
-    return path.slice(-4);
-  })();
-
-  // Meta line for the Figma-style header: tag.class
+  // Parent lookup drives the header's "select parent" affordance.
   const selectedInstance = composer?.elements?.getElement(selectedElement.id) ?? null;
-  const firstClass = selectedInstance?.getClasses()[0] ?? "";
-  const metaPrimary = selectedElement.tagName
-    ? `${selectedElement.tagName.toLowerCase()}${firstClass ? `.${firstClass}` : ""}`
-    : `#${selectedElement.id.slice(-6)}`;
-
-  const bpMeta = BREAKPOINTS[currentBreakpoint];
-  const bpSizeLabel = bpMeta.maxWidth !== undefined ? `${bpMeta.maxWidth}+` : "1200+";
 
   return (
     <div className="bdi-panel">
@@ -298,20 +253,18 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
         {elementLabel} selected
       </div>
-      {/* Selection breadcrumb (tag.class DOM path) — engineer jargon. Redesign P3
-          (sev 3): show it only in full density. In the client / content-editor view
-          ("fewer") the human "You are editing" header below is the only header, and
-          parent nav stays on the canvas breadcrumb + Alt+↑. */}
-      {inspectorDensity === "full" && breadcrumbPath.length > 0 && (
-        <div className="bdi-ssel">
-          <div className="bdi-crumb" title={breadcrumbPath.map((p) => p.label).join(" / ")}>
-            {breadcrumbPath.map((p, i) => (
-              <React.Fragment key={i}>
-                {i > 0 && <span className="bdi-sep">/</span>}
-                <span className={p.isCurrent ? "bdi-cur" : undefined}>{p.label}</span>
-              </React.Fragment>
-            ))}
-          </div>
+      {/* Figma 32-2 header — clean `[icon] <Element>  ⋯`. The verbose "YOU ARE
+          EDITING / this container" banner and the tag.class DOM breadcrumb were
+          dropped from the primary view; pick-element + select-parent stay as
+          compact icons, binding + the ⋯ menu on the right. */}
+      <div className="bdi-ehdr">
+        <div className="bdi-eic" aria-hidden="true">
+          <ElementIcon size="sm" />
+        </div>
+        <div className="bdi-ename">
+          <div className="bdi-n">{elementLabel}</div>
+        </div>
+        <div className="bdi-eact">
           <Button
             type="button"
             className={`bdi-icon-btn${pickActive ? " on" : ""}`}
@@ -336,20 +289,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           >
             <CornerLeftUp size={12} aria-hidden="true" />
           </Button>
-        </div>
-      )}
-      {/* 59-inspector: "YOU ARE EDITING / this <element>" — human framing, not a
-          DOM/CSS inspector header. The technical tag.class meta is dropped from
-          the primary view (it still lives in the selection breadcrumb above). */}
-      <div className="bdi-ehdr">
-        <div className="bdi-eic" aria-hidden="true">
-          <ElementIcon size="sm" />
-        </div>
-        <div className="bdi-ename">
-          <div className="bdi-t" style={{ textTransform: "uppercase", letterSpacing: "0.04em", fontSize: 10 }}>You are editing</div>
-          <div className="bdi-n">this {(elementLabel || "element").toLowerCase()}</div>
-        </div>
-        <div className="bdi-eact">
           <BindingPopover
             elementId={selectedElement?.id ?? null}
             composer={composer ?? null}
@@ -373,38 +312,21 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           elementLabel={elementLabel}
         />
       </div>
-      {/* 40/41/59 — the 3-reach picker, the inspector's primary decision: This
-          item / All like this / Whole site. Sits right under "You are editing". */}
-      <ReachScopeStrip composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} />
-      {/* S3.9: no tab strip — the body is one flat scrolling column ordered per
-          element profile. The Look/Layout/Effects tabs were removed. */}
-      {/* Breakpoint + state strip (mock pattern: pill + states + size right) */}
+      {/* Figma 32-2 pill row: `This ▾ · Desktop ▾ · Base ▾` (scope · breakpoint ·
+          state), three compact dropdowns on one line. S3.9: no tab strip — the
+          body below is one flat scrolling column ordered per element profile. */}
       <div className="bdi-bpr">
+        <ScopeDropdown composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} />
         <BreakpointPill
           current={currentBreakpoint}
           onChange={onBreakpointChange}
           hasOverride={breakpointHasOverride}
         />
-        {showStatePills ? (
-          <StatePills
-            current={currentPseudoState}
-            onChange={setCurrentPseudoState}
-            withOverrides={statesWithOverrides}
-            visibleStates={visibleStates}
-          />
-        ) : (
-          <Button
-            type="button"
-            onClick={() => setStateSelectorManuallyShown(true)}
-            aria-label="Show state override selector"
-            title="Add hover / focus / active styles"
-            className="bdi-state-pill"
-            style={{ borderStyle: "dashed", borderWidth: 1, borderColor: "var(--bd-border)" }}
-          >
-            + state
-          </Button>
-        )}
-        <span className="bdi-sz">{bpSizeLabel}</span>
+        <StateDropdown
+          current={currentPseudoState}
+          onChange={setCurrentPseudoState}
+          withOverrides={statesWithOverrides}
+        />
         {/* S6: detach catalog/user-saved instance — pro-mode only, hides
             itself when selectedElement is not an instance. Self-gated. */}
         <DetachInstanceButton

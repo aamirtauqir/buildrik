@@ -86,9 +86,6 @@ export const Section: React.FC<SectionProps> = ({
         aria-controls={contentId}
         aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
       >
-        <span className="bdi-chev">
-          <ChevronDown size={9} aria-hidden="true" />
-        </span>
         <span className="bdi-sec-name">{title}</span>
         {preview && <span className="bdi-sec-preview">{preview}</span>}
         {action && (
@@ -99,6 +96,10 @@ export const Section: React.FC<SectionProps> = ({
             {action}
           </span>
         )}
+        {/* Figma 32-2: chevron sits on the RIGHT of the uppercase section label. */}
+        <span className="bdi-chev">
+          <ChevronDown size={11} aria-hidden="true" />
+        </span>
       </div>
       {isOpen && (
         <div id={contentId} className="bdi-sec-body">
