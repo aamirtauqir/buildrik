@@ -50,7 +50,10 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
         </div>
       )}
 
-      {!isLoading && data && data.timeSeries.length === 0 && (
+      {/* Empty state only when EVERY dataset is empty. Source/country/device data
+          comes from live events and can exist before the daily rollup runs — it
+          used to be hidden whenever the (lagging) timeSeries was empty. */}
+      {!isLoading && data && data.timeSeries.length === 0 && data.trafficSources.length === 0 && data.countries.length === 0 && (data.devices?.length ?? 0) === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <BarChart3 className="h-10 w-10 mb-4" style={{ color: "var(--color-text-muted)" }} />
           <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>No analytics data yet</h3>
@@ -60,16 +63,18 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
         </div>
       )}
 
-      {!isLoading && data && data.timeSeries.length > 0 && (
+      {!isLoading && data && (data.timeSeries.length > 0 || data.trafficSources.length > 0 || data.countries.length > 0 || (data.devices?.length ?? 0) > 0) && (
         <>
-          {/* Chart placeholder */}
-          <SectionCard title="Traffic Overview">
-            <div className="flex h-48 items-end gap-1">
-              {data.timeSeries.map((d, i) => (
-                <div key={i} className="flex-1 rounded-t" style={{ height: `${Math.max(10, (d.visitors / Math.max(...data.timeSeries.map((t) => t.visitors), 1)) * 100)}%`, backgroundColor: "var(--color-primary)", opacity: 0.7 }} title={`${d.date}: ${d.visitors} visitors`} />
-              ))}
-            </div>
-          </SectionCard>
+          {/* Traffic chart — only when there's a time series to plot. */}
+          {data.timeSeries.length > 0 && (
+            <SectionCard title="Traffic Overview">
+              <div className="flex h-48 items-end gap-1">
+                {data.timeSeries.map((d, i) => (
+                  <div key={i} className="flex-1 rounded-t" style={{ height: `${Math.max(10, (d.visitors / Math.max(...data.timeSeries.map((t) => t.visitors), 1)) * 100)}%`, backgroundColor: "var(--color-primary)", opacity: 0.7 }} title={`${d.date}: ${d.visitors} visitors`} />
+                ))}
+              </div>
+            </SectionCard>
+          )}
 
           {/* Traffic Sources + Countries */}
           {(() => {

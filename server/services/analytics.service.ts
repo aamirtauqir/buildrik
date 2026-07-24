@@ -136,14 +136,41 @@ export async function getSiteAnalytics(
     count: r._count,
   }));
 
-  const dailyRows = timeSeries.map((row) => ({
-    date: row.date,
-    visitors: row.visitors,
-    uniqueVisitors: row.uniqueVisitors,
-    pageViews: row.pageViews,
-    avgSession: row.avgSession,
-    bounceRate: row.bounceRate,
-  }));
+  // The daily rollup cron aggregates only up to YESTERDAY, so today's bar is
+  // always missing and the "today" range looked permanently empty despite live
+  // traffic. Fold in a live count of today's events as the current-day row.
+  const startOfToday = new Date();
+  startOfToday.setUTCHours(0, 0, 0, 0);
+  const rolledRows = timeSeries
+    .filter((row) => row.date < startOfToday)
+    .map((row) => ({
+      date: row.date,
+      visitors: row.visitors,
+      uniqueVisitors: row.uniqueVisitors,
+      pageViews: row.pageViews,
+      avgSession: row.avgSession,
+      bounceRate: row.bounceRate,
+    }));
+
+  const dailyRows = [...rolledRows];
+  if (end >= startOfToday) {
+    const todayWindow = { siteId, createdAt: { gte: startOfToday, lte: end } };
+    const [todayPageViews, todaySessions] = await Promise.all([
+      prisma.analyticsEvent.count({ where: todayWindow }),
+      prisma.analyticsEvent.findMany({ where: todayWindow, select: { sessionId: true }, distinct: ["sessionId"] }),
+    ]);
+    if (todayPageViews > 0) {
+      const uniq = todaySessions.filter((s) => s.sessionId).length || todayPageViews;
+      dailyRows.push({
+        date: startOfToday,
+        visitors: uniq,
+        uniqueVisitors: uniq,
+        pageViews: todayPageViews,
+        avgSession: 0,
+        bounceRate: 0,
+      });
+    }
+  }
 
   const devices = [
     { device: "mobile", count: mobile },

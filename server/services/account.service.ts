@@ -4,6 +4,7 @@ import type { UpdateProfileInput, NotificationPrefInput, UpdatePreferencesInput 
 import { sendAccountDeletionEmail, sendEmailChangedEmail } from "@/server/services/email.service";
 import { createNotification } from "@/server/services/notification.trigger";
 import { generateToken } from "@/server/services/token.service";
+import { getDailyPromptUsage } from "@/server/services/quota.service";
 
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -391,12 +392,12 @@ export async function disable2FA(userId: string, password: string, code?: string
   return { success: true };
 }
 
-export async function getAICreditsInfo(workspaceId: string, plan: PlanName) {
+export async function getAICreditsInfo(workspaceId: string, userId: string, plan: PlanName) {
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
 
-  const [history, used] = await Promise.all([
+  const [history, used, dailyPrompts] = await Promise.all([
     prisma.aIGenerationJob.findMany({
       where: { workspaceId },
       orderBy: { createdAt: "desc" },
@@ -408,11 +409,16 @@ export async function getAICreditsInfo(workspaceId: string, plan: PlanName) {
         createdAt: { gte: startOfMonth },
       },
     }),
+    // The daily per-user prompt limit is what actually blocks in-editor AI —
+    // surface it so the number the user sees matches the one that stops them.
+    getDailyPromptUsage(userId, plan),
   ]);
 
   return {
     history,
     used,
     limit: PLAN_LIMITS[plan].aiGenerations as number,
+    dailyPromptsUsed: dailyPrompts.used,
+    dailyPromptsLimit: dailyPrompts.limit,
   };
 }

@@ -277,7 +277,7 @@ export const accountRouter = router({
   }),
   aiCredits: protectedProcedure.query(async ({ ctx }) => {
     const { workspaceId, plan } = await getWorkspaceCtx(ctx);
-    return getAICreditsInfo(workspaceId, plan);
+    return getAICreditsInfo(workspaceId, ctx.session.user.id, plan);
   }),
   dangerZone: router({
     pendingDeletion: protectedProcedure.query(({ ctx }) => {

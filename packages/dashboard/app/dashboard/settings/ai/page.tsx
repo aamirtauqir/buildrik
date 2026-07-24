@@ -15,6 +15,8 @@ export default function AICreditsPage() {
       used={creditsQuery.data.used}
       limit={creditsQuery.data.limit}
       history={creditsQuery.data.history}
+      dailyPromptsUsed={creditsQuery.data.dailyPromptsUsed}
+      dailyPromptsLimit={creditsQuery.data.dailyPromptsLimit}
     />
   );
 }

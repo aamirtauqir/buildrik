@@ -15,6 +15,10 @@ interface AICreditsTabProps {
   used?: number;
   limit?: number;
   history?: GenerationRecord[];
+  // The per-day, per-user in-editor AI prompt limit — the one that actually
+  // blocks AI edits. -1 = unlimited.
+  dailyPromptsUsed?: number;
+  dailyPromptsLimit?: number;
 }
 
 const COMING_SOON_TOOLS = [
@@ -45,9 +49,13 @@ export function AICreditsTab({
   used = 0,
   limit = 10,
   history = [],
+  dailyPromptsUsed = 0,
+  dailyPromptsLimit = 0,
 }: AICreditsTabProps) {
   const remaining = Math.max(0, limit - used);
   const usagePercent = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+  const promptsUnlimited = dailyPromptsLimit < 0;
+  const promptsPercent = dailyPromptsLimit > 0 ? Math.min(100, (dailyPromptsUsed / dailyPromptsLimit) * 100) : 0;
 
   return (
     <div className="space-y-8">
@@ -77,6 +85,29 @@ export function AICreditsTab({
         <ProgressBar pct={usagePercent} tone="accent" />
         <p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
           Credits reset on the 1st of each month.
+        </p>
+      </SectionCard>
+
+      {/* The daily per-user prompt limit is what actually gates in-editor AI —
+          surfacing it so users aren't blocked by a number shown nowhere. */}
+      <SectionCard title="In-editor AI prompts">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm" style={{ color: "var(--color-text-primary)" }}>
+            {promptsUnlimited ? (
+              <MetricValue className="text-lg font-semibold">Unlimited</MetricValue>
+            ) : (
+              <><MetricValue className="text-lg font-semibold">{Math.max(0, dailyPromptsLimit - dailyPromptsUsed)}</MetricValue> remaining today</>
+            )}
+          </p>
+          {!promptsUnlimited && (
+            <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
+              <MetricValue>{dailyPromptsUsed}/{dailyPromptsLimit}</MetricValue> prompts used
+            </p>
+          )}
+        </div>
+        {!promptsUnlimited && <ProgressBar pct={promptsPercent} tone="accent" />}
+        <p className="text-xs mt-2" style={{ color: "var(--color-text-secondary)" }}>
+          Each AI edit in the editor uses one prompt. Resets daily at midnight UTC.
         </p>
       </SectionCard>
 

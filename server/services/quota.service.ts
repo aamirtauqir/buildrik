@@ -28,6 +28,23 @@ function nextMidnightUTC(): Date {
   return next;
 }
 
+/**
+ * Read a user's AI-prompt usage for today. This is the limit that actually
+ * blocks in-editor AI (reserveQuota enforces aiPromptsPerDay), so the AI-credits
+ * UI can surface it instead of only the monthly site-generation count.
+ */
+export async function getDailyPromptUsage(
+  userId: string,
+  plan: PlanName,
+): Promise<{ used: number; limit: number }> {
+  const limit = PLAN_LIMITS[plan].aiPromptsPerDay as number;
+  const row = await prisma.aIUsage.findUnique({
+    where: { userId_dayBucket: { userId, dayBucket: todayBucket() } },
+    select: { count: true },
+  });
+  return { used: row?.count ?? 0, limit };
+}
+
 async function getUserPlan(userId: string): Promise<PlanName> {
   const member = await prisma.workspaceMember.findFirst({
     where: { userId, status: "ACTIVE" },

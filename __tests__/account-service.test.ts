@@ -15,6 +15,7 @@ vi.mock("@/lib/prisma", () => ({
     site: { findMany: vi.fn() },
     userPreference: { findUnique: vi.fn() },
     aIGenerationJob: { findMany: vi.fn(), count: vi.fn() },
+    aIUsage: { findUnique: vi.fn() },
   },
 }));
 
@@ -286,10 +287,15 @@ describe("Notification Preferences", () => {
         { id: "j1", status: "COMPLETED", businessType: "PORTFOLIO", createdAt: new Date() },
       ] as any);
       vi.mocked(prisma.aIGenerationJob.count).mockResolvedValue(2);
-      const result = await getAICreditsInfo("ws1", "FREE");
+      // Daily in-editor prompt usage (the enforced limit, now surfaced too).
+      vi.mocked(prisma.aIUsage.findUnique).mockResolvedValue({ count: 4 } as any);
+      const result = await getAICreditsInfo("ws1", "u1", "FREE");
       expect(result.history).toHaveLength(1);
       expect(result.used).toBe(2);
       expect(result.limit).toBe(3);
+      // FREE aiPromptsPerDay = 10; 4 used today.
+      expect(result.dailyPromptsUsed).toBe(4);
+      expect(result.dailyPromptsLimit).toBe(10);
     });
   });
 });
