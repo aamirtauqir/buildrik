@@ -59,8 +59,11 @@ export function TopNav({ onSearch }: { onSearch: () => void }) {
           Dashboard
           {!isFullWidthRoute(pathname) && <span className="absolute inset-x-3 -bottom-[calc((var(--topnav-h)-100%)/2)] h-0.5 rounded-pill" style={{ backgroundColor: "var(--color-text-primary)" }} />}
         </Link>
-        <span className="mx-1.5 h-4 w-px" style={{ backgroundColor: "var(--color-border-default)" }} />
-        <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.11em]" style={{ color: "var(--color-text-muted)" }}>Explore</span>
+        {/* A vertical rule (not a text label) separates the workspace anchor from
+            the ecosystem tabs. The former "Explore" caption sat at the nav's own
+            rhythm and read as a disabled tab (audit G5); the divider carries the
+            grouping the way Linear/Vercel do, with nothing clickable-looking. */}
+        <span className="mx-2 h-4 w-px" style={{ backgroundColor: "var(--color-border-default)" }} />
         {ECOSYSTEM_NAV.map((item) => {
           const active = isTopActive(pathname, item.href);
           return (

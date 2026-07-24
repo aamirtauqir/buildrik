@@ -5,7 +5,7 @@ import { Search, Upload, Trash2, Copy, Check, Folder, FolderPlus, Images, ImageO
 import { upload } from "@vercel/blob/client";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
-import { Button, Modal, PageHeader, MetricValue, ProgressBar, InputField, FilterTabs } from "@/components/dashboard/primitives";
+import { Button, Modal, PageHeader, InputField, FilterTabs } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
 
 type MediaType = "image" | "video" | "icon" | "font";
@@ -159,7 +159,6 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
   const items = sortBy === "name" ? [...rawItems].sort((a, b) => a.filename.localeCompare(b.filename)) : rawItems;
   const hasMore = Boolean(assets.data?.nextCursor);
   const q = quota.data;
-  const usedPct = q && q.totalBytes > 0 ? Math.min((q.usedBytes / q.totalBytes) * 100, 100) : 0;
 
   return (
     <div>
@@ -255,22 +254,15 @@ export function MediaLibrary({ workspaceId }: { workspaceId: string }) {
             </button>
           </nav>
 
-          {/* Storage usage */}
-          {q && (
+          {/* Storage lives in the shell sidebar (the SSOT meter, present on
+              every dashboard route). We don't repeat the bar here — a second
+              identical meter in the same viewport was the audit's G4. We keep
+              only the in-context "almost full" nudge, shown when it matters. */}
+          {q?.warningAt80Percent && (
             <div className="mt-5 border-t pt-4" style={{ borderColor: "var(--color-border-default)" }}>
-              <div className="flex items-center justify-between text-body-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                <span>Storage</span>
-                <span style={{ color: "var(--color-text-muted)" }}>
-                  <MetricValue>{formatBytes(q.usedBytes)}</MetricValue>
-                  {q.totalBytes === -1 ? " used" : <> / <MetricValue>{formatBytes(q.totalBytes)}</MetricValue></>}
-                </span>
-              </div>
-              {q.totalBytes > 0 && <ProgressBar pct={usedPct} tone="auto" className="mt-2" />}
-              {q.warningAt80Percent && (
-                <p className="mt-1.5 text-body-sm" style={{ color: "var(--color-error)" }}>
-                  Almost full — <a href="/dashboard/settings/billing" className="font-medium underline">upgrade</a>.
-                </p>
-              )}
+              <p className="text-body-sm" style={{ color: "var(--color-error)" }}>
+                Storage almost full — <a href="/dashboard/settings/billing" className="font-medium underline">upgrade</a>.
+              </p>
             </div>
           )}
         </aside>

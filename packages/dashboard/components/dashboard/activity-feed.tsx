@@ -42,6 +42,7 @@ export function collapseEntries(entries: ActivityEntry[]): Array<{ entry: Activi
     const sameAs =
       last &&
       last.entry.actorName === entry.actorName &&
+      last.entry.siteName === entry.siteName &&
       (last.entry.description ?? last.entry.action) === (entry.description ?? entry.action);
     if (sameAs) last.count += 1;
     else out.push({ entry, count: 1 });
@@ -70,6 +71,9 @@ function ActivityRow({ entry, count, isLast }: { entry: ActivityEntry; count: nu
         <p className="truncate text-[13.5px]" style={{ color: "var(--color-text-primary)" }}>
           {entry.actorName && <span className="font-semibold">{entry.actorName} </span>}
           {entry.description ?? entry.action}
+          {entry.siteName && (
+            <span style={{ color: "var(--color-text-secondary)" }}> · {entry.siteName}</span>
+          )}
           {count > 1 && (
             <span className="ml-1.5 text-body-sm font-medium" style={{ color: "var(--color-text-muted)" }}>
               ×{count}

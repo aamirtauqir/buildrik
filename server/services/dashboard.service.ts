@@ -156,6 +156,16 @@ export async function getActivityFeed(
       : [];
   const actorMap = new Map(actors.map((a) => [a.id, a]));
 
+  // Resolve site names so a feed row can name the object it acted on. One query
+  // for all referenced sites; entries without a siteId (or for a deleted site)
+  // simply carry a null siteName and read as before.
+  const siteIds = [...new Set(logs.map((l) => l.siteId).filter(Boolean))] as string[];
+  const sites =
+    siteIds.length > 0
+      ? await prisma.site.findMany({ where: { id: { in: siteIds } }, select: { id: true, name: true } })
+      : [];
+  const siteMap = new Map(sites.map((s) => [s.id, s.name]));
+
   // Group by date bucket
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -178,6 +188,7 @@ export async function getActivityFeed(
       actorAvatar: actor?.avatar ?? null,
       description: log.description ?? null,
       siteId: log.siteId ?? null,
+      siteName: log.siteId ? siteMap.get(log.siteId) ?? null : null,
       createdAt: log.createdAt,
     };
   });

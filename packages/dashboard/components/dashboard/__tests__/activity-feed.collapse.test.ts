@@ -16,6 +16,7 @@ function entry(over: Partial<ActivityEntry>): ActivityEntry {
     actorAvatar: null,
     description: "Updated 2 settings",
     siteId: null,
+    siteName: null,
     createdAt: new Date(0),
     ...over,
   };
@@ -41,6 +42,14 @@ describe("collapseEntries", () => {
     const result = collapseEntries([
       entry({ actorName: "Saqib" }),
       entry({ actorName: "Ali" }),
+    ]);
+    expect(result).toHaveLength(2);
+  });
+
+  it("does not merge same-text entries acting on different sites", () => {
+    const result = collapseEntries([
+      entry({ description: "Updated 2 settings", siteName: "Pulse — Pricing" }),
+      entry({ description: "Updated 2 settings", siteName: "Riverstone — Studio" }),
     ]);
     expect(result).toHaveLength(2);
   });

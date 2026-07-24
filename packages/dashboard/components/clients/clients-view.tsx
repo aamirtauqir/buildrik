@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Briefcase, Plus, Pencil, Trash2, MoreHorizontal } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Briefcase, Pencil, Trash2, MoreHorizontal } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { StateEmpty, LoadingSkeleton, ErrorState, DeniedState } from "@/components/states";
@@ -107,6 +107,7 @@ function ConfirmDeleteDialog({
 
 export function ClientsView() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { addToast } = useToast();
   // clients.list returns [] both when the agency_layer flag is off AND when it's
   // on with zero clients — the flag disambiguates so a solo workspace gets a
@@ -118,6 +119,16 @@ export function ClientsView() {
   const [renaming, setRenaming] = useState<ClientRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<ClientRow | null>(null);
   const [menu, setMenu] = useState<{ id: string; top: number; left: number } | null>(null);
+
+  // The section header's "Add client" button (in the agency layout) opens this
+  // dialog via ?new=1 — consume it once, then strip the param so a refresh or
+  // back-nav doesn't reopen the dialog.
+  useEffect(() => {
+    if (searchParams.get("new") === "1") {
+      setCreating(true);
+      router.replace("/dashboard/agency");
+    }
+  }, [searchParams, router]);
 
   const createMut = trpc.clients.create.useMutation({
     onSuccess: () => {
@@ -157,6 +168,12 @@ export function ClientsView() {
     clients.map((c, i) => [c.id, c.brandColor ?? TILE_TOKENS[i % TILE_TOKENS.length]] as const),
   );
 
+  // The domain column carried a client's customDomain but was headed "Contact"
+  // and, with no domains set, rendered as a full column of "—" that read as
+  // broken (audit A1). Show it only when at least one client actually has a
+  // domain, and label it for what it is.
+  const anyDomain = clients.some((c) => c.customDomain);
+
   const columns: Column<ClientRow>[] = [
     {
       key: "name",
@@ -185,16 +202,18 @@ export function ClientsView() {
         </span>
       ),
     },
-    {
-      key: "contact",
-      header: "Contact",
-      render: (c) =>
-        c.customDomain ? (
-          <span style={{ color: "var(--color-text-secondary)" }}>{c.customDomain}</span>
-        ) : (
-          <span style={{ color: "var(--color-text-muted)" }}>—</span>
-        ),
-    },
+    ...(anyDomain
+      ? [{
+          key: "contact",
+          header: "Domain",
+          render: (c: ClientRow) =>
+            c.customDomain ? (
+              <span style={{ color: "var(--color-text-secondary)" }}>{c.customDomain}</span>
+            ) : (
+              <span style={{ color: "var(--color-text-muted)" }}>—</span>
+            ),
+        } as Column<ClientRow>]
+      : []),
     {
       key: "status",
       header: "Status",
@@ -222,19 +241,11 @@ export function ClientsView() {
     },
   ];
 
-  const addButton = agencyEnabled ? (
-    <Button onClick={() => setCreating(true)} className="gap-1.5">
-      <Plus className="h-4 w-4" />
-      Add client
-    </Button>
-  ) : undefined;
-
   return (
     <div>
-      {/* The agency layout owns the section PageHeader (D10.4) — this page keeps
-          only its functional action. */}
-      {addButton && <div className="mb-6 flex justify-end">{addButton}</div>}
-
+      {/* Primary action ("Add client") lives in the section PageHeader owned by
+          the agency layout (audit A3) — it opens this view's create dialog via
+          ?new=1. This view provides content only. */}
       {featuresQuery.isLoading ? (
         <LoadingSkeleton rows={3} variant="card" />
       ) : !agencyEnabled ? (

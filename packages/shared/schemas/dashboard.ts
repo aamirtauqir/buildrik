@@ -39,6 +39,9 @@ export const activityEntrySchema = z.object({
   actorAvatar: z.string().nullable(),
   description: z.string().nullable(),
   siteId: z.string().nullable(),
+  // Name of the site the entry acted on, when it has a siteId. Lets the feed
+  // say WHICH site changed instead of a bare "Updated 2 settings".
+  siteName: z.string().nullable(),
   createdAt: z.date(),
 });
 

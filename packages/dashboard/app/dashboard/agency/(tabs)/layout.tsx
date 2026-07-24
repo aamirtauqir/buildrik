@@ -1,9 +1,10 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { LoadingSkeleton, ErrorState } from "@/components/states";
-import { PageHeader } from "@/components/dashboard/primitives";
+import { PageHeader, Button } from "@/components/dashboard/primitives";
 import { AgencyTabs } from "@/components/dashboard/shell/agency-tabs";
 
 /** Agency section chrome (IA v2). The layout owns the PageHeader + tab row
@@ -14,6 +15,13 @@ import { AgencyTabs } from "@/components/dashboard/shell/agency-tabs";
  *  security authority; this guard is UX. */
 export default function AgencyTabsLayout({ children }: { children: React.ReactNode }) {
   const features = trpc.features.list.useQuery(undefined, { staleTime: 60_000 });
+  const pathname = usePathname();
+  const router = useRouter();
+  // The Clients tab's primary action lives in the section header (audit A3 —
+  // it used to float in a dead-space row inside the tab). It opens the create
+  // dialog via a ?new=1 param the ClientsView consumes, so the button can sit
+  // in the shared PageHeader without the layout owning the dialog state.
+  const onClientsTab = pathname === "/dashboard/agency";
 
   if (features.isLoading) return <LoadingSkeleton rows={3} variant="card" />;
   if (features.isError) {
@@ -29,7 +37,18 @@ export default function AgencyTabsLayout({ children }: { children: React.ReactNo
 
   return (
     <div>
-      <PageHeader title="Agency" description="Clients, sign-off, shared theme, and partner program." />
+      <PageHeader
+        title="Agency"
+        description="Clients, sign-off, shared theme, and partner program."
+        actions={
+          onClientsTab ? (
+            <Button onClick={() => router.push("/dashboard/agency?new=1")} className="gap-1.5">
+              <Plus className="h-4 w-4" />
+              Add client
+            </Button>
+          ) : undefined
+        }
+      />
       <div className="mb-6">
         <AgencyTabs />
       </div>

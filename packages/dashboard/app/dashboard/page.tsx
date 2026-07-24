@@ -5,7 +5,7 @@ import Link from "next/link";
 import { trpc } from "@lib/trpc/client";
 import { formatCompact } from "@lib/utils";
 import { StatCard, PageHeader, SectionCard, MetricValue } from "@/components/dashboard/primitives";
-import { TrendArrow, Sparkline } from "@/components/dashboard/dataviz";
+import { TrendArrow, Sparkline, MiniDonut } from "@/components/dashboard/dataviz";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { EmptyState, type EmptyStateVariant } from "@/components/dashboard/empty-state";
@@ -143,17 +143,27 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Stat tiles — sparkline visual per the IA-fixed design. Visitors uses
-              the real dailyVisitors series; the other metrics have no time-series
-              yet, so their sparkline is a representative trend (visual only). */}
-          {/* 4-up at the design's 1440 width; below that the tiles' fixed-width
-              sparklines cannot fit four across and would push the page sideways. */}
+          {/* Stat tiles. Rule (design audit G1/G3, 2026-07-24): a tile's visual
+              MUST reflect real data or it isn't drawn. Counts with no time-series
+              (Sites/Published/Team) carry NO sparkline — a synthesised uptrend on
+              zero is dishonest. Sites shows a real donut of its published/draft
+              split; Visitors shows the real dailyVisitors series, or a flat
+              zero-baseline when there is no traffic. Never a fabricated trend. */}
           <div className="grid grid-cols-1 gap-[14px] sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label="Sites"
               value={stats.data?.totalSites ?? 0}
               delta={<><MetricValue>{stats.data?.draftSites ?? 0}</MetricValue> in draft</>}
-              visual={<Sparkline data={[4, 5, 5, 6, 6, 7, 8]} />}
+              visual={
+                (stats.data?.totalSites ?? 0) > 0 ? (
+                  <MiniDonut
+                    segments={[
+                      { value: stats.data?.publishedSites ?? 0, color: "var(--color-primary)" },
+                      { value: stats.data?.draftSites ?? 0, color: "var(--color-border-strong)" },
+                    ]}
+                  />
+                ) : undefined
+              }
               href="/dashboard/projects"
             />
             <StatCard
@@ -175,7 +185,6 @@ export default function DashboardPage() {
                   "none published"
                 )
               }
-              visual={<Sparkline data={[3, 3, 4, 4, 4, 5, 5]} />}
               href="/dashboard/projects?status=published"
             />
             {/* No href: there is no workspace-level analytics view to link to.
@@ -189,12 +198,18 @@ export default function DashboardPage() {
                   <TrendArrow value={stats.data?.visitsChange ?? 0} /> · 30d
                 </span>
               }
-              visual={<Sparkline data={(stats.data?.dailyVisitors?.length ?? 0) >= 2 ? stats.data!.dailyVisitors : [10, 12, 11, 14, 13, 16, 18]} />}
+              visual={
+                (stats.data?.dailyVisitors?.length ?? 0) >= 2 ? (
+                  <Sparkline data={stats.data!.dailyVisitors} />
+                ) : (
+                  // Honest empty: a flat baseline at zero, muted — reads as "no
+                  // traffic", not growth. Not a fabricated series.
+                  <Sparkline data={[0, 0, 0, 0, 0, 0, 0]} color="var(--color-border-strong)" />
+                )
+              }
             />
             {/* This is the team metric — collaborator count + pending invites,
-                linking to Team settings. It was mislabeled "Form leads", which has
-                no data behind it (the dashboard stats carry no form-submission
-                aggregate); the label now matches what the card actually shows. */}
+                linking to Team settings. */}
             <StatCard
               label="Team"
               value={stats.data?.collaborators ?? 0}
@@ -203,7 +218,6 @@ export default function DashboardPage() {
                   ? <><MetricValue>{stats.data?.pendingInvites}</MetricValue> pending</>
                   : undefined
               }
-              visual={<Sparkline data={[2, 3, 3, 4, 4, 5, 6]} />}
               href="/dashboard/settings/team"
             />
           </div>
