@@ -3,7 +3,10 @@ import { z } from "zod";
 export const inviteMembersSchema = z.object({
   emails: z.array(z.string().email()).min(1).max(10),
   role: z.enum(["ADMIN", "EDITOR", "DESIGNER", "VIEWER"]),
-  siteIds: z.array(z.string()).optional(),
+  // Omit for "all sites" access; a non-empty list scopes the invite to those
+  // sites. An EMPTY array (chose "specific sites" but picked none) is rejected —
+  // it used to silently fall through to unrestricted all-site access.
+  siteIds: z.array(z.string()).min(1).optional(),
   message: z.string().max(500).optional(),
 });
 

@@ -8,7 +8,7 @@ import { MembersTable } from "@/components/team/members-table";
 import { InviteModal } from "@/components/team/invite-modal";
 import { PendingInvites } from "@/components/team/pending-invites";
 import { TeamEmptyState } from "@/components/team/team-empty-state";
-import { ErrorState } from "@/components/states";
+import { ErrorState, DeniedState } from "@/components/states";
 import { MetricValue } from "@/components/dashboard/primitives";
 import { UserPlus } from "lucide-react";
 
@@ -102,9 +102,22 @@ export default function TeamPage() {
     return <div className="h-72 animate-pulse rounded-xl" style={{ backgroundColor: "var(--color-bg-subtle)" }} />;
   }
 
-  // Without this, a failed stats/list query left data undefined → isEmpty true →
-  // the "invite your first member" empty state showed on a real error.
+  // Team data is ADMIN/OWNER only — a non-admin gets FORBIDDEN, which should read
+  // as "not for you", not "something broke".
   if (isError) {
+    const forbidden =
+      statsQuery.error?.data?.code === "FORBIDDEN" || membersQuery.error?.data?.code === "FORBIDDEN";
+    if (forbidden) {
+      return (
+        <DeniedState
+          title="Team is admin-only"
+          description="Only workspace admins and owners can view and manage members."
+          action={{ label: "Back to settings", href: "/dashboard/settings" }}
+        />
+      );
+    }
+    // Without this, a failed stats/list query left data undefined → isEmpty true →
+    // the "invite your first member" empty state showed on a real error.
     return (
       <ErrorState
         title="Couldn't load your team"

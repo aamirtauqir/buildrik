@@ -47,12 +47,15 @@ async function requireAdmin(ctx: WorkspaceCtx): Promise<{ workspaceId: string; p
 }
 
 export const teamRouter = router({
+  // Team roster, seats, and (below) pending-invite emails + activity are
+  // ADMIN/OWNER only — they expose every member's name+email and all
+  // pending-invite addresses, which any member could previously read.
   stats: protectedProcedure.query(async ({ ctx }) => {
-    const { workspaceId } = await getWorkspaceCtx(ctx);
+    const { workspaceId } = await requireAdmin(ctx);
     return getTeamStats(workspaceId);
   }),
   list: protectedProcedure.input(listMembersSchema).query(async ({ ctx, input }) => {
-    const { workspaceId } = await getWorkspaceCtx(ctx);
+    const { workspaceId } = await requireAdmin(ctx);
     return listMembers(workspaceId, input);
   }),
   // W4: the workspace-wide audit log (full, filterable, paginated). Audit trails
@@ -136,7 +139,7 @@ export const teamRouter = router({
     }
   }),
   pendingInvites: protectedProcedure.query(async ({ ctx }) => {
-    const { workspaceId } = await getWorkspaceCtx(ctx);
+    const { workspaceId } = await requireAdmin(ctx);
     return listPendingInvites(workspaceId);
   }),
   revokeInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ ctx, input }) => {
@@ -148,7 +151,7 @@ export const teamRouter = router({
     return resendInvite(input.inviteId, workspaceId);
   }),
   activity: protectedProcedure.query(async ({ ctx }) => {
-    const { workspaceId } = await getWorkspaceCtx(ctx);
+    const { workspaceId } = await requireAdmin(ctx);
     return getTeamActivity(workspaceId);
   }),
 });

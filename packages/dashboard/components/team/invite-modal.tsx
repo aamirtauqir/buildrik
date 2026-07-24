@@ -56,6 +56,9 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
   const tooMany = validCount > 10;
   const invalidEmails = emails.filter((e) => !EMAIL_RE.test(e));
   const hasInvalid = invalidEmails.length > 0;
+  // "Specific sites" with nothing selected is an invalid restriction (it used to
+  // silently grant ALL sites). Block it here and on the server.
+  const specificEmpty = accessMode === "specific" && selectedSiteIds.size === 0;
 
   function toggleSite(siteId: string) {
     setSelectedSiteIds((prev) => {
@@ -68,7 +71,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (tooMany || validCount === 0 || hasInvalid) return;
+    if (tooMany || validCount === 0 || hasInvalid || specificEmpty) return;
     onSubmit({
       emails,
       role,
@@ -91,7 +94,7 @@ export function InviteModal({ open, onClose, onSubmit, isLoading }: InviteModalP
           <Button
             type="submit"
             form="invite-modal-form"
-            disabled={validCount === 0 || tooMany || hasInvalid || isLoading}
+            disabled={validCount === 0 || tooMany || hasInvalid || specificEmpty || isLoading}
             className="flex-1"
           >
             {isLoading

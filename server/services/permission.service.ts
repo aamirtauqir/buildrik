@@ -26,6 +26,39 @@ interface BearerScope {
   workspaceId: string;
 }
 
+interface ScopedMember {
+  id: string;
+  role: string;
+  _count: { sitePermissions: number };
+}
+
+/**
+ * Enforce per-site scoping. A member invited to "specific sites" has one
+ * SitePermission row per allowed site; such a member may reach ONLY those
+ * sites. A member with no rows is on the "all sites" default (unscoped).
+ * ADMIN/OWNER manage the whole workspace and are never site-scoped.
+ *
+ * Returns this site's SitePermission row (for its roleOverride) or null.
+ * Throws FORBIDDEN when a scoped member requests a site outside their grant —
+ * previously SitePermission was only an additive role override, so scoping was
+ * never actually enforced and every member could reach every site.
+ */
+async function resolveSiteScope(
+  db: PrismaClient,
+  member: ScopedMember,
+  siteId: string,
+): Promise<{ roleOverride: string } | null> {
+  const row = await db.sitePermission.findUnique({
+    where: { memberId_siteId: { memberId: member.id, siteId } },
+    select: { roleOverride: true },
+  });
+  const managesWorkspace = member.role === "ADMIN" || member.role === "OWNER";
+  if (!managesWorkspace && member._count.sitePermissions > 0 && !row) {
+    throw new PermissionError("FORBIDDEN", "You don't have access to this site.");
+  }
+  return row;
+}
+
 export async function assertSiteAccess(
   db: PrismaClient,
   userId: string,
@@ -41,9 +74,10 @@ export async function assertSiteAccess(
   }
   const member = await db.workspaceMember.findFirst({
     where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
-    select: { id: true },
+    select: { id: true, role: true, _count: { select: { sitePermissions: true } } },
   });
   if (!member) throw new PermissionError("FORBIDDEN");
+  await resolveSiteScope(db, member, siteId);
 }
 
 export async function checkSiteRole(
@@ -61,11 +95,13 @@ export async function checkSiteRole(
 
   const member = await db.workspaceMember.findFirst({
     where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
-    include: { sitePermissions: { where: { siteId } } },
+    select: { id: true, role: true, _count: { select: { sitePermissions: true } } },
   });
   if (!member) throw new PermissionError("FORBIDDEN");
 
-  const effectiveRole = (member.sitePermissions[0]?.roleOverride ?? member.role) as UserRoleType;
+  // Enforce site scope AND read this site's role override in one step.
+  const row = await resolveSiteScope(db, member, siteId);
+  const effectiveRole = (row?.roleOverride ?? member.role) as UserRoleType;
   if ((ROLE_RANK[effectiveRole] ?? -1) < ROLE_RANK[minRole]) {
     throw new PermissionError("FORBIDDEN", "Insufficient permissions");
   }
