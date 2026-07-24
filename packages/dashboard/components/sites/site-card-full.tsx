@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { FileText, Pencil, Settings, Users, Clock, Globe } from "lucide-react";
-import { cn, siteAddress } from "@lib/utils";
+import { FileText, Pencil, Settings, Users, Clock } from "lucide-react";
+import { cn, siteAddress, coverFromSeed } from "@lib/utils";
 import { ContextMenu } from "./context-menu";
 import { EditorLink } from "@/components/editor-route/EditorLink";
 import { siteStatusTone, siteStatusLabel } from "./site-status";
@@ -39,13 +39,24 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
         <input type="checkbox" checked={selected} onChange={() => {}} className="h-4 w-4 rounded border-gray-300 accent-[var(--color-primary)]" onClick={(e) => { e.stopPropagation(); onSelect(site.id, e); }} />
       </div>
       <Link href={`/dashboard/sites/${site.id}`}>
-        {/* 16:10 preview placeholder (no thumbnail rendered yet) */}
-        <div
-          className="flex aspect-[16/10] w-full items-center justify-center"
-          style={{ backgroundColor: "var(--color-bg-subtle)" }}
-        >
-          <Globe className="h-8 w-8" style={{ color: "var(--color-text-muted)" }} />
-        </div>
+        {/* 16:10 preview. A real screenshot when we have one; otherwise a
+            deterministic tinted cover with the site's initial, so no two cards
+            read as the same grey globe (audit B1). */}
+        {site.thumbnail ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={site.thumbnail} alt="" className="aspect-[16/10] w-full object-cover" />
+        ) : (
+          (() => {
+            const cover = coverFromSeed(site.id);
+            return (
+              <div className="flex aspect-[16/10] w-full items-center justify-center" style={{ backgroundColor: cover.bg }}>
+                <span className="text-[38px] font-bold leading-none" style={{ color: cover.fg }}>
+                  {site.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            );
+          })()
+        )}
         <div className="p-4">
           <div className="flex items-center justify-between gap-2">
             <h3 className="truncate text-[14px] font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{site.name}</h3>

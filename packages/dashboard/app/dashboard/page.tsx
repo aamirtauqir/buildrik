@@ -35,6 +35,11 @@ export default function DashboardPage() {
   const showChecklist = onboardingState.data && !onboardingState.data.completed && !onboardingState.data.dismissed;
 
   const isEmpty = stats.data?.totalSites === 0;
+  // Has sites, but nothing is live yet. The single most important next move is
+  // to publish — promote it above the stat grid instead of leaving it as one of
+  // three equal quick actions (audit B2).
+  const draftCount = stats.data?.draftSites ?? 0;
+  const noneLive = !isEmpty && (stats.data?.publishedSites ?? 0) === 0 && draftCount > 0;
 
   // Determine empty state variant based on role
   const memberRole = stats.data?.memberRole;
@@ -143,6 +148,28 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="space-y-4">
+          {noneLive && (
+            <div
+              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5"
+              style={{ borderColor: "var(--color-primary)", backgroundColor: "var(--color-primary-subtle)" }}
+            >
+              <div className="min-w-0">
+                <p className="text-[15px] font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                  {draftCount === 1 ? "Your site is ready to go live" : `${draftCount} drafts, none live yet`}
+                </p>
+                <p className="mt-0.5 text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+                  Publish to get a real URL you can share with your client.
+                </p>
+              </div>
+              <Link
+                href="/dashboard/projects?status=draft"
+                className="shrink-0 rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ backgroundColor: "var(--color-primary)" }}
+              >
+                {draftCount === 1 ? "Review & publish" : "Pick a draft to publish"}
+              </Link>
+            </div>
+          )}
           {/* Stat tiles. Rule (design audit G1/G3, 2026-07-24): a tile's visual
               MUST reflect real data or it isn't drawn. Counts with no time-series
               (Sites/Published/Team) carry NO sparkline — a synthesised uptrend on

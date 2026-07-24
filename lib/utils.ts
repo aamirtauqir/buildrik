@@ -82,3 +82,24 @@ export function csvCell(value: unknown): string {
   if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
   return `"${s.replace(/"/g, '""')}"`;
 }
+
+/**
+ * Deterministic placeholder cover for a card that has no real thumbnail yet
+ * (sites/templates). Keyed off a seed (id) so the same item always gets the
+ * same tint, and different items differ — a grid of identical grey globes was
+ * the audit's "can't tell them apart" (B1). Palette is the DS neutral-tint set
+ * (no purple/violet — accent rules hold); returns a soft fill + a stronger ink
+ * for the initial glyph.
+ */
+export function coverFromSeed(seed: string): { bg: string; fg: string } {
+  const palette = [
+    { bg: "var(--color-primary-subtle)", fg: "var(--color-primary)" },
+    { bg: "color-mix(in srgb, var(--color-teal) 14%, white)", fg: "var(--color-teal)" },
+    { bg: "color-mix(in srgb, var(--color-amber) 16%, white)", fg: "var(--color-amber)" },
+    { bg: "color-mix(in srgb, var(--color-pink) 14%, white)", fg: "var(--color-pink)" },
+    { bg: "color-mix(in srgb, var(--color-success) 13%, white)", fg: "var(--color-success)" },
+  ];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  return palette[hash % palette.length];
+}

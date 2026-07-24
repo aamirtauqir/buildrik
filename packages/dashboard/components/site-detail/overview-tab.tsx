@@ -113,6 +113,13 @@ export function OverviewTab({
 
   const healthColor = stats.healthScore > 70 ? "var(--color-success)" : stats.healthScore > 40 ? "var(--color-warning)" : "var(--color-primary)";
 
+  // Surface the biggest drag on the score without making the user expand the
+  // panel first (audit SD2). Only worth showing when it's actually weak.
+  const weakest = HEALTH_METRICS.reduce((lo, m) =>
+    stats.healthBreakdown[m.key] < stats.healthBreakdown[lo.key] ? m : lo
+  );
+  const weakestScore = stats.healthBreakdown[weakest.key];
+
   return (
     <div className="space-y-8">
       {/* Stat Cards */}
@@ -166,9 +173,16 @@ export function OverviewTab({
           onClick={() => setHealthExpanded(!healthExpanded)}
           className="flex w-full items-center justify-between p-5"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <h3 className="text-body font-semibold" style={{ color: "var(--color-text-primary)" }}>Health Score</h3>
             <span className="text-body font-bold" style={{ color: healthColor }}>{stats.healthScore}/100</span>
+            {/* The single weakest area, inline — the top thing to fix, visible
+                before expanding. Hidden once the full breakdown is open. */}
+            {!healthExpanded && weakestScore <= 70 && (
+              <span className="truncate text-body-sm" style={{ color: "var(--color-text-muted)" }}>
+                · Weakest: {weakest.label} <span className="tabular-nums">{weakestScore}%</span>
+              </span>
+            )}
           </div>
           {healthExpanded ? (
             <ChevronDown className="h-4 w-4" style={{ color: "var(--color-text-secondary)" }} />

@@ -3,9 +3,9 @@
 import { Suspense, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Globe, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import { cn } from "@lib/utils";
+import { cn, coverFromSeed } from "@lib/utils";
 import { LoadingSkeleton, ErrorState, StateEmpty } from "@/components/states";
 import { TemplateFilterRail } from "@/components/templates/template-filter-rail";
 import { paginationRange } from "@/components/templates/pagination-range";
@@ -110,6 +110,7 @@ function TemplatesBrowserInner() {
               <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {items.map((t) => {
                   const diff = DIFFICULTY_STYLES[t.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
+                  const cover = coverFromSeed(t.id);
                   return (
                     <Link
                       key={t.id}
@@ -117,25 +118,32 @@ function TemplatesBrowserInner() {
                       className="group overflow-hidden rounded-xl border shadow-card transition-shadow hover:shadow-md"
                       style={{ borderColor: "var(--color-border-default)", backgroundColor: "var(--color-bg-surface)" }}
                     >
-                      <div className="flex h-[172px] items-center justify-center" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
-                        <Globe className="h-9 w-9" style={{ color: "var(--color-text-muted)" }} />
+                      {/* Deterministic tinted cover with the template initial so the
+                          gallery isn't a wall of identical grey globes (audit B1). */}
+                      <div className="flex h-[172px] items-center justify-center" style={{ backgroundColor: cover.bg }}>
+                        <span className="text-[42px] font-bold leading-none" style={{ color: cover.fg }}>
+                          {t.name.charAt(0).toUpperCase()}
+                        </span>
                       </div>
                       <div className="px-3.5 py-3">
                         <div className="flex items-center justify-between gap-2">
-                          <h2 className="text-[13.5px] font-semibold" style={{ color: "var(--color-text-primary)" }}>{t.name}</h2>
+                          <h2 className="truncate text-[13.5px] font-semibold" style={{ color: "var(--color-text-primary)" }}>{t.name}</h2>
                           <span className="shrink-0 text-body-sm font-semibold opacity-0 transition-opacity group-hover:opacity-100" style={{ color: "var(--color-primary)" }}>
                             View →
                           </span>
                         </div>
-                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        {/* Two fixed rows (pills, then usage) so a wider difficulty
+                            pill can't shove the count onto a second line and make
+                            cards different heights (audit T2). */}
+                        <div className="mt-1.5 flex items-center gap-1.5">
                           <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: "var(--color-bg-subtle)", color: "var(--color-text-secondary)" }}>
                             {t.category.toLowerCase()}
                           </span>
                           <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>
                             {diff.label}
                           </span>
-                          <span className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>{formatCount(t.usageCount)} {t.usageCount === 1 ? "site" : "sites"}</span>
                         </div>
+                        <p className="mt-1.5 text-[11px]" style={{ color: "var(--color-text-muted)" }}>{formatCount(t.usageCount)} {t.usageCount === 1 ? "site" : "sites"}</p>
                       </div>
                     </Link>
                   );
