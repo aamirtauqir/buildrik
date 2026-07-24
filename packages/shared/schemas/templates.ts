@@ -18,6 +18,10 @@ export const generateSiteSchema = z.object({
   tone: z.enum(["professional", "casual", "creative", "minimal", "bold", "playful"]).optional(),
   content: z.enum(["generate", "lorem", "empty"]).optional(),
   images: z.enum(["stock", "placeholders", "none"]).optional(),
+  // Regenerate target. When set (and owned by the caller's workspace), the
+  // worker REPLACES this site's pages instead of creating a new site — so a
+  // "Regenerate draft" in onboarding reuses the draft instead of orphaning it.
+  siteId: z.string().optional(),
 });
 
 export const applyTemplateToSiteSchema = z.object({

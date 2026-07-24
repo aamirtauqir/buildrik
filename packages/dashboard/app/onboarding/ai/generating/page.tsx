@@ -56,10 +56,13 @@ export default function AiGeneratingPage() {
       return;
     }
     createJob
-      .mutateAsync(buildGenerateInput(data.ai))
+      // A regenerate re-enters this page with a siteId already set — pass it so
+      // the worker replaces that draft in place instead of orphaning it and
+      // creating a new one.
+      .mutateAsync({ ...buildGenerateInput(data.ai), ...(data.siteId ? { siteId: data.siteId } : {}) })
       .then((job) => setJobId(job.id))
       .catch((e) => setError(e instanceof Error ? friendlyError(e.message) : "Couldn't start generation."));
-  }, [data.ai, createJob, router]);
+  }, [data.ai, data.siteId, createJob, router]);
 
   // React to terminal status. The poll keeps running until this unmounts, so the
   // handoff is latched — otherwise a second COMPLETED tick fires saveAndGo again
@@ -118,8 +121,12 @@ export default function AiGeneratingPage() {
           </div>
 
           <div className="flex w-[280px] flex-col gap-5">
-            {STEPS.map((s) => {
-              const done = progress > s.at + 25;
+            {STEPS.map((s, i) => {
+              // A step is done once progress reaches the next step's threshold
+              // (or 100 for the last). The old `> at + 25` meant the final step
+              // at 95 needed progress > 120 and could never show as complete.
+              const nextAt = STEPS[i + 1]?.at ?? 100;
+              const done = progress >= nextAt;
               const active = progress >= s.at && !done;
               return (
                 <div key={s.label} className={cn("flex items-center gap-3", !done && !active && "opacity-40")}>

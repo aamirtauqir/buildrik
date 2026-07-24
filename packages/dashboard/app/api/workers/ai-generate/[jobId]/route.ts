@@ -173,22 +173,46 @@ export async function POST(
     // last-moment cancel rolls the whole site back instead of being
     // overwritten by COMPLETED.
     await setPhase(jobId, "GENERATING_STYLES", 85);
+    // Regenerate reuses the existing draft (verified owned in
+    // ai-generation.service) so a re-roll doesn't orphan the previous site or
+    // change its id/slug/domain. First-time generation creates a new site.
+    const replaceSiteId = (meta?.replaceSiteId as string) || null;
     const siteId = await prisma.$transaction(async (tx) => {
-      const site = await tx.site.create({
-        data: {
-          name: siteName,
-          slug,
-          status: "DRAFT",
-          workspaceId: job.workspaceId,
-          createdBy: job.userId,
-          creationMethod: "AI",
-          pages: pages.length,
-          lastEditedAt: new Date(),
-        },
-      });
+      const existing = replaceSiteId
+        ? await tx.site.findFirst({
+            where: { id: replaceSiteId, workspaceId: job.workspaceId, deletedAt: null },
+            select: { id: true },
+          })
+        : null;
+
+      let siteRowId: string;
+      if (existing) {
+        // Swap the draft's pages in place; keep the site row (id, slug, domain).
+        await tx.page.deleteMany({ where: { siteId: existing.id } });
+        await tx.site.update({
+          where: { id: existing.id },
+          data: { name: siteName, creationMethod: "AI", pages: pages.length, lastEditedAt: new Date() },
+        });
+        siteRowId = existing.id;
+      } else {
+        const site = await tx.site.create({
+          data: {
+            name: siteName,
+            slug,
+            status: "DRAFT",
+            workspaceId: job.workspaceId,
+            createdBy: job.userId,
+            creationMethod: "AI",
+            pages: pages.length,
+            lastEditedAt: new Date(),
+          },
+        });
+        siteRowId = site.id;
+      }
+
       await tx.page.createMany({
         data: generated.map((g, i) => ({
-          siteId: site.id,
+          siteId: siteRowId,
           name: g.name,
           slug: i === 0 ? "home" : slugify(g.name),
           position: i,
@@ -198,10 +222,10 @@ export async function POST(
       });
       const flipped = await tx.aIGenerationJob.updateMany({
         where: { id: jobId, status: { not: "CANCELLED" } },
-        data: { status: "COMPLETED", progress: 100, siteId: site.id, completedAt: new Date(), error: null },
+        data: { status: "COMPLETED", progress: 100, siteId: siteRowId, completedAt: new Date(), error: null },
       });
       if (flipped.count === 0) throw new CancelledError();
-      return site.id;
+      return siteRowId;
     });
 
     return Response.json({ ok: true, siteId });

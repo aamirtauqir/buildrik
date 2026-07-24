@@ -3,11 +3,14 @@ import { type NextRequest } from "next/server";
 
 // Transaction-client mock (worker writes site+pages+job flip atomically)
 const txSiteCreate = vi.fn();
+const txSiteFindFirst = vi.fn();
+const txSiteUpdate = vi.fn();
 const txPageCreateMany = vi.fn();
+const txPageDeleteMany = vi.fn();
 const txJobUpdateMany = vi.fn();
 const txClient = {
-  site: { create: txSiteCreate },
-  page: { createMany: txPageCreateMany },
+  site: { create: txSiteCreate, findFirst: txSiteFindFirst, update: txSiteUpdate },
+  page: { createMany: txPageCreateMany, deleteMany: txPageDeleteMany },
   aIGenerationJob: { updateMany: txJobUpdateMany },
 };
 
@@ -162,6 +165,53 @@ describe("ai-generate worker", () => {
     // FAILED must not stomp the CANCELLED status
     const failed = p.aIGenerationJob.updateMany.mock.calls.find((c) => c[0].data?.status === "FAILED");
     expect(failed).toBeFalsy();
+  });
+
+  it("regenerate REUSES the owned draft instead of creating a new site (no orphan)", async () => {
+    p.aIGenerationJob.findUnique.mockResolvedValue({
+      id: "j1", status: "QUEUED", workspaceId: "w1", userId: "u1",
+      businessType: "BUSINESS", selectedPages: ["landing", "about"], description: "A bakery",
+      metadata: { name: "Bakery", replaceSiteId: "site-old" },
+    });
+    p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
+    p.site.findMany.mockResolvedValue([]);
+    txSiteFindFirst.mockResolvedValue({ id: "site-old" }); // owned draft exists
+    txPageDeleteMany.mockResolvedValue({ count: 3 });
+    txSiteUpdate.mockResolvedValue({ id: "site-old" });
+    txPageCreateMany.mockResolvedValue({ count: 2 });
+    txJobUpdateMany.mockResolvedValue({ count: 1 });
+    genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
+
+    const res = await POST(req("secret"), ctx);
+    expect(res.status).toBe(200);
+    // The old draft's pages are swapped in place; NO new site row is created.
+    expect(txSiteCreate).not.toHaveBeenCalled();
+    expect(txPageDeleteMany).toHaveBeenCalledWith({ where: { siteId: "site-old" } });
+    expect(txSiteUpdate).toHaveBeenCalledTimes(1);
+    // New pages + the COMPLETED flip both point at the SAME (reused) site id.
+    expect(txPageCreateMany.mock.calls[0][0].data[0].siteId).toBe("site-old");
+    expect(txJobUpdateMany.mock.calls[0][0].data.siteId).toBe("site-old");
+  });
+
+  it("falls back to creating a new site when replaceSiteId is not owned", async () => {
+    p.aIGenerationJob.findUnique.mockResolvedValue({
+      id: "j1", status: "QUEUED", workspaceId: "w1", userId: "u1",
+      businessType: "BUSINESS", selectedPages: ["landing"], description: null,
+      metadata: { replaceSiteId: "site-someone-elses" },
+    });
+    p.aIGenerationJob.updateMany.mockResolvedValue({ count: 1 });
+    p.site.findMany.mockResolvedValue([]);
+    txSiteFindFirst.mockResolvedValue(null); // not owned by this workspace
+    txSiteCreate.mockResolvedValue({ id: "site-new" });
+    txPageCreateMany.mockResolvedValue({ count: 1 });
+    txJobUpdateMany.mockResolvedValue({ count: 1 });
+    genPage.mockResolvedValue({ sections: [{ type: "hero", html: "<h1>Hi</h1>" }] });
+
+    const res = await POST(req("secret"), ctx);
+    expect(res.status).toBe(200);
+    expect(txSiteCreate).toHaveBeenCalledTimes(1);
+    expect(txPageDeleteMany).not.toHaveBeenCalled();
+    expect(txJobUpdateMany.mock.calls[0][0].data.siteId).toBe("site-new");
   });
 
   it("400 when job is not QUEUED", async () => {

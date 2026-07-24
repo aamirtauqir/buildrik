@@ -75,7 +75,8 @@ export default function AiPreviewPage() {
         <div className="flex flex-col items-center gap-3 text-center">
           <h1 className="text-onb-title font-bold text-onb-text">Your first draft is ready</h1>
           <p className="max-w-[560px] text-sm leading-[1.5] text-onb-muted">
-            Review what Buildrick created before opening the editor.
+            Here's the structure Buildrick drafted. Open the editor to see the full
+            design and make it yours.
           </p>
         </div>
 

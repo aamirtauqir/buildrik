@@ -44,6 +44,16 @@ export async function createGenerationJob(
   if (input.tone) metadata.tone = input.tone;
   if (input.content) metadata.content = input.content;
   if (input.images) metadata.images = input.images;
+  // Regenerate: reuse the existing draft instead of orphaning it. Only honour a
+  // siteId the caller's own workspace owns (IDOR-safe); an unowned/stale id is
+  // dropped and the worker falls back to creating a new site.
+  if (input.siteId) {
+    const owned = await prisma.site.findFirst({
+      where: { id: input.siteId, workspaceId, deletedAt: null },
+      select: { id: true },
+    });
+    if (owned) metadata.replaceSiteId = owned.id;
+  }
 
   const job = await prisma.aIGenerationJob.create({
     data: {
