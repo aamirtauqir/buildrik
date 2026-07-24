@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 1 — Telling an agent to implement a Figma design</title>
+<style>
+  :root{
+    --ink:#0F172A; --ink-soft:#485465; --ink-muted:#656F7E;
+    --bg:#FBFBF9; --card:#FFFFFF; --border:#E2E8F0; --accent:#406ED6;
+    --tint:#ECF0FB; --success:#117D39; --warn:#A05804; --code-bg:#0F172A;
+    --serif:Georgia,'Iowan Old Style',Palatino,serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Inter',system-ui,sans-serif;
+    --mono:'SF Mono',ui-monospace,'Cascadia Code',Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--ink:#E7EBF0;--ink-soft:#AAB3BF;--ink-muted:#8A93A0;--bg:#0E1116;
+      --card:#161A21;--border:#262C36;--tint:#1A2233;--code-bg:#0A0D12;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);
+    line-height:1.6;font-size:18px}
+  .wrap{max-width:760px;margin:0 auto;padding:64px 24px 120px}
+  .eyebrow{font-family:var(--sans);font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 8px}
+  h1{font-size:34px;line-height:1.15;margin:0 0 8px;letter-spacing:-.01em}
+  .sub{font-family:var(--sans);color:var(--ink-muted);font-size:15px;margin:0 0 40px}
+  h2{font-family:var(--sans);font-size:22px;margin:52px 0 4px;letter-spacing:-.01em}
+  h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:10px}
+  h3{font-family:var(--sans);font-size:16px;margin:28px 0 6px;color:var(--ink-soft)}
+  p{margin:12px 0}
+  .lead{font-size:20px;color:var(--ink-soft)}
+  code{font-family:var(--mono);font-size:.86em;background:var(--tint);
+    padding:.1em .35em;border-radius:4px;color:var(--ink)}
+  .callout{background:var(--card);border:1px solid var(--border);
+    border-left:3px solid var(--accent);border-radius:8px;padding:16px 20px;
+    margin:20px 0;font-family:var(--sans);font-size:15px;line-height:1.55}
+  .callout.warn{border-left-color:var(--warn)}
+  .callout.good{border-left-color:var(--success)}
+  .callout b{font-weight:650}
+  pre{background:var(--code-bg);color:#E7EBF0;border-radius:10px;padding:20px 22px;
+    overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.6;
+    margin:18px 0;border:1px solid #222}
+  pre .c{color:#7C8798}  /* comment */
+  pre .k{color:#82AAFF}  /* keyword/heading */
+  pre .s{color:#C3E88D}  /* string/value */
+  .goal pre{font-size:13.5px}
+  table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:14px;margin:16px 0}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--tint);
+    color:var(--accent);padding:2px 8px;border-radius:999px;border:1px solid var(--border)}
+  ul,ol{padding-left:22px}
+  li{margin:7px 0}
+  .foot{margin-top:64px;padding-top:20px;border-top:1px solid var(--border);
+    font-family:var(--sans);font-size:14px;color:var(--ink-muted)}
+  a{color:var(--accent)}
+  .kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--border);
+    border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:var(--card)}
+  hr{border:0;border-top:1px solid var(--border);margin:44px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Buildrik · Lesson 1</p>
+  <h1>Telling an agent to implement a Figma design — cleanly, in one goal</h1>
+  <p class="sub">Mission: direct an AI agent to apply your Figma foundations to the whole editor, remove the old design, and prove it with tests — like a real developer.</p>
+
+  <p class="lead">Aap code nahi likhte — aap <b>agent</b> ko direct karte ho. To asli skill CSS nahi hai. Skill yeh hai: <b>ek accha goal likhna</b> — scoped, phased, verifiable. Yeh lesson aapko wo goal deta hai, aur samjhata hai har hissa <i>kyun</i> hai.</p>
+
+  <div class="callout">
+    <b>Pehle ek sच्च:</b> aapka Figma (<code>g4GzQFqzNYz5sosz1QtZXC</code>, node&nbsp;32-2) sirf <b>foundations</b> hai — colour, type, spacing, radius, size tokens. Ismein koi <b>naye screen/flow</b> nahi. To "design apply karo" ka matlab hai: yeh <b>visual language</b> poore editor pe consistently lagao. Agar naye layouts chahiye, wo alag Figma chahiye hoga.
+  </div>
+
+  <h2><span class="n">01</span>Ek acche goal ke 4 hisse</h2>
+  <p>Koi bhi bada design/build goal jo aap agent ko dete ho, usmein 4 cheezein honi chahiye. Yaad rakho: <b>S · P · V · G</b>.</p>
+  <table>
+    <tr><th>Hissa</th><th>Kya</th><th>Kyun</th></tr>
+    <tr><td><b>Scope</b></td><td>Kya badalna, kya nahi. Source of truth (Figma link).</td><td>Agent guess na kare. Warna aधा kaam galat jagah.</td></tr>
+    <tr><td><b>Phases</b></td><td>Audit → change → verify. Har phase pe rukna/commit.</td><td>Ek saath sab badla = review impossible, rollback mushkil.</td></tr>
+    <tr><td><b>Verify</b></td><td>Tests jo design ko Figma se match karke prove karein.</td><td>"Ho gaya" kaafi nahi. Proof chahiye — drift wapas na aaye.</td></tr>
+    <tr><td><b>Guardrails</b></td><td>Kya <i>nahi</i> karna. (Gates mat blanket-hatao.)</td><td>Agent shortcut le sakta. Rails usse rokte hain.</td></tr>
+  </table>
+
+  <h2><span class="n">02</span>Aapka goal — copy/paste ke liye</h2>
+  <p>Yeh grounded hai aapke codebase pe (tokens, gates, vibcoder, 311 hex drift). Isko paste karo, agent ko bolo "run as one goal, stop at Phase 0".</p>
+  <div class="goal">
+<pre><span class="k">GOAL — Editor ko Figma "Foundations (32-2)" pe le aao, clean.</span>
+
+<span class="c"># SCOPE</span>
+Source of truth: Figma <span class="s">g4GzQFqzNYz5sosz1QtZXC</span>, node <span class="s">32-2</span>
+(Foundations page — sirf tokens: colour, type 11 styles, spacing,
+radius, size). Apply karo POORE editor chrome pe: rail, sidebar,
+canvas-chrome, topbar, footer, inspector, panels. Naye layout NAHI —
+sirf visual language unify + purana/drifted styling REMOVE.
+
+<span class="c"># PHASE 0 — AUDIT (koi edit nahi, phir RUKO)</span>
+- Figma tokens padho: figma MCP get_variable_defs + get_metadata
+  (file g4GzQF..., node 32-2). Har token nikaalo.
+- Current tokens map: src/themes/design-system/*.css.
+- Diff table banao: Figma value vs current value — har mismatch.
+- Saara hardcoded hex grep: src/editor/**/*.tsx (~311). Surface ke
+  hisaab se list — rail/sidebar/canvas/topbar/footer/panels.
+- Audit doc likho. RUKO. Mujhe dikhao edit karne se pehle.
+
+<span class="c"># PHASE 1 — TOKEN RECONCILE</span>
+- Har design-system token ko Figma value ke exactly barabar karo:
+  colour.css, typography.css (11 styles), spacing.css, radius.css,
+  layout.css size tokens (rail 60, inspector 300, drawer 320,
+  panel-right 360, topbar 56, header 44, footer 32, nav 240, rows).
+- Ek source of truth. Duplicate token def NAHI (DS SSOT respect).
+
+<span class="c"># PHASE 2 — APPLY + PURANA HATAO</span>
+- Har chrome surface tokens use kare, hardcoded value nahi. 311 hex
+  ko token vars se replace.
+- Inspector wali 32-2 language (compact pills, UPPERCASE section
+  labels, type scale, density) baaki sab surfaces pe consistently.
+- Dead/purani CSS + orphan class rules delete karte jao. Clean,
+  additive nahi.
+
+<span class="c"># PHASE 3 — VERIFY (jaise real dev)</span>
+- Token-conformance test: assert har design-system token === Figma
+  value (fixture figma MCP se). Drift wapas aaye to FAIL.
+- Visual regression: Playwright screenshots har chrome surface ki
+  (editor route pe); baseline ek baar, phir diff.
+- DS gates chalao: pnpm verify:ds (SSOT, no-hex Gate 24, baseline).
+  Yeh isi design ko ENFORCE karte — GREEN rakho.
+- tsc dono package + vitest.
+
+<span class="c"># GUARDRAILS</span>
+- Gates MAT hatao — woh yeh design enforce karte. Agar kisi gate ka
+  baseline number ek legit naye value ko rokta hai, sirf US baseline
+  ko adjust karo aur reason likho. Kabhi blanket-disable nahi.
+- Har phase report + commit (solo -> main). Phase 0 pe RUKO review ke liye.</pre>
+  </div>
+
+  <h2><span class="n">03</span>Har hissa kyun (taake aap adapt kar sako)</h2>
+  <ul>
+    <li><b>"Source of truth: Figma …node 32-2"</b> — agent ko exact file batao. Warna woh apni marzi ka design bana dega. <span class="pill">Scope</span></li>
+    <li><b>"Phase 0 audit, phir RUKO"</b> — sabse important. Agent pehle <i>dikhata</i> hai kitna kaam hai. Aap scope dekh ke tab green light dete ho. Mass-rewrite se pehle brake. <span class="pill">Phases</span></li>
+    <li><b>"311 hex ko token se replace"</b> — yeh "purana design remove" ka asli matlab. Hardcoded colour = drift. Token = ek jagah se control. <span class="pill">Clean</span></li>
+    <li><b>"token === Figma value test"</b> — yeh woh cheez hai jo real dev karta. Agar kal koi token Figma se hat gaya, test <i>foran fail</i>. Design locked. <span class="pill">Verify</span></li>
+    <li><b>"Gates mat hatao"</b> — aapne bola tha "rule rok raha ho to hata do". <b>Ulta:</b> gates isi design ko enforce karte (token use karo, hex mat likho). Hatana = drift ko invite. <span class="pill">Guardrail</span></li>
+  </ul>
+
+  <div class="callout warn">
+    <b>Woh "rule hata do" wali baat:</b> 90% waqt jo gate design ko "rok raha" lagta hai, woh actually design ko <b>protect</b> kar raha hai. Agent ko bolo: "gate ko samjhao pehle, hatao mat — sirf agar ek specific baseline number literally naye value ko block kare to us number ko adjust karo." Yeh ek line aapko bade regressions se bachati hai.
+  </div>
+
+  <h2><span class="n">04</span>Test kaise — "jaise real developer"</h2>
+  <p>Design ko verify karne ke 3 layer. Teeno agent ko goal mein diye hain:</p>
+  <table>
+    <tr><th>Layer</th><th>Kya check karta</th><th>Tool</th></tr>
+    <tr><td>Token conformance</td><td>Har CSS token === Figma value</td><td>vitest + figma MCP fixture</td></tr>
+    <tr><td>Visual regression</td><td>Surface pixel-for-pixel same rehta</td><td>Playwright screenshot diff</td></tr>
+    <tr><td>DS gates</td><td>Koi hex leak / duplicate token / drift</td><td><code>pnpm verify:ds</code></td></tr>
+  </table>
+  <div class="callout good">
+    <b>Insight:</b> Figma ko "test" karne ka matlab yeh nahi ke test Figma khole. Matlab: agent Figma se values ek <b>fixture</b> mein nikaal leta hai (ek baar), phir test us fixture se code compare karta. Figma badle to fixture refresh + test dobara. Yeh drift ko permanently pakadta hai.
+  </div>
+
+  <h2><span class="n">05</span>Vibcoder — agent ko yeh batao</h2>
+  <p>Vibcoder aapki <b>component library</b> hai (chrome ke buttons, inputs, pills, panels). Aapko iska code nahi aata — koi baat nahi, agent ko yeh rules do:</p>
+  <pre><span class="c"># Vibcoder rules (goal mein add karo)</span>
+- Chrome primitives yahan: <span class="s">src/editor/shared/vibcoder/</span> (React)
+  + <span class="s">src/themes/components/</span> (CSS).
+- Primitive restyle karna? Wahi files EDIT karo. Buildrik-owned hai,
+  fork/wrapper mat banao.
+- Sirf tokens use karo: <span class="s">--buildrick-*</span> / <span class="s">--bd-*</span>. Inline hex kabhi nahi.
+- Naya primitive? vibcoder mein add + matching CSS themes/components/
+  mein + @import themes/default.css mein.</pre>
+  <p>Ek line mein: <b>"vibcoder ko fork mat karo, uski files direct edit karo, hex ki jagah token."</b></p>
+
+  <h2><span class="n">06</span>Aapke liye 5 tips (kisi bhi agent goal pe)</h2>
+  <ol>
+    <li><b>Hamesha Phase 0 = audit + RUKO.</b> Agent ko andha mat chhodo. Pehle scope dekho.</li>
+    <li><b>"Source of truth" naam se do.</b> Figma link, file, ya doc — exact. Guess-room zero.</li>
+    <li><b>"Verify" ko goal ka hissa banao,</b> baad ki soch nahi. Test = design lock.</li>
+    <li><b>"Clean, additive nahi."</b> Yeh 3 shabd purana code delete karwate hain, banner nahi.</li>
+    <li><b>Guardrails likho</b> — kya <i>nahi</i> karna. Gates, blanket-delete, scope-creep.</li>
+  </ol>
+
+  <hr>
+  <p style="font-family:var(--sans);font-size:15px"><b>Primary source (padho):</b> Buildrik ka apna design contract — <code>packages/editor/CLAUDE.md</code> ka "DESIGN SYSTEM — SSOT CONTRACT" section. Woh batata hai token kahan rehte, vibcoder kaise extend hota, kaunse gates hain. Yeh aapki apni sabse high-trust reference hai.</p>
+
+  <div class="callout">
+    <b>Agla kadam:</b> Yeh goal main <i>abhi khud run kar sakta hoon</i> (Phase 0 audit se, jahan aapko scope dikhega). Ya aap ise kisi aur agent ko de sakte ho. Bolo — main Phase 0 audit start karun?
+  </div>
+
+  <p class="foot">Yeh lesson aapka hai — wapas aa ke padho. Koi hissa clear na ho? Mujhe (TA) poocho, main aapka teacher hoon. · Lesson 1 / Buildrik editor-figma-goal</p>
+</div>
+</body>
+</html>
