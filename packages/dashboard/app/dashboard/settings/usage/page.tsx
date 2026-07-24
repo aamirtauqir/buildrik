@@ -53,7 +53,7 @@ export default function UsagePage() {
 
           <SectionCard
             className="mt-5"
-            title="Bandwidth over time"
+            title="Form submissions over time"
             actions={
               <span className="font-mono text-eyebrow uppercase tracking-wide" style={{ color: "var(--color-text-muted)" }}>
                 last 14 days

@@ -62,6 +62,7 @@ export const billingRouter = router({
     catch (e: unknown) {
       if (e instanceof Error && e.message === "PAYMENTS_NOT_CONFIGURED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Payments are not available yet." });
       if (e instanceof Error && e.message === "NO_STRIPE_CUSTOMER") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "No billing account yet — upgrade a plan first." });
+      if (e instanceof Error && e.message === "GRANDFATHERED_NO_PORTAL") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "This plan was set up outside Stripe. Contact support to change or cancel it." });
       throw e;
     }
   }),

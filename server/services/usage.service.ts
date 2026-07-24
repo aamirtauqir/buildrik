@@ -35,7 +35,7 @@ export async function getWorkspaceUsage(workspaceId: string): Promise<WorkspaceU
 
   const siteIds = (await prisma.site.findMany({ where: { workspaceId }, select: { id: true } })).map((s) => s.id);
 
-  const [workspace, storageAgg, submissionCount, recentSubmissions] = await Promise.all([
+  const [workspace, storageAgg, submissionCount, recentSubmissions, memberCount, aiCount] = await Promise.all([
     prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } }),
     prisma.mediaAsset.aggregate({ _sum: { bytes: true }, where: { siteId: { in: siteIds } } }),
     prisma.formSubmission.count({ where: { siteId: { in: siteIds }, createdAt: { gte: startOfMonth } } }),
@@ -43,6 +43,8 @@ export async function getWorkspaceUsage(workspaceId: string): Promise<WorkspaceU
       where: { siteId: { in: siteIds }, createdAt: { gte: fourteenDaysAgo } },
       select: { createdAt: true },
     }),
+    prisma.workspaceMember.count({ where: { workspaceId, status: "ACTIVE" } }),
+    prisma.aIGenerationJob.count({ where: { workspaceId, createdAt: { gte: startOfMonth } } }),
   ]);
 
   const plan = (workspace?.plan as PlanName) ?? "FREE";
@@ -61,16 +63,19 @@ export async function getWorkspaceUsage(workspaceId: string): Promise<WorkspaceU
   }
   const submissionSeries = [...buckets.entries()].map(([day, count]) => ({ day, count }));
 
-  // Design order: Bandwidth, Build minutes, Form submissions, Storage.
+  // Lead with the metrics that actually gate the workspace (sites, team, AI,
+  // storage, submissions) — the page used to show only bandwidth/build (both
+  // permanently 0) + submissions/storage, omitting every real quota driver.
   const metrics: UsageMetric[] = [
-    // Bandwidth is not measured server-side (served from the edge); shown against
-    // the plan cap and flagged estimated rather than fabricating a used value.
-    { key: "bandwidth", label: "Bandwidth", used: 0, limit: toGB(limits.bandwidthMB as number), unit: "GB", estimated: true },
-    // Build minutes aren't metered server-side either (builds run off-platform);
-    // shown against the plan cap and flagged estimated, same as bandwidth.
-    { key: "build", label: "Build minutes", used: 0, limit: BUILD_MINUTES_LIMIT[plan], unit: "", estimated: true },
-    { key: "submissions", label: "Form submissions", used: submissionCount, limit: limits.formSubmissions as number, unit: "" },
+    { key: "sites", label: "Sites", used: siteIds.length, limit: limits.sites as number, unit: "" },
+    { key: "team", label: "Team members", used: memberCount, limit: limits.teamMembers as number, unit: "" },
+    { key: "ai", label: "AI generations", used: aiCount, limit: limits.aiGenerations as number, unit: "" },
     { key: "storage", label: "Storage", used: toGB(storageMB), limit: toGB(limits.storageMB as number), unit: "GB" },
+    { key: "submissions", label: "Form submissions", used: submissionCount, limit: limits.formSubmissions as number, unit: "" },
+    // Bandwidth + build minutes aren't metered server-side (edge/off-platform);
+    // shown against the plan cap and flagged estimated rather than fabricated.
+    { key: "bandwidth", label: "Bandwidth", used: 0, limit: toGB(limits.bandwidthMB as number), unit: "GB", estimated: true },
+    { key: "build", label: "Build minutes", used: 0, limit: BUILD_MINUTES_LIMIT[plan], unit: "", estimated: true },
   ];
 
   return {

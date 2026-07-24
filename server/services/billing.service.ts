@@ -241,9 +241,15 @@ export async function createPortalSession(workspaceId: string): Promise<{ url: s
 
   const workspace = await prisma.workspace.findUnique({
     where: { id: workspaceId },
-    select: { stripeCustomerId: true },
+    select: { stripeCustomerId: true, plan: true },
   });
-  if (!workspace?.stripeCustomerId) throw new Error("NO_STRIPE_CUSTOMER");
+  if (!workspace?.stripeCustomerId) {
+    // A paid workspace with no Stripe customer was imported/grandfathered
+    // outside Stripe — telling them to "upgrade first" is contradictory. Give
+    // them a distinct, honest error. A FREE workspace genuinely has no billing
+    // account yet.
+    throw new Error(workspace?.plan && workspace.plan !== "FREE" ? "GRANDFATHERED_NO_PORTAL" : "NO_STRIPE_CUSTOMER");
+  }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const session = await getStripe().billingPortal.sessions.create({

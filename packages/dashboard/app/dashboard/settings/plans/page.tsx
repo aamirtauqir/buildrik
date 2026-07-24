@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Check } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { MetricValue } from "@/components/dashboard/primitives";
 import { ErrorState } from "@/components/states";
+import { useToast } from "@/components/dashboard/toast-provider";
 
 type PlanName = "FREE" | "PRO" | "BUSINESS";
 
@@ -64,10 +64,33 @@ function planFeatures(plan: PlanEntry): string[] {
 
 export default function PlansPage() {
   const [yearly, setYearly] = useState(false);
+  const { addToast } = useToast();
   const overviewQuery = trpc.billing.overview.useQuery(undefined, { retry: false });
   const plansQuery = trpc.billing.plans.useQuery();
 
   const currentPlanId = (overviewQuery.data?.plan as PlanName) ?? "FREE";
+
+  // Wire the plan CTAs to the real Stripe flow (they used to be dead links to
+  // /billing that dropped the chosen plan). A FREE workspace upgrading goes to
+  // Checkout; a paid workspace changing/cancelling tier goes to the Customer
+  // Portal (createCheckoutSession throws ALREADY_SUBSCRIBED for them).
+  const checkoutMutation = trpc.billing.createCheckoutSession.useMutation({
+    onSuccess: (data) => window.location.assign(data.url),
+    onError: (e) => addToast("error", "Couldn't start checkout", e.message),
+  });
+  const portalMutation = trpc.billing.createPortalSession.useMutation({
+    onSuccess: (data) => window.location.assign(data.url),
+    onError: (e) => addToast("error", "Couldn't open billing portal", e.message),
+  });
+  const pending = checkoutMutation.isPending || portalMutation.isPending;
+
+  function selectPlan(target: PlanName) {
+    if (currentPlanId === "FREE" && target !== "FREE") {
+      checkoutMutation.mutate({ planId: target, interval: yearly ? "YEARLY" : "MONTHLY" });
+    } else {
+      portalMutation.mutate();
+    }
+  }
 
   // Without this, `?? 0` fallbacks below render every plan as $0 / 0-limit
   // while the query is in flight or errored — false pricing on the money page.
@@ -212,7 +235,7 @@ export default function PlansPage() {
               </ul>
 
               <div className="mt-auto pt-6">
-                <PlanCta planId={planId} popular={popular} isCurrent={isCurrent} currentPlanId={currentPlanId} />
+                <PlanCta planId={planId} popular={popular} isCurrent={isCurrent} currentPlanId={currentPlanId} onSelect={selectPlan} pending={pending} />
               </div>
             </div>
           );
@@ -227,11 +250,15 @@ function PlanCta({
   popular,
   isCurrent,
   currentPlanId,
+  onSelect,
+  pending,
 }: {
   planId: PlanName;
   popular: boolean;
   isCurrent: boolean;
   currentPlanId: PlanName;
+  onSelect: (planId: PlanName) => void;
+  pending: boolean;
 }) {
   if (isCurrent) {
     return (
@@ -248,25 +275,22 @@ function PlanCta({
   const isUpgrade = PLAN_ORDER.indexOf(planId) > PLAN_ORDER.indexOf(currentPlanId);
   const label = isUpgrade ? "Upgrade" : "Downgrade";
 
-  if (popular) {
-    return (
-      <Link
-        href="/dashboard/settings/billing"
-        className="block w-full rounded-lg py-2.5 text-center text-body font-semibold text-white transition-opacity hover:opacity-90"
-        style={{ backgroundColor: "var(--color-primary)" }}
-      >
-        {label}
-      </Link>
-    );
-  }
-
   return (
-    <Link
-      href="/dashboard/settings/billing"
-      className="block w-full rounded-lg border py-2.5 text-center text-body font-semibold transition-colors"
-      style={{ borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)" }}
+    <button
+      onClick={() => onSelect(planId)}
+      disabled={pending}
+      className={
+        popular
+          ? "block w-full rounded-lg py-2.5 text-center text-body font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          : "block w-full rounded-lg border py-2.5 text-center text-body font-semibold transition-colors disabled:opacity-50"
+      }
+      style={
+        popular
+          ? { backgroundColor: "var(--color-primary)" }
+          : { borderColor: "var(--color-border-strong)", color: "var(--color-text-primary)" }
+      }
     >
-      {label}
-    </Link>
+      {pending ? "Opening…" : label}
+    </button>
   );
 }

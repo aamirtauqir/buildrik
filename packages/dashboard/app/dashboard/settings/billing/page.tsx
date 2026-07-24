@@ -203,7 +203,13 @@ function BillingPageInner() {
           className="rounded-lg px-4 py-2 text-body font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           style={{ backgroundColor: "var(--color-primary)" }}
         >
-          {planKey === "FREE" ? "View Plans" : portalMutation.isPending ? "Opening…" : "Change plan"}
+          {planKey === "FREE"
+            ? "View Plans"
+            : portalMutation.isPending
+              ? "Opening…"
+              : isDunning
+                ? "Update payment method"
+                : "Change plan"}
         </button>
       </div>
 
