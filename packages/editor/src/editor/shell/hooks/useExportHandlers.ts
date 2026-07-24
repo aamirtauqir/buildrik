@@ -29,6 +29,7 @@ import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL as dashboardUrlFromEnv } from "@/shared/utils/runtimeEnv";
 import { usePublishJob, type UsePublishJobResult } from "./usePublishJob";
 import { exportPublishPages } from "../exportPublishPages";
+import { captureAndUploadThumbnail } from "../captureThumbnail";
 
 export interface UseExportHandlersOptions {
   composer: Composer | null;
@@ -100,6 +101,11 @@ export function useExportHandlers({
           });
           return;
         }
+        // Fire-and-forget: snapshot the home page for the site's card thumbnail.
+        // Runs before publish (so the preview reflects current content even if a
+        // Vercel publish is blocked or fails), never awaited, and swallows its
+        // own errors — it cannot delay or fail the publish the user triggered.
+        void captureAndUploadThumbnail(siteId, pages[0].html);
         await publishJob.publish(siteId, pages, { acknowledgeStale });
       } catch (err) {
         addToast({

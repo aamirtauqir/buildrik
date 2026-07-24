@@ -326,6 +326,22 @@ export async function renameSite(siteId: string, name: string) {
   });
 }
 
+/**
+ * Store a preview thumbnail URL on a site. Written by the editor's best-effort
+ * capture at publish/save time (client screenshots the rendered page → Blob →
+ * here), so the sites grid and template detail can show a real preview instead
+ * of the generated cover. Requires edit access; the capture is non-blocking, so
+ * a FORBIDDEN here simply means no thumbnail is stored.
+ */
+export async function setSiteThumbnail(userId: string, siteId: string, url: string) {
+  await checkSiteRole(prisma, userId, siteId, "EDITOR");
+  return prisma.site.update({
+    where: { id: siteId },
+    data: { thumbnail: url },
+    select: { id: true, thumbnail: true },
+  });
+}
+
 export async function duplicateSite(
   siteId: string,
   workspaceId: string,
