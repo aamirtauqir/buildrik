@@ -4,6 +4,7 @@ const getConnMock = vi.fn();
 const markInactiveMock = vi.fn();
 const createDepMock = vi.fn();
 const setPwMock = vi.fn();
+const deleteDepMock = vi.fn();
 
 vi.mock("@server/services/integrations.service", () => ({
   getActiveVercelConnection: (...args: unknown[]) => getConnMock(...args),
@@ -19,18 +20,70 @@ vi.mock("@/lib/vercel", () => ({
   // alias-vs-fallback logic is tested separately in __tests__/vercel-pickPublicUrl.test.ts.
   pickPublicUrl: (d: { url: string }) => `https://${d.url}`,
   setProjectPasswordProtection: (...args: unknown[]) => setPwMock(...args),
+  deleteVercelDeployment: (...args: unknown[]) => deleteDepMock(...args),
   VercelApiError: class extends Error { constructor(public status: number, public code: string, msg: string) { super(msg); } },
 }));
 
 const jobFindUniqueMock = vi.fn();
+const jobFindFirstMock = vi.fn();
+const siteFindUniqueMock = vi.fn();
+const siteUpdateMock = vi.fn();
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    publishBuildJob: { findUnique: (...a: unknown[]) => jobFindUniqueMock(...a) },
+    publishBuildJob: {
+      findUnique: (...a: unknown[]) => jobFindUniqueMock(...a),
+      findFirst: (...a: unknown[]) => jobFindFirstMock(...a),
+    },
+    site: {
+      findUnique: (...a: unknown[]) => siteFindUniqueMock(...a),
+      update: (...a: unknown[]) => siteUpdateMock(...a),
+    },
   },
 }));
 
 // Import after mocks
-import { runVercelDeploy, getPublishStatus } from "@server/services/publish.service";
+import { runVercelDeploy, getPublishStatus, unpublishSite } from "@server/services/publish.service";
+
+describe("unpublishSite — takes the deployment down on Vercel", () => {
+  beforeEach(() => {
+    getConnMock.mockReset();
+    deleteDepMock.mockReset();
+    siteFindUniqueMock.mockReset();
+    jobFindFirstMock.mockReset();
+    siteUpdateMock.mockReset();
+    siteUpdateMock.mockResolvedValue({ id: "s1", status: "DRAFT" });
+  });
+
+  it("deletes the last production deployment, then flips to DRAFT", async () => {
+    siteFindUniqueMock.mockResolvedValue({ workspaceId: "ws1" });
+    jobFindFirstMock.mockResolvedValue({ deploymentId: "dep_9" });
+    getConnMock.mockResolvedValue({ id: "i1", token: "tok", teamId: "team_1" });
+    await unpublishSite("s1");
+    expect(deleteDepMock).toHaveBeenCalledWith(
+      expect.objectContaining({ deploymentId: "dep_9", token: "tok", teamId: "team_1" }),
+    );
+    expect(siteUpdateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { status: "DRAFT", publishedUrl: null } }),
+    );
+  });
+
+  it("still flips to DRAFT when the Vercel delete throws (best-effort)", async () => {
+    siteFindUniqueMock.mockResolvedValue({ workspaceId: "ws1" });
+    jobFindFirstMock.mockResolvedValue({ deploymentId: "dep_9" });
+    getConnMock.mockResolvedValue({ id: "i1", token: "tok", teamId: null });
+    deleteDepMock.mockRejectedValue(new Error("Vercel 500"));
+    await expect(unpublishSite("s1")).resolves.toMatchObject({ status: "DRAFT" });
+    expect(siteUpdateMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips the Vercel call when the site has no completed deployment", async () => {
+    siteFindUniqueMock.mockResolvedValue({ workspaceId: "ws1" });
+    jobFindFirstMock.mockResolvedValue(null);
+    await unpublishSite("s1");
+    expect(deleteDepMock).not.toHaveBeenCalled();
+    expect(siteUpdateMock).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe("getPublishStatus — never leaks the raw-HTML `log` column", () => {
   beforeEach(() => jobFindUniqueMock.mockReset());

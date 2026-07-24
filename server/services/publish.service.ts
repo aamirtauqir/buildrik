@@ -10,6 +10,7 @@ import {
   waitForDeploymentReady,
   pickPublicUrl,
   setProjectPasswordProtection,
+  deleteVercelDeployment,
   VercelApiError,
   type VercelFile,
 } from "@/lib/vercel";
@@ -451,6 +452,35 @@ export async function rollbackPublish(
 }
 
 export async function unpublishSite(siteId: string) {
+  // Actually take the site down on Vercel — deleting the production deployment
+  // removes it from the web (the project + custom domains stay attached, so a
+  // later publish restores everything). Without this, unpublish only flipped
+  // the DB to DRAFT while the deployment stayed live and crawlable.
+  //
+  // Best-effort: a Vercel failure must not block the local unpublish — the user
+  // asked for the site to be a draft, and a stale deployment is better handled
+  // by a retry than by refusing the whole action.
+  try {
+    const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+    const lastJob = await prisma.publishBuildJob.findFirst({
+      where: { siteId, status: "COMPLETED", deploymentId: { not: null } },
+      orderBy: { completedAt: "desc" },
+      select: { deploymentId: true },
+    });
+    if (site && lastJob?.deploymentId) {
+      const conn = await getActiveVercelConnection(site.workspaceId);
+      if (conn) {
+        await deleteVercelDeployment({
+          token: conn.token,
+          teamId: conn.teamId,
+          deploymentId: lastJob.deploymentId,
+        });
+      }
+    }
+  } catch (e) {
+    console.error(`[unpublish] Vercel take-down failed for site ${siteId}:`, e instanceof Error ? e.message : e);
+  }
+
   return prisma.site.update({
     where: { id: siteId },
     data: { status: "DRAFT", publishedUrl: null },

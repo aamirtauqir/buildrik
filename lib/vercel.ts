@@ -355,6 +355,34 @@ export async function removeDomainFromVercelProject({
 }
 
 /**
+ * Delete a Vercel deployment. Used to take a site OFFLINE on unpublish: the
+ * project and its custom domains stay attached, but removing the production
+ * deployment means nothing serves until the next publish. A 404 (already gone)
+ * is treated as success. Throws VercelApiError on other non-2xx.
+ */
+export async function deleteVercelDeployment({
+  token,
+  teamId,
+  deploymentId,
+}: {
+  token: string;
+  teamId: string | null;
+  deploymentId: string;
+}): Promise<void> {
+  const res = await fetch(
+    `${VERCEL_API_BASE}/v13/deployments/${encodeURIComponent(deploymentId)}${teamQueryString(teamId)}`,
+    {
+      method: "DELETE",
+      headers: authHeaders(token),
+    },
+  );
+  if (!res.ok && res.status !== 404) {
+    const errBody = (await res.json().catch(() => ({}))) as { error?: { code?: string; message?: string } };
+    throw new VercelApiError(res.status, errBody.error?.code ?? "UNKNOWN", errBody.error?.message ?? `Vercel API ${res.status}`);
+  }
+}
+
+/**
  * Enable or disable Vercel deployment password protection on a project. This is
  * what actually enforces a published-site password on the public
  * `<project>.vercel.app` URL — the static deploy is otherwise world-readable.
