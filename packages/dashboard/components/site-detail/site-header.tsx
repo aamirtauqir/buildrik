@@ -9,7 +9,7 @@ import { siteStatusTone } from "@/components/sites/site-status";
 import { Button, Pill, MetricValue, Modal } from "@/components/dashboard/primitives";
 import { SendReviewModal } from "@/components/reviews/send-review-modal";
 import { ShareDraftModal } from "@/components/site-detail/share-draft-modal";
-import { ApplyTemplateModal } from "@/components/site-detail/apply-template-modal";
+import { UseTemplateModal } from "@/components/templates/use-template-modal";
 
 interface SiteHeaderProps {
   site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null; domain?: string | null; sourceTemplate?: { id: string; name: string } | null };
@@ -164,7 +164,7 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
       </div>
       <ShareDraftModal open={shareOpen} onClose={() => setShareOpen(false)} siteId={site.id} />
       <SendReviewModal open={reviewOpen} onClose={() => setReviewOpen(false)} siteId={site.id} siteName={site.name} />
-      <ApplyTemplateModal open={applyTemplateOpen} onClose={() => setApplyTemplateOpen(false)} siteId={site.id} siteName={site.name} />
+      <UseTemplateModal open={applyTemplateOpen} onClose={() => setApplyTemplateOpen(false)} siteId={site.id} siteName={site.name} />
 
       {/* Unpublishing takes the live site down — confirm, don't fire on a click. */}
       <Modal
