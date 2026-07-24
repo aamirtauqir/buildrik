@@ -262,22 +262,26 @@
   text-transform: uppercase;
 }
 
-/* ── Row with text label (56px lb + control) ──────────── */
+/* ── Row with text label (Figma 32-2: 88px right-aligned ink-soft label + control) ──
+   Node 32:2 geometry: 16px row pad + 88 label + 8 gap + 172 control = 300 (inspector).
+   Label is Inter Regular 12px, ink-soft (#485465), right-aligned to the control. */
 .bdi-row-ctrl {
   display: grid;
-  grid-template-columns: 56px 1fr;
+  grid-template-columns: 88px 1fr;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 .bdi-row-ctrl.wide {
-  grid-template-columns: 72px 1fr;
+  grid-template-columns: 88px 1fr;
 }
 .bdi-row-ctrl .bdi-lb {
-  font: 500 10.5px var(--bd-font);
+  font: 400 12px var(--bd-font);
   color: var(--bd-fg-secondary);
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  text-align: right;
   gap: var(--bd-space-1);
 }
 .bdi-row-ctrl.disabled {
