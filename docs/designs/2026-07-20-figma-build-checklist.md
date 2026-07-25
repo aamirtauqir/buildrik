@@ -457,6 +457,20 @@ The board shows the row CLIPPED on purpose: it needs ~947px and the canvas colum
 
 Housekeeping in the same pass: 12 stub captions on the Dashboard page (each just repeating the board name, stacked on the caption that documents the route) removed, 7 over-wide Editor captions narrowed to their board pitch, and 6 boards added earlier in the week repositioned out of their neighbours. Every flow page now reports **0 collisions, 0 unreachable, 0 dead ends** across 517 edges.
 
+**P16 · Component craft pass — 2026-07-26.** Audited the 🧩 Components sheet against the shipped atoms and measured every pair rather than eyeballing. Five defects, all fixed at the main component so they propagate to **240 instances across 131 boards**:
+
+| Component | Was | Now |
+|---|---|---|
+| **Badge** | its own Tailwind-ish palette (`#DCFCE7/#166534`…), 4px radius, no border | the shipped atom: pill + 1px semantic border + the file's tint tokens. Uses the `-text` steps because `success #16A34A` on its own 10% tint measures **2.65:1** — the darker step is 4.56:1 |
+| **Avatar initials** | bound to `accent-text #3C68C9` on the `accent #406ED6` fill = **1.06:1, invisible** | `accent-on`, centred — 4.75:1, same pairing the primary button uses |
+| **Input disabled** | `#CBD5E1` on `#F1F5F9` = **1.36:1** | `text-muted`, matching the shipped `.bd-input:disabled` — 4.63:1 |
+| **Button disabled** | label swapped to `#CBD5E1` on a full-strength accent fill = 3.2:1, read as a live button | `opacity: 0.5` on the whole control, which is what `button.css` actually does |
+| **Button set** | 8 disabled variants each embedded a tooltip overhanging the 150-wide set by 170px, landing on the Input specimens | tooltip lifted out (it is its own component); the rule preserved as a labelled documentation pair |
+
+Every changed pair now passes AA: badge 4.56–7.0, avatar 4.75, input 4.63. The sheet itself had 4 overlapping specimens (2 pre-existing, 2 introduced by the doc frame) — laid out top-to-bottom with a 120px gutter, now **0 collisions**.
+
+Worth stating plainly: button `radius-md` = 8 in Figma matched `button.css` exactly, so it was left alone. The audit's job is to find drift, not to impose taste on things that already agree.
+
 **One constraint worth stating, because no amount of wiring fixes it:** Figma prototype links cannot cross pages — `NAVIGATE` destinations must be a top-level frame on the same page. So Editor → Site settings and Editor → Client review are documented in captions, not clickable. A demoable end-to-end path needs a dedicated flow page holding instances of the spine screens.
 
 ---
@@ -484,7 +498,8 @@ Housekeeping in the same pass: 12 stub captions on the Dashboard page (each just
 | P13 J5 states + Domains + Forms rebuild | 42 | 42 |
 | P14 Post-freeze reconciliation (2026-07-25) | 30 | 30 |
 | P15 Canvas toolbar + file hygiene (2026-07-26) | 4 | 4 |
-| **Total** | **343** | **343** |
+| P16 Component craft pass (2026-07-26) | 5 | 5 |
+| **Total** | **348** | **348** |
 
 ---
 
