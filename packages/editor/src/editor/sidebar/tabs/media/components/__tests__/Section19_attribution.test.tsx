@@ -69,8 +69,8 @@ function renderModal(extra: Partial<React.ComponentProps<typeof StockSourceModal
 
 describe("§19 — Stock tile attribution", () => {
   it("photo tile shows author + source", () => {
-    const { container } = renderModal({ photos: [photo()] });
-    const attribution = container.querySelector(
+    renderModal({ photos: [photo()] });
+    const attribution = document.querySelector(
       "[data-testid='stock-tile-attribution']",
     );
     expect(attribution).toBeInTheDocument();
@@ -103,17 +103,17 @@ describe("§19 — Stock tile attribution", () => {
   });
 
   it("video tile shows author + source", () => {
-    const { container } = renderModal({
+    renderModal({
       activeType: "vid",
       videos: [video()],
     });
     // Modal's internal activeTab defaults to "img"; click the Videos tab.
     fireEvent.click(screen.getByRole("button", { name: /^videos$/i }));
-    const attribution = container.querySelector(
+    const attribution = document.querySelector(
       "[data-testid='stock-tile-attribution']",
     );
     expect(attribution).toBeInTheDocument();
-    const tile = container.querySelector(".med-vid-card") as HTMLElement;
+    const tile = document.querySelector(".med-vid-card") as HTMLElement;
     expect(within(tile).getByText(/Filmmaker/)).toBeInTheDocument();
     expect(within(tile).getByText(/pexels/i)).toBeInTheDocument();
   });

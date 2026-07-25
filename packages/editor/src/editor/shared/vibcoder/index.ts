@@ -238,6 +238,8 @@ export {
   ModalClose,
   ModalTitle,
   ModalDescription,
+  ModalHead,
+  ModalBody,
   ModalFooter,
 } from "./Modal";
 export type {

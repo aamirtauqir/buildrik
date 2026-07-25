@@ -1,4 +1,5 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
 /**
  * Stock Source Modal — Browse and save stock assets to library.
  * Replaces the old Discovery tab. Opens on demand via "+ Add from Stock".
@@ -7,7 +8,6 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { X, Download, SquareArrowOutUpRight } from "lucide-react";
-import { useEscapeKey } from "../../../../../shared/hooks/useEscapeKey";
 import { SearchBar } from "../../../shared/SearchBar";
 import type {
   DiscoveryViewProps,
@@ -79,7 +79,6 @@ export function StockSourceModal({
 }: StockSourceModalProps) {
   const [activeTab, setActiveTab] = React.useState<"img" | "vid" | "ico" | "fnt">("img");
 
-  useEscapeKey(onClose, { enabled: open });
 
   if (!open) return null;
 
@@ -87,13 +86,8 @@ export function StockSourceModal({
   const showFilters = activeTab === "img" || activeTab === "vid";
 
   return (
-    <div className="stock-modal-backdrop" onClick={onClose}>
-      <div
-        className="stock-modal"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-label="Browse stock assets"
-      >
+    <Modal open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <ModalContent srTitle="Browse stock assets" className="stock-modal">
         {/* Header */}
         <div className="stock-modal-header">
           <h3 className="stock-modal-title">Add from Stock</h3>
@@ -384,7 +378,7 @@ export function StockSourceModal({
             </Button>
           )}
         </div>
-      </div>
-    </div>
+      </ModalContent>
+    </Modal>
   );
 }

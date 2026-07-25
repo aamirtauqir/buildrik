@@ -383,19 +383,10 @@
   opacity: 0.9;
 }
 
-.stock-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 500;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(2px);
-}
-
 .stock-modal {
   width: min(720px, 90vw);
+  /* lift the .bd-modal 380px cap — this dialog is a browsing surface */
+  max-width: min(720px, 90vw);
   max-height: 80vh;
   background: var(--bd-bg-panel);
   border: 1px solid var(--bd-border-light, rgba(255,255,255,0.08));

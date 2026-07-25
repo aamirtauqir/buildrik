@@ -1,8 +1,11 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
 /**
  * Media Tab — Confirm Delete Modal
  * Shows in-use warning, bulk type-DELETE gate, and file names.
+ * P5: on the shared Radix Modal substrate (focus trap, Esc, overlay) — the
+ * hand-rolled med-modal-overlay wrapper is gone; inner med-* styling stays.
  * @license BSD-3-Clause
  */
 
@@ -28,8 +31,8 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
   const hiddenCount = names.length - visibleNames.length;
 
   return (
-    <div className="med-modal-overlay" role="presentation">
-      <div className="med-modal" role="dialog" aria-modal="true" aria-labelledby="med-del-title">
+    <Modal open onOpenChange={(o) => { if (!o) onCancel(); }}>
+      <ModalContent srTitle="Delete files" className="med-modal">
         <h3 className="med-modal-title" id="med-del-title">
           {isBulk ? `Delete ${keys.length} files?` : "Delete file?"}
         </h3>
@@ -86,7 +89,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
             Delete{keys.length > 1 ? ` ${keys.length} files` : ""}
           </Button>
         </div>
-      </div>
-    </div>
+      </ModalContent>
+    </Modal>
   );
 }

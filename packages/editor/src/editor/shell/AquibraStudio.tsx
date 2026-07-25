@@ -21,6 +21,7 @@ import { StudioSkeleton } from "@/shared/extensions/SkeletonCompounds";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { StaleApprovalModal } from "./modals/StaleApprovalModal";
+import { PreviewOverlay } from "./PreviewOverlay";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
@@ -146,6 +147,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const [loadError, setLoadError] = React.useState<LoadErrorKind>(null);
   // P3: the Issues panel (the topbar issue pill opens it — was a settings stub).
   const [issuesOpen, setIssuesOpen] = React.useState(false);
+  // In-shell preview (shell state 7) — sanitized page HTML below the topbar.
+  const [previewHtml, setPreviewHtml] = React.useState<string | null>(null);
 
   // Initialize composer with hooks
   const composer = useComposerInit({
@@ -328,6 +331,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           showSuggestions={state.overlays.showSuggestions}
           studioSyncStatus={state.syncStatus}
           issues={state.issues}
+          onInlinePreview={setPreviewHtml}
           onSetPreviewLoading={modals.setPreviewLoading}
           onSetExportLoading={modals.setExportLoading}
           // ✨ Ask AI → the AITab rail panel (single consolidated AI surface).
@@ -540,6 +544,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         composer={composer}
         selectedElement={selectedElement}
       />
+
+      <PreviewOverlay html={previewHtml} onDone={() => setPreviewHtml(null)} />
 
       <UpgradeModal />
 

@@ -25,12 +25,11 @@
  *   Source modal.css structures the panel as
  *     .bd-modal > .bd-modal__head (icon + title + subtitle) + .bd-modal__body
  *     + .bd-modal__foot
- *   Radix.Dialog renders .bd-modal as a single flat container; vibcoder
- *   ModalTitle and ModalDescription render as direct children of ModalContent
- *   without an intermediate __head wrapper. The visual difference is that
- *   __head's padding + border-bottom won't render — content sits flush against
- *   the panel edge. Acceptable for Phase 3 canary; M5 may add a ModalHead
- *   sibling for full source parity if chrome consumers need it.
+ *   Radix.Dialog renders .bd-modal as a single flat container. P5 (2026-07-25)
+ *   closed the gap with OPT-IN wrappers: ModalHead (.bd-modal__head — icon +
+ *   title + subtitle with padding + border-bottom) and ModalBody
+ *   (.bd-modal__body). Existing flat consumers are unchanged; wrap title/desc
+ *   in ModalHead + content in ModalBody for full source-CSS parity.
  *
  * E1: ModalTrigger + ModalClose accept asChild
  * E2: NO Radix types in public API — DialogProps not re-exported
@@ -210,6 +209,32 @@ export const ModalDescription = forwardRef<
 ModalDescription.displayName = "ModalDescription";
 
 // Footer — pure layout slot (maps to bd-modal__foot per source CSS)
+/** Opt-in header wrapper — .bd-modal__head padding + divider (P5/F18). */
+export const ModalHead = forwardRef<HTMLDivElement, ModalFooterProps>(
+  ({ children, className, ...rest }, ref) => {
+    const classes = ["bd-modal__head", className].filter(Boolean).join(" ");
+    return (
+      <div ref={ref} className={classes} {...rest}>
+        {children}
+      </div>
+    );
+  },
+);
+ModalHead.displayName = "ModalHead";
+
+/** Opt-in body wrapper — .bd-modal__body padding (P5/F18). */
+export const ModalBody = forwardRef<HTMLDivElement, ModalFooterProps>(
+  ({ children, className, ...rest }, ref) => {
+    const classes = ["bd-modal__body", className].filter(Boolean).join(" ");
+    return (
+      <div ref={ref} className={classes} {...rest}>
+        {children}
+      </div>
+    );
+  },
+);
+ModalBody.displayName = "ModalBody";
+
 export const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(
   ({ children, className, ...rest }, ref) => {
     const classes = ["bd-modal__foot", className].filter(Boolean).join(" ");

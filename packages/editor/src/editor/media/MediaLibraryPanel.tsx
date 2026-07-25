@@ -7,6 +7,7 @@
  */
 
 import * as React from "react";
+import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
@@ -293,54 +294,17 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
         />
       )}
 
-      {/* Delete Confirmation */}
-      {pendingDeleteId &&
-        (() => {
-          const asset = filteredAssets.find((a) => a.id === pendingDeleteId);
-          return (
-            <div
-              style={{
-                position: "fixed",
-                inset: 0,
-                zIndex: 9999,
-                background: "rgba(0,0,0,0.5)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  background: "var(--buildrick-bg-card)",
-                  borderRadius: 8,
-                  padding: 24,
-                  width: 320,
-                  boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
-                }}
-              >
-                <h3 style={{ margin: "0 0 8px", fontSize: 15, fontWeight: 600 }}>Delete file?</h3>
-                <p
-                  style={{
-                    margin: "0 0 20px",
-                    fontSize: 13,
-                    color: "var(--buildrick-text-secondary)",
-                  }}
-                >
-                  &quot;{asset?.name ?? "This file"}&quot; will be permanently deleted. This cannot
-                  be undone.
-                </p>
-                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                  <Button variant="ghost" size="sm" onClick={() => setPendingDeleteId(null)}>
-                    Cancel
-                  </Button>
-                  <Button variant="danger" size="sm" onClick={confirmDeleteAsset}>
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
+      {/* Delete confirmation — shared ConfirmDialog substrate (P5, was a
+          hand-rolled fixed overlay at zIndex 9999 with no focus trap). */}
+      <ConfirmDialog
+        isOpen={pendingDeleteId != null}
+        onClose={() => setPendingDeleteId(null)}
+        onConfirm={confirmDeleteAsset}
+        title="Delete file?"
+        message={`"${filteredAssets.find((a) => a.id === pendingDeleteId)?.name ?? "This file"}" will be permanently deleted. This cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
           </div>
         </ModalContent>
       </Modal>

@@ -1,4 +1,5 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
+import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
@@ -157,56 +158,28 @@ const ShortcutRow: React.FC<{ keys: string[]; description: string }> = ({ keys, 
  * Main Keyboard Cheat Sheet component
  */
 export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, onClose }) => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  // Close on Escape
+  // Escape, focus trap and the overlay come from the shared Radix Modal
+  // substrate (P5). '?' also closes — the toggle key mirrors open/close.
   React.useEffect(() => {
     if (!isOpen) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.key === "?") {
+      if (e.key === "?") {
         e.preventDefault();
         onClose();
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Focus trap
-  React.useEffect(() => {
-    if (isOpen && containerRef.current) {
-      containerRef.current.focus();
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="keyboard-cheatsheet-title"
-      onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: tokens.zIndex.modal,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "rgba(0, 0, 0, 0.6)",
-        backdropFilter: "blur(4px)",
-        animation: "bd-fade-in 0.15s ease",
-      }}
-    >
-      <Stack
-        ref={containerRef}
-        tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
+    <Modal open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <ModalContent
+        srTitle="Keyboard shortcuts"
+        aria-labelledby="keyboard-cheatsheet-title"
         style={{
           width: "min(900px, 90vw)",
+          maxWidth: "min(900px, 90vw)",
           maxHeight: "85vh",
           background: tokens.colors.surface1,
           borderRadius: tokens.radius.lg,
@@ -337,8 +310,8 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
             opens command palette
           </span>
         </div>
-      </Stack>
-    </div>
+      </ModalContent>
+    </Modal>
   );
 };
 

@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../engine";
-import { sanitizeHTMLForPreview, setupPreviewWindow } from "../export/ExportUtils";
+import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { PresenceIndicators } from "../collaboration";
 import { Button } from "@/editor/shared/vibcoder/Button";
@@ -85,6 +85,8 @@ export interface StudioHeaderProps {
   /** Export HTML as zip download */
   onExportHTML?: () => void;
 
+  /** Opens the in-shell preview overlay with the sanitized page HTML (shell state 7). */
+  onInlinePreview: (html: string) => void;
   /** Vercel publish flow — when present, replaces fallback handleExport on Publish click */
   onVercelPublish?: () => void;
   /** Publish workflow state — drives PublishDropdown visuals */
@@ -135,6 +137,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenShortcuts,
   onSave,
   onExportHTML,
+  onInlinePreview,
   onVercelPublish,
   publishState,
   publishLoading,
@@ -174,27 +177,17 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   /**
    * Handle preview - opens sanitized HTML in new window with sandboxed iframe
    */
+  // In-shell preview (shell state 7, P5/F20): render the sanitized page below
+  // the topbar instead of a pop-up window (which could be blocked and lost the
+  // shell context).
   const handlePreview = React.useCallback(() => {
     if (previewLoading) return;
     onSetPreviewLoading(true);
-
     const rawHtml =
       composer?.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
-    const html = sanitizeHTMLForPreview(rawHtml);
-    const previewWindow = window.open("", "_blank");
-
-    if (previewWindow) {
-      setupPreviewWindow(previewWindow, html);
-    } else {
-      addToast({
-        title: "Preview blocked",
-        description: "Allow pop-ups.",
-        tone: "warning",
-      });
-    }
-
-    setTimeout(() => onSetPreviewLoading(false), 600);
-  }, [composer, previewLoading, onSetPreviewLoading, addToast]);
+    onInlinePreview(sanitizeHTMLForPreview(rawHtml));
+    setTimeout(() => onSetPreviewLoading(false), 300);
+  }, [composer, previewLoading, onSetPreviewLoading, onInlinePreview]);
 
   /**
    * Handle export - show export modal

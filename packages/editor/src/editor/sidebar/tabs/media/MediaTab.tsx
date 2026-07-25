@@ -179,9 +179,53 @@ function MediaTabWithComposer({
   }, [composer, state]);
 
   // ─── Panel mode: slim launcher (320px) or expanded panel (560px) ────
+  const handleOpenIconPicker = React.useCallback(() => {
+    if (!onOpenIconPicker) return;
+    onOpenIconPicker(undefined, (icon) => {
+      try {
+        const result = composer.mediaOps.insertMedia(icon.name, "icon");
+        if (result) {
+          showToast(`${icon.name} icon added ✓`, "success");
+        }
+      } catch {
+        showToast("Could not add icon", "error");
+      }
+    });
+  }, [onOpenIconPicker, composer, showToast]);
+
+  // Stock modal mounts in EVERY mode — SlimLauncher's "+ Stock" used to set
+  // state that only the fullpage branch rendered (dead button, found in the
+  // P5 live walk).
+  const stockModal = (
+    <StockSourceModal
+      open={stockModalOpen}
+      onClose={() => setStockModalOpen(false)}
+      activeType={state.activeType}
+      photos={state.stockPhotos}
+      videos={state.stockVideos}
+      icons={state.discIcons}
+      fonts={state.discFonts}
+      loading={state.discLoading}
+      searchQuery={state.discoverySearch}
+      orientation={state.discOrientation}
+      color={state.discColor}
+      onSearch={state.discSearchAll}
+      onSetOrientation={state.setDiscOrientation}
+      onSetColor={state.setDiscColor}
+      onLoadMore={state.loadMoreDisc}
+      onSave={(type, item) => {
+        state.saveToLibrary(type, item);
+        // Don't close modal — let user save multiple items
+      }}
+      onInsert={state.insertToCanvas}
+      onOpenIconPicker={handleOpenIconPicker}
+    />
+  );
+
   if (onOpenLibrary) {
     if (state.panelExpanded) {
       return (
+        <>
         <ExpandedMediaPanel
           composer={composer}
           state={state}
@@ -193,9 +237,12 @@ function MediaTabWithComposer({
           onOptimized={handleOptimized}
           onOpenIconPicker={onOpenIconPicker}
         />
+        {stockModal}
+        </>
       );
     }
     return (
+      <>
       <SlimLauncher
         composer={composer}
         libraryItems={state.libraryItems}
@@ -216,23 +263,12 @@ function MediaTabWithComposer({
         selectionContext={state.selectionContext}
         onCancelSelection={() => state.setSelectionContext(null)}
       />
+      {stockModal}
+      </>
     );
   }
 
   // ─── Fullpage mode: render full manager content ──────────────────
-  const handleOpenIconPicker = React.useCallback(() => {
-    if (!onOpenIconPicker) return;
-    onOpenIconPicker(undefined, (icon) => {
-      try {
-        const result = composer.mediaOps.insertMedia(icon.name, "icon");
-        if (result) {
-          showToast(`${icon.name} icon added ✓`, "success");
-        }
-      } catch {
-        showToast("Could not add icon", "error");
-      }
-    });
-  }, [onOpenIconPicker, composer, showToast]);
 
   return (
     <TabFrame
@@ -377,30 +413,7 @@ function MediaTabWithComposer({
           onReplaceAcross={handleReplaceAcross}
         />
       )}
-      {/* Stock Source Modal — replaces old Discovery tab */}
-      <StockSourceModal
-        open={stockModalOpen}
-        onClose={() => setStockModalOpen(false)}
-        activeType={state.activeType}
-        photos={state.stockPhotos}
-        videos={state.stockVideos}
-        icons={state.discIcons}
-        fonts={state.discFonts}
-        loading={state.discLoading}
-        searchQuery={state.discoverySearch}
-        orientation={state.discOrientation}
-        color={state.discColor}
-        onSearch={state.discSearchAll}
-        onSetOrientation={state.setDiscOrientation}
-        onSetColor={state.setDiscColor}
-        onLoadMore={state.loadMoreDisc}
-        onSave={(type, item) => {
-          state.saveToLibrary(type, item);
-          // Don't close modal — let user save multiple items
-        }}
-        onInsert={state.insertToCanvas}
-        onOpenIconPicker={handleOpenIconPicker}
-      />
+      {stockModal}
     </TabFrame>
   );
 }

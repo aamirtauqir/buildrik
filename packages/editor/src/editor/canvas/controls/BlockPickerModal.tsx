@@ -8,7 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { createPortal } from "react-dom";
+import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
 import { getBlockById, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";
@@ -36,29 +36,8 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Handle escape key to close
-  React.useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, onClose]);
-
-  // Prevent body scroll when open
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  // Escape, focus trap, overlay and scroll lock come from the shared Radix
+  // Modal substrate (P5) — the hand-rolled handlers are gone.
 
   // Handle block selection
   const handleBlockSelect = React.useCallback(
@@ -157,20 +136,12 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
     after: "Add Element After",
   };
 
-  return createPortal(
-    <div
-     
-      style={overlayStyles}
-      onClick={onClose}
-      role="presentation"
-    >
-      <div
-       
-        role="dialog"
-        aria-modal="true"
-        aria-label={positionLabels[insertionContext.position]}
+  return (
+    <Modal open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <ModalContent
+        size="xl"
+        srTitle={positionLabels[insertionContext.position]}
         style={modalStyles}
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div style={headerStyles}>
@@ -217,24 +188,12 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
         <div style={contentStyles}>
           <ElementsTab searchQuery={searchQuery} onBlockClick={handleBlockSelect} />
         </div>
-      </div>
-    </div>,
-    document.body
+      </ModalContent>
+    </Modal>
   );
 };
 
 // Styles
-const overlayStyles: React.CSSProperties = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(0, 0, 0, 0.7)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 10000,
-  backdropFilter: "blur(4px)",
-};
-
 const modalStyles: React.CSSProperties = {
   background: "var(--buildrick-bg-panel)",
   borderRadius: 12,

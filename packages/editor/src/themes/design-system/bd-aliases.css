@@ -22,6 +22,7 @@
 :root {
   /* ─── SURFACES ───────────────────────────────────────────────────────── */
   --bd-bg-panel: var(--buildrick-bg-panel);
+  --bd-bg-app: var(--buildrick-bg-app);
   --bd-bg-card: var(--buildrick-bg-card);
   --bd-bg-input: var(--buildrick-bg-input);
   --bd-bg-elevated: var(--buildrick-bg-elevated);

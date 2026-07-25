@@ -376,3 +376,49 @@ Board-exact state sweep. Every remaining 🟦 item terminally resolved:
 | Legend n/p (Review/Compare/Issues) + ⌘⏎ publish | **Deferred** — documented, small follow-ups |
 
 Verify: tsc clean both packages; verify:ds full green; palette 24 + bell 10 + regionCycle 12 + ProInspector P4 6 new/updated tests; shell+inspector+rail+ai suites green (2 load-flakes re-ran green in isolation). Live-walked on :5050: F6 → topbar → rail → drawer in board order; L/B/D open Layers/Brand/Content; C shows "Comment · Esc"; ⌘K "qqp" → Nothing matches, "make the hero warmer" → AI hand-off + explainer (disabled-row path unit-pinned — the live demo legitimately has history).
+
+---
+
+## 12. Phase 5 execution record (2026-07-25, same session)
+
+Opened with a P4 investigation pass: commit `5021f7d3` intact; panels+sidebar
+suites (237) green; regex-inserted agent-run emits verified in context; two
+earlier "failures" confirmed as machine-load flakes (isolated re-run green).
+
+**F18 — Modal head CSS gap CLOSED:** opt-in `ModalHead` (.bd-modal__head
+padding + divider) and `ModalBody` (.bd-modal__body) compounds added to the
+vibcoder Modal; header doc-note updated; existing flat consumers unchanged.
+
+**F8 — substrate migrations (5 surfaces onto Radix Modal):**
+media ConfirmDeleteModal (type-DELETE gate kept) · MediaLibraryPanel inline
+delete confirm → shared ConfirmDialog (was fixed overlay @ zIndex 9999, no
+focus trap) · StockSourceModal (custom backdrop/Esc handlers removed —
+substrate owns them; dead .stock-modal-backdrop CSS deleted; .bd-modal 380px
+cap lifted for browsing surfaces) · BlockPickerModal (manual portal + Esc +
+body-scroll-lock removed) · KeyboardCheatSheet ('?' toggle kept, Esc/trap
+from substrate). Documented NON-migrations: ConflictModal (B7
+dashboard-embed Radix breakage — stays hand-rolled, documented in-file) ·
+AchievementPrompt (transient auto-dismiss celebration; a focus trap
+mid-onboarding would be worse a11y) · AddTokenModal + TabGuardModal
+(deliberately PANEL-SCOPED absolute overlays inside the Brand panel) ·
+palette family (shell/canvas/pages ⌘K — own keyboard-first pattern, 3
+consistent consumers; a dedicated palette primitive is the right unification,
+not Dialog).
+
+**F20 — preview DECIDED + BUILT (board 65:211):** in-shell `PreviewOverlay` —
+topbar stays, everything below is a fully sandboxed iframe (`sandbox=""`) of
+the same `sanitizeHTMLForPreview` output, single "Done" pill + Esc exits.
+Replaces the pop-up window (blockable, shell-losing). Console during the live
+walk showed the sandbox doing its job: "Blocked script execution in
+'about:srcdoc'".
+
+**Live-walk find fixed:** SlimLauncher's "+ Stock" was a DEAD BUTTON — it set
+state only the fullpage branch rendered. Stock modal now mounts in every
+media-panel mode (slim/expanded/fullpage).
+
+Tests: PreviewOverlay 4 new; portal-aware fixes to stock attribution tests
+(Radix portals out of the render container — query the document); broad battery
+2323 green across shell/canvas-controls/media/vibcoder; tsc clean both
+packages; verify:ds full green (new legit alias --bd-bg-app). Live-verified on
+:5050: preview overlay open/Done/sandbox, cheat sheet on substrate via '?',
+stock modal on substrate + Esc.
