@@ -1,6 +1,10 @@
 /**
  * bdr-badge — status pill atom.
  * Variants: published, draft, issues, unsaved, syncing, new, premium, count
+ *
+ * Text uses the -text step of each semantic colour, never the full-strength
+ * hue: that hue is a border/icon weight and fails AA as 11px text on its own
+ * 10%% tint (success measured 2.95:1). Borders keep the full strength.
  */
 
 .bd-badge {
@@ -26,7 +30,7 @@
 .bd-badge--published {
   background: var(--buildrick-success-light);
   border-color: var(--buildrick-success-border);
-  color: var(--buildrick-success);
+  color: var(--buildrick-success-text);
 }
 .bd-badge--draft {
   background: var(--buildrick-layer-muted-alpha);
@@ -36,22 +40,22 @@
 .bd-badge--issues {
   background: var(--buildrick-error-light);
   border-color: var(--buildrick-error);
-  color: var(--buildrick-error);
+  color: var(--buildrick-error-text);
 }
 .bd-badge--unsaved {
   background: var(--buildrick-warning-light);
   border-color: var(--buildrick-warning-border);
-  color: var(--buildrick-warning);
+  color: var(--buildrick-warning-text);
 }
 .bd-badge--syncing {
   background: var(--buildrick-accent-alpha-08);
   border-color: var(--buildrick-primary-alpha-30);
-  color: var(--buildrick-accent);
+  color: var(--buildrick-accent-text);
 }
 .bd-badge--new {
   background: var(--buildrick-accent-tint);
   border-color: var(--buildrick-primary-alpha-30);
-  color: var(--buildrick-accent);
+  color: var(--buildrick-accent-text);
 }
 .bd-badge--premium {
   background: var(--buildrick-text-heading);
@@ -67,5 +71,5 @@
   border-radius: var(--buildrick-radius-md-plus);
   background: var(--buildrick-accent-tint);
   border-color: transparent;
-  color: var(--buildrick-accent);
+  color: var(--buildrick-accent-text);
 }

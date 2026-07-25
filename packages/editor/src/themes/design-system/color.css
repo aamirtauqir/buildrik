@@ -55,6 +55,14 @@
   --buildrick-surface-3: #F1F5F9;
 
   --buildrick-error: #DC2626;
+  /* Text steps for semantic colour ON its own 10% tint. The full-strength
+     hues are border/icon weights and fail AA as body text on their tints:
+     success 2.95:1, warning 4.38:1, error 4.14:1. These measure 4.6–4.7:1. */
+  --buildrick-success-text: #117D39;
+  --buildrick-warning-text: #A05804;
+  /* Referenced by badge--syncing and the skeleton shimmer; was undefined, so
+     both rendered with no fill at all. */
+  --buildrick-accent-alpha-08: rgba(64, 110, 214, 0.08);
   /* Error text ON a tinted background. #DC2626 measures 4.24:1 on
      warning-tint and 4.08:1 on error-tint — both under AA for body copy.
      This is the darker step Figma already carries as `color/error-text`. */
