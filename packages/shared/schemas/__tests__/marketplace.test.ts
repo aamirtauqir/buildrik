@@ -1,13 +1,28 @@
 import { describe, it, expect } from "vitest";
-import { isConfigurableApp, parseAppConfig, liveChatConfigSchema } from "../marketplace";
+import { isConfigurableApp, parseAppConfig, liveChatConfigSchema, APP_CONFIG_SCHEMAS } from "../marketplace";
 
 describe("isConfigurableApp", () => {
-  it("recognizes live-chat, rejects features / connect apps", () => {
+  it("recognizes head-inject apps, rejects features / connect apps", () => {
     expect(isConfigurableApp("live-chat")).toBe(true);
+    expect(isConfigurableApp("hubspot")).toBe(true);
+    expect(isConfigurableApp("linkedin-insight")).toBe(true);
+    expect(isConfigurableApp("tiktok-pixel")).toBe(true);
+    expect(isConfigurableApp("pinterest-tag")).toBe(true);
+    expect(isConfigurableApp("site-verification")).toBe(true);
     expect(isConfigurableApp("commerce")).toBe(false);
     expect(isConfigurableApp("memberships")).toBe(false);
     expect(isConfigurableApp("google-analytics")).toBe(false);
     expect(isConfigurableApp("nope")).toBe(false);
+  });
+});
+
+describe("siteVerificationConfigSchema", () => {
+  it("accepts any one code, strips empties", () => {
+    const out = parseAppConfig("site-verification", { google: " g-abc12345 ", bing: "", pinterest: "" });
+    expect(out).toEqual({ google: "g-abc12345" });
+  });
+  it("rejects when all blank", () => {
+    expect(APP_CONFIG_SCHEMAS["site-verification"].safeParse({ google: "", bing: "", pinterest: "" }).success).toBe(false);
   });
 });
 

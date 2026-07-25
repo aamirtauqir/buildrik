@@ -22,6 +22,50 @@ describe("generateWorkspaceAppScripts — Live Chat (Tawk.to)", () => {
   });
 });
 
+describe("generateWorkspaceAppScripts — other head-inject apps", () => {
+  it("HubSpot: emits the tracking loader with the portal id", () => {
+    const out = generateWorkspaceAppScripts([{ appId: "hubspot", config: { portalId: "1234567" } }]);
+    expect(out).toContain("js.hs-scripts.com/1234567.js");
+    expect(out).toContain('id="hs-script-loader"');
+  });
+
+  it("LinkedIn: emits partner id + snap.licdn loader + noscript pixel", () => {
+    const out = generateWorkspaceAppScripts([{ appId: "linkedin-insight", config: { partnerId: "987654" } }]);
+    expect(out).toContain('_linkedin_partner_id = "987654"');
+    expect(out).toContain("snap.licdn.com/li.lms-analytics/insight.min.js");
+    expect(out).toContain("px.ads.linkedin.com/collect/?pid=987654");
+  });
+
+  it("TikTok: emits ttq loader with the pixel id + page()", () => {
+    const out = generateWorkspaceAppScripts([{ appId: "tiktok-pixel", config: { pixelId: "C4A1B2C3D4E5F6G7H8I9" } }]);
+    expect(out).toContain('ttq.load("C4A1B2C3D4E5F6G7H8I9")');
+    expect(out).toContain("analytics.tiktok.com/i18n/pixel/events.js");
+  });
+
+  it("Pinterest: emits pintrk load + noscript fallback", () => {
+    const out = generateWorkspaceAppScripts([{ appId: "pinterest-tag", config: { tagId: "2612345678901" } }]);
+    expect(out).toContain('pintrk("load","2612345678901")');
+    expect(out).toContain("ct.pinterest.com/v3/?event=init&tid=2612345678901");
+  });
+
+  it("Site verification: one meta per configured engine; skips blanks", () => {
+    const out = generateWorkspaceAppScripts([{ appId: "site-verification", config: { google: "g-abc123456", pinterest: "p-xyz789012" } }]);
+    expect(out).toContain('<meta name="google-site-verification" content="g-abc123456">');
+    expect(out).toContain('<meta name="p:domain_verify" content="p-xyz789012">');
+    expect(out).not.toContain("msvalidate.01");
+  });
+
+  it("Site verification: nothing when all codes blank/invalid", () => {
+    expect(generateWorkspaceAppScripts([{ appId: "site-verification", config: {} }])).toBe("");
+    expect(generateWorkspaceAppScripts([{ appId: "site-verification", config: { google: "" } }])).toBe("");
+  });
+
+  it("rejects malformed ids per app", () => {
+    expect(generateWorkspaceAppScripts([{ appId: "hubspot", config: { portalId: "abc" } }])).toBe("");
+    expect(generateWorkspaceAppScripts([{ appId: "tiktok-pixel", config: { pixelId: "short" } }])).toBe("");
+  });
+});
+
 describe("generateWorkspaceAppScripts — gating", () => {
   it("ignores non-configurable / unknown app ids", () => {
     expect(generateWorkspaceAppScripts([{ appId: "commerce", config: VALID }])).toBe("");

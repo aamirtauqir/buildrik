@@ -18,6 +18,9 @@ export interface AppConfigField {
   label: string;
   hint?: string;
   placeholder?: string;
+  /** When true the field may be left blank (the app's schema decides validity,
+   *  e.g. Site Verification needs any one of several optional codes). */
+  optional?: boolean;
 }
 
 export interface CatalogApp {
@@ -66,6 +69,68 @@ export const CATALOG_APPS: readonly CatalogApp[] = [
     ],
   },
   { id: "memberships", name: "Memberships", category: "Marketing", description: "Gate content with paid tiers and logins.", icon: "Lock", action: "Install", color: "#EA8E1E" },
+  {
+    id: "hubspot",
+    name: "HubSpot",
+    category: "Marketing",
+    description: "Load the HubSpot tracking code on every site — capture leads and analytics into your CRM.",
+    icon: "Users",
+    action: "Install",
+    color: "#FF7A59",
+    configFields: [
+      { key: "portalId", label: "Hub ID (Portal ID)", hint: "HubSpot → Settings → Tracking Code. The numeric Hub ID.", placeholder: "1234567" },
+    ],
+  },
+  {
+    id: "linkedin-insight",
+    name: "LinkedIn Insight Tag",
+    category: "Marketing",
+    description: "Track conversions and build retargeting audiences for LinkedIn Ads across your sites.",
+    icon: "TrendingUp",
+    action: "Install",
+    color: "#0A66C2",
+    configFields: [
+      { key: "partnerId", label: "Partner ID", hint: "LinkedIn Campaign Manager → Analyze → Insight Tag. The numeric partner ID.", placeholder: "1234567" },
+    ],
+  },
+  {
+    id: "tiktok-pixel",
+    name: "TikTok Pixel",
+    category: "Marketing",
+    description: "Measure TikTok ad performance and build audiences with the TikTok pixel.",
+    icon: "Video",
+    action: "Install",
+    color: "#010101",
+    configFields: [
+      { key: "pixelId", label: "Pixel ID", hint: "TikTok Events Manager → your pixel → the pixel code.", placeholder: "C4A1B2C3D4E5F6G7H8I9" },
+    ],
+  },
+  {
+    id: "pinterest-tag",
+    name: "Pinterest Tag",
+    category: "Marketing",
+    description: "Track Pinterest conversions and reach shoppers who saved your pins.",
+    icon: "Pin",
+    action: "Install",
+    color: "#E60023",
+    configFields: [
+      { key: "tagId", label: "Tag ID", hint: "Pinterest → Ads → Conversions → Pinterest Tag. The numeric tag ID.", placeholder: "2612345678901" },
+    ],
+  },
+  {
+    id: "site-verification",
+    name: "Site Verification",
+    category: "SEO",
+    description: "Prove you own your sites for Google, Bing and Pinterest — needed before you can see search data.",
+    icon: "ShieldCheck",
+    action: "Install",
+    color: "#1A8917",
+    configFields: [
+      { key: "google", label: "Google Search Console code", hint: "Search Console → add property → HTML tag method → the content value.", placeholder: "abc123…", optional: true },
+      { key: "bing", label: "Bing Webmaster code", hint: "Bing Webmaster Tools → HTML meta tag → the content value.", placeholder: "ABC123…", optional: true },
+      { key: "pinterest", label: "Pinterest verification code", hint: "Pinterest → Claim website → the content value.", placeholder: "abc123…", optional: true },
+    ],
+  },
 ];
 
 /** The subset a workspace can actually install. Connect-type apps are OAuth

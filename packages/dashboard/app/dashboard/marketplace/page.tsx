@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, Settings2, type LucideIcon } from "lucide-react";
+import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, Settings2, Users, TrendingUp, Video, Pin, ShieldCheck, type LucideIcon } from "lucide-react";
 import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory, type CatalogApp } from "@/lib/marketplace-catalog";
 import { PageHeader, IconChip, InputField, Button, ButtonLink, Modal } from "@/components/dashboard/primitives";
 import { trpc } from "@lib/trpc/client";
@@ -15,6 +15,11 @@ const iconMap: Record<string, LucideIcon> = {
   Search,
   MessageSquare,
   Lock,
+  Users,
+  TrendingUp,
+  Video,
+  Pin,
+  ShieldCheck,
 };
 
 type Filter = "All" | AppCategory;
@@ -289,7 +294,7 @@ export default function MarketplacePage() {
               <Button
                 disabled={
                   configure.isPending ||
-                  (configuring.configFields ?? []).some((f) => !form[f.key]?.trim())
+                  (configuring.configFields ?? []).filter((f) => !f.optional).some((f) => !form[f.key]?.trim())
                 }
                 onClick={() => {
                   if (!configuring) return;
@@ -311,7 +316,10 @@ export default function MarketplacePage() {
             </p>
             {(configuring.configFields ?? []).map((f) => (
               <label key={f.key} className="flex flex-col gap-1.5">
-                <span className="text-body-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{f.label}</span>
+                <span className="text-body-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                  {f.label}
+                  {f.optional && <span style={{ fontWeight: 400, color: "var(--color-text-secondary)" }}> (optional)</span>}
+                </span>
                 <InputField
                   type="text"
                   value={form[f.key] ?? ""}
