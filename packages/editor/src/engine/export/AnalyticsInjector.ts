@@ -60,6 +60,25 @@ function generateGoogleAds(conversionId: string): string {
 }
 
 /**
+ * Generate Microsoft Clarity script (free heatmaps + session recordings).
+ * Head-only; no body/noscript needed.
+ */
+function generateMicrosoftClarity(projectId: string): string {
+  return `  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${projectId}");
+  </script>`;
+}
+
+/**
+ * Generate Google Tag Manager container script. This is the head half; GTM's
+ * <noscript> body fallback is only needed for no-JS visitors (irrelevant to
+ * analytics) so it is intentionally omitted here where injection is head-only.
+ */
+function generateGoogleTagManager(containerId: string): string {
+  return `  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${containerId}');</script>`;
+}
+
+/**
  * Generate all configured analytics scripts
  * Returns empty string if no analytics are enabled
  */
@@ -88,7 +107,27 @@ export function generateAnalyticsScripts(config?: AnalyticsConfig): string {
     }
   }
 
+  // Microsoft Clarity
+  if (config.microsoftClarity?.enabled && config.microsoftClarity.projectId) {
+    scripts.push(generateMicrosoftClarity(config.microsoftClarity.projectId));
+  }
+
+  // Google Tag Manager
+  if (config.googleTagManager?.enabled && config.googleTagManager.containerId) {
+    scripts.push(generateGoogleTagManager(config.googleTagManager.containerId));
+  }
+
   return scripts.join("\n");
+}
+
+/** Microsoft Clarity project ids are short alphanumeric strings. */
+export function isValidClarityProjectId(id: string): boolean {
+  return /^[a-z0-9]{6,15}$/i.test(id);
+}
+
+/** Google Tag Manager container ids look like GTM-XXXXXXX. */
+export function isValidGTMContainerId(id: string): boolean {
+  return /^GTM-[A-Z0-9]{4,}$/.test(id);
 }
 
 /**

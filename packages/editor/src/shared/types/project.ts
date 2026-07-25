@@ -90,6 +90,16 @@ export interface AnalyticsConfig {
     enabled: boolean;
     conversionId: string;
   };
+  /** Microsoft Clarity — free heatmaps + session recordings (head script). */
+  microsoftClarity?: {
+    enabled: boolean;
+    projectId: string;
+  };
+  /** Google Tag Manager — one container for all tags/pixels (head script). */
+  googleTagManager?: {
+    enabled: boolean;
+    containerId: string;
+  };
   /** Cookie consent banner configuration (GDPR) */
   cookieConsent?: {
     enabled: boolean;

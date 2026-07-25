@@ -11,6 +11,8 @@ import {
   generateAnalyticsScripts,
   isValidGAMeasurementId,
   isValidFBPixelId,
+  isValidClarityProjectId,
+  isValidGTMContainerId,
 } from "../AnalyticsInjector";
 import type { AnalyticsConfig } from "../../../shared/types";
 
@@ -161,5 +163,42 @@ describe("isValidFBPixelId", () => {
     expect(isValidFBPixelId("12345678901234567")).toBe(false);
     expect(isValidFBPixelId("12345678901234a")).toBe(false);
     expect(isValidFBPixelId("")).toBe(false);
+  });
+});
+
+describe("Microsoft Clarity", () => {
+  it("injects the Clarity loader when enabled with a project id", () => {
+    const out = generateAnalyticsScripts({ microsoftClarity: { enabled: true, projectId: "abcd1234ef" } });
+    expect(out).toContain("clarity.ms/tag/"); // url built at runtime as base + id
+    expect(out).toContain('"abcd1234ef"'); // project id injected as the last arg
+    expect(out).toContain('"clarity","script"');
+  });
+  it("stays out when disabled or id empty", () => {
+    expect(generateAnalyticsScripts({ microsoftClarity: { enabled: false, projectId: "abcd1234ef" } })).toBe("");
+    expect(generateAnalyticsScripts({ microsoftClarity: { enabled: true, projectId: "" } })).toBe("");
+  });
+  it("validates project id shape", () => {
+    expect(isValidClarityProjectId("abcd1234ef")).toBe(true);
+    expect(isValidClarityProjectId("abc")).toBe(false); // too short
+    expect(isValidClarityProjectId("has space")).toBe(false);
+    expect(isValidClarityProjectId("")).toBe(false);
+  });
+});
+
+describe("Google Tag Manager", () => {
+  it("injects the GTM container loader when enabled with an id", () => {
+    const out = generateAnalyticsScripts({ googleTagManager: { enabled: true, containerId: "GTM-ABC1234" } });
+    expect(out).toContain("googletagmanager.com/gtm.js?id='+i");
+    expect(out).toContain("GTM-ABC1234");
+  });
+  it("stays out when disabled or id empty", () => {
+    expect(generateAnalyticsScripts({ googleTagManager: { enabled: false, containerId: "GTM-ABC1234" } })).toBe("");
+    expect(generateAnalyticsScripts({ googleTagManager: { enabled: true, containerId: "" } })).toBe("");
+  });
+  it("validates container id shape", () => {
+    expect(isValidGTMContainerId("GTM-ABC1234")).toBe(true);
+    expect(isValidGTMContainerId("GTM-")).toBe(false);
+    expect(isValidGTMContainerId("ABC1234")).toBe(false);
+    expect(isValidGTMContainerId("")).toBe(false);
   });
 });
