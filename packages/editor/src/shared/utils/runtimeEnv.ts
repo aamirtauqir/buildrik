@@ -7,9 +7,21 @@
 type EnvMap = Record<string, string | undefined>;
 
 function readViteEnv(): EnvMap {
+  // Node (Vitest, SSR): process.env holds the VITE_* keys and stays mutable,
+  // which is what makes this module testable — the injected object below is a
+  // build-time snapshot that vi.stubEnv cannot reach.
+  if (typeof process !== "undefined" && process.env) {
+    return process.env as EnvMap;
+  }
   try {
-    const meta = import.meta as unknown as { env?: EnvMap };
-    return meta?.env ?? {};
+    // Browser: this MUST stay the literal `import.meta.env` member expression.
+    // Vite resolves env by static text replacement on exactly that pattern, so
+    // aliasing it first (`const m = import.meta; m.env`) leaves nothing to
+    // replace — and the browser's native `import.meta` carries no `env`, so
+    // every VITE_* var silently read as undefined. That shipped: Publish stayed
+    // hidden with VITE_FEATURE_PUBLISH=true set, and DASHBOARD_URL fell through
+    // to window.location.origin instead of the dashboard.
+    return (import.meta as unknown as { env?: EnvMap }).env ?? {};
   } catch {
     return {};
   }
