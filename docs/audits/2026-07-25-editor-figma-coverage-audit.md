@@ -521,3 +521,13 @@ dispositions.
 
 Phase 6 CLOSED. All phases P0-P6 of the convergence plan are now executed,
 tested, and live-verified.
+
+**Post-close security hardening (`bf220bef`):** automated security review
+flagged SSRF on `deliverWebhook` — admin-supplied URL fetched server-side.
+Guard added: https-only in production (http kept for dev receivers),
+hostname resolved and rejected on loopback/RFC1918/link-local/CGNAT (v4+v6
+incl. ::ffff: mapped, metadata 169.254.169.254), re-validated at delivery
+time against DNS repointing, `redirect: "error"` on the fetch, connect
+surfaces "use a public https endpoint". Residual rebinding window between
+lookup and connect documented in-file (no IP pinning — blind best-effort
+delivery). 23 guard unit tests green.
