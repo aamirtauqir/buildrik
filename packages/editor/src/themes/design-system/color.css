@@ -45,6 +45,10 @@
 
   /* SEMANTIC STATUS */
   --buildrick-error: #DC2626;
+  /* Error text ON a tinted background. #DC2626 measures 4.24:1 on
+     warning-tint and 4.08:1 on error-tint — both under AA for body copy.
+     This is the darker step Figma already carries as `color/error-text`. */
+  --buildrick-error-text: #CB2323;
   --buildrick-error-light: rgba(220, 38, 38, 0.10);
   --buildrick-error-border: rgba(220, 38, 38, 0.30);
   --buildrick-error-bg: rgba(220, 38, 38, 0.05);

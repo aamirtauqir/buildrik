@@ -54,6 +54,22 @@ export class LintState extends EventEmitter {
     return this.getIssues(tokenId);
   }
 
+  /**
+   * Every unsuppressed issue across every token, flattened and tagged with the
+   * token it belongs to. The per-token getters above answer "is THIS swatch
+   * bad", which is what the Brand panel asks; the Issues panel asks the
+   * opposite question — "what is wrong anywhere" — and cannot iterate tokens
+   * it does not know about.
+   */
+  getAllVisibleIssues(): Array<{ tokenId: string; issue: LintIssue }> {
+    const out: Array<{ tokenId: string; issue: LintIssue }> = [];
+    for (const [tokenId, issues] of this.issues) {
+      if (this.suppressed.has(tokenId)) continue;
+      for (const issue of issues) out.push({ tokenId, issue });
+    }
+    return out;
+  }
+
   suppress(tokenId: string): void {
     this.suppressed.add(tokenId);
     this.persist();

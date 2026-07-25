@@ -64,6 +64,16 @@ export interface Issue {
   id: string;
   type: "error" | "warning" | "info";
   message: string;
+  /**
+   * Set when the issue came from a design token. Carries what the Issues panel
+   * needs to offer a fix: which token to rewrite, and the hint the engine's
+   * `applyAutoFix` needs. Absent on issues nothing can auto-fix (a broken link
+   * has no token and no mechanical repair).
+   */
+  tokenId?: string;
+  autoFixHint?: string;
+  /** Where the issue lives, e.g. "Brand › color.accent". Shown under the message. */
+  location?: string;
 }
 
 /** Hook return type */

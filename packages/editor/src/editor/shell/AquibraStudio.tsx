@@ -147,6 +147,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const [loadError, setLoadError] = React.useState<LoadErrorKind>(null);
   // P3: the Issues panel (the topbar issue pill opens it — was a settings stub).
   const [issuesOpen, setIssuesOpen] = React.useState(false);
+
   // In-shell preview (shell state 7) — sanitized page HTML below the topbar.
   const [previewHtml, setPreviewHtml] = React.useState<string | null>(null);
 
@@ -233,6 +234,33 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setSaveState: state.setSaveState,
     setIsDirty: state.setIsDirty,
   });
+
+  // The Issues panel had a state slot but no producer, so it rendered "No
+  // issues" no matter how many the DS linter had found. Bridge the one real
+  // source we have (designSystem.lintState) into it, and keep it live — the
+  // linter re-runs on token edits and emits 'lint:changed'.
+  const setIssues = state.setIssues;
+  React.useEffect(() => {
+    const lint = composer?.designSystem?.lintState;
+    if (!lint) return;
+    const sync = () => {
+      setIssues(
+        lint.getAllVisibleIssues().map(({ tokenId, issue }) => ({
+          id: `${tokenId}:${issue.type}`,
+          type: issue.severity === "error" ? ("error" as const) : ("warning" as const),
+          message: issue.message,
+          tokenId,
+          autoFixHint: issue.autoFixHint,
+          location: `Brand › ${tokenId}`,
+        })),
+      );
+    };
+    sync();
+    lint.on("lint:changed", sync);
+    return () => {
+      lint.off("lint:changed", sync);
+    };
+  }, [composer, setIssues]);
 
   // 60-save-states: track connectivity so the topbar can reassure "changes
   // queued, will sync" instead of looking like a failed/lost save.
@@ -445,6 +473,20 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             // a node), so v1 just closes. Wiring a real jump needs each issue
             // to carry its target elementId — a follow-up.
             onSelectElement={() => setIssuesOpen(false)}
+            // applyAutoFix already wraps the rewrite in one transaction, which
+            // is what lets the panel promise a single undo step. It returns
+            // null when it will not touch the token — the panel shows that as
+            // fix-failed instead of silently doing nothing.
+            onFix={async (issue) =>
+              issue.tokenId && issue.autoFixHint
+                ? composer.designSystem.applyAutoFix(issue.tokenId, issue.autoFixHint)
+                : null
+            }
+            onOpenBrand={() => {
+              setIssuesOpen(false);
+              composer.emit("ui:switch-tab", { tab: "design" });
+            }}
+            onIgnore={(tokenId) => composer.designSystem.lintState.suppress(tokenId)}
           />
         </div>
       )}

@@ -63,6 +63,7 @@
 
   /* ─── SEMANTIC STATUS ────────────────────────────────────────────────── */
   --bd-error: var(--buildrick-error);
+  --bd-error-text: var(--buildrick-error-text);
   --bd-error-bg: var(--buildrick-error-bg);
   --bd-error-tint: var(--buildrick-error-light);
   --bd-error-border: var(--buildrick-error-border);
