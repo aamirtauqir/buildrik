@@ -20,19 +20,18 @@ export default function GettingStartedPage() {
   const onboarding = trpc.onboarding.getState.useQuery(undefined, { retry: false });
   const sites = trpc.sites.list.useQuery({ page: 1, perPage: 1 }, { retry: false });
   const domains = trpc.siteDetail.domains.listForWorkspace.useQuery(undefined, { retry: false });
+  // Real workspace counts (not admin-gated) — the team/publish steps used to
+  // flip only via the self-attest floating widget, so a user who genuinely
+  // invited a teammate or published a site stayed stuck at "3 of 5" forever.
+  const stats = trpc.dashboard.stats.useQuery(undefined, { retry: false });
 
-  const rawTasks = onboarding.data?.dashboardTasks;
-  const completedTasks = new Set(
-    Array.isArray(rawTasks) ? rawTasks.filter((t): t is string => typeof t === "string") : [],
-  );
-
-  // Completion derived only from real state; anything not derivable stays false.
+  // Completion derived from real state only.
   const completion: Record<string, boolean> = {
     workspace: Boolean(onboarding.data), // existing user — onboarding state loaded
     site: (sites.data?.total ?? 0) > 0,
     domain: (domains.data ?? []).some((d) => d.status === "VERIFIED"),
-    team: completedTasks.has("invite-team-member"),
-    publish: completedTasks.has("publish-site"),
+    team: (stats.data?.collaborators ?? 0) > 0 || (stats.data?.pendingInvites ?? 0) > 0,
+    publish: (stats.data?.publishedSites ?? 0) > 0,
   };
 
   const doneCount = STEPS.filter((s) => completion[s.id]).length;
