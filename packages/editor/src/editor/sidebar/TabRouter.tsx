@@ -202,6 +202,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       return (
         <ReviewTab
           {...commonTabProps}
+          composer={composer}
           onResend={onResendReview}
           onExportCurrentPages={composer ? () => exportPublishPages(composer) : undefined}
         />

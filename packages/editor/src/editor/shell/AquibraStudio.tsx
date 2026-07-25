@@ -20,6 +20,7 @@ import { TooltipProvider, ToastProvider, useToast } from "@/editor/shared/vibcod
 import { StudioSkeleton } from "@/shared/extensions/SkeletonCompounds";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { StaleApprovalModal } from "./modals/StaleApprovalModal";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
@@ -545,19 +546,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       {/* First-time onboarding checklist (gated to new users by the orchestrator). */}
       <OnboardingMount composer={composer} />
 
-      {/* Stale-approval gate (contracts §1.5): the site changed after the client
-          approved it. Publish is not revoked — it is blocked behind a deliberate
-          acknowledgement. "Publish anyway" ships the un-approved changes; Cancel
-          keeps the sign-off intact so the designer can re-send for review. */}
-      <ConfirmDialog
+      {/* Stale-approval gate (contracts §1.5, S5.6 board 131:201): the site
+          changed after the client approved it. The modal itemizes the changed
+          pages, offers a fresh review round, or ships the changes deliberately. */}
+      <StaleApprovalModal
         isOpen={publishJob.blockedReason === "stale-approval"}
+        composer={composer}
         onClose={publishJob.dismissBlock}
-        onConfirm={handlePublishAcknowledged}
-        title="Publish changes your client hasn't approved?"
-        message="This design changed after your client approved it. Publishing now ships changes they haven't signed off on. To keep their sign-off, re-send it for review from the top bar first — or publish these un-approved changes deliberately."
-        confirmText="Publish anyway"
-        cancelText="Cancel"
-        variant="danger"
+        onPublishAnyway={handlePublishAcknowledged}
       />
     </Stack>
   );

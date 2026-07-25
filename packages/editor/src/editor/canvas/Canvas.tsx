@@ -50,6 +50,7 @@ import type { DropError, DropSuccess } from "./hooks/useCanvasDragDrop";
 import { useGlobalCustomCss } from "./hooks/useGlobalCustomCss";
 import { ElementContextMenu } from "./menus";
 import { CanvasOverlayGroup } from "./overlays";
+import { CommentLayer } from "./comments/CommentLayer";
 import "./Canvas.css";
 
 export type { CanvasProps, CanvasRef };
@@ -574,6 +575,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             editing={editing}
             onInlineCommand={handleInlineCommand}
           />
+
+          {/* S5 shell state 6 — comment pins + click-to-pin + orphan recovery */}
+          <CommentLayer composer={composer} canvasRef={canvasRef} />
         </div>
         </DeviceFramePreview>
 

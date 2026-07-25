@@ -23,6 +23,19 @@ export const listCommentsInput = z.object({
 });
 export type ListCommentsInput = z.infer<typeof listCommentsInput>;
 
+/** Re-anchor an orphaned pin to a new element (S5 orphan-comment recovery).
+ *  targetSelector is the new anchor; x/y update alongside so the pin lands on
+ *  the picked element rather than the dead one's last position. */
+export const reattachCommentInput = z.object({
+  id: z.string().min(1),
+  siteId: z.string().min(1),
+  targetSelector: z.string().min(1).max(500),
+  pageId: z.string().nullable().optional(),
+  x: fraction.nullable().optional(),
+  y: fraction.nullable().optional(),
+});
+export type ReattachCommentInput = z.infer<typeof reattachCommentInput>;
+
 export const resolveCommentInput = z.object({
   id: z.string().min(1),
   siteId: z.string().min(1),

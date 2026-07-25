@@ -10,6 +10,7 @@ import {
 } from "@/server/services/permission.service";
 import {
   createComment,
+  reattachComment,
   listComments,
   listWorkspaceComments,
   resolveComment,
@@ -19,6 +20,7 @@ import {
   createCommentInput,
   listCommentsInput,
   resolveCommentInput,
+  reattachCommentInput,
 } from "@buildrik/shared/schemas/comments";
 import { paginationInput } from "@buildrik/shared/schemas/pagination";
 
@@ -62,6 +64,23 @@ export const commentsRouter = router({
         translatePermission(e);
       }
       return listWorkspaceComments(workspaceId, input?.status, { limit: input?.limit, cursor: input?.cursor });
+    }),
+
+  // Re-anchoring an orphaned pin is an editorial action, same tier as resolve.
+  reattach: protectedProcedure
+    .input(reattachCommentInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+      } catch (e) {
+        translatePermission(e);
+      }
+      try {
+        return await reattachComment(input.siteId, input);
+      } catch (e) {
+        if (e instanceof CommentError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
     }),
 
   // Resolving/reopening is an editorial action — the agency, not the commenter.

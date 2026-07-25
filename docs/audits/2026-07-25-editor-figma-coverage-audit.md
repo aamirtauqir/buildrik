@@ -298,3 +298,23 @@ Target: board `S1 · Editor — ASSEMBLED` 52:2 (rail frame 52:6 fetched from no
 Live verification (headless browse, localhost:5050): rail order/labels exact vs board; all six panels open; Brand panel content intact; T / ⇧A / ⌘K off-rail entries verified; empty-canvas + inspector-empty "Browse Templates" CTAs still functional (route to drawer).
 
 Deferred within P1 (documented, deliberate): e3/legacy rail modes kept (escape hatches, `?rail=`); full drawer retirement + S1.3 3-way modal = Phase 2; Components fold into Brand·components sub-view = later phase per board 153:29.
+
+---
+
+## 9. Phase 2 execution record (2026-07-25, same session)
+
+Prereqs verified first: **B3** — `Comment` model already stores anchors (`targetSelector`, `x`/`y` page-fractions, `pageId`); **B2** — RBAC exists (`reviews.resolve`: ADMIN + agency-gated, APPROVED|CHANGES_REQUESTED, can't-resolve-own-submission; client path via token).
+
+| Piece | Built | Proof |
+|---|---|---|
+| Server | `comments.reattach` mutation (EDITOR-gated, site-scoped IDOR guard) + `reattachComment` service + `reattachCommentInput` schema | comment.service tests 14 green |
+| Comment mode (board 200:2) | `CommentLayer` in canvas (event-driven: ui:comment-mode, comments:refresh/orphans/orphans-request/reattach-start/reattached), Topbar 💬 toggle + "Comment · Esc" pill, click-to-pin composer, numbered pins (fraction-positioned, zoom-inherited), overlay-piercing hit-test (`elementsFromPoint`) | Unit 36 green; LIVE: pin rendered, DB row `pageId`+`targetSelector`+fractions after real `comments.create` 200 |
+| Orphan recovery (184:56/70/87) | Settle-delayed detection on delete/page-change, modal (board copy), ReviewTab **Detached** group with Reattach + Resolve, replay handshake for late-mounting panel, pick-to-reattach banner + flow | LIVE: deleted anchored element → modal on reload; Detached · 1 in panel; reattach click → DB selector updated dead→live |
+| S5.6 (131:2 + 131:201) | Approved pill enriched ("Approved by {name} · {rel}"); `StaleApprovalModal` replaces generic ConfirmDialog — itemized page diff (approved snapshot vs current export), "Re-send for approval" (fresh round to same client) + amber "Publish anyway" | Modal tests 6 green (diff rows, re-send payload, publish-anyway) |
+| ReviewService | `targetSelector` mapping, `createPinnedComment`, `reattachReviewComment` | typed + exercised by live E2E |
+
+E2E environment: dashboard dev (3000) + editor Vite (5050) + magic-link login (dev procedure), seeded agency_layer + PENDING round on site `Pulse — Pricing`. Server log evidence: `comments.list`/`comments.create` 200 from the editor origin. Screenshots: scratchpad `e2e-pin.png`, `e2e-orphan-modal.png`, `e2e-detached.png`.
+
+Gates: verify:ds full green (shadows/radii/width tokenized to keep chrome-axiom baselines); tsc clean both packages; touched suites 1382 green + server comment tests 14.
+
+Deferred (documented): S5.6 modal live-fire needs an APPROVED round + edits + publish attempt (component-tested; wiring is the pre-existing blockedReason path); comment-pin rendering on the account-less client review page (that page still posts general notes only); known infra note — Turbopack /edit/[siteId] cold compile wedged the dev server twice (worktrees/ia-v2 dual-React contamination suspected), E2E ran via the documented :5050 flow instead.

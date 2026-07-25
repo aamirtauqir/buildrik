@@ -81,6 +81,8 @@ export interface ReviewComment {
   pageId: string | null;
   x: number | null;
   y: number | null;
+  /** Element anchor (engine element id selector). null = unpinned/general. */
+  targetSelector: string | null;
   status: "OPEN" | "RESOLVED";
   authorKind: "client" | "internal";
   authorName: string | null;
@@ -121,6 +123,7 @@ export async function fetchReviewComments(status?: "OPEN" | "RESOLVED"): Promise
     pageId: r.pageId,
     x: r.x,
     y: r.y,
+    targetSelector: r.targetSelector,
     status: r.status as "OPEN" | "RESOLVED",
     authorKind: r.reviewerId ? "client" : "internal",
     authorName: r.reviewer?.name ?? null,
@@ -184,6 +187,31 @@ export async function postReply(body: string, pageId?: string): Promise<void> {
   const siteId = currentSiteId();
   if (!siteId) throw new Error("No site to reply on");
   await getBuildrikClient(DASHBOARD_URL).comments.create.mutate({ siteId, body, pageId });
+}
+
+/** Create a pinned comment from canvas comment mode (S5 shell state 6).
+ *  x/y are page-relative fractions (0..1); targetSelector anchors the pin to
+ *  an engine element so it survives layout shifts. Throws for a retry toast. */
+export async function createPinnedComment(input: {
+  body: string;
+  pageId: string | null;
+  x: number | null;
+  y: number | null;
+  targetSelector: string | null;
+}): Promise<void> {
+  const siteId = currentSiteId();
+  if (!siteId) throw new Error("No site to comment on");
+  await getBuildrikClient(DASHBOARD_URL).comments.create.mutate({ siteId, ...input });
+}
+
+/** Re-anchor an orphaned pin to a new element (orphan-comment recovery). */
+export async function reattachReviewComment(
+  id: string,
+  input: { targetSelector: string; pageId?: string | null; x?: number | null; y?: number | null },
+): Promise<void> {
+  const siteId = currentSiteId();
+  if (!siteId) throw new Error("No site to reattach on");
+  await getBuildrikClient(DASHBOARD_URL).comments.reattach.mutate({ id, siteId, ...input });
 }
 
 /** Resolve / reopen a comment. Throws on failure for a retry. */

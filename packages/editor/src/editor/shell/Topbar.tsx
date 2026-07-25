@@ -28,7 +28,7 @@ import { Menu, MenuItem } from "@/editor/shared/vibcoder/Menu";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { useClickOutside } from "@/shared/hooks";
-import { Sparkles, MoreHorizontal } from "lucide-react";
+import { Sparkles, MoreHorizontal, MessageSquare } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import { submitForReview, fetchReviewStatus, type ReviewStatus } from "../../services/ReviewService";
 import { NotificationBell } from "./NotificationBell";
@@ -159,6 +159,16 @@ function formatSavedAgo(ts?: number): string {
   return `${Math.floor(diff / 86400)}d`;
 }
 
+/** "· 2d ago" suffix for the approved pill (S5.6 board 131:2). */
+function formatPillAgo(at?: string | Date | null): string {
+  if (!at) return "";
+  const diff = Math.floor((Date.now() - new Date(at).getTime()) / 1000);
+  if (!Number.isFinite(diff) || diff < 0) return "";
+  if (diff < 3600) return " · just now";
+  if (diff < 86400) return ` · ${Math.floor(diff / 3600)}h ago`;
+  return ` · ${Math.floor(diff / 86400)}d ago`;
+}
+
 // ── component ────────────────────────────────────────────────────────────────
 
 export const Topbar: React.FC<TopbarProps> = ({
@@ -199,6 +209,18 @@ export const Topbar: React.FC<TopbarProps> = ({
   const [reviewEmail, setReviewEmail] = React.useState("");
   const reviewRef = React.useRef<HTMLDivElement | null>(null);
   useClickOutside(reviewRef, () => setReviewOpen(false), { enabled: reviewOpen });
+  // S5 shell state 6 — canvas comment mode. The layer owns the state; the
+  // topbar toggles it and mirrors it as the "Comment · Esc" pill (board 200:2).
+  const [commentMode, setCommentMode] = React.useState(false);
+  React.useEffect(() => {
+    if (!composer) return;
+    const onMode = (p: { on?: boolean }) =>
+      setCommentMode((v) => (typeof p?.on === "boolean" ? p.on : !v));
+    composer.on("ui:comment-mode", onMode);
+    return () => {
+      composer.off("ui:comment-mode", onMode);
+    };
+  }, [composer]);
   // S5.2: the persistent review-status pill — distinct from `reviewState` (the
   // send flow). Fetched on mount; refreshed after a send lands.
   const [reviewStatus, setReviewStatus] = React.useState<ReviewStatus>({
@@ -418,13 +440,51 @@ export const Topbar: React.FC<TopbarProps> = ({
             </TooltipPortal>
           </Tooltip>
 
-          {REVIEW_PILL[reviewStatus.state] ? (
+          {commentMode ? (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                height: 24,
+                padding: "0 10px",
+                borderRadius: "var(--bd-radius-full)",
+                fontSize: 12,
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+                background: "var(--buildrick-accent-subtle)",
+                color: "var(--buildrick-accent)",
+              }}
+            >
+              <MessageSquare size={12} aria-hidden="true" />
+              Comment · Esc
+            </span>
+          ) : null}
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                aria-label="Comment mode"
+                aria-pressed={commentMode}
+                onClick={() => composer?.emit("ui:comment-mode", { on: !commentMode })}
+                style={commentMode ? { color: "var(--buildrick-accent)", background: "var(--buildrick-accent-subtle)" } : undefined}
+              >
+                <MessageSquare size={16} />
+              </IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Comment mode <TooltipKbd>Esc</TooltipKbd> exits</TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
+
+                    {REVIEW_PILL[reviewStatus.state] ? (
             <span
               title={
                 reviewStatus.reviewerName
                   ? `${REVIEW_PILL[reviewStatus.state]!.label} — ${reviewStatus.reviewerName}`
                   : REVIEW_PILL[reviewStatus.state]!.label
               }
+              data-review-pill={reviewStatus.state}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -439,7 +499,9 @@ export const Topbar: React.FC<TopbarProps> = ({
                 color: REVIEW_PILL[reviewStatus.state]!.fg,
               }}
             >
-              {REVIEW_PILL[reviewStatus.state]!.label}
+              {reviewStatus.state === "approved" && reviewStatus.reviewerName
+                ? `Approved by ${reviewStatus.reviewerName}${formatPillAgo(reviewStatus.at)}`
+                : REVIEW_PILL[reviewStatus.state]!.label}
             </span>
           ) : null}
 

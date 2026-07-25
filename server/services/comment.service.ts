@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { CreateCommentInput } from "@buildrik/shared/schemas/comments";
+import type { CreateCommentInput, ReattachCommentInput } from "@buildrik/shared/schemas/comments";
 import type { Paginated, PaginationInput } from "@buildrik/shared/schemas/pagination";
 
 /**
@@ -51,6 +51,25 @@ export async function listComments(siteId: string, status?: "OPEN" | "RESOLVED")
     where: { siteId, ...(status ? { status } : {}) },
     orderBy: { createdAt: "asc" },
     include: { reviewer: { select: { name: true } } },
+  });
+}
+
+/** Re-anchor an orphaned comment to a new element. Site-scoped like resolve —
+ *  a crafted id can't move a pin on another site. */
+export async function reattachComment(siteId: string, input: ReattachCommentInput) {
+  const owned = await prisma.comment.findFirst({
+    where: { id: input.id, siteId },
+    select: { id: true },
+  });
+  if (!owned) throw new CommentError("NOT_FOUND", "Comment not found");
+  return prisma.comment.update({
+    where: { id: input.id },
+    data: {
+      targetSelector: input.targetSelector,
+      ...(input.pageId !== undefined ? { pageId: input.pageId } : {}),
+      ...(input.x !== undefined ? { x: input.x } : {}),
+      ...(input.y !== undefined ? { y: input.y } : {}),
+    },
   });
 }
 

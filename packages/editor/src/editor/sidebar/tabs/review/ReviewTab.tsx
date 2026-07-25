@@ -44,6 +44,8 @@ export interface ReviewTabProps {
   /** Live-render the current site to pages for the §3 Compare — same decoupling
    *  as onResend (the shell owns the composer/export path). Absent → no Compare. */
   onExportCurrentPages?: () => Promise<PublishPage[]>;
+  /** Composer for the orphan-comment events (Detached group + reattach). */
+  composer?: import("@/engine").Composer | null;
 }
 
 type LoadState = "loading" | "ready" | "error";
@@ -114,6 +116,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   onClose,
   onResend,
   onExportCurrentPages,
+  composer,
 }) => {
   const [state, setState] = React.useState<LoadState>("loading");
   const [round, setRound] = React.useState<CurrentRound | null>(null);
@@ -124,6 +127,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
   const [replyError, setReplyError] = React.useState(false);
   const [moreOpen, setMoreOpen] = React.useState(false);
   const [confirmRevoke, setConfirmRevoke] = React.useState(false);
+  // Orphaned pins (element deleted) — announced by the canvas CommentLayer.
+  const [detachedIds, setDetachedIds] = React.useState<ReadonlySet<string>>(new Set());
   const [resending, setResending] = React.useState(false);
   const [notice, setNotice] = React.useState<string | null>(null);
   const [compareOpen, setCompareOpen] = React.useState(false);
@@ -142,6 +147,21 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       setState("error");
     }
   }, []);
+
+  React.useEffect(() => {
+    if (!composer) return;
+    const onOrphans = (p: { ids?: string[] }) => setDetachedIds(new Set(p?.ids ?? []));
+    const onReattached = () => void load();
+    composer.on("comments:orphans", onOrphans);
+    composer.on("comments:reattached", onReattached);
+    // The canvas layer detected orphans before this panel mounted — ask for a
+    // replay of the current set.
+    composer.emit("comments:orphans-request", {});
+    return () => {
+      composer.off("comments:orphans", onOrphans);
+      composer.off("comments:reattached", onReattached);
+    };
+  }, [composer, load]);
 
   React.useEffect(() => {
     void load();
@@ -312,7 +332,11 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
 
   const tone = STATUS_TONE[round.status] ?? { label: round.status, variant: "syncing" as const };
   const visible = showResolved ? comments : comments.filter((c) => c.status === "OPEN");
-  const groups = groupByPage(visible);
+  // Detached group first (board 157:2 / 184:56): orphaned pins surface at the
+  // top with a Reattach action; everything else groups by page as before.
+  const detached = visible.filter((c) => detachedIds.has(c.id));
+  const attached = visible.filter((c) => !detachedIds.has(c.id));
+  const groups = groupByPage(attached);
 
   return (
     <div style={S.body}>
@@ -369,7 +393,43 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             <div style={S.centerHint}>When {round.reviewerName ?? "the client"} leaves a comment, it shows up here.</div>
           </div>
         ) : (
-          groups.map((g) => (
+          <>
+          {detached.length > 0 && (
+            <div style={S.group} data-detached-group>
+              <div style={{ ...S.groupHead, color: "var(--bd-warn-strong)" }}>
+                Detached · {detached.length}
+              </div>
+              {detached.map((c) => (
+                <div
+                  style={{ ...S.row, background: "var(--bd-warning-tint)" }}
+                  key={c.id}
+                  data-comment-row
+                  data-comment-id={c.id}
+                >
+                  <div style={S.rowTop}>
+                    <span style={S.who}>
+                      {c.authorKind === "client" ? `${c.authorName ?? "Client"} · client` : "You"}
+                    </span>
+                    <span style={S.when}>element deleted · {relTime(c.createdAt)}</span>
+                  </div>
+                  <div style={S.text}>{c.body}</div>
+                  <div style={S.actions}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => composer?.emit("comments:reattach-start", { id: c.id })}
+                    >
+                      Reattach
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => void onResolve(c)}>
+                      {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {groups.map((g) => (
             <div style={S.group} key={g.key}>
               <div style={S.groupHead}>{g.label}</div>
               {g.comments.map((c) => {
@@ -396,7 +456,8 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                 );
               })}
             </div>
-          ))
+          ))}
+          </>
         )}
       </div>
 

@@ -25,6 +25,7 @@ import {
   createComment,
   listComments,
   resolveComment,
+  reattachComment,
   CommentError,
 } from "@server/services/comment.service";
 
@@ -64,6 +65,34 @@ describe("listComments", () => {
     expect(rows[0].reviewerId).toBe("rv1");
     expect(rows[1].reviewer).toBeNull();
     expect(rows[1].authorId).toBe("u1");
+  });
+});
+
+describe("reattachComment", () => {
+  it("re-anchors a comment on the site (selector + pin coords)", async () => {
+    findFirst.mockResolvedValueOnce({ id: "c1" });
+    update.mockResolvedValueOnce({ id: "c1" });
+    await reattachComment("s1", {
+      id: "c1",
+      siteId: "s1",
+      targetSelector: '[data-buildrick-id="el-2"]',
+      pageId: "p1",
+      x: 0.1,
+      y: 0.2,
+    });
+    expect(findFirst).toHaveBeenCalledWith({ where: { id: "c1", siteId: "s1" }, select: { id: true } });
+    expect(update).toHaveBeenCalledWith({
+      where: { id: "c1" },
+      data: { targetSelector: '[data-buildrick-id="el-2"]', pageId: "p1", x: 0.1, y: 0.2 },
+    });
+  });
+
+  it("NOT_FOUND when the comment is not on that site (IDOR guard)", async () => {
+    findFirst.mockResolvedValueOnce(null);
+    await expect(
+      reattachComment("s1", { id: "other", siteId: "s1", targetSelector: "[x]" }),
+    ).rejects.toBeInstanceOf(CommentError);
+    expect(update).not.toHaveBeenCalled();
   });
 });
 
