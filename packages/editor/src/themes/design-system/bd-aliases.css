@@ -46,11 +46,13 @@
   --bd-border-light: var(--buildrick-border);
   --bd-border-medium: var(--buildrick-border-medium);
   --bd-border-strong: var(--buildrick-border-strong);
+  --bd-border-input: var(--buildrick-border-input);
   --bd-border-subtle: var(--buildrick-border-subtle);
   --bd-border-focus: var(--buildrick-border-focus);
 
   /* ─── ACCENT (cobalt single-accent system — value lives in color.css) ── */
   --bd-accent: var(--buildrick-accent);
+  --bd-accent-text: var(--buildrick-accent-text);
   --bd-accent-hover: var(--buildrick-accent-hover);
   --bd-accent-pressed: var(--buildrick-accent-pressed);
   --bd-accent-subtle: var(--buildrick-accent-subtle);

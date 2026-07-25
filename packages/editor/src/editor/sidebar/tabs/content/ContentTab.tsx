@@ -1,27 +1,39 @@
 /**
- * ContentTab (P4.2) — the data front-door. Today a data source is only
- * creatable/inspectable through the inspector's binding chip, which means you
- * must select an element first. This panel surfaces the workspace's data
- * sources data-first: see every registered source, spin up a new collection,
- * and learn how to bind — without touching an element.
+ * ContentTab — the Content panel (Figma boards 148:2…151:87, P3 build-out).
  *
- * Placement note: the authoritative IA map (14-screen-specs.md:8) puts a
- * "Content" tab in the rail; the master plan said "no rail change". This
- * resolves that contradiction toward the authoritative IA — an additive rail
- * entry (like the P0 review tab), not a restructure. Easily re-homed if the
- * 6-tab-rail redesign lands.
+ * Drill-in views over the live engine:
+ *   root        collections (+ counts) · Data: Sources / Variables / Conditions
+ *   collection  records list · + Add · Fields ›
+ *   record      field form + Published toggle + unsaved savebar
+ *   fields      field list · + Add field
+ *   sources     DataManager sources · + Add a source (JSON → importSampleData)
+ *   variables   {{site.*}} key/values (persisted, registered as a live source)
+ *   conditions  element condition bindings · + New condition (pick → expr)
  *
- * Inline-style + DS primitives, matching the chrome convention (Topbar/ReviewTab).
+ * Deliberate divergences from the boards (documented in the audit doc):
+ * "Dynamic pages ›" row omitted (no edit path for an existing collection's
+ * page settings yet); "Connect a source" is "+ Add a source (JSON)" — external
+ * connectors (Sheets) aren't built.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, Icon } from "@/editor/shared/vibcoder";
 import { PanelHeader } from "@/shared/extensions/PanelHeader";
-import { useDataManager } from "@/editor/shell/hooks/useDataManager";
+import { EVENTS } from "@/shared/constants";
 import type { Composer } from "@/engine";
-import type { DataSource } from "@/shared/types/data";
+import type { ConditionExpression } from "@/shared/types/data";
+import { useContentPanel } from "./useContentPanel";
+import {
+  CollectionView,
+  ConditionsView,
+  FieldsView,
+  RecordView,
+  RootView,
+  S,
+  SourcesView,
+  VariablesView,
+} from "./ContentViews";
 
 export interface ContentTabProps {
   composer: Composer | null;
@@ -34,36 +46,6 @@ export interface ContentTabProps {
   onCreateCollection?: () => void;
 }
 
-const TYPE_LABEL: Record<DataSource["type"], string> = {
-  object: "Object",
-  array: "Collection",
-  function: "Dynamic",
-  api: "API",
-};
-
-function recordCount(s: DataSource): number | null {
-  if (Array.isArray(s.data)) return s.data.length;
-  return null;
-}
-
-const S: Record<string, React.CSSProperties> = {
-  body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bd-border)" },
-  spacer: { flex: 1 },
-  scroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "8px 12px" },
-  row: { display: "flex", alignItems: "center", gap: 10, padding: "10px", border: "1px solid var(--bd-border)", borderRadius: "var(--bd-radius-md)", marginBottom: 6 },
-  rowMain: { display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 },
-  name: { fontSize: 13, fontWeight: 600, color: "var(--bd-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-  meta: { fontSize: 12, color: "var(--bd-text-muted)" },
-  typeTag: { fontSize: 11, fontWeight: 600, color: "var(--bd-text-secondary)", background: "var(--bd-surface)", border: "1px solid var(--bd-border)", borderRadius: "var(--bd-radius-md)", padding: "2px 6px", flexShrink: 0 },
-  hint: { fontSize: 12, color: "var(--bd-text-muted)", lineHeight: 1.5, padding: "6px 12px", borderTop: "1px solid var(--bd-border)" },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bd-text)" },
-  centerHint: { fontSize: 12, color: "var(--bd-text-muted)", maxWidth: "15rem" },
-};
-
-const BIND_HINT = "To bind: select an element on the canvas, then use its data chip in the inspector to connect it to a source and field.";
-
 export const ContentTab: React.FC<ContentTabProps> = ({
   composer,
   isPinned,
@@ -72,70 +54,185 @@ export const ContentTab: React.FC<ContentTabProps> = ({
   onClose,
   onCreateCollection,
 }) => {
-  const { sources } = useDataManager(composer);
+  const panel = useContentPanel(composer);
+  const { view, setView, reload } = panel;
+  const [pickedElementId, setPickedElementId] = React.useState<string | null>(null);
 
-  const header = (
-    <PanelHeader
-      title="Content"
-      isPinned={isPinned}
-      onPinToggle={onPinToggle}
-      onHelpClick={onHelpClick}
-      onClose={onClose}
-    />
-  );
+  // Reload on engine CMS events (collection created via the shell modal, etc.).
+  // NB: CollectionManager is its own emitter — subscribe there, not on composer.
+  React.useEffect(() => {
+    if (!composer) return;
+    const cms = composer.cms.collections;
+    const onChange = () => reload();
+    const cmsEvents = [
+      EVENTS.CMS_COLLECTION_CREATED,
+      EVENTS.CMS_COLLECTION_UPDATED,
+      EVENTS.CMS_COLLECTION_DELETED,
+      EVENTS.CMS_CONTENT_CREATED,
+      EVENTS.CMS_CONTENT_UPDATED,
+      EVENTS.CMS_CONTENT_DELETED,
+    ] as const;
+    cmsEvents.forEach((ev) => cms.on(ev, onChange));
+    return () => {
+      cmsEvents.forEach((ev) => cms.off(ev, onChange));
+    };
+  }, [composer, reload]);
+
+  // "+ New condition" pick flow — reuses the inspector's canvas pick mode.
+  React.useEffect(() => {
+    if (!composer) return;
+    const onResult = (id: unknown) => {
+      if (typeof id === "string" && view.kind === "conditions") setPickedElementId(id);
+    };
+    composer.on("inspector:pick-result", onResult);
+    return () => {
+      composer.off("inspector:pick-result", onResult);
+    };
+  }, [composer, view.kind]);
+
+  const startPick = () => composer?.emit("inspector:pick-start");
+  const cancelPick = () => {
+    composer?.emit("inspector:pick-cancel");
+    setPickedElementId(null);
+  };
+
+  const importJson = (json: string): string | null => {
+    if (!composer) return "Editor not ready.";
+    try {
+      composer.data.importSampleData(json);
+      reload();
+      return null;
+    } catch {
+      return "Not valid JSON — check the syntax and try again.";
+    }
+  };
+
+  const selectElement = (id: string) => {
+    const el = composer?.elements.getElement(id);
+    if (el && composer) composer.selection.select(el);
+  };
+
+  const collectionFor = (id: string) => panel.collections.find((c) => c.id === id) ?? null;
+
+  let body: React.ReactNode = null;
+  switch (view.kind) {
+    case "root":
+      body = (
+        <RootView
+          collections={panel.collections}
+          recordCounts={panel.recordCounts}
+          sourcesCount={panel.sources.length}
+          variablesCount={panel.variables.length}
+          conditionsCount={panel.conditions.length}
+          onOpenCollection={(id) => {
+            void panel.loadRecords(id);
+            setView({ kind: "collection", id });
+          }}
+          onCreateCollection={onCreateCollection}
+          onOpenSources={() => setView({ kind: "sources" })}
+          onOpenVariables={() => setView({ kind: "variables" })}
+          onOpenConditions={() => setView({ kind: "conditions" })}
+        />
+      );
+      break;
+    case "collection": {
+      const collection = collectionFor(view.id);
+      body = collection ? (
+        <CollectionView
+          collection={collection}
+          records={panel.records}
+          onBack={() => setView({ kind: "root" })}
+          onOpenRecord={(recordId) => setView({ kind: "record", collectionId: view.id, recordId })}
+          onAddRecord={() => setView({ kind: "record", collectionId: view.id, recordId: null })}
+          onOpenFields={() => setView({ kind: "fields", collectionId: view.id })}
+        />
+      ) : null;
+      break;
+    }
+    case "record": {
+      const collection = collectionFor(view.collectionId);
+      const record = view.recordId ? panel.records.find((r) => r.id === view.recordId) ?? null : null;
+      body = collection ? (
+        <RecordView
+          collection={collection}
+          record={record}
+          onBack={() => setView({ kind: "collection", id: view.collectionId })}
+          onSave={async (data, published) => {
+            await panel.saveRecord(view.collectionId, view.recordId, data, published);
+            setView({ kind: "collection", id: view.collectionId });
+          }}
+          onDelete={
+            view.recordId
+              ? () => {
+                  void panel.deleteRecord(view.recordId as string).then(() => {
+                    void panel.loadRecords(view.collectionId);
+                    setView({ kind: "collection", id: view.collectionId });
+                  });
+                }
+              : undefined
+          }
+        />
+      ) : null;
+      break;
+    }
+    case "fields": {
+      const collection = collectionFor(view.collectionId);
+      body = collection ? (
+        <FieldsView
+          collection={collection}
+          onBack={() => setView({ kind: "collection", id: view.collectionId })}
+          onAddField={(name, type, required) => panel.addField(view.collectionId, name, type, required)}
+          onDeleteField={(fieldId) => panel.deleteField(view.collectionId, fieldId)}
+        />
+      ) : null;
+      break;
+    }
+    case "sources":
+      body = <SourcesView sources={panel.sources} onBack={() => setView({ kind: "root" })} onImportJson={importJson} />;
+      break;
+    case "variables":
+      body = (
+        <VariablesView
+          variables={panel.variables}
+          onBack={() => setView({ kind: "root" })}
+          onChange={panel.setVariables}
+        />
+      );
+      break;
+    case "conditions":
+      body = (
+        <ConditionsView
+          conditions={panel.conditions}
+          onBack={() => {
+            cancelPick();
+            setView({ kind: "root" });
+          }}
+          onRemove={panel.removeCondition}
+          onSelectElement={selectElement}
+          onStartPick={startPick}
+          pickedElementId={pickedElementId}
+          onCancelPick={cancelPick}
+          onCreate={(expr: ConditionExpression) => {
+            if (pickedElementId) {
+              panel.addCondition(pickedElementId, expr);
+              setPickedElementId(null);
+            }
+          }}
+        />
+      );
+      break;
+  }
 
   return (
     <div style={S.body}>
-      {header}
-
-      {onCreateCollection && (
-        <div style={S.toolbar}>
-          <span style={S.meta}>{sources.length} data source{sources.length === 1 ? "" : "s"}</span>
-          <div style={S.spacer} />
-          <Button variant="primary" size="sm" onClick={onCreateCollection}>
-            <Icon name="plus" size="sm" /> New collection
-          </Button>
-        </div>
-      )}
-
-      {sources.length === 0 ? (
-        <div style={S.center}>
-          <Icon name="components" size="lg" />
-          <div style={S.centerTitle}>No data yet</div>
-          <div style={S.centerHint}>
-            Create a collection to power dynamic content — product lists, blog posts, team members —
-            then bind elements to it.{onCreateCollection ? "" : " Drop a data-bound block to start."}
-          </div>
-          {onCreateCollection && (
-            <Button variant="primary" size="sm" onClick={onCreateCollection}>
-              <Icon name="plus" size="sm" /> New collection
-            </Button>
-          )}
-        </div>
-      ) : (
-        <>
-          <div style={S.scroll}>
-            {sources.map((s) => {
-              const count = recordCount(s);
-              return (
-                <div key={s.id} style={S.row}>
-                  <span style={{ color: "var(--bd-text-muted)", flexShrink: 0 }}>
-                    <Icon name="components" size="sm" />
-                  </span>
-                  <div style={S.rowMain}>
-                    <span style={S.name}>{s.name}</span>
-                    <span style={S.meta}>
-                      {count != null ? `${count} record${count === 1 ? "" : "s"}` : s.description || "—"}
-                    </span>
-                  </div>
-                  <span style={S.typeTag}>{TYPE_LABEL[s.type]}</span>
-                </div>
-              );
-            })}
-          </div>
-          <div style={S.hint}>{BIND_HINT}</div>
-        </>
-      )}
+      <PanelHeader
+        title="Content"
+        isPinned={isPinned}
+        onPinToggle={onPinToggle}
+        onHelpClick={onHelpClick}
+        onClose={onClose}
+      />
+      {body}
     </div>
   );
 };

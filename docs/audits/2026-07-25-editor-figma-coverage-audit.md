@@ -318,3 +318,39 @@ E2E environment: dashboard dev (3000) + editor Vite (5050) + magic-link login (d
 Gates: verify:ds full green (shadows/radii/width tokenized to keep chrome-axiom baselines); tsc clean both packages; touched suites 1382 green + server comment tests 14.
 
 Deferred (documented): S5.6 modal live-fire needs an APPROVED round + edits + publish attempt (component-tested; wiring is the pre-existing blockedReason path); comment-pin rendering on the account-less client review page (that page still posts general notes only); known infra note — Turbopack /edit/[siteId] cold compile wedged the dev server twice (worktrees/ia-v2 dual-React contamination suspected), E2E ran via the documented :5050 flow instead.
+
+---
+
+## 10. Phase 3 execution record (2026-07-25, same session)
+
+Content panel rebuilt from the 143-line stub to the nine boards (148:2 root ·
+149:7 empty · 149:50 collection · 149:84 record · 149:108 unsaved · 151:2
+fields · 151:46 sources · 151:62 variables · 151:87 conditions), entirely on
+existing engine APIs — no engine edits:
+
+| View | Backing | Live proof |
+|---|---|---|
+| Root + empty | `composer.cms.collections` (+ per-collection record counts), DataManager sources, persisted variables, element condition scan | "Menu items 1 › / Sources 0 / Variables 2 / Conditions 1" walked live |
+| Collection | `getContentItems` (status dot = published), + Add, Fields › | created "Menu items", record listed with green dot |
+| Record | field form (vibcoder Input/Textarea/Switch per CMSField type) + Published toggle + Unsaved savebar (Discard/Save per 149:108) | created "Margherita", published, saved through `createContentItem`/`updateContentItem` |
+| Fields | list w/ type + required, + Add field (`addField`, slugified), delete via ConfirmDialog | Fields 1 › after wizard field |
+| Sources | DataManager list + one-way-sync hint; **"+ Add a source (JSON)" via `importSampleData`** (documented divergence — external connectors unbuilt) | JSON import unit-tested; bad-JSON error state |
+| Variables | `{{site.*}}` rows (mono + value), add/edit/delete with key validation; persisted per-project + **registered as the live `site` object source** so TemplateEngine/DataManager bindings resolve | added name + phone live; localStorage verified |
+| Conditions | element condition-binding scan (summary "when available is false" formatter), Select (jump to element), remove; **+ New condition = inspector pick-mode reuse → expression form → `bindCondition`** | picked heading live → "heading · Heading / when site.open is true" row |
+
+Live-walk findings fixed on the spot: (1) CollectionManager emits CMS events on
+ITSELF, not the composer — panel reload now subscribes on
+`composer.cms.collections`; (2) `DataManager.registerSource` THROWS on a
+duplicate id — site-source registration is now an upsert (register-or-update).
+Dead `useDataManager` hook deleted with the stub. New aliases
+`--bd-border-input`, `--bd-accent-text` added to bd-aliases.css (Gate 17);
+all form controls use vibcoder primitives (Gate 24 zero-tolerance stays 0).
+
+Tests: contentPanelUtils 15 + ContentTab 8 (×2 dup path = 38 reported) new;
+sidebar + comments regression 2048 green; tsc clean both packages; verify:ds
+full green. Screenshot: scratchpad `p3-content-root.png`.
+
+Deferred (documented): "Dynamic pages ›" row (no edit path for an existing
+collection's page settings — needs CMSCollectionSetupModal edit mode);
+external source connectors (Sheets); field edit-in-place (add/delete shipped);
+board 151:46's "Connected · synced" meta awaits real connectors.
