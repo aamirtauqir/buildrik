@@ -21,3 +21,4 @@ export * from "./reviews";
 export * from "./comments";
 export * from "./cms";
 export * from "./theme";
+export * from "./marketplace";
