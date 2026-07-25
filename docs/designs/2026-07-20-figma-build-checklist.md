@@ -414,7 +414,43 @@ a better regex; it is to grep for the loosest form and read the misses.
 
 ---
 
+## P14 · After this checklist froze — reconciled against the file 2026-07-25
+
+> This checklist was written on 2026-07-20 and closed at 309/309. The Figma file kept moving. Everything below was built after that line and had no row until now, which is exactly the drift the header warns about: *a checklist that drifts from the file is worse than none.*
+>
+> Counted directly from `g4GzQFqzNYz5sosz1QtZXC` on 2026-07-25.
+
+| Item | Status | Note |
+|---|---|---|
+| **B9 · as-built boards for the six code-ahead surfaces** | ✅ 7 boards | Animation editor · Achievement prompt ×2 · Milestone banner · Migration modal · Project settings modal · Page tab bar. Drawing them found 3 ghost tokens, an invisible active tab, dark-era hardcodes and the retired cobalt — all fixed in code (`175b0ec8`) |
+| **Editor failure states** | ✅ 6 boards | `Media · load-error` · `Review panel · load-error` · `Content · load-error` · `Versions · load-error` · `Notifications · load-error` · `Rollback · failed`. Each maps to a request that can reject |
+| **Auth in-flight + error** | ✅ 2 boards | `Auth · sign-in · submitting` · `· invalid-credentials`. The front door had neither |
+| **Domains in-flight** | ✅ 1 board | `Domains · checking` — Check now had no acknowledgement |
+| **Portfolio load failure** | ✅ 1 board | `Portfolio Sites · load-error` — distinct from empty, which would tell an agency their client work vanished |
+| **Site page renames** | ✅ 12 boards | `Shape1 · *` → `Integrations · GA · *`, `Shape2 · *` → `Webhooks · *`. Placeholder names had shipped |
+| **S1 · Editor — ASSEMBLED repaired** | ✅ | The flagship board rendered its shell 424px tall inside a 900px frame (Middle band 336 where every `Shell state` board uses 812) |
+| **Prototype reachability** | ✅ 517 edges | Every flow page: **0 unreachable, 0 dead ends**. 21 Editor reference boards stay unwired by design |
+| **Radius + type systems normalised** | ✅ | 13 radius values → 2/4/6/8/12/16/full. Off-scale type snapped to 11/12/13/14/16/20/24; the 9 remaining are ≤2-char decorative glyphs |
+| **Status semantics** | ✅ 33 dots | Every status dot was success-green regardless of label. Now Live green · Draft neutral · In review accent |
+
+**Figma file as it actually stands, 2026-07-25 — 395 boards:**
+
+| Page | Boards | Flow | Reference | Unreachable | Dead ends |
+|---|---|---|---|---|---|
+| 🖥️ Editor | 252 | 231 | 21 | 0 | 0 |
+| 🗔 Site | 47 | 46 | 1 | 0 | 0 |
+| 🏢 Portfolio | 28 | 27 | 1 | 0 | 0 |
+| 👤 Client review | 16 | 16 | 0 | 0 | 0 |
+| 🏠 Dashboard — spine | 14 | 14 | 0 | 0 | 0 |
+| 🧩 Components · 📕 Foundations · 🗃️ Archive | 38 | — | library / archive | — | — |
+
+**One constraint worth stating, because no amount of wiring fixes it:** Figma prototype links cannot cross pages — `NAVIGATE` destinations must be a top-level frame on the same page. So Editor → Site settings and Editor → Client review are documented in captions, not clickable. A demoable end-to-end path needs a dedicated flow page holding instances of the spine screens.
+
+---
+
 ## Running count
+
+> P0–P13 closed at 309/309 on 2026-07-20. P14 adds the 30 items above that were built after.
 
 | Phase | Done | Total |
 |---|---|---|
@@ -433,7 +469,8 @@ a better regex; it is to grep for the loosest form and read the misses.
 | P11 Enumerated states | 171 | 171 |
 | P12 Device frames + control states | 2 | 2 |
 | P13 J5 states + Domains + Forms rebuild | 42 | 42 |
-| **Total** | **309** | **309** |
+| P14 Post-freeze reconciliation (2026-07-25) | 30 | 30 |
+| **Total** | **339** | **339** |
 
 ---
 

@@ -18,6 +18,25 @@
 | ⚠ **Partly backed** — one gap named | 13 | Integrations: no site-level router |
 | ❌ **Not backed** — needs schema work first | 6, 10 | the J5 wedge and the Review panel |
 
+> ### ⟳ Reconciled against the code, 2026-07-25
+>
+> **The wedge row above is no longer true. The schema work it was waiting on has shipped.** This block is the correction; the row is left standing so the sequencing call that came out of it still reads in context.
+>
+> | Claim as written 2026-07-20 | Verified 2026-07-25 | Evidence |
+> |---|---|---|
+> | ❌ wedge not backed — needs schema work | ✅ **backed** | `ReviewRequest.token String? @unique`, `expiresAt` (90 days), `revokedAt`, `invitedEmail`; `Comment.authorId String?` so an account-less client can author |
+> | client review page unreachable | ✅ **route exists** | `packages/dashboard/app/review/[token]` |
+> | site snapshot in the review page is a placeholder | ✅ **real** | `ReviewRequest.snapshotPages Json?` — the page payload frozen at send, per contracts §1.6 |
+> | DESIGNER may publish, but code is ADMIN-gated | ✅ **fixed** | `sites.ts:305` — "a DESIGNER (EDITOR site-role) may publish" |
+> | editor accent still cobalt | ✅ **fixed** | `--buildrick-primary-alpha-15/-30` and `defaultStyles.ts` `THEME.primary` migrated to `#406ED6` (commits `175b0ec8`, `539477a8`) |
+>
+> **Still true, do not treat as resolved:**
+> - **No site-level integrations router.** `site-detail.ts` carries `redirects`, `domains`, `sharing` only. The root `integrations` router is `vercel` alone — that is OAuth for publishing, not the marketing integrations Site §6.2 draws.
+> - **ConvertKit is not in the provider enum.** Adding it is still a schema change.
+> - **The wedge is flag-gated.** `isFeatureEnabled` returns `row?.enabled ?? false`, so `agency_layer` is **off unless a `WorkspaceFeature` row exists**. Enabled for 4 workspaces in dev. Being backed and being reachable are different things.
+>
+> **New backend that did not exist when this doc was written:** `webhooks` router (workspace endpoint, HMAC-signed delivery, ADMIN-gated) and `siteDetail.domains.check` (real DNS resolution), both registered in `server/trpc/router.ts`.
+
 ---
 
 ## 1. Backed — draw with confidence
