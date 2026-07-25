@@ -21,11 +21,6 @@ export interface OnboardingStep {
   actionKey?: string;
   /** Whether this step has been completed */
   completed: boolean;
-  /**
-   * DOM id of the element to spotlight when this step is active.
-   * If omitted, no spotlight is shown for this step.
-   */
-  spotlightTarget?: string;
 }
 
 // ── Schema Version ──────────────────────────────────────────────────────────
@@ -44,7 +39,6 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
     actionLabel: "Open settings",
     actionKey: "open-project-name",
     completed: false,
-    spotlightTarget: "topbar-btn-project",
   },
   {
     id: "pick-start",
@@ -54,7 +48,6 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
     actionLabel: "Browse templates",
     actionKey: "open-templates",
     completed: false,
-    spotlightTarget: "rail-tab-templates",
   },
   {
     id: "add-element",
@@ -64,7 +57,6 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
     actionLabel: "Open Build panel",
     actionKey: "open-build",
     completed: false,
-    spotlightTarget: "rail-tab-build",
   },
   {
     id: "edit-text",
@@ -88,7 +80,6 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
     actionLabel: "Open preview",
     actionKey: "trigger-preview",
     completed: false,
-    spotlightTarget: "topbar-btn-preview",
   },
   {
     id: "publish",
@@ -98,6 +89,5 @@ export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
     actionLabel: "Publish now",
     actionKey: "trigger-publish",
     completed: false,
-    spotlightTarget: "topbar-btn-publish",
   },
 ];

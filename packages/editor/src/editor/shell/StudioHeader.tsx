@@ -7,7 +7,6 @@
 
 import * as React from "react";
 import type { Composer } from "../../engine";
-import type { DeviceType } from "../../shared/types";
 import { sanitizeHTMLForPreview, setupPreviewWindow } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { PresenceIndicators } from "../collaboration";
@@ -30,14 +29,6 @@ export interface SelectedElementInfo {
 export interface StudioHeaderProps {
   /** Composer instance */
   composer: Composer | null;
-  /** Current device breakpoint */
-  device: DeviceType;
-  /** Current zoom level */
-  zoom: number;
-  /** Can undo history */
-  canUndo: boolean;
-  /** Can redo history */
-  canRedo: boolean;
   /** Save status indicator */
   saveStatus: "idle" | "saving" | "error";
   /** Has unsaved changes */
@@ -66,8 +57,6 @@ export interface StudioHeaderProps {
   issues?: Issue[];
 
   // Callbacks for state changes
-  onDeviceChange: (device: DeviceType) => void;
-  onZoomChange: (zoom: number) => void;
   onSetPreviewLoading: (loading: boolean) => void;
   onSetExportLoading: (loading: boolean) => void;
 
@@ -100,7 +89,7 @@ export interface StudioHeaderProps {
   /** Vercel publish flow — when present, replaces fallback handleExport on Publish click */
   onVercelPublish?: () => void;
   /** Publish workflow state — drives PublishDropdown visuals */
-  publishState?: "draft" | "in-review" | "approved" | "published";
+  publishState?: "draft" | "published";
   /** True while a publish job is in flight */
   publishLoading?: boolean;
   /** Live URL after successful publish */
@@ -117,10 +106,6 @@ export interface StudioHeaderProps {
  */
 export const StudioHeader: React.FC<StudioHeaderProps> = ({
   composer,
-  device,
-  zoom,
-  canUndo,
-  canRedo,
   saveStatus,
   isDirty,
   isOffline,
@@ -134,8 +119,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   showSuggestions = true,
   studioSyncStatus = "connected",
   issues = [],
-  onDeviceChange,
-  onZoomChange,
   onSetPreviewLoading,
   onSetExportLoading,
   onShowTemplates,
@@ -224,28 +207,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     setTimeout(() => onSetExportLoading(false), 500);
   }, [onSetExportLoading, onShowExporter]);
 
-  /**
-   * Handle device change - updates device and notifies composer
-   */
-  const handleDeviceChange = React.useCallback(
-    (d: "desktop" | "tablet" | "mobile" | "wide") => {
-      onDeviceChange(d as DeviceType);
-      if (composer) composer.setDevice(d as DeviceType);
-    },
-    [composer, onDeviceChange]
-  );
-
-  /**
-   * Handle zoom change - updates zoom and notifies composer
-   */
-  const handleZoomChange = React.useCallback(
-    (z: number) => {
-      onZoomChange(z);
-      if (composer) composer.setZoom(z);
-    },
-    [composer, onZoomChange]
-  );
-
   // Compute lastSavedAt from lastSaved Date if not provided
   const computedLastSavedAt = lastSavedAt ?? (lastSaved ? lastSaved.getTime() : undefined);
 
@@ -275,10 +236,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       composer={composer}
       projectName={crumb.projectName}
       pageName={crumb.pageName}
-      device={device}
-      zoom={zoom}
-      canUndo={canUndo}
-      canRedo={canRedo}
       saveStatus={saveStatus}
       isOffline={isOffline}
       isDirty={isDirty}
@@ -291,11 +248,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       showSuggestions={showSuggestions}
       syncStatus={studioSyncStatus}
       issues={issues}
-      onDeviceChange={handleDeviceChange}
-      onZoomChange={handleZoomChange}
       onAddPage={onAddPage}
-      onUndo={() => composer?.history.undo()}
-      onRedo={() => composer?.history.redo()}
       onShowTemplates={onShowTemplates}
       onPreview={handlePreview}
       onPublish={onVercelPublish ?? onOpenPublish ?? handleExport}

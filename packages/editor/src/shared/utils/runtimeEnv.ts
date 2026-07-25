@@ -58,6 +58,11 @@ export const FEATURE_COMPONENTS_V2: boolean =
 export const FEATURE_DS_AI: boolean =
   (vite.VITE_FEATURE_DS_AI ?? proc.NEXT_PUBLIC_FEATURE_DS_AI) === "true";
 
+// Dev/demo build detection. Vite exposes MODE as a plain string in both dev
+// and build; Next-bundled context falls back to NODE_ENV.
+export const IS_DEV_BUILD: boolean =
+  vite.MODE === "development" || proc.NODE_ENV === "development";
+
 // Real-time collaboration is DEMO-ONLY (last-write-wins, 6 known
 // non-convergence P1s). Gate the Collaborate CTA behind this flag so it is
 // not exposed as production-ready until a real OT/CRDT arc lands.

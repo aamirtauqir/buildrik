@@ -6,9 +6,6 @@
 export { OnboardingChecklist } from "./OnboardingChecklist";
 export type { OnboardingChecklistProps } from "./OnboardingChecklist";
 
-export { SpotlightOverlay } from "./SpotlightOverlay";
-export type { SpotlightOverlayProps } from "./SpotlightOverlay";
-
 export { AchievementPrompt } from "./AchievementPrompt";
 export type { AchievementPromptProps } from "./AchievementPrompt";
 
@@ -18,9 +15,6 @@ export type {
   OnboardingPhase,
   AchievementPromptState,
 } from "./useOnboardingOrchestrator";
-
-export { WelcomeModal } from "./WelcomeModal";
-export type { WelcomeModalProps } from "./WelcomeModal";
 
 // Step definitions (SSOT — shared with shell for event wiring)
 export type { OnboardingStep } from "../../shared/constants/onboardingSteps";

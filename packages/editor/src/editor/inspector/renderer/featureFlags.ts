@@ -25,3 +25,11 @@ function read(key: string): boolean {
 }
 
 export const USE_SCHEMA_BORDER = read("buildrick:schema-border");
+
+/**
+ * Dev-mode inspector: unlocks the "All CSS" section (raw property editor)
+ * registered in every element profile. Was `const devMode = false` hardcoded
+ * in ProInspector — the section could never render (audit F22, 2026-07-25).
+ *   localStorage.setItem("buildrick:dev-mode", "1"); // reload
+ */
+export const USE_DEV_MODE = read("buildrick:dev-mode");

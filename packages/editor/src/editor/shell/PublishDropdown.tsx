@@ -1,12 +1,16 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
- * PublishDropdown — Topbar publish button with 4 workflow states.
+ * PublishDropdown — Topbar publish button.
  *
- * States:
- *   draft      → cobalt accent — Submit for Review / Publish Directly / View Live Site
- *   in-review  → amber #92400E  — Approve (disabled) / Request Changes / View Live Site
- *   approved   → green #166534  — Publish Now / View Live Site
- *   published  → cyan  #0EA5E9  — Submit for Review / Unpublish / View Live Site / Copy URL / Deployment Status
+ * States (only the two the shell's publish job actually produces):
+ *   draft     → cobalt accent — Publish Directly / View Live Site
+ *   published → cyan #0EA5E9  — Publish Update / View Live Site / Copy Published URL
+ *
+ * Review-workflow states (in-review / approved) and their actions
+ * (Submit for Review, Approve, Request Changes, Unpublish, Deployment
+ * Status) were removed 2026-07-25: they rendered as live menu items but
+ * had no handlers and no reachable state. They return with the S5 review
+ * arc (Phase 2 of the Figma convergence plan) wired to real review state.
  *
  * @license BSD-3-Clause
  */
@@ -14,7 +18,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
 
-export type PublishState = "draft" | "in-review" | "approved" | "published";
+export type PublishState = "draft" | "published";
 
 interface PublishDropdownProps {
   publishState?: PublishState;
@@ -52,22 +56,6 @@ const STATE_CONFIG: Record<PublishState, StateConfig> = {
     // pattern (light text on darker brand color) and stays accessible.
     badge: { label: "Draft", bg: "var(--bd-accent-pressed)", text: "var(--bd-bg-card)" },
   },
-  "in-review": {
-    buttonLabel: "In Review",
-    bg: "#92400E",
-    hoverBg: "#78350F",
-    iconColor: "#FDE68A",
-    textColor: "#FDE68A",
-    chevronColor: "#FDE68A",
-  },
-  approved: {
-    buttonLabel: "Approved · Publish Now",
-    bg: "#166534",
-    hoverBg: "#14532D",
-    iconColor: "var(--bd-bg-card)",
-    textColor: "var(--bd-bg-card)",
-    chevronColor: "#DCFCE7",
-  },
   published: {
     buttonLabel: "Published",
     bg: "#0EA5E9",
@@ -83,35 +71,20 @@ const STATE_CONFIG: Record<PublishState, StateConfig> = {
 interface DropdownOption {
   label: string;
   sublabel?: string;
-  danger?: boolean;
   disabled?: boolean;
   external?: boolean;
-  checked?: boolean;
   onClick?: () => void;
 }
 
 const STATE_OPTIONS: Record<PublishState, DropdownOption[]> = {
   draft: [
-    { label: "Submit for Review" },
-    { label: "Publish Directly", sublabel: "Admin only for non-admin users" },
-    { label: "View Live Site", external: true, sublabel: "Shown only if previously published" },
-  ],
-  "in-review": [
-    { label: "Approve", sublabel: "Can't approve your own submission", disabled: true },
-    { label: "Request Changes" },
-    { label: "View Live Site", external: true },
-  ],
-  approved: [
-    { label: "Publish Now", checked: true },
+    { label: "Publish Directly" },
     { label: "View Live Site", external: true },
   ],
   published: [
     { label: "Publish Update", sublabel: "Deploy latest edits — replaces the live site" },
-    { label: "Submit for Review", sublabel: "Live site stays live during review" },
-    { label: "Unpublish", danger: true },
     { label: "View Live Site", external: true },
     { label: "Copy Published URL" },
-    { label: "Deployment Status" },
   ],
 };
 
@@ -129,12 +102,6 @@ const IconRocket: React.FC<{ color: string }> = ({ color }) => (
 const IconChevronDown: React.FC<{ color: string }> = ({ color }) => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polyline points="6 9 12 15 18 9" />
-  </svg>
-);
-
-const IconCheck: React.FC = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--bd-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 
@@ -160,9 +127,8 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
 
   const cfg = STATE_CONFIG[publishState];
 
-  // Wire the live-site actions for any state. Static options without onClicks
-  // pass through unchanged (Submit-for-Review / Approve / Unpublish need
-  // backend RBAC — Phase 7 work, currently no-ops).
+  // Every rendered option carries a real handler; URL-dependent ones disable
+  // without a publishedUrl.
   const options = React.useMemo<DropdownOption[]>(() => {
     const handleViewLive = publishedUrl
       ? () => window.open(publishedUrl, "_blank", "noopener,noreferrer")
@@ -179,10 +145,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
       if (opt.label === "Copy Published URL") {
         return { ...opt, onClick: handleCopyUrl, disabled: !publishedUrl };
       }
-      if (opt.label === "Publish Now" || opt.label === "Publish Directly" || opt.label === "Publish Update") {
-        return { ...opt, onClick: handlePublishNow };
-      }
-      return opt;
+      return { ...opt, onClick: handlePublishNow };
     });
   }, [publishState, publishedUrl, onPublish]);
 
@@ -194,11 +157,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
   });
 
   const handleMainClick = () => {
-    if (publishState === "approved") {
-      onPublish();
-    } else {
-      setIsOpen((v) => !v);
-    }
+    setIsOpen((v) => !v);
   };
 
   return (
@@ -248,30 +207,28 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
           </span>
         )}
       </Button>
-      {/* Chevron trigger (draft only shows as separate segment) */}
-      {publishState !== "approved" && (
-        <Button
-          onClick={() => setIsOpen((v) => !v)}
-          aria-label="Open publish options"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 26,
-            height: 30,
-            background: cfg.bg,
-            border: "none",
-            borderLeft: `1px solid ${cfg.hoverBg}`,
-            borderRadius: "0 var(--bd-radius-full) var(--bd-radius-full) 0",
-            cursor: "pointer",
-            transition: "background 0.12s ease",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = cfg.hoverBg; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = cfg.bg; }}
-        >
-          <IconChevronDown color={cfg.chevronColor} />
-        </Button>
-      )}
+      {/* Chevron trigger segment */}
+      <Button
+        onClick={() => setIsOpen((v) => !v)}
+        aria-label="Open publish options"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 26,
+          height: 30,
+          background: cfg.bg,
+          border: "none",
+          borderLeft: `1px solid ${cfg.hoverBg}`,
+          borderRadius: "0 var(--bd-radius-full) var(--bd-radius-full) 0",
+          cursor: "pointer",
+          transition: "background 0.12s ease",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = cfg.hoverBg; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = cfg.bg; }}
+      >
+        <IconChevronDown color={cfg.chevronColor} />
+      </Button>
       {/* Dropdown panel */}
       {isOpen && buttonRef.current && (
         <div
@@ -309,9 +266,9 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                   padding: "8px 12px",
                   background: "transparent",
                   border: "none",
-                  color: opt.danger ? "var(--bd-error)" : opt.disabled ? "var(--bd-fg-muted)" : "var(--bd-fg-primary)",
+                  color: opt.disabled ? "var(--bd-fg-muted)" : "var(--bd-fg-primary)",
                   fontSize: 13,
-                  fontWeight: opt.checked ? 600 : 400,
+                  fontWeight: 400,
                   cursor: opt.disabled ? "default" : "pointer",
                   textAlign: "left",
                   fontFamily: "inherit",
@@ -319,14 +276,13 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                 }}
                 onMouseEnter={(e) => {
                   if (!opt.disabled) {
-                    e.currentTarget.style.background = opt.danger ? "var(--bd-error-tint)" : "var(--bd-bg-panel)";
+                    e.currentTarget.style.background = "var(--bd-bg-panel)";
                   }
                 }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
               >
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    {opt.checked && <IconCheck />}
                     <span>{opt.label}</span>
                   </div>
                   {opt.sublabel && (

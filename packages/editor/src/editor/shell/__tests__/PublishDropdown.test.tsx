@@ -1,7 +1,13 @@
 /**
- * PublishDropdown.test.tsx — the 4 publish-state configs (draft / in-review /
- * approved / published), wired-vs-no-op menu items (pinned), and the
- * copy-URL / view-live actions.
+ * PublishDropdown.test.tsx — the 2 reachable publish states (draft /
+ * published), the every-item-is-wired invariant, and the copy-URL /
+ * view-live actions.
+ *
+ * The in-review / approved states and their no-op actions (Submit for
+ * Review, Approve, Request Changes, Unpublish, Deployment Status) were
+ * removed 2026-07-25 — see the component header. When the S5 review arc
+ * reintroduces them WIRED, extend these tests rather than restoring the
+ * old no-op pins.
  *
  * @license BSD-3-Clause
  */
@@ -31,7 +37,7 @@ afterEach(() => {
 const mainButton = () => screen.getByLabelText(/click to open publish options/i);
 
 describe("PublishDropdown", () => {
-  // ── the 4 state configs ────────────────────────────────────────────────────
+  // ── state configs ──────────────────────────────────────────────────────────
   describe("state configs", () => {
     it("draft: 'Publish' label + Draft badge + separate chevron segment", () => {
       render(<PublishDropdown publishState="draft" onPublish={vi.fn()} />);
@@ -40,25 +46,10 @@ describe("PublishDropdown", () => {
       expect(screen.getByRole("button", { name: "Open publish options" })).toBeInTheDocument();
     });
 
-    it("in-review: 'In Review' label, no badge", () => {
-      render(<PublishDropdown publishState="in-review" onPublish={vi.fn()} />);
-      expect(mainButton()).toHaveTextContent("In Review");
-      expect(screen.queryByText("Draft")).toBeNull();
-    });
-
-    it("approved: 'Approved · Publish Now' label and NO chevron — main click publishes directly", () => {
-      const onPublish = vi.fn();
-      render(<PublishDropdown publishState="approved" onPublish={onPublish} />);
-      expect(mainButton()).toHaveTextContent("Approved · Publish Now");
-      expect(screen.queryByRole("button", { name: "Open publish options" })).toBeNull();
-      fireEvent.click(mainButton());
-      expect(onPublish).toHaveBeenCalledTimes(1);
-      expect(screen.queryByRole("menu")).toBeNull(); // no menu opened
-    });
-
-    it("published: 'Published' label", () => {
+    it("published: 'Published' label, no badge", () => {
       render(<PublishDropdown publishState="published" onPublish={vi.fn()} />);
       expect(mainButton()).toHaveTextContent("Published");
+      expect(screen.queryByText("Draft")).toBeNull();
     });
 
     it("defaults to draft when no state given", () => {
@@ -77,7 +68,7 @@ describe("PublishDropdown", () => {
 
   // ── menu open/close ────────────────────────────────────────────────────────
   describe("menu", () => {
-    it("main click toggles the menu for non-approved states", () => {
+    it("main click toggles the menu", () => {
       render(<PublishDropdown publishState="draft" onPublish={vi.fn()} />);
       fireEvent.click(mainButton());
       expect(screen.getByRole("menu", { name: "Publish options" })).toBeInTheDocument();
@@ -91,48 +82,44 @@ describe("PublishDropdown", () => {
       expect(screen.getByRole("menu")).toBeInTheDocument();
     });
 
-    it("draft menu lists its 3 options", () => {
+    it("draft menu lists exactly its 2 wired options", () => {
       render(<PublishDropdown publishState="draft" onPublish={vi.fn()} />);
       fireEvent.click(mainButton());
       const items = screen.getAllByRole("menuitem");
       expect(items.map((i) => i.textContent)).toEqual([
-        "Submit for Review",
-        "Publish DirectlyAdmin only for non-admin users",
-        "View Live SiteShown only if previously published",
+        "Publish Directly",
+        "View Live Site",
       ]);
     });
 
-    it("published menu lists its 6 options", () => {
+    it("published menu lists exactly its 3 wired options", () => {
       render(
         <PublishDropdown publishState="published" publishedUrl={LIVE_URL} onPublish={vi.fn()} />
       );
       fireEvent.click(mainButton());
-      expect(screen.getAllByRole("menuitem")).toHaveLength(6);
+      const items = screen.getAllByRole("menuitem");
+      expect(items.map((i) => i.textContent)).toEqual([
+        "Publish UpdateDeploy latest edits — replaces the live site",
+        "View Live Site",
+        "Copy Published URL",
+      ]);
     });
   });
 
-  // ── wired vs no-op items ───────────────────────────────────────────────────
-  // PIN: wired vs no-op items — only three families of menu items have real
-  // handlers today:
-  //   WIRED:  "Publish Now" / "Publish Directly" / "Publish Update" → onPublish
-  //           "View Live Site"       → window.open (disabled without publishedUrl)
-  //           "Copy Published URL"   → navigator.clipboard.writeText (disabled
-  //                                    without publishedUrl)
-  //   NO-OP (decorative until Phase 7 backend RBAC lands):
-  //           "Submit for Review", "Request Changes", "Unpublish",
-  //           "Deployment Status" — no onClick; clicking only closes the menu.
-  //           "Approve" (in-review) is hard-disabled.
-  describe("wired vs no-op items", () => {
-    it("'Publish Directly' (draft) is wired to onPublish", () => {
+  // ── every item wired ───────────────────────────────────────────────────────
+  // PIN: no decorative menu items. Every option either fires a real handler
+  // or is disabled with a stated reason (missing publishedUrl).
+  describe("wired items", () => {
+    it("'Publish Directly' (draft) fires onPublish and closes the menu", () => {
       const onPublish = vi.fn();
       render(<PublishDropdown publishState="draft" onPublish={onPublish} />);
       fireEvent.click(mainButton());
       fireEvent.click(screen.getByRole("menuitem", { name: /Publish Directly/ }));
       expect(onPublish).toHaveBeenCalledTimes(1);
-      expect(screen.queryByRole("menu")).toBeNull(); // closes after action
+      expect(screen.queryByRole("menu")).toBeNull();
     });
 
-    it("'Publish Update' (published) is wired to onPublish", () => {
+    it("'Publish Update' (published) fires onPublish", () => {
       const onPublish = vi.fn();
       render(
         <PublishDropdown publishState="published" publishedUrl={LIVE_URL} onPublish={onPublish} />
@@ -142,47 +129,21 @@ describe("PublishDropdown", () => {
       expect(onPublish).toHaveBeenCalledTimes(1);
     });
 
-    it("'Submit for Review' (draft) is a NO-OP — closes the menu, fires nothing", () => {
-      const onPublish = vi.fn();
-      render(<PublishDropdown publishState="draft" onPublish={onPublish} />);
-      fireEvent.click(mainButton());
-      fireEvent.click(screen.getByRole("menuitem", { name: "Submit for Review" }));
-      expect(onPublish).not.toHaveBeenCalled();
-      expect(writeText).not.toHaveBeenCalled();
-      expect(openSpy).not.toHaveBeenCalled();
-      expect(screen.queryByRole("menu")).toBeNull();
-    });
-
-    it("'Unpublish' and 'Deployment Status' (published) are NO-OPs", () => {
-      const onPublish = vi.fn();
-      render(
-        <PublishDropdown publishState="published" publishedUrl={LIVE_URL} onPublish={onPublish} />
-      );
-      fireEvent.click(mainButton());
-      fireEvent.click(screen.getByRole("menuitem", { name: "Unpublish" }));
-      expect(onPublish).not.toHaveBeenCalled();
-      fireEvent.click(mainButton());
-      fireEvent.click(screen.getByRole("menuitem", { name: "Deployment Status" }));
-      expect(onPublish).not.toHaveBeenCalled();
-      expect(openSpy).not.toHaveBeenCalled();
-    });
-
-    it("'Approve' (in-review) is hard-disabled — click does not close the menu", () => {
-      render(<PublishDropdown publishState="in-review" onPublish={vi.fn()} />);
-      fireEvent.click(mainButton());
-      const approve = screen.getByRole("menuitem", { name: /Approve/ });
-      expect(approve).toBeDisabled();
-      fireEvent.click(approve);
-      expect(screen.getByRole("menu")).toBeInTheDocument();
-    });
-
-    it("'Request Changes' (in-review) is a NO-OP", () => {
-      const onPublish = vi.fn();
-      render(<PublishDropdown publishState="in-review" onPublish={onPublish} />);
-      fireEvent.click(mainButton());
-      fireEvent.click(screen.getByRole("menuitem", { name: "Request Changes" }));
-      expect(onPublish).not.toHaveBeenCalled();
-      expect(screen.queryByRole("menu")).toBeNull();
+    it("no former no-op items render in any state", () => {
+      for (const state of ["draft", "published"] as const) {
+        render(<PublishDropdown publishState={state} onPublish={vi.fn()} />);
+        fireEvent.click(mainButton());
+        for (const gone of [
+          "Submit for Review",
+          "Approve",
+          "Request Changes",
+          "Unpublish",
+          "Deployment Status",
+        ]) {
+          expect(screen.queryByRole("menuitem", { name: gone })).toBeNull();
+        }
+        cleanup();
+      }
     });
   });
 

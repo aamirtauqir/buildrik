@@ -107,7 +107,7 @@ export function useLayersState({
   const actionsHook = useLayerActions(composer, treeHook.currentPageId);
   const searchHook = useLayerSearch();
   const selectionHook = useLayerSelection(composer, treeHook.layers, treeHook.expandedIds);
-  const dragHook = useLayerDrag(composer);
+  const dragHook = useLayerDrag();
 
   const [displayPrefs, setDisplayPrefs] = React.useState<LayerDisplayPrefs>(loadDisplayPrefs);
   const [contextMenu, setContextMenu] = React.useState<LayerContextMenuState | null>(null);

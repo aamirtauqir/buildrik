@@ -316,10 +316,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       <header role="banner" aria-label="Editor toolbar">
         <StudioHeader
           composer={composer}
-          device={state.device}
-          zoom={state.zoom}
-          canUndo={state.canUndo}
-          canRedo={state.canRedo}
           saveStatus={state.saveState.status}
           isDirty={state.isDirty}
           isOffline={isOffline}
@@ -333,14 +329,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           showSuggestions={state.overlays.showSuggestions}
           studioSyncStatus={state.syncStatus}
           issues={state.issues}
-          onDeviceChange={(d) => {
-            state.setDevice(d);
-            if (composer) composer.setDevice(d);
-          }}
-          onZoomChange={(z) => {
-            state.setZoom(z);
-            if (composer) composer.setZoom(z);
-          }}
           onSetPreviewLoading={modals.setPreviewLoading}
           onSetExportLoading={modals.setExportLoading}
           onShowTemplates={modals.openTemplates}

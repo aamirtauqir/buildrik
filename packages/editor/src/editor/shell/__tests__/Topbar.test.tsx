@@ -87,10 +87,6 @@ function render(ui: React.ReactElement) {
 
 function makeProps(overrides: Partial<TopbarProps> = {}): TopbarProps {
   return {
-    canUndo: false,
-    canRedo: false,
-    onUndo: vi.fn(),
-    onRedo: vi.fn(),
     onPreview: vi.fn(),
     onPublish: vi.fn(),
     onSave: vi.fn(),

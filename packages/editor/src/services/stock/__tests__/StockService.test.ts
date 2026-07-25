@@ -18,15 +18,11 @@ vi.mock("../../api-client", () => ({
 }));
 vi.mock("../../../shared/utils/runtimeEnv", () => ({ DASHBOARD_URL: "http://localhost:3000" }));
 
-import { stockService, IS_STOCK_CONFIGURED } from "../StockService";
+import { stockService } from "../StockService";
 
 beforeEach(() => [searchPhotos, searchVideos].forEach((m) => m.mockReset()));
 
 describe("StockService", () => {
-  it("is marked configured now that the route exists", () => {
-    expect(IS_STOCK_CONFIGURED).toBe(true);
-  });
-
   it("searchPhotos calls the route with input + signal and returns the result", async () => {
     const ctrl = new AbortController();
     searchPhotos.mockResolvedValueOnce([{ id: "u1", source: "unsplash" }]);

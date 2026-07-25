@@ -9,6 +9,7 @@
  */
 
 import * as React from "react";
+import { Z_LAYERS } from "../../../shared/constants/canvas";
 import type { SnapLine } from "../hooks/useCanvasSnapping";
 
 interface SmartGuidesOverlayProps {
@@ -28,7 +29,7 @@ export const SmartGuidesOverlay: React.FC<SmartGuidesOverlayProps> = ({ snapLine
         width: "100%",
         height: "100%",
         pointerEvents: "none",
-        zIndex: 9999, // Above almost everything
+        zIndex: Z_LAYERS.dropFeedback,
       }}
     >
       {snapLines.map((line, i) => {

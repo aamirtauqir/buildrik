@@ -25,7 +25,6 @@
     "packages/editor/src/editor/canvas/spots/CanvasSpot.tsx",
     "packages/editor/src/editor/canvas/spots/CanvasSpotBadge.tsx",
     "packages/editor/src/editor/canvas/spots/CanvasSpotSpacing.tsx",
-    "packages/editor/src/editor/collaboration/ConnectionQualityIndicator.tsx",
     "packages/editor/src/editor/inspector/components/BatchStylePanel.tsx",
     "packages/editor/src/editor/inspector/components/DeleteConfirmModal.tsx",
     "packages/editor/src/editor/inspector/components/MultiSelectToolbar.tsx",

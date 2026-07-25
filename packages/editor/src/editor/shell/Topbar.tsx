@@ -101,8 +101,6 @@ const IconWarn = () => (
 export interface TopbarProps {
   composer?: Composer | null;
 
-  canUndo: boolean;
-  canRedo: boolean;
   issues?: Issue[];
 
   projectName?: string;
@@ -118,8 +116,6 @@ export interface TopbarProps {
 
   collaborationSlot?: React.ReactNode;
 
-  onUndo: () => void;
-  onRedo: () => void;
   onPreview: () => void;
   onPublish: () => void;
   onSave: () => void;
@@ -128,8 +124,6 @@ export interface TopbarProps {
   onHelp?: () => void;
 
   // Legacy / StudioHeader wiring
-  device?: string;
-  zoom?: number;
   saveStatus?: "idle" | "saving" | "error";
   isDirty?: boolean;
   lastSavedAt?: number;
@@ -139,8 +133,6 @@ export interface TopbarProps {
   showXRay?: boolean;
   devMode?: boolean;
   showSuggestions?: boolean;
-  onDeviceChange?: (d: "desktop" | "tablet" | "mobile" | "wide") => void;
-  onZoomChange?: (z: number) => void;
   onToggleXRay?: () => void;
   onToggleDevMode?: () => void;
   onToggleSuggestions?: () => void;
@@ -172,8 +164,6 @@ function formatSavedAgo(ts?: number): string {
 
 export const Topbar: React.FC<TopbarProps> = ({
   composer,
-  canUndo,
-  canRedo,
   issues = [],
   projectName = "My project",
   pageName = "Home",
@@ -183,7 +173,6 @@ export const Topbar: React.FC<TopbarProps> = ({
   isOffline = false,
   syncStatus,
   previewLoading = false,
-  device = "desktop",
   saveStatus = "idle",
   isDirty = false,
   lastSavedAt,

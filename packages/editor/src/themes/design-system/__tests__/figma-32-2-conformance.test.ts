@@ -7,9 +7,10 @@
  * color.css / layout.css drifts from Figma, this test fails — that is the point:
  * it is the "real developer" verification the design language stays applied.
  *
- * Intentional deviations from Figma are declared in A11Y_KEEPS and SHIPPED_KEEPS
- * with a reason, so the test documents *why* a value is allowed to differ rather
- * than silently passing. Update the fixture only when Figma itself changes.
+ * Intentional deviations from Figma would be declared in a KEEPS map with a
+ * reason. Currently there are none: the last one (warning #B45309 vs Figma
+ * #D97706, WCAG AA) was resolved 2026-07-25 by updating the FIGMA variable to
+ * the a11y-safe value. Update the fixture only when Figma itself changes.
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -54,9 +55,12 @@ const FIGMA_COLOR: Record<string, string> = {
   "--buildrick-accent-text": "#3C68C9",
   "--buildrick-accent-tint-solid": "#ECF0FB",
   "--buildrick-text-on-accent": "#FFFFFF", // Figma accent-on
-  // semantic fill (only where code matches Figma; deviations in A11Y_KEEPS)
+  // semantic fill
   "--buildrick-success": "#16A34A",
   "--buildrick-error": "#DC2626",
+  // warning: Figma variable updated 2026-07-25 to the WCAG-AA amber-700 the
+  // code shipped (amber-600 #D97706 failed 3.19:1 on warning-bg).
+  "--buildrick-warning": "#B45309",
 };
 
 const FIGMA_SIZE: Record<string, string> = {
@@ -77,16 +81,6 @@ const FIGMA_SIZE: Record<string, string> = {
   "--buildrick-sidebar-panel-width": "320PX", // Figma drawer
   "--buildrick-right-panel-width": "300PX", // Figma inspector
 };
-
-/** Deliberate deviations — Figma value would regress accessibility. */
-const A11Y_KEEPS: Record<string, { value: string; figma: string; why: string }> = {
-  "--buildrick-warning": {
-    value: "#B45309",
-    figma: "#D97706",
-    why: "Figma amber-600 fails WCAG AA on warning-bg (3.19:1); amber-700 passes (5.04:1).",
-  },
-};
-
 
 describe("Figma 32-2 foundation conformance", () => {
   const color = parseTokens("color.css");
@@ -110,12 +104,4 @@ describe("Figma 32-2 foundation conformance", () => {
     }
   });
 
-  describe("declared deviations stay declared (not silently reverted)", () => {
-    for (const [token, dev] of Object.entries(A11Y_KEEPS)) {
-      it(`${token} keeps a11y-safe ${dev.value} (not Figma ${dev.figma})`, () => {
-        expect(color[token]).toBe(dev.value.toUpperCase());
-        expect(color[token]).not.toBe(dev.figma.toUpperCase());
-      });
-    }
-  });
 });

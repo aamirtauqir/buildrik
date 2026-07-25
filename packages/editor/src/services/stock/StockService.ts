@@ -48,13 +48,14 @@ export interface StockService {
 }
 
 /**
- * #24 (2026-06-24): the provider is now wired via the dashboard tRPC
+ * #24 (2026-06-24): the provider is wired via the dashboard tRPC
  * `media.searchStockPhotos` / `searchStockVideos` proxy (keys stay server-side).
- * `true` means the UI shows the stock browser; the server returns `[]` when its
- * provider keys (UNSPLASH_ACCESS_KEY / PEXELS_API_KEY) are unset, which the
- * existing "no results" empty state handles.
+ * The server returns `[]` when its provider keys (UNSPLASH_ACCESS_KEY /
+ * PEXELS_API_KEY) are unset — the "no results" empty state handles that.
+ * (An `IS_STOCK_CONFIGURED` flag + not-configured banner existed here but was
+ * hardcoded `true` and unreachable; removed 2026-07-25. A real configured-ness
+ * signal needs a server capability endpoint.)
  */
-export const IS_STOCK_CONFIGURED = true;
 
 function client() {
   return getBuildrikClient(DASHBOARD_URL);

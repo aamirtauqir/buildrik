@@ -14,6 +14,7 @@ import { BreakpointPill } from "./components/BreakpointPill";
 import { ScopeDropdown } from "./components/ScopeDropdown";
 import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
 import { StateDropdown } from "./components/StateDropdown";
+import { USE_DEV_MODE } from "./renderer/featureFlags";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
@@ -86,7 +87,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     currentPseudoState,
     setCurrentPseudoState,
   } = useInspectorState(selectedElement);
-  const devMode = false;
+  const devMode = USE_DEV_MODE;
 
   const {
     styles: styles_state,

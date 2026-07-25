@@ -52,10 +52,11 @@ interface MenuItem {
 // ============================================================================
 
 const styles = {
+  root: {
+    position: "relative" as const,
+    display: "flex",
+  },
   trigger: {
-    position: "absolute" as const,
-    top: 8,
-    right: 8,
     width: 28,
     height: 28,
     padding: 0,
@@ -76,8 +77,8 @@ const styles = {
   },
   menu: {
     position: "absolute" as const,
-    top: 40,
-    right: 8,
+    top: 32,
+    right: 0,
     minWidth: 180,
     background: "var(--buildrick-surface-3)",
     border: "1px solid var(--buildrick-border)",
@@ -216,7 +217,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
   ];
 
   return (
-    <>
+    <div style={styles.root}>
       <Button
         ref={triggerRef}
         type="button"
@@ -263,7 +264,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 };
 

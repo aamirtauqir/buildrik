@@ -13,27 +13,18 @@ function makeUser(
 }
 
 describe("PresenceIndicators — MOCK_USERS fallback (pinned behavior)", () => {
-  // KNOWN pin: in demo mode (disconnected + zero users) the component falls
-  // back to the MOCK_USERS pair ("You" + "Ana") so the header slot is never
-  // empty. This is intentional current behavior.
-  it("renders mock users You + Ana when disconnected with no users", () => {
-    render(<PresenceIndicators users={[]} currentUser={null} state="disconnected" />);
+  // PIN (2026-07-25, audit F2): the MOCK_USERS demo pair ("You" + "Ana") is
+  // DEV-BUILD-ONLY (IS_DEV_BUILD). In any non-dev context — including this
+  // test env — a disconnected session with zero users renders NOTHING.
+  // Fake collaborators must never appear in production.
+  it("renders nothing when disconnected with no users (no fake collaborators)", () => {
+    const { container } = render(
+      <PresenceIndicators users={[]} currentUser={null} state="disconnected" />,
+    );
 
-    // Tooltip labels carry the full names; avatars carry initials.
-    expect(screen.getByText("You")).toBeInTheDocument();
-    expect(screen.getByText("Ana")).toBeInTheDocument();
-    expect(screen.getByText("Y")).toBeInTheDocument();
-    expect(screen.getByText("A")).toBeInTheDocument();
-  });
-
-  it("marks the mock 'You' entry (id 1) as self via the outline ring", () => {
-    render(<PresenceIndicators users={[]} currentUser={null} state="disconnected" />);
-
-    // selfId falls back to "1" in disconnected mode → mock "You" gets the ring.
-    const youAvatar = screen.getByText("Y");
-    const anaAvatar = screen.getByText("A");
-    expect(youAvatar.style.outlineOffset).toBe("2px");
-    expect(anaAvatar.style.outlineOffset).not.toBe("2px");
+    expect(screen.queryByText("You")).not.toBeInTheDocument();
+    expect(screen.queryByText("Ana")).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 
   it("does NOT fall back to mock users when disconnected but real users exist", () => {

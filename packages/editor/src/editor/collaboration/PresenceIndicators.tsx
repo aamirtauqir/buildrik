@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import type { CollaborationUser, CollaborationState } from "../../shared/types/collaboration";
+import { IS_DEV_BUILD } from "../../shared/utils/runtimeEnv";
 
 // ============================================================================
 // TYPES
@@ -36,7 +37,7 @@ const AVATAR_PALETTE = [
   "#3b82f6",
 ];
 
-/** Mock users shown in demo/disconnected mode */
+/** Mock users shown in dev-build demo mode only (never in production) */
 const MOCK_USERS: CollaborationUser[] = [
   { id: "1", name: "You", color: "var(--buildrick-accent)", lastActive: Date.now() },
   { id: "2", name: "Ana", color: "var(--buildrick-accent)", lastActive: Date.now() },
@@ -265,16 +266,16 @@ export const PresenceIndicators: React.FC<PresenceIndicatorsProps> = ({
   maxVisible = 3,
 }) => {
   // Determine which users to display.
-  // In demo mode (disconnected, no users) fall back to mock data so the
-  // header slot is never empty and the visual spec is visible.
+  // Mock fallback is DEV-ONLY: in production a disconnected session renders
+  // nothing instead of fake collaborators ("You", "Ana").
   const displayUsers: CollaborationUser[] = React.useMemo(() => {
     if (state === "connected" && users.length > 0) return users;
-    if (state === "disconnected" && users.length === 0) return MOCK_USERS;
+    if (IS_DEV_BUILD && state === "disconnected" && users.length === 0) return MOCK_USERS;
     return users;
   }, [users, state]);
 
-  // Self is either the real currentUser or the mock "You" entry in demo mode.
-  const selfId = currentUser?.id ?? (state === "disconnected" ? "1" : null);
+  // Self is either the real currentUser or the mock "You" entry in dev demo mode.
+  const selfId = currentUser?.id ?? (IS_DEV_BUILD && state === "disconnected" ? "1" : null);
 
   const visibleUsers = displayUsers.slice(0, maxVisible);
   const overflowCount = displayUsers.length - maxVisible;
