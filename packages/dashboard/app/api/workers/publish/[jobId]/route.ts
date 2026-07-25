@@ -7,6 +7,7 @@ import type { PublishPage } from "@buildrik/shared/schemas/publish";
 import { record as recordActivity } from "@server/services/activity-log.service";
 import { runVercelDeploy } from "@server/services/publish.service";
 import { decryptPublishedPassword } from "@server/services/site-settings.service";
+import { getWorkspaceAppScripts } from "@server/services/marketplace.service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -250,6 +251,17 @@ function escapeAttr(s: string): string {
 }
 
 /**
+ * Inject installed workspace-app head scripts (Live Chat, …) before </head>.
+ * `scripts` is prebuilt once per deploy from WorkspaceApp config; empty means
+ * nothing installed/configured, so the page is returned untouched.
+ */
+function injectWorkspaceApps(html: string, scripts: string): string {
+  if (!scripts) return html;
+  if (html.includes("</head>")) return html.replace("</head>", `${scripts}</head>`);
+  return scripts + html;
+}
+
+/**
  * Inject favicon / apple-touch-icon / og:image into <head>. These were
  * uploaded + stored on the Site row but never reached the deployed HTML
  * (the editor's head builder only emits og:image, and only when the editor
@@ -339,9 +351,19 @@ async function runVercelDeployJob(
 
   const icons = { favicon: site.favicon, touchIcon: site.touchIcon, ogImage: site.ogImage };
   const seo = { canonicalUrl: site.canonicalUrl, allowIndexing: site.allowIndexing };
+
+  // Workspace-app head scripts (Live Chat, …). Best-effort: an error here must
+  // never fail an otherwise-good publish, so fall back to no injection.
+  let appScripts = "";
+  try {
+    appScripts = await getWorkspaceAppScripts(workspaceId);
+  } catch {
+    appScripts = "";
+  }
+
   const files: VercelFile[] = pages.map((p) => ({
     file: p.path,
-    data: injectBadge(injectSeoTags(injectHeadTags(injectAnalyticsBeacon(p.html, siteId), icons), seo), showBadge),
+    data: injectBadge(injectSeoTags(injectHeadTags(injectWorkspaceApps(injectAnalyticsBeacon(p.html, siteId), appScripts), icons), seo), showBadge),
   }));
 
   // Technical SEO (d5): ship robots.txt — the site's custom rules if set, else a

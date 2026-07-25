@@ -207,6 +207,10 @@ model WorkspaceApp {
   workspaceId String
   appId       String
   installedAt DateTime @default(now())
+  // Per-app configuration (e.g. Live Chat property/widget id). Shape is
+  // validated per appId by packages/shared/schemas/marketplace.ts before write.
+  // An installed app only affects published sites once this holds valid config.
+  config      Json?
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, type LucideIcon } from "lucide-react";
+import { BarChart3, ShoppingCart, Mail, FileText, Search, MessageSquare, Lock, Check, Settings2, type LucideIcon } from "lucide-react";
 import { CATALOG_APPS, MARKETPLACE_CATEGORIES, FEATURED_APP, type AppCategory, type CatalogApp } from "@/lib/marketplace-catalog";
 import { PageHeader, IconChip, InputField, Button, ButtonLink, Modal } from "@/components/dashboard/primitives";
 import { trpc } from "@lib/trpc/client";
@@ -29,6 +29,10 @@ export default function MarketplacePage() {
   const [actionError, setActionError] = useState<string>();
   // The design confirms an install in a dialog before it runs; uninstall stays direct.
   const [confirming, setConfirming] = useState<CatalogApp>();
+  // Configurable apps (Live Chat, …) open a settings dialog instead — saving it
+  // both installs the app and stores the config that makes it work.
+  const [configuring, setConfiguring] = useState<CatalogApp>();
+  const [form, setForm] = useState<Record<string, string>>({});
 
   const utils = trpc.useUtils();
   const installed = trpc.marketplace.listInstalled.useQuery(undefined, { staleTime: 30_000 });
@@ -41,8 +45,33 @@ export default function MarketplacePage() {
 
   const install = trpc.marketplace.install.useMutation({ onSettled, onError });
   const uninstall = trpc.marketplace.uninstall.useMutation({ onSettled, onError });
+  const configure = trpc.marketplace.configure.useMutation({
+    onSettled,
+    onError,
+    onSuccess: () => setConfiguring(undefined),
+  });
   const pendingId =
     install.isPending ? install.variables?.appId : uninstall.isPending ? uninstall.variables?.appId : undefined;
+
+  // Pre-fill the config dialog from stored config when it opens.
+  const existingConfig = trpc.marketplace.getConfig.useQuery(
+    { appId: configuring?.id ?? "" },
+    { enabled: !!configuring, staleTime: 0 },
+  );
+  useEffect(() => {
+    if (!configuring) return;
+    const stored = (existingConfig.data ?? {}) as Record<string, unknown>;
+    const next: Record<string, string> = {};
+    for (const f of configuring.configFields ?? []) {
+      next[f.key] = typeof stored[f.key] === "string" ? (stored[f.key] as string) : "";
+    }
+    setForm(next);
+  }, [configuring, existingConfig.data]);
+
+  const openConfigure = (app: CatalogApp) => {
+    setActionError(undefined);
+    setConfiguring(app);
+  };
 
   const filters: Filter[] = ["All", ...MARKETPLACE_CATEGORIES];
 
@@ -163,6 +192,17 @@ export default function MarketplacePage() {
                   <ButtonLink href={INTEGRATIONS_HREF} variant="ghost" className="w-full">
                     Set up in Integrations
                   </ButtonLink>
+                ) : app.configFields ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={busy}
+                    onClick={() => openConfigure(app)}
+                    className="w-full"
+                  >
+                    {isInstalled ? <Settings2 className="h-4 w-4" /> : null}
+                    {isInstalled ? "Configure" : "Set up"}
+                  </Button>
                 ) : (
                   <Button
                     type="button"
@@ -221,6 +261,68 @@ export default function MarketplacePage() {
                 Preview — installing marks this app as enabled for your workspace, but it isn&apos;t active yet.
               </p>
             </div>
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        open={configuring !== undefined}
+        onClose={() => setConfiguring(undefined)}
+        title={configuring ? `${configuring.name} settings` : ""}
+        footer={
+          configuring && (
+            <>
+              {installedIds.has(configuring.id) && (
+                <Button
+                  variant="ghost"
+                  disabled={uninstall.isPending}
+                  onClick={() => {
+                    uninstall.mutate({ appId: configuring.id });
+                    setConfiguring(undefined);
+                  }}
+                  style={{ marginRight: "auto", color: "var(--color-error-text)" }}
+                >
+                  Remove
+                </Button>
+              )}
+              <Button variant="ghost" onClick={() => setConfiguring(undefined)}>Cancel</Button>
+              <Button
+                disabled={
+                  configure.isPending ||
+                  (configuring.configFields ?? []).some((f) => !form[f.key]?.trim())
+                }
+                onClick={() => {
+                  if (!configuring) return;
+                  const config: Record<string, string> = {};
+                  for (const f of configuring.configFields ?? []) config[f.key] = form[f.key]?.trim() ?? "";
+                  configure.mutate({ appId: configuring.id, config });
+                }}
+              >
+                {configure.isPending ? "Saving…" : "Save & activate"}
+              </Button>
+            </>
+          )
+        }
+      >
+        {configuring && (
+          <div className="flex flex-col gap-4">
+            <p className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
+              {configuring.description} Once saved, it&apos;s added to every published site on your next publish.
+            </p>
+            {(configuring.configFields ?? []).map((f) => (
+              <label key={f.key} className="flex flex-col gap-1.5">
+                <span className="text-body-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{f.label}</span>
+                <InputField
+                  type="text"
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => setForm((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                  placeholder={f.placeholder}
+                />
+                {f.hint && (
+                  <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>{f.hint}</span>
+                )}
+              </label>
+            ))}
           </div>
         )}
       </Modal>
