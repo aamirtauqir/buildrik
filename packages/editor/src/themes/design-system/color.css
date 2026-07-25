@@ -44,6 +44,16 @@
   --buildrick-accent-tint-solid: #ECF0FB;     /* Figma 32-2 accent-tint (opaque; for fills that can't use alpha) */
 
   /* SEMANTIC STATUS */
+  /* Surface elevation scale. Referenced 36 times across the editor (active
+     toggle fills, selected zoom preset, view-switcher active tab, form
+     sections, presence chips) but never defined — every one of those
+     backgrounds rendered transparent, so "selected" looked identical to
+     "not selected". Named to match `uiStyles.ts`'s level2/level3.
+     The bare `--buildrick-surface` is deliberately NOT defined: Gate 8 retires
+     that name, and its remaining refs all carry their own fallback. */
+  --buildrick-surface-2: #F8FAFC;
+  --buildrick-surface-3: #F1F5F9;
+
   --buildrick-error: #DC2626;
   /* Error text ON a tinted background. #DC2626 measures 4.24:1 on
      warning-tint and 4.08:1 on error-tint — both under AA for body copy.

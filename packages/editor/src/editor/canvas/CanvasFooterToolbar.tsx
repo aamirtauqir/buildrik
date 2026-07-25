@@ -455,11 +455,22 @@ const containerStyles: React.CSSProperties = {
   gap: "12px",
   padding: "8px 16px",        /* PRD §10.7: 8px padding */
   height: "40px",
-  background: "var(--buildrick-surface-3)",           /* PRD §10.7: surface-3 bg */
+  // was --buildrick-surface-3, which is defined nowhere: the floating bar
+  // rendered with NO fill, so canvas content showed straight through a
+  // toolbar that is supposed to sit above it.
+  background: "var(--buildrick-bg-card)",
   border: "1px solid var(--buildrick-border)",        /* PRD §10.7: all-sides border */
   borderRadius: "var(--buildrick-radius-lg)",         /* PRD §10.7: lg corner radius */
-  boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+  // 30%-black was a dark-theme weight; the light chrome uses the shadow scale.
+  boxShadow: "var(--bd-shadow-md)",
   whiteSpace: "nowrap" as const,
+  // The bar is centred over the canvas column, which narrows when the
+  // inspector opens. Without these the row kept its intrinsic width and ran
+  // ~276px under the inspector at 1440. Now it stays inside the column and
+  // scrolls instead of hiding controls behind another panel.
+  maxWidth: "100%",
+  minWidth: 0,
+  overflowX: "auto",
 };
 
 const overlaysGroupStyles: React.CSSProperties = {
