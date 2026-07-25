@@ -32,6 +32,7 @@ import { Sparkles, MoreHorizontal, MessageSquare } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import { submitForReview, fetchReviewStatus, type ReviewStatus } from "../../services/ReviewService";
 import { NotificationBell } from "./NotificationBell";
+import { useEditorRole } from "./hooks/useEditorRole";
 import { exportPublishPages } from "./exportPublishPages";
 
 /** S5.2 review-status pill copy + tone, keyed by the derived review state.
@@ -198,6 +199,10 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenAI,
 }) => {
   const publishEnabled = isFeatureEnabled("publish");
+  // P6 permissions boards: a VIEWER sees Publish / Send-for-review DISABLED
+  // with the reason attached — never hidden. Unknown role (demo, fetch
+  // failure) leaves the chrome as-is; the server still enforces.
+  const isViewer = useEditorRole() === "VIEWER";
   // E3: in 4-tool mode AI leaves the rail, so the topbar carries the ✨ trigger.
   const viewMode = getEditorViewMode();
   const fourToolRail = viewMode.fourToolRail;
@@ -513,7 +518,8 @@ export const Topbar: React.FC<TopbarProps> = ({
                 variant="primary"
                 size="sm"
                 onClick={() => (reviewState === "sent" ? undefined : setReviewOpen((v) => !v))}
-                disabled={reviewState === "sending" || reviewState === "sent"}
+                disabled={isViewer || reviewState === "sending" || reviewState === "sent"}
+                title={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
                 aria-label="Send for review"
               >
                 {reviewState === "sending"
@@ -583,6 +589,16 @@ export const Topbar: React.FC<TopbarProps> = ({
                 </div>
               ) : null}
             </div>
+          ) : publishEnabled && isViewer ? (
+            <Button
+              variant="primary"
+              size="sm"
+              disabled
+              title="Viewers can't publish — ask an editor"
+              aria-label="Publish"
+            >
+              Publish
+            </Button>
           ) : publishEnabled ? (
             <div style={{ position: "relative" }}>
               <PublishDropdown

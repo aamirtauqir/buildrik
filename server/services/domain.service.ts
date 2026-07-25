@@ -1,3 +1,4 @@
+import dns from "node:dns/promises";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import { addDomainToVercelProject, removeDomainFromVercelProject, slugifyProjectName } from "@/lib/vercel";
@@ -7,6 +8,52 @@ import { getActiveVercelConnection } from "@server/services/integrations.service
 // no live verification records yet. Replaces the old dead "sites.buildrik.app"
 // host that nothing ever served.
 const VERCEL_CNAME = "cname.vercel-dns.com";
+
+/**
+ * Re-check a domain's DNS against its expected records (P6 "⟳ Check now",
+ * Figma Domains boards). Resolves A/CNAME live via node:dns, marks each
+ * DnsRecord verified, and flips Domain.status PENDING → VERIFIED when every
+ * record answers (FAILED when none do after a lookup). SSL issuance stays
+ * with the deploy pipeline — status VERIFIED + sslStatus PENDING is the
+ * "issuing certificate" board state.
+ */
+export async function checkDomainDns(domainId: string) {
+  const domain = await prisma.domain.findUnique({
+    where: { id: domainId },
+    include: { dnsRecords: true },
+  });
+  if (!domain) return null;
+
+  let anyVerified = false;
+  let allVerified = domain.dnsRecords.length > 0;
+  for (const rec of domain.dnsRecords) {
+    const fqdn = rec.host === "@" || rec.host === "" ? domain.domain : `${rec.host}.${domain.domain}`;
+    let ok = false;
+    try {
+      if (rec.type.toUpperCase() === "A") {
+        const answers = await dns.resolve4(fqdn);
+        ok = answers.includes(rec.value);
+      } else if (rec.type.toUpperCase() === "CNAME") {
+        const answers = await dns.resolveCname(fqdn);
+        ok = answers.some((a) => a.replace(/\.$/, "") === rec.value.replace(/\.$/, ""));
+      }
+    } catch {
+      ok = false;
+    }
+    anyVerified = anyVerified || ok;
+    allVerified = allVerified && ok;
+    if (ok !== rec.verified) {
+      await prisma.dnsRecord.update({ where: { id: rec.id }, data: { verified: ok } });
+    }
+  }
+
+  const status = allVerified ? "VERIFIED" : anyVerified ? "PENDING" : "FAILED";
+  return prisma.domain.update({
+    where: { id: domainId },
+    data: { status, lastCheckedAt: new Date() },
+    include: { dnsRecords: true },
+  });
+}
 
 export async function listDomains(siteId: string) {
   return prisma.domain.findMany({

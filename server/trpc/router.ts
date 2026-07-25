@@ -25,6 +25,7 @@ import { reviewsRouter } from "./routers/reviews";
 import { handoverRouter } from "./routers/handover";
 import { clientReviewRouter } from "./routers/client-review";
 import { commentsRouter } from "./routers/comments";
+import { webhooksRouter } from "./routers/webhooks";
 import { cmsRouter } from "./routers/cms";
 import { themeRouter } from "./routers/theme";
 import { siteVersionsRouter } from "./routers/site-version";
@@ -59,6 +60,7 @@ export const appRouter = router({
   handover: handoverRouter,
   clientReview: clientReviewRouter,
   comments: commentsRouter,
+  webhooks: webhooksRouter,
   cms: cmsRouter,
   theme: themeRouter,
   siteVersions: siteVersionsRouter,

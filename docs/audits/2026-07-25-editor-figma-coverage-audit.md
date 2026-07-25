@@ -422,3 +422,102 @@ Tests: PreviewOverlay 4 new; portal-aware fixes to stock attribution tests
 packages; verify:ds full green (new legit alias --bd-bg-app). Live-verified on
 :5050: preview overlay open/Done/sandbox, cheat sheet on substrate via '?',
 stock modal on substrate + Esc.
+
+## 13. Phase 6 execution record (2026-07-25, same session)
+
+Scope: everything the Site boards still owed — workspace webhooks (Shape2
+boards 176:456…727), Domains inside the editor (6 board states), role-aware
+chrome per the Permissions boards (59:2 / 396:3777), plus the C1-C3 security
+dispositions.
+
+**Server vertical (dashboard package):**
+- Schema: `WorkspaceWebhook` (one per workspace, `whsec_` secret, url,
+  events[]) + `WebhookDelivery` (status/httpStatus/error, indexed by
+  webhook+createdAt). Migration `20260725181403_workspace_webhooks` applied
+  via `migrate diff` + `migrate deploy` (migrate dev refuses non-interactive).
+- `webhook.service.ts`: connect (upsert, secret survives URL/event edits),
+  disconnect, regenerateSecret, getWebhookStatus (lastDelivery/lastStatus/
+  failures24h/recentFailures[5]), deliverWebhook — HMAC-SHA256 of the raw
+  body in `x-buildrick-signature: sha256=<hmac>`, 10s timeout, best-effort:
+  never propagates into the publish/submit that fired it.
+- `webhooks` router: status/connect/disconnect/regenerateSecret, ALL
+  ADMIN-gated via checkWorkspaceRole (secret is in the status payload).
+- Fire hooks: publish worker (after COMPLETED txn) fires `site.publish`;
+  form-submission service fires `form.submit`.
+- `domain.service.checkDomainDns`: real dns.resolve4/resolveCname per
+  DnsRecord, per-record verified flags, Domain.status
+  VERIFIED/PENDING/FAILED + lastCheckedAt. Exposed as `domains.check`
+  (member-level assertSiteAccess + siteId cross-check).
+- `sites.myRole`: the member's workspace role for a site — feeds the chrome.
+
+**Editor:**
+- `RoleService` (session-cached `sites.myRole`) + `useEditorRole` hook.
+  null role = unknown → never gates (server stays the enforcer).
+- `DomainsScreen` (Settings › DISTRIBUTION, replaces the old workspace
+  deep-link): all 6 board states — none / adding / pending-dns (records
+  list + Copy + "⟳ Check now" + 30s auto-recheck) / failed (48h-propagation
+  copy + "⟳ Check again") / ssl-provisioning ("◷ DNS verified · issuing
+  certificate…") / verified ("✓ Connected — live"). Connect/Remove
+  ADMIN-gated with "Only an admin can change the domain" attached.
+- `WebhooksScreen` (Settings › PLUMBING): connect form (url + event
+  checkboxes) → status card (never-fired / "✓ Delivering — last delivery N
+  ago" / "⚠ N failed deliveries in 24h" + failure log), masked
+  `whsec_••••` secret with Reveal/Copy, Regenerate confirm ("Every existing
+  endpoint stops verifying…"), Disconnect confirm ("workspace connection —
+  every site stops sending"). Non-admins get the admin-only explainer
+  (server 403 "Insufficient permissions" detected).
+- Role chrome (disabled-with-reason, never hidden): Topbar VIEWER →
+  Publish disabled "Viewers can't publish — ask an editor", Send-for-review
+  disabled "Viewers can't send for review — ask an editor"; PublishHistory
+  non-admin → rollback disabled "Ask an admin to roll back"; TemplatesTab
+  non-admin apply → toast "Only an admin can apply a template".
+- AnalyticsScreen: "Saved, but not live yet — analytics settings are
+  written into the site when you publish."
+- Root fix en route: the standalone shell (:5050/?siteId=) never threaded
+  projectId into SettingsTab, leaving EVERY server-side settings screen
+  (Redirects/Forms/Headers/Localization + the new ones) gated behind "open
+  from the dashboard". SettingsTab now falls back to the URL siteId
+  (`currentSiteId()`), same source BuildrikSyncProvider loads from.
+
+**Dispositions:**
+- C1-C3 security gates: VERIFIED ALREADY FIXED in code review —
+  applyToSite is ADMIN-gated, all billing mutations requireOwner, bulk
+  publish/unpublish REMOVED entirely. No work needed.
+- Shape1 boards (176:2…390) = GA Integrations "Test" states, not webhooks.
+  DEFERRED: no verifiable test path exists for a GA tag from the server
+  (would be a fake green light — same class of lie as G1 fake sparklines).
+  Documented here as the disposition of record.
+- `site.publish` webhook fire: verified by code-path parity (identical
+  `void deliverWebhook(...)` call site as the live-verified form.submit;
+  publish loop itself already live-verified in earlier arcs).
+
+**Verification:**
+- tsc clean both packages; verify:ds full green (Gates 12/13/14 IMPROVED
+  below baseline); all touched suites green — settings 26, screens+templates
+  416, Topbar+PublishHistory 92 (incl. 6 new P6 role-gate tests).
+- LIVE walk on :5050 + dashboard (magic-link login, fresh .next after the
+  Turbopack stale-Prisma trap resurfaced — `workspaceWebhook.findUnique`
+  undefined until restart):
+  - Domains: connected a fake domain → PENDING with real Vercel CNAME
+    records → 30s auto-poll ran a real DNS check → FAILED board; patched
+    DNS records to a resolvable A record → "Check now" → ssl-provisioning
+    board; flipped sslStatus ACTIVE → verified board; Remove cleaned up.
+    All 6 board states seen rendered.
+  - Webhooks: connected `http://localhost:4567/hook` via the UI → real
+    form submit through the public forms route → local receiver got the
+    signed POST; HMAC INDEPENDENTLY RECOMPUTED from the DB secret and
+    matched byte-for-byte; delivery row OK/200; UI flipped to
+    "✓ Delivering — last delivery under a minute ago". Pointed at a dead
+    port → "⚠ 1 failed delivery in the last 24h" + "fetch failed" log row.
+    Regenerated secret (UI reveals fresh secret once; DB tail changed).
+    Disconnected (confirm copy verified; DB row GONE; empty state back).
+  - Roles: seeded a real VIEWER member, logged in via their magic link —
+    `sites.myRole` returned VIEWER; Domains "Add domain" rendered DISABLED
+    with the reason attached; Webhooks showed the admin-only explainer;
+    template apply click produced the "Only an admin can apply a template"
+    toast. Topbar publish/send viewer gating is feature-flag-hidden in dev
+    (`VITE_FEATURE_PUBLISH` off) — covered by the 4 new Topbar unit tests
+    instead.
+
+Phase 6 CLOSED. All phases P0-P6 of the convergence plan are now executed,
+tested, and live-verified.

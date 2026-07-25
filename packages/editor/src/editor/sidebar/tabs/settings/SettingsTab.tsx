@@ -35,6 +35,8 @@ import {
   FormsScreen,
   HeadersScreen,
   LocalizationScreen,
+  DomainsScreen,
+  WebhooksScreen,
 } from "./index";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
@@ -43,6 +45,7 @@ import { getEditorPlanTier } from "@/services/BuildrikSyncProvider";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "@/editor/shell/PublishHistory";
 import { EVENTS } from "@/shared/constants/events";
+import { currentSiteId } from "@/services/ReviewService";
 import "./settings.css";
 
 // ─── Nav definition ──────────────────────────────────────────────────────────
@@ -59,8 +62,8 @@ import "./settings.css";
 
 type InTabNavId =
   | "general" | "branding" | "seo"
-  | "analytics" | "localization"
-  | "custom-code" | "redirects" | "headers" | "forms" | "integrations"
+  | "analytics" | "localization" | "domains"
+  | "custom-code" | "redirects" | "headers" | "forms" | "integrations" | "webhooks"
   | "publish-history" | "export";
 
 type NavGroupId = "site" | "distribution" | "plumbing";
@@ -81,6 +84,7 @@ const NAV: NavDef[] = [
   // DISTRIBUTION
   { id: "publish-history", title: "Publish history", subtitle: "Past deploys + rollback", group: "distribution", icon: IntegrationsIcon },
   { id: "export", title: "Export", subtitle: "Download the site as code", group: "distribution", icon: IntegrationsIcon },
+  { id: "domains", title: "Domains", subtitle: "Custom domain + DNS", group: "distribution", icon: IntegrationsIcon },
   { id: "analytics", title: "Analytics", subtitle: "GA4, Plausible, PostHog, Pixel", group: "distribution", icon: IntegrationsIcon },
   { id: "localization", title: "Localization", subtitle: "Locale claim and preview", group: "distribution", icon: IntegrationsIcon },
   // PLUMBING
@@ -89,6 +93,7 @@ const NAV: NavDef[] = [
   { id: "headers", title: "Headers", subtitle: "CSP, HSTS, security policy", group: "plumbing", icon: IntegrationsIcon },
   { id: "forms", title: "Forms", subtitle: "Submissions inbox + config", group: "plumbing", icon: IntegrationsIcon },
   { id: "integrations", title: "Integrations", subtitle: "Third-party OAuth", group: "plumbing", icon: IntegrationsIcon },
+  { id: "webhooks", title: "Webhooks", subtitle: "Workspace event deliveries", group: "plumbing", icon: IntegrationsIcon },
 ];
 
 const GROUP_LABELS: Record<NavGroupId, string> = {
@@ -118,7 +123,6 @@ interface WorkspaceLink {
 }
 
 const WORKSPACE_LINKS: WorkspaceLink[] = [
-  { id: "domains", title: "Domains", path: "domains", scope: "site" },
   { id: "members", title: "Members", path: "/dashboard/settings/team", scope: "workspace" },
   { id: "billing", title: "Billing", path: "/dashboard/settings/billing", scope: "workspace" },
 ];
@@ -241,10 +245,15 @@ export const SettingsTab: React.FC<
   onClose,
   userPlan,
   onReplayTour,
-  projectId,
+  projectId: projectIdProp,
   onDirtyChange,
   onOpenDesignTab,
 }) => {
+  // P6: the standalone shell (:5050/?siteId=) never threads projectId through
+  // AquibraStudio → StudioPanels, which left every server-side screen
+  // (Redirects/Forms/Domains/…) gated behind "open from the dashboard".
+  // The URL param is the same source BuildrikSyncProvider loads from.
+  const projectId = projectIdProp ?? currentSiteId();
   // Effective plan: explicit prop wins; otherwise read the real workspace tier
   // captured at project load. Previously defaulted to "starter" for everyone,
   // permanently locking the Custom-code + Integrations screens.
@@ -677,6 +686,12 @@ export const SettingsTab: React.FC<
         );
       case "forms":
         return <FormsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
+      // P6: Domains graduates from a workspace deep-link to an in-tab screen;
+      // Webhooks is new (workspace endpoint, ADMIN-gated server-side).
+      case "domains":
+        return <DomainsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
+      case "webhooks":
+        return <WebhooksScreen onDirtyChange={handleScreenDirty} />;
       // P5: publish history + export graduate into the full-page settings snav
       // (authoritative IA — "Site full-page = settings + export + publish history").
       case "publish-history":

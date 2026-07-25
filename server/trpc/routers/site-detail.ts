@@ -7,7 +7,7 @@ import { getSiteOverview } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
-import { listDomains, connectDomain, removeDomain, setPrimaryDomain, listWorkspaceDomains } from "@/server/services/domain.service";
+import { checkDomainDns, listDomains, connectDomain, removeDomain, setPrimaryDomain, listWorkspaceDomains } from "@/server/services/domain.service";
 import { resolveWorkspaceId } from "@/server/trpc/workspace-ctx";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
 import { getSiteAnalytics } from "@/server/services/analytics.service";
@@ -206,6 +206,20 @@ export const siteDetailRouter = router({
       const workspaceId = await resolveWorkspaceId(ctx);
       return listWorkspaceDomains(workspaceId);
     }),
+
+    check: protectedProcedure
+      .input(z.object({ id: z.string(), siteId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        const result = await checkDomainDns(input.id);
+        if (!result || result.siteId !== input.siteId) throw new TRPCError({ code: "NOT_FOUND" });
+        return result;
+      }),
 
     connect: protectedProcedure
       .input(connectDomainSchema)

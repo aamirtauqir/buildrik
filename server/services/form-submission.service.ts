@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { deliverWebhook } from "@/server/services/webhook.service";
 import { csvCell } from "@/lib/utils";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { FormSubmissionInput, ListSubmissionsInput } from "@buildrik/shared/schemas/forms";
@@ -71,6 +72,15 @@ export async function submitForm(
     );
     return sendFormSubmissionEmail(owner.user.email, site!.name, fields, siteId);
   }).catch(() => {});
+
+  // P6 workspace webhook — best-effort, never blocks the submission.
+  if (site?.workspaceId) {
+    void deliverWebhook(site.workspaceId, "form.submit", {
+      siteId,
+      submissionId: submission.id,
+      data: input.data ?? {},
+    });
+  }
 
   return submission;
 }

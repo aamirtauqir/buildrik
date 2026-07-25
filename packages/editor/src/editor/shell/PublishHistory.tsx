@@ -15,6 +15,8 @@
 import * as React from "react";
 import { Button, Icon, Badge, Spinner } from "@/editor/shared/vibcoder";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { useEditorRole } from "./hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 import {
   fetchPublishHistory,
   rollbackToVersion,
@@ -52,6 +54,9 @@ const S: Record<string, React.CSSProperties> = {
 };
 
 export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted }) => {
+  // P6 permissions boards: rollback is admin-scoped — non-admins see the
+  // button disabled with "Ask an admin to roll back", never hidden.
+  const canRollback = roleAtLeast(useEditorRole(), "ADMIN") !== false;
   const [state, setState] = React.useState<LoadState>("loading");
   const [rows, setRows] = React.useState<PublishHistoryRow[]>([]);
   const [confirm, setConfirm] = React.useState<PublishHistoryRow | null>(null);
@@ -136,8 +141,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
               <Button
                 variant="secondary"
                 size="sm"
-                disabled={!r.rollbackable}
-                title={r.rollbackable ? undefined : "This version's snapshot is no longer stored"}
+                disabled={!r.rollbackable || !canRollback}
+                title={
+                  !canRollback
+                    ? "Ask an admin to roll back"
+                    : r.rollbackable
+                      ? undefined
+                      : "This version's snapshot is no longer stored"
+                }
                 onClick={() => setConfirm(r)}
               >
                 Roll back

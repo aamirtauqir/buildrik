@@ -1,5 +1,6 @@
 import { type NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
+import { deliverWebhook } from "@/server/services/webhook.service";
 import { prisma } from "@lib/prisma";
 import { slugifyProjectName, type VercelFile } from "@lib/vercel";
 import { MARKETING_URL } from "@lib/constants/contact";
@@ -130,6 +131,13 @@ export async function POST(
         },
       }),
     ]);
+
+    // P6 workspace webhook — best-effort, never blocks the publish result.
+    void deliverWebhook(job.workspaceId, "site.publish", {
+      siteId: job.siteId,
+      jobId,
+      url: publicUrl,
+    });
 
     const completedSite = await prisma.site.findUnique({
       where: { id: job.siteId },

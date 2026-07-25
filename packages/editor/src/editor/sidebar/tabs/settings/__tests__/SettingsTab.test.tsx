@@ -136,18 +136,19 @@ async function makeSectionDirty(siteNameInput: HTMLInputElement) {
 // ─── Group 1 — Root view ─────────────────────────────────────────────────────
 
 describe("SettingsTab v2 — root view", () => {
-  it("renders 10 in-tab sections + WORKSPACE group with 3 deep-links", () => {
+  it("renders 12 in-tab sections + WORKSPACE group with 2 deep-links", () => {
     render(<SettingsTab composer={makeComposer() as never} userPlan="enterprise" />);
     [
       /general/i, /branding/i, /seo/i,
-      /analytics/i, /localization/i,
-      /custom code/i, /redirects/i, /headers/i, /forms/i, /integrations/i,
+      /analytics/i, /localization/i, /domains/i,
+      /custom code/i, /redirects/i, /headers/i, /forms/i, /integrations/i, /webhooks/i,
     ].forEach((re) => {
       expect(screen.getByRole("button", { name: re })).toBeTruthy();
     });
     const links = screen.getAllByRole("link");
     const labels = links.map((a) => a.textContent ?? "");
-    expect(labels.some((l) => /Domains/.test(l))).toBe(true);
+    // P6: Domains graduated from a deep-link to an in-tab screen.
+    expect(labels.some((l) => /Domains/.test(l))).toBe(false);
     expect(labels.some((l) => /Members/.test(l))).toBe(true);
     expect(labels.some((l) => /Billing/.test(l))).toBe(true);
     links.forEach((a) => {

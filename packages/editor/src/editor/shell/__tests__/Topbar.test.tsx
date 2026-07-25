@@ -39,6 +39,15 @@ vi.mock("../../../shared/utils/editorViewMode", () => ({
 vi.mock("../../../services/ReviewService", () => ({
   submitForReview: vi.fn(() => Promise.resolve()),
   fetchReviewStatus: vi.fn(() => Promise.resolve({ state: "none", reviewerName: null, at: null })),
+  // RoleService (P6) resolves the site id through ReviewService — null keeps
+  // the role "unknown" so no chrome gating kicks in during these tests.
+  currentSiteId: vi.fn(() => null),
+}));
+
+// P6 role gating — controllable per test; null = unknown (no gating).
+const roleState = vi.hoisted(() => ({ role: null as string | null }));
+vi.mock("../hooks/useEditorRole", () => ({
+  useEditorRole: () => roleState.role,
 }));
 
 vi.mock("../../../services/NotificationService", () => ({
@@ -113,6 +122,7 @@ describe("Topbar", () => {
   afterEach(() => {
     cleanup();
     vi.clearAllMocks();
+    roleState.role = null;
   });
 
   // ── zones ──────────────────────────────────────────────────────────────────
@@ -454,6 +464,43 @@ describe("Topbar", () => {
       fireEvent.click(screen.getByText("Design system"));
       expect(onOpenDesignSystem).toHaveBeenCalledTimes(1);
       expect(screen.queryByText("Design system")).not.toBeInTheDocument();
+    });
+  });
+
+  // ── P6 permissions boards: VIEWER sees Publish / Send-for-review DISABLED
+  //    with the reason attached — never hidden. Unknown role = no gating.
+  describe("P6 viewer gating", () => {
+    it("VIEWER + publish flag on: disabled Publish button with reason, no dropdown", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      roleState.role = "VIEWER";
+      render(<Topbar {...makeProps()} />);
+      expect(screen.queryByTestId("publish-dropdown")).not.toBeInTheDocument();
+      const publish = screen.getByRole("button", { name: "Publish" });
+      expect(publish).toBeDisabled();
+      expect(publish).toHaveAttribute("title", "Viewers can't publish — ask an editor");
+    });
+
+    it("unknown role + publish flag on: the real PublishDropdown renders", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      roleState.role = null;
+      render(<Topbar {...makeProps()} />);
+      expect(screen.getByTestId("publish-dropdown")).toBeInTheDocument();
+    });
+
+    it("VIEWER in client view: Send for review disabled with reason", () => {
+      setViewMode({ clientView: true });
+      roleState.role = "VIEWER";
+      render(<Topbar {...makeProps()} />);
+      const send = screen.getByRole("button", { name: "Send for review" });
+      expect(send).toBeDisabled();
+      expect(send).toHaveAttribute("title", "Viewers can't send for review — ask an editor");
+    });
+
+    it("EDITOR keeps publish enabled (only VIEWER is read-only)", () => {
+      vi.mocked(isFeatureEnabled).mockReturnValue(true);
+      roleState.role = "EDITOR";
+      render(<Topbar {...makeProps()} />);
+      expect(screen.getByTestId("publish-dropdown")).toBeInTheDocument();
     });
   });
 });

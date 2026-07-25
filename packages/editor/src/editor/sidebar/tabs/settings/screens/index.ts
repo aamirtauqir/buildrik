@@ -17,3 +17,5 @@ export { RedirectsScreen } from "./RedirectsScreen";
 export { FormsScreen } from "./FormsScreen";
 export { HeadersScreen } from "./HeadersScreen";
 export { LocalizationScreen } from "./LocalizationScreen";
+export { DomainsScreen } from "./DomainsScreen";
+export { WebhooksScreen } from "./WebhooksScreen";

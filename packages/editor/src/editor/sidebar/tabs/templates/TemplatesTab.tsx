@@ -16,6 +16,8 @@ import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_P
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, ProModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
 import { TemplatePreviewModal } from "./TemplatePreviewModal";
+import { useEditorRole } from "@/editor/shell/hooks/useEditorRole";
+import { roleAtLeast } from "@/services/RoleService";
 import { useTemplatePersistence } from "./hooks/useTemplatePersistence";
 import { useTemplateApply } from "./hooks/useTemplateApply";
 import { useTemplateSelection } from "./hooks/useTemplateSelection";
@@ -153,8 +155,18 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   // Track whether apply is "add as new page" mode
   const addAsNewPageRef = React.useRef(false);
 
+  // P6 permissions boards: applying a template rewrites the whole page —
+  // admin-scoped. Non-admins get the reason, not a silent no-op.
+  const canApplyTemplate = roleAtLeast(useEditorRole(), "ADMIN") !== false;
+  function denyApply(): boolean {
+    if (canApplyTemplate) return false;
+    addToast({ description: "Only an admin can apply a template", tone: "warning" });
+    return true;
+  }
+
   // ── Handlers ──
   function handleApplyToCurrent(id: string) {
+    if (denyApply()) return;
     const t = SITE_TEMPLATES.find((x) => x.id === id);
     if (!t) return;
     if (t.status === "premium") { sel.setShowUpgrade(true); return; }
@@ -165,6 +177,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   }
 
   function handleAddAsNewPage(id: string) {
+    if (denyApply()) return;
     const t = SITE_TEMPLATES.find((x) => x.id === id);
     if (!t) return;
     if (t.status === "premium") { sel.setShowUpgrade(true); return; }

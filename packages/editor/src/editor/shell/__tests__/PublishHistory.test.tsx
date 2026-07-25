@@ -17,6 +17,12 @@ vi.mock("../../../services/PublishService", () => ({
   rollbackToVersion: (...a: unknown[]) => rollbackToVersion(...a),
 }));
 
+// P6 role gating — controllable; null = unknown (rollback stays enabled).
+const roleState = vi.hoisted(() => ({ role: null as string | null }));
+vi.mock("../hooks/useEditorRole", () => ({
+  useEditorRole: () => roleState.role,
+}));
+
 import { PublishHistory } from "../PublishHistory";
 
 const ROWS = [
@@ -37,7 +43,34 @@ beforeEach(() => {
   fetchPublishHistory.mockReset().mockResolvedValue(ROWS);
   rollbackToVersion.mockReset().mockResolvedValue(undefined);
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  roleState.role = null;
+});
+
+// P6 permissions boards: rollback is admin-scoped — non-admins see the button
+// disabled with "Ask an admin to roll back", never hidden.
+describe("P6 rollback role gating", () => {
+  it("EDITOR sees rollback disabled with the ask-an-admin reason", async () => {
+    roleState.role = "EDITOR";
+    renderIt();
+    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    const buttons = screen.getAllByRole("button", { name: /roll back/i });
+    buttons.forEach((b) => {
+      expect(b).toBeDisabled();
+      expect(b).toHaveAttribute("title", "Ask an admin to roll back");
+    });
+  });
+
+  it("ADMIN keeps rollback enabled on rollbackable versions", async () => {
+    roleState.role = "ADMIN";
+    renderIt();
+    expect(await screen.findByText(/Version 3/i)).toBeInTheDocument();
+    const rows = screen.getAllByRole("button", { name: /roll back/i });
+    // v2 is rollbackable (enabled); v1's snapshot is gone (still disabled).
+    expect(rows.some((b) => !(b as HTMLButtonElement).disabled)).toBe(true);
+  });
+});
 
 describe("load states", () => {
   it("lists versions with a live badge on the latest and a ↩ marker on a rollback", async () => {

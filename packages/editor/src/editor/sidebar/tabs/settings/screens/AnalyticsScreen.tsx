@@ -87,6 +87,12 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
 
   return (
     <Screen>
+      {/* P6 board: analytics IDs only reach visitors at publish time. */}
+      <div className="bd-set-section">
+        <div className="bd-set-section-d">
+          Saved, but not live yet — analytics settings are written into the site when you publish.
+        </div>
+      </div>
       <Section title="Google Analytics">
         <p style={privacyNoteStyles}>
           Track visitor behavior on your published site. When enabled, Google&apos;s analytics

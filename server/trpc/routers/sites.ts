@@ -201,6 +201,25 @@ export const sitesRouter = router({
       return bulkAction(workspaceId, input);
     }),
 
+  // P6 editor role plumbing — the chrome shows disabled-with-reason controls
+  // per the Permissions boards (59:2 / 396:3777), so it needs the member's
+  // effective role for this site's workspace.
+  myRole: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const site = await ctx.prisma.site.findUnique({
+        where: { id: input.siteId },
+        select: { workspaceId: true },
+      });
+      if (!site) throw new TRPCError({ code: "NOT_FOUND" });
+      const member = await ctx.prisma.workspaceMember.findFirst({
+        where: { userId: ctx.session.user.id, workspaceId: site.workspaceId, status: "ACTIVE" },
+        select: { role: true },
+      });
+      if (!member) throw new TRPCError({ code: "FORBIDDEN", message: "Not a member of this workspace" });
+      return { role: member.role };
+    }),
+
   checkSlug: protectedProcedure
     .input(checkSlugSchema)
     .query(async ({ input }) => ({
