@@ -444,6 +444,19 @@ a better regex; it is to grep for the loosest form and read the misses.
 | 🏠 Dashboard — spine | 14 | 14 | 0 | 0 | 0 |
 | 🧩 Components · 📕 Foundations · 🗃️ Archive | 38 | — | library / archive | — | — |
 
+**P15 · Canvas toolbar reconciled — 2026-07-26.** The floating canvas toolbar (history · device · overlays · zoom · shortcuts) shipped in code but appeared on no shell board, which is why the editor and the design read as a mismatch. Now drawn as built on the assembled board and on all 11 editing shell states; Preview and Loading are skipped on purpose (preview hides the chrome, loading has no canvas to act on).
+
+Drawing it exposed two code bugs, both fixed (`101993d6`):
+
+| Found | Effect | Fix |
+|---|---|---|
+| `--buildrick-surface-2/-3` referenced 36× across 14+ files, defined nowhere | every active/selected fill rendered transparent — "selected" looked identical to "not selected", and this floating bar had no fill at all | scale defined in `color.css`; the bare `--buildrick-surface` stays retired per Gate 8 |
+| bar was `nowrap` with no max-width or overflow rule | at 1440 with the inspector open the row kept its intrinsic ~1076px and ran 276px UNDER the inspector, where the controls could not be clicked | `maxWidth:100%` + `minWidth:0` + `overflowX:auto` — it scrolls inside the column |
+
+The board shows the row CLIPPED on purpose: it needs ~947px and the canvas column is 760 once the inspector opens. That is the honest state, not a drawing error.
+
+Housekeeping in the same pass: 12 stub captions on the Dashboard page (each just repeating the board name, stacked on the caption that documents the route) removed, 7 over-wide Editor captions narrowed to their board pitch, and 6 boards added earlier in the week repositioned out of their neighbours. Every flow page now reports **0 collisions, 0 unreachable, 0 dead ends** across 517 edges.
+
 **One constraint worth stating, because no amount of wiring fixes it:** Figma prototype links cannot cross pages — `NAVIGATE` destinations must be a top-level frame on the same page. So Editor → Site settings and Editor → Client review are documented in captions, not clickable. A demoable end-to-end path needs a dedicated flow page holding instances of the spine screens.
 
 ---
@@ -470,7 +483,8 @@ a better regex; it is to grep for the loosest form and read the misses.
 | P12 Device frames + control states | 2 | 2 |
 | P13 J5 states + Domains + Forms rebuild | 42 | 42 |
 | P14 Post-freeze reconciliation (2026-07-25) | 30 | 30 |
-| **Total** | **339** | **339** |
+| P15 Canvas toolbar + file hygiene (2026-07-26) | 4 | 4 |
+| **Total** | **343** | **343** |
 
 ---
 
