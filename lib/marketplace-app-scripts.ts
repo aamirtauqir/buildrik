@@ -23,7 +23,9 @@ function generateHubspot(config: { portalId: string }): string {
   return `<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/${config.portalId}.js"></script>`;
 }
 
-/** LinkedIn Insight Tag — partner id snippet + <noscript> pixel. */
+/** LinkedIn Insight Tag. Head-only: the JS loader is the real tracker. The
+ *  vendor's <noscript> pixel is omitted — <noscript><img> is invalid inside
+ *  <head> (where this injects) and the no-JS fallback carries negligible value. */
 function generateLinkedInInsight(config: { partnerId: string }): string {
   const id = config.partnerId;
   return `<script type="text/javascript">
@@ -31,8 +33,7 @@ _linkedin_partner_id = "${id}";
 window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
 window._linkedin_data_partner_ids.push(_linkedin_partner_id);
 (function(l){if(!l){window.lintrk=function(a,b){window.lintrk.q.push([a,b])};window.lintrk.q=[]}var s=document.getElementsByTagName("script")[0];var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src="https://snap.licdn.com/li.lms-analytics/insight.min.js";s.parentNode.insertBefore(b,s);})(window.lintrk);
-</script>
-<noscript><img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=${id}&fmt=gif" /></noscript>`;
+</script>`;
 }
 
 /** TikTok Pixel loader (ttq) with PageView. */
@@ -45,15 +46,16 @@ ttq.page();
 </script>`;
 }
 
-/** Pinterest Tag (pintrk) with PageVisit + <noscript> fallback. */
+/** Pinterest Tag (pintrk) with PageVisit. Head-only: the vendor <noscript>
+ *  pixel is omitted for the same reason as LinkedIn — invalid in <head>, and the
+ *  pintrk JS loader is the real tracker. */
 function generatePinterestTag(config: { tagId: string }): string {
   const id = config.tagId;
   return `<script>
 !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";var t=document.createElement("script");t.async=!0,t.src=e;var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
 pintrk("load","${id}");
 pintrk("page");
-</script>
-<noscript><img height="1" width="1" style="display:none;" alt="" src="https://ct.pinterest.com/v3/?event=init&tid=${id}&noscript=1" /></noscript>`;
+</script>`;
 }
 
 /** Search-engine ownership verification meta tags (one per configured engine). */

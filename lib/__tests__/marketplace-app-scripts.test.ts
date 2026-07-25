@@ -29,11 +29,11 @@ describe("generateWorkspaceAppScripts — other head-inject apps", () => {
     expect(out).toContain('id="hs-script-loader"');
   });
 
-  it("LinkedIn: emits partner id + snap.licdn loader + noscript pixel", () => {
+  it("LinkedIn: emits partner id + snap.licdn loader, head-only (no noscript)", () => {
     const out = generateWorkspaceAppScripts([{ appId: "linkedin-insight", config: { partnerId: "987654" } }]);
     expect(out).toContain('_linkedin_partner_id = "987654"');
     expect(out).toContain("snap.licdn.com/li.lms-analytics/insight.min.js");
-    expect(out).toContain("px.ads.linkedin.com/collect/?pid=987654");
+    expect(out).not.toContain("<noscript>"); // invalid in <head>; omitted
   });
 
   it("TikTok: emits ttq loader with the pixel id + page()", () => {
@@ -42,10 +42,11 @@ describe("generateWorkspaceAppScripts — other head-inject apps", () => {
     expect(out).toContain("analytics.tiktok.com/i18n/pixel/events.js");
   });
 
-  it("Pinterest: emits pintrk load + noscript fallback", () => {
+  it("Pinterest: emits pintrk load, head-only (no noscript)", () => {
     const out = generateWorkspaceAppScripts([{ appId: "pinterest-tag", config: { tagId: "2612345678901" } }]);
     expect(out).toContain('pintrk("load","2612345678901")');
-    expect(out).toContain("ct.pinterest.com/v3/?event=init&tid=2612345678901");
+    expect(out).toContain("s.pinimg.com/ct/core.js");
+    expect(out).not.toContain("<noscript>"); // invalid in <head>; omitted
   });
 
   it("Site verification: one meta per configured engine; skips blanks", () => {
