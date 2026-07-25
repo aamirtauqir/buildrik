@@ -6,6 +6,28 @@ Severity: **Critical** = security, data loss, money, or a hard dead end a real u
 
 ---
 
+## RESOLUTION — 2026-07-25 (fixed + deployed BUILD `rA1jJR6QsjJvGlQIVryy0`)
+
+All actionable findings fixed, typechecked (0 errors), tested (95 passing across 9 touched suites), and deployed to prod. Commits `3f1e0b22` (security) → `1185c685` (minors).
+
+**Critical — all fixed** (except CR5, founder-gated):
+- CR1/CR1b ✅ per-site scoping now enforced in `permission.service` (+6 regression tests); empty "specific sites" rejected.
+- CR2 ✅ unpublish deletes the Vercel deployment (`deleteVercelDeployment`, best-effort).
+- CR3 ✅ AI daily-prompt quota surfaced alongside monthly generations.
+- CR4 ✅ today's analytics folded from live events; tab shows any populated dataset.
+- CR5 ⛔ Stripe live checkout — **founder-gated** (needs live Products/prices + secrets), not code.
+- CR6 ✅ team read queries ADMIN-gated; non-admins get a clean denied state.
+
+**Major — all fixed** (except two, noted):
+- MJ2 ✅ Plans CTAs wired · MJ3 ✅ chart retitled · MJ4 ✅ usage shows real quota drivers · MJ5 ✅ dunning "Update payment method" · MJ6 ✅ grandfathered portal message · MJ7 ✅ reactivate · MJ8 ✅ self-strand guards · MJ10 ✅ login returnUrl · MJ11 ✅ favicon upload guard · MJ12 ✅ redirect edit · MJ13 ✅ domain error messages · MJ14 ✅ (folded into CR4) · MJ15 ✅ real checklist completion · MJ16 ✅ api-tokens error state.
+- MJ1 ⛔ "$79/yr" was **bad Northwind demo-seed data**, not a product bug (Stripe stores a yearly price's `unit_amount` as the annual total → real yearly plans render correctly).
+- MJ9 ⏭️ edit a member's per-site access after invite — a **missing feature**, not a bug; deferred.
+
+**Minor — real code ones fixed:** primary-domain-must-be-VERIFIED guard, removed the dead/hazardous `billing.switchInterval`, team "seats" now shows members / plan capacity.
+**Minor — deferred (not code bugs):** Learn placeholder videos (content), bandwidth/build/avgSession/country (unmetered infra), `LimitReached`/`switchInterval` dead-code (removed the latter), marketplace install non-admin hide + no-op (server-enforced / disclosed), SEO preview host, DESIGNER type casts, FREE `currentPeriodEnd` placeholder, LAST_ADMIN dead guard.
+
+---
+
 ## CRITICAL
 
 ### CR1 — "Invite to specific sites" is not enforced; every member can reach every site  · SECURITY
