@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { trpc } from "@lib/trpc/client";
 import { useUnsavedChanges } from "@lib/hooks/use-unsaved-changes";
 import { Button, SectionCard } from "@/components/dashboard/primitives";
+import { useToast } from "@/components/dashboard/toast-provider";
 
 const SOCIAL_PLATFORMS = ["twitter", "instagram", "linkedin", "youtube", "github"] as const;
 type SocialPlatform = (typeof SOCIAL_PLATFORMS)[number];
@@ -53,6 +54,8 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
   const [password, setPassword] = useState("");
   const [faviconPreview, setFaviconPreview] = useState<string | null>(site.favicon);
   const [touchIconPreview, setTouchIconPreview] = useState<string | null>(site.touchIcon);
+  const [uploading, setUploading] = useState(false);
+  const { addToast } = useToast();
   const faviconInputRef = useRef<HTMLInputElement>(null);
   const touchIconInputRef = useRef<HTMLInputElement>(null);
 
@@ -92,22 +95,45 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
     onComplete(confirmed.cdnUrl);
   }
 
-  function handleFaviconChange(e: React.ChangeEvent<HTMLInputElement>) {
+  // Show a local FileReader preview while the real upload runs, but on failure
+  // REVERT to the last saved value — otherwise the base64 data URL stuck around
+  // and Save persisted a giant data: URI into the site's favicon (and the
+  // published <link rel=icon>). `uploading` also gates Save so a click can't
+  // persist the transient preview mid-upload.
+  async function handleFaviconChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const previous = faviconPreview;
     const reader = new FileReader();
     reader.onload = () => setFaviconPreview(reader.result as string);
     reader.readAsDataURL(file);
-    handleFileUpload(file, "favicon", (url) => setFaviconPreview(url));
+    setUploading(true);
+    try {
+      await handleFileUpload(file, "favicon", (url) => setFaviconPreview(url));
+    } catch (err) {
+      setFaviconPreview(previous);
+      addToast("error", "Couldn't upload favicon", err instanceof Error ? err.message : "Please try again.");
+    } finally {
+      setUploading(false);
+    }
   }
 
-  function handleTouchIconChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleTouchIconChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const previous = touchIconPreview;
     const reader = new FileReader();
     reader.onload = () => setTouchIconPreview(reader.result as string);
     reader.readAsDataURL(file);
-    handleFileUpload(file, "touch_icon", (url) => setTouchIconPreview(url));
+    setUploading(true);
+    try {
+      await handleFileUpload(file, "touch_icon", (url) => setTouchIconPreview(url));
+    } catch (err) {
+      setTouchIconPreview(previous);
+      addToast("error", "Couldn't upload touch icon", err instanceof Error ? err.message : "Please try again.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   function updateSocialLink(platform: string, value: string) {
@@ -143,10 +169,11 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
       headCode,
       bodyCode,
       socialLinks: filteredSocial,
-      touchIcon: touchIconPreview,
-      // favicon upload previously had no persistence target (no column) —
-      // it now rides the save like touchIcon.
-      favicon: faviconPreview,
+      // Never persist a transient FileReader data: URL (a failed/in-flight
+      // upload) — fall back to the last saved value so a giant base64 blob can't
+      // land in the column and the published <link rel=icon>.
+      touchIcon: touchIconPreview?.startsWith("data:") ? site.touchIcon : touchIconPreview,
+      favicon: faviconPreview?.startsWith("data:") ? site.favicon : faviconPreview,
     };
     if (!passwordEnabled) {
       if (site.hasPublishedPassword) data.publishedPassword = null; // explicit removal
@@ -332,7 +359,7 @@ export function SettingsTab({ site, onSave }: SettingsTabProps) {
         </div>
       </SectionCard>
 
-      <Button onClick={handleSave}>
+      <Button onClick={handleSave} disabled={uploading}>
         Save Changes
       </Button>
     </div>

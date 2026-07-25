@@ -231,6 +231,10 @@ export const siteDetailRouter = router({
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "DOMAIN_IN_USE")
             throw new TRPCError({ code: "CONFLICT", message: "Domain already in use." });
+          if (e instanceof Error && e.message === "DOMAIN_LIMIT")
+            throw new TRPCError({ code: "FORBIDDEN", message: "You've reached your plan's custom-domain limit. Upgrade to add more." });
+          if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+            throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
           throw e;
         }
       }),

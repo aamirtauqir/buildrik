@@ -22,6 +22,10 @@ export default function SiteRedirectsPage() {
     onSuccess: () => { listQuery.refetch(); addToast("success", "Redirect added"); },
     onError: (err) => addToast("error", "Failed", err.message),
   });
+  const updateMutation = trpc.siteDetail.redirects.update.useMutation({
+    onSuccess: () => { listQuery.refetch(); addToast("success", "Redirect updated"); },
+    onError: (err) => addToast("error", "Couldn't update redirect", err.message),
+  });
   const deleteMutation = trpc.siteDetail.redirects.delete.useMutation({
     onSuccess: () => { listQuery.refetch(); addToast("success", "Redirect removed"); },
     onError: (err) => addToast("error", "Couldn't remove redirect", err.message),
@@ -62,6 +66,7 @@ export default function SiteRedirectsPage() {
       limit={limit}
       canEdit
       onCreate={(data) => createMutation.mutate({ siteId, ...data })}
+      onUpdate={(id, data) => updateMutation.mutate({ id, ...data })}
       onDelete={(id) => deleteMutation.mutate({ id })}
       onImport={(csv) => importMutation.mutate({ siteId, csv })}
       onExport={handleExport}

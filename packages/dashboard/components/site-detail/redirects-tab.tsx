@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Plus, Trash2, Download, Upload } from "lucide-react";
+import { ArrowRight, Plus, Trash2, Download, Upload, Pencil } from "lucide-react";
 import { Button, StatCard, MetricValue, DataTable, Pill, type Column } from "@/components/dashboard/primitives";
 
 export interface RedirectRow {
@@ -17,25 +17,45 @@ interface RedirectsTabProps {
   limit: number; // -1 = unlimited
   canEdit: boolean;
   onCreate: (data: { fromPath: string; toUrl: string; type: "301" | "302" }) => void;
+  onUpdate?: (id: string, data: { fromPath: string; toUrl: string; type: "301" | "302" }) => void;
   onDelete: (id: string) => void;
   onImport: (csv: string) => void;
   onExport: () => void;
   saving?: boolean;
 }
 
-export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, onImport, onExport, saving }: RedirectsTabProps) {
+export function RedirectsTab({ redirects, limit, canEdit, onCreate, onUpdate, onDelete, onImport, onExport, saving }: RedirectsTabProps) {
   const [fromPath, setFromPath] = useState("");
   const [toUrl, setToUrl] = useState("");
   const [type, setType] = useState<"301" | "302">("301");
+  // Editing an existing redirect reuses this same form (was Add/Delete only — a
+  // typo meant delete-and-re-add). null = adding a new one.
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const atLimit = limit !== -1 && redirects.length >= limit;
+
+  const startEdit = (r: RedirectRow) => {
+    setEditingId(r.id);
+    setFromPath(r.fromPath);
+    setToUrl(r.toUrl);
+    setType(r.type === "302" ? "302" : "301");
+  };
+  const resetForm = () => {
+    setEditingId(null);
+    setFromPath("");
+    setToUrl("");
+    setType("301");
+  };
 
   const submit = () => {
     if (!fromPath.trim() || !toUrl.trim()) return;
     const from = fromPath.trim().startsWith("/") ? fromPath.trim() : `/${fromPath.trim()}`;
-    onCreate({ fromPath: from, toUrl: toUrl.trim(), type });
-    setFromPath("");
-    setToUrl("");
+    if (editingId) {
+      onUpdate?.(editingId, { fromPath: from, toUrl: toUrl.trim(), type });
+    } else {
+      onCreate({ fromPath: from, toUrl: toUrl.trim(), type });
+    }
+    resetForm();
   };
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,9 +85,16 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
       align: "right",
       render: (r) =>
         canEdit ? (
-          <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-red-600">
-            <Trash2 size={13} /> Delete
-          </button>
+          <div className="inline-flex items-center gap-3">
+            {onUpdate && (
+              <button type="button" onClick={() => startEdit(r)} className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-[var(--color-primary)]">
+                <Pencil size={13} /> Edit
+              </button>
+            )}
+            <button type="button" onClick={() => onDelete(r.id)} className="inline-flex items-center gap-1 text-body-sm text-neutral-500 hover:text-red-600">
+              <Trash2 size={13} /> Delete
+            </button>
+          </div>
         ) : null,
     },
   ];
@@ -101,10 +128,10 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
         <StatCard label="Permanent (301)" value={<MetricValue>{redirects.filter((r) => r.type === "301").length}</MetricValue>} />
       </div>
 
-      {/* Add row */}
-      {canEdit && (
+      {/* Add / edit row — shown at limit too when editing (edit doesn't add). */}
+      {canEdit && (!atLimit || editingId) && (
         <div className="rounded-xl border p-4" style={{ borderColor: "var(--color-border-default)" }}>
-          {atLimit ? (
+          {atLimit && !editingId ? (
             <p className="text-body text-amber-700">
               You&apos;ve hit your plan&apos;s redirect limit. <a href="/dashboard/settings/billing" className="font-medium underline">Upgrade</a> to add more.
             </p>
@@ -124,8 +151,13 @@ export function RedirectsTab({ redirects, limit, canEdit, onCreate, onDelete, on
                 <option value="302">302</option>
               </select>
               <Button type="button" size="sm" onClick={submit} disabled={saving || !fromPath.trim() || !toUrl.trim()} className="gap-1">
-                <Plus size={14} /> Add
+                {editingId ? <><Pencil size={14} /> Update</> : <><Plus size={14} /> Add</>}
               </Button>
+              {editingId && (
+                <Button type="button" size="sm" variant="ghost" onClick={resetForm}>
+                  Cancel
+                </Button>
+              )}
             </div>
           )}
         </div>
