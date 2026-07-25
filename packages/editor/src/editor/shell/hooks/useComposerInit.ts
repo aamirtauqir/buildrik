@@ -45,7 +45,6 @@ export interface UseComposerInitParams {
   setCanRedo: (can: boolean) => void;
   setDevice: (d: DeviceType) => void;
   setZoom: (z: number) => void;
-  setShowTemplates: React.Dispatch<React.SetStateAction<boolean>>;
   setShowExporter: React.Dispatch<React.SetStateAction<boolean>>;
   setShowComponentView: React.Dispatch<React.SetStateAction<boolean>>;
   setIsDirty: (dirty: boolean) => void;
@@ -76,7 +75,6 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     setCanRedo,
     setDevice,
     setZoom,
-    setShowTemplates,
     setShowExporter,
     setShowComponentView,
     setIsDirty,
@@ -306,7 +304,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       // History state is managed in the dedicated undo/redo useEffect
     };
 
-    const toggleTemplatesHandler = () => setShowTemplates((v) => !v);
+    // Templates is one surface now — the TemplatesTab drawer. The ⌘⇧T command
+    // emits ui:toggle:templates; translate it to opening the "templates" tab
+    // (StudioPanels listens for ui:switch-tab) instead of the retired modal.
+    const toggleTemplatesHandler = () => instance.emit("ui:switch-tab", { tab: "templates" });
     const toggleExporterHandler = () => setShowExporter((v) => !v);
     // AI is one surface now — the AITab rail panel. The ⌘K "AI" command emits
     // ui:toggle:ai; translate it to opening the "ai" tab (StudioPanels listens

@@ -158,7 +158,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     setCanRedo: state.setCanRedo,
     setDevice: state.setDevice,
     setZoom: state.setZoom,
-    setShowTemplates: modals.setShowTemplates,
     setShowExporter: modals.setShowExporter,
     setShowComponentView: state.setShowComponentView,
     setIsDirty: state.setIsDirty,
@@ -218,7 +217,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const handlers = useStudioHandlers({
     composer,
     addToast,
-    closeTemplates: modals.closeTemplates,
   });
 
   // Enable descriptive history toasts
@@ -331,7 +329,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           issues={state.issues}
           onSetPreviewLoading={modals.setPreviewLoading}
           onSetExportLoading={modals.setExportLoading}
-          onShowTemplates={modals.openTemplates}
           // ✨ Ask AI → the AITab rail panel (single consolidated AI surface).
           // Emitting ui:switch-tab opens the "ai" tab; AITab reads the live
           // canvas selection itself, so no element context needs threading.
@@ -415,7 +412,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onOpenIconPicker={modals.openIconPicker}
         onOpenImageEditor={modals.openImageEditor}
         onOpenCreateCollection={modals.openCMSCollectionSetup}
-        onOpenTemplates={modals.openTemplates}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
         publishJob={publishJob}
@@ -451,9 +447,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       <StudioModals
         composer={composer}
-        showTemplates={modals.showTemplates}
-        onCloseTemplates={modals.closeTemplates}
-        onSelectTemplate={handlers.handleSelectTemplate}
         showSaveTemplate={modals.showSaveTemplate}
         onCloseSaveTemplate={modals.closeSaveTemplate}
         onSaveTemplate={handlers.handleSaveTemplate}

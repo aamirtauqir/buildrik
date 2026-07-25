@@ -7,7 +7,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import { MyTemplates } from "../MyTemplates";
 import { SaveTemplate } from "../SaveTemplate";
-import type { Template } from "../TemplateLibrary";
+import type { Template } from "../types";
 
 afterEach(() => {
   cleanup();

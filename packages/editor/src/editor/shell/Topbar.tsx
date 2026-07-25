@@ -143,7 +143,6 @@ export interface TopbarProps {
   onOpenHistory?: () => void;
   /** ✨ Ask AI — opens the AITab rail panel (shown only in the E3 escape-hatch rail). */
   onOpenAI?: () => void;
-  onShowTemplates?: () => void;
   onAddPage?: () => void;
   onExportHTML?: () => void;
 }

@@ -279,3 +279,22 @@ Before touching any code-ahead surface, draw its boards in Figma (Editor page, m
 | B6 | Figma `color/warning` variable (VariableID:2:22, Primitives/Default) set to **#B45309**; swatch hex label 67:93 updated. Read-back verified via variable defs. Conformance test updated: warning moved from A11Y_KEEPS (now empty, removed) into FIGMA_COLOR. | get_variable_defs shows #b45309; conformance 72 green |
 
 Gates: `pnpm verify:ds` green (green-panel allowlist pruned of deleted file) · `npx tsc --noEmit` clean · targeted suites 396 green + conformance 72 green. Full-suite run recorded below.
+
+---
+
+## 8. Phase 1 execution record (2026-07-25, same session)
+
+Target: board `S1 · Editor — ASSEMBLED` 52:2 (rail frame 52:6 fetched from node metadata: 6 items, ONE group, 48px pitch, 44×44 icon+label items, rail 60).
+
+| Change | Detail | Proof |
+|---|---|---|
+| Rail contract | `RAIL_FIGMA` → single group `add · layers · pages · assets · content · design` (was stale 5-item Add/Assets/Components + Layers/Pages from the incomplete-fetch era). | tabsConfig.figma.test.ts rewritten: order, labels, one-group, partition, off-rail-shortcut contract — green |
+| Rail visuals | `.ls-btn--labeled` 44×44 icon+label (token `--buildrick-size-rail-item`), `.ls-rail` 48px hardcode → `var(--buildrick-size-rail)` (60px — was drifting from the shipped token). | Live: computed `.ls-rail` width 60px; screenshot rail-final.png matches board |
+| Design→Brand | tabsConfig label + aria, DesignSystemTab headerTitle. | Live: panel header "Brand"; ⌘K "Open Brand panel" |
+| Components off-rail | Reachable via ⇧A + ⌘K (nav commands derive from config). | Live: ⇧A opens Components panel |
+| Templates dedupe (B1 partial) | **TemplateLibrary modal + SectionTemplates quick-inserts DELETED** (2 of the 3 duplicate surfaces from three-way audit §2) with full prop-chain drain: StudioModals, useContentModals/useStudioModals, useComposerInit (⌘⇧T now opens the drawer via ui:switch-tab), AquibraStudio, StudioHeader, Topbar, StudioPanels, useStudioHandlers (handleSelectTemplate + dead templateActions.ts deleted). `Template` type moved to `src/templates/types.ts`. TemplatesTab drawer KEPT as the one browse surface until the S1.3 3-way new-page modal lands (Phase 2+); "From template" page-add entry already routes into it (TabRouter onSwitchToTemplates). | tsc clean; shell/templates suites green; live: T opens drawer |
+| Gate ratchet | Chrome-axioms baselines lowered 174→173, 272→267, 337→333 (locking this phase's literal drains). | verify:ds full green |
+
+Live verification (headless browse, localhost:5050): rail order/labels exact vs board; all six panels open; Brand panel content intact; T / ⇧A / ⌘K off-rail entries verified; empty-canvas + inspector-empty "Browse Templates" CTAs still functional (route to drawer).
+
+Deferred within P1 (documented, deliberate): e3/legacy rail modes kept (escape hatches, `?rail=`); full drawer retirement + S1.3 3-way modal = Phase 2; Components fold into Brand·components sub-view = later phase per board 153:29.

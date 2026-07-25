@@ -76,7 +76,6 @@ export interface StudioPanelsProps {
     onSelect: (icon: IconConfig) => void
   ) => void;
   onOpenCreateCollection?: () => void;
-  onOpenTemplates?: () => void;
   onOpenImageEditor?: (
     imageSrc: string,
     onSave: (editedSrc: string) => void | Promise<void>,

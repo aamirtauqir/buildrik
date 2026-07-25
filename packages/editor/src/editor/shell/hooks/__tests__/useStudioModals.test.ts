@@ -16,7 +16,6 @@ describe("useStudioModals", () => {
   it("starts with every modal closed and no contexts", () => {
     const { result } = renderHook(() => useStudioModals());
     const m = result.current;
-    expect(m.showTemplates).toBe(false);
     expect(m.showSaveTemplate).toBe(false);
     expect(m.showExporter).toBe(false);
     expect(m.showShortcuts).toBe(false);
@@ -42,7 +41,6 @@ describe("useStudioModals", () => {
 
   // Simple boolean modals -------------------------------------------------------
   it.each([
-    ["templates", "openTemplates", "closeTemplates", "showTemplates"],
     ["saveTemplate", "openSaveTemplate", "closeSaveTemplate", "showSaveTemplate"],
     ["exporter", "openExporter", "closeExporter", "showExporter"],
     ["projectSettings", "openProjectSettings", "closeProjectSettings", "showProjectSettings"],
@@ -152,7 +150,6 @@ describe("useStudioModals", () => {
   it("closeAll closes every modal and clears every context", () => {
     const { result } = renderHook(() => useStudioModals());
     act(() => {
-      result.current.openTemplates();
       result.current.openSaveTemplate();
       result.current.openExporter();
       result.current.setShowShortcuts(true);
@@ -172,7 +169,6 @@ describe("useStudioModals", () => {
     });
     act(() => result.current.closeAll());
     const m = result.current;
-    expect(m.showTemplates).toBe(false);
     expect(m.showSaveTemplate).toBe(false);
     expect(m.showExporter).toBe(false);
     expect(m.showShortcuts).toBe(false);

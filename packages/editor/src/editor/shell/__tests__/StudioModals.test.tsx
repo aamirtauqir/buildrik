@@ -16,10 +16,6 @@ vi.mock("../../../templates/SaveTemplate", () => ({
   SaveTemplate: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-save-template" /> : null,
 }));
-vi.mock("../../../templates/TemplateLibrary", () => ({
-  TemplateLibrary: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="modal-template-library" /> : null,
-}));
 vi.mock("../../ecommerce", () => ({
   CollectionSetupModal: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="modal-collection-setup" /> : null,
@@ -81,9 +77,6 @@ function makeComposer() {
 function makeProps(over: Partial<StudioModalsProps> = {}): StudioModalsProps {
   return {
     composer: makeComposer(),
-    showTemplates: false,
-    onCloseTemplates: vi.fn(),
-    onSelectTemplate: vi.fn(),
     showSaveTemplate: false,
     onCloseSaveTemplate: vi.fn(),
     onSaveTemplate: vi.fn(),
@@ -131,7 +124,6 @@ function renderModals(over: Partial<StudioModalsProps> = {}) {
 }
 
 const ALL_MARKERS = [
-  "modal-template-library",
   "modal-save-template",
   "modal-export",
   "modal-shortcuts",
@@ -159,7 +151,6 @@ describe("StudioModals — mounting contract", () => {
 
   // Simple flag → modal pairs (no context required).
   it.each([
-    ["showTemplates", "modal-template-library"],
     ["showSaveTemplate", "modal-save-template"],
     ["showExporter", "modal-export"],
     ["showShortcuts", "modal-shortcuts"],
@@ -217,8 +208,8 @@ describe("StudioModals — mounting contract", () => {
   });
 
   it("multiple flags can be open at once (modals are independent)", () => {
-    renderModals({ showTemplates: true, showExporter: true, showCommandPalette: true });
-    expect(screen.getByTestId("modal-template-library")).toBeInTheDocument();
+    renderModals({ showSaveTemplate: true, showExporter: true, showCommandPalette: true });
+    expect(screen.getByTestId("modal-save-template")).toBeInTheDocument();
     expect(screen.getByTestId("modal-export")).toBeInTheDocument();
     expect(screen.getByTestId("modal-command-palette")).toBeInTheDocument();
   });

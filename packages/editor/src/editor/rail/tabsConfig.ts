@@ -189,8 +189,10 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     id: "design",
     tool: "styles",
     iconName: "Palette",
-    label: "Design",
-    ariaLabel: "Global colors, fonts, spacing tokens",
+    // 2026-07-25 P1 rail convergence: Figma board 52:2 names this rail item
+    // "Brand" (tokens + presets + starters + lint = the site's brand system).
+    label: "Brand",
+    ariaLabel: "Brand — global colors, fonts, spacing tokens",
     section: "bottom",
     pattern: "standalone",
     shortcut: "D",
@@ -345,30 +347,32 @@ export function getRailTools(): Array<{ tool: RailTool; meta: RailToolMeta }> {
 
 // ─── Figma-contract rail (F1) ─────────────────────────────────────────────────
 //
-// The 02 · Editor Figma design (2026-07) supersedes the E3 4-tool rail: the rail
-// carries five first-class tools grouped into two zones, and everything else
-// leaves the rail entirely.
+// P1 rail convergence (2026-07-25): the live Figma board `S1 · Editor —
+// ASSEMBLED` (g4GzQFqzNYz5sosz1QtZXC node 52:2, rail frame 52:6) draws SIX
+// rail items in ONE group — no divider, 48px pitch, icon + visible label:
 //
-//   creation   Add · Assets · Components
-//   structure  Layers · Pages
+//   Insert · Layers · Pages · Media · Content · Brand
 //
-// The six panels that leave the rail keep their engine + panel intact and are
+// (The previous 5-item Add/Assets/Components + Layers/Pages reading came from
+// an incomplete fetch of the design file — see feedback_figma_page_list_unreliable.)
+//
+// The panels that leave the rail keep their engine + panel intact and are
 // reachable off-rail (verified entry points, so nothing is stranded):
-//   ai        → contextual: canvas selection + ⌘K command palette
-//   templates → inside the Add drawer ("Browse templates")
-//   design    → topbar ⋯ site menu ("Design system")
-//   settings  → topbar ⋯ site menu ("Site settings")
-//   publish   → topbar Publish button
-//   history   → topbar ⋯ site menu ("History")
+//   ai         → contextual: canvas selection ✨ + ⌘K command palette
+//   templates  → Pages panel "From template" (new-page flow) + ⌘K + shortcut T
+//   components → shortcut ⇧A + ⌘K ("Open Components panel"); folds into
+//                Brand · components per the design in a later phase
+//   settings   → topbar ⋯ site menu ("Site settings")
+//   publish    → topbar Publish button
+//   history    → topbar ⋯ site menu ("Version history")
 //
 // This is a THIRD render source alongside the zone rail (legacy) and the tool
 // rail (E3). All three read GROUPED_TABS_CONFIG; none of them mutate it. Which
 // one renders is chosen by editorViewMode.railMode ("figma" is the default).
 
-/** The five rail tools of the Figma contract, in rail order, grouped by zone. */
-export const RAIL_FIGMA: ReadonlyArray<{ zone: Extract<TabZone, "creation" | "structure">; ids: readonly GroupedTabId[] }> = [
-  { zone: "creation", ids: ["add", "assets", "components"] },
-  { zone: "structure", ids: ["layers", "pages"] },
+/** The six rail items of the Figma contract, in board 52:2 order, one group. */
+export const RAIL_FIGMA: ReadonlyArray<{ zone: TabZone; ids: readonly GroupedTabId[] }> = [
+  { zone: "creation", ids: ["add", "layers", "pages", "assets", "content", "design"] },
 ] as const;
 
 /** Flat set of tab ids that appear in the Figma rail (for filtering / tests). */

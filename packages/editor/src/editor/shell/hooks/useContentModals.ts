@@ -25,12 +25,8 @@ import type {
 
 export interface UseContentModalsReturn {
   // Templates
-  showTemplates: boolean;
-  setShowTemplates: React.Dispatch<React.SetStateAction<boolean>>;
   showSaveTemplate: boolean;
   setShowSaveTemplate: React.Dispatch<React.SetStateAction<boolean>>;
-  openTemplates: () => void;
-  closeTemplates: () => void;
   openSaveTemplate: () => void;
   closeSaveTemplate: () => void;
 
@@ -72,7 +68,6 @@ export interface UseContentModalsReturn {
 }
 
 export function useContentModals(): UseContentModalsReturn {
-  const [showTemplates, setShowTemplates] = React.useState(false);
   const [showSaveTemplate, setShowSaveTemplate] = React.useState(false);
   const [showExporter, setShowExporter] = React.useState(false);
   const [showMediaLibrary, setShowMediaLibrary] = React.useState(false);
@@ -84,8 +79,6 @@ export function useContentModals(): UseContentModalsReturn {
   const [showIconPicker, setShowIconPicker] = React.useState(false);
   const [iconPickerContext, setIconPickerContext] = React.useState<IconPickerContext | null>(null);
 
-  const openTemplates = React.useCallback(() => setShowTemplates(true), []);
-  const closeTemplates = React.useCallback(() => setShowTemplates(false), []);
   const openSaveTemplate = React.useCallback(() => setShowSaveTemplate(true), []);
   const closeSaveTemplate = React.useCallback(() => setShowSaveTemplate(false), []);
 
@@ -129,7 +122,6 @@ export function useContentModals(): UseContentModalsReturn {
   }, []);
 
   const resetContentModals = React.useCallback(() => {
-    setShowTemplates(false);
     setShowSaveTemplate(false);
     setShowExporter(false);
     setShowMediaLibrary(false);
@@ -141,12 +133,8 @@ export function useContentModals(): UseContentModalsReturn {
   }, []);
 
   return {
-    showTemplates,
-    setShowTemplates,
     showSaveTemplate,
     setShowSaveTemplate,
-    openTemplates,
-    closeTemplates,
     openSaveTemplate,
     closeSaveTemplate,
     showExporter,

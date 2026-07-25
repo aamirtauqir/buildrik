@@ -61,7 +61,6 @@ export interface StudioHeaderProps {
   onSetExportLoading: (loading: boolean) => void;
 
   // UI toggles
-  onShowTemplates: () => void;
   /** ✨ Ask AI — opens the AITab rail panel (single consolidated AI surface). */
   onShowAI: () => void;
   onShowExporter: () => void;
@@ -121,7 +120,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   issues = [],
   onSetPreviewLoading,
   onSetExportLoading,
-  onShowTemplates,
   onShowAI,
   onShowExporter,
   onToggleXRay,
@@ -249,7 +247,6 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       syncStatus={studioSyncStatus}
       issues={issues}
       onAddPage={onAddPage}
-      onShowTemplates={onShowTemplates}
       onPreview={handlePreview}
       onPublish={onVercelPublish ?? onOpenPublish ?? handleExport}
       publishState={publishState}

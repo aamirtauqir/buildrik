@@ -492,9 +492,8 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
   // Short titles — the section tablist below the toolbar row already shows
   // Tokens / Styles / Components / Export, so the header just needs the panel
-  // identity. Long "Design · Components" was clipping to "Design · Compo…" at
-  // the 320px panel width even with the toolbar-row split.
-  const headerTitle = "Design";
+  // identity ("Brand" per Figma board 52:2 rail naming, P1 convergence).
+  const headerTitle = "Brand";
 
   const changedSectionLabels = isDirty ? ["Tokens"] : [];
 

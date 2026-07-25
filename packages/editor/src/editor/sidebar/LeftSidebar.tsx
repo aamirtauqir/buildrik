@@ -114,6 +114,7 @@ function RailZone({
   drawerOpen,
   onBtnClick,
   dirtyTabIds,
+  showLabels = false,
 }: {
   zone: TabZone;
   /** Explicit tab list. When omitted, all tabs in `zone` render (legacy path). */
@@ -122,6 +123,8 @@ function RailZone({
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
   dirtyTabIds?: ReadonlySet<string>;
+  /** Figma 52:2 rail items carry a visible label under the icon. */
+  showLabels?: boolean;
 }) {
   const tabs = React.useMemo(
     () => tabsOverride ?? getTabsByZone(zone),
@@ -141,7 +144,7 @@ function RailZone({
           <Tooltip key={tab.id}>
             <TooltipTrigger asChild>
               <Button
-                className={`ls-btn${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
+                className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
                 onClick={() => onBtnClick(tab.id)}
                 role="tab"
                 aria-selected={isVisibleActive}
@@ -151,6 +154,7 @@ function RailZone({
                 {isVisibleActive && <div className="ls-btn-bar" />}
                 {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
                 <Icon size={20} />
+                {showLabels && <span className="ls-btn__label">{tab.label}</span>}
               </Button>
             </TooltipTrigger>
             <TooltipPortal>
@@ -171,11 +175,12 @@ function RailZone({
 // ============================================
 // F1 — Figma-contract rail (default)
 // ============================================
-// Five rail tools in two zones: Add/Assets/Components (creation) then
-// Layers/Pages (structure), with a divider between. Reuses RailZone's button
-// markup via an explicit tab list. The six off-rail panels (AI, Templates,
-// Design, Settings, Publish, History) still open from ⌘K + topbar — nothing
-// is stranded (see tabsConfig RAIL_FIGMA + tabsConfig.figma.test.ts).
+// P1 convergence (board 52:2): SIX rail items in ONE group — Insert · Layers ·
+// Pages · Media · Content · Brand — icon + visible label, no divider. Reuses
+// RailZone's button markup via an explicit tab list. Off-rail panels (AI,
+// Templates, Components, Settings, Publish, History) still open from ⌘K +
+// shortcuts + topbar — nothing is stranded (see tabsConfig RAIL_FIGMA +
+// tabsConfig.figma.test.ts).
 function FigmaRail({
   activeTab,
   drawerOpen,
@@ -199,6 +204,7 @@ function FigmaRail({
             drawerOpen={drawerOpen}
             onBtnClick={onBtnClick}
             dirtyTabIds={dirtyTabIds}
+            showLabels
           />
           {i < groups.length - 1 && <div className="ls-divider" />}
         </React.Fragment>

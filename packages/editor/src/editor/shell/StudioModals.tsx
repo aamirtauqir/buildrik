@@ -9,8 +9,6 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { SaveTemplate } from "../../templates/SaveTemplate";
-import type { Template } from "../../templates/TemplateLibrary";
-import { TemplateLibrary } from "../../templates/TemplateLibrary";
 import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
 import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
@@ -32,9 +30,6 @@ export interface StudioModalsProps {
   composer: Composer | null;
 
   // Template modals
-  showTemplates: boolean;
-  onCloseTemplates: () => void;
-  onSelectTemplate: (template: Template) => void;
   showSaveTemplate: boolean;
   onCloseSaveTemplate: () => void;
   onSaveTemplate: (data: { name: string; category: string; description: string }) => void;
@@ -111,9 +106,6 @@ export interface StudioModalsProps {
 
 export const StudioModals: React.FC<StudioModalsProps> = ({
   composer,
-  showTemplates,
-  onCloseTemplates,
-  onSelectTemplate,
   showSaveTemplate,
   onCloseSaveTemplate,
   onSaveTemplate,
@@ -167,14 +159,6 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
 
   return (
     <>
-      {/* Template Library */}
-      <TemplateLibrary
-        isOpen={showTemplates}
-        onClose={onCloseTemplates}
-        onSelect={onSelectTemplate}
-        composer={composer}
-      />
-
       {/* Save Template */}
       <SaveTemplate
         isOpen={showSaveTemplate}

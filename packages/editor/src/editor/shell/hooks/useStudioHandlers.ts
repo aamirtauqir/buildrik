@@ -12,25 +12,21 @@ import type { Composer } from "../../../engine";
 import { STORAGE_KEYS } from "../../../shared/constants/config";
 import type { BlockData } from "../../../shared/types";
 import { canNestElement } from "../../../shared/utils/nesting";
-import { applyTemplate } from "../../../templates/templateActions";
 import { mirrorUserTemplate } from "../../../services/templateSync";
-import type { Template } from "../../../templates/TemplateLibrary";
 import type { ToastInput } from "@/editor/shared/vibcoder";
 
 export interface UseStudioHandlersParams {
   composer: Composer | null;
   addToast: (input: ToastInput) => string;
-  closeTemplates: () => void;
 }
 
 export interface UseStudioHandlersReturn {
   handleQuickAdd: (block: BlockData) => void;
-  handleSelectTemplate: (template: Template) => void;
   handleSaveTemplate: (data: { name: string; category: string; description: string }) => void;
 }
 
 export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHandlersReturn {
-  const { composer, addToast, closeTemplates } = params;
+  const { composer, addToast } = params;
 
   const handleQuickAdd = React.useCallback(
     (block: BlockData) => {
@@ -48,30 +44,6 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
       }
     },
     [composer]
-  );
-
-  const handleSelectTemplate = React.useCallback(
-    (template: Template) => {
-      if (composer) {
-        try {
-          applyTemplate(composer, template);
-          closeTemplates();
-          addToast({
-            title: "Template applied",
-            description: `${template.name} added`,
-            tone: "success",
-            duration: 1800,
-          });
-        } catch {
-          addToast({
-            title: "Template failed",
-            description: "Could not apply template.",
-            tone: "error",
-          });
-        }
-      }
-    },
-    [composer, closeTemplates, addToast]
   );
 
   const handleSaveTemplate = React.useCallback(
@@ -108,7 +80,6 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
 
   return {
     handleQuickAdd,
-    handleSelectTemplate,
     handleSaveTemplate,
   };
 }

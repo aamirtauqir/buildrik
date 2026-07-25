@@ -85,12 +85,8 @@ export interface SaveAsComponentContext {
 
 export interface UseStudioModalsReturn {
   // Template modals
-  showTemplates: boolean;
-  setShowTemplates: React.Dispatch<React.SetStateAction<boolean>>;
   showSaveTemplate: boolean;
   setShowSaveTemplate: React.Dispatch<React.SetStateAction<boolean>>;
-  openTemplates: () => void;
-  closeTemplates: () => void;
   openSaveTemplate: () => void;
   closeSaveTemplate: () => void;
 

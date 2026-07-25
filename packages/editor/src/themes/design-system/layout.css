@@ -28,6 +28,7 @@
      applied 2026-07-24 (founder-approved): rail 48->60, drawer 280->320,
      inspector 280->300. See docs/audits/2026-07-24-editor-figma-32-2-drift-audit.md §2. */
   --buildrick-size-rail: 60px;                /* Figma rail */
+  --buildrick-size-rail-item: 44px;           /* Figma rail item (board 52:6 — 44×44 icon+label) */
   --buildrick-size-drawer: 320px;             /* Figma drawer */
   --buildrick-size-inspector: 300px;          /* Figma inspector */
   --buildrick-size-panel-right: 360px;        /* Figma (no current equivalent) */

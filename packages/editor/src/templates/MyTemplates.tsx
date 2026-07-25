@@ -8,7 +8,7 @@ import * as React from "react";
 import { InputField } from "../shared/forms";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { SemanticBadge } from "@/shared/ui/SemanticBadge";
-import type { Template } from "./TemplateLibrary";
+import type { Template } from "./types";
 
 // ============================================================================
 // TYPES

@@ -13,7 +13,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useStudioHandlers, type UseStudioHandlersParams } from "../useStudioHandlers";
 import { STORAGE_KEYS } from "../../../../shared/constants/config";
 import type { BlockData } from "../../../../shared/types";
-import type { Template } from "../../../../templates/TemplateLibrary";
 
 vi.mock("../../../../blocks/blockRegistry", () => ({
   getBlockDefinitions: vi.fn(() => [
@@ -27,17 +26,12 @@ vi.mock("../../../../shared/utils/nesting", () => ({
   canNestElement: vi.fn(() => true),
 }));
 
-vi.mock("../../../../templates/templateActions", () => ({
-  applyTemplate: vi.fn(),
-}));
-
 vi.mock("../../../../services/templateSync", () => ({
   mirrorUserTemplate: vi.fn(() => Promise.resolve()),
 }));
 
 import { getBlockDefinitions, insertBlock } from "../../../../blocks/blockRegistry";
 import { canNestElement } from "../../../../shared/utils/nesting";
-import { applyTemplate } from "../../../../templates/templateActions";
 import { mirrorUserTemplate } from "../../../../services/templateSync";
 
 // ---------------------------------------------------------------------------
@@ -92,15 +86,13 @@ function mount(overrides: Partial<UseStudioHandlersParams> = {}) {
   const root = makeElement({ getId: vi.fn(() => "root-1") });
   const composer = makeComposer(root);
   const addToast = vi.fn().mockReturnValue("toast-id");
-  const closeTemplates = vi.fn();
   const params: UseStudioHandlersParams = {
     composer: composer as unknown as UseStudioHandlersParams["composer"],
     addToast,
-    closeTemplates,
     ...overrides,
   };
   const hook = renderHook(() => useStudioHandlers(params));
-  return { hook, composer, root, addToast, closeTemplates };
+  return { hook, composer, root, addToast };
 }
 
 const BLOCK: BlockData = { id: "hero-1" } as unknown as BlockData;
@@ -113,7 +105,6 @@ describe("useStudioHandlers", () => {
       { id: "hero-1", elementType: "hero" },
       { id: "nav-1", elementType: "navbar" },
     ] as unknown as ReturnType<typeof getBlockDefinitions>);
-    vi.mocked(applyTemplate).mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -165,40 +156,6 @@ describe("useStudioHandlers", () => {
       composer.elements.createPage.mockReturnValue({ root: { id: "root-new" } } as never);
       act(() => hook.result.current.handleQuickAdd(BLOCK));
       expect(composer.elements.createPage).toHaveBeenCalledWith("Page 1");
-    });
-  });
-
-  // handleSelectTemplate ---------------------------------------------------------
-  describe("handleSelectTemplate", () => {
-    const template = { id: "t1", name: "Portfolio" } as unknown as Template;
-
-    it("applies the template, closes the modal and toasts success", () => {
-      const { hook, composer, addToast, closeTemplates } = mount();
-      act(() => hook.result.current.handleSelectTemplate(template));
-      expect(applyTemplate).toHaveBeenCalledWith(composer, template);
-      expect(closeTemplates).toHaveBeenCalledTimes(1);
-      expect(addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Template applied", tone: "success" }),
-      );
-    });
-
-    it("toasts an error and does NOT close the modal when apply throws", () => {
-      vi.mocked(applyTemplate).mockImplementation(() => {
-        throw new Error("bad template");
-      });
-      const { hook, addToast, closeTemplates } = mount();
-      act(() => hook.result.current.handleSelectTemplate(template));
-      expect(closeTemplates).not.toHaveBeenCalled();
-      expect(addToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Template failed", tone: "error" }),
-      );
-    });
-
-    it("no-ops without composer", () => {
-      const { hook, addToast } = mount({ composer: null });
-      act(() => hook.result.current.handleSelectTemplate(template));
-      expect(applyTemplate).not.toHaveBeenCalled();
-      expect(addToast).not.toHaveBeenCalled();
     });
   });
 
