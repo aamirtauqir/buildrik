@@ -89,6 +89,29 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   } = useInspectorState(selectedElement);
   const devMode = USE_DEV_MODE;
 
+  // Board 189:2 — "Whole site" scope shows the site-wide banner instead of
+  // per-element controls (site styles live in the Brand panel).
+  const [wholeSite, setWholeSite] = React.useState(false);
+  React.useEffect(() => {
+    setWholeSite(false); // scope resets with the selection
+  }, [selectedElement?.id]);
+
+  // Board 160:512 — while the AI agent runs, the inspector hands over to a
+  // status card; selection is kept and restored on return.
+  const [agentRun, setAgentRun] = React.useState<{ running: boolean; summary: string }>({
+    running: false,
+    summary: "",
+  });
+  React.useEffect(() => {
+    if (!composer) return;
+    const onRun = (p: { running?: boolean; summary?: string }) =>
+      setAgentRun({ running: Boolean(p?.running), summary: p?.summary ?? "" });
+    composer.on("ai:agent-run", onRun);
+    return () => {
+      composer.off("ai:agent-run", onRun);
+    };
+  }, [composer]);
+
   const {
     styles: styles_state,
     handleStyleChange,
@@ -317,7 +340,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           state), three compact dropdowns on one line. S3.9: no tab strip — the
           body below is one flat scrolling column ordered per element profile. */}
       <div className="bdi-bpr">
-        <ScopeDropdown composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} />
+        <ScopeDropdown composer={composer} selectedElement={{ id: selectedElement.id, type: selectedElement.type }} onWholeSite={() => setWholeSite(true)} />
         <BreakpointPill
           current={currentBreakpoint}
           onChange={onBreakpointChange}
@@ -335,7 +358,37 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           selectedElementId={selectedElement?.id}
         />
       </div>
-      {/* Scrollable body */}
+      {/* AI agent takeover (board 160:512) — the run replaces the controls;
+          the selection is kept and restored when the run ends. */}
+      {agentRun.running ? (
+        <div role="status" aria-live="polite" style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 8 }} data-testid="inspector-ai-run">
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bd-fg-primary)" }}>AI</div>
+          <div style={{ fontSize: 13, color: "var(--bd-fg-primary)" }}>{agentRun.summary || "Working…"}</div>
+          <div style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>
+            Your selection is kept and restored when you go back.
+          </div>
+        </div>
+      ) : wholeSite ? (
+        /* Whole-site scope (board 189:2) — per-element controls step aside;
+           site-wide styles live in the Brand panel. */
+        <div style={{ padding: "16px" }} data-testid="inspector-whole-site">
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bd-fg-primary)", marginBottom: 6 }}>
+            Editing the whole site — every page
+          </div>
+          <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", lineHeight: 1.5, marginBottom: 12 }}>
+            Site-wide colours, fonts and spacing live in the Brand panel — change them once,
+            everywhere updates.
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button variant="primary" size="sm" onClick={() => composer?.emit("ui:switch-tab", { tab: "design" })}>
+              Open Brand
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setWholeSite(false)}>
+              Back to this element
+            </Button>
+          </div>
+        </div>
+      ) : (
       <div
         ref={contentRef}
         className="bdi-panel-scroll"
@@ -373,6 +426,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           </InspectorErrorBoundary>
         </div>
       </div>
+      )}
     </div>
   );
 };

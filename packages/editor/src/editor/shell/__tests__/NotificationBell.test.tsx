@@ -94,4 +94,26 @@ describe("panel", () => {
     fireEvent.click(await screen.findByRole("button", { name: /mark all read/i }));
     await waitFor(() => expect(markAllNotificationsRead).toHaveBeenCalled());
   });
+
+  // ── P4 board 165:71 — jump target deleted ──────────────────────────────────
+  it("renders a null-actionUrl row as information, not a dead button", async () => {
+    fetchRecentNotifications.mockResolvedValue([
+      {
+        id: "n3",
+        type: "comment",
+        actorName: "Sara",
+        message: "commented on Opening hours",
+        actionUrl: null,
+        read: false,
+        createdAt: "2026-07-22T10:00:00Z",
+      },
+    ]);
+    render(<TooltipProvider><NotificationBell onNavigate={vi.fn()} /></TooltipProvider>);
+    fireEvent.click(await screen.findByRole("button", { name: /notifications/i }));
+    await screen.findByText(/commented on Opening hours/);
+    const row = document.querySelector('[data-jump-gone="true"]') as HTMLElement;
+    expect(row).toBeTruthy();
+    expect(row.getAttribute("role")).toBeNull();
+    expect(row.textContent).toContain("nothing to jump to");
+  });
 });

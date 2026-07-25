@@ -11,6 +11,8 @@
  *   Cmd/Ctrl+J            → open the AI tab (composer ui:switch-tab → AITab)
  *   Escape                → close shortcuts modal
  *   ?                     → modals.setShowShortcuts(true)
+ *   F6 / Shift+F6         → cycle focus between shell regions (board 58:2)
+ *   C                     → toggle canvas comment mode (board 58:215 legend)
  *
  * The handler short-circuits when the keydown originates inside an
  * editable surface (input/textarea/select/contenteditable) so users
@@ -26,6 +28,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import { cycleRegion } from "../regionCycle";
 
 // Modals subset the shortcut handler reads. Match the public surface of
 // useStudioModals; passing the full modals object keeps mocking simple.
@@ -47,10 +50,27 @@ export function useEditorShortcuts({
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target instanceof HTMLElement ? e.target : null;
+
+      // F6 region cycle runs even from editable surfaces — that's the point
+      // of a region-escape key (board 58:2).
+      if (e.key === "F6") {
+        e.preventDefault();
+        cycleRegion(e.shiftKey ? -1 : 1);
+        return;
+      }
+
       if (
         target?.closest("input, textarea, select, [contenteditable='true']") ||
         target?.isContentEditable
       ) {
+        return;
+      }
+
+      // C — comment mode toggle (keyboard legend 58:215). Plain key, no
+      // modifiers, guarded above against editable surfaces.
+      if ((e.key === "c" || e.key === "C") && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+        e.preventDefault();
+        composer?.emit("ui:comment-mode", {});
         return;
       }
 

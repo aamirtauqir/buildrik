@@ -129,7 +129,7 @@ export function useAgentRunner(
 
   const advance = React.useCallback((next: number) => {
     if (cancelledRef.current || next >= stepsRef.current.length) {
-      setPhase("done");
+      setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
       setCurrentIndex(-1);
       reportRun();
       return;
@@ -144,6 +144,9 @@ export function useAgentRunner(
       indexRef.current = i;
       setCurrentIndex(i);
       setStep(i, { status: "running" });
+      // Inspector takeover (board 160:512) — broadcast what the agent is doing
+      // so the right panel can show "AI · {step}…" instead of stale controls.
+      composer.emit("ai:agent-run", { running: true, summary: step.plan.title ?? step.plan.instruction });
       // Re-ground page-scope steps against the live canvas; element-scope steps
       // target the id the plan chose.
       const scope =
@@ -213,7 +216,7 @@ export function useAgentRunner(
         if (cancelledRef.current) return;
         if (!plan || plan.length === 0) {
           setError("Couldn't break that into steps. Try a more specific build request.");
-          setPhase("done");
+          setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
           return;
         }
         const runSteps: RunStep[] = plan.map((p) => ({ plan: p, status: "pending" }));
@@ -223,7 +226,7 @@ export function useAgentRunner(
         generateStepRef.current(0);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Planning failed");
-        setPhase("done");
+        setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
       }
     },
     [composer, model, gatherElements, gatherTokens, gatherMediaAssets],
@@ -252,14 +255,14 @@ export function useAgentRunner(
 
   const stop = React.useCallback(() => {
     cancelledRef.current = true;
-    setPhase("done");
+    setPhase("done"); composer?.emit("ai:agent-run", { running: false, summary: "" });
     setCurrentIndex(-1);
     reportRun();
   }, [reportRun]);
 
   const reset = React.useCallback(() => {
     cancelledRef.current = true;
-    setPhase("idle");
+    setPhase("idle"); composer?.emit("ai:agent-run", { running: false, summary: "" });
     setSteps([]);
     stepsRef.current = [];
     setCurrentIndex(-1);

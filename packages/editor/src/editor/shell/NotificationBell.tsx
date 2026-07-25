@@ -157,22 +157,37 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }
               <div style={S.centerTitle}>You're all caught up</div>
             </div>
           )}
-          {state === "ready" && ordered.map((n) => (
+          {state === "ready" && ordered.map((n) => {
+            // Board 165:71 jump-target-deleted: a notification with no
+            // actionUrl has nothing to jump to (the target was deleted or was
+            // never linkable) — render it as information, not as a dead button.
+            const jumpable = n.actionUrl != null;
+            return (
             <div
-              role="button"
-              tabIndex={0}
+              role={jumpable ? "button" : undefined}
+              tabIndex={jumpable ? 0 : undefined}
               key={n.id}
-              style={n.read ? S.row : { ...S.row, ...S.rowUnread }}
-              onClick={() => void onRow(n)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); void onRow(n); } }}
+              data-jump-gone={jumpable ? undefined : "true"}
+              style={{
+                ...(n.read ? S.row : { ...S.row, ...S.rowUnread }),
+                ...(jumpable ? {} : { cursor: "default" }),
+              }}
+              onClick={jumpable ? () => void onRow(n) : undefined}
+              onKeyDown={jumpable ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); void onRow(n); } } : undefined}
             >
               {n.read ? <span style={S.dotSpacer} /> : <span style={S.dot} aria-label="unread" />}
               <span style={S.rowBody}>
                 <span style={S.rowText}>{n.actorName ? `${n.actorName} ` : ""}{n.message}</span>
+                {!jumpable && (
+                  <span style={{ ...S.rowMeta, color: "var(--bd-warn-strong)" }}>
+                    The target is gone — the note is kept, but there&rsquo;s nothing to jump to.
+                  </span>
+                )}
                 <span style={S.rowMeta}>{n.type} · {relTime(n.createdAt)}</span>
               </span>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

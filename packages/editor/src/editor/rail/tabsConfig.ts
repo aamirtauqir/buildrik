@@ -145,7 +145,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     ariaLabel: "View and reorder page structure",
     section: "top",
     pattern: "standalone",
-    shortcut: "Z",
+    shortcut: "L",
     mode: "panel",
     panelWidth: 280,
     zone: "structure",
@@ -195,7 +195,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     ariaLabel: "Brand — global colors, fonts, spacing tokens",
     section: "bottom",
     pattern: "standalone",
-    shortcut: "D",
+    shortcut: "B",
     mode: "panel",
     panelWidth: 320,
     zone: "config",
@@ -275,7 +275,9 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     ariaLabel: "Data sources and collections for dynamic content",
     section: "bottom",
     pattern: "standalone",
-    shortcut: "C",
+    // Keyboard legend 58:215: rail letters are A L P M D B — D opens Content.
+    // Bare C toggles comment mode (useEditorShortcuts).
+    shortcut: "D",
     mode: "panel",
     panelWidth: 320,
   },

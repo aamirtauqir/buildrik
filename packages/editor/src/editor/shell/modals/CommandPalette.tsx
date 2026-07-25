@@ -27,6 +27,10 @@ interface PaletteCommand {
   shortcut?: string;
   icon?: string;
   handler: () => void;
+  /** Board 166:58 — a command you cannot run is still worth seeing. Disabled
+   *  rows render muted with the reason and don't close the palette. */
+  disabled?: boolean;
+  disabledReason?: string;
 }
 
 export interface CommandPaletteProps {
@@ -67,6 +71,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       label: "Undo",
       group: "Edit",
       shortcut: "Ctrl+Z",
+      disabled: !composer.history.canUndo(),
+      disabledReason: "nothing to undo",
       handler: () => { composer.history.undo(); onClose(); },
     },
     {
@@ -74,6 +80,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       label: "Redo",
       group: "Edit",
       shortcut: "Ctrl+Y",
+      disabled: !composer.history.canRedo(),
+      disabledReason: "nothing to redo",
       handler: () => { composer.history.redo(); onClose(); },
     },
     {
@@ -142,6 +150,8 @@ function buildCommands(composer: Composer | null, onClose: () => void): PaletteC
       label: "Undo last action",
       group: "History",
       shortcut: "Ctrl+Z",
+      disabled: !composer.history.canUndo(),
+      disabledReason: "nothing to undo",
       handler: () => { composer.history.undo(); onClose(); },
     },
     {
@@ -223,6 +233,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
 
   // Run a command AND record it as recent (S3.14), so the next ⌘K surfaces it.
   const runCommand = React.useCallback((cmd: PaletteCommand) => {
+    if (cmd.disabled) return; // board 166:58 — visible, not runnable
     recordCommandRun(cmd.id);
     cmd.handler();
   }, []);
@@ -410,27 +421,45 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         >
           {displayCommands.length === 0 ? (
             query.trim() ? (
-              <Button
-                onClick={askAI}
-                data-idx={0}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  width: "100%",
-                  height: 52,
-                  padding: "0 16px",
-                  background: "var(--buildrick-accent-tint)",
-                  border: "none",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  color: "var(--buildrick-text-primary)",
-                  fontSize: 14,
-                }}
-              >
-                <span aria-hidden="true">✨</span>
-                Ask AI: “{query.trim()}”
-              </Button>
+              // Boards 166:45 / 166:51 — a garbage query gets "nothing
+              // matches"; a natural-language one gets the AI hand-off with the
+              // diff-not-direct-writes explainer. Both route to the AI panel.
+              <div style={{ padding: "14px 16px" }} data-testid="cmdk-no-results">
+                {query.trim().split(/\s+/).length > 1 ? (
+                  <>
+                    <div style={{ fontSize: 13, color: "var(--buildrick-text-primary)" }}>
+                      That isn&rsquo;t a command — send it to AI?
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", margin: "6px 0 10px" }}>
+                      AI proposes a diff and never writes directly. Apply lands as one undo step.
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ fontSize: 13, color: "var(--buildrick-text-primary)", marginBottom: 10 }}>
+                    Nothing matches &lsquo;{query.trim()}&rsquo;.
+                  </div>
+                )}
+                <Button
+                  onClick={askAI}
+                  data-idx={0}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "8px 12px",
+                    background: "var(--buildrick-accent-tint)",
+                    border: "none",
+                    borderRadius: "var(--buildrick-radius-sm)",
+                    cursor: "pointer",
+                    color: "var(--buildrick-accent)",
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}
+                >
+                  <span aria-hidden="true">✨</span>
+                  {query.trim().split(/\s+/).length > 1 ? "Ask AI ›" : "Ask AI instead ›"}
+                </Button>
+              </div>
             ) : (
               <div
                 style={{
@@ -474,6 +503,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                         data-idx={globalIdx}
                         onClick={() => runCommand(cmd)}
                         onMouseEnter={() => setSelectedIndex(globalIdx)}
+                        aria-disabled={cmd.disabled || undefined}
                         style={{
                           display: "flex",
                           alignItems: "center",
@@ -486,7 +516,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                             ? "var(--buildrick-accent-tint)"
                             : "transparent",
                           border: "none",
-                          cursor: "pointer",
+                          cursor: cmd.disabled ? "default" : "pointer",
+                          opacity: cmd.disabled ? 0.55 : 1,
                           textAlign: "left",
                           transition: "background 0.1s",
                         }}
@@ -520,6 +551,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                           >
                             {cmd.label}
                           </span>
+                          {cmd.disabled && cmd.disabledReason && (
+                            <span
+                              style={{
+                                fontSize: 11,
+                                color: "var(--buildrick-text-muted)",
+                                whiteSpace: "nowrap",
+                                flexShrink: 0,
+                              }}
+                            >
+                              {cmd.disabledReason}
+                            </span>
+                          )}
                         </div>
                         {cmd.shortcut && <ShortcutBadge shortcut={cmd.shortcut} />}
                       </Button>

@@ -354,3 +354,25 @@ Deferred (documented): "Dynamic pages ›" row (no edit path for an existing
 collection's page settings — needs CMSCollectionSetupModal edit mode);
 external source connectors (Sheets); field edit-in-place (add/delete shipped);
 board 151:46's "Connected · synced" meta awaits real connectors.
+
+---
+
+## 11. Phase 4 execution record (2026-07-25, same session)
+
+Board-exact state sweep. Every remaining 🟦 item terminally resolved:
+
+| Board | Disposition | Detail |
+|---|---|---|
+| CmdK · no-results 166:45 | **Built** | "Nothing matches '{q}'." + "Ask AI instead ›" (single-token queries) |
+| CmdK · ai-offer 166:51 | **Built** | Multi-word queries: "That isn't a command — send it to AI?" + the diff-not-direct-writes explainer + "Ask AI ›" |
+| CmdK · disabled 166:58 | **Built** | `disabled`/`disabledReason` on palette commands — visible, muted, reasoned, non-running (board rationale honored); real cases: Undo/Redo gated on `history.canUndo/canRedo` |
+| Notifications · jump-target-deleted 165:71 | **Built** | null-`actionUrl` rows render as information (no button role, warn sub-line "nothing to jump to") instead of a dead clickable row |
+| Inspector · ai-agent-run 160:512 | **Built** | `useAgentRunner` broadcasts `ai:agent-run {running, summary}`; inspector hands over to the "AI · {step}… / selection kept" card and restores after |
+| Inspector · reach-whole-site 189:2 | **Built (wired)** | ScopeDropdown "Whole site" now switches the inspector to the site-wide banner ("Editing the whole site — every page") with **Open Brand** (→ Brand panel) + "Back to this element". Divergence: board draws editable controls in this scope — site-wide apply isn't built, so controls step aside instead of lying |
+| Keyboard · F6 region cycle 58:2 | **Built** | `regionCycle.ts` (pure, 12 tests): board order 1→7 with wrap, ⇧F6 reverse, hidden regions (closed drawer, absent page-tabs/inspector) drop out; wired in useEditorShortcuts (works from editable surfaces) |
+| Keyboard legend 58:215 rail letters | **Built** | Shortcuts remapped to the legend: L=Layers (was Z), D=Content (was C), B=Brand (was D); bare **C = comment-mode toggle**. ⌘K/Topbar/KeyboardShortcutsPanel derive automatically |
+| Inspector · loading 159:102 | **Rejected** — the inspector derives context synchronously; no async path exists to load. Board presumes a future async inspector |
+| Issues · fixing 164:42 / fix-failed 164:57 | **Deferred (B5)** — no issue-producer pipeline exists (shell issues list is manual); building auto-fix UI over nothing would be decorative. Note: real fixers exist as parts (engine `contrastFix.ts`, `AltTextService`) for a future issues arc |
+| Legend n/p (Review/Compare/Issues) + ⌘⏎ publish | **Deferred** — documented, small follow-ups |
+
+Verify: tsc clean both packages; verify:ds full green; palette 24 + bell 10 + regionCycle 12 + ProInspector P4 6 new/updated tests; shell+inspector+rail+ai suites green (2 load-flakes re-ran green in isolation). Live-walked on :5050: F6 → topbar → rail → drawer in board order; L/B/D open Layers/Brand/Content; C shows "Comment · Esc"; ⌘K "qqp" → Nothing matches, "make the hero warmer" → AI hand-off + explainer (disabled-row path unit-pinned — the live demo legitimately has history).

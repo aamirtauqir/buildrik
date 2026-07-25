@@ -13,7 +13,7 @@ import type { Composer } from "../../../../engine";
 function makeComposer() {
   return {
     emit: vi.fn(),
-    history: { undo: vi.fn(), redo: vi.fn() },
+    history: { undo: vi.fn(), redo: vi.fn(), canUndo: vi.fn(() => true), canRedo: vi.fn(() => true) },
     selection: { getSelectedIds: vi.fn(() => ["el-1"]) },
     elements: { removeElement: vi.fn() },
   };
@@ -122,7 +122,7 @@ describe("CommandPalette", () => {
       fireEvent.change(searchInput(), { target: { value: "xyzzy" } });
       // No command rows, but the ai-offer replaces the old "No commands found".
       expect(screen.queryByText("No commands found")).toBeNull();
-      expect(screen.getByText(/Ask AI:/)).toBeInTheDocument();
+      expect(screen.getByText(/Ask AI instead/)).toBeInTheDocument();
     });
 
     it("clearing the query restores the full list", () => {
@@ -213,7 +213,7 @@ describe("CommandPalette", () => {
     it("offers Ask AI on a query that matches nothing, and opens the AI panel", () => {
       const { composer, onClose } = renderPalette();
       fireEvent.change(searchInput(), { target: { value: "zzzznotacommand" } });
-      const askAI = screen.getByText(/Ask AI:/);
+      const askAI = screen.getByRole("button", { name: /Ask AI instead/ });
       expect(askAI).toBeInTheDocument();
       fireEvent.click(askAI);
       expect(composer!.emit).toHaveBeenCalledWith(EVENTS.UI_PANEL_OPEN, { panel: "ai" });
@@ -283,6 +283,40 @@ describe("CommandPalette", () => {
     it("no Recent group when nothing has run yet", () => {
       renderPalette();
       expect(screen.queryByText("Recent")).not.toBeInTheDocument();
+    });
+  });
+
+  // ── P4 board states ─────────────────────────────────────────────────────────
+  describe("no-results / ai-offer / disabled (boards 166:45/51/58)", () => {
+    it("single-token garbage → 'Nothing matches' + Ask AI instead", () => {
+      const composer = makeComposer();
+      renderPalette(composer);
+      fireEvent.change(searchInput(), { target: { value: "qqp" } });
+      expect(screen.getByText(/Nothing matches/)).toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: /Ask AI instead/ }));
+      expect(composer.emit).toHaveBeenCalledWith(expect.anything(), { panel: "ai" });
+    });
+
+    it("natural-language query → AI hand-off with the diff explainer", () => {
+      renderPalette();
+      fireEvent.change(searchInput(), { target: { value: "make the hero warmer" } });
+      expect(screen.getByText(/That isn’t a command — send it to AI\?/)).toBeInTheDocument();
+      expect(screen.getByText(/AI proposes a diff and never writes directly/)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Ask AI ›/ })).toBeInTheDocument();
+    });
+
+    it("disabled command stays visible with its reason and doesn't run", () => {
+      const composer = makeComposer();
+      composer.history.canUndo.mockReturnValue(false);
+      renderPalette(composer);
+      fireEvent.change(searchInput(), { target: { value: "undo" } });
+      const rows = screen.getAllByText("Undo");
+      expect(rows.length).toBeGreaterThan(0);
+      expect(screen.getAllByText("nothing to undo").length).toBeGreaterThan(0);
+      const row = rows[0].closest("button") as HTMLElement;
+      expect(row).toHaveAttribute("aria-disabled", "true");
+      fireEvent.click(row);
+      expect(composer.history.undo).not.toHaveBeenCalled();
     });
   });
 });

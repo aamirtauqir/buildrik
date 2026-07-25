@@ -31,9 +31,12 @@ import type { Composer } from "../../../engine";
 interface ScopeDropdownProps {
   composer: Composer | null | undefined;
   selectedElement: { id: string; type: string };
+  /** Board 189:2 — selecting Whole site switches the inspector into the
+   *  site-wide banner state (site styles live in the Brand panel). */
+  onWholeSite?: () => void;
 }
 
-export function ScopeDropdown({ composer, selectedElement }: ScopeDropdownProps) {
+export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeDropdownProps) {
   const [open, setOpen] = React.useState(false);
   const [confirming, setConfirming] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
@@ -153,6 +156,10 @@ export function ScopeDropdown({ composer, selectedElement }: ScopeDropdownProps)
             variant="bare"
             style={optionRow}
             title="Site-wide colors & fonts live in the Styles tab"
+            onClick={() => {
+              setOpen(false);
+              onWholeSite?.();
+            }}
           >
             <span style={optTop}>Whole site</span>
             <span style={optSub}>colors & fonts — Styles tab</span>
