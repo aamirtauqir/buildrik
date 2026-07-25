@@ -71,8 +71,10 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
         alignItems: "center",
         gap: 8,
         padding: "8px 12px",
-        background: "var(--bd-accent-tint, rgba(45,109,255,0.08))",
-        border: "1px solid rgba(45,109,255,0.2)",
+        background: "var(--bd-accent-tint)",
+        // was a raw rgba of the retired cobalt #2D6DFF — the accent moved to
+        // #406ED6 on 2026-07-21 and this border never followed (board B9.4).
+        border: "1px solid var(--bd-accent-alpha-30)",
         borderRadius: "var(--bd-radius-md)",
         margin: "0 12px 8px",
       }}

@@ -531,3 +531,67 @@ time against DNS repointing, `redirect: "error"` on the fetch, connect
 surfaces "use a public https endpoint". Residual rebinding window between
 lookup and connect documented in-file (no IP pinning — blind best-effort
 delivery). 23 guard unit tests green.
+
+## 14. B9 execution record — code-ahead surfaces get boards (2026-07-25, same session)
+
+B9 was the last open item: six surfaces that shipped in code before any Figma
+board existed, so there was no visual source of truth to check them against.
+Seven boards now sit on the Editor page (`1:3`) at y≈68 200–74 800, under the
+banner "B9 · Code-ahead surfaces — as-built design records".
+
+| Board | Node | Covers |
+|---|---|---|
+| B9.1 Animation editor | `429:2350` | Entrance / Attention / Exit tab states, chip grid, timing block, CSS readout |
+| B9.2 Achievement prompt — step complete | `430:2348` | Scrim + card + countdown bar + next-up block |
+| B9.3 Achievement prompt — final step | `430:2375` | Success tone, no next-up, body copy |
+| B9.4 Milestone suggestion banner | `433:2348` | suggested · editing · saving |
+| B9.5 Migration progress modal | `433:2391` | running · failed (error banner, snapshot receipt, scoped retry) |
+| B9.6 Project settings modal | `434:2348` | General · Canvas · SEO |
+| B9.7 Page tab bar | `435:2348` | default · unsaved · renaming ×3 validations · context menu · delete confirm + undo toast |
+
+Every board carries a caption in the file's existing convention (Inter 12,
+ink-muted, below the board) explaining the design decisions, not just labelling
+the parts.
+
+**The boards are not transcriptions — designing them surfaced real defects,
+which were then fixed in code:**
+
+1. **Three ghost tokens rendering as nothing.** `--buildrick-bg-panel-secondary`
+   and `--buildrick-bg-dark` (AnimationEditor) and `--buildrick-surface-3`
+   (ProjectSettingsModal) are defined nowhere in `themes/`. Gate 17 only scans
+   `--bd-*` aliases in CSS files, so inline-JSX `--buildrick-*` refs slipped
+   past it: the unselected animation chips, the generated-CSS readout, and every
+   settings input had NO background at all. Fixed to `--buildrick-bg-app` /
+   `--buildrick-bg-card` with a real border.
+2. **Active page tab was invisible.** `PageTabBar` painted the strip AND the
+   active tab both `bg-card`, leaving the current page marked only by a 500
+   weight and a 5%-alpha shadow. The strip now takes `bg-app` so the active tab
+   reads as proud of it. Live-measured: strip `rgb(241,245,249)`, active tab
+   `rgb(255,255,255)` + `#E2E8F0` border + token shadow.
+3. **Dark-era hardcodes in AchievementPrompt.** `rgba(255,255,255,0.04)` panel,
+   `rgba(0,0,0,0.6)` shadow, and four `rgba(255,255,255,…)` colour fallbacks —
+   all leftovers from the dark-only direction retired 2026-04-18, all invisible
+   or wrong on the light chrome. Drained to canonical tokens.
+4. **Retired cobalt still shipping.** `MilestoneSuggestionBanner` bordered itself
+   with a raw `rgba(45,109,255,0.2)`, and — worse — `--buildrick-primary-alpha-15`
+   / `-alpha-30` in `color.css` still held the *retired* cobalt after the
+   2026-07-21 `#406ED6` migration. Those two tokens back the button shadow, badge
+   borders, list-row and history-panel focus rings and the info banner, so a
+   second blue was quietly shipping across the chrome. Both migrated.
+5. **Copy drift.** The settings modal rendered "Seo" (from capitalising the tab
+   id), "Project Settings", and Title Case field labels. Normalised to the
+   board: "SEO", "Project settings", sentence case throughout.
+
+**Verification:** Figma sweep across the seven boards — 0 collisions, 0
+overflowing children, 0 fixed-height auto-layout containers (the `resize()`
+hug-collapse trap), and the only multi-line text nodes are intentional body
+copy. Code side — a var()-resolution sweep proves all 37 distinct tokens
+referenced by the six surfaces now resolve (was 3 ghosts); `verify:ds` fully
+green with Gates 12/13/14 IMPROVED and the baselines ratcheted down
+(173→169 shadows, 267→260 radii, 333→332 layout literals); tsc clean both
+packages; 2220 tests green across 240 files. Live-walked on :5050: the page tab
+bar computed styles and the settings modal background/copy both match their
+boards.
+
+B9 CLOSED. With P0–P6 already shipped, the editor↔Figma convergence program has
+no open items in either direction.

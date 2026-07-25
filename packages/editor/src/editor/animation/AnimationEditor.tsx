@@ -106,15 +106,21 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
               key={anim.value}
               onClick={() => updateAnimation({ type: anim.value })}
               style={{
-                padding: "12px 8px",
+                // 11px label + 6px side padding: at 12px the longest presets
+                // ("Fade In Down", "Slide In Down", "Fade Out Down") wrapped to
+                // two lines inside a 1fr column (Figma board B9.1).
+                padding: "12px 6px",
                 background:
                   animation.type === anim.value
                     ? "var(--buildrick-accent)"
-                    : "var(--buildrick-bg-panel-secondary)",
-                border: "none",
-                borderRadius: 8,
+                    : "var(--buildrick-bg-app)",
+                border:
+                  animation.type === anim.value
+                    ? "none"
+                    : "1px solid var(--buildrick-border)",
+                borderRadius: "var(--bd-radius-sm)",
                 color: animation.type === anim.value ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
-                fontSize: 12,
+                fontSize: 11,
                 cursor: "pointer",
                 transition: "all 0.15s ease",
               }}
@@ -191,11 +197,12 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
         <div
           style={{
             padding: 12,
-            background: "var(--buildrick-bg-dark)",
-            borderRadius: 8,
+            background: "var(--buildrick-bg-app)",
+            border: "1px solid var(--buildrick-border)",
+            borderRadius: "var(--bd-radius-sm)",
             fontFamily: "var(--buildrick-font-family-mono)",
-            fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            fontSize: 10,
+            color: "var(--buildrick-text-secondary)",
           }}
         >
           animation: {animation.type} {animation.duration}ms {animation.easing} {animation.delay}ms{" "}

@@ -72,7 +72,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
         style={{
           position: "fixed",
           inset: 0,
-          background: "rgba(0,0,0,0.55)",
+          background: "var(--buildrick-overlay)",
           zIndex: 10000,
           cursor: "pointer",
         }}
@@ -90,10 +90,10 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           zIndex: 10001,
           width: 380,
           maxWidth: "calc(100vw - 48px)",
-          background: "var(--buildrick-bg-panel)",
-          border: "1px solid var(--buildrick-border-light)",
-          borderRadius: 16,
-          boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
+          background: "var(--buildrick-bg-card)",
+          border: "1px solid var(--buildrick-border)",
+          borderRadius: "var(--bd-radius-lg)",
+          boxShadow: "var(--bd-shadow-lg)",
           overflow: "hidden",
         }}
       >
@@ -121,9 +121,12 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                 width: 40,
                 height: 40,
                 borderRadius: "var(--bd-radius-full)",
+                // Was a tinted disc with a glyph on top — unreadable once the
+                // chrome flipped to the light theme. Solid fill, white glyph.
                 background: isLastStep
-                  ? "rgba(16,185,129,0.15)"
-                  : "rgba(45, 109, 255, 0.15)",
+                  ? "var(--buildrick-success)"
+                  : "var(--buildrick-accent)",
+                color: "var(--buildrick-text-on-accent)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -163,7 +166,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: "6px 0 0",
                     fontSize: 13,
-                    color: "var(--buildrick-text-secondary, rgba(255,255,255,0.6))",
+                    color: "var(--buildrick-text-secondary)",
                     lineHeight: 1.5,
                   }}
                 >
@@ -178,8 +181,11 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
             <div
               style={{
                 padding: "12px 14px",
-                background: "rgba(255,255,255,0.04)",
-                borderRadius: 10,
+                // Dark-theme leftover: a 4%-white wash is invisible on the light
+                // chrome, so the next-step block had no edge at all (board B9.2).
+                background: "var(--buildrick-bg-app)",
+                border: "1px solid var(--buildrick-border)",
+                borderRadius: "var(--bd-radius-md)",
                 marginBottom: 20,
                 display: "flex",
                 alignItems: "flex-start",
@@ -190,7 +196,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                 aria-hidden="true"
                 style={{
                   fontSize: 16,
-                  color: "var(--buildrick-text-tertiary, rgba(255,255,255,0.4))",
+                  color: "var(--buildrick-text-muted)",
                   flexShrink: 0,
                   marginTop: 2,
                 }}
@@ -202,7 +208,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: "0 0 2px",
                     fontSize: 11,
-                    color: "var(--buildrick-text-tertiary, rgba(255,255,255,0.4))",
+                    color: "var(--buildrick-text-muted)",
                     fontWeight: 600,
                     textTransform: "uppercase",
                     letterSpacing: 0.8,
@@ -214,7 +220,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: 0,
                     fontSize: 13,
-                    color: "var(--buildrick-text-secondary, rgba(255,255,255,0.7))",
+                    color: "var(--buildrick-text-secondary)",
                     fontWeight: 500,
                   }}
                 >
@@ -224,7 +230,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: "2px 0 0",
                     fontSize: 12,
-                    color: "var(--buildrick-text-tertiary, rgba(255,255,255,0.4))",
+                    color: "var(--buildrick-text-muted)",
                     lineHeight: 1.4,
                   }}
                 >

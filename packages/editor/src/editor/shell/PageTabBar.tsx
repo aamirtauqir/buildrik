@@ -413,7 +413,11 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
 const containerStyles: React.CSSProperties = {
   position: "relative",
   borderBottom: "1px solid var(--buildrick-border)",
-  background: "var(--buildrick-bg-card)",
+  // The strip carries the app background so the active tab (bg-card) reads as
+  // proud of it. Both were bg-card before, which left the active page marked
+  // only by a 500 weight and a 5%-alpha shadow — invisible in practice.
+  // Figma board B9.7 is the record.
+  background: "var(--buildrick-bg-app)",
 };
 
 // Outer row: tablist (scrollable) + add button (fixed, outside tablist)
@@ -448,10 +452,12 @@ const tabStyles: React.CSSProperties = {
 };
 
 const activeTabStyles: React.CSSProperties = {
-  background: "var(--buildrick-surface-2, #fff)",
+  background: "var(--buildrick-bg-card)",
+  border: "1px solid var(--buildrick-border)",
+  borderBottom: "none",
   color: "var(--buildrick-text-primary)",
   fontWeight: 500,
-  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+  boxShadow: "var(--bd-shadow-sm)",
 };
 
 const homeIconStyles: React.CSSProperties = {
@@ -502,10 +508,10 @@ const addButtonStyles: React.CSSProperties = {
 const menuStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10000,
-  background: "var(--buildrick-surface, #fff)",
+  background: "var(--buildrick-bg-card)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: 8,
-  boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+  borderRadius: "var(--bd-radius-sm-plus)",
+  boxShadow: "var(--bd-shadow-dropdown)",
   padding: 4,
   minWidth: 140,
 };

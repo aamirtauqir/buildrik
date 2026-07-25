@@ -116,8 +116,12 @@
   --buildrick-danger-bg: rgba(220, 38, 38, 0.05);
   --buildrick-success-bg: rgba(22, 163, 74, 0.10);
   --buildrick-status-synced: #16A34A;
-  --buildrick-primary-alpha-15: rgba(45, 109, 255, 0.15);
-  --buildrick-primary-alpha-30: rgba(45, 109, 255, 0.30);
+  /* Missed by the 2026-07-21 cobalt → #406ED6 migration: every other accent in
+     this file moved, these two kept the retired cobalt, so focus rings, badge
+     borders and the button shadow were tinted a different blue than the accent
+     they belong to. Surfaced by the B9 design-first pass. */
+  --buildrick-primary-alpha-15: rgba(64, 110, 214, 0.15);
+  --buildrick-primary-alpha-30: rgba(64, 110, 214, 0.30);
 
   /* Pill borders (retained for legacy component migration window) */
   --buildrick-pill-stroke: rgba(148, 163, 184, 0.35);

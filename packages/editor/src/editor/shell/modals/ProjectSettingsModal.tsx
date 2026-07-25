@@ -29,6 +29,14 @@ export interface ProjectSettingsModalProps {
 
 type TabId = "general" | "canvas" | "seo";
 
+// Capitalising the id gave "Seo". SEO is an initialism everywhere else in the
+// product (Settings › SEO), so the label is explicit (Figma board B9.6).
+const TAB_LABELS: Record<TabId, string> = {
+  general: "General",
+  canvas: "Canvas",
+  seo: "SEO",
+};
+
 export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
   isOpen,
   onClose,
@@ -95,7 +103,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
     <OverlayMount>
       <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
-          <ModalTitle>Project Settings</ModalTitle>
+          <ModalTitle>Project settings</ModalTitle>
           <ModalClose aria-label="Close modal">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
@@ -115,7 +123,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 color: activeTab === tab ? "var(--buildrick-text-primary)" : "var(--buildrick-text-muted)",
               }}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {TAB_LABELS[tab]}
             </Button>
           ))}
         </div>
@@ -124,7 +132,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         <div style={contentStyles}>
           {activeTab === "general" && (
             <Stack gap="md">
-              <label style={labelStyles}>Project Name</label>
+              <label style={labelStyles}>Project name</label>
               <Input
                 type="text"
                 value={projectName}
@@ -133,7 +141,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 placeholder="My Awesome Project"
               />
 
-              <label style={labelStyles}>Author / Description</label>
+              <label style={labelStyles}>Author / description</label>
               <Input
                 type="text"
                 value={projectDescription}
@@ -146,7 +154,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
           {activeTab === "canvas" && (
             <Stack gap="md">
-              <label style={labelStyles}>Grid Size (px)</label>
+              <label style={labelStyles}>Grid size (px)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Input
                   type="number"
@@ -157,7 +165,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                   max={100}
                 />
                 <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
-                  Width/Height in pixels
+                  Width / height in pixels
                 </span>
               </div>
 
@@ -167,7 +175,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                     checked={snapToGrid}
                     onChange={(e) => setSnapToGrid(e.target.checked)}
                     style={checkboxStyles} />
-                  <span>Snap to Grid</span>
+                  <span>Snap to grid</span>
                 </label>
               </div>
             </Stack>
@@ -175,7 +183,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
           {activeTab === "seo" && (
             <Stack gap="md">
-              <label style={labelStyles}>Site Name (SEO Default)</label>
+              <label style={labelStyles}>Site name (SEO default)</label>
               <Input
                 type="text"
                 value={siteTitle}
@@ -197,7 +205,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               Cancel
             </Button>
             <Button variant="primary" onClick={handleSave}>
-              Save Changes
+              Save changes
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -247,9 +255,11 @@ const labelStyles: React.CSSProperties = {
 
 const inputStyles: React.CSSProperties = {
   padding: "8px 12px",
-  background: "var(--buildrick-surface-3)",
+  // was --buildrick-surface-3, which is defined nowhere — the field rendered
+  // with no background at all on the light theme (Figma board B9.6).
+  background: "var(--buildrick-bg-card)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: 6,
+  borderRadius: "var(--bd-radius-sm)",
   color: "var(--buildrick-text-primary)",
   fontSize: 13,
 };
