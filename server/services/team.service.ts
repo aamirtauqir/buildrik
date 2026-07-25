@@ -12,12 +12,17 @@ const TEAM_ACTIONS = [
 ];
 
 export async function getTeamStats(workspaceId: string) {
-  const [total, active, pending] = await Promise.all([
+  const [total, active, pending, workspace] = await Promise.all([
     prisma.workspaceMember.count({ where: { workspaceId } }),
     prisma.workspaceMember.count({ where: { workspaceId, status: "ACTIVE" } }),
     prisma.invite.count({ where: { workspaceId, status: "PENDING" } }),
+    prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } }),
   ]);
-  return { total, active, pending };
+  // Seat capacity = the plan's team-member limit, so the UI can show
+  // "used / capacity" instead of members/members ("4 / 4" on a 25-seat plan).
+  const plan = (workspace?.plan ?? "FREE") as PlanName;
+  const limit = PLAN_LIMITS[plan].teamMembers as number;
+  return { total, active, pending, limit };
 }
 
 export async function listMembers(

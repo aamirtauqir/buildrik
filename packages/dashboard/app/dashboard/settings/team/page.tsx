@@ -149,7 +149,7 @@ export default function TeamPage() {
       <div className="mb-6 flex items-center justify-end gap-2">
         {statsQuery.data && (
           <span className="text-body-sm" style={{ color: "var(--color-text-secondary)" }}>
-            <MetricValue>{statsQuery.data.active} / {statsQuery.data.total}</MetricValue> seats
+            <MetricValue>{statsQuery.data.active} / {statsQuery.data.limit === -1 ? "∞" : statsQuery.data.limit}</MetricValue> seats
           </span>
         )}
         {!isEmpty && (

@@ -144,11 +144,13 @@ export async function setPrimaryDomain(id: string, siteId: string) {
   // Scope the promotion to {id, siteId}: a domain id belonging to another site
   // matches zero rows instead of being mutated under this site's authz check.
   return prisma.$transaction(async (tx) => {
+    const target = await tx.domain.findFirst({ where: { id, siteId }, select: { status: true } });
+    if (!target) throw new Error("DOMAIN_NOT_FOUND");
+    // Only a VERIFIED domain can be primary — the publish worker ignores an
+    // unverified primary, so promoting a PENDING one was a silent no-op at
+    // publish with no explanation.
+    if (target.status !== "VERIFIED") throw new Error("DOMAIN_NOT_VERIFIED");
     await tx.domain.updateMany({ where: { siteId }, data: { isPrimary: false } });
-    const promoted = await tx.domain.updateMany({
-      where: { id, siteId },
-      data: { isPrimary: true },
-    });
-    if (promoted.count === 0) throw new Error("DOMAIN_NOT_FOUND");
+    await tx.domain.update({ where: { id }, data: { isPrimary: true } });
   });
 }

@@ -75,18 +75,9 @@ export const billingRouter = router({
       throw e;
     }
   }),
-  switchInterval: protectedProcedure
-    .input(z.object({ interval: z.enum(["MONTHLY", "YEARLY"]) }))
-    .mutation(async ({ ctx, input }) => {
-      const wsId = await getWorkspaceId(ctx);
-      await requireOwner(ctx, wsId);
-      const subscription = await ctx.prisma.subscription.findUnique({ where: { workspaceId: wsId } });
-      if (!subscription) throw new TRPCError({ code: "NOT_FOUND", message: "No subscription" });
-      return ctx.prisma.subscription.update({
-        where: { workspaceId: wsId },
-        data: { interval: input.interval },
-      });
-    }),
+  // switchInterval removed: it did a raw subscription.update({interval}) with no
+  // Stripe reprice/proration (desyncing the DB from Stripe) and had no UI caller.
+  // A real interval change must go through Stripe (Checkout/Portal).
   reactivate: protectedProcedure.mutation(async ({ ctx }) => {
     const wsId = await getWorkspaceId(ctx);
     await requireOwner(ctx, wsId);

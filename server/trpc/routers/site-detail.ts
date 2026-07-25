@@ -275,7 +275,15 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return setPrimaryDomain(input.id, input.siteId);
+        try {
+          return await setPrimaryDomain(input.id, input.siteId);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "DOMAIN_NOT_VERIFIED")
+            throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Verify this domain before making it primary." });
+          if (e instanceof Error && e.message === "DOMAIN_NOT_FOUND")
+            throw new TRPCError({ code: "NOT_FOUND", message: "Domain not found." });
+          throw e;
+        }
       }),
   }),
 

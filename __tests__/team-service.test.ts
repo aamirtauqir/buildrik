@@ -32,10 +32,12 @@ describe("Team Service", () => {
         .mockResolvedValueOnce(5)
         .mockResolvedValueOnce(4);
       vi.mocked(prisma.invite.count).mockResolvedValue(2);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as any);
       const stats = await getTeamStats("ws1");
       expect(stats.total).toBe(5);
       expect(stats.active).toBe(4);
       expect(stats.pending).toBe(2);
+      expect(stats.limit).toBe(5); // PRO teamMembers
     });
   });
 
