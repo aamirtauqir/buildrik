@@ -1,4 +1,6 @@
 import crypto from "node:crypto";
+import net from "node:net";
+import dns from "node:dns/promises";
 import { prisma } from "@/lib/prisma";
 import type { ConnectWebhookInput, WebhookEvent } from "@buildrik/shared/schemas/webhooks";
 
@@ -18,6 +20,63 @@ function newSecret(): string {
   return `whsec_${crypto.randomBytes(24).toString("hex")}`;
 }
 
+// ── SSRF guard ────────────────────────────────────────────────────────────────
+// The endpoint URL is admin-supplied and fetched from the server, so without
+// a guard any workspace admin could aim deliveries at loopback services,
+// RFC1918 hosts, or cloud metadata (169.254.169.254). Deliveries are blind
+// (the response body never reaches the caller), but blind POSTs into internal
+// services are still an SSRF primitive.
+
+function isPrivateV4(ip: string): boolean {
+  const [a, b] = ip.split(".").map(Number);
+  return (
+    a === 0 || // 0.0.0.0/8
+    a === 10 || // 10/8
+    a === 127 || // loopback
+    (a === 100 && b >= 64 && b <= 127) || // 100.64/10 CGNAT
+    (a === 169 && b === 254) || // link-local (cloud metadata)
+    (a === 172 && b >= 16 && b <= 31) || // 172.16/12
+    (a === 192 && b === 168) // 192.168/16
+  );
+}
+
+export function isPrivateAddress(ip: string): boolean {
+  if (net.isIPv4(ip)) return isPrivateV4(ip);
+  const v6 = ip.toLowerCase();
+  if (v6 === "::" || v6 === "::1") return true;
+  if (v6.startsWith("::ffff:")) {
+    const mapped = v6.slice(7);
+    return net.isIPv4(mapped) ? isPrivateV4(mapped) : true;
+  }
+  if (/^fe[89ab]/.test(v6)) return true; // fe80::/10 link-local
+  if (v6.startsWith("fc") || v6.startsWith("fd")) return true; // fc00::/7 unique-local
+  return false;
+}
+
+/**
+ * Throws WEBHOOK_URL_UNSAFE when the URL could reach loopback / private /
+ * link-local address space. Scheme must be https (http allowed outside
+ * production so local dev receivers keep working; the private-range check is
+ * production-only for the same reason). Residual risk: no IP pinning between
+ * this lookup and the fetch connect (DNS rebinding window) — accepted for a
+ * blind, best-effort delivery; revisit with a custom undici dispatcher if
+ * webhook responses ever become readable.
+ */
+export async function assertSafeWebhookUrl(rawUrl: string): Promise<void> {
+  const url = new URL(rawUrl); // upstream zod guarantees URL shape; throws on garbage
+  const isProd = process.env.NODE_ENV === "production";
+  const schemeOk = url.protocol === "https:" || (url.protocol === "http:" && !isProd);
+  if (!schemeOk) throw new Error("WEBHOOK_URL_UNSAFE");
+  if (!isProd) return;
+  const host = url.hostname.replace(/^\[|\]$/g, ""); // strip IPv6 brackets
+  const addrs = net.isIP(host)
+    ? [{ address: host }]
+    : await dns.lookup(host, { all: true, verbatim: true }).catch(() => []);
+  if (addrs.length === 0 || addrs.some((a) => isPrivateAddress(a.address))) {
+    throw new Error("WEBHOOK_URL_UNSAFE");
+  }
+}
+
 export async function getWorkspaceWebhook(workspaceId: string) {
   return prisma.workspaceWebhook.findUnique({ where: { workspaceId } });
 }
@@ -25,6 +84,7 @@ export async function getWorkspaceWebhook(workspaceId: string) {
 /** Connect (or update) the workspace endpoint. Keeps the existing secret on
  *  URL/event edits — regeneration is its own deliberate action. */
 export async function connectWebhook(workspaceId: string, input: ConnectWebhookInput) {
+  await assertSafeWebhookUrl(input.url);
   return prisma.workspaceWebhook.upsert({
     where: { workspaceId },
     create: { workspaceId, url: input.url, events: [...input.events], secret: newSecret() },
@@ -98,6 +158,17 @@ export async function deliverWebhook(
     const hook = await prisma.workspaceWebhook.findUnique({ where: { workspaceId } });
     if (!hook || !hook.events.includes(event)) return;
 
+    // Re-validate at delivery time — the URL was checked at connect, but its
+    // DNS can be repointed at private space afterwards.
+    try {
+      await assertSafeWebhookUrl(hook.url);
+    } catch {
+      await prisma.webhookDelivery.create({
+        data: { webhookId: hook.id, event, status: "FAILED", httpStatus: null, error: "blocked: URL resolves to a private address" },
+      });
+      return;
+    }
+
     const body = JSON.stringify({ event, createdAt: new Date().toISOString(), data: payload });
     const signature = crypto.createHmac("sha256", hook.secret).update(body).digest("hex");
 
@@ -113,6 +184,9 @@ export async function deliverWebhook(
           "x-buildrick-signature": `sha256=${signature}`,
         },
         body,
+        // A redirect could bounce the signed POST into private address space
+        // after the URL check — webhooks never follow redirects.
+        redirect: "error",
         signal: AbortSignal.timeout(DELIVERY_TIMEOUT_MS),
       });
       httpStatus = res.status;

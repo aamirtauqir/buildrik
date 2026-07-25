@@ -36,7 +36,16 @@ export const webhooksRouter = router({
       if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
       throw e;
     }
-    return connectWebhook(workspaceId, input);
+    try {
+      return await connectWebhook(workspaceId, input);
+    } catch (e) {
+      if (e instanceof Error && e.message === "WEBHOOK_URL_UNSAFE")
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "That URL can't receive webhooks — use a public https endpoint.",
+        });
+      throw e;
+    }
   }),
 
   disconnect: protectedProcedure.mutation(async ({ ctx }) => {
