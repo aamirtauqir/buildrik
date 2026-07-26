@@ -1,7 +1,3 @@
-import { Input as VibcoderInput } from "@/editor/shared/vibcoder/Input";
-import { Textarea as VibcoderTextarea } from "@/editor/shared/vibcoder/Textarea";
-import { Select as VibcoderSelect } from "@/editor/shared/vibcoder/Select";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Settings tab — shared primitives.
  *
@@ -22,6 +18,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input as VibcoderInput, Select as VibcoderSelect, Textarea as VibcoderTextarea } from "@/editor/ui";
 import { SIDEBAR_WIDE } from "@/shared/constants/layout";
 import "./settings.css";
 

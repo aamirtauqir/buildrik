@@ -9,8 +9,8 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Input, Screen, Section, Select, Textarea } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -271,7 +271,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
           <div role="alert" style={errorStyles}>{saveError}</div>
         )}
         <Button
-          variant="primary"
+          kind="primary"
           size="sm"
           type="button"
           onClick={handleSave}

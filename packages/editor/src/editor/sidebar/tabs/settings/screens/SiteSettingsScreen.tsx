@@ -4,10 +4,10 @@
  */
 
 import * as React from "react";
+import { Stack } from "@/editor/ui";
 import { Field, Input, Screen, Section, Select } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
-import { Stack } from "@/editor/shared/vibcoder";
 
 interface IdentitySettings {
   siteName: string;

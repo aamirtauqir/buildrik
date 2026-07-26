@@ -13,10 +13,9 @@
  */
 
 import * as React from "react";
+import { Button, Checkbox } from "@/editor/ui";
 import { createBuildrikApiClient } from "@/services/api-client";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { Field, Input, Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
 
@@ -185,7 +184,7 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
         {!loading && !status && !editing && (
           <div className="bd-set-webhook-empty">
             <div className="bd-set-section-d">No endpoint connected.</div>
-            <Button variant="secondary" size="sm" onClick={() => startEdit(null)}>
+            <Button kind="secondary" size="sm" onClick={() => startEdit(null)}>
               Connect endpoint
             </Button>
           </div>
@@ -212,14 +211,14 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
             {submitError && <div className="bd-set-section-d">{submitError}</div>}
             <div className="bd-set-webhook-actions">
               <Button
-                variant="primary"
+                kind="primary"
                 size="sm"
                 disabled={submitting || !url.trim() || events.length === 0}
                 onClick={() => void handleSave()}
               >
                 {submitting ? "Saving…" : status ? "Save changes" : "Connect"}
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
+              <Button kind="ghost" size="sm" onClick={() => setEditing(false)}>
                 Cancel
               </Button>
             </div>
@@ -246,10 +245,10 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
             <Field label="Signing secret" hint="Verify deliveries by recomputing the HMAC with this secret">
               <div className="bd-set-webhook-secret">
                 <code>{secretVisible ? status.secret : maskSecret(status.secret)}</code>
-                <Button variant="ghost" size="sm" onClick={() => setSecretVisible((v) => !v)}>
+                <Button kind="ghost" size="sm" onClick={() => setSecretVisible((v) => !v)}>
                   {secretVisible ? "Hide" : "Reveal"}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => void navigator.clipboard?.writeText(status.secret)}>
+                <Button kind="ghost" size="sm" onClick={() => void navigator.clipboard?.writeText(status.secret)}>
                   Copy
                 </Button>
               </div>
@@ -262,8 +261,8 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
                   with the new secret.
                 </div>
                 <div className="bd-set-webhook-actions">
-                  <Button variant="primary" size="sm" onClick={() => void handleRegenerate()}>Regenerate</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setConfirming(null)}>Cancel</Button>
+                  <Button kind="primary" size="sm" onClick={() => void handleRegenerate()}>Regenerate</Button>
+                  <Button kind="ghost" size="sm" onClick={() => setConfirming(null)}>Cancel</Button>
                 </div>
               </div>
             )}
@@ -274,17 +273,17 @@ export const WebhooksScreen: React.FC<ScreenProps> = ({ onDirtyChange }) => {
                   events immediately.
                 </div>
                 <div className="bd-set-webhook-actions">
-                  <Button variant="primary" size="sm" onClick={() => void handleDisconnect()}>Disconnect</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setConfirming(null)}>Cancel</Button>
+                  <Button kind="primary" size="sm" onClick={() => void handleDisconnect()}>Disconnect</Button>
+                  <Button kind="ghost" size="sm" onClick={() => setConfirming(null)}>Cancel</Button>
                 </div>
               </div>
             )}
 
             {confirming === null && (
               <div className="bd-set-webhook-actions">
-                <Button variant="secondary" size="sm" onClick={() => startEdit(status)}>Edit</Button>
-                <Button variant="ghost" size="sm" onClick={() => setConfirming("regenerate")}>Regenerate secret</Button>
-                <Button variant="ghost" size="sm" onClick={() => setConfirming("disconnect")}>Disconnect</Button>
+                <Button kind="secondary" size="sm" onClick={() => startEdit(status)}>Edit</Button>
+                <Button kind="ghost" size="sm" onClick={() => setConfirming("regenerate")}>Regenerate secret</Button>
+                <Button kind="ghost" size="sm" onClick={() => setConfirming("disconnect")}>Disconnect</Button>
               </div>
             )}
           </div>

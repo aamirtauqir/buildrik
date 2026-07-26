@@ -10,8 +10,8 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -261,7 +261,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
             <Button
               key={f}
               type="button"
-              variant="ghost"
+              kind="ghost"
               size="sm"
               role="tab"
               aria-selected={filter === f}
@@ -277,7 +277,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
       <Section title={`Submissions${submissions ? ` (${submissions.total})` : ""}`}>
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
           <Button
-            variant="ghost"
+            kind="ghost"
             size="sm"
             type="button"
             onClick={handleExport}
@@ -301,7 +301,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                 <li key={s.id} style={s.isRead ? rowStyles : rowUnreadStyles}>
                   <Button
                     type="button"
-                    variant="ghost"
+                    kind="ghost"
                     onClick={() => {
                       setExpandedId(isExpanded ? null : s.id);
                       if (!s.isRead) void handleUpdate(s.id, { isRead: true });
@@ -329,26 +329,26 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                       </dl>
                       <div style={actionsStyles}>
                         {!s.isSpam && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles}>
+                          <Button kind="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles}>
                             Mark spam
                           </Button>
                         )}
                         {s.isSpam && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles}>
+                          <Button kind="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles}>
                             Not spam
                           </Button>
                         )}
                         {!s.isArchived && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles}>
+                          <Button kind="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles}>
                             Archive
                           </Button>
                         )}
                         {s.isArchived && (
-                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles}>
+                          <Button kind="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles}>
                             Unarchive
                           </Button>
                         )}
-                        <Button variant="ghost" size="sm" type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles}>
+                        <Button kind="ghost" size="sm" type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles}>
                           Delete
                         </Button>
                       </div>
@@ -362,7 +362,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
         {submissions && submissions.total > PER_PAGE && (
           <div style={paginationStyles}>
             <Button
-              variant="ghost"
+              kind="ghost"
               size="sm"
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -375,7 +375,7 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
               Page {page} of {totalPages}
             </span>
             <Button
-              variant="ghost"
+              kind="ghost"
               size="sm"
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}

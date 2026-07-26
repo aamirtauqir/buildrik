@@ -6,8 +6,8 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { createBuildrikApiClient } from "@/services/api-client";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Input, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
@@ -212,7 +212,7 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
           {submitError && (
             <div role="alert" style={errorStyles}>{submitError}</div>
           )}
-          <Button type="submit" variant="primary" disabled={submitting} style={addButtonStyles}>
+          <Button type="submit" kind="primary" disabled={submitting} style={addButtonStyles}>
             {submitting ? "Adding…" : "Add redirect"}
           </Button>
         </form>
@@ -238,7 +238,7 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
                 <div style={metaColStyles}>
                   <span style={typeBadgeStyles}>{r.type}</span>
                   <Button
-                    variant="ghost"
+                    kind="ghost"
                     size="sm"
                     type="button"
                     onClick={() => handleDelete(r.id)}

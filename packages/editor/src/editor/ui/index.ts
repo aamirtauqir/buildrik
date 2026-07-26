@@ -18,6 +18,7 @@ export { Toggle, type ToggleProps } from "./Toggle";
 export { Badge, type BadgeProps, type BadgeKind } from "./Badge";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
 export { Avatar, type AvatarProps, type AvatarSize } from "./Avatar";
+export { Textarea, type TextareaProps } from "./Textarea";
 
 /* ── Molecules ──────────────────────────────────────────────────────────── */
 export { Row, type RowProps, type RowSize } from "./Row";
@@ -51,3 +52,9 @@ export { CommandPalette, type CommandPaletteProps, type Command } from "./Comman
 
 /* ── Shell ──────────────────────────────────────────────────────────────── */
 export { EditorShell, type EditorShellProps } from "./EditorShell";
+
+/* ── Layout + compositions ──────────────────────────────────────────────── */
+export { Stack, type StackProps, type StackGap } from "./Stack";
+export { PanelFrame, type PanelFrameProps, type PanelFrameHeaderProps, type PanelFrameBodyProps, type PanelWidth } from "./PanelFrame";
+export { Tabs, type TabsProps, type Tab } from "./Tabs";
+export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";

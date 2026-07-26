@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Integrations screen — L1: actionable cards with external links
  * Real integration API not yet available; each card links to docs/external setup.
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { INTEGRATION_CATALOG } from "../constants";
 import { Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
