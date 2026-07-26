@@ -48,3 +48,6 @@ export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "
 export { Topbar, TopbarSpacer, type TopbarProps } from "./Topbar";
 export { Footer, FooterSpacer, type FooterProps } from "./Footer";
 export { CommandPalette, type CommandPaletteProps, type Command } from "./CommandPalette";
+
+/* ── Shell ──────────────────────────────────────────────────────────────── */
+export { EditorShell, type EditorShellProps } from "./EditorShell";
