@@ -20,6 +20,8 @@ const composer = {
   getProjectSettings: () => ({ designTokens: [] }),
   // set-image recall (W5): gatherMediaAssets reads the media library.
   media: { getAssets: () => [] },
+  // agent-run takeover (P4): the runner broadcasts ai:agent-run to the inspector.
+  emit: vi.fn(),
 } as never;
 
 const PLAN = [
