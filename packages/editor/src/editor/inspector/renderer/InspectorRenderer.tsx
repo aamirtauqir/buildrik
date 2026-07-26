@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * InspectorRenderer — turns a SectionSchema into React.
  *
@@ -21,6 +20,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { defaultControlRegistry } from "./controlRegistry";
 import type {
   AtomicField,

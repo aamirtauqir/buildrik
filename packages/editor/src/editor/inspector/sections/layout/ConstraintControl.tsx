@@ -1,11 +1,10 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Constraint Control - Fixed / Fill / Hug size controls
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { constraintBtnStyle, fixedInputStyle } from "./styles";
 
 // ============================================================================

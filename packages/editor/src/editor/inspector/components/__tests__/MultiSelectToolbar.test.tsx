@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * MultiSelectToolbar — alignment / distribution gating (align needs 2+,
  * distribute needs 3+), handler wiring, and the batch panel's Mixed labelling.
@@ -7,7 +8,6 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { MultiSelectToolbar } from "../MultiSelectToolbar";
 import { AlignmentHandler } from "@/engine/canvas/AlignmentHandler";
 import { makeMockElement, makeMockComposer } from "@/editor/inspector/__tests__/harness";

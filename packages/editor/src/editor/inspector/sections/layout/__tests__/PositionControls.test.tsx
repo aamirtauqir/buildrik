@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * PositionControls — position-mode buttons, offset inputs gated on a non-static
  * position, z-index row, disabled/reason plumbing, and Mixed badges.
@@ -7,7 +8,6 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { PositionControls } from "../PositionControls";
 
 type Props = React.ComponentProps<typeof PositionControls>;

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Animation Section - CSS Animations with presets
  * AQUI-026: Basic Interactions/Animations
@@ -8,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { AnimationConfig } from "../../../shared/types/animations";
 import { DEFAULT_ANIMATION, generateAnimationCSS } from "../../../shared/types/animations";
 import { AnimationEditor } from "../../animation/AnimationEditor";

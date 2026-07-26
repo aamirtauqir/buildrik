@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Interaction Editor Component
  * Editor panel for configuring a single interaction's animation settings
@@ -6,8 +5,8 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { SelectField } from "../../../../shared/forms";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
 
 // ============================================================================
@@ -151,7 +150,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.buttonRow}>
         <Button
           onClick={() => onPreview?.(interaction)}
-          variant="secondary"
+          kind="secondary"
           size="sm"
           style={{ flex: 1 }}
         >
@@ -164,7 +163,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.buttonRowSecondary}>
         <Button
           onClick={() => onToggleEnabled(interaction.id)}
-          variant="secondary"
+          kind="secondary"
           size="sm"
           style={{ flex: 1 }}
         >
@@ -172,7 +171,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         </Button>
         <Button
           onClick={() => onRemove(interaction.id)}
-          variant="danger"
+          kind="destructive"
           size="sm"
           style={{ flex: 1 }}
         >

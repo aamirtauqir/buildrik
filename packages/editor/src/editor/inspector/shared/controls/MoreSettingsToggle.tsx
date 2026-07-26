@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * MoreSettingsToggle — progressive disclosure. Ported to .bdi-adv.
  *
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 
 export interface MoreSettingsToggleProps {
   isOpen: boolean;

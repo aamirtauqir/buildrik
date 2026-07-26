@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Spacing Controls — nested Webflow box (margin + padding) + CornerRadiusInput.
  * Ported to .bdi-box / .bdi-mbox / .bdi-pbox / .bdi-ax per comp-inspector.html v2.
@@ -13,7 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
-import { Stack } from "@/editor/shared/vibcoder";
+import { Button, Input, Stack } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { DSBindingChip } from "../../sections/DSBindingChip";

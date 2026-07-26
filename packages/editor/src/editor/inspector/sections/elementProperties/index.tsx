@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Element Properties Section - Per-element specific attributes
  * href, src, alt, placeholder, etc.
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../../../shared/types/media";
 import { Section, type SectionTier } from "../../shared/controls";

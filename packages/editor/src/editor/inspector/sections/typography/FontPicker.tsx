@@ -1,5 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * FontPicker - Font family dropdown with Google Fonts integration
  * Part of Typography section refactoring
@@ -9,6 +7,7 @@ import { Stack } from "@/editor/shared/vibcoder/Stack";
  */
 
 import * as React from "react";
+import { Button, Stack } from "@/editor/ui";
 import {
   GoogleFontsService,
   loadGoogleFont,

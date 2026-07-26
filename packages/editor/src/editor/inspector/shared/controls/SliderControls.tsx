@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Slider Controls — SliderInput, RangeSlider. Ported to .bdi-row-ctrl with
  * numeric value display on the right.
@@ -7,6 +6,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Input } from "@/editor/ui";
 
 // ============================================================================
 // SLIDER INPUT

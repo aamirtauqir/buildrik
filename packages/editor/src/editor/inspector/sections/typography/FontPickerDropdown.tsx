@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * FontPickerDropdown - Dropdown components for font selection
  * Part of Typography section refactoring
@@ -9,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import type { GoogleFont, FontCategory } from "../../../../services/GoogleFontsService";
 import type { SystemFont } from "./FontPicker";
 

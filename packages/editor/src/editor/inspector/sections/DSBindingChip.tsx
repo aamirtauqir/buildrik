@@ -15,8 +15,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { useDSModeOptional } from "../../design-system/state/DSModeContext";
-import { Button } from "@/editor/shared/vibcoder/Button";
 
 export type DSBindingState = "token" | "preset" | "off-ds";
 
@@ -143,7 +143,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
       {chip}
       <Button
-        variant="ghost"
+        kind="ghost"
         size="sm"
         type="button"
         onClick={onBindRequest}

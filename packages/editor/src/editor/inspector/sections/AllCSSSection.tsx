@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * AllCSSSection - Raw CSS property editor (Dev Mode only)
  * Allows adding any CSS property directly
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { InputField } from "../../../shared/forms/InputField";
 import { runTransaction } from "../../../shared/utils/helpers";

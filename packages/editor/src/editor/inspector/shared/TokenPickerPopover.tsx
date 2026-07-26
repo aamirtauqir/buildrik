@@ -1,6 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * TokenPickerPopover — pick a design-system token or enter a raw value.
  *
@@ -23,6 +20,7 @@ import { Stack } from "@/editor/shared/vibcoder/Stack";
  */
 
 import * as React from "react";
+import { Button, Input, Stack } from "@/editor/ui";
 
 // ============================================================================
 // TYPES

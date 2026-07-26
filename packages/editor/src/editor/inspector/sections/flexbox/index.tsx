@@ -1,10 +1,10 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Flexbox Section - Enhanced visual controls with icons and grid picker
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { Section, baseStyles, type SectionTier } from "../../shared/controls";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { AlignmentSection } from "./AlignmentSection";

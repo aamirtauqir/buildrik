@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Visibility Section — per-breakpoint show/hide toggles.
  * Ported to .bdi-sw-row + .bdi-sw-ctrl pattern per comp-inspector.v1.
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { BREAKPOINTS as SHARED_BREAKPOINTS } from "../../../shared/constants/breakpoints";
 import { Section, type SectionTier } from "../shared/controls/Section";
 

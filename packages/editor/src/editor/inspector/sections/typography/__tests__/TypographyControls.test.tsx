@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * TypographyControls — the advanced typography block: color, align, transform,
  * white-space, word-break, vertical-align, word-spacing/text-indent, plus the
@@ -8,7 +9,6 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { TypographyControls } from "../TypographyControls";
 
 function renderTypo(styles: Record<string, string> = {}, mixedKeys?: ReadonlySet<string>) {

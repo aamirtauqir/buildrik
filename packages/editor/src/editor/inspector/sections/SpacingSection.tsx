@@ -3,11 +3,11 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { Link, Link2Off } from "lucide-react";
 import { Section, SpacingBox, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
 import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
-import { Button } from "@/editor/shared/vibcoder/Button";
 
 export interface SpacingSectionProps {
   styles: Record<string, string>;
@@ -142,7 +142,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
           four (margin or padding). */}
       <div style={{ display: "flex", gap: 4, marginBottom: 6 }}>
         <Button
-          variant={marginLinked ? "secondary" : "bare"}
+          kind={marginLinked ? "secondary" : "ghost"}
           size="sm"
           onClick={() => setMarginLinked((v) => !v)}
           aria-pressed={marginLinked}
@@ -152,7 +152,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
           <span style={{ marginLeft: 4 }}>Margin</span>
         </Button>
         <Button
-          variant={paddingLinked ? "secondary" : "bare"}
+          kind={paddingLinked ? "secondary" : "ghost"}
           size="sm"
           onClick={() => setPaddingLinked((v) => !v)}
           aria-pressed={paddingLinked}

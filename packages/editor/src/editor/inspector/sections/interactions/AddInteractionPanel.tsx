@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Add Interaction Panel Component
  * Panel for selecting and adding new interaction triggers
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { type InteractionTrigger, TRIGGER_GROUPS } from "./types";
 
 // ============================================================================

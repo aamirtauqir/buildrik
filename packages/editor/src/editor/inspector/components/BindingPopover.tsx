@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * BindingPopover — Link element content to a CMS collection field (WS-14b)
  * PRD §12.3 — Chain icon button + popover with collection/field selection
@@ -12,6 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { CMSCollection, CMSContentItem } from "../../../shared/types/cms";

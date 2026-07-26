@@ -24,8 +24,8 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { ChevronDown } from "lucide-react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import type { Composer } from "../../../engine";
 
 interface ScopeDropdownProps {
@@ -135,7 +135,7 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
           }}
         >
           <Button
-            variant="bare"
+            kind="ghost"
             style={{ ...optionRow, background: "var(--bk-accent-tint)" }}
             title="Just this element"
           >
@@ -143,7 +143,7 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
             <span style={optSub}>just here — the default</span>
           </Button>
           <Button
-            variant="bare"
+            kind="ghost"
             style={optionRow}
             disabled={peers.length === 0}
             onClick={() => setConfirming(true)}
@@ -153,7 +153,7 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
             <span style={optSub}>{peers.length} {peers.length === 1 ? "instance" : "instances"}</span>
           </Button>
           <Button
-            variant="bare"
+            kind="ghost"
             style={optionRow}
             title="Site-wide colors & fonts live in the Styles tab"
             onClick={() => {
@@ -171,8 +171,8 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
                 Apply this element&apos;s styles to the <strong>{othersLabel}</strong> on this page?
               </p>
               <div style={{ display: "flex", gap: 6 }}>
-                <Button variant="primary" size="sm" onClick={propagate}>Apply to {peers.length}</Button>
-                <Button variant="bare" size="sm" onClick={() => setConfirming(false)}>Cancel</Button>
+                <Button kind="primary" size="sm" onClick={propagate}>Apply to {peers.length}</Button>
+                <Button kind="ghost" size="sm" onClick={() => setConfirming(false)}>Cancel</Button>
               </div>
             </div>
           )}

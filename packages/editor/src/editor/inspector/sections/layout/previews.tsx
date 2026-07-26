@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
+import { Stack } from "@/editor/ui";
 
 // ============================================================================
 // DISPLAY PREVIEW

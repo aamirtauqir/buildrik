@@ -1,11 +1,10 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Overflow & Visibility Controls - Overflow, visibility, float, and clear controls
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button, Select } from "@/editor/ui";
 import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 

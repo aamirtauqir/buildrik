@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { DEFAULT_ANIMATION } from "../../../../shared/types/animations";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { Section } from "../../shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
@@ -120,7 +120,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
 
         {/* Add Interaction Button / Panel */}
         {!showAddPanel ? (
-          <Button onClick={() => setShowAddPanel(true)} variant="secondary" size="sm" style={{
+          <Button onClick={() => setShowAddPanel(true)} kind="secondary" size="sm" style={{
             width: "100%"
           }}>
             + Add Interaction

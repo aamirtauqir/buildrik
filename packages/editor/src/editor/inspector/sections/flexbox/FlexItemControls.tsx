@@ -1,11 +1,10 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * FlexItemControls - Flex item (child) properties: grow, shrink, basis, order
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================

@@ -1,10 +1,10 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * EnableFlexPrompt - Prompts user to enable Flexbox on a container
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 
 // ============================================================================
 // TYPES

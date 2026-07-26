@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * LayoutSection (index) — collapsed preview string + advanced disclosure of the
  * Overflow / Visibility groups behind the MoreSettingsToggle.
@@ -7,7 +8,6 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { LayoutSection } from "../index";
 
 type Props = React.ComponentProps<typeof LayoutSection>;

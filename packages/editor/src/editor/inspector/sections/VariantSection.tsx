@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * VariantSection - Component variant picker for instances
  * Shows when selected element is a component instance with variants
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { Package } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { ComponentDefinition } from "../../../shared/types/components";

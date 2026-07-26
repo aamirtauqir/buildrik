@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * QuickActionsSection — one-click display presets per comp-inspector.v1 mock.
  *
@@ -13,6 +12,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { Section, type SectionTier } from "../shared/controls";
 
 export interface QuickActionsSectionProps {

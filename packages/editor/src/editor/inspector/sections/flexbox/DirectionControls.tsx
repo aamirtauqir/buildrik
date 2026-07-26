@@ -1,10 +1,10 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * DirectionControls - Flex direction selection with visual icons
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DirectionIcon } from "./icons";
 

@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Flexbox Control Components
  * AlignmentGrid (9-dot picker) and GapSlider
@@ -7,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 
 // ============================================================================
 // ALIGNMENT GRID - 9-dot visual alignment picker

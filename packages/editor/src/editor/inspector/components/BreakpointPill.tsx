@@ -14,9 +14,9 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { ChevronDown, Monitor, Tablet, Smartphone } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import {
   BREAKPOINTS,
   BREAKPOINT_ORDER,

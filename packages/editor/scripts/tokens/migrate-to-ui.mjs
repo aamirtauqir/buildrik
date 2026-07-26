@@ -44,9 +44,43 @@ const NEEDS_HUMAN = new Set([
   "SkeletonCompounds", "UpgradeModal", "CopyButton", "ErrorState", "HelpTooltip", "Icons",
 ]);
 
+/**
+ * Walk to the real end of a JSX open tag, respecting braces and strings.
+ * A regex cannot do this: `onClick={() => x}` contains a `>` that ends the
+ * match early, which is how batch 4 ended up with variant= props unrenamed.
+ */
+function eachTag(src, tag, transform) {
+  const open = new RegExp(`<${tag}(?=[\\s/>])`, "g");
+  let out = "";
+  let last = 0;
+  let m;
+  while ((m = open.exec(src)) !== null) {
+    const start = m.index;
+    let i = start;
+    let depth = 0;
+    let quote = null;
+    for (; i < src.length; i++) {
+      const c = src[i];
+      if (quote) {
+        if (c === quote && src[i - 1] !== "\\") quote = null;
+        continue;
+      }
+      if (c === '"' || c === "'" || c === "`") quote = c;
+      else if (c === "{") depth++;
+      else if (c === "}") depth--;
+      else if (c === ">" && depth === 0) break;
+    }
+    const end = Math.min(i + 1, src.length);
+    out += src.slice(last, start) + transform(src.slice(start, end));
+    last = end;
+    open.lastIndex = end;
+  }
+  return out + src.slice(last);
+}
+
 /** Rename attributes only inside the given JSX tag. */
 function renameAttrsInTag(src, tag, renames) {
-  return src.replace(new RegExp(`<${tag}\\b[^>]*?/?>`, "gs"), (match) => {
+  return eachTag(src, tag, (match) => {
     let out = match;
     for (const [from, to] of Object.entries(renames)) out = out.replace(new RegExp(`\\b${from}=`, "g"), `${to}=`);
     return out;
@@ -56,7 +90,7 @@ function renameAttrsInTag(src, tag, renames) {
 /** Map legacy variant values onto the new kind vocabulary, tag-scoped. */
 function mapVariantValues(src, tag) {
   const VALUES = { danger: "destructive", publish: "primary", bare: "ghost" };
-  return src.replace(new RegExp(`<${tag}\\b[^>]*?/?>`, "gs"), (match) =>
+  return eachTag(src, tag, (match) =>
     match.replace(/\bkind=\{?["']([a-z]+)["']\}?/g, (_m, v) => `kind="${VALUES[v] ?? v}"`),
   );
 }
@@ -124,10 +158,7 @@ for (const file of files) {
   s = s.replace(/(<ConfirmDialog[^>]*?)kind="destructive"/gs, "$1destructive");
   s = s.replace(/(<ConfirmDialog[^>]*?)kind="primary"/gs, "$1");
   s = s.replace(/<Badge\s+size=\{?["'][a-z]+["']\}?\s*\/>/g, '<Badge kind="pro">PRO</Badge>');
-  s = renameAttrsInTag(s, "Button", { size: "size" }).replace(
-    /<Button\b[^>]*?\/?>/gs,
-    (m) => m.replace(/\bsize=\{?["']lg["']\}?/g, 'size="md"'),
-  );
+  s = eachTag(s, "Button", (m) => m.replace(/\bsize=\{?["']lg["']\}?/g, 'size="md"'));
 
   const importLine = `import { ${[...imported].sort().join(", ")} } from "@/editor/ui";\n`;
   if (/^import .*from "react";?\n/m.test(s)) s = s.replace(/^(import .*from "react";?\n)/m, `$1${importLine}`);

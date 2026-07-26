@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * InspectorElementMenu — three-dot overflow menu for element actions.
  *
@@ -18,6 +17,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Copy, ClipboardPaste, CopyPlus, MoreHorizontal, Trash2 } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 

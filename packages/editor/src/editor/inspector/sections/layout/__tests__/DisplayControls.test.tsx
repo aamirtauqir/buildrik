@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * DisplayControls — display-mode buttons + the Flex/Grid hint box + Mixed badge.
  *
@@ -6,7 +7,6 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { DisplayControls } from "../DisplayControls";
 
 function renderDisplay(display = "", mixedKeys?: ReadonlySet<string>) {

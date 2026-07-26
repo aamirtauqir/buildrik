@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Text Controls — TextInputRow, InlineInput, SectionLabel, SubSectionTitle.
  * Ported to .bdi-text + .bdi-row-ctrl + .bdi-sub-label.
@@ -7,6 +6,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Input } from "@/editor/ui";
 
 // ============================================================================
 // TEXT INPUT ROW

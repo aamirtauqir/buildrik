@@ -12,9 +12,9 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { PseudoStateId } from "../../../shared/types";
 
 const PSEUDO_LABELS: Record<PseudoStateId, string> = {
