@@ -82,7 +82,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
                 style={{
                   width: 32,
                   height: 32,
-                  background: "var(--buildrick-surface-5)",
+                  background: "var(--buildrick-bg-pressed)",
                   borderRadius: "var(--buildrick-radius-sm)",
                   flexShrink: 0,
                 }}
@@ -132,7 +132,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
             style={{
               width: 32,
               height: 32,
-              background: "var(--buildrick-surface-5)",
+              background: "var(--buildrick-bg-pressed)",
               borderRadius: "var(--buildrick-radius-sm)",
               flexShrink: 0,
             }}

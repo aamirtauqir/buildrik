@@ -76,7 +76,6 @@ export {
   UI,
   TEXT_STYLES,
   COLOR,
-  SURFACE,
   SPACE,
   CARD_STYLES,
   TAB_STYLES,

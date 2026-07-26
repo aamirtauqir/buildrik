@@ -111,7 +111,7 @@ const previewBannerStyle: React.CSSProperties = {
   background: "rgba(0,0,0,0.82)",
   border: "1px solid rgba(255,255,255,0.12)",
   borderRadius: 8,
-  color: "var(--text-primary, #fff)",
+  color: "var(--buildrick-text-on-accent)",
   fontSize: 13,
   zIndex: 50,
   pointerEvents: "auto",
@@ -434,7 +434,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             {isVersionPreview && (
               <div style={previewBannerStyle}>
                 <span style={{ fontWeight: 500 }}>Preview</span>
-                <span style={{ color: "var(--text-muted, rgba(255,255,255,0.45))", fontSize: 12 }}>
+                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 12 }}>
                   — not saved
                 </span>
                 <Button

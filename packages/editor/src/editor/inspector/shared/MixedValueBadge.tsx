@@ -35,7 +35,7 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
         border: "1px solid var(--buildrick-warning-border)",
         padding: "1px 6px",
         borderRadius: 3,
-        fontFamily: "var(--font-mono, JetBrains Mono, monospace)",
+        fontFamily: "var(--buildrick-font-family-mono)",
         letterSpacing: "0.01em",
       }}
     >

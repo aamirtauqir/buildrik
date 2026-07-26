@@ -32,7 +32,7 @@ export const SidebarErrorFallback: React.FC<{ onRetry: () => void }> = ({ onRetr
       style={{
         padding: "6px 16px",
         background: "var(--buildrick-surface-3)",
-        border: "1px solid var(--buildrick-bg-active)",
+        border: "1px solid var(--buildrick-border)",
         borderRadius: 6,
         color: "var(--buildrick-text-primary)",
         fontSize: 12,

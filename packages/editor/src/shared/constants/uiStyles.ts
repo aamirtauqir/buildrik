@@ -62,16 +62,6 @@ export const COLOR = {
 };
 
 /**
- * Surface/background colors for different elevation levels
- */
-export const SURFACE = {
-  level1: "var(--buildrick-surface-1)",
-  level2: "var(--buildrick-surface-2)",
-  level3: "var(--buildrick-surface-3)",
-  level4: "var(--buildrick-surface-4)",
-};
-
-/**
  * Spacing scale in pixels (for inline styles that need numbers)
  */
 export const SPACE = {
@@ -285,7 +275,6 @@ export const UI_ANIMATIONS = `
 export const UI = {
   text: TEXT_STYLES,
   color: COLOR,
-  surface: SURFACE,
   space: SPACE,
   card: CARD_STYLES,
   tab: TAB_STYLES,

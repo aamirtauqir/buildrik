@@ -96,7 +96,7 @@ export const S: Record<string, React.CSSProperties> = {
     background: "var(--bd-bg-panel)",
   },
   hint: { fontSize: 12, color: "var(--bd-fg-muted)", lineHeight: 1.5, padding: "10px 12px", borderTop: "1px solid var(--bd-border)" },
-  mono: { fontFamily: "var(--buildrick-font-mono, monospace)", fontSize: 12, color: "var(--bd-accent-text, var(--bd-accent))" },
+  mono: { fontFamily: "var(--buildrick-font-family-mono)", fontSize: 12, color: "var(--bd-accent-text, var(--bd-accent))" },
   sub: { fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 2 },
   center: {
     flex: 1,
@@ -536,7 +536,7 @@ export function SourcesView({
         {adding ? (
           <div style={S.inlineForm}>
             <Textarea
-              style={{ ...S.input, margin: 0, width: "auto", minHeight: 96, resize: "vertical", fontFamily: "var(--buildrick-font-mono, monospace)", fontSize: 12 }}
+              style={{ ...S.input, margin: 0, width: "auto", minHeight: 96, resize: "vertical", fontFamily: "var(--buildrick-font-family-mono)", fontSize: 12 }}
               placeholder='{"products": [{"name": "…"}]}'
               value={json}
               onChange={(e) => setJson(e.target.value)}

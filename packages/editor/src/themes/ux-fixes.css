@@ -234,7 +234,7 @@ button:disabled,
 .buildrick-empty-state-desc {
   font-size: var(--buildrick-text-sm-plus);
   color: var(--buildrick-text-muted);
-  line-height: var(--buildrick-leading-relaxed);
+  line-height: var(--buildrick-lh-20);
 }
 
 @keyframes bd-uxfix-fade-in {

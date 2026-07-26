@@ -356,7 +356,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           background: "var(--buildrick-surface-3)",
           border: "1px solid var(--buildrick-border-light)",
           borderRadius: "var(--buildrick-radius-xl)",
-          boxShadow: "var(--buildrick-shadow-2xl)",
+          boxShadow: "var(--buildrick-shadow-overlay)",
           zIndex: "var(--buildrick-z-modal)",
           overflow: "hidden",
         }}
@@ -416,7 +416,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             maxHeight: 360,
             overflowY: "auto",
             scrollbarWidth: "thin",
-            scrollbarColor: "var(--buildrick-surface-5) transparent",
+            scrollbarColor: "var(--buildrick-bg-pressed) transparent",
           }}
         >
           {displayCommands.length === 0 ? (

@@ -312,7 +312,7 @@
 
 /* Optional subtitle under title (e.g. "30 blocks · 4 categories") */
 .ls-panel-subtitle {
-  font-family: var(--buildrick-font-mono, "Geist Mono", ui-monospace, monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 10px;
   font-weight: 500;
   color: var(--buildrick-text-muted);

@@ -27,7 +27,7 @@ const baseStyle: React.CSSProperties = {
   borderRadius: 4,
   fontSize: 11,
   fontWeight: 500,
-  fontFamily: "var(--buildrick-font-mono, ui-monospace, monospace)",
+  fontFamily: "var(--buildrick-font-family-mono)",
 };
 
 const usedStyle: React.CSSProperties = {
