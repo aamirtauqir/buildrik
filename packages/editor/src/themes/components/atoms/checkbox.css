@@ -22,7 +22,7 @@
   appearance: none;
   -webkit-appearance: none;
   background: var(--buildrick-bg-input);
-  border: 1.5px solid var(--buildrick-border-medium);
+  border: 1px solid var(--buildrick-border-medium);
   border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   transition:
@@ -70,16 +70,21 @@
   transform: translate(-50%, -50%);
 }
 
-/* Focus — DS glow ring */
+/* Focus — hard 2px accent outline (no halo) */
 .bd-checkbox__input:focus-visible {
-  outline: none;
-  box-shadow: var(--buildrick-glow-primary);
+  outline: 2px solid var(--buildrick-accent);
+  outline-offset: 1px;
+  box-shadow: none;
 }
 
 /* Disabled */
 .bd-checkbox__input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.bd-checkbox__input:disabled:not(:checked):not(:indeterminate) {
+  background: var(--buildrick-bg-subtle);
+  border-color: var(--buildrick-border-medium);
 }
 .bd-checkbox:has(.bd-checkbox__input:disabled),
 .bd-checkbox.bd-checkbox--disabled {
@@ -111,5 +116,6 @@
   border-color: var(--buildrick-error);
 }
 .bd-checkbox--error .bd-checkbox__input:focus-visible {
-  box-shadow: 0 0 0 3px var(--buildrick-error-light);
+  outline-color: var(--buildrick-error);
+  box-shadow: none;
 }

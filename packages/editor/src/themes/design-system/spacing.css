@@ -1,11 +1,16 @@
 /**
  * themes/design-system/spacing.css
- * Buildrik DS V1 — chrome spacing tokens
- * NEW: --buildrick-space-1..12. Replaces chrome consumption of --buildrick-design-space-*.
+ * Buildrik DS — chrome spacing tokens.
+ *
+ * Canonical source: Figma "Buildrick — Product" Foundations (spacing/*):
+ * 2 · 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64. Intermediate 4px-grid steps
+ * (20, 40) stay for chrome compat.
+ *
  * @license BSD-3-Clause
  */
 
 :root {
+  --buildrick-space-0-5: 2px;
   --buildrick-space-1: 4px;
   --buildrick-space-2: 8px;
   --buildrick-space-3: 12px;
@@ -15,6 +20,7 @@
   --buildrick-space-8: 32px;
   --buildrick-space-10: 40px;
   --buildrick-space-12: 48px;
+  --buildrick-space-16: 64px;
   --buildrick-touch-min: 44px;
   --buildrick-touch-gap: 8px;
 }

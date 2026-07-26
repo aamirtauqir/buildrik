@@ -7,8 +7,8 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid var(--buildrick-accent);
-  border-right-color: transparent;
+  border: 2px solid var(--buildrick-ink-12);
+  border-right-color: var(--buildrick-ink-48);
   border-radius: var(--buildrick-radius-circle);
   animation: bd-spin 800ms linear infinite;
 }

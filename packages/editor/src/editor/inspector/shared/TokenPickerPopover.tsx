@@ -186,7 +186,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
         background: "var(--buildrick-bg-panel)",
         border: `1px solid ${"var(--buildrick-border)"}`,
         borderRadius: 8,
-        boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
+        boxShadow: "var(--bd-shadow-lg)",
         overflow: "hidden",
       }}
     >
@@ -325,7 +325,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       border: selected
                         ? `1px solid ${"var(--buildrick-accent)"}`
                         : focused
-                          ? `1px solid ${"rgba(45, 109, 255, 0.30)"}`
+                          ? "1px solid var(--buildrick-primary-alpha-30)"
                           : "1px solid transparent",
                       borderRadius: 5,
                       cursor: "pointer",
@@ -335,7 +335,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     onMouseEnter={(e) => {
                       if (!selected)
                         (e.currentTarget as HTMLButtonElement).style.background =
-                          "rgba(45, 109, 255, 0.08)";
+                          "var(--bd-accent-subtle)";
                     }}
                     onMouseLeave={(e) => {
                       if (!selected)
@@ -393,7 +393,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       border: selected
                         ? `1px solid ${"var(--buildrick-accent)"}`
                         : focused
-                          ? `1px solid ${"rgba(45, 109, 255, 0.30)"}`
+                          ? "1px solid var(--buildrick-primary-alpha-30)"
                           : "1px solid transparent",
                       borderRadius: 5,
                       cursor: "pointer",
@@ -405,7 +405,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     onMouseEnter={(e) => {
                       if (!selected)
                         (e.currentTarget as HTMLButtonElement).style.background =
-                          "rgba(45, 109, 255, 0.08)";
+                          "var(--bd-accent-subtle)";
                     }}
                     onMouseLeave={(e) => {
                       if (!selected)

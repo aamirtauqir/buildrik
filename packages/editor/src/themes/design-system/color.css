@@ -1,155 +1,177 @@
 /**
  * themes/design-system/color.css
- * Buildrik DS V1 — chrome color tokens
+ * Buildrik DS — chrome color tokens.
+ *
+ * Canonical source: Figma "Buildrick — Product" (g4GzQFqzNYz5sosz1QtZXC),
+ * 📕 Foundations page, replaced 2026-07-26. Names follow the Figma variable
+ * set (color/ink, color/bg-*, color/accent-*); legacy chrome names survive
+ * only as references onto the new set — no legacy VALUE survives.
+ *
+ * Tint rule (Figma board title): semantic tints are PRE-MIXED opaque values,
+ * never frame/alpha opacity. Alpha remains only where transparency is the
+ * point (scrims, canvas overlays, shimmer).
+ *
  * @license BSD-3-Clause
  */
 
 :root {
-  /* BACKGROUNDS */
+  /* ─── SURFACES (Figma color/bg-*) ─── */
+  --buildrick-bg-app: #F1F5F9;
+  --buildrick-bg-subtle: #F1F5F9;
   --buildrick-bg-panel: #F8FAFC;
   --buildrick-bg-card: #FFFFFF;
-  --buildrick-bg-input: #FFFFFF;
   --buildrick-bg-elevated: #FFFFFF;
-  --buildrick-bg-hover: rgba(15, 23, 42, 0.04);
-  --buildrick-bg-subtle: #F1F5F9;
-  --buildrick-bg-app: #F1F5F9;                /* Figma 32-2 bg-app (= bg-subtle; the app shell backdrop) */
+  --buildrick-bg-input: #FFFFFF;
+  /* Interaction fills — pre-mixed (rows/buttons hover = bg-subtle per boards) */
+  --buildrick-bg-hover: #F1F5F9;
+  --buildrick-bg-pressed: #E2E8F0;
 
-  /* TEXT — ink scale (Figma 32-2: ink #0F172A / ink-soft #485465 / ink-muted #656F7E).
-     Darkened 2026-07-24 from slate-700/500/400 to match Figma foundations. */
-  --buildrick-text-primary: #0F172A;          /* Figma ink */
-  --buildrick-text-secondary: #485465;        /* Figma ink-soft */
-  --buildrick-text-muted: #656F7E;            /* Figma ink-muted */
-  --buildrick-text-tertiary: #656F7E;         /* aligned to Figma ink-muted */
-  --buildrick-text-on-accent: #FFFFFF;        /* Figma accent-on */
-  --buildrick-text-heading: #0F172A;          /* Figma ink */
+  /* ─── INK (Figma color/ink*) ─── */
+  --buildrick-ink: #0F172A;
+  --buildrick-ink-soft: #485465;
+  --buildrick-ink-muted: #656F7E;
+  --buildrick-ink-disabled: #CBD5E1;
+  /* Legacy chrome text names → ink scale */
+  --buildrick-text-primary: var(--buildrick-ink);
+  --buildrick-text-heading: var(--buildrick-ink);
+  --buildrick-text-secondary: var(--buildrick-ink-soft);
+  --buildrick-text-muted: var(--buildrick-ink-muted);
+  --buildrick-text-tertiary: var(--buildrick-ink-muted);
+  --buildrick-text-disabled: var(--buildrick-ink-disabled);
+  --buildrick-text-on-accent: var(--buildrick-accent-on);
+  /* Dark surface (tooltips, value bubbles) = ink per boards */
+  --buildrick-bg-dark: var(--buildrick-ink);
 
-  /* BORDERS */
+  /* Ink alpha utilities — transparency IS the point (overlays, shimmer,
+   * hairlines on imagery). Not for chrome fills; use pre-mixed tokens there. */
+  --buildrick-ink-06: rgba(15, 23, 42, 0.06);
+  --buildrick-ink-08: rgba(15, 23, 42, 0.08);
+  --buildrick-ink-10: rgba(15, 23, 42, 0.10);
+  --buildrick-ink-12: rgba(15, 23, 42, 0.12);
+  --buildrick-ink-15: rgba(15, 23, 42, 0.15);
+  --buildrick-ink-18: rgba(15, 23, 42, 0.18);
+  --buildrick-ink-20: rgba(15, 23, 42, 0.20);
+  --buildrick-ink-25: rgba(15, 23, 42, 0.25);
+  --buildrick-ink-30: rgba(15, 23, 42, 0.30);
+  --buildrick-ink-48: rgba(15, 23, 42, 0.48);
+  --buildrick-ink-50: rgba(15, 23, 42, 0.50);
+  /* On-dark (text/controls over ink surfaces) */
+  --buildrick-on-dark-12: rgba(255, 255, 255, 0.12);
+  --buildrick-on-dark-15: rgba(255, 255, 255, 0.15);
+  --buildrick-on-dark-40: rgba(255, 255, 255, 0.40);
+
+  /* ─── BORDERS (Figma color/border*) ─── */
   --buildrick-border: #E2E8F0;
-  --buildrick-border-light: #94A3B8;
   --buildrick-border-medium: #CBD5E1;
   --buildrick-border-strong: #94A3B8;
-  --buildrick-border-input: #8D949C;          /* Figma 32-2 border-input */
-  --buildrick-border-hover: #94A3B8;
-  --buildrick-border-focus: #406ED6;
+  --buildrick-border-input: #8D949C;
+  --buildrick-border-light: var(--buildrick-border);
+  --buildrick-border-subtle: var(--buildrick-border);
+  --buildrick-border-default: var(--buildrick-border-medium);
+  --buildrick-border-hover: var(--buildrick-border-strong);
+  --buildrick-border-focus: var(--buildrick-accent);
 
-  /* ACCENT (#406ED6 — single product accent per DESIGN.md; migrated from cobalt
-     #2D6DFF 2026-07-21 to match the Figma file + dashboard. White on #406ED6 is
-     4.75:1, clearing the 4.5 AA bar cobalt missed at 4.43:1.) */
+  /* ─── ACCENT (Figma Package collection — one blue, guarded) ─── */
   --buildrick-accent: #406ED6;
-  --buildrick-accent-text: #3C68C9;           /* Figma 32-2 accent-text (AA text on light) */
-  --buildrick-accent-hover: #5E86E0;
-  --buildrick-accent-pressed: #2E56B8;
-  --buildrick-accent-subtle: rgba(64, 110, 214, 0.05);
-  --buildrick-accent-tint: rgba(64, 110, 214, 0.10);
-  --buildrick-accent-tint-solid: #ECF0FB;     /* Figma 32-2 accent-tint (opaque; for fills that can't use alpha) */
+  --buildrick-accent-hover: #2E56B8;
+  --buildrick-accent-pressed: #264899;
+  --buildrick-accent-on: #FFFFFF;
+  --buildrick-accent-text: #3C68C9;
+  --buildrick-accent-subtle: #EBF1FF;   /* selected-row fill (pre-mixed) */
+  --buildrick-accent-tint: #ECF0FB;     /* badge/pill fill (pre-mixed) */
+  --buildrick-accent-tint-solid: var(--buildrick-accent-tint);
+  /* Accent alpha utilities (focus shadows on imagery, badge borders) */
+  --buildrick-accent-alpha-025: rgba(64, 110, 214, 0.025);
+  --buildrick-accent-alpha-08: rgba(64, 110, 214, 0.08);
+  --buildrick-primary-alpha-15: rgba(64, 110, 214, 0.15);
+  --buildrick-primary-alpha-30: rgba(64, 110, 214, 0.30);
 
-  /* SEMANTIC STATUS */
-  /* Surface elevation scale. Referenced 36 times across the editor (active
-     toggle fills, selected zoom preset, view-switcher active tab, form
-     sections, presence chips) but never defined — every one of those
-     backgrounds rendered transparent, so "selected" looked identical to
-     "not selected". Named to match `uiStyles.ts`'s level2/level3.
-     The bare `--buildrick-surface` is deliberately NOT defined: Gate 8 retires
-     that name, and its remaining refs all carry their own fallback. */
-  --buildrick-surface-2: #F8FAFC;
-  --buildrick-surface-3: #F1F5F9;
+  /* ─── SEMANTIC (Figma fill / text / tint triads — tints pre-mixed) ─── */
+  --buildrick-success: #16A34A;
+  --buildrick-success-text: #117D39;
+  --buildrick-success-tint: #E3F4E9;
+  --buildrick-success-light: var(--buildrick-success-tint);
+  --buildrick-success-soft: var(--buildrick-success-tint);
+  --buildrick-success-strong: var(--buildrick-success-text);
+  --buildrick-success-bg: var(--buildrick-success-tint);
+  --buildrick-success-bg-light: var(--buildrick-success-tint);
+  --buildrick-success-border: var(--buildrick-success);
+  --buildrick-success-border-soft: var(--buildrick-success);
+  --buildrick-status-synced: var(--buildrick-success);
+
+  --buildrick-warning: #B45309;
+  --buildrick-warning-text: #A05804;
+  --buildrick-warning-tint: #FAECDC;
+  --buildrick-warning-light: var(--buildrick-warning-tint);
+  --buildrick-warning-soft: var(--buildrick-warning-tint);
+  --buildrick-warning-strong: var(--buildrick-warning-text);
+  --buildrick-warning-bg: var(--buildrick-warning-tint);
+  --buildrick-warning-bg-light: var(--buildrick-warning-tint);
+  --buildrick-warning-border: var(--buildrick-warning);
+  --buildrick-warning-border-soft: var(--buildrick-warning);
+  --buildrick-amber-soft: var(--buildrick-warning-tint);
+  --buildrick-amber-light: var(--buildrick-warning-tint);
+  --buildrick-amber-dark: var(--buildrick-warning-tint);
+  --buildrick-amber-border: var(--buildrick-warning);
 
   --buildrick-error: #DC2626;
-  /* Text steps for semantic colour ON its own 10% tint. The full-strength
-     hues are border/icon weights and fail AA as body text on their tints:
-     success 2.95:1, warning 4.38:1, error 4.14:1. These measure 4.6–4.7:1. */
-  --buildrick-success-text: #117D39;
-  --buildrick-warning-text: #A05804;
-  /* Referenced by badge--syncing and the skeleton shimmer; was undefined, so
-     both rendered with no fill at all. */
-  --buildrick-accent-alpha-08: rgba(64, 110, 214, 0.08);
-  /* Error text ON a tinted background. #DC2626 measures 4.24:1 on
-     warning-tint and 4.08:1 on error-tint — both under AA for body copy.
-     This is the darker step Figma already carries as `color/error-text`. */
   --buildrick-error-text: #CB2323;
-  --buildrick-error-light: rgba(220, 38, 38, 0.10);
-  --buildrick-error-border: rgba(220, 38, 38, 0.30);
-  --buildrick-error-bg: rgba(220, 38, 38, 0.05);
-  --buildrick-success: #16A34A;
-  --buildrick-success-light: rgba(22, 163, 74, 0.10);
-  --buildrick-success-soft: #DCFCE7;          /* light fill for success chips/badges (used by avatar, count, toast, history-panel) */
-  --buildrick-success-strong: #15803D;        /* WCAG AA text on success-soft (5.66:1 vs 4.5 required) */
-  --buildrick-success-border: rgba(22, 163, 74, 0.30);
-  --buildrick-warning: #B45309;             /* amber-700 — fixes WCAG AA on warning-bg (was #D97706 amber-600 → 3.19:1 fail; now 5.04:1 pass) */
-  --buildrick-warning-light: rgba(180, 83, 9, 0.10);
-  /* T9 added warning-soft/warning-strong; pre-existing consumers (count/avatar/tag warning
-     variants, actionbar--dirty, toast--warning icon chip) previously rendered with no fill
-     because the token was undefined. Defining canonical amber-100/amber-900 values completes
-     the warning palette in parity with success-soft/info-soft. Toast warning is the only
-     consumer actively rendered in chrome (via tone="warning"); others are unused primitives. */
-  --buildrick-warning-soft: #FEF3C7;          /* T9: amber-100 fill for warning chips (dark-missing chip, etc.) — matches info/success pattern */
-  --buildrick-warning-strong: #854D0E;        /* T9: amber-900 — WCAG AA text on warning-soft (5.61:1 vs 4.5 required) */
-  --buildrick-warning-border: rgba(180, 83, 9, 0.30);
-  --buildrick-warning-bg: rgba(180, 83, 9, 0.05);
-  --buildrick-info: #406ED6;
-  --buildrick-info-light: rgba(64, 110, 214, 0.08);
-  --buildrick-info-soft: #EFF4FF;             /* light fill for info chips/badges (used by beginner-mode hint) */
-  --buildrick-info-strong: #1F4FBF;           /* WCAG AA text on info-soft */
+  --buildrick-error-tint: #FBE5E5;
+  --buildrick-error-light: var(--buildrick-error-tint);
+  --buildrick-error-soft: var(--buildrick-error-tint);
+  --buildrick-error-bg: var(--buildrick-error-tint);
+  --buildrick-error-bg-light: var(--buildrick-error-tint);
+  --buildrick-error-border: var(--buildrick-error);
+  --buildrick-error-border-soft: var(--buildrick-error);
+  --buildrick-destructive: var(--buildrick-error);
 
-  /* AMBER / EMERALD FAMILIES */
-  --buildrick-amber-light: rgba(217, 119, 6, 0.10);
-  --buildrick-amber-dark: rgba(217, 119, 6, 0.20);
-  --buildrick-amber-border: rgba(217, 119, 6, 0.30);
-  --buildrick-emerald-light: rgba(22, 163, 74, 0.10);
-  --buildrick-emerald-dark: rgba(22, 163, 74, 0.20);
-  --buildrick-emerald-border: rgba(22, 163, 74, 0.30);
+  --buildrick-emerald-light: var(--buildrick-success-tint);
+  --buildrick-emerald-dark: var(--buildrick-success-tint);
+  --buildrick-emerald-border: var(--buildrick-success);
 
-  /* OVERLAYS */
+  /* Info = accent family (one blue) */
+  --buildrick-info: var(--buildrick-accent);
+  --buildrick-info-light: var(--buildrick-accent-tint);
+  --buildrick-info-soft: var(--buildrick-accent-tint);
+  --buildrick-info-strong: var(--buildrick-accent-text);
+
+  /* ─── SURFACE STEPS (legacy names → new surfaces) ─── */
+  --buildrick-surface-2: var(--buildrick-bg-panel);
+  --buildrick-surface-3: var(--buildrick-bg-subtle);
+  --buildrick-surface-4: var(--buildrick-bg-pressed);
+  --buildrick-bg-panel-secondary: var(--buildrick-bg-subtle);
+
+  /* ─── OVERLAYS / SCRIM (alpha by necessity) ─── */
   --buildrick-overlay: rgba(15, 23, 42, 0.40);
 
-  /* CANVAS CHROME */
+  /* ─── CANVAS CHROME ─── */
   --buildrick-canvas-content: #FFFFFF;
-  --buildrick-canvas-wrapper: #F8FAFC;
-  --buildrick-canvas-dot: rgba(15, 23, 42, 0.08);
+  --buildrick-canvas-wrapper: var(--buildrick-bg-app);
+  --buildrick-canvas-dot: var(--buildrick-ink-08);
+  --buildrick-selection-color: var(--buildrick-accent);
+  --buildrick-drop-valid-border: var(--buildrick-success);
+  --buildrick-drop-invalid-border: var(--buildrick-error);
 
-  /* MISC */
-  --buildrick-destructive: #DC2626;
-  --buildrick-input-ring: rgba(45, 109, 255, 0.08);
-  --buildrick-input-ring-error: rgba(220, 38, 38, 0.10);
-
-  /* ─── DS V1 REMEDIATION (2026-04-20) — NEW TOKENS ─── */
-
-  /* Pressed / active fills (distinct from accent-tint which is branded selection) */
-  --buildrick-bg-pressed: rgba(15, 23, 42, 0.06);
-
-  /* Text */
-  --buildrick-text-disabled: #CBD5E1;
-
-  /* Canvas box-model overlay */
+  /* Canvas box-model overlay (functional inspector colors, alpha required) */
   --buildrick-boxmodel-content: rgba(111, 168, 220, 0.50);
   --buildrick-boxmodel-padding: rgba(147, 196, 125, 0.45);
   --buildrick-boxmodel-margin: rgba(246, 178, 107, 0.50);
 
   /* Layer tree tints */
-  --buildrick-layer-accent-muted: rgba(45, 109, 255, 0.15);
+  --buildrick-layer-accent-muted: var(--buildrick-primary-alpha-15);
   --buildrick-layer-muted-alpha: rgba(100, 116, 139, 0.15);
   --buildrick-layer-muted-light: rgba(100, 116, 139, 0.08);
 
-  /* Border */
-  --buildrick-border-subtle: rgba(148, 163, 184, 0.24);
-  --buildrick-border-default: #CBD5E1;
+  /* ─── INPUT FOCUS — no halo. Focus = 2px accent border/outline (Figma).
+   * Invisible-but-valid shadow keeps `box-shadow: var(...)` consumers inert. */
+  --buildrick-input-ring: 0 0 0 2px transparent;
+  --buildrick-input-ring-error: 0 0 0 2px transparent;
 
-  /* Semantic tints */
-  --buildrick-danger-bg: rgba(220, 38, 38, 0.05);
-  --buildrick-success-bg: rgba(22, 163, 74, 0.10);
-  --buildrick-status-synced: #16A34A;
-  /* Missed by the 2026-07-21 cobalt → #406ED6 migration: every other accent in
-     this file moved, these two kept the retired cobalt, so focus rings, badge
-     borders and the button shadow were tinted a different blue than the accent
-     they belong to. Surfaced by the B9 design-first pass. */
-  --buildrick-primary-alpha-15: rgba(64, 110, 214, 0.15);
-  --buildrick-primary-alpha-30: rgba(64, 110, 214, 0.30);
+  /* ─── PILL STROKES (legacy names → border scale) ─── */
+  --buildrick-pill-stroke: var(--buildrick-border-medium);
+  --buildrick-pill-stroke-strong: var(--buildrick-border-strong);
 
-  /* Pill borders (retained for legacy component migration window) */
-  --buildrick-pill-stroke: rgba(148, 163, 184, 0.35);
-  --buildrick-pill-stroke-strong: rgba(148, 163, 184, 0.50);
-
-  /* Skeleton / shimmer loading placeholders */
+  /* ─── SKELETON / SHIMMER (alpha by necessity) ─── */
   --buildrick-bg-shimmer-light: rgba(15, 23, 42, 0.02);
   --buildrick-bg-shimmer-mid: rgba(15, 23, 42, 0.04);
   --buildrick-bg-shimmer-dark: rgba(15, 23, 42, 0.08);

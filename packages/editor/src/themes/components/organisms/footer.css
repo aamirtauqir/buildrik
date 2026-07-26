@@ -4,23 +4,24 @@
  */
 
 .bd-footer {
-  height: 32px;
+  height: var(--buildrick-size-footer);
   background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md);
-  padding: 0 var(--buildrick-space-3);
+  border: none;
+  border-top: 1px solid var(--buildrick-border);
+  border-radius: 0;
+  padding: 0 var(--buildrick-space-4);
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-xs);
   font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-secondary);
+  color: var(--buildrick-text-muted);
 }
 .bd-footer__group {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-3);
+  gap: var(--buildrick-space-4);
 }
 .bd-footer__chip {
   display: inline-flex;
@@ -30,11 +31,11 @@
   border-radius: var(--buildrick-radius-sm);
   background: var(--buildrick-bg-subtle);
   font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs-plus);
+  font-size: var(--buildrick-text-xs);
 }
 .bd-footer__dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: var(--buildrick-radius-circle);
   background: var(--buildrick-success);
 }

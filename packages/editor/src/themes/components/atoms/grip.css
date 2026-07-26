@@ -50,9 +50,10 @@
   color: var(--buildrick-text-secondary);
 }
 .bd-grip:focus-visible {
-  outline: none;
+  outline: 2px solid var(--buildrick-accent);
+  outline-offset: 1px;
   border-radius: var(--buildrick-radius-sm);
-  box-shadow: var(--buildrick-glow-primary);
+  box-shadow: none;
 }
 .bd-grip:active {
   cursor: grabbing;

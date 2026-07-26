@@ -78,7 +78,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ selected, onSelect }
         onClick={() => onSelect(cat)}
         style={{
           padding: "4px 8px",
-          background: selected === cat ? "rgba(45, 109, 255, 0.20)" : "transparent",
+          background: selected === cat ? "var(--bd-accent-tint)" : "transparent",
           border: "none",
           borderRadius: 4,
           color: selected === cat ? "var(--buildrick-accent)" : "var(--buildrick-text-tertiary)",
@@ -141,7 +141,7 @@ export const FontList: React.FC<FontListProps> = ({
                 width: "100%",
                 padding: "8px",
                 background:
-                  currentValue === font.value ? "rgba(45, 109, 255, 0.20)" : "transparent",
+                  currentValue === font.value ? "var(--bd-accent-tint)" : "transparent",
                 border: "none",
                 borderRadius: 4,
                 color: "var(--buildrick-text-primary)",
@@ -180,7 +180,7 @@ export const FontList: React.FC<FontListProps> = ({
             width: "100%",
             padding: "8px",
             background: currentValue?.includes(font.family)
-              ? "rgba(45, 109, 255, 0.20)"
+              ? "var(--bd-accent-tint)"
               : "transparent",
             border: "none",
             borderRadius: 4,

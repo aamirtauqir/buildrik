@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 600;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--bd-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +14,7 @@
   height: min(720px, 90vh);
   background: var(--buildrick-bg-panel, var(--bd-bg-panel));
   border-radius: var(--bd-radius-lg);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--bd-shadow-lg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -26,13 +26,13 @@
   justify-content: space-between;
   padding: 14px var(--bd-space-5);
   border-bottom: 1px solid var(--buildrick-border-light, var(--bd-border));
-  background: var(--buildrick-bg-card, #fff);
+  background: var(--buildrick-bg-card);
 }
 
 .ie-title {
   margin: 0;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: var(--bd-weight-semibold);
   color: var(--buildrick-text-primary);
 }
 
@@ -47,7 +47,7 @@
   padding: 0 var(--bd-space-3);
   border-radius: var(--bd-radius-sm-plus);
   border: 1px solid var(--buildrick-border, #D1D9E6);
-  background: var(--buildrick-bg-card, #fff);
+  background: var(--buildrick-bg-card);
   color: var(--buildrick-text-secondary, #475569);
   font-size: 13px;
   font-weight: 500;
@@ -188,7 +188,7 @@
 
 .ie-section-label {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: var(--bd-weight-semibold);
   color: var(--buildrick-text-disabled);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -222,7 +222,7 @@
   background: var(--buildrick-accent);
   cursor: pointer;
   border: 2px solid var(--buildrick-bg-card);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  box-shadow: var(--bd-shadow-md);
 }
 
 .ie-slider-val {

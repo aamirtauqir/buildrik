@@ -10,14 +10,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--buildrick-radius-circle);
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  background: var(--buildrick-accent);
+  color: var(--buildrick-text-on-accent);
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-weight: var(--buildrick-font-weight-medium);
   letter-spacing: 0.02em;
   overflow: hidden;
   flex-shrink: 0;
@@ -31,8 +31,8 @@
 }
 
 /* Sizes — diameter scales font + presence-dot proportionally */
-.bd-avatar--xs { width: 20px; height: 20px; font-size: var(--buildrick-text-3xs); }
-.bd-avatar--sm { width: 24px; height: 24px; font-size: var(--buildrick-text-2xs); }
+.bd-avatar--xs { width: 20px; height: 20px; font-size: var(--buildrick-text-xs); }
+.bd-avatar--sm { width: 24px; height: 24px; font-size: var(--buildrick-text-xs); }
 .bd-avatar--lg { width: 40px; height: 40px; font-size: var(--buildrick-text-md); }
 .bd-avatar--xl { width: 56px; height: 56px; font-size: var(--buildrick-text-xl); }
 
@@ -56,7 +56,12 @@
   height: 9px;
   border-radius: var(--buildrick-radius-circle);
   background: var(--buildrick-text-muted);
-  box-shadow: 0 0 0 2px var(--buildrick-bg-card);
+  /* Card-colored separator ring as a border (box-shadow reserved for elevation tokens) */
+  box-sizing: content-box;
+  border: 2px solid var(--buildrick-bg-card);
+  margin-right: -2px;
+  margin-bottom: -2px;
+  box-shadow: none;
 }
 .bd-avatar__presence--online  { background: var(--buildrick-success); }
 .bd-avatar__presence--away    { background: var(--buildrick-warning); }

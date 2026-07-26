@@ -77,7 +77,7 @@ const styles = {
     alignItems: "center",
     gap: 8,
     padding: "8px 12px",
-    background: "linear-gradient(135deg, rgba(45,109,255,0.08), rgba(45,109,255,0.04))",
+    background: "var(--bd-accent-subtle)",
     borderRadius: 8,
     marginBottom: 8,
   },

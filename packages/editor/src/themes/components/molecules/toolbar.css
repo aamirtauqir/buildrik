@@ -57,8 +57,8 @@
    bd-label markup just for one word. */
 .bd-toolbar__label {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-3xs-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
   letter-spacing: var(--buildrick-tracking-widest);
   text-transform: uppercase;
   color: var(--buildrick-text-muted);

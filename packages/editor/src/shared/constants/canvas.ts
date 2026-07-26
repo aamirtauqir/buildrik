@@ -18,17 +18,17 @@ import type React from "react";
  */
 export const BRAND_ACCENT = {
   // Core shades — resolve via cobalt accent ramp (color.css:33-37)
-  DEFAULT: "var(--buildrick-accent)", // #2D6DFF — Main cobalt
-  light: "var(--buildrick-accent-subtle)", // rgba(45, 109, 255, 0.05) — Faint background
-  dark: "var(--buildrick-accent-pressed)", // #1E58D9 — Active/pressed states
-  subtle: "var(--buildrick-accent-tint)", // rgba(45, 109, 255, 0.10) — Very light tint
+  DEFAULT: "var(--buildrick-accent)", // #406ED6 — Main accent
+  light: "var(--buildrick-accent-subtle)", // Faint accent background
+  dark: "var(--buildrick-accent-pressed)", // Active/pressed states
+  subtle: "var(--buildrick-accent-tint)", // Very light accent tint
 
-  // Alpha variations for glows and overlays — cobalt rgba (45, 109, 255, x)
-  alpha10: "var(--buildrick-accent-tint)", // rgba(45, 109, 255, 0.10)
-  alpha15: "rgba(45, 109, 255, 0.15)",
-  alpha20: "rgba(45, 109, 255, 0.2)",
-  alpha30: "rgba(45, 109, 255, 0.3)",
-  alpha40: "rgba(45, 109, 255, 0.4)",
+  // Alpha variations for glows and overlays — accent alpha ramp
+  alpha10: "var(--buildrick-accent-tint)",
+  alpha15: "var(--buildrick-primary-alpha-15)",
+  alpha20: "var(--buildrick-primary-alpha-15)",
+  alpha30: "var(--buildrick-primary-alpha-30)",
+  alpha40: "var(--buildrick-primary-alpha-30)",
 } as const;
 
 /**
@@ -47,10 +47,10 @@ export const SELECTION_COLORS = {
   // Glow effects - reference CSS vars
   glow: "var(--buildrick-selection-glow)",
   glowStrong: "var(--buildrick-selection-glow-strong)",
-  glowSubtle: "0 0 0 2px rgba(45, 109, 255, 0.3)",
+  glowSubtle: "var(--bd-glow-primary)",
 
   // Multi-select
-  multiSelectOutline: "rgba(45, 109, 255, 0.4)",
+  multiSelectOutline: "var(--buildrick-primary-alpha-30)",
   multiSelectFill: "var(--buildrick-accent-tint)",
 } as const;
 
@@ -69,7 +69,7 @@ export const CANVAS_SURFACE = {
 
   // Grid/pattern overlay
   gridDot: "var(--bd-border)",
-  gridLine: "rgba(45, 109, 255, 0.08)", // Blue grid lines
+  gridLine: "var(--bd-accent-subtle)", // Blue grid lines
 } as const;
 
 /**
@@ -149,14 +149,14 @@ export const ANIMATION = {
   duration: {
     instant: "50ms",
     fast: "150ms",
-    normal: "200ms",
+    normal: "var(--buildrick-duration-normal)",
     slow: "300ms",
     slower: "400ms",
   },
 
   // Easing functions
   easing: {
-    default: "cubic-bezier(0.4, 0, 0.2, 1)",
+    default: "var(--buildrick-ease-default)",
     smooth: "ease-out",
     spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
     bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
@@ -164,11 +164,11 @@ export const ANIMATION = {
 
   // Presets
   transition: {
-    fast: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
-    normal: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
-    slow: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)",
+    fast: "all 150ms var(--buildrick-ease-default)",
+    normal: "all var(--buildrick-duration-normal) var(--buildrick-ease-default)",
+    slow: "all 300ms var(--buildrick-ease-default)",
     colors: "background-color 150ms ease, border-color 150ms ease, color 150ms ease",
-    transform: "transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+    transform: "transform var(--buildrick-duration-normal) var(--buildrick-ease-default)",
   },
 } as const;
 
@@ -178,22 +178,22 @@ export const ANIMATION = {
 
 export const SHADOWS = {
   // Elevation shadows
-  sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
-  md: "0 4px 12px rgba(0, 0, 0, 0.08)",
-  lg: "0 8px 25px rgba(0, 0, 0, 0.12)",
-  xl: "0 12px 32px rgba(0, 0, 0, 0.15)",
+  sm: "var(--bd-shadow-sm)",
+  md: "var(--bd-shadow-md)",
+  lg: "var(--bd-shadow-lg)",
+  xl: "var(--bd-shadow-lg)",
 
   // Blue glow shadows (matches primary brand color)
-  glowSm: "0 2px 8px rgba(45, 109, 255, 0.2)",
-  glowMd: "0 4px 14px rgba(45, 109, 255, 0.3)",
-  glowLg: "0 8px 25px rgba(45, 109, 255, 0.4)",
+  glowSm: "0 2px 8px var(--buildrick-primary-alpha-15)",
+  glowMd: "0 4px 14px var(--buildrick-primary-alpha-30)",
+  glowLg: "0 8px 25px var(--buildrick-primary-alpha-30)",
 
   // Selection shadows
   selection: SELECTION_COLORS.glow,
   selectionStrong: SELECTION_COLORS.glowStrong,
 
   // Hover lift shadow
-  hoverLift: "0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(45, 109, 255, 0.1)",
+  hoverLift: "var(--bd-shadow-md)",
 } as const;
 
 // ============================================
@@ -218,7 +218,7 @@ export const PANEL_STYLE: React.CSSProperties = {
   background: CANVAS_COLORS.bgPanel,
   border: `1px solid ${CANVAS_COLORS.border}`,
   borderRadius: 10,
-  boxShadow: "0 12px 32px rgba(0,0,0,0.35)",
+  boxShadow: "var(--bd-shadow-lg)",
 };
 
 export const INPUT_STYLE: React.CSSProperties = {
@@ -235,7 +235,7 @@ export const DROPDOWN_STYLE: React.CSSProperties = {
   background: CANVAS_COLORS.bgPanel,
   border: `1px solid ${CANVAS_COLORS.borderInput}`,
   borderRadius: 6,
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+  boxShadow: "var(--bd-shadow-md)",
   overflow: "hidden",
   zIndex: 100,
 };

@@ -8,7 +8,7 @@
 .tmpl-preview-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: var(--bd-overlay);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -65,7 +65,7 @@
 .tmpl-preview__name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--bd-fg, #0F172A);
+  color: var(--bd-fg);
   letter-spacing: -0.01em;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -74,7 +74,7 @@
 
 .tmpl-preview__count {
   font-size: 12px;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted);
   font-weight: 400;
   flex-shrink: 0;
 }
@@ -83,7 +83,7 @@
 .tmpl-preview__viewports {
   display: flex;
   gap: 2px;
-  background: var(--bd-bg-soft, #F1F5F9);
+  background: var(--bd-bg-soft);
   border-radius: 5px;
   padding: 2px;
   flex-shrink: 0;
@@ -95,7 +95,7 @@
   border-radius: 3px;
   border: none;
   background: transparent;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -107,13 +107,13 @@
 }
 
 .tmpl-preview .tmpl-preview__vp-btn:hover {
-  background: var(--bd-bg, #FFFFFF);
-  color: var(--bd-fg, #0F172A);
+  background: var(--bd-bg);
+  color: var(--bd-fg);
 }
 
 .tmpl-preview .tmpl-preview__vp-btn--active {
-  background: var(--bd-bg, #FFFFFF);
-  color: var(--bd-cobalt, #2D6DFF);
+  background: var(--bd-bg);
+  color: var(--bd-accent);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
@@ -121,10 +121,10 @@
 .tmpl-preview .tmpl-preview__close {
   width: 28px;
   height: 28px;
-  border-radius: var(--bd-radius-sm, 4px);
+  border-radius: var(--bd-radius-sm);
   border: none;
   background: transparent;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -134,8 +134,8 @@
 }
 
 .tmpl-preview .tmpl-preview__close:hover {
-  background: var(--bd-bg-soft, #F1F5F9);
-  color: var(--bd-fg, #0F172A);
+  background: var(--bd-bg-soft);
+  color: var(--bd-fg);
 }
 
 .tmpl-preview__close:hover {
@@ -192,7 +192,7 @@
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: background var(--bd-duration-fast, 100ms), color var(--bd-duration-fast, 100ms);
+  transition: background var(--bd-duration-fast), color var(--bd-duration-fast);
 }
 
 .tmpl-preview__back:hover {
@@ -212,7 +212,7 @@
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  transition: opacity var(--bd-duration-fast, 100ms);
+  transition: opacity var(--bd-duration-fast);
 }
 
 .tmpl-preview__use:hover {

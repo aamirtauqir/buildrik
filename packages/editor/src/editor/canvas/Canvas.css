@@ -24,11 +24,9 @@
 
   /* Selection (canvas handles) — uses canonical accent */
   --buildrick-selection-color:       var(--buildrick-accent);
-  --buildrick-selection-alpha-40:    rgba(45, 109, 255, 0.40);
-  --buildrick-selection-alpha-20:    rgba(45, 109, 255, 0.20);
-  --buildrick-selection-glow:        0 0 0 1px var(--buildrick-accent-tint), 0 0 12px rgba(45, 109, 255, 0.12);
+  --buildrick-selection-glow:        var(--buildrick-glow-selection);
   --buildrick-selection-glow-sm:     0 2px 8px var(--buildrick-accent-tint);
-  --buildrick-selection-glow-strong: 0 0 0 2px rgba(45, 109, 255, 0.40), 0 0 16px var(--buildrick-accent-tint);
+  --buildrick-selection-glow-strong: var(--buildrick-glow-selection);
   --buildrick-selection-outline:     2px solid var(--buildrick-accent);
   --buildrick-handle-gradient:       var(--buildrick-accent);
 
@@ -93,7 +91,7 @@
 }
 
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id] {
-  outline: 1px dashed rgba(45, 109, 255, 0.35);
+  outline: 1px dashed var(--buildrick-primary-alpha-30);
   outline-offset: -1px;
 }
 
@@ -428,12 +426,11 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.15s;
+  transition: opacity 0.15s;
 }
 
 .bd-canvas-empty-cta__browse:hover {
   opacity: 0.9;
-  transform: translateY(-1px);
 }
 
 .bd-canvas-empty-cta__blank {
@@ -603,8 +600,7 @@
 }
 
 [data-buildrick-id][data-drop-target="true"][data-drop-valid="true"] {
-  box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.3),
-              0 0 12px rgba(45, 109, 255, 0.1);
+  box-shadow: var(--bd-glow-primary);
   transition: box-shadow 150ms ease, outline 150ms ease;
 }
 
@@ -624,7 +620,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(45, 109, 255, 0.3);
   z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
   pointer-events: none;
 }

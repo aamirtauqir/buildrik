@@ -48,8 +48,8 @@ export function getCanvasStyles(
     background: "var(--buildrick-bg-card)",
     borderRadius: 12,
     boxShadow: isDragOver
-      ? "0 0 0 3px #89b4fa, 0 8px 32px rgba(0,0,0,0.4)"
-      : "0 8px 32px rgba(0,0,0,0.4)",
+      ? "var(--bd-glow-primary), var(--bd-shadow-lg)"
+      : "var(--bd-shadow-lg)",
     overflow: "auto",
     transform: `scale(${scale})`,
     transformOrigin: "center center",
@@ -102,8 +102,8 @@ export function getMarqueeStyles(marquee: {
     top: Math.min(marquee.start.y, marquee.current.y),
     width: Math.abs(marquee.current.x - marquee.start.x),
     height: Math.abs(marquee.current.y - marquee.start.y),
-    backgroundColor: "rgba(45, 109, 255, 0.15)",
-    border: "1px solid rgba(45, 109, 255, 0.8)",
+    backgroundColor: "var(--buildrick-primary-alpha-15)",
+    border: "1px solid var(--bd-accent)",
     borderRadius: 2,
     pointerEvents: "none",
     zIndex: Z_LAYERS.modal,

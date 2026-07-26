@@ -236,13 +236,12 @@
   overflow: hidden;
   background: var(--bd-bg-card, var(--bd-bg-card));
   cursor: pointer;
-  transition: border-color 0.14s, box-shadow 0.14s, transform 0.14s;
+  transition: border-color 0.14s, box-shadow 0.14s;
   outline: none;
 }
 .tpl-card:hover {
   border-color: var(--bd-accent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transform: translateY(-1px);
+  box-shadow: var(--bd-shadow-sm);
 }
 .tpl-card:focus-visible {
   outline: 2px solid var(--bd-accent);
@@ -273,7 +272,7 @@
   background: var(--bd-accent);
   color: var(--bd-bg-card, var(--bd-bg-card));
   font-size: 9px;
-  font-weight: 700;
+  font-weight: var(--bd-weight-semibold);
   letter-spacing: 0.04em;
   border-radius: 3px;
   line-height: 1.2;
@@ -294,7 +293,7 @@
   white-space: nowrap;
 }
 .tpl-card-name-mark {
-  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.16));
+  background: var(--bd-accent-tint);
   color: inherit;
   padding: 0 2px;
   border-radius: 2px;
@@ -468,13 +467,13 @@
   color: var(--bd-warn, var(--bd-warning));
 }
 .tpl-detail-meta-pill--usage {
-  background: var(--bd-accent-tint, rgba(45, 109, 255, 0.1));
+  background: var(--bd-accent-tint);
   color: var(--bd-accent, var(--bd-accent));
   cursor: pointer;
   transition: background 0.12s;
 }
 .tpl-detail-meta-pill--usage:hover {
-  background: var(--bd-accent-tint-hover, rgba(45, 109, 255, 0.18));
+  background: var(--bd-accent-tint-hover);
 }
 
 /* ── Detail panel: "Apply to" section label ── */
@@ -818,7 +817,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--bd-space-4);
-  box-shadow: var(--bd-shadow-modal, 0 4px 24px rgba(0, 0, 0, 0.2));
+  box-shadow: var(--bd-shadow-modal);
   border-color: var(--bd-border-medium, var(--bd-border));
 }
 .tpl-modal-row {

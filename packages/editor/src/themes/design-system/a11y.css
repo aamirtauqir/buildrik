@@ -92,9 +92,8 @@
   }
 }
 
-/* ─── Focus rings — default (cobalt) ─────────────────────────────────────
- * Migrated from themes/ux-fixes.css (retired 2026-04-25).
- * DESIGN.md §Focus rings: 3px cobalt at 8-12% alpha, outline-offset 2px.
+/* ─── Focus rings ────────────────────────────────────────────────────────
+ * Figma "Buildrick — Product" focus spec: 2px accent border/outline, NO halo.
  */
 *:focus-visible {
   outline: 2px solid var(--bd-accent);
@@ -112,7 +111,6 @@ a:focus-visible,
 [tabindex]:not([tabindex="-1"]):focus-visible {
   outline: 2px solid var(--bd-accent);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--bd-accent-subtle);
 }
 
 /* ─── Skip link — keyboard accessibility entry point ────────────────────

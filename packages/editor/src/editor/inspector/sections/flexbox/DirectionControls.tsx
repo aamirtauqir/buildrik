@@ -11,9 +11,9 @@ import { DirectionIcon } from "./icons";
 const visualBtn = (active: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "10px 6px",
-  background: active ? "rgba(45, 109, 255, 0.20)" : "var(--buildrick-bg-subtle)",
+  background: active ? "var(--bd-accent-tint)" : "var(--buildrick-bg-subtle)",
   border: active
-    ? `1px solid ${"rgba(45, 109, 255, 0.30)"}`
+    ? "1px solid var(--buildrick-primary-alpha-30)"
     : `1px solid ${"var(--buildrick-border)"}`,
   borderRadius: 6,
   color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",

@@ -18,16 +18,17 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--buildrick-space-2);
-  padding: var(--buildrick-space-2) var(--buildrick-space-3);
+  min-height: var(--buildrick-size-row-dense);
+  padding: 0 var(--buildrick-space-4);
   cursor: pointer;
   user-select: none;
-  background: transparent;
+  background: var(--buildrick-bg-subtle);
   border: none;
   width: 100%;
   text-align: left;
   font-family: var(--buildrick-font-family);
-  color: var(--buildrick-text-heading);
-  border-radius: var(--buildrick-radius-md);
+  color: var(--buildrick-text-muted);
+  border-radius: 0;
   transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 
@@ -50,7 +51,6 @@
   justify-content: center;
   color: var(--buildrick-text-muted);
   transform: rotate(90deg);
-  transition: transform var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 .bd-section-head__indicator > svg {
   width: 12px;
@@ -69,10 +69,10 @@
 /* ---- Title (matches inspector convention: uppercase, xs-plus, semibold) ---- */
 .bd-section-head__title {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
-  color: var(--buildrick-text-heading);
-  letter-spacing: 0.02em;
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+  letter-spacing: var(--buildrick-tracking-wide);
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -85,6 +85,9 @@
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-xs);
+  color: var(--buildrick-text-muted);
 }
 
 /* ---- Actions slot (right; composes bdr-icon-btn--xs) ---- */
@@ -98,7 +101,7 @@
 
 /* ---- States (a11y baseline) ---- */
 .bd-section-head:hover {
-  background: var(--buildrick-bg-subtle);
+  background: var(--buildrick-bg-pressed);
 }
 .bd-section-head:focus-visible {
   outline: none;
@@ -116,11 +119,11 @@
 
 /* ---- Variant: --sm (smaller padding + smaller title) ---- */
 .bd-section-head--sm {
-  padding: var(--buildrick-space-1) var(--buildrick-space-2);
+  padding: 0 var(--buildrick-space-3);
   gap: var(--buildrick-space-1);
 }
 .bd-section-head--sm .bd-section-head__title {
-  font-size: var(--buildrick-text-2xs-plus);
+  font-size: var(--buildrick-text-xs);
 }
 
 /* ---- Variant: --inset (no horizontal padding for embedded use) ---- */
@@ -139,7 +142,7 @@
 /* ---- Variant: --ink (full-width tone, emphasized section) ---- */
 .bd-section-head--ink {
   background: var(--buildrick-bg-subtle);
-  border-radius: var(--buildrick-radius-md);
+  border-radius: 0;
 }
 .bd-section-head--ink:hover {
   background: var(--buildrick-bg-pressed);
@@ -150,7 +153,7 @@
 
 /* ---- Variant: --inline-title (text-sm regular case, non-inspector) ---- */
 .bd-section-head--inline-title .bd-section-head__title {
-  font-size: var(--buildrick-text-sm);
+  font-size: var(--buildrick-text-sm-plus);
   font-weight: var(--buildrick-font-weight-medium);
   letter-spacing: 0;
   text-transform: none;

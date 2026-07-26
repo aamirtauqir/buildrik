@@ -19,7 +19,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    var(--buildrick-accent-alpha-08),
+    var(--buildrick-ink-06),
     transparent
   );
   transform: translateX(-100%);

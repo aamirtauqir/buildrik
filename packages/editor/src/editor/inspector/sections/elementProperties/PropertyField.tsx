@@ -42,8 +42,8 @@ const styles = {
   } as React.CSSProperties,
   browseButton: {
     padding: "8px 12px",
-    background: "rgba(45, 109, 255, 0.20)",
-    border: `1px solid ${"rgba(45, 109, 255, 0.30)"}`,
+    background: "var(--bd-accent-tint)",
+    border: "1px solid var(--buildrick-primary-alpha-30)",
     borderRadius: 6,
     color: "var(--buildrick-accent)",
     fontSize: 12,

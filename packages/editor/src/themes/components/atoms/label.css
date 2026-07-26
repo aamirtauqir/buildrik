@@ -52,14 +52,14 @@
   padding: 0;
   cursor: help;
   border-radius: var(--buildrick-radius-full);
-  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 .bd-label__info:hover { color: var(--buildrick-text-primary); }
 .bd-label__info:focus-visible {
-  outline: none;
+  outline: 2px solid var(--buildrick-accent);
+  outline-offset: 1px;
   color: var(--buildrick-text-primary);
-  box-shadow: var(--buildrick-glow-primary);
+  box-shadow: none;
 }
 .bd-label__info:active { color: var(--buildrick-accent); }
 .bd-label__info[disabled],

@@ -6,7 +6,7 @@
 
 .bd-pages-drawer {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: var(--buildrick-size-drawer) 1fr;
   min-height: 0;
   background: var(--buildrick-bg-panel);
   height: 100%;
@@ -21,7 +21,8 @@
   min-height: 0;
 }
 .bd-pages-drawer__tree-head {
-  padding: var(--buildrick-space-3) var(--buildrick-space-3) var(--buildrick-space-2);
+  min-height: var(--buildrick-size-header);
+  padding: 0 var(--buildrick-space-4);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -29,11 +30,11 @@
 }
 .bd-pages-drawer__tree-label {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-2xs);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--buildrick-text-muted);
+  color: var(--buildrick-text-secondary);
 }
 .bd-pages-drawer__tree-count {
   font-family: var(--buildrick-font-family-mono);
@@ -50,12 +51,13 @@
 .bd-pages-drawer__row {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-1);
-  padding: 5px var(--buildrick-space-2);
-  border-radius: var(--buildrick-rounded);
+  min-height: var(--buildrick-size-row);
+  gap: var(--buildrick-space-2);
+  padding: 0 var(--buildrick-space-2);
+  border-radius: var(--buildrick-radius-sm);
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
   color: var(--buildrick-text-primary);
   cursor: pointer;
   background: transparent;
@@ -66,9 +68,9 @@
 .bd-pages-drawer__row:hover { background: var(--buildrick-bg-subtle); }
 .bd-pages-drawer__row.is-selected,
 .bd-pages-drawer__row[aria-selected="true"] {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
-  font-weight: var(--buildrick-font-weight-semibold);
+  background: var(--buildrick-accent-subtle);
+  color: var(--buildrick-accent-text);
+  font-weight: var(--buildrick-font-weight-medium);
 }
 .bd-pages-drawer__row-name {
   flex: 1;
@@ -92,10 +94,10 @@
 .bd-pages-drawer__detail-title {
   margin: 0 0 var(--buildrick-space-1);
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-md-plus);
+  font-size: var(--buildrick-text-lg);
   font-weight: var(--buildrick-font-weight-semibold);
   color: var(--buildrick-text-heading);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.0625em;
 }
 .bd-pages-drawer__detail-meta {
   font-family: var(--buildrick-font-family-mono);

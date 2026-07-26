@@ -168,7 +168,7 @@ export function VersionRow({
                 <span
                   className="entry-badge"
                   style={{
-                    background: "rgba(45,109,255,0.12)",
+                    background: "var(--bd-accent-tint)",
                     color: "var(--buildrick-accent)",
                   }}
                 >

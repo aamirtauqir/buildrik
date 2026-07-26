@@ -54,8 +54,8 @@
   align-items: center;
   gap: var(--buildrick-space-3);
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-2xs, 10px);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--buildrick-text-muted);

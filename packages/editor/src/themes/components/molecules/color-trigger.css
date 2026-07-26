@@ -43,7 +43,7 @@
   outline: none;
   transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
               border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 
 .bd-color-trigger:hover {
@@ -89,7 +89,7 @@
 /* Optional alpha % suffix */
 .bd-color-trigger__alpha {
   font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs);
+  font-size: var(--buildrick-text-xs);
   font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-muted);
   flex-shrink: 0;
@@ -104,8 +104,8 @@
   justify-content: center;
   color: var(--buildrick-text-muted);
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-2xs);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
 }
 
 /* ----- Sizes ----- */

@@ -9,29 +9,29 @@
  * Namespace: `bd-canvas-toolbar` — distinct from the generic `bd-toolbar`
  * molecule (sidebar/inspector chipbar layouts).
  *
- * Token sourcing matches the original `canvasTokens` JS map:
- *   colors.surface.border    → rgba(255, 255, 255, 0.08)
+ * Token sourcing (Figma foundation port 2026-07-26 — pre-mixed tokens):
+ *   hover fill               → var(--bd-bg-card)
+ *   focus fill               → var(--bd-accent-subtle)
  *   colors.text.primary      → var(--bd-fg-primary)
  *   colors.primary.default   → var(--bd-accent)
- *   colors.primary.alpha10   → rgba(45, 109, 255, 0.1)
  *   colors.text.muted        → var(--bd-fg-muted)
- *   colors.status.errorBg    → var(--bd-error-bg)
- *   colors.status.error      → var(--bd-error)
+ *   delete hover             → var(--bd-error-tint) + var(--bd-error-text)
+ *   dark dropdown focus      → var(--bd-on-dark-12)
  */
 
 .bd-canvas-toolbar button:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: var(--bd-bg-card) !important;
   color: var(--bd-fg-primary) !important;
 }
 
 .bd-canvas-toolbar button:active {
-  transform: scale(0.95);
+  opacity: 0.85;
 }
 
 .bd-canvas-toolbar button:focus-visible {
   outline: 2px solid var(--bd-accent) !important;
   outline-offset: 1px;
-  background: rgba(45, 109, 255, 0.1) !important;
+  background: var(--bd-accent-subtle) !important;
 }
 
 .bd-canvas-toolbar button[aria-label="Delete element"] {
@@ -39,8 +39,8 @@
 }
 
 .bd-canvas-toolbar button[aria-label="Delete element"]:hover {
-  background: var(--bd-error-bg) !important;
-  color: var(--bd-error) !important;
+  background: var(--bd-error-tint) !important;
+  color: var(--bd-error-text) !important;
 }
 
 .bd-canvas-toolbar button[aria-label="Delete element"]:focus-visible {
@@ -49,7 +49,7 @@
 
 /* Dropdown menu keyboard navigation */
 .bd-canvas-toolbar [role="menu"] button:focus-visible {
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: var(--bd-on-dark-12) !important;
   outline: none;
 }
 

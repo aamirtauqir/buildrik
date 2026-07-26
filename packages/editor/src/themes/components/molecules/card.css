@@ -8,9 +8,9 @@
 .bd-card {
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md-plus, 10px);
+  border-radius: var(--buildrick-radius-md);
   overflow: hidden;
-  box-shadow: var(--buildrick-shadow-md);
+  box-shadow: none;
 }
 
 .bd-card__head {
@@ -18,8 +18,8 @@
   border-bottom: 1px solid var(--buildrick-border);
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
-  color: var(--buildrick-text-heading);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -34,8 +34,8 @@
 .bd-card__body {
   padding: var(--buildrick-space-4);
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-half);
-  line-height: 1.55;
+  font-size: var(--buildrick-text-sm);
+  line-height: var(--buildrick-lh-16);
   color: var(--buildrick-text-secondary);
 }
 
@@ -52,7 +52,7 @@
 .bd-card--flush {
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md-plus, 10px);
+  border-radius: var(--buildrick-radius-md);
   padding: var(--buildrick-space-4);
   box-shadow: none;
   overflow: visible;
@@ -60,14 +60,14 @@
 .bd-card__title {
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
-  color: var(--buildrick-text-heading);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
   margin: 0 0 var(--buildrick-space-1) 0;
 }
 .bd-card__desc {
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-sm);
   font-weight: var(--buildrick-font-weight-normal);
-  color: var(--buildrick-text-secondary);
+  color: var(--buildrick-text-muted);
   margin: 0;
 }

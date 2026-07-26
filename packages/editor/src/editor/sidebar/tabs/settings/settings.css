@@ -28,7 +28,7 @@
   flex-direction: column;
   transition: transform 180ms ease-out, opacity 180ms ease-out;
   will-change: transform, opacity;
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card);
   /* Allow inner snav / pane-body to scroll independently. */
   min-height: 0;
 }
@@ -51,7 +51,7 @@
 /* Section screen: animates in from right; departing on pop */
 .bd-set-screen--section {
   transform: translateX(100%);
-  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--bd-shadow-sm);
   pointer-events: auto;
 }
 .bd-set-screen--section.entered   { transform: translateX(0);    opacity: 1; }
@@ -299,7 +299,7 @@ textarea.bd-set-input {
   background: var(--bd-bg-card);
   border-radius: var(--bd-radius-full);
   transition: left 120ms;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--bd-shadow-md);
 }
 .bd-set-switch.on {
   background: var(--bd-accent);
@@ -317,7 +317,7 @@ textarea.bd-set-input {
   justify-content: space-between;
   gap: 6px;
   padding: var(--bd-space-2) 10px;
-  background: var(--bd-bg-card, #fff);
+  background: var(--bd-bg-card);
   border-top: 1px solid var(--bd-border);
   transform: translateY(100%);
   transition: transform 180ms ease-out;

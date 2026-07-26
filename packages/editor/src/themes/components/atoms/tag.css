@@ -35,12 +35,12 @@
   font-size: var(--buildrick-text-2xs);
 }
 
-/* Tones — paired bg + text tokens */
-.bd-tag--accent  { background: var(--buildrick-accent-tint);  color: var(--buildrick-accent);          border-color: transparent; }
-.bd-tag--success { background: var(--buildrick-success-light); color: var(--buildrick-success);        border-color: transparent; }
-.bd-tag--warning { background: var(--buildrick-warning-soft);  color: var(--buildrick-warning);        border-color: transparent; }
-.bd-tag--error   { background: var(--buildrick-error-light);   color: var(--buildrick-error);          border-color: transparent; }
-.bd-tag--ink     { background: var(--buildrick-text-heading); color: var(--buildrick-bg-card);        border-color: transparent; }
+/* Tones — pre-mixed tint bg + dark -text tokens (full hue fails AA at 11px on tint) */
+.bd-tag--accent  { background: var(--buildrick-accent-tint);   color: var(--buildrick-accent-text);   border-color: transparent; }
+.bd-tag--success { background: var(--buildrick-success-tint);  color: var(--buildrick-success-text);  border-color: transparent; }
+.bd-tag--warning { background: var(--buildrick-warning-tint);  color: var(--buildrick-warning-text);  border-color: transparent; }
+.bd-tag--error   { background: var(--buildrick-error-tint);    color: var(--buildrick-error-text);    border-color: transparent; }
+.bd-tag--ink     { background: var(--buildrick-text-heading);  color: var(--buildrick-bg-card);       border-color: transparent; }
 
 /* Selectable — toggleable filter chip (aria-pressed="true" = on) */
 .bd-tag--selectable {

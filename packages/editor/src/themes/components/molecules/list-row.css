@@ -29,8 +29,9 @@
   display: flex;
   align-items: center;
   gap: var(--buildrick-space-2);
-  padding: var(--buildrick-space-2) var(--buildrick-space-3);
-  border-radius: var(--buildrick-rounded);
+  min-height: var(--buildrick-size-row);
+  padding: var(--buildrick-space-1) var(--buildrick-space-3);
+  border-radius: 0;
   cursor: pointer;
   background: transparent;
   border: none;
@@ -63,8 +64,8 @@
 
 .bd-list-row__title {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
   color: var(--buildrick-text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -73,8 +74,8 @@
 
 .bd-list-row__meta {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-2xs-plus);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-normal);
   color: var(--buildrick-text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -83,7 +84,7 @@
 
 .bd-list-row__path {
   font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs-plus);
+  font-size: var(--buildrick-text-xs);
   color: var(--buildrick-text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -115,14 +116,14 @@
 .bd-list-row.is-active,
 .bd-list-row[aria-selected="true"],
 .bd-list-row[aria-current="page"] {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  background: var(--buildrick-accent-subtle);
+  color: var(--buildrick-accent-text);
 }
 .bd-list-row.is-selected .bd-list-row__title,
 .bd-list-row.is-active .bd-list-row__title,
 .bd-list-row[aria-selected="true"] .bd-list-row__title,
 .bd-list-row[aria-current="page"] .bd-list-row__title {
-  color: var(--buildrick-accent);
+  color: var(--buildrick-accent-text);
 }
 .bd-list-row.is-selected::before,
 .bd-list-row.is-active::before,
@@ -133,30 +134,42 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 2px;
+  width: 3px;
   background: var(--buildrick-accent);
-  border-top-left-radius: var(--buildrick-rounded);
-  border-bottom-left-radius: var(--buildrick-rounded);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .bd-list-row[disabled],
 .bd-list-row[aria-disabled="true"] {
-  opacity: 0.5;
+  color: var(--buildrick-text-disabled);
   cursor: not-allowed;
   pointer-events: none;
+}
+.bd-list-row[disabled] .bd-list-row__title,
+.bd-list-row[aria-disabled="true"] .bd-list-row__title,
+.bd-list-row[disabled] .bd-list-row__meta,
+.bd-list-row[aria-disabled="true"] .bd-list-row__meta,
+.bd-list-row[disabled] .bd-list-row__lead,
+.bd-list-row[aria-disabled="true"] .bd-list-row__lead,
+.bd-list-row[disabled] .bd-list-row__tail,
+.bd-list-row[aria-disabled="true"] .bd-list-row__tail {
+  color: var(--buildrick-text-disabled);
 }
 
 /* ---- Variants ---- */
 .bd-list-row--sm {
-  padding: var(--buildrick-space-1) var(--buildrick-space-2);
-  gap: var(--buildrick-space-1);
+  min-height: var(--buildrick-size-row-dense);
+  padding: 0 var(--buildrick-space-3);
+  gap: var(--buildrick-space-2);
 }
-.bd-list-row--sm .bd-list-row__title { font-size: var(--buildrick-text-xs); }
+.bd-list-row--sm .bd-list-row__title { font-size: var(--buildrick-text-sm-plus); }
 .bd-list-row--sm .bd-list-row__lead { width: 18px; height: 18px; }
 
 .bd-list-row--lg {
-  padding: var(--buildrick-space-3) var(--buildrick-space-4);
-  gap: var(--buildrick-space-3);
+  min-height: 56px;
+  padding: var(--buildrick-space-2) var(--buildrick-space-4);
+  gap: var(--buildrick-space-2);
 }
 .bd-list-row--lg .bd-list-row__title { font-size: var(--buildrick-text-sm-plus); }
 .bd-list-row--lg .bd-list-row__lead { width: 28px; height: 28px; }
@@ -194,7 +207,6 @@
 .bd-list-row--timeline.is-selected .bd-list-row__bullet,
 .bd-list-row--timeline[aria-selected="true"] .bd-list-row__bullet {
   background: var(--buildrick-accent);
-  box-shadow: 0 0 0 3px var(--buildrick-primary-alpha-15);
 }
 
 .bd-list-row--unread { padding-left: var(--buildrick-space-4); }

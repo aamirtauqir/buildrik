@@ -76,20 +76,19 @@
 .bd-thumb--interactive {
   cursor: pointer;
   transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              transform var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+              background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 .bd-thumb--interactive:hover {
   border-color: var(--buildrick-border-hover);
-  transform: translateY(-1px);
 }
 .bd-thumb--interactive:focus-visible {
-  outline: none;
-  border-color: var(--buildrick-border-focus);
-  box-shadow: var(--buildrick-glow-primary);
+  outline: 2px solid var(--buildrick-accent);
+  outline-offset: 1px;
+  border-color: var(--buildrick-accent);
+  box-shadow: none;
 }
 .bd-thumb--interactive:active {
-  transform: translateY(0);
+  border-color: var(--buildrick-border-hover);
 }
 .bd-thumb--interactive[disabled],
 .bd-thumb--interactive[aria-disabled="true"] {

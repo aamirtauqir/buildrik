@@ -1,6 +1,6 @@
 /**
  * bdr-modal — dialog organism.
- * Sizes: sm (380), md (default 380), lg (460)
+ * Sizes: default question (440), lg flow (560), xl form (580)
  * Variants by header icon: info (accent), success, warning, danger
  * Composes: bdr-btn, bdr-input, bdr-card patterns
  * A11y: role="dialog" aria-modal="true" aria-labelledby="<id>"; trap focus; Esc to dismiss.
@@ -9,42 +9,40 @@
 .bd-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: var(--buildrick-ink-48);
-  backdrop-filter: blur(2px);
+  background: var(--buildrick-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--buildrick-z-modal, 50);
+  z-index: var(--buildrick-z-modal, 60);
   padding: var(--buildrick-space-6);
 }
 .bd-modal-backdrop--light { background: var(--buildrick-ink-12); }
 
 .bd-modal {
   position: relative;
-  background: var(--buildrick-bg-card);
-  border-radius: var(--buildrick-radius-md-plus, 10px);
-  box-shadow: 0 20px 60px -12px var(--buildrick-ink-50),
-              0 4px 12px var(--buildrick-ink-15);
+  background: var(--buildrick-bg-elevated);
+  border-radius: var(--buildrick-radius-lg);
+  box-shadow: var(--buildrick-shadow-modal);
   width: 100%;
-  max-width: 380px;
+  max-width: 440px;
   overflow: hidden;
-  border: 1px solid var(--buildrick-ink-06);
+  border: 1px solid var(--buildrick-border);
 }
-.bd-modal--lg { max-width: 460px; }
-.bd-modal--xl { max-width: 560px; }
+.bd-modal--lg { max-width: 560px; }
+.bd-modal--xl { max-width: 580px; }
 
 .bd-modal__head {
-  padding: var(--buildrick-space-4) var(--buildrick-space-4) var(--buildrick-space-3);
+  min-height: 56px;
+  padding: var(--buildrick-space-2) var(--buildrick-space-6);
   border-bottom: 1px solid var(--buildrick-border);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--buildrick-space-3);
 }
 .bd-modal__icon {
   width: 32px;
   height: 32px;
-  /* off-grid 7px — sits between radius-md(8) and radius-sm(4); chosen to soften 32px tile without going pillowy */
-  border-radius: 7px;
+  border-radius: var(--buildrick-radius-md);
   background: var(--buildrick-accent-tint);
   color: var(--buildrick-accent);
   display: inline-flex;
@@ -60,14 +58,14 @@
 .bd-modal__title {
   margin: 0 0 2px;
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-plus);
+  font-size: var(--buildrick-text-lg);
   font-weight: var(--buildrick-font-weight-semibold);
   color: var(--buildrick-text-heading);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.0625em;
 }
 .bd-modal__subtitle {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-2xs-plus);
+  font-size: var(--buildrick-text-sm);
   font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-muted);
   line-height: 1.45;
@@ -75,10 +73,10 @@
 /* bdr-modal__close removed — composes .bd-icon-btn--xs --ghost. */
 
 .bd-modal__body {
-  padding: var(--buildrick-space-3) var(--buildrick-space-4) var(--buildrick-space-4);
+  padding: var(--buildrick-space-4) var(--buildrick-space-6);
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs-plus);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
   color: var(--buildrick-text-secondary);
   line-height: 1.55;
 }
@@ -86,11 +84,12 @@
 .bd-modal__body p:last-child { margin-bottom: 0; }
 
 .bd-modal__foot {
-  padding: var(--buildrick-space-3) var(--buildrick-space-3);
+  min-height: 64px;
+  padding: var(--buildrick-space-2) var(--buildrick-space-6);
   border-top: 1px solid var(--buildrick-border);
-  background: var(--buildrick-bg-subtle);
+  background: var(--buildrick-bg-elevated);
   display: flex;
-  gap: var(--buildrick-space-2);
+  gap: var(--buildrick-space-3);
   justify-content: flex-end;
   align-items: center;
 }
@@ -106,6 +105,6 @@
  * editor/canvas/controls/BlockPickerModal.tsx (animation: "bd-modal-in 0.2s ease").
  * Moved here from legacy components.css 2026-05-07 (vibcoder-finish Phase Final). */
 @keyframes bd-modal-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

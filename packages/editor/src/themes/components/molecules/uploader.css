@@ -78,8 +78,8 @@
 .bd-uploader__name {
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
-  color: var(--buildrick-text-heading);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -87,7 +87,7 @@
 
 .bd-uploader__hint {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
+  font-size: var(--buildrick-text-sm);
   color: var(--buildrick-text-muted);
 }
 
@@ -121,10 +121,10 @@
 /* ---- Modifier: error ---- */
 .bd-uploader--error {
   border-color: var(--buildrick-error);
-  background: var(--buildrick-error-bg);
+  background: var(--buildrick-error-tint);
 }
 .bd-uploader--error .bd-uploader__hint {
-  color: var(--buildrick-error);
+  color: var(--buildrick-error-text);
 }
 
 /* ---- Modifier: disabled ---- */

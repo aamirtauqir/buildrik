@@ -13,7 +13,7 @@
 .bd-a11y__tile {
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md-plus, 10px);
+  border-radius: var(--buildrick-radius-md);
   padding: var(--buildrick-space-3) var(--buildrick-space-4);
   display: flex;
   flex-direction: column;
@@ -22,8 +22,8 @@
 .bd-a11y__tile h4 {
   margin: 0;
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-half);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-heading);
 }
 .bd-a11y__tile p {
@@ -40,7 +40,7 @@
   font-weight: var(--buildrick-font-weight-medium);
   background: var(--buildrick-bg-subtle);
   padding: 1px 5px;
-  border-radius: var(--buildrick-radius-xs);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-primary);
 }
 
@@ -54,7 +54,7 @@
 }
 .bd-a11y__swatch {
   padding: var(--buildrick-space-2);
-  border-radius: var(--buildrick-rounded);
+  border-radius: var(--buildrick-radius-sm);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -109,7 +109,7 @@
   color: var(--buildrick-text-primary);
   background: var(--buildrick-bg-subtle);
   padding: var(--buildrick-space-2);
-  border-radius: var(--buildrick-rounded);
+  border-radius: var(--buildrick-radius-sm);
   line-height: 1.5;
   white-space: pre;
   overflow-x: auto;

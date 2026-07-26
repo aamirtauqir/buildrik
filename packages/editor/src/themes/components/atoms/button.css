@@ -11,8 +11,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--buildrick-space-2);
-  padding: 9px var(--buildrick-space-4);
+  gap: 6px;
+  height: 32px;
+  padding: 0 var(--buildrick-space-3);
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-sm-plus);
   font-weight: var(--buildrick-font-weight-medium);
@@ -20,13 +21,14 @@
   border: 1px solid transparent;
   border-radius: var(--buildrick-radius-md);
   cursor: pointer;
-  transition: background-color var(--buildrick-duration-normal) var(--buildrick-ease-default),
-              border-color var(--buildrick-duration-normal) var(--buildrick-ease-default),
-              color var(--buildrick-duration-normal) var(--buildrick-ease-default);
+  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 .bd-btn:focus-visible {
-  outline: 0;
-  box-shadow: var(--buildrick-glow-primary);
+  outline: 2px solid var(--buildrick-accent);
+  outline-offset: 1px;
+  box-shadow: none;
 }
 .bd-btn:disabled,
 .bd-btn[aria-disabled="true"] {
@@ -55,48 +57,50 @@
 }
 .bd-btn--secondary:hover {
   background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-strong);
 }
 
 .bd-btn--ghost {
   background: transparent;
-  color: var(--buildrick-text-secondary);
+  color: var(--buildrick-text-primary);
 }
 .bd-btn--ghost:hover {
-  background: var(--buildrick-bg-hover);
+  background: var(--buildrick-bg-subtle);
   color: var(--buildrick-text-primary);
 }
 
+/* Destructive — filled error surface per Figma Button/destructive (hover stays error) */
 .bd-btn--danger {
-  background: var(--buildrick-bg-card);
-  border-color: var(--buildrick-error-border);
-  color: var(--buildrick-error);
+  background: var(--buildrick-error);
+  border-color: transparent;
+  color: var(--buildrick-text-on-accent);
 }
 .bd-btn--danger:hover {
-  background: var(--buildrick-error-bg);
-  border-color: var(--buildrick-error);
+  background: var(--buildrick-error);
+  border-color: transparent;
 }
 
-/* Pill CTA (Publish). Single use per topbar context. */
+/* CTA (Publish). Single use per topbar context. Button geometry canonical (r8, h32). */
 .bd-btn--publish {
   background: var(--buildrick-accent);
   color: var(--buildrick-text-on-accent);
-  border-radius: var(--buildrick-radius-full);
-  padding: 9px 18px;
-  font-weight: var(--buildrick-font-weight-semibold);
+  border-radius: var(--buildrick-radius-md);
+  padding: 0 var(--buildrick-space-3);
+  font-weight: var(--buildrick-font-weight-medium);
 }
 .bd-btn--publish:hover { background: var(--buildrick-accent-hover); }
 .bd-btn--publish:active { background: var(--buildrick-accent-pressed); }
 
 /* ---- Sizes ---- */
 .bd-btn--sm {
-  padding: 6px var(--buildrick-space-3);
+  height: 28px;
+  padding: 0 10px;
   font-size: var(--buildrick-text-sm);
-  border-radius: var(--buildrick-rounded);
+  border-radius: var(--buildrick-radius-md);
 }
 .bd-btn--lg {
-  padding: 12px 22px;
-  font-size: var(--buildrick-text-md);
+  height: 36px;
+  padding: 0 var(--buildrick-space-4);
+  font-size: var(--buildrick-text-sm-plus);
 }
 
 /* ---- Busy (loading) ---- */
@@ -117,9 +121,9 @@
 .bd-btn-split {
   display: inline-flex;
   align-items: stretch;
-  border-radius: var(--buildrick-radius-full);
+  border-radius: var(--buildrick-radius-md);
   overflow: hidden;
-  box-shadow: 0 1px 2px var(--buildrick-primary-alpha-30);
+  box-shadow: none;
 }
 .bd-btn-split .bd-btn--publish {
   border-radius: 0;
@@ -128,7 +132,7 @@
 }
 .bd-btn-split__caret {
   width: 30px;
-  background: var(--buildrick-accent-pressed);
+  background: var(--buildrick-accent-hover);
   color: var(--buildrick-text-on-accent);
   border: 0;
   cursor: pointer;
@@ -138,7 +142,6 @@
 }
 .bd-btn-split__caret:hover {
   background: var(--buildrick-accent-pressed);
-  filter: brightness(0.9);
 }
 
 /* ---- Bare variant ----
@@ -169,5 +172,5 @@
   border-radius: 0;
   transition: none;
 }
-.bd-btn--bare:focus-visible { box-shadow: none; }
+.bd-btn--bare:focus-visible { box-shadow: none; outline: 0; }
 /* :disabled inherits cursor + opacity + pointer-events from .bd-btn base. */

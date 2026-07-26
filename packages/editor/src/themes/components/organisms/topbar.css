@@ -1,33 +1,34 @@
 /**
- * bdr-topbar — 48px editor chrome top bar.
+ * bdr-topbar — 56px editor chrome top bar.
  * Layout: 3-col grid (left grp · center bp-switcher · right grp).
  * Composes: bdr-btn (Publish), bdr-bp-switcher (centered), bdr-status (chip).
  * A11y: role="banner".
  */
 
 .bd-topbar {
-  height: 48px;
+  height: var(--buildrick-size-topbar);
   background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md-plus, 10px);
+  border: none;
+  border-bottom: 1px solid var(--buildrick-border);
+  border-radius: 0;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: 0 var(--buildrick-space-3);
+  padding: 0 var(--buildrick-space-4);
   gap: var(--buildrick-space-3);
-  box-shadow: var(--buildrick-shadow-xs);
+  box-shadow: none;
 }
 .bd-topbar__group {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-1);
+  gap: var(--buildrick-space-3);
 }
 .bd-topbar__group--center { justify-self: center; }
 
 .bd-topbar__brand {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-md);
-  font-weight: var(--buildrick-font-weight-bold);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-heading);
   letter-spacing: -0.01em;
   padding-right: var(--buildrick-space-3);
@@ -48,7 +49,7 @@
   font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-secondary);
   padding: 4px var(--buildrick-space-3);
-  border-radius: var(--buildrick-rounded);
+  border-radius: var(--buildrick-radius-full);
   background: var(--buildrick-bg-subtle);
 }
 .bd-topbar__status-dot {

@@ -39,12 +39,12 @@ export const exportOptionStyles: React.CSSProperties = {
   color: "var(--bd-fg-primary)",
   cursor: "pointer",
   fontSize: 18,
-  transition: "background 120ms, border-color 120ms",
+  transition: "background var(--buildrick-duration-fast), border-color var(--buildrick-duration-fast)",
 };
 
 /** Overlay applied to the selected option button. */
 export const activeExportOptionStyles: React.CSSProperties = {
-  background: "rgba(45,109,255,0.08)",
+  background: "var(--bd-accent-subtle)",
   borderColor: "var(--bd-accent)",
   color: "var(--bd-accent)",
 };

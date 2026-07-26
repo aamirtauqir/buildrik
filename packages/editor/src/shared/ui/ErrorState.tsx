@@ -71,8 +71,8 @@ const severityConfig: Record<
   info: {
     icon: "ℹ",
     color: "var(--buildrick-info)",
-    bgColor: "rgba(45, 109, 255, 0.1)",
-    borderColor: "rgba(45, 109, 255, 0.3)",
+    bgColor: "var(--bd-accent-tint)",
+    borderColor: "var(--buildrick-primary-alpha-30)",
   },
 };
 

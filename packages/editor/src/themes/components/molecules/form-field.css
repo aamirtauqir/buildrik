@@ -22,7 +22,7 @@
 .bd-form-field {
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-space-1);
+  gap: var(--buildrick-space-2);
 }
 
 /* Inline — label sits beside the control */
@@ -54,13 +54,12 @@
 .bd-form-field--required > .bd-label::after {
   content: "*";
   margin-left: var(--buildrick-space-1);
-  color: var(--buildrick-error);
-  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-error-text);
+  font-weight: var(--buildrick-font-weight-medium);
 }
 
 /* Disabled state — dim label + helper; control handles its own treatment */
 .bd-form-field.is-disabled > .bd-label,
 .bd-form-field.is-disabled > .bd-helper-text {
-  opacity: 0.5;
   color: var(--buildrick-text-disabled);
 }

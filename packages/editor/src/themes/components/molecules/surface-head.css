@@ -26,9 +26,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--buildrick-space-3);
-  padding: var(--buildrick-space-4) var(--buildrick-space-5);
+  min-height: var(--buildrick-size-header);
+  padding: var(--buildrick-space-3) var(--buildrick-space-4);
   border-bottom: 1px solid var(--buildrick-border);
-  background: transparent;
+  background: var(--buildrick-bg-panel);
 }
 
 .bd-surface-head__body {
@@ -41,21 +42,22 @@
 
 .bd-surface-head__eyebrow {
   font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-3xs-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--buildrick-tracking-widest);
 }
 
 .bd-surface-head__title {
   margin: 0;
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-md);
-  font-weight: var(--buildrick-font-weight-semibold);
-  color: var(--buildrick-text-heading);
-  letter-spacing: -0.01em;
-  line-height: 1.2;
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-secondary);
+  letter-spacing: var(--buildrick-tracking-wide);
+  text-transform: uppercase;
+  line-height: var(--buildrick-lh-16);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -83,18 +85,26 @@
   align-items: center;
   gap: var(--buildrick-space-1);
   flex-shrink: 0;
+  color: var(--buildrick-text-secondary);
 }
 
 /* ---- Variants ---- */
 .bd-surface-head--sm {
   padding: var(--buildrick-space-2) var(--buildrick-space-3);
 }
-.bd-surface-head--sm .bd-surface-head__title { font-size: var(--buildrick-text-sm); }
+.bd-surface-head--sm .bd-surface-head__title { font-size: var(--buildrick-text-xs); }
 
 .bd-surface-head--lg {
-  padding: var(--buildrick-space-5) var(--buildrick-space-6);
+  padding: var(--buildrick-space-4) var(--buildrick-space-6);
 }
-.bd-surface-head--lg .bd-surface-head__title { font-size: var(--buildrick-text-lg); }
+.bd-surface-head--lg .bd-surface-head__title {
+  font-size: var(--buildrick-text-lg);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-primary);
+  text-transform: none;
+  letter-spacing: var(--buildrick-tracking-tight);
+  line-height: var(--buildrick-lh-24);
+}
 
 .bd-surface-head--flush { border-bottom: none; }
 

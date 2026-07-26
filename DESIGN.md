@@ -105,21 +105,19 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 **No system fallbacks. No `system-ui`. No `-apple-system`. No `Roboto`, `Helvetica`, `Arial`, `Segoe UI` named in any stack.**
 
 - **Display / Hero (marketing site only):** `General Sans` (Fontshare). 600–700 weight for hero copy.
-- **Body + Editor UI (primary workhorse):** `Inter Tight`. Tight letter-spacing, reads as "tool" not "document." Used for every label, button, input, breadcrumb, panel title, row label in the editor.
+- **Body + Editor UI + Dashboard (primary workhorse):** `Inter`. The editor chrome moved from Inter Tight to Inter on 2026-07-26 with the DS replacement — the Figma foundation ("Buildrick — Product", `g4GzQFqzNYz5sosz1QtZXC`) sets every ui/* style in Inter. Used for every label, button, input, breadcrumb, panel title, row label in the editor.
 - **Data / Inspector values / mono content:** `Geist Mono` with `font-variant-numeric: tabular-nums`. Required for dimensions, timestamps, slugs, file sizes, page counts.
 - **Loading:** Bunny Fonts CDN with `font-display: swap` in dev. Self-host in production. No `@font-face` redefinitions in individual components.
-- **Dashboard UI (scoped exception):** `Inter` is loaded alongside Inter Tight and applied only on the dashboard shell root (`DashboardShell`), cascading to dashboard content. Auth and onboarding keep `Inter Tight`; Geist Mono remains the data face everywhere.
+- **Auth/onboarding:** still on `Inter Tight` until their own reskin lands; Geist Mono remains the data face everywhere.
 
-**Canonical CSS:**
+**Canonical CSS (editor chrome):**
 
 ```css
---aqb-font-family: "Inter Tight", sans-serif;
---aqb-font-mono:   "Geist Mono", monospace;
+--buildrick-font-family: "Inter", "Inter Tight", "Geist", sans-serif;  /* Inter Tight = transition fallback only */
+--buildrick-font-family-mono: "Geist Mono", "SF Mono", Menlo, monospace;
 ```
 
-In **editor chrome**, the only fallback allowed is the CSS generic (`sans-serif` / `monospace`) — never name a specific fallback font. If `Inter Tight` fails to load, the user gets the system generic, which is acceptable because `font-display: swap` swaps Inter Tight in as soon as it loads. (The **dashboard** is the one exception: it sets `'Inter', 'Inter Tight', sans-serif` on the shell root so Inter is scoped to the dashboard and everything outside it keeps Inter Tight.)
-
-**Scale (px):** 11 / 12 / 13 / 14 / 16 / 20 / 24 / 32 / 48. Editor chrome lives mostly at 12–14. Breadcrumb project = 13/400, page = 13/500. Panel titles = 14/600. Row labels = 13/400. Mono data = 11/500.
+**Type ramp (Figma "Type — 11 styles"):** ui/11 caption (11/16, 500) · ui/12 small (12/16) · ui/13 row label (13/20, 400/500) · ui/14 panel title (14/20, 600) · ui/16 heading (16/24, 600, −0.06em) · ui/20 heading lg (20/28, 600) · ui/24 title (24/32, 600) · data/11–13 in Geist Mono. **Weights cap at 600 — no 700 anywhere in chrome.** Editor chrome lives mostly at 12–14. Panel/drawer headers = 11/500 UPPERCASE ink-soft.
 
 ## Color
 
@@ -136,52 +134,56 @@ In **editor chrome**, the only fallback allowed is the CSS generic (`sans-serif`
 --aqb-bg-canvas:   #FFFFFF   /* user's canvas — unchanged */
 ```
 
-Depth is communicated by nesting + hairline borders, not shadows. Modals get one `box-shadow: 0 8px 32px rgba(15,23,42,0.08)` on the outer container.
+Depth is communicated by nesting + hairline borders, not shadows. The elevation scale is exactly three steps (Figma foundation, 2026-07-26): `raised 0 1px 3px rgba(15,23,42,.12)` (knobs, chips) · `drag 0 2px 6px rgba(15,23,42,.24)` (picked-up state, menus, popovers) · `overlay 0 12px 32px rgba(15,23,42,.16)` (modals, command palette, floating drawers).
 
 ### Borders (slate, matches topbar)
 
 ```
 --aqb-border:         #E2E8F0   /* slate-200, default hairline */
 --aqb-border-medium:  #CBD5E1   /* slate-300, inputs + buttons — matches topbar */
+--aqb-border-input:   #8D949C   /* dedicated input-border step (Figma) */
 --aqb-border-strong:  #94A3B8   /* slate-400, hover — matches topbar hover */
---aqb-border-focus:   #2D6DFF   /* cobalt focus ring — CODE ONLY, design is #406ED6 */
+--aqb-border-focus:   #406ED6   /* accent focus — 2px, no halo */
 ```
 
-### Text (no black, ever)
+### Text — the ink scale (no pure black, ever)
 
 ```
---aqb-text-primary:   #334155   /* slate-700, 11.6:1 on slate-50 — AAA */
---aqb-text-secondary: #64748B   /* slate-500, 7.0:1 — AAA */
---aqb-text-muted:     #94A3B8   /* slate-400, 3.7:1 — AA for large text only */
---aqb-text-disabled:  #CBD5E1   /* slate-300 — visibly inert */
---aqb-text-on-accent: #FFFFFF   /* white on cobalt surfaces */
+--ink:          #0F172A   /* slate-900 — primary text, 4.5:1+ everywhere */
+--ink-soft:     #485465   /* secondary labels, panel headers */
+--ink-muted:    #656F7E   /* captions, counts, footer */
+--ink-disabled: #CBD5E1   /* slate-300 — visibly inert */
+--accent-on:    #FFFFFF   /* white on accent surfaces */
 ```
 
-The primary text color matches topbar `.tbBreadcrumb-page` (`#334155`). Secondary matches topbar `.tbBreadcrumb-project` (`#64748B`). This is intentional — topbar becomes the type-color reference for every surface in the editor.
+(Foundation replaced 2026-07-26: the old slate-700/500/400 text ramp is retired; every level of the ink scale passes 4.5:1 on the light surfaces.)
 
-### Accent (cobalt, single, unchanged)
+### Accent (single blue, Figma Package variable — the guard against a second blue)
 
 ```
---accent:         #2D6DFF   /* CODE ONLY, design is #406ED6 */
---accent-hover:   #4B8DFF
---accent-pressed: #1E58D9
---accent-tint:    rgba(45, 109, 255, 0.10)   /* selection bg on light surfaces */
---accent-subtle:  rgba(45, 109, 255, 0.05)   /* hover bg on light surfaces */
---accent-on:      #FFFFFF                     /* text on cobalt buttons */
+--accent:         #406ED6
+--accent-hover:   #2E56B8
+--accent-pressed: #264899
+--accent-text:    #3C68C9   /* AA accent-colored text on light */
+--accent-subtle:  #EBF1FF   /* selected-row fill — PRE-MIXED, never alpha */
+--accent-tint:    #ECF0FB   /* badge/pill fill — PRE-MIXED, never alpha */
+--accent-on:      #FFFFFF   /* text on accent buttons */
 ```
+
+**Tint rule (Figma):** semantic and accent tints are pre-mixed opaque values — never frame/alpha opacity. Alpha survives only where transparency is the point (scrims, canvas overlays, shimmer).
 
 **Usage rules:** accent appears on (a) the one primary CTA per screen, (b) selection outlines and selected-row tint, (c) active rail/tab indicator, (d) focus rings, (e) the account avatar (replaces the legacy `#1F2937` pill). Nowhere else.
 
-### Semantic (light-mode tuned, WCAG AA on light bg)
+### Semantic (fill / text / tint triads — WCAG AA, tints pre-mixed)
 
 ```
---success: #16A34A   /* green-600 */
---warning: #D97706   /* amber-600 */
---error:   #DC2626   /* red-600 */
---info:    #2D6DFF   /* CODE ONLY — design accent is #406ED6 */
+--success: #16A34A   --success-text: #117D39   --success-tint: #E3F4E9
+--warning: #B45309   --warning-text: #A05804   --warning-tint: #FAECDC
+--error:   #DC2626   --error-text:   #CB2323   --error-tint:   #FBE5E5
+--info:    = accent (#406ED6 family — one blue)
 ```
 
-Use for status indicators only (save state, validation, toasts). Never for decoration.
+Fill = dots/icons/borders. Text = labels on the matching tint (each measures 4.5:1+). Tint = the chip/badge background. Use for status indicators only (save state, validation, toasts). Never for decoration.
 
 ## Spacing
 - **Base unit:** 4px.
@@ -196,8 +198,8 @@ Use for status indicators only (save state, validation, toasts). Never for decor
 
 ## Motion
 - **Approach:** Minimal-functional. Only transitions that aid comprehension.
-- **Easing:** `enter: ease-out`, `exit: ease-in`, `move: ease-in-out`.
-- **Duration:** hover `120ms` (matches topbar), panel open `200ms`, modal enter `200ms`. No spring physics. No scroll choreography. No entrance animations on first paint.
+- **Easing:** house curve `cubic-bezier(0.2, 0, 0, 1)` (ease-out) for enter/hover; `ease-in` for exit.
+- **Duration (Figma motion tokens, 2026-07-26):** hover/press `100ms` (fast), panel/drawer `160ms` (base), modal/overlay enter `240ms` (slow). No spring physics. No scroll choreography. No entrance animations on first paint. No hover lifts/scales — the design moves color, not geometry.
 - **Reduced motion:** respect `prefers-reduced-motion: reduce` — disable all non-essential transitions.
 
 ## ⚠ Editor layout sections — SUPERSEDED 2026-07-18
@@ -346,6 +348,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-07-26 | **Editor chrome DS replaced with the Figma "Buildrick — Product" foundation** | Founder-directed replacement (Figma file `g4GzQFqzNYz5sosz1QtZXC`): the editor's token layer was rewritten from the file's Foundations page and all 173 shipped components. Concrete flips: editor UI font Inter Tight → **Inter**; accent shades corrected (hover `#2E56B8` — was lighter `#5E86E0`; pressed `#264899`); accent/semantic tints became **pre-mixed opaque** values (`accent-subtle #EBF1FF`, `accent-tint #ECF0FB`, success/warning/error tints `#E3F4E9/#FAECDC/#FBE5E5`) per the Figma "never frame opacity" rule; text ramp darkened onto the ink scale (`#0F172A/#485465/#656F7E`); elevation collapsed to the 3-step raised/drag/overlay scale; focus = 2px accent with **no halo**; motion re-based to 100/160/240ms ease-out with hover lifts/scales retired; weights cap at 600. Legacy token names survive only as references onto the new set — no legacy value survives. Conformance locked by `figma-32-2-conformance.test.ts` (rewritten against the new file). |
 | 2026-07-21 | **Dashboard IA follow-up — Templates → top nav, Help → Resources, Projects → Sites** | Post-IA-v2 cleanup (Codex dashboard audit): Templates moved out of the sidebar into the ecosystem top nav (it's a browse-the-catalog surface, not a workspace destination); the labeled Support group was dropped — Getting started folds into the main sidebar group and Help centre moves into Resources; the `Projects` sidebar item was relabelled **Sites** (route unchanged, `/dashboard/projects`). Sidebar settles at a single 6-item group `Home · Getting started · Sites · Agency (agency-only) · Media · Settings`. SSOT `components/dashboard/shell/nav.ts` reflects this; the shell bullets above were updated to match. No accent/token change. |
 | 2026-07-18 | **Single accent → `#406ED6` (UI kit); onboarding's scoped blue retired** | Founder adopted the supplied UI kit (`docs/design/dashboard-ui-kit.md`) over the cobalt reskin values, and chose to flip auth + onboarding with the dashboard so the kit's "one blue" rule (§7.2) actually holds. `--color-primary`, `--color-auth-cta` and `--color-onb-primary` all → `#406ED6` (hover `#2E56B8`); `--color-nav-label-active` → `#2E56B8`. The `.onb-scope` focus override and the short-lived `.dash-scope` override were both deleted — with one accent there is nothing to scope, and the global ring now resolves to `--color-primary`. Supersedes the 2026-07-12 RED→COBALT unification for these three surfaces. **Editor chrome remains cobalt `#2D6DFF`** in its own `--buildrick-*` DS (separate token contract + CI gates) and is a pending migration — until it lands, editor and app chrome differ. |
 | 2026-07-18 | **Anti-Slop Rules scoped to editor chrome; dashboard allowances made explicit** | The 12 anti-slop rules sat at top level and read as global, but were written alongside the editor Rail/Composition specs. As global rules they contradicted shipped dashboard code on four counts — card elevation shadows (#10), the ink `#141924` featured surface and filter chip (#1), per-app brand tile colours (#11), and the multi-column grid of coloured icon tiles (#3) — and the Dashboard section already prescribed `shadow-card`, so the doc contradicted itself. Rules retitled editor-chrome-only; the dashboard section now lists what it explicitly allows. The editor keeps the guard (light chrome / no-black is a real decision there). Cobalt remains the single accent everywhere — brand tile colours are illustrative data, never accents. Also scoped the "never name a specific fallback font" typography rule to the editor, since the dashboard deliberately sets `'Inter', 'Inter Tight', sans-serif` on its shell root. No code change. |
@@ -436,7 +439,7 @@ Panel chrome must be visually restrained. Canvas (user content) owns decoration;
 
 Restates and sharpens the existing §Color rules.
 
-1. **The accent is used ONLY where §Color §Accent Usage Rules already allow** — primary CTA, selection outlines and selected-row tint, active rail/tab indicator, focus rings, account avatar. Nowhere else in chrome. (`#406ED6` in design; the editor code still emits cobalt `#2D6DFF` until the migration lands.)
+1. **The accent is used ONLY where §Color §Accent Usage Rules already allow** — primary CTA, selection outlines and selected-row tint, active rail/tab indicator, focus rings, account avatar. Nowhere else in chrome. (`#406ED6` in design AND code since 2026-07-21.)
 2. **Semantic colors (`--success`, `--warning`, `--error`, `--info`) are used ONLY in functional status indicators** — Toast, SyncStatusIndicator, save-state badges, validation messages. Never as decoration elsewhere in chrome.
 3. **No decorative tint** in panel headers, sidebar section backgrounds, toolbar fills. Chrome uses the neutral surface tokens (`--aqb-bg-*` / `--buildrick-bg-panel*`) only.
 4. **Chrome must survive any user canvas color.** A user building a hot-pink brand site and a user building a forest-green one must see the same chrome affordances.

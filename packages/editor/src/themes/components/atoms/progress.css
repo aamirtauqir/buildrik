@@ -9,7 +9,7 @@
   --bdr-progress-value: 0;
   position: relative;
   width: 100%;
-  height: 6px;
+  height: 4px;
   border-radius: var(--buildrick-radius-full);
   background: var(--buildrick-bg-subtle);
   overflow: hidden;
@@ -23,7 +23,6 @@
   border-radius: inherit;
   transform-origin: left center;
   transform: scaleX(var(--bdr-progress-value));
-  transition: transform var(--buildrick-duration-normal) var(--buildrick-ease-default);
 }
 
 /* Tone variants */

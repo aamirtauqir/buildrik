@@ -6,10 +6,11 @@
 .bd-tabs {
   display: flex;
   gap: var(--buildrick-space-1);
-  padding: var(--buildrick-space-2) var(--buildrick-space-2) 0;
+  padding: 0 var(--buildrick-space-2);
   background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md-plus, 10px);
+  border: none;
+  border-bottom: 1px solid var(--buildrick-border);
+  border-radius: 0;
 }
 .bd-tabs__tab {
   flex: 1;
@@ -17,11 +18,11 @@
   align-items: center;
   justify-content: center;
   gap: var(--buildrick-space-1);
-  padding: var(--buildrick-space-3) var(--buildrick-space-3);
+  padding: var(--buildrick-space-2) var(--buildrick-space-3);
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-secondary);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
+  color: var(--buildrick-text-muted);
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -37,9 +38,9 @@
 .bd-tabs__tab[aria-selected="true"],
 .bd-tabs__tab.is-active {
   color: var(--buildrick-text-primary);
-  background: var(--buildrick-bg-subtle);
+  background: transparent;
   border-bottom-color: var(--buildrick-accent);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-weight: var(--buildrick-font-weight-medium);
 }
 
 /* Pill group (segmented control — used for breakpoint-like switches inline) */
@@ -47,7 +48,7 @@
   display: inline-flex;
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-md);
+  border-radius: var(--buildrick-radius-sm);
   overflow: hidden;
 }
 .bd-pillgroup__btn {
@@ -66,7 +67,7 @@
 .bd-pillgroup__btn.is-on {
   background: var(--buildrick-bg-subtle);
   color: var(--buildrick-text-primary);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-weight: var(--buildrick-font-weight-medium);
 }
 
 /* States — a11y baseline */

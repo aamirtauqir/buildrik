@@ -42,10 +42,10 @@
 }
 
 .bd-tile-meta__name {
-  font-size: var(--buildrick-text-sm);
+  font-size: var(--buildrick-text-sm-plus);
   font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--buildrick-tracking-normal);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -54,7 +54,7 @@
 }
 
 .bd-tile-meta__sub {
-  font-size: var(--buildrick-text-2xs);
+  font-size: var(--buildrick-text-sm);
   color: var(--buildrick-text-muted);
   overflow: hidden;
   text-overflow: ellipsis;

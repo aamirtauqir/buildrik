@@ -48,15 +48,15 @@
 .bd-toggle-row__name {
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
-  color: var(--buildrick-text-heading);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
 }
 
 .bd-toggle-row__desc {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-text-secondary);
-  line-height: 1.45;
+  font-size: var(--buildrick-text-sm);
+  color: var(--buildrick-text-muted);
+  line-height: var(--buildrick-lh-16);
 }
 
 /* Disabled treatment — when the control is aria-checked="false" AND the row
@@ -64,7 +64,7 @@
    its own off-state colour. */
 .bd-toggle-row.is-disabled .bd-toggle-row__name,
 .bd-toggle-row.is-disabled .bd-toggle-row__desc {
-  opacity: 0.55;
+  color: var(--buildrick-text-disabled);
 }
 .bd-toggle-row.is-disabled .bd-switch {
   cursor: not-allowed;

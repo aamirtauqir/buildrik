@@ -21,10 +21,10 @@
   height: 32px;
   background: var(--buildrick-bg-input);
   border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-md);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-muted);
   transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+              background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 
 /* ---- Leading magnifier icon ---- */
@@ -51,8 +51,8 @@
   outline: none;
   background: transparent;
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
   color: var(--buildrick-text-primary);
   /* inputs inherit font-family by default in some UAs but not all — set it explicitly */
 }
@@ -88,7 +88,7 @@
   border-color: var(--buildrick-border-strong);
 }
 .bd-search:focus-within {
-  border-color: var(--buildrick-border-focus);
+  border-color: var(--buildrick-accent);
   box-shadow: var(--buildrick-glow-primary);
 }
 .bd-search:focus-within .bd-search__icon {
@@ -100,7 +100,7 @@
 }
 .bd-search--error:focus-within {
   border-color: var(--buildrick-error);
-  box-shadow: 0 0 0 3px var(--buildrick-error-light);
+  box-shadow: none;
 }
 
 .bd-search--disabled,
@@ -117,13 +117,15 @@
   height: 28px;
   padding: 0 var(--buildrick-space-2);
   gap: var(--buildrick-space-1);
+  background: var(--buildrick-bg-subtle);
+  border-color: transparent;
 }
 .bd-search--sm .bd-search__icon {
   width: 14px;
   height: 14px;
 }
 .bd-search--sm .bd-search__input {
-  font-size: var(--buildrick-text-xs);
+  font-size: var(--buildrick-text-sm);
 }
 
 .bd-search--lg {

@@ -47,19 +47,23 @@ it("renders raw-HTML content that omits contentFormat (template/AI seed shape)",
 
 `cd packages/editor && npx vitest run src/engine/export/__tests__/ExportEngine.formats.test.ts`
 
-- [ ] **Step 4: Fix the branch.** Change the content sink (around line 682) so unset `contentFormat` with tag-shaped content is sanitized, not escaped:
+- [ ] **Step 4: Fix the branch — TYPE-AWARE (corrected 2026-07-22 after the first attempt found the regex-only version breaks the `<script>`-safety guards).**
 
+The single sink is `renderContent(content, contentFormat)` (ExportEngine.ts:681-684); both call sites (`elementToHTML` ~250, `renderPageElement` ~752) delegate to it, so fixing it covers both — do NOT touch line ~249/~752 separately.
+
+Regex-alone is WRONG: existing tests intentionally ESCAPE real tags typed into a `type:"text"` element (a user typing `<script>` must be escaped on publish — the invariant at ExportEngine.ts:671-672 + memory `ai_sites_raw_html_export_escaped`), e.g. `formats.test.ts` "escapes plain text content verbatim" and `aiRoundTrip.test.ts` "leaves ordinary text content escaped when contentFormat is absent". Those guard tests MUST keep passing. The template/AI raw-HTML content lives in `type:"container"` elements (verified: template blocks are `{type:"container", content:"<h1>…"}`; aiRoundTrip seeds `type:"container", tagName:"section"`). So the discriminator is the element **type**, not the string.
+
+Thread `type` into the sink and gate the auto-detect on a container:
 ```ts
-// Was: if (contentFormat !== "html") return escapeHTML(content);
-//      return sanitizeHTML(content);
-const looksLikeHtml = /<[a-z][\s\S]*>/i.test(content);   // a real tag, not "a < b"
-if (contentFormat === "html" || (contentFormat == null && looksLikeHtml)) {
-  return sanitizeHTML(content);   // preserves the markup, strips dangerous nodes
+private renderContent(content: string, contentFormat?: "text" | "html", type?: string): string {
+  const looksLikeHtml = /<[a-z][\s\S]*>/i.test(content);
+  if (contentFormat === "html" || (contentFormat == null && type === "container" && looksLikeHtml)) {
+    return sanitizeHTML(content);   // preserves markup, strips dangerous nodes
+  }
+  return escapeHTML(content);       // text elements + non-HTML content stay escaped (XSS guard)
 }
-return escapeHTML(content);
 ```
-
-Apply the SAME change to the mirror branch at `ExportEngine.ts:249` if it has the identical escape logic (read it first; only change it if it is the same content sink). Do NOT change `ReactExporter.ts` in this task (separate export target; note it for a follow-up).
+Both callers already have the element in hand — pass `element.type` as the third arg. Do NOT change `ReactExporter.ts` (separate target; follow-up).
 
 - [ ] **Step 5: Run the test — PASS.** Then run the full ExportEngine suite to check no regression (existing tests asserting escaping of *plain text* must still pass — the heuristic only fires on tag-shaped content):
 

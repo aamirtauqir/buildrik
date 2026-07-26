@@ -313,7 +313,7 @@ function ToolSubNav({
               padding: "4px 10px",
               borderRadius: 6,
               color: active ? "var(--bd-accent)" : "var(--bd-text-secondary)",
-              background: active ? "var(--bd-accent-subtle, rgba(45,109,255,0.08))" : "transparent",
+              background: active ? "var(--bd-accent-subtle)" : "transparent",
             }}
           >
             {t.label}

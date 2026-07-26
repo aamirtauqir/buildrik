@@ -22,11 +22,12 @@
   position: relative;
   height: 120px;
   border-radius: var(--buildrick-radius-sm);
+  border: 1px solid var(--buildrick-ink-08);
   background: var(--buildrick-accent);
   background-image:
     linear-gradient(to bottom, transparent, var(--buildrick-text-heading)),
     linear-gradient(to right, var(--buildrick-bg-card), transparent);
-  box-shadow: inset 0 0 0 1px var(--buildrick-ink-08);
+  box-shadow: none;
 }
 .bd-color-picker__sat-pin {
   position: absolute;
@@ -37,7 +38,7 @@
   border-radius: var(--buildrick-radius-circle);
   background: transparent;
   border: 2px solid var(--buildrick-bg-card);
-  box-shadow: 0 0 0 1px var(--buildrick-ink-25), 0 1px 3px var(--buildrick-shadow-black-30);
+  box-shadow: var(--buildrick-shadow-raised);
   transform: translate(-50%, -50%);
 }
 
@@ -46,7 +47,8 @@
   height: 10px;
   border-radius: var(--buildrick-radius-full);
   position: relative;
-  box-shadow: inset 0 0 0 1px var(--buildrick-ink-08);
+  border: 1px solid var(--buildrick-ink-08);
+  box-shadow: none;
 }
 /* Hue strip: pure RGB spectrum is structural input — exempt from token rule (same exemption as canvas dot grid). */
 .bd-color-picker__strip--hue {
@@ -54,7 +56,7 @@
 }
 .bd-color-picker__strip--alpha {
   background:
-    linear-gradient(to right, rgba(45, 109, 255, 0), rgba(45, 109, 255, 1)),
+    linear-gradient(to right, transparent, var(--buildrick-accent)),
     repeating-conic-gradient(var(--buildrick-border-medium) 0% 25%, var(--buildrick-bg-card) 0% 50%) 50% / 8px 8px;
 }
 .bd-color-picker__strip-thumb {
@@ -65,8 +67,8 @@
   height: 18px;
   border-radius: var(--buildrick-radius-sm);
   background: var(--buildrick-bg-card);
-  border: 1.5px solid var(--buildrick-text-heading);
-  box-shadow: 0 1px 2px var(--buildrick-shadow-black-20);
+  border: 2px solid var(--buildrick-accent);
+  box-shadow: var(--buildrick-shadow-raised);
 }
 
 /* Swatch + hex input row */
@@ -78,9 +80,10 @@
 .bd-color-picker__swatch {
   width: 36px;
   height: 36px;
-  border-radius: var(--buildrick-radius-md);
+  border-radius: var(--buildrick-radius-sm);
   background: var(--buildrick-accent);
-  box-shadow: inset 0 0 0 1px var(--buildrick-ink-10);
+  border: 1px solid var(--buildrick-ink-10);
+  box-shadow: none;
   flex-shrink: 0;
 }
 .bd-color-picker__hex {
@@ -90,11 +93,12 @@
   gap: var(--buildrick-space-1);
   height: 32px;
   padding: 0 var(--buildrick-space-3);
-  background: var(--buildrick-bg-subtle);
-  border: 1px solid transparent;
-  border-radius: var(--buildrick-rounded);
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-sm);
   font-variant-numeric: tabular-nums;
 }
+.bd-color-picker__hex:focus-within { border-color: var(--buildrick-accent); }
 .bd-color-picker__hex-prefix {
   font-family: var(--buildrick-font-family);
   font-size: var(--buildrick-text-sm);
@@ -103,9 +107,9 @@
 }
 .bd-color-picker__hex-value {
   flex: 1;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-half);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-normal);
   color: var(--buildrick-text-primary);
   letter-spacing: 0.01em;
   background: transparent;
@@ -127,9 +131,9 @@
 }
 .bd-color-picker__recents-label {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-3xs-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
-  letter-spacing: 0.06em;
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--buildrick-text-muted);
 }
@@ -141,15 +145,14 @@
   width: 20px;
   height: 20px;
   border-radius: var(--buildrick-radius-sm);
-  box-shadow: inset 0 0 0 1px var(--buildrick-ink-08);
+  border: 1px solid var(--buildrick-ink-08);
+  box-shadow: none;
   cursor: pointer;
   background: transparent;
-  border: none;
   padding: 0;
 }
 .bd-color-picker__ss.is-on,
 .bd-color-picker__ss[aria-pressed="true"] {
-  box-shadow: inset 0 0 0 1px var(--buildrick-ink-08),
-              0 0 0 2px var(--buildrick-bg-card),
-              0 0 0 4px var(--buildrick-accent);
+  border-color: var(--buildrick-accent);
+  box-shadow: var(--buildrick-glow-primary);
 }

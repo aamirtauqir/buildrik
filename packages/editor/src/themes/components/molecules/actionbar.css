@@ -66,7 +66,7 @@
   transform: translateX(-50%);
   border: 1px solid var(--buildrick-border);
   border-top: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md-plus);
+  border-radius: var(--buildrick-radius-md);
   box-shadow: var(--buildrick-shadow-md);
   width: auto;
   max-width: calc(100% - var(--buildrick-space-6));
@@ -82,10 +82,10 @@
 /* Dirty — accent left border + warning tint, status text shifts to warning */
 .bd-actionbar--dirty {
   border-left: 3px solid var(--buildrick-warning);
-  background: var(--buildrick-warning-soft);
+  background: var(--buildrick-warning-tint);
 }
 .bd-actionbar--dirty .bd-actionbar__status {
-  color: var(--buildrick-warning);
+  color: var(--buildrick-warning-text);
   font-weight: var(--buildrick-font-weight-medium);
 }
 

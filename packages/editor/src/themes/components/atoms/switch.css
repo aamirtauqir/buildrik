@@ -17,8 +17,8 @@
 .bd-switch__track {
   position: relative;
   display: inline-block;
-  width: 36px;
-  height: 20px;
+  width: 28px;
+  height: 16px;
   background: var(--buildrick-accent);
   border-radius: var(--buildrick-radius-full);
   transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
@@ -26,24 +26,26 @@
 .bd-switch__thumb {
   position: absolute;
   top: 2px;
-  left: 18px;
-  width: 16px;
-  height: 16px;
+  left: 14px;
+  width: 12px;
+  height: 12px;
   background: var(--buildrick-bg-card);
   border-radius: var(--buildrick-radius-circle);
-  box-shadow: 0 1px 2px var(--buildrick-ink-20);
-  transition: left var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  box-shadow: none;
 }
 .bd-switch[aria-checked="false"] .bd-switch__track,
-.bd-switch--off .bd-switch__track { background: var(--buildrick-border-medium); }
+.bd-switch--off .bd-switch__track { background: var(--buildrick-border-strong); }
 .bd-switch[aria-checked="false"] .bd-switch__thumb,
 .bd-switch--off .bd-switch__thumb { left: 2px; }
 .bd-switch[aria-checked="false"] { color: var(--buildrick-text-secondary); }
 
-/* States — a11y baseline */
+/* States — a11y baseline. Focus = hard 2px accent outline, no halo. */
 .bd-switch:focus-visible { outline: none; }
-.bd-switch:focus-visible .bd-switch__track { box-shadow: var(--buildrick-glow-primary); }
-.bd-switch:active .bd-switch__thumb { transform: scale(0.94); }
+.bd-switch:focus-visible .bd-switch__track {
+  outline: 2px solid var(--buildrick-accent);
+  outline-offset: 1px;
+  box-shadow: none;
+}
 .bd-switch[aria-disabled="true"],
 .bd-switch[disabled],
 .bd-switch--disabled {
@@ -51,3 +53,6 @@
   opacity: 0.5;
   pointer-events: none;
 }
+.bd-switch[aria-disabled="true"] .bd-switch__track,
+.bd-switch[disabled] .bd-switch__track,
+.bd-switch--disabled .bd-switch__track { background: var(--buildrick-border); }

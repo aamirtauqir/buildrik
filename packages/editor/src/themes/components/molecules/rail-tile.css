@@ -44,8 +44,8 @@
   text-align: left;
   cursor: grab;
   transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              transform var(--buildrick-duration-fast) var(--buildrick-ease-default);
+              background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 
 /* ---- Grip slot (composes bdr-grip atom) ---- */
@@ -70,8 +70,8 @@
   border-radius: var(--buildrick-radius-sm);
 }
 .bd-rail-tile__glyph > svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   display: block;
 }
 
@@ -84,8 +84,8 @@
 }
 
 .bd-rail-tile__label {
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
   color: var(--buildrick-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -95,24 +95,23 @@
 .bd-rail-tile__count {
   margin-left: auto;
   font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs);
+  font-size: var(--buildrick-text-xs);
   color: var(--buildrick-text-muted);
   flex-shrink: 0;
 }
 
 /* ---- States (a11y baseline) ---- */
 .bd-rail-tile:hover {
-  border-color: var(--buildrick-border-hover);
-  box-shadow: 0 1px 2px var(--buildrick-ink-08);
+  background: var(--buildrick-bg-subtle);
+  border-color: var(--buildrick-border-medium);
 }
 .bd-rail-tile:focus-visible {
   outline: none;
   box-shadow: var(--buildrick-glow-primary);
-  border-color: var(--buildrick-border-focus);
+  border-color: var(--buildrick-accent);
 }
 .bd-rail-tile:active {
   cursor: grabbing;
-  transform: translateY(1px);
 }
 
 .bd-rail-tile[draggable="true"][aria-grabbed="true"],

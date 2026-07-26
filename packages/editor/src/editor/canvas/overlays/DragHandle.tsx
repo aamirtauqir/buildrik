@@ -94,7 +94,7 @@ export const DragHandle: React.FC<DragHandleProps> = ({ rect, elementId, size = 
   const handleLeft = Math.max(4, rect.left - config.offset);
   const handleTop = rect.top + rect.height / 2 - config.verticalOffset;
 
-  const bgColor = isHovered ? "var(--bd-accent)" : "rgba(45, 109, 255, 0.85)";
+  const bgColor = isHovered ? "var(--bd-accent-hover)" : "var(--bd-accent)";
 
   // Keyboard handler for accessibility
   const handleKeyDown = React.useCallback((e: React.KeyboardEvent) => {
@@ -131,9 +131,8 @@ export const DragHandle: React.FC<DragHandleProps> = ({ rect, elementId, size = 
         gap: config.gap,
         padding: config.padding,
         pointerEvents: "auto",
-        transform: isHovered ? "scale(1.1)" : "scale(1)",
-        transition: "transform 0.15s ease, background 0.15s ease",
-        boxShadow: isHovered ? "0 0 0 2px rgba(45, 109, 255, 0.3)" : "0 1px 4px rgba(0, 0, 0, 0.15)",
+        transition: "background 0.15s ease",
+        boxShadow: isHovered ? "var(--bd-glow-primary)" : "var(--bd-shadow-md)",
         zIndex: 10000,
       }}
     >

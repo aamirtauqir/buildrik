@@ -41,8 +41,8 @@ const styles = {
   iconPickerButton: {
     width: "100%",
     padding: "12px 16px",
-    background: "rgba(45, 109, 255, 0.20)",
-    border: `1px solid ${"rgba(45, 109, 255, 0.30)"}`,
+    background: "var(--bd-accent-tint)",
+    border: "1px solid var(--buildrick-primary-alpha-30)",
     borderRadius: 8,
     color: "var(--buildrick-accent)",
     fontSize: 13,

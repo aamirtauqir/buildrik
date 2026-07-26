@@ -13,7 +13,7 @@
   height: 18px;
   padding: 0 var(--buildrick-space-2);
   font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs, 10px);
+  font-size: var(--buildrick-text-xs);
   font-weight: var(--buildrick-font-weight-medium);
   line-height: 1;
   color: var(--buildrick-text-secondary);
@@ -57,7 +57,7 @@
   align-items: center;
   gap: 4px;
   font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs, 10px);
+  font-size: var(--buildrick-text-xs);
   color: var(--buildrick-text-muted);
 }
 .bd-kbd-seq__then {

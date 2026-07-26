@@ -68,7 +68,7 @@
   height: 20px;
   min-width: 20px;
   padding: 0 var(--buildrick-space-2);
-  font-size: var(--buildrick-text-2xs);
+  font-size: var(--buildrick-text-xs);
 }
 
 /* "+N more" overflow indicator — text-only, no border. */
@@ -86,5 +86,5 @@
 }
 .bd-chipbar__overflow--sm {
   height: 20px;
-  font-size: var(--buildrick-text-2xs);
+  font-size: var(--buildrick-text-xs);
 }

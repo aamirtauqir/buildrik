@@ -14,7 +14,7 @@
 
 .bd-sidebar-shell__sidebar {
   flex: 0 0 auto;
-  width: 280px;
+  width: var(--buildrick-size-inspector);
   min-width: 0;
 }
 
@@ -23,10 +23,11 @@
   min-width: 0;
 }
 
-/* Width variants — raw px IS the contract for fixed rails. */
-.bd-sidebar-shell--sidebar-sm .bd-sidebar-shell__sidebar { width: 220px; }
-.bd-sidebar-shell--sidebar-md .bd-sidebar-shell__sidebar { width: 280px; }
-.bd-sidebar-shell--sidebar-lg .bd-sidebar-shell__sidebar { width: 320px; }
+/* Width variants — bound to the --buildrick-size-* shell contract
+ * (nav 240 / inspector 300 / drawer 320). */
+.bd-sidebar-shell--sidebar-sm .bd-sidebar-shell__sidebar { width: var(--buildrick-size-nav); }
+.bd-sidebar-shell--sidebar-md .bd-sidebar-shell__sidebar { width: var(--buildrick-size-inspector); }
+.bd-sidebar-shell--sidebar-lg .bd-sidebar-shell__sidebar { width: var(--buildrick-size-drawer); }
 
 /* Place the sidebar on the right (e.g. inspector panel). */
 .bd-sidebar-shell--side-right {

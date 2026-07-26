@@ -57,19 +57,19 @@
 /* ---- Tones (tinted bg + matching text) ---- */
 .bd-count--accent {
   background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  color: var(--buildrick-accent-text);
 }
 .bd-count--success {
-  background: var(--buildrick-success-soft);
-  color: var(--buildrick-success);
+  background: var(--buildrick-success-tint);
+  color: var(--buildrick-success-text);
 }
 .bd-count--warning {
-  background: var(--buildrick-warning-soft);
-  color: var(--buildrick-warning);
+  background: var(--buildrick-warning-tint);
+  color: var(--buildrick-warning-text);
 }
 .bd-count--error {
-  background: var(--buildrick-error-light);
-  color: var(--buildrick-error);
+  background: var(--buildrick-error-tint);
+  color: var(--buildrick-error-text);
 }
 .bd-count--ink {
   background: var(--buildrick-text-heading);

@@ -56,7 +56,7 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--buildrick-bg-panel);
+  background: var(--buildrick-bg-app);
   color: var(--buildrick-text-primary);
   font-family: var(--buildrick-font-family);
 }
@@ -125,7 +125,7 @@
   bottom: 0;
   width: var(--layout-drawer-width, 280px);
   z-index: 200;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--buildrick-shadow-overlay);
   border-right: none;
   border-radius: 0 var(--buildrick-radius-lg) var(--buildrick-radius-lg) 0;
 }
@@ -155,11 +155,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 14px;
+  padding: 0 16px;
   gap: var(--bd-space-4);
   background: var(--buildrick-bg-card);
   border-top: 1px solid var(--buildrick-border);
-  font: 500 11px "Geist Mono", "SF Mono", Menlo, monospace;
+  font: 500 var(--buildrick-text-xs) / var(--buildrick-lh-16) var(--buildrick-font-family);
   color: var(--buildrick-text-muted);
   z-index: 100;
 }
@@ -172,9 +172,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 6px 0;
-  gap: 2px;
-  background: var(--buildrick-bg-card);
+  padding: 10px 0 0;
+  gap: 4px;
+  background: var(--buildrick-bg-app);
   border-right: 1px solid var(--buildrick-border);
   z-index: 90;
   overflow-y: auto;
@@ -257,7 +257,7 @@
   grid-area: drawer;
   display: flex;
   flex-direction: column;
-  background: var(--buildrick-bg-card);
+  background: var(--buildrick-bg-panel);
   border-right: 1px solid var(--buildrick-border);
   overflow: hidden;
   z-index: 80;
@@ -265,8 +265,8 @@
   transform: translateX(-100%);
   opacity: 0;
   transition:
-    transform 120ms cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 120ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform var(--buildrick-duration-fast) var(--buildrick-ease-default),
+    opacity var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 
 .layout-shell__drawer--open {
@@ -294,7 +294,7 @@
   inset: 0;
   background-image: radial-gradient(
     circle,
-    rgba(15, 23, 42, 0.08) 1px,
+    var(--buildrick-canvas-dot) 1px,
     transparent 1px
   );
   background-size: 20px 20px;
@@ -309,7 +309,7 @@
   grid-area: inspector;
   display: flex;
   flex-direction: column;
-  background: var(--buildrick-bg-card);
+  background: var(--buildrick-bg-panel);
   border-left: 1px solid var(--buildrick-border);
   overflow: hidden;
   z-index: 80;
@@ -317,8 +317,8 @@
   transform: translateX(100%);
   opacity: 0;
   transition:
-    transform 120ms cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 120ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform var(--buildrick-duration-fast) var(--buildrick-ease-default),
+    opacity var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 
 .layout-shell__inspector--open {
@@ -395,8 +395,8 @@
     right: var(--layout-gap, 12px);
     bottom: var(--layout-gap, 12px);
     width: var(--layout-inspector-width, 280px);
-    border-radius: var(--buildrick-radius-xl);
-    box-shadow: var(--glass-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.37));
+    border-radius: var(--buildrick-radius-lg);
+    box-shadow: var(--buildrick-shadow-overlay);
     z-index: 200;
   }
 }

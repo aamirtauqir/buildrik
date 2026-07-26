@@ -1,52 +1,60 @@
 /**
  * themes/design-system/typography.css
- * Buildrik DS V1 — chrome typography tokens
+ * Buildrik DS — chrome typography tokens.
+ *
+ * Canonical source: Figma "Buildrick — Product" Foundations, Type — 11 styles.
+ * Families: Inter (UI) + Geist Mono (data). Ramp core: 11/12/13/14/16/20/24.
+ * Headings ≥16px carry negative tracking (Figma: -1px @16, -1.2 @20, -1.5 @24
+ * ≈ -0.06em). Weights cap at 600 — the design uses 400/500/600 only.
+ *
  * @license BSD-3-Clause
  */
 
 :root {
-  /* FONT FAMILIES
-   * Display family aligned to Inter Tight (matches shipped reality + project/README).
-   * General Sans was aspirational in DESIGN.md; no @font-face loaded. Inter Tight
-   * is the workhorse per project/README.md.
-   * Fallbacks widened to match bridge-tokens shipped values.
-   */
-  --buildrick-font-family: "Inter Tight", "Geist", sans-serif;             /* FINDING-003 — was system-ui, -apple-system; curated Geist fallback so font-load failure stays in design-system, not OS default (the AI-slop signal) */
-  --buildrick-font-family-display: "Inter Tight", "Geist", sans-serif;     /* FINDING-003 — same swap for display token */
+  /* FONT FAMILIES — Inter Tight kept as transition fallback only */
+  --buildrick-font-family: "Inter", "Inter Tight", "Geist", sans-serif;
+  --buildrick-font-family-display: "Inter", "Inter Tight", "Geist", sans-serif;
   --buildrick-font-family-mono: "Geist Mono", "SF Mono", Menlo, monospace;
 
-  /* FONT SIZE SCALE */
-  --buildrick-text-xs: 11px;
-  --buildrick-text-sm: 12px;
-  --buildrick-text-sm-plus: 13px;
-  --buildrick-text-md: 14px;
-  --buildrick-text-lg: 16px;
+  /* FONT SIZE SCALE — Figma ramp core (11–24) + compat ladder */
+  --buildrick-text-3xs: 9px;
+  --buildrick-text-3xs-plus: 9.5px;
+  --buildrick-text-2xs: 10px;
+  --buildrick-text-2xs-plus: 10.5px;
+  --buildrick-text-xs: 11px;        /* ui/11 caption · data/11 mono small */
+  --buildrick-text-xs-plus: 11.5px;
+  --buildrick-text-sm: 12px;        /* ui/12 small · data/12 mono */
+  --buildrick-text-sm-half: 12.5px;
+  --buildrick-text-sm-plus: 13px;   /* ui/13 row label · data/13 mono */
+  --buildrick-text-md: 14px;        /* ui/14 panel title */
+  --buildrick-text-md-plus: 15px;
+  --buildrick-text-lg: 16px;        /* ui/16 heading */
   --buildrick-text-xl: 18px;
-  --buildrick-text-2xl: 20px;
-  --buildrick-text-3xl: 24px;
+  --buildrick-text-2xl: 20px;       /* ui/20 heading lg */
+  --buildrick-text-3xl: 24px;       /* ui/24 title */
   --buildrick-text-4xl: 32px;
+  --buildrick-text-display: 48px;
 
-  /* FONT WEIGHTS */
+  /* LINE HEIGHTS — Figma pairs: 11-12→16 · 13-14→20 · 16→24 · 20→28 · 24→32 */
+  --buildrick-lh-16: 16px;
+  --buildrick-lh-20: 20px;
+  --buildrick-lh-24: 24px;
+  --buildrick-lh-28: 28px;
+  --buildrick-lh-32: 32px;
+  --buildrick-line-tight: 1.25;
+  --buildrick-line-normal: 1.5;
+  --buildrick-line-relaxed: 1.6;
+
+  /* FONT WEIGHTS — 600 is the ceiling (no 700 anywhere in the design) */
   --buildrick-font-weight-normal: 400;
   --buildrick-font-weight-medium: 500;
   --buildrick-font-weight-semibold: 600;
-  --buildrick-font-weight-bold: 700;
+  --buildrick-font-weight-bold: 600;
 
-  /* LETTER SPACING */
-  --buildrick-tracking-tight: -0.02em;
+  /* LETTER SPACING — tight = Figma heading tracking (≈ -0.06em) */
+  --buildrick-tracking-tight: -0.06em;
   --buildrick-tracking-normal: 0;
   --buildrick-tracking-wide: 0.02em;
   --buildrick-tracking-wider: 0.04em;
   --buildrick-tracking-widest: 0.08em;
-
-  /* LINE HEIGHT */
-  --buildrick-line-tight: 1.2;
-  --buildrick-line-normal: 1.5;
-
-  /* ─── DS V1 REMEDIATION (2026-04-20) — NEW TOKENS ─── */
-  --buildrick-text-2xs: 10px;
-  --buildrick-text-2xs-plus: 10.5px;
-  --buildrick-text-md-plus: 15px;
-  --buildrick-text-display: 48px;
-  --buildrick-line-relaxed: 1.6;
 }

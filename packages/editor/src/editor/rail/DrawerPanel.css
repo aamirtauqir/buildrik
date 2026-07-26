@@ -1,12 +1,9 @@
 /**
- * DrawerPanel CSS - Sliding panel styling
- * Follows COMPONENT_SPECS.md specifications
+ * DrawerPanel CSS — sliding drawer panel chrome.
  *
- * Features:
- * - Glassmorphic background
- * - Slide animation with bounce easing
- * - Scroll position preservation
- * - Header with title and controls
+ * Figma "Buildrick — Product" Drawer frame: 320 wide on bg-panel; header 44
+ * with UPPERCASE ink-soft title; hairline borders; minimal motion (no blur,
+ * no bounce, no rotate).
  *
  * @license BSD-3-Clause
  */
@@ -19,9 +16,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--buildrick-bg-card));
-  backdrop-filter: var(--glass-blur, blur(12px));
-  -webkit-backdrop-filter: var(--glass-blur, blur(12px));
+  background: var(--buildrick-bg-panel);
   overflow: hidden;
 }
 
@@ -29,28 +24,31 @@
 
 /* Pinned state indicator */
 .drawer-panel--pinned {
-  /* Visual indicator for pinned state */
   border-left: 2px solid var(--buildrick-accent);
 }
 
 /* ============================================
-   Header
+   Header — Figma Panel header: h44, bg-panel, uppercase ink-soft
    ============================================ */
 .drawer-panel__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--bd-space-3) var(--bd-space-4);
-  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  min-height: var(--buildrick-size-header);
+  padding: 0 var(--bd-space-3) 0 var(--bd-space-4);
+  background: var(--buildrick-bg-panel);
+  border-bottom: 1px solid var(--buildrick-border);
   flex-shrink: 0;
 }
 
 .drawer-panel__title {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary, var(--bd-bg-card));
-  letter-spacing: -0.01em;
+  font-size: var(--buildrick-text-xs);
+  line-height: var(--buildrick-lh-16);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: var(--buildrick-tracking-wider);
 }
 
 .drawer-panel__controls {
@@ -62,7 +60,7 @@
 /* Pin button styling */
 .drawer-panel__pin-btn {
   opacity: 0.6;
-  transition: opacity var(--duration-fast, 150ms) ease;
+  transition: opacity var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 
 .drawer-panel__pin-btn:hover,
@@ -70,14 +68,14 @@
   opacity: 1;
 }
 
-/* Close button - rotated chevron */
+/* Close button — color feedback only, no transform (minimal motion) */
 .drawer-panel__close-btn {
-  transform: rotate(0deg);
-  transition: transform var(--duration-fast, 150ms) ease;
+  color: var(--buildrick-ink-soft);
+  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
 }
 
 .drawer-panel__close-btn:hover {
-  transform: rotate(-10deg);
+  color: var(--buildrick-ink);
 }
 
 /* ============================================
@@ -100,18 +98,18 @@
 }
 
 .drawer-panel__content::-webkit-scrollbar-thumb {
-  background: var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background: var(--buildrick-border-medium);
   border-radius: 3px;
 }
 
 .drawer-panel__content::-webkit-scrollbar-thumb:hover {
-  background: var(--border-medium, rgba(255, 255, 255, 0.12));
+  background: var(--buildrick-border-strong);
 }
 
 /* Firefox scrollbar */
 .drawer-panel__content {
   scrollbar-width: thin;
-  scrollbar-color: var(--border-subtle) transparent;
+  scrollbar-color: var(--buildrick-border-medium) transparent;
 }
 
 /* ============================================
@@ -119,6 +117,7 @@
    ============================================ */
 .drawer-panel__footer {
   padding: var(--bd-space-3) var(--bd-space-4);
-  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background: var(--buildrick-bg-panel);
+  border-top: 1px solid var(--buildrick-border);
   flex-shrink: 0;
 }

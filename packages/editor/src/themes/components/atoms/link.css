@@ -21,8 +21,9 @@
   color: var(--buildrick-accent-pressed);
 }
 .bd-link:focus-visible {
-  outline: none;
-  box-shadow: var(--buildrick-glow-primary);
+  outline: 2px solid var(--buildrick-accent);
+  outline-offset: 1px;
+  box-shadow: none;
   border-radius: var(--buildrick-radius-sm);
 }
 
@@ -57,7 +58,8 @@
   color: var(--buildrick-on-dark-40);
 }
 .bd-link--inverse:focus-visible {
-  box-shadow: 0 0 0 3px var(--buildrick-on-dark-15);
+  outline: 2px solid var(--buildrick-text-on-accent);
+  box-shadow: none;
 }
 
 /* ─── MODIFIERS ─── */

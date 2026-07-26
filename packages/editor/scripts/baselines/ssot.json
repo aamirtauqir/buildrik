@@ -16,9 +16,9 @@
     "violations": [
       {
         "path": "src/editor/canvas/Canvas.css",
-        "line": 601,
+        "line": 598,
         "severity": "important",
-        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:601, src/themes/design-system/a11y.css:56",
+        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:598, src/themes/design-system/a11y.css:56",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       },
       {
@@ -30,9 +30,9 @@
       },
       {
         "path": "src/themes/components/organisms/topbar.css",
-        "line": 27,
+        "line": 28,
         "severity": "important",
-        "message": "Selector \".bd-topbar__brand\" defined in 2 files: src/themes/components/organisms/topbar.css:27, src/themes/design-system/bd-topbar-overrides.css:86",
+        "message": "Selector \".bd-topbar__brand\" defined in 2 files: src/themes/components/organisms/topbar.css:28, src/themes/design-system/bd-topbar-overrides.css:86",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       }
     ]

@@ -1,5 +1,5 @@
 /**
- * bdr-nc — persistent notification center organism (380px wide).
+ * bdr-nc — persistent notification center organism (360px wide).
  * Layout: head (bdr-surface-head) → flush tabs strip → grouped list (bdr-list-row)
  *         → foot CTA button.
  * Composes: bdr-surface-head (--sm), bdr-list-row (--bordered, --unread),
@@ -7,11 +7,11 @@
  */
 
 .bd-nc {
-  width: 380px;
-  background: var(--buildrick-bg-card);
-  border-radius: var(--buildrick-radius-md-plus, 10px);
+  width: var(--buildrick-size-panel-right);
+  background: var(--buildrick-bg-elevated);
+  border-radius: var(--buildrick-radius-lg);
   border: 1px solid var(--buildrick-border);
-  box-shadow: 0 14px 40px -10px var(--buildrick-ink-18);
+  box-shadow: var(--buildrick-shadow-overlay);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -89,8 +89,8 @@
 .bd-nc__group { padding: var(--buildrick-space-2) 0; }
 .bd-nc__group-label {
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-3xs-plus);
-  font-weight: var(--buildrick-font-weight-semibold);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--buildrick-text-muted);
@@ -113,15 +113,19 @@
 /* Foot — full-width CTA. Differs from any canonical button (it's a flush
  * footer link, not a button shape). */
 .bd-nc__foot {
-  padding: var(--buildrick-space-3);
+  min-height: var(--buildrick-size-header);
+  padding: 0 var(--buildrick-space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-top: 1px solid var(--buildrick-border);
-  background: var(--buildrick-bg-subtle);
+  background: var(--buildrick-bg-panel);
   text-align: center;
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
+  font-size: var(--buildrick-text-sm-plus);
   font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-accent);
+  color: var(--buildrick-accent-text);
   cursor: pointer;
   width: 100%;
 }

@@ -164,7 +164,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               style={{
                 ...stepItemStyles,
                 opacity: isCompleted ? 0.55 : 1,
-                background: isActive && !isCompleted ? "rgba(45, 109, 255, 0.07)" : "transparent",
+                background: isActive && !isCompleted ? "var(--bd-accent-subtle)" : "transparent",
                 borderLeft: isActive && !isCompleted
                   ? "2px solid var(--bd-accent)"
                   : "2px solid transparent",
@@ -256,7 +256,7 @@ const panelStyles: React.CSSProperties = {
   background: "#1a1d27",
   border: "1px solid rgba(255,255,255,0.08)",
   borderRadius: 12,
-  boxShadow: "0 8px 40px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.04) inset",
+  boxShadow: "var(--bd-shadow-lg), 0 1px 0 rgba(255,255,255,0.04) inset",
   zIndex: 1200,
   overflow: "hidden",
   display: "flex",
@@ -275,7 +275,7 @@ const pillStyles: React.CSSProperties = {
   background: "#1a1d27",
   border: "1px solid rgba(255,255,255,0.08)",
   borderRadius: 999,
-  boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
+  boxShadow: "var(--bd-shadow-lg)",
   zIndex: 1200,
   cursor: "pointer",
   fontFamily: "var(--buildrick-font-family)",
@@ -306,7 +306,7 @@ const headerStyles: React.CSSProperties = {
 
 const headerTitleStyles: React.CSSProperties = {
   fontSize: 13,
-  fontWeight: 700,
+  fontWeight: 600,
   color: "var(--bd-bg-panel)",
   letterSpacing: -0.1,
 };
