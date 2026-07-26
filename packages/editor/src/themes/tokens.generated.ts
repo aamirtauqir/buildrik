@@ -85,7 +85,7 @@ export const color = {
   "error-text": "#C81E1E",
 } as const;
 
-export const space = [2, 4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 64] as const;
+export const space = [2, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 48, 64] as const;
 
 export const radius = {
   "sm": 4,

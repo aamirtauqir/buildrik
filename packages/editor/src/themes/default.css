@@ -19,6 +19,9 @@
 
 @import "./design-system/index.css";
 
+/* Buildrick UI — the component library atoms (see src/editor/ui/). */
+@import "../editor/ui/ui.css" layer(components);
+
 /* ─── Vibcoder vendored bundle — full wiring (76 files) ───
  * Loads atom + layout + molecule + organism CSS into @layer components
  * per cascade contract (themes/components/_layer.css).
