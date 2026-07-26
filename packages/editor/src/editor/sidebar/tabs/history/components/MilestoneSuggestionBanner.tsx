@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * MilestoneSuggestionBanner - Inline banner for auto-milestone suggestions
  * Phase 5: Shows AI-suggested version name with Save/Edit/Dismiss actions
@@ -8,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import type { MilestoneSuggestion } from "../../../../../shared/hooks/useAutoMilestone";
 
 interface MilestoneSuggestionBannerProps {

@@ -1,10 +1,10 @@
 import * as React from "react";
+import { type ToastInput } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 import { fetchPublishStatus } from "@/services/PublishService";
-import { type ToastInput } from "@/editor/shared/vibcoder/Toast";
 import { useToast } from "@/editor/ui";
 
 /**

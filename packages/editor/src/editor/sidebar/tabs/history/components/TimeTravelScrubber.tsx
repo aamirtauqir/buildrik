@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TimeTravelScrubber - Bottom drawer for time-travel mode
  * Phase 5: Canvas preview scrubbing with slider, restore, and exit
@@ -20,6 +18,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { HistoryDisplayEntry } from "../../../../../engine/HistoryManager";
 import type { NamedVersion } from "../../../../../shared/types/versions";

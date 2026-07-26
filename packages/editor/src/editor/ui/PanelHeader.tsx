@@ -8,9 +8,14 @@ import React from "react";
 export interface PanelHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   actions?: React.ReactNode;
+  /** Drawers can be pinned open; the state is announced, not just drawn. */
+  isPinned?: boolean;
+  onPinToggle?: () => void;
+  onHelpClick?: () => void;
+  onClose?: () => void;
 }
 
-export function PanelHeader({ title, actions, className, ...rest }: PanelHeaderProps) {
+export function PanelHeader({ title, actions, isPinned, onPinToggle, onHelpClick, onClose, className, ...rest }: PanelHeaderProps) {
   return (
     <div
       role="heading"
@@ -19,7 +24,35 @@ export function PanelHeader({ title, actions, className, ...rest }: PanelHeaderP
       {...rest}
     >
       <span className="bk-panel-header__title">{title}</span>
-      {actions ? <span className="bk-panel-header__actions">{actions}</span> : null}
+      <span className="bk-panel-header__actions">
+        {actions}
+        {onPinToggle ? (
+          <button
+            type="button"
+            className="bk-btn bk-btn--ghost bk-btn--sm"
+            onClick={onPinToggle}
+            aria-pressed={Boolean(isPinned)}
+            aria-label={isPinned ? `Unpin ${title}` : `Pin ${title}`}
+          >
+            {isPinned ? "📌" : "📍"}
+          </button>
+        ) : null}
+        {onHelpClick ? (
+          <button type="button" className="bk-btn bk-btn--ghost bk-btn--sm" onClick={onHelpClick} aria-label="Help">
+            ?
+          </button>
+        ) : null}
+        {onClose ? (
+          <button
+            type="button"
+            className="bk-btn bk-btn--ghost bk-btn--sm"
+            onClick={onClose}
+            aria-label={`Close ${title}`}
+          >
+            ✕
+          </button>
+        ) : null}
+      </span>
     </div>
   );
 }

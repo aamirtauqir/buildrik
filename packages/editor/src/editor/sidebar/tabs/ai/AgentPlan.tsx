@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
+import { Button, Checkbox } from "@/editor/ui";
 import { DiffRows } from "./DiffRows";
 import type { RunStep, RunPhase } from "./hooks/useAgentRunner";
 
@@ -43,12 +42,10 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
   onStop,
 }) => {
   const autoApplyToggle = (
-    <Checkbox
-      className="bd-ai-agent-autoapply"
-      checked={autoApply}
-      onChange={(e) => onAutoApplyChange(e.target.checked)}
-      label="Auto-apply steps (skip per-step approval)"
-    />
+    <label className="bd-ai-agent-autoapply">
+      <Checkbox checked={autoApply} onChange={(e) => onAutoApplyChange(e.target.checked)} />
+      <span>Auto-apply steps (skip per-step approval)</span>
+    </label>
   );
   if (phase === "idle") {
     return (
@@ -69,7 +66,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
           <span className="bd-ai-agent-progress">
             Step {Math.min(currentIndex + 1, steps.length)} of {steps.length}
           </span>
-          <Button type="button" variant="bare" aria-label="Stop run" onClick={onStop}>
+          <Button type="button" kind="ghost" aria-label="Stop run" onClick={onStop}>
             Stop
           </Button>
         </div>
@@ -88,7 +85,7 @@ export const AgentPlan: React.FC<AgentPlanProps> = ({
               <div className="bd-ai-agent-step-review">
                 <DiffRows edit={{ ...s.edit, state: "pending" }} />
                 <div className="bd-ai-agent-step-actions">
-                  <Button type="button" variant="bare" aria-label="Skip step" onClick={onSkip}>
+                  <Button type="button" kind="ghost" aria-label="Skip step" onClick={onSkip}>
                     Skip
                   </Button>
                   <Button type="button" aria-label="Apply step" onClick={onApprove}>

@@ -1,5 +1,5 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { ChatMessage as ChatMessageType, DiffEdit } from "./types";
 import { DiffRows } from "./DiffRows";
 
@@ -31,7 +31,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             <div className="bd-ai-msg-edit-actions">
               <Button
                 type="button"
-                variant="bare"
+                kind="ghost"
                 aria-label="Discard"
                 onClick={() => onReject(message.id)}
               >Discard</Button>

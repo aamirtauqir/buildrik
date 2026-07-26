@@ -9,11 +9,9 @@
  */
 
 import * as React from "react";
+import { Button, PanelFrame, Stack } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { TabFrame } from "@/shared/extensions/TabFrame";
-import { Stack } from "@/editor/shared/vibcoder";
 import { useToast } from "@/editor/ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
@@ -290,8 +288,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   }, [_composer]);
 
   return (
-    <TabFrame>
-      <TabFrame.Header
+    <PanelFrame>
+      <PanelFrame.Header
         title="Publish"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -361,7 +359,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           ) : (
             <>
               <Button
-                variant="primary"
+                kind="primary"
                 onClick={handlePublish}
                 disabled={isPublishing}
                 style={{ width: "100%" }}
@@ -428,7 +426,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           Terms of service
         </a>
       </div>
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

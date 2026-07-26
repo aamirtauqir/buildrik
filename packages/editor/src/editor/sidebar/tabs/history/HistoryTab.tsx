@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * HistoryTab — Version history sidebar panel
  *
@@ -11,10 +9,10 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input, PanelFrame } from "@/editor/ui";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
@@ -112,8 +110,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   }, []);
 
   return (
-    <TabFrame className="bd-history-container">
-      <TabFrame.Header
+    <PanelFrame className="bd-history-container">
+      <PanelFrame.Header
         title="Version History"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -196,7 +194,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           onExit={handleScrubberExit}
         />
       )}
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

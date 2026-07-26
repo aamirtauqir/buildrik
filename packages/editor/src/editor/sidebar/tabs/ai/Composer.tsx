@@ -1,7 +1,6 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 
 import * as React from "react";
+import { Button, Textarea } from "@/editor/ui";
 
 export interface ComposerProps {
   onSubmit: (text: string) => void;
