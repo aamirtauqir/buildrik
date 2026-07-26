@@ -37,3 +37,14 @@ export { ProgressRow, type ProgressRowProps, type ProgressTone } from "./Progres
 export { Tooltip, type TooltipProps } from "./Tooltip";
 export { MediaCard, type MediaCardProps } from "./MediaCard";
 export { SiteCard, type SiteCardProps } from "./SiteCard";
+
+/* ── Organisms ──────────────────────────────────────────────────────────── */
+export { OverlayMount, type OverlayMountProps } from "./OverlayMount";
+export { useFocusTrap } from "./useFocusTrap";
+export { Modal, type ModalProps, type ModalKind } from "./Modal";
+export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";
+export { RightPanel, type RightPanelProps } from "./RightPanel";
+export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "./Rail";
+export { Topbar, TopbarSpacer, type TopbarProps } from "./Topbar";
+export { Footer, FooterSpacer, type FooterProps } from "./Footer";
+export { CommandPalette, type CommandPaletteProps, type Command } from "./CommandPalette";

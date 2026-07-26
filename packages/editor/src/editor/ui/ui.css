@@ -364,3 +364,145 @@
 .bk-site-card__name { font-family: var(--bk-font-ui); font-size: var(--bk-text-13); font-weight: var(--bk-weight-medium); color: var(--bk-ink); }
 .bk-site-card__meta { display: flex; align-items: center; gap: var(--bk-space-8); font-family: var(--bk-font-ui); font-size: var(--bk-text-11); color: var(--bk-ink-muted); }
 .bk-site-card__meta-right { margin-left: auto; }
+
+/* ═══ ORGANISMS ═════════════════════════════════════════════════════════════ */
+
+/* ── Overlay mount · portal + scrim ─────────────────────────────────────── */
+.bk-scrim {
+  position: fixed; inset: 0;
+  z-index: var(--bk-z-overlay);
+  background: var(--bk-alpha-ink-40);
+  display: flex; align-items: center; justify-content: center;
+}
+.bk-scrim--top { align-items: flex-start; padding-top: 12vh; }
+
+/* ── Modal frame · Figma 19:79 · Kind ───────────────────────────────────── */
+.bk-modal {
+  z-index: var(--bk-z-modal);
+  display: flex; flex-direction: column;
+  background: var(--bk-bg-elevated);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-overlay);
+  max-height: 80vh; max-width: calc(100vw - var(--bk-space-32));
+  font-family: var(--bk-font-ui);
+}
+.bk-modal--question { width: 440px; }
+.bk-modal--form { width: 560px; }
+.bk-modal--flow { width: 720px; }
+.bk-modal__head { display: flex; flex-direction: column; gap: var(--bk-space-4); padding: var(--bk-space-20) var(--bk-space-20) var(--bk-space-12); }
+.bk-modal__title { font-size: var(--bk-text-16); font-weight: var(--bk-weight-semibold); color: var(--bk-ink); }
+.bk-modal__subtitle { font-size: var(--bk-text-12); color: var(--bk-ink-muted); }
+.bk-modal__body { padding: 0 var(--bk-space-20) var(--bk-space-16); overflow: auto; font-size: var(--bk-text-13); color: var(--bk-ink-soft); }
+.bk-modal__foot {
+  display: flex; align-items: center; justify-content: flex-end; gap: var(--bk-space-8);
+  padding: var(--bk-space-16) var(--bk-space-20);
+  border-top: 1px solid var(--bk-border);
+}
+
+/* ── Drawer frame · Figma 19:46 · Layout ────────────────────────────────── */
+.bk-drawer {
+  width: var(--bk-size-drawer); flex: none;
+  display: flex; flex-direction: column;
+  background: var(--bk-bg-panel);
+  border-right: 1px solid var(--bk-border);
+  overflow: hidden;
+}
+.bk-drawer__body { flex: 1; overflow: auto; }
+.bk-drawer__body--grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--bk-space-12); padding: var(--bk-space-12); }
+.bk-drawer__body--table { display: block; }
+.bk-drawer__foot { border-top: 1px solid var(--bk-border); padding: var(--bk-space-8) var(--bk-space-12); }
+
+/* ── Right panel frame · Figma 19:47 ────────────────────────────────────── */
+.bk-right-panel {
+  width: var(--bk-size-inspector); flex: none;
+  display: flex; flex-direction: column;
+  background: var(--bk-bg-panel);
+  border-left: 1px solid var(--bk-border);
+  overflow: hidden;
+}
+.bk-right-panel--wide { width: var(--bk-size-panel-right); }
+.bk-right-panel__body { flex: 1; overflow: auto; padding: var(--bk-space-12); display: flex; flex-direction: column; gap: var(--bk-space-12); }
+
+/* ── Rail · 60px · Figma shell 52:6 ─────────────────────────────────────── */
+.bk-rail {
+  width: var(--bk-size-rail); flex: none;
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--bk-space-4); padding: var(--bk-space-8) 0;
+  background: var(--bk-bg-app);
+  border-right: 1px solid var(--bk-border);
+}
+.bk-rail__spacer { flex: 1; }
+.bk-rail-item {
+  position: relative;
+  width: 44px; height: 44px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--bk-space-2);
+  border: 0; border-radius: var(--bk-radius-lg); background: transparent;
+  color: var(--bk-ink-muted); cursor: pointer;
+  font-family: var(--bk-font-ui); font-size: var(--bk-text-11);
+  transition: var(--bk-transition-fast);
+}
+.bk-rail-item:hover { background: var(--bk-bg-subtle); color: var(--bk-ink); }
+.bk-rail-item[aria-current="true"] { background: var(--bk-accent-tint); color: var(--bk-accent-text); }
+.bk-rail-item[aria-current="true"]::before {
+  content: ""; position: absolute; left: -8px; top: 8px; bottom: 8px;
+  width: 3px; border-radius: var(--bk-radius-full); background: var(--bk-accent);
+}
+.bk-rail-item:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
+
+/* ── Topbar · 56px ──────────────────────────────────────────────────────── */
+.bk-topbar {
+  height: var(--bk-size-topbar); flex: none;
+  display: flex; align-items: center; gap: var(--bk-space-12);
+  padding: 0 var(--bk-space-16);
+  background: var(--bk-bg-panel);
+  border-bottom: 1px solid var(--bk-border);
+  font-family: var(--bk-font-ui); font-size: var(--bk-text-13);
+  color: var(--bk-ink);
+}
+.bk-topbar__spacer { flex: 1; }
+
+/* ── Footer · 32px ──────────────────────────────────────────────────────── */
+.bk-footer {
+  height: var(--bk-size-footer); flex: none;
+  display: flex; align-items: center; gap: var(--bk-space-12);
+  padding: 0 var(--bk-space-16);
+  background: var(--bk-bg-panel);
+  border-top: 1px solid var(--bk-border);
+  font-family: var(--bk-font-ui); font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
+}
+.bk-footer__spacer { flex: 1; }
+
+/* ── Command palette · Figma 166:2 · 640×420 ────────────────────────────── */
+.bk-palette {
+  z-index: var(--bk-z-cmdk);
+  width: 640px; max-width: calc(100vw - var(--bk-space-32)); max-height: 420px;
+  display: flex; flex-direction: column;
+  background: var(--bk-bg-elevated);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-overlay);
+  overflow: hidden;
+  font-family: var(--bk-font-ui);
+}
+.bk-palette__query {
+  height: var(--bk-size-topbar); flex: none;
+  display: flex; align-items: center; padding: 0 var(--bk-space-16);
+  border-bottom: 1px solid var(--bk-border);
+}
+.bk-palette__input {
+  flex: 1; border: 0; background: none; outline: none;
+  font-family: var(--bk-font-ui); font-size: var(--bk-text-16);
+  color: var(--bk-ink);
+}
+.bk-palette__input::placeholder { color: var(--bk-ink-disabled); }
+.bk-palette__list { flex: 1; overflow: auto; padding: var(--bk-space-4) 0; }
+.bk-palette__item {
+  display: flex; align-items: center; gap: var(--bk-space-8);
+  height: var(--bk-space-40); padding: 0 var(--bk-space-16);
+  font-size: var(--bk-text-13); color: var(--bk-ink);
+  cursor: pointer; border: 0; background: none; width: 100%; text-align: left;
+}
+.bk-palette__item[aria-selected="true"] { background: var(--bk-accent-tint); color: var(--bk-accent-text); }
+.bk-palette__item[aria-disabled="true"] { color: var(--bk-ink-disabled); pointer-events: none; }
+.bk-palette__kbd { margin-left: auto; color: var(--bk-ink-muted); font-size: var(--bk-text-11); }
