@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TemplateDetail — inline detail panel (prototype-v3 §2).
  *
@@ -15,6 +14,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { TemplateItem } from "../templatesData";
 
 interface TemplateDetailProps {
@@ -169,7 +169,7 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
           <span>
             Replacing current {pageName} page content.{" "}
             <Button
-              variant="ghost"
+              kind="ghost"
               size="sm"
               className="tpl-detail-info-note-link"
               onClick={() => onAddAsNewPage(template.id)}

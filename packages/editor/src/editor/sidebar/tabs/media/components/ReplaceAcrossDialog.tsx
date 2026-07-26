@@ -1,5 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 /**
  * ReplaceAcrossDialog — confirms and surfaces results of replace-across-canvas.
  *
@@ -16,6 +14,7 @@ import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
  */
 
 import * as React from "react";
+import { Button, Checkbox } from "@/editor/ui";
 import type { Composer } from "../../../../../engine/Composer";
 import type { ReplaceAcrossResult } from "../../../../../engine/media/MediaCommandLayer";
 
@@ -174,21 +173,18 @@ export function ReplaceAcrossDialog({
               >
                 {state.pages.map((p) => (
                   <li key={p.id} className="med-rx-page-row">
-                    <Checkbox
-                      className="med-rx-page-label"
-                      checked={state.selected.has(p.id)}
-                      onChange={() => handleTogglePage(p.id)}
-                      data-testid={`rx-page-${p.id}`}
-                      aria-label={`Replace on ${p.name}`}
-                      label={
-                        <>
-                          <span className="med-rx-page-name">{p.name}</span>
-                          <span className="med-rx-page-count">
-                            {p.useCount} use{p.useCount === 1 ? "" : "s"}
-                          </span>
-                        </>
-                      }
-                    />
+                    <label className="med-rx-page-label">
+                      <Checkbox
+                        checked={state.selected.has(p.id)}
+                        onChange={() => handleTogglePage(p.id)}
+                        data-testid={`rx-page-${p.id}`}
+                        aria-label={`Replace on ${p.name}`}
+                      />
+                      <span className="med-rx-page-name">{p.name}</span>
+                      <span className="med-rx-page-count">
+                        {p.useCount} use{p.useCount === 1 ? "" : "s"}
+                      </span>
+                    </label>
                   </li>
                 ))}
               </ul>

@@ -20,7 +20,7 @@ import * as React from "react";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Modal, ModalContent, ModalTitle, ModalFooter } from "@/editor/shared/vibcoder/Modal";
-import { useToast } from "@/editor/shared/vibcoder/Toast";
+import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
 import { Z_LAYERS } from "@/shared/constants/canvas";

@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";

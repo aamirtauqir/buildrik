@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
+import { ToastProvider } from "@/editor/ui";
 import { useBuildTab } from "./useBuildTab";
-import { ToastProvider } from "@/editor/shared/vibcoder";
 
 const wrapper = ({ children }: { children: React.ReactNode }) =>
   React.createElement(ToastProvider, null, children);

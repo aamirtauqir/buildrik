@@ -4,7 +4,8 @@ import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { exportPublishPages } from "@/editor/shell/exportPublishPages";
 import { fetchPublishStatus } from "@/services/PublishService";
-import { useToast, type ToastInput } from "@/editor/shared/vibcoder/Toast";
+import { type ToastInput } from "@/editor/shared/vibcoder/Toast";
+import { useToast } from "@/editor/ui";
 
 /**
  * The AI privileged-action confirm gate (platform phase 4b). An AI `propose-action`

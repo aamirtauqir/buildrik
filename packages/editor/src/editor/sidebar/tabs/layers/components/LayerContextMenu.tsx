@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerContextMenu — Right-click context menu for layer tree rows
  * Per .pen Screen 11: Delete, Group, Rename, Lock/Unlock actions.
@@ -8,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { Trash2, Group, Edit3, Lock, Unlock } from "lucide-react";
 import { useClickOutside } from "@/shared/hooks";
 

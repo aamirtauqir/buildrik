@@ -1,6 +1,6 @@
 import * as React from "react";
+import { Input } from "@/editor/ui";
 import { Upload } from "lucide-react";
-import { Input } from "@/editor/shared/vibcoder/Input";
 
 interface Props {
   folderName: string;

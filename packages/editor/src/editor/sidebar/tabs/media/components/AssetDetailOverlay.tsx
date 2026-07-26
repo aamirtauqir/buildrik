@@ -14,9 +14,8 @@
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { OptimizationPanel } from "@/editor/media/OptimizationPanel";
 import type { LibraryItem } from "../data/mediaTypes";
 import { fmtDur, fmtSize } from "../data/mediaUtils";
@@ -223,7 +222,7 @@ export function AssetDetailOverlay({
           <Button
             key={t.id}
             type="button"
-            variant="ghost"
+            kind="ghost"
             size="sm"
             role="tab"
             aria-selected={tab === t.id}
@@ -340,7 +339,7 @@ export function AssetDetailOverlay({
                   <li key={v.key}>
                     <Button
                       type="button"
-                      variant="ghost"
+                      kind="ghost"
                       size="sm"
                       className={`med-detail-version-row${v.key === item.key ? " is-current" : ""}`}
                       onClick={() => v.key !== item.key && onOpenItem?.(v)}
@@ -374,7 +373,7 @@ export function AssetDetailOverlay({
                         </span>
                         <Button
                           type="button"
-                          variant="ghost"
+                          kind="ghost"
                           size="sm"
                           onClick={() => handleRestoreVersion(v.id)}
                           disabled={restoringId !== null}

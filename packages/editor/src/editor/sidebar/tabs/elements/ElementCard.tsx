@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ElementCard, AnimatedAccordionContent, ChevronIcon — UI sub-components for ElementsTab
  * Also exports handleDragStart and highlightMatch as standalone helpers.
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Star, Square, ChevronDown } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { getBlockById } from "../../../../blocks/blockRegistry";
 import type { BlockData } from "../../../../shared/types";
 import { BLOCK_ICONS, BLOCK_DESCRIPTIONS } from "./constants";

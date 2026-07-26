@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Tab — Onboarding Empty State
  * Shown when the library is empty. Upload CTA + browse stock.
@@ -7,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { useRef } from "react";
 import { Upload } from "lucide-react";
 import { SUPPORTED_FORMATS_LABEL } from "../../../../../shared/constants/media";

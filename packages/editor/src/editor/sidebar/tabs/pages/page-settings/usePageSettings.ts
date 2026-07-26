@@ -10,8 +10,8 @@
  */
 
 import * as React from "react";
+import { useToast } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
-import { useToast } from "@/editor/shared/vibcoder";
 import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore } from "../utils/seoScore";
 import { normalizeSlug, validateSlug, isSlugDuplicate } from "../utils/slug";

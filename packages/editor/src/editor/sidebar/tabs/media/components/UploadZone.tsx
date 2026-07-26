@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Media Tab — Upload Zone
  *
@@ -9,8 +8,8 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { Upload, AlertTriangle, XCircle, RotateCcw } from "lucide-react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import type { UploadZoneProps } from "../data/mediaTypes";
 import { StorageQuotaBar } from "./StorageQuotaBar";
 
@@ -155,7 +154,7 @@ export function UploadZone({
               {onRetryUpload ? (
                 <Button
                   type="button"
-                  variant="ghost"
+                  kind="ghost"
                   size="sm"
                   className="med-upload-queue-item__retry"
                   onClick={() => onRetryUpload(item.fileName)}

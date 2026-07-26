@@ -18,7 +18,7 @@ import {
   ModalFooter,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import { Stack } from "@/editor/shared/vibcoder";
 
 export interface CreateComponentModalProps {

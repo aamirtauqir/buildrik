@@ -9,7 +9,7 @@ import * as React from "react";
 import { Sparkles } from "lucide-react";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 import { getElementNameFromType } from "../utils/elementInfo";
 import { BlockPickerModal } from "./BlockPickerModal";

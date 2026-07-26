@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TipsFooter — PRO TIPS carousel at bottom of Add panel.
  *
@@ -11,6 +10,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { Lightbulb, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { TIPS } from "../catalog/tips";
 

@@ -1,3 +1,4 @@
+import { ToastProvider } from "@/editor/ui";
 /**
  * §14 MultiSelectBanner integration — Phase 5 Task 28.
  *
@@ -11,7 +12,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ToastProvider } from "@/editor/shared/vibcoder";
 import { ExpandedMediaPanel } from "../ExpandedMediaPanel";
 import { mockComposer } from "../../__tests__/test-utils/mockComposer";
 import { mockMediaState } from "../../__tests__/test-utils/mockMediaState";

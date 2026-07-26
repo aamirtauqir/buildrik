@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { MultiSelectBanner } from "./MultiSelectBanner";
 import { MoveToFolderPopover } from "./MoveToFolderPopover";
 /**
@@ -9,6 +8,7 @@ import { MoveToFolderPopover } from "./MoveToFolderPopover";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { useEffect, useRef, useState } from "react";
 import { useClickOutside } from "@/shared/hooks";
 import { EMPTY_MSGS, FORMAT_OPTIONS, SORT_OPTIONS } from "../data/mediaData";

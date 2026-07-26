@@ -13,7 +13,8 @@ import type { Composer } from "../../../../engine";
 import type { UsePublishJobResult } from "../../../shell/hooks/usePublishJob";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { TabFrame } from "@/shared/extensions/TabFrame";
-import { Stack, useToast } from "@/editor/shared/vibcoder";
+import { Stack } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { PublishHistory } from "../../../shell/PublishHistory";
 

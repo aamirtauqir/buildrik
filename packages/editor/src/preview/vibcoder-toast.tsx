@@ -1,9 +1,6 @@
 import { createRoot } from "react-dom/client";
-import {
-  ToastProvider,
-  useToast,
-  type ToastTone,
-} from "../editor/shared/vibcoder/Toast";
+import { type ToastTone } from "../editor/shared/vibcoder/Toast";
+import { ToastProvider, useToast } from "@/editor/ui";
 import { sectionLabel, stack } from "./_galleryStyles";
 
 const stackWide = { ...stack, gap: 16, maxWidth: 480 };

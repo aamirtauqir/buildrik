@@ -23,8 +23,11 @@ const { addToastMock, trackSidebarMock } = vi.hoisted(() => ({
   trackSidebarMock: vi.fn(),
 }));
 
-vi.mock("@/editor/shared/vibcoder", () => ({
+vi.mock("@/editor/ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/ui")>()),
+  ...{
   useToast: () => ({ addToast: addToastMock }),
+},
 }));
 vi.mock("@/shared/utils/sidebarAnalytics", () => ({
   trackSidebar: trackSidebarMock,

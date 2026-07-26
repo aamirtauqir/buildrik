@@ -5,9 +5,13 @@
  *   node scripts/tokens/migrate-to-ui.mjs <dir>            # dry run
  *   node scripts/tokens/migrate-to-ui.mjs <dir> --apply
  *
- * Mechanical only: import sources and the prop renames whose meaning is
- * identical. Anything ambiguous is reported and left alone for a human — a
- * codemod that guesses is worse than one that stops.
+ * Mechanical only. Two rules learned the hard way on batch 2:
+ *
+ *  1. Prop renames are scoped to the tag that owns them. A global
+ *     `isOpen -> open` sweep renamed the prop on an unrelated accordion and
+ *     produced 112 type errors from one line of regex.
+ *  2. Anything needing structural judgement is skipped and listed, never
+ *     guessed. A codemod that guesses is worse than one that stops.
  *
  * @license BSD-3-Clause
  */
@@ -23,10 +27,39 @@ if (!dirArg) {
 const ROOT = resolve(process.cwd());
 const DIR = resolve(ROOT, dirArg);
 
-/** legacy component name -> new name (null = same name, import path only) */
+/** legacy import name -> new name */
 const RENAME = { TabFrame: "PanelFrame", PremiumBadge: "Badge", Switch: "Toggle", SemanticBadge: "Badge" };
-const BUTTON_VARIANT = { danger: "destructive", publish: "primary", bare: "ghost" };
-const NEEDS_HUMAN = /\b(PanelShell|Popover|Menu|Toast|NotificationCenter|ColorPicker|Uploader|Slider|Inspector|SidebarShell|HistoryPanel|CommandPalette|Skeleton|A11yOverlay)\b/;
+
+/** Imports the new library has no equivalent for yet — these files wait. */
+const NEEDS_HUMAN = new Set([
+  "PanelShell", "Popover", "Menu", "NotificationCenter", "ColorPicker", "ColorTrigger", "Uploader",
+  "Slider", "Inspector", "SidebarShell", "HistoryPanel", "CommandPalette", "Skeleton", "A11yOverlay",
+  "Toast", "ToastTitle", "ToastDescription", "ToastAction", "ToastClose", "ToastViewport",
+  "ModalClose", "ModalContent", "ModalTitle", "ModalDescription", "ModalFooter", "ModalTrigger",
+  "DrawerClose", "DrawerContent", "DrawerTitle", "Accordion", "Breadcrumb", "Chipbar", "Switcher",
+  "ActionBar", "Frame", "Grid", "Center", "Cluster", "Thumb", "TileMeta", "Kbd", "SurfaceHead",
+  "LeftPanel", "PagesDrawer", "TemplatesDrawer", "Topbar", "Footer", "Rail", "RailTile", "Toolbar",
+  "SearchInput", "NumericStepper", "Spinner", "Progress", "Divider", "Grip", "Icon", "IconButton",
+  "Card", "Link", "Label", "HelperText", "Count", "Tag", "FormField", "BreakpointSwitcher",
+  "SkeletonCompounds", "UpgradeModal", "CopyButton", "ErrorState", "HelpTooltip", "Icons",
+]);
+
+/** Rename attributes only inside the given JSX tag. */
+function renameAttrsInTag(src, tag, renames) {
+  return src.replace(new RegExp(`<${tag}\\b[^>]*?/?>`, "gs"), (match) => {
+    let out = match;
+    for (const [from, to] of Object.entries(renames)) out = out.replace(new RegExp(`\\b${from}=`, "g"), `${to}=`);
+    return out;
+  });
+}
+
+/** Map legacy variant values onto the new kind vocabulary, tag-scoped. */
+function mapVariantValues(src, tag) {
+  const VALUES = { danger: "destructive", publish: "primary", bare: "ghost" };
+  return src.replace(new RegExp(`<${tag}\\b[^>]*?/?>`, "gs"), (match) =>
+    match.replace(/\bkind=\{?["']([a-z]+)["']\}?/g, (_m, v) => `kind="${VALUES[v] ?? v}"`),
+  );
+}
 
 const files = [];
 (function walk(d) {
@@ -44,54 +77,58 @@ for (const file of files) {
   const before = readFileSync(file, "utf8");
   if (!/shared\/vibcoder|shared\/extensions|shared\/ui/.test(before)) continue;
 
-  let s = before;
-  const imported = new Set();
-
-  // collect + drop legacy import statements
-  s = s.replace(
-    /import\s*\{([^}]+)\}\s*from\s*["'][^"']*(?:editor\/shared\/vibcoder|shared\/extensions|shared\/ui)(?:\/[^"']*)?["'];?\n/g,
-    (_m, names) => {
-      for (const raw of names.split(",")) {
-        const name = raw.trim().split(/\s+as\s+/)[0].trim();
-        const alias = raw.trim().split(/\s+as\s+/)[1]?.trim();
-        if (!name) continue;
-        const mapped = RENAME[name] ?? name;
-        imported.add(alias && alias !== mapped ? `${mapped} as ${alias}` : mapped);
+  const names = [];
+  let s = before.replace(
+    /import\s*(?:type\s*)?\{([^}]+)\}\s*from\s*["'][^"']*(?:editor\/shared\/vibcoder|shared\/extensions|shared\/ui)(?:\/[^"']*)?["'];?\n/g,
+    (_m, group) => {
+      for (const raw of group.split(",")) {
+        const [name, alias] = raw.trim().split(/\s+as\s+/).map((x) => (x ? x.trim() : x));
+        if (name) names.push({ name, alias });
       }
       return "";
     },
   );
-  if (imported.size === 0) continue;
+  if (names.length === 0) continue;
 
-  if (NEEDS_HUMAN.test([...imported].join(","))) {
-    skipped.push(`${relative(ROOT, file)} — uses ${[...imported].filter((i) => NEEDS_HUMAN.test(i)).join(", ")}`);
+  const blocked = [...new Set(names.filter((n) => NEEDS_HUMAN.has(n.name)).map((n) => n.name))];
+  if (blocked.length) {
+    skipped.push(`${relative(ROOT, file)} — ${blocked.join(", ")}`);
+    continue;
+  }
+  // The old Checkbox took a label prop; the new one expects a real <label>.
+  if (/<Checkbox\b[^>]*\blabel=/s.test(s)) {
+    skipped.push(`${relative(ROOT, file)} — <Checkbox label=…> needs a real <label>`);
     continue;
   }
 
-  // JSX tag renames, including compound sub-components (TabFrame.Header etc.)
+  const imported = new Set(
+    names.map(({ name, alias }) => {
+      const mapped = RENAME[name] ?? name;
+      return alias && alias !== mapped ? `${mapped} as ${alias}` : mapped;
+    }),
+  );
+
+  // JSX tag renames, including compound sub-components (TabFrame.Header)
   for (const [from, to] of Object.entries(RENAME)) {
     s = s.replace(new RegExp(`<${from}(?=[\\s/>.])`, "g"), `<${to}`);
     s = s.replace(new RegExp(`</${from}(?=[\\s>.])`, "g"), `</${to}`);
-    s = s.replace(new RegExp(`<(/?)${to}\\.`, "g"), `<$1${to}.`);
   }
-  // PremiumBadge had no children; Badge needs the word
-  s = s.replace(/<Badge\s+size=\{?["'][a-z]+["']\}?\s*\/>/g, '<Badge kind="pro">PRO</Badge>');
-  // ConfirmDialog takes a boolean, not a kind
+
+  // Scoped prop renames — never global.
+  s = renameAttrsInTag(s, "Button", { variant: "kind", busy: "loading" });
+  s = mapVariantValues(s, "Button");
+  s = renameAttrsInTag(s, "ConfirmDialog", {
+    isOpen: "open", confirmText: "confirmLabel", cancelText: "cancelLabel", variant: "kind",
+  });
+  s = s.replace(/(<ConfirmDialog[^>]*?)kind="danger"/gs, "$1destructive");
   s = s.replace(/(<ConfirmDialog[^>]*?)kind="destructive"/gs, "$1destructive");
   s = s.replace(/(<ConfirmDialog[^>]*?)kind="primary"/gs, "$1");
+  s = s.replace(/<Badge\s+size=\{?["'][a-z]+["']\}?\s*\/>/g, '<Badge kind="pro">PRO</Badge>');
+  s = renameAttrsInTag(s, "Button", { size: "size" }).replace(
+    /<Button\b[^>]*?\/?>/gs,
+    (m) => m.replace(/\bsize=\{?["']lg["']\}?/g, 'size="md"'),
+  );
 
-  // prop renames with identical meaning
-  s = s.replace(/\bvariant=\{?["']([a-z]+)["']\}?/g, (m, v) => {
-    const mapped = BUTTON_VARIANT[v] ?? v;
-    return `kind="${mapped}"`;
-  });
-  s = s.replace(/\bbusy=/g, "loading=");
-  s = s.replace(/\bsize=\{?["']lg["']\}?/g, 'size="md"');
-  s = s.replace(/\bisOpen=/g, "open=");
-  s = s.replace(/\bconfirmText=/g, "confirmLabel=");
-  s = s.replace(/\bcancelText=/g, "cancelLabel=");
-
-  // one import for the new library, placed after the react import
   const importLine = `import { ${[...imported].sort().join(", ")} } from "@/editor/ui";\n`;
   if (/^import .*from "react";?\n/m.test(s)) s = s.replace(/^(import .*from "react";?\n)/m, `$1${importLine}`);
   else s = importLine + s;

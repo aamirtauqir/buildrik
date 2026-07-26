@@ -44,7 +44,7 @@ vi.mock("../../exportPublishPages", () => ({
   ),
 }));
 
-import { ToastProvider } from "@/editor/shared/vibcoder/Toast";
+import { ToastProvider } from "@/editor/ui";
 import { StaleApprovalModal } from "../StaleApprovalModal";
 
 const composer = {} as never;

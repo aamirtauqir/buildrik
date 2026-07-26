@@ -7,7 +7,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { ToastProvider } from "@/editor/shared/vibcoder";
+import { ToastProvider } from "@/editor/ui";
 import { CopyButton } from "../CopyButton";
 
 function renderWithToasts(ui: React.ReactElement) {

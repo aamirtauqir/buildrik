@@ -35,10 +35,13 @@ export interface PanelFrameHeaderProps extends React.HTMLAttributes<HTMLDivEleme
   actions?: React.ReactNode;
   onClose?: () => void;
   onHelpClick?: () => void;
+  /** Drawers can be pinned open; the state is announced, not just drawn. */
+  isPinned?: boolean;
+  onPinToggle?: () => void;
 }
 
 function PanelFrameHeader({
-  title, subtitle, actions, onClose, onHelpClick, className, ...rest
+  title, subtitle, actions, onClose, onHelpClick, isPinned, onPinToggle, className, ...rest
 }: PanelFrameHeaderProps) {
   return (
     <div className={["bk-panel-frame__head", className].filter(Boolean).join(" ")} {...rest}>
@@ -50,6 +53,17 @@ function PanelFrameHeader({
       </div>
       <div className="bk-panel-frame__actions">
         {actions}
+        {onPinToggle ? (
+          <button
+            type="button"
+            className="bk-btn bk-btn--ghost bk-btn--sm"
+            onClick={onPinToggle}
+            aria-pressed={Boolean(isPinned)}
+            aria-label={isPinned ? `Unpin ${title}` : `Pin ${title}`}
+          >
+            {isPinned ? "📌" : "📍"}
+          </button>
+        ) : null}
         {onHelpClick ? (
           <button type="button" className="bk-btn bk-btn--ghost bk-btn--sm" onClick={onHelpClick} aria-label="Help">
             ?

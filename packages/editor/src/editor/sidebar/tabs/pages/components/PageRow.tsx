@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PageRow — single page row in the pages tree.
  *
@@ -16,6 +14,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";

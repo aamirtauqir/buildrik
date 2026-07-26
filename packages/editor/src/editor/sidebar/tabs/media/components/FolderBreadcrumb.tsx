@@ -13,9 +13,9 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { ChevronRight } from "lucide-react";
 import type { MediaFolder } from "@shared/types/media";
-import { Button } from "@/editor/shared/vibcoder/Button";
 
 export interface FolderBreadcrumbProps {
   folders: MediaFolder[];
@@ -40,7 +40,7 @@ export function FolderBreadcrumb({
     >
       <Button
         type="button"
-        variant="ghost"
+        kind="ghost"
         size="sm"
         className={
           "med-folder-breadcrumb__seg" +
@@ -61,7 +61,7 @@ export function FolderBreadcrumb({
             />
             <Button
               type="button"
-              variant="ghost"
+              kind="ghost"
               size="sm"
               className={
                 "med-folder-breadcrumb__seg" +

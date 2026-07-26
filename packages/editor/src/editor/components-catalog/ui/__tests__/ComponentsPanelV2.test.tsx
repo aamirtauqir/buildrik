@@ -4,7 +4,7 @@ import * as React from "react";
 import { ComponentsPanelV2 } from "../ComponentsPanelV2";
 import { TokenRegistryProvider } from "@/editor/design-system/state/TokenRegistryContext";
 import { StylePresetRegistryProvider } from "@/editor/design-system/state/StylePresetRegistryContext";
-import { ToastProvider } from "@/editor/shared/vibcoder";
+import { ToastProvider } from "@/editor/ui";
 import { EVENTS } from "@/shared/constants/events";
 
 const wrap = (ui: React.ReactNode) => (

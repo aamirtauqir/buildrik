@@ -24,7 +24,7 @@ import { Composer } from "../Composer";
 import { TokenRegistryProvider } from "../../editor/design-system/state/TokenRegistryContext";
 import { TokensSection } from "../../editor/design-system/ui/sections/TokensSection";
 import { DSModeProvider } from "../../editor/design-system/state/DSModeContext";
-import { ToastProvider } from "@/editor/shared/vibcoder";
+import { ToastProvider } from "@/editor/ui";
 import type { LintIssue } from "../designSystem/LintState";
 
 describe("Arc D6.c · Auto-fix history-awareness", () => {

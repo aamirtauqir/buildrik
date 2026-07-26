@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SettingsErrorBoundary — catches render errors inside the page-settings
  * drawer so a bad page / composer state can't crash the whole Pages tab.
@@ -9,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { captureError } from "../../../../../shared/utils/errorTracking";
 
 interface Props {

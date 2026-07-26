@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PageSettingsDrawer — 580px slide-over for page-level settings.
  *
@@ -12,6 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { PageItem, DrawerTab } from "../types";
 import { usePageSettings } from "./usePageSettings";

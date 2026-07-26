@@ -1,6 +1,6 @@
 import * as React from "react";
+import { ToastProvider } from "@/editor/ui";
 import { render, type RenderResult } from "@testing-library/react";
-import { ToastProvider } from "@/editor/shared/vibcoder";
 import { MediaTab } from "../../MediaTab";
 import { mockComposer } from "./mockComposer";
 

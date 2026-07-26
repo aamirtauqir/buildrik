@@ -12,9 +12,9 @@
  */
 
 import * as React from "react";
+import { PanelFrame } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import { SearchBar } from "../../shared/SearchBar";
 import { CATALOG, flatCatalog } from "./catalog/catalog";
 import { useBuildTab } from "./hooks/useBuildTab";
@@ -62,8 +62,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) =>
   const blocksSubtitle = `${flatCatalog.length} blocks · ${CATALOG.length} categories`;
 
   return (
-    <TabFrame className="bld-container">
-      <TabFrame.Header title="Insert" subtitle={blocksSubtitle} />
+    <PanelFrame className="bld-container">
+      <PanelFrame.Header title="Insert" subtitle={blocksSubtitle} />
 
       <div className="bld-content">
         <div
@@ -129,7 +129,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) =>
           </div>
         )}
       </div>
-    </TabFrame>
+    </PanelFrame>
   );
 };
 

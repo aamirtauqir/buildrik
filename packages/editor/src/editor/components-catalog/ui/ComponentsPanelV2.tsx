@@ -24,7 +24,7 @@
 import * as React from "react";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import { PanelHeader } from "@/shared/extensions/PanelHeader";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";

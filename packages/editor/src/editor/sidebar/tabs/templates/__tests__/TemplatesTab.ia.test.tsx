@@ -10,8 +10,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 
-vi.mock("@/editor/shared/vibcoder", async () => {
-  const actual = await vi.importActual<Record<string, unknown>>("@/editor/shared/vibcoder");
+vi.mock("@/editor/ui", async () => {
+  const actual = await vi.importActual<Record<string, unknown>>("@/editor/ui");
   return {
     ...actual,
     useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),

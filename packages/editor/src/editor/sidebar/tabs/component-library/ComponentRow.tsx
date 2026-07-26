@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ComponentRow - Single component item in the component list
  * Handles drag, selection, context menu (insert/rename/duplicate/favorite/delete).
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { MoreHorizontal, Plus, Copy, Trash2, RefreshCw, Star, Edit3 } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ComponentIcon } from "./ComponentIcon";
 

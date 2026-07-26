@@ -11,7 +11,7 @@ import { PanelErrorState } from "../../../editor/sidebar/shared/PanelErrorState"
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { DEFAULT_TOKENS } from "../constants";

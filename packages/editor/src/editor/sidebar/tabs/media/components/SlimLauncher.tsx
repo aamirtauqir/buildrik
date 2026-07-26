@@ -9,10 +9,8 @@
  */
 
 import * as React from "react";
+import { Button, Input, PanelFrame } from "@/editor/ui";
 import { Search } from "lucide-react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import type { Composer } from "@/engine/Composer";
 import type { LibraryItem, MediaTypeFilter, TypeCounts, UploadProgress } from "../data/mediaTypes";
 import { TypePills } from "./TypePills";
@@ -67,14 +65,14 @@ export function SlimLauncher(props: SlimLauncherProps) {
   }, [props.libraryItems, activeType, searchQuery]);
 
   return (
-    <TabFrame className="sl-launcher">
+    <PanelFrame className="sl-launcher">
       {selectionContext ? (
         <SelectionContextBar
           label={selectionContext.label}
           onCancel={onCancelSelection ?? (() => {})}
         />
       ) : null}
-      <TabFrame.Header title="Media" onClose={onClose} />
+      <PanelFrame.Header title="Media" onClose={onClose} />
       <div className="sl-controls">
         <TypePills
           activeType={activeType}
@@ -143,6 +141,6 @@ export function SlimLauncher(props: SlimLauncherProps) {
           disabled={props.storage.used >= props.storage.total}
         />
       </div>
-    </TabFrame>
+    </PanelFrame>
   );
 }

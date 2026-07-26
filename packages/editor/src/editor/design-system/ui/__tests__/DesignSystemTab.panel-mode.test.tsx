@@ -16,7 +16,7 @@ import { DesignSystemTab } from "../DesignSystemTab";
 import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
 import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
-import { ToastProvider } from "@/editor/shared/vibcoder";
+import { ToastProvider } from "@/editor/ui";
 
 function makeFakeComposer() {
   const settings: Record<string, unknown> = {

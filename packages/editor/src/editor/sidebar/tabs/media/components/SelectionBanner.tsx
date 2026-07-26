@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Tab — Selection Banner (XSWRz spec)
  * Fill cobalt-accent-tint, Move/Download/Deselect all/More buttons
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 
 interface SelectionBannerProps {
   count: number;

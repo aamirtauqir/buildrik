@@ -27,7 +27,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { SkeletonListItem } from "@/shared/extensions/SkeletonCompounds";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { TabFrame } from "@/shared/extensions/TabFrame";
 import { SearchBar } from "../shared/SearchBar";

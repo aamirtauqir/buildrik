@@ -11,7 +11,7 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";

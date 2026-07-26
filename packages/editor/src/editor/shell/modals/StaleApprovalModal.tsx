@@ -12,7 +12,7 @@
 import * as React from "react";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Modal, ModalContent, ModalTitle, ModalFooter } from "@/editor/shared/vibcoder/Modal";
-import { useToast } from "@/editor/shared/vibcoder/Toast";
+import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { exportPublishPages, type PublishPage } from "../exportPublishPages";
 import {

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ApplyProgressOverlay — shows 4-step progress while template apply runs.
  *
@@ -10,6 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { createPortal } from "react-dom";
 import "./ApplyProgressOverlay.css";
 

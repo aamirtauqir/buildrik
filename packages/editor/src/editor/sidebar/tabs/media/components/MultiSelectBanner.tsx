@@ -1,6 +1,6 @@
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { FolderInput, Trash2, X } from "lucide-react";
-import { Button } from "@/editor/shared/vibcoder/Button";
 
 interface MultiSelectBannerProps {
   count: number;
@@ -25,7 +25,7 @@ export function MultiSelectBanner({
       <div className="med-multi-select-banner__actions">
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           size="sm"
           className="med-multi-select-banner__btn"
           onClick={onMove}
@@ -36,7 +36,7 @@ export function MultiSelectBanner({
         </Button>
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           size="sm"
           className="med-multi-select-banner__btn is-danger"
           onClick={onDelete}
@@ -47,7 +47,7 @@ export function MultiSelectBanner({
         </Button>
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           size="sm"
           className="med-multi-select-banner__btn"
           onClick={onCancel}

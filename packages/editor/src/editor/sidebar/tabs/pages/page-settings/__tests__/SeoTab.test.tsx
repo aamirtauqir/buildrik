@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 // @vitest-environment jsdom
 /**
  * SeoTab — pure form renderer. Tests field behavior, counters, slug warning,
@@ -18,13 +19,12 @@ vi.mock("@/shared/utils/openai", () => ({
 }));
 
 import * as React from "react";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { SeoTab } from "../SeoTab";
 import type { UsePageSettingsReturn } from "../usePageSettings";
 import type { PageItem } from "../../types";
 
 // SeoTab mounts a Radix Tooltip (info icon on the description field), which
-// requires a TooltipProvider ancestor.
+// The new Tooltip is self-contained — no provider ancestor needed.
 const render = (ui: React.ReactElement) =>
   rtlRender(<TooltipProvider>{ui}</TooltipProvider>);
 

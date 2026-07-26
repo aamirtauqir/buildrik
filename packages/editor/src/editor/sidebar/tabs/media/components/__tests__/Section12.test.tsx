@@ -1,6 +1,6 @@
+import { ToastProvider } from "@/editor/ui";
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
-import { ToastProvider } from "@/editor/shared/vibcoder";
 import { ExpandedMediaPanel } from "../ExpandedMediaPanel";
 import { mockComposer } from "../../__tests__/test-utils/mockComposer";
 import { mockMediaState } from "../../__tests__/test-utils/mockMediaState";

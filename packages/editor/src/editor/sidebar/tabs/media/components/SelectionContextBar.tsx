@@ -1,5 +1,5 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 
 interface SelectionContextBarProps {
   /** Display label for the canvas element requesting media (e.g., "Hero block"). */

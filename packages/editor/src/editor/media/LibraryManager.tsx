@@ -22,7 +22,7 @@ import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDele
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
-import { useToast } from "@/editor/shared/vibcoder";
+import { useToast } from "@/editor/ui";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";

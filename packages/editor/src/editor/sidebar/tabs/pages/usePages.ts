@@ -19,9 +19,9 @@
  */
 
 import * as React from "react";
+import { useToast } from "@/editor/ui";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { useToast } from "@/editor/shared/vibcoder";
 import { getDefaultPageName } from "../../../../shared/utils/pageUtils";
 import { slugify } from "@shared/utils/helpers/string";
 import type { PageItem } from "./types";

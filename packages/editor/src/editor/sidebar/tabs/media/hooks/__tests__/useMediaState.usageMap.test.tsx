@@ -3,8 +3,11 @@ import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { useMediaState } from "../useMediaState";
 
-vi.mock("@/editor/shared/vibcoder", () => ({
+vi.mock("@/editor/ui", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/editor/ui")>()),
+  ...{
   useToast: () => ({ addToast: vi.fn() }),
+},
 }));
 
 const stableMocks = vi.hoisted(() => {

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SearchResults — grouped search results with zero-results state
  * Pure render component — never calls searchElements() internally
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { SearchGroup } from "../catalog/types";
 import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import { ElCard } from "./ElCard";

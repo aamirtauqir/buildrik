@@ -1,3 +1,4 @@
+import { ToastProvider } from "@/editor/ui";
 /**
  * §15 AssetDetailOverlay footer Replace action — Phase 6 Task 37.
  *
@@ -10,7 +11,6 @@
 
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
-import { ToastProvider } from "@/editor/shared/vibcoder";
 import { AssetDetailOverlay } from "../AssetDetailOverlay";
 import type { LibraryItem } from "../../data/mediaTypes";
 
