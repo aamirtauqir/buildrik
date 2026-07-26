@@ -77,6 +77,11 @@ export default defineConfig({
       "@testing-library/dom": resolve(__dirname, "./node_modules/@testing-library/dom"),
       "@testing-library/jest-dom": resolve(__dirname, "./node_modules/@testing-library/jest-dom"),
       "@testing-library/user-event": resolve(__dirname, "./node_modules/@testing-library/user-event"),
+      // Same pin for React itself: dashboard test files otherwise resolve the
+      // root-hoisted react@19 while RTL renders with editor's react@18 — two
+      // copies, "Invalid hook call" on every dashboard component test.
+      "react-dom": resolve(__dirname, "./node_modules/react-dom"),
+      "react": resolve(__dirname, "./node_modules/react"),
     },
   },
 });

@@ -102,6 +102,9 @@ describe("cross-origin inventory (Phase 0 D14)", () => {
     // packages/shared to packages/editor/src/services on 2026-05-23 as
     // part of the shared-contract cleanup arc). Same-origin after
     // Phase 4 will make these no-ops but harmless to keep.
-    expect(hits.length).toBeLessThanOrEqual(2);
+    // +1 2026-07-26: captureThumbnail.ts (B1 publish thumbnails, 1a30d5f9) —
+    // POSTs the canvas PNG to /api/site-thumbnail with session-cookie auth;
+    // same class as the other two.
+    expect(hits.length).toBeLessThanOrEqual(3);
   });
 });
