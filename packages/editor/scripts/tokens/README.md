@@ -45,18 +45,30 @@ Only the values change between exports. The structure of `figma-tokens.json`
 (which groups exist, what they are called) is a deliberate design decision and
 is edited by hand.
 
-## The two tiers
+## One flat tier
 
-**Tier 1 — palette.** Raw scale steps: `--bk-blue-700`, `--bk-gray-200`. These
-are the Flowbite ramps. A component should almost never reference these directly.
+Every token holds a literal value. Nothing in this file references anything else:
 
-**Tier 2 — semantic.** Role tokens that reference tier 1: `--bk-accent`,
-`--bk-ink`, `--bk-border`. **This is what components use.** The name says what
-the colour is *for*, not what it *is*, so re-theming is a tier-1 edit.
+```css
+--bk-accent: #1A56DB;      /* not var(--bk-blue-700) */
+--bk-border: #E5E7EB;      /* not var(--bk-gray-200) */
+```
 
-There is no third tier. The previous system had one (`--bd-*` mirroring
-`--buildrick-*`) and it is what rotted: 213 tokens ended up referenced by
-nothing, and 42 were the same value under different names.
+**The indirection lives in Figma, not in CSS.** In the Figma file `color/accent`
+is an alias of `flowbite/blue/700`. Change that alias, regenerate, and every
+consumer follows — exactly as if the CSS had a var() chain, but without the chain
+being something a human has to read, maintain, or accidentally fork.
+
+So: **Figma holds the decision, CSS shows the result.** One Figma variable = one
+flat CSS line. That rule is the whole system.
+
+Components reference **role** names (`--bk-accent`, `--bk-ink`, `--bk-border`),
+not ramp steps (`--bk-blue-700`). The role name says what a colour is *for*, so a
+rebrand is a Figma edit, not a find-and-replace.
+
+The previous system had three tiers, one of which (`--bd-*`) existed only to
+mirror another (`--buildrick-*`). That mirror is what rotted: 213 tokens ended up
+referenced by nothing, and 42 were the same value under different names.
 
 Two more rules that make whole categories of mess impossible:
 

@@ -12,10 +12,9 @@
  * scripts/check-tokens-generated.mjs). To change a value, change it in Figma,
  * re-export, and re-run this script.
  *
- * Naming: every token is `--bk-*`. Two tiers only.
- *   Tier 1 palette   — raw scale steps (--bk-blue-700, --bk-gray-200)
- *   Tier 2 semantic  — role tokens that reference tier 1 (--bk-accent, --bk-ink)
- * There is no third alias tier. That tier is what rotted last time.
+ * Naming: every token is `--bk-*`. ONE flat tier — every token holds a literal
+ * value, nothing references anything else. No aliases, no indirection, no
+ * legacy names. The old system had three tiers and 36% of it was dead.
  *
  * Spacing is named by its pixel value (--bk-space-16 is 16px), which makes a
  * duplicate scale impossible to introduce by accident.
@@ -34,17 +33,17 @@ const SRC = join(ROOT, "src", "themes");
 
 const tokens = JSON.parse(readFileSync(join(HERE, "figma-tokens.json"), "utf8"));
 
-/** hex -> palette token name, so semantic tokens can reference tier 1 instead of repeating a literal */
-const paletteByHex = new Map();
-for (const [name, hex] of Object.entries(tokens.palette)) {
-  const varName = `--bk-${name.replace("/", "-")}`;
-  if (!paletteByHex.has(hex.toUpperCase())) paletteByHex.set(hex.toUpperCase(), varName);
-}
-
-/** A semantic value resolves to a palette reference when the hex exists in tier 1. */
-function semanticValue(hex) {
-  const ref = paletteByHex.get(hex.toUpperCase());
-  return ref ? `var(${ref})` : hex;
+/**
+ * ONE FLAT TIER. Every token carries its own literal value — no `var()` chains
+ * inside this file, no palette/semantic split, no aliases.
+ *
+ * This does not cost re-theming power: the indirection lives in Figma, where
+ * `color/accent` is already an alias of `flowbite/blue/700`. Change the alias
+ * there, regenerate, and every consumer follows. The CSS shows the RESULT of the
+ * decision; Figma holds the decision. Rule: one Figma variable = one flat line.
+ */
+function value(v) {
+  return v;
 }
 
 const lines = [];
@@ -63,7 +62,7 @@ push(" */");
 push();
 push(":root {");
 
-push("  /* ── Tier 1 · palette ─────────────────────────────────────────── */");
+push("  /* ── Palette · the Flowbite ramps ─────────────────────────────── */");
 let group = null;
 for (const [name, hex] of Object.entries(tokens.palette)) {
   const [family] = name.split("/");
@@ -75,10 +74,10 @@ for (const [name, hex] of Object.entries(tokens.palette)) {
 }
 
 push();
-push("  /* ── Tier 2 · semantic roles ──────────────────────────────────── */");
+push("  /* ── Roles · what components actually reference ───────────────── */");
 push();
 for (const [name, hex] of Object.entries(tokens.semantic)) {
-  push(`  --bk-${name}: ${semanticValue(hex)};`);
+  push(`  --bk-${name}: ${value(hex)};`);
 }
 
 push();

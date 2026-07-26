@@ -10,7 +10,7 @@
  */
 
 :root {
-  /* ── Tier 1 · palette ─────────────────────────────────────────── */
+  /* ── Palette · the Flowbite ramps ─────────────────────────────── */
 
   --bk-blue-50: #EBF5FF;
   --bk-blue-100: #E1EFFE;
@@ -63,37 +63,37 @@
   --bk-purple-700: #6C2BD9;
   --bk-purple-800: #5521B5;
 
-  /* ── Tier 2 · semantic roles ──────────────────────────────────── */
+  /* ── Roles · what components actually reference ───────────────── */
 
-  --bk-bg-app: var(--bk-gray-100);
+  --bk-bg-app: #F3F4F6;
   --bk-bg-panel: #FFFFFF;
-  --bk-bg-subtle: var(--bk-gray-100);
+  --bk-bg-subtle: #F3F4F6;
   --bk-bg-card: #FFFFFF;
   --bk-bg-elevated: #FFFFFF;
-  --bk-border: var(--bk-gray-200);
-  --bk-border-medium: var(--bk-gray-300);
-  --bk-border-strong: var(--bk-gray-400);
-  --bk-border-input: var(--bk-gray-400);
-  --bk-ink: var(--bk-gray-900);
-  --bk-ink-soft: var(--bk-gray-600);
-  --bk-ink-muted: var(--bk-gray-500);
-  --bk-ink-disabled: var(--bk-gray-300);
-  --bk-accent: var(--bk-blue-700);
-  --bk-accent-hover: var(--bk-blue-800);
-  --bk-accent-pressed: var(--bk-blue-900);
-  --bk-accent-subtle: var(--bk-blue-100);
-  --bk-accent-tint: var(--bk-blue-50);
-  --bk-accent-text: var(--bk-blue-700);
+  --bk-border: #E5E7EB;
+  --bk-border-medium: #D1D5DB;
+  --bk-border-strong: #9CA3AF;
+  --bk-border-input: #9CA3AF;
+  --bk-ink: #111827;
+  --bk-ink-soft: #4B5563;
+  --bk-ink-muted: #6B7280;
+  --bk-ink-disabled: #D1D5DB;
+  --bk-accent: #1A56DB;
+  --bk-accent-hover: #1E429F;
+  --bk-accent-pressed: #233876;
+  --bk-accent-subtle: #E1EFFE;
+  --bk-accent-tint: #EBF5FF;
+  --bk-accent-text: #1A56DB;
   --bk-accent-on: #FFFFFF;
-  --bk-success: var(--bk-green-500);
-  --bk-success-tint: var(--bk-green-100);
-  --bk-success-text: var(--bk-green-600);
-  --bk-warning: var(--bk-yellow-500);
-  --bk-warning-tint: var(--bk-yellow-50);
-  --bk-warning-text: var(--bk-yellow-800);
-  --bk-error: var(--bk-red-600);
-  --bk-error-tint: var(--bk-red-100);
-  --bk-error-text: var(--bk-red-700);
+  --bk-success: #0E9F6E;
+  --bk-success-tint: #DEF7EC;
+  --bk-success-text: #057A55;
+  --bk-warning: #C27803;
+  --bk-warning-tint: #FDFDEA;
+  --bk-warning-text: #723B13;
+  --bk-error: #E02424;
+  --bk-error-tint: #FDE8E8;
+  --bk-error-text: #C81E1E;
 
   /* ── Space · named by pixel value ─────────────────────────────── */
 
