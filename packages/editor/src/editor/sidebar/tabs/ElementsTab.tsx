@@ -1,5 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { EmptyState, EmptyStateDesc } from "@/editor/shared/vibcoder";
 /**
  * ElementsTab - Block library (orchestrator)
  * Quick Access Pills, animated accordion by category, favorites, recents.
@@ -12,6 +10,7 @@ import { EmptyState, EmptyStateDesc } from "@/editor/shared/vibcoder";
 
 import { History, Star, X, Lightbulb } from "lucide-react";
 import * as React from "react";
+import { Button, EmptyState, EmptyStateDesc } from "@/editor/ui";
 import { CATEGORY_ICONS } from "./elements/constants";
 import { ElementCard, AnimatedAccordionContent, ChevronIcon } from "./elements/ElementCard";
 import type { ElementsTabProps } from "./elements/types";

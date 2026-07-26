@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * StickyFooter - Save/Apply/Cancel footer for drill-in screens
  * Sticks to bottom of panel, shows unsaved indicator
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 
 // ============================================
 // Types

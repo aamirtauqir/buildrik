@@ -1,6 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * CommandPalette — Studio-level Command Palette
  * Triggered by Ctrl+K / ⌘+K
@@ -11,6 +8,7 @@ import { Stack } from "@/editor/shared/vibcoder/Stack";
  */
 
 import * as React from "react";
+import { Button, Input, Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 import { GROUPED_TABS_CONFIG } from "../../rail/tabsConfig";

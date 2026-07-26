@@ -18,8 +18,8 @@
  */
 
 import * as React from "react";
+import { ToastInput } from "@/editor/ui";
 import type { Composer } from "../../../engine";
-import type { ToastInput } from "@/editor/shared/vibcoder/Toast";
 import type { SaveState } from "./useStudioState";
 import { getSiteIdFromUrl, saveProject, SaveConflictError } from "@/services/BuildrikSyncProvider";
 

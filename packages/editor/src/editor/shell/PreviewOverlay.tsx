@@ -10,7 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 import { Z_LAYERS } from "@/shared/constants/canvas";
 
 interface PreviewOverlayProps {
@@ -58,7 +58,7 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) 
         style={{ flex: 1, width: "100%", border: "none", background: "#fff" }}
       />
       <Button
-        variant="primary"
+        kind="primary"
         size="sm"
         onClick={onDone}
         style={{

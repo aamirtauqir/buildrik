@@ -1,16 +1,14 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PageTabBar - Horizontal tab bar for page switching
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button, ConfirmDialog, Input } from "@/editor/ui";
 import { createPortal } from "react-dom";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useToast } from "@/editor/ui";
 import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
@@ -394,13 +392,13 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
         )}
       {/* Delete confirmation dialog */}
       <ConfirmDialog
-        isOpen={!!deleteConfirmPageId}
+        open={!!deleteConfirmPageId}
         onClose={() => setDeleteConfirmPageId(null)}
         onConfirm={confirmDelete}
         title={`Delete "${pages.find((p) => p.id === deleteConfirmPageId)?.name}"?`}
         message="All content on this page will be permanently removed. You can undo immediately after."
-        confirmText="Delete Page"
-        variant="danger"
+        confirmLabel="Delete Page"
+        destructive
       />
     </div>
   );

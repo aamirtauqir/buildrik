@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * FilterChips - Scrollable horizontal filter chip row
  * Used for category filtering in Suggestions, Styling tabs
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 
 // ============================================
 // Types

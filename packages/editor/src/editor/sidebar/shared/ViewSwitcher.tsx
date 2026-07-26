@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ViewSwitcher - Dropdown for switching between views (e.g., Layers/Pages)
  * Replaces horizontal sub-tabs with a cleaner dropdown pattern
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { useClickOutside } from "@/shared/hooks";
 import { ChevronIcon, CheckIcon } from "./headerIcons";
 

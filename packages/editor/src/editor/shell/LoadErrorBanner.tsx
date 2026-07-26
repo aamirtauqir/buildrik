@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 
 export type LoadErrorKind = "auth" | "network" | null;
 
@@ -49,9 +49,9 @@ export const LoadErrorBanner: React.FC<LoadErrorBannerProps> = ({ kind, onRetry,
         )}
       </div>
       <div style={S.actions}>
-        {onDismiss && <Button variant="ghost" size="sm" onClick={onDismiss}>Dismiss</Button>}
-        {isAuth && <Button variant="secondary" size="sm" onClick={onSignIn}>Sign in</Button>}
-        <Button variant="primary" size="sm" onClick={onRetry}>Retry</Button>
+        {onDismiss && <Button kind="ghost" size="sm" onClick={onDismiss}>Dismiss</Button>}
+        {isAuth && <Button kind="secondary" size="sm" onClick={onSignIn}>Sign in</Button>}
+        <Button kind="primary" size="sm" onClick={onRetry}>Retry</Button>
       </div>
     </div>
   );

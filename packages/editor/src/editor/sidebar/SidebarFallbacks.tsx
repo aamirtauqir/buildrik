@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SidebarFallbacks — Skeleton + Error boundary fallback for LeftSidebar
  * Extracted from index.tsx for single-responsibility compliance
@@ -7,8 +6,8 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Stack } from "@/editor/ui";
 import { SkeletonListItem } from "@/shared/extensions/SkeletonCompounds";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 /** Loading skeleton shown while lazy-loaded tab chunks download */
 export const PanelSkeleton: React.FC = () => (

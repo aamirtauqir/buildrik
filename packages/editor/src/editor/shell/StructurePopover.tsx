@@ -11,8 +11,8 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer } from "../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { X } from "lucide-react";
 import { LayersPanel } from "../panels/layers";
 import type { SelectedElementInfo } from "../panels/layers";
@@ -83,7 +83,7 @@ export const StructurePopover: React.FC<StructurePopoverProps> = ({
       >
         <span style={{ fontSize: 12, fontWeight: 600, color: "var(--bk-ink)" }}>Structure</span>
         <Button
-          variant="bare"
+          kind="ghost"
           size="sm"
           onClick={onClose}
           aria-label="Close structure"

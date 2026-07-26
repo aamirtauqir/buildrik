@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * EmptyStates — Per-tab empty state components
  * Each empty state has: icon, title, message, primary action.
@@ -8,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { Plus, Image, Layers, FileText, Diamond, Clock, LayoutGrid } from "lucide-react";
 import "./EmptyStates.css";
 

@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SearchBar - Search input for sidebar tabs
  * Debounces onChange to parent (300ms default) while keeping input visually instant
@@ -7,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { trackSidebar } from "../../../shared/utils/sidebarAnalytics";
 
 export interface SearchBarProps {

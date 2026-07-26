@@ -13,7 +13,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 import { RecoveryManager } from "@/engine/recovery/RecoveryManager";
 
 export interface RecoveryBannerProps {
@@ -66,8 +66,8 @@ export const RecoveryBanner: React.FC<RecoveryBannerProps> = ({ pageCount, reloa
         <span style={S.strong}>Recovered your work</span> after an unexpected close · {relTime(record.at)}{scope}.
       </div>
       <div style={S.actions}>
-        <Button variant="ghost" size="sm" onClick={discard}>Discard &amp; reload</Button>
-        <Button variant="primary" size="sm" onClick={() => setDismissed(true)}>Keep changes</Button>
+        <Button kind="ghost" size="sm" onClick={discard}>Discard &amp; reload</Button>
+        <Button kind="primary" size="sm" onClick={() => setDismissed(true)}>Keep changes</Button>
       </div>
     </div>
   );

@@ -7,13 +7,13 @@
  */
 
 import * as React from "react";
+import { ToastInput } from "@/editor/ui";
 import { getBlockDefinitions, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import { STORAGE_KEYS } from "../../../shared/constants/config";
 import type { BlockData } from "../../../shared/types";
 import { canNestElement } from "../../../shared/utils/nesting";
 import { mirrorUserTemplate } from "../../../services/templateSync";
-import type { ToastInput } from "@/editor/shared/vibcoder";
 
 export interface UseStudioHandlersParams {
   composer: Composer | null;

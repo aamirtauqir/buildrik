@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * StudioFooter — 32px status bar at bottom of editor shell.
  * Left: sync status + breadcrumb path to selected element.
@@ -8,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { ListTree } from "lucide-react";
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { Composer } from "../../engine";
@@ -93,7 +93,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
     <>
       {fourToolRail && onOpenStructure && (
         <Button
-          variant="bare"
+          kind="ghost"
           onClick={onOpenStructure}
           aria-label="Page structure"
           style={{

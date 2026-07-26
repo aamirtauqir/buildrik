@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 
 export interface ConflictModalProps {
   open: boolean;
@@ -60,12 +60,12 @@ export function ConflictModal({ open, onReload, onSaveBackup, onOverwrite, onClo
           </p>
         )}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
-          <Button variant="primary" onClick={onReload}>Reload latest</Button>
-          <Button variant="secondary" onClick={onSaveBackup}>Save a backup</Button>
+          <Button kind="primary" onClick={onReload}>Reload latest</Button>
+          <Button kind="secondary" onClick={onSaveBackup}>Save a backup</Button>
           {confirmOverwrite ? (
-            <Button variant="danger" onClick={onOverwrite}>Yes, overwrite</Button>
+            <Button kind="destructive" onClick={onOverwrite}>Yes, overwrite</Button>
           ) : (
-            <Button variant="bare" onClick={() => setConfirmOverwrite(true)}>Overwrite…</Button>
+            <Button kind="ghost" onClick={() => setConfirmOverwrite(true)}>Overwrite…</Button>
           )}
         </div>
       </div>

@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * DrillInHeader - "← Back to [Parent]" header for drill-in screens
  * Shows breadcrumb path and back button for nested navigation
@@ -6,9 +5,10 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, } from "@/editor/ui";
+import { HeaderActions } from "@/shared/extensions/PanelHeader";
 import { BackArrowIcon } from "./headerIcons";
 import { drillInHeaderContainerStyles } from "./headerStyles";
-import { HeaderActions } from "@/shared/extensions/PanelHeader";
 
 export interface DrillInHeaderProps {
   /** Current screen title (e.g., "Elements") */

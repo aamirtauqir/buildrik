@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PublishDropdown — Topbar publish button.
  *
@@ -16,6 +15,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { useClickOutside } from "@/shared/hooks";
 
 export type PublishState = "draft" | "published";

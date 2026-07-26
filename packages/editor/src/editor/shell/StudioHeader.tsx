@@ -6,18 +6,17 @@
  */
 
 import * as React from "react";
+import { Button, ToastInput } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
 import { PresenceIndicators } from "../collaboration";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { Users } from "lucide-react";
 import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
 import { EVENTS } from "../../shared/constants";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { Topbar } from "./Topbar";
-import type { ToastInput } from "@/editor/shared/vibcoder";
 
 /** Selected element minimal info */
 export interface SelectedElementInfo {
@@ -269,7 +268,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
             <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
           ) : (
             <Button
-              variant="ghost"
+              kind="ghost"
               size="sm"
               onClick={handleStartCollab}
               aria-label="Start collaboration session"
