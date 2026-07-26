@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette (error boundary / overlay / preview
@@ -22,8 +21,8 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Stack } from "@/editor/ui";
 import { Check, ChevronUp, ChevronDown, Minus, X, ArrowRight } from "lucide-react";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 import type { OnboardingStep } from "../../shared/constants/onboardingSteps";
 
 // ── Props ───────────────────────────────────────────────────────────────────

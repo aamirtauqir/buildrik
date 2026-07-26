@@ -19,7 +19,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 import type { LintIssue, LintRuleId } from "../../../engine/designSystem/linter";
 
 export interface DSLintBannerProps {
@@ -98,7 +98,7 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
           {onReviewAll && (
             <Button
-              variant="primary"
+              kind="primary"
               size="sm"
               type="button"
               onClick={onReviewAll}
@@ -109,7 +109,7 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
           )}
           {onDismiss && (
             <Button
-              variant="ghost"
+              kind="ghost"
               size="sm"
               type="button"
               onClick={onDismiss}

@@ -14,9 +14,9 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { DesignToken } from "../../types";
 import { TokenPickerPopover, type TokenEntry } from "@/editor/inspector/shared/TokenPickerPopover";
-import { Button } from "@/editor/shared/vibcoder/Button";
 
 interface BindingRowProps {
   cssProperty: string;
@@ -102,7 +102,7 @@ export const BindingRow: React.FC<BindingRowProps> = ({
         <span style={labelStyle}>{cssProperty}</span>
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           size="sm"
           aria-label={`Edit binding for ${cssProperty}`}
           aria-expanded={open}
@@ -113,7 +113,7 @@ export const BindingRow: React.FC<BindingRowProps> = ({
         </Button>
         <Button
           type="button"
-          variant="danger"
+          kind="destructive"
           size="sm"
           aria-label={`Delete binding for ${cssProperty}`}
           onClick={onDelete}

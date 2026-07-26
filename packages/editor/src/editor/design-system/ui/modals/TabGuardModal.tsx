@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 
 export const TabGuardModal: React.FC<{
   changedTabs: string[];
@@ -64,21 +64,21 @@ export const TabGuardModal: React.FC<{
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <Button
             ref={firstButtonRef}
-            variant="ghost"
+            kind="ghost"
             size="sm"
             onClick={onKeep}
           >
             Stay
           </Button>
           <Button
-            variant="primary"
+            kind="primary"
             size="sm"
             onClick={onSaveAndSwitch}
           >
             Save and switch
           </Button>
           <Button
-            variant="primary"
+            kind="primary"
             size="sm"
             onClick={onDiscard}
             style={{ background: "var(--bk-error)", border: "none" }}

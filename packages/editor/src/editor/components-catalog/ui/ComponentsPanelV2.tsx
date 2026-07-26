@@ -22,10 +22,8 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button, Input, PanelHeader } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
-import { PanelHeader } from "@/shared/extensions/PanelHeader";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";
 import { UserSavedSection } from "./UserSavedSection";
@@ -196,7 +194,7 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
         <div style={{ marginLeft: "auto" }}>
           <Button
             type="button"
-            variant="ghost"
+            kind="ghost"
             size="sm"
             onClick={handleOpenAI}
             data-components-ai-entry
@@ -213,7 +211,7 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
           <Button
             key={f.id}
             type="button"
-            variant="ghost"
+            kind="ghost"
             size="sm"
             role="radio"
             aria-checked={filter === f.id}
@@ -252,7 +250,7 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
 
       <Button
         type="button"
-        variant="ghost"
+        kind="ghost"
         onClick={handleSaveSelection}
         data-save-current-selection
         style={footerSaveStyle}

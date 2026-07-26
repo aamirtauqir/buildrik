@@ -27,6 +27,7 @@
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import type { Composer } from "../../../../engine/Composer";
 import type { DesignToken } from "../../types";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
@@ -35,8 +36,6 @@ import { ELEMENT_TYPE_LABELS } from "../../../../shared/constants/elementTypeLab
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { ColorPicker } from "../colors/ColorPicker";
 import { TokenReplaceModal } from "./TokenReplaceModal";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
 
 export interface TokenDetailViewProps {
   token: DesignToken;
@@ -548,7 +547,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           {issue.autoFixHint && (
             <Button
               type="button"
-              variant="ghost"
+              kind="ghost"
               size="sm"
               onClick={handleAutoFix}
               style={smallBtnStyle}
@@ -559,7 +558,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
           )}
           <Button
             type="button"
-            variant="ghost"
+            kind="ghost"
             size="sm"
             onClick={handleIgnore}
             style={smallBtnStyle}
@@ -577,7 +576,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       {/* Back arrow */}
       <Button
         type="button"
-        variant="ghost"
+        kind="ghost"
         onClick={onBack}
         style={backBtnStyle}
         aria-label="Back to tokens"
@@ -669,7 +668,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         <div style={fieldValueStyle}>
           <Button
             type="button"
-            variant="ghost"
+            kind="ghost"
             onClick={() => {
               if (usageCount > 0) setUsageExpanded((v) => !v);
             }}
@@ -699,7 +698,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
                   <li key={`${ref.elementId}-${ref.styleProp}-${idx}`}>
                     <Button
                       type="button"
-                      variant="ghost"
+                      kind="ghost"
                       onClick={() => {
                         const target = composer?.elements?.getElement?.(
                           ref.elementId,
@@ -744,7 +743,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
       <div style={actionRowStyle}>
         <Button
           type="button"
-          variant="primary"
+          kind="primary"
           onClick={handleReplaceValue}
           style={actionBtnStyle}
           aria-label="Replace value"
@@ -753,7 +752,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         </Button>
         <Button
           type="button"
-          variant="secondary"
+          kind="secondary"
           onClick={handleRenameId}
           style={{
             ...actionBtnStyle,
@@ -768,7 +767,7 @@ export const TokenDetailView: React.FC<TokenDetailViewProps> = ({
         </Button>
         <Button
           type="button"
-          variant="danger"
+          kind="destructive"
           onClick={handleDelete}
           style={dangerBtnStyle}
           aria-label="Delete token"

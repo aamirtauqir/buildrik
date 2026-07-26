@@ -9,7 +9,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 import type { PresetCategory } from "../../types";
 
 export interface StyleCategoryRowProps {
@@ -43,7 +43,7 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
   return (
     <Button
       type="button"
-      variant="ghost"
+      kind="ghost"
       size="sm"
       data-category-row={category}
       data-active={isActive ? "true" : undefined}

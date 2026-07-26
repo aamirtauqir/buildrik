@@ -6,8 +6,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder";
-import { Input } from "@/editor/shared/vibcoder/Input";
+import { Button, Input } from "@/editor/ui";
 import type { ColorHSB } from "../../types";
 import {
   hexToHsb,
@@ -317,11 +316,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
       {/* Action buttons */}
       <div className="buildrick-design-picker__actions">
-        <Button variant="ghost" onClick={onCancel} type="button">
+        <Button kind="ghost" onClick={onCancel} type="button">
           Cancel
         </Button>
         <Button
-          variant="primary"
+          kind="primary"
           onClick={() => onSave(currentHex)}
           type="button"
           disabled={!!hexError}

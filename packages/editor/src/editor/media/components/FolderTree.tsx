@@ -14,7 +14,6 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import {
   Clock,
   CheckCircle,
@@ -26,6 +25,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { LibraryItem, MediaFolder } from "../../sidebar/tabs/media/data/mediaTypes";
 
 // ─── Types ────────────────────────────────────────────────────────────────

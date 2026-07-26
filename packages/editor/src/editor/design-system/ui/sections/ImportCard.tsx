@@ -23,10 +23,8 @@
  */
 
 import * as React from "react";
+import { Button, Input, Textarea } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
 import { useImportTokens } from "../../state/useImportTokens";
 import {
@@ -399,7 +397,7 @@ export const ImportCard: React.FC = () => {
 
           <Button
             type="button"
-            variant="ghost"
+            kind="ghost"
             size="sm"
             onClick={() => setShowPaste((v) => !v)}
             style={{
@@ -433,7 +431,7 @@ export const ImportCard: React.FC = () => {
               </label>
               <Button
                 type="button"
-                variant="primary"
+                kind="primary"
                 onClick={() => ingestRaw(pasteBuffer, null)}
                 style={pasteSubmitStyle}
                 disabled={!pasteBuffer.trim()}
@@ -500,7 +498,7 @@ export const ImportCard: React.FC = () => {
               <div style={conflictBtnRowStyle}>
                 <Button
                   type="button"
-                  variant="secondary"
+                  kind="secondary"
                   size="sm"
                   onClick={() => setStrategy("replace")}
                   style={strategyBtnStyle(strategy === "replace")}
@@ -510,7 +508,7 @@ export const ImportCard: React.FC = () => {
                 </Button>
                 <Button
                   type="button"
-                  variant="secondary"
+                  kind="secondary"
                   size="sm"
                   onClick={() => setStrategy("keep-mine")}
                   style={strategyBtnStyle(strategy === "keep-mine")}
@@ -520,7 +518,7 @@ export const ImportCard: React.FC = () => {
                 </Button>
                 <Button
                   type="button"
-                  variant="secondary"
+                  kind="secondary"
                   size="sm"
                   onClick={() => setStrategy("keep-theirs")}
                   style={strategyBtnStyle(strategy === "keep-theirs")}
@@ -535,7 +533,7 @@ export const ImportCard: React.FC = () => {
           <div style={actionRowStyle}>
             <Button
               type="button"
-              variant="primary"
+              kind="primary"
               onClick={handleApply}
               style={applyBtnStyle}
               disabled={applyCount === 0}
@@ -544,7 +542,7 @@ export const ImportCard: React.FC = () => {
             </Button>
             <Button
               type="button"
-              variant="secondary"
+              kind="secondary"
               onClick={handleCancel}
               style={cancelBtnStyle}
             >

@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 
 export interface FooterProps {
   isDirty: boolean;
@@ -35,7 +35,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       {isDirty ? `${dirtyCount} previewing` : "All changes saved"}
     </div>
     <Button
-      variant="ghost"
+      kind="ghost"
       size="sm"
       onClick={onDiscard}
       disabled={!isDirty}
@@ -44,7 +44,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       Discard
     </Button>
     <Button
-      variant="primary"
+      kind="primary"
       size="sm"
       onClick={onReview}
       disabled={!isDirty}

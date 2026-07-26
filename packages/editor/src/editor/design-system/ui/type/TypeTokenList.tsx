@@ -5,12 +5,10 @@
  */
 
 import * as React from "react";
+import { Button, Input, Select } from "@/editor/ui";
 import type { ResponsiveMode } from "../../state/useTypeTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Select } from "@/editor/shared/vibcoder/Select";
 
 export interface TypeTokenListProps {
   tokens: DesignToken[];
@@ -67,7 +65,7 @@ const StyleToggle: React.FC<{
   fontStyle?: React.CSSProperties;
 }> = ({ label, active, onToggle, fontStyle }) => (
   <Button
-    variant="ghost"
+    kind="ghost"
     size="sm"
     onClick={onToggle}
     aria-pressed={active}
@@ -241,7 +239,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       {/* Undo button */}
       {canUndo && (
         <Button
-          variant="ghost"
+          kind="ghost"
           size="sm"
           onClick={() => onUndo(token.id)}
           title="Undo"
@@ -262,7 +260,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       {/* Redo button */}
       {canRedo && (
         <Button
-          variant="ghost"
+          kind="ghost"
           size="sm"
           onClick={() => onRedo(token.id)}
           title="Redo"
@@ -518,7 +516,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
         title="Preview only — font sizes scale automatically for mobile. You cannot set separate mobile values here."
       >
         <Button
-          variant="ghost"
+          kind="ghost"
           size="sm"
           onClick={() => onResponsiveModeChange("desktop")}
           title="Desktop preview"
@@ -540,7 +538,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
           Desktop preview
         </Button>
         <Button
-          variant="ghost"
+          kind="ghost"
           size="sm"
           onClick={() => onResponsiveModeChange("mobile")}
           title="Mobile preview"

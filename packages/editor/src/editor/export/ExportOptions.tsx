@@ -1,6 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Export Options Panel
  * Configuration UI for export settings
@@ -8,9 +5,9 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Checkbox, Input, Stack } from "@/editor/ui";
 import type { CMSExportMode, TemplateSyntax } from "../../engine/cms/CMSExportResolver";
 import type { ExportConfig, CSSExportStyle, ExportFormat } from "../../shared/types/export";
-import { Stack } from "@/editor/shared/vibcoder";
 
 // ============================================================================
 // FORMAT CONFIG

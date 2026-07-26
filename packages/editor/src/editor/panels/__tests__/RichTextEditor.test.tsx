@@ -24,8 +24,8 @@
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import * as React from "react";
-import { RichTextEditor } from "../RichTextEditor";
 import { TooltipProvider } from "@/editor/shared/vibcoder";
+import { RichTextEditor } from "../RichTextEditor";
 
 beforeAll(() => {
   // jsdom ships no document.execCommand. RichTextEditor's consumer wires

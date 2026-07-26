@@ -6,9 +6,9 @@
  * always-present legend (icon+label, never color-only).
  */
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { ApprovedCompareView } from "../ApprovedCompareView";
 import type { ComparePage } from "@/shared/utils/html";
 

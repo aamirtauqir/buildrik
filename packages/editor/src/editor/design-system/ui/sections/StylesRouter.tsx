@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 import type { PresetCategory, StylePreset } from "../../types";
 import {
   useButtonPresets,
@@ -105,7 +105,7 @@ export const StylesRouter: React.FC = () => {
       >
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           size="sm"
           onClick={() => setView({ kind: "list" })}
           style={{

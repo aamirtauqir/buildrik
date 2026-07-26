@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder";
+import { Button } from "@/editor/ui";
 import { useFormHandler } from "../hooks/useFormHandler";
 import type { Composer } from "../../engine";
 import type { Element } from "../../engine/elements/Element";
@@ -83,7 +83,7 @@ export const FormSettingsSection: React.FC<FormSettingsSectionProps> = ({
   if (!hasFormId) {
     return (
       <div style={sectionStyles}>
-        <Button variant="primary" onClick={handleCreateForm}>
+        <Button kind="primary" onClick={handleCreateForm}>
           Enable Form Handling
         </Button>
         <p style={hintStyles}>

@@ -42,6 +42,8 @@ const NEEDS_HUMAN = new Set([
   "SearchInput", "NumericStepper", "Spinner", "Progress", "Divider", "Grip", "Icon", "IconButton",
   "Card", "Link", "Label", "HelperText", "Count", "Tag", "FormField", "BreakpointSwitcher",
   "SkeletonCompounds", "UpgradeModal", "CopyButton", "ErrorState", "HelpTooltip", "Icons",
+  "Tab", "Tabs", "TooltipProvider", "TooltipContent", "TooltipTrigger", "TooltipPortal",
+  "getElementIcon", "IconInfo",
 ]);
 
 /**
@@ -129,9 +131,9 @@ for (const file of files) {
     skipped.push(`${relative(ROOT, file)} — ${blocked.join(", ")}`);
     continue;
   }
-  // The old Checkbox took a label prop; the new one expects a real <label>.
-  if (/<Checkbox\b[^>]*\blabel=/s.test(s)) {
-    skipped.push(`${relative(ROOT, file)} — <Checkbox label=…> needs a real <label>`);
+  // The old Checkbox and Radio took a label prop; the new ones expect a real <label>.
+  if (/<(?:Checkbox|Radio)\b[^>]*\blabel=/s.test(s)) {
+    skipped.push(`${relative(ROOT, file)} — <Checkbox|Radio label=…> needs a real <label>`);
     continue;
   }
 

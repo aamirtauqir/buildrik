@@ -6,13 +6,12 @@
  */
 
 import * as React from "react";
-import { PanelHeader } from "@/shared/extensions/PanelHeader";
+import { Button, PanelHeader } from "@/editor/ui";
 import { PanelErrorState } from "../../../editor/sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
 import { useToast } from "@/editor/ui";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import { DEFAULT_TOKENS } from "../constants";
 import {
@@ -531,7 +530,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           </div>
         </div>
         <Button
-          variant="secondary"
+          kind="secondary"
           size="sm"
           onClick={() => window.open(`${DASHBOARD_URL}/dashboard/agency/theme`, "_blank", "noopener")}
           title="Open the workspace shared theme"
@@ -564,7 +563,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
             StudioPanels subscribes to EVENTS.UI_OPEN_STARTERS. */}
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           onClick={() => composer?.emit(EVENTS.UI_OPEN_STARTERS, {})}
           aria-label="Browse starter themes"
           title="Browse starter themes"
@@ -586,7 +585,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         </Button>
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           data-ai-entry
           onClick={() => setAiOpen(true)}
           aria-label="Open AI assist"
@@ -637,7 +636,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           return (
             <Button
               key={s.id}
-              variant="ghost"
+              kind="ghost"
               role="tab"
               id={`design-tab-${s.id}`}
               aria-selected={selected}

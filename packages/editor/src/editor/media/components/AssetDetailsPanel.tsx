@@ -17,10 +17,9 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Download, FolderOpen, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
 import * as React from "react";
+import { Button, Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
 import { formatBytes } from "@shared/utils/helpers/number";

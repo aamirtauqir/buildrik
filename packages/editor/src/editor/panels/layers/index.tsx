@@ -1,10 +1,10 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayersPanel - Minimal Tree Design. Search + Tree only.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import "./styles/layers-v2.css";
 import type { Element } from "../../../engine/elements/Element";
 import type { ElementType } from "../../../shared/types";

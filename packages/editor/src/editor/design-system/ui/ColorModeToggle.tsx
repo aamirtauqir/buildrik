@@ -17,8 +17,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { useColorMode } from "../state/useColorMode";
 
 export interface ColorModeToggleProps {
@@ -66,7 +66,7 @@ interface PillProps {
 const Pill: React.FC<PillProps> = ({ value, label, active, composer }) => (
   <Button
     type="button"
-    variant="ghost"
+    kind="ghost"
     size="sm"
     role="tab"
     aria-selected={active}

@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder";
+import { Button } from "@/editor/ui";
 import type { FormState } from "../../engine/forms/FormHandler";
 
 // ============================================================================
@@ -86,7 +86,7 @@ export const FormStateOverlay: React.FC<FormStateOverlayProps> = ({
             ))}
           </ul>
         )}
-        <Button variant="primary" onClick={handleDismiss}>
+        <Button kind="primary" onClick={handleDismiss}>
           {isSuccess ? "Continue" : "Try Again"}
         </Button>
       </div>

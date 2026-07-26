@@ -20,14 +20,13 @@
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import type { DesignToken, TokenDiff } from "../../types";
 import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { TokenRow } from "../sections/TokenRow";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
 import type { Composer } from "../../../../engine/Composer";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
 
 export interface ColorTokenListProps {
   tokens: DesignToken[];
@@ -326,7 +325,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         </div>
         <Button
           type="button"
-          variant="secondary"
+          kind="secondary"
           size="sm"
           onClick={() => setFilterMode("all")}
           style={{
@@ -345,7 +344,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
         </Button>
         <Button
           type="button"
-          variant="secondary"
+          kind="secondary"
           size="sm"
           onClick={() => setFilterMode("issues")}
           style={{
@@ -369,7 +368,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {resolvedMode === "dark" && missingDarkCount > 0 && (
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           size="sm"
           onClick={handleDarkMissingClick}
           data-dark-missing-chip
@@ -421,7 +420,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             {Object.keys(contrastFixes).length > 0 && (
               <Button
                 type="button"
-                variant="secondary"
+                kind="secondary"
                 size="sm"
                 onClick={applyAllFixes}
                 style={{
@@ -536,7 +535,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                       <code style={{ fontSize: 11 }}>{fix}</code>
                       <Button
                         type="button"
-                        variant="secondary"
+                        kind="secondary"
                         size="sm"
                         onClick={() => onColorChange(t.id, fix)}
                         style={{
@@ -564,7 +563,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {/* Add token */}
       <Button
         type="button"
-        variant="ghost"
+        kind="ghost"
         onClick={onAddToken}
         style={{
           marginTop: 16,

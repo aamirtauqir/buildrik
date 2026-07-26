@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * AchievementPrompt — Game-like step completion overlay
  *
@@ -11,6 +10,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { ACHIEVEMENT_AUTO_DISMISS_MS, type AchievementPromptState } from "./useOnboardingOrchestrator";
 
 export interface AchievementPromptProps extends AchievementPromptState {

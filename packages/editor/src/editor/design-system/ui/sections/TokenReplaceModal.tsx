@@ -15,6 +15,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import {
   Modal,
   ModalContent,
@@ -22,7 +23,6 @@ import {
   ModalDescription,
   ModalFooter,
 } from "../../../shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import type { DesignToken } from "../../types";
 
 export interface TokenReplaceModalProps {
@@ -166,7 +166,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
           <div style={btnRowStyle}>
             <Button
               type="button"
-              variant="secondary"
+              kind="secondary"
               onClick={() => onOpenChange(false)}
               style={cancelBtnStyle}
             >
@@ -174,7 +174,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
             </Button>
             <Button
               type="button"
-              variant="danger"
+              kind="destructive"
               data-token-replace-confirm
               disabled={!selectedId}
               onClick={handleConfirm}

@@ -1,10 +1,10 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerContextMenu - Right-click context menu for layer rows.
  * Props-only, no hook imports. Closes on click-outside + Escape.
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { LayerAction } from "../types";
 

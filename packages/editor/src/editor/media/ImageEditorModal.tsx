@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Aquibra Image Editor Modal
  * Crop, resize, rotate, flip, and adjust images.
@@ -11,6 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {

@@ -1,10 +1,9 @@
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import type { DesignToken } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
 import type { LintIssue } from "../../../../engine/designSystem/LintState";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
 
 interface GenericTokenListProps {
   tokens: DesignToken[];
@@ -184,7 +183,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
               />
               <Button
                 type="button"
-                variant="ghost"
+                kind="ghost"
                 size="sm"
                 disabled={!undoable}
                 onClick={() => onUndo(t.id)}

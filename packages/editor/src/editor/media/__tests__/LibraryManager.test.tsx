@@ -39,8 +39,8 @@ vi.mock("../../sidebar/tabs/media/hooks/useMediaState", () => ({
   useMediaState: () => mocks.state.mediaState,
 }));
 
-vi.mock("@/editor/shared/vibcoder", async () => {
-  const actual: Record<string, unknown> = await vi.importActual("@/editor/shared/vibcoder");
+vi.mock("@/editor/ui", async () => {
+  const actual: Record<string, unknown> = await vi.importActual("@/editor/ui");
   return {
     ...actual,
     useToast: () => ({ addToast: vi.fn() }),

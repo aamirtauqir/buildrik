@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerTreeItem - Minimal Tree Design
  * Clean rows with hover-reveal actions (Hide/Lock)
@@ -7,9 +5,10 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input, } from "@/editor/ui";
+import { getElementIcon } from "@/shared/ui/Icons";
 import type { Composer } from "../../../engine";
 import { ELEMENT_TYPE_LABELS } from "../../../shared/constants/elementTypeLabels";
-import { getElementIcon } from "../../../shared/ui/Icons";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 
 export interface LayerTreeItemProps {

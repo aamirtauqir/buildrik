@@ -20,8 +20,8 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { NamedVersion } from "../../../shared/types/versions";
 import { formatRelativeTime } from "../../../editor/sidebar/tabs/history/helpers";
 import { SnapshotPreview } from "../../../editor/sidebar/tabs/history/components/SnapshotPreview";

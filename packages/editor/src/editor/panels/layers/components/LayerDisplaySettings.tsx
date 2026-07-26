@@ -1,5 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerDisplaySettings - Popover for toggling layer display preferences.
  *
@@ -10,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Checkbox } from "@/editor/ui";
 import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { LayerDisplayPrefs } from "../types";
 

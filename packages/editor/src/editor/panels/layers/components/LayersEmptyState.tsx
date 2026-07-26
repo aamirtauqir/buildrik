@@ -1,10 +1,10 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayersEmptyState - Empty state for Layers panel when canvas has no elements.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 
 interface LayersEmptyStateProps {
   onAddBlockClick?: () => void;

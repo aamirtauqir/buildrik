@@ -12,8 +12,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { useDSMode, type DSMode } from "../state/DSModeContext";
-import { Button } from "@/editor/shared/vibcoder/Button";
 
 const SEGMENTS: ReadonlyArray<{ value: DSMode; label: string; hint: string }> = [
   { value: "beginner", label: "Beginner", hint: "Friendly · hides token IDs and empty foundations" },
@@ -48,7 +48,7 @@ export const DSModeToggle: React.FC<DSModeToggleProps> = ({ className }) => {
           <Button
             key={seg.value}
             type="button"
-            variant="ghost"
+            kind="ghost"
             size="sm"
             role="radio"
             aria-checked={active}

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 
 interface TokenKindCardProps {
   kindId: string;
@@ -87,7 +87,7 @@ export const TokenKindCard: React.FC<TokenKindCardProps> = ({
 
   return (
     <div style={cardStyle} data-token-kind-card={kindId}>
-      <Button type="button" variant="ghost" size="sm" onClick={toggle} style={headerStyle} aria-expanded={open}>
+      <Button type="button" kind="ghost" size="sm" onClick={toggle} style={headerStyle} aria-expanded={open}>
         <span>{title} · {count} TOKENS</span>
         {isDirty && <span aria-label="unsaved changes in this kind" style={dirtyDotStyle} />}
         <span style={spacerStyle} />

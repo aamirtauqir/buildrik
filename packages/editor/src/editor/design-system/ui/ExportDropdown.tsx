@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ExportFormat } from "../utils/exportUtils";
 
@@ -27,7 +27,7 @@ export const ExportDropdown: React.FC<{
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <Button
-        variant="ghost"
+        kind="ghost"
         size="sm"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
@@ -74,7 +74,7 @@ export const ExportDropdown: React.FC<{
                 ⚠ Exporting unsaved changes — not yet live on your site.
               </div>
               <Button
-                variant="ghost"
+                kind="ghost"
                 size="sm"
                 onClick={() => {
                   setOpen(false);
@@ -94,7 +94,7 @@ export const ExportDropdown: React.FC<{
           {EXPORT_OPTIONS.map(({ fmt, label, desc }) => (
             <Button
               key={fmt}
-              variant="ghost"
+              kind="ghost"
               size="sm"
               role="menuitem"
               onClick={() => {

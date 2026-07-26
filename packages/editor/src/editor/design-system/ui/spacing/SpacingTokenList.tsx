@@ -14,11 +14,10 @@
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import type { SpacingPreset } from "../../state/useSpacingTokens";
 import type { DesignToken } from "../../types";
 import { TokenUsageChip } from "../sections/TokenUsageChip";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Input } from "@/editor/shared/vibcoder/Input";
 
 export interface SpacingTokenListProps {
   tokens: DesignToken[];
@@ -56,7 +55,7 @@ const PresetChip: React.FC<{
 }> = ({ preset, isActive, onApply }) => (
   <Button
     type="button"
-    variant="ghost"
+    kind="ghost"
     size="sm"
     onClick={onApply}
     style={{
@@ -90,7 +89,7 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
   return (
     <Button
       type="button"
-      variant="ghost"
+      kind="ghost"
       size="sm"
       role="listitem"
       aria-label={`Edit spacing ${token.name} (${token.value})`}
@@ -202,7 +201,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       {canUndo && (
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           size="sm"
           onClick={() => onUndo(token.id)}
           title="Undo"
@@ -215,7 +214,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       {canRedo && (
         <Button
           type="button"
-          variant="ghost"
+          kind="ghost"
           size="sm"
           onClick={() => onRedo(token.id)}
           title="Redo"
@@ -227,7 +226,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       )}
       <Button
         type="button"
-        variant="ghost"
+        kind="ghost"
         size="sm"
         onClick={onClose}
         aria-label="Close edit drawer"
@@ -296,7 +295,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
         ))}
         <Button
           type="button"
-          variant="secondary"
+          kind="secondary"
           size="sm"
           onClick={onResetToDefaults}
           title="Reset all spacing to factory defaults"
@@ -402,7 +401,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
             {onRowClick ? (
               <Button
                 type="button"
-                variant="ghost"
+                kind="ghost"
                 size="sm"
                 onClick={() => onRowClick(t.id)}
                 aria-label={`Open details for ${t.name}`}

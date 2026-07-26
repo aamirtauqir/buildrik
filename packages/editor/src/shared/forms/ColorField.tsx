@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { Input } from "@/editor/shared/vibcoder";
+import { Input } from "@/editor/ui";
 
 export interface ColorFieldProps {
   label?: string;

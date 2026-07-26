@@ -1,10 +1,10 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerBreadcrumb - Shows ancestor path when exactly 1 layer is selected.
  * Props-only, no hook imports.
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { getAncestors, getDisplayName, findById } from "../data/layerUtils";
 import type { LayerItem } from "../types";
 

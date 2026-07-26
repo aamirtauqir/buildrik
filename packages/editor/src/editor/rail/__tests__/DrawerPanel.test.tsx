@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 // @vitest-environment jsdom
 /**
  * DrawerPanel — pin/close controls, Escape gating, scroll-position memory.
@@ -15,7 +16,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, fireEvent, cleanup } from "@testing-library/react";
 import { DrawerPanel } from "../DrawerPanel";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 
 afterEach(cleanup);
 

@@ -18,8 +18,8 @@
  * @license BSD-3-Clause
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
 import { AIResultText, AIControls } from "./AIPanel";
 

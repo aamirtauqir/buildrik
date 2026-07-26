@@ -5,11 +5,11 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { DesignToken, WcagLevel } from "../../types";
 import { calcWcagLevel, wcagTooltip, calcContrastRatio } from "../../utils/colorUtils";
 import { ColorPicker } from "./ColorPicker";
-import { Button } from "@/editor/shared/vibcoder/Button";
 
 // ─── WCAG Badge ───────────────────────────────────────────────────────────────
 
@@ -235,7 +235,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
             )}
           </div>
           <Button
-            variant="ghost"
+            kind="ghost"
             onClick={handleCopyHex}
             style={{
               background: "none",
@@ -257,7 +257,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {showWcag && (
           <div ref={popoverRef} style={{ position: "relative" }}>
             <Button
-              variant="ghost"
+              kind="ghost"
               onClick={() => setShowWcagPopover((v) => !v)}
               style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
               aria-label={wcagTooltip(wcagLevel)}
@@ -317,7 +317,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {/* Undo */}
         {canUndo && (
           <Button
-            variant="ghost"
+            kind="ghost"
             onClick={() => onUndo(token.id)}
             style={{
               background: "none",
@@ -339,7 +339,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         {/* Redo */}
         {canRedo && (
           <Button
-            variant="ghost"
+            kind="ghost"
             onClick={() => onRedo(token.id)}
             style={{
               background: "none",

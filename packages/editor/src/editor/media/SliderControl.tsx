@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Slider Control Component
  * Reusable slider input for image adjustments
@@ -6,6 +5,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Input } from "@/editor/ui";
 import { sliderStyles as styles } from "./ImageEditorStyles";
 
 export interface SliderControlProps {

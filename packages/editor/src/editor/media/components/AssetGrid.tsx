@@ -38,7 +38,6 @@
  * react-window can virtualize.
  */
 
-import { Button } from "@/editor/shared/vibcoder/Button";
 import {
   Check,
   ChevronDown,
@@ -51,6 +50,7 @@ import {
   Upload,
 } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type {
   LibraryItem,
   MediaSortBy,
