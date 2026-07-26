@@ -49,7 +49,7 @@ const containerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--bd-bg-canvas)",
+  background: "var(--bk-bg-subtle)",
 };
 
 const subHeaderStyle: React.CSSProperties = {
@@ -57,7 +57,7 @@ const subHeaderStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "6px 12px 8px",
-  borderBottom: "1px solid var(--bd-border)",
+  borderBottom: "1px solid var(--bk-border)",
   flexWrap: "wrap",
 };
 
@@ -65,15 +65,15 @@ const filterRowStyle: React.CSSProperties = {
   display: "flex",
   gap: 4,
   padding: "8px 12px",
-  borderBottom: "1px solid var(--bd-border)",
+  borderBottom: "1px solid var(--bk-border)",
 };
 
 const pillStyle = (active: boolean): React.CSSProperties => ({
   padding: "3px 10px",
-  background: active ? "var(--bd-accent)" : "transparent",
-  color: active ? "#fff" : "var(--bd-fg-secondary)",
+  background: active ? "var(--bk-accent)" : "transparent",
+  color: active ? "#fff" : "var(--bk-ink-soft)",
   border: "1px solid",
-  borderColor: active ? "var(--bd-accent)" : "var(--bd-border)",
+  borderColor: active ? "var(--bk-accent)" : "var(--bk-border)",
   borderRadius: 12,
   fontSize: 11,
   cursor: "pointer",
@@ -82,9 +82,9 @@ const pillStyle = (active: boolean): React.CSSProperties => ({
 const searchInputStyle: React.CSSProperties = {
   width: "100%",
   padding: "5px 10px",
-  background: "var(--bd-bg-canvas)",
-  color: "var(--bd-fg-primary)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  color: "var(--bk-ink)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   fontSize: 12,
   margin: "8px 12px",
@@ -102,8 +102,8 @@ const bodyScrollStyle: React.CSSProperties = {
 const headerAiButtonStyle: React.CSSProperties = {
   padding: "3px 10px",
   background: "transparent",
-  color: "var(--bd-fg-secondary)",
-  border: "1px solid var(--bd-border)",
+  color: "var(--bk-ink-soft)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 12,
   fontSize: 11,
   cursor: "pointer",
@@ -117,8 +117,8 @@ const footerSaveStyle: React.CSSProperties = {
   margin: "8px 12px 12px",
   padding: "8px 10px",
   background: "transparent",
-  color: "var(--bd-fg-secondary)",
-  border: "1px dashed var(--bd-border)",
+  color: "var(--bk-ink-soft)",
+  border: "1px dashed var(--bk-border)",
   borderRadius: 6,
   fontSize: 11,
   cursor: "pointer",

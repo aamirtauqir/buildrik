@@ -25,10 +25,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--buildrick-space-2);
-  padding: var(--buildrick-space-2) var(--buildrick-space-1) 0;
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-8) var(--bk-space-4) 0;
   width: 100%;
-  font-family: var(--buildrick-font-family);
+  font-family: var(--bk-font-ui);
   min-width: 0;
 }
 
@@ -42,10 +42,10 @@
 }
 
 .bd-tile-meta__name {
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-primary);
-  letter-spacing: var(--buildrick-tracking-normal);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink);
+  letter-spacing: var(--bk-tracking-normal);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -54,8 +54,8 @@
 }
 
 .bd-tile-meta__sub {
-  font-size: var(--buildrick-text-sm);
-  color: var(--buildrick-text-muted);
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -65,7 +65,7 @@
 .bd-tile-meta__action {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-1);
+  gap: var(--bk-space-4);
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -79,7 +79,7 @@
 .bd-tile-meta--inline .bd-tile-meta__body {
   flex-direction: row;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 
 /* Centered — title-only template tiles, no action slot */

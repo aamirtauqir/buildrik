@@ -11,14 +11,14 @@
 .bd-spacing-indicator {
   position: absolute;
   border: 2px dashed;
-  background: var(--buildrick-ink-06);
+  background: var(--bk-alpha-ink-06);
   pointer-events: auto;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .bd-spacing-indicator:hover {
-  background: var(--buildrick-ink-10);
+  background: var(--bk-alpha-ink-10);
   border-style: solid;
 }
 
@@ -31,15 +31,15 @@
   color: white;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: var(--bd-shadow-md);
+  box-shadow: var(--bk-shadow-drag);
 }
 
 .bd-spacing-indicator--margin .bd-spacing-indicator-label {
-  background-color: var(--buildrick-success);
+  background-color: var(--bk-success);
 }
 
 .bd-spacing-indicator--padding .bd-spacing-indicator-label {
-  background-color: var(--buildrick-accent);
+  background-color: var(--bk-accent);
 }
 
 .bd-spacing-indicator--top .bd-spacing-indicator-label {
@@ -68,11 +68,11 @@
 
 .bd-spacing-indicator-input {
   width: 50px;
-  padding: 2px var(--bd-space-1);
+  padding: 2px var(--bk-space-4);
   border: none;
   border-radius: 2px;
-  background: var(--bd-bg-card);
-  color: var(--buildrick-text-heading);
+  background: var(--bk-bg-card);
+  color: var(--bk-ink);
   font-size: 12px;
   font-weight: 600;
   text-align: center;

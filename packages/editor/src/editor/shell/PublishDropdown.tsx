@@ -44,24 +44,24 @@ interface StateConfig {
 const STATE_CONFIG: Record<PublishState, StateConfig> = {
   draft: {
     buttonLabel: "Publish",
-    bg: "var(--bd-accent)",
-    hoverBg: "var(--bd-accent-pressed)",
-    iconColor: "var(--bd-bg-card)",
-    textColor: "var(--bd-bg-card)",
-    chevronColor: "var(--bd-accent-tint)",
+    bg: "var(--bk-accent)",
+    hoverBg: "var(--bk-accent-pressed)",
+    iconColor: "var(--bk-bg-card)",
+    textColor: "var(--bk-bg-card)",
+    chevronColor: "var(--bk-accent-tint)",
     // Draft pill sits on the cobalt Publish button. Text was
     // --bd-accent-alpha-30 (30% cobalt) on bg --bd-accent-pressed (darker
     // cobalt) — both same hue family, near-zero contrast, label
     // unreadable in the live walk. White-tint matches the in-review pill
     // pattern (light text on darker brand color) and stays accessible.
-    badge: { label: "Draft", bg: "var(--bd-accent-pressed)", text: "var(--bd-bg-card)" },
+    badge: { label: "Draft", bg: "var(--bk-accent-pressed)", text: "var(--bk-bg-card)" },
   },
   published: {
     buttonLabel: "Published",
     bg: "#0EA5E9",
     hoverBg: "#0284C7",
-    iconColor: "var(--bd-bg-card)",
-    textColor: "var(--bd-bg-card)",
+    iconColor: "var(--bk-bg-card)",
+    textColor: "var(--bk-bg-card)",
     chevronColor: "#E0F2FE",
   },
 };
@@ -177,7 +177,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
           padding: "0 10px",
           background: cfg.bg,
           border: "none",
-          borderRadius: publishState === "draft" ? "var(--bd-radius-full) 0 0 var(--bd-radius-full)" : "var(--bd-radius-full)",
+          borderRadius: publishState === "draft" ? "var(--bk-radius-full) 0 0 var(--bk-radius-full)" : "var(--bk-radius-full)",
           color: cfg.textColor,
           fontSize: 12,
           fontWeight: 700,
@@ -220,7 +220,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
           background: cfg.bg,
           border: "none",
           borderLeft: `1px solid ${cfg.hoverBg}`,
-          borderRadius: "0 var(--bd-radius-full) var(--bd-radius-full) 0",
+          borderRadius: "0 var(--bk-radius-full) var(--bk-radius-full) 0",
           cursor: "pointer",
           transition: "background 0.12s ease",
         }}
@@ -240,8 +240,8 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
             top: buttonRef.current.getBoundingClientRect().bottom + 6,
             right: window.innerWidth - buttonRef.current.getBoundingClientRect().right - 26,
             width: 240,
-            background: "var(--buildrick-bg-card)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-card)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 10,
             boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
             overflow: "hidden",
@@ -266,7 +266,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                   padding: "8px 12px",
                   background: "transparent",
                   border: "none",
-                  color: opt.disabled ? "var(--bd-fg-muted)" : "var(--bd-fg-primary)",
+                  color: opt.disabled ? "var(--bk-ink-muted)" : "var(--bk-ink)",
                   fontSize: 13,
                   fontWeight: 400,
                   cursor: opt.disabled ? "default" : "pointer",
@@ -276,7 +276,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                 }}
                 onMouseEnter={(e) => {
                   if (!opt.disabled) {
-                    e.currentTarget.style.background = "var(--bd-bg-panel)";
+                    e.currentTarget.style.background = "var(--bk-bg-panel)";
                   }
                 }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
@@ -286,13 +286,13 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                     <span>{opt.label}</span>
                   </div>
                   {opt.sublabel && (
-                    <div style={{ fontSize: 11, color: "var(--buildrick-text-tertiary)", marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginTop: 2 }}>
                       {opt.sublabel}
                     </div>
                   )}
                 </div>
                 {opt.external && (
-                  <span style={{ color: "var(--buildrick-text-tertiary)", flexShrink: 0, marginTop: 1 }}>
+                  <span style={{ color: "var(--bk-ink-muted)", flexShrink: 0, marginTop: 1 }}>
                     <IconExternal />
                   </span>
                 )}

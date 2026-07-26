@@ -295,9 +295,9 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
 const emptyStyles: React.CSSProperties = {
   padding: "12px 14px",
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
-  background: "var(--bd-bg-sub)",
-  border: "1px dashed var(--bd-border-default)",
+  color: "var(--bk-ink-muted)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px dashed var(--bk-border-medium)",
   borderRadius: 6,
 };
 
@@ -305,8 +305,8 @@ const errorStyles: React.CSSProperties = {
   marginTop: 4,
   marginBottom: 8,
   padding: "8px 10px",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-error)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-error)",
   background: "rgba(220, 38, 38, 0.06)",
   border: "1px solid rgba(220, 38, 38, 0.25)",
   borderRadius: 6,
@@ -327,8 +327,8 @@ const localeRowStyles: React.CSSProperties = {
   justifyContent: "space-between",
   gap: 12,
   padding: "8px 10px",
-  background: "var(--bd-bg-sub)",
-  border: "1px solid var(--bd-border-default)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 6,
 };
 
@@ -342,20 +342,20 @@ const localeInfoStyles: React.CSSProperties = {
 
 const codeChipStyles: React.CSSProperties = {
   padding: "2px 6px",
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
   fontWeight: 600,
   letterSpacing: "0.04em",
   textTransform: "uppercase",
-  color: "var(--bd-fg-strong)",
-  background: "var(--bd-bg-default)",
-  border: "1px solid var(--bd-border-default)",
+  color: "var(--bk-ink)",
+  background: "var(--bk-bg-panel)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 4,
 };
 
 const localeLabelStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--bd-fg-strong)",
+  color: "var(--bk-ink)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -363,23 +363,23 @@ const localeLabelStyles: React.CSSProperties = {
 
 const defaultBadgeStyles: React.CSSProperties = {
   padding: "2px 6px",
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
   fontWeight: 600,
   textTransform: "uppercase",
   letterSpacing: "0.04em",
-  color: "var(--bd-accent)",
-  background: "var(--bd-accent-tint)",
-  border: "1px solid var(--bd-accent)",
+  color: "var(--bk-accent)",
+  background: "var(--bk-accent-tint)",
+  border: "1px solid var(--bk-accent)",
   borderRadius: 4,
 };
 
 const removeBtnStyles: React.CSSProperties = {
   padding: "4px 8px",
-  font: "500 11px var(--bd-font)",
-  color: "var(--bd-fg-secondary)",
+  font: "500 11px var(--bk-font-ui)",
+  color: "var(--bk-ink-soft)",
   background: "transparent",
-  border: "1px solid var(--bd-border-default)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 4,
   cursor: "pointer",
   flexShrink: 0,
@@ -387,7 +387,7 @@ const removeBtnStyles: React.CSSProperties = {
 
 const removeDisabledStyles: React.CSSProperties = {
   ...removeBtnStyles,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   cursor: "not-allowed",
   opacity: 0.5,
 };
@@ -400,10 +400,10 @@ const addRowStyles: React.CSSProperties = {
 
 const addButtonStyles: React.CSSProperties = {
   padding: "8px 14px",
-  font: "600 12px var(--bd-font)",
-  color: "var(--bd-fg-muted)",
-  background: "var(--bd-bg-sub)",
-  border: "1px solid var(--bd-border-default)",
+  font: "600 12px var(--bk-font-ui)",
+  color: "var(--bk-ink-muted)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 6,
   cursor: "not-allowed",
   flexShrink: 0,
@@ -412,8 +412,8 @@ const addButtonStyles: React.CSSProperties = {
 const addButtonActiveStyles: React.CSSProperties = {
   ...addButtonStyles,
   color: "#fff",
-  background: "var(--bd-accent)",
-  borderColor: "var(--bd-accent)",
+  background: "var(--bk-accent)",
+  borderColor: "var(--bk-accent)",
   cursor: "pointer",
 };
 
@@ -421,10 +421,10 @@ const enforcementNoteStyles: React.CSSProperties = {
   marginTop: 8,
   marginBottom: 8,
   padding: "10px 12px",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-fg-secondary)",
-  background: "var(--bd-bg-sub)",
-  border: "1px dashed var(--bd-border-default)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-ink-soft)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px dashed var(--bk-border-medium)",
   borderRadius: 6,
   lineHeight: 1.5,
 };
@@ -432,10 +432,10 @@ const enforcementNoteStyles: React.CSSProperties = {
 const saveButtonStyles: React.CSSProperties = {
   marginTop: 4,
   padding: "8px 14px",
-  font: "600 12px var(--bd-font)",
-  color: "var(--bd-fg-muted)",
-  background: "var(--bd-bg-sub)",
-  border: "1px solid var(--bd-border-default)",
+  font: "600 12px var(--bk-font-ui)",
+  color: "var(--bk-ink-muted)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 6,
   cursor: "not-allowed",
 };
@@ -443,7 +443,7 @@ const saveButtonStyles: React.CSSProperties = {
 const saveButtonActiveStyles: React.CSSProperties = {
   ...saveButtonStyles,
   color: "#fff",
-  background: "var(--bd-accent)",
-  borderColor: "var(--bd-accent)",
+  background: "var(--bk-accent)",
+  borderColor: "var(--bk-accent)",
   cursor: "pointer",
 };

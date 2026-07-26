@@ -8,40 +8,40 @@
   display: inline-flex;
   padding: 3px;
   gap: 2px;
-  background: var(--buildrick-bg-subtle);
-  border-radius: var(--buildrick-radius-md);
-  border: 1px solid var(--buildrick-border);
+  background: var(--bk-bg-subtle);
+  border-radius: var(--bk-radius-lg);
+  border: 1px solid var(--bk-border);
 }
 .bd-bp-switcher__btn {
   width: 34px;
   height: 28px;
-  border-radius: var(--buildrick-rounded);
+  border-radius: var(--bk-radius-md);
   border: 0;
   cursor: pointer;
   background: transparent;
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default),
+              color var(--bk-motion-fast) var(--bk-ease-default);
 }
 .bd-bp-switcher__btn:hover {
-  background: var(--buildrick-bg-hover);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 .bd-bp-switcher__btn[aria-pressed="true"],
 .bd-bp-switcher__btn.is-on {
-  background: var(--buildrick-bg-card);
-  color: var(--buildrick-accent);
-  box-shadow: var(--buildrick-shadow-xs);
+  background: var(--bk-bg-card);
+  color: var(--bk-accent);
+  box-shadow: var(--bk-shadow-drag);
 }
 
 .bd-bp-switcher--labelled .bd-bp-switcher__btn {
   width: auto;
-  padding: 0 var(--buildrick-space-3);
-  gap: var(--buildrick-space-1);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
+  padding: 0 var(--bk-space-12);
+  gap: var(--bk-space-4);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-medium);
 }

@@ -167,7 +167,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
       ? "none"
       : "opacity 150ms ease-out";
     layer.style.zIndex = "199";
-    layer.style.background = "var(--buildrick-bg-subtle)";
+    layer.style.background = "var(--bk-bg-subtle)";
     layer.style.display = "flex";
     layer.style.alignItems = "center";
     layer.style.justifyContent = "center";
@@ -224,7 +224,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
         ? `Time-traveling: ${currentEntry.label}`
         : "Select a point to preview";
       label.style.fontSize = "14px";
-      label.style.color = "var(--bd-fg-secondary)";
+      label.style.color = "var(--bk-ink-soft)";
       label.style.fontFamily = "inherit";
       label.style.padding = "16px";
       layer.appendChild(label);
@@ -309,7 +309,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
         aria-label="Time travel"
       >
         {historyStack.length === 0 ? (
-          <p style={{ color: "var(--bd-fg-muted)", fontSize: 13 }}>
+          <p style={{ color: "var(--bk-ink-muted)", fontSize: 13 }}>
             No history entries to scrub through.
           </p>
         ) : (

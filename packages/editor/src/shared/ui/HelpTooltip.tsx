@@ -69,7 +69,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
           style={{
             display: "block",
             marginTop: 4,
-            color: "var(--buildrick-accent)",
+            color: "var(--bk-accent)",
             fontSize: 12,
             textDecoration: "none",
           }}
@@ -125,8 +125,8 @@ const buttonStyles: React.CSSProperties = {
   marginLeft: 4,
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-radius-full)",
-  color: "var(--buildrick-text-tertiary)",
+  borderRadius: "var(--bk-radius-full)",
+  color: "var(--bk-ink-muted)",
   cursor: "help",
   transition: "color 0.15s, background 0.15s",
   verticalAlign: "middle",

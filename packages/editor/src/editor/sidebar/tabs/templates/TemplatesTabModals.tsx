@@ -42,40 +42,40 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal tpl-modal--replace" onClick={(e) => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-          <div style={{ width: 32, height: 32, background: "var(--bd-warn-soft)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--bd-warn)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <div style={{ width: 32, height: 32, background: "var(--bk-warning-tint)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--bk-warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M12 9v2m0 4h.01M5 21h14a2 2 0 0 0 1.84-2.75L13.74 4a2 2 0 0 0-3.48 0L3.16 18.25A2 2 0 0 0 5 21z"/>
             </svg>
           </div>
           <div>
             <h3 className="tpl-modal-title" style={{ margin: 0 }}>Replace current page content?</h3>
-            <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 2 }}>
+            <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 2 }}>
               {currentPageName ? `${currentPageName} page` : "Current page"} has {currentPageCount} element{currentPageCount === 1 ? "" : "s"} that will be replaced.
             </div>
           </div>
         </div>
-        <div style={{ fontSize: 12, color: "var(--bd-fg-secondary)", marginBottom: 12 }}>
-          Applying <b style={{ color: "var(--bd-fg)" }}>{template.name}</b> will replace all elements on the current page. You can:
+        <div style={{ fontSize: 12, color: "var(--bk-ink-soft)", marginBottom: 12 }}>
+          Applying <b style={{ color: "var(--bk-ink)" }}>{template.name}</b> will replace all elements on the current page. You can:
         </div>
-        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bd-fg-muted)", cursor: "pointer", margin: "0 0 6px" }}>
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bk-ink-muted)", cursor: "pointer", margin: "0 0 6px" }}>
           <Checkbox
             checked={backupCurrentPage}
             onChange={(e) => onBackupChange(e.target.checked)}
             style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
           <span>
-            <span style={{ display: "block", fontWeight: 500, color: "var(--bd-fg)" }}>
+            <span style={{ display: "block", fontWeight: 500, color: "var(--bk-ink)" }}>
               Backup current page as &ldquo;{currentPageName || "Current"} (backup)&rdquo;
             </span>
             <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Preserves your work in a new page.</span>
           </span>
         </label>
-        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bd-fg-muted)", cursor: "pointer", margin: "0 0 4px" }}>
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bk-ink-muted)", cursor: "pointer", margin: "0 0 4px" }}>
           <Checkbox
             checked={resetGlobalStyles}
             onChange={(e) => onResetChange(e.target.checked)}
             style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
           <span>
-            <span style={{ display: "block", fontWeight: 500, color: "var(--bd-fg)" }}>Reset global styles to template defaults</span>
+            <span style={{ display: "block", fontWeight: 500, color: "var(--bk-ink)" }}>Reset global styles to template defaults</span>
             <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Override your brand colors with template colors.</span>
           </span>
         </label>
@@ -120,34 +120,34 @@ export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUp
             height: 56,
             margin: "4px auto 16px",
             background: /* @lint-hex-policy: warm illustrative gradient for template-warning hero */ "linear-gradient(135deg, #fff7ed, #fed7aa)",
-            borderRadius: "var(--bd-radius-full)",
+            borderRadius: "var(--bk-radius-full)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
           aria-hidden="true"
         >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bd-warn)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-warning)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2l3 7h7l-5.5 5L18 22l-6-4-6 4 1.5-8L2 9h7z" />
           </svg>
         </div>
         <h3 className="tpl-modal-title" style={{ margin: "0 0 6px" }}>
           &ldquo;{templateName}&rdquo; is a Pro template
         </h3>
-        <p style={{ fontSize: 13, color: "var(--bd-fg-muted, var(--bd-fg-secondary))", lineHeight: 1.5, margin: "0 0 20px" }}>
+        <p style={{ fontSize: 13, color: "var(--bk-ink-muted, var(--bk-ink-soft))", lineHeight: 1.5, margin: "0 0 20px" }}>
           Unlock 80+ premium templates with conversion-tested layouts.
         </p>
         <div
           style={{
             textAlign: "left",
-            background: "var(--bd-bg-soft)",
+            background: "var(--bk-bg-subtle)",
             padding: "14px 16px",
             borderRadius: 6,
             margin: "0 0 20px",
           }}
         >
           <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>Pro includes</div>
-          <div style={{ fontSize: 12, color: "var(--bd-fg-secondary)", display: "flex", flexDirection: "column", gap: 4 }}>
+          <div style={{ fontSize: 12, color: "var(--bk-ink-soft)", display: "flex", flexDirection: "column", gap: 4 }}>
             {PRO_FEATURES.map((feat) => (
               <div key={feat}>✓ {feat}</div>
             ))}
@@ -186,7 +186,7 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <h3 className="tpl-modal-title">Create page?</h3>
         <div className="tpl-modal-row">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-muted, var(--bd-fg-secondary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--bk-ink-muted, var(--bk-ink-soft))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <path d="M3 9h18M9 21V9" />
           </svg>
@@ -218,7 +218,7 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
     <div className="tpl-modal-overlay" onClick={onClose}>
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-modal-icon tpl-modal-icon--success">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--bd-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--bk-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M9 12l2 2 4-4" />
           </svg>
@@ -251,14 +251,14 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-modal-icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--bd-error, var(--bd-error))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--bk-error, var(--bk-error))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M12 8v4M12 16h.01" />
           </svg>
         </div>
         <h3 className="tpl-modal-title tpl-modal-title--lg">Couldn&apos;t create page</h3>
-        <div className="tpl-modal-warning" style={{ background: "var(--bd-error-bg)", borderColor: "transparent" }}>
-          <p className="tpl-modal-warning-text" style={{ color: "var(--bd-fg-muted)" }}>
+        <div className="tpl-modal-warning" style={{ background: "var(--bk-error-tint)", borderColor: "transparent" }}>
+          <p className="tpl-modal-warning-text" style={{ color: "var(--bk-ink-muted)" }}>
             Something went wrong creating your page. Your existing pages were not affected.
           </p>
         </div>

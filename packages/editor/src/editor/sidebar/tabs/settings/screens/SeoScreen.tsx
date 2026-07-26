@@ -90,11 +90,11 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange, regi
       <div
         style={{
           padding: "10px 12px",
-          background: "var(--bd-bg-subtle)",
-          border: "1px solid var(--bd-border)",
-          borderRadius: "var(--buildrick-radius-sm)",
+          background: "var(--bk-bg-subtle)",
+          border: "1px solid var(--bk-border)",
+          borderRadius: "var(--bk-radius-sm)",
           fontSize: 12,
-          color: "var(--bd-fg-muted)",
+          color: "var(--bk-ink-muted)",
           lineHeight: 1.5,
         }}
       >

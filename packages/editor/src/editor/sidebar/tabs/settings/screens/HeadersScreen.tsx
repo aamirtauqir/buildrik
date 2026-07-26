@@ -287,9 +287,9 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
 const emptyStyles: React.CSSProperties = {
   padding: "12px 14px",
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
-  background: "var(--bd-bg-sub)",
-  border: "1px dashed var(--bd-border-default)",
+  color: "var(--bk-ink-muted)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px dashed var(--bk-border-medium)",
   borderRadius: 6,
 };
 
@@ -297,8 +297,8 @@ const errorStyles: React.CSSProperties = {
   marginTop: 4,
   marginBottom: 8,
   padding: "8px 10px",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-error)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-error)",
   background: "rgba(220, 38, 38, 0.06)",
   border: "1px solid rgba(220, 38, 38, 0.25)",
   borderRadius: 6,
@@ -307,11 +307,11 @@ const errorStyles: React.CSSProperties = {
 const enforcementBannerStyles: React.CSSProperties = {
   marginBottom: 16,
   padding: "12px 14px",
-  font: "500 12px var(--bd-font)",
-  color: "var(--bd-fg-primary)",
-  background: "var(--bd-warning-tint)",
-  border: "1px solid var(--bd-warning-border)",
-  borderLeft: "3px solid var(--bd-warning)",
+  font: "500 12px var(--bk-font-ui)",
+  color: "var(--bk-ink)",
+  background: "var(--bk-warning-tint)",
+  border: "1px solid var(--bk-warning-text)",
+  borderLeft: "3px solid var(--bk-warning)",
   borderRadius: 6,
   lineHeight: 1.5,
 };
@@ -319,10 +319,10 @@ const enforcementBannerStyles: React.CSSProperties = {
 const saveButtonStyles: React.CSSProperties = {
   marginTop: 4,
   padding: "8px 14px",
-  font: "600 12px var(--bd-font)",
-  color: "var(--bd-fg-muted)",
-  background: "var(--bd-bg-sub)",
-  border: "1px solid var(--bd-border-default)",
+  font: "600 12px var(--bk-font-ui)",
+  color: "var(--bk-ink-muted)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 6,
   cursor: "not-allowed",
 };
@@ -330,7 +330,7 @@ const saveButtonStyles: React.CSSProperties = {
 const saveButtonActiveStyles: React.CSSProperties = {
   ...saveButtonStyles,
   color: "#fff",
-  background: "var(--bd-accent)",
-  borderColor: "var(--bd-accent)",
+  background: "var(--bk-accent)",
+  borderColor: "var(--bk-accent)",
   cursor: "pointer",
 };

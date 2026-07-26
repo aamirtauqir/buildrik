@@ -23,9 +23,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--buildrick-space-4);
-  padding: var(--buildrick-space-3) 0;
-  border-top: 1px solid var(--buildrick-border);
+  gap: var(--bk-space-16);
+  padding: var(--bk-space-12) 0;
+  border-top: 1px solid var(--bk-border);
 }
 .bd-toggle-row:first-child,
 .bd-toggle-row--first {
@@ -34,8 +34,8 @@
 }
 
 .bd-toggle-row--inset {
-  padding-left: var(--buildrick-space-4);
-  padding-right: var(--buildrick-space-4);
+  padding-left: var(--bk-space-16);
+  padding-right: var(--bk-space-16);
 }
 
 .bd-toggle-row__meta {
@@ -46,17 +46,17 @@
 }
 
 .bd-toggle-row__name {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-primary);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink);
 }
 
 .bd-toggle-row__desc {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  color: var(--buildrick-text-muted);
-  line-height: var(--buildrick-lh-16);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink-muted);
+  line-height: var(--bk-space-16);
 }
 
 /* Disabled treatment — when the control is aria-checked="false" AND the row
@@ -64,7 +64,7 @@
    its own off-state colour. */
 .bd-toggle-row.is-disabled .bd-toggle-row__name,
 .bd-toggle-row.is-disabled .bd-toggle-row__desc {
-  color: var(--buildrick-text-disabled);
+  color: var(--bk-ink-disabled);
 }
 .bd-toggle-row.is-disabled .bd-switch {
   cursor: not-allowed;

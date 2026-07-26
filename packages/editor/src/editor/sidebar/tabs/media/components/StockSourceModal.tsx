@@ -29,9 +29,9 @@ interface StockSourceModalProps extends DiscoveryViewProps {
 
 const COLORS: Array<{ id: DiscColor; hex?: string; label: string }> = [
   { id: "all", label: "All Colors" },
-  { id: "black_and_white", label: "B&W", hex: "linear-gradient(45deg, #000 50%, var(--buildrick-bg-card) 50%)" },
+  { id: "black_and_white", label: "B&W", hex: "linear-gradient(45deg, #000 50%, var(--bk-bg-card) 50%)" },
   { id: "black", hex: "#000000", label: "Black" },
-  { id: "white", hex: "var(--bd-bg-card)", label: "White" },
+  { id: "white", hex: "var(--bk-bg-card)", label: "White" },
   { id: "red", hex: "#ef4444", label: "Red" },
   { id: "orange", hex: "#f97316", label: "Orange" },
   { id: "yellow", hex: "#eab308", label: "Yellow" },
@@ -103,7 +103,7 @@ export function StockSourceModal({
             style={{
               margin: "12px 20px 0",
               padding: "8px 12px",
-              background: "var(--bd-cobalt-tint)",
+              background: "var(--bk-ink-muted)",
               borderRadius: 4,
               display: "flex",
               alignItems: "center",
@@ -118,7 +118,7 @@ export function StockSourceModal({
             {quota.upgradeHref && (
               <a
                 href={quota.upgradeHref}
-                style={{ color: "var(--bd-accent)", fontWeight: 500, textDecoration: "none" }}
+                style={{ color: "var(--bk-accent)", fontWeight: 500, textDecoration: "none" }}
               >
                 Upgrade for unlimited →
               </a>
@@ -156,7 +156,7 @@ export function StockSourceModal({
               role="radiogroup"
               aria-label="Stock source"
               data-testid="stock-source-pills"
-              style={{ display: "flex", gap: 2, padding: 2, background: "var(--bd-bg-subtle)", borderRadius: 6 }}
+              style={{ display: "flex", gap: 2, padding: 2, background: "var(--bk-bg-subtle)", borderRadius: 6 }}
             >
               {SOURCES.map((s) => {
                 const active = source === s.id;
@@ -176,8 +176,8 @@ export function StockSourceModal({
                       borderRadius: 4,
                       fontSize: 12,
                       fontWeight: active ? 600 : 500,
-                      color: active ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
-                      background: active ? "var(--bd-accent)" : "transparent",
+                      color: active ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
+                      background: active ? "var(--bk-accent)" : "transparent",
                     }}
                   >
                     {s.label}
@@ -210,7 +210,7 @@ export function StockSourceModal({
                   onClick={() => onSetColor(c.id)}
                   title={c.label}
                   className={`stock-color-dot${color === c.id ? " active" : ""}`}
-                  style={{ background: c.hex || "var(--bd-bg-subtle)" }}
+                  style={{ background: c.hex || "var(--bk-bg-subtle)" }}
                 >
                   {c.id === "all" && "\u00d7"}
                 </Button>
@@ -328,7 +328,7 @@ export function StockSourceModal({
                       style={{ padding: 8 }}
                     >
                       <img src={ico.svgDataUrl} alt={ico.name} style={{ width: 24, height: 24 }} />
-                      <span style={{ fontSize: 10, color: "var(--bd-fg-disabled)", marginTop: 4 }}>{ico.name}</span>
+                      <span style={{ fontSize: 10, color: "var(--bk-ink-disabled)", marginTop: 4 }}>{ico.name}</span>
                     </div>
                   ))}
                 </div>

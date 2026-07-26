@@ -92,14 +92,14 @@ class StudioErrorBoundary extends React.Component<
         <Stack
           style={{
             padding: 24,
-            color: "var(--buildrick-text-primary)",
-            background: "var(--buildrick-bg-panel)",
+            color: "var(--bk-ink)",
+            background: "var(--bk-bg-panel)",
             height: "100vh",
           }}
         >
           <h2 style={{ margin: 0 }}>Something went wrong</h2>
-          <div style={{ color: "var(--buildrick-error)" }}>{this.state.message}</div>
-          <div style={{ fontSize: 13, color: "var(--buildrick-text-secondary)" }}>
+          <div style={{ color: "var(--bk-error)" }}>{this.state.message}</div>
+          <div style={{ fontSize: 13, color: "var(--bk-ink-soft)" }}>
             Please reload the editor.
           </div>
           <Button
@@ -107,10 +107,10 @@ class StudioErrorBoundary extends React.Component<
             style={{
               alignSelf: "flex-start",
               padding: "8px 14px",
-              background: "var(--buildrick-accent)",
+              background: "var(--bk-accent)",
               border: "none",
               borderRadius: 6,
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bk-accent-on)",
               fontWeight: 600,
               cursor: "pointer",
             }}
@@ -329,9 +329,9 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       style={{
         gap: 0,
         height: "100%",
-        background: "var(--buildrick-bg-app, var(--bd-bg-panel))",
-        color: "var(--buildrick-text-primary)",
-        fontFamily: "var(--buildrick-font-family)",
+        background: "var(--bk-bg-app, var(--bk-bg-panel))",
+        color: "var(--bk-ink)",
+        fontFamily: "var(--bk-font-ui)",
         position: "relative",
         ...style,
       }}
@@ -461,8 +461,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             bottom: 0,
             width: 360,
             zIndex: 45,
-            background: "var(--bd-surface)",
-            borderLeft: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-panel)",
+            borderLeft: "1px solid var(--bk-border)",
           }}
         >
           <IssuesPanel

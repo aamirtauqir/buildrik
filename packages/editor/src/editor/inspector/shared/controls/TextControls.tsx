@@ -84,8 +84,8 @@ export interface SectionLabelProps {
 export const SectionLabel: React.FC<SectionLabelProps> = ({ children, style }) => (
   <label
     style={{
-      font: "500 11px var(--bd-font)",
-      color: "var(--bd-fg-secondary)",
+      font: "500 11px var(--bk-font-ui)",
+      color: "var(--bk-ink-soft)",
       display: "block",
       marginBottom: 4,
       ...style,

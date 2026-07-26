@@ -16,15 +16,15 @@
 .bd-search {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
-  padding: 0 var(--buildrick-space-3);
+  gap: var(--bk-space-8);
+  padding: 0 var(--bk-space-12);
   height: 32px;
-  background: var(--buildrick-bg-input);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-sm);
-  color: var(--buildrick-text-muted);
-  transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border-medium);
+  border-radius: var(--bk-radius-sm);
+  color: var(--bk-ink-muted);
+  transition: border-color var(--bk-motion-fast) var(--bk-ease-default),
+              background-color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* ---- Leading magnifier icon ---- */
@@ -32,7 +32,7 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -50,14 +50,14 @@
   border: none;
   outline: none;
   background: transparent;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-normal);
-  color: var(--buildrick-text-primary);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-regular);
+  color: var(--bk-ink);
   /* inputs inherit font-family by default in some UAs but not all — set it explicitly */
 }
 .bd-search__input::placeholder {
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
 }
 .bd-search__input:disabled {
   cursor: not-allowed;
@@ -85,21 +85,21 @@
 
 /* ---- States (a11y baseline) ---- */
 .bd-search:hover {
-  border-color: var(--buildrick-border-strong);
+  border-color: var(--bk-border-strong);
 }
 .bd-search:focus-within {
-  border-color: var(--buildrick-accent);
-  box-shadow: var(--buildrick-glow-primary);
+  border-color: var(--bk-accent);
+  box-shadow: var(--bk-shadow-focus);
 }
 .bd-search:focus-within .bd-search__icon {
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
 }
 
 .bd-search--error {
-  border-color: var(--buildrick-error);
+  border-color: var(--bk-error);
 }
 .bd-search--error:focus-within {
-  border-color: var(--buildrick-error);
+  border-color: var(--bk-error);
   box-shadow: none;
 }
 
@@ -115,9 +115,9 @@
  */
 .bd-search--sm {
   height: 28px;
-  padding: 0 var(--buildrick-space-2);
-  gap: var(--buildrick-space-1);
-  background: var(--buildrick-bg-subtle);
+  padding: 0 var(--bk-space-8);
+  gap: var(--bk-space-4);
+  background: var(--bk-bg-subtle);
   border-color: transparent;
 }
 .bd-search--sm .bd-search__icon {
@@ -125,19 +125,19 @@
   height: 14px;
 }
 .bd-search--sm .bd-search__input {
-  font-size: var(--buildrick-text-sm);
+  font-size: var(--bk-text-12);
 }
 
 .bd-search--lg {
   height: 40px;
-  padding: 0 var(--buildrick-space-4);
+  padding: 0 var(--bk-space-16);
 }
 .bd-search--lg .bd-search__icon {
   width: 18px;
   height: 18px;
 }
 .bd-search--lg .bd-search__input {
-  font-size: var(--buildrick-text-sm-plus);
+  font-size: var(--bk-text-13);
 }
 
 /* ---- Reduced motion ---- */

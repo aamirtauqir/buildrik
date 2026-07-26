@@ -187,13 +187,13 @@ const lockedIconStyle: React.CSSProperties = {
   marginBottom: 4,
 };
 const lockedTitleStyle: React.CSSProperties = {
-  font: "600 14px var(--bd-font)",
-  color: "var(--bd-fg-heading)",
+  font: "600 14px var(--bk-font-ui)",
+  color: "var(--bk-ink)",
   margin: 0,
 };
 const lockedDescStyle: React.CSSProperties = {
-  font: "500 12px var(--bd-font)",
-  color: "var(--bd-fg-muted)",
+  font: "500 12px var(--bk-font-ui)",
+  color: "var(--bk-ink-muted)",
   maxWidth: LOCKED_MAX_WIDTH,
   lineHeight: 1.5,
   margin: 0,
@@ -201,11 +201,11 @@ const lockedDescStyle: React.CSSProperties = {
 const lockedBtnStyle: React.CSSProperties = {
   marginTop: 8,
   padding: "8px 16px",
-  borderRadius: "var(--buildrick-radius-sm)",
-  background: "var(--bd-accent)",
-  color: "var(--bd-fg-on-accent)",
+  borderRadius: "var(--bk-radius-sm)",
+  background: "var(--bk-accent)",
+  color: "var(--bk-accent-on)",
   border: "none",
-  font: "600 12px var(--bd-font)",
+  font: "600 12px var(--bk-font-ui)",
   cursor: "pointer",
 };
 

@@ -28,7 +28,7 @@ const TIER_ORDER: Array<{ tier: ComponentTier; label: string }> = [
 const sectionHeaderStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 500,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
   margin: "12px 0 6px",
   textTransform: "uppercase",
   letterSpacing: "0.04em",
@@ -42,7 +42,7 @@ const tierGridStyle: React.CSSProperties = {
 
 const emptyTierStyle: React.CSSProperties = {
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   padding: "4px 0",
 };
 

@@ -49,20 +49,20 @@ function relTime(iso: string | Date): string {
 
 const S: Record<string, React.CSSProperties> = {
   wrap: { position: "relative" },
-  bellBtn: { position: "relative", width: 32, height: 32, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "none", background: "transparent", cursor: "pointer", color: "var(--bd-text-muted)" },
-  badge: { position: "absolute", top: 2, right: 2, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 8, background: "var(--bd-accent)", color: "#fff", fontSize: 10, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", lineHeight: 1 },
-  panel: { position: "absolute", right: 0, top: "calc(100% + 6px)", zIndex: 40, width: 360, maxHeight: 440, overflowY: "auto", background: "var(--bd-surface)", border: "1px solid var(--bd-border)", borderRadius: 10 },
-  head: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderBottom: "1px solid var(--bd-border)", position: "sticky", top: 0, background: "var(--bd-surface)" },
-  headTitle: { fontSize: 13, fontWeight: 600, color: "var(--bd-text)" },
-  row: { display: "flex", gap: 8, padding: "10px 12px", borderBottom: "1px solid var(--bd-border)", cursor: "pointer", alignItems: "flex-start", background: "transparent", border: "none", width: "100%", textAlign: "left" },
-  rowUnread: { background: "var(--bd-accent-subtle)" },
-  dot: { width: 8, height: 8, borderRadius: 4, background: "var(--bd-accent)", marginTop: 5, flexShrink: 0 },
+  bellBtn: { position: "relative", width: 32, height: 32, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 8, border: "none", background: "transparent", cursor: "pointer", color: "var(--bk-ink-muted)" },
+  badge: { position: "absolute", top: 2, right: 2, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 8, background: "var(--bk-accent)", color: "#fff", fontSize: 10, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center", lineHeight: 1 },
+  panel: { position: "absolute", right: 0, top: "calc(100% + 6px)", zIndex: 40, width: 360, maxHeight: 440, overflowY: "auto", background: "var(--bk-bg-panel)", border: "1px solid var(--bk-border)", borderRadius: 10 },
+  head: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", borderBottom: "1px solid var(--bk-border)", position: "sticky", top: 0, background: "var(--bk-bg-panel)" },
+  headTitle: { fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" },
+  row: { display: "flex", gap: 8, padding: "10px 12px", borderBottom: "1px solid var(--bk-border)", cursor: "pointer", alignItems: "flex-start", background: "transparent", border: "none", width: "100%", textAlign: "left" },
+  rowUnread: { background: "var(--bk-accent-subtle)" },
+  dot: { width: 8, height: 8, borderRadius: 4, background: "var(--bk-accent)", marginTop: 5, flexShrink: 0 },
   dotSpacer: { width: 8, flexShrink: 0 },
   rowBody: { display: "flex", flexDirection: "column", gap: 2, minWidth: 0 },
-  rowText: { fontSize: 13, color: "var(--bd-text)", lineHeight: 1.4 },
-  rowMeta: { fontSize: 11, color: "var(--bd-text-muted)" },
-  center: { display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 13, fontWeight: 600, color: "var(--bd-text)" },
+  rowText: { fontSize: 13, color: "var(--bk-ink)", lineHeight: 1.4 },
+  rowMeta: { fontSize: 11, color: "var(--bk-ink-muted)" },
+  center: { display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bk-ink-muted)" },
+  centerTitle: { fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" },
 };
 
 export const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
@@ -179,7 +179,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }
               <span style={S.rowBody}>
                 <span style={S.rowText}>{n.actorName ? `${n.actorName} ` : ""}{n.message}</span>
                 {!jumpable && (
-                  <span style={{ ...S.rowMeta, color: "var(--bd-warn-strong)" }}>
+                  <span style={{ ...S.rowMeta, color: "var(--bk-warning-text)" }}>
                     The target is gone — the note is kept, but there&rsquo;s nothing to jump to.
                   </span>
                 )}

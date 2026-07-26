@@ -127,11 +127,11 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby="ai-prompt-title">
-        <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bd-border)" }}>
+        <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bk-border)" }}>
           <ModalTitle id="ai-prompt-title" style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em" }}>
             Generate component with AI
           </ModalTitle>
-          <ModalDescription style={{ fontSize: 13, color: "var(--bd-text-muted)", marginTop: 4 }}>
+          <ModalDescription style={{ fontSize: 13, color: "var(--bk-ink-muted)", marginTop: 4 }}>
             Describe what you want. The AI returns a structured schema bound to your design system.
           </ModalDescription>
         </div>
@@ -148,17 +148,17 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
               width: "100%",
               padding: 10,
               borderRadius: 6,
-              border: "1px solid var(--bd-border)",
+              border: "1px solid var(--bk-border)",
               fontFamily: "inherit",
               fontSize: 13,
               resize: "vertical",
-              background: isGenerating ? "var(--bd-bg-subtle)" : "var(--bd-surface)",
-              color: "var(--bd-text)",
+              background: isGenerating ? "var(--bk-bg-subtle)" : "var(--bk-bg-panel)",
+              color: "var(--bk-ink)",
             }}
           />
 
           {isGenerating && (
-            <div role="status" aria-live="polite" style={{ fontSize: 12, color: "var(--bd-text-muted)" }}>
+            <div role="status" aria-live="polite" style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
               Generating schema…
             </div>
           )}
@@ -166,9 +166,9 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
           {errorMessage && (
             <div role="alert" style={{
               fontSize: 12,
-              color: "var(--bd-warn-strong)",
-              background: "var(--bd-warn-soft)",
-              border: "1px solid var(--bd-warn-border)",
+              color: "var(--bk-warning-text)",
+              background: "var(--bk-warning-tint)",
+              border: "1px solid var(--bk-warning-text)",
               borderRadius: 6,
               padding: "8px 10px",
             }}>
@@ -179,22 +179,22 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
           {showSuccess && state.kind === "success" && (
             <div data-testid="ai-prompt-schema-preview" style={{
               fontSize: 11,
-              fontFamily: "var(--bd-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
-              background: "var(--bd-bg-subtle)",
-              border: "1px solid var(--bd-border)",
+              fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+              background: "var(--bk-bg-subtle)",
+              border: "1px solid var(--bk-border)",
               borderRadius: 6,
               padding: 12,
               maxHeight: 220,
               overflow: "auto",
               whiteSpace: "pre-wrap",
-              color: "var(--bd-text)",
+              color: "var(--bk-ink)",
             }}>
               {JSON.stringify(state.schema, null, 2)}
             </div>
           )}
         </div>
 
-        <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bd-border)" }}>
+        <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bk-border)" }}>
           {state.kind === "idle" && (
             <>
               <Button variant="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>

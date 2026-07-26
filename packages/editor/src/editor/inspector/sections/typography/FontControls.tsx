@@ -81,10 +81,10 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
         style={{
           padding: "2px 4px",
-          background: "var(--buildrick-accent-subtle)",
-          border: `1px solid ${"var(--buildrick-accent)"}`,
+          background: "var(--bk-accent-subtle)",
+          border: `1px solid ${"var(--bk-accent)"}`,
           borderRadius: 4,
-          color: "var(--buildrick-accent)",
+          color: "var(--bk-accent)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -117,7 +117,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
             padding: 2,
             background: "none",
             border: "none",
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",

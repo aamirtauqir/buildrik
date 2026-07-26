@@ -63,9 +63,9 @@ const PresetChip: React.FC<{
       padding: "4px 10px",
       borderRadius: 20,
       border: "1px solid",
-      borderColor: isActive ? "var(--bd-accent)" : "var(--bd-border)",
+      borderColor: isActive ? "var(--bk-accent)" : "var(--bk-border)",
       background: isActive ? "rgba(45, 109, 255, 0.15)" : "transparent",
-      color: isActive ? "var(--bd-accent)" : "var(--bd-fg-muted)",
+      color: isActive ? "var(--bk-accent)" : "var(--bk-ink-muted)",
       fontSize: 11,
       fontWeight: isActive ? 600 : 500,
       cursor: "pointer",
@@ -100,10 +100,10 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
         position: "relative",
         padding: "5px 12px",
         borderRadius: 5,
-        background: isActive ? "var(--bd-accent-tint, rgba(45,109,255,0.10))" : "var(--bd-bg-subtle)",
-        color: isActive ? "var(--bd-accent)" : "var(--bd-fg-primary)",
-        border: isActive ? "1px solid var(--bd-accent)" : "1px solid transparent",
-        font: "500 11px var(--buildrick-font-family-mono, ui-monospace, monospace)",
+        background: isActive ? "var(--bk-accent-tint, rgba(45,109,255,0.10))" : "var(--bk-bg-subtle)",
+        color: isActive ? "var(--bk-accent)" : "var(--bk-ink)",
+        border: isActive ? "1px solid var(--bk-accent)" : "1px solid transparent",
+        font: "500 11px var(--bk-font-mono, ui-monospace, monospace)",
         cursor: "pointer",
         outline: "none",
       }}
@@ -118,8 +118,8 @@ const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick
             right: -2,
             width: 6,
             height: 6,
-            borderRadius: "var(--bd-radius-full)",
-            background: "var(--bd-warning)",
+            borderRadius: "var(--bk-radius-full)",
+            background: "var(--bk-warning)",
           }}
         />
       )}
@@ -152,8 +152,8 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
       style={{
         marginTop: 8,
         padding: 10,
-        background: "var(--bd-bg-subtle)",
-        border: "1px solid var(--bd-border)",
+        background: "var(--bk-bg-subtle)",
+        border: "1px solid var(--bk-border)",
         borderRadius: 8,
         display: "flex",
         alignItems: "center",
@@ -162,8 +162,8 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
     >
       <span
         style={{
-          font: "500 11px var(--buildrick-font-family-mono, ui-monospace, monospace)",
-          color: "var(--bd-fg-primary)",
+          font: "500 11px var(--bk-font-mono, ui-monospace, monospace)",
+          color: "var(--bk-ink)",
           flex: 1,
         }}
       >
@@ -181,19 +181,19 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
         style={{
           width: 60,
           padding: "4px 6px",
-          background: "var(--bd-surface-1)",
-          border: "1px solid var(--bd-border)",
+          background: "var(--bk-bg-card)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 4,
-          color: "var(--bd-fg-primary)",
-          font: "500 11px var(--buildrick-font-family-mono, ui-monospace, monospace)",
+          color: "var(--bk-ink)",
+          font: "500 11px var(--bk-font-mono, ui-monospace, monospace)",
           textAlign: "right",
         }}
       />
-      <span style={{ fontSize: 11, color: "var(--bd-fg-muted)" }}>px</span>
+      <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>px</span>
       {num === 0 && (
         <span
           title="Zero spacing will collapse layout gaps"
-          style={{ color: "var(--bd-warning)", fontSize: 12 }}
+          style={{ color: "var(--bk-warning)", fontSize: 12 }}
           aria-label="zero-spacing warning"
         >
           ⚠
@@ -207,7 +207,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
           onClick={() => onUndo(token.id)}
           title="Undo"
           aria-label={`Undo change to ${token.name}`}
-          style={iconBtnStyle("var(--bd-warning)")}
+          style={iconBtnStyle("var(--bk-warning)")}
         >
           ↩
         </Button>
@@ -220,7 +220,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
           onClick={() => onRedo(token.id)}
           title="Redo"
           aria-label={`Redo change to ${token.name}`}
-          style={iconBtnStyle("var(--bd-accent)")}
+          style={iconBtnStyle("var(--bk-accent)")}
         >
           ↪
         </Button>
@@ -236,7 +236,7 @@ const EditDrawer: React.FC<EditDrawerProps> = ({
           border: "none",
           padding: 4,
           cursor: "pointer",
-          color: "var(--bd-fg-muted)",
+          color: "var(--bk-ink-muted)",
           fontSize: 13,
         }}
       >
@@ -303,9 +303,9 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           style={{
             padding: "4px 10px",
             background: "transparent",
-            border: "1px solid var(--bd-border)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 20,
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             fontSize: 11,
             cursor: "pointer",
             marginLeft: "auto",
@@ -349,19 +349,19 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
       >
         <span
           style={{
-            font: "600 10px var(--buildrick-font-family-mono, ui-monospace, monospace)",
-            color: "var(--bd-fg-muted)",
+            font: "600 10px var(--bk-font-mono, ui-monospace, monospace)",
+            color: "var(--bk-ink-muted)",
             textTransform: "uppercase",
             letterSpacing: "0.08em",
           }}
         >
           Scale
         </span>
-        <div style={{ flex: 1, height: 1, background: "var(--bd-border)" }} />
+        <div style={{ flex: 1, height: 1, background: "var(--bk-border)" }} />
         <span
           style={{
-            font: "500 10px var(--buildrick-font-family-mono, ui-monospace, monospace)",
-            color: "var(--bd-fg-secondary)",
+            font: "500 10px var(--bk-font-mono, ui-monospace, monospace)",
+            color: "var(--bk-ink-soft)",
           }}
         >
           4-pt grid

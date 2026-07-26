@@ -54,20 +54,20 @@ const headerRowStyle: React.CSSProperties = {
 const headerTitleStyle: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const headerSubtitleStyle: React.CSSProperties = {
   padding: "0 12px 10px",
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const openPanelButtonStyle: React.CSSProperties = {
   padding: "4px 10px",
-  background: "var(--bd-accent)",
+  background: "var(--bk-accent)",
   color: "#fff",
-  border: "1px solid var(--bd-accent)",
+  border: "1px solid var(--bk-accent)",
   borderRadius: 6,
   fontSize: 11,
   fontWeight: 500,
@@ -85,9 +85,9 @@ const cardStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   padding: 8,
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 8,
-  background: "var(--bd-bg-elevated, var(--bd-bg))",
+  background: "var(--bk-bg-card, var(--bk-bg-app))",
   minHeight: 116,
 };
 
@@ -98,21 +98,21 @@ const previewBoxStyle: React.CSSProperties = {
   height: 44,
   marginBottom: 6,
   borderRadius: 4,
-  background: "var(--bd-bg-subtle)",
+  background: "var(--bk-bg-subtle)",
   fontSize: 10,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const cardNameStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 600,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   marginBottom: 2,
 };
 
 const cardMetaStyle: React.CSSProperties = {
   fontSize: 10,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   lineHeight: 1.4,
 };
 
@@ -127,20 +127,20 @@ const aiRowStyle: React.CSSProperties = {
 const aiCtaTextStyle: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 500,
-  color: "var(--bd-accent)",
+  color: "var(--bk-accent)",
 };
 
 const aiDescStyle: React.CSSProperties = {
   padding: "0 12px 12px",
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const aiButtonStyle: React.CSSProperties = {
   padding: "4px 10px",
   background: "transparent",
-  color: "var(--bd-accent)",
-  border: "1px solid var(--bd-accent)",
+  color: "var(--bk-accent)",
+  border: "1px solid var(--bk-accent)",
   borderRadius: 6,
   fontSize: 11,
   fontWeight: 500,
@@ -151,7 +151,7 @@ const savedHeaderStyle: React.CSSProperties = {
   padding: "8px 12px 6px",
   fontSize: 11,
   fontWeight: 600,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
   textTransform: "uppercase",
   letterSpacing: "0.04em",
 };
@@ -159,21 +159,21 @@ const savedHeaderStyle: React.CSSProperties = {
 const emptySavedStyle: React.CSSProperties = {
   margin: "0 12px 16px",
   padding: "12px",
-  border: "1px dashed var(--bd-border)",
+  border: "1px dashed var(--bk-border)",
   borderRadius: 8,
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   textAlign: "center",
 };
 
 const footerCalloutStyle: React.CSSProperties = {
   margin: "16px 12px 16px",
   padding: "10px 12px",
-  background: "var(--bd-info-bg, rgba(45,109,255,0.06))",
-  border: "1px solid var(--bd-info-border, rgba(45,109,255,0.16))",
+  background: "var(--bk-accent-tint, rgba(45,109,255,0.06))",
+  border: "1px solid var(--bk-accent-tint, rgba(45,109,255,0.16))",
   borderRadius: 8,
   fontSize: 11,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
   lineHeight: 1.5,
 };
 
@@ -186,8 +186,8 @@ function CatalogPreview({ component }: { component: ComponentType }): React.Reac
         <div
           style={{
             padding: "3px 10px",
-            background: "var(--bd-accent)",
-            color: "var(--bd-fg-on-accent)",
+            background: "var(--bk-accent)",
+            color: "var(--bk-accent-on)",
             borderRadius: 4,
             fontSize: 10,
           }}
@@ -201,8 +201,8 @@ function CatalogPreview({ component }: { component: ComponentType }): React.Reac
           style={{
             width: "70%",
             height: 16,
-            background: "var(--bd-bg)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-app)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 3,
           }}
         />
@@ -213,9 +213,9 @@ function CatalogPreview({ component }: { component: ComponentType }): React.Reac
           style={{
             width: "70%",
             height: 28,
-            border: "1px solid var(--bd-border)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 4,
-            background: "var(--bd-bg)",
+            background: "var(--bk-bg-app)",
           }}
         />
       );
@@ -225,8 +225,8 @@ function CatalogPreview({ component }: { component: ComponentType }): React.Reac
           style={{
             width: "70%",
             height: 28,
-            background: "var(--bd-bg)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-app)",
+            border: "1px solid var(--bk-border)",
             boxShadow: "0 2px 4px rgba(0,0,0,0.08)",
             borderRadius: 4,
           }}
@@ -238,7 +238,7 @@ function CatalogPreview({ component }: { component: ComponentType }): React.Reac
           style={{
             width: "80%",
             height: 22,
-            background: "var(--bd-bg-subtle)",
+            background: "var(--bk-bg-subtle)",
             borderRadius: 3,
           }}
         />
@@ -376,7 +376,7 @@ export const ComponentsSection: React.FC<ComponentsSectionProps> = ({
                 style={cardStyle}
               >
                 <div style={previewBoxStyle}>
-                  <span style={{ fontSize: 10, color: "var(--bd-fg-muted)" }}>
+                  <span style={{ fontSize: 10, color: "var(--bk-ink-muted)" }}>
                     {component.name.slice(0, 4)}
                   </span>
                 </div>

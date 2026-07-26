@@ -135,11 +135,11 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, 
 
               {isBound ? (
                 <>
-                  <Link2 size={10} aria-hidden="true" style={{ color: "var(--bd-accent)", flexShrink: 0 }} />
+                  <Link2 size={10} aria-hidden="true" style={{ color: "var(--bk-accent)", flexShrink: 0 }} />
                   <span
                     className="bdi-hx"
                     style={{
-                      color: "var(--bd-accent)",
+                      color: "var(--bk-accent)",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",

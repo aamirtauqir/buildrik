@@ -126,7 +126,7 @@ export const NumericStepper = forwardRef<HTMLInputElement, NumericStepperProps>(
 
     const wrapperStyle: CSSProperties = {
       ...(error
-        ? { borderColor: "var(--buildrick-error)" }
+        ? { borderColor: "var(--bk-error)" }
         : null),
       ...(disabled
         ? { opacity: 0.5, pointerEvents: "none" }

@@ -8,15 +8,15 @@
 
 .bd-grid {
   display: grid;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
 }
 
 /* Gap variants */
-.bd-grid--xs { gap: var(--buildrick-space-1); }
-.bd-grid--sm { gap: var(--buildrick-space-2); }
-.bd-grid--md { gap: var(--buildrick-space-3); }
-.bd-grid--lg { gap: var(--buildrick-space-4); }
-.bd-grid--xl { gap: var(--buildrick-space-6); }
+.bd-grid--xs { gap: var(--bk-space-4); }
+.bd-grid--sm { gap: var(--bk-space-8); }
+.bd-grid--md { gap: var(--bk-space-12); }
+.bd-grid--lg { gap: var(--bk-space-16); }
+.bd-grid--xl { gap: var(--bk-space-24); }
 
 /* Fixed column counts */
 .bd-grid--cols-2  { grid-template-columns: repeat(2, 1fr); }

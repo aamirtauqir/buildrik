@@ -42,34 +42,34 @@ const rowStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const metaStyle: React.CSSProperties = {
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
-  fontFamily: "var(--bd-font-mono, monospace)",
+  color: "var(--bk-ink-muted)",
+  fontFamily: "var(--bk-font-mono, monospace)",
   marginTop: 2,
 };
 
 const inputStyle: React.CSSProperties = {
   height: 28,
   padding: "0 8px",
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  background: "var(--bd-bg-elevated)",
-  color: "var(--bd-fg-primary)",
+  background: "var(--bk-bg-card)",
+  color: "var(--bk-ink)",
   fontSize: 12,
-  fontFamily: "var(--bd-font-mono, monospace)",
+  fontFamily: "var(--bk-font-mono, monospace)",
 };
 
 const restoreButtonStyle: React.CSSProperties = {
   height: 28,
   padding: "0 8px",
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   background: "transparent",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   fontSize: 11,
   cursor: "pointer",
 };
@@ -77,7 +77,7 @@ const restoreButtonStyle: React.CSSProperties = {
 const emptyStyle: React.CSSProperties = {
   padding: "16px 0",
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   textAlign: "center",
 };
 
@@ -87,7 +87,7 @@ const emptyStyle: React.CSSProperties = {
 // usage chip. Auto-fix + Ignore buttons move to T8 detail view per D7.
 const lintRowContainerStyle: React.CSSProperties = {
   background: "rgba(245, 158, 11, 0.08)",
-  borderLeft: "3px solid var(--buildrick-warning-strong)",
+  borderLeft: "3px solid var(--bk-warning-text)",
   borderRadius: 4,
   // Inner row already has its own grid padding — outer wrapper pads by 3px
   // less on the left so total visual padding stays constant.
@@ -102,7 +102,7 @@ const lintRowContainerStyle: React.CSSProperties = {
 const lintDescStyle: React.CSSProperties = {
   fontSize: 11,
   fontStyle: "italic",
-  color: "var(--buildrick-warning-strong)",
+  color: "var(--bk-warning-text)",
   marginTop: 4,
 };
 
@@ -112,7 +112,7 @@ const lintTagStyle: React.CSSProperties = {
   padding: "1px 6px",
   borderRadius: 4,
   background: "rgba(245, 158, 11, 0.18)",
-  color: "var(--buildrick-warning-strong)",
+  color: "var(--bk-warning-text)",
 };
 
 export const GenericTokenList: React.FC<GenericTokenListProps> = ({
@@ -178,7 +178,7 @@ export const GenericTokenList: React.FC<GenericTokenListProps> = ({
                 onChange={(e) => onTokenChange(t.id, e.target.value)}
                 style={{
                   ...inputStyle,
-                  borderColor: isDirty ? "var(--bd-warning)" : "var(--bd-border)",
+                  borderColor: isDirty ? "var(--bk-warning)" : "var(--bk-border)",
                 }}
                 aria-label={`${friendly} value`}
               />

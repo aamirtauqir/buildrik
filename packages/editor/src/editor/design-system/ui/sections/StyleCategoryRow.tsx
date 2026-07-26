@@ -56,19 +56,19 @@ export const StyleCategoryRow: React.FC<StyleCategoryRowProps> = ({
         width: "100%",
         padding: "8px 12px",
         paddingLeft: isActive ? 10 : 12,
-        background: isActive ? "var(--bd-bg-subtle)" : "transparent",
+        background: isActive ? "var(--bk-bg-subtle)" : "transparent",
         borderTop: "none",
         borderRight: "none",
         borderBottom: "none",
         borderLeft: isActive
-          ? "2px solid var(--bd-accent)"
+          ? "2px solid var(--bk-accent)"
           : "2px solid transparent",
         borderRadius: 4,
         cursor: enabled ? "pointer" : "not-allowed",
         opacity: enabled ? 1 : 0.4,
         textAlign: "left",
         fontSize: 12.5,
-        color: isActive ? "var(--bd-accent)" : "var(--bd-fg-primary)",
+        color: isActive ? "var(--bk-accent)" : "var(--bk-ink)",
         fontWeight: isActive ? 600 : 500,
       }}
     >

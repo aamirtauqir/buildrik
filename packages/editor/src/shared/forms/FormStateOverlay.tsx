@@ -131,7 +131,7 @@ const overlayStyles: React.CSSProperties = {
 };
 
 const cardStyles: React.CSSProperties = {
-  background: "var(--buildrick-surface, #fff)",
+  background: "var(--bk-bg-panel, #fff)",
   borderRadius: "12px",
   padding: "32px",
   maxWidth: "400px",
@@ -155,7 +155,7 @@ const titleStyles: React.CSSProperties = {
 const messageStyles: React.CSSProperties = {
   margin: "0 0 16px 0",
   fontSize: "14px",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const errorListStyles: React.CSSProperties = {
@@ -167,7 +167,7 @@ const errorListStyles: React.CSSProperties = {
 
 const errorItemStyles: React.CSSProperties = {
   fontSize: "13px",
-  color: "var(--buildrick-error)",
+  color: "var(--bk-error)",
   padding: "8px 12px",
   background: "rgba(239, 68, 68, 0.1)",
   borderRadius: "6px",

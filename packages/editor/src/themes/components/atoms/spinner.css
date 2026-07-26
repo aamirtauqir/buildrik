@@ -7,9 +7,9 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid var(--buildrick-ink-12);
-  border-right-color: var(--buildrick-ink-48);
-  border-radius: var(--buildrick-radius-circle);
+  border: 2px solid var(--bk-alpha-ink-12);
+  border-right-color: var(--bk-alpha-ink-50);
+  border-radius: var(--bk-radius-full);
   animation: bd-spin 800ms linear infinite;
 }
 .bd-spinner--sm { width: 10px; height: 10px; border-width: 1.5px; }
@@ -20,7 +20,7 @@
   display: inline-block;
   width: 8px;
   height: 8px;
-  border-radius: var(--buildrick-radius-circle);
+  border-radius: var(--bk-radius-full);
   background: currentColor;
 }
 .bd-status-dot--pulse {
@@ -30,7 +30,7 @@
   content: "";
   position: absolute;
   inset: -4px;
-  border-radius: var(--buildrick-radius-circle);
+  border-radius: var(--bk-radius-full);
   border: 2px solid currentColor;
   opacity: 0;
   animation: bd-pulse 1.4s infinite;

@@ -25,10 +25,10 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
     <Stack gap="lg" style={{ gap: 18 }}>
       {/* Visibility */}
       <Stack gap="sm">
-        <div style={{ font: "600 11px var(--bd-font)", color: "var(--bd-fg-heading)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+        <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Visibility
         </div>
-        <div style={{ display: "inline-flex", padding: 2, background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)", borderRadius: 4 }} role="radiogroup" aria-label="Page visibility">
+        <div style={{ display: "inline-flex", padding: 2, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4 }} role="radiogroup" aria-label="Page visibility">
           {(["live", "hidden", "password"] as const).map((v) => (
             <Button
               key={v}
@@ -41,13 +41,13 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
                 flex: 1,
                 padding: "5px 14px",
                 border: 0,
-                background: s.visibility === v ? "var(--bd-bg-card)" : "transparent",
-                color: s.visibility === v ? "var(--bd-fg-heading)" : "var(--bd-fg-secondary)",
-                font: "500 11.5px var(--bd-font)",
+                background: s.visibility === v ? "var(--bk-bg-card)" : "transparent",
+                color: s.visibility === v ? "var(--bk-ink)" : "var(--bk-ink-soft)",
+                font: "500 11.5px var(--bk-font-ui)",
                 cursor: "pointer",
                 borderRadius: 3,
                 transition: "background 100ms, color 100ms",
-                boxShadow: s.visibility === v ? "var(--bd-shadow-xs)" : "none",
+                boxShadow: s.visibility === v ? "var(--bk-shadow-drag)" : "none",
               }}
               onClick={() => s.setVisibility(v)}
             >
@@ -63,7 +63,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       </Stack>
       {/* Password input — only when visibility=password */}
       {s.visibility === "password" && (
-        <div style={{ padding: 10, background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)", borderRadius: 4, display: "flex", flexDirection: "column", gap: "var(--bd-space-2)" }}>
+        <div style={{ padding: 10, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4, display: "flex", flexDirection: "column", gap: "var(--bk-space-8)" }}>
           <Cluster align="center" gap="xs">
             <Input
               type={s.showPassword ? "text" : "password"}
@@ -85,7 +85,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       )}
       {/* Indexing */}
       <Stack gap="sm">
-        <div style={{ font: "600 11px var(--bd-font)", color: "var(--bd-fg-heading)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+        <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Search Engine Indexing
         </div>
         <ToggleRow label="Allow indexing" helper="Let search engines list this page in results.">
@@ -97,7 +97,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       </Stack>
       {/* Head code */}
       <Stack gap="sm">
-        <div style={{ font: "600 11px var(--bd-font)", color: "var(--bd-fg-heading)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+        <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Custom &lt;head&gt; code
         </div>
         <Textarea
@@ -107,7 +107,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           rows={6}
           spellCheck={false}
           aria-label="Custom head code"
-          style={{ minHeight: 100, fontFamily: "var(--bd-mono)", fontSize: "11.5px", lineHeight: 1.4 }}
+          style={{ minHeight: 100, fontFamily: "var(--bk-font-mono)", fontSize: "11.5px", lineHeight: 1.4 }}
         />
         {s.headCodeError && <HelperText tone="error">{s.headCodeError}</HelperText>}
         <HelperText>Injected into the &lt;head&gt; of this page only. Sanitized before save.</HelperText>

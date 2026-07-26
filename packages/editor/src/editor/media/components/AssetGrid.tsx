@@ -180,7 +180,7 @@ export function AssetGrid({
                     >
                       <div
                         className="mgr-folder-dot"
-                        style={{ background: "var(--buildrick-warning)" }}
+                        style={{ background: "var(--bk-warning)" }}
                       />
                       {folder.name}
                     </Button>
@@ -298,7 +298,7 @@ export function AssetGrid({
                   style={{
                     fontSize: viewMode === "list" ? 18 : 32,
                     fontWeight: 700,
-                    color: "var(--buildrick-text-primary)",
+                    color: "var(--bk-ink)",
                   }}
                 >
                   Aa

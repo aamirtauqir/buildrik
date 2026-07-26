@@ -70,7 +70,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
         alignItems: "center",
         gap: 12,
         padding: 12,
-        background: "var(--buildrick-bg-panel-secondary)",
+        background: "var(--bk-bg-subtle)",
         borderRadius: 8,
         transition: "background 0.2s",
       }}
@@ -81,7 +81,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
           width: 60,
           height: 45,
           borderRadius: 6,
-          background: "var(--buildrick-bg-dark)",
+          background: "var(--bk-gray-900)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -118,7 +118,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
             <div
               style={{
                 fontSize: 12,
-                color: "var(--buildrick-text-muted)",
+                color: "var(--bk-ink-muted)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -225,7 +225,7 @@ export const MyTemplates: React.FC<MyTemplatesProps> = ({
         style={{
           padding: 40,
           textAlign: "center",
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bk-ink-muted)",
         }}
       >
         <div style={{ fontSize: 48, marginBottom: 16 }}>📁</div>
@@ -248,7 +248,7 @@ export const MyTemplates: React.FC<MyTemplatesProps> = ({
       {/* Count */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <SemanticBadge variant="default">{templates.length}</SemanticBadge>
-        <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
           saved template{templates.length !== 1 ? "s" : ""}
         </span>
       </div>

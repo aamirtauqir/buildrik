@@ -34,14 +34,14 @@
 .bd-uploader {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-3);
-  padding: var(--buildrick-space-4);
-  background: var(--buildrick-bg-card);
-  border: 2px dashed var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-md);
-  color: var(--buildrick-text-primary);
-  transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  gap: var(--bk-space-12);
+  padding: var(--bk-space-16);
+  background: var(--bk-bg-card);
+  border: 2px dashed var(--bk-border-medium);
+  border-radius: var(--bk-radius-lg);
+  color: var(--bk-ink);
+  transition: border-color var(--bk-motion-fast) var(--bk-ease-default),
+              background-color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* ---- Thumb slot ---- */
@@ -49,13 +49,13 @@
   width: 64px;
   height: 64px;
   flex-shrink: 0;
-  border-radius: var(--buildrick-radius-sm);
-  background: var(--buildrick-bg-subtle);
-  border: 1px solid var(--buildrick-border);
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-subtle);
+  border: 1px solid var(--bk-border);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   overflow: hidden;
 }
 .bd-uploader__thumb > img,
@@ -70,61 +70,61 @@
 .bd-uploader__meta {
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-space-1);
+  gap: var(--bk-space-4);
   flex: 1;
   min-width: 0;
 }
 
 .bd-uploader__name {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-primary);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .bd-uploader__hint {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink-muted);
 }
 
 /* ---- Actions cluster (right-aligned) ---- */
 .bd-uploader__actions {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
   margin-left: auto;
   flex-shrink: 0;
 }
 
 /* ---- States (a11y baseline) ---- */
 .bd-uploader:hover {
-  border-color: var(--buildrick-border-hover);
+  border-color: var(--bk-border-strong);
 }
 .bd-uploader:focus-within,
 .bd-uploader.is-dragover {
-  border-color: var(--buildrick-accent);
-  background: var(--buildrick-accent-tint);
+  border-color: var(--bk-accent);
+  background: var(--bk-accent-tint);
   outline: none;
 }
 
 /* ---- Modifier: has a file (solid border, bg-subtle) ---- */
 .bd-uploader--has-file {
   border-style: solid;
-  border-color: var(--buildrick-border);
-  background: var(--buildrick-bg-subtle);
+  border-color: var(--bk-border);
+  background: var(--bk-bg-subtle);
 }
 
 /* ---- Modifier: error ---- */
 .bd-uploader--error {
-  border-color: var(--buildrick-error);
-  background: var(--buildrick-error-tint);
+  border-color: var(--bk-error);
+  background: var(--bk-error-tint);
 }
 .bd-uploader--error .bd-uploader__hint {
-  color: var(--buildrick-error-text);
+  color: var(--bk-error-text);
 }
 
 /* ---- Modifier: disabled ---- */
@@ -136,27 +136,27 @@
 
 /* ---- Sizes ---- */
 .bd-uploader--sm {
-  padding: var(--buildrick-space-3);
-  gap: var(--buildrick-space-2);
+  padding: var(--bk-space-12);
+  gap: var(--bk-space-8);
 }
 .bd-uploader--sm .bd-uploader__thumb {
   width: 48px;
   height: 48px;
 }
 .bd-uploader--sm .bd-uploader__name {
-  font-size: var(--buildrick-text-sm);
+  font-size: var(--bk-text-12);
 }
 
 .bd-uploader--lg {
-  padding: var(--buildrick-space-6);
-  gap: var(--buildrick-space-4);
+  padding: var(--bk-space-24);
+  gap: var(--bk-space-16);
 }
 .bd-uploader--lg .bd-uploader__thumb {
   width: 96px;
   height: 96px;
 }
 .bd-uploader--lg .bd-uploader__name {
-  font-size: var(--buildrick-text-md);
+  font-size: var(--bk-text-13);
 }
 
 /* ---- Centered (column layout for full-page mounts) ---- */
@@ -164,7 +164,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
 }
 .bd-uploader--centered .bd-uploader__meta {
   align-items: center;

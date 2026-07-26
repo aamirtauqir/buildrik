@@ -271,7 +271,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
                 background: "rgba(15, 23, 42, 0.06)",
                 border: "none",
                 borderRadius: 3,
-                color: "var(--bd-fg-muted)",
+                color: "var(--bk-ink-muted)",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",

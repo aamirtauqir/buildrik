@@ -64,8 +64,8 @@ export const StructurePopover: React.FC<StructurePopoverProps> = ({
         maxHeight: "60vh",
         display: "flex",
         flexDirection: "column",
-        background: "var(--bd-bg)",
-        border: "1px solid var(--bd-border)",
+        background: "var(--bk-bg-app)",
+        border: "1px solid var(--bk-border)",
         borderRadius: 8,
         boxShadow: "0 12px 32px rgba(0,0,0,0.18)",
         zIndex: 1000,
@@ -78,10 +78,10 @@ export const StructurePopover: React.FC<StructurePopoverProps> = ({
           alignItems: "center",
           justifyContent: "space-between",
           padding: "8px 10px",
-          borderBottom: "1px solid var(--bd-border)",
+          borderBottom: "1px solid var(--bk-border)",
         }}
       >
-        <span style={{ fontSize: 12, fontWeight: 600, color: "var(--bd-fg)" }}>Structure</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: "var(--bk-ink)" }}>Structure</span>
         <Button
           variant="bare"
           size="sm"

@@ -52,12 +52,12 @@ const rowStyle = (selected: boolean): React.CSSProperties => ({
   alignItems: "center",
   justifyContent: "space-between",
   padding: "8px 12px",
-  background: selected ? "var(--bd-bg-elevated)" : "transparent",
-  border: `1px solid ${selected ? "var(--bd-accent)" : "var(--bd-border)"}`,
+  background: selected ? "var(--bk-bg-card)" : "transparent",
+  border: `1px solid ${selected ? "var(--bk-accent)" : "var(--bk-border)"}`,
   borderRadius: 6,
   cursor: "pointer",
   fontSize: 12,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 });
 
 const nameStyle: React.CSSProperties = {
@@ -66,14 +66,14 @@ const nameStyle: React.CSSProperties = {
 
 const idMonoStyle: React.CSSProperties = {
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
-  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+  color: "var(--bk-ink-muted)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
 };
 
 const emptyStyle: React.CSSProperties = {
   padding: 16,
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   textAlign: "center",
 };
 
@@ -85,19 +85,19 @@ const btnRowStyle: React.CSSProperties = {
 const cancelBtnStyle: React.CSSProperties = {
   padding: "6px 12px",
   background: "transparent",
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   fontSize: 12,
   cursor: "pointer",
 };
 
 const confirmBtnStyle = (enabled: boolean): React.CSSProperties => ({
   padding: "6px 12px",
-  background: enabled ? "var(--bd-accent)" : "var(--bd-bg-elevated)",
-  border: "1px solid var(--bd-border)",
+  background: enabled ? "var(--bk-accent)" : "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  color: enabled ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
+  color: enabled ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
   fontSize: 12,
   cursor: enabled ? "pointer" : "not-allowed",
 });

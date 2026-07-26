@@ -19,8 +19,8 @@
 .bdc-panel {
   grid-area: panel;
   display: flex; flex-direction: column;
-  background: var(--bd-bg-card);
-  border-right: 1px solid var(--bd-border);
+  background: var(--bk-bg-card);
+  border-right: 1px solid var(--bk-border);
   overflow: hidden;
 }
 
@@ -28,20 +28,20 @@
 .bdc-canvas {
   grid-area: canvas;
   position: relative;
-  background: var(--bd-canvas-wrapper);
-  background-image: radial-gradient(circle, var(--bd-canvas-dot) 1px, transparent 1px);
+  background: var(--bk-bg-subtle);
+  background-image: radial-gradient(circle, var(--bk-alpha-ink-08) 1px, transparent 1px);
   background-size: 20px 20px;
-  overflow: auto; padding: var(--bd-space-8);
+  overflow: auto; padding: var(--bk-space-32);
 }
 
 /* Buttons — Figma Button component: h32 md, r8, ghost/secondary/primary kinds */
-.bdc-btn { display: inline-flex; align-items: center; gap: var(--bd-space-1); height: 32px; padding: 0 var(--bd-space-3); font: 500 var(--bd-text-sm-plus) / var(--buildrick-lh-20) var(--bd-font); border: 1px solid transparent; border-radius: var(--bd-radius-md); cursor: pointer; background: transparent; color: var(--bd-fg-primary); transition: var(--bd-transition-colors); }
-.bdc-btn:hover { background: var(--bd-bg-hover); }
+.bdc-btn { display: inline-flex; align-items: center; gap: var(--bk-space-4); height: 32px; padding: 0 var(--bk-space-12); font: 500 var(--bk-text-13) / var(--bk-space-20) var(--bk-font-ui); border: 1px solid transparent; border-radius: var(--bk-radius-lg); cursor: pointer; background: transparent; color: var(--bk-ink); transition: var(--bk-transition-base); }
+.bdc-btn:hover { background: var(--bk-bg-subtle); }
 .bdc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .bdc-btn.bdc-icon { padding: 6px; }
-.bdc-btn.bdc-secondary { background: var(--bd-bg-card); border-color: var(--bd-border-medium); color: var(--bd-fg-primary); }
-.bdc-btn.bdc-secondary:hover { background: var(--bd-bg-subtle); }
-.bdc-btn.bdc-primary { background: var(--bd-accent); color: var(--bd-fg-on-accent); }
-.bdc-btn.bdc-primary:hover { background: var(--bd-accent-hover); }
-.bdc-btn.bdc-publish { background: var(--bd-accent); color: var(--bd-fg-on-accent); font-weight: 500; }
-.bdc-btn.bdc-publish:hover { background: var(--bd-accent-hover); }
+.bdc-btn.bdc-secondary { background: var(--bk-bg-card); border-color: var(--bk-border-medium); color: var(--bk-ink); }
+.bdc-btn.bdc-secondary:hover { background: var(--bk-bg-subtle); }
+.bdc-btn.bdc-primary { background: var(--bk-accent); color: var(--bk-accent-on); }
+.bdc-btn.bdc-primary:hover { background: var(--bk-accent-hover); }
+.bdc-btn.bdc-publish { background: var(--bk-accent); color: var(--bk-accent-on); font-weight: 500; }
+.bdc-btn.bdc-publish:hover { background: var(--bk-accent-hover); }

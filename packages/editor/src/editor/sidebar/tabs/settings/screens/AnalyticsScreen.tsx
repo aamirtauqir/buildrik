@@ -112,7 +112,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
               setHasChanges(true);
             }}
             placeholder="G-XXXXXXXXXX"
-            style={{ borderColor: gaError ? "var(--bd-error)" : undefined }}
+            style={{ borderColor: gaError ? "var(--bk-error)" : undefined }}
             aria-describedby={gaError ? "ga-error" : undefined}
             aria-invalid={!!gaError}
           />
@@ -157,7 +157,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
               setHasChanges(true);
             }}
             placeholder="1234567890123456"
-            style={{ borderColor: pixelError ? "var(--bd-error)" : undefined }}
+            style={{ borderColor: pixelError ? "var(--bk-error)" : undefined }}
             aria-describedby={pixelError ? "pixel-error" : undefined}
             aria-invalid={!!pixelError}
           />
@@ -200,7 +200,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
               setHasChanges(true);
             }}
             placeholder="abcdefghij"
-            style={{ borderColor: clarityError ? "var(--bd-error)" : undefined }}
+            style={{ borderColor: clarityError ? "var(--bk-error)" : undefined }}
             aria-invalid={!!clarityError}
           />
           {clarityError && (
@@ -242,7 +242,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
               setHasChanges(true);
             }}
             placeholder="GTM-XXXXXXX"
-            style={{ borderColor: gtmError ? "var(--bd-error)" : undefined }}
+            style={{ borderColor: gtmError ? "var(--bk-error)" : undefined }}
             aria-invalid={!!gtmError}
           />
           {gtmError && (
@@ -288,31 +288,31 @@ const privacyNoteStyles: React.CSSProperties = {
   margin: "0 0 12px",
   fontSize: 13,
   lineHeight: 1.5,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const errorHintStyles: React.CSSProperties = {
   marginTop: 4,
-  font: "500 10.5px var(--bd-font)",
-  color: "var(--bd-error)",
+  font: "500 10.5px var(--bk-font-ui)",
+  color: "var(--bk-error)",
 };
 
 const successNoteStyles: React.CSSProperties = {
   padding: "10px 12px",
   background: "rgba(22, 163, 74, 0.08)",
   border: "1px solid rgba(22, 163, 74, 0.3)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-success)",
+  borderRadius: "var(--bk-radius-sm)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-success)",
   lineHeight: 1.5,
 };
 
 const infoNoteStyles: React.CSSProperties = {
   padding: "10px 12px",
-  background: "var(--bd-bg-subtle)",
-  border: "1px solid var(--bd-border)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-fg-primary)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-sm)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-ink)",
   lineHeight: 1.5,
 };

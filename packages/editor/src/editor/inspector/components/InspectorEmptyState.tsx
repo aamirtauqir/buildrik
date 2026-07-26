@@ -47,8 +47,8 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
     return (
       <div role="status" aria-live="polite" style={containerStyle}>
         <div style={appliedBannerStyle}>
-          <h3 style={{ ...titleStyle, color: "var(--buildrick-success)", marginBottom: 4 }}>Template applied!</h3>
-          <p style={{ ...descriptionStyle, color: "var(--buildrick-success-light)", marginBottom: 12 }}>
+          <h3 style={{ ...titleStyle, color: "var(--bk-success)", marginBottom: 4 }}>Template applied!</h3>
+          <p style={{ ...descriptionStyle, color: "var(--bk-success-tint)", marginBottom: 12 }}>
             {appliedName}
           </p>
           {composer && (
@@ -137,34 +137,34 @@ const containerStyle: React.CSSProperties = {
   height: "100%",
   padding: "24px",
   textAlign: "center",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   marginTop: "40px",
 };
 
 const iconCircleStyle: React.CSSProperties = {
   width: 48,
   height: 48,
-  borderRadius: "var(--bd-radius-full)",
-  background: "var(--bd-bg-subtle)",
+  borderRadius: "var(--bk-radius-full)",
+  background: "var(--bk-bg-subtle)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   marginBottom: 16,
-  border: "1px solid var(--bd-bg-subtle)",
+  border: "1px solid var(--bk-bg-subtle)",
 };
 
 const titleStyle: React.CSSProperties = {
   margin: "0 0 8px 0",
   fontSize: "14px",
   fontWeight: 600,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
 };
 
 const descriptionStyle: React.CSSProperties = {
   margin: 0,
   fontSize: "13px",
   lineHeight: 1.5,
-  color: "var(--buildrick-text-tertiary)",
+  color: "var(--bk-ink-muted)",
   maxWidth: "220px",
 };
 
@@ -183,10 +183,10 @@ const primaryButtonStyle: React.CSSProperties = {
   justifyContent: "center",
   gap: "6px",
   padding: "8px 16px",
-  background: "var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bk-accent)",
+  color: "var(--bk-accent-on)",
   border: "none",
-  borderRadius: "var(--bd-radius-sm-plus)",
+  borderRadius: "var(--bk-radius-md)",
   fontSize: "12px",
   fontWeight: 600,
   cursor: "pointer",
@@ -196,7 +196,7 @@ const primaryButtonStyle: React.CSSProperties = {
 const secondaryButtonStyle: React.CSSProperties = {
   padding: "6px 12px",
   background: "transparent",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   border: "none",
   borderRadius: "4px",
   fontSize: "12px",
@@ -213,17 +213,17 @@ const tipStyle: React.CSSProperties = {
   background: "rgba(137, 180, 250, 0.08)",
   borderRadius: 6,
   fontSize: "11px",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const kbdStyle: React.CSSProperties = {
   display: "inline-block",
   padding: "2px 6px",
-  background: "var(--bd-border)",
+  background: "var(--bk-border)",
   borderRadius: 4,
   fontSize: "10px",
   fontFamily: "monospace",
-  border: "1px solid var(--bd-border-medium)",
+  border: "1px solid var(--bk-border-medium)",
 };
 
 // Phase 7: Post-apply banner styles
@@ -243,9 +243,9 @@ const appliedActionStyle: React.CSSProperties = {
   padding: "6px 10px",
   fontSize: "11px",
   fontFamily: "inherit",
-  color: "var(--bd-accent)",
-  background: "var(--bd-accent-subtle)",
-  border: "1px solid var(--bd-accent-alpha-15)",
+  color: "var(--bk-accent)",
+  background: "var(--bk-accent-subtle)",
+  border: "1px solid var(--bk-alpha-accent-15)",
   borderRadius: 6,
   cursor: "pointer",
   textAlign: "center",

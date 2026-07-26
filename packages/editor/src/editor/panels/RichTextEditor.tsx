@@ -131,9 +131,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
      
       style={{
         padding: 8,
-        background: "var(--buildrick-bg-panel)",
+        background: "var(--bk-bg-panel)",
         borderRadius: 8,
-        border: "1px solid var(--buildrick-border)",
+        border: "1px solid var(--bk-border)",
       }}
     >
       {/* Heading Selector */}
@@ -141,10 +141,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
           padding: "4px 8px",
-          background: "var(--buildrick-bg-dark)",
-          border: "1px solid var(--buildrick-border)",
+          background: "var(--bk-gray-900)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 4,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bk-ink)",
           fontSize: 12,
           cursor: "pointer",
         }}
@@ -160,10 +160,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
           padding: "4px 8px",
-          background: "var(--buildrick-bg-dark)",
-          border: "1px solid var(--buildrick-border)",
+          background: "var(--bk-gray-900)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 4,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bk-ink)",
           fontSize: 12,
           cursor: "pointer",
         }}
@@ -189,8 +189,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
                     onClick={() => onCommand(item.command)}
                     style={{
                       ...toolbarButtonStyle,
-                      background: isActive ? "var(--buildrick-accent)" : "transparent",
-                      color: isActive ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
+                      background: isActive ? "var(--bk-accent)" : "transparent",
+                      color: isActive ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
                       ...itemStyle,
                     }}
                   >
@@ -210,7 +210,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       <Popover open={textColorOpen} onOpenChange={setTextColorOpen}>
         <PopoverTrigger asChild>
           <Button style={toolbarButtonStyle} title="Text Color" aria-label="Change text color">
-            <span style={{ borderBottom: "2px solid var(--buildrick-accent)" }}>A</span>
+            <span style={{ borderBottom: "2px solid var(--bk-accent)" }}>A</span>
           </Button>
         </PopoverTrigger>
         <PopoverPortal>
@@ -226,7 +226,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             title="Background Color"
             aria-label="Change background highlight color"
           >
-            <span style={{ background: "var(--buildrick-warning)", padding: "0 4px" }}>A</span>
+            <span style={{ background: "var(--bk-warning)", padding: "0 4px" }}>A</span>
           </Button>
         </PopoverTrigger>
         <PopoverPortal>
@@ -245,8 +245,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           <Button
             style={{
               ...toolbarButtonStyle,
-              background: activeStyles.link ? "var(--buildrick-accent)" : "transparent",
-              color: activeStyles.link ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
+              background: activeStyles.link ? "var(--bk-accent)" : "transparent",
+              color: activeStyles.link ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
             }}
             title="Insert Link"
           >
@@ -264,10 +264,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
                 style={{
                   width: "100%",
                   padding: "8px 12px",
-                  background: "var(--buildrick-bg-dark)",
-                  border: "1px solid var(--buildrick-border)",
+                  background: "var(--bk-gray-900)",
+                  border: "1px solid var(--bk-border)",
                   borderRadius: 6,
-                  color: "var(--buildrick-text-primary)",
+                  color: "var(--bk-ink)",
                   fontSize: 13,
                   marginBottom: 8,
                 }}
@@ -304,7 +304,7 @@ const Divider = () => (
     style={{
       width: 1,
       height: 20,
-      background: "var(--buildrick-border)",
+      background: "var(--bk-border)",
       margin: "0 4px",
     }}
   />
@@ -319,7 +319,7 @@ const toolbarButtonStyle: React.CSSProperties = {
   background: "transparent",
   border: "none",
   borderRadius: 4,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   cursor: "pointer",
   fontSize: 13,
   transition: "all 0.15s ease",

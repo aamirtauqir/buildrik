@@ -27,25 +27,25 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
   return (
     <Stack gap="lg" style={{ gap: 14 }}>
       {/* OG card preview — prototype .og-card */}
-      <div style={{ maxWidth: 420, background: "var(--bd-bg-card)", border: "1px solid var(--bd-border)", borderRadius: 6, overflow: "hidden" }}>
-        <div style={{ width: "100%", aspectRatio: "1200 / 630", display: "grid", placeItems: "center", background: "var(--bd-bg-subtle)", position: "relative" }} role="img" aria-label="Open Graph image preview">
+      <div style={{ maxWidth: 420, background: "var(--bk-bg-card)", border: "1px solid var(--bk-border)", borderRadius: 6, overflow: "hidden" }}>
+        <div style={{ width: "100%", aspectRatio: "1200 / 630", display: "grid", placeItems: "center", background: "var(--bk-bg-subtle)", position: "relative" }} role="img" aria-label="Open Graph image preview">
           {s.ogImageUrl ? (
             <img src={s.ogImageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           ) : (
-            <span style={{ font: "500 14px var(--bd-mono)", color: "var(--bd-fg-muted)", letterSpacing: "0.04em" }}>1200 × 630</span>
+            <span style={{ font: "500 14px var(--bk-font-mono)", color: "var(--bk-ink-muted)", letterSpacing: "0.04em" }}>1200 × 630</span>
           )}
         </div>
-        <Stack gap="xs" style={{ padding: "10px var(--bd-space-3)", gap: 2 }}>
-          <div style={{ font: "500 10px var(--bd-mono)", color: "var(--bd-fg-muted)" }}>{domain}</div>
-          <div style={{ font: "500 12.5px var(--bd-font)", color: "var(--bd-fg-heading)" }}>{title}</div>
-          <div style={{ font: "400 11.5px var(--bd-font)", color: "var(--bd-fg-primary)", lineHeight: 1.4 }}>{desc || "Add a description to preview here"}</div>
+        <Stack gap="xs" style={{ padding: "10px var(--bk-space-12)", gap: 2 }}>
+          <div style={{ font: "500 10px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{domain}</div>
+          <div style={{ font: "500 12.5px var(--bk-font-ui)", color: "var(--bk-ink)" }}>{title}</div>
+          <div style={{ font: "400 11.5px var(--bk-font-ui)", color: "var(--bk-ink)", lineHeight: 1.4 }}>{desc || "Add a description to preview here"}</div>
         </Stack>
       </div>
       {/* OG Title */}
       <Stack gap="xs" style={{ gap: 6 }}>
         <Cluster align="center" gap="xs" style={{ justifyContent: "space-between" }}>
           <Label htmlFor="og-title">Open Graph Title</Label>
-          <span style={{ font: "500 10.5px var(--bd-mono)", color: "var(--bd-fg-muted)" }}>{s.ogTitle.length}/60</span>
+          <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
         </Cluster>
         <Input
           id="og-title"
@@ -59,7 +59,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       <Stack gap="xs" style={{ gap: 6 }}>
         <Cluster align="center" gap="xs" style={{ justifyContent: "space-between" }}>
           <Label htmlFor="og-desc">Open Graph Description</Label>
-          <span style={{ font: "500 10.5px var(--bd-mono)", color: "var(--bd-fg-muted)" }}>{s.ogDesc.length}/160</span>
+          <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
         </Cluster>
         <Textarea
           id="og-desc"

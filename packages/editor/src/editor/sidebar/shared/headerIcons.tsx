@@ -104,7 +104,7 @@ export const CheckIcon: React.FC = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    style={{ marginLeft: "auto", color: "var(--buildrick-accent)" }}
+    style={{ marginLeft: "auto", color: "var(--bk-accent)" }}
   >
     <path d="M3 7l3 3 5-5" />
   </svg>

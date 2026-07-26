@@ -4,8 +4,8 @@ import { Grid, type GridCols, type GridGap } from "../editor/shared/vibcoder/Gri
 import { sectionLabel } from "./_galleryStyles";
 
 const tile: React.CSSProperties = {
-  background: "var(--buildrick-surface-2, #f3f4f6)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-subtle, #f3f4f6)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
   padding: "12px 8px",
   fontSize: 13,
@@ -13,8 +13,8 @@ const tile: React.CSSProperties = {
 };
 
 const containerCard: React.CSSProperties = {
-  background: "var(--buildrick-surface, #fff)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-panel, #fff)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   padding: 12,
   maxWidth: 720,

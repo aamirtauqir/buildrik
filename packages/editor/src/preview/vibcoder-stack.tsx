@@ -4,16 +4,16 @@ import { Stack } from "../editor/shared/vibcoder/Stack";
 import { sectionLabel } from "./_galleryStyles";
 
 const tile: React.CSSProperties = {
-  background: "var(--buildrick-surface-2, #f3f4f6)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-subtle, #f3f4f6)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
   padding: "8px 12px",
   fontSize: 13,
 };
 
 const containerCard: React.CSSProperties = {
-  background: "var(--buildrick-surface, #fff)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-panel, #fff)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   padding: 12,
   maxWidth: 360,

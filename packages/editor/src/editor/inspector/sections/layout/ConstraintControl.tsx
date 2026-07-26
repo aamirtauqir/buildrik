@@ -52,7 +52,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
 
   return (
     <div style={{ marginBottom: 10 }}>
-      <div style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", marginBottom: 6 }}>
+      <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6 }}>
         {label}
       </div>
       <div style={{ display: "flex", gap: 4 }}>
@@ -133,7 +133,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
             gap: 4,
           }}
         >
-          <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", width: 32 }}>
+          <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", width: 32 }}>
             {isWidth ? "W" : "H"}
           </span>
           <Input

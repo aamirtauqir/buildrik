@@ -23,12 +23,12 @@
   position: relative;
   width: 100%;
   height: 140px;
-  background: var(--buildrick-bg-subtle);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md);
-  color: var(--buildrick-text-muted);
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
+  background: var(--bk-bg-subtle);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  color: var(--bk-ink-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -49,7 +49,7 @@
 
 /* ---- Image mode — hosts an <img> child (or token-styled mock <div>) ---- */
 .bd-thumb--image {
-  background: var(--buildrick-bg-subtle);
+  background: var(--bk-bg-subtle);
 }
 .bd-thumb--image > img {
   width: 100%;
@@ -66,29 +66,29 @@
 }
 .bd-thumb--placeholder::before {
   content: "image";
-  color: var(--buildrick-text-muted);
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
+  color: var(--bk-ink-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
   letter-spacing: 0.04em;
 }
 
 /* ---- Interactive — clickable thumb (a11y baseline) ---- */
 .bd-thumb--interactive {
   cursor: pointer;
-  transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: border-color var(--bk-motion-fast) var(--bk-ease-default),
+              background-color var(--bk-motion-fast) var(--bk-ease-default);
 }
 .bd-thumb--interactive:hover {
-  border-color: var(--buildrick-border-hover);
+  border-color: var(--bk-border-strong);
 }
 .bd-thumb--interactive:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
-  border-color: var(--buildrick-accent);
+  border-color: var(--bk-accent);
   box-shadow: none;
 }
 .bd-thumb--interactive:active {
-  border-color: var(--buildrick-border-hover);
+  border-color: var(--bk-border-strong);
 }
 .bd-thumb--interactive[disabled],
 .bd-thumb--interactive[aria-disabled="true"] {

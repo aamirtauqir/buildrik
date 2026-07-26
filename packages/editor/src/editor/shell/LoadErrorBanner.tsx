@@ -25,7 +25,7 @@ export interface LoadErrorBannerProps {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bd-warning-tint)", borderBottom: "1px solid var(--bd-border)", fontSize: 13, color: "var(--bd-text)" },
+  bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bk-warning-tint)", borderBottom: "1px solid var(--bk-border)", fontSize: 13, color: "var(--bk-ink)" },
   text: { flex: 1, lineHeight: 1.4 },
   strong: { fontWeight: 600 },
   actions: { display: "flex", alignItems: "center", gap: 8 },

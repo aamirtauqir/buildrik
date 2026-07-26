@@ -50,7 +50,7 @@ function Demo() {
             justifyContent: "space-between",
             alignItems: "center",
             padding: "12px 16px",
-            borderBottom: "1px solid var(--bd-border)",
+            borderBottom: "1px solid var(--bk-border)",
           }}
         >
           <strong>Notifications</strong>

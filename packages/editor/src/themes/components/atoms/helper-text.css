@@ -12,14 +12,14 @@
  */
 
 .bd-helper-text {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
   line-height: 1.45;
-  color: var(--buildrick-text-muted);
-  margin-top: var(--buildrick-space-1);
+  color: var(--bk-ink-muted);
+  margin-top: var(--bk-space-4);
 }
 
-.bd-helper-text--error   { color: var(--buildrick-error); }
-.bd-helper-text--success { color: var(--buildrick-success); }
-.bd-helper-text--warning { color: var(--buildrick-warning); }
+.bd-helper-text--error   { color: var(--bk-error); }
+.bd-helper-text--success { color: var(--bk-success); }
+.bd-helper-text--warning { color: var(--bk-warning); }

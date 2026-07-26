@@ -119,8 +119,8 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               onClick={() => setActiveTab(tab)}
               style={{
                 ...tabButtonStyles,
-                borderBottomColor: activeTab === tab ? "var(--buildrick-accent)" : "transparent",
-                color: activeTab === tab ? "var(--buildrick-text-primary)" : "var(--buildrick-text-muted)",
+                borderBottomColor: activeTab === tab ? "var(--bk-accent)" : "transparent",
+                color: activeTab === tab ? "var(--bk-ink)" : "var(--bk-ink-muted)",
               }}
             >
               {TAB_LABELS[tab]}
@@ -164,7 +164,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                   min={1}
                   max={100}
                 />
-                <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+                <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
                   Width / height in pixels
                 </span>
               </div>
@@ -227,7 +227,7 @@ const containerStyles: React.CSSProperties = {
 const tabBarStyles: React.CSSProperties = {
   display: "flex",
   gap: 20,
-  borderBottom: "1px solid var(--buildrick-border-subtle)",
+  borderBottom: "1px solid var(--bk-border)",
   marginBottom: 20,
 };
 
@@ -249,7 +249,7 @@ const contentStyles: React.CSSProperties = {
 const labelStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   marginBottom: 4,
 };
 
@@ -257,10 +257,10 @@ const inputStyles: React.CSSProperties = {
   padding: "8px 12px",
   // was --buildrick-surface-3, which is defined nowhere — the field rendered
   // with no background at all on the light theme (Figma board B9.6).
-  background: "var(--buildrick-bg-card)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--bd-radius-sm)",
-  color: "var(--buildrick-text-primary)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-sm)",
+  color: "var(--bk-ink)",
   fontSize: 13,
 };
 
@@ -279,7 +279,7 @@ const checkboxStyles: React.CSSProperties = {
 
 const hintStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   marginTop: 4,
 };
 

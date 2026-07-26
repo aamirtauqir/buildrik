@@ -1,20 +1,33 @@
 /**
  * themes/design-system/index.css
- * Buildrik DS V1 — public DS entry point.
+ * Buildrik DS — public DS entry point.
+ *
+ * Token VALUES no longer live here. They are generated from the Figma file into
+ * ../tokens.generated.css by scripts/tokens/generate.mjs, and that file is the
+ * only place a chrome token is defined.
+ *
+ * What used to live here (color, typography, spacing, radius, shadow, motion,
+ * z-index, layout, design, bd-aliases) was 588 tokens across three tiers, of
+ * which 213 were referenced by nothing and 42 were the same value under a
+ * different name. It was deleted, not migrated.
+ *
+ * a11y.css stays because it holds real rules (focus-visible, reduced-motion),
+ * not token definitions.
+ *
  * @license BSD-3-Clause
  */
 
-@import "./color.css";
-@import "./typography.css";
-@import "./spacing.css";
-@import "./radius.css";
-@import "./shadow.css";
-@import "./motion.css";
-@import "./z-index.css";
-@import "./layout.css";
-@import "./design.css";
+@import "../tokens.generated.css";
 @import "./a11y.css";
-@import "./bd-aliases.css";
+
+/* SITE-BUILDER tokens — a DIFFERENT domain, deliberately not generated.
+ * design.css defines --buildrick-design-*, the tokens that ship inside
+ * CUSTOMERS' published websites and are overwritten at runtime by the Brand
+ * panel. They are user data, not chrome styling: regenerating them from Figma
+ * would restyle every published site on its next publish. Values here must stay
+ * in sync with DEFAULT_TOKENS in editor/design-system/constants.ts.
+ * Do not fold this into the generated file. */
+@import "./design.css";
 
 /* Forward-looking override layer for vibcoder canonical bd-topbar.
  * See docs/superpowers/specs/2026-04-29-vibcoder-bd-topbar-evolution.md.

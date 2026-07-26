@@ -124,8 +124,8 @@ describe("RichTextEditor — active-state reflection", () => {
     renderEditor({ activeStyles: { bold: true } });
     const boldBtn = screen.getByText("B");
     const italicBtn = screen.getByText("I");
-    expect(boldBtn.getAttribute("style")).toContain("var(--buildrick-accent)");
-    expect(italicBtn.getAttribute("style")).not.toContain("var(--buildrick-accent)");
+    expect(boldBtn.getAttribute("style")).toContain("var(--bk-accent)");
+    expect(italicBtn.getAttribute("style")).not.toContain("var(--bk-accent)");
   });
 });
 

@@ -10,8 +10,8 @@
   display: block;
   width: 100%;
   overflow: hidden;
-  border-radius: var(--buildrick-radius-md);
-  background: var(--buildrick-bg-subtle);
+  border-radius: var(--bk-radius-lg);
+  background: var(--bk-bg-subtle);
 }
 
 .bd-frame--1-1  { aspect-ratio: 1 / 1; }

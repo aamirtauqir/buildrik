@@ -32,7 +32,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
     },
     styles: {
       display: "flex",
-      borderBottom: "2px solid var(--bd-border)",
+      borderBottom: "2px solid var(--bk-border)",
       marginBottom: "16px",
     },
   });
@@ -58,7 +58,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
         cursor: "pointer",
         fontSize: "14px",
         fontWeight: index === 0 ? "600" : "500",
-        color: index === 0 ? "#8b5cf6" : "var(--bd-fg-secondary)",
+        color: index === 0 ? "#8b5cf6" : "var(--bk-ink-soft)",
         transition: "all 0.2s ease",
       },
     });
@@ -82,7 +82,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
       styles: {
         display: index === 0 ? "block" : "none",
         padding: "20px",
-        background: "var(--bd-bg-panel)",
+        background: "var(--bk-bg-panel)",
         borderRadius: "8px",
         minHeight: "120px",
       },
@@ -94,7 +94,7 @@ function buildTabs(composer: Composer, parentId: string, dropIndex?: number): st
       content: `Content for ${tabLabel}. Click to edit this text and add your own content.`,
       styles: {
         margin: "0",
-        color: "var(--bd-fg-secondary)",
+        color: "var(--bk-ink-soft)",
         lineHeight: "1.6",
       },
     });

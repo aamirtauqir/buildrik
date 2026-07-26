@@ -14,12 +14,12 @@
 .bd-crumbs {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-1);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-normal);
-  color: var(--buildrick-text-muted);
-  letter-spacing: var(--buildrick-tracking-normal);
+  gap: var(--bk-space-4);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-regular);
+  color: var(--bk-ink-muted);
+  letter-spacing: var(--bk-tracking-normal);
   white-space: nowrap;
   min-width: 0;
 }
@@ -32,7 +32,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
 }
 .bd-crumbs__icon > svg {
   width: 100%;
@@ -42,7 +42,7 @@
 
 /* ---- Single crumb (anchor or button) ---- */
 .bd-crumbs__item {
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   text-decoration: none;
   cursor: pointer;
   background: transparent;
@@ -50,31 +50,31 @@
   padding: 0;
   font: inherit;
   letter-spacing: inherit;
-  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 .bd-crumbs__item:hover {
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
 }
 .bd-crumbs__item:focus-visible {
   outline: none;
-  box-shadow: var(--buildrick-glow-primary);
-  border-radius: var(--buildrick-radius-sm);
+  box-shadow: var(--bk-shadow-focus);
+  border-radius: var(--bk-radius-sm);
 }
 .bd-crumbs__item:active {
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
 }
 
 /* Current / non-interactive terminal crumb */
 .bd-crumbs__item--current,
 .bd-crumbs__item[aria-current="page"] {
-  color: var(--buildrick-text-primary);
-  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--bk-ink);
+  font-weight: var(--bk-weight-medium);
   cursor: default;
 }
 .bd-crumbs__item--current:hover,
 .bd-crumbs__item[aria-current="page"]:hover {
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
 }
 
 /* Disabled crumb */
@@ -87,7 +87,7 @@
 
 /* ---- Separator (chevron or "/") ---- */
 .bd-crumbs__sep {
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   margin: 0;
   user-select: none;
   display: inline-flex;
@@ -113,8 +113,8 @@
 
 /* Mono — for code/path crumbs (inspector selection chains, file paths) */
 .bd-crumbs--mono {
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
   letter-spacing: 0;
 }
 .bd-crumbs--mono .bd-crumbs__sep {
@@ -123,7 +123,7 @@
 
 /* Small — denser surfaces */
 .bd-crumbs--sm {
-  font-size: var(--buildrick-text-xs);
+  font-size: var(--bk-text-11);
 }
 .bd-crumbs--sm .bd-crumbs__icon {
   width: 12px;

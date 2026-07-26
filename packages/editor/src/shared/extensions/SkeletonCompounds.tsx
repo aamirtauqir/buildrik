@@ -35,9 +35,9 @@ export const SkeletonListItem: FC<SkeletonListItemProps> = ({
       alignItems: "center",
       gap: 12,
       padding: "12px 16px",
-      background: "var(--buildrick-bg-shimmer-light)",
-      borderRadius: "var(--buildrick-radius-md)",
-      border: "1px solid var(--buildrick-bg-shimmer-mid)",
+      background: "var(--bk-alpha-ink-12)",
+      borderRadius: "var(--bk-radius-lg)",
+      border: "1px solid var(--bk-alpha-ink-12)",
     }}
   >
     {hasAvatar && (
@@ -52,7 +52,7 @@ export const SkeletonListItem: FC<SkeletonListItemProps> = ({
       {textLines > 1 && <Skeleton style={{ height: 12, width: "80%" }} aria-hidden />}
     </div>
     {hasAction && (
-      <Skeleton style={{ height: 32, width: 32, borderRadius: "var(--buildrick-radius-md)" }} aria-hidden />
+      <Skeleton style={{ height: 32, width: 32, borderRadius: "var(--bk-radius-lg)" }} aria-hidden />
     )}
   </div>
 );
@@ -84,7 +84,7 @@ export const StudioSkeleton: FC = () => {
         flexDirection: "column",
         height: "100vh",
         width: "100vw",
-        background: "var(--buildrick-text-primary)",
+        background: "var(--bk-ink)",
         overflow: "hidden",
       }}
     >
@@ -95,37 +95,37 @@ export const StudioSkeleton: FC = () => {
           alignItems: "center",
           padding: "0 16px",
           gap: 12,
-          borderBottom: "1px solid var(--buildrick-bg-shimmer-dark)",
-          background: "var(--buildrick-text-primary)",
+          borderBottom: "1px solid var(--bk-alpha-ink-08)",
+          background: "var(--bk-ink)",
           zIndex: 10,
         }}
       >
         <div style={{ display: "flex", gap: 12, marginRight: 24 }}>
-          <Skeleton style={{ width: 32, height: 32, borderRadius: "var(--buildrick-radius-sm)" }} />
-          <Skeleton style={{ width: 32, height: 32, borderRadius: "var(--buildrick-radius-sm)" }} />
+          <Skeleton style={{ width: 32, height: 32, borderRadius: "var(--bk-radius-sm)" }} />
+          <Skeleton style={{ width: 32, height: 32, borderRadius: "var(--bk-radius-sm)" }} />
         </div>
-        <Skeleton style={{ width: 160, height: 32, borderRadius: "var(--buildrick-radius-md)" }} />
+        <Skeleton style={{ width: 160, height: 32, borderRadius: "var(--bk-radius-lg)" }} />
         <div style={{ flex: 1 }} />
-        <Skeleton style={{ width: 80, height: 32, borderRadius: "var(--buildrick-radius-md)" }} />
-        <Skeleton style={{ width: 80, height: 32, borderRadius: "var(--buildrick-radius-md)" }} />
+        <Skeleton style={{ width: 80, height: 32, borderRadius: "var(--bk-radius-lg)" }} />
+        <Skeleton style={{ width: 80, height: 32, borderRadius: "var(--bk-radius-lg)" }} />
       </div>
 
       <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
         <div
           style={{
             width: 60,
-            borderRight: "1px solid var(--buildrick-bg-shimmer-dark)",
+            borderRight: "1px solid var(--bk-alpha-ink-08)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             paddingTop: 16,
             gap: 20,
-            background: "var(--buildrick-text-primary)",
+            background: "var(--bk-ink)",
             zIndex: 5,
           }}
         >
           {[1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} style={{ width: 36, height: 36, borderRadius: "var(--buildrick-radius-md)" }} />
+            <Skeleton key={i} style={{ width: 36, height: 36, borderRadius: "var(--bk-radius-lg)" }} />
           ))}
           <div style={{ flex: 1 }} />
           <Skeleton style={{ width: 36, height: 36, borderRadius: 9999, marginBottom: 16 }} />
@@ -134,7 +134,7 @@ export const StudioSkeleton: FC = () => {
         <div
           style={{
             flex: 1,
-            background: "var(--buildrick-bg-app)",
+            background: "var(--bk-bg-app)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -146,10 +146,10 @@ export const StudioSkeleton: FC = () => {
             style={{
               width: "70%",
               height: "70%",
-              background: "var(--buildrick-bg-card)",
+              background: "var(--bk-bg-card)",
               borderRadius: 4,
               opacity: 0.1,
-              boxShadow: "0 20px 50px var(--buildrick-bg-shimmer-overlay)",
+              boxShadow: "0 20px 50px var(--bk-alpha-ink-12)",
             }}
           />
           <div
@@ -169,14 +169,14 @@ export const StudioSkeleton: FC = () => {
                 width: 48,
                 height: 48,
                 borderRadius: "50%",
-                border: "3px solid var(--buildrick-bg-shimmer-dark)",
-                borderTopColor: "var(--buildrick-accent)",
+                border: "3px solid var(--bk-alpha-ink-08)",
+                borderTopColor: "var(--bk-accent)",
                 ...spinStyle,
               }}
             />
             <div
               style={{
-                color: "var(--buildrick-text-muted)",
+                color: "var(--bk-ink-muted)",
                 fontSize: 13,
                 fontWeight: 500,
                 letterSpacing: 0.5,

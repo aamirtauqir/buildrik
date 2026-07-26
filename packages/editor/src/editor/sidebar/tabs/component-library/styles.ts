@@ -10,7 +10,7 @@ export const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--bd-bg-subtle)",
+  background: "var(--bk-bg-subtle)",
 };
 
 export const searchContainerStyles: React.CSSProperties = {
@@ -21,9 +21,9 @@ export const dialogInputStyles: React.CSSProperties = {
   padding: "8px 12px",
   borderRadius: 8,
   fontSize: 13,
-  background: "var(--bd-bg-subtle)",
-  border: "1px solid var(--bd-border)",
-  color: "var(--bd-fg-primary)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
+  color: "var(--bk-ink)",
   outline: "none",
   width: "100%",
 };
@@ -33,9 +33,9 @@ export const dialogCancelBtnStyles: React.CSSProperties = {
   borderRadius: 6,
   fontSize: 13,
   cursor: "pointer",
-  background: "var(--bd-bg-subtle)",
-  border: "1px solid var(--bd-border)",
-  color: "var(--bd-fg-secondary)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
+  color: "var(--bk-ink-soft)",
 };
 
 export const dialogPrimaryBtnStyles: React.CSSProperties = {
@@ -43,7 +43,7 @@ export const dialogPrimaryBtnStyles: React.CSSProperties = {
   borderRadius: 6,
   fontSize: 13,
   cursor: "pointer",
-  background: "var(--bd-accent)",
-  border: "1px solid var(--bd-accent)",
-  color: "var(--bd-fg-on-accent)",
+  background: "var(--bk-accent)",
+  border: "1px solid var(--bk-accent)",
+  color: "var(--bk-accent-on)",
 };

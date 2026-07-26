@@ -26,7 +26,7 @@ interface UserSavedSectionProps extends ComponentsTabProps {
 const sectionHeaderStyle: React.CSSProperties = {
   fontSize: 11,
   fontWeight: 500,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
   margin: "16px 12px 6px",
   textTransform: "uppercase",
   letterSpacing: "0.04em",

@@ -61,20 +61,20 @@ export const PresetBindingRow: React.FC<PresetBindingRowProps> = ({
       justifyContent: "space-between",
       gap: 12,
       padding: "8px 0",
-      borderBottom: "1px solid var(--bd-border)",
+      borderBottom: "1px solid var(--bk-border)",
       fontSize: 12,
     }}
   >
-    <span style={{ color: "var(--bd-fg-muted)" }}>{humanize(propertyName)}</span>
+    <span style={{ color: "var(--bk-ink-muted)" }}>{humanize(propertyName)}</span>
     <span
       data-token-chip
       style={{
         padding: "3px 8px",
         borderRadius: 4,
         background: "rgba(34, 197, 94, 0.1)",
-        color: "var(--bd-success)",
+        color: "var(--bk-success)",
         fontFamily:
-          "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+          "var(--bk-font-mono, ui-monospace, monospace)",
         fontSize: 11,
         fontWeight: 500,
       }}

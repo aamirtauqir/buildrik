@@ -58,21 +58,21 @@ const severityConfig: Record<
 > = {
   error: {
     icon: "✕",
-    color: "var(--buildrick-error)",
+    color: "var(--bk-error)",
     bgColor: "rgba(239, 68, 68, 0.1)",
     borderColor: "rgba(239, 68, 68, 0.3)",
   },
   warning: {
     icon: "⚠",
-    color: "var(--buildrick-warning)",
+    color: "var(--bk-warning)",
     bgColor: "rgba(245, 158, 11, 0.1)",
     borderColor: "rgba(245, 158, 11, 0.3)",
   },
   info: {
     icon: "ℹ",
-    color: "var(--buildrick-info)",
-    bgColor: "var(--bd-accent-tint)",
-    borderColor: "var(--buildrick-primary-alpha-30)",
+    color: "var(--bk-accent)",
+    bgColor: "var(--bk-accent-tint)",
+    borderColor: "var(--bk-alpha-accent-30)",
   },
 };
 
@@ -139,16 +139,16 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           padding: "10px 14px",
           background: config.bgColor,
           border: `1px solid ${config.borderColor}`,
-          borderRadius: "var(--buildrick-radius-md)",
+          borderRadius: "var(--bk-radius-lg)",
         }}
       >
         <span
           style={{
             width: 20,
             height: 20,
-            borderRadius: "var(--bd-radius-full)",
+            borderRadius: "var(--bk-radius-full)",
             background: config.color,
-            color: "var(--buildrick-text-on-accent)",
+            color: "var(--bk-accent-on)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -164,7 +164,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           style={{
             flex: 1,
             fontSize: 13,
-            color: "var(--buildrick-text-primary, var(--bd-bg-panel))",
+            color: "var(--bk-ink, var(--bk-bg-panel))",
           }}
         >
           {message}
@@ -203,7 +203,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         padding: sizes.padding,
         background: "rgba(255, 255, 255, 0.02)",
         border: "1px solid rgba(255, 255, 255, 0.06)",
-        borderRadius: "var(--buildrick-radius-lg)",
+        borderRadius: "var(--bk-radius-lg)",
       }}
     >
       {/* Icon */}
@@ -211,7 +211,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         style={{
           width: sizes.iconSize + sizes.iconPadding * 2,
           height: sizes.iconSize + sizes.iconPadding * 2,
-          borderRadius: "var(--bd-radius-full)",
+          borderRadius: "var(--bk-radius-full)",
           background: config.bgColor,
           border: `2px solid ${config.borderColor}`,
           display: "flex",
@@ -238,7 +238,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           marginBottom: sizes.gap / 2,
           fontSize: sizes.titleSize,
           fontWeight: 600,
-          color: "var(--buildrick-text-primary, var(--bd-bg-panel))",
+          color: "var(--bk-ink, var(--bk-bg-panel))",
         }}
       >
         {title || defaultTitles[severity]}
@@ -249,7 +249,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           margin: 0,
           marginBottom: sizes.gap,
           fontSize: sizes.messageSize,
-          color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
+          color: "var(--bk-ink-muted, var(--bk-ink-soft))",
           maxWidth: 320,
           lineHeight: 1.5,
         }}
@@ -263,7 +263,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           style={{
             background: "transparent",
             border: "none",
-            color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
+            color: "var(--bk-ink-soft, var(--bk-ink-muted))",
             fontSize: 12,
             cursor: "pointer",
             display: "flex",
@@ -292,11 +292,11 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             marginBottom: sizes.gap,
             padding: 12,
             background: "rgba(0, 0, 0, 0.3)",
-            borderRadius: "var(--buildrick-radius-md)",
-            border: "1px solid var(--buildrick-border, var(--bd-fg-primary))",
+            borderRadius: "var(--bk-radius-lg)",
+            border: "1px solid var(--bk-border, var(--bk-ink))",
             fontSize: 12,
-            fontFamily: "var(--buildrick-font-family-mono)",
-            color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
+            fontFamily: "var(--bk-font-mono)",
+            color: "var(--bk-ink-soft, var(--bk-ink-muted))",
             textAlign: "left",
             maxWidth: "100%",
             maxHeight: 200,
@@ -367,7 +367,7 @@ export const FieldError: React.FC<FieldErrorProps> = ({ message, className = "" 
         gap: 4,
         marginTop: 4,
         fontSize: 12,
-        color: "var(--buildrick-error)",
+        color: "var(--bk-error)",
       }}
     >
       <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor">

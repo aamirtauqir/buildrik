@@ -17,8 +17,8 @@
  *     intensifies whichever tone is active (background → solid, text → on-accent).
  *   __presence sub-element: dedicated slot prop (`presence`) for status dot.
  *
- * The base `.bd-avatar` rule already paints accent (var(--buildrick-accent-tint)
- * background + var(--buildrick-accent) text). We treat "accent" as the virtual
+ * The base `.bd-avatar` rule already paints accent (var(--bk-accent-tint)
+ * background + var(--bk-accent) text). We treat "accent" as the virtual
  * default and OMIT the `bd-avatar--accent` modifier when variant is unset or
  * "accent" — matching the Tag.tsx convention where the base class IS the
  * default tone.

@@ -35,7 +35,7 @@ function relTime(at: number): string {
 }
 
 const S: Record<string, React.CSSProperties> = {
-  bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bd-accent-subtle, #EEF3FC)", borderBottom: "1px solid var(--bd-border)", fontSize: 13, color: "var(--bd-text)" },
+  bar: { display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: "var(--bk-accent-subtle, #EEF3FC)", borderBottom: "1px solid var(--bk-border)", fontSize: 13, color: "var(--bk-ink)" },
   text: { flex: 1, lineHeight: 1.4 },
   strong: { fontWeight: 600 },
   actions: { display: "flex", alignItems: "center", gap: 8 },

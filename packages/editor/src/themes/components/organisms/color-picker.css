@@ -6,14 +6,14 @@
 
 .bd-color-picker {
   width: 240px;
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md);
-  padding: var(--buildrick-space-3);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  padding: var(--bk-space-12);
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-space-2);
-  box-shadow: var(--buildrick-shadow-md);
+  gap: var(--bk-space-8);
+  box-shadow: var(--bk-shadow-drag);
 }
 .bd-color-picker--wide { width: 280px; }
 
@@ -21,12 +21,12 @@
 .bd-color-picker__sat {
   position: relative;
   height: 120px;
-  border-radius: var(--buildrick-radius-sm);
-  border: 1px solid var(--buildrick-ink-08);
-  background: var(--buildrick-accent);
+  border-radius: var(--bk-radius-sm);
+  border: 1px solid var(--bk-alpha-ink-08);
+  background: var(--bk-accent);
   background-image:
-    linear-gradient(to bottom, transparent, var(--buildrick-text-heading)),
-    linear-gradient(to right, var(--buildrick-bg-card), transparent);
+    linear-gradient(to bottom, transparent, var(--bk-ink)),
+    linear-gradient(to right, var(--bk-bg-card), transparent);
   box-shadow: none;
 }
 .bd-color-picker__sat-pin {
@@ -35,19 +35,19 @@
   left: 62%;
   width: 14px;
   height: 14px;
-  border-radius: var(--buildrick-radius-circle);
+  border-radius: var(--bk-radius-full);
   background: transparent;
-  border: 2px solid var(--buildrick-bg-card);
-  box-shadow: var(--buildrick-shadow-raised);
+  border: 2px solid var(--bk-bg-card);
+  box-shadow: var(--bk-shadow-raised);
   transform: translate(-50%, -50%);
 }
 
 /* Hue / alpha strips (visual; input semantics via bdr-slider when interactive) */
 .bd-color-picker__strip {
   height: 10px;
-  border-radius: var(--buildrick-radius-full);
+  border-radius: var(--bk-radius-full);
   position: relative;
-  border: 1px solid var(--buildrick-ink-08);
+  border: 1px solid var(--bk-alpha-ink-08);
   box-shadow: none;
 }
 /* Hue strip: pure RGB spectrum is structural input — exempt from token rule (same exemption as canvas dot grid). */
@@ -56,8 +56,8 @@
 }
 .bd-color-picker__strip--alpha {
   background:
-    linear-gradient(to right, transparent, var(--buildrick-accent)),
-    repeating-conic-gradient(var(--buildrick-border-medium) 0% 25%, var(--buildrick-bg-card) 0% 50%) 50% / 8px 8px;
+    linear-gradient(to right, transparent, var(--bk-accent)),
+    repeating-conic-gradient(var(--bk-border-medium) 0% 25%, var(--bk-bg-card) 0% 50%) 50% / 8px 8px;
 }
 .bd-color-picker__strip-thumb {
   position: absolute;
@@ -65,24 +65,24 @@
   transform: translate(-50%, -50%);
   width: 14px;
   height: 18px;
-  border-radius: var(--buildrick-radius-sm);
-  background: var(--buildrick-bg-card);
-  border: 2px solid var(--buildrick-accent);
-  box-shadow: var(--buildrick-shadow-raised);
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-card);
+  border: 2px solid var(--bk-accent);
+  box-shadow: var(--bk-shadow-raised);
 }
 
 /* Swatch + hex input row */
 .bd-color-picker__swatch-row {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 .bd-color-picker__swatch {
   width: 36px;
   height: 36px;
-  border-radius: var(--buildrick-radius-sm);
-  background: var(--buildrick-accent);
-  border: 1px solid var(--buildrick-ink-10);
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-accent);
+  border: 1px solid var(--bk-alpha-ink-10);
   box-shadow: none;
   flex-shrink: 0;
 }
@@ -90,27 +90,27 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-1);
+  gap: var(--bk-space-4);
   height: 32px;
-  padding: 0 var(--buildrick-space-3);
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-sm);
+  padding: 0 var(--bk-space-12);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border-medium);
+  border-radius: var(--bk-radius-sm);
   font-variant-numeric: tabular-nums;
 }
-.bd-color-picker__hex:focus-within { border-color: var(--buildrick-accent); }
+.bd-color-picker__hex:focus-within { border-color: var(--bk-accent); }
 .bd-color-picker__hex-prefix {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
 }
 .bd-color-picker__hex-value {
   flex: 1;
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-normal);
-  color: var(--buildrick-text-primary);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-regular);
+  color: var(--bk-ink);
   letter-spacing: 0.01em;
   background: transparent;
   border: none;
@@ -118,24 +118,24 @@
   width: 100%;
 }
 .bd-color-picker__alpha-pct {
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
 }
 
 /* Recent swatches */
 .bd-color-picker__recents {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 .bd-color-picker__recents-label {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
 }
 .bd-color-picker__swatches {
   display: flex;
@@ -144,8 +144,8 @@
 .bd-color-picker__ss {
   width: 20px;
   height: 20px;
-  border-radius: var(--buildrick-radius-sm);
-  border: 1px solid var(--buildrick-ink-08);
+  border-radius: var(--bk-radius-sm);
+  border: 1px solid var(--bk-alpha-ink-08);
   box-shadow: none;
   cursor: pointer;
   background: transparent;
@@ -153,6 +153,6 @@
 }
 .bd-color-picker__ss.is-on,
 .bd-color-picker__ss[aria-pressed="true"] {
-  border-color: var(--buildrick-accent);
-  box-shadow: var(--buildrick-glow-primary);
+  border-color: var(--bk-accent);
+  box-shadow: var(--bk-shadow-focus);
 }

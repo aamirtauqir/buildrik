@@ -4,21 +4,21 @@ import { SidebarShell } from "../editor/shared/vibcoder/SidebarShell";
 import { sectionLabel } from "./_galleryStyles";
 
 const sidebarPane: React.CSSProperties = {
-  background: "var(--buildrick-surface-2, #f3f4f6)",
+  background: "var(--bk-bg-subtle, #f3f4f6)",
   padding: 12,
   fontSize: 13,
   height: "100%",
 };
 
 const mainPane: React.CSSProperties = {
-  background: "var(--buildrick-surface, #fff)",
+  background: "var(--bk-bg-panel, #fff)",
   padding: 12,
   fontSize: 13,
   height: "100%",
 };
 
 const containerCard: React.CSSProperties = {
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   height: 200,
   overflow: "hidden",

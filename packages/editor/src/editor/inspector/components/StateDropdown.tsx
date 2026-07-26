@@ -61,7 +61,7 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ current, onChange,
         {current !== "normal" && (
           <span
             aria-hidden="true"
-            style={{ width: 5, height: 5, borderRadius: "var(--bd-radius-full)", background: "currentColor" }}
+            style={{ width: 5, height: 5, borderRadius: "var(--bk-radius-full)", background: "currentColor" }}
           />
         )}
         <ChevronDown size={10} aria-hidden="true" style={{ opacity: 0.7 }} />
@@ -74,12 +74,12 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ current, onChange,
             top: "calc(100% + 4px)",
             left: 0,
             zIndex: 200,
-            background: "var(--buildrick-bg-card)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-card)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 4,
             padding: 4,
             minWidth: 150,
-            boxShadow: "var(--bd-shadow-dropdown)",
+            boxShadow: "var(--bk-shadow-drag)",
           }}
         >
           {ALL_STATES.map((s) => {
@@ -101,22 +101,22 @@ export const StateDropdown: React.FC<StateDropdownProps> = ({ current, onChange,
                   gap: 8,
                   width: "100%",
                   padding: "5px 8px",
-                  background: active ? "var(--bd-accent-tint)" : "transparent",
+                  background: active ? "var(--bk-accent-tint)" : "transparent",
                   border: "none",
                   borderRadius: 4,
-                  color: active ? "var(--bd-accent)" : "var(--bd-fg-primary)",
+                  color: active ? "var(--bk-accent)" : "var(--bk-ink)",
                   fontSize: 11,
                   fontWeight: active ? 600 : 500,
                   cursor: "pointer",
                   textAlign: "left",
-                  fontFamily: "var(--bd-font)",
+                  fontFamily: "var(--bk-font-ui)",
                 }}
               >
                 <span style={{ flex: 1 }}>{PSEUDO_LABELS[s]}</span>
                 {hasOverride && (
                   <span
                     aria-hidden="true"
-                    style={{ width: 5, height: 5, borderRadius: "var(--bd-radius-full)", background: "var(--bd-accent)" }}
+                    style={{ width: 5, height: 5, borderRadius: "var(--bk-radius-full)", background: "var(--bk-accent)" }}
                   />
                 )}
               </Button>

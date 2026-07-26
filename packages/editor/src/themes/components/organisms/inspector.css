@@ -7,14 +7,14 @@
  */
 
 .bd-inspector {
-  width: var(--buildrick-size-inspector);
-  background: var(--buildrick-bg-panel);
-  border: 1px solid var(--buildrick-border);
+  width: var(--bk-size-inspector);
+  background: var(--bk-bg-panel);
+  border: 1px solid var(--bk-border);
   border-radius: 0;
   overflow: hidden;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  color: var(--buildrick-text-primary);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink);
   box-shadow: none;
 }
 
@@ -22,8 +22,8 @@
 /* Inspector-scoped overrides for the crumbs strip: tighter padding + bottom border. */
 .bd-inspector__crumbs {
   display: flex;
-  padding: var(--buildrick-space-2) var(--buildrick-space-2) var(--buildrick-space-2) var(--buildrick-space-3);
-  border-bottom: 1px solid var(--buildrick-border);
+  padding: var(--bk-space-8) var(--bk-space-8) var(--bk-space-8) var(--bk-space-12);
+  border-bottom: 1px solid var(--bk-border);
   overflow: hidden;
 }
 
@@ -31,7 +31,7 @@
  * (surface-head has no icon slot) and the gradient + denser type unique to
  * the inspector. __head-name / __head-meta / __head-tag removed. */
 .bd-inspector__head {
-  background: var(--buildrick-bg-panel);
+  background: var(--bk-bg-panel);
   align-items: center;
 }
 .bd-inspector__head-icon {
@@ -41,33 +41,33 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--buildrick-rounded);
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  border-radius: var(--bk-radius-md);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent);
 }
-.bd-inspector__head .bd-surface-head__title { font-size: var(--buildrick-text-sm-half); }
+.bd-inspector__head .bd-surface-head__title { font-size: var(--bk-text-12); }
 .bd-inspector__head .bd-surface-head__meta {
-  font-size: var(--buildrick-text-3xs-plus);
+  font-size: var(--bk-text-11);
   letter-spacing: -0.01em;
 }
 
 /* Section (collapsible) — kept bespoke: the left 2px stripe accent that
  * shifts from border to accent on expand is unique to the inspector and has
  * no equivalent on bdr-section-head (which uses a rotating chevron). */
-.bd-inspector__sec { border-bottom: 1px solid var(--buildrick-border); }
+.bd-inspector__sec { border-bottom: 1px solid var(--bk-border); }
 .bd-inspector__sec:last-child { border-bottom: none; }
 .bd-inspector__sec-head {
   display: flex;
   align-items: center;
-  min-height: var(--buildrick-size-row-dense);
-  gap: var(--buildrick-space-1);
-  padding: 0 var(--buildrick-space-3);
+  min-height: var(--bk-size-row-dense);
+  gap: var(--bk-space-4);
+  padding: 0 var(--bk-space-12);
   width: 100%;
   text-align: left;
   cursor: pointer;
   user-select: none;
   position: relative;
-  background: var(--buildrick-bg-subtle);
+  background: var(--bk-bg-subtle);
   border: none;
 }
 .bd-inspector__sec-head::before {
@@ -75,26 +75,26 @@
   position: absolute;
   left: 0; top: 6px; bottom: 6px;
   width: 3px;
-  border-radius: 0 var(--buildrick-radius-2xs) var(--buildrick-radius-2xs) 0;
+  border-radius: 0 var(--bk-radius-lg) var(--bk-radius-lg) 0;
   background: transparent;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default);
 }
 .bd-inspector__sec[aria-expanded="true"] .bd-inspector__sec-head::before,
-.bd-inspector__sec.is-open .bd-inspector__sec-head::before { background: var(--buildrick-accent); }
+.bd-inspector__sec.is-open .bd-inspector__sec-head::before { background: var(--bk-accent); }
 .bd-inspector__sec-name {
   flex: 1;
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
 }
 /* __sec-ind removed — composes .bd-count--xs. */
 .bd-inspector__sec-body {
-  padding: 2px var(--buildrick-space-3) var(--buildrick-space-3);
+  padding: 2px var(--bk-space-12) var(--bk-space-12);
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-space-1);
+  gap: var(--bk-space-4);
 }
 .bd-inspector__sec[aria-expanded="false"] .bd-inspector__sec-body { display: none; }
 
@@ -104,19 +104,19 @@
 .bd-inspector__field {
   display: flex;
   align-items: center;
-  height: var(--buildrick-size-row-dense);
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-sm);
+  height: var(--bk-size-row-dense);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border-medium);
+  border-radius: var(--bk-radius-sm);
   overflow: hidden;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              border-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default),
+              border-color var(--bk-motion-fast) var(--bk-ease-default);
 }
-.bd-inspector__field:hover { background: var(--buildrick-bg-card); border-color: var(--buildrick-border-input); }
+.bd-inspector__field:hover { background: var(--bk-bg-card); border-color: var(--bk-border-input); }
 .bd-inspector__field:focus-within {
-  background: var(--buildrick-bg-card);
-  border-color: var(--buildrick-accent);
-  box-shadow: var(--buildrick-glow-primary);
+  background: var(--bk-bg-card);
+  border-color: var(--bk-accent);
+  box-shadow: var(--bk-shadow-focus);
 }
 .bd-inspector__field-icon {
   width: 22px;
@@ -124,29 +124,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--buildrick-text-muted);
-  font-size: var(--buildrick-text-2xs);
-  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--bk-ink-muted);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-semibold);
 }
 .bd-inspector__field input {
   flex: 1;
   min-width: 0;
-  padding: 0 var(--buildrick-space-1) 0 0;
+  padding: 0 var(--bk-space-4) 0 0;
   background: transparent;
   border: none;
   outline: none;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-normal);
-  color: var(--buildrick-text-primary);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-regular);
+  color: var(--bk-ink);
   font-variant-numeric: tabular-nums;
 }
 .bd-inspector__field-unit {
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
-  padding-right: var(--buildrick-space-1);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
+  padding-right: var(--bk-space-4);
   text-transform: lowercase;
 }
 
@@ -162,11 +162,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   cursor: pointer;
-  border-radius: var(--buildrick-radius-xs);
+  border-radius: var(--bk-radius-lg);
   background: transparent;
   border: none;
 }
-.bd-inspector__pair-link:hover { color: var(--buildrick-accent); background: var(--buildrick-accent-tint); }
-.bd-inspector__pair-link.is-on { color: var(--buildrick-accent); }
+.bd-inspector__pair-link:hover { color: var(--bk-accent); background: var(--bk-accent-tint); }
+.bd-inspector__pair-link.is-on { color: var(--bk-accent); }

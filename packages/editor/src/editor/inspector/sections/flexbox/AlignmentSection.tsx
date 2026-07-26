@@ -43,7 +43,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
+          color: "var(--bk-ink-muted)",
           marginBottom: 6,
         }}
       >
@@ -64,7 +64,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
         <div
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             marginBottom: 4,
             display: "flex",
             alignItems: "center",
@@ -103,7 +103,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
         <div
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             marginBottom: 4,
             display: "flex",
             alignItems: "center",

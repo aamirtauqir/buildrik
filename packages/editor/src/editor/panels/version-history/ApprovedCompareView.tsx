@@ -36,37 +36,37 @@ export interface ApprovedCompareViewProps {
 type Mode = "split" | "overlay" | "list";
 
 const KIND: Record<CompareChangeKind, { icon: IconName; color: string; label: string }> = {
-  content: { icon: "file", color: "var(--bd-accent)", label: "Content" },
-  style: { icon: "palette", color: "var(--bd-warning-strong)", label: "Style" },
-  added: { icon: "plus", color: "var(--bd-success)", label: "Added" },
-  removed: { icon: "minus", color: "var(--bd-danger)", label: "Removed" },
-  moved: { icon: "grip-vertical", color: "var(--bd-text-secondary)", label: "Moved" },
+  content: { icon: "file", color: "var(--bk-accent)", label: "Content" },
+  style: { icon: "palette", color: "var(--bk-warning-text)", label: "Style" },
+  added: { icon: "plus", color: "var(--bk-success)", label: "Added" },
+  removed: { icon: "minus", color: "var(--bk-error)", label: "Removed" },
+  moved: { icon: "grip-vertical", color: "var(--bk-ink-soft)", label: "Moved" },
 };
 
 const KIND_ORDER: CompareChangeKind[] = ["added", "removed", "moved", "content", "style"];
 
 const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bd-border)", flexWrap: "wrap" },
+  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bk-border)", flexWrap: "wrap" },
   spacer: { flex: 1 },
   stage: { flex: 1, minHeight: 0, display: "flex", gap: 8, padding: 8, overflow: "hidden" },
-  pane: { flex: 1, minWidth: 0, display: "flex", flexDirection: "column", border: "1px solid var(--bd-border)", borderRadius: "var(--bd-radius-md)", overflow: "hidden", background: "var(--bd-surface)" },
-  paneLabel: { fontSize: 11, fontWeight: 600, color: "var(--bd-text-muted)", padding: "6px 10px", borderBottom: "1px solid var(--bd-border)", textTransform: "uppercase", letterSpacing: "0.04em" },
+  pane: { flex: 1, minWidth: 0, display: "flex", flexDirection: "column", border: "1px solid var(--bk-border)", borderRadius: "var(--bk-radius-lg)", overflow: "hidden", background: "var(--bk-bg-panel)" },
+  paneLabel: { fontSize: 11, fontWeight: 600, color: "var(--bk-ink-muted)", padding: "6px 10px", borderBottom: "1px solid var(--bk-border)", textTransform: "uppercase", letterSpacing: "0.04em" },
   frame: { flex: 1, minHeight: 0, border: "none", width: "100%", background: "#fff" },
   overlayWrap: { flex: 1, position: "relative", minHeight: 0 },
   overlayFrame: { position: "absolute", inset: 0, border: "none", width: "100%", height: "100%", background: "#fff" },
-  placeholder: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--bd-text-muted)", fontSize: 13, textAlign: "center", padding: 24 },
-  legend: { display: "flex", gap: 12, flexWrap: "wrap", padding: "6px 12px", borderTop: "1px solid var(--bd-border)", fontSize: 11, color: "var(--bd-text-muted)" },
+  placeholder: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--bk-ink-muted)", fontSize: 13, textAlign: "center", padding: 24 },
+  legend: { display: "flex", gap: 12, flexWrap: "wrap", padding: "6px 12px", borderTop: "1px solid var(--bk-border)", fontSize: 11, color: "var(--bk-ink-muted)" },
   legendItem: { display: "flex", alignItems: "center", gap: 4 },
   listScroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "4px 12px 12px" },
-  listRow: { display: "flex", gap: 8, padding: "8px 10px", border: "1px solid var(--bd-border)", borderRadius: "var(--bd-radius-md)", marginBottom: 6, alignItems: "flex-start" },
+  listRow: { display: "flex", gap: 8, padding: "8px 10px", border: "1px solid var(--bk-border)", borderRadius: "var(--bk-radius-lg)", marginBottom: 6, alignItems: "flex-start" },
   listMain: { display: "flex", flexDirection: "column", gap: 2, minWidth: 0 },
-  listLabel: { fontSize: 13, color: "var(--bd-text)", fontWeight: 500 },
-  listDetail: { fontSize: 12, color: "var(--bd-text-muted)" },
+  listLabel: { fontSize: 13, color: "var(--bk-ink)", fontWeight: 500 },
+  listDetail: { fontSize: 12, color: "var(--bk-ink-muted)" },
   kindTag: { fontSize: 11, fontWeight: 600, flexShrink: 0, display: "flex", alignItems: "center", gap: 3 },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bd-text)" },
-  summary: { fontSize: 12, color: "var(--bd-text-muted)", padding: "6px 12px" },
+  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bk-ink-muted)" },
+  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
+  summary: { fontSize: 12, color: "var(--bk-ink-muted)", padding: "6px 12px" },
 };
 
 function findPage(pages: ComparePage[] | null, path: string): ComparePage | undefined {

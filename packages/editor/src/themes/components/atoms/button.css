@@ -13,20 +13,20 @@
   justify-content: center;
   gap: 6px;
   height: 32px;
-  padding: 0 var(--buildrick-space-3);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-medium);
+  padding: 0 var(--bk-space-12);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-medium);
   line-height: 1.2;
   border: 1px solid transparent;
-  border-radius: var(--buildrick-radius-md);
+  border-radius: var(--bk-radius-lg);
   cursor: pointer;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default),
+              border-color var(--bk-motion-fast) var(--bk-ease-default),
+              color var(--bk-motion-fast) var(--bk-ease-default);
 }
 .bd-btn:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
   box-shadow: none;
 }
@@ -44,63 +44,63 @@
 
 /* ---- Variants ---- */
 .bd-btn--primary {
-  background: var(--buildrick-accent);
-  color: var(--buildrick-text-on-accent);
+  background: var(--bk-accent);
+  color: var(--bk-accent-on);
 }
-.bd-btn--primary:hover { background: var(--buildrick-accent-hover); }
-.bd-btn--primary:active { background: var(--buildrick-accent-pressed); }
+.bd-btn--primary:hover { background: var(--bk-accent-hover); }
+.bd-btn--primary:active { background: var(--bk-accent-pressed); }
 
 .bd-btn--secondary {
-  background: var(--buildrick-bg-card);
-  border-color: var(--buildrick-border-medium);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-card);
+  border-color: var(--bk-border-medium);
+  color: var(--bk-ink);
 }
 .bd-btn--secondary:hover {
-  background: var(--buildrick-bg-subtle);
+  background: var(--bk-bg-subtle);
 }
 
 .bd-btn--ghost {
   background: transparent;
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
 }
 .bd-btn--ghost:hover {
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 
 /* Destructive — filled error surface per Figma Button/destructive (hover stays error) */
 .bd-btn--danger {
-  background: var(--buildrick-error);
+  background: var(--bk-error);
   border-color: transparent;
-  color: var(--buildrick-text-on-accent);
+  color: var(--bk-accent-on);
 }
 .bd-btn--danger:hover {
-  background: var(--buildrick-error);
+  background: var(--bk-error);
   border-color: transparent;
 }
 
 /* CTA (Publish). Single use per topbar context. Button geometry canonical (r8, h32). */
 .bd-btn--publish {
-  background: var(--buildrick-accent);
-  color: var(--buildrick-text-on-accent);
-  border-radius: var(--buildrick-radius-md);
-  padding: 0 var(--buildrick-space-3);
-  font-weight: var(--buildrick-font-weight-medium);
+  background: var(--bk-accent);
+  color: var(--bk-accent-on);
+  border-radius: var(--bk-radius-lg);
+  padding: 0 var(--bk-space-12);
+  font-weight: var(--bk-weight-medium);
 }
-.bd-btn--publish:hover { background: var(--buildrick-accent-hover); }
-.bd-btn--publish:active { background: var(--buildrick-accent-pressed); }
+.bd-btn--publish:hover { background: var(--bk-accent-hover); }
+.bd-btn--publish:active { background: var(--bk-accent-pressed); }
 
 /* ---- Sizes ---- */
 .bd-btn--sm {
   height: 28px;
   padding: 0 10px;
-  font-size: var(--buildrick-text-sm);
-  border-radius: var(--buildrick-radius-md);
+  font-size: var(--bk-text-12);
+  border-radius: var(--bk-radius-lg);
 }
 .bd-btn--lg {
   height: 36px;
-  padding: 0 var(--buildrick-space-4);
-  font-size: var(--buildrick-text-sm-plus);
+  padding: 0 var(--bk-space-16);
+  font-size: var(--bk-text-13);
 }
 
 /* ---- Busy (loading) ---- */
@@ -110,9 +110,9 @@
 .bd-btn__spinner {
   width: 12px;
   height: 12px;
-  border-radius: var(--buildrick-radius-circle);
-  border: 2px solid var(--buildrick-on-dark-40);
-  border-top-color: var(--buildrick-text-on-accent);
+  border-radius: var(--bk-radius-full);
+  border: 2px solid var(--bk-alpha-on-dark-40);
+  border-top-color: var(--bk-accent-on);
   animation: bd-btn-spin 600ms linear infinite;
 }
 @keyframes bd-btn-spin { to { transform: rotate(360deg); } }
@@ -121,19 +121,19 @@
 .bd-btn-split {
   display: inline-flex;
   align-items: stretch;
-  border-radius: var(--buildrick-radius-md);
+  border-radius: var(--bk-radius-lg);
   overflow: hidden;
   box-shadow: none;
 }
 .bd-btn-split .bd-btn--publish {
   border-radius: 0;
-  padding-right: var(--buildrick-space-3);
+  padding-right: var(--bk-space-12);
   box-shadow: none;
 }
 .bd-btn-split__caret {
   width: 30px;
-  background: var(--buildrick-accent-hover);
-  color: var(--buildrick-text-on-accent);
+  background: var(--bk-accent-hover);
+  color: var(--bk-accent-on);
   border: 0;
   cursor: pointer;
   display: inline-flex;
@@ -141,7 +141,7 @@
   justify-content: center;
 }
 .bd-btn-split__caret:hover {
-  background: var(--buildrick-accent-pressed);
+  background: var(--bk-accent-pressed);
 }
 
 /* ---- Bare variant ----

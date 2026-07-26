@@ -90,16 +90,16 @@ const fieldLabel: React.CSSProperties = {
   fontSize: 9,
   letterSpacing: "0.03em",
   textTransform: "uppercase",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   width: 34,
   flexShrink: 0,
 };
 
 function SourceTag({ source }: { source: Source }) {
   return source === "custom" ? (
-    <span style={{ ...srcBase, background: "var(--bd-accent)", color: "var(--bd-fg-on-accent)" }}>custom</span>
+    <span style={{ ...srcBase, background: "var(--bk-accent)", color: "var(--bk-accent-on)" }}>custom</span>
   ) : (
-    <span style={{ ...srcBase, border: "1px dashed var(--bd-border)", color: "var(--bd-fg-muted)" }}>
+    <span style={{ ...srcBase, border: "1px dashed var(--bk-border)", color: "var(--bk-ink-muted)" }}>
       site default
     </span>
   );
@@ -114,8 +114,8 @@ function FlagPill({ flag }: { flag: Flag }) {
         borderRadius: 3,
         padding: "1px 6px",
         whiteSpace: "nowrap",
-        border: ok ? "1px solid var(--bd-border)" : "1px solid var(--bd-fg)",
-        color: ok ? "var(--bd-fg-muted)" : "var(--bd-fg)",
+        border: ok ? "1px solid var(--bk-border)" : "1px solid var(--bk-ink)",
+        color: ok ? "var(--bk-ink-muted)" : "var(--bk-ink)",
         fontWeight: ok ? 400 : 600,
       }}
     >
@@ -128,7 +128,7 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: 6, minWidth: 0 }}>
       <span style={fieldLabel}>{label}</span>
-      <span style={{ fontSize: 11, color: "var(--bd-fg)", minWidth: 0, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+      <span style={{ fontSize: 11, color: "var(--bk-ink)", minWidth: 0, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
         {children}
       </span>
     </div>
@@ -148,7 +148,7 @@ export function SearchListingsTable({ pages, onEditPage }: SearchListingsTablePr
           title={`Edit ${r.page.name}'s search listing`}
           style={{
             cursor: "pointer",
-            border: "1px solid var(--bd-border)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 6,
             padding: "7px 9px",
             display: "flex",
@@ -157,11 +157,11 @@ export function SearchListingsTable({ pages, onEditPage }: SearchListingsTablePr
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <strong style={{ fontSize: 12, color: "var(--bd-fg)" }}>{r.page.name}</strong>
-            <span style={{ fontSize: 10, color: "var(--bd-fg-muted)" }}>{r.path}</span>
+            <strong style={{ fontSize: 12, color: "var(--bk-ink)" }}>{r.page.name}</strong>
+            <span style={{ fontSize: 10, color: "var(--bk-ink-muted)" }}>{r.path}</span>
             <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5 }}>
               {!r.indexed && (
-                <span style={{ fontSize: 9, color: "var(--bd-fg-muted)", whiteSpace: "nowrap" }}>
+                <span style={{ fontSize: 9, color: "var(--bk-ink-muted)", whiteSpace: "nowrap" }}>
                   hidden from Google
                 </span>
               )}
@@ -179,17 +179,17 @@ export function SearchListingsTable({ pages, onEditPage }: SearchListingsTablePr
                 <SourceTag source={r.descriptionSource} />
               </>
             ) : (
-              <span style={{ color: "var(--bd-fg-muted)" }}>— missing —</span>
+              <span style={{ color: "var(--bk-ink-muted)" }}>— missing —</span>
             )}
           </FieldRow>
         </div>
       ))}
-      <p style={{ margin: "4px 2px 0", fontSize: 11, color: "var(--bd-fg-muted)", lineHeight: 1.5 }}>
+      <p style={{ margin: "4px 2px 0", fontSize: 11, color: "var(--bk-ink-muted)", lineHeight: 1.5 }}>
         {issues.length === 0 ? (
           <>All pages have a title &amp; description Google can use.</>
         ) : (
           <>
-            <strong style={{ color: "var(--bd-fg)" }}>{issues.length}</strong>{" "}
+            <strong style={{ color: "var(--bk-ink)" }}>{issues.length}</strong>{" "}
             {issues.length === 1 ? "page needs" : "pages need"} attention — click a card to fix its search listing.
           </>
         )}

@@ -111,8 +111,8 @@ const searchWrapStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   padding: "8px 12px",
-  borderBottom: "1px solid var(--buildrick-border)",
-  background: "var(--buildrick-bg-panel)",
+  borderBottom: "1px solid var(--bk-border)",
+  background: "var(--bk-bg-panel)",
   flexShrink: 0,
 };
 
@@ -123,9 +123,9 @@ const searchBoxStyles: React.CSSProperties = {
   flex: 1,
   height: 28,
   padding: "0 8px",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
-  background: "var(--buildrick-bg-input, var(--buildrick-bg-panel))",
+  background: "var(--bk-bg-card, var(--bk-bg-panel))",
 };
 
 const searchInputStyles: React.CSSProperties = {
@@ -134,7 +134,7 @@ const searchInputStyles: React.CSSProperties = {
   outline: "none",
   background: "transparent",
   fontSize: 12,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
 };
 
 const SearchRow: React.FC<SearchRowProps> = ({
@@ -227,18 +227,18 @@ const emptyStyles: React.CSSProperties = {
   gap: 8,
   padding: "32px 16px",
   textAlign: "center",
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const emptyLabelStyles: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 500,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
 };
 
 const emptyHintStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const Empty: React.FC<EmptyProps> = ({ icon, label, hint, action }) => (

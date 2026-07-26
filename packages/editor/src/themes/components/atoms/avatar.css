@@ -12,12 +12,12 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: var(--buildrick-radius-circle);
-  background: var(--buildrick-accent);
-  color: var(--buildrick-text-on-accent);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-accent);
+  color: var(--bk-accent-on);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-medium);
   letter-spacing: 0.02em;
   overflow: hidden;
   flex-shrink: 0;
@@ -31,20 +31,20 @@
 }
 
 /* Sizes — diameter scales font + presence-dot proportionally */
-.bd-avatar--xs { width: 20px; height: 20px; font-size: var(--buildrick-text-xs); }
-.bd-avatar--sm { width: 24px; height: 24px; font-size: var(--buildrick-text-xs); }
-.bd-avatar--lg { width: 40px; height: 40px; font-size: var(--buildrick-text-md); }
-.bd-avatar--xl { width: 56px; height: 56px; font-size: var(--buildrick-text-xl); }
+.bd-avatar--xs { width: 20px; height: 20px; font-size: var(--bk-text-11); }
+.bd-avatar--sm { width: 24px; height: 24px; font-size: var(--bk-text-11); }
+.bd-avatar--lg { width: 40px; height: 40px; font-size: var(--bk-text-13); }
+.bd-avatar--xl { width: 56px; height: 56px; font-size: var(--bk-text-20); }
 
 /* Color variants — background + text token pairs (no hex) */
-.bd-avatar--accent  { background: var(--buildrick-accent-tint);   color: var(--buildrick-accent); }
-.bd-avatar--neutral { background: var(--buildrick-bg-subtle);     color: var(--buildrick-text-secondary); }
-.bd-avatar--ink     { background: var(--buildrick-text-heading);  color: var(--buildrick-bg-card); }
-.bd-avatar--success { background: var(--buildrick-success-soft);  color: var(--buildrick-success); }
-.bd-avatar--warning { background: var(--buildrick-warning-soft);  color: var(--buildrick-warning); }
+.bd-avatar--accent  { background: var(--bk-accent-tint);   color: var(--bk-accent); }
+.bd-avatar--neutral { background: var(--bk-bg-subtle);     color: var(--bk-ink-soft); }
+.bd-avatar--ink     { background: var(--bk-ink);  color: var(--bk-bg-card); }
+.bd-avatar--success { background: var(--bk-success-tint);  color: var(--bk-success); }
+.bd-avatar--warning { background: var(--bk-warning-tint);  color: var(--bk-warning); }
 .bd-avatar--solid {
-  background: var(--buildrick-accent);
-  color: var(--buildrick-text-on-accent);
+  background: var(--bk-accent);
+  color: var(--bk-accent-on);
 }
 
 /* Presence dot — wraps the avatar with status-dot at bottom-right */
@@ -54,18 +54,18 @@
   bottom: 0;
   width: 9px;
   height: 9px;
-  border-radius: var(--buildrick-radius-circle);
-  background: var(--buildrick-text-muted);
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-ink-muted);
   /* Card-colored separator ring as a border (box-shadow reserved for elevation tokens) */
   box-sizing: content-box;
-  border: 2px solid var(--buildrick-bg-card);
+  border: 2px solid var(--bk-bg-card);
   margin-right: -2px;
   margin-bottom: -2px;
   box-shadow: none;
 }
-.bd-avatar__presence--online  { background: var(--buildrick-success); }
-.bd-avatar__presence--away    { background: var(--buildrick-warning); }
-.bd-avatar__presence--offline { background: var(--buildrick-text-muted); }
+.bd-avatar__presence--online  { background: var(--bk-success); }
+.bd-avatar__presence--away    { background: var(--bk-warning); }
+.bd-avatar__presence--offline { background: var(--bk-ink-muted); }
 
 .bd-avatar--xs .bd-avatar__presence,
 .bd-avatar--sm .bd-avatar__presence { width: 7px; height: 7px; }
@@ -79,7 +79,7 @@
 }
 .bd-avatar-stack > .bd-avatar {
   margin-left: -8px;
-  border: 2px solid var(--buildrick-bg-card);
+  border: 2px solid var(--bk-bg-card);
   box-sizing: content-box;
 }
 .bd-avatar-stack > .bd-avatar:first-child { margin-left: 0; }

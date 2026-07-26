@@ -147,10 +147,10 @@ const editBtnStyles: React.CSSProperties = {
   width: ROW_SM,
   height: ROW_SM,
   padding: 0,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   background: "transparent",
   border: "1px solid transparent",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: "var(--bk-radius-sm)",
   cursor: "pointer",
   transition: "all 0.15s ease",
 };
@@ -190,17 +190,17 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
           height: "28px",
           fontSize: "11px",
           fontWeight: 500,
-          color: active ? "var(--buildrick-text-primary)" : "var(--buildrick-text-secondary)",
-          background: active ? "var(--buildrick-surface-3)" : "transparent",
-          border: active ? "1px solid var(--buildrick-accent)" : "1px solid transparent",
-          borderRadius: "var(--buildrick-radius-sm)",
+          color: active ? "var(--bk-ink)" : "var(--bk-ink-soft)",
+          background: active ? "var(--bk-bg-subtle)" : "transparent",
+          border: active ? "1px solid var(--bk-accent)" : "1px solid transparent",
+          borderRadius: "var(--bk-radius-sm)",
           cursor: "pointer",
           transition: "all 0.15s ease",
         }}
       >
         <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
         <span>{label}</span>
-        {active && <span style={{ marginLeft: "2px", color: "var(--buildrick-accent-text)" }}>✓</span>}
+        {active && <span style={{ marginLeft: "2px", color: "var(--bk-accent-text)" }}>✓</span>}
       </Button>
     </TooltipTrigger>
     <TooltipPortal>
@@ -391,11 +391,11 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 }}
                 style={{
                   ...presetItemStyles,
-                  background: Math.round(zoom) === preset ? "var(--buildrick-surface-3)" : "transparent",
+                  background: Math.round(zoom) === preset ? "var(--bk-bg-subtle)" : "transparent",
                   color:
                     Math.round(zoom) === preset
-                      ? "var(--buildrick-text-primary)"
-                      : "var(--buildrick-text-secondary)",
+                      ? "var(--bk-ink)"
+                      : "var(--bk-ink-soft)",
                 }}
               >
                 {preset}%
@@ -458,11 +458,11 @@ const containerStyles: React.CSSProperties = {
   // was --buildrick-surface-3, which is defined nowhere: the floating bar
   // rendered with NO fill, so canvas content showed straight through a
   // toolbar that is supposed to sit above it.
-  background: "var(--buildrick-bg-card)",
-  border: "1px solid var(--buildrick-border)",        /* PRD §10.7: all-sides border */
-  borderRadius: "var(--buildrick-radius-lg)",         /* PRD §10.7: lg corner radius */
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",        /* PRD §10.7: all-sides border */
+  borderRadius: "var(--bk-radius-lg)",         /* PRD §10.7: lg corner radius */
   // 30%-black was a dark-theme weight; the light chrome uses the shadow scale.
-  boxShadow: "var(--bd-shadow-md)",
+  boxShadow: "var(--bk-shadow-drag)",
   whiteSpace: "nowrap" as const,
   // The bar is centred over the canvas column, which narrows when the
   // inspector opens. Without these the row kept its intrinsic width and ran
@@ -482,7 +482,7 @@ const overlaysGroupStyles: React.CSSProperties = {
 const dividerStyles: React.CSSProperties = {
   width: "1px",
   height: "20px",
-  background: "var(--buildrick-border)",
+  background: "var(--bk-border)",
   margin: "0 4px",
 };
 
@@ -490,8 +490,8 @@ const zoomGroupStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: "2px",
-  background: "var(--buildrick-surface-2)",
-  borderRadius: "var(--buildrick-radius-sm)",
+  background: "var(--bk-bg-subtle)",
+  borderRadius: "var(--bk-radius-sm)",
   padding: "2px",
 };
 
@@ -503,10 +503,10 @@ const zoomBtnStyles: React.CSSProperties = {
   height: "24px",
   fontSize: "14px",
   fontWeight: 500,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: "var(--bk-radius-sm)",
   cursor: "pointer",
   transition: "all 0.15s ease",
 };
@@ -519,7 +519,7 @@ const zoomPctStyles: React.CSSProperties = {
   height: "24px",
   fontSize: "11px",
   fontWeight: 600,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   background: "transparent",
   border: "none",
   cursor: "pointer",
@@ -533,9 +533,9 @@ const presetsDropdownStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   padding: "4px",
-  background: "var(--buildrick-surface-2)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-md)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-lg)",
   boxShadow: "0 4px 16px rgba(0, 0, 0, 0.35)",
   zIndex: 500,
   minWidth: "100px",
@@ -544,8 +544,8 @@ const presetsDropdownStyles: React.CSSProperties = {
 const presetItemStyles: React.CSSProperties = {
   padding: "5px 12px",
   border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-secondary)",
+  borderRadius: "var(--bk-radius-sm)",
+  color: "var(--bk-ink-soft)",
   fontSize: "12px",
   fontWeight: 500,
   cursor: "pointer",
@@ -556,7 +556,7 @@ const presetItemStyles: React.CSSProperties = {
 
 const presetDividerStyles: React.CSSProperties = {
   height: "1px",
-  background: "var(--buildrick-border)",
+  background: "var(--bk-border)",
   margin: "4px 0",
 };
 

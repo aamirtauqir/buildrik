@@ -418,17 +418,17 @@ function formatTime(iso: string | Date): string {
 const emptyStyles: React.CSSProperties = {
   padding: "12px 14px",
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
-  background: "var(--bd-bg-sub)",
-  border: "1px dashed var(--bd-border-default)",
+  color: "var(--bk-ink-muted)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px dashed var(--bk-border-medium)",
   borderRadius: 6,
 };
 
 const errorStyles: React.CSSProperties = {
   marginTop: 4,
   padding: "8px 10px",
-  font: "500 11.5px var(--bd-font)",
-  color: "var(--bd-error)",
+  font: "500 11.5px var(--bk-font-ui)",
+  color: "var(--bk-error)",
   background: "rgba(220, 38, 38, 0.06)",
   border: "1px solid rgba(220, 38, 38, 0.25)",
   borderRadius: 6,
@@ -443,21 +443,21 @@ const filterRowStyles: React.CSSProperties = {
 
 const filterChipBaseStyles: React.CSSProperties = {
   padding: "4px 10px",
-  font: "500 11px var(--bd-font)",
+  font: "500 11px var(--bk-font-ui)",
   background: "transparent",
-  border: "1px solid var(--bd-border-default)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 999,
   cursor: "pointer",
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const filterChipStyles: React.CSSProperties = filterChipBaseStyles;
 
 const filterChipActiveStyles: React.CSSProperties = {
   ...filterChipBaseStyles,
-  background: "var(--bd-accent-tint)",
-  color: "var(--bd-accent)",
-  borderColor: "var(--bd-accent)",
+  background: "var(--bk-accent-tint)",
+  color: "var(--bk-accent)",
+  borderColor: "var(--bk-accent)",
 };
 
 const listStyles: React.CSSProperties = {
@@ -470,8 +470,8 @@ const listStyles: React.CSSProperties = {
 };
 
 const rowBaseStyles: React.CSSProperties = {
-  background: "var(--bd-bg-sub)",
-  border: "1px solid var(--bd-border-default)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 6,
   overflow: "hidden",
 };
@@ -480,7 +480,7 @@ const rowStyles: React.CSSProperties = rowBaseStyles;
 
 const rowUnreadStyles: React.CSSProperties = {
   ...rowBaseStyles,
-  borderLeft: "3px solid var(--bd-accent)",
+  borderLeft: "3px solid var(--bk-accent)",
 };
 
 const rowButtonStyles: React.CSSProperties = {
@@ -503,7 +503,7 @@ const summaryRowStyles: React.CSSProperties = {
 
 const subjectReadStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
   fontWeight: 500,
   whiteSpace: "nowrap",
   overflow: "hidden",
@@ -512,22 +512,22 @@ const subjectReadStyles: React.CSSProperties = {
 
 const subjectUnreadStyles: React.CSSProperties = {
   ...subjectReadStyles,
-  color: "var(--bd-fg-strong)",
+  color: "var(--bk-ink)",
   fontWeight: 600,
 };
 
 const timestampStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   flexShrink: 0,
 };
 
 const sourceStyles: React.CSSProperties = {
   marginTop: 2,
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -535,8 +535,8 @@ const sourceStyles: React.CSSProperties = {
 
 const detailStyles: React.CSSProperties = {
   padding: "8px 10px 10px",
-  borderTop: "1px solid var(--bd-border-default)",
-  background: "var(--bd-bg-default)",
+  borderTop: "1px solid var(--bk-border-medium)",
+  background: "var(--bk-bg-panel)",
 };
 
 const dlStyles: React.CSSProperties = {
@@ -549,18 +549,18 @@ const dlStyles: React.CSSProperties = {
 };
 
 const dtStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 10,
   textTransform: "uppercase",
   letterSpacing: "0.04em",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   paddingTop: 2,
 };
 
 const ddStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 12,
-  color: "var(--bd-fg-strong)",
+  color: "var(--bk-ink)",
   wordBreak: "break-word",
 };
 
@@ -573,17 +573,17 @@ const actionsStyles: React.CSSProperties = {
 
 const actionBtnStyles: React.CSSProperties = {
   padding: "4px 8px",
-  font: "500 11px var(--bd-font)",
-  color: "var(--bd-fg-secondary)",
+  font: "500 11px var(--bk-font-ui)",
+  color: "var(--bk-ink-soft)",
   background: "transparent",
-  border: "1px solid var(--bd-border-default)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 4,
   cursor: "pointer",
 };
 
 const deleteBtnStyles: React.CSSProperties = {
   ...actionBtnStyles,
-  color: "var(--bd-error)",
+  color: "var(--bk-error)",
   borderColor: "rgba(220, 38, 38, 0.4)",
 };
 
@@ -597,16 +597,16 @@ const paginationStyles: React.CSSProperties = {
 
 const pageBtnStyles: React.CSSProperties = {
   padding: "4px 10px",
-  font: "500 11px var(--bd-font)",
-  color: "var(--bd-fg-secondary)",
-  background: "var(--bd-bg-default)",
-  border: "1px solid var(--bd-border-default)",
+  font: "500 11px var(--bk-font-ui)",
+  color: "var(--bk-ink-soft)",
+  background: "var(--bk-bg-panel)",
+  border: "1px solid var(--bk-border-medium)",
   borderRadius: 4,
   cursor: "pointer",
 };
 
 const pageLabelStyles: React.CSSProperties = {
-  fontFamily: "var(--bd-font-mono)",
+  fontFamily: "var(--bk-font-mono)",
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };

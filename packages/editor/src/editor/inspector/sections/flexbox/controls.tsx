@@ -66,9 +66,9 @@ export const FlexAlignmentGrid: React.FC<FlexAlignmentGridProps> = ({
         gridTemplateColumns: "repeat(3, 1fr)",
         gap: 3,
         padding: 8,
-        background: "var(--buildrick-bg-subtle)",
+        background: "var(--bk-bg-subtle)",
         borderRadius: 6,
-        border: `1px solid ${"var(--buildrick-border)"}`,
+        border: `1px solid ${"var(--bk-border)"}`,
       }}
     >
       {[0, 1, 2].map((row) =>
@@ -85,7 +85,7 @@ export const FlexAlignmentGrid: React.FC<FlexAlignmentGridProps> = ({
                 height: 20,
                 borderRadius: 4,
                 border: "none",
-                background: isActive ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel)",
+                background: isActive ? "var(--bk-accent)" : "var(--bk-bg-panel)",
                 cursor: "pointer",
                 transition: "all 0.1s",
                 display: "flex",
@@ -99,7 +99,7 @@ export const FlexAlignmentGrid: React.FC<FlexAlignmentGridProps> = ({
                   width: 6,
                   height: 6,
                   borderRadius: 2,
-                  background: isActive ? "var(--buildrick-text-on-accent)" : "var(--buildrick-text-tertiary)",
+                  background: isActive ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
                 }}
               />
             </Button>
@@ -138,11 +138,11 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
           flex: 1,
           height: 4,
           appearance: "none" as const,
-          background: `linear-gradient(to right, ${"var(--buildrick-accent)"} 0%, ${"var(--buildrick-accent)"} ${
+          background: `linear-gradient(to right, ${"var(--bk-accent)"} 0%, ${"var(--bk-accent)"} ${
             (numericValue / maxGap) * 100
-          }%, ${"var(--buildrick-bg-panel)"} ${
+          }%, ${"var(--bk-bg-panel)"} ${
             (numericValue / maxGap) * 100
-          }%, ${"var(--buildrick-bg-panel)"} 100%)`,
+          }%, ${"var(--bk-bg-panel)"} 100%)`,
           borderRadius: 2,
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.5 : 1,
@@ -156,10 +156,10 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
         style={{
           width: 48,
           padding: "4px 6px",
-          background: "var(--buildrick-bg-input)",
-          border: `1px solid ${"var(--buildrick-border-medium)"}`,
+          background: "var(--bk-bg-card)",
+          border: `1px solid ${"var(--bk-border-medium)"}`,
           borderRadius: 4,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bk-ink)",
           fontSize: 12,
           textAlign: "center" as const,
           outline: "none",

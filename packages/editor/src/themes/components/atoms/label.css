@@ -19,21 +19,21 @@
 .bd-label {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-1);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
+  gap: var(--bk-space-4);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-medium);
   line-height: 1.2;
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
   letter-spacing: 0.02em;
 }
 
 /* Required marker — small asterisk after label text */
 .bd-label__required {
   display: inline-block;
-  margin-left: var(--buildrick-space-1);
-  color: var(--buildrick-error);
-  font-weight: var(--buildrick-font-weight-semibold);
+  margin-left: var(--bk-space-4);
+  color: var(--bk-error);
+  font-weight: var(--bk-weight-semibold);
   line-height: 1;
 }
 .bd-label__required::before { content: "*"; }
@@ -45,23 +45,23 @@
   justify-content: center;
   width: 14px;
   height: 14px;
-  margin-left: var(--buildrick-space-1);
-  color: var(--buildrick-text-muted);
+  margin-left: var(--bk-space-4);
+  color: var(--bk-ink-muted);
   background: transparent;
   border: 0;
   padding: 0;
   cursor: help;
-  border-radius: var(--buildrick-radius-full);
-  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  border-radius: var(--bk-radius-full);
+  transition: color var(--bk-motion-fast) var(--bk-ease-default);
 }
-.bd-label__info:hover { color: var(--buildrick-text-primary); }
+.bd-label__info:hover { color: var(--bk-ink); }
 .bd-label__info:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
   box-shadow: none;
 }
-.bd-label__info:active { color: var(--buildrick-accent); }
+.bd-label__info:active { color: var(--bk-accent); }
 .bd-label__info[disabled],
 .bd-label__info[aria-disabled="true"] {
   cursor: not-allowed;
@@ -70,13 +70,13 @@
 }
 
 /* Variants */
-.bd-label--sm { font-size: var(--buildrick-text-xs); }
+.bd-label--sm { font-size: var(--bk-text-11); }
 .bd-label--inline { margin: 0; }
 
 /* Disabled treatment — applied when wrapping a disabled control */
 .bd-label[data-disabled],
 .bd-label.is-disabled {
   opacity: 0.5;
-  color: var(--buildrick-text-disabled);
+  color: var(--bk-ink-disabled);
   cursor: not-allowed;
 }

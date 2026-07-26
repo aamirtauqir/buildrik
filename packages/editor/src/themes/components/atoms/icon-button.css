@@ -21,13 +21,13 @@
   justify-content: center;
   background: transparent;
   border: 0;
-  border-radius: var(--buildrick-radius-sm-plus);
-  color: var(--buildrick-text-secondary);
+  border-radius: var(--bk-radius-md);
+  color: var(--bk-ink-soft);
   cursor: pointer;
-  font-family: var(--buildrick-font-family);
+  font-family: var(--bk-font-ui);
   line-height: 1;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default),
+              color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* Render any nested SVG icon at a sensible default — caller can override */
@@ -39,21 +39,21 @@
 
 /* ---- States (a11y baseline) ---- */
 .bd-icon-btn:hover {
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 .bd-icon-btn:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
   box-shadow: none;
 }
 .bd-icon-btn:active {
-  background: var(--buildrick-bg-pressed);
+  background: var(--bk-gray-200);
 }
 .bd-icon-btn[aria-pressed="true"],
 .bd-icon-btn.is-on {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent);
 }
 .bd-icon-btn[disabled],
 .bd-icon-btn[aria-disabled="true"] {
@@ -78,37 +78,37 @@
  */
 .bd-icon-btn--ghost {
   background: transparent;
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
 }
 .bd-icon-btn--ghost:hover {
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 
 .bd-icon-btn--primary {
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
 }
 .bd-icon-btn--primary:hover {
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 
 .bd-icon-btn--accent:hover {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent);
 }
 .bd-icon-btn--accent[aria-pressed="true"],
 .bd-icon-btn--accent.is-on {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent);
 }
 
 .bd-icon-btn--danger:hover {
-  background: var(--buildrick-error-bg);
-  color: var(--buildrick-error);
+  background: var(--bk-error-tint);
+  color: var(--bk-error);
 }
 .bd-icon-btn--danger:active {
-  background: var(--buildrick-error-light);
+  background: var(--bk-error-tint);
 }
 
 /* ---- Reduced motion ---- */

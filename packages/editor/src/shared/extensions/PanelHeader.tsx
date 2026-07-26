@@ -85,7 +85,7 @@ const iconBtnStyles: React.CSSProperties = {
   background: "transparent",
   borderRadius: 4,
   cursor: "pointer",
-  color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
+  color: "var(--bk-ink-muted, var(--bk-ink-soft))",
 };
 
 const actionsContainerStyles: React.CSSProperties = {
@@ -118,8 +118,8 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
         style={{
           ...iconBtnStyles,
           color: isPinned
-            ? "var(--buildrick-accent, var(--bd-accent))"
-            : "var(--buildrick-text-muted, var(--bd-fg-secondary))",
+            ? "var(--bk-accent, var(--bk-accent))"
+            : "var(--bk-ink-muted, var(--bk-ink-soft))",
         }}
         title={isPinned ? "Unpin panel" : "Pin panel"}
         aria-label={isPinned ? "Unpin panel" : "Pin panel"}

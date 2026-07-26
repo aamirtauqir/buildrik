@@ -62,23 +62,23 @@ const STATE_STYLE: Record<
   }
 > = {
   token: {
-    bg: "var(--bd-success-soft)",
-    fg: "var(--bd-success-strong)",
-    border: "var(--bd-success-border)",
+    bg: "var(--bk-success-tint)",
+    fg: "var(--bk-success-text)",
+    border: "var(--bk-success)",
     prefix: "",
     actionLabel: (l) => `Jump to token ${l} in Design tab`,
   },
   preset: {
-    bg: "var(--bd-info-soft)",
-    fg: "var(--bd-info-strong)",
-    border: "var(--bd-info-border)",
+    bg: "var(--bk-accent-tint)",
+    fg: "var(--bk-accent-text)",
+    border: "var(--bk-accent-tint)",
     prefix: "",
     actionLabel: (l) => `Jump to preset ${l} in Design tab`,
   },
   "off-ds": {
-    bg: "var(--bd-warn-soft)",
-    fg: "var(--bd-warn-strong)",
-    border: "var(--bd-warn-border)",
+    bg: "var(--bk-warning-tint)",
+    fg: "var(--bk-warning-text)",
+    border: "var(--bk-warning-text)",
     prefix: "⚠ ",
     actionLabel: (l) => `Off-design-system value ${l}. Click to bind to a token.`,
   },
@@ -151,7 +151,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
         style={{
           padding: 0,
           fontSize: 11,
-          color: "var(--bd-accent)",
+          color: "var(--bk-accent)",
           textDecoration: "underline dotted",
           textUnderlineOffset: 2,
         }}

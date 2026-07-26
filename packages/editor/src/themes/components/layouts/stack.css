@@ -8,17 +8,17 @@
 .bd-stack {
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
 }
 
-.bd-stack--xs { gap: var(--buildrick-space-1); }
-.bd-stack--sm { gap: var(--buildrick-space-2); }
-.bd-stack--md { gap: var(--buildrick-space-3); }
-.bd-stack--lg { gap: var(--buildrick-space-4); }
-.bd-stack--xl { gap: var(--buildrick-space-6); }
+.bd-stack--xs { gap: var(--bk-space-4); }
+.bd-stack--sm { gap: var(--bk-space-8); }
+.bd-stack--md { gap: var(--bk-space-12); }
+.bd-stack--lg { gap: var(--bk-space-16); }
+.bd-stack--xl { gap: var(--bk-space-24); }
 
 /* Adds a hairline divider between adjacent children. */
 .bd-stack--separator > * + * {
-  border-top: 1px solid var(--buildrick-border);
-  padding-top: var(--buildrick-space-3);
+  border-top: 1px solid var(--bk-border);
+  padding-top: var(--bk-space-12);
 }

@@ -30,7 +30,7 @@ interface PresenceIndicatorsProps {
 /** Predefined avatar palette — cycled via user ID hash */
 const AVATAR_PALETTE = [
   "#0891B2",
-  "var(--bd-error)",
+  "var(--bk-error)",
   "#ec4899",
   "#f59e0b",
   "#10b981",
@@ -39,8 +39,8 @@ const AVATAR_PALETTE = [
 
 /** Mock users shown in dev-build demo mode only (never in production) */
 const MOCK_USERS: CollaborationUser[] = [
-  { id: "1", name: "You", color: "var(--buildrick-accent)", lastActive: Date.now() },
-  { id: "2", name: "Ana", color: "var(--buildrick-accent)", lastActive: Date.now() },
+  { id: "1", name: "You", color: "var(--bk-accent)", lastActive: Date.now() },
+  { id: "2", name: "Ana", color: "var(--bk-accent)", lastActive: Date.now() },
 ];
 
 // ============================================================================
@@ -96,12 +96,12 @@ const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
     left: "50%",
     transform: "translateX(-50%)",
     whiteSpace: "nowrap",
-    backgroundColor: "var(--buildrick-surface-4)",
-    color: "var(--buildrick-text-primary)",
+    backgroundColor: "var(--bk-gray-200)",
+    color: "var(--bk-ink)",
     fontSize: 12,
     padding: "4px 8px",
-    borderRadius: "var(--buildrick-radius-sm)",
-    boxShadow: "var(--buildrick-shadow-md)",
+    borderRadius: "var(--bk-radius-sm)",
+    boxShadow: "var(--bk-shadow-drag)",
     pointerEvents: "none",
     zIndex: 9999,
     opacity: visible ? 1 : 0,
@@ -141,17 +141,17 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user, isSelf, role, stackIndex 
   const avatarStyle: React.CSSProperties = {
     width: 28,
     height: 28,
-    borderRadius: "var(--bd-radius-full)",
+    borderRadius: "var(--bk-radius-full)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: color,
-    color: "var(--buildrick-text-on-accent)",
+    color: "var(--bk-accent-on)",
     fontSize: 11,
     fontWeight: 600,
-    border: "2px solid var(--buildrick-bg-dark)",
+    border: "2px solid var(--bk-gray-900)",
     // Self indicator: primary-colored ring with offset gap
-    outline: isSelf ? "2px solid var(--buildrick-accent)" : "none",
+    outline: isSelf ? "2px solid var(--bk-accent)" : "none",
     outlineOffset: isSelf ? 2 : 0,
     marginLeft: stackIndex === 0 ? 0 : -8,
     cursor: "default",
@@ -164,7 +164,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user, isSelf, role, stackIndex 
   const imgStyle: React.CSSProperties = {
     width: "100%",
     height: "100%",
-    borderRadius: "var(--bd-radius-full)",
+    borderRadius: "var(--bk-radius-full)",
     objectFit: "cover",
   };
 
@@ -194,15 +194,15 @@ const OverflowBadge: React.FC<OverflowBadgeProps> = ({ count, stackIndex }) => {
   const style: React.CSSProperties = {
     width: 28,
     height: 28,
-    borderRadius: "var(--bd-radius-full)",
-    backgroundColor: "var(--buildrick-surface-4)",
+    borderRadius: "var(--bk-radius-full)",
+    backgroundColor: "var(--bk-gray-200)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     fontSize: 11,
     fontWeight: 600,
-    border: "2px solid var(--buildrick-bg-dark)",
+    border: "2px solid var(--bk-gray-900)",
     marginLeft: -8,
     cursor: "default",
     flexShrink: 0,
@@ -231,18 +231,18 @@ const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({ status }) => 
     alignItems: "center",
     gap: 6,
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     padding: "4px 8px",
-    backgroundColor: "var(--buildrick-surface-3)",
-    borderRadius: "var(--buildrick-radius-xl)",
+    backgroundColor: "var(--bk-bg-subtle)",
+    borderRadius: "var(--bk-radius-lg)",
   };
 
   const spinnerStyle: React.CSSProperties = {
     width: 12,
     height: 12,
-    border: "2px solid var(--buildrick-border)",
-    borderTopColor: "var(--buildrick-accent)",
-    borderRadius: "var(--bd-radius-full)",
+    border: "2px solid var(--bk-border)",
+    borderTopColor: "var(--bk-accent)",
+    borderRadius: "var(--bk-radius-full)",
     animation: "bd-spin 1s linear infinite",
     flexShrink: 0,
   };

@@ -299,9 +299,9 @@ function MediaTabWithComposer({
             <Plus size={14} />
             Add from Stock
           </Button>
-          <div style={{ width: 1, height: 24, background: 'var(--bd-border-light)' }} />
+          <div style={{ width: 1, height: 24, background: 'var(--bk-border)' }} />
           <Button onClick={onClose} style={{
-            background: 'none', border: 'none', color: 'var(--bd-fg-muted)',
+            background: 'none', border: 'none', color: 'var(--bk-ink-muted)',
             cursor: 'pointer', padding: 4, display: 'flex'
           }}>
             <Upload size={18} style={{ transform: 'rotate(180deg)' }} />

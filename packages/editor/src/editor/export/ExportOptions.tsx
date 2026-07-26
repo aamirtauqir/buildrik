@@ -66,11 +66,11 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
             key={fmt}
             onClick={() => onFormatChange(fmt)}
             style={{
-              background: isSelected ? "var(--buildrick-accent-subtle)" : "var(--buildrick-surface-3)",
+              background: isSelected ? "var(--bk-accent-subtle)" : "var(--bk-bg-subtle)",
               border: isSelected
-                ? "2px solid var(--buildrick-accent)"
-                : "1px solid var(--buildrick-border)",
-              borderRadius: "var(--buildrick-radius-md)",
+                ? "2px solid var(--bk-accent)"
+                : "1px solid var(--bk-border)",
+              borderRadius: "var(--bk-radius-lg)",
               padding: 16,
               cursor: "pointer",
               textAlign: "left",
@@ -82,8 +82,8 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
                 style={{
                   width: 32,
                   height: 32,
-                  background: "var(--buildrick-bg-pressed)",
-                  borderRadius: "var(--buildrick-radius-sm)",
+                  background: "var(--bk-gray-200)",
+                  borderRadius: "var(--bk-radius-sm)",
                   flexShrink: 0,
                 }}
               />
@@ -91,7 +91,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
                 style={{
                   fontSize: 14,
                   fontWeight: 500,
-                  color: "var(--buildrick-text-primary)",
+                  color: "var(--bk-ink)",
                 }}
               >
                 {FORMAT_LABELS[fmt]}
@@ -99,7 +99,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
               <div
                 style={{
                   fontSize: 12,
-                  color: "var(--buildrick-text-muted)",
+                  color: "var(--bk-ink-muted)",
                   lineHeight: 1.4,
                 }}
               >
@@ -117,9 +117,9 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
           gap="sm"
           title="Coming soon"
           style={{
-            background: "var(--buildrick-surface-3)",
-            border: "1px solid var(--buildrick-border)",
-            borderRadius: "var(--buildrick-radius-md)",
+            background: "var(--bk-bg-subtle)",
+            border: "1px solid var(--bk-border)",
+            borderRadius: "var(--bk-radius-lg)",
             padding: 16,
             textAlign: "left",
             opacity: 0.5,
@@ -132,8 +132,8 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
             style={{
               width: 32,
               height: 32,
-              background: "var(--buildrick-bg-pressed)",
-              borderRadius: "var(--buildrick-radius-sm)",
+              background: "var(--bk-gray-200)",
+              borderRadius: "var(--bk-radius-sm)",
               flexShrink: 0,
             }}
           />
@@ -141,7 +141,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
             style={{
               fontSize: 14,
               fontWeight: 500,
-              color: "var(--buildrick-text-primary)",
+              color: "var(--bk-ink)",
               display: "flex",
               alignItems: "center",
               gap: 6,
@@ -152,8 +152,8 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
             <span
               style={{
                 fontSize: 10,
-                color: "var(--buildrick-text-muted)",
-                background: "var(--buildrick-surface-4)",
+                color: "var(--bk-ink-muted)",
+                background: "var(--bk-gray-200)",
                 borderRadius: 10,
                 padding: "1px 6px",
                 fontWeight: 500,
@@ -166,7 +166,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
           <div
             style={{
               fontSize: 12,
-              color: "var(--buildrick-text-muted)",
+              color: "var(--bk-ink-muted)",
               lineHeight: 1.4,
             }}
           >
@@ -242,10 +242,10 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           style={{
             width: "100%",
             padding: "8px 12px",
-            background: "var(--buildrick-bg-dark)",
-            border: "1px solid var(--buildrick-border)",
+            background: "var(--bk-gray-900)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 6,
-            color: "var(--buildrick-text-primary)",
+            color: "var(--bk-ink)",
           }}
         />
       </div>
@@ -262,11 +262,11 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 padding: "8px 12px",
                 background:
                   config.cssStyle === style
-                    ? "var(--buildrick-accent)"
-                    : "var(--buildrick-bg-panel-secondary)",
+                    ? "var(--bk-accent)"
+                    : "var(--bk-bg-subtle)",
                 border: "none",
                 borderRadius: 6,
-                color: config.cssStyle === style ? "var(--buildrick-bg-card)" : "var(--buildrick-text-primary)",
+                color: config.cssStyle === style ? "var(--bk-bg-card)" : "var(--bk-ink)",
                 cursor: "pointer",
                 fontSize: 12,
                 textTransform: "capitalize",
@@ -302,7 +302,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
       </Stack>
       {/* CMS Export Options - only show if project has CMS bindings */}
       {hasCMSBindings && onCMSChange && (
-        <div style={{ borderTop: "1px solid var(--buildrick-border)", paddingTop: 16 }}>
+        <div style={{ borderTop: "1px solid var(--bk-border)", paddingTop: 16 }}>
           <label style={{ display: "block", fontSize: 12, marginBottom: 6, fontWeight: 600 }}>
             CMS Content
           </label>
@@ -316,11 +316,11 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                   padding: "8px 12px",
                   background:
                     cmsSettings.mode === mode
-                      ? "var(--buildrick-accent)"
-                      : "var(--buildrick-bg-panel-secondary)",
+                      ? "var(--bk-accent)"
+                      : "var(--bk-bg-subtle)",
                   border: "none",
                   borderRadius: 6,
-                  color: cmsSettings.mode === mode ? "var(--buildrick-bg-card)" : "var(--buildrick-text-primary)",
+                  color: cmsSettings.mode === mode ? "var(--bk-bg-card)" : "var(--bk-ink)",
                   cursor: "pointer",
                   fontSize: 12,
                 }}
@@ -337,7 +337,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                   display: "block",
                   fontSize: 12,
                   marginBottom: 6,
-                  color: "var(--buildrick-text-muted)",
+                  color: "var(--bk-ink-muted)",
                 }}
               >
                 Template Syntax
@@ -351,10 +351,10 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                       flex: 1,
                       padding: "6px 10px",
                       background:
-                        cmsSettings.syntax === syntax ? /* @lint-hex-policy: syntax-theme swatch color (Catppuccin), not chrome */ "#a6e3a1" : "var(--buildrick-bg-panel-secondary)",
+                        cmsSettings.syntax === syntax ? /* @lint-hex-policy: syntax-theme swatch color (Catppuccin), not chrome */ "#a6e3a1" : "var(--bk-bg-subtle)",
                       border: "none",
                       borderRadius: 4,
-                      color: cmsSettings.syntax === syntax ? "var(--buildrick-text-heading)" : "var(--buildrick-text-primary)",
+                      color: cmsSettings.syntax === syntax ? "var(--bk-ink)" : "var(--bk-ink)",
                       cursor: "pointer",
                       fontSize: 12,
                       textTransform: "capitalize",
@@ -367,7 +367,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
             </div>
           )}
 
-          <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 8 }}>
+          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 8 }}>
             {cmsSettings.mode === "none" && "CMS bindings will not be resolved in export."}
             {cmsSettings.mode === "static" && "CMS data will be embedded directly in HTML."}
             {cmsSettings.mode === "template" &&

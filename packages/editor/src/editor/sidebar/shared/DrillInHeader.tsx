@@ -202,9 +202,9 @@ const backButtonStyles: React.CSSProperties = {
   margin: "-4px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-radius-md)",
-  color: "var(--buildrick-text-secondary)",
-  fontSize: "var(--buildrick-text-sm-plus)",
+  borderRadius: "var(--bk-radius-lg)",
+  color: "var(--bk-ink-soft)",
+  fontSize: "var(--bk-text-13)",
   fontWeight: 500,
   cursor: "pointer",
   transition: "background 0.15s ease, color 0.15s ease",
@@ -218,18 +218,18 @@ const breadcrumbStyles: React.CSSProperties = {
 };
 
 const breadcrumbItemStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm)",
+  fontSize: "var(--bk-text-12)",
   fontWeight: 400,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const breadcrumbSeparatorStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm)",
-  color: "var(--buildrick-text-disabled)",
+  fontSize: "var(--bk-text-12)",
+  color: "var(--bk-ink-disabled)",
 };
 
 const breadcrumbCurrentStyles: React.CSSProperties = {
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   fontWeight: 500,
 };
 

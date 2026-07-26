@@ -27,13 +27,13 @@ function Demo() {
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>status dots (color via parent currentColor)</h2>
       <div style={inline}>
-        <span style={{ ...labelRow, color: "var(--buildrick-accent)" }}>
+        <span style={{ ...labelRow, color: "var(--bk-accent)" }}>
           <StatusDot pulse />Connected
         </span>
-        <span style={{ ...labelRow, color: "var(--buildrick-warning)" }}>
+        <span style={{ ...labelRow, color: "var(--bk-warning)" }}>
           <StatusDot />Slow connection
         </span>
-        <span style={{ ...labelRow, color: "var(--buildrick-error)" }}>
+        <span style={{ ...labelRow, color: "var(--bk-error)" }}>
           <StatusDot />Offline
         </span>
       </div>

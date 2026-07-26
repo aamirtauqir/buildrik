@@ -6,8 +6,8 @@
 
 .bd-skeleton {
   display: block;
-  background: var(--buildrick-bg-subtle);
-  border-radius: var(--buildrick-radius-sm);
+  background: var(--bk-bg-subtle);
+  border-radius: var(--bk-radius-sm);
   position: relative;
   overflow: hidden;
 }
@@ -19,7 +19,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    var(--buildrick-ink-06),
+    var(--bk-alpha-ink-06),
     transparent
   );
   transform: translateX(-100%);
@@ -43,14 +43,14 @@
 .bd-skeleton--line {
   width: 100%;
   height: 12px;
-  border-radius: var(--buildrick-radius-full);
+  border-radius: var(--bk-radius-full);
 }
 
 /* Circle — 1:1 ratio, default 32px */
 .bd-skeleton--circle {
   width: 32px;
   height: 32px;
-  border-radius: var(--buildrick-radius-circle);
+  border-radius: var(--bk-radius-full);
   aspect-ratio: 1;
 }
 

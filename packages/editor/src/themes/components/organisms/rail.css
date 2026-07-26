@@ -5,20 +5,20 @@
  */
 
 .bd-rail {
-  width: var(--buildrick-size-rail);
-  background: var(--buildrick-bg-app);
+  width: var(--bk-size-rail);
+  background: var(--bk-bg-app);
   border: none;
   border-radius: 0;
   padding: 10px 0 0;
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-space-1);
+  gap: var(--bk-space-4);
   align-items: center;
 }
 .bd-rail__btn {
-  width: var(--buildrick-size-rail-item);
-  height: var(--buildrick-size-rail-item);
-  border-radius: var(--buildrick-radius-md);
+  width: var(--bk-size-header);
+  height: var(--bk-size-header);
+  border-radius: var(--bk-radius-lg);
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -27,17 +27,17 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
   position: relative;
 }
 .bd-rail__btn:hover {
-  background: var(--buildrick-bg-hover);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 .bd-rail__btn[aria-current="page"],
 .bd-rail__btn.is-on {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent);
 }
 .bd-rail__btn[aria-current="page"]::before,
 .bd-rail__btn.is-on::before {
@@ -47,13 +47,13 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  border-radius: var(--buildrick-radius-2xs);
-  background: var(--buildrick-accent);
+  border-radius: var(--bk-radius-lg);
+  background: var(--bk-accent);
 }
 /* bdr-rail__kbd removed — use atom `bdr-kbd bdr-kbd--bare` (see atoms/kbd.css). */
 .bd-rail__btn[aria-current="page"] .bd-kbd,
 .bd-rail__btn.is-on .bd-kbd {
-  color: var(--buildrick-accent);
+  color: var(--bk-accent);
 }
 /* bdr-rail__sep removed — use atom `bdr-divider` (see atoms/divider.css). */
 
@@ -65,7 +65,7 @@
   flex-direction: row;
   width: 100%;
   height: auto;
-  padding: 0 var(--buildrick-space-2);
+  padding: 0 var(--bk-space-8);
   justify-content: space-around;
   align-items: center;
   gap: 0;
@@ -84,7 +84,7 @@
 /* States — a11y baseline */
 .bd-rail__btn:focus-visible {
   outline: none;
-  box-shadow: var(--buildrick-glow-primary);
+  box-shadow: var(--bk-shadow-focus);
   position: relative;
   z-index: 1;
 }

@@ -170,7 +170,7 @@ export const Slider: React.FC<SliderProps> = ({
                   style={{
                     display: "inline-block",
                     padding: "14px 32px",
-                    background: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "var(--buildrick-accent, #00d4aa)",
+                    background: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "var(--bk-accent, #00d4aa)",
                     color: /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "#fff",
                     fontSize: 16,
                     fontWeight: 600,
@@ -254,7 +254,7 @@ export const Slider: React.FC<SliderProps> = ({
                 borderRadius: 5,
                 border: "none",
                 background:
-                  index === activeIndex ? /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "var(--buildrick-accent, #00d4aa)" : "rgba(255,255,255,0.5)",
+                  index === activeIndex ? /* @lint-hex-policy: block default color — exported user-site content, not editor chrome */ "var(--bk-accent, #00d4aa)" : "rgba(255,255,255,0.5)",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
               }}

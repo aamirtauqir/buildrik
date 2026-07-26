@@ -122,7 +122,7 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
     }}
   >
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-      <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", width: 14 }}>X</span>
+      <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", width: 14 }}>X</span>
       <Select
         value={styles["overflow-x"] || ""}
         onChange={(e) => onChange("overflow-x", e.target.value)}
@@ -136,7 +136,7 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
       </Select>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-      <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", width: 14 }}>Y</span>
+      <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", width: 14 }}>Y</span>
       <Select
         value={styles["overflow-y"] || ""}
         onChange={(e) => onChange("overflow-y", e.target.value)}

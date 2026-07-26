@@ -362,9 +362,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           the selection is kept and restored when the run ends. */}
       {agentRun.running ? (
         <div role="status" aria-live="polite" style={{ padding: "20px 16px", display: "flex", flexDirection: "column", gap: 8 }} data-testid="inspector-ai-run">
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bd-fg-primary)" }}>AI</div>
-          <div style={{ fontSize: 13, color: "var(--bd-fg-primary)" }}>{agentRun.summary || "Working…"}</div>
-          <div style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" }}>AI</div>
+          <div style={{ fontSize: 13, color: "var(--bk-ink)" }}>{agentRun.summary || "Working…"}</div>
+          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
             Your selection is kept and restored when you go back.
           </div>
         </div>
@@ -372,10 +372,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         /* Whole-site scope (board 189:2) — per-element controls step aside;
            site-wide styles live in the Brand panel. */
         <div style={{ padding: "16px" }} data-testid="inspector-whole-site">
-          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bd-fg-primary)", marginBottom: 6 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--bk-ink)", marginBottom: 6 }}>
             Editing the whole site — every page
           </div>
-          <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", lineHeight: 1.5, marginBottom: 12 }}>
+          <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", lineHeight: 1.5, marginBottom: 12 }}>
             Site-wide colours, fonts and spacing live in the Brand panel — change them once,
             everywhere updates.
           </div>

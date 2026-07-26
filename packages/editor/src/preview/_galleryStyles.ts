@@ -50,8 +50,8 @@ export const gridRow = (cols: number, minPx = 120) => ({
  * (Link tone="inverse", future Switch dark-mode demos, etc.).
  */
 export const darkSurface = {
-  background: "var(--buildrick-stage-dark, #111)",
+  background: "var(--bk-gray-900, #111)",
   padding: 16,
   borderRadius: 6,
-  color: "var(--buildrick-text-on-accent)",
+  color: "var(--bk-accent-on)",
 };

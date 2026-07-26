@@ -22,14 +22,14 @@
 .bd-form-field {
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 
 /* Inline — label sits beside the control */
 .bd-form-field--inline {
   flex-direction: row;
   align-items: center;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
 }
 .bd-form-field--inline > .bd-label { flex: 0 0 auto; }
 .bd-form-field--inline > .bd-input,
@@ -46,20 +46,20 @@
   display: grid;
   grid-template-columns: minmax(80px, max-content) minmax(0, 1fr) minmax(0, max-content);
   align-items: center;
-  gap: var(--buildrick-space-2) var(--buildrick-space-3);
+  gap: var(--bk-space-8) var(--bk-space-12);
 }
 .bd-form-field--row > .bd-helper-text { margin-top: 0; }
 
 /* Required passthrough — renders the asterisk even if author omitted the span */
 .bd-form-field--required > .bd-label::after {
   content: "*";
-  margin-left: var(--buildrick-space-1);
-  color: var(--buildrick-error-text);
-  font-weight: var(--buildrick-font-weight-medium);
+  margin-left: var(--bk-space-4);
+  color: var(--bk-error-text);
+  font-weight: var(--bk-weight-medium);
 }
 
 /* Disabled state — dim label + helper; control handles its own treatment */
 .bd-form-field.is-disabled > .bd-label,
 .bd-form-field.is-disabled > .bd-helper-text {
-  color: var(--buildrick-text-disabled);
+  color: var(--bk-ink-disabled);
 }

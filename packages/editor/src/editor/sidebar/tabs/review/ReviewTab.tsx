@@ -70,28 +70,28 @@ const STATUS_TONE: Record<string, { label: string; variant: "syncing" | "publish
 
 const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  header: { padding: 12, borderBottom: "1px solid var(--bd-border)", display: "flex", flexDirection: "column", gap: 8 },
+  header: { padding: 12, borderBottom: "1px solid var(--bk-border)", display: "flex", flexDirection: "column", gap: 8 },
   headRow: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between" },
-  meta: { fontSize: 12, color: "var(--bd-text-muted)", lineHeight: 1.4 },
+  meta: { fontSize: 12, color: "var(--bk-ink-muted)", lineHeight: 1.4 },
   actions: { display: "flex", alignItems: "center", gap: 6 },
   more: { position: "relative" },
-  menu: { position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 10, background: "var(--bd-surface)", border: "1px solid var(--bd-border)", borderRadius: 8, padding: 4, minWidth: 160 },
+  menu: { position: "absolute", right: 0, top: "calc(100% + 4px)", zIndex: 10, background: "var(--bk-bg-panel)", border: "1px solid var(--bk-border)", borderRadius: 8, padding: 4, minWidth: 160 },
   scroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "8px 12px" },
   group: { marginBottom: 12 },
-  groupHead: { fontSize: 11, fontWeight: 600, letterSpacing: ".4px", textTransform: "uppercase", color: "var(--bd-text-muted)", margin: "6px 0" },
-  row: { display: "flex", flexDirection: "column", gap: 4, padding: 8, border: "1px solid var(--bd-border)", borderRadius: 8, marginBottom: 6 },
+  groupHead: { fontSize: 11, fontWeight: 600, letterSpacing: ".4px", textTransform: "uppercase", color: "var(--bk-ink-muted)", margin: "6px 0" },
+  row: { display: "flex", flexDirection: "column", gap: 4, padding: 8, border: "1px solid var(--bk-border)", borderRadius: 8, marginBottom: 6 },
   rowResolved: { opacity: 0.6 },
   rowTop: { display: "flex", alignItems: "center", gap: 6, justifyContent: "space-between" },
-  who: { fontSize: 12, fontWeight: 600, color: "var(--bd-text)" },
-  when: { fontSize: 11, color: "var(--bd-text-muted)" },
-  text: { fontSize: 13, color: "var(--bd-text)", lineHeight: 1.4 },
-  composer: { borderTop: "1px solid var(--bd-border)", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bd-text)" },
-  centerHint: { fontSize: 12, color: "var(--bd-text-muted)", maxWidth: 240 },
-  toolbar: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid var(--bd-border)" },
-  toggle: { fontSize: 12, color: "var(--bd-text-muted)", display: "flex", alignItems: "center", gap: 6 },
-  compareBar: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderBottom: "1px solid var(--bd-border)" },
+  who: { fontSize: 12, fontWeight: 600, color: "var(--bk-ink)" },
+  when: { fontSize: 11, color: "var(--bk-ink-muted)" },
+  text: { fontSize: 13, color: "var(--bk-ink)", lineHeight: 1.4 },
+  composer: { borderTop: "1px solid var(--bk-border)", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 8 },
+  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bk-ink-muted)" },
+  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
+  centerHint: { fontSize: 12, color: "var(--bk-ink-muted)", maxWidth: 240 },
+  toolbar: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 12px", borderBottom: "1px solid var(--bk-border)" },
+  toggle: { fontSize: 12, color: "var(--bk-ink-muted)", display: "flex", alignItems: "center", gap: 6 },
+  compareBar: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderBottom: "1px solid var(--bk-border)" },
 };
 
 interface Group { key: string; label: string; comments: ReviewComment[]; }
@@ -396,12 +396,12 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <>
           {detached.length > 0 && (
             <div style={S.group} data-detached-group>
-              <div style={{ ...S.groupHead, color: "var(--bd-warn-strong)" }}>
+              <div style={{ ...S.groupHead, color: "var(--bk-warning-text)" }}>
                 Detached · {detached.length}
               </div>
               {detached.map((c) => (
                 <div
-                  style={{ ...S.row, background: "var(--bd-warning-tint)" }}
+                  style={{ ...S.row, background: "var(--bk-warning-tint)" }}
                   key={c.id}
                   data-comment-row
                   data-comment-id={c.id}

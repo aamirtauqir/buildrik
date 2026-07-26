@@ -9,15 +9,15 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
   align-items: center;
 }
 
-.bd-cluster--xs { gap: var(--buildrick-space-1); }
-.bd-cluster--sm { gap: var(--buildrick-space-2); }
-.bd-cluster--md { gap: var(--buildrick-space-3); }
-.bd-cluster--lg { gap: var(--buildrick-space-4); }
-.bd-cluster--xl { gap: var(--buildrick-space-6); }
+.bd-cluster--xs { gap: var(--bk-space-4); }
+.bd-cluster--sm { gap: var(--bk-space-8); }
+.bd-cluster--md { gap: var(--bk-space-12); }
+.bd-cluster--lg { gap: var(--bk-space-16); }
+.bd-cluster--xl { gap: var(--bk-space-24); }
 
 .bd-cluster--align-start    { align-items: flex-start; }
 .bd-cluster--align-center   { align-items: center; }

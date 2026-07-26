@@ -33,19 +33,19 @@
 .bd-rail-tile {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
-  padding: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-8);
   width: 100%;
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md);
-  color: var(--buildrick-text-primary);
-  font-family: var(--buildrick-font-family);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
+  color: var(--bk-ink);
+  font-family: var(--bk-font-ui);
   text-align: left;
   cursor: grab;
-  transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: border-color var(--bk-motion-fast) var(--bk-ease-default),
+              background-color var(--bk-motion-fast) var(--bk-ease-default),
+              color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* ---- Grip slot (composes bdr-grip atom) ---- */
@@ -54,7 +54,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
 }
 
 /* ---- Glyph slot (24px tile, centered icon) ---- */
@@ -65,9 +65,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-secondary);
-  border-radius: var(--buildrick-radius-sm);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink-soft);
+  border-radius: var(--bk-radius-sm);
 }
 .bd-rail-tile__glyph > svg {
   width: 16px;
@@ -84,9 +84,9 @@
 }
 
 .bd-rail-tile__label {
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-normal);
-  color: var(--buildrick-text-primary);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-regular);
+  color: var(--bk-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -94,21 +94,21 @@
 
 .bd-rail-tile__count {
   margin-left: auto;
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
   flex-shrink: 0;
 }
 
 /* ---- States (a11y baseline) ---- */
 .bd-rail-tile:hover {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-medium);
+  background: var(--bk-bg-subtle);
+  border-color: var(--bk-border-medium);
 }
 .bd-rail-tile:focus-visible {
   outline: none;
-  box-shadow: var(--buildrick-glow-primary);
-  border-color: var(--buildrick-accent);
+  box-shadow: var(--bk-shadow-focus);
+  border-color: var(--bk-accent);
 }
 .bd-rail-tile:active {
   cursor: grabbing;
@@ -128,8 +128,8 @@
 
 /* ---- Sizes ---- */
 .bd-rail-tile--sm {
-  padding: var(--buildrick-space-1) var(--buildrick-space-2);
-  gap: var(--buildrick-space-1);
+  padding: var(--bk-space-4) var(--bk-space-8);
+  gap: var(--bk-space-4);
 }
 .bd-rail-tile--sm .bd-rail-tile__glyph {
   width: 20px;
@@ -140,7 +140,7 @@
   height: 12px;
 }
 .bd-rail-tile--sm .bd-rail-tile__label {
-  font-size: var(--buildrick-text-xs);
+  font-size: var(--bk-text-11);
 }
 
 /* ---- Orientation ---- */
@@ -152,8 +152,8 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: var(--buildrick-space-3) var(--buildrick-space-2);
-  gap: var(--buildrick-space-2);
+  padding: var(--bk-space-12) var(--bk-space-8);
+  gap: var(--bk-space-8);
 }
 .bd-rail-tile--vertical .bd-rail-tile__grip {
   display: none;
@@ -165,7 +165,7 @@
 }
 .bd-rail-tile--vertical .bd-rail-tile__count {
   margin-left: 0;
-  margin-top: var(--buildrick-space-1);
+  margin-top: var(--bk-space-4);
 }
 
 /* ---- Reduced motion ---- */

@@ -45,11 +45,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: var(--buildrick-size-rail);
-  min-width: var(--buildrick-size-rail);
+  width: var(--bk-size-rail);
+  min-width: var(--bk-size-rail);
   height: 100%;
-  background: var(--buildrick-bg-card);
-  border-right: 1px solid var(--buildrick-border);
+  background: var(--bk-bg-card);
+  border-right: 1px solid var(--bk-border);
   overflow: hidden;
   flex-shrink: 0;
   padding: 6px 0;
@@ -66,7 +66,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: var(--buildrick-accent);
+  color: var(--bk-accent);
   margin-bottom: 2px;
 }
 
@@ -76,9 +76,9 @@
 .ls-divider {
   width: 24px;
   height: 1px;
-  background: var(--buildrick-border);
+  background: var(--bk-border);
   flex-shrink: 0;
-  margin: var(--bd-space-1) 0;
+  margin: var(--bk-space-4) 0;
 }
 
 /* ─────────────────────────────────────────────
@@ -115,7 +115,7 @@
   border-radius: 7px;
   background: transparent;
   cursor: pointer;
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
   font-family: inherit;
   padding: 0;
   text-decoration: none;
@@ -128,9 +128,9 @@
 .ls-btn--labeled {
   flex-direction: column;
   gap: 2px;
-  width: var(--buildrick-size-rail-item);
-  height: var(--buildrick-size-rail-item);
-  min-height: var(--buildrick-size-rail-item);
+  width: var(--bk-size-header);
+  height: var(--bk-size-header);
+  min-height: var(--bk-size-header);
 }
 
 .ls-btn__label {
@@ -149,12 +149,12 @@
 }
 
 .ls-btn:hover {
-  background: var(--buildrick-bg-hover);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 
 .ls-btn:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: -2px;
 }
 
@@ -179,13 +179,13 @@
    ACTIVE BUTTON — accent tint + inset left bar
    ───────────────────────────────────────────── */
 .ls-btn--active {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent-text);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent-text);
 }
 
 .ls-btn--active:hover {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent-text);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent-text);
 }
 
 /* Left accent bar — 2px inset (not full height). Offsets match
@@ -198,18 +198,18 @@
   width: 2px;
   height: auto;
   border-radius: 0 2px 2px 0;
-  background: var(--buildrick-accent);
+  background: var(--bk-accent);
 }
 
 /* Last-active tab while drawer is closed — dim highlight so users keep
    their orientation. No accent bar (bar only renders when drawer open). */
 .ls-btn--last {
-  background: var(--buildrick-bg-hover);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 .ls-btn--last:hover {
-  background: var(--buildrick-bg-hover);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 
 /* ─────────────────────────────────────────────
@@ -221,8 +221,8 @@
   right: 6px;
   width: 6px;
   height: 6px;
-  border-radius: var(--bd-radius-full);
-  background: var(--buildrick-warning, #F59E0B);
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-warning, #F59E0B);
   pointer-events: none;
 }
 
@@ -241,8 +241,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--buildrick-bg-card);
-  border-right: 1px solid var(--buildrick-border);
+  background: var(--bk-bg-card);
+  border-right: 1px solid var(--bk-border);
   overflow: hidden;
   transition: width 0.2s ease, opacity 0.15s ease;
 }
@@ -270,17 +270,17 @@
   background: transparent;
   border: none;
   border-radius: 5px;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   cursor: pointer;
   padding: 0;
   transition: background 0.12s ease, color 0.12s ease;
 }
 .ls-panel-close:hover {
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 .ls-panel-close:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: -2px;
 }
 .ls-panel-close:focus:not(:focus-visible) {
@@ -293,17 +293,17 @@
 .ls-panel-header {
   display: flex;
   align-items: center;
-  padding: 11px var(--bd-space-3) 10px;
-  border-bottom: 1px solid var(--buildrick-border);
+  padding: 11px var(--bk-space-12) 10px;
+  border-bottom: 1px solid var(--bk-border);
   flex-shrink: 0;
-  gap: var(--bd-space-2);
+  gap: var(--bk-space-8);
 }
 
 .ls-panel-title {
-  font-family: var(--buildrick-font-family, "Inter Tight", system-ui, sans-serif);
+  font-family: var(--bk-font-ui, "Inter Tight", system-ui, sans-serif);
   font-size: 13px;
   font-weight: 600;
-  color: var(--bd-fg-heading);
+  color: var(--bk-ink);
   letter-spacing: -0.01em;
   white-space: nowrap;
   margin: 0;
@@ -312,10 +312,10 @@
 
 /* Optional subtitle under title (e.g. "30 blocks · 4 categories") */
 .ls-panel-subtitle {
-  font-family: var(--buildrick-font-family-mono);
+  font-family: var(--bk-font-mono);
   font-size: 10px;
   font-weight: 500;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   letter-spacing: -0.01em;
   margin-top: 1px;
   line-height: 1.2;
@@ -334,7 +334,7 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   padding: 0;
   border-radius: 5px;
   transition: background 0.12s ease, color 0.12s ease;
@@ -342,12 +342,12 @@
 }
 
 .ls-panel-icon-btn:hover {
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-primary);
+  background: var(--bk-bg-subtle);
+  color: var(--bk-ink);
 }
 
 .ls-panel-icon-btn:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: -2px;
 }
 
@@ -363,11 +363,11 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--bd-space-3);
-  padding: var(--bd-space-4);
+  gap: var(--bk-space-12);
+  padding: var(--bk-space-16);
   overflow-y: auto;
   overflow-x: hidden;
-  background: var(--buildrick-bg-card);
+  background: var(--bk-bg-card);
 }
 
 .ls-panel-content--no-padding {
@@ -386,12 +386,12 @@
 }
 
 .ls-panel-content::-webkit-scrollbar-thumb {
-  background: var(--buildrick-border);
+  background: var(--bk-border);
   border-radius: 2px;
 }
 
 .ls-panel-content::-webkit-scrollbar-thumb:hover {
-  background: var(--buildrick-text-secondary);
+  background: var(--bk-ink-soft);
 }
 
 /* ─────────────────────────────────────────────

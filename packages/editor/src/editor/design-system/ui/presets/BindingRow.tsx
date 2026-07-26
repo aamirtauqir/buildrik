@@ -36,8 +36,8 @@ const rowStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = {
   fontSize: 11,
-  fontFamily: "var(--bd-font-mono, monospace)",
-  color: "var(--bd-fg-secondary)",
+  fontFamily: "var(--bk-font-mono, monospace)",
+  color: "var(--bk-ink-soft)",
   flexShrink: 0,
   minWidth: 120,
 };
@@ -46,20 +46,20 @@ const valueButtonStyle: React.CSSProperties = {
   flex: "1 1 auto",
   minWidth: 0,
   padding: "3px 8px",
-  background: "var(--bd-bg-canvas)",
-  color: "var(--bd-fg-primary)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  color: "var(--bk-ink)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
   fontSize: 11,
   textAlign: "left",
   cursor: "pointer",
-  fontFamily: "var(--bd-font-mono, monospace)",
+  fontFamily: "var(--bk-font-mono, monospace)",
 };
 
 const dangerBtnStyle: React.CSSProperties = {
   padding: "3px 8px",
   background: "transparent",
-  color: "var(--bd-error)",
+  color: "var(--bk-error)",
   border: "1px solid rgba(239,68,68,0.3)",
   borderRadius: 4,
   fontSize: 11,

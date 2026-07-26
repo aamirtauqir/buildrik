@@ -29,7 +29,7 @@ export interface InteractionEditorProps {
 const styles = {
   container: {
     padding: 12,
-    borderTop: `1px solid ${"var(--buildrick-border)"}`,
+    borderTop: `1px solid ${"var(--bk-border)"}`,
     display: "flex",
     flexDirection: "column" as const,
     gap: 12,
@@ -44,16 +44,16 @@ const styles = {
   label: {
     display: "block",
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     marginBottom: 4,
   },
   input: {
     width: "100%",
     padding: "8px 10px",
-    background: "var(--buildrick-bg-input)",
-    border: `1px solid ${"var(--buildrick-border-medium)"}`,
+    background: "var(--bk-bg-card)",
+    border: `1px solid ${"var(--bk-border-medium)"}`,
     borderRadius: 6,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
     fontSize: 13,
   } as React.CSSProperties,
   buttonRow: {

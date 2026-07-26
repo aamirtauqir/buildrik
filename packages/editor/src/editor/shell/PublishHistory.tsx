@@ -42,15 +42,15 @@ function relTime(iso: string | Date | null): string {
 
 const S: Record<string, React.CSSProperties> = {
   wrap: { display: "flex", flexDirection: "column", gap: 8, padding: 12, minWidth: 320 },
-  head: { fontSize: 13, fontWeight: 600, color: "var(--bd-text)" },
-  row: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 10px", border: "1px solid var(--bd-border)", borderRadius: 8 },
+  head: { fontSize: 13, fontWeight: 600, color: "var(--bk-ink)" },
+  row: { display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between", padding: "8px 10px", border: "1px solid var(--bk-border)", borderRadius: 8 },
   left: { display: "flex", flexDirection: "column", gap: 2 },
-  ver: { fontSize: 13, fontWeight: 600, color: "var(--bd-text)", display: "flex", alignItems: "center", gap: 6 },
-  meta: { fontSize: 11, color: "var(--bd-text-muted)" },
-  center: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bd-text)" },
-  centerHint: { fontSize: 12, color: "var(--bd-text-muted)", maxWidth: 260 },
-  notice: { fontSize: 12, color: "var(--bd-text-muted)" },
+  ver: { fontSize: 13, fontWeight: 600, color: "var(--bk-ink)", display: "flex", alignItems: "center", gap: 6 },
+  meta: { fontSize: 11, color: "var(--bk-ink-muted)" },
+  center: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 24, textAlign: "center", color: "var(--bk-ink-muted)" },
+  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
+  centerHint: { fontSize: 12, color: "var(--bk-ink-muted)", maxWidth: 260 },
+  notice: { fontSize: 12, color: "var(--bk-ink-muted)" },
 };
 
 export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollbackStarted }) => {

@@ -32,7 +32,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     styles: {
       width: "100%",
       borderCollapse: "collapse",
-      background: "var(--bd-bg-card)",
+      background: "var(--bk-bg-card)",
       borderRadius: "8px",
       overflow: "hidden",
       boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
@@ -45,7 +45,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
   const thead = composer.elements.createElement("container", {
     tagName: "thead",
     styles: {
-      background: "var(--bd-bg-panel)",
+      background: "var(--bk-bg-panel)",
     },
   });
   composer.elements.addElement(thead, tableId);
@@ -64,10 +64,10 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
         textAlign: "left",
         fontWeight: "600",
         fontSize: "12px",
-        color: "var(--bd-fg-secondary)",
+        color: "var(--bk-ink-soft)",
         textTransform: "uppercase",
         letterSpacing: "0.05em",
-        borderBottom: "2px solid var(--bd-border)",
+        borderBottom: "2px solid var(--bk-border)",
       },
     });
     composer.elements.addElement(th, headerRow.getId());
@@ -96,7 +96,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     const tr = composer.elements.createElement("container", {
       tagName: "tr",
       styles: {
-        borderBottom: "1px solid var(--bd-border)",
+        borderBottom: "1px solid var(--bk-border)",
       },
     });
     composer.elements.addElement(tr, tbody.getId());
@@ -123,7 +123,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       tagName: "td",
       styles: {
         padding: "14px 16px",
-        color: "var(--bd-fg-secondary)",
+        color: "var(--bk-ink-soft)",
       },
     });
     composer.elements.addElement(tdEmail, tr.getId());
@@ -184,12 +184,12 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       },
       styles: {
         padding: "6px 12px",
-        background: "var(--bd-bg-subtle)",
+        background: "var(--bk-bg-subtle)",
         border: "none",
         borderRadius: "6px",
         fontSize: "12px",
         fontWeight: "500",
-        color: "var(--bd-fg-secondary)",
+        color: "var(--bk-ink-soft)",
         cursor: "pointer",
       },
     });

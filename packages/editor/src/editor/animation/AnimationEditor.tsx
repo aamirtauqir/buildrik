@@ -112,14 +112,14 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
                 padding: "12px 6px",
                 background:
                   animation.type === anim.value
-                    ? "var(--buildrick-accent)"
-                    : "var(--buildrick-bg-app)",
+                    ? "var(--bk-accent)"
+                    : "var(--bk-bg-app)",
                 border:
                   animation.type === anim.value
                     ? "none"
-                    : "1px solid var(--buildrick-border)",
-                borderRadius: "var(--bd-radius-sm)",
-                color: animation.type === anim.value ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
+                    : "1px solid var(--bk-border)",
+                borderRadius: "var(--bk-radius-sm)",
+                color: animation.type === anim.value ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
                 fontSize: 11,
                 cursor: "pointer",
                 transition: "all 0.15s ease",
@@ -137,7 +137,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             fontSize: 12,
             fontWeight: 600,
             textTransform: "uppercase",
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             marginBottom: 12,
           }}
         >
@@ -197,12 +197,12 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
         <div
           style={{
             padding: 12,
-            background: "var(--buildrick-bg-app)",
-            border: "1px solid var(--buildrick-border)",
-            borderRadius: "var(--bd-radius-sm)",
-            fontFamily: "var(--buildrick-font-family-mono)",
+            background: "var(--bk-bg-app)",
+            border: "1px solid var(--bk-border)",
+            borderRadius: "var(--bk-radius-sm)",
+            fontFamily: "var(--bk-font-mono)",
             fontSize: 10,
-            color: "var(--buildrick-text-secondary)",
+            color: "var(--bk-ink-soft)",
           }}
         >
           animation: {animation.type} {animation.duration}ms {animation.easing} {animation.delay}ms{" "}

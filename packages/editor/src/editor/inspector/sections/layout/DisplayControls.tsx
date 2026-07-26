@@ -47,7 +47,7 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
       <div
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
+          color: "var(--bk-ink-muted)",
           marginBottom: 8,
           display: "flex",
           alignItems: "center",

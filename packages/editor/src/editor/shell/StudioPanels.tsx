@@ -111,7 +111,7 @@ const previewBannerStyle: React.CSSProperties = {
   background: "rgba(0,0,0,0.82)",
   border: "1px solid rgba(255,255,255,0.12)",
   borderRadius: 8,
-  color: "var(--buildrick-text-on-accent)",
+  color: "var(--bk-accent-on)",
   fontSize: 13,
   zIndex: 50,
   pointerEvents: "auto",
@@ -134,7 +134,7 @@ const styles = {
   container: {
     flex: 1,
     overflow: "hidden",
-    background: "var(--buildrick-bg-panel)",
+    background: "var(--bk-bg-panel)",
   } as React.CSSProperties,
 
   canvasPattern: {

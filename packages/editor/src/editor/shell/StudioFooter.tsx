@@ -41,13 +41,13 @@ const zoomBtnStyle: React.CSSProperties = {
   padding: 0,
   border: "none",
   background: "transparent",
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   cursor: "pointer",
   borderRadius: 4,
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  fontFamily: "var(--buildrick-font-family)",
+  fontFamily: "var(--bk-font-ui)",
   fontSize: 13,
   fontWeight: 500,
   lineHeight: 1,
@@ -101,7 +101,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
             alignItems: "center",
             gap: 4,
             padding: "2px 6px",
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             fontSize: 12,
           }}
         >
@@ -121,10 +121,10 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
           style={{
             width: 6,
             height: 6,
-            borderRadius: "var(--bd-radius-full)",
+            borderRadius: "var(--bk-radius-full)",
             background: syncConnected
-              ? "var(--buildrick-success)"
-              : "var(--buildrick-text-muted)",
+              ? "var(--bk-success)"
+              : "var(--bk-ink-muted)",
           }}
         />
         {syncConnected ? "Connected · main" : "Offline"}
@@ -150,7 +150,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
             gap: 2,
             padding: "2px 4px",
             borderRadius: 5,
-            background: "var(--buildrick-bg-subtle)",
+            background: "var(--bk-bg-subtle)",
           }}
         >
           <Button
@@ -166,7 +166,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
             style={{
               minWidth: 36,
               textAlign: "center",
-              color: "var(--buildrick-text-primary)",
+              color: "var(--bk-ink)",
               fontVariantNumeric: "tabular-nums",
             }}
           >

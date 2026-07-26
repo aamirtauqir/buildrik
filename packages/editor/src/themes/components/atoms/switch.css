@@ -6,11 +6,11 @@
 .bd-switch {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-primary);
+  gap: var(--bk-space-8);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink);
   cursor: pointer;
   user-select: none;
 }
@@ -19,9 +19,9 @@
   display: inline-block;
   width: 28px;
   height: 16px;
-  background: var(--buildrick-accent);
-  border-radius: var(--buildrick-radius-full);
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  background: var(--bk-accent);
+  border-radius: var(--bk-radius-full);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default);
 }
 .bd-switch__thumb {
   position: absolute;
@@ -29,20 +29,20 @@
   left: 14px;
   width: 12px;
   height: 12px;
-  background: var(--buildrick-bg-card);
-  border-radius: var(--buildrick-radius-circle);
+  background: var(--bk-bg-card);
+  border-radius: var(--bk-radius-full);
   box-shadow: none;
 }
 .bd-switch[aria-checked="false"] .bd-switch__track,
-.bd-switch--off .bd-switch__track { background: var(--buildrick-border-strong); }
+.bd-switch--off .bd-switch__track { background: var(--bk-border-strong); }
 .bd-switch[aria-checked="false"] .bd-switch__thumb,
 .bd-switch--off .bd-switch__thumb { left: 2px; }
-.bd-switch[aria-checked="false"] { color: var(--buildrick-text-secondary); }
+.bd-switch[aria-checked="false"] { color: var(--bk-ink-soft); }
 
 /* States — a11y baseline. Focus = hard 2px accent outline, no halo. */
 .bd-switch:focus-visible { outline: none; }
 .bd-switch:focus-visible .bd-switch__track {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
   box-shadow: none;
 }
@@ -55,4 +55,4 @@
 }
 .bd-switch[aria-disabled="true"] .bd-switch__track,
 .bd-switch[disabled] .bd-switch__track,
-.bd-switch--disabled .bd-switch__track { background: var(--buildrick-border); }
+.bd-switch--disabled .bd-switch__track { background: var(--bk-border); }

@@ -7,7 +7,7 @@
 .bd-checkbox {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
   cursor: pointer;
   user-select: none;
 }
@@ -21,24 +21,24 @@
   margin: 0;
   appearance: none;
   -webkit-appearance: none;
-  background: var(--buildrick-bg-input);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-sm);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border-medium);
+  border-radius: var(--bk-radius-sm);
   cursor: pointer;
   transition:
-    background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-    border-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+    background-color var(--bk-motion-fast) var(--bk-ease-default),
+    border-color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* Hover (only when interactive + not already filled) */
 .bd-checkbox__input:hover:not(:checked):not(:disabled):not(:indeterminate) {
-  border-color: var(--buildrick-border-hover);
+  border-color: var(--bk-border-strong);
 }
 
 /* Checked — accent fill + checkmark glyph */
 .bd-checkbox__input:checked {
-  background: var(--buildrick-accent);
-  border-color: var(--buildrick-accent);
+  background: var(--bk-accent);
+  border-color: var(--bk-accent);
 }
 .bd-checkbox__input:checked::after {
   content: "\2713"; /* ✓ CHECK MARK */
@@ -47,16 +47,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--buildrick-text-on-accent);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-bold);
+  color: var(--bk-accent-on);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-semibold);
   line-height: 1;
 }
 
 /* Indeterminate — accent fill + horizontal bar */
 .bd-checkbox__input:indeterminate {
-  background: var(--buildrick-accent);
-  border-color: var(--buildrick-accent);
+  background: var(--bk-accent);
+  border-color: var(--bk-accent);
 }
 .bd-checkbox__input:indeterminate::after {
   content: "";
@@ -65,14 +65,14 @@
   left: 50%;
   width: 60%;
   height: 2px;
-  background: var(--buildrick-text-on-accent);
-  border-radius: var(--buildrick-radius-full);
+  background: var(--bk-accent-on);
+  border-radius: var(--bk-radius-full);
   transform: translate(-50%, -50%);
 }
 
 /* Focus — hard 2px accent outline (no halo) */
 .bd-checkbox__input:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
   box-shadow: none;
 }
@@ -83,8 +83,8 @@
   cursor: not-allowed;
 }
 .bd-checkbox__input:disabled:not(:checked):not(:indeterminate) {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-medium);
+  background: var(--bk-bg-subtle);
+  border-color: var(--bk-border-medium);
 }
 .bd-checkbox:has(.bd-checkbox__input:disabled),
 .bd-checkbox.bd-checkbox--disabled {
@@ -93,29 +93,29 @@
 
 /* Label text */
 .bd-checkbox__label {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  color: var(--buildrick-text-primary);
-  line-height: var(--buildrick-line-normal);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink);
+  line-height: var(--bk-leading-normal);
 }
 
 /* ─── SIZES ─── */
 
 .bd-checkbox--sm .bd-checkbox__input { width: 14px; height: 14px; }
-.bd-checkbox--sm .bd-checkbox__input:checked::after { font-size: var(--buildrick-text-xs); }
-.bd-checkbox--sm .bd-checkbox__label { font-size: var(--buildrick-text-xs); }
+.bd-checkbox--sm .bd-checkbox__input:checked::after { font-size: var(--bk-text-11); }
+.bd-checkbox--sm .bd-checkbox__label { font-size: var(--bk-text-11); }
 
 .bd-checkbox--lg .bd-checkbox__input { width: 20px; height: 20px; }
-.bd-checkbox--lg .bd-checkbox__input:checked::after { font-size: var(--buildrick-text-md); }
-.bd-checkbox--lg .bd-checkbox__label { font-size: var(--buildrick-text-md); }
+.bd-checkbox--lg .bd-checkbox__input:checked::after { font-size: var(--bk-text-13); }
+.bd-checkbox--lg .bd-checkbox__label { font-size: var(--bk-text-13); }
 
 /* ─── ERROR ─── */
 
 .bd-checkbox--error .bd-checkbox__input,
 .bd-checkbox--error .bd-checkbox__input:hover:not(:checked):not(:disabled) {
-  border-color: var(--buildrick-error);
+  border-color: var(--bk-error);
 }
 .bd-checkbox--error .bd-checkbox__input:focus-visible {
-  outline-color: var(--buildrick-error);
+  outline-color: var(--bk-error);
   box-shadow: none;
 }

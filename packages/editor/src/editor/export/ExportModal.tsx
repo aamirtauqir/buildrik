@@ -222,7 +222,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
             <div
               style={{
                 fontSize: 12,
-                color: "var(--buildrick-text-muted)",
+                color: "var(--bk-ink-muted)",
                 marginTop: 16,
                 marginBottom: 4,
               }}
@@ -250,10 +250,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               width: "100%",
               height: 44,
               marginTop: 16,
-              background: "var(--buildrick-accent)",
-              color: "var(--buildrick-text-on-accent)",
+              background: "var(--bk-accent)",
+              color: "var(--bk-accent-on)",
               border: "none",
-              borderRadius: "var(--buildrick-radius-md)",
+              borderRadius: "var(--bk-radius-lg)",
               fontSize: 14,
               fontWeight: 600,
               cursor:
@@ -332,7 +332,7 @@ const LoadingState: React.FC = () => (
     }}
   >
     <Spinner size="lg" />
-    <span style={{ color: "var(--buildrick-text-muted)" }}>Generating export...</span>
+    <span style={{ color: "var(--bk-ink-muted)" }}>Generating export...</span>
   </Stack>
 );
 
@@ -343,7 +343,7 @@ const ErrorState: React.FC<{ error: string }> = ({ error }) => (
       alignItems: "center",
       justifyContent: "center",
       height: 300,
-      color: "var(--buildrick-error)",
+      color: "var(--bk-error)",
     }}
   >
     <span style={{ fontSize: 32 }}>Error</span>
@@ -365,10 +365,10 @@ const PreviewTab: React.FC<{
           style={{
             padding: "6px 12px",
             background:
-              previewDevice === device ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
+              previewDevice === device ? "var(--bk-accent)" : "var(--bk-bg-subtle)",
             border: "none",
             borderRadius: 6,
-            color: previewDevice === device ? "var(--buildrick-bg-card)" : "var(--buildrick-text-primary)",
+            color: previewDevice === device ? "var(--bk-bg-card)" : "var(--bk-ink)",
             cursor: "pointer",
             fontSize: 12,
           }}
@@ -388,7 +388,7 @@ const NoPreviewMessage: React.FC<{ format: string }> = ({ format }) => (
       alignItems: "center",
       justifyContent: "center",
       height: 300,
-      color: "var(--buildrick-text-muted)",
+      color: "var(--bk-ink-muted)",
     }}
   >
     <span style={{ fontSize: 32 }}>⚛</span>

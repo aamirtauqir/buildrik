@@ -42,11 +42,11 @@ const REVIEW_PILL: Record<
   { label: string; bg: string; fg: string } | null
 > = {
   none: null,
-  pending: { label: "In review", bg: "var(--buildrick-accent-subtle)", fg: "var(--buildrick-accent)" },
-  "opened-not-acted": { label: "Opened · no reply", bg: "var(--buildrick-accent-subtle)", fg: "var(--buildrick-accent)" },
-  "changes-requested": { label: "Changes requested", bg: "var(--buildrick-warning-soft)", fg: "var(--buildrick-warning-strong)" },
-  approved: { label: "Approved", bg: "var(--buildrick-success-soft)", fg: "var(--buildrick-success-strong)" },
-  "approved-edited-since": { label: "Approved · edited since", bg: "var(--buildrick-warning-soft)", fg: "var(--buildrick-warning-strong)" },
+  pending: { label: "In review", bg: "var(--bk-accent-subtle)", fg: "var(--bk-accent)" },
+  "opened-not-acted": { label: "Opened · no reply", bg: "var(--bk-accent-subtle)", fg: "var(--bk-accent)" },
+  "changes-requested": { label: "Changes requested", bg: "var(--bk-warning-tint)", fg: "var(--bk-warning-text)" },
+  approved: { label: "Approved", bg: "var(--bk-success-tint)", fg: "var(--bk-success-text)" },
+  "approved-edited-since": { label: "Approved · edited since", bg: "var(--bk-warning-tint)", fg: "var(--bk-warning-text)" },
 };
 import type { Issue } from "./hooks/useStudioState";
 import { CommandPalette } from "./modals/CommandPalette";
@@ -363,7 +363,7 @@ export const Topbar: React.FC<TopbarProps> = ({
               href={`${dashboardUrl}/dashboard/projects`}
               className="bd-topbar__exit"
               aria-label="Exit to Dashboard"
-              style={{ fontSize: 13, color: "var(--bd-text-muted)", textDecoration: "none", whiteSpace: "nowrap" }}
+              style={{ fontSize: 13, color: "var(--bk-ink-muted)", textDecoration: "none", whiteSpace: "nowrap" }}
             >
               ‹ Exit
             </a>
@@ -453,12 +453,12 @@ export const Topbar: React.FC<TopbarProps> = ({
                 gap: 6,
                 height: 24,
                 padding: "0 10px",
-                borderRadius: "var(--bd-radius-full)",
+                borderRadius: "var(--bk-radius-full)",
                 fontSize: 12,
                 fontWeight: 500,
                 whiteSpace: "nowrap",
-                background: "var(--buildrick-accent-subtle)",
-                color: "var(--buildrick-accent)",
+                background: "var(--bk-accent-subtle)",
+                color: "var(--bk-accent)",
               }}
             >
               <MessageSquare size={12} aria-hidden="true" />
@@ -472,7 +472,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                 aria-label="Comment mode"
                 aria-pressed={commentMode}
                 onClick={() => composer?.emit("ui:comment-mode", { on: !commentMode })}
-                style={commentMode ? { color: "var(--buildrick-accent)", background: "var(--buildrick-accent-subtle)" } : undefined}
+                style={commentMode ? { color: "var(--bk-accent)", background: "var(--bk-accent-subtle)" } : undefined}
               >
                 <MessageSquare size={16} />
               </IconButton>
@@ -496,7 +496,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                 gap: 6,
                 height: 24,
                 padding: "0 10px",
-                borderRadius: "var(--bd-radius-full)",
+                borderRadius: "var(--bk-radius-full)",
                 fontSize: 12,
                 fontWeight: 500,
                 whiteSpace: "nowrap",
@@ -539,15 +539,15 @@ export const Topbar: React.FC<TopbarProps> = ({
                     top: "calc(100% + 6px)",
                     right: 0,
                     width: 280,
-                    background: "var(--bd-surface)",
-                    border: "1px solid var(--bd-border)",
+                    background: "var(--bk-bg-panel)",
+                    border: "1px solid var(--bk-border)",
                     borderRadius: 4,
-                    boxShadow: "var(--bd-shadow-md, 0 8px 24px rgba(0,0,0,.12))",
+                    boxShadow: "var(--bk-shadow-drag, 0 8px 24px rgba(0,0,0,.12))",
                     padding: 12,
                     zIndex: 50,
                   }}
                 >
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--bd-fg)", marginBottom: 8 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--bk-ink)", marginBottom: 8 }}>
                     Send for review
                   </div>
                   <Input
@@ -582,7 +582,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                     </Button>
                   </div>
                   {reviewState === "error" ? (
-                    <div style={{ fontSize: 11, color: "var(--bd-danger)", marginTop: 6 }}>
+                    <div style={{ fontSize: 11, color: "var(--bk-error)", marginTop: 6 }}>
                       Couldn&apos;t send — try again.
                     </div>
                   ) : null}

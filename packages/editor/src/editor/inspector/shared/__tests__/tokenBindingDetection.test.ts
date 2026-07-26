@@ -14,7 +14,7 @@ describe("isTokenVar", () => {
   it("rejects non-token var() and raw values", () => {
     expect(isTokenVar("#FF0000")).toBe(false);
     expect(isTokenVar("16px")).toBe(false);
-    expect(isTokenVar("var(--bd-accent)")).toBe(false);
+    expect(isTokenVar("var(--bk-accent)")).toBe(false);
     expect(isTokenVar("var(--something-else)")).toBe(false);
     expect(isTokenVar("")).toBe(false);
     expect(isTokenVar("var(--buildrick-design-color-primary, #FF0000)")).toBe(false);
@@ -30,7 +30,7 @@ describe("extractVarName", () => {
 
   it("returns null for non-matching strings", () => {
     expect(extractVarName("#FF0000")).toBeNull();
-    expect(extractVarName("var(--bd-accent)")).toBeNull();
+    expect(extractVarName("var(--bk-accent)")).toBeNull();
     expect(extractVarName("")).toBeNull();
     expect(extractVarName("var(--buildrick-design-color-primary, #FF0000)")).toBeNull();
     expect(extractVarName("var(--something-else)")).toBeNull();

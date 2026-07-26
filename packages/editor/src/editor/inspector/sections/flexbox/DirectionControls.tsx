@@ -11,12 +11,12 @@ import { DirectionIcon } from "./icons";
 const visualBtn = (active: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "10px 6px",
-  background: active ? "var(--bd-accent-tint)" : "var(--buildrick-bg-subtle)",
+  background: active ? "var(--bk-accent-tint)" : "var(--bk-bg-subtle)",
   border: active
-    ? "1px solid var(--buildrick-primary-alpha-30)"
-    : `1px solid ${"var(--buildrick-border)"}`,
+    ? "1px solid var(--bk-alpha-accent-30)"
+    : `1px solid ${"var(--bk-border)"}`,
   borderRadius: 6,
-  color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
+  color: active ? "var(--bk-accent)" : "var(--bk-ink-muted)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -50,7 +50,7 @@ export const DirectionControls: React.FC<DirectionControlsProps> = ({
     <div
       style={{
         fontSize: 12,
-        color: "var(--buildrick-text-tertiary)",
+        color: "var(--bk-ink-muted)",
         marginBottom: 6,
         display: "flex",
         alignItems: "center",

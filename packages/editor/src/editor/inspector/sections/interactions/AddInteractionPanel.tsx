@@ -34,7 +34,7 @@ const GROUP_LABELS: Record<string, string> = {
 
 const styles = {
   container: {
-    background: "var(--buildrick-bg-input)",
+    background: "var(--bk-bg-card)",
     borderRadius: 8,
     padding: 12,
   },
@@ -47,12 +47,12 @@ const styles = {
   title: {
     fontSize: 12,
     fontWeight: 600,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   },
   closeButton: {
     background: "none",
     border: "none",
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     cursor: "pointer",
     fontSize: 16,
   } as React.CSSProperties,
@@ -63,7 +63,7 @@ const styles = {
     fontSize: 12,
     fontWeight: 600,
     textTransform: "uppercase" as const,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     marginBottom: 6,
   },
   triggerGrid: {
@@ -76,10 +76,10 @@ const styles = {
     alignItems: "center",
     gap: 6,
     padding: "8px 10px",
-    background: "var(--buildrick-bg-subtle)",
+    background: "var(--bk-bg-subtle)",
     border: "none",
     borderRadius: 6,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
     fontSize: 12,
     cursor: "pointer",
     transition: "all 0.15s ease",

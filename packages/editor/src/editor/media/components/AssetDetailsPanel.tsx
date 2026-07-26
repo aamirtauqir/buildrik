@@ -106,7 +106,7 @@ export function AssetDetailsPanel({
             padding: 32,
           }}
         >
-          <div style={{ textAlign: "center", color: "var(--buildrick-text-disabled)" }}>
+          <div style={{ textAlign: "center", color: "var(--bk-ink-disabled)" }}>
             <FolderOpen size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
             <div style={{ fontSize: 13 }}>Select an asset to view details</div>
           </div>
@@ -138,7 +138,7 @@ export function AssetDetailsPanel({
               style={{
                 fontSize: 48,
                 fontWeight: 700,
-                color: "var(--buildrick-text-primary)",
+                color: "var(--bk-ink)",
               }}
             >
               Aa Bb
@@ -222,7 +222,7 @@ export function AssetDetailsPanel({
                       style={{
                         fontSize: 12,
                         fontWeight: 500,
-                        color: "var(--buildrick-text-primary)",
+                        color: "var(--bk-ink)",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -234,8 +234,8 @@ export function AssetDetailsPanel({
                           style={{
                             marginLeft: 6,
                             fontSize: 9,
-                            background: "var(--buildrick-accent-tint)",
-                            color: "var(--buildrick-text-primary)",
+                            background: "var(--bk-accent-tint)",
+                            color: "var(--bk-ink)",
                             padding: "1px 5px",
                             borderRadius: 6,
                             fontWeight: 700,
@@ -245,7 +245,7 @@ export function AssetDetailsPanel({
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: 10, color: "var(--buildrick-text-disabled)" }}>
+                    <div style={{ fontSize: 10, color: "var(--bk-ink-disabled)" }}>
                       {formatBytes(v.size)} · {new Date(v.createdAt).toLocaleString()}
                     </div>
                   </div>
@@ -276,13 +276,13 @@ export function AssetDetailsPanel({
               </div>
               {usageCount === 0 ? (
                 <div
-                  style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", padding: 8 }}
+                  style={{ fontSize: 12, color: "var(--bk-ink-disabled)", padding: 8 }}
                 >
                   Not used on any page yet
                 </div>
               ) : (
                 <div
-                  style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", padding: 8 }}
+                  style={{ fontSize: 12, color: "var(--bk-ink-disabled)", padding: 8 }}
                 >
                   {usageCount} element{usageCount !== 1 ? "s" : ""} reference this asset
                 </div>
@@ -354,7 +354,7 @@ export function AssetDetailsPanel({
               <p
                 style={{
                   fontSize: 12,
-                  color: "var(--buildrick-text-disabled)",
+                  color: "var(--bk-ink-disabled)",
                   marginBottom: 12,
                 }}
               >
@@ -392,7 +392,7 @@ export function AssetDetailsPanel({
                       style={{
                         padding: "4px 6px",
                         fontSize: 11,
-                        color: "var(--buildrick-text-secondary)",
+                        color: "var(--bk-ink-soft)",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -464,7 +464,7 @@ function AltTextSection({
     <div data-testid="alt-text-section" style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 6 }}>
       <label
         htmlFor={`alt-text-${item.key}`}
-        style={{ fontSize: 11, fontWeight: 600, color: "var(--buildrick-text-secondary)" }}
+        style={{ fontSize: 11, fontWeight: 600, color: "var(--bk-ink-soft)" }}
       >
         Alt text
       </label>
@@ -480,9 +480,9 @@ function AltTextSection({
           fontSize: 12,
           padding: "6px 8px",
           borderRadius: 4,
-          border: "1px solid var(--buildrick-border)",
-          background: "var(--buildrick-bg-input)",
-          color: "var(--buildrick-text-primary)",
+          border: "1px solid var(--bk-border)",
+          background: "var(--bk-bg-card)",
+          color: "var(--bk-ink)",
           resize: "vertical",
           fontFamily: "inherit",
         }}
@@ -494,7 +494,7 @@ function AltTextSection({
           justifyContent: "space-between",
           gap: 8,
           fontSize: 10,
-          color: "var(--buildrick-text-disabled)",
+          color: "var(--bk-ink-disabled)",
         }}
       >
         {provenance ? (

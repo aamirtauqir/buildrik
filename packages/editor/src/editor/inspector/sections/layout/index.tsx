@@ -65,8 +65,8 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       <span
         style={{
           fontSize: 11,
-          color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-font-family-mono)",
+          color: "var(--bk-ink-muted)",
+          fontFamily: "var(--bk-font-mono)",
           whiteSpace: "nowrap",
         }}
       >

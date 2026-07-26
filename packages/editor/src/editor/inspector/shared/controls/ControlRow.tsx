@@ -53,8 +53,8 @@ export const ControlRow: React.FC<ControlRowProps> = ({
       >
         <label
           style={{
-            font: "500 11px var(--bd-font)",
-            color: "var(--bd-fg-secondary)",
+            font: "500 11px var(--bk-font-ui)",
+            color: "var(--bk-ink-soft)",
             letterSpacing: "-0.005em",
             display: "flex",
             alignItems: "center",

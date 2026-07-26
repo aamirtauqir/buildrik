@@ -46,8 +46,8 @@ const containerStyle: React.CSSProperties = {
 };
 
 const cardStyle: React.CSSProperties = {
-  background: "var(--bd-bg-subtle)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 8,
   padding: 12,
 };
@@ -64,17 +64,17 @@ const formatRowStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "6px 8px",
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   cursor: "pointer",
   fontSize: 12,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const formatRowSelectedStyle: React.CSSProperties = {
   ...formatRowStyle,
-  borderColor: "var(--bd-accent)",
-  background: "var(--bd-bg-elevated, var(--bd-bg-subtle))",
+  borderColor: "var(--bk-accent)",
+  background: "var(--bk-bg-card, var(--bk-bg-subtle))",
 };
 
 const chipBaseStyle: React.CSSProperties = {
@@ -90,7 +90,7 @@ const chipBaseStyle: React.CSSProperties = {
 const statsLineStyle: React.CSSProperties = {
   marginTop: 10,
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const warningCalloutStyle: React.CSSProperties = {
@@ -100,18 +100,18 @@ const warningCalloutStyle: React.CSSProperties = {
   background: "rgba(217, 119, 6, 0.08)",
   borderRadius: 4,
   fontSize: 11,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   lineHeight: 1.5,
 };
 
 const previewStyle: React.CSSProperties = {
   margin: 0,
   padding: 12,
-  background: "var(--bd-bg-canvas)",
-  color: "var(--bd-fg-secondary)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  color: "var(--bk-ink-soft)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  fontFamily: "var(--bd-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
   fontSize: 11,
   lineHeight: 1.55,
   maxHeight: 320,
@@ -122,7 +122,7 @@ const previewStyle: React.CSSProperties = {
 const downloadButtonStyle: React.CSSProperties = {
   marginTop: 8,
   padding: "8px 14px",
-  background: "var(--bd-accent)",
+  background: "var(--bk-accent)",
   color: "#fff",
   border: "none",
   borderRadius: 6,
@@ -137,7 +137,7 @@ const radioRowStyle: React.CSSProperties = {
   gap: 16,
   flexWrap: "wrap",
   fontSize: 12,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const radioLabelStyle: React.CSSProperties = {
@@ -310,7 +310,7 @@ export const ExportSection: React.FC = () => {
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", color: "var(--bd-fg-muted)" }}>
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", color: "var(--bk-ink-muted)" }}>
           FORMAT
         </div>
         <div style={formatListStyle} role="radiogroup" aria-label="Export format">
@@ -332,7 +332,7 @@ export const ExportSection: React.FC = () => {
                   <>
                     <span>
                       {label}
-                      <span style={{ marginLeft: 4, color: "var(--bd-fg-muted)" }}>· {desc}</span>
+                      <span style={{ marginLeft: 4, color: "var(--bk-ink-muted)" }}>· {desc}</span>
                     </span>
                     <span
                       data-testid={`format-chip-${id}`}
@@ -366,7 +366,7 @@ export const ExportSection: React.FC = () => {
 
         {format === "css" && (
           <div style={{ marginTop: 12 }}>
-            <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginBottom: 6 }}>
+            <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6 }}>
               Dark mode strategy
             </div>
             <div style={radioRowStyle} role="radiogroup" aria-label="Dark mode strategy">
@@ -388,7 +388,7 @@ export const ExportSection: React.FC = () => {
       </div>
 
       <div style={cardStyle}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--bd-fg-primary)", marginBottom: 8 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--bk-ink)", marginBottom: 8 }}>
           Preview
         </div>
         <pre data-testid="export-preview" style={previewStyle}>

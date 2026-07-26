@@ -33,7 +33,7 @@ const styles = {
   emptyState: {
     textAlign: "center" as const,
     padding: "16px 12px",
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     fontSize: 12,
   },
 };

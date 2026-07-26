@@ -56,30 +56,30 @@ type Size = NonNullable<SemanticBadgeProps["size"]>;
 // info === accent family per DESIGN.md. Canonical --buildrick-info shares
 // the same cobalt value as --buildrick-accent (see color.css).
 const variantFg: Record<Variant, string> = {
-  default: "var(--bd-fg-muted)",
-  primary: "var(--bd-accent)",
-  success: "var(--bd-success)",
-  warning: "var(--bd-warning)",
-  error: "var(--bd-error)",
-  info: "var(--bd-accent)",
+  default: "var(--bk-ink-muted)",
+  primary: "var(--bk-accent)",
+  success: "var(--bk-success)",
+  warning: "var(--bk-warning)",
+  error: "var(--bk-error)",
+  info: "var(--bk-accent)",
 };
 
 const variantBg: Record<Variant, string> = {
-  default: "var(--bd-bg-subtle)",
-  primary: "var(--bd-accent-tint)",
-  success: "var(--bd-success-bg)",
-  warning: "var(--bd-warning-bg)",
-  error: "var(--bd-error-bg)",
-  info: "var(--bd-accent-tint)",
+  default: "var(--bk-bg-subtle)",
+  primary: "var(--bk-accent-tint)",
+  success: "var(--bk-success-tint)",
+  warning: "var(--bk-warning-tint)",
+  error: "var(--bk-error-tint)",
+  info: "var(--bk-accent-tint)",
 };
 
 const variantBorder: Record<Variant, string> = {
-  default: "var(--bd-border)",
-  primary: "var(--bd-accent-subtle)",
-  success: "var(--bd-success-border)",
-  warning: "var(--bd-warning-border)",
-  error: "var(--bd-error-border)",
-  info: "var(--bd-accent-subtle)",
+  default: "var(--bk-border)",
+  primary: "var(--bk-accent-subtle)",
+  success: "var(--bk-success)",
+  warning: "var(--bk-warning-text)",
+  error: "var(--bk-error)",
+  info: "var(--bk-accent-subtle)",
 };
 
 // BD3: xs size per prototype .tab-badge (10px font, 1px 6px pad).
@@ -91,10 +91,10 @@ const sizePad: Record<Size, string> = {
 };
 
 const sizeFont: Record<Size, string> = {
-  xs: "var(--bd-text-2xs)",
-  sm: "var(--bd-text-2xs)",
-  md: "var(--bd-text-xs)",
-  lg: "var(--bd-text-sm)",
+  xs: "var(--bk-text-11)",
+  sm: "var(--bk-text-11)",
+  md: "var(--bk-text-11)",
+  lg: "var(--bk-text-12)",
 };
 
 const dotSize: Record<Size, string> = {
@@ -107,15 +107,15 @@ const dotSize: Record<Size, string> = {
 const Pill = styled.span<{ v: Variant; s: Size }>`
   display: inline-flex;
   align-items: center;
-  gap: var(--bd-space-2);
+  gap: var(--bk-space-8);
   padding: ${(p) => sizePad[p.s]};
-  font-family: var(--bd-font);
+  font-family: var(--bk-font-ui);
   font-size: ${(p) => sizeFont[p.s]};
-  font-weight: var(--bd-weight-semibold);
-  letter-spacing: var(--bd-track-wide);
+  font-weight: var(--bk-weight-semibold);
+  letter-spacing: var(--bk-tracking-wide);
   /* xs is a numeric counter — never uppercase */
   text-transform: ${(p) => (p.v === "default" || p.s === "xs" ? "none" : "uppercase")};
-  border-radius: var(--bd-radius-full);
+  border-radius: var(--bk-radius-full);
   border: 1px solid ${(p) => variantBorder[p.v]};
   background: ${(p) => variantBg[p.v]};
   color: ${(p) => variantFg[p.v]};
@@ -126,7 +126,7 @@ const Dot = styled.span<{ v: Variant; s: Size }>`
   display: inline-block;
   width: ${(p) => dotSize[p.s]};
   height: ${(p) => dotSize[p.s]};
-  border-radius: var(--bd-radius-full);
+  border-radius: var(--bk-radius-full);
   background: ${(p) => variantFg[p.v]};
   flex-shrink: 0;
 `;

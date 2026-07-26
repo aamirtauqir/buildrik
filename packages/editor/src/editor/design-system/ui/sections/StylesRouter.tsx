@@ -112,7 +112,7 @@ export const StylesRouter: React.FC = () => {
             padding: "6px 12px",
             background: "transparent",
             border: "none",
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             cursor: "pointer",
             fontSize: 12,
             textAlign: "left" as const,

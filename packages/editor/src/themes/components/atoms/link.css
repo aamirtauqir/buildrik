@@ -5,32 +5,32 @@
  */
 
 .bd-link {
-  color: var(--buildrick-accent);
+  color: var(--bk-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
   cursor: pointer;
-  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 .bd-link:hover {
-  color: var(--buildrick-accent-hover);
+  color: var(--bk-accent-hover);
   text-decoration-thickness: 2px;
 }
 .bd-link:active {
-  color: var(--buildrick-accent-pressed);
+  color: var(--bk-accent-pressed);
 }
 .bd-link:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
   box-shadow: none;
-  border-radius: var(--buildrick-radius-sm);
+  border-radius: var(--bk-radius-sm);
 }
 
 .bd-link[disabled],
 .bd-link[aria-disabled="true"],
 .bd-link.bd-link--disabled {
-  color: var(--buildrick-text-disabled);
+  color: var(--bk-ink-disabled);
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -38,27 +38,27 @@
 /* ─── TONES ─── */
 
 .bd-link--muted {
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
 }
 .bd-link--muted:hover {
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
 }
 .bd-link--muted:active {
-  color: var(--buildrick-text-heading);
+  color: var(--bk-ink);
 }
 
 /* Inverse — for use on dark surfaces (stage-dark, accent fills, overlay) */
 .bd-link--inverse {
-  color: var(--buildrick-text-on-accent);
+  color: var(--bk-accent-on);
 }
 .bd-link--inverse:hover {
-  color: var(--buildrick-bg-card);
+  color: var(--bk-bg-card);
 }
 .bd-link--inverse:active {
-  color: var(--buildrick-on-dark-40);
+  color: var(--bk-alpha-on-dark-40);
 }
 .bd-link--inverse:focus-visible {
-  outline: 2px solid var(--buildrick-text-on-accent);
+  outline: 2px solid var(--bk-accent-on);
   box-shadow: none;
 }
 
@@ -76,8 +76,8 @@
 .bd-link--external::after {
   content: "\2197"; /* ↗ NORTH EAST ARROW */
   display: inline-block;
-  margin-left: var(--buildrick-space-1);
-  font-size: var(--buildrick-text-sm);
+  margin-left: var(--bk-space-4);
+  font-size: var(--bk-text-12);
   line-height: 1;
   text-decoration: none;
 }

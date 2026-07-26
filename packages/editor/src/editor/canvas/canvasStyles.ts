@@ -17,7 +17,7 @@ import type { DeviceType } from "../../shared/types";
 
 export const wrapperStyles: React.CSSProperties = {
   flex: 1,
-  background: "var(--buildrick-bg-subtle)",
+  background: "var(--bk-bg-subtle)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -45,11 +45,11 @@ export function getCanvasStyles(
     height: safe.height,
     maxWidth: device === "desktop" ? "100%" : safe.width,
     maxHeight: device === "desktop" ? "100%" : safe.height,
-    background: "var(--buildrick-bg-card)",
+    background: "var(--bk-bg-card)",
     borderRadius: 12,
     boxShadow: isDragOver
-      ? "var(--bd-glow-primary), var(--bd-shadow-lg)"
-      : "var(--bd-shadow-lg)",
+      ? "var(--bk-shadow-focus), var(--bk-shadow-overlay)"
+      : "var(--bk-shadow-overlay)",
     overflow: "auto",
     transform: `scale(${scale})`,
     transformOrigin: "center center",
@@ -61,8 +61,8 @@ export function getCanvasStyles(
 export const contentStyles: React.CSSProperties = {
   minHeight: "100%",
   padding: 20,
-  fontFamily: "var(--bd-font)",
-  color: "var(--bd-fg-primary)",
+  fontFamily: "var(--bk-font-ui)",
+  color: "var(--bk-ink)",
   lineHeight: 1.6,
   position: "relative",
 };
@@ -102,8 +102,8 @@ export function getMarqueeStyles(marquee: {
     top: Math.min(marquee.start.y, marquee.current.y),
     width: Math.abs(marquee.current.x - marquee.start.x),
     height: Math.abs(marquee.current.y - marquee.start.y),
-    backgroundColor: "var(--buildrick-primary-alpha-15)",
-    border: "1px solid var(--bd-accent)",
+    backgroundColor: "var(--bk-alpha-accent-15)",
+    border: "1px solid var(--bk-accent)",
     borderRadius: 2,
     pointerEvents: "none",
     zIndex: Z_LAYERS.modal,

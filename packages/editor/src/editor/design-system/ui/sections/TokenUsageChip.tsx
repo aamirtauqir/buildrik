@@ -27,17 +27,17 @@ const baseStyle: React.CSSProperties = {
   borderRadius: 4,
   fontSize: 11,
   fontWeight: 500,
-  fontFamily: "var(--buildrick-font-family-mono)",
+  fontFamily: "var(--bk-font-mono)",
 };
 
 const usedStyle: React.CSSProperties = {
-  background: "var(--buildrick-success-soft)",
-  color: "var(--buildrick-success-strong)",
+  background: "var(--bk-success-tint)",
+  color: "var(--bk-success-text)",
 };
 
 const unusedStyle: React.CSSProperties = {
-  background: "var(--bd-bg-muted)",
-  color: "var(--bd-fg-muted)",
+  background: "var(--bk-bg-subtle)",
+  color: "var(--bk-ink-muted)",
 };
 
 export const TokenUsageChip: React.FC<TokenUsageChipProps> = ({ count }) => {

@@ -22,7 +22,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
   <div
     style={{
       padding: 10,
-      background: "var(--buildrick-accent-subtle)",
+      background: "var(--bk-accent-subtle)",
       borderRadius: 6,
       marginBottom: 10,
       textAlign: "center",
@@ -31,7 +31,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
     <div
       style={{
         fontSize: 12,
-        color: "var(--buildrick-text-muted)",
+        color: "var(--bk-ink-muted)",
         marginBottom: 6,
       }}
     >
@@ -41,10 +41,10 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
       onClick={() => onChange("display", "flex")}
       style={{
         padding: "6px 14px",
-        background: "var(--buildrick-accent)",
+        background: "var(--bk-accent)",
         border: "none",
         borderRadius: 4,
-        color: "var(--buildrick-text-on-accent)",
+        color: "var(--bk-accent-on)",
         fontSize: 12,
         fontWeight: 600,
         cursor: "pointer",

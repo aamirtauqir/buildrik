@@ -63,7 +63,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
     <div className="bd-canvas-spot-spacing">
       {indicators.map((indicator, index) => {
         const isEditing = editing === `${indicator.type}-${indicator.side}`;
-        const color = indicator.type === "margin" ? "#00d4aa" : "var(--bd-accent-pressed)";
+        const color = indicator.type === "margin" ? "#00d4aa" : "var(--bk-accent-pressed)";
 
         return (
           <div

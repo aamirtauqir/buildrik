@@ -63,8 +63,8 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
         style={{
           background:
             previewState === "ready"
-              ? (template.gradient ?? "var(--bd-bg-subtle, var(--bd-bg-subtle))")
-              : "var(--bd-bg-subtle, var(--bd-bg-subtle))",
+              ? (template.gradient ?? "var(--bk-bg-subtle, var(--bk-bg-subtle))")
+              : "var(--bk-bg-subtle, var(--bk-bg-subtle))",
         }}
       >
         {appliedToCurrentPage && previewState === "ready" && (
@@ -77,11 +77,11 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
         )}
         {previewState === "error" && (
           <div className="tpl-detail-preview-state">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, var(--bd-fg-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bk-ink-soft, var(--bk-ink-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <path d="M12 8v4M12 16h.01" />
             </svg>
-            <p style={{ fontSize: 11, color: "var(--bd-fg-muted)", margin: "6px 0 0", textAlign: "center" }}>
+            <p style={{ fontSize: 11, color: "var(--bk-ink-muted)", margin: "6px 0 0", textAlign: "center" }}>
               Preview unavailable
             </p>
             {onPreviewRetry && (

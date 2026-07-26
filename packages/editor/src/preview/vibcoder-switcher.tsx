@@ -4,8 +4,8 @@ import { Switcher } from "../editor/shared/vibcoder/Switcher";
 import { sectionLabel } from "./_galleryStyles";
 
 const tile: React.CSSProperties = {
-  background: "var(--buildrick-surface-2, #f3f4f6)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-subtle, #f3f4f6)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
   padding: "8px 12px",
   fontSize: 13,
@@ -13,8 +13,8 @@ const tile: React.CSSProperties = {
 };
 
 const containerCard: React.CSSProperties = {
-  background: "var(--buildrick-surface, #fff)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-panel, #fff)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   padding: 12,
   resize: "horizontal",
@@ -26,7 +26,7 @@ const containerCard: React.CSSProperties = {
 
 const note: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--buildrick-color-muted, #6b7280)",
+  color: "var(--bk-ink-muted)",
   marginBottom: 8,
 };
 

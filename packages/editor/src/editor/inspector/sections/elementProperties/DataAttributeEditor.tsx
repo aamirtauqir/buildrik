@@ -28,26 +28,26 @@ const styles = {
   input: {
     flex: 1,
     padding: "8px 10px",
-    background: "var(--bd-bg-subtle)",
-    border: "1px solid var(--bd-border-medium)",
+    background: "var(--bk-bg-subtle)",
+    border: "1px solid var(--bk-border-medium)",
     borderRadius: 6,
-    color: "var(--bd-fg-primary)",
+    color: "var(--bk-ink)",
     fontSize: 12,
     outline: "none",
   } as React.CSSProperties,
   addButton: {
     padding: "8px 16px",
-    background: "var(--buildrick-accent)",
+    background: "var(--bk-accent)",
     border: "none",
     borderRadius: 6,
-    color: "var(--buildrick-text-on-accent)",
+    color: "var(--bk-accent-on)",
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
   } as React.CSSProperties,
   hint: {
     fontSize: 12,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
   } as React.CSSProperties,
 };
 

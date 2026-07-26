@@ -26,14 +26,14 @@
   width: 12px;
   height: 16px;
   cursor: grab;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   background: transparent;
   border: 0;
   padding: 0;
   flex-shrink: 0;
   user-select: none;
   touch-action: none;
-  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* Render any nested SVG glyph at a sensible default — caller can override
@@ -47,17 +47,17 @@
 
 /* ---- States (a11y baseline) ---- */
 .bd-grip:hover {
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
 }
 .bd-grip:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
-  border-radius: var(--buildrick-radius-sm);
+  border-radius: var(--bk-radius-sm);
   box-shadow: none;
 }
 .bd-grip:active {
   cursor: grabbing;
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
 }
 .bd-grip[disabled],
 .bd-grip[aria-disabled="true"] {

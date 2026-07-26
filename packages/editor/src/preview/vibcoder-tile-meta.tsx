@@ -7,14 +7,14 @@ const stackWide = { ...stack, gap: 16, maxWidth: 480 };
 
 const tileFrame = {
   width: 160,
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 8,
   overflow: "hidden" as const,
 };
 
 const thumbBox = {
   height: 90,
-  background: "var(--bd-bg-subtle)",
+  background: "var(--bk-bg-subtle)",
 };
 
 function Demo() {

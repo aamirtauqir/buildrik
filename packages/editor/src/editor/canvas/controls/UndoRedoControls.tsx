@@ -74,7 +74,7 @@ export const UndoRedoControls: React.FC<UndoRedoControlsProps> = ({ composer, cl
         alignItems: "center",
         gap: SIZES.padding.xs,
         padding: SIZES.padding.xs,
-        background: "var(--buildrick-bg-panel-secondary)",
+        background: "var(--bk-bg-subtle)",
         borderRadius: SIZES.borderRadius.lg,
       }}
     >

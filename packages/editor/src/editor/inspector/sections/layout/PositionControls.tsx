@@ -65,7 +65,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
+          color: "var(--bk-ink-muted)",
           marginBottom: 6,
           display: "flex",
           alignItems: "center",
@@ -159,7 +159,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
 
   return (
     <div style={positionOffsetContainerStyle}>
-      <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginBottom: 6, display: "flex", alignItems: "center" }}>
+      <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6, display: "flex", alignItems: "center" }}>
         {(mixedKeys?.has("top") || mixedKeys?.has("right") || mixedKeys?.has("bottom") || mixedKeys?.has("left")) && (
           <MixedValueBadge compact />
         )}
@@ -229,7 +229,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
         {mixedKeys?.has("z-index") && (
           <div style={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
             <MixedValueBadge compact />
-            <span style={{ fontSize: 11, color: "var(--buildrick-text-muted)" }}>Z-Index</span>
+            <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>Z-Index</span>
           </div>
         )}
         <InputRow

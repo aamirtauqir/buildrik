@@ -89,7 +89,7 @@ const rootStylesBase: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--buildrick-bg-panel)",
+  background: "var(--bk-bg-panel)",
   overflow: "hidden",
 };
 
@@ -115,7 +115,7 @@ const PanelShellFn: React.FC<PanelShellProps> = ({
 
   const borderStyles: React.CSSProperties =
     bordered && (width === "narrow" || width === "wide")
-      ? { borderRight: "1px solid var(--buildrick-border)" }
+      ? { borderRight: "1px solid var(--bk-border)" }
       : {};
 
   return (
@@ -162,8 +162,8 @@ const toolbarStyles: React.CSSProperties = {
   height: TOOLBAR_H,
   minHeight: TOOLBAR_H,
   padding: "0 12px",
-  borderBottom: "1px solid var(--buildrick-border)",
-  background: "var(--buildrick-bg-panel)",
+  borderBottom: "1px solid var(--bk-border)",
+  background: "var(--bk-bg-panel)",
   flexShrink: 0,
 };
 
@@ -234,8 +234,8 @@ const footerStyles: React.CSSProperties = {
   height: FOOTER_H,
   minHeight: FOOTER_H,
   padding: "0 12px",
-  borderTop: "1px solid var(--buildrick-border)",
-  background: "var(--buildrick-bg-panel)",
+  borderTop: "1px solid var(--bk-border)",
+  background: "var(--bk-bg-panel)",
   flexShrink: 0,
 };
 

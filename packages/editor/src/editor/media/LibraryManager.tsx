@@ -379,7 +379,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       </div>
       {/* ═══ STATUS BAR ═══ */}
       <div className="mgr-status">
-        <span><strong style={{ color: "var(--buildrick-text-secondary)" }}>{state.counts.all}</strong> assets</span>
+        <span><strong style={{ color: "var(--bk-ink-soft)" }}>{state.counts.all}</strong> assets</span>
         <span className="mgr-status-dot" />
         <span>{formatBytes(state.storage.used)} / {formatBytes(state.storage.total)}</span>
         <div className="mgr-status-right">

@@ -127,7 +127,7 @@ export const AssetCard: React.FC<AssetCardProps> = ({
       left: -9999px;
       padding: 8px 12px;
       background: linear-gradient(135deg, #89b4fa 0%, #b4befe 100%);
-      border-radius: "var(--bd-radius-md)";
+      border-radius: "var(--bk-radius-lg)";
       color: #fff;
       font-size: 12px;
       font-weight: 500;

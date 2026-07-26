@@ -14,7 +14,7 @@
 
 .bd-sidebar-shell__sidebar {
   flex: 0 0 auto;
-  width: var(--buildrick-size-inspector);
+  width: var(--bk-size-inspector);
   min-width: 0;
 }
 
@@ -25,9 +25,9 @@
 
 /* Width variants — bound to the --buildrick-size-* shell contract
  * (nav 240 / inspector 300 / drawer 320). */
-.bd-sidebar-shell--sidebar-sm .bd-sidebar-shell__sidebar { width: var(--buildrick-size-nav); }
-.bd-sidebar-shell--sidebar-md .bd-sidebar-shell__sidebar { width: var(--buildrick-size-inspector); }
-.bd-sidebar-shell--sidebar-lg .bd-sidebar-shell__sidebar { width: var(--buildrick-size-drawer); }
+.bd-sidebar-shell--sidebar-sm .bd-sidebar-shell__sidebar { width: var(--bk-size-nav); }
+.bd-sidebar-shell--sidebar-md .bd-sidebar-shell__sidebar { width: var(--bk-size-inspector); }
+.bd-sidebar-shell--sidebar-lg .bd-sidebar-shell__sidebar { width: var(--bk-size-drawer); }
 
 /* Place the sidebar on the right (e.g. inspector panel). */
 .bd-sidebar-shell--side-right {
@@ -36,10 +36,10 @@
 
 /* Hairline divider between rail and main. */
 .bd-sidebar-shell--bordered .bd-sidebar-shell__sidebar {
-  border-right: 1px solid var(--buildrick-border);
+  border-right: 1px solid var(--bk-border);
 }
 
 .bd-sidebar-shell--bordered.bd-sidebar-shell--side-right .bd-sidebar-shell__sidebar {
   border-right: 0;
-  border-left: 1px solid var(--buildrick-border);
+  border-left: 1px solid var(--bk-border);
 }

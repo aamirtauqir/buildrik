@@ -76,7 +76,7 @@ const backBtnStyle: React.CSSProperties = {
   padding: "4px 8px",
   background: "transparent",
   border: "none",
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   fontSize: 12,
   cursor: "pointer",
   alignSelf: "flex-start",
@@ -92,20 +92,20 @@ const headerStyle: React.CSSProperties = {
 const nameStyle: React.CSSProperties = {
   fontSize: 16,
   fontWeight: 600,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   lineHeight: 1.2,
 };
 
 const idMonoStyle: React.CSSProperties = {
   fontSize: 12,
-  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
-  color: "var(--bd-fg-muted)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
+  color: "var(--bk-ink-muted)",
 };
 
 const cssVarStyle: React.CSSProperties = {
   fontSize: 11,
-  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
-  color: "var(--bd-fg-muted)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
+  color: "var(--bk-ink-muted)",
   marginTop: 2,
 };
 
@@ -114,14 +114,14 @@ const fieldRowStyle: React.CSSProperties = {
   alignItems: "flex-start",
   gap: 12,
   padding: "8px 0",
-  borderTop: "1px solid var(--bd-border)",
+  borderTop: "1px solid var(--bk-border)",
 };
 
 const fieldLabelStyle: React.CSSProperties = {
   width: 96,
   flexShrink: 0,
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   paddingTop: 4,
 };
 
@@ -129,18 +129,18 @@ const fieldValueStyle: React.CSSProperties = {
   flex: 1,
   minWidth: 0,
   fontSize: 12,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "6px 8px",
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
-  background: "var(--bd-bg-elevated)",
-  color: "var(--bd-fg-primary)",
+  background: "var(--bk-bg-card)",
+  color: "var(--bk-ink)",
   fontSize: 12,
-  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
   boxSizing: "border-box",
 };
 
@@ -149,7 +149,7 @@ const lintPassStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   fontSize: 12,
-  color: "var(--bd-success)",
+  color: "var(--bk-success)",
 };
 
 const lintFailStyle: React.CSSProperties = {
@@ -157,7 +157,7 @@ const lintFailStyle: React.CSSProperties = {
   flexDirection: "column",
   gap: 6,
   fontSize: 12,
-  color: "var(--buildrick-warning-strong)",
+  color: "var(--bk-warning-text)",
 };
 
 const lintActionRowStyle: React.CSSProperties = {
@@ -168,9 +168,9 @@ const lintActionRowStyle: React.CSSProperties = {
 const smallBtnStyle: React.CSSProperties = {
   padding: "3px 8px",
   borderRadius: 4,
-  border: "1px solid var(--bd-border)",
+  border: "1px solid var(--bk-border)",
   background: "transparent",
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   fontSize: 11,
   fontWeight: 500,
   cursor: "pointer",
@@ -185,9 +185,9 @@ const actionRowStyle: React.CSSProperties = {
 const actionBtnStyle: React.CSSProperties = {
   padding: "6px 12px",
   borderRadius: 6,
-  border: "1px solid var(--bd-border)",
-  background: "var(--bd-bg-elevated)",
-  color: "var(--bd-fg-primary)",
+  border: "1px solid var(--bk-border)",
+  background: "var(--bk-bg-card)",
+  color: "var(--bk-ink)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -195,8 +195,8 @@ const actionBtnStyle: React.CSSProperties = {
 
 const dangerBtnStyle: React.CSSProperties = {
   ...actionBtnStyle,
-  color: "var(--bd-danger)",
-  borderColor: "var(--bd-danger)",
+  color: "var(--bk-error)",
+  borderColor: "var(--bk-error)",
 };
 
 // ─ Used-by expand styles (D6.b drill-in list) ─────────────────────────────
@@ -207,7 +207,7 @@ const usageToggleStyle: React.CSSProperties = {
   padding: "0",
   background: "transparent",
   border: "none",
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   fontSize: 12,
   cursor: "pointer",
   textAlign: "left",
@@ -217,7 +217,7 @@ const usageCaretStyle: React.CSSProperties = {
   display: "inline-block",
   width: 10,
   fontSize: 10,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const usageListStyle: React.CSSProperties = {
@@ -236,7 +236,7 @@ const usageEntryBtnStyle: React.CSSProperties = {
   background: "transparent",
   border: "none",
   borderRadius: 4,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   fontSize: 11.5,
   cursor: "pointer",
   textAlign: "left",
@@ -244,16 +244,16 @@ const usageEntryBtnStyle: React.CSSProperties = {
 };
 
 const usagePropStyle: React.CSSProperties = {
-  color: "var(--bd-fg-muted)",
-  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
+  color: "var(--bk-ink-muted)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
   fontSize: 11,
 };
 
 const beginnerNoticeStyle: React.CSSProperties = {
   marginTop: 12,
   padding: "10px 12px",
-  background: "var(--buildrick-info-soft)",
-  color: "var(--buildrick-info-strong)",
+  background: "var(--bk-accent-tint)",
+  color: "var(--bk-accent-text)",
   borderRadius: 6,
   fontSize: 11.5,
   lineHeight: 1.5,
@@ -272,7 +272,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
           height: 24,
           borderRadius: 4,
           background: token.value,
-          border: "1px solid var(--bd-border)",
+          border: "1px solid var(--bk-border)",
           flexShrink: 0,
         }}
       />
@@ -291,7 +291,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
           fontSize: 14,
           fontWeight: 600,
           fontFamily: token.type === "font-family" ? token.value : undefined,
-          color: "var(--bd-fg-primary)",
+          color: "var(--bk-ink)",
           flexShrink: 0,
         }}
       >
@@ -309,7 +309,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
           display: "inline-block",
           width: 24,
           height: 8,
-          background: "var(--bd-border)",
+          background: "var(--bk-border)",
           borderRadius: 2,
           flexShrink: 0,
           position: "relative",
@@ -322,7 +322,7 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
             top: 0,
             width: widthPx,
             height: "100%",
-            background: "var(--bd-accent)",
+            background: "var(--bk-accent)",
             borderRadius: 2,
           }}
         />
@@ -338,8 +338,8 @@ const previewSlot = (token: DesignToken): React.ReactNode => {
         width: 24,
         height: 24,
         borderRadius: 4,
-        background: "var(--bd-bg-subtle)",
-        border: "1px solid var(--bd-border)",
+        background: "var(--bk-bg-subtle)",
+        border: "1px solid var(--bk-border)",
         flexShrink: 0,
       }}
     />

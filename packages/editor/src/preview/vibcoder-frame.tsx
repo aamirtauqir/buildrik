@@ -4,8 +4,8 @@ import { Frame, type FrameRatio } from "../editor/shared/vibcoder/Frame";
 import { sectionLabel } from "./_galleryStyles";
 
 const containerCard: React.CSSProperties = {
-  background: "var(--buildrick-surface, #fff)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bk-bg-panel, #fff)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 6,
   padding: 12,
   maxWidth: 320,
@@ -17,8 +17,8 @@ const containerCard: React.CSSProperties = {
  */
 const block: React.CSSProperties = {
   background:
-    "linear-gradient(135deg, var(--buildrick-accent) 0%, #6A9BFF 100%)",
-  color: "var(--buildrick-text-on-accent)",
+    "linear-gradient(135deg, var(--bk-accent) 0%, #6A9BFF 100%)",
+  color: "var(--bk-accent-on)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",

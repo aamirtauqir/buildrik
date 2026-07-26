@@ -188,9 +188,9 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           alignItems: "center",
           justifyContent: "center",
           padding: 40,
-          background: "var(--buildrick-bg-panel-secondary)",
+          background: "var(--bk-bg-subtle)",
           borderRadius: 8,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bk-ink-muted)",
           gap: 0,
         }}
       >
@@ -218,7 +218,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
         style={{
           width: "100%",
           display: "block",
-          background: "var(--buildrick-text-primary)",
+          background: "var(--bk-ink)",
           maxHeight: 400,
         }}
       />
@@ -234,7 +234,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             background: "rgba(0,0,0,0.5)",
           }}
         >
-          <span style={{ color: "var(--buildrick-text-on-accent)", fontSize: 14 }}>Loading...</span>
+          <span style={{ color: "var(--bk-accent-on)", fontSize: 14 }}>Loading...</span>
         </div>
       )}
       {/* Controls */}
@@ -264,7 +264,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               height: "100%",
               width: `${progressPercent}%`,
-              background: "var(--buildrick-accent)",
+              background: "var(--bk-accent)",
               borderRadius: 2,
               transition: "width 0.1s linear",
             }}
@@ -285,7 +285,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "transparent",
               border: "none",
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bk-accent-on)",
               cursor: "pointer",
               fontSize: 16,
               padding: 4,
@@ -301,7 +301,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "rgba(255,255,255,0.2)",
               border: "none",
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bk-accent-on)",
               cursor: "pointer",
               fontSize: 18,
               padding: "8px 12px",
@@ -317,7 +317,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "transparent",
               border: "none",
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bk-accent-on)",
               cursor: "pointer",
               fontSize: 16,
               padding: 4,
@@ -328,7 +328,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           </Button>
 
           {/* Time display */}
-          <span style={{ color: "var(--buildrick-text-on-accent)", fontSize: 12, fontFamily: "monospace" }}>
+          <span style={{ color: "var(--bk-accent-on)", fontSize: 12, fontFamily: "monospace" }}>
             {formatTime(state.currentTime)} / {formatTime(state.duration)}
           </span>
 
@@ -342,7 +342,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
               style={{
                 background: "transparent",
                 border: "none",
-                color: "var(--buildrick-text-on-accent)",
+                color: "var(--bk-accent-on)",
                 cursor: "pointer",
                 fontSize: 16,
                 padding: 4,
@@ -372,7 +372,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             padding: "4px 12px",
             background: "rgba(0,0,0,0.6)",
             borderRadius: 4,
-            color: "var(--buildrick-text-on-accent)",
+            color: "var(--bk-accent-on)",
             fontSize: 13,
             fontWeight: 500,
           }}

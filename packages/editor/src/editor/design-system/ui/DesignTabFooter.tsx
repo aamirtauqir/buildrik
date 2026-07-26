@@ -26,12 +26,12 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       alignItems: "center",
       gap: 8,
       padding: "10px 12px",
-      borderTop: "1px solid var(--bd-border)",
-      background: "var(--bd-bg-subtle)",
+      borderTop: "1px solid var(--bk-border)",
+      background: "var(--bk-bg-subtle)",
       flexShrink: 0,
     }}
   >
-    <div style={{ flex: 1, fontSize: 12, color: "var(--bd-fg-muted)" }}>
+    <div style={{ flex: 1, fontSize: 12, color: "var(--bk-ink-muted)" }}>
       {isDirty ? `${dirtyCount} previewing` : "All changes saved"}
     </div>
     <Button

@@ -56,24 +56,24 @@ export class InspectorErrorBoundary extends React.Component<
           style={{
             padding: 16,
             margin: 12,
-            background: "var(--buildrick-error-light)",
-            border: "1px solid var(--buildrick-error-border)",
+            background: "var(--bk-error-tint)",
+            border: "1px solid var(--bk-error)",
             borderRadius: 8,
-            color: "var(--buildrick-error)",
+            color: "var(--bk-error)",
           }}
         >
           <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>Inspector Error</div>
-          <div style={{ fontSize: 12, color: "var(--buildrick-error)", marginBottom: 12 }}>
+          <div style={{ fontSize: 12, color: "var(--bk-error)", marginBottom: 12 }}>
             {this.state.message}
           </div>
           <Button
             onClick={() => this.setState({ hasError: false, message: undefined })}
             style={{
               padding: "6px 12px",
-              background: "var(--buildrick-error-light)",
-              border: "1px solid var(--buildrick-error-border)",
+              background: "var(--bk-error-tint)",
+              border: "1px solid var(--bk-error)",
               borderRadius: 4,
-              color: "var(--buildrick-error)",
+              color: "var(--bk-error)",
               fontSize: 12,
               fontWeight: 500,
               cursor: "pointer",

@@ -290,7 +290,7 @@ const panelStyles: React.CSSProperties = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  background: "var(--buildrick-bg-panel)",
+  background: "var(--bk-bg-panel)",
   zIndex: 50,
   // Animation handled by CSS class .bd-template-preview-panel + .visible
 };
@@ -301,13 +301,13 @@ const emptyStateStyles: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   gap: 16,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const emptyTextStyles: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 500,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   margin: 0,
 };
 
@@ -327,7 +327,7 @@ const iframeWrapperStyles: React.CSSProperties = {
   maxWidth: 900,
   height: "100%",
   maxHeight: 500,
-  background: "var(--buildrick-bg-card)",
+  background: "var(--bk-bg-card)",
   borderRadius: 12,
   boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)",
   overflow: "hidden",
@@ -350,7 +350,7 @@ const premiumOverlayStyles: React.CSSProperties = {
   gap: 8,
   background: "rgba(0, 0, 0, 0.7)",
   backdropFilter: "blur(4px)",
-  color: "var(--buildrick-text-on-accent)",
+  color: "var(--bk-accent-on)",
   fontSize: 14,
   fontWeight: 600,
 };
@@ -359,9 +359,9 @@ const infoCardStyles: React.CSSProperties = {
   width: "100%",
   maxWidth: 900,
   padding: 20,
-  background: "var(--buildrick-bg-card)",
+  background: "var(--bk-bg-card)",
   borderTop: "1px solid rgba(0, 0, 0, 0.06)",
-  borderRadius: "0 0 var(--bd-radius-lg) var(--bd-radius-lg)",
+  borderRadius: "0 0 var(--bk-radius-lg) var(--bk-radius-lg)",
   margin: "-20px auto 40px",
 };
 
@@ -375,7 +375,7 @@ const infoHeaderStyles: React.CSSProperties = {
 const templateNameStyles: React.CSSProperties = {
   fontSize: 16,
   fontWeight: 600,
-  color: "var(--buildrick-text-heading)",
+  color: "var(--bk-ink)",
 };
 
 const badgeFreeStyles: React.CSSProperties = {
@@ -386,8 +386,8 @@ const badgeFreeStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
   textTransform: "uppercase",
-  background: "var(--buildrick-success)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bk-success)",
+  color: "var(--bk-accent-on)",
   borderRadius: 4,
 };
 
@@ -399,14 +399,14 @@ const badgeProStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
   textTransform: "uppercase",
-  background: "var(--buildrick-warning)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bk-warning)",
+  color: "var(--bk-accent-on)",
   borderRadius: 4,
 };
 
 const templateMetaStyles: React.CSSProperties = {
   fontSize: 13,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   marginBottom: 16,
 };
 
@@ -417,8 +417,8 @@ const actionsStyles: React.CSSProperties = {
 
 const primaryButtonStyles: React.CSSProperties = {
   padding: "10px 20px",
-  background: "var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bk-accent)",
+  color: "var(--bk-accent-on)",
   border: "none",
   borderRadius: 8,
   fontSize: 13,
@@ -435,7 +435,7 @@ const ghostButtonStyles: React.CSSProperties = {
   height: 40,
   padding: 0,
   background: "transparent",
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bk-ink-muted)",
   border: "1px solid rgba(0, 0, 0, 0.12)",
   borderRadius: 8,
   cursor: "pointer",
@@ -447,8 +447,8 @@ const upgradeButtonStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "12px 24px",
-  background: "var(--buildrick-warning)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bk-warning)",
+  color: "var(--bk-accent-on)",
   border: "none",
   borderRadius: 8,
   fontSize: 14,
@@ -468,8 +468,8 @@ const closeButtonStyles: React.CSSProperties = {
   padding: 0,
   background: "rgba(255, 255, 255, 0.9)",
   border: "none",
-  borderRadius: "var(--bd-radius-full)",
-  color: "var(--buildrick-text-muted)",
+  borderRadius: "var(--bk-radius-full)",
+  color: "var(--bk-ink-muted)",
   cursor: "pointer",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   transition: "all 150ms ease",

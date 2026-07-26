@@ -197,7 +197,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
           </ModalClose>
           <div className="bd-modal__body" style={{ minHeight: "20rem" }}>
             {collections.length === 0 ? (
-              <p style={{ color: "var(--bd-fg-secondary)" }}>
+              <p style={{ color: "var(--bk-ink-soft)" }}>
                 No collections yet. Create one from an element&apos;s CMS binding first.
               </p>
             ) : (
@@ -238,9 +238,9 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                           padding: "8px 10px",
                           fontSize: 12,
                           borderRadius: 4,
-                          color: "var(--bd-warning-strong, var(--bd-warning))",
-                          background: "var(--bd-warning-bg)",
-                          border: "1px solid var(--bd-warning-border)",
+                          color: "var(--bk-warning-text, var(--bk-warning))",
+                          background: "var(--bk-warning-tint)",
+                          border: "1px solid var(--bk-warning-text)",
                         }}
                       >
                         No records published yet — this collection generates a page per entry, but
@@ -248,7 +248,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                       </div>
                     )}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                      <span style={{ fontSize: 12, color: "var(--bd-fg-secondary)" }}>
+                      <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
                         {items.length} record{items.length === 1 ? "" : "s"}
                       </span>
                       <Button variant="secondary" size="sm" onClick={startAdd} disabled={!collection}>
@@ -257,12 +257,12 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                     </div>
                     <div>
                       {items.length === 0 ? (
-                        <p style={{ color: "var(--bd-fg-secondary)", fontSize: 13 }}>No records yet.</p>
+                        <p style={{ color: "var(--bk-ink-soft)", fontSize: 13 }}>No records yet.</p>
                       ) : (
                         items.map((item) => (
                           <div
                             key={item.id}
-                            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--bd-border)" }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid var(--bk-border)" }}
                           >
                             <span style={{ fontSize: 13 }}>
                               {collection ? displayValue(item, collection) : item.id}
@@ -271,7 +271,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                                   marginLeft: 8,
                                   fontSize: 11,
                                   fontWeight: 500,
-                                  color: item.status === "published" ? "var(--bd-success)" : "var(--bd-fg-muted)",
+                                  color: item.status === "published" ? "var(--bk-success)" : "var(--bk-ink-muted)",
                                 }}
                               >
                                 {item.status}
@@ -310,9 +310,9 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
 };
 
 const FieldLabel: React.FC<{ field: CMSField }> = ({ field }) => (
-  <label style={{ display: "block", fontSize: 12, marginBottom: 4, color: "var(--bd-fg-secondary)" }}>
+  <label style={{ display: "block", fontSize: 12, marginBottom: 4, color: "var(--bk-ink-soft)" }}>
     {field.name}
-    {field.validation?.required && <span style={{ color: "var(--bd-danger)" }}> *</span>}
+    {field.validation?.required && <span style={{ color: "var(--bk-error)" }}> *</span>}
   </label>
 );
 

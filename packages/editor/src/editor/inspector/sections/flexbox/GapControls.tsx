@@ -45,15 +45,15 @@ export const GapControls: React.FC<GapControlsProps> = ({
     style={{
       marginTop: 8,
       padding: 10,
-      background: "var(--buildrick-bg-subtle)",
+      background: "var(--bk-bg-subtle)",
       borderRadius: 6,
-      border: `1px solid ${"var(--buildrick-border)"}`,
+      border: `1px solid ${"var(--bk-border)"}`,
     }}
   >
     {mixedKeys?.has("gap") && (
       <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
         <MixedValueBadge compact />
-        <span style={{ fontSize: 11, color: "var(--buildrick-text-muted)" }}>Gap</span>
+        <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>Gap</span>
       </div>
     )}
     <LinkedGapInput

@@ -210,7 +210,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onClick={() => setPaletteOpen(true)}
           aria-label="Open command palette"
         >
-          <span style={{ font: "500 10px var(--bd-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bd-border)", background: "var(--bd-bg-subtle)", color: "var(--bd-fg-muted)" }}>
+          <span style={{ font: "500 10px var(--bk-font-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bk-border)", background: "var(--bk-bg-subtle)", color: "var(--bk-ink-muted)" }}>
             ⌘K
           </span>
         </Button>
@@ -218,7 +218,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
         <TabFrame.Body>
-          <EmptyState size="compact" style={{ margin: "var(--bd-space-3)" }} role="alert" aria-live="assertive">
+          <EmptyState size="compact" style={{ margin: "var(--bk-space-12)" }} role="alert" aria-live="assertive">
             <EmptyStateTitle>{p.loadError}</EmptyStateTitle>
             <EmptyStateDesc>Your connection dropped. Work is safe — nothing was lost.</EmptyStateDesc>
             <EmptyStateActions>
@@ -237,7 +237,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             style={{
               display: "inline-flex",
               margin: "8px 12px 0",
-              border: "1px solid var(--bd-border)",
+              border: "1px solid var(--bk-border)",
               borderRadius: 4,
               overflow: "hidden",
               alignSelf: "flex-start",
@@ -258,9 +258,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
                     fontSize: 11,
                     fontWeight: on ? 600 : 400,
                     borderRadius: 0,
-                    borderRight: i === 0 ? "1px solid var(--bd-border)" : undefined,
-                    background: on ? "var(--bd-accent)" : "transparent",
-                    color: on ? "var(--bd-fg-on-accent)" : "var(--bd-fg-muted)",
+                    borderRight: i === 0 ? "1px solid var(--bk-border)" : undefined,
+                    background: on ? "var(--bk-accent)" : "transparent",
+                    color: on ? "var(--bk-accent-on)" : "var(--bk-ink-muted)",
                   }}
                 >
                   {label}

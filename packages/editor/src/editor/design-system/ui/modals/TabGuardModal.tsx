@@ -31,8 +31,8 @@ export const TabGuardModal: React.FC<{
     >
       <div
         style={{
-          background: "var(--bd-bg-subtle)",
-          border: "1px solid var(--bd-border)",
+          background: "var(--bk-bg-subtle)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 12,
           padding: 20,
           width: 260,
@@ -43,7 +43,7 @@ export const TabGuardModal: React.FC<{
           style={{
             fontSize: 14,
             fontWeight: 600,
-            color: "var(--bd-fg-primary)",
+            color: "var(--bk-ink)",
             marginBottom: 8,
           }}
         >
@@ -52,12 +52,12 @@ export const TabGuardModal: React.FC<{
         <div
           style={{
             fontSize: 12,
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             marginBottom: 16,
             lineHeight: 1.6,
           }}
         >
-          Your <strong style={{ color: "var(--bd-fg-primary)" }}>{tabList}</strong> tab
+          Your <strong style={{ color: "var(--bk-ink)" }}>{tabList}</strong> tab
           {changedTabs.length > 1 ? "s have" : " has"} unsaved changes. Switching tabs will discard{" "}
           {changedTabs.length > 1 ? "all of them" : "them"}.
         </div>
@@ -81,7 +81,7 @@ export const TabGuardModal: React.FC<{
             variant="primary"
             size="sm"
             onClick={onDiscard}
-            style={{ background: "var(--bd-error)", border: "none" }}
+            style={{ background: "var(--bk-error)", border: "none" }}
           >
             Discard {tabList}
           </Button>

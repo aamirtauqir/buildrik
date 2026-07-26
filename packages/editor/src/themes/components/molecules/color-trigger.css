@@ -4,7 +4,7 @@
  * a single button so the entire row is one click target.
  *
  * Composes: tokens only. No new colors, spacing, radius, typography.
- * The swatch fill color is passed inline as `style="background: var(--buildrick-*)"`
+ * The swatch fill color is passed inline as `style="background: var(--bk-*)"`
  * — token-only by convention. NEVER pass a raw hex inline.
  *
  * Sizes: sm (20px swatch), md (24px swatch, default), lg (28px swatch).
@@ -30,41 +30,41 @@
 .bd-color-trigger {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
-  padding: var(--buildrick-space-1) var(--buildrick-space-2);
-  background: var(--buildrick-bg-subtle);
+  gap: var(--bk-space-8);
+  padding: var(--bk-space-4) var(--bk-space-8);
+  background: var(--bk-bg-subtle);
   border: 1px solid transparent;
-  border-radius: var(--buildrick-radius-sm);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-primary);
+  border-radius: var(--bk-radius-sm);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink);
   cursor: pointer;
   outline: none;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default),
+              border-color var(--bk-motion-fast) var(--bk-ease-default),
+              color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 .bd-color-trigger:hover {
-  background: var(--buildrick-bg-card);
-  border-color: var(--buildrick-border);
+  background: var(--bk-bg-card);
+  border-color: var(--bk-border);
 }
 
 .bd-color-trigger:focus-visible,
 .bd-color-trigger.is-open,
 .bd-color-trigger[aria-expanded="true"] {
-  background: var(--buildrick-bg-card);
-  border-color: var(--buildrick-accent);
-  box-shadow: var(--buildrick-glow-primary);
+  background: var(--bk-bg-card);
+  border-color: var(--bk-accent);
+  box-shadow: var(--bk-shadow-focus);
 }
 
-/* Swatch — 24px square chip, color via inline style="background: var(--buildrick-*)" */
+/* Swatch — 24px square chip, color via inline style="background: var(--bk-*)" */
 .bd-color-trigger__swatch {
   width: 24px;
   height: 24px;
-  border-radius: var(--buildrick-radius-sm);
-  border: 1px solid var(--buildrick-border);
+  border-radius: var(--bk-radius-sm);
+  border: 1px solid var(--bk-border);
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -75,10 +75,10 @@
 .bd-color-trigger__hex {
   flex: 1;
   min-width: 0;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-primary);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
   white-space: nowrap;
@@ -88,10 +88,10 @@
 
 /* Optional alpha % suffix */
 .bd-color-trigger__alpha {
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
   flex-shrink: 0;
 }
 
@@ -102,10 +102,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--buildrick-text-muted);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--bk-ink-muted);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
 }
 
 /* ----- Sizes ----- */
@@ -116,21 +116,21 @@
 .bd-color-trigger--add {
   background: transparent;
   border-style: dashed;
-  border-color: var(--buildrick-border-medium);
-  color: var(--buildrick-text-muted);
+  border-color: var(--bk-border-medium);
+  color: var(--bk-ink-muted);
 }
 .bd-color-trigger--add .bd-color-trigger__swatch {
   background: transparent;
   border-style: dashed;
-  border-color: var(--buildrick-border-medium);
-  color: var(--buildrick-text-muted);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-semibold);
+  border-color: var(--bk-border-medium);
+  color: var(--bk-ink-muted);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-semibold);
 }
 .bd-color-trigger--add:hover {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-text-muted);
+  background: var(--bk-bg-subtle);
+  border-color: var(--bk-ink-muted);
 }
 
 /* ----- Variant: inline (embedded inside inspector field rows) ----- */
@@ -138,7 +138,7 @@
   padding: 0;
   background: transparent;
   border: none;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
   border-radius: 0;
 }
 .bd-color-trigger--inline:hover {
@@ -156,8 +156,8 @@
 .bd-color-trigger--inline:focus-visible .bd-color-trigger__swatch,
 .bd-color-trigger--inline.is-open .bd-color-trigger__swatch,
 .bd-color-trigger--inline[aria-expanded="true"] .bd-color-trigger__swatch {
-  border-color: var(--buildrick-accent);
-  box-shadow: var(--buildrick-glow-primary);
+  border-color: var(--bk-accent);
+  box-shadow: var(--bk-shadow-focus);
 }
 
 /* Row helper — flex row that pairs an inline trigger (or several) with an
@@ -166,6 +166,6 @@
 .bd-color-trigger-row {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 .bd-color-trigger-row > .bd-inspector__field { flex: 1; min-width: 0; }

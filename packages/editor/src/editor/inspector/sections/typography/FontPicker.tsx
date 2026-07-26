@@ -100,7 +100,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
       <label
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
+          color: "var(--bk-ink-muted)",
           fontWeight: 500,
           display: "block",
           marginBottom: 6,
@@ -117,10 +117,10 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
         style={{
           width: "100%",
           padding: "10px 12px",
-          background: "var(--buildrick-bg-input)",
-          border: `1px solid ${"var(--buildrick-border-medium)"}`,
+          background: "var(--bk-bg-card)",
+          border: `1px solid ${"var(--bk-border-medium)"}`,
           borderRadius: 6,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bk-ink)",
           fontSize: 12,
           textAlign: "left",
           cursor: "pointer",
@@ -131,7 +131,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
         }}
       >
         <span>{currentFontName}</span>
-        <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)" }}>
+        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
           {showFontPicker ? "\u25B2" : "\u25BC"}
         </span>
       </Button>
@@ -147,8 +147,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
             left: 0,
             right: 0,
             marginTop: 4,
-            background: "var(--buildrick-bg-panel)",
-            border: `1px solid ${"var(--buildrick-border-medium)"}`,
+            background: "var(--bk-bg-panel)",
+            border: `1px solid ${"var(--bk-border-medium)"}`,
             borderRadius: 8,
             zIndex: 100,
             maxHeight: 300,
@@ -161,8 +161,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
             style={{
               padding: "6px 8px",
               fontSize: 12,
-              color: "var(--buildrick-text-tertiary)",
-              borderBottom: `1px solid ${"var(--buildrick-border)"}`,
+              color: "var(--bk-ink-muted)",
+              borderBottom: `1px solid ${"var(--bk-border)"}`,
             }}
           >
             Showing {googleFonts.length} of {totalFonts} Google fonts

@@ -42,7 +42,7 @@ export const SocialIcons: React.FC<SocialIconsProps> = ({
   links = defaultLinks,
   size = "md",
   variant = "filled",
-  color = "var(--buildrick-accent, #00d4aa)",
+  color = "var(--bk-accent, #00d4aa)",
 }) => {
   const sizeMap = { sm: 32, md: 40, lg: 48 };
   const iconSize = sizeMap[size];
@@ -86,10 +86,10 @@ export const socialIconsBlockConfig = {
   elementType: "social" as const,
   content:
     '<div class="buildrick-social-icons" data-buildrick-type="social-icons" style="display:flex;gap:12px;">' +
-    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--buildrick-accent,#00d4aa);color:#fff;text-decoration:none;">📘</a>' +
-    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--buildrick-accent,#00d4aa);color:#fff;text-decoration:none;">🐦</a>' +
-    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--buildrick-accent,#00d4aa);color:#fff;text-decoration:none;">📷</a>' +
-    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--buildrick-accent,#00d4aa);color:#fff;text-decoration:none;">💼</a>' +
+    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bk-accent,#00d4aa);color:#fff;text-decoration:none;">📘</a>' +
+    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bk-accent,#00d4aa);color:#fff;text-decoration:none;">🐦</a>' +
+    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bk-accent,#00d4aa);color:#fff;text-decoration:none;">📷</a>' +
+    '<a href="#" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bk-accent,#00d4aa);color:#fff;text-decoration:none;">💼</a>' +
     "</div>",
 };
 

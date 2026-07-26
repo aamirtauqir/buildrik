@@ -39,7 +39,7 @@ const styles = {
     alignItems: "center",
     gap: 6,
     border: "none",
-    borderRadius: "var(--buildrick-radius-sm)",
+    borderRadius: "var(--bk-radius-sm)",
     cursor: "pointer",
     fontWeight: 500,
     transition: "all 0.2s ease",
@@ -54,30 +54,30 @@ const styles = {
   } as React.CSSProperties,
   ghost: {
     background: "transparent",
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
   } as React.CSSProperties,
   ghostHover: {
     background: "rgba(255, 255, 255, 0.08)",
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   } as React.CSSProperties,
   outline: {
     background: "transparent",
     border: "1px solid rgba(255, 255, 255, 0.15)",
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
   } as React.CSSProperties,
   outlineHover: {
     borderColor: "rgba(255, 255, 255, 0.25)",
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   } as React.CSSProperties,
   solid: {
     background: "rgba(255, 255, 255, 0.1)",
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   } as React.CSSProperties,
   solidHover: {
     background: "rgba(255, 255, 255, 0.15)",
   } as React.CSSProperties,
   copied: {
-    color: "var(--buildrick-success)",
+    color: "var(--bk-success)",
   } as React.CSSProperties,
 };
 

@@ -101,8 +101,8 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
     textAlign: "left",
     lineHeight: 1.2,
   };
-  const optTop: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: "var(--bd-fg-primary)" };
-  const optSub: React.CSSProperties = { fontSize: 10, color: "var(--bd-fg-muted)" };
+  const optTop: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: "var(--bk-ink)" };
+  const optSub: React.CSSProperties = { fontSize: 10, color: "var(--bk-ink-muted)" };
 
   return (
     <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
@@ -126,20 +126,20 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
             top: "calc(100% + 4px)",
             left: 0,
             zIndex: 200,
-            background: "var(--buildrick-bg-card)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-card)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 4,
             padding: 4,
             minWidth: 200,
-            boxShadow: "var(--bd-shadow-dropdown)",
+            boxShadow: "var(--bk-shadow-drag)",
           }}
         >
           <Button
             variant="bare"
-            style={{ ...optionRow, background: "var(--bd-accent-tint)" }}
+            style={{ ...optionRow, background: "var(--bk-accent-tint)" }}
             title="Just this element"
           >
-            <span style={{ ...optTop, color: "var(--bd-accent)" }}>This item</span>
+            <span style={{ ...optTop, color: "var(--bk-accent)" }}>This item</span>
             <span style={optSub}>just here — the default</span>
           </Button>
           <Button
@@ -166,8 +166,8 @@ export function ScopeDropdown({ composer, selectedElement, onWholeSite }: ScopeD
           </Button>
 
           {confirming && (
-            <div style={{ margin: 4, padding: 8, borderRadius: 4, background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)" }}>
-              <p style={{ margin: "0 0 6px", fontSize: 11, color: "var(--bd-fg-primary)" }}>
+            <div style={{ margin: 4, padding: 8, borderRadius: 4, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)" }}>
+              <p style={{ margin: "0 0 6px", fontSize: 11, color: "var(--bk-ink)" }}>
                 Apply this element&apos;s styles to the <strong>{othersLabel}</strong> on this page?
               </p>
               <div style={{ display: "flex", gap: 6 }}>

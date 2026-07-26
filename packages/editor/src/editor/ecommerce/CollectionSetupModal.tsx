@@ -78,7 +78,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
           <div className="bd-modal__body">
       <div style={containerStyles}>
         <div style={iconContainerStyles}>
-          <ShoppingBag size={48} style={{ color: "var(--buildrick-accent)" }} />
+          <ShoppingBag size={48} style={{ color: "var(--bk-accent)" }} />
         </div>
 
         <p style={descriptionStyles}>
@@ -104,15 +104,15 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
 
         <div style={featuresListStyles}>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
+            <Check size={16} style={{ color: "var(--bk-success)" }} />
             <span>8 product fields (name, price, image, etc.)</span>
           </div>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
+            <Check size={16} style={{ color: "var(--bk-success)" }} />
             <span>Validation rules included</span>
           </div>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
+            <Check size={16} style={{ color: "var(--bk-success)" }} />
             <span>Ready for CMS data binding</span>
           </div>
         </div>
@@ -146,16 +146,16 @@ const iconContainerStyles: React.CSSProperties = {
 
 const descriptionStyles: React.CSSProperties = {
   margin: 0,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   textAlign: "center",
   lineHeight: 1.5,
 };
 
 const checkboxContainerStyles: React.CSSProperties = {
-  background: "var(--buildrick-bg-elevated)",
-  borderRadius: "var(--bd-radius-md)",
+  background: "var(--bk-bg-card)",
+  borderRadius: "var(--bk-radius-lg)",
   padding: "12px",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
 };
 
 const checkboxLabelStyles: React.CSSProperties = {
@@ -169,7 +169,7 @@ const checkboxStyles: React.CSSProperties = {
   width: "18px",
   height: "18px",
   marginTop: "2px",
-  accentColor: "var(--bd-accent)",
+  accentColor: "var(--bk-accent)",
 };
 
 const checkboxContentStyles: React.CSSProperties = {
@@ -187,7 +187,7 @@ const checkboxTitleStyles: React.CSSProperties = {
 
 const checkboxDescStyles: React.CSSProperties = {
   fontSize: "13px",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const featuresListStyles: React.CSSProperties = {
@@ -202,7 +202,7 @@ const featureItemStyles: React.CSSProperties = {
   alignItems: "center",
   gap: "8px",
   fontSize: "13px",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const footerStyles: React.CSSProperties = {
@@ -211,7 +211,7 @@ const footerStyles: React.CSSProperties = {
   gap: "8px",
   marginTop: "16px",
   paddingTop: "16px",
-  borderTop: "1px solid var(--buildrick-border)",
+  borderTop: "1px solid var(--bk-border)",
 };
 
 export default CollectionSetupModal;

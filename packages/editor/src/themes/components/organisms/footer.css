@@ -4,40 +4,40 @@
  */
 
 .bd-footer {
-  height: var(--buildrick-size-footer);
-  background: var(--buildrick-bg-card);
+  height: var(--bk-size-row);
+  background: var(--bk-bg-card);
   border: none;
-  border-top: 1px solid var(--buildrick-border);
+  border-top: 1px solid var(--bk-border);
   border-radius: 0;
-  padding: 0 var(--buildrick-space-4);
+  padding: 0 var(--bk-space-16);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
 }
 .bd-footer__group {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-4);
+  gap: var(--bk-space-16);
 }
 .bd-footer__chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 2px 7px;
-  border-radius: var(--buildrick-radius-sm);
-  background: var(--buildrick-bg-subtle);
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-subtle);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
 }
 .bd-footer__dot {
   width: 6px;
   height: 6px;
-  border-radius: var(--buildrick-radius-circle);
-  background: var(--buildrick-success);
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-success);
 }
 /* bdr-footer__icon-btn removed — use atom .bd-icon-btn (atoms/icon-button.css). */
 /* bdr-footer__sep removed — use atom `bdr-divider bdr-divider--vertical` (see atoms/divider.css). */

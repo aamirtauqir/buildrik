@@ -59,11 +59,11 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby={`tpl-usage-title-${templateId}`}>
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--bd-border)" }}>
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--bk-border)" }}>
           <ModalTitle id={`tpl-usage-title-${templateId}`} style={{ fontSize: 16, fontWeight: 600 }}>
             {templateName}
           </ModalTitle>
-          <ModalDescription style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 2 }}>
+          <ModalDescription style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 2 }}>
             Where this template is in use across pages
           </ModalDescription>
         </div>
@@ -75,7 +75,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             display: "flex",
             gap: 4,
             padding: "8px 12px",
-            borderBottom: "1px solid var(--bd-border)",
+            borderBottom: "1px solid var(--bk-border)",
           }}
         >
           {(["preview", "used", "versions"] as const).map((t) => (
@@ -94,9 +94,9 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                 borderRadius: 4,
                 fontSize: 13,
                 fontWeight: tab === t ? 600 : 500,
-                color: tab === t ? "var(--bd-fg)" : "var(--bd-fg-muted)",
+                color: tab === t ? "var(--bk-ink)" : "var(--bk-ink-muted)",
                 borderBottom:
-                  tab === t ? "2px solid var(--bd-accent)" : "2px solid transparent",
+                  tab === t ? "2px solid var(--bk-accent)" : "2px solid transparent",
               }}
             >
               {t === "preview" ? "Preview" : t === "used" ? "Used in" : "Versions"}
@@ -124,8 +124,8 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                     maxHeight: 240,
                     objectFit: "contain",
                     borderRadius: 4,
-                    border: "1px solid var(--bd-border)",
-                    background: "var(--bd-bg-subtle)",
+                    border: "1px solid var(--bk-border)",
+                    background: "var(--bk-bg-subtle)",
                   }}
                 />
               ) : (
@@ -137,10 +137,10 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: 4,
-                    border: "1px dashed var(--bd-border)",
-                    background: "var(--bd-bg-subtle)",
+                    border: "1px dashed var(--bk-border)",
+                    background: "var(--bk-bg-subtle)",
                     fontSize: 12,
-                    color: "var(--bd-fg-muted)",
+                    color: "var(--bk-ink-muted)",
                   }}
                 >
                   No preview thumbnail
@@ -166,7 +166,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
               <div
                 style={{
                   fontSize: 13,
-                  color: "var(--bd-fg-muted)",
+                  color: "var(--bk-ink-muted)",
                   padding: "32px 0",
                   textAlign: "center",
                 }}
@@ -202,7 +202,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                         padding: "8px 10px",
                         borderRadius: 4,
                         fontSize: 13,
-                        color: "var(--bd-fg)",
+                        color: "var(--bk-ink)",
                       }}
                     >
                       <span style={{ flex: 1 }}>{entry.pageName}</span>
@@ -212,14 +212,14 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                             fontSize: 11,
                             padding: "2px 6px",
                             borderRadius: 3,
-                            background: "var(--bd-bg-subtle)",
-                            color: "var(--bd-fg-muted)",
+                            background: "var(--bk-bg-subtle)",
+                            color: "var(--bk-ink-muted)",
                           }}
                         >
                           v{entry.version}
                         </span>
                       )}
-                      <span style={{ fontSize: 11, color: "var(--bd-fg-muted)" }}>
+                      <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
                         {formatRelative(entry.appliedAt)}
                       </span>
                     </Button>
@@ -242,7 +242,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             display: "flex",
             justifyContent: "flex-end",
             padding: "12px 24px",
-            borderTop: "1px solid var(--bd-border)",
+            borderTop: "1px solid var(--bk-border)",
           }}
         >
           <Button
@@ -287,12 +287,12 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
             alignItems: "center",
             padding: "8px 10px",
             borderRadius: 6,
-            background: "var(--bd-bg-subtle)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-subtle)",
+            border: "1px solid var(--bk-border)",
             fontSize: 12,
           }}
         >
-          <span style={{ color: "var(--bd-fg-muted)" }}>Current version</span>
+          <span style={{ color: "var(--bk-ink-muted)" }}>Current version</span>
           <span style={{ fontWeight: 600 }}>v{currentVersion}</span>
         </div>
       )}
@@ -301,7 +301,7 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
         <div
           style={{
             fontSize: 13,
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             padding: "24px 0",
             textAlign: "center",
           }}
@@ -325,11 +325,11 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
                   padding: "8px 10px",
                   borderRadius: 4,
                   fontSize: 13,
-                  color: "var(--bd-fg)",
+                  color: "var(--bk-ink)",
                   border: stale
-                    ? "1px solid var(--bd-warn-border)"
+                    ? "1px solid var(--bk-warning-text)"
                     : "1px solid transparent",
-                  background: stale ? "var(--bd-warn-soft)" : "transparent",
+                  background: stale ? "var(--bk-warning-tint)" : "transparent",
                 }}
               >
                 <span style={{ flex: 1 }}>{entry.pageName}</span>
@@ -339,19 +339,19 @@ function VersionsPanel({ usage, currentVersion }: VersionsPanelProps) {
                       fontSize: 11,
                       padding: "2px 6px",
                       borderRadius: 3,
-                      background: "var(--bd-bg-subtle)",
-                      color: "var(--bd-fg-muted)",
+                      background: "var(--bk-bg-subtle)",
+                      color: "var(--bk-ink-muted)",
                     }}
                   >
                     v{entry.version}
                   </span>
                 )}
                 {stale && (
-                  <span style={{ fontSize: 11, color: "var(--bd-warn-strong)", fontWeight: 600 }}>
+                  <span style={{ fontSize: 11, color: "var(--bk-warning-text)", fontWeight: 600 }}>
                     update available
                   </span>
                 )}
-                <span style={{ fontSize: 11, color: "var(--bd-fg-muted)" }}>
+                <span style={{ fontSize: 11, color: "var(--bk-ink-muted)" }}>
                   {formatRelative(entry.appliedAt)}
                 </span>
               </li>

@@ -30,11 +30,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--buildrick-space-3);
-  padding: var(--buildrick-space-3) var(--buildrick-space-4);
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md);
+  gap: var(--bk-space-12);
+  padding: var(--bk-space-12) var(--bk-space-16);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-lg);
   min-height: 48px;
 }
 
@@ -44,11 +44,11 @@
 .bd-toolbar__group {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 .bd-toolbar__group + .bd-toolbar__group {
-  padding-left: var(--buildrick-space-3);
-  border-left: 1px solid var(--buildrick-border);
+  padding-left: var(--bk-space-12);
+  border-left: 1px solid var(--bk-border);
 }
 
 /* ---- Inline micro-label ----
@@ -56,12 +56,12 @@
    consumers can drop a label directly inside a __group without composing
    bd-label markup just for one word. */
 .bd-toolbar__label {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  letter-spacing: var(--buildrick-tracking-widest);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  letter-spacing: var(--bk-tracking-wide);
   text-transform: uppercase;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   user-select: none;
 }
 
@@ -76,12 +76,12 @@
 
 /* --sm — denser bar for secondary toolbars (e.g. inside drawers). */
 .bd-toolbar--sm {
-  padding: var(--buildrick-space-2) var(--buildrick-space-3);
+  padding: var(--bk-space-8) var(--bk-space-12);
   min-height: 36px;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 .bd-toolbar--sm .bd-toolbar__group + .bd-toolbar__group {
-  padding-left: var(--buildrick-space-2);
+  padding-left: var(--bk-space-8);
 }
 
 /* --inset — strips the chrome so the toolbar sits flush inside a parent
@@ -97,13 +97,13 @@
 
 /* --floating — when the toolbar is overlaid (e.g. sticky atop a scroll). */
 .bd-toolbar--floating {
-  box-shadow: var(--buildrick-shadow-md);
+  box-shadow: var(--bk-shadow-drag);
 }
 
 /* --dense — tighter inter-child gap. */
 .bd-toolbar--dense {
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 .bd-toolbar--dense .bd-toolbar__group + .bd-toolbar__group {
-  padding-left: var(--buildrick-space-2);
+  padding-left: var(--bk-space-8);
 }

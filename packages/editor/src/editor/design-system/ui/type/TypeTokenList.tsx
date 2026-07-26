@@ -79,9 +79,9 @@ const StyleToggle: React.FC<{
       justifyContent: "center",
       borderRadius: 4,
       border: "1px solid",
-      borderColor: active ? "var(--bd-accent)" : "var(--bd-border)",
+      borderColor: active ? "var(--bk-accent)" : "var(--bk-border)",
       background: active ? "rgba(45, 109, 255, 0.15)" : "transparent",
-      color: active ? "var(--bd-accent)" : "var(--bd-fg-muted)",
+      color: active ? "var(--bk-accent)" : "var(--bk-ink-muted)",
       fontSize: 12,
       fontWeight: 700,
       cursor: "pointer",
@@ -167,10 +167,10 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
         }
         style={{ width: 64, flexShrink: 0, cursor: onRowClick ? "pointer" : undefined }}
       >
-        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bd-fg-primary)" }}>
+        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bk-ink)" }}>
           {info?.semantic ?? token.name}
         </div>
-        <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 1 }}>{token.id}</div>
+        <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 1 }}>{token.id}</div>
       </div>
 
       {/* Size input */}
@@ -185,15 +185,15 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           width: 44,
           padding: "4px 6px",
           background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--bd-border)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 4,
-          color: "var(--bd-fg-primary)",
+          color: "var(--bk-ink)",
           fontSize: 12,
           textAlign: "right",
           flexShrink: 0,
         }}
       />
-      <span style={{ fontSize: 12, color: "var(--bd-fg-muted)", flexShrink: 0 }}>{unit}</span>
+      <span style={{ fontSize: 12, color: "var(--bk-ink-muted)", flexShrink: 0 }}>{unit}</span>
 
       {/* Style toggles */}
       <div style={{ display: "flex", gap: 3 }}>
@@ -218,7 +218,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           fontSize: token.value,
           fontWeight: bold ? 700 : 400,
           fontStyle: italic ? "italic" : "normal",
-          color: "var(--bd-fg-secondary)",
+          color: "var(--bk-ink-soft)",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -232,7 +232,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       {isExtreme && (
         <span
           title="Extreme font size may break layout"
-          style={{ color: "var(--bd-warning)", fontSize: 12, flexShrink: 0 }}
+          style={{ color: "var(--bk-warning)", fontSize: 12, flexShrink: 0 }}
         >
           ⚠
         </span>
@@ -250,7 +250,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "var(--bd-warning)",
+            color: "var(--bk-warning)",
             fontSize: 13,
             flexShrink: 0,
           }}
@@ -271,7 +271,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "var(--bd-accent)",
+            color: "var(--bk-accent)",
             fontSize: 13,
             flexShrink: 0,
           }}
@@ -347,21 +347,21 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
         }
         style={{ flex: 1, cursor: onRowClick ? "pointer" : undefined }}
       >
-        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bd-fg-primary)" }}>
+        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bk-ink)" }}>
           {token.name}
         </div>
         <div
           style={{
             fontSize: 13,
             fontFamily: token.value,
-            color: "var(--bd-fg-muted)",
+            color: "var(--bk-ink-muted)",
             marginTop: 2,
           }}
         >
           Aa Bb Cc 123
         </div>
         {fontLoadFailed && (
-          <div style={{ fontSize: 12, color: "var(--bd-warning)", marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: "var(--bk-warning)", marginTop: 2 }}>
             Font unavailable — may fall back to system font
           </div>
         )}
@@ -372,9 +372,9 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange, usageCount, on
         style={{
           padding: "5px 8px",
           background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--bd-border)",
+          border: "1px solid var(--bk-border)",
           borderRadius: 6,
-          color: "var(--bd-fg-primary)",
+          color: "var(--bk-ink)",
           fontSize: 12,
           cursor: "pointer",
         }}
@@ -424,7 +424,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
         padding: 12,
         background: "rgba(255,255,255,0.03)",
         borderRadius: 8,
-        border: "1px solid var(--bd-border)",
+        border: "1px solid var(--bk-border)",
         display: "flex",
         flexDirection: "column",
         gap: 8,
@@ -435,7 +435,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
           fontFamily: headingFont,
           fontSize: getSize("font-size-4xl"),
           fontWeight: 700,
-          color: "var(--bd-fg-primary)",
+          color: "var(--bk-ink)",
           lineHeight: 1.1,
         }}
       >
@@ -446,7 +446,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
           fontFamily: headingFont,
           fontSize: getSize("font-size-3xl"),
           fontWeight: 600,
-          color: "var(--bd-fg-primary)",
+          color: "var(--bk-ink)",
           lineHeight: 1.2,
         }}
       >
@@ -456,7 +456,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
         style={{
           fontFamily: bodyFont,
           fontSize: getSize("font-size-base"),
-          color: "var(--bd-fg-secondary)",
+          color: "var(--bk-ink-soft)",
           lineHeight: 1.6,
         }}
       >
@@ -465,7 +465,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: "var(--bd-fg-muted)",
+          color: "var(--bk-ink-muted)",
           textAlign: "right",
           letterSpacing: "0.3px",
         }}
@@ -481,7 +481,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
 const SECTION_HEADER: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
   marginBottom: 4,
@@ -507,7 +507,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
     <div style={{ display: "flex", flexDirection: "column" }}>
       {/* Device hint */}
       <div
-        style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginBottom: 6, lineHeight: 1.5 }}
+        style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginBottom: 6, lineHeight: 1.5 }}
       >
         Type scale per device — changes here only affect the selected breakpoint.
       </div>
@@ -529,9 +529,9 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
             padding: "5px 10px",
             borderRadius: 6,
             border: "1px solid",
-            borderColor: responsiveMode === "desktop" ? "var(--bd-accent)" : "var(--bd-border)",
+            borderColor: responsiveMode === "desktop" ? "var(--bk-accent)" : "var(--bk-border)",
             background: responsiveMode === "desktop" ? "rgba(45, 109, 255, 0.12)" : "transparent",
-            color: responsiveMode === "desktop" ? "var(--bd-accent)" : "var(--bd-fg-muted)",
+            color: responsiveMode === "desktop" ? "var(--bk-accent)" : "var(--bk-ink-muted)",
             fontSize: 12,
             cursor: "pointer",
           }}
@@ -551,9 +551,9 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
             padding: "5px 10px",
             borderRadius: 6,
             border: "1px solid",
-            borderColor: responsiveMode === "mobile" ? "var(--bd-accent)" : "var(--bd-border)",
+            borderColor: responsiveMode === "mobile" ? "var(--bk-accent)" : "var(--bk-border)",
             background: responsiveMode === "mobile" ? "rgba(45, 109, 255, 0.12)" : "transparent",
-            color: responsiveMode === "mobile" ? "var(--bd-accent)" : "var(--bd-fg-muted)",
+            color: responsiveMode === "mobile" ? "var(--bk-accent)" : "var(--bk-ink-muted)",
             fontSize: 12,
             cursor: "pointer",
           }}

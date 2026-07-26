@@ -443,20 +443,20 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                       onClick={() => state.confirmVariant(v.id)}
                       style={{
                         padding: "10px 14px",
-                        borderRadius: "var(--bd-radius-sm)",
+                        borderRadius: "var(--bk-radius-sm)",
                         fontSize: 13,
                         cursor: "pointer",
                         textAlign: "left" as const,
-                        background: isCurrent ? "var(--bd-accent-alpha-15)" : "var(--bd-bg-subtle)",
+                        background: isCurrent ? "var(--bk-alpha-accent-15)" : "var(--bk-bg-subtle)",
                         border: isCurrent
-                          ? "1px solid var(--bd-accent)"
-                          : "1px solid var(--bd-border)",
-                        color: "var(--bd-fg-primary)",
+                          ? "1px solid var(--bk-accent)"
+                          : "1px solid var(--bk-border)",
+                        color: "var(--bk-ink)",
                       }}
                     >
                       {v.name}
                       {isCurrent && (
-                        <span style={{ marginLeft: 8, fontSize: 12, color: "var(--bd-accent)" }}>
+                        <span style={{ marginLeft: 8, fontSize: 12, color: "var(--bk-accent)" }}>
                           (current)
                         </span>
                       )}

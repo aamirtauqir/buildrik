@@ -43,7 +43,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           top: "50%",
           transform: "translateY(-50%)",
           pointerEvents: "none",
-          color: "var(--buildrick-text-tertiary)",
+          color: "var(--bk-ink-muted)",
           display: "inline-flex",
         }}
       >

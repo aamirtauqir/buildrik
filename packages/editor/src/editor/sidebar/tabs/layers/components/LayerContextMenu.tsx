@@ -67,7 +67,7 @@ export const LayerContextMenu: React.FC<LayerContextMenuProps> = ({
         <span>{isLocked ? "Unlock" : "Lock"}</span>
       </Button>
       <div style={dividerStyles} />
-      <Button style={{ ...itemStyles, color: "var(--bd-error)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
+      <Button style={{ ...itemStyles, color: "var(--bk-error)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
         <Trash2 size={14} />
         <span>Delete</span>
       </Button>
@@ -98,7 +98,7 @@ export const DragTooltip: React.FC<DragTooltipProps> = ({
       ...tooltipStyles,
       left: position.x + 12,
       top: position.y + 12,
-      background: variant === "error" ? "var(--bd-error)" : "var(--bd-bg-hover)",
+      background: variant === "error" ? "var(--bk-error)" : "var(--bk-bg-subtle)",
     }}
     role="tooltip"
   >
@@ -113,12 +113,12 @@ export const DragTooltip: React.FC<DragTooltipProps> = ({
 const menuStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10000,
-  background: "var(--bd-bg-elevated)",
-  border: "1px solid var(--bd-border)",
-  borderRadius: "var(--bd-radius-sm)",
+  background: "var(--bk-bg-card)",
+  border: "1px solid var(--bk-border)",
+  borderRadius: "var(--bk-radius-sm)",
   padding: "4px 0",
   minWidth: 160,
-  boxShadow: "var(--bd-shadow-dropdown)",
+  boxShadow: "var(--bk-shadow-drag)",
 };
 
 const itemStyles: React.CSSProperties = {
@@ -129,7 +129,7 @@ const itemStyles: React.CSSProperties = {
   padding: "8px 12px",
   border: "none",
   background: "transparent",
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
   fontSize: 13,
   cursor: "pointer",
   fontFamily: "inherit",
@@ -138,7 +138,7 @@ const itemStyles: React.CSSProperties = {
 
 const dividerStyles: React.CSSProperties = {
   height: 1,
-  background: "var(--bd-border, rgba(255, 255, 255, 0.08))",
+  background: "var(--bk-border, rgba(255, 255, 255, 0.08))",
   margin: "4px 0",
 };
 
@@ -146,11 +146,11 @@ const tooltipStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10001,
   padding: "6px 10px",
-  borderRadius: "var(--bd-radius-sm)",
-  color: "var(--bd-fg-on-accent)",
+  borderRadius: "var(--bk-radius-sm)",
+  color: "var(--bk-accent-on)",
   fontSize: 12,
   fontWeight: 500,
   whiteSpace: "nowrap" as const,
   pointerEvents: "none" as const,
-  boxShadow: "var(--bd-shadow-md)",
+  boxShadow: "var(--bk-shadow-drag)",
 };

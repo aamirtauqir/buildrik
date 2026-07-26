@@ -11,15 +11,15 @@
   justify-content: center;
   min-width: 18px;
   height: 18px;
-  padding: 0 var(--buildrick-space-2);
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
+  padding: 0 var(--bk-space-8);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
   line-height: 1;
-  color: var(--buildrick-text-secondary);
-  background: var(--buildrick-bg-subtle);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-sm);
+  color: var(--bk-ink-soft);
+  background: var(--bk-bg-subtle);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-sm);
   letter-spacing: 0.02em;
   user-select: none;
 }
@@ -27,14 +27,14 @@
 .bd-kbd--xs {
   min-width: 14px;
   height: 14px;
-  font-size: var(--buildrick-text-3xs);
+  font-size: var(--bk-text-11);
   padding: 0 3px;
 }
 
 .bd-kbd--inverted {
-  color: var(--buildrick-bg-card);
-  background: var(--buildrick-on-dark-12);
-  border-color: var(--buildrick-on-dark-15);
+  color: var(--bk-bg-card);
+  background: var(--bk-alpha-on-dark-12);
+  border-color: var(--bk-alpha-on-dark-15);
 }
 
 /* Bare — no chrome. Colored mono glyph for hint contexts (rail, dense lists)
@@ -46,8 +46,8 @@
   background: transparent;
   border: 0;
   border-radius: 0;
-  font-size: var(--buildrick-text-3xs);
-  color: var(--buildrick-text-muted);
+  font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
 }
 .bd-kbd--bare.bd-kbd--xs { font-size: 8px; }
 
@@ -56,11 +56,11 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
 }
 .bd-kbd-seq__then {
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   padding: 0 2px;
 }

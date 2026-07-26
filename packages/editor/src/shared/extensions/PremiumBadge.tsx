@@ -62,8 +62,8 @@ const baseStyle: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   fontWeight: 600,
-  background: "var(--bd-accent)",
-  color: "var(--bd-fg-on-accent)",
+  background: "var(--bk-accent)",
+  color: "var(--bk-accent-on)",
   borderRadius: 100,
   whiteSpace: "nowrap",
 };

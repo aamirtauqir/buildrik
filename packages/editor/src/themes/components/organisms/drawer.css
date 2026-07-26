@@ -8,68 +8,68 @@
 
 .bd-drawer {
   position: relative;
-  background: var(--buildrick-bg-panel);
+  background: var(--bk-bg-panel);
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  border-left: 1px solid var(--buildrick-border);
-  box-shadow: var(--buildrick-shadow-overlay);
-  z-index: var(--buildrick-z-drawer, 20);
+  border-left: 1px solid var(--bk-border);
+  box-shadow: var(--bk-shadow-overlay);
+  z-index: var(--bk-z-drawer, 20);
 }
 
-.bd-drawer--sm { width: var(--buildrick-size-drawer); }
+.bd-drawer--sm { width: var(--bk-size-drawer); }
 .bd-drawer--md { width: 420px; }
 .bd-drawer--lg { width: 520px; }
 
 .bd-drawer--left {
   border-left: none;
-  border-right: 1px solid var(--buildrick-border);
-  box-shadow: var(--buildrick-shadow-overlay);
+  border-right: 1px solid var(--bk-border);
+  box-shadow: var(--bk-shadow-overlay);
 }
 .bd-drawer--bottom {
   width: 100%;
   height: 340px;
   border-left: none;
-  border-top: 1px solid var(--buildrick-border);
-  box-shadow: var(--buildrick-shadow-overlay);
-  border-radius: var(--buildrick-radius-lg) var(--buildrick-radius-lg) 0 0;
+  border-top: 1px solid var(--bk-border);
+  box-shadow: var(--bk-shadow-overlay);
+  border-radius: var(--bk-radius-lg) var(--bk-radius-lg) 0 0;
 }
 .bd-drawer__handle {
   position: absolute;
-  top: var(--buildrick-space-2);
+  top: var(--bk-space-8);
   left: 50%;
   transform: translateX(-50%);
   width: 36px;
   height: 3px;
-  background: var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-2xs);
+  background: var(--bk-border-medium);
+  border-radius: var(--bk-radius-lg);
 }
 
 .bd-drawer__head {
-  min-height: var(--buildrick-size-header);
-  padding: 0 var(--buildrick-space-4);
-  background: var(--buildrick-bg-panel);
-  border-bottom: 1px solid var(--buildrick-border);
+  min-height: var(--bk-size-header);
+  padding: 0 var(--bk-space-16);
+  background: var(--bk-bg-panel);
+  border-bottom: 1px solid var(--bk-border);
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
 }
 .bd-drawer__meta { flex: 1; min-width: 0; }
 .bd-drawer__title {
   margin: 0;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
   text-transform: uppercase;
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
   letter-spacing: 0.08em;
 }
 .bd-drawer__subtitle {
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
   letter-spacing: -0.01em;
 }
 .bd-drawer__actions {
@@ -81,32 +81,32 @@
 .bd-drawer__body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--buildrick-space-3) var(--buildrick-space-4);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-normal);
-  color: var(--buildrick-text-primary);
+  padding: var(--bk-space-12) var(--bk-space-16);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-regular);
+  color: var(--bk-ink);
 }
-.bd-drawer__section { margin-bottom: var(--buildrick-space-4); }
+.bd-drawer__section { margin-bottom: var(--bk-space-16); }
 .bd-drawer__section:last-child { margin-bottom: 0; }
 .bd-drawer__section-title {
-  margin: 0 0 var(--buildrick-space-2);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
+  margin: 0 0 var(--bk-space-8);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
 }
 
 .bd-drawer__foot {
-  min-height: var(--buildrick-size-header);
-  padding: var(--buildrick-space-2) var(--buildrick-space-3);
-  border-top: 1px solid var(--buildrick-border);
-  background: var(--buildrick-bg-panel);
+  min-height: var(--bk-size-header);
+  padding: var(--bk-space-8) var(--bk-space-12);
+  border-top: 1px solid var(--bk-border);
+  background: var(--bk-bg-panel);
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
   justify-content: flex-end;
 }
 

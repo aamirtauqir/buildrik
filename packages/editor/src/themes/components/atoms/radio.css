@@ -15,7 +15,7 @@
 .bd-radio {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
   cursor: pointer;
   user-select: none;
 }
@@ -29,23 +29,23 @@
   margin: 0;
   appearance: none;
   -webkit-appearance: none;
-  background: var(--buildrick-bg-input);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-full);
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border-medium);
+  border-radius: var(--bk-radius-full);
   cursor: pointer;
   transition:
-    background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-    border-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+    background-color var(--bk-motion-fast) var(--bk-ease-default),
+    border-color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* Hover (only when interactive + not already filled) */
 .bd-radio__input:hover:not(:checked):not(:disabled) {
-  border-color: var(--buildrick-border-hover);
+  border-color: var(--bk-border-strong);
 }
 
 /* Checked — accent border + accent dot inside */
 .bd-radio__input:checked {
-  border-color: var(--buildrick-accent);
+  border-color: var(--bk-accent);
 }
 .bd-radio__input:checked::after {
   content: "";
@@ -54,14 +54,14 @@
   left: 50%;
   width: 8px;
   height: 8px;
-  background: var(--buildrick-accent);
-  border-radius: var(--buildrick-radius-full);
+  background: var(--bk-accent);
+  border-radius: var(--bk-radius-full);
   transform: translate(-50%, -50%);
 }
 
 /* Focus — hard 2px accent outline (no halo) */
 .bd-radio__input:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
+  outline: 2px solid var(--bk-accent);
   outline-offset: 1px;
   box-shadow: none;
 }
@@ -72,8 +72,8 @@
   cursor: not-allowed;
 }
 .bd-radio__input:disabled:not(:checked) {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-medium);
+  background: var(--bk-bg-subtle);
+  border-color: var(--bk-border-medium);
 }
 .bd-radio:has(.bd-radio__input:disabled),
 .bd-radio.bd-radio--disabled {
@@ -82,30 +82,30 @@
 
 /* Label text */
 .bd-radio__label {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  color: var(--buildrick-text-primary);
-  line-height: var(--buildrick-line-normal);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  color: var(--bk-ink);
+  line-height: var(--bk-leading-normal);
 }
 
 /* ─── SIZES ─── */
 
 .bd-radio--sm .bd-radio__input { width: 14px; height: 14px; }
 .bd-radio--sm .bd-radio__input:checked::after { width: 6px; height: 6px; }
-.bd-radio--sm .bd-radio__label { font-size: var(--buildrick-text-xs); }
+.bd-radio--sm .bd-radio__label { font-size: var(--bk-text-11); }
 
 .bd-radio--lg .bd-radio__input { width: 20px; height: 20px; }
 .bd-radio--lg .bd-radio__input:checked::after { width: 10px; height: 10px; }
-.bd-radio--lg .bd-radio__label { font-size: var(--buildrick-text-md); }
+.bd-radio--lg .bd-radio__label { font-size: var(--bk-text-13); }
 
 /* ─── ERROR ─── */
 
 .bd-radio--error .bd-radio__input,
 .bd-radio--error .bd-radio__input:hover:not(:checked):not(:disabled) {
-  border-color: var(--buildrick-error);
+  border-color: var(--bk-error);
 }
 .bd-radio--error .bd-radio__input:focus-visible {
-  outline-color: var(--buildrick-error);
+  outline-color: var(--bk-error);
   box-shadow: none;
 }
 
@@ -114,10 +114,10 @@
 .bd-radio-group {
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
 }
 .bd-radio-group--horizontal {
   flex-direction: row;
-  gap: var(--buildrick-space-4);
+  gap: var(--bk-space-16);
   flex-wrap: wrap;
 }

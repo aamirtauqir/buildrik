@@ -65,7 +65,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
       onChange={(e) => onChange?.(e.target.value)}
       disabled={disabled}
       error={!!error}
-      style={{ color: value ? undefined : "var(--buildrick-text-muted)" }}
+      style={{ color: value ? undefined : "var(--bk-ink-muted)" }}
     >
       {placeholder && <option value="">{placeholder}</option>}
       {groupedOptions.ungrouped.map((opt) => (

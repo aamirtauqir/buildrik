@@ -79,11 +79,11 @@ function PinDot({
         top: top - PIN_SIZE / 2,
         width: PIN_SIZE,
         height: PIN_SIZE,
-        borderRadius: "var(--bd-radius-full) var(--bd-radius-full) var(--bd-radius-full) var(--bd-radius-sm)",
-        background: ghost ? "var(--bd-accent-tint)" : "var(--bd-accent)",
-        color: ghost ? "var(--bd-accent)" : "var(--bd-bg-card)",
-        border: "2px solid var(--bd-bg-card)",
-        boxShadow: "var(--bd-shadow-md)",
+        borderRadius: "var(--bk-radius-full) var(--bk-radius-full) var(--bk-radius-full) var(--bk-radius-sm)",
+        background: ghost ? "var(--bk-accent-tint)" : "var(--bk-accent)",
+        color: ghost ? "var(--bk-accent)" : "var(--bk-bg-card)",
+        border: "2px solid var(--bk-bg-card)",
+        boxShadow: "var(--bk-shadow-drag)",
         fontSize: 11,
         fontWeight: 700,
         display: "flex",
@@ -349,9 +349,9 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             left: "50%",
             transform: "translateX(-50%)",
             padding: "4px 10px",
-            background: "var(--bd-accent)",
-            color: "var(--bd-bg-card)",
-            borderRadius: "var(--bd-radius-full)",
+            background: "var(--bk-accent)",
+            color: "var(--bk-bg-card)",
+            borderRadius: "var(--bk-radius-full)",
             fontSize: 12,
             fontWeight: 600,
             zIndex: Z_LAYERS.floatingPanel,
@@ -384,10 +384,10 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
               left: draft.left + 16,
               top: draft.top + 8,
               width: 236,
-              background: "var(--bd-bg-card)",
-              border: "1px solid var(--bd-border)",
-              borderRadius: "var(--bd-radius-md)",
-              boxShadow: "var(--bd-shadow-dropdown)",
+              background: "var(--bk-bg-card)",
+              border: "1px solid var(--bk-border)",
+              borderRadius: "var(--bk-radius-lg)",
+              boxShadow: "var(--bk-shadow-drag)",
               padding: 10,
               zIndex: Z_LAYERS.floatingPanel,
             }}
@@ -431,7 +431,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
               ? "A comment lost its element"
               : `${orphanModal?.length ?? 0} comments lost their element`}
           </ModalTitle>
-          <p style={{ fontSize: 13, color: "var(--bd-fg-muted)", margin: "8px 0 12px" }}>
+          <p style={{ fontSize: 13, color: "var(--bk-ink-muted)", margin: "8px 0 12px" }}>
             The elements these were pinned to were deleted. The comments are kept — never
             auto-deleted — and moved to the Detached group at the top of the Review panel.
           </p>
@@ -440,15 +440,15 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
               <div
                 key={c.id}
                 style={{
-                  background: "var(--bd-warning-tint)",
-                  border: "1px solid var(--bd-warning-border)",
-                  borderRadius: "var(--bd-radius-sm)",
+                  background: "var(--bk-warning-tint)",
+                  border: "1px solid var(--bk-warning-text)",
+                  borderRadius: "var(--bk-radius-sm)",
                   padding: "8px 10px",
                   fontSize: 12,
                 }}
               >
-                <div style={{ color: "var(--bd-fg-primary)" }}>&ldquo;{c.body.slice(0, 120)}&rdquo;</div>
-                <div style={{ color: "var(--bd-warn-strong)", marginTop: 2 }}>was pinned to a deleted element</div>
+                <div style={{ color: "var(--bk-ink)" }}>&ldquo;{c.body.slice(0, 120)}&rdquo;</div>
+                <div style={{ color: "var(--bk-warning-text)", marginTop: 2 }}>was pinned to a deleted element</div>
               </div>
             ))}
           </div>

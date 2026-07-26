@@ -124,7 +124,7 @@ function TreeNode({
 
 // ─── FolderTree (LEFT panel) ──────────────────────────────────────────────
 
-const FOLDER_COLORS = ["#F59E0B", "#10B981", "#EC4899", "var(--bd-fg-secondary)", "#0EA5E9"];
+const FOLDER_COLORS = ["#F59E0B", "#10B981", "#EC4899", "var(--bk-ink-soft)", "#0EA5E9"];
 
 export function FolderTree({
   folders,
@@ -220,7 +220,7 @@ export function FolderTree({
           }}
         />
         <TreeNode
-          icon={<CheckCircle size={14} style={{ color: "var(--buildrick-success)" }} />}
+          icon={<CheckCircle size={14} style={{ color: "var(--bk-success)" }} />}
           label="In use"
           count={inUseCount}
           active={smartFolder === "in-use"}
@@ -230,7 +230,7 @@ export function FolderTree({
           }}
         />
         <TreeNode
-          icon={<MinusCircle size={14} style={{ color: "var(--buildrick-text-disabled)" }} />}
+          icon={<MinusCircle size={14} style={{ color: "var(--bk-ink-disabled)" }} />}
           label="Unused"
           count={unusedCount}
           active={smartFolder === "unused"}
@@ -261,7 +261,7 @@ export function FolderTree({
         {renderFolderTree(null, 0)}
 
         {folders.length === 0 && (
-          <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--buildrick-text-disabled)" }}>
+          <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--bk-ink-disabled)" }}>
             No folders yet
           </div>
         )}

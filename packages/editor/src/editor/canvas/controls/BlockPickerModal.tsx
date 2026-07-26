@@ -195,7 +195,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
 
 // Styles
 const modalStyles: React.CSSProperties = {
-  background: "var(--buildrick-bg-panel)",
+  background: "var(--bk-bg-panel)",
   borderRadius: 12,
   boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
   width: 380,
@@ -207,7 +207,7 @@ const modalStyles: React.CSSProperties = {
 
 const headerStyles: React.CSSProperties = {
   padding: "14px 16px",
-  borderBottom: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
+  borderBottom: "1px solid var(--bk-border, rgba(255,255,255,0.08))",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -216,13 +216,13 @@ const headerStyles: React.CSSProperties = {
 const titleStyles: React.CSSProperties = {
   fontWeight: 600,
   fontSize: 14,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
 };
 
 const closeButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   cursor: "pointer",
   padding: 4,
   borderRadius: 6,
@@ -235,7 +235,7 @@ const searchContainerStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "8px 16px",
-  borderBottom: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
+  borderBottom: "1px solid var(--bk-border, rgba(255,255,255,0.08))",
 };
 
 const searchInputStyles: React.CSSProperties = {
@@ -243,7 +243,7 @@ const searchInputStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   outline: "none",
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bk-ink)",
   fontSize: 13,
 };
 

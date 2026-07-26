@@ -44,7 +44,7 @@ const styles = {
   propertyLabel: {
     fontSize: 12,
     fontWeight: 500,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
   },
@@ -56,9 +56,9 @@ const styles = {
   chip: (isSelected: boolean): React.CSSProperties => ({
     padding: "6px 12px",
     borderRadius: 6,
-    border: isSelected ? "1px solid var(--buildrick-accent)" : "1px solid var(--buildrick-border)",
-    background: isSelected ? "var(--buildrick-accent-subtle)" : "var(--buildrick-surface-3)",
-    color: isSelected ? "var(--buildrick-accent)" : "var(--buildrick-text-secondary)",
+    border: isSelected ? "1px solid var(--bk-accent)" : "1px solid var(--bk-border)",
+    background: isSelected ? "var(--bk-accent-subtle)" : "var(--bk-bg-subtle)",
+    color: isSelected ? "var(--bk-accent)" : "var(--bk-ink-soft)",
     fontSize: 12,
     fontWeight: isSelected ? 600 : 400,
     cursor: "pointer",
@@ -66,10 +66,10 @@ const styles = {
   }),
   noVariants: {
     padding: 12,
-    background: "var(--buildrick-surface-2)",
+    background: "var(--bk-bg-subtle)",
     borderRadius: 8,
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     textAlign: "center" as const,
   },
   componentName: {
@@ -77,7 +77,7 @@ const styles = {
     alignItems: "center",
     gap: 8,
     padding: "8px 12px",
-    background: "var(--bd-accent-subtle)",
+    background: "var(--bk-accent-subtle)",
     borderRadius: 8,
     marginBottom: 8,
   },
@@ -87,13 +87,13 @@ const styles = {
   componentLabel: {
     fontSize: 12,
     fontWeight: 600,
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   },
   hint: {
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     padding: "8px 0 0",
-    borderTop: "1px solid var(--buildrick-border)",
+    borderTop: "1px solid var(--bk-border)",
     marginTop: 8,
   },
 };

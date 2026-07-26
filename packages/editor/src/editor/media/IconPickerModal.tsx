@@ -65,7 +65,7 @@ const styles = {
   },
   iconCount: {
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
   },
   toolbar: {
     display: "flex",
@@ -80,27 +80,27 @@ const styles = {
     gap: 4,
     flexWrap: "wrap" as const,
     paddingBottom: 12,
-    borderBottom: "1px solid var(--buildrick-border)",
+    borderBottom: "1px solid var(--bk-border)",
   },
   categoryBtn: {
     padding: "4px 10px",
     fontSize: 12,
-    border: "1px solid var(--buildrick-border)",
+    border: "1px solid var(--bk-border)",
     borderRadius: 16,
     background: "transparent",
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
     cursor: "pointer",
     transition: "all 0.15s ease",
   },
   categoryBtnActive: {
-    background: "var(--buildrick-accent)",
-    borderColor: "var(--buildrick-accent)",
-    color: "var(--buildrick-text-on-accent)",
+    background: "var(--bk-accent)",
+    borderColor: "var(--bk-accent)",
+    color: "var(--bk-accent-on)",
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: 600,
-    color: "var(--buildrick-text-secondary)",
+    color: "var(--bk-ink-soft)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
     marginBottom: 8,
@@ -119,27 +119,27 @@ const styles = {
     justifyContent: "center",
     width: 48,
     height: 48,
-    border: "1px solid var(--buildrick-border)",
+    border: "1px solid var(--bk-border)",
     borderRadius: 8,
-    background: "var(--buildrick-bg-panel)",
+    background: "var(--bk-bg-panel)",
     cursor: "pointer",
     transition: "all 0.15s ease",
-    color: "var(--buildrick-text-primary)",
+    color: "var(--bk-ink)",
   },
   iconBtnHover: {
-    background: "var(--bd-accent-tint)",
-    borderColor: "var(--bd-accent-alpha-30)",
+    background: "var(--bk-accent-tint)",
+    borderColor: "var(--bk-alpha-accent-30)",
   },
   iconBtnSelected: {
-    border: "2px solid var(--bd-accent)",
-    background: "var(--bd-accent-alpha-15)",
+    border: "2px solid var(--bk-accent)",
+    background: "var(--bk-alpha-accent-15)",
   },
   preview: {
     display: "flex",
     alignItems: "center",
     gap: 16,
     padding: 16,
-    background: "var(--buildrick-bg-panel-secondary)",
+    background: "var(--bk-bg-subtle)",
     borderRadius: 8,
   },
   previewIcon: {
@@ -148,9 +148,9 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "var(--buildrick-bg-panel)",
+    background: "var(--bk-bg-panel)",
     borderRadius: 8,
-    border: "1px solid var(--buildrick-border)",
+    border: "1px solid var(--bk-border)",
   },
   previewInfo: {
     flex: 1,
@@ -162,7 +162,7 @@ const styles = {
   },
   previewTags: {
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
   },
   controls: {
     display: "flex",
@@ -176,16 +176,16 @@ const styles = {
   },
   controlLabel: {
     fontSize: 12,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
     textTransform: "uppercase" as const,
   },
   sizeInput: {
     width: 60,
     padding: "6px 8px",
     borderRadius: 6,
-    border: "1px solid var(--buildrick-border)",
-    background: "var(--buildrick-bg-panel)",
-    color: "var(--buildrick-text-primary)",
+    border: "1px solid var(--bk-border)",
+    background: "var(--bk-bg-panel)",
+    color: "var(--bk-ink)",
     fontSize: 12,
     textAlign: "center" as const,
   },
@@ -193,7 +193,7 @@ const styles = {
     width: 40,
     height: 32,
     borderRadius: 6,
-    border: "1px solid var(--buildrick-border)",
+    border: "1px solid var(--bk-border)",
     cursor: "pointer",
     padding: 2,
   },
@@ -201,9 +201,9 @@ const styles = {
     width: 60,
     padding: "6px 8px",
     borderRadius: 6,
-    border: "1px solid var(--buildrick-border)",
-    background: "var(--buildrick-bg-panel)",
-    color: "var(--buildrick-text-primary)",
+    border: "1px solid var(--bk-border)",
+    background: "var(--bk-bg-panel)",
+    color: "var(--bk-ink)",
     fontSize: 12,
   },
   footer: {
@@ -211,12 +211,12 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     paddingTop: 16,
-    borderTop: "1px solid var(--buildrick-border)",
+    borderTop: "1px solid var(--bk-border)",
   },
   noResults: {
     padding: 40,
     textAlign: "center" as const,
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bk-ink-muted)",
   },
 };
 
@@ -234,7 +234,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
   const [selectedCategory, setSelectedCategory] = React.useState<string>("all");
   const [selectedIcon, setSelectedIcon] = React.useState<IconDefinition | null>(null);
   const [iconSize, setIconSize] = React.useState(currentIcon?.size || 24);
-  const [iconColor, setIconColor] = React.useState(currentIcon?.color || "var(--bd-bg-card)");
+  const [iconColor, setIconColor] = React.useState(currentIcon?.color || "var(--bk-bg-card)");
   const [strokeWidth, setStrokeWidth] = React.useState(currentIcon?.strokeWidth || 2);
   const [recentIcons, setRecentIcons] = React.useState<string[]>([]);
   const categoryLabels = React.useMemo(
@@ -267,7 +267,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
         if (existing) {
           setSelectedIcon(existing);
           setIconSize(currentIcon.size || 24);
-          setIconColor(currentIcon.color || "var(--bd-bg-card)");
+          setIconColor(currentIcon.color || "var(--bk-bg-card)");
           setStrokeWidth(currentIcon.strokeWidth || 2);
         }
       }
@@ -485,8 +485,8 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
                   <span
                     style={{
                       fontSize: 11,
-                      fontFamily: "var(--bd-font-mono, ui-monospace, monospace)",
-                      color: "var(--bd-fg-muted)",
+                      fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
+                      color: "var(--bk-ink-muted)",
                       minWidth: 24,
                       textAlign: "right",
                     }}
@@ -510,7 +510,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
 
         {/* Footer */}
         <div style={styles.footer}>
-          <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+          <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
             Powered by Lucide Icons
           </span>
           <div style={{ display: "flex", gap: 8 }}>

@@ -242,7 +242,7 @@ export function AssetDetailOverlay({
       <div className="med-detail-body" role="tabpanel">
         {metaError ? (
           <div className="med-detail-error-body">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, var(--bd-fg-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bk-ink-soft, var(--bk-ink-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <line x1="9" y1="9" x2="15" y2="15" />
               <line x1="15" y1="9" x2="9" y2="15" />

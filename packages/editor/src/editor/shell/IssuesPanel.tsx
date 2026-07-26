@@ -44,34 +44,34 @@ function isFixable(i: Issue): boolean {
 }
 
 const TONE: Record<Issue["type"], { icon: "alert-circle" | "info"; color: string }> = {
-  error: { icon: "alert-circle", color: "var(--bd-danger)" },
-  warning: { icon: "alert-circle", color: "var(--bd-warning-strong)" },
-  info: { icon: "info", color: "var(--bd-text-muted)" },
+  error: { icon: "alert-circle", color: "var(--bk-error)" },
+  warning: { icon: "alert-circle", color: "var(--bk-warning-text)" },
+  info: { icon: "info", color: "var(--bk-ink-muted)" },
 };
 
 const S: Record<string, React.CSSProperties> = {
   body: { display: "flex", flexDirection: "column", height: "100%", minHeight: 0 },
-  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bd-border)" },
-  summary: { fontSize: 12, color: "var(--bd-text-muted)", padding: "6px 12px" },
+  toolbar: { display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderBottom: "1px solid var(--bk-border)" },
+  summary: { fontSize: 12, color: "var(--bk-ink-muted)", padding: "6px 12px" },
   scroll: { flex: 1, minHeight: 0, overflowY: "auto", padding: "4px 12px 12px" },
   rowShell: { display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 6 },
-  row: { display: "flex", gap: 8, padding: "8px 10px", border: "1px solid var(--bd-border)", borderRadius: "var(--bd-radius-md)", cursor: "pointer", alignItems: "flex-start", flex: 1, minWidth: 0, textAlign: "left", background: "transparent" },
-  msg: { fontSize: 13, color: "var(--bd-text)", lineHeight: 1.4 },
-  loc: { fontSize: 11, fontWeight: 500, color: "var(--bd-text-muted)", marginTop: 2 },
+  row: { display: "flex", gap: 8, padding: "8px 10px", border: "1px solid var(--bk-border)", borderRadius: "var(--bk-radius-lg)", cursor: "pointer", alignItems: "flex-start", flex: 1, minWidth: 0, textAlign: "left", background: "transparent" },
+  msg: { fontSize: 13, color: "var(--bk-ink)", lineHeight: 1.4 },
+  loc: { fontSize: 11, fontWeight: 500, color: "var(--bk-ink-muted)", marginTop: 2 },
   rowMain: { display: "flex", flexDirection: "column", minWidth: 0, flex: 1 },
   // fixing — accent-tint band (Figma 164:48)
-  fixing: { background: "var(--bd-accent-tint)", padding: "10px 12px", borderBottom: "1px solid var(--bd-border)" },
-  fixingLabel: { fontSize: 12, color: "var(--bd-accent-text)" },
-  track: { height: 6, background: "var(--bd-bg-card)", borderRadius: "var(--bd-radius-sm)", overflow: "hidden", margin: "8px 0 6px" },
-  fill: { height: 6, background: "var(--bd-accent)", borderRadius: "var(--bd-radius-sm)", width: "60%" },
-  undoNote: { fontSize: 11, fontWeight: 500, color: "var(--bd-text-muted)" },
+  fixing: { background: "var(--bk-accent-tint)", padding: "10px 12px", borderBottom: "1px solid var(--bk-border)" },
+  fixingLabel: { fontSize: 12, color: "var(--bk-accent-text)" },
+  track: { height: 6, background: "var(--bk-bg-card)", borderRadius: "var(--bk-radius-sm)", overflow: "hidden", margin: "8px 0 6px" },
+  fill: { height: 6, background: "var(--bk-accent)", borderRadius: "var(--bk-radius-sm)", width: "60%" },
+  undoNote: { fontSize: 11, fontWeight: 500, color: "var(--bk-ink-muted)" },
   // fix-failed — warning-tint band (Figma 164:63)
-  failed: { background: "var(--bd-warning-tint)", padding: "10px 12px", borderBottom: "1px solid var(--bd-border)" },
-  failedTitle: { fontSize: 12, color: "var(--bd-error-text)" },
-  failedWhy: { fontSize: 11, fontWeight: 500, color: "var(--bd-text-muted)", lineHeight: 1.45, marginTop: 6 },
+  failed: { background: "var(--bk-warning-tint)", padding: "10px 12px", borderBottom: "1px solid var(--bk-border)" },
+  failedTitle: { fontSize: 12, color: "var(--bk-error-text)" },
+  failedWhy: { fontSize: 11, fontWeight: 500, color: "var(--bk-ink-muted)", lineHeight: 1.45, marginTop: 6 },
   failedActions: { display: "flex", gap: 8, marginTop: 8 },
-  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bd-text-muted)" },
-  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bd-text)" },
+  center: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, padding: 28, textAlign: "center", color: "var(--bk-ink-muted)" },
+  centerTitle: { fontSize: 14, fontWeight: 600, color: "var(--bk-ink)" },
 };
 
 const FILTERS: { key: Filter; label: string }[] = [

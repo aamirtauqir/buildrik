@@ -106,9 +106,9 @@ const chipStyles: React.CSSProperties = {
   padding: "6px 12px",
   height: 28,
   background: "transparent",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 8,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -118,9 +118,9 @@ const chipStyles: React.CSSProperties = {
 };
 
 const chipActiveStyles: React.CSSProperties = {
-  background: "var(--buildrick-accent)",
-  borderColor: "var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bk-accent)",
+  borderColor: "var(--bk-accent)",
+  color: "var(--bk-accent-on)",
 };
 
 const iconStyles: React.CSSProperties = {

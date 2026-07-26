@@ -14,47 +14,47 @@
 .bd-tag {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
   height: 24px;
-  padding: 0 var(--buildrick-space-3);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs, 11px);
-  font-weight: var(--buildrick-font-weight-medium);
+  padding: 0 var(--bk-space-12);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11, 11px);
+  font-weight: var(--bk-weight-medium);
   line-height: 1;
-  color: var(--buildrick-text-secondary);
-  background: var(--buildrick-bg-subtle);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-full);
+  color: var(--bk-ink-soft);
+  background: var(--bk-bg-subtle);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius-full);
   white-space: nowrap;
   user-select: none;
 }
 
 .bd-tag--sm {
   height: 20px;
-  padding: 0 var(--buildrick-space-2);
-  font-size: var(--buildrick-text-2xs);
+  padding: 0 var(--bk-space-8);
+  font-size: var(--bk-text-11);
 }
 
 /* Tones — pre-mixed tint bg + dark -text tokens (full hue fails AA at 11px on tint) */
-.bd-tag--accent  { background: var(--buildrick-accent-tint);   color: var(--buildrick-accent-text);   border-color: transparent; }
-.bd-tag--success { background: var(--buildrick-success-tint);  color: var(--buildrick-success-text);  border-color: transparent; }
-.bd-tag--warning { background: var(--buildrick-warning-tint);  color: var(--buildrick-warning-text);  border-color: transparent; }
-.bd-tag--error   { background: var(--buildrick-error-tint);    color: var(--buildrick-error-text);    border-color: transparent; }
-.bd-tag--ink     { background: var(--buildrick-text-heading);  color: var(--buildrick-bg-card);       border-color: transparent; }
+.bd-tag--accent  { background: var(--bk-accent-tint);   color: var(--bk-accent-text);   border-color: transparent; }
+.bd-tag--success { background: var(--bk-success-tint);  color: var(--bk-success-text);  border-color: transparent; }
+.bd-tag--warning { background: var(--bk-warning-tint);  color: var(--bk-warning-text);  border-color: transparent; }
+.bd-tag--error   { background: var(--bk-error-tint);    color: var(--bk-error-text);    border-color: transparent; }
+.bd-tag--ink     { background: var(--bk-ink);  color: var(--bk-bg-card);       border-color: transparent; }
 
 /* Selectable — toggleable filter chip (aria-pressed="true" = on) */
 .bd-tag--selectable {
   cursor: pointer;
   background: transparent;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              border-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default),
+              color var(--bk-motion-fast) var(--bk-ease-default),
+              border-color var(--bk-motion-fast) var(--bk-ease-default);
 }
-.bd-tag--selectable:hover { background: var(--buildrick-bg-hover); }
+.bd-tag--selectable:hover { background: var(--bk-bg-subtle); }
 .bd-tag--selectable[aria-pressed="true"],
 .bd-tag--selectable.is-on {
-  background: var(--buildrick-text-heading);
-  color: var(--buildrick-bg-card);
+  background: var(--bk-ink);
+  color: var(--bk-bg-card);
   border-color: transparent;
 }
 
@@ -66,7 +66,7 @@
   height: 16px;
   margin-right: -4px;
   color: inherit;
-  border-radius: var(--buildrick-radius-circle);
+  border-radius: var(--bk-radius-full);
 }
 .bd-tag__close > svg { width: 10px; height: 10px; }
 
@@ -74,7 +74,7 @@
 .bd-tag__dot {
   width: 6px;
   height: 6px;
-  border-radius: var(--buildrick-radius-circle);
+  border-radius: var(--bk-radius-full);
   background: currentColor;
   flex-shrink: 0;
 }

@@ -25,7 +25,7 @@ export interface SliderInputProps {
 const sliderStyle: React.CSSProperties = {
   flex: 1,
   height: 4,
-  background: "var(--bd-border-medium, var(--bd-border-medium))",
+  background: "var(--bk-border-medium, var(--bk-border-medium))",
   borderRadius: 2,
   appearance: "none",
   cursor: "pointer",
@@ -54,8 +54,8 @@ export const SliderInput: React.FC<SliderInputProps> = ({
       />
       <span
         style={{
-          font: "500 11px var(--bd-font)",
-          color: "var(--bd-fg-muted)",
+          font: "500 11px var(--bk-font-ui)",
+          color: "var(--bk-ink-muted)",
           minWidth: 32,
           textAlign: "right",
           fontVariantNumeric: "tabular-nums",
@@ -107,8 +107,8 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
       />
       <span
         style={{
-          font: "500 11px var(--bd-font)",
-          color: "var(--bd-fg-muted)",
+          font: "500 11px var(--bk-font-ui)",
+          color: "var(--bk-ink-muted)",
           minWidth: 32,
           textAlign: "right",
           fontVariantNumeric: "tabular-nums",

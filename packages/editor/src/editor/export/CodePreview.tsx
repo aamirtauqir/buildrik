@@ -84,7 +84,7 @@ function highlightHTML(code: string): React.ReactNode[] {
     } else if (match[5]) {
       // Comments
       parts.push(
-        <span key={key++} style={{ color: "var(--buildrick-text-muted)", fontStyle: "italic" }}>
+        <span key={key++} style={{ color: "var(--bk-ink-muted)", fontStyle: "italic" }}>
           {match[0]}
         </span>
       );
@@ -141,7 +141,7 @@ function highlightCSS(code: string): React.ReactNode[] {
     } else if (match[4]) {
       // Comments
       parts.push(
-        <span key={key++} style={{ color: "var(--buildrick-text-muted)", fontStyle: "italic" }}>
+        <span key={key++} style={{ color: "var(--bk-ink-muted)", fontStyle: "italic" }}>
           {match[0]}
         </span>
       );
@@ -173,7 +173,7 @@ const LineNumbers: React.FC<{ count: number }> = ({ count }) => (
     style={{
       textAlign: "right",
       paddingRight: 16,
-      color: "var(--buildrick-text-muted)",
+      color: "var(--bk-ink-muted)",
       fontSize: 12,
       fontFamily: "monospace",
       userSelect: "none",
@@ -267,7 +267,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
           <Tab id="html">HTML</Tab>
           <Tab id="css">CSS</Tab>
         </Tabs>
-        <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
           {activeTab === "html"
             ? `${html.split("\n").length} lines`
             : `${cssCode.split("\n").length} lines`}

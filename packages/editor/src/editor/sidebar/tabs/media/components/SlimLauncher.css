@@ -37,7 +37,7 @@
   height: 26px;
   padding: 0 10px;
   font-size: 12px;
-  background: var(--bd-accent);
+  background: var(--bk-accent);
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -55,7 +55,7 @@
   left: 22px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bk-ink-muted, #64748B);
   pointer-events: none;
 }
 .sl-search__input {
@@ -63,9 +63,9 @@
   height: 30px;
   padding: 0 10px 0 32px;
   font-size: 12px;
-  border: 1px solid var(--bd-border-light, var(--bd-border));
+  border: 1px solid var(--bk-border, var(--bk-border));
   border-radius: 4px;
-  background: var(--bd-bg-card, #fff);
+  background: var(--bk-bg-card, #fff);
 }
 .sl-grid-wrap {
   flex: 1;
@@ -92,12 +92,12 @@
   margin: 0;
   font-size: 13px;
   font-weight: 600;
-  color: var(--bd-fg, var(--bd-fg-primary));
+  color: var(--bk-ink, var(--bk-ink));
 }
 .sl-empty__body {
   margin: 0;
   font-size: 11px;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bk-ink-muted, #64748B);
   line-height: 1.5;
   max-width: 220px;
 }
@@ -105,8 +105,8 @@
   margin-top: 4px;
 }
 .sl-upload-footer {
-  border-top: 1px solid var(--bd-border-light, var(--bd-border));
+  border-top: 1px solid var(--bk-border, var(--bk-border));
   padding: 10px 12px;
-  background: var(--bd-bg-panel, #fff);
+  background: var(--bk-bg-panel, #fff);
   flex-shrink: 0;
 }

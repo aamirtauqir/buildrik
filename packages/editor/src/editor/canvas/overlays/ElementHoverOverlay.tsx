@@ -49,23 +49,23 @@ export interface ElementHoverOverlayProps {
 // Colors using CSS variables - single source of truth is Canvas.css
 const COLORS = {
   // Minimal mode - uses CSS vars for consistency
-  outline: "var(--buildrick-accent)",
-  outlineDashed: "var(--buildrick-accent-tint)",
-  label: "var(--buildrick-surface-2)",
-  labelText: "var(--buildrick-text-primary)",
+  outline: "var(--bk-accent)",
+  outlineDashed: "var(--bk-accent-tint)",
+  label: "var(--bk-bg-subtle)",
+  labelText: "var(--bk-ink)",
 
   // Box model (DevTools-style) - CSS vars for theme compatibility
-  content: "var(--buildrick-boxmodel-content)",
-  padding: "var(--buildrick-boxmodel-padding)",
-  margin: "var(--buildrick-boxmodel-margin)",
+  content: "var(--bk-boxmodel-content)",
+  padding: "var(--bk-boxmodel-padding)",
+  margin: "var(--bk-boxmodel-margin)",
 
   // Hierarchy
   hierarchyBg: "rgba(30, 30, 46, 0.95)",
-  hierarchyText: "var(--buildrick-text-secondary)",
-  hierarchyCurrent: "var(--buildrick-accent-subtle)",
+  hierarchyText: "var(--bk-ink-soft)",
+  hierarchyCurrent: "var(--bk-accent-subtle)",
 
   // Clone mode badge background
-  cloneMode: "var(--buildrick-success)",
+  cloneMode: "var(--bk-success)",
 };
 
 // =============================================================================
@@ -428,8 +428,8 @@ const CloneBadge: React.FC<{ rect: DOMRect }> = ({ rect }) => (
       width: 18,
       height: 18,
       background: COLORS.cloneMode,
-      color: "var(--buildrick-text-on-accent)",
-      borderRadius: "var(--bd-radius-full)",
+      color: "var(--bk-accent-on)",
+      borderRadius: "var(--bk-radius-full)",
       fontSize: 12,
       fontWeight: 700,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",

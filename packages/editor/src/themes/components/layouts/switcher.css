@@ -8,7 +8,7 @@
 .bd-switcher {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
   align-items: stretch;
 }
 

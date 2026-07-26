@@ -47,7 +47,7 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
       <div
         data-preset-detail-pane
         data-empty="true"
-        style={{ padding: 16, color: "var(--bd-fg-muted)", fontSize: 12 }}
+        style={{ padding: 16, color: "var(--bk-ink-muted)", fontSize: 12 }}
       >
         No presets in this category yet.
       </div>
@@ -78,7 +78,7 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
           style={{
             fontSize: 16,
             fontWeight: 600,
-            color: "var(--bd-fg-primary)",
+            color: "var(--bk-ink)",
           }}
         >
           {CATEGORY_LABELS[category]} · {activeVariant}
@@ -88,8 +88,8 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
           style={{
             fontSize: 12,
             fontFamily:
-              "var(--buildrick-font-family-mono, ui-monospace, monospace)",
-            color: "var(--bd-fg-muted)",
+              "var(--bk-font-mono, ui-monospace, monospace)",
+            color: "var(--bk-ink-muted)",
             marginTop: 2,
           }}
         >
@@ -102,9 +102,9 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
         data-preview-area
         style={{
           padding: 24,
-          background: "var(--bd-bg-subtle)",
+          background: "var(--bk-bg-subtle)",
           borderRadius: 8,
-          border: "1px solid var(--bd-border)",
+          border: "1px solid var(--bk-border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -124,12 +124,12 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
                 fontSize: 12,
                 fontWeight: 600,
                 background: isActive
-                  ? "var(--bd-accent)"
-                  : "var(--bd-bg-panel)",
-                color: isActive ? "var(--bd-fg-on-accent)" : "var(--bd-fg-primary)",
+                  ? "var(--bk-accent)"
+                  : "var(--bk-bg-panel)",
+                color: isActive ? "var(--bk-accent-on)" : "var(--bk-ink)",
                 border: isActive
-                  ? "1px solid var(--bd-accent)"
-                  : "1px solid var(--bd-border)",
+                  ? "1px solid var(--bk-accent)"
+                  : "1px solid var(--bk-border)",
               }}
             >
               {p.friendlyName || p.variant}
@@ -145,7 +145,7 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
         style={{
           display: "flex",
           gap: 4,
-          borderBottom: "1px solid var(--bd-border)",
+          borderBottom: "1px solid var(--bk-border)",
           paddingBottom: 0,
           overflowX: "auto",
         }}
@@ -167,9 +167,9 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
                 background: "transparent",
                 border: "none",
                 borderBottom: isActive
-                  ? "2px solid var(--bd-accent)"
+                  ? "2px solid var(--bk-accent)"
                   : "2px solid transparent",
-                color: isActive ? "var(--bd-accent)" : "var(--bd-fg-muted)",
+                color: isActive ? "var(--bk-accent)" : "var(--bk-ink-muted)",
                 fontSize: 12,
                 fontWeight: isActive ? 600 : 500,
                 cursor: "pointer",
@@ -205,15 +205,15 @@ export const PresetDetailPane: React.FC<PresetDetailPaneProps> = ({
         style={{
           marginTop: 8,
           padding: 12,
-          background: "var(--bd-bg-subtle)",
-          borderLeft: "3px solid var(--bd-accent)",
+          background: "var(--bk-bg-subtle)",
+          borderLeft: "3px solid var(--bk-accent)",
           borderRadius: 4,
           fontSize: 12,
-          color: "var(--bd-fg-muted)",
+          color: "var(--bk-ink-muted)",
           lineHeight: 1.5,
         }}
       >
-        <strong style={{ color: "var(--bd-accent)" }}>Variant tabs:</strong>{" "}
+        <strong style={{ color: "var(--bk-accent)" }}>Variant tabs:</strong>{" "}
         {presets.map((p) => p.variant).join(" / ")} — each an independent
         token-binding map. Edit any binding here = all canvas elements
         restyle.

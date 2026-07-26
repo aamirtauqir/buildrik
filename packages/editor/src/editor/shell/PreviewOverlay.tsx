@@ -41,11 +41,11 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) 
       data-testid="preview-overlay"
       style={{
         position: "fixed",
-        top: "var(--buildrick-size-topbar, 56px)",
+        top: "var(--bk-size-topbar, 56px)",
         left: 0,
         right: 0,
         bottom: 0,
-        background: "var(--bd-bg-app, var(--bd-bg-panel))",
+        background: "var(--bk-bg-app, var(--bk-bg-panel))",
         zIndex: Z_LAYERS.floatingPanel,
         display: "flex",
         flexDirection: "column",
@@ -66,8 +66,8 @@ export const PreviewOverlay: React.FC<PreviewOverlayProps> = ({ html, onDone }) 
           bottom: 16,
           left: "50%",
           transform: "translateX(-50%)",
-          borderRadius: "var(--bd-radius-full)",
-          boxShadow: "var(--bd-shadow-lg)",
+          borderRadius: "var(--bk-radius-full)",
+          boxShadow: "var(--bk-shadow-overlay)",
         }}
       >
         Done

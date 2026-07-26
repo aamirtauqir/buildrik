@@ -64,24 +64,24 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
       alignItems: "center",
       gap: 6,
       padding: "4px 10px",
-      borderRadius: "var(--bd-radius-full)",
-      fontSize: "var(--bd-text-xs, 12px)",
+      borderRadius: "var(--bk-radius-full)",
+      fontSize: "var(--bk-text-11, 12px)",
       fontWeight: 600,
       letterSpacing: "0.02em",
       background: isPublished
-        ? "var(--bd-success-bg, rgba(34, 197, 94, 0.12))"
+        ? "var(--bk-success-tint, rgba(34, 197, 94, 0.12))"
         : "rgba(245, 158, 11, 0.15)",
-      color: isPublished ? "var(--bd-success)" : "var(--bd-warning)",
+      color: isPublished ? "var(--bk-success)" : "var(--bk-warning)",
     }}
   >
     <span
       style={{
         width: 6,
         height: 6,
-        borderRadius: "var(--bd-radius-full)",
+        borderRadius: "var(--bk-radius-full)",
         background: isPublished
-          ? "var(--bd-success)"
-          : "var(--bd-warning)",
+          ? "var(--bk-success)"
+          : "var(--bk-warning)",
       }}
     />
     {isPublished ? "Published" : "Draft"}
@@ -102,7 +102,7 @@ const ChecklistItem: React.FC<{
       padding: "6px 8px",
       borderRadius: 6,
       background: ok ? "rgba(34,197,94,0.06)" : "rgba(255,255,255,0.02)",
-      border: `1px solid ${ok ? "rgba(34,197,94,0.15)" : "var(--bd-border-light, var(--bd-border))"}`,
+      border: `1px solid ${ok ? "rgba(34,197,94,0.15)" : "var(--bk-border, var(--bk-border))"}`,
       fontSize: 13,
     }}
     aria-label={`${label}: ${ok ? "complete" : "incomplete"}`}
@@ -112,12 +112,12 @@ const ChecklistItem: React.FC<{
       style={{
         width: 16,
         height: 16,
-        borderRadius: "var(--bd-radius-sm)",
+        borderRadius: "var(--bk-radius-sm)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: ok ? "var(--bd-success)" : "transparent",
-        border: ok ? "none" : "1px solid var(--bd-border-light, var(--bd-border))",
+        background: ok ? "var(--bk-success)" : "transparent",
+        border: ok ? "none" : "1px solid var(--bk-border, var(--bk-border))",
         flexShrink: 0,
         transition: "background 0.15s",
       }}
@@ -132,7 +132,7 @@ const ChecklistItem: React.FC<{
     <span
       style={{
         flex: 1,
-        color: ok ? "var(--bd-fg-muted)" : "var(--bd-fg-secondary)",
+        color: ok ? "var(--bk-ink-muted)" : "var(--bk-ink-soft)",
         textDecoration: ok ? "line-through" : "none",
         fontSize: 13,
       }}
@@ -140,10 +140,10 @@ const ChecklistItem: React.FC<{
       {label}
     </span>
     {required && !ok && (
-      <span style={{ fontSize: 12, color: "var(--bd-error)", fontWeight: 500 }}>Required</span>
+      <span style={{ fontSize: 12, color: "var(--bk-error)", fontWeight: 500 }}>Required</span>
     )}
     {hint && !ok && (
-      <span style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>{hint}</span>
+      <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>{hint}</span>
     )}
   </div>
 );
@@ -330,14 +330,14 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </Stack>
           {projectId && (
             <p style={{ ...metaTextStyles, marginTop: 4 }}>
-              Publishing to <strong style={{ color: "var(--bd-fg-primary)" }}>your connected Vercel project</strong>
+              Publishing to <strong style={{ color: "var(--bk-ink)" }}>your connected Vercel project</strong>
             </p>
           )}
         </section>
 
         {/* Trust signal */}
         <div style={trustBadgeStyles}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--bd-success)" }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--bk-success)" }}>
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
           <span>Your site data is encrypted and stored securely.</span>
@@ -350,9 +350,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               padding: "12px",
               background: "rgba(245, 158, 11, 0.08)",
               border: "1px solid rgba(245, 158, 11, 0.2)",
-              borderRadius: "var(--bd-radius-md)",
+              borderRadius: "var(--bk-radius-lg)",
               fontSize: 12,
-              color: "var(--bd-fg-secondary)",
+              color: "var(--bk-ink-soft)",
               lineHeight: 1.5,
             }}>
               Publishing not configured. Contact your administrator to link this project.
@@ -441,7 +441,7 @@ const RocketIcon: React.FC = () => (
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="var(--bd-accent)"
+    stroke="var(--bk-accent)"
     strokeWidth="1.5"
     style={{ flexShrink: 0, marginTop: 2 }}
     aria-hidden="true"
@@ -471,9 +471,9 @@ const sectionStyles: React.CSSProperties = {
   flexDirection: "column",
   gap: 8,
   padding: 12,
-  background: "var(--bd-bg-subtle)",
-  borderRadius: "var(--bd-radius-md)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  borderRadius: "var(--bk-radius-lg)",
+  border: "1px solid var(--bk-border)",
 };
 
 const sectionHeaderStyles: React.CSSProperties = {
@@ -484,21 +484,21 @@ const sectionHeaderStyles: React.CSSProperties = {
 
 const sectionTitleStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--bd-text-sm, 13px)",
+  fontSize: "var(--bk-text-12, 13px)",
   fontWeight: 600,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const metaTextStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--bd-text-xs, 12px)",
-  color: "var(--bd-fg-muted)",
+  fontSize: "var(--bk-text-11, 12px)",
+  color: "var(--bk-ink-muted)",
 };
 
 const labelStyles: React.CSSProperties = {
-  fontSize: "var(--bd-text-xs, 12px)",
+  fontSize: "var(--bk-text-11, 12px)",
   fontWeight: 500,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
   marginBottom: 4,
 };
 
@@ -512,15 +512,15 @@ const urlRowStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   padding: "6px 8px",
-  background: "var(--bd-bg-subtle)",
-  borderRadius: "var(--bd-radius-sm)",
-  border: "1px solid var(--bd-border)",
+  background: "var(--bk-bg-subtle)",
+  borderRadius: "var(--bk-radius-sm)",
+  border: "1px solid var(--bk-border)",
 };
 
 const urlLinkStyles: React.CSSProperties = {
   flex: 1,
-  fontSize: "var(--bd-text-xs, 12px)",
-  color: "var(--bd-accent)",
+  fontSize: "var(--bk-text-11, 12px)",
+  color: "var(--bk-accent)",
   textDecoration: "none",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -536,8 +536,8 @@ const copyButtonStyles: React.CSSProperties = {
   padding: 0,
   background: "transparent",
   border: "none",
-  borderRadius: "var(--bd-radius-sm)",
-  color: "var(--bd-fg-secondary)",
+  borderRadius: "var(--bk-radius-sm)",
+  color: "var(--bk-ink-soft)",
   cursor: "pointer",
   flexShrink: 0,
 };
@@ -545,7 +545,7 @@ const copyButtonStyles: React.CSSProperties = {
 const disabledReasonStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   lineHeight: 1.4,
 };
 
@@ -553,23 +553,23 @@ const infoSectionStyles: React.CSSProperties = {
   display: "flex",
   gap: 12,
   padding: 12,
-  background: "var(--bd-accent-tint)",
-  borderRadius: "var(--bd-radius-md)",
-  border: "1px solid var(--bd-accent-subtle)",
+  background: "var(--bk-accent-tint)",
+  borderRadius: "var(--bk-radius-lg)",
+  border: "1px solid var(--bk-accent-subtle)",
 };
 
 const infoTitleStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--bd-text-sm, 13px)",
+  fontSize: "var(--bk-text-12, 13px)",
   fontWeight: 600,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const infoDescStyles: React.CSSProperties = {
   margin: "4px 0 0",
-  fontSize: "var(--bd-text-xs, 12px)",
+  fontSize: "var(--bk-text-11, 12px)",
   lineHeight: 1.5,
-  color: "var(--bd-fg-secondary)",
+  color: "var(--bk-ink-soft)",
 };
 
 const errorStyles: React.CSSProperties = {
@@ -578,11 +578,11 @@ const errorStyles: React.CSSProperties = {
   justifyContent: "space-between",
   gap: 8,
   padding: "8px 12px",
-  background: "var(--bd-error-tint, rgba(239, 68, 68, 0.1))",
-  borderRadius: "var(--bd-radius-md)",
-  border: "1px solid var(--bd-error-tint, rgba(239, 68, 68, 0.2))",
-  color: "var(--bd-error)",
-  fontSize: "var(--bd-text-xs, 12px)",
+  background: "var(--bk-error-tint, rgba(239, 68, 68, 0.1))",
+  borderRadius: "var(--bk-radius-lg)",
+  border: "1px solid var(--bk-error-tint, rgba(239, 68, 68, 0.2))",
+  color: "var(--bk-error)",
+  fontSize: "var(--bk-text-11, 12px)",
 };
 
 const errorDismissStyles: React.CSSProperties = {
@@ -605,24 +605,24 @@ const trustBadgeStyles: React.CSSProperties = {
   gap: 6,
   padding: "7px 10px",
   background: "rgba(34, 197, 94, 0.06)",
-  borderRadius: "var(--bd-radius-md)",
+  borderRadius: "var(--bk-radius-lg)",
   border: "1px solid rgba(34, 197, 94, 0.15)",
   fontSize: 12,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   lineHeight: 1.4,
 };
 
 const privacyFooterStyles: React.CSSProperties = {
   padding: "10px 16px",
-  borderTop: "1px solid var(--bd-border)",
+  borderTop: "1px solid var(--bk-border)",
   fontSize: 12,
   lineHeight: 1.5,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   textAlign: "center",
 };
 
 const privacyLinkStyles: React.CSSProperties = {
-  color: "var(--bd-accent)",
+  color: "var(--bk-accent)",
   textDecoration: "none",
 };
 

@@ -52,24 +52,24 @@ const idLineStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   fontSize: 11,
-  fontFamily: "var(--buildrick-font-family-mono, ui-monospace, monospace)",
-  color: "var(--bd-fg-muted)",
+  fontFamily: "var(--bk-font-mono, ui-monospace, monospace)",
+  color: "var(--bk-ink-muted)",
 };
 
 const aliasChipStyle: React.CSSProperties = {
-  color: "var(--bd-accent)",
+  color: "var(--bk-accent)",
 };
 
 const nameStyle: React.CSSProperties = {
   fontSize: 12.5,
   fontWeight: 500,
-  color: "var(--bd-fg-primary)",
+  color: "var(--bk-ink)",
 };
 
 const lintDescStyle: React.CSSProperties = {
   fontSize: 11,
   fontStyle: "italic",
-  color: "var(--buildrick-warning-strong)",
+  color: "var(--bk-warning-text)",
 };
 
 const lintTagStyle: React.CSSProperties = {
@@ -78,7 +78,7 @@ const lintTagStyle: React.CSSProperties = {
   padding: "1px 6px",
   borderRadius: 4,
   background: "rgba(245, 158, 11, 0.18)",
-  color: "var(--buildrick-warning-strong)",
+  color: "var(--bk-warning-text)",
 };
 
 export const TokenRow: React.FC<TokenRowProps> = ({
@@ -99,7 +99,7 @@ export const TokenRow: React.FC<TokenRowProps> = ({
     gap: 10,
     padding: hasLint ? "8px 12px 8px 9px" : "8px 12px",
     background: hasLint ? "rgba(245, 158, 11, 0.08)" : "transparent",
-    borderLeft: hasLint ? "3px solid var(--buildrick-warning-strong)" : "none",
+    borderLeft: hasLint ? "3px solid var(--bk-warning-text)" : "none",
     cursor: "pointer",
     borderRadius: 4,
     transition: "background 60ms",
@@ -121,7 +121,7 @@ export const TokenRow: React.FC<TokenRowProps> = ({
       onClick={onClick}
       onKeyDown={handleKeyDown}
       onMouseEnter={(e) => {
-        if (!hasLint) e.currentTarget.style.background = "var(--bd-bg-subtle)";
+        if (!hasLint) e.currentTarget.style.background = "var(--bk-bg-subtle)";
       }}
       onMouseLeave={(e) => {
         if (!hasLint) e.currentTarget.style.background = "transparent";

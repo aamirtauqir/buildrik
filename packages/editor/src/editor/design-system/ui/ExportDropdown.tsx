@@ -53,8 +53,8 @@ export const ExportDropdown: React.FC<{
             position: "absolute",
             top: "calc(100% + 4px)",
             right: 0,
-            background: "var(--bd-bg-subtle)",
-            border: "1px solid var(--bd-border)",
+            background: "var(--bk-bg-subtle)",
+            border: "1px solid var(--bk-border)",
             borderRadius: 8,
             overflow: "hidden",
             zIndex: 100,
@@ -66,11 +66,11 @@ export const ExportDropdown: React.FC<{
             <div
               style={{
                 padding: "10px 14px",
-                borderBottom: "1px solid var(--bd-border)",
+                borderBottom: "1px solid var(--bk-border)",
                 background: "rgba(245,158,11,0.06)",
               }}
             >
-              <div style={{ fontSize: 12, color: "var(--bd-warning)", marginBottom: 6, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12, color: "var(--bk-warning)", marginBottom: 6, lineHeight: 1.5 }}>
                 ⚠ Exporting unsaved changes — not yet live on your site.
               </div>
               <Button
@@ -82,7 +82,7 @@ export const ExportDropdown: React.FC<{
                 }}
                 style={{
                   fontSize: 12,
-                  color: "var(--bd-accent)",
+                  color: "var(--bk-accent)",
                   padding: 0,
                   textDecoration: "underline",
                 }}
@@ -111,8 +111,8 @@ export const ExportDropdown: React.FC<{
                 textAlign: "left",
               }}
             >
-              <div style={{ fontSize: 12, color: "var(--bd-fg-primary)" }}>{label}</div>
-              <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 1 }}>
+              <div style={{ fontSize: 12, color: "var(--bk-ink)" }}>{label}</div>
+              <div style={{ fontSize: 12, color: "var(--bk-ink-muted)", marginTop: 1 }}>
                 {desc}
               </div>
             </Button>

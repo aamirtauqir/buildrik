@@ -22,58 +22,58 @@
   justify-content: center;
   min-width: 18px;
   height: 18px;
-  padding: 0 var(--buildrick-space-1);
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-2xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
-  background: var(--buildrick-bg-subtle);
-  border-radius: var(--buildrick-radius-full);
+  padding: 0 var(--bk-space-4);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
+  background: var(--bk-bg-subtle);
+  border-radius: var(--bk-radius-full);
   font-variant-numeric: tabular-nums;
   line-height: 1;
   white-space: nowrap;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
-              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default),
+              color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* ---- Sizes ---- */
 .bd-count--xs {
   min-width: 14px;
   height: 14px;
-  font-size: var(--buildrick-text-3xs-plus);
+  font-size: var(--bk-text-11);
 }
 .bd-count--sm {
   min-width: 16px;
   height: 16px;
-  font-size: var(--buildrick-text-2xs);
+  font-size: var(--bk-text-11);
 }
 .bd-count--lg {
   min-width: 22px;
   height: 22px;
-  font-size: var(--buildrick-text-xs);
-  padding: 0 var(--buildrick-space-2);
+  font-size: var(--bk-text-11);
+  padding: 0 var(--bk-space-8);
 }
 
 /* ---- Tones (tinted bg + matching text) ---- */
 .bd-count--accent {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent-text);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent-text);
 }
 .bd-count--success {
-  background: var(--buildrick-success-tint);
-  color: var(--buildrick-success-text);
+  background: var(--bk-success-tint);
+  color: var(--bk-success-text);
 }
 .bd-count--warning {
-  background: var(--buildrick-warning-tint);
-  color: var(--buildrick-warning-text);
+  background: var(--bk-warning-tint);
+  color: var(--bk-warning-text);
 }
 .bd-count--error {
-  background: var(--buildrick-error-tint);
-  color: var(--buildrick-error-text);
+  background: var(--bk-error-tint);
+  color: var(--bk-error-text);
 }
 .bd-count--ink {
-  background: var(--buildrick-text-heading);
-  color: var(--buildrick-bg-card);
+  background: var(--bk-ink);
+  color: var(--bk-bg-card);
 }
 
 /* ---- Modifier: dot (unread indicator with no count) ---- */
@@ -95,7 +95,7 @@
   height: auto;
   font-size: inherit;
   font-family: inherit;
-  padding: 0 var(--buildrick-space-1);
+  padding: 0 var(--bk-space-4);
   vertical-align: baseline;
 }
 

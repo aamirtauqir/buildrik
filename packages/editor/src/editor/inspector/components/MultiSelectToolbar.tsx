@@ -49,43 +49,43 @@ export interface MultiSelectToolbarProps {
 const toolbarStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--buildrick-space-4)",
-  padding: "var(--buildrick-space-4)",
+  gap: "var(--bk-space-16)",
+  padding: "var(--bk-space-16)",
 };
 
 const sectionStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--buildrick-space-2)",
+  gap: "var(--bk-space-8)",
 };
 
 const sectionLabelStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-xs)",
+  fontSize: "var(--bk-text-11)",
   fontWeight: 600,
-  color: "var(--buildrick-text-tertiary)",
+  color: "var(--bk-ink-muted)",
   textTransform: "uppercase" as const,
   letterSpacing: "0.05em",
 };
 
 const buttonGroupStyles: React.CSSProperties = {
   display: "flex",
-  gap: "var(--buildrick-space-1)",
-  background: "var(--buildrick-surface-3)",
-  padding: "var(--buildrick-space-1)",
-  borderRadius: "var(--buildrick-radius-md)",
+  gap: "var(--bk-space-4)",
+  background: "var(--bk-bg-subtle)",
+  padding: "var(--bk-space-4)",
+  borderRadius: "var(--bk-radius-lg)",
 };
 
 const countBadgeStyles: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  background: "var(--buildrick-accent-subtle)",
-  color: "var(--buildrick-accent)",
-  fontSize: "var(--buildrick-text-sm)",
+  background: "var(--bk-accent-subtle)",
+  color: "var(--bk-accent)",
+  fontSize: "var(--bk-text-12)",
   fontWeight: 600,
-  padding: "var(--buildrick-space-2)",
-  borderRadius: "var(--buildrick-radius-md)",
-  marginBottom: "var(--buildrick-space-2)",
+  padding: "var(--bk-space-8)",
+  borderRadius: "var(--bk-radius-lg)",
+  marginBottom: "var(--bk-space-8)",
 };
 
 // ============================================================================

@@ -14,8 +14,8 @@ const buttonStyle: React.CSSProperties = {
   alignSelf: "flex-start",
   padding: "6px 12px",
   borderRadius: 4,
-  border: "1px solid var(--buildrick-border)",
-  background: "var(--buildrick-bg-card, white)",
+  border: "1px solid var(--bk-border)",
+  background: "var(--bk-bg-card, white)",
   cursor: "pointer",
 };
 

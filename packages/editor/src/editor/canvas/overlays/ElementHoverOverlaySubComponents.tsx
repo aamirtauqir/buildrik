@@ -221,7 +221,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       {info.isFlexContainer && (
         <span
           style={{
-            background: "var(--buildrick-accent)",
+            background: "var(--bk-accent)",
             padding: "0 4px",
             borderRadius: 2,
             fontSize: 12,
@@ -233,7 +233,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       {info.isGridContainer && (
         <span
           style={{
-            background: "var(--buildrick-accent)",
+            background: "var(--bk-accent)",
             padding: "0 4px",
             borderRadius: 2,
             fontSize: 12,
@@ -244,7 +244,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       )}
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-      {info.parentName && <span style={{ color: "var(--buildrick-text-muted)" }}>in {info.parentName}</span>}
+      {info.parentName && <span style={{ color: "var(--bk-ink-muted)" }}>in {info.parentName}</span>}
       <span style={{ color: DIMENSION_HIGHLIGHT_FG, fontFamily: "monospace" }}>
         {info.dimensions.width} × {info.dimensions.height}
       </span>

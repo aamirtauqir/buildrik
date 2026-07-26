@@ -501,9 +501,9 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                           style={{
                             padding: "5px 8px",
                             fontSize: 11,
-                            background: active ? "var(--bd-cobalt-soft)" : "transparent",
-                            border: `1px solid ${active ? "var(--bd-cobalt)" : "var(--bd-border)"}`,
-                            color: active ? "var(--bd-cobalt)" : "var(--bd-fg-secondary)",
+                            background: active ? "var(--bk-accent-subtle)" : "transparent",
+                            border: `1px solid ${active ? "var(--bk-accent)" : "var(--bk-border)"}`,
+                            color: active ? "var(--bk-accent)" : "var(--bk-ink-soft)",
                             borderRadius: 4,
                             cursor: "pointer",
                             fontWeight: active ? 500 : 400,
@@ -543,7 +543,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                       <span>px</span>
                     </label>
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--buildrick-text-disabled)", marginTop: 8 }}>
+                  <div style={{ fontSize: 11, color: "var(--bk-ink-disabled)", marginTop: 8 }}>
                     Leave empty to keep original crop dimensions
                   </div>
                 </>

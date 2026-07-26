@@ -137,9 +137,9 @@ const discloseButtonStyle: React.CSSProperties = {
   gap: 6,
   padding: "4px 8px",
   fontSize: 12,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bk-ink-soft)",
   background: "transparent",
-  border: "1px solid var(--buildrick-border)",
+  border: "1px solid var(--bk-border)",
   borderRadius: 4,
   cursor: "pointer",
 };

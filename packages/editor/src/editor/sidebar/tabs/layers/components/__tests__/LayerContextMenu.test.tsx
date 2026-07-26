@@ -98,6 +98,6 @@ describe("DragTooltip", () => {
 
   it("uses the info background for the info variant", () => {
     render(<DragTooltip message="ok" position={{ x: 0, y: 0 }} variant="info" />);
-    expect(screen.getByRole("tooltip").style.background).toContain("--bd-bg-hover");
+    expect(screen.getByRole("tooltip").style.background).toContain("--bk-bg-subtle");
   });
 });

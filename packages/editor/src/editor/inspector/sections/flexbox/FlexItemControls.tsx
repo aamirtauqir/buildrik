@@ -43,13 +43,13 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
     style={{
       marginTop: 10,
       paddingTop: 10,
-      borderTop: `1px solid ${"var(--buildrick-border)"}`,
+      borderTop: `1px solid ${"var(--bk-border)"}`,
     }}
   >
     <div
       style={{
         fontSize: 12,
-        color: "var(--buildrick-text-muted)",
+        color: "var(--bk-ink-muted)",
         fontWeight: 600,
         marginBottom: 8,
         textTransform: "uppercase",
@@ -72,7 +72,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             width: 30,
           }}
         >
@@ -98,7 +98,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             width: 30,
           }}
         >
@@ -124,7 +124,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bk-ink-muted)",
             width: 30,
           }}
         >

@@ -31,7 +31,7 @@ const buttonStyle: React.CSSProperties = {
   gap: 6,
   padding: "4px 10px",
   background: "transparent",
-  color: "var(--bd-warning)",
+  color: "var(--bk-warning)",
   border: "1px solid rgba(245,158,11,0.3)",
   borderRadius: 4,
   fontSize: 11,
@@ -41,7 +41,7 @@ const buttonStyle: React.CSSProperties = {
 const dotStyle: React.CSSProperties = {
   width: 5,
   height: 5,
-  borderRadius: "var(--bd-radius-full)",
+  borderRadius: "var(--bk-radius-full)",
   background: "currentColor",
   flexShrink: 0,
 };

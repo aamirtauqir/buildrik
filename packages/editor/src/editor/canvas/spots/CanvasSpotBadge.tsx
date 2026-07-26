@@ -98,13 +98,13 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
 
   const badgeColors: Record<string, string> = {
     tag: "#00d4aa",
-    id: "var(--bd-accent-pressed)",
+    id: "var(--bk-accent-pressed)",
     class: "#f59e0b",
-    data: "var(--bd-accent)",
-    custom: badge.color || "var(--bd-fg-muted)",
+    data: "var(--bk-accent)",
+    custom: badge.color || "var(--bk-ink-muted)",
   };
 
-  const color = badgeColors[badge.type] || "var(--bd-fg-muted)";
+  const color = badgeColors[badge.type] || "var(--bk-ink-muted)";
 
   return (
     <div

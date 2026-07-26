@@ -85,9 +85,9 @@ const STYLE_USER_CHIP: React.CSSProperties = {
   justifyContent: "center",
   width: 16,
   height: 16,
-  borderRadius: "var(--bd-radius-full)",
-  background: "var(--bd-accent-tint)",
-  color: "var(--bd-accent)",
+  borderRadius: "var(--bk-radius-full)",
+  background: "var(--bk-accent-tint)",
+  color: "var(--bk-accent)",
   fontSize: 10,
   fontWeight: 600,
   lineHeight: 1,
@@ -95,13 +95,13 @@ const STYLE_USER_CHIP: React.CSSProperties = {
 
 const STYLE_RELATIVE_TIME: React.CSSProperties = {
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
 };
 
 const STYLE_DIFF_COUNT: React.CSSProperties = {
   marginLeft: 6,
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: "var(--bk-ink-muted)",
   fontVariantNumeric: "tabular-nums",
 };
 

@@ -87,7 +87,7 @@ export const DragHandleDot = styled.div`
   width: 3px;
   height: 3px;
   background: rgba(255, 255, 255, 0.8);
-  border-radius: "var(--bd-radius-full)";
+  border-radius: "var(--bk-radius-full)";
 `;
 
 // ============================================================================
@@ -222,7 +222,7 @@ export const BreadcrumbSegment = styled.button<{
 export const BreadcrumbSeparator = styled.span`
   display: flex;
   align-items: center;
-  color: var(--buildrick-text-secondary);
+  color: var(--bk-ink-soft);
 `;
 
 export const BreadcrumbHint = styled.div`

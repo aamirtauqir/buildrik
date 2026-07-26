@@ -9,96 +9,96 @@
 .bd-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: var(--buildrick-overlay);
+  background: var(--bk-alpha-ink-40);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--buildrick-z-modal, 60);
-  padding: var(--buildrick-space-6);
+  z-index: var(--bk-z-modal, 60);
+  padding: var(--bk-space-24);
 }
-.bd-modal-backdrop--light { background: var(--buildrick-ink-12); }
+.bd-modal-backdrop--light { background: var(--bk-alpha-ink-12); }
 
 .bd-modal {
   position: relative;
-  background: var(--buildrick-bg-elevated);
-  border-radius: var(--buildrick-radius-lg);
-  box-shadow: var(--buildrick-shadow-modal);
+  background: var(--bk-bg-card);
+  border-radius: var(--bk-radius-lg);
+  box-shadow: var(--bk-shadow-overlay);
   width: 100%;
   max-width: 440px;
   overflow: hidden;
-  border: 1px solid var(--buildrick-border);
+  border: 1px solid var(--bk-border);
 }
 .bd-modal--lg { max-width: 560px; }
 .bd-modal--xl { max-width: 580px; }
 
 .bd-modal__head {
   min-height: 56px;
-  padding: var(--buildrick-space-2) var(--buildrick-space-6);
-  border-bottom: 1px solid var(--buildrick-border);
+  padding: var(--bk-space-8) var(--bk-space-24);
+  border-bottom: 1px solid var(--bk-border);
   display: flex;
   align-items: center;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
 }
 .bd-modal__icon {
   width: 32px;
   height: 32px;
-  border-radius: var(--buildrick-radius-md);
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  border-radius: var(--bk-radius-lg);
+  background: var(--bk-accent-tint);
+  color: var(--bk-accent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.bd-modal__icon--success { background: var(--buildrick-success-light); color: var(--buildrick-success); }
-.bd-modal__icon--warning { background: var(--buildrick-warning-light); color: var(--buildrick-warning); }
-.bd-modal__icon--danger  { background: var(--buildrick-error-light); color: var(--buildrick-error); }
+.bd-modal__icon--success { background: var(--bk-success-tint); color: var(--bk-success); }
+.bd-modal__icon--warning { background: var(--bk-warning-tint); color: var(--bk-warning); }
+.bd-modal__icon--danger  { background: var(--bk-error-tint); color: var(--bk-error); }
 
 .bd-modal__meta { flex: 1; min-width: 0; }
 .bd-modal__title {
   margin: 0 0 2px;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-lg);
-  font-weight: var(--buildrick-font-weight-semibold);
-  color: var(--buildrick-text-heading);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-16);
+  font-weight: var(--bk-weight-semibold);
+  color: var(--bk-ink);
   letter-spacing: -0.0625em;
 }
 .bd-modal__subtitle {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
   line-height: 1.45;
 }
 /* bdr-modal__close removed — composes .bd-icon-btn--xs --ghost. */
 
 .bd-modal__body {
-  padding: var(--buildrick-space-4) var(--buildrick-space-6);
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-normal);
-  color: var(--buildrick-text-secondary);
+  padding: var(--bk-space-16) var(--bk-space-24);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-regular);
+  color: var(--bk-ink-soft);
   line-height: 1.55;
 }
-.bd-modal__body p { margin: 0 0 var(--buildrick-space-2); }
+.bd-modal__body p { margin: 0 0 var(--bk-space-8); }
 .bd-modal__body p:last-child { margin-bottom: 0; }
 
 .bd-modal__foot {
   min-height: 64px;
-  padding: var(--buildrick-space-2) var(--buildrick-space-6);
-  border-top: 1px solid var(--buildrick-border);
-  background: var(--buildrick-bg-elevated);
+  padding: var(--bk-space-8) var(--bk-space-24);
+  border-top: 1px solid var(--bk-border);
+  background: var(--bk-bg-card);
   display: flex;
-  gap: var(--buildrick-space-3);
+  gap: var(--bk-space-12);
   justify-content: flex-end;
   align-items: center;
 }
 .bd-modal__hint {
   margin-right: auto;
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-3xs-plus);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
 }
 
 /* bd-modal-in — modal entrance animation. Consumed inline by

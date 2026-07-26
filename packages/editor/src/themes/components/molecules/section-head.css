@@ -17,26 +17,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--buildrick-space-2);
-  min-height: var(--buildrick-size-row-dense);
-  padding: 0 var(--buildrick-space-4);
+  gap: var(--bk-space-8);
+  min-height: var(--bk-size-row-dense);
+  padding: 0 var(--bk-space-16);
   cursor: pointer;
   user-select: none;
-  background: var(--buildrick-bg-subtle);
+  background: var(--bk-bg-subtle);
   border: none;
   width: 100%;
   text-align: left;
-  font-family: var(--buildrick-font-family);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-ui);
+  color: var(--bk-ink-muted);
   border-radius: 0;
-  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+  transition: background-color var(--bk-motion-fast) var(--bk-ease-default);
 }
 
 /* ---- Left cluster (indicator + title + count) ---- */
 .bd-section-head__lead {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-2);
+  gap: var(--bk-space-8);
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -49,7 +49,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--buildrick-text-muted);
+  color: var(--bk-ink-muted);
   transform: rotate(90deg);
 }
 .bd-section-head__indicator > svg {
@@ -68,11 +68,11 @@
 
 /* ---- Title (matches inspector convention: uppercase, xs-plus, semibold) ---- */
 .bd-section-head__title {
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-muted);
-  letter-spacing: var(--buildrick-tracking-wide);
+  font-family: var(--bk-font-ui);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  color: var(--bk-ink-muted);
+  letter-spacing: var(--bk-tracking-wide);
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -85,30 +85,30 @@
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-text-muted);
+  font-family: var(--bk-font-mono);
+  font-size: var(--bk-text-11);
+  color: var(--bk-ink-muted);
 }
 
 /* ---- Actions slot (right; composes bdr-icon-btn--xs) ---- */
 .bd-section-head__actions {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-space-1);
+  gap: var(--bk-space-4);
   flex: 0 0 auto;
   /* Stop click on action from toggling parent collapse */
 }
 
 /* ---- States (a11y baseline) ---- */
 .bd-section-head:hover {
-  background: var(--buildrick-bg-pressed);
+  background: var(--bk-gray-200);
 }
 .bd-section-head:focus-visible {
   outline: none;
-  box-shadow: var(--buildrick-glow-primary);
+  box-shadow: var(--bk-shadow-focus);
 }
 .bd-section-head:active {
-  background: var(--buildrick-bg-pressed);
+  background: var(--bk-gray-200);
 }
 .bd-section-head[disabled],
 .bd-section-head[aria-disabled="true"] {
@@ -119,11 +119,11 @@
 
 /* ---- Variant: --sm (smaller padding + smaller title) ---- */
 .bd-section-head--sm {
-  padding: 0 var(--buildrick-space-3);
-  gap: var(--buildrick-space-1);
+  padding: 0 var(--bk-space-12);
+  gap: var(--bk-space-4);
 }
 .bd-section-head--sm .bd-section-head__title {
-  font-size: var(--buildrick-text-xs);
+  font-size: var(--bk-text-11);
 }
 
 /* ---- Variant: --inset (no horizontal padding for embedded use) ---- */
@@ -135,29 +135,29 @@
 
 /* ---- Variant: --bordered (bottom border) ---- */
 .bd-section-head--bordered {
-  border-bottom: 1px solid var(--buildrick-border);
+  border-bottom: 1px solid var(--bk-border);
   border-radius: 0;
 }
 
 /* ---- Variant: --ink (full-width tone, emphasized section) ---- */
 .bd-section-head--ink {
-  background: var(--buildrick-bg-subtle);
+  background: var(--bk-bg-subtle);
   border-radius: 0;
 }
 .bd-section-head--ink:hover {
-  background: var(--buildrick-bg-pressed);
+  background: var(--bk-gray-200);
 }
 .bd-section-head--ink:active {
-  background: var(--buildrick-bg-pressed);
+  background: var(--bk-gray-200);
 }
 
 /* ---- Variant: --inline-title (text-sm regular case, non-inspector) ---- */
 .bd-section-head--inline-title .bd-section-head__title {
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--bk-text-13);
+  font-weight: var(--bk-weight-medium);
   letter-spacing: 0;
   text-transform: none;
-  color: var(--buildrick-text-primary);
+  color: var(--bk-ink);
 }
 
 /* ---- Reduced motion ---- */

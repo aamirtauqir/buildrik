@@ -14,9 +14,9 @@ export const canvasTokens = {
   colors: {
     // Cobalt accent ramp — references themes/design-system/color.css canonical values
     primary: {
-      default: "var(--bd-accent)",
-      light: "var(--bd-accent-hover)",
-      dark: "var(--bd-accent-pressed)",
+      default: "var(--bk-accent)",
+      light: "var(--bk-accent-hover)",
+      dark: "var(--bk-accent-pressed)",
       subtle: "rgba(45, 109, 255, 0.1)",
       alpha10: "rgba(45, 109, 255, 0.1)",
       alpha15: "rgba(45, 109, 255, 0.15)",
@@ -32,7 +32,7 @@ export const canvasTokens = {
       background: "#0A0A0A", // True Obsidian
       backgroundSecondary: "#121212", // Secondary dark
       backgroundTertiary: "#1A1A1A",
-      content: "var(--bd-bg-card)",
+      content: "var(--bk-bg-card)",
       border: "rgba(255, 255, 255, 0.08)",
       borderLight: "rgba(255, 255, 255, 0.04)",
       glass: "rgba(10, 10, 10, 0.6)", // Glassmorphism base
@@ -40,9 +40,9 @@ export const canvasTokens = {
 
     // Text Colors
     text: {
-      primary: "var(--bd-fg-primary)",
+      primary: "var(--bk-ink)",
       secondary: "#B8B5AD", // 6.5:1 on dark — WCAG AA
-      muted: "var(--bd-fg-muted)",
+      muted: "var(--bk-ink-muted)",
       onPrimary: "#ffffff",
     },
 
@@ -51,7 +51,7 @@ export const canvasTokens = {
       success: "#10B981",
       error: "#EF4444",
       warning: "#F59E0B",
-      info: "var(--bd-accent)",
+      info: "var(--bk-accent)",
       errorBg: "rgba(239, 68, 68, 0.1)",
       errorBorder: "rgba(239, 68, 68, 0.3)",
     },
@@ -91,8 +91,8 @@ export const canvasTokens = {
 
   // Selection Effects
   selection: {
-    outline: "var(--bd-accent)",
-    handleGradient: "linear-gradient(135deg, var(--bd-accent) 0%, var(--bd-accent-hover) 100%)",
+    outline: "var(--bk-accent)",
+    handleGradient: "linear-gradient(135deg, var(--bk-accent) 0%, var(--bk-accent-hover) 100%)",
     glow: "0 0 0 3px rgba(45, 109, 255, 0.2)",
     glowStrong: "0 0 0 4px rgba(45, 109, 255, 0.4)",
     glowSubtle: "0 0 0 2px rgba(45, 109, 255, 0.15)",
@@ -108,7 +108,7 @@ export const canvasTokens = {
     glowMd: "0 4px 14px rgba(45, 109, 255, 0.4)",
     glowLg: "0 8px 25px rgba(45, 109, 255, 0.5)",
     badge: "0 4px 12px rgba(45, 109, 255, 0.4)",
-    panel: "var(--bd-shadow-modal)",
+    panel: "var(--bk-shadow-overlay)",
     glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
   },
 
@@ -116,12 +116,12 @@ export const canvasTokens = {
   animation: {
     duration: {
       instant: "50ms",
-      fast: "var(--bd-duration-fast)",
-      normal: "var(--bd-duration-normal)",
-      slow: "var(--bd-duration-slow)",
+      fast: "var(--bk-motion-fast)",
+      normal: "var(--bk-motion-base)",
+      slow: "var(--bk-motion-slow)",
     },
     easing: {
-      default: "var(--bd-ease-default)",
+      default: "var(--bk-ease-default)",
       smooth: "ease-out",
       spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
@@ -139,10 +139,10 @@ export const canvasTokens = {
 
   // Border Radius
   radius: {
-    sm: "var(--bd-radius-sm)",
-    md: "var(--bd-radius-md)",
-    lg: "var(--bd-radius-lg)",
-    xl: "var(--bd-radius-xl)",
+    sm: "var(--bk-radius-sm)",
+    md: "var(--bk-radius-lg)",
+    lg: "var(--bk-radius-lg)",
+    xl: "var(--bk-radius-lg)",
     round: 50,
   },
 
