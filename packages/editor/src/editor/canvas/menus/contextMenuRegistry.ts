@@ -1,3 +1,4 @@
+import { ToastActionPayload, ToastTone } from "@/editor/ui";
 /**
  * Context Menu Registry
  * Simplified context menu with 4 main groups and nested submenus
@@ -5,7 +6,6 @@
  */
 
 import type { Composer, Element } from "../../../engine";
-import type { ToastActionPayload, ToastTone } from "@/editor/shared/vibcoder";
 import {
   editSubmenu,
   insertSubmenu,

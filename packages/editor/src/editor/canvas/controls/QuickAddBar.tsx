@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Aquibra Quick Add Bar
  * Quick access to common blocks
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Type, Heading, ImageIcon, Square, LayoutTemplate, LucideIcon } from "lucide-react";
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { BlockData } from "../../../shared/types";
 
 interface QuickAddBarProps {

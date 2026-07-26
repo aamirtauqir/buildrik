@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Selection Label Component
  * Shows element name with parent navigation and settings at top-left of selection
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { Z_INDEX } from "../../../shared/constants/canvas";
 import { canvasTokens } from "../../../styles/tokens";

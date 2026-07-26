@@ -7,9 +7,9 @@
  */
 
 import * as React from "react";
+import { ToastActionPayload, ToastTone } from "@/editor/ui";
 import type { Composer } from "../../../engine/Composer";
 import type { Element } from "../../../engine/elements/Element";
-import type { ToastActionPayload, ToastTone } from "@/editor/shared/vibcoder";
 import { devLogger } from "../../../shared/utils/devLogger";
 import { getElementNameFromType } from "../utils/elementInfo";
 import {

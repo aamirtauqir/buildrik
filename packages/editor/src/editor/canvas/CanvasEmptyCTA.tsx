@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Canvas Empty State CTA
  * Shown when the canvas has no content.
@@ -7,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 
 interface CanvasEmptyCTAProps {
   onBrowseTemplates: () => void;

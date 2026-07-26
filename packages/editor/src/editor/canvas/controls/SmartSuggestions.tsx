@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Smart Suggestions Component
  * Context-aware action suggestions below selected element
@@ -13,6 +12,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import type { Composer, Element } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { EVENTS } from "../../../shared/constants/events";

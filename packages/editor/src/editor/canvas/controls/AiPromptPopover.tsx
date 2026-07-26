@@ -5,10 +5,9 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button, Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Button } from "@/editor/shared/vibcoder/Button";
 import { useStreamPrompt } from "../../sidebar/tabs/ai/hooks/useStreamPrompt";
 import { applyAiEdit } from "../../sidebar/tabs/ai/applySetStyle";
 import { DiffRows } from "../../sidebar/tabs/ai/DiffRows";
@@ -89,7 +88,7 @@ export const AiPromptPopover: React.FC<AiPromptPopoverProps> = ({
         <>
           <DiffRows edit={stream.edit!} />
           <div className="bd-ai-popover-actions">
-            <Button type="button" variant="bare" onClick={onClose} aria-label="Discard">
+            <Button type="button" kind="ghost" onClick={onClose} aria-label="Discard">
               Discard
             </Button>
             <Button type="button" onClick={accept} aria-label="Apply changes">

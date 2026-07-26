@@ -1,6 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * Command Palette Component
  * Searchable action list triggered by Cmd+Shift+P (like VS Code)
@@ -18,6 +15,7 @@ import { Stack } from "@/editor/shared/vibcoder/Stack";
  */
 
 import * as React from "react";
+import { Button, Input, Stack } from "@/editor/ui";
 import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
 
 // =============================================================================

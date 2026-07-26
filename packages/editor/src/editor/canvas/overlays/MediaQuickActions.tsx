@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Quick Actions Component
  * Floating toolbar for image elements on canvas
@@ -7,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { Edit2, Image, Type, Check, Palette } from "lucide-react";
 import type { Composer } from "../../../engine";
 

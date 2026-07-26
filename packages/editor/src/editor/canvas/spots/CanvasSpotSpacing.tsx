@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Canvas Spot Spacing
  * Interactive spacing editor for elements
@@ -6,6 +5,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Input } from "@/editor/ui";
 import type { Composer } from "../../../engine";
 import type { SpacingIndicator } from "../../../shared/types/canvas";
 import "./CanvasSpotSpacing.css";

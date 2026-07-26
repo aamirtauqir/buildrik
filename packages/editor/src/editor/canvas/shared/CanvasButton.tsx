@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Canvas Button Component
  * Shared button component for canvas UI elements
@@ -6,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button } from "@/editor/ui";
 import { CANVAS_COLORS, BUTTON_BASE_STYLE } from "../../../shared/constants/canvas";
 
 export interface CanvasButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
