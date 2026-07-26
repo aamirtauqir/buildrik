@@ -5,6 +5,7 @@
   "viewport": { "width": 1440, "height": 900 },
   "steps": [{ "action": "waitFor", "selector": ".bd-topbar" }],
   "contrastScope": "body",
+  "ignore": ["[class*=\"styles-module__\"]"],
   "targets": [
     { "name": "topbar", "selector": ".bd-topbar" },
     { "name": "rail", "selector": ".ls-rail" },

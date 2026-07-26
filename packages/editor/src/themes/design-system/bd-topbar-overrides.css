@@ -166,7 +166,7 @@
   }
 
   .bd-topbar__status--warn {
-    color: var(--buildrick-warning);
+    color: var(--buildrick-warning-text);
     background: var(--buildrick-warning-bg);
     border: 1px solid var(--buildrick-warning-border);
     cursor: pointer;

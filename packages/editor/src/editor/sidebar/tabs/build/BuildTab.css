@@ -94,11 +94,11 @@
 .bld-cat-row.open,
 .bld-cat-row.open:hover {
   background: var(--bd-accent-tint);
-  color: var(--bd-accent);
+  color: var(--bd-accent-text);
 }
 
 .bld-cat-row.open .bld-cat-count {
-  color: var(--bd-accent);
+  color: var(--bd-accent-text);
 }
 
 .bld-cat-row:focus-visible {

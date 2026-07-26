@@ -180,12 +180,12 @@
    ───────────────────────────────────────────── */
 .ls-btn--active {
   background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  color: var(--buildrick-accent-text);
 }
 
 .ls-btn--active:hover {
   background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
+  color: var(--buildrick-accent-text);
 }
 
 /* Left accent bar — 2px inset (not full height). Offsets match

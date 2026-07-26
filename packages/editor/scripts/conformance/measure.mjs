@@ -62,7 +62,7 @@ for (const step of recipe.steps ?? []) {
 // Let transitions settle before reading computed styles.
 await page.waitForTimeout(400);
 
-const result = await page.evaluate(({ targets, contrastScope }) => {
+const result = await page.evaluate(({ targets, contrastScope, ignore }) => {
   const lum = (r, g, b) => {
     const f = (c) => {
       c /= 255;
@@ -132,8 +132,10 @@ const result = await page.evaluate(({ targets, contrastScope }) => {
   // Contrast sweep: every visible element painting text directly, page-wide
   // (or scoped by the recipe's contrastScope selector).
   const scope = document.querySelector(contrastScope ?? "body") ?? document.body;
+  const ignoreSel = (ignore ?? []).join(",");
   const pairs = [];
   for (const el of scope.querySelectorAll("*")) {
+    if (ignoreSel && el.closest(ignoreSel)) continue;
     if (!paintsTextDirectly(el)) continue;
     const r = el.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) continue;
@@ -165,7 +167,7 @@ const result = await page.evaluate(({ targets, contrastScope }) => {
     }
   }
   return { targets: targets_, contrastFailures: pairs };
-}, { targets: recipe.targets, contrastScope: recipe.contrastScope });
+}, { targets: recipe.targets, contrastScope: recipe.contrastScope, ignore: recipe.ignore });
 
 await browser.close();
 

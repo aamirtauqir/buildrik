@@ -200,7 +200,7 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
       >
         <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
         <span>{label}</span>
-        {active && <span style={{ marginLeft: "2px", color: "var(--buildrick-accent)" }}>✓</span>}
+        {active && <span style={{ marginLeft: "2px", color: "var(--buildrick-accent-text)" }}>✓</span>}
       </Button>
     </TooltipTrigger>
     <TooltipPortal>
