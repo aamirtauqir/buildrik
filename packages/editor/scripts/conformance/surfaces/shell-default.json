@@ -1,0 +1,15 @@
+{
+  "surface": "shell-default",
+  "board": "Editor Shell — default (Insert open, no selection) @1440",
+  "url": "http://localhost:5050/",
+  "viewport": { "width": 1440, "height": 900 },
+  "steps": [{ "action": "waitFor", "selector": ".bd-topbar" }],
+  "contrastScope": "body",
+  "targets": [
+    { "name": "topbar", "selector": ".bd-topbar" },
+    { "name": "rail", "selector": ".ls-rail" },
+    { "name": "sidebar-panel", "selector": ".ls-panel" },
+    { "name": "canvas", "selector": ".buildrick-canvas" },
+    { "name": "breakpoint-switcher", "selector": ".bd-bp-switcher" }
+  ]
+}
