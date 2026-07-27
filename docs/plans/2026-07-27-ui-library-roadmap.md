@@ -44,7 +44,7 @@ Toggle, Badge, StatusDot, Avatar. 92 token refs, 0 hex, 0 fallbacks, 42 tests.
 
 ---
 
-## Stage 2 · Molecules — NEXT
+## Stage 2 · Molecules — DONE (16 components, 88 tests)
 
 16 components. Each one exists in Figma except `FieldRow`, which four Inspector
 sections currently reinvent.
@@ -75,7 +75,7 @@ to `ui.css` with the node id in a comment. Contract tests per component.
 
 **Effort:** human ~1 week / CC ~2 hours.
 
-## Stage 3 · Organisms
+## Stage 3 · Organisms — DONE (8 + focus trap)
 
 8 components: `Rail`, `Topbar`, `Footer`, `DrawerFrame` (19:46), `ModalFrame`
 (19:79), `RightPanelFrame` (19:47), `CommandPalette`, `OverlayMount` (portal +
@@ -89,7 +89,7 @@ focus returns to trigger.
 
 **Effort:** human ~1 week / CC ~2 hours.
 
-## Stage 4 · The shell is ONE component
+## Stage 4 · The shell is ONE component — DONE
 
 `EditorShell` = Topbar + Rail + Drawer + Canvas slot + Inspector + Footer,
 assembled once. Every screen renders `<EditorShell>` with a different slot
@@ -108,7 +108,7 @@ byte-identical across all of them.
 
 ---
 
-## Stage 5 · Migrate 352 files
+## Stage 5 · Migrate — IN PROGRESS: 261 of 402 done, 141 left (120 production, 21 tests)
 
 Not a big bang. Batches ordered by risk — lowest first, so the mechanics are
 proven before touching the canvas.
@@ -139,7 +139,7 @@ anyone's feature work.
 
 **Effort:** human ~4-6 weeks / CC ~1-2 days. This stage is the project.
 
-## Stage 6 · Delete the old library
+## Stage 6 · Delete the old library — BLOCKED on stage 5 reaching 0
 
 When the ratchet hits 0: delete `src/editor/shared/vibcoder/` (70 primitives +
 tests), `src/shared/extensions/`, `src/shared/ui/`, and their CSS in
@@ -185,3 +185,34 @@ tokens can ship without the library.
 - **Dashboard package** — still on its own tokens, 34 stale `#406ED6`. Chrome-only was the D3 decision.
 - **Customer site output tokens** (`--buildrick-design-*`) — needs version pinning + migration before any change.
 - **`gate:buildrick`** — already red on main before this work (baseline 78, actual 111). Not caused here, not fixed here.
+
+
+---
+
+## Progress log — 2026-07-27
+
+| Stage | State |
+|---|---|
+| 0 · Tokens | done — 152 flat tokens, generated, gated |
+| 1 · Atoms | done — 10 components |
+| 2 · Molecules | done — 16 components |
+| 3 · Organisms | done — 8 + useFocusTrap |
+| 4 · EditorShell | done |
+| 5 · Migration | **261 of 402 files (65%)** |
+| 6 · Delete old library | blocked on 5 |
+| 7 · Final gates | 2 of 4 live (gate:tokens-generated, gate:vibcoder-ratchet) |
+
+Library now: 44 components + 1 hook, 164 contract tests, 0 hex, 0 fallbacks.
+
+**What the last 120 files are waiting on.** Not effort — specific components
+whose old API is structurally different, so a codemod cannot move them:
+
+- **Popover / Menu** — compound `PopoverTrigger`/`PopoverContent` and `MenuItem`
+  children, versus the new array + trigger-prop form
+- **Tabs** — `<Tabs value onValueChange><Tab>` versus the new array form
+- **Slider, ColorPicker, Uploader, BreakpointSwitcher, HelpTooltip** — not built
+- **Icon-set consumers** (`<Icon name="…">`) — the glyph registry moves first
+- **21 test files** pinned to the real Radix TooltipProvider, because the
+  trees they render still contain the old Tooltip
+
+Each is small and well defined. None of it is discovery.
