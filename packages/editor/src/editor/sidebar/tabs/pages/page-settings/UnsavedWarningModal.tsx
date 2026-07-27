@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * UnsavedWarningModal — confirms tab switch with unsaved changes.
  * Form atoms (action buttons) use ROW_MD from layout constants + radius-sm
@@ -13,13 +12,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import {
-  Modal,
-  ModalContent as VibcoderModalContent,
-  ModalTitle,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
+import { Button, ModalContent as VibcoderModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import { ROW_MD } from "@shared/constants/layout";
 
 // Phase 5 escape: Radix.Dialog.Content props (onOpenAutoFocus) are hidden
@@ -54,8 +47,8 @@ export const UnsavedWarningModal: React.FC<Props> = ({
   const tabLabel = pendingTab === "social" ? "Social" : pendingTab === "advanced" ? "Advanced" : "SEO";
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onCancel()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onCancel()}>
         <ModalContent
           size="lg"
           onOpenAutoFocus={(e) => {
@@ -122,8 +115,8 @@ export const UnsavedWarningModal: React.FC<Props> = ({
       </Stack>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

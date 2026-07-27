@@ -20,15 +20,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import {
-  Modal,
-  ModalContent,
-  ModalDescription,
-  ModalFooter,
-  ModalTitle,
-} from "@/editor/shared/vibcoder";
+import { Button, ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle, Textarea } from "@/editor/ui";
 import type {
   AIAssistService,
   ComponentSchema,
@@ -125,7 +117,7 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
   const errorMessage = state.kind === "error" ? state.message : null;
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby="ai-prompt-title">
         <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bk-border)" }}>
           <ModalTitle id="ai-prompt-title" style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em" }}>
@@ -197,30 +189,30 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
         <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bk-border)" }}>
           {state.kind === "idle" && (
             <>
-              <Button variant="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
+              <Button kind="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" type="button" onClick={handleGenerate}>
+              <Button kind="primary" size="sm" type="button" onClick={handleGenerate}>
                 Generate
               </Button>
             </>
           )}
 
           {isGenerating && (
-            <Button variant="ghost" size="sm" type="button" onClick={handleCancelGeneration}>
+            <Button kind="ghost" size="sm" type="button" onClick={handleCancelGeneration}>
               Cancel generation
             </Button>
           )}
 
           {showSuccess && (
             <>
-              <Button variant="ghost" size="sm" type="button" onClick={handleDiscard}>
+              <Button kind="ghost" size="sm" type="button" onClick={handleDiscard}>
                 Discard
               </Button>
-              <Button variant="ghost" size="sm" type="button" onClick={handleGenerate}>
+              <Button kind="ghost" size="sm" type="button" onClick={handleGenerate}>
                 Retry
               </Button>
-              <Button variant="primary" size="sm" type="button" onClick={handleAccept}>
+              <Button kind="primary" size="sm" type="button" onClick={handleAccept}>
                 Accept
               </Button>
             </>
@@ -228,16 +220,16 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
 
           {state.kind === "error" && (
             <>
-              <Button variant="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
+              <Button kind="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" type="button" onClick={handleGenerate}>
+              <Button kind="primary" size="sm" type="button" onClick={handleGenerate}>
                 Retry
               </Button>
             </>
           )}
         </ModalFooter>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };

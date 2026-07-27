@@ -18,14 +18,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalDescription,
-  ModalFooter,
-  ModalTitle,
-} from "@/editor/shared/vibcoder";
+import { Button, ModalContent, ModalDescription, ModalFooter, ModalRoot, ModalTitle } from "@/editor/ui";
 import { STARTER_DS_REGISTRY, type StarterDS } from "../starters";
 
 export interface StarterGalleryModalProps {
@@ -58,7 +51,7 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
   }, [onSkip, onOpenChange]);
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="xl" aria-labelledby="starter-gallery-title">
         <div style={{ padding: "24px 28px", borderBottom: "1px solid var(--bk-border)" }}>
           <ModalTitle id="starter-gallery-title" style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em" }}>
@@ -93,11 +86,11 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
           <div style={{ fontSize: 11, color: "var(--bk-ink-muted)", marginRight: "auto" }}>
             Tip: applying a starter restyles tokens but keeps your elements.
           </div>
-          <Button variant="ghost" size="sm" type="button" onClick={handleSkip}>
+          <Button kind="ghost" size="sm" type="button" onClick={handleSkip}>
             Skip
           </Button>
           <Button
-            variant="primary"
+            kind="primary"
             size="sm"
             type="button"
             onClick={handleApply}
@@ -107,7 +100,7 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
           </Button>
         </ModalFooter>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 
@@ -125,7 +118,7 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
   return (
     <Button
       type="button"
-      variant="ghost"
+      kind="ghost"
       role="radio"
       aria-checked={selected}
       onClick={onSelect}

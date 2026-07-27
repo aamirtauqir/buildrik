@@ -17,12 +17,12 @@
  */
 
 import * as React from "react";
-import { Button, Icon, Badge, Textarea, Spinner, Switch } from "@/editor/shared/vibcoder";
-import { PanelHeader } from "@/shared/extensions/PanelHeader";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { Badge, Button, ConfirmDialog, PanelHeader, Spinner, Textarea, Toggle } from "@/editor/ui";
+import { Icon } from "@/editor/shared/vibcoder";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
+
   fetchCurrentRound,
   fetchReviewComments,
   fetchApprovedSnapshot,
@@ -32,6 +32,15 @@ import {
   type CurrentRound,
   type ReviewComment,
 } from "../../../../services/ReviewService";
+
+/** Review's own status words onto Badge kinds. Named, not inlined, so a new
+ *  status shows up as a type error instead of silently rendering neutral. */
+const BADGE_KIND: Record<string, "neutral" | "success" | "warning" | "danger"> = {
+  published: "success",
+  syncing: "warning",
+  issues: "danger",
+};
+
 
 export interface ReviewTabProps {
   isPinned?: boolean;
@@ -278,7 +287,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <Icon name="alert-circle" size="lg" />
           <div style={S.centerTitle}>Couldn't load the review</div>
           <div style={S.centerHint}>The dashboard didn't answer. Your feedback is safe — this is just the panel.</div>
-          <Button variant="secondary" size="sm" onClick={() => void load()}>Retry</Button>
+          <Button kind="secondary" size="sm" onClick={() => void load()}>Retry</Button>
         </div>
       </div>
     );
@@ -301,7 +310,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
     return (
       <div style={S.body}>
         <div style={S.compareBar}>
-          <Button variant="ghost" size="sm" onClick={() => setCompareOpen(false)}>
+          <Button kind="ghost" size="sm" onClick={() => setCompareOpen(false)}>
             <Icon name="chevron-left" size="sm" /> Back
           </Button>
           <span style={S.who}>Compare with approved</span>
@@ -313,7 +322,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
             <Icon name="alert-circle" size="lg" />
             <div style={S.centerTitle}>Couldn't load the approved snapshot</div>
             <div style={S.centerHint}>The dashboard didn't answer. Try again.</div>
-            <Button variant="secondary" size="sm" onClick={() => void openCompare()}>Retry</Button>
+            <Button kind="secondary" size="sm" onClick={() => void openCompare()}>Retry</Button>
           </div>
         ) : (
           <ApprovedCompareView
@@ -345,22 +354,22 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.header}>
         <div style={S.headRow}>
           <div style={S.actions}>
-            <Badge variant={round.revoked ? "issues" : tone.variant}>{round.revoked ? "Link revoked" : tone.label}</Badge>
-            {round.openCommentCount > 0 && <Badge variant="count">{round.openCommentCount} open</Badge>}
+            <Badge kind={BADGE_KIND[round.revoked ? "issues" : tone.variant] ?? "neutral"}>{round.revoked ? "Link revoked" : tone.label}</Badge>
+            {round.openCommentCount > 0 && <Badge kind="neutral">{round.openCommentCount} open</Badge>}
           </div>
           <div style={S.actions}>
             {round.status === "APPROVED" && onExportCurrentPages && (
-              <Button variant="ghost" size="sm" onClick={() => void openCompare()}>
+              <Button kind="ghost" size="sm" onClick={() => void openCompare()}>
                 <Icon name="history" size="sm" /> Compare
               </Button>
             )}
-            <Button variant="primary" size="sm" busy={resending} onClick={() => void doResend()}>Re-send</Button>
+            <Button kind="primary" size="sm" loading={resending} onClick={() => void doResend()}>Re-send</Button>
             <div style={S.more}>
-              <Button variant="ghost" size="sm" aria-label="More options" onClick={() => setMoreOpen((v) => !v)}>⋯</Button>
+              <Button kind="ghost" size="sm" aria-label="More options" onClick={() => setMoreOpen((v) => !v)}>⋯</Button>
               {moreOpen && (
                 <div style={S.menu} role="menu">
                   <Button
-                    variant="danger"
+                    kind="destructive"
                     size="sm"
                     onClick={() => { setConfirmRevoke(true); setMoreOpen(false); }}
                   >
@@ -381,7 +390,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         <span style={S.meta}>{visible.length} comment{visible.length === 1 ? "" : "s"}</span>
         <span style={S.toggle}>
           Show resolved
-          <Switch checked={showResolved} aria-label="Show resolved" onClick={() => setShowResolved((v) => !v)} />
+          <Toggle checked={showResolved} aria-label="Show resolved" onClick={() => setShowResolved((v) => !v)} />
         </span>
       </div>
 
@@ -415,13 +424,13 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                   <div style={S.text}>{c.body}</div>
                   <div style={S.actions}>
                     <Button
-                      variant="ghost"
+                      kind="ghost"
                       size="sm"
                       onClick={() => composer?.emit("comments:reattach-start", { id: c.id })}
                     >
                       Reattach
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => void onResolve(c)}>
+                    <Button kind="ghost" size="sm" onClick={() => void onResolve(c)}>
                       {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
                     </Button>
                   </div>
@@ -448,7 +457,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
                     </div>
                     <div style={S.text}>{c.body}</div>
                     <div style={S.actions}>
-                      <Button variant="ghost" size="sm" onClick={() => void onResolve(c)}>
+                      <Button kind="ghost" size="sm" onClick={() => void onResolve(c)}>
                         {c.status === "RESOLVED" ? "Reopen" : "Resolve"}
                       </Button>
                     </div>
@@ -472,19 +481,19 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
         {replyError && <span style={S.meta}>Couldn't send that reply. Try again.</span>}
         <div style={S.headRow}>
           <span style={S.meta}>Replies are internal notes on the thread.</span>
-          <Button variant="primary" size="sm" busy={sending} disabled={!draft.trim()} onClick={() => void send()}>Send</Button>
+          <Button kind="primary" size="sm" loading={sending} disabled={!draft.trim()} onClick={() => void send()}>Send</Button>
         </div>
       </div>
 
       <ConfirmDialog
-        isOpen={confirmRevoke}
+        open={confirmRevoke}
         onClose={() => setConfirmRevoke(false)}
         onConfirm={() => void onRevoke()}
-        variant="danger"
+        destructive
         title="Revoke the review link?"
         message="The client's link stops working immediately. Their comments stay. Send a new link any time with Re-send."
-        confirmText="Revoke link"
-        cancelText="Keep it live"
+        confirmLabel="Revoke link"
+        cancelLabel="Keep it live"
       />
     </div>
   );

@@ -21,14 +21,26 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /** Compound parts — call sites that build their own copy blocks use these. */
-export function EmptyStateTitle({ children }: { children: React.ReactNode }) {
-  return <span className="bk-empty__title">{children}</span>;
+export function EmptyStateTitle({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className={["bk-empty__title", className].filter(Boolean).join(" ")} {...rest}>
+      {children}
+    </span>
+  );
 }
-export function EmptyStateDesc({ children }: { children: React.ReactNode }) {
-  return <span className="bk-empty__body">{children}</span>;
+export function EmptyStateDesc({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className={["bk-empty__body", className].filter(Boolean).join(" ")} {...rest}>
+      {children}
+    </span>
+  );
 }
-export function EmptyStateActions({ children }: { children: React.ReactNode }) {
-  return <span className="bk-stack bk-stack--row bk-stack--sm">{children}</span>;
+export function EmptyStateActions({ className, children, ...rest }: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className={["bk-stack bk-stack--row bk-stack--sm", className].filter(Boolean).join(" ")} {...rest}>
+      {children}
+    </span>
+  );
 }
 
 export function EmptyState({ size = "md", title, body, icon, action, className, children, ...rest }: EmptyStateProps) {

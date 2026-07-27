@@ -8,9 +8,9 @@
  * the panel must say so rather than leaving the row looking untouched.
  */
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { IssuesPanel } from "../IssuesPanel";
 import type { Issue } from "../hooks/useStudioState";
 

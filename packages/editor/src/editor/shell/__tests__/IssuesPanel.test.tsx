@@ -4,9 +4,9 @@
  * Verifies the filter, the counts, the clean/empty states, and jump-to.
  */
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { IssuesPanel } from "../IssuesPanel";
 
 const ISSUES = [

@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Aquibra Icon Picker Modal
  * Browse and select icons from Lucide library (300+ icons)
@@ -8,6 +7,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Button, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import {
   ICON_CATEGORIES,
   getAllIcons,
@@ -20,14 +20,6 @@ import {
 } from "../../shared/constants/icons";
 import { InputField } from "../../shared/forms";
 import type { IconConfig, IconLibrary } from "../../shared/types/media";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
 
 // ============================================
 // Types
@@ -329,8 +321,8 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Select Icon</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -514,7 +506,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             Powered by Lucide Icons
           </span>
           <div style={{ display: "flex", gap: 8 }}>
-            <Button variant="ghost" onClick={onClose}>
+            <Button kind="ghost" onClick={onClose}>
               Cancel
             </Button>
             <Button onClick={handleSelect} disabled={!selectedIcon}>
@@ -525,8 +517,8 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

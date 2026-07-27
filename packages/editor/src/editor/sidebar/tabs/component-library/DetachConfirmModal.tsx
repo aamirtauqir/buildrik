@@ -10,14 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-  Button,
-} from "@/editor/shared/vibcoder";
+import { Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 
 export interface DetachConfirmModalProps {
   /** Label for the instance being detached, e.g. "#3". */
@@ -100,8 +93,8 @@ export function DetachConfirmModal({
     masterInstanceCount === 1 ? "1 instance" : `${masterInstanceCount} instances`;
 
   return (
-    <OverlayMount>
-      <Modal
+    <Portal>
+      <ModalRoot
         open
         onOpenChange={(next) => {
           if (!next) onCancel();
@@ -140,17 +133,17 @@ export function DetachConfirmModal({
               ))}
             </ul>
             <div style={footerStyle}>
-              <Button variant="ghost" onClick={onCancel}>
+              <Button kind="ghost" onClick={onCancel}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={onConfirm}>
+              <Button kind="primary" onClick={onConfirm}>
                 Detach
               </Button>
             </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 }
 

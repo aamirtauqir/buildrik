@@ -4,9 +4,9 @@
  * and offers Keep / Discard-and-reload. No crash → nothing renders.
  */
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { RecoveryBanner } from "../RecoveryBanner";
 
 const SENTINEL = "buildrick:last-crash";

@@ -19,11 +19,11 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { render as rtlRender, screen } from "@testing-library/react";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
 
 const ALL_OFF = { guides: false, spacing: false, grid: false, rulers: false, badges: false, xray: false };

@@ -1,5 +1,3 @@
-import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ActivityView — Undo/redo activity timeline
  * Pixel-aligned with the History Tab prototype:
@@ -13,6 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Kbd } from "@/editor/ui";
 // react-window 1.8.x ships JS only; stub the minimal surface we use.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — module has no bundled .d.ts (see @types/react-window stub)

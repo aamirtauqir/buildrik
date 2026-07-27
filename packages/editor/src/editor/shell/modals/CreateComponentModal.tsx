@@ -1,6 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 /**
  * CreateComponentModal - Modal for creating reusable components
  * Allows users to save selected elements as reusable components
@@ -8,18 +5,9 @@ import { Textarea } from "@/editor/shared/vibcoder/Textarea";
  */
 
 import * as React from "react";
+import { Button, Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack, Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  ModalFooter,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
 import { useToast } from "@/editor/ui";
-import { Stack } from "@/editor/shared/vibcoder";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -136,8 +124,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Create Component</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -252,16 +240,16 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
       </Stack>
           </div>
           <ModalFooter>
-            <Button variant="ghost" onClick={onClose} disabled={isCreating}>
+            <Button kind="ghost" onClick={onClose} disabled={isCreating}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
+            <Button kind="primary" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
               {isCreating ? "Creating..." : "Create Component"}
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

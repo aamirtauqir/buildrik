@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import { Button, } from "@/editor/ui";
 import { HeaderActions } from "@/shared/extensions/PanelHeader";
+import { Button, } from "@/editor/ui";
 import { BackArrowIcon } from "./headerIcons";
 import { drillInHeaderContainerStyles } from "./headerStyles";
 

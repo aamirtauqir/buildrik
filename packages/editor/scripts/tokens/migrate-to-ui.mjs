@@ -35,14 +35,14 @@ const NEEDS_HUMAN = new Set([
   "PanelShell", "Popover", "Menu", "NotificationCenter", "ColorPicker", "ColorTrigger", "Uploader",
   "Slider", "Inspector", "SidebarShell", "HistoryPanel", "CommandPalette", "Skeleton", "A11yOverlay",
   "Toast", "ToastTitle", "ToastDescription", "ToastAction", "ToastClose", "ToastViewport",
-  "ModalClose", "ModalContent", "ModalTitle", "ModalDescription", "ModalFooter", "ModalTrigger",
+  "ModalTrigger",
   "DrawerClose", "DrawerContent", "DrawerTitle", "Accordion", "Breadcrumb", "Chipbar", "Switcher",
-  "ActionBar", "Frame", "Grid", "Center", "Cluster", "Thumb", "TileMeta", "Kbd", "SurfaceHead",
+  "ActionBar", "Frame", "Grid", "Center", "Cluster", "Thumb", "TileMeta", "SurfaceHead",
   "LeftPanel", "PagesDrawer", "TemplatesDrawer", "Topbar", "Footer", "Rail", "RailTile", "Toolbar",
-  "SearchInput", "NumericStepper", "Spinner", "Progress", "Divider", "Grip", "Icon", "IconButton",
+  "SearchInput", "NumericStepper", "Progress", "Divider", "Grip", "IconButton",
   "Card", "Link", "Label", "HelperText", "Count", "Tag", "FormField", "BreakpointSwitcher",
   "SkeletonCompounds", "UpgradeModal", "CopyButton", "ErrorState", "HelpTooltip", "Icons",
-  "Tab", "Tabs", "TooltipProvider", "TooltipContent", "TooltipTrigger", "TooltipPortal",
+  "Tab", "Tabs", "TooltipPortal",
   "getElementIcon", "IconInfo",
 ]);
 
@@ -137,15 +137,24 @@ for (const file of files) {
     continue;
   }
 
+  // The old compound roots map to the compat roots, but ONLY when the file
+  // actually composes them — a file importing plain Modal wants the prop-based one.
+  const usesCompoundModal = names.some((n) => n.name.startsWith("ModalContent") || n.name.startsWith("ModalTitle"));
+  const usesCompoundTooltip = names.some((n) => n.name.startsWith("TooltipTrigger") || n.name.startsWith("TooltipContent"));
+  const dynamicRename = {
+    ...(usesCompoundModal ? { Modal: "ModalRoot" } : {}),
+    ...(usesCompoundTooltip ? { Tooltip: "TooltipRoot" } : {}),
+  };
+
   const imported = new Set(
     names.map(({ name, alias }) => {
-      const mapped = RENAME[name] ?? name;
+      const mapped = dynamicRename[name] ?? RENAME[name] ?? name;
       return alias && alias !== mapped ? `${mapped} as ${alias}` : mapped;
     }),
   );
 
   // JSX tag renames, including compound sub-components (TabFrame.Header)
-  for (const [from, to] of Object.entries(RENAME)) {
+  for (const [from, to] of Object.entries({ ...RENAME, ...dynamicRename })) {
     s = s.replace(new RegExp(`<${from}(?=[\\s/>.])`, "g"), `<${to}`);
     s = s.replace(new RegExp(`</${from}(?=[\\s>.])`, "g"), `</${to}`);
   }

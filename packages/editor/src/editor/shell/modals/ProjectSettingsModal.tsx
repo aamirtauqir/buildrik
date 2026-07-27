@@ -1,5 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * ProjectSettingsModal - Modal for managing project-wide configurations
  * Allows users to update project name, canvas defaults, and SEO settings.
@@ -7,18 +5,9 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Button, Checkbox, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import type { Composer } from "../../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  ModalFooter,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
 import { useToast } from "@/editor/ui";
-import { Stack } from "@/editor/shared/vibcoder";
 import { devError } from "../../../shared/utils/devLogger";
 
 export interface ProjectSettingsModalProps {
@@ -100,8 +89,8 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Project settings</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -201,16 +190,16 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
       </div>
           </div>
           <ModalFooter>
-            <Button variant="ghost" onClick={onClose}>
+            <Button kind="ghost" onClick={onClose}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleSave}>
+            <Button kind="primary" onClick={handleSave}>
               Save changes
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

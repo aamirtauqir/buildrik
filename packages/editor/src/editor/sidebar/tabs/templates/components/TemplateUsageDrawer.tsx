@@ -11,8 +11,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal, ModalContent, ModalDescription, ModalTitle } from "@/editor/shared/vibcoder";
+import { Button, ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
 import type { TemplateUsageEntry } from "../utils/templateUsage";
 
 type Tab = "preview" | "used" | "versions";
@@ -57,7 +56,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
   const [tab, setTab] = React.useState<Tab>("preview");
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby={`tpl-usage-title-${templateId}`}>
         <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--bk-border)" }}>
           <ModalTitle id={`tpl-usage-title-${templateId}`} style={{ fontSize: 16, fontWeight: 600 }}>
@@ -82,7 +81,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             <Button
               key={t}
               type="button"
-              variant="ghost"
+              kind="ghost"
               size="sm"
               role="tab"
               aria-selected={tab === t}
@@ -188,7 +187,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                   <li key={entry.pageId}>
                     <Button
                       type="button"
-                      variant="ghost"
+                      kind="ghost"
                       size="sm"
                       onClick={() => onJumpToPage?.(entry.pageId)}
                       disabled={!onJumpToPage}
@@ -246,7 +245,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
           }}
         >
           <Button
-            variant="ghost"
+            kind="ghost"
             size="sm"
             type="button"
             aria-label="Close drawer"
@@ -256,7 +255,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
           </Button>
         </div>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 

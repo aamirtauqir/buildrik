@@ -300,7 +300,6 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
           onMoreMenuToggle={() => setShowMoreMenu((v) => !v)}
         />
         <IconButton
-          variant="primary"
           size="sm"
           aria-label="Edit with AI"
           pressed={aiOpen}

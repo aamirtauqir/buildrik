@@ -13,8 +13,8 @@
  */
 
 import * as React from "react";
-import { Button, Icon, Badge, Spinner } from "@/editor/shared/vibcoder";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { Badge, Button, ConfirmDialog, Spinner } from "@/editor/ui";
+import { Icon } from "@/editor/shared/vibcoder";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -103,7 +103,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       <div style={S.center}>
         <Icon name="alert-circle" size="lg" />
         <div style={S.centerTitle}>Couldn't load publish history</div>
-        <Button variant="secondary" size="sm" onClick={() => void load()}>Retry</Button>
+        <Button kind="secondary" size="sm" onClick={() => void load()}>Retry</Button>
       </div>
     );
   }
@@ -132,14 +132,14 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
             <div style={S.left}>
               <span style={S.ver}>
                 Version {r.version}
-                {isLive && <Badge variant="published">Live</Badge>}
+                {isLive && <Badge kind="neutral">Live</Badge>}
                 {fromVersion !== undefined && <span style={S.meta}>↩ from v{fromVersion}</span>}
               </span>
               <span style={S.meta}>{relTime(r.completedAt)}</span>
             </div>
             {!isLive && (
               <Button
-                variant="secondary"
+                kind="secondary"
                 size="sm"
                 disabled={!r.rollbackable || !canRollback}
                 title={
@@ -159,13 +159,13 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
       })}
 
       <ConfirmDialog
-        isOpen={confirm !== null}
+        open={confirm !== null}
         onClose={() => setConfirm(null)}
         onConfirm={() => void doRollback()}
         title={confirm ? `Roll back to version ${confirm.version}?` : "Roll back?"}
         message="This re-publishes that version as a new one — it doesn't delete anything and your current draft is untouched. The live site changes to the older version."
-        confirmText="Roll back now"
-        cancelText="Cancel"
+        confirmLabel="Roll back now"
+        cancelLabel="Cancel"
       />
     </div>
   );

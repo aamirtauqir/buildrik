@@ -13,9 +13,9 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { render as rtlRender, screen, fireEvent } from "@testing-library/react";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { ZOOM_PRESETS } from "../shared";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
 

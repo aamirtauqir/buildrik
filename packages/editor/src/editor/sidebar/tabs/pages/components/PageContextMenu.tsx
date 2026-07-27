@@ -1,5 +1,3 @@
-import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PageContextMenu — portal context menu for page actions.
  *
@@ -12,6 +10,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Button, Kbd } from "@/editor/ui";
 import { createPortal } from "react-dom";
 import type { PageItem } from "../types";
 

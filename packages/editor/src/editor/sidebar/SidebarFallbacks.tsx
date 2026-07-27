@@ -6,8 +6,8 @@
  */
 
 import * as React from "react";
-import { Button, Stack } from "@/editor/ui";
 import { SkeletonListItem } from "@/shared/extensions/SkeletonCompounds";
+import { Button, Stack } from "@/editor/ui";
 
 /** Loading skeleton shown while lazy-loaded tab chunks download */
 export const PanelSkeleton: React.FC = () => (

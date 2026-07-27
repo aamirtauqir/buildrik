@@ -5,9 +5,9 @@
  * confirm → re-publish-as-new-version.
  */
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 
 const fetchPublishHistory = vi.fn();
 const rollbackToVersion = vi.fn();

@@ -10,7 +10,8 @@
  */
 
 import * as React from "react";
-import { Button, Icon, Spinner } from "@/editor/shared/vibcoder";
+import { Button, Spinner } from "@/editor/ui";
+import { Icon } from "@/editor/shared/vibcoder";
 import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import {
   fetchRecentNotifications,
@@ -140,7 +141,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }
         <div style={S.panel} role="dialog" aria-label="Notifications">
           <div style={S.head}>
             <span style={S.headTitle}>Notifications</span>
-            <Button variant="ghost" size="sm" onClick={() => void onMarkAll()}>Mark all read</Button>
+            <Button kind="ghost" size="sm" onClick={() => void onMarkAll()}>Mark all read</Button>
           </div>
 
           {state === "loading" && <div style={S.center}><Spinner size="lg" /><span>Loading…</span></div>}
@@ -148,7 +149,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }
             <div style={S.center}>
               <Icon name="alert-circle" size="lg" />
               <div style={S.centerTitle}>Couldn't load notifications</div>
-              <Button variant="secondary" size="sm" onClick={() => void loadPanel()}>Retry</Button>
+              <Button kind="secondary" size="sm" onClick={() => void loadPanel()}>Retry</Button>
             </div>
           )}
           {state === "ready" && ordered.length === 0 && (

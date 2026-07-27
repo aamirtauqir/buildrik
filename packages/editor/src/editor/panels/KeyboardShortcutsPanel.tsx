@@ -6,15 +6,8 @@
  */
 
 import * as React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+import { ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
-import { Stack } from "@/editor/shared/vibcoder";
 
 // =============================================================================
 // SHORTCUT DATA
@@ -110,8 +103,8 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
   onClose,
 }) => {
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Keyboard Shortcuts</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -196,8 +189,8 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

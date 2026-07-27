@@ -17,9 +17,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Modal, ModalContent, ModalTitle, ModalFooter } from "@/editor/shared/vibcoder/Modal";
+import { Button, ModalContent, ModalFooter, ModalRoot, ModalTitle, Textarea } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { EVENTS } from "@/shared/constants";
@@ -406,7 +404,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             />
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8 }}>
               <Button
-                variant="ghost"
+                kind="ghost"
                 size="sm"
                 onClick={() => {
                   setDraft(null);
@@ -415,7 +413,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
               >
                 Cancel
               </Button>
-              <Button variant="primary" size="sm" disabled={!draftBody.trim() || posting} onClick={() => void handlePost()}>
+              <Button kind="primary" size="sm" disabled={!draftBody.trim() || posting} onClick={() => void handlePost()}>
                 {posting ? "Posting…" : "Post"}
               </Button>
             </div>
@@ -424,7 +422,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
       )}
 
       {/* Orphan-comment modal (board 184:56) */}
-      <Modal open={orphanModal != null} onOpenChange={(o) => !o && setOrphanModal(null)}>
+      <ModalRoot open={orphanModal != null} onOpenChange={(o) => !o && setOrphanModal(null)}>
         <ModalContent size="lg" srTitle="Comments lost their element">
           <ModalTitle>
             {orphanModal?.length === 1
@@ -454,7 +452,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
           </div>
           <ModalFooter>
             <Button
-              variant="primary"
+              kind="primary"
               size="sm"
               onClick={() => {
                 setOrphanModal(null);
@@ -465,7 +463,7 @@ export const CommentLayer: React.FC<CommentLayerProps> = ({ composer, canvasRef 
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </ModalRoot>
     </>
   );
 };

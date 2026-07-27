@@ -20,13 +20,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalDescription,
-  ModalTitle,
-} from "@/editor/shared/vibcoder";
+import { Button, ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
 
 export interface MigrationStep {
   /** Migration toVersion. */
@@ -76,7 +70,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
   const progress = Math.round((completedCount / total) * 100);
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" aria-labelledby="migration-modal-title">
         <div style={{ padding: "20px 24px" }}>
           <ModalTitle id="migration-modal-title" style={{ fontSize: 16, fontWeight: 600 }}>
@@ -192,7 +186,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
               <div style={{ display: "flex", gap: 6, marginTop: 16 }}>
                 {onRestoreSnapshot && (
                   <Button
-                    variant="primary"
+                    kind="primary"
                     size="sm"
                     type="button"
                     onClick={onRestoreSnapshot}
@@ -201,7 +195,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
                   </Button>
                 )}
                 {onRetry && stuckAt !== undefined && (
-                  <Button variant="secondary" size="sm" type="button" onClick={onRetry}>
+                  <Button kind="secondary" size="sm" type="button" onClick={onRetry}>
                     Retry v{stuckAt}
                   </Button>
                 )}
@@ -210,7 +204,7 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
           )}
         </div>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 

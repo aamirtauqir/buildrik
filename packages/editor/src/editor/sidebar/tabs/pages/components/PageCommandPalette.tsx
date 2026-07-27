@@ -1,5 +1,3 @@
-import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * PageCommandPalette — Cmd+K fuzzy-search overlay for quick page navigation.
  *
@@ -15,6 +13,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Input, Kbd } from "@/editor/ui";
 import type { PageItem } from "../types";
 import { getStatusLabel } from "../utils/statusLabel";
 

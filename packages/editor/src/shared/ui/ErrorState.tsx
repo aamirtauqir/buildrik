@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button } from "@/editor/ui";
 
 export type ErrorSeverity = "error" | "warning" | "info";
 
@@ -319,7 +319,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           }}
         >
           {onRetry && (
-            <Button variant="primary" size={size === "lg" ? "md" : "sm"} onClick={onRetry}>
+            <Button kind="primary" size={size === "lg" ? "md" : "sm"} onClick={onRetry}>
               <svg
                 width={14}
                 height={14}
@@ -337,7 +337,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           )}
           {secondaryAction && (
             <Button
-              variant="ghost"
+              kind="ghost"
               size={size === "lg" ? "md" : "sm"}
               onClick={secondaryAction.onClick}
             >

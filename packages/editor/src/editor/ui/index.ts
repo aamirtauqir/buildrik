@@ -41,6 +41,7 @@ export { SiteCard, type SiteCardProps } from "./SiteCard";
 
 /* ── Organisms ──────────────────────────────────────────────────────────── */
 export { OverlayMount, type OverlayMountProps } from "./OverlayMount";
+export { Portal } from "./Portal";
 export { useFocusTrap } from "./useFocusTrap";
 export { Modal, type ModalProps, type ModalKind } from "./Modal";
 export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";
@@ -62,3 +63,11 @@ export {
   ToastProvider, useToast,
   type ToastInput, type QueuedToast, type ToastTone, type ToastActionPayload, type UseToastReturn,
 } from "./Toast";
+
+/* ── Compatibility surfaces for trees written against the old API ───────── */
+export { Icon, IconButton, Kbd, Spinner, type IconProps, type IconButtonProps, type KbdProps, type SpinnerProps } from "./Icon";
+export {
+  ModalRoot, ModalContent, ModalTitle, ModalDescription, ModalBody, ModalFooter, ModalClose,
+  type ModalContentProps, type ModalSize,
+} from "./ModalParts";
+export { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent, TooltipPortal } from "./TooltipParts";

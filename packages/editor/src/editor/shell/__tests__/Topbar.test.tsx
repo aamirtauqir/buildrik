@@ -11,6 +11,7 @@
  */
 
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import {
   render as rtlRender,
   screen,
@@ -19,7 +20,6 @@ import {
   within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 
 // ── controllable module mocks ────────────────────────────────────────────────
 

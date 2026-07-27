@@ -8,17 +8,17 @@ function Demo() {
     <>
       <h2 style={sectionLabel}>sizes</h2>
       <div style={stack}>
-        <Checkbox size="sm" label="sm" />
-        <Checkbox label="md (default)" />
-        <Checkbox size="lg" label="lg" />
+        <label className="bk-stack bk-stack--row bk-stack--sm"><Checkbox size="sm" /><span>sm</span></label>
+        <label className="bk-stack bk-stack--row bk-stack--sm"><Checkbox /><span>md (default)</span></label>
+        <label className="bk-stack bk-stack--row bk-stack--sm"><Checkbox size="lg" /><span>lg</span></label>
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>states</h2>
       <div style={stack}>
-        <Checkbox defaultChecked label="checked" />
-        <Checkbox indeterminate label="indeterminate" />
-        <Checkbox error label="error" />
-        <Checkbox disabled label="disabled" />
+        <label className="bk-stack bk-stack--row bk-stack--sm"><Checkbox defaultChecked /><span>checked</span></label>
+        <label className="bk-stack bk-stack--row bk-stack--sm"><Checkbox indeterminate /><span>indeterminate</span></label>
+        <label className="bk-stack bk-stack--row bk-stack--sm"><Checkbox error /><span>error</span></label>
+        <label className="bk-stack bk-stack--row bk-stack--sm"><Checkbox disabled /><span>disabled</span></label>
       </div>
     </>
   );

@@ -1,14 +1,13 @@
-import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /* @lint-hex-policy: component-theme
    "Template applied!" success banner uses a slightly brighter emerald than
    canonical --buildrick-success — intentional tonal choice for the post-apply
    celebration state. */
 
 import * as React from "react";
+import { Button, Kbd, } from "@/editor/ui";
+import { SvgPointer } from "@/shared/ui/Icons";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
-import { SvgPointer } from "../../../shared/ui/Icons";
 
 /**
  * Empty state shown when no element is selected in the Inspector.

@@ -1,4 +1,3 @@
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 // @vitest-environment jsdom
 /**
  * SeoTab — pure form renderer. Tests field behavior, counters, slug warning,
@@ -19,6 +18,7 @@ vi.mock("@/shared/utils/openai", () => ({
 }));
 
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { SeoTab } from "../SeoTab";
 import type { UsePageSettingsReturn } from "../usePageSettings";
 import type { PageItem } from "../../types";

@@ -10,8 +10,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal, ModalContent, ModalTitle, ModalFooter } from "@/editor/shared/vibcoder/Modal";
+import { Button, ModalContent, ModalFooter, ModalRoot, ModalTitle } from "@/editor/ui";
 import { useToast } from "@/editor/ui";
 import type { Composer } from "@/engine";
 import { exportPublishPages, type PublishPage } from "../exportPublishPages";
@@ -131,7 +130,7 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
   };
 
   return (
-    <Modal open={isOpen} onOpenChange={(o) => !o && onClose()}>
+    <ModalRoot open={isOpen} onOpenChange={(o) => !o && onClose()}>
       <ModalContent size="lg" srTitle="Publish un-approved changes?">
         <ModalTitle>Publish work {name} hasn&rsquo;t seen?</ModalTitle>
         <p style={{ fontSize: 13, color: "var(--bk-ink-muted)", margin: "8px 0 12px" }}>
@@ -177,11 +176,11 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
           now just ships these on top of it.
         </p>
         <ModalFooter>
-          <Button variant="secondary" size="sm" disabled={resending} onClick={() => void handleResend()}>
+          <Button kind="secondary" size="sm" disabled={resending} onClick={() => void handleResend()}>
             {resending ? "Re-sending…" : "Re-send for approval"}
           </Button>
           <Button
-            variant="primary"
+            kind="primary"
             size="sm"
             style={{ background: "var(--bk-warning)", borderColor: "var(--bk-warning)" }}
             onClick={() => void onPublishAnyway()}
@@ -190,7 +189,7 @@ export const StaleApprovalModal: React.FC<StaleApprovalModalProps> = ({
           </Button>
         </ModalFooter>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 

@@ -1,5 +1,3 @@
-import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Delete Confirmation Modal
  * Extracted from ProInspector.tsx for 500-line compliance.
@@ -7,13 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+import { Button, Kbd, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -28,8 +20,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onConfirm,
   elementLabel,
 }) => (
-  <OverlayMount>
-    <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+  <Portal>
+    <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <ModalContent size="lg">
         <ModalTitle>Delete Element</ModalTitle>
         <ModalClose aria-label="Close modal">
@@ -92,6 +84,6 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     </div>
         </div>
       </ModalContent>
-    </Modal>
-  </OverlayMount>
+    </ModalRoot>
+  </Portal>
 );

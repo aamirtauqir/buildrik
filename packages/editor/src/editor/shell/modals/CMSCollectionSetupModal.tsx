@@ -1,6 +1,3 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -14,17 +11,8 @@ import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
+import { Button, Input, ModalClose, ModalContent, ModalFooter, ModalRoot, ModalTitle, Portal, Select, Stack, Textarea } from "@/editor/ui";
 import type { Composer } from "../../../engine";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  ModalFooter,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Stack } from "@/editor/shared/vibcoder";
 
 // =============================================================================
 // TYPES
@@ -354,12 +342,12 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
 
   const footer = (
     <div style={s.footer}>
-      <Button variant="ghost" size="sm" onClick={onClose} disabled={creating}>
+      <Button kind="ghost" size="sm" onClick={onClose} disabled={creating}>
         Cancel
       </Button>
       {step === 1 ? (
         <Button
-          variant="primary"
+          kind="primary"
           size="sm"
           disabled={!canProceed}
           onClick={() => setStep(2)}
@@ -368,9 +356,9 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </Button>
       ) : (
         <Button
-          variant="primary"
+          kind="primary"
           size="sm"
-          busy={creating}
+          loading={creating}
           disabled={!canProceed || creating}
           onClick={handleCreate}
         >
@@ -381,8 +369,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   );
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Create Collection</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -491,7 +479,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
               Fields for <strong style={{ color: "var(--bk-ink)" }}>{name}</strong>
             </span>
-            <Button variant="ghost" size="sm" onClick={addField}>
+            <Button kind="ghost" size="sm" onClick={addField}>
               <Plus size={12} aria-hidden="true" />
               Add Field
             </Button>
@@ -563,7 +551,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--bk-border)" }}>
             <Button
               type="button"
-              variant={genPages ? "primary" : "secondary"}
+              kind={genPages ? "primary" : "secondary"}
               onClick={() => setGenPages((v) => !v)}
               style={{ fontSize: 12 }}
             >
@@ -606,8 +594,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           </div>
           <ModalFooter>{footer}</ModalFooter>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

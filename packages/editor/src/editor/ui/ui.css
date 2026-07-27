@@ -606,3 +606,46 @@
 .bk-toast__title { font-weight: var(--bk-weight-medium); }
 .bk-toast__desc { color: var(--bk-ink-soft); font-size: var(--bk-text-12); }
 .bk-toast__close { flex: none; }
+
+/* ── Modal compound parts ───────────────────────────────────────────────── */
+.bk-modal--sm { width: 360px; }
+.bk-modal--lg { width: 720px; }
+.bk-modal--xl { width: 960px; }
+.bk-modal__close { position: absolute; top: var(--bk-space-12); right: var(--bk-space-12); }
+
+/* ── Icon · Kbd · Spinner ───────────────────────────────────────────────── */
+.bk-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; color: currentColor; }
+.bk-icon-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--bk-space-28); height: var(--bk-space-28);
+  border: 0; border-radius: var(--bk-radius-md);
+  background: transparent; color: var(--bk-ink-soft); cursor: pointer;
+  transition: var(--bk-transition-fast);
+}
+.bk-icon-button:hover:not(:disabled) { background: var(--bk-bg-subtle); color: var(--bk-ink); }
+.bk-icon-button[aria-pressed="true"] { background: var(--bk-accent-tint); color: var(--bk-accent-text); }
+.bk-icon-button:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
+.bk-icon-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.bk-icon-button--sm { width: var(--bk-space-24); height: var(--bk-space-24); }
+.bk-kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: var(--bk-space-20); height: var(--bk-space-20);
+  padding: 0 var(--bk-space-4);
+  border: 1px solid var(--bk-border); border-bottom-width: 2px;
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-bg-subtle);
+  font-family: var(--bk-font-mono); font-size: var(--bk-text-11);
+  color: var(--bk-ink-soft);
+}
+.bk-spinner {
+  display: inline-block; flex: none;
+  width: var(--bk-space-16); height: var(--bk-space-16);
+  border: 2px solid var(--bk-border);
+  border-top-color: var(--bk-accent);
+  border-radius: var(--bk-radius-full);
+  animation: bk-spin 700ms linear infinite;
+}
+.bk-spinner--sm { width: var(--bk-space-12); height: var(--bk-space-12); border-width: 1.5px; }
+.bk-spinner--lg { width: var(--bk-space-24); height: var(--bk-space-24); }
+@keyframes bk-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .bk-spinner { animation-duration: 2s; } }

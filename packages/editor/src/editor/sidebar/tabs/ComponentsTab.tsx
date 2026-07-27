@@ -1,11 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  EmptyState,
-  EmptyStateSpot,
-  EmptyStateTitle,
-  EmptyStateDesc,
-} from "@/editor/shared/vibcoder";
 /**
  * ComponentsTab - Reusable components library (orchestrator)
  * Displays, creates, and manages saved components.
@@ -18,18 +10,11 @@ import {
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, Stack } from "@/editor/ui";
 import { SkeletonListItem } from "@/shared/extensions/SkeletonCompounds";
+import { EmptyStateSpot } from "@/editor/shared/vibcoder";
 import { useToast } from "@/editor/ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
-import { TabFrame } from "@/shared/extensions/TabFrame";
 import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
@@ -46,7 +31,6 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
 import "./component-library/ComponentsTab.css";
-import { Stack } from "@/editor/shared/vibcoder";
 
 export type { ComponentsTabProps };
 
@@ -118,9 +102,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   if (!composer?.components?.isAvailable()) {
     return (
-      <TabFrame>
+      <PanelFrame>
         {state.isStandaloneMode && (
-          <TabFrame.Header
+          <PanelFrame.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -128,7 +112,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </TabFrame.Header>
+          </PanelFrame.Header>
         )}
         <EmptyState>
           <EmptyStateSpot>
@@ -141,15 +125,15 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             Try opening in a regular browser window.
           </EmptyStateDesc>
         </EmptyState>
-      </TabFrame>
+      </PanelFrame>
     );
   }
 
   if (state.error) {
     return (
-      <TabFrame>
+      <PanelFrame>
         {state.isStandaloneMode && (
-          <TabFrame.Header
+          <PanelFrame.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -157,10 +141,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </TabFrame.Header>
+          </PanelFrame.Header>
         )}
         <PanelErrorState message={state.error} onRetry={() => state.setError(null)} />
-      </TabFrame>
+      </PanelFrame>
     );
   }
 
@@ -200,10 +184,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       );
     }
     return (
-      <TabFrame>
+      <PanelFrame>
         {state.isStandaloneMode && (
           <>
-            <TabFrame.Header
+            <PanelFrame.Header
               title="Components"
               isPinned={isPinned}
               onPinToggle={onPinToggle}
@@ -211,7 +195,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               onClose={onClose}
             >
               {headerAddBtn}
-            </TabFrame.Header>
+            </PanelFrame.Header>
             <div style={searchContainerStyles}>
               <SearchBar
                 value={state.internalSearchQuery}
@@ -257,17 +241,17 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onSubmit={handleCreateComponent}
           />
         )}
-      </TabFrame>
+      </PanelFrame>
     );
   }
 
   // ── Main list view ────────────────────────────────────────────────────────────
 
   return (
-    <TabFrame>
+    <PanelFrame>
       {state.isStandaloneMode && (
         <>
-          <TabFrame.Header
+          <PanelFrame.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -275,7 +259,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </TabFrame.Header>
+          </PanelFrame.Header>
           <div style={searchContainerStyles}>
             <SearchBar
               value={state.internalSearchQuery}
@@ -378,7 +362,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         />
       )}
       <ConfirmDialog
-        isOpen={!!state.confirmDelete}
+        open={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}
         onConfirm={() => {
           const name = state.confirmDelete?.name;
@@ -387,11 +371,11 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         }}
         title="Delete Component"
         message={`Are you sure you want to delete "${state.confirmDelete?.name}"? This action cannot be undone.`}
-        confirmText="Delete"
-        variant="danger"
+        confirmLabel="Delete"
+        destructive
       />
-      <OverlayMount>
-        <Modal open={!!state.renameTarget} onOpenChange={(next) => !next && state.setRenameTarget(null)}>
+      <Portal>
+        <ModalRoot open={!!state.renameTarget} onOpenChange={(next) => !next && state.setRenameTarget(null)}>
           <ModalContent size="lg">
             <ModalTitle>Rename Component</ModalTitle>
             <ModalClose aria-label="Close modal">
@@ -422,10 +406,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </Stack>
             </div>
           </ModalContent>
-        </Modal>
-      </OverlayMount>
-      <OverlayMount>
-        <Modal open={!!state.variantPicker} onOpenChange={(next) => !next && state.setVariantPicker(null)}>
+        </ModalRoot>
+      </Portal>
+      <Portal>
+        <ModalRoot open={!!state.variantPicker} onOpenChange={(next) => !next && state.setVariantPicker(null)}>
           <ModalContent size="lg">
             <ModalTitle>{`Select Variant — ${state.variantPicker?.componentName ?? ""}`}</ModalTitle>
             <ModalClose aria-label="Close modal">
@@ -466,9 +450,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </Stack>
             </div>
           </ModalContent>
-        </Modal>
-      </OverlayMount>
-    </TabFrame>
+        </ModalRoot>
+      </Portal>
+    </PanelFrame>
   );
 };
 

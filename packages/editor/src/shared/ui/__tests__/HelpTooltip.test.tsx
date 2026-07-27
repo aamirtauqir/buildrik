@@ -1,3 +1,4 @@
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * HelpTooltip tests — trigger accessibility, focus-opened tooltip content,
  * and the optional docs link. Radix Tooltip requires TooltipProvider.
@@ -6,7 +7,6 @@
  */
 import { describe, it, expect, afterEach } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { HelpTooltip } from "../HelpTooltip";
 
 afterEach(cleanup);

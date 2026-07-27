@@ -32,6 +32,7 @@
  */
 
 import * as React from "react";
+import { PanelHeader, PanelHeaderProps } from "@/editor/ui";
 import {
   SIDEBAR_W,
   SIDEBAR_WIDE,
@@ -42,8 +43,6 @@ import {
   ROW_MD,
   ROW_LG,
 } from "@shared/constants/layout";
-import { PanelHeader } from "@/shared/extensions/PanelHeader";
-import type { PanelHeaderProps } from "@/shared/extensions/PanelHeader";
 
 // ============================================================================
 // Root

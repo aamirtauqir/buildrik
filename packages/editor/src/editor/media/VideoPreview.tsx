@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Video Preview Component
  * Video player with controls, thumbnail extraction, and duration display
@@ -6,15 +5,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+import { Button, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, Stack } from "@/editor/ui";
 
 // ============================================================================
 // TYPES
@@ -392,8 +383,8 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
   if (props.isModal) {
     const handleClose = props.onClose || (() => {});
     return (
-      <OverlayMount>
-        <Modal
+      <Portal>
+        <ModalRoot
           open={props.isOpen || false}
           onOpenChange={(next) => !next && handleClose()}
         >
@@ -413,14 +404,14 @@ export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
                   marginTop: 16,
                 }}
               >
-                <Button variant="ghost" onClick={props.onClose}>
+                <Button kind="ghost" onClick={props.onClose}>
                   Close
                 </Button>
               </div>
             </div>
           </ModalContent>
-        </Modal>
-      </OverlayMount>
+        </ModalRoot>
+      </Portal>
     );
   }
 

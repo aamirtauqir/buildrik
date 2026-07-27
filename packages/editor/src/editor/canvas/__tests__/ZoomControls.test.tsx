@@ -9,9 +9,9 @@
  */
 
 import * as React from "react";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render as rtlRender, screen, fireEvent, cleanup } from "@testing-library/react";
-import { TooltipProvider } from "@/editor/shared/vibcoder/Tooltip";
 import { ZoomControls } from "../ZoomControls";
 import { ZOOM_PRESETS } from "../shared";
 

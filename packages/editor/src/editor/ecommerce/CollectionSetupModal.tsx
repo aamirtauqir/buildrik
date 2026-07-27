@@ -1,4 +1,3 @@
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 /**
  * Collection Setup Modal
  * Prompts user to create Products collection when dropping e-commerce blocks
@@ -7,15 +6,8 @@ import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 
 import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
+import { Button, Checkbox, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import { useState } from "react";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
 
 export interface CollectionSetupModalProps {
   isOpen: boolean;
@@ -66,8 +58,8 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Set Up Products Collection</ModalTitle>
           <ModalClose aria-label="Close modal">
@@ -118,17 +110,17 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
         </div>
       </div>
       <div style={footerStyles}>
-        <Button variant="ghost" onClick={handleSkip} disabled={isCreating}>
+        <Button kind="ghost" onClick={handleSkip} disabled={isCreating}>
           Skip for now
         </Button>
-        <Button variant="primary" onClick={handleConfirm} disabled={isCreating}>
+        <Button kind="primary" onClick={handleConfirm} disabled={isCreating}>
           {isCreating ? "Creating..." : "Create Collection"}
         </Button>
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

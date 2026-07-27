@@ -1,4 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -9,11 +8,10 @@ import { Input } from "@/editor/shared/vibcoder/Input";
  */
 
 import * as React from "react";
+import { Button, Input, Spinner } from "@/editor/ui";
 import { MediaOptimizer } from "../../engine/media";
 import { formatBytes } from "@shared/utils/helpers/number";
 import type { ImageExportFormat } from "../../shared/types/media";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 
 // ============================================================================
 // TYPES
@@ -340,7 +338,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       {/* Actions */}
       <div style={styles.footer}>
         {onClose && (
-          <Button variant="ghost" onClick={onClose}>
+          <Button kind="ghost" onClick={onClose}>
             Cancel
           </Button>
         )}

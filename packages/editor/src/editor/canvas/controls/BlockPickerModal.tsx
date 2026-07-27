@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * BlockPickerModal - Block picker modal for UnifiedSelectionToolbar
  * Opens a modal with ElementsTab to select block type for insertion
@@ -8,7 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
+import { Button, Input, ModalContent, ModalRoot } from "@/editor/ui";
 import { getBlockById, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";
@@ -137,7 +135,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
   };
 
   return (
-    <Modal open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
+    <ModalRoot open={isOpen} onOpenChange={(o) => { if (!o) onClose(); }}>
       <ModalContent
         size="xl"
         srTitle={positionLabels[insertionContext.position]}
@@ -189,7 +187,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
           <ElementsTab searchQuery={searchQuery} onBlockClick={handleBlockSelect} />
         </div>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 

@@ -1,5 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
 /**
  * Stock Source Modal — Browse and save stock assets to library.
  * Replaces the old Discovery tab. Opens on demand via "+ Add from Stock".
@@ -7,6 +5,7 @@ import { Modal, ModalContent } from "@/editor/shared/vibcoder/Modal";
  */
 
 import * as React from "react";
+import { Button, ModalContent, ModalRoot } from "@/editor/ui";
 import { X, Download, SquareArrowOutUpRight } from "lucide-react";
 import { SearchBar } from "../../../shared/SearchBar";
 import type {
@@ -86,7 +85,7 @@ export function StockSourceModal({
   const showFilters = activeTab === "img" || activeTab === "vid";
 
   return (
-    <Modal open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+    <ModalRoot open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <ModalContent srTitle="Browse stock assets" className="stock-modal">
         {/* Header */}
         <div className="stock-modal-header">
@@ -164,7 +163,7 @@ export function StockSourceModal({
                   <Button
                     key={s.id}
                     type="button"
-                    variant="ghost"
+                    kind="ghost"
                     size="sm"
                     role="radio"
                     aria-checked={active}
@@ -379,6 +378,6 @@ export function StockSourceModal({
           )}
         </div>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 }

@@ -15,8 +15,8 @@
  */
 
 import * as React from "react";
-import { Button, Icon } from "@/editor/shared/vibcoder";
-import { PanelHeader } from "@/shared/extensions/PanelHeader";
+import { Button, PanelHeader } from "@/editor/ui";
+import { Icon } from "@/editor/shared/vibcoder";
 import type { Issue } from "./hooks/useStudioState";
 
 export interface IssuesPanelProps {
@@ -127,7 +127,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
             {FILTERS.map((f) => (
               <Button
                 key={f.key}
-                variant={filter === f.key ? "primary" : "ghost"}
+                kind={filter === f.key ? "primary" : "ghost"}
                 size="sm"
                 onClick={() => setFilter(f.key)}
               >
@@ -157,11 +157,11 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                 would change every site using them.
               </div>
               <div style={S.failedActions}>
-                <Button variant="ghost" size="sm" onClick={() => { setFailed(null); onOpenBrand?.(); }}>
+                <Button kind="ghost" size="sm" onClick={() => { setFailed(null); onOpenBrand?.(); }}>
                   Open Brand
                 </Button>
                 <Button
-                  variant="ghost"
+                  kind="ghost"
                   size="sm"
                   onClick={() => {
                     if (failed.tokenId) onIgnore?.(failed.tokenId);
@@ -202,7 +202,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                   </div>
                   {isFixable(i) && onFix && (
                     <Button
-                      variant="ghost"
+                      kind="ghost"
                       size="sm"
                       disabled={fixing !== null}
                       onClick={() => void runFix(i)}
