@@ -71,3 +71,5 @@ export {
   type ModalContentProps, type ModalSize,
 } from "./ModalParts";
 export { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent, TooltipPortal } from "./TooltipParts";
+export { Cluster, Label, HelperText, FormField, Tag, type ClusterProps, type LabelProps, type HelperTextProps, type FormFieldProps, type TagProps } from "./Field";
+export { Popover, Menu, MenuSeparator, type PopoverProps, type PopoverPlacement, type MenuProps, type MenuItemDef } from "./Popover";
