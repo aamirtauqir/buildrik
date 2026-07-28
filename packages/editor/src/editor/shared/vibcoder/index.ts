@@ -64,8 +64,6 @@ export { Switcher } from "./Switcher";
 export type { SwitcherProps, SwitcherThreshold } from "./Switcher";
 export { Grip } from "./Grip";
 export type { GripOrientation, GripSize, GripProps } from "./Grip";
-export { BreakpointSwitcher } from "./BreakpointSwitcher";
-export type { Breakpoint, BreakpointSwitcherProps } from "./BreakpointSwitcher";
 export { Label } from "./Label";
 export type { LabelSize, LabelInfoProps, LabelProps } from "./Label";
 export { Kbd, KbdSeq } from "./Kbd";

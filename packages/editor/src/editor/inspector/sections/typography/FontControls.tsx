@@ -1,4 +1,4 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button, Popover } from "@/editor/ui";
 /**
  * FontControls - Font weight, style, and decoration controls
  * Part of Typography section refactoring
@@ -15,12 +15,6 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useTypeRegistry } from "../../../design-system/state/TokenRegistryContext";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverPortal,
-  PopoverContent,
-} from "@/editor/shared/vibcoder";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
 import { SelectRow, ButtonGroup, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
@@ -106,11 +100,17 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
   }
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+    <Popover
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      placement="bottom-end"
+      label="Type tokens"
+      trigger={
         <Button
           type="button"
+          onClick={() => setIsOpen((v) => !v)}
           aria-label={`Link ${property} to type token`}
+          aria-expanded={isOpen}
           title="Link to type token"
           className="bd-chain-btn"
           style={{
@@ -128,19 +128,16 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
         >
           <Link2 size={12} aria-hidden="true" />
         </Button>
-      </PopoverTrigger>
-      <PopoverPortal>
-        <PopoverContent sideOffset={8}>
-          <TokenPickerPopover
-            tokens={tokenEntries}
-            currentValue={value}
-            showSwatch={false}
-            tokenLabel="type"
-            onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
-            onCustomValue={onChange}
-          />
-        </PopoverContent>
-      </PopoverPortal>
+      }
+    >
+      <TokenPickerPopover
+        tokens={tokenEntries}
+        currentValue={value}
+        showSwatch={false}
+        tokenLabel="type"
+        onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
+        onCustomValue={onChange}
+      />
     </Popover>
   );
 };

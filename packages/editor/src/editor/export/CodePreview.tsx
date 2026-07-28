@@ -12,9 +12,8 @@
 
 import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
-import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
+import { Tabs, Stack } from "@/editor/ui";
 import { CopyButton } from "@/shared/extensions/CopyButton";
-import { Stack } from "@/editor/shared/vibcoder";
 
 // ============================================================================
 // TYPES
@@ -261,12 +260,14 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
       {/* Tabs */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Tabs
+          tabs={[
+            { id: "html", label: "HTML" },
+            { id: "css", label: "CSS" },
+          ]}
           value={activeTab}
-          onValueChange={(tab) => setActiveTab(tab as CodeTab)}
-        >
-          <Tab id="html">HTML</Tab>
-          <Tab id="css">CSS</Tab>
-        </Tabs>
+          onChange={(tab) => setActiveTab(tab as CodeTab)}
+          label="Code language"
+        />
         <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }}>
           {activeTab === "html"
             ? `${html.split("\n").length} lines`

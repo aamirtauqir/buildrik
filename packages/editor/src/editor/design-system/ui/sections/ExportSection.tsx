@@ -27,8 +27,7 @@ import { buildExport, downloadFile, type ExportFormat } from "../../utils/export
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../../../engine/designSystem/bundler/CSSBundler";
 import { ImportCard } from "./ImportCard";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Radio } from "@/editor/shared/vibcoder/Radio";
+import { Button, Radio } from "@/editor/ui";
 
 // Local format type widens exportUtils ExportFormat with a stub "figma" entry
 // so the s05 prototype's 4-row selector renders without touching the shared
@@ -319,35 +318,31 @@ export const ExportSection: React.FC = () => {
             const droppedCount = id === "tailwind" ? tailwindDropped : 0;
             const chip = chipForFormat(id, droppedCount);
             return (
-              <Radio
-                key={id}
-                style={selected ? formatRowSelectedStyle : formatRowStyle}
-                data-testid={`format-row-${id}`}
-                name="export-format"
-                value={id}
-                checked={selected}
-                onChange={() => setFormat(id)}
-                aria-label={label}
-                label={
-                  <>
-                    <span>
-                      {label}
-                      <span style={{ marginLeft: 4, color: "var(--bk-ink-muted)" }}>· {desc}</span>
-                    </span>
-                    <span
-                      data-testid={`format-chip-${id}`}
-                      style={{
-                        ...chipBaseStyle,
-                        background: chip.bg,
-                        color: chip.fg,
-                        borderColor: chip.border,
-                      }}
-                    >
-                      {chip.label}
-                    </span>
-                  </>
-                }
-              />
+              <label key={id} style={selected ? formatRowSelectedStyle : formatRowStyle}>
+                <Radio
+                  data-testid={`format-row-${id}`}
+                  name="export-format"
+                  value={id}
+                  checked={selected}
+                  onChange={() => setFormat(id)}
+                  aria-label={label}
+                />
+                <span>
+                  {label}
+                  <span style={{ marginLeft: 4, color: "var(--bk-ink-muted)" }}>· {desc}</span>
+                </span>
+                <span
+                  data-testid={`format-chip-${id}`}
+                  style={{
+                    ...chipBaseStyle,
+                    background: chip.bg,
+                    color: chip.fg,
+                    borderColor: chip.border,
+                  }}
+                >
+                  {chip.label}
+                </span>
+              </label>
             );
           })}
         </div>
@@ -371,16 +366,16 @@ export const ExportSection: React.FC = () => {
             </div>
             <div style={radioRowStyle} role="radiogroup" aria-label="Dark mode strategy">
               {DARK_OPTIONS.map(({ id, label }) => (
-                <Radio
-                  key={id}
-                  style={radioLabelStyle}
-                  name="dark-strategy"
-                  value={id}
-                  checked={darkStrategy === id}
-                  onChange={() => setDarkStrategy(id)}
-                  aria-label={label}
-                  label={label}
-                />
+                <label key={id} style={radioLabelStyle}>
+                  <Radio
+                    name="dark-strategy"
+                    value={id}
+                    checked={darkStrategy === id}
+                    onChange={() => setDarkStrategy(id)}
+                    aria-label={label}
+                  />
+                  <span>{label}</span>
+                </label>
               ))}
             </div>
           </div>
@@ -394,7 +389,7 @@ export const ExportSection: React.FC = () => {
         <pre data-testid="export-preview" style={previewStyle}>
           {preview}
         </pre>
-        <Button variant="primary" onClick={handleDownload} style={downloadButtonStyle}>
+        <Button kind="primary" onClick={handleDownload} style={downloadButtonStyle}>
           {downloadLabelFor(format)}
         </Button>
       </div>

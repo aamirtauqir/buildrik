@@ -1,9 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
-import { Cluster } from "@/editor/shared/vibcoder/Cluster";
-import { Label } from "@/editor/shared/vibcoder/Label";
-import { HelperText } from "@/editor/shared/vibcoder/HelperText";
 /**
  * SeoTab — Pure form renderer. No state. No logic.
  * All state via UsePageSettingsReturn (s prop).
@@ -14,7 +8,7 @@ import { HelperText } from "@/editor/shared/vibcoder/HelperText";
  */
 
 import * as React from "react";
-import { Button, Tooltip } from "@/editor/ui";
+import { Button, Cluster, HelperText, Input, Label, Stack, Textarea, Tooltip } from "@/editor/ui";
 import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
@@ -140,7 +134,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       )}
       {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Cluster align="center" gap="xs" style={{ justifyContent: "space-between" }}>
+        <Cluster justify="between">
           <Label htmlFor="seo-title">Title</Label>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: range === "ok" || range === "ideal" ? "var(--bk-success)" : range === "short" ? "var(--bk-warning)" : "var(--bk-error)" }}>
             {s.seoTitle.length}/60{rangeLabel[range]}
@@ -173,9 +167,9 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       </Stack>
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Cluster align="center" gap="xs" style={{ justifyContent: "space-between" }}>
+        <Cluster justify="between">
           {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
-          <Cluster align="center" gap="xs">
+          <Cluster>
             <Label htmlFor="seo-desc">Meta Description</Label>
             <Tooltip label="A short summary of your page shown in Google search results (keep under 160 characters)">
               <Button
@@ -239,7 +233,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           </div>
         )}
         {s.slugError ? (
-          <HelperText tone="error">{s.slugError}</HelperText>
+          <HelperText error>{s.slugError}</HelperText>
         ) : (
           <HelperText>Lowercase letters, numbers, and hyphens only — auto-formatted as you type</HelperText>
         )}

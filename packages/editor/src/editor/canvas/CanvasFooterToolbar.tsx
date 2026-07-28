@@ -16,8 +16,7 @@
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import { Button, Tooltip } from "@/editor/ui";
-import { BreakpointSwitcher, type Breakpoint } from "@/editor/shared/vibcoder/BreakpointSwitcher";
+import { BreakpointSwitcher, Button, Tooltip, type Breakpoint } from "@/editor/ui";
 import { ZOOM_PRESETS } from "./shared";
 import { ROW_SM } from "@/shared/constants/layout";
 

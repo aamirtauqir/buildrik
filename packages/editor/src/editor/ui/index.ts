@@ -78,3 +78,6 @@ export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";
 export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
 export { Topbar, SiteMenuIcon } from "./Topbar";
 export type { TopbarProps, PublishState, ReviewPill, ReviewTone } from "./Topbar";
+
+/* ── BreakpointSwitcher · ported from vibcoder ──────────────────────────── */
+export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "./BreakpointSwitcher";

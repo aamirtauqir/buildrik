@@ -44,9 +44,7 @@ import {
   type TabId,
 } from "../sections/registry";
 import type { SectionTier } from "../shared/controls";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { HelperText } from "@/editor/shared/vibcoder/HelperText";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
+import { Button, HelperText, Stack } from "@/editor/ui";
 
 // ============================================================================
 // TYPES
@@ -241,7 +239,7 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
             {visibleIds.length - renderIds.length === 1 ? "" : "s"} hidden. It&apos;s a preference, not a limit.
           </HelperText>
           <Button
-            variant="bare"
+            kind="ghost"
             size="sm"
             onClick={() => {
               const url = new URL(window.location.href);

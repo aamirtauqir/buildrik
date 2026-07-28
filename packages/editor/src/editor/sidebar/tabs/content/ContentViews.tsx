@@ -8,7 +8,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, Checkbox, Input, Select, Switch, Textarea } from "@/editor/shared/vibcoder";
+import { Button, Checkbox, Input, Select, Textarea, Toggle } from "@/editor/ui";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
@@ -172,7 +172,7 @@ export function RootView({
       <div style={S.center} data-testid="content-empty">
         <div>Collections turn a spreadsheet into pages — one page per row, updated when the data changes.</div>
         {onCreateCollection && (
-          <Button variant="primary" size="sm" onClick={onCreateCollection}>
+          <Button kind="primary" size="sm" onClick={onCreateCollection}>
             Create a collection
           </Button>
         )}
@@ -336,10 +336,10 @@ export function RecordView({
             {f.type === "boolean" ? (
               <div style={S.toggleRow}>
                 <span style={{ fontSize: 13 }}>{f.name}</span>
-                <Switch
+                <Toggle
                   checked={Boolean(data[f.slug])}
                   aria-label={f.name}
-                  onClick={() => setField(f.slug, !data[f.slug])}
+                  onChange={() => setField(f.slug, !data[f.slug])}
                 />
               </div>
             ) : (
@@ -367,7 +367,7 @@ export function RecordView({
         ))}
         <div style={S.toggleRow}>
           <span style={{ fontSize: 13 }}>Published</span>
-          <Switch checked={published} aria-label="Published" onClick={() => setPublished((v) => !v)} />
+          <Toggle checked={published} aria-label="Published" onChange={() => setPublished((v) => !v)} />
         </div>
         {record && onDelete && (
           <Button style={{ ...S.addLink, color: "var(--bk-error)" }} onClick={onDelete}>
@@ -379,11 +379,11 @@ export function RecordView({
         <div style={S.savebar} role="region" aria-label="Unsaved changes">
           <span style={{ fontSize: 12, color: "var(--bk-warning-text)" }}>Unsaved changes</span>
           <span style={{ flex: 1 }} />
-          <Button variant="ghost" size="sm" onClick={() => { setData(initial); setPublished(record?.status === "published"); }}>
+          <Button kind="ghost" size="sm" onClick={() => { setData(initial); setPublished(record?.status === "published"); }}>
             Discard
           </Button>
           <Button
-            variant="primary"
+            kind="primary"
             size="sm"
             disabled={saving}
             onClick={() => {
@@ -433,7 +433,7 @@ export function FieldsView({
             <span style={S.rowMeta}>
               {f.validation?.required && <span style={{ color: "var(--bk-ink-muted)" }}>required</span>}
               <Button
-                variant="ghost"
+                kind="ghost"
                 size="sm"
                 aria-label={`Delete field ${f.name}`}
                 onClick={() => setConfirmDelete(f)}
@@ -459,15 +459,17 @@ export function FieldsView({
                   <option key={t} value={t}>{t}</option>
                 ))}
               </Select>
-              <Checkbox
-                label="required"
-                checked={required}
-                onChange={(e) => setRequired(e.target.checked)}
-              />
+              <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                <Checkbox
+                  checked={required}
+                  onChange={(e) => setRequired(e.target.checked)}
+                />
+                <span>required</span>
+              </label>
               <span style={{ flex: 1 }} />
-              <Button variant="ghost" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
+              <Button kind="ghost" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
               <Button
-                variant="primary"
+                kind="primary"
                 size="sm"
                 disabled={!name.trim()}
                 onClick={() => {
@@ -546,9 +548,9 @@ export function SourcesView({
             {error && <div style={{ fontSize: 12, color: "var(--bk-error)" }} role="alert">{error}</div>}
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button variant="ghost" size="sm" onClick={() => { setAdding(false); setError(null); }}>Cancel</Button>
+              <Button kind="ghost" size="sm" onClick={() => { setAdding(false); setError(null); }}>Cancel</Button>
               <Button
-                variant="primary"
+                kind="primary"
                 size="sm"
                 disabled={!json.trim()}
                 onClick={() => {
@@ -625,7 +627,7 @@ export function VariablesView({
             <span style={S.rowMeta}>
               {editKey === v.key ? (
                 <Button
-                  variant="ghost"
+                  kind="ghost"
                   size="sm"
                   onClick={() => {
                     onChange(variables.map((x) => (x.key === v.key ? { ...x, value: editValue } : x)));
@@ -636,10 +638,10 @@ export function VariablesView({
                 </Button>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" aria-label={`Edit ${v.key}`} onClick={() => { setEditKey(v.key); setEditValue(v.value); }}>
+                  <Button kind="ghost" size="sm" aria-label={`Edit ${v.key}`} onClick={() => { setEditKey(v.key); setEditValue(v.value); }}>
                     Edit
                   </Button>
-                  <Button variant="ghost" size="sm" aria-label={`Delete ${v.key}`} onClick={() => onChange(variables.filter((x) => x.key !== v.key))}>
+                  <Button kind="ghost" size="sm" aria-label={`Delete ${v.key}`} onClick={() => onChange(variables.filter((x) => x.key !== v.key))}>
                     ✕
                   </Button>
                 </>
@@ -671,9 +673,9 @@ export function VariablesView({
             />
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button variant="ghost" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
+              <Button kind="ghost" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
               <Button
-                variant="primary"
+                kind="primary"
                 size="sm"
                 disabled={!key.trim() || keyError || dupError}
                 onClick={() => {
@@ -736,10 +738,10 @@ export function ConditionsView({
               <span style={S.sub}>{conditionSummary(c.binding)}</span>
             </span>
             <span style={S.rowMeta}>
-              <Button variant="ghost" size="sm" onClick={() => onSelectElement(c.elementId)}>
+              <Button kind="ghost" size="sm" onClick={() => onSelectElement(c.elementId)}>
                 Select
               </Button>
-              <Button variant="ghost" size="sm" aria-label="Remove condition" onClick={() => onRemove(c.elementId)}>
+              <Button kind="ghost" size="sm" aria-label="Remove condition" onClick={() => onRemove(c.elementId)}>
                 ✕
               </Button>
             </span>
@@ -784,9 +786,9 @@ export function ConditionsView({
             </div>
             <div style={S.formRow}>
               <span style={{ flex: 1 }} />
-              <Button variant="ghost" size="sm" onClick={onCancelPick}>Cancel</Button>
+              <Button kind="ghost" size="sm" onClick={onCancelPick}>Cancel</Button>
               <Button
-                variant="primary"
+                kind="primary"
                 size="sm"
                 disabled={!left.trim() || (needsRight && !right.trim())}
                 onClick={() =>

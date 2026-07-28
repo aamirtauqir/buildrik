@@ -148,12 +148,12 @@ describe("AdvancedTab password box", () => {
 describe("AdvancedTab indexing switches", () => {
   it("reflects allowIndex / allowFollow as switch checked state", () => {
     render(<AdvancedTab s={makeSettings({ allowIndex: true, allowFollow: false })} />);
-    expect(screen.getByRole("switch", { name: "Allow indexing" }).getAttribute("aria-checked")).toBe(
-      "true"
-    );
-    expect(screen.getByRole("switch", { name: "Follow links" }).getAttribute("aria-checked")).toBe(
-      "false"
-    );
+    expect(
+      (screen.getByRole("switch", { name: "Allow indexing" }) as HTMLInputElement).checked
+    ).toBe(true);
+    expect(
+      (screen.getByRole("switch", { name: "Follow links" }) as HTMLInputElement).checked
+    ).toBe(false);
   });
 
   it("toggles allowIndex to the opposite of its current value", () => {

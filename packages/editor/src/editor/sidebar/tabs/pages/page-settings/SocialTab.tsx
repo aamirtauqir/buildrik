@@ -1,9 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
-import { Cluster } from "@/editor/shared/vibcoder/Cluster";
-import { Label } from "@/editor/shared/vibcoder/Label";
-import { HelperText } from "@/editor/shared/vibcoder/HelperText";
 /**
  * SocialTab — Open Graph + Twitter sharing preview & fields.
  *
@@ -11,6 +5,7 @@ import { HelperText } from "@/editor/shared/vibcoder/HelperText";
  */
 
 import * as React from "react";
+import { Cluster, HelperText, Input, Label, Stack, Textarea } from "@/editor/ui";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
@@ -43,7 +38,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       </div>
       {/* OG Title */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Cluster align="center" gap="xs" style={{ justifyContent: "space-between" }}>
+        <Cluster justify="between">
           <Label htmlFor="og-title">Open Graph Title</Label>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogTitle.length}/60</span>
         </Cluster>
@@ -57,7 +52,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       </Stack>
       {/* OG Description */}
       <Stack gap="xs" style={{ gap: 6 }}>
-        <Cluster align="center" gap="xs" style={{ justifyContent: "space-between" }}>
+        <Cluster justify="between">
           <Label htmlFor="og-desc">Open Graph Description</Label>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: "var(--bk-ink-muted)" }}>{s.ogDesc.length}/160</span>
         </Cluster>

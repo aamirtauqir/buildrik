@@ -1,5 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette (error boundary / overlay / preview
@@ -16,7 +14,7 @@ import { getBlockDefinitions } from "../../blocks/blockRegistry";
 import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { ToastProvider, useToast } from "@/editor/ui";
+import { Button, Stack, ToastProvider, useToast } from "@/editor/ui";
 import { StudioSkeleton } from "@/shared/extensions/SkeletonCompounds";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";

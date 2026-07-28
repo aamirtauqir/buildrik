@@ -14,7 +14,7 @@
  */
 import React from "react";
 
-export type PopoverPlacement = "bottom" | "bottom-end" | "top" | "right";
+export type PopoverPlacement = "bottom" | "bottom-end" | "top" | "top-end" | "right";
 
 export interface PopoverProps {
   open: boolean;
@@ -24,9 +24,11 @@ export interface PopoverProps {
   children: React.ReactNode;
   label?: string;
   className?: string;
+  /** Anchor stretches to fill its flex/grid parent — for full-width triggers. */
+  block?: boolean;
 }
 
-export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className }: PopoverProps) {
+export function Popover({ open, onClose, trigger, placement = "bottom", children, label, className, block }: PopoverProps) {
   const wrap = React.useRef<HTMLSpanElement | null>(null);
 
   React.useEffect(() => {
@@ -46,7 +48,7 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
   }, [open, onClose]);
 
   return (
-    <span className="bk-popover-anchor" ref={wrap}>
+    <span className={["bk-popover-anchor", block && "bk-popover-anchor--block"].filter(Boolean).join(" ")} ref={wrap}>
       {trigger}
       {open ? (
         <div

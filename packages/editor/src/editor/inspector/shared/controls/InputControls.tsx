@@ -1,6 +1,3 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 /**
  * Input Controls — InputRow, InputWithUnit, SelectRow.
  * Ported to .bdi-num / .bdi-text / .bdi-row-ctrl per comp-inspector.v1 design.
@@ -11,7 +8,7 @@ import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { X } from "lucide-react";
 import * as React from "react";
 import { IconInfo } from "../../../../shared/ui/Icons";
-import { Button, Tooltip } from "@/editor/ui";
+import { Button, Input, Select, Textarea, Tooltip } from "@/editor/ui";
 
 // ============================================================================
 // HELPERS

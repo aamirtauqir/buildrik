@@ -33,7 +33,6 @@
 @import "./components/atoms/animation-utils.css" layer(components);
 @import "./components/atoms/avatar.css" layer(components);
 @import "./components/atoms/badge.css" layer(components);
-@import "./components/atoms/breakpoint-switcher.css" layer(components);
 @import "./components/atoms/button.css" layer(components);
 @import "./components/atoms/checkbox.css" layer(components);
 @import "./components/atoms/count.css" layer(components);

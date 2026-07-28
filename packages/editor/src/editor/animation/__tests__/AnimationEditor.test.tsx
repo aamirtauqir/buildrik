@@ -115,9 +115,9 @@ describe("AnimationEditor — timing controls", () => {
         onChange={vi.fn()}
       />,
     );
-    const values = Array.from(container.querySelectorAll(".bd-slider__value")).map(
-      (el) => el.textContent,
-    );
+    const values = Array.from(
+      container.querySelectorAll<HTMLInputElement>(".bk-slider__num"),
+    ).map((el) => el.value);
     expect(values).toEqual(["700", "200"]);
   });
 });

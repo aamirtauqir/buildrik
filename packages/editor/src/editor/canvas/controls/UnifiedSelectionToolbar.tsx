@@ -9,8 +9,7 @@ import * as React from "react";
 import { Sparkles } from "lucide-react";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
-import { useToast } from "@/editor/ui";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
+import { IconButton, useToast } from "@/editor/ui";
 import { getElementNameFromType } from "../utils/elementInfo";
 import { BlockPickerModal } from "./BlockPickerModal";
 import { AiPromptPopover } from "./AiPromptPopover";
@@ -301,7 +300,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
         />
         <IconButton
           size="sm"
-          aria-label="Edit with AI"
+          label="Edit with AI"
           pressed={aiOpen}
           onClick={() => setAiOpen((v) => !v)}
         >

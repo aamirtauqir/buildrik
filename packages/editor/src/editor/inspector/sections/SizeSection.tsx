@@ -1,5 +1,4 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Select, Button, Popover } from "@/editor/ui";
 /**
  * Size Section - Width, Height, Min/Max dimensions
  * CP3: W and H rows each have a hover-reveal chain button that opens a spacing
@@ -10,12 +9,6 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverPortal,
-  PopoverContent,
-} from "@/editor/shared/vibcoder";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { getCssVariable } from "@/shared/utils/getCssVariable";
@@ -92,11 +85,17 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
   }
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+    <Popover
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      placement="bottom-end"
+      label="Spacing tokens"
+      trigger={
         <Button
           type="button"
+          onClick={() => setIsOpen((v) => !v)}
           aria-label={`Link ${property} to spacing token`}
+          aria-expanded={isOpen}
           title="Link to spacing token"
           className="bd-chain-btn"
           style={{
@@ -114,19 +113,16 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
         >
           <Link2 size={12} aria-hidden="true" />
         </Button>
-      </PopoverTrigger>
-      <PopoverPortal>
-        <PopoverContent sideOffset={8}>
-          <TokenPickerPopover
-            tokens={tokenEntries}
-            currentValue={value}
-            showSwatch={false}
-            tokenLabel="spacing"
-            onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
-            onCustomValue={onChange}
-          />
-        </PopoverContent>
-      </PopoverPortal>
+      }
+    >
+      <TokenPickerPopover
+        tokens={tokenEntries}
+        currentValue={value}
+        showSwatch={false}
+        tokenLabel="spacing"
+        onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
+        onCustomValue={onChange}
+      />
     </Popover>
   );
 };

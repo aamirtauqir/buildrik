@@ -12,7 +12,6 @@ import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
 import { Button, ConfirmDialog, EmptyState, EmptyStateDesc, EmptyStateTitle, Input, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal, PanelFrame, Stack } from "@/editor/ui";
 import { SkeletonListItem } from "@/shared/extensions/SkeletonCompounds";
-import { EmptyStateSpot } from "@/editor/shared/vibcoder";
 import { useToast } from "@/editor/ui";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { SearchBar } from "../shared/SearchBar";
@@ -114,10 +113,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             {headerAddBtn}
           </PanelFrame.Header>
         )}
-        <EmptyState>
-          <EmptyStateSpot>
-            <ComponentIcon />
-          </EmptyStateSpot>
+        <EmptyState icon={<ComponentIcon />}>
           <EmptyStateTitle>Components not available</EmptyStateTitle>
           <EmptyStateDesc>
             Components require storage access.

@@ -1,6 +1,4 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import { Menu, MenuItem } from "@/editor/shared/vibcoder/Menu";
+import { Button, IconButton, Menu, MenuItem } from "@/editor/ui";
 /**
  * AddPageButton — sticky cobalt CTA in pages footer.
  * Overflow (⋮) menu reveals secondary actions: "From template" + "New folder".
@@ -31,7 +29,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
 
   return (
     <div ref={wrapRef} style={{ display: "flex", alignItems: "center", gap: 4, position: "relative" }}>
-      <Button type="button" variant="primary" size="sm" onClick={onAddBlank} aria-label="Add new page">
+      <Button type="button" kind="primary" size="sm" onClick={onAddBlank} aria-label="Add new page">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" style={{ width: 14, height: 14 }}>
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
@@ -41,11 +39,9 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
       {hasOverflow && (
         <>
           <IconButton
-            type="button"
-            variant="ghost"
+            label="More add options"
             size="sm"
             onClick={() => setMenuOpen((o) => !o)}
-            aria-label="More add options"
             aria-expanded={menuOpen}
             aria-haspopup="menu"
           >
@@ -56,30 +52,34 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
             </svg>
           </IconButton>
           {menuOpen && (
-            <Menu style={{ position: "absolute", bottom: "calc(100% + 4px)", right: 0, zIndex: 10 }}>
-              {onFromTemplate && (
-                <MenuItem
-                  type="button"
-                  onClick={() => {
-                    onFromTemplate();
-                    setMenuOpen(false);
-                  }}
-                >
-                  From template
-                </MenuItem>
-              )}
-              {onAddFolder && (
-                <MenuItem
-                  type="button"
-                  onClick={() => {
-                    onAddFolder();
-                    setMenuOpen(false);
-                  }}
-                >
-                  New folder
-                </MenuItem>
-              )}
-            </Menu>
+            <div
+              className="bk-popover"
+              role="presentation"
+              style={{ position: "absolute", bottom: "calc(100% + 4px)", right: 0, zIndex: 10 }}
+            >
+              <Menu label="More add options">
+                {onFromTemplate && (
+                  <MenuItem
+                    onClick={() => {
+                      onFromTemplate();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    From template
+                  </MenuItem>
+                )}
+                {onAddFolder && (
+                  <MenuItem
+                    onClick={() => {
+                      onAddFolder();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    New folder
+                  </MenuItem>
+                )}
+              </Menu>
+            </div>
           )}
         </>
       )}

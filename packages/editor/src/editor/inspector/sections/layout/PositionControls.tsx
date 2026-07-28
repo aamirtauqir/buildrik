@@ -1,11 +1,10 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Position Controls - Position mode selection and offset inputs
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Button, Input } from "@/editor/ui";
 import { HelpTooltip } from "../../../../shared/ui/HelpTooltip";
 import { InputRow } from "../../shared/controls";
 import { baseStyles } from "../../shared/controls/controlStyles";

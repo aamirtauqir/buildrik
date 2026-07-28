@@ -15,8 +15,8 @@
  */
 
 import * as React from "react";
+import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 import { Button, PanelHeader } from "@/editor/ui";
-import { Icon } from "@/editor/shared/vibcoder";
 import type { Issue } from "./hooks/useStudioState";
 
 export interface IssuesPanelProps {
@@ -43,10 +43,10 @@ function isFixable(i: Issue): boolean {
   return Boolean(i.tokenId && i.autoFixHint);
 }
 
-const TONE: Record<Issue["type"], { icon: "alert-circle" | "info"; color: string }> = {
-  error: { icon: "alert-circle", color: "var(--bk-error)" },
-  warning: { icon: "alert-circle", color: "var(--bk-warning-text)" },
-  info: { icon: "info", color: "var(--bk-ink-muted)" },
+const TONE: Record<Issue["type"], { icon: React.ReactNode; color: string }> = {
+  error: { icon: <AlertCircle size={14} aria-hidden="true" />, color: "var(--bk-error)" },
+  warning: { icon: <AlertCircle size={14} aria-hidden="true" />, color: "var(--bk-warning-text)" },
+  info: { icon: <Info size={14} aria-hidden="true" />, color: "var(--bk-ink-muted)" },
 };
 
 const S: Record<string, React.CSSProperties> = {
@@ -117,7 +117,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
 
       {issues.length === 0 ? (
         <div style={S.center}>
-          <Icon name="check-circle" size="lg" />
+          <CheckCircle2 size={24} aria-hidden="true" />
           <div style={S.centerTitle}>No issues</div>
           <div style={S.summary}>Your site is clean — nothing to fix.</div>
         </div>
@@ -176,7 +176,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
           <div style={S.scroll}>
             {visible.length === 0 ? (
               <div style={S.center}>
-                <Icon name="check-circle" size="lg" />
+                <CheckCircle2 size={24} aria-hidden="true" />
                 <div style={S.centerTitle}>No {filter === "error" ? "errors" : "warnings"}</div>
               </div>
             ) : (
@@ -193,7 +193,7 @@ export const IssuesPanel: React.FC<IssuesPanelProps> = ({
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelectElement?.(i.id); } }}
                   >
                     <span style={{ color: TONE[i.type].color, marginTop: 1, flexShrink: 0 }}>
-                      <Icon name={TONE[i.type].icon} size="sm" />
+                      {TONE[i.type].icon}
                     </span>
                     <span style={S.rowMain}>
                       <span style={S.msg}>{i.message}</span>

@@ -17,7 +17,18 @@
  */
 
 import * as React from "react";
-import { Button, Icon, Select, Slider, type IconName } from "@/editor/shared/vibcoder";
+import {
+  CheckCircle2,
+  File,
+  GripVertical,
+  History,
+  Minus,
+  Palette,
+  Plus,
+  RefreshCw,
+  type LucideIcon,
+} from "lucide-react";
+import { Button, Select, Slider } from "@/editor/ui";
 import {
   compareApprovedToCurrent,
   type ComparePage,
@@ -35,12 +46,12 @@ export interface ApprovedCompareViewProps {
 
 type Mode = "split" | "overlay" | "list";
 
-const KIND: Record<CompareChangeKind, { icon: IconName; color: string; label: string }> = {
-  content: { icon: "file", color: "var(--bk-accent)", label: "Content" },
-  style: { icon: "palette", color: "var(--bk-warning-text)", label: "Style" },
-  added: { icon: "plus", color: "var(--bk-success)", label: "Added" },
-  removed: { icon: "minus", color: "var(--bk-error)", label: "Removed" },
-  moved: { icon: "grip-vertical", color: "var(--bk-ink-soft)", label: "Moved" },
+const KIND: Record<CompareChangeKind, { icon: LucideIcon; color: string; label: string }> = {
+  content: { icon: File, color: "var(--bk-accent)", label: "Content" },
+  style: { icon: Palette, color: "var(--bk-warning-text)", label: "Style" },
+  added: { icon: Plus, color: "var(--bk-success)", label: "Added" },
+  removed: { icon: Minus, color: "var(--bk-error)", label: "Removed" },
+  moved: { icon: GripVertical, color: "var(--bk-ink-soft)", label: "Moved" },
 };
 
 const KIND_ORDER: CompareChangeKind[] = ["added", "removed", "moved", "content", "style"];
@@ -108,7 +119,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
     return (
       <div style={S.body}>
         <div style={S.center}>
-          <Icon name="history" size="lg" />
+          <History size={24} aria-hidden="true" />
           <div style={S.centerTitle}>No approved snapshot for this round</div>
           <div style={S.summary}>
             This review was sent before snapshots were captured, so there's nothing to compare
@@ -131,7 +142,7 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
     <div style={S.body}>
       <div style={S.toolbar}>
         {(["split", "overlay", "list"] as Mode[]).map((m) => (
-          <Button key={m} variant={mode === m ? "primary" : "ghost"} size="sm" onClick={() => setMode(m)}>
+          <Button key={m} kind={mode === m ? "primary" : "ghost"} size="sm" onClick={() => setMode(m)}>
             {m === "split" ? "Side by side" : m === "overlay" ? "Overlay" : "List"}
           </Button>
         ))}
@@ -148,8 +159,8 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           </Select>
         )}
         {onRefreshCurrent && (
-          <Button variant="ghost" size="sm" onClick={onRefreshCurrent} title="Re-render the current site">
-            <Icon name="refresh" size="sm" />
+          <Button kind="ghost" size="sm" onClick={onRefreshCurrent} title="Re-render the current site" aria-label="Re-render the current site">
+            <RefreshCw size={14} aria-hidden="true" />
           </Button>
         )}
       </div>
@@ -166,14 +177,16 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
           <div style={S.listScroll}>
             {changesForPage.length === 0 ? (
               <div style={S.center}>
-                <Icon name="check-circle" size="lg" />
+                <CheckCircle2 size={24} aria-hidden="true" />
                 <div style={S.centerTitle}>This page matches the approved version</div>
               </div>
             ) : (
-              changesForPage.map((c: CompareChange, i) => (
+              changesForPage.map((c: CompareChange, i) => {
+                const KindIcon = KIND[c.kind].icon;
+                return (
                 <div key={`${c.key}-${c.kind}-${i}`} style={S.listRow}>
                   <span style={{ ...S.kindTag, color: KIND[c.kind].color }}>
-                    <Icon name={KIND[c.kind].icon} size="sm" />
+                    <KindIcon size={14} aria-hidden="true" />
                     {KIND[c.kind].label}
                   </span>
                   <div style={S.listMain}>
@@ -181,7 +194,8 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
                     <span style={S.listDetail}>{c.detail}</span>
                   </div>
                 </div>
-              ))
+                );
+              })
             )}
           </div>
         </>
@@ -208,7 +222,8 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
                 min={0}
                 max={100}
                 step={2}
-                aria-label="Overlay opacity"
+                label="Overlay opacity"
+                withField={false}
               />
             </div>
             <span style={S.listDetail}>Current</span>
@@ -232,14 +247,17 @@ export const ApprovedCompareView: React.FC<ApprovedCompareViewProps> = ({
       )}
 
       <div style={S.legend}>
-        {KIND_ORDER.map((k) => (
-          <span key={k} style={S.legendItem}>
-            <span style={{ color: KIND[k].color, display: "inline-flex" }}>
-              <Icon name={KIND[k].icon} size="sm" />
+        {KIND_ORDER.map((k) => {
+          const KindIcon = KIND[k].icon;
+          return (
+            <span key={k} style={S.legendItem}>
+              <span style={{ color: KIND[k].color, display: "inline-flex" }}>
+                <KindIcon size={14} aria-hidden="true" />
+              </span>
+              {KIND[k].label}
             </span>
-            {KIND[k].label}
-          </span>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

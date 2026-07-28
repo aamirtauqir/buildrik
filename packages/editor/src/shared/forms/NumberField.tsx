@@ -1,17 +1,16 @@
 /**
- * NumberField — labelled numeric stepper.
- * Internal: composes vibcoder <NumericStepper> + <FormField>.
+ * NumberField — labelled numeric input.
+ * Internal: composes ui <FormField> + <Input type="number">.
  *
- * Drops the legacy unit-select dropdown from the original L1 wrapper
- * (zero callers used non-empty `units` array — verified Day-1 inventory).
- * `unit` prop now renders as a display-only suffix via NumericStepper's
- * built-in unit cell.
+ * The vibcoder-era −/+ stepper buttons are gone (the Figma design has no
+ * stepper); the native number input keeps ArrowUp/ArrowDown stepping.
+ * `unit` renders as a display-only suffix.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { NumericStepper, FormField } from "@/editor/shared/vibcoder";
+import { FormField, Input } from "@/editor/ui";
 
 export interface NumberFieldProps {
   label?: string;
@@ -40,36 +39,52 @@ export const NumberField: React.FC<NumberFieldProps> = ({
   hint,
   id,
 }) => {
-  const generatedId = React.useId();
-  const fieldId = id || generatedId;
+  const clamp = (n: number) => {
+    if (min !== undefined && n < min) return min;
+    if (max !== undefined && n > max) return max;
+    return n;
+  };
 
-  const stepper = (
-    <NumericStepper
-      id={fieldId}
-      value={value}
-      onChange={(v) => onChange?.(v)}
-      min={min}
-      max={max}
-      step={step}
-      unit={unit && unit !== "" ? unit : undefined}
-      disabled={disabled}
-      error={!!error}
-    />
-  );
+  const renderInput = (extra?: {
+    id: string;
+    "aria-describedby": string | undefined;
+    "aria-invalid": true | undefined;
+  }) => {
+    const input = (
+      <Input
+        id={id}
+        {...extra}
+        type="number"
+        value={value}
+        min={min}
+        max={max}
+        step={step}
+        disabled={disabled}
+        error={!!error}
+        onChange={(e) => {
+          const n = Number(e.target.value);
+          if (!Number.isNaN(n)) onChange?.(clamp(n));
+        }}
+      />
+    );
+    if (!unit) return input;
+    return (
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+        {input}
+        <span style={{ fontSize: 12, color: "var(--bk-ink-muted)" }} aria-hidden="true">
+          {unit}
+        </span>
+      </span>
+    );
+  };
 
   if (!label && !error && !hint) {
-    return stepper;
+    return renderInput();
   }
 
   return (
-    <FormField
-      label={label ?? ""}
-      htmlFor={fieldId}
-      error={error}
-      helper={hint}
-      disabled={disabled}
-    >
-      {stepper}
+    <FormField label={label ?? ""} hint={hint} error={error}>
+      {(wiring) => renderInput(wiring)}
     </FormField>
   );
 };

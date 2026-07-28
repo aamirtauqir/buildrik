@@ -1,13 +1,13 @@
 /**
  * SelectField — labelled select wrapper.
- * Internal: composes vibcoder <FormField> + <Select>.
+ * Internal: composes ui <FormField> + <Select>.
  * Bare path (no label/error/hint) renders just <Select>.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Select, FormField } from "@/editor/shared/vibcoder";
+import { FormField, Select } from "@/editor/ui";
 
 export interface SelectOption {
   value: string;
@@ -41,9 +41,6 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   id,
   className,
 }) => {
-  const generatedId = React.useId();
-  const selectId = id || generatedId;
-
   const groupedOptions = React.useMemo(() => {
     const groups: Record<string, SelectOption[]> = {};
     const ungrouped: SelectOption[] = [];
@@ -58,13 +55,17 @@ export const SelectField: React.FC<SelectFieldProps> = ({
     return { groups, ungrouped };
   }, [options]);
 
-  const selectEl = (
+  const renderSelect = (extra?: {
+    id: string;
+    "aria-describedby": string | undefined;
+    "aria-invalid": true | undefined;
+  }) => (
     <Select
-      id={selectId}
+      id={id}
+      {...extra}
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       disabled={disabled}
-      error={!!error}
       style={{ color: value ? undefined : "var(--bk-ink-muted)" }}
     >
       {placeholder && <option value="">{placeholder}</option>}
@@ -86,19 +87,12 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   );
 
   if (!label && !error && !hint) {
-    return className ? <div className={className}>{selectEl}</div> : selectEl;
+    return className ? <div className={className}>{renderSelect()}</div> : renderSelect();
   }
 
   return (
-    <FormField
-      label={label ?? ""}
-      htmlFor={selectId}
-      error={error}
-      helper={hint}
-      disabled={disabled}
-      className={className}
-    >
-      {selectEl}
+    <FormField label={label ?? ""} hint={hint} error={error} className={className}>
+      {(wiring) => renderSelect(wiring)}
     </FormField>
   );
 };

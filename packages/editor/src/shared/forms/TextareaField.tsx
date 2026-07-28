@@ -1,13 +1,13 @@
 /**
  * TextareaField — labelled textarea wrapper.
- * Internal: composes vibcoder <FormField> + <Textarea>.
+ * Internal: composes ui <FormField> + <Textarea>.
  * Bare path (no label/error/hint) renders just <Textarea>.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Textarea, FormField } from "@/editor/shared/vibcoder";
+import { FormField, Textarea } from "@/editor/ui";
 
 export interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -20,27 +20,16 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
   error,
   hint,
   className,
-  id,
   ...props
 }) => {
-  const generatedId = React.useId();
-  const fieldId = id || generatedId;
-  const textarea = <Textarea {...props} id={fieldId} error={!!error} />;
-
   if (!label && !error && !hint) {
-    return className ? <div className={className}>{textarea}</div> : textarea;
+    const bare = <Textarea {...props} error={!!error} />;
+    return className ? <div className={className}>{bare}</div> : bare;
   }
 
   return (
-    <FormField
-      label={label ?? ""}
-      htmlFor={fieldId}
-      error={error}
-      helper={hint}
-      disabled={props.disabled}
-      className={className}
-    >
-      {textarea}
+    <FormField label={label ?? ""} hint={hint} error={error} className={className}>
+      {(wiring) => <Textarea {...props} {...wiring} error={!!error} />}
     </FormField>
   );
 };

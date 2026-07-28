@@ -1,11 +1,10 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * ZoomControls - Canvas zoom slider and controls
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, Tooltip } from "@/editor/ui";
+import { Button, Input, Tooltip } from "@/editor/ui";
 import { ZOOM_PRESETS } from "./shared";
 
 export interface ZoomControlsProps {

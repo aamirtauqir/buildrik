@@ -8,9 +8,7 @@ import * as React from "react";
 import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
-import { Stack } from "@/editor/shared/vibcoder";
+import { Button, Tabs, Stack } from "@/editor/ui";
 
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "../../shared/types/animations";
@@ -88,11 +86,16 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
   return (
     <div style={{ padding: 12 }}>
       {/* Animation Type */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="bd-tabs--sm">
-        <Tab id="entrance">Entrance</Tab>
-        <Tab id="attention">Attention</Tab>
-        <Tab id="exit">Exit</Tab>
-      </Tabs>
+      <Tabs
+        tabs={[
+          { id: "entrance", label: "Entrance" },
+          { id: "attention", label: "Attention" },
+          { id: "exit", label: "Exit" },
+        ]}
+        value={activeTab}
+        onChange={setActiveTab}
+        label="Animation type"
+      />
       <div style={{ marginTop: 16 }}>
         <div
           style={{
@@ -188,7 +191,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
       <div style={{ marginTop: 24 }}>
         <Button onClick={onPreview} style={{
           width: "100%"
-        }} variant="secondary">
+        }} kind="secondary">
           ▶️ Preview Animation
         </Button>
       </div>

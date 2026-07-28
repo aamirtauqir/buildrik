@@ -17,8 +17,8 @@
  */
 
 import * as React from "react";
+import { AlertCircle, CheckCircle2, ChevronLeft, History } from "lucide-react";
 import { Badge, Button, ConfirmDialog, PanelHeader, Spinner, Textarea, Toggle } from "@/editor/ui";
-import { Icon } from "@/editor/shared/vibcoder";
 import { ApprovedCompareView } from "@/editor/panels/version-history/ApprovedCompareView";
 import type { PublishPage } from "@/editor/shell/exportPublishPages";
 import {
@@ -284,7 +284,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.body}>
         {header}
         <div style={S.center}>
-          <Icon name="alert-circle" size="lg" />
+          <AlertCircle size={24} aria-hidden="true" />
           <div style={S.centerTitle}>Couldn't load the review</div>
           <div style={S.centerHint}>The dashboard didn't answer. Your feedback is safe — this is just the panel.</div>
           <Button kind="secondary" size="sm" onClick={() => void load()}>Retry</Button>
@@ -298,7 +298,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.body}>
         {header}
         <div style={S.center}>
-          <Icon name="check-circle" size="lg" />
+          <CheckCircle2 size={24} aria-hidden="true" />
           <div style={S.centerTitle}>No review yet</div>
           <div style={S.centerHint}>This site hasn't been sent for review yet. Use “Send for review” in the top bar to invite a client.</div>
         </div>
@@ -311,7 +311,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.body}>
         <div style={S.compareBar}>
           <Button kind="ghost" size="sm" onClick={() => setCompareOpen(false)}>
-            <Icon name="chevron-left" size="sm" /> Back
+            <ChevronLeft size={14} aria-hidden="true" /> Back
           </Button>
           <span style={S.who}>Compare with approved</span>
         </div>
@@ -319,7 +319,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <div style={S.center}><Spinner size="lg" /><span>Loading approved snapshot…</span></div>
         ) : compareState === "error" ? (
           <div style={S.center}>
-            <Icon name="alert-circle" size="lg" />
+            <AlertCircle size={24} aria-hidden="true" />
             <div style={S.centerTitle}>Couldn't load the approved snapshot</div>
             <div style={S.centerHint}>The dashboard didn't answer. Try again.</div>
             <Button kind="secondary" size="sm" onClick={() => void openCompare()}>Retry</Button>
@@ -360,7 +360,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
           <div style={S.actions}>
             {round.status === "APPROVED" && onExportCurrentPages && (
               <Button kind="ghost" size="sm" onClick={() => void openCompare()}>
-                <Icon name="history" size="sm" /> Compare
+                <History size={14} aria-hidden="true" /> Compare
               </Button>
             )}
             <Button kind="primary" size="sm" loading={resending} onClick={() => void doResend()}>Re-send</Button>
@@ -397,7 +397,7 @@ export const ReviewTab: React.FC<ReviewTabProps> = ({
       <div style={S.scroll}>
         {visible.length === 0 ? (
           <div style={S.center}>
-            <Icon name="check-circle" size="lg" />
+            <CheckCircle2 size={24} aria-hidden="true" />
             <div style={S.centerTitle}>No feedback yet</div>
             <div style={S.centerHint}>When {round.reviewerName ?? "the client"} leaves a comment, it shows up here.</div>
           </div>

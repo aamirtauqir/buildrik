@@ -1,6 +1,3 @@
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 /**
  * Aquibra Rich Text Editor
  * WYSIWYG text editing toolbar
@@ -9,13 +6,7 @@ import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Button, Tooltip } from "@/editor/ui";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverPortal,
-  PopoverContent,
-} from "@/editor/shared/vibcoder";
+import { Button, Tooltip, Select, Input, Cluster, Popover } from "@/editor/ui";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -124,7 +115,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
   return (
     <Cluster
       gap="xs"
-     
       style={{
         padding: 8,
         background: "var(--bk-bg-panel)",
@@ -199,42 +189,54 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       ))}
       <Divider />
       {/* Colors */}
-      <Popover open={textColorOpen} onOpenChange={setTextColorOpen}>
-        <PopoverTrigger asChild>
-          <Button kind="ghost" style={toolbarButtonStyle} title="Text Color" aria-label="Change text color">
+      <Popover
+        open={textColorOpen}
+        onClose={() => setTextColorOpen(false)}
+        label="Text color"
+        trigger={
+          <Button
+            kind="ghost"
+            style={toolbarButtonStyle}
+            title="Text Color"
+            aria-label="Change text color"
+            aria-expanded={textColorOpen}
+            onClick={() => setTextColorOpen((v) => !v)}
+          >
             <span style={{ borderBottom: "2px solid var(--bk-accent)" }}>A</span>
           </Button>
-        </PopoverTrigger>
-        <PopoverPortal>
-          <PopoverContent sideOffset={8}>
-            <ColorField label="Text Color" onChange={(color) => onCommand("foreColor", color)} />
-          </PopoverContent>
-        </PopoverPortal>
+        }
+      >
+        <ColorField label="Text Color" onChange={(color) => onCommand("foreColor", color)} />
       </Popover>
-      <Popover open={bgColorOpen} onOpenChange={setBgColorOpen}>
-        <PopoverTrigger asChild>
+      <Popover
+        open={bgColorOpen}
+        onClose={() => setBgColorOpen(false)}
+        label="Highlight color"
+        trigger={
           <Button
             kind="ghost"
             style={toolbarButtonStyle}
             title="Background Color"
             aria-label="Change background highlight color"
+            aria-expanded={bgColorOpen}
+            onClick={() => setBgColorOpen((v) => !v)}
           >
             <span style={{ background: "var(--bk-warning)", padding: "0 4px" }}>A</span>
           </Button>
-        </PopoverTrigger>
-        <PopoverPortal>
-          <PopoverContent sideOffset={8}>
-            <ColorField
-              label="Highlight Color"
-              onChange={(color) => onCommand("hiliteColor", color)}
-            />
-          </PopoverContent>
-        </PopoverPortal>
+        }
+      >
+        <ColorField
+          label="Highlight Color"
+          onChange={(color) => onCommand("hiliteColor", color)}
+        />
       </Popover>
       <Divider />
       {/* Link */}
-      <Popover open={linkOpen} onOpenChange={setLinkOpen}>
-        <PopoverTrigger asChild>
+      <Popover
+        open={linkOpen}
+        onClose={() => setLinkOpen(false)}
+        label="Insert link"
+        trigger={
           <Button
             kind="ghost"
             style={{
@@ -243,40 +245,39 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
               color: activeStyles.link ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
             }}
             title="Insert Link"
+            aria-expanded={linkOpen}
+            onClick={() => setLinkOpen((v) => !v)}
           >
             🔗
           </Button>
-        </PopoverTrigger>
-        <PopoverPortal>
-          <PopoverContent sideOffset={8}>
-            <div style={{ width: 250 }}>
-              <Input
-                type="text"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                placeholder="https://..."
-                style={{
-                  width: "100%",
-                  padding: "8px 12px",
-                  background: "var(--bk-gray-900)",
-                  border: "1px solid var(--bk-border)",
-                  borderRadius: 6,
-                  color: "var(--bk-ink)",
-                  fontSize: 13,
-                  marginBottom: 8,
-                }}
-              />
-              <div style={{ display: "flex", gap: 8 }}>
-                <Button size="sm" kind="ghost" onClick={() => onCommand("unlink")}>
-                  Remove
-                </Button>
-                <Button size="sm" kind="primary" onClick={handleLink}>
-                  Apply
-                </Button>
-              </div>
-            </div>
-          </PopoverContent>
-        </PopoverPortal>
+        }
+      >
+        <div style={{ width: 250 }}>
+          <Input
+            type="text"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            placeholder="https://..."
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              background: "var(--bk-gray-900)",
+              border: "1px solid var(--bk-border)",
+              borderRadius: 6,
+              color: "var(--bk-ink)",
+              fontSize: 13,
+              marginBottom: 8,
+            }}
+          />
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button size="sm" kind="ghost" onClick={() => onCommand("unlink")}>
+              Remove
+            </Button>
+            <Button size="sm" kind="primary" onClick={handleLink}>
+              Apply
+            </Button>
+          </div>
+        </div>
       </Popover>
       {/* Clear Formatting */}
       <Tooltip label="Clear Formatting">

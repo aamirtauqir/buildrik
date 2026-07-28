@@ -13,8 +13,8 @@
  */
 
 import * as React from "react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { Badge, Button, ConfirmDialog, Spinner } from "@/editor/ui";
-import { Icon } from "@/editor/shared/vibcoder";
 import { useEditorRole } from "./hooks/useEditorRole";
 import { roleAtLeast } from "@/services/RoleService";
 import {
@@ -101,7 +101,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
   if (state === "error") {
     return (
       <div style={S.center}>
-        <Icon name="alert-circle" size="lg" />
+        <AlertCircle size={24} aria-hidden="true" />
         <div style={S.centerTitle}>Couldn't load publish history</div>
         <Button kind="secondary" size="sm" onClick={() => void load()}>Retry</Button>
       </div>
@@ -110,7 +110,7 @@ export const PublishHistory: React.FC<PublishHistoryProps> = ({ siteId, onRollba
   if (rows.length === 0) {
     return (
       <div style={S.center}>
-        <Icon name="check-circle" size="lg" />
+        <CheckCircle2 size={24} aria-hidden="true" />
         <div style={S.centerTitle}>No published versions yet</div>
         <div style={S.centerHint}>Publish this site and each version shows up here — you can roll back to any of the last 20.</div>
       </div>

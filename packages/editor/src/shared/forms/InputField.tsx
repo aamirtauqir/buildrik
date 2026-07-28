@@ -1,13 +1,13 @@
 /**
  * InputField — labelled input wrapper.
- * Internal: composes vibcoder <FormField> + <Input>.
+ * Internal: composes ui <FormField> + <Input>.
  * Bare path (no label/error/hint) renders just <Input>.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Input, FormField } from "@/editor/shared/vibcoder";
+import { FormField, Input } from "@/editor/ui";
 
 export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -24,51 +24,42 @@ export const InputField: React.FC<InputFieldProps> = ({
   hint,
   leftIcon,
   className,
-  id,
   style,
   ...props
 }) => {
-  const generatedId = React.useId();
-  const inputId = id || generatedId;
   const inputStyle = leftIcon ? { paddingLeft: ICON_PAD, ...style } : style;
-  const inputEl = <Input {...props} id={inputId} error={!!error} style={inputStyle} />;
 
-  const inputWithIcon = leftIcon ? (
-    <div style={{ position: "relative" }}>
-      <span
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          left: 10,
-          top: "50%",
-          transform: "translateY(-50%)",
-          pointerEvents: "none",
-          color: "var(--bk-ink-muted)",
-          display: "inline-flex",
-        }}
-      >
-        {leftIcon}
-      </span>
-      {inputEl}
-    </div>
-  ) : (
-    inputEl
-  );
+  const withIcon = (input: React.ReactNode) =>
+    leftIcon ? (
+      <div style={{ position: "relative" }}>
+        <span
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: 10,
+            top: "50%",
+            transform: "translateY(-50%)",
+            pointerEvents: "none",
+            color: "var(--bk-ink-muted)",
+            display: "inline-flex",
+          }}
+        >
+          {leftIcon}
+        </span>
+        {input}
+      </div>
+    ) : (
+      input
+    );
 
   if (!label && !error && !hint) {
-    return className ? <div className={className}>{inputWithIcon}</div> : inputWithIcon;
+    const bare = withIcon(<Input {...props} error={!!error} style={inputStyle} />);
+    return className ? <div className={className}>{bare}</div> : <>{bare}</>;
   }
 
   return (
-    <FormField
-      label={label ?? ""}
-      htmlFor={inputId}
-      error={error}
-      helper={hint}
-      disabled={props.disabled}
-      className={className}
-    >
-      {inputWithIcon}
+    <FormField label={label ?? ""} hint={hint} error={error} className={className}>
+      {(wiring) => withIcon(<Input {...props} {...wiring} error={!!error} style={inputStyle} />)}
     </FormField>
   );
 };

@@ -1,5 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 /**
  * PageFolder — collapsible folder row + flat list of child PageRows.
  *
@@ -15,6 +13,7 @@ import { IconButton } from "@/editor/shared/vibcoder/IconButton";
  */
 
 import * as React from "react";
+import { IconButton, Input } from "@/editor/ui";
 import type { Composer } from "../../../../../engine";
 import type { FolderItem, PageItem } from "../types";
 import { PageRow } from "./PageRow";
@@ -122,10 +121,8 @@ export const PageFolder: React.FC<Props> = ({
           }}
         >
           <IconButton
-            variant="ghost"
-            size="xs"
-            type="button"
-            aria-label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
+            size="sm"
+            label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
             onClick={(e) => {
               e.stopPropagation();
               onToggle();
@@ -184,11 +181,9 @@ export const PageFolder: React.FC<Props> = ({
           <div className="bd-pg-folder-actions">
             <IconButton
               className="bd-pg-folder-act"
-              variant="ghost"
-              size="xs"
-              type="button"
+              size="sm"
               title="Rename folder"
-              aria-label={`Rename folder ${folder.name}`}
+              label={`Rename folder ${folder.name}`}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsRenamingFolder(true);
@@ -201,11 +196,9 @@ export const PageFolder: React.FC<Props> = ({
             </IconButton>
             <IconButton
               className="bd-pg-folder-act danger"
-              variant="ghost"
-              size="xs"
-              type="button"
+              size="sm"
               title="Delete folder (pages kept)"
-              aria-label={`Delete folder ${folder.name}`}
+              label={`Delete folder ${folder.name}`}
               onClick={(e) => {
                 e.stopPropagation();
                 onFolderDelete();
@@ -226,11 +219,9 @@ export const PageFolder: React.FC<Props> = ({
             <div key={page.id} className="bd-pg-page-wrap">
               <IconButton
                 className="bd-pg-page-eject"
-                variant="ghost"
-                size="xs"
-                type="button"
+                size="sm"
                 title="Remove from folder"
-                aria-label={`Remove ${page.name} from folder`}
+                label={`Remove ${page.name} from folder`}
                 onClick={() => onPageRemove(page.id)}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" style={{ width: 8, height: 8 }}>

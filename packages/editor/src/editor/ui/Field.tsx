@@ -13,12 +13,14 @@ import React from "react";
 export interface ClusterProps extends React.HTMLAttributes<HTMLDivElement> {
   justify?: "start" | "between" | "end";
   nowrap?: boolean;
+  /** "xs" tightens the gap to 4px for dense toolbars; default is 8px. */
+  gap?: "xs" | "md";
 }
 
-export function Cluster({ justify = "start", nowrap, className, children, ...rest }: ClusterProps) {
+export function Cluster({ justify = "start", nowrap, gap, className, children, ...rest }: ClusterProps) {
   return (
     <div
-      className={["bk-cluster", justify !== "start" && `bk-cluster--${justify}`, nowrap && "bk-cluster--nowrap", className]
+      className={["bk-cluster", justify !== "start" && `bk-cluster--${justify}`, nowrap && "bk-cluster--nowrap", gap === "xs" && "bk-cluster--gap-xs", className]
         .filter(Boolean)
         .join(" ")}
       {...rest}

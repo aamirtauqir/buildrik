@@ -1,12 +1,3 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Stack } from "@/editor/shared/vibcoder/Stack";
-import { Cluster } from "@/editor/shared/vibcoder/Cluster";
-import { Label } from "@/editor/shared/vibcoder/Label";
-import { HelperText } from "@/editor/shared/vibcoder/HelperText";
-import { Switch } from "@/editor/shared/vibcoder/Switch";
-import { ToggleRow } from "@/editor/shared/vibcoder/ToggleRow";
 /**
  * AdvancedTab — Visibility, schedule, password, indexing, head code.
  *
@@ -14,6 +5,7 @@ import { ToggleRow } from "@/editor/shared/vibcoder/ToggleRow";
  */
 
 import * as React from "react";
+import { Button, Cluster, HelperText, Input, Label, Stack, Textarea, Toggle } from "@/editor/ui";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
 interface Props {
@@ -32,8 +24,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           {(["live", "hidden", "password"] as const).map((v) => (
             <Button
               key={v}
-              type="button"
-              variant="ghost"
+              kind="ghost"
               size="sm"
               role="radio"
               aria-checked={s.visibility === v}
@@ -64,7 +55,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       {/* Password input — only when visibility=password */}
       {s.visibility === "password" && (
         <div style={{ padding: 10, background: "var(--bk-bg-subtle)", border: "1px solid var(--bk-border)", borderRadius: 4, display: "flex", flexDirection: "column", gap: "var(--bk-space-8)" }}>
-          <Cluster align="center" gap="xs">
+          <Cluster nowrap>
             <Input
               type={s.showPassword ? "text" : "password"}
               value={s.password}
@@ -73,10 +64,10 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
               aria-label="Page access password"
               style={{ flex: 1 }}
             />
-            <Button variant="secondary" size="sm" onClick={() => s.setShowPassword(!s.showPassword)} type="button" aria-label={s.showPassword ? "Hide password" : "Show password"}>
+            <Button kind="secondary" size="sm" onClick={() => s.setShowPassword(!s.showPassword)} aria-label={s.showPassword ? "Hide password" : "Show password"}>
               {s.showPassword ? "Hide" : "Show"}
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => s.copyPassword()} type="button" aria-label="Copy password" disabled={!s.password}>
+            <Button kind="secondary" size="sm" onClick={() => s.copyPassword()} aria-label="Copy password" disabled={!s.password}>
               Copy
             </Button>
           </Cluster>
@@ -88,12 +79,20 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
         <div style={{ font: "600 11px var(--bk-font-ui)", color: "var(--bk-ink)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           Search Engine Indexing
         </div>
-        <ToggleRow label="Allow indexing" helper="Let search engines list this page in results.">
-          <Switch checked={s.allowIndex} onCheckedChange={() => s.setAllowIndex(!s.allowIndex)} aria-label="Allow indexing" />
-        </ToggleRow>
-        <ToggleRow label="Follow links" helper="Let search engines follow outbound links on this page.">
-          <Switch checked={s.allowFollow} onCheckedChange={() => s.setAllowFollow(!s.allowFollow)} aria-label="Follow links" />
-        </ToggleRow>
+        <Cluster justify="between" nowrap>
+          <Stack gap="xs">
+            <Label>Allow indexing</Label>
+            <HelperText>Let search engines list this page in results.</HelperText>
+          </Stack>
+          <Toggle checked={s.allowIndex} onChange={() => s.setAllowIndex(!s.allowIndex)} aria-label="Allow indexing" />
+        </Cluster>
+        <Cluster justify="between" nowrap>
+          <Stack gap="xs">
+            <Label>Follow links</Label>
+            <HelperText>Let search engines follow outbound links on this page.</HelperText>
+          </Stack>
+          <Toggle checked={s.allowFollow} onChange={() => s.setAllowFollow(!s.allowFollow)} aria-label="Follow links" />
+        </Cluster>
       </Stack>
       {/* Head code */}
       <Stack gap="sm">
@@ -109,7 +108,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           aria-label="Custom head code"
           style={{ minHeight: 100, fontFamily: "var(--bk-font-mono)", fontSize: "11.5px", lineHeight: 1.4 }}
         />
-        {s.headCodeError && <HelperText tone="error">{s.headCodeError}</HelperText>}
+        {s.headCodeError && <HelperText error>{s.headCodeError}</HelperText>}
         <HelperText>Injected into the &lt;head&gt; of this page only. Sanitized before save.</HelperText>
       </Stack>
     </Stack>
