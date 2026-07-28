@@ -6,14 +6,7 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalClose,
-  ModalTitle,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import { SemanticBadge } from "@/shared/ui/SemanticBadge";
 import type { Template } from "./types";
 
@@ -144,10 +137,10 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   const previewWidth = deviceWidths[device];
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="xl" style={{ maxWidth: "90vw" }}>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -240,8 +233,8 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

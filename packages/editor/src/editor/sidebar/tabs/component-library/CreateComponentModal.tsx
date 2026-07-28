@@ -17,18 +17,18 @@
 // right-click, the shell one is the lightweight sidebar header variant.
 
 import * as React from "react";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Select } from "@/editor/shared/vibcoder/Select";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import {
-  Modal,
-  ModalContent,
-  ModalTitle,
+  Button,
+  Checkbox,
+  Input,
   ModalClose,
-  OverlayMount,
+  ModalContent,
+  ModalRoot,
+  ModalTitle,
+  Portal,
+  Select,
   Stack,
-} from "@/editor/shared/vibcoder";
+} from "@/editor/ui";
 import {
   dialogCancelBtnStyles,
   dialogInputStyles,
@@ -105,11 +105,11 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Save as component</ModalTitle>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -151,13 +151,14 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
               {selectionContext && (
                 <div style={bindingsCardStyle}>
-                  <Checkbox
-                    style={bindingsCheckboxStyle}
-                    checked={prefillBindings}
-                    onChange={(e) => setPrefillBindings(e.target.checked)}
-                    aria-label="Pre-fill bindings from DS"
-                    label="Pre-fill bindings from DS"
-                  />
+                  <label style={bindingsCheckboxStyle}>
+                    <Checkbox
+                      checked={prefillBindings}
+                      onChange={(e) => setPrefillBindings(e.target.checked)}
+                      aria-label="Pre-fill bindings from DS"
+                    />
+                    <span>Pre-fill bindings from DS</span>
+                  </label>
                   <p style={bindingsHintStyle}>
                     {bindingCount === 1
                       ? "1 style will bind to your DS tokens. Editing tokens later updates this component too."
@@ -184,7 +185,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </Button>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };

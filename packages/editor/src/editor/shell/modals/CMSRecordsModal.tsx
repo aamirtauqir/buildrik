@@ -13,18 +13,18 @@ import * as React from "react";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { CMSCollection, CMSContentItem, CMSField } from "../../../shared/types/cms";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Input } from "@/editor/shared/vibcoder/Input";
-import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Select } from "@/editor/shared/vibcoder/Select";
 import {
-  Modal,
-  ModalContent,
-  ModalTitle,
+  Button,
+  Checkbox,
+  Input,
   ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
+  ModalContent,
+  ModalRoot,
+  ModalTitle,
+  Portal,
+  Select,
+  Textarea,
+} from "@/editor/ui";
 
 export interface CMSRecordsModalProps {
   composer: Composer | null;
@@ -136,11 +136,13 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
     if (field.type === "boolean") {
       return (
         <div {...common}>
-          <Checkbox
-            checked={Boolean(value)}
-            onChange={(e) => setField(field.slug, e.target.checked)}
-            label={field.name}
-          />
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+            <Checkbox
+              checked={Boolean(value)}
+              onChange={(e) => setField(field.slug, e.target.checked)}
+            />
+            <span>{field.name}</span>
+          </label>
         </div>
       );
     }
@@ -186,11 +188,11 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>CMS Records</ModalTitle>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -220,10 +222,10 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                   <div>
                     {collection.fields.map(renderField)}
                     <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                      <Button variant="primary" size="sm" busy={busy} onClick={save}>
+                      <Button kind="primary" size="sm" loading={busy} onClick={save}>
                         {editingId === "" ? "Add record" : "Save"}
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>
+                      <Button kind="ghost" size="sm" onClick={() => setEditingId(null)}>
                         Cancel
                       </Button>
                     </div>
@@ -251,7 +253,7 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                       <span style={{ fontSize: 12, color: "var(--bk-ink-soft)" }}>
                         {items.length} record{items.length === 1 ? "" : "s"}
                       </span>
-                      <Button variant="secondary" size="sm" onClick={startAdd} disabled={!collection}>
+                      <Button kind="secondary" size="sm" onClick={startAdd} disabled={!collection}>
                         <Plus size={13} /> Add record
                       </Button>
                     </div>
@@ -279,18 +281,18 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
                             </span>
                             <span style={{ display: "flex", gap: 4 }}>
                               <Button
-                                variant="ghost"
+                                kind="ghost"
                                 size="sm"
-                                busy={busy}
+                                loading={busy}
                                 onClick={() => setStatus(item.id, item.status === "published" ? "draft" : "published")}
                                 aria-label={item.status === "published" ? "Unpublish record" : "Publish record"}
                               >
                                 {item.status === "published" ? "Unpublish" : "Publish"}
                               </Button>
-                              <Button variant="ghost" size="sm" onClick={() => startEdit(item)} aria-label="Edit record">
+                              <Button kind="ghost" size="sm" onClick={() => startEdit(item)} aria-label="Edit record">
                                 <Pencil size={13} />
                               </Button>
-                              <Button variant="ghost" size="sm" busy={busy} onClick={() => remove(item.id)} aria-label="Delete record">
+                              <Button kind="ghost" size="sm" loading={busy} onClick={() => remove(item.id)} aria-label="Delete record">
                                 <Trash2 size={13} />
                               </Button>
                             </span>
@@ -304,8 +306,8 @@ export const CMSRecordsModal: React.FC<CMSRecordsModalProps> = ({ composer, isOp
             )}
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 

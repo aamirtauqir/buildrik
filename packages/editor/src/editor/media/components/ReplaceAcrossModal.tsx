@@ -12,9 +12,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Modal, ModalContent, ModalDescription, ModalTitle } from "@/editor/shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
+import { Button, Checkbox, ModalContent, ModalDescription, ModalRoot, ModalTitle } from "@/editor/ui";
 
 export interface ReplaceAcrossPageEntry {
   pageId: string;
@@ -88,7 +86,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
   const selectedCount = selected.size;
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="xl" aria-labelledby="replace-across-title">
         {/* Header */}
         <div
@@ -181,14 +179,14 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
           <div style={{ display: "flex", gap: 8 }}>
             <Button
               type="button"
-              variant="ghost"
+              kind="ghost"
               onClick={() => onOpenChange(false)}
             >
               Cancel
             </Button>
             <Button
               type="button"
-              variant="primary"
+              kind="primary"
               onClick={handleConfirm}
               disabled={selectedCount === 0}
             >
@@ -197,7 +195,7 @@ export const ReplaceAcrossModal: React.FC<ReplaceAcrossModalProps> = ({
           </div>
         </div>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };
 

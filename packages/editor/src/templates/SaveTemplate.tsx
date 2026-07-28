@@ -5,14 +5,7 @@
 
 import * as React from "react";
 import { InputField, TextareaField, SelectField } from "../shared/forms";
-import {
-  Modal,
-  ModalContent,
-  ModalTitle,
-  ModalClose,
-  OverlayMount,
-} from "@/editor/shared/vibcoder";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 
 export interface SaveTemplateProps {
   isOpen: boolean;
@@ -47,11 +40,11 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
   };
 
   return (
-    <OverlayMount>
-      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+    <Portal>
+      <ModalRoot open={isOpen} onOpenChange={(next) => !next && onClose()}>
         <ModalContent size="lg">
           <ModalTitle>Save as Template</ModalTitle>
-          <ModalClose aria-label="Close modal">
+          <ModalClose aria-label="Close modal" onClick={onClose}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
@@ -96,17 +89,17 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
           justifyContent: "flex-end",
         }}
       >
-        <Button variant="ghost" onClick={onClose}>
+        <Button kind="ghost" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={handleSave} busy={saving} disabled={!name.trim()}>
+        <Button onClick={handleSave} loading={saving} disabled={!name.trim()}>
           Save Template
         </Button>
       </div>
           </div>
         </ModalContent>
-      </Modal>
-    </OverlayMount>
+      </ModalRoot>
+    </Portal>
   );
 };
 
