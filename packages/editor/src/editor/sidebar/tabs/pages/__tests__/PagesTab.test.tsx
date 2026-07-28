@@ -17,15 +17,6 @@ vi.mock("@/editor/ui", async () => {
     ToastProvider: ({ children }: { children: React.ReactNode }) => children,
   };
 });
-vi.mock("@/shared/extensions/ConfirmDialog", () => ({
-  ConfirmDialog: () => null,
-}));
-vi.mock("@/shared/extensions/PanelHeader", () => ({
-  PanelHeader: ({ title }: { title: string }) => {
-    const React = require("react");
-    return React.createElement("div", { "data-testid": "panel-header" }, title);
-  },
-}));
 vi.mock("../components/PageContextMenu", () => ({
   PageContextMenu: () => null,
 }));

@@ -143,11 +143,7 @@
     "packages/editor/src/engine/elements/PreviewLayer.ts",
     "packages/editor/src/shared/forms/InputField.tsx",
     "packages/editor/src/shared/forms/NumberField.tsx",
-    "packages/editor/src/shared/forms/SelectField.tsx",
-    "packages/editor/src/shared/ui/SemanticBadge.tsx",
-    "packages/editor/src/shared/ui/HelpTooltip.tsx",
-    "packages/editor/src/shared/ui/Icons.tsx",
-    "packages/editor/src/shared/ui/panel/PanelShell.tsx"
+    "packages/editor/src/shared/forms/SelectField.tsx"
   ],
   "notes": [
     "Broad chrome audit (93 files added): swept editor/inspector/* + editor/canvas/* + editor/shell/* + editor/panels/* + editor/rail/* + editor/sidebar/shared/* + editor/collaboration/* + remaining shared/ui/* + shared/forms/* and added every zero-violation file.",
@@ -156,8 +152,12 @@
   ],
   "lastDriftAudit": "2026-05-18",
   "driftedRemoved": {
-    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md.",
+    "description": "21 files removed 2026-05-18 \u2014 12 stale (file deleted/moved), 9 drifted (re-add after cleanup arc). See TODOS.md. +4 stale 2026-07-28: shared/ui drain (Slice 6B) \u2014 folder deleted; HelpTooltip moved to editor/ui/, PanelShell superseded by editor/ui/PanelFrame.",
     "stale": [
+      "packages/editor/src/shared/ui/SemanticBadge.tsx",
+      "packages/editor/src/shared/ui/HelpTooltip.tsx",
+      "packages/editor/src/shared/ui/Icons.tsx",
+      "packages/editor/src/shared/ui/panel/PanelShell.tsx",
       "packages/editor/src/editor/inspector/sections/registry.tsx",
       "packages/editor/src/editor/sidebar/tabs/DesignSystemTab.tsx",
       "packages/editor/src/editor/sidebar/tabs/settings/screens/BillingScreen.tsx",

@@ -81,3 +81,12 @@ export type { TopbarProps, PublishState, ReviewPill, ReviewTone } from "./Topbar
 
 /* ── BreakpointSwitcher · ported from vibcoder ──────────────────────────── */
 export { BreakpointSwitcher, type Breakpoint, type BreakpointSwitcherProps } from "./BreakpointSwitcher";
+
+/* ── HelpTooltip · moved from shared/ui (Slice 6B) ──────────────────────── */
+export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
+
+/* ── Extensions drain · ported from shared/extensions ───────────────────── */
+export { PanelHeaderActions, type PanelHeaderActionsProps } from "./PanelHeader";
+export { CopyButton, type CopyButtonProps } from "./CopyButton";
+export { SkeletonListItem, StudioSkeleton, type SkeletonListItemProps } from "./SkeletonCompounds";
+export { UpgradeModal, type UpgradeModalProps } from "./UpgradeModal";

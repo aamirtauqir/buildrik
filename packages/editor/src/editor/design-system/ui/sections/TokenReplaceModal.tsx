@@ -15,14 +15,14 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button } from "@/editor/ui";
 import {
-  Modal,
+  Button,
+  ModalRoot,
   ModalContent,
   ModalTitle,
   ModalDescription,
   ModalFooter,
-} from "../../../shared/vibcoder";
+} from "@/editor/ui";
 import type { DesignToken } from "../../types";
 
 export interface TokenReplaceModalProps {
@@ -123,7 +123,7 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
   };
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <ModalRoot open={open} onOpenChange={onOpenChange}>
       <ModalContent size="lg" data-token-replace-modal={token.id}>
         <ModalTitle>Replace {token.name}?</ModalTitle>
         <ModalDescription>
@@ -185,6 +185,6 @@ export const TokenReplaceModal: React.FC<TokenReplaceModalProps> = ({
           </div>
         </ModalFooter>
       </ModalContent>
-    </Modal>
+    </ModalRoot>
   );
 };

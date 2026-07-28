@@ -6,8 +6,7 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import { Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
-import { SemanticBadge } from "@/shared/ui/SemanticBadge";
+import { Badge, Button, ModalClose, ModalContent, ModalRoot, ModalTitle, Portal } from "@/editor/ui";
 import type { Template } from "./types";
 
 // ============================================================================
@@ -165,7 +164,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
                 {template.description}
               </div>
             </div>
-            <SemanticBadge variant="default">{template.category}</SemanticBadge>
+            <Badge kind="neutral">{template.category}</Badge>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -222,9 +221,9 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
               </div>
               <div style={{ display: "flex", gap: 4 }}>
                 {template.tags.map((tag) => (
-                  <SemanticBadge key={tag} variant="default" size="sm">
+                  <Badge key={tag} kind="neutral">
                     {tag}
-                  </SemanticBadge>
+                  </Badge>
                 ))}
               </div>
             </div>

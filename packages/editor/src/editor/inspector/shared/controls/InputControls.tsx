@@ -5,9 +5,8 @@
  * @license BSD-3-Clause
  */
 
-import { X } from "lucide-react";
+import { Info, X } from "lucide-react";
 import * as React from "react";
-import { IconInfo } from "../../../../shared/ui/Icons";
 import { Button, Input, Select, Textarea, Tooltip } from "@/editor/ui";
 
 // ============================================================================
@@ -28,7 +27,7 @@ const HelperIcon: React.FC<{ text: string }> = ({ text }) => (
         cursor: "help",
       }}
     >
-      <IconInfo size="xs" />
+      <Info size={12} />
     </span>
   </Tooltip>
 );

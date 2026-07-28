@@ -5,7 +5,7 @@ import { Button } from "@/editor/ui";
  */
 
 import * as React from "react";
-import { HelpTooltip } from "../../../../shared/ui/HelpTooltip";
+import { HelpTooltip } from "@/editor/ui";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DisplayPreview } from "./previews";
 import { cardBtn, tipBoxStyle } from "./styles";

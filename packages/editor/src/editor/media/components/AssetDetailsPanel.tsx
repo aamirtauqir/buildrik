@@ -27,7 +27,7 @@ import { formatBytes } from "@shared/utils/helpers/number";
 // P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
 const ALT_TEXT_MAX = 125;
 
-// ─── Toast contract (matches @/editor/shared/vibcoder useToast) ──────────
+// ─── Toast contract (matches @/editor/ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
 interface ToastInput {

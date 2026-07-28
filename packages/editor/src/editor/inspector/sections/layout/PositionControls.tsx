@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import { Button, Input } from "@/editor/ui";
-import { HelpTooltip } from "../../../../shared/ui/HelpTooltip";
+import { HelpTooltip } from "@/editor/ui";
 import { InputRow } from "../../shared/controls";
 import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";

@@ -311,13 +311,10 @@ for p in data.get('files', []):
   set -e
 fi
 
-# Gate 15: --bd-* SSOT — alias tokens defined only in bd-aliases.css and _aliases.css.
-# The --bd-* namespace is the chrome shorthand alias layer (contract documented
-# in bd-aliases.css header). Every --bd-* name must be defined in exactly one
-# of two canonical locations:
-#   1. themes/design-system/bd-aliases.css (hand-written core chrome aliases)
-#   2. themes/components/_aliases.css (vibcoder R2-namespace alias map)
-# Any other file defining --bd-* (literal or var()) is a cascade-override risk.
+# Gate 15: --bd-* namespace is RETIRED (ds/fresh-token-system stage 6).
+# Both former canonical homes (bd-aliases.css, _aliases.css) were deleted with
+# the old token system; the only chrome token namespace is the generated
+# --bk-* set. Any file defining --bd-* today is resurrecting a dead namespace.
 # Enforces the SSOT rule that was broken by themes/bridge-tokens.css (deleted 2026-04-24)
 # and the src/new-design/project/ reference snapshot (deleted 2026-04-24).
 #
@@ -511,14 +508,12 @@ pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 # (not just src/editor/) — that mismatch was the root cause of the rollback.
 # Excludes: barrel files themselves (index.ts, index.tsx) which legitimately
 # re-export from sibling shim files.
-LEAK=$(grep -rEn 'from\s+"(@/shared/ui|(\.\./)+shared/ui)"' packages/editor/src --include='*.ts' --include='*.tsx' --exclude-dir=__tests__ 2>/dev/null \
-  | grep -v 'shared/ui/index\.ts\(x\)\?:' \
-  || true)
-if [ -n "$LEAK" ]; then
-  echo "$LEAK"
-  fail "Gate 20: barrel import of @/shared/ui — use direct named path (e.g. @/shared/ui/Button)"
-fi
-pass "Gate 20: no barrel imports of @/shared/ui"
+# RETIRED (Slice 6B, shared/ui drain 2026-07-28): src/shared/ui/ was deleted
+# entirely — last primitives (Icons/ErrorState/HelpTooltip/SemanticBadge) were
+# drained onto editor/ui + lucide, and panel/PanelShell went with the
+# shared/extensions drain. No shared/ui import can resolve anymore, so the
+# gate has nothing left to guard.
+pass "Gate 20: retired — shared/ui deleted (Slice 6B)"
 
 # Gate 22: E3 portal discipline — no document.body in vibcoder wrappers (except OverlayMount)
 # Phase 3 overlays MUST portal through #vibcoder-overlay-root via useOverlayContainer().
@@ -538,21 +533,11 @@ if [ -n "$GATE22_HITS" ]; then
 fi
 pass "Gate 22: E3 portal discipline (no document.body outside OverlayMount)"
 
-# Gate 23: Shim layer is gate-keeper for mapped primitives.
-# Forbids direct imports of `@/shared/ui/<MappedPrimitive>` outside
-# `shared/ui/` itself. Every consumer must go through the barrel which
-# goes through the shim which goes through vibcoder. Bypass is regression.
-# Mapped primitives = the shims actually shipped by Phase 4 T1-T6.
-GATE23_PRIMITIVES='Button|Input|Select|Switch|Checkbox|Slider|Spinner|Skeleton|Icon|IconButton|Kbd|Badge|Tag|Card|Tabs|FormField|TextInput|PanelHeader|Popover|Tooltip|Toast'
-GATE23_HITS=$(grep -rE "from ['\"]@/shared/ui/(${GATE23_PRIMITIVES})['\"]" packages/editor/src --include='*.ts' --include='*.tsx' --exclude-dir=__tests__ --exclude-dir=project 2>/dev/null \
-  | grep -v 'shared/ui/' \
-  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
-  || true)
-if [ -n "$GATE23_HITS" ]; then
-  echo "$GATE23_HITS"
-  fail "Gate 23: direct shim-primitive import outside shared/ui/ (use barrel @/shared/ui)"
-fi
-pass "Gate 23: shim layer is gate-keeper for mapped primitives"
+# Gate 23: RETIRED (Slice 6 · stage 6, 2026-07-28). The shared/ui shim layer
+# and the vibcoder library behind it were deleted; the import path this gate
+# policed no longer exists. Kept as an explicit pass so gate numbering and CI
+# logs stay stable.
+pass "Gate 23: retired — shared/ui shim layer deleted (stage 6)"
 
 # Gate 24: Inline-pattern enforcement (AST-based — catches multi-line JSX).
 # Forbids inline lowercase HTML JSX (<button>, <input>, <select>, <textarea>) in editor/.

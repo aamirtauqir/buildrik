@@ -11,8 +11,8 @@
 
 import * as React from "react";
 import "./DrawerPanel.css";
+import { ChevronLeft, Pin } from "lucide-react";
 import { Button, Tooltip } from "@/editor/ui";
-import { SvgChevronLeft, SvgPin } from "../../shared/ui/Icons";
 
 // ============================================
 // Types
@@ -136,7 +136,7 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
                 aria-label={isPinned ? "Unpin panel" : "Pin panel"}
                 onClick={onPinToggle}
                 className="drawer-panel__pin-btn"
-              ><SvgPin /></Button>
+              ><Pin size={16} strokeWidth={1.5} /></Button>
             </Tooltip>
           )}
 
@@ -149,7 +149,7 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
                 aria-label="Close panel"
                 onClick={handleClose}
                 className="drawer-panel__close-btn"
-              ><SvgChevronLeft /></Button>
+              ><ChevronLeft size={16} strokeWidth={1.5} /></Button>
             </Tooltip>
           )}
         </div>

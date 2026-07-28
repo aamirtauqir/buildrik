@@ -15,7 +15,7 @@ import { getTabWidth, getTabConfig, getTabsByZone, getRailTools, getTabsByTool, 
 import { getEditorViewMode } from "../../shared/utils/editorViewMode";
 import type { BlockData } from "../../shared/types";
 import type { UsePublishJobResult } from "../shell/hooks/usePublishJob";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { ConfirmDialog } from "@/editor/ui";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
@@ -592,13 +592,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
       </div>
       {/* Settings dirty guard */}
       <ConfirmDialog
-        isOpen={tabGuard.open}
+        open={tabGuard.open}
         onClose={cancelTabSwitch}
         onConfirm={confirmTabSwitch}
         title="Unsaved Changes"
         message="You have unsaved changes in Settings. Switching tabs will discard them."
-        confirmText="Discard & Switch"
-        variant="danger"
+        confirmLabel="Discard & Switch"
+        destructive
       />
     </div>
   );

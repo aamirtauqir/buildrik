@@ -7,12 +7,12 @@
  */
 
 import * as React from "react";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
 import {
   Button,
+  ConfirmDialog,
   ModalClose,
   ModalContent,
   ModalRoot,
@@ -301,13 +301,13 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       {/* Delete confirmation — shared ConfirmDialog substrate (P5, was a
           hand-rolled fixed overlay at zIndex 9999 with no focus trap). */}
       <ConfirmDialog
-        isOpen={pendingDeleteId != null}
+        open={pendingDeleteId != null}
         onClose={() => setPendingDeleteId(null)}
-        onConfirm={confirmDeleteAsset}
+        onConfirm={() => void confirmDeleteAsset()}
         title="Delete file?"
         message={`"${filteredAssets.find((a) => a.id === pendingDeleteId)?.name ?? "This file"}" will be permanently deleted. This cannot be undone.`}
-        confirmText="Delete"
-        variant="danger"
+        confirmLabel="Delete"
+        destructive
       />
           </div>
         </ModalContent>

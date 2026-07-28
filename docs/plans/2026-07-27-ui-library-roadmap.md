@@ -247,7 +247,7 @@ earlier codemod shortened the file.
 
 ---
 
-## Progress log — 2026-07-27
+## Progress log — 2026-07-28 · MIGRATION COMPLETE
 
 | Stage | State |
 |---|---|
@@ -256,21 +256,18 @@ earlier codemod shortened the file.
 | 2 · Molecules | done — 16 components |
 | 3 · Organisms | done — 8 + useFocusTrap |
 | 4 · EditorShell | done |
-| 5 · Migration | **265 of 402 files (66%)** — ratchet 141 → 137 |
-| 6 · Delete old library | blocked on 5 |
-| 7 · Final gates | 2 of 4 live (gate:tokens-generated, gate:vibcoder-ratchet) |
+| 5 · Migration | **done — 402 of 402, ratchet 141 → 0** (slices 2–6, 2026-07-28) |
+| 6 · Delete old library | **done** — `editor/shared/vibcoder/` (70 primitives), `shared/extensions/`, `shared/ui/`, `themes/components/` (76 CSS files), all 54 preview galleries deleted; Gates 20/23 retired, Gate 15 repurposed as a --bd-* resurrection ban |
+| 7 · Final gates | tokens-generated live · ratchet locked at **0** (= the legacy-import ban / gate:ui-only first half) · no-hex = Gate 16 hex ratchet (49 CSS + 143 TSX to drain — separate arc) · shell-parity: conformance runner exists, CI wiring pending |
 
-Library now: 44 components + 1 hook, 164 contract tests, 0 hex, 0 fallbacks.
+Library at close: 50+ components + useFocusTrap, ~200 contract tests, 0 hex, 0 fallbacks.
+Additions during the final slices: Slider (92:30), BreakpointSwitcher (ported),
+CopyButton, SkeletonCompounds, UpgradeModal, HelpTooltip, PanelHeaderActions,
+`editor/shared/elementIcons` (element-type glyph map), ModalClose self-wiring
+via ModalRoot context, Popover `top-end` + `block` anchor, Cluster `gap="xs"`.
 
-**What the last 120 files are waiting on.** Not effort — specific components
-whose old API is structurally different, so a codemod cannot move them:
+Slice history: 1 topbar `eaa9a393` · 2 rail+drawer `c5a64252` · 3 tooltip drain
+`8c0d4f4f` · 4 modals `a67f6779` · infra `579d5b1e` · 5 forms/compounds/mech
+`73a0cbd1` · 6 extensions+shared/ui drain + stage-6 delete (this commit).
 
-- **Popover / Menu** — compound `PopoverTrigger`/`PopoverContent` and `MenuItem`
-  children, versus the new array + trigger-prop form
-- **Tabs** — `<Tabs value onValueChange><Tab>` versus the new array form
-- **Slider, ColorPicker, Uploader, BreakpointSwitcher, HelpTooltip** — not built
-- **Icon-set consumers** (`<Icon name="…">`) — the glyph registry moves first
-- **21 test files** pinned to the real Radix TooltipProvider, because the
-  trees they render still contain the old Tooltip
-
-Each is small and well defined. None of it is discovery.
+Residual Emotion: 4 files (canvas.tokens.ts, ReviewTab, CodePreview + test) — tracked for a cleanup pass, not load-bearing for the DS.

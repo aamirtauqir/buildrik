@@ -60,7 +60,7 @@ import type {
 import type { SmartFolder } from "./FolderTree";
 import { formatBytes } from "@shared/utils/helpers/number";
 
-// ─── Toast contract (matches @/editor/shared/vibcoder useToast) ──────────
+// ─── Toast contract (matches @/editor/ui useToast) ───────────────────────
 
 type ToastTone = "info" | "success" | "error" | "warning";
 interface ToastInput {

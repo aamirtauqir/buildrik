@@ -1,97 +1,28 @@
-@import "./components/_layer.css";
-
 /**
  * themes/default.css
- * Buildrik DS V1 — public entry point (stable import contract).
+ * Buildrik DS — public entry point (stable import contract).
  *
  * Imports:
- *   design-system/index.css — canonical DS (color, typography, spacing, radius,
- *     shadow, motion, z-index, layout, design, a11y)
- *   legacy-components.css — final residual rules (canonical engine selectors,
- *     1 single-consumer chrome class, generic input element styling). Renamed
- *     from components.css 2026-05-07 (Phase Final lock).
+ *   design-system/index.css — generated tokens (tokens.generated.css) +
+ *     a11y rules + site-builder design.css (user-output tokens, own domain)
+ *   ../editor/ui/ui.css — the component library styles (@layer components)
+ *   legacy-components.css — final residual engine selectors (canvas container,
+ *     drag cursor state, selection ring, vendor pseudo-elements)
  *
- * Phase 4 complete: compat.css deleted, no alias layer remaining.
+ * The old vibcoder bundle (themes/components/, 76 files) was deleted at
+ * stage 6 of the ds/fresh-token-system migration — src/editor/ui/ is the
+ * only component library.
  *
- * See: docs/superpowers/specs/2026-04-19-buildrik-design-system-v1-design.md
  * @license BSD-3-Clause
  */
 
+/* Cascade contract: reset < components < overrides; unlayered rules
+ * (tokens, engine selectors) win over all layers per CSS spec. */
+@layer reset, components, overrides;
+
 @import "./design-system/index.css";
 
-/* Buildrick UI — the component library atoms (see src/editor/ui/). */
+/* Buildrick UI — the component library (see src/editor/ui/). */
 @import "../editor/ui/ui.css" layer(components);
-
-/* ─── Vibcoder vendored bundle — full wiring (76 files) ───
- * Loads atom + layout + molecule + organism CSS into @layer components
- * per cascade contract (themes/components/_layer.css).
- *
- * Ordering: atoms → layouts → molecules → organisms
- */
-
-/* Atoms (25 files) */
-@import "./components/atoms/animation-utils.css" layer(components);
-@import "./components/atoms/avatar.css" layer(components);
-@import "./components/atoms/badge.css" layer(components);
-@import "./components/atoms/button.css" layer(components);
-@import "./components/atoms/checkbox.css" layer(components);
-@import "./components/atoms/count.css" layer(components);
-@import "./components/atoms/divider.css" layer(components);
-@import "./components/atoms/grip.css" layer(components);
-@import "./components/atoms/helper-text.css" layer(components);
-@import "./components/atoms/icon-button.css" layer(components);
-@import "./components/atoms/icon.css" layer(components);
-@import "./components/atoms/input.css" layer(components);
-@import "./components/atoms/kbd.css" layer(components);
-@import "./components/atoms/label.css" layer(components);
-@import "./components/atoms/link.css" layer(components);
-@import "./components/atoms/progress.css" layer(components);
-@import "./components/atoms/radio.css" layer(components);
-@import "./components/atoms/select.css" layer(components);
-@import "./components/atoms/skeleton.css" layer(components);
-@import "./components/atoms/slider.css" layer(components);
-@import "./components/atoms/spinner.css" layer(components);
-@import "./components/atoms/switch.css" layer(components);
-@import "./components/atoms/tag.css" layer(components);
-@import "./components/atoms/textarea.css" layer(components);
-@import "./components/atoms/thumb.css" layer(components);
-
-/* Layouts (7 files) */
-@import "./components/layouts/center.css" layer(components);
-@import "./components/layouts/cluster.css" layer(components);
-@import "./components/layouts/frame.css" layer(components);
-@import "./components/layouts/grid.css" layer(components);
-@import "./components/layouts/stack.css" layer(components);
-@import "./components/layouts/switcher.css" layer(components);
-
-/* Molecules (24 files) */
-@import "./components/molecules/actionbar.css" layer(components);
-@import "./components/molecules/breadcrumb.css" layer(components);
-@import "./components/molecules/canvas-toolbar.css" layer(components);
-@import "./components/molecules/card.css" layer(components);
-@import "./components/molecules/chain-row.css" layer(components);
-@import "./components/molecules/chipbar.css" layer(components);
-@import "./components/molecules/color-trigger.css" layer(components);
-@import "./components/molecules/form-field.css" layer(components);
-@import "./components/molecules/list-row.css" layer(components);
-@import "./components/molecules/popover.css" layer(components);
-@import "./components/molecules/search-input.css" layer(components);
-@import "./components/molecules/section-head.css" layer(components);
-@import "./components/molecules/surface-head.css" layer(components);
-@import "./components/molecules/tabs.css" layer(components);
-@import "./components/molecules/tile-meta.css" layer(components);
-@import "./components/molecules/toast.css" layer(components);
-@import "./components/molecules/toggle-row.css" layer(components);
-@import "./components/molecules/toolbar.css" layer(components);
-@import "./components/molecules/uploader.css" layer(components);
-
-/* Organisms (15 files — asset-library.css + canvas.css not yet vendored) */
-@import "./components/organisms/a11y-overlay.css" layer(components);
-@import "./components/organisms/color-picker.css" layer(components);
-@import "./components/organisms/command-palette.css" layer(components);
-@import "./components/organisms/empty-state.css" layer(components);
-@import "./components/organisms/footer.css" layer(components);
-@import "./components/organisms/modal.css" layer(components);
-@import "./components/organisms/notification-center.css" layer(components);
 
 @import "./legacy-components.css";

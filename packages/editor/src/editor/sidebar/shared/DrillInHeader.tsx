@@ -5,8 +5,7 @@
  */
 
 import * as React from "react";
-import { HeaderActions } from "@/shared/extensions/PanelHeader";
-import { Button, } from "@/editor/ui";
+import { Button, PanelHeaderActions } from "@/editor/ui";
 import { BackArrowIcon } from "./headerIcons";
 import { drillInHeaderContainerStyles } from "./headerStyles";
 
@@ -171,7 +170,8 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
         </nav>
       </div>
       {/* Action buttons */}
-      <HeaderActions
+      <PanelHeaderActions
+        label="panel"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
         onHelpClick={onHelpClick}

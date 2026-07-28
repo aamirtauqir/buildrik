@@ -4,8 +4,8 @@
    celebration state. */
 
 import * as React from "react";
+import { MousePointerClick } from "lucide-react";
 import { Button, Kbd, } from "@/editor/ui";
-import { SvgPointer } from "@/shared/ui/Icons";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants/events";
 
@@ -72,7 +72,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
     <div role="status" aria-live="polite" aria-label="No element selected" style={containerStyle}>
       {/* Icon */}
       <div style={iconCircleStyle} aria-hidden="true">
-        <SvgPointer style={{ opacity: 0.5 }} />
+        <MousePointerClick size={16} strokeWidth={1.5} style={{ opacity: 0.5 }} />
       </div>
       {/* Title */}
       <h3 style={titleStyle}>Nothing Selected</h3>

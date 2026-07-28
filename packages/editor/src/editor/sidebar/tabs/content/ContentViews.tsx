@@ -8,8 +8,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { Button, Checkbox, Input, Select, Textarea, Toggle } from "@/editor/ui";
-import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { Button, Checkbox, ConfirmDialog, Input, Select, Textarea, Toggle } from "@/editor/ui";
 import type { CMSCollection, CMSContentItem, CMSField } from "@/shared/types/cms";
 import type { ConditionExpression, ConditionOperator, DataSource } from "@/shared/types/data";
 import { conditionSummary, fieldDefault, isValidVariableKey, type SiteVariable } from "./contentPanelUtils";
@@ -491,7 +490,7 @@ export function FieldsView({
         )}
       </div>
       <ConfirmDialog
-        isOpen={confirmDelete != null}
+        open={confirmDelete != null}
         onClose={() => setConfirmDelete(null)}
         onConfirm={() => {
           if (confirmDelete) void onDeleteField(confirmDelete.id);
@@ -499,8 +498,8 @@ export function FieldsView({
         }}
         title="Delete field?"
         message={`"${confirmDelete?.name}" and its values on every record will be removed.`}
-        confirmText="Delete field"
-        variant="danger"
+        confirmLabel="Delete field"
+        destructive
       />
     </div>
   );

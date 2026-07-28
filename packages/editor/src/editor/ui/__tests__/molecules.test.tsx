@@ -244,3 +244,76 @@ describe("BreakpointSwitcher", () => {
     expect(texts).toEqual(["Desktop", "Tablet", "Mobile"]);
   });
 });
+
+/* ── Extensions drain · ported from shared/extensions ───────────────────── */
+import { PanelHeaderActions, CopyButton, SkeletonListItem, StudioSkeleton, UpgradeModal, ToastProvider } from "../index";
+
+describe("PanelHeaderActions", () => {
+  it("renders only the buttons whose callbacks are provided, labelled by context", () => {
+    const onPinToggle = vi.fn();
+    const onClose = vi.fn();
+    render(<PanelHeaderActions label="panel" isPinned onPinToggle={onPinToggle} onClose={onClose} />);
+    const pin = screen.getByRole("button", { name: "Unpin panel" });
+    expect(pin.getAttribute("aria-pressed")).toBe("true");
+    expect(screen.queryByRole("button", { name: "Help" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Close panel" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    fireEvent.click(pin);
+    expect(onPinToggle).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("CopyButton", () => {
+  it("copies the content and flips to a Copied state", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(
+      <ToastProvider>
+        <CopyButton content="hello" label="HTML" variant="solid" />
+      </ToastProvider>,
+    );
+    const btn = screen.getByRole("button", { name: "Copy HTML" });
+    expect(btn.className).toContain("bk-copy-btn--solid");
+    fireEvent.click(btn);
+    expect(writeText).toHaveBeenCalledWith("hello");
+    expect(await screen.findByRole("button", { name: "Copied" })).toBeTruthy();
+    expect(screen.getByText("Copied!")).toBeTruthy();
+  });
+});
+
+describe("SkeletonCompounds", () => {
+  it("SkeletonListItem hides its blocks from assistive tech and honours the flags", () => {
+    const { container } = render(<SkeletonListItem hasAvatar avatarSize={24} textLines={1} hasAction />);
+    const blocks = container.querySelectorAll(".bk-skeleton");
+    expect(blocks.length).toBe(3); // avatar + one line + action
+    blocks.forEach((b) => expect(b.getAttribute("aria-hidden")).toBe("true"));
+    expect(container.querySelector(".bk-skeleton--circle")).toBeTruthy();
+  });
+
+  it("StudioSkeleton renders the boot screen with its loading label", () => {
+    const { container } = render(<StudioSkeleton />);
+    expect(screen.getByText("INITIALIZING ENGINE")).toBeTruthy();
+    expect(container.querySelector(".bk-studio-skeleton__spinner")).toBeTruthy();
+  });
+});
+
+describe("UpgradeModal", () => {
+  it("stays closed until the upgrade-modal-open event arrives, then names the feature", () => {
+    render(<UpgradeModal />);
+    expect(screen.queryByText("Upgrade Your Plan")).toBeNull();
+    fireEvent(
+      window,
+      new CustomEvent("upgrade-modal-open", { detail: { feature: "Export", requiredPlan: "Business" } }),
+    );
+    expect(screen.getByText("Upgrade Your Plan")).toBeTruthy();
+    expect(screen.getByText("Export requires the Business plan.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Upgrade to Business" })).toBeTruthy();
+  });
+
+  it("supports controlled open state and closes via Maybe Later", () => {
+    const onClose = vi.fn();
+    render(<UpgradeModal isOpen onClose={onClose} />);
+    fireEvent.click(screen.getByRole("button", { name: "Maybe Later" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});

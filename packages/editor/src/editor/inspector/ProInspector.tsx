@@ -9,7 +9,7 @@
 import { Crosshair, CornerLeftUp } from "lucide-react";
 import * as React from "react";
 import { Button, } from "@/editor/ui";
-import { getElementIcon } from "@/shared/ui/Icons";
+import { getElementIcon } from "@/editor/shared/elementIcons";
 import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
 import { ScopeDropdown } from "./components/ScopeDropdown";

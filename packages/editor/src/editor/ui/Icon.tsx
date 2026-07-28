@@ -2,8 +2,8 @@
  * Icon + IconButton + Kbd + Spinner.
  *
  * Icon is a sizing and colour wrapper, not an icon set — the glyphs stay where
- * they are (shared/ui/Icons, lucide) so this library does not become a place
- * SVGs get pasted into.
+ * they are (lucide, editor/shared/elementIcons) so this library does not become
+ * a place SVGs get pasted into.
  *
  * @license BSD-3-Clause
  */

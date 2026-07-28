@@ -12,8 +12,7 @@
 
 import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
-import { Tabs, Stack } from "@/editor/ui";
-import { CopyButton } from "@/shared/extensions/CopyButton";
+import { CopyButton, Tabs, Stack } from "@/editor/ui";
 
 // ============================================================================
 // TYPES

@@ -13,13 +13,6 @@ vi.mock("@/editor/ui", async () => {
   };
 });
 
-vi.mock("@/shared/extensions/PanelHeader", () => ({
-  PanelHeader: ({ title }: { title: string }) => {
-    const React = require("react");
-    return React.createElement("div", { "data-testid": "panel-header" }, title);
-  },
-}));
-
 import { PublishTab } from "../PublishTab";
 
 const composer = {
