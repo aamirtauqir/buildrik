@@ -11,13 +11,7 @@
 
 import * as React from "react";
 import "./DrawerPanel.css";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
+import { Button, Tooltip } from "@/editor/ui";
 import { SvgChevronLeft, SvgPin } from "../../shared/ui/Icons";
 
 // ============================================
@@ -134,38 +128,28 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
         <div className="drawer-panel__controls">
           {/* Pin button - keeps panel open */}
           {onPinToggle && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton
-                  size="sm"
-                  variant="ghost"
-                  pressed={isPinned}
-                  aria-label={isPinned ? "Unpin panel" : "Pin panel"}
-                  onClick={onPinToggle}
-                  className="drawer-panel__pin-btn"
-                ><SvgPin /></IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>{isPinned ? "Unpin panel" : "Pin panel"}</TooltipContent>
-              </TooltipPortal>
+            <Tooltip label={isPinned ? "Unpin panel" : "Pin panel"}>
+              <Button
+                kind="ghost"
+                size="sm"
+                aria-pressed={isPinned}
+                aria-label={isPinned ? "Unpin panel" : "Pin panel"}
+                onClick={onPinToggle}
+                className="drawer-panel__pin-btn"
+              ><SvgPin /></Button>
             </Tooltip>
           )}
 
           {/* Close button */}
           {onClose && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton
-                  size="sm"
-                  variant="ghost"
-                  aria-label="Close panel"
-                  onClick={handleClose}
-                  className="drawer-panel__close-btn"
-                ><SvgChevronLeft /></IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>Close panel</TooltipContent>
-              </TooltipPortal>
+            <Tooltip label="Close panel">
+              <Button
+                kind="ghost"
+                size="sm"
+                aria-label="Close panel"
+                onClick={handleClose}
+                className="drawer-panel__close-btn"
+              ><SvgChevronLeft /></Button>
             </Tooltip>
           )}
         </div>

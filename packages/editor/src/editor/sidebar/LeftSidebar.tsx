@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LeftSidebar — Merged rail + panel component
  * Rail: 60px icon navigation with 3 zones (creation, structure, config)
@@ -35,13 +34,7 @@ import {
   Rocket,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-  TooltipProvider,
-} from "@/editor/shared/vibcoder/Tooltip";
+import { Button, Tooltip } from "@/editor/ui";
 
 // ============================================
 // Icon map — lucide icon name → component
@@ -141,30 +134,21 @@ function RailZone({
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
-          <Tooltip key={tab.id}>
-            <TooltipTrigger asChild>
-              <Button
-                className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
-                onClick={() => onBtnClick(tab.id)}
-                role="tab"
-                aria-selected={isVisibleActive}
-                aria-label={tab.ariaLabel}
-                data-tab={tab.id}
-              >
-                {isVisibleActive && <div className="ls-btn-bar" />}
-                {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
-                <Icon size={20} />
-                {showLabels && <span className="ls-btn__label">{tab.label}</span>}
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent side="right" sideOffset={8}>
-                {tab.label}
-                {tab.shortcut && (
-                  <span style={{ opacity: 0.6, marginLeft: 6 }}>{tab.shortcut}</span>
-                )}
-              </TooltipContent>
-            </TooltipPortal>
+          <Tooltip key={tab.id} label={tab.shortcut ? `${tab.label} · ${tab.shortcut}` : tab.label}>
+            <Button
+              kind="ghost"
+              className={`ls-btn${showLabels ? " ls-btn--labeled" : ""}${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
+              onClick={() => onBtnClick(tab.id)}
+              role="tab"
+              aria-selected={isVisibleActive}
+              aria-label={tab.ariaLabel}
+              data-tab={tab.id}
+            >
+              {isVisibleActive && <div className="ls-btn-bar" />}
+              {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
+              <Icon size={20} />
+              {showLabels && <span className="ls-btn__label">{tab.label}</span>}
+            </Button>
           </Tooltip>
         );
       })}
@@ -247,25 +231,19 @@ function FourToolRail({
         const isSelected = tool === activeTool;
         const isVisibleActive = isSelected && drawerOpen;
         return (
-          <Tooltip key={tool}>
-            <TooltipTrigger asChild>
-              <Button
-                className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
-                onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
-                role="tab"
-                aria-selected={isVisibleActive}
-                aria-label={meta.ariaLabel}
-                data-tool={tool}
-              >
-                {isVisibleActive && <div className="ls-btn-bar" />}
-                <Icon size={20} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent side="right" sideOffset={8}>
-                {meta.label}
-              </TooltipContent>
-            </TooltipPortal>
+          <Tooltip key={tool} label={meta.label}>
+            <Button
+              kind="ghost"
+              className={`ls-btn${isSelected ? " ls-btn--active" : ""}${!drawerOpen && isSelected ? " ls-btn--last" : ""}`}
+              onClick={() => onBtnClick(TOOL_PRIMARY_TAB[tool])}
+              role="tab"
+              aria-selected={isVisibleActive}
+              aria-label={meta.ariaLabel}
+              data-tool={tool}
+            >
+              {isVisibleActive && <div className="ls-btn-bar" />}
+              <Icon size={20} />
+            </Button>
           </Tooltip>
         );
       })}
@@ -303,7 +281,8 @@ function ToolSubNav({
         return (
           <Button
             key={t.id}
-            variant="bare"
+            kind="ghost"
+            size="sm"
             role="tab"
             aria-selected={active}
             onClick={() => onSubTabChange(t.id)}
@@ -520,7 +499,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   };
 
   return (
-    <TooltipProvider delayDuration={200}>
     <div className="ls-root">
       {/* Rail */}
       <nav
@@ -623,7 +601,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         variant="danger"
       />
     </div>
-    </TooltipProvider>
   );
 };
 

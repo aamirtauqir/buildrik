@@ -62,8 +62,6 @@ export { Frame } from "./Frame";
 export type { FrameProps, FrameRatio } from "./Frame";
 export { Switcher } from "./Switcher";
 export type { SwitcherProps, SwitcherThreshold } from "./Switcher";
-export { SidebarShell } from "./SidebarShell";
-export type { SidebarShellProps, SidebarShellWidth, SidebarShellSide } from "./SidebarShell";
 export { Grip } from "./Grip";
 export type { GripOrientation, GripSize, GripProps } from "./Grip";
 export { BreakpointSwitcher } from "./BreakpointSwitcher";
@@ -207,12 +205,6 @@ export { ToggleRow } from "./ToggleRow";
 export type { ToggleRowProps } from "./ToggleRow";
 export { TileMeta } from "./TileMeta";
 export type { TileMetaProps, TileMetaVariant } from "./TileMeta";
-export { RailTile } from "./RailTile";
-export type {
-  RailTileProps,
-  RailTileSize,
-  RailTileOrientation,
-} from "./RailTile";
 export { SearchInput } from "./SearchInput";
 export type { SearchInputProps, SearchInputSize } from "./SearchInput";
 export { Toolbar, ToolbarGroup, ToolbarLabel, ToolbarSpacer } from "./Toolbar";
@@ -252,24 +244,6 @@ export type {
   ModalDescriptionProps,
   ModalFooterProps,
 } from "./Modal";
-export {
-  Drawer,
-  DrawerTrigger,
-  DrawerContent,
-  DrawerClose,
-  DrawerTitle,
-  DrawerDescription,
-} from "./Drawer";
-export type {
-  DrawerProps,
-  DrawerSide,
-  DrawerSize,
-  DrawerTriggerProps,
-  DrawerContentProps,
-  DrawerCloseProps,
-  DrawerTitleProps,
-  DrawerDescriptionProps,
-} from "./Drawer";
 export {
   NotificationCenter,
   NotificationCenterMark,
@@ -322,61 +296,6 @@ export type {
   FooterChipProps,
   FooterDotProps,
 } from "./Footer";
-export { Rail, RailButton } from "./Rail";
-export type { RailProps, RailButtonProps } from "./Rail";
-export {
-  LeftPanel,
-  LeftPanelHead,
-  LeftPanelTitle,
-  LeftPanelSub,
-  LeftPanelActions,
-  LeftPanelBody,
-} from "./LeftPanel";
-export type {
-  LeftPanelProps,
-  LeftPanelHeadProps,
-  LeftPanelTitleProps,
-  LeftPanelSubProps,
-  LeftPanelActionsProps,
-  LeftPanelBodyProps,
-} from "./LeftPanel";
-export {
-  Inspector,
-  InspectorCrumbs,
-  InspectorHead,
-  InspectorHeadIcon,
-  InspectorSection,
-  InspectorSectionHead,
-  InspectorSectionBody,
-} from "./Inspector";
-export type {
-  InspectorProps,
-  InspectorCrumbsProps,
-  InspectorHeadProps,
-  InspectorHeadIconProps,
-  InspectorSectionProps,
-  InspectorSectionHeadProps,
-  InspectorSectionBodyProps,
-} from "./Inspector";
-export {
-  HistoryPanel,
-  HistoryPanelTimeline,
-  HistoryPanelDay,
-  HistoryPanelRow,
-  HistoryPanelTag,
-  HistoryPanelViewer,
-  HistoryPanelDiffLine,
-} from "./HistoryPanel";
-export type {
-  HistoryPanelProps,
-  HistoryPanelTimelineProps,
-  HistoryPanelDayProps,
-  HistoryPanelRowProps,
-  HistoryPanelTagProps,
-  HistoryPanelViewerProps,
-  HistoryPanelDiffLineProps,
-  HistoryPanelDiffKind,
-} from "./HistoryPanel";
 export {
   EmptyState,
   EmptyStateArt,
@@ -413,23 +332,3 @@ export type {
   A11yOverlayHitProps,
   A11yOverlayHitKind,
 } from "./A11yOverlay";
-export {
-  PagesDrawer,
-  PagesDrawerGroup,
-  PagesDrawerItem,
-} from "./PagesDrawer";
-export type {
-  PagesDrawerProps,
-  PagesDrawerGroupProps,
-  PagesDrawerItemProps,
-} from "./PagesDrawer";
-export {
-  TemplatesDrawer,
-  TemplatesDrawerCategory,
-  TemplatesDrawerItem,
-} from "./TemplatesDrawer";
-export type {
-  TemplatesDrawerProps,
-  TemplatesDrawerCategoryProps,
-  TemplatesDrawerItemProps,
-} from "./TemplatesDrawer";

@@ -62,7 +62,6 @@
 @import "./components/layouts/cluster.css" layer(components);
 @import "./components/layouts/frame.css" layer(components);
 @import "./components/layouts/grid.css" layer(components);
-@import "./components/layouts/sidebar-shell.css" layer(components);
 @import "./components/layouts/stack.css" layer(components);
 @import "./components/layouts/switcher.css" layer(components);
 
@@ -77,7 +76,6 @@
 @import "./components/molecules/form-field.css" layer(components);
 @import "./components/molecules/list-row.css" layer(components);
 @import "./components/molecules/popover.css" layer(components);
-@import "./components/molecules/rail-tile.css" layer(components);
 @import "./components/molecules/search-input.css" layer(components);
 @import "./components/molecules/section-head.css" layer(components);
 @import "./components/molecules/surface-head.css" layer(components);
@@ -92,16 +90,9 @@
 @import "./components/organisms/a11y-overlay.css" layer(components);
 @import "./components/organisms/color-picker.css" layer(components);
 @import "./components/organisms/command-palette.css" layer(components);
-@import "./components/organisms/drawer.css" layer(components);
 @import "./components/organisms/empty-state.css" layer(components);
 @import "./components/organisms/footer.css" layer(components);
-@import "./components/organisms/history-panel.css" layer(components);
-@import "./components/organisms/inspector.css" layer(components);
-@import "./components/organisms/left-panel.css" layer(components);
 @import "./components/organisms/modal.css" layer(components);
 @import "./components/organisms/notification-center.css" layer(components);
-@import "./components/organisms/pages-drawer.css" layer(components);
-@import "./components/organisms/rail.css" layer(components);
-@import "./components/organisms/templates-drawer.css" layer(components);
 
 @import "./legacy-components.css";

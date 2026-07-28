@@ -1,11 +1,8 @@
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 // @vitest-environment jsdom
 /**
  * DrawerPanel — pin/close controls, Escape gating, scroll-position memory.
  *
- * Renders the real vibcoder IconButton + Radix-backed Tooltip compound, so
- * trees are wrapped in <TooltipProvider delayDuration={0}> (Radix Root
- * requires a Provider ancestor; the app shell mounts it once at root).
+ * Renders the library Button + Tooltip (editor/ui) — no provider needed.
  *
  * Scroll memory mechanic (DrawerPanel.tsx): a scrollPositions ref keyed by
  * tabId. scrollTop is SAVED on close (both the close-button handler and the
@@ -25,11 +22,9 @@ function panelUi(props: PanelProps = {}) {
   const { title = "Layers", isOpen = true, children = "panel body", ...rest } =
     props;
   return (
-    <TooltipProvider delayDuration={0}>
-      <DrawerPanel title={title} isOpen={isOpen} {...rest}>
-        {children}
-      </DrawerPanel>
-    </TooltipProvider>
+    <DrawerPanel title={title} isOpen={isOpen} {...rest}>
+      {children}
+    </DrawerPanel>
   );
 }
 
