@@ -17,6 +17,9 @@ import { IconButton } from "./Icon";
 
 export type ModalSize = "sm" | "question" | "form" | "lg" | "xl";
 
+/** Lets ModalClose inherit the root's close without per-consumer wiring. */
+const ModalCloseContext = React.createContext<(() => void) | null>(null);
+
 export interface ModalRootProps {
   open: boolean;
   /** Radix-style callback the existing surfaces already pass. */
@@ -34,7 +37,7 @@ export function ModalRoot({ open, onOpenChange, onClose, children, dismissOnScri
   }, [onClose, onOpenChange]);
   return (
     <OverlayMount open={open} onClose={close} dismissOnScrimClick={dismissOnScrimClick}>
-      {children}
+      <ModalCloseContext.Provider value={close}>{children}</ModalCloseContext.Provider>
     </OverlayMount>
   );
 }
@@ -107,14 +110,19 @@ export interface ModalCloseProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 }
 
 export const ModalClose = React.forwardRef<HTMLButtonElement, ModalCloseProps>(function ModalClose(
-  { label = "Close", className, children, ...rest },
+  { label = "Close", className, children, onClick, ...rest },
   ref,
 ) {
+  const close = React.useContext(ModalCloseContext);
   return (
     <IconButton
       ref={ref}
       label={label}
       className={["bk-modal__close", className].filter(Boolean).join(" ")}
+      onClick={(e) => {
+        onClick?.(e);
+        if (!e.defaultPrevented) close?.();
+      }}
       {...rest}
     >
       {children ?? "✕"}

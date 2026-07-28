@@ -15,6 +15,7 @@ export { Select, type SelectProps } from "./Select";
 export { Checkbox, type CheckboxProps } from "./Checkbox";
 export { Radio, type RadioProps } from "./Radio";
 export { Toggle, type ToggleProps } from "./Toggle";
+export { Slider, type SliderProps } from "./Slider";
 export { Badge, type BadgeProps, type BadgeKind } from "./Badge";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
 export { Avatar, type AvatarProps, type AvatarSize, type AvatarTone } from "./Avatar";

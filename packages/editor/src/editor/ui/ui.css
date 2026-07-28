@@ -636,7 +636,6 @@
 .bk-spinner--sm { width: var(--bk-space-12); height: var(--bk-space-12); border-width: 1.5px; }
 .bk-spinner--lg { width: var(--bk-space-24); height: var(--bk-space-24); }
 @keyframes bk-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .bk-spinner { animation-duration: 2s; } }
 
 /* ── Cluster · Label · HelperText · FormField · Tag ─────────────────────── */
 .bk-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--bk-space-8); }
@@ -831,3 +830,49 @@ button.bk-topbar__review:focus-visible { outline: none; box-shadow: var(--bk-sha
 .bk-topbar__review--info { background: var(--bk-accent-subtle); color: var(--bk-accent-text); }
 .bk-topbar__review--warning { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
 .bk-topbar__review--success { background: var(--bk-success-tint); color: var(--bk-success-text); }
+
+/* ── Slider · Figma 92:30 ──────────────────────────────────────────────
+   Track 4px full-radius, filled portion accent; knob 14px card-on-accent
+   ring that grows to 16px while dragging; mono numeric field 46×26. */
+.bk-slider { display: inline-flex; align-items: center; gap: var(--bk-space-8); }
+.bk-slider__range {
+  appearance: none; -webkit-appearance: none;
+  width: 118px; height: 4px; border-radius: var(--bk-radius-full);
+  background: linear-gradient(to right, var(--bk-accent) var(--bk-slider-fill, 0%), var(--bk-border) var(--bk-slider-fill, 0%));
+  outline: none; cursor: pointer;
+}
+.bk-slider__range::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none;
+  width: 14px; height: 14px; border-radius: var(--bk-radius-full);
+  background: var(--bk-bg-card); border: 2px solid var(--bk-accent);
+  box-shadow: var(--bk-shadow-raised);
+  transition: width var(--bk-motion-fast) var(--bk-ease-default), height var(--bk-motion-fast) var(--bk-ease-default);
+}
+.bk-slider__range::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: var(--bk-radius-full);
+  background: var(--bk-bg-card); border: 2px solid var(--bk-accent);
+  box-shadow: var(--bk-shadow-raised);
+}
+.bk-slider__range:active::-webkit-slider-thumb { width: 16px; height: 16px; box-shadow: var(--bk-shadow-drag); }
+.bk-slider__range:active::-moz-range-thumb { width: 16px; height: 16px; box-shadow: var(--bk-shadow-drag); }
+.bk-slider__range:focus-visible { box-shadow: var(--bk-shadow-focus); }
+.bk-slider__field {
+  display: inline-flex; align-items: center; gap: 2px;
+  height: 26px; padding: 0 6px;
+  background: var(--bk-bg-card);
+  border: 1px solid var(--bk-border-input); border-radius: var(--bk-radius-sm);
+}
+.bk-slider__field:focus-within { border-color: var(--bk-accent); }
+.bk-slider__num {
+  width: 30px; border: none; outline: none; background: none; padding: 0;
+  font: 400 var(--bk-text-12) / var(--bk-space-16) var(--bk-font-mono);
+  color: var(--bk-ink); text-align: right;
+  appearance: textfield; -moz-appearance: textfield;
+}
+.bk-slider__num::-webkit-outer-spin-button, .bk-slider__num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.bk-slider__unit { font: 400 var(--bk-text-11) / var(--bk-space-16) var(--bk-font-ui); color: var(--bk-ink-muted); }
+.bk-slider--disabled { opacity: 0.55; }
+.bk-slider--disabled .bk-slider__range { cursor: not-allowed; background: linear-gradient(to right, var(--bk-border-medium) var(--bk-slider-fill, 0%), var(--bk-bg-subtle) var(--bk-slider-fill, 0%)); }
+.bk-slider--disabled .bk-slider__range::-webkit-slider-thumb { border-color: var(--bk-border-medium); box-shadow: none; }
+.bk-slider--disabled .bk-slider__range::-moz-range-thumb { border-color: var(--bk-border-medium); box-shadow: none; }
+.bk-slider--disabled .bk-slider__num { color: var(--bk-ink-muted); }

@@ -197,14 +197,15 @@ check_gate 11 "$GRADIENT_COUNT" "$BASE_11" "A1.1 — no chrome gradients" || exi
 
 # Gate 12: Chrome Axiom A1.2 — box-shadow must use shadow/glow token (--buildrick-* OR --bd-* alias).
 # Broadened: CSS (box-shadow:) + TSX camelCase (boxShadow:). Exempts lines
-# where the next non-whitespace token is var(--buildrick-shadow|glow) or
-# var(--bd-shadow|glow). The --bd-* aliases (added 2026-04-25) point at canonical
-# --buildrick-shadow-* tokens — both qualify as tokenized.
+# where the next non-whitespace token is var(--buildrick-shadow|glow),
+# var(--bd-shadow|glow), or var(--bk-shadow*) — the generated flat namespace
+# (ds/fresh-token-system, 2026-07-27) whose shadow tokens are the Figma
+# elevation scale. All three qualify as tokenized.
 # Match all box-shadow / boxShadow occurrences first, then subtract token-bound ones.
 SHADOW_ALL=$(count_chrome '(box-shadow|boxShadow)[[:space:]]*:')
-SHADOW_TOKENIZED=$(count_chrome "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--(buildrick|bd)-(shadow|glow)")
+SHADOW_TOKENIZED=$(count_chrome "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*([\"']?var\(--(buildrick|bd|bk)-(shadow|glow)|[\"']?none)")
 SHADOW_COUNT=$((SHADOW_ALL - SHADOW_TOKENIZED))
-check_gate 12 "$SHADOW_COUNT" "$BASE_12" "A1.2 — box-shadow via shadow/glow token (--buildrick-*|--bd-*)" || exit 1
+check_gate 12 "$SHADOW_COUNT" "$BASE_12" "A1.2 — box-shadow via shadow/glow token (--buildrick-*|--bd-*|--bk-*)" || exit 1
 
 # Gate 13: Chrome Axiom A1.3 — border-radius ≤ 4px on panel chrome (form atoms exempt).
 # Broadened: CSS (border-radius:) + TSX camelCase (borderRadius:).
@@ -283,8 +284,9 @@ for p in data.get('files', []):
       # since grep's no-match would append a second "0" and break arithmetic.
       file_gradients=$(grep -cE '(linear-gradient|radial-gradient|conic-gradient)' "$green_file" 2>/dev/null); file_gradients=${file_gradients:-0}
       file_shadow_all=$(grep -cE '(box-shadow|boxShadow)[[:space:]]*:' "$green_file" 2>/dev/null); file_shadow_all=${file_shadow_all:-0}
-      # Token-bound shadow check allows both ' and " quote styles AND --bd-* aliases.
-      file_shadow_tok=$(grep -cE "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--(buildrick|bd)-(shadow|glow)" "$green_file" 2>/dev/null); file_shadow_tok=${file_shadow_tok:-0}
+      # Token-bound shadow check allows both ' and " quote styles, --bd-* aliases,
+      # the generated --bk-shadow-* namespace, and box-shadow: none.
+      file_shadow_tok=$(grep -cE "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*([\"']?var\(--(buildrick|bd|bk)-(shadow|glow)|[\"']?none)" "$green_file" 2>/dev/null); file_shadow_tok=${file_shadow_tok:-0}
       file_shadow_raw=$((file_shadow_all - file_shadow_tok))
       file_radius=$(grep -cE "(border-radius|borderRadius)[[:space:]]*:[[:space:]]*[\"']?([5-9]|1[0-9]|2[0-9]|3[0-9]|50%|999)" "$green_file" 2>/dev/null); file_radius=${file_radius:-0}
       # Layout literal: CSS (Npx) + TSX bare-number (camelCase property).
@@ -358,7 +360,10 @@ pass "Gate 15: --bd-* defs only in bd-aliases.css"
 # canonical file only — ghosts must be fixed by adding aliases to bd-aliases.css,
 # not by defining them in random consumer files.
 GHOST_DEFINED=$(grep -oE -- '--bd-[a-z0-9-]+:' "$CANONICAL" 2>/dev/null | sed 's/:$//' | sort -u)
-GHOST_USED=$(grep -rohE -- 'var\(--bd-[a-z0-9-]+' \
+# Code files only — audit .md notes inside src/ carry historical snippets and
+# must not count as consumers (they went ghost when bd-aliases.css was deleted
+# in the ds/fresh-token-system stage-0 cutover).
+GHOST_USED=$(grep -rohE --include='*.ts' --include='*.tsx' --include='*.css' -- 'var\(--bd-[a-z0-9-]+' \
   packages/editor/src/shared/ui \
   packages/editor/src/editor \
   packages/editor/src/shared/forms \
@@ -443,6 +448,15 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 #     editor/sidebar/tabs/media/components/StockSourceModal.tsx — stock photo
 #                                                                  color filter
 #     editor/sidebar/tabs/media/data/mediaTypes.ts — stock filter type union
+#   Extended (ds/fresh-token-system 2026-07-28 — Figma-generated palette):
+#     themes/tokens.generated.{css,ts}  — full Flowbite ramp from the Figma
+#                                          Primitives collection (purple ramp
+#                                          feeds PRO badge + avatar tones)
+#     editor/ui/{ui.css,Avatar.tsx,Presence.tsx} — PRO badge + avatar identity
+#                                          tones per the Figma components;
+#                                          data/identity colour, not an accent
+#                                          (same precedent as dashboard brand
+#                                          tiles, DESIGN.md anti-slop #11)
 #   Extended (C-arc 2026-04-26 — user-facing token displays / published HTML):
 #     blocks/Ecommerce/                — published HTML for user's website
 #     features/design-system/           — user design system token UI
@@ -470,7 +484,7 @@ GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA
   --exclude-dir=node_modules \
   --exclude-dir=dist 2>/dev/null || true)
 GATE18_VIOLATIONS=$(echo "$GATE18_RAW" | grep -vE \
-  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|engine/ai/PageGenerator\.ts|engine/designSystem/|features/design-system/|editor/design-system/|editor/inspector/sections/DSBindingChip\.tsx|themes/design-system/design\.css|blocks/Ecommerce/|blocks/Components/|shared/forms/ColorField\.tsx|shared/forms/GradientPicker\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|\.test\.ts' \
+  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|engine/ai/PageGenerator\.ts|engine/designSystem/|features/design-system/|editor/design-system/|editor/inspector/sections/DSBindingChip\.tsx|themes/design-system/design\.css|blocks/Ecommerce/|blocks/Components/|shared/forms/ColorField\.tsx|shared/forms/GradientPicker\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|themes/tokens\.generated\.(css|ts)|editor/ui/(ui\.css|Avatar\.tsx|Presence\.tsx)|\.test\.ts' \
   | grep -v '^$' || true)
 if [ -n "$GATE18_VIOLATIONS" ]; then
   echo "$GATE18_VIOLATIONS" | head -20
@@ -548,15 +562,19 @@ GATE24_FILE_COUNT=$(find packages/editor/src/editor -name '*.tsx' \
   -not -path '*/__tests__/*' \
   -not -path '*/preview/*' \
   -not -path '*/shared/vibcoder/*' \
+  -not -path '*/editor/ui/*' \
   -not -name '*.test.tsx' 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$GATE24_FILE_COUNT" -eq 0 ]; then
   GATE24_HITS=0
 else
+  # editor/ui/ is the component library itself — its whole job is to own the
+  # native <button>/<input> elements so no one else has to (ds/fresh-token-system).
   GATE24_HITS=$(find packages/editor/src/editor -name '*.tsx' \
     -not -path '*/__tests__/*' \
     -not -path '*/preview/*' \
     -not -path '*/shared/vibcoder/*' \
+    -not -path '*/editor/ui/*' \
     -not -name '*.test.tsx' 2>/dev/null \
     | xargs npx tsx packages/editor/scripts/jsx-inline-element-scanner.ts 2>/dev/null \
     | jq -s 'add | length' 2>/dev/null || echo "0")

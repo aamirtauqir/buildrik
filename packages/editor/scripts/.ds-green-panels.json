@@ -71,7 +71,6 @@
     "packages/editor/src/editor/rail/DrawerPanel.tsx",
     "packages/editor/src/editor/shell/StudioHeader.tsx",
     "packages/editor/src/editor/shell/StudioModals.tsx",
-    "packages/editor/src/editor/shell/Topbar.tsx",
     "packages/editor/src/editor/sidebar/FullPageRouter.tsx",
     "packages/editor/src/editor/sidebar/FullPageView.tsx",
     "packages/editor/src/editor/sidebar/TabRouter.tsx",
