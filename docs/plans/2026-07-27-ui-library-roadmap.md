@@ -189,6 +189,64 @@ tokens can ship without the library.
 
 ---
 
+## Module slices — 2026-07-27
+
+Stage 5's remaining files are being drained **module by module** rather than by
+codemod batch. A slice takes one surface, builds only the components that
+surface needs, rewires the container, and deletes the old file in the same
+commit. Nothing is left running in two versions.
+
+### Slice 1 · Topbar — DONE
+
+| Deleted | Replaced by |
+|---|---|
+| `shell/Topbar.tsx` (755 lines, 45 props) | `ui/Topbar.tsx` (13 props, Figma 681:122) |
+| `shell/PublishDropdown.tsx` (308) | the Publish button + the live-URL items in `SiteMenu` |
+| `shell/NotificationBell.tsx` (198) | `Topbar`'s bell + `shell/NotificationPanel.tsx` |
+| `PresenceIndicators.tsx` body (300) | `ui/Presence.tsx`; the file is now a 70-line adapter |
+| `shell/__tests__/Topbar.test.tsx` (506) | `shell/__tests__/StudioHeader.test.tsx` (38 cases) |
+| `vibcoder/Topbar.tsx` + test | nothing — the shell topbar was its only consumer |
+| `themes/components/organisms/topbar.css` | `ui.css` `.bk-topbar` block |
+| `themes/design-system/bd-topbar-overrides.css` (11.7 KB) | — the override layer had nothing left to override |
+| `preview/vibcoder-topbar.{tsx,html}` | — a gallery for a component nothing rendered |
+
+New in the library: `Topbar`, `SaveStatus`, `Presence`, `Avatar` tones, and a
+compound `Menu` (`Menu > MenuGroup > MenuLabel + MenuItem`) whose roving focus
+is computed from the DOM, so groups and conditional items work.
+
+New in the shell: `SiteMenu`, `SendForReview`, `NotificationPanel`, `header.css`.
+`StudioHeader` is now the single container — the wrapper-around-a-wrapper is gone.
+
+**Design decisions taken during the slice**, each one narrowing rather than
+widening what ships:
+
+- `connecting` and `reconnecting` both read as "Reconnecting…". The user's
+  question is identical in both — are my edits landing — and the design has one
+  answer.
+- Per-user avatar hex is gone. Tone is derived from the user id against the
+  token ramp, so the same person is the same colour in every session.
+- The publish split-button's extra actions (View live site, Copy URL) moved into
+  the site menu. The Figma component has one publish button, not a split one.
+- `SaveStatus` gained an `error` state, and the Figma set (697:461) gained the
+  matching variant in the same pass. Save failure is a real state the product
+  produces; mapping it onto "conflict" would have been a lie.
+- The review pill takes `{ label, tone }` instead of a count, so all five review
+  states share one shape — and it is a `<button>` only when it goes somewhere.
+
+Deleting the vibcoder skin drained 2 of the 4 grandfathered `selectorDuplicates`
+(`.bd-topbar`, `.bd-topbar__brand`) — the CSS had outlived the markup by one
+migration. The reduced-motion rule for `.bd-topbar__status-dot` went with it.
+
+**Pre-existing red, untouched by this slice** (recorded so it is not mistaken for
+new damage): `gate:buildrick` sits at 111 against a baseline of 78 — red on main
+before this work started. `gate:ds-ssot` flags `.bd-depth-badge` in Canvas.css;
+that is the same grandfathered violation as before, at a new line number after an
+earlier codemod shortened the file.
+
+### Slice 2 · Rail + Drawer — next
+
+---
+
 ## Progress log — 2026-07-27
 
 | Stage | State |
@@ -198,7 +256,7 @@ tokens can ship without the library.
 | 2 · Molecules | done — 16 components |
 | 3 · Organisms | done — 8 + useFocusTrap |
 | 4 · EditorShell | done |
-| 5 · Migration | **261 of 402 files (65%)** |
+| 5 · Migration | **265 of 402 files (66%)** — ratchet 141 → 137 |
 | 6 · Delete old library | blocked on 5 |
 | 7 · Final gates | 2 of 4 live (gate:tokens-generated, gate:vibcoder-ratchet) |
 

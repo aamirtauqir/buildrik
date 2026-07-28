@@ -451,18 +451,6 @@
 }
 .bk-rail-item:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
 
-/* ── Topbar · 56px ──────────────────────────────────────────────────────── */
-.bk-topbar {
-  height: var(--bk-size-topbar); flex: none;
-  display: flex; align-items: center; gap: var(--bk-space-12);
-  padding: 0 var(--bk-space-16);
-  background: var(--bk-bg-panel);
-  border-bottom: 1px solid var(--bk-border);
-  font-family: var(--bk-font-ui); font-size: var(--bk-text-13);
-  color: var(--bk-ink);
-}
-.bk-topbar__spacer { flex: 1; }
-
 /* ── Footer · 32px ──────────────────────────────────────────────────────── */
 .bk-footer {
   height: var(--bk-size-footer); flex: none;
@@ -711,3 +699,135 @@
 .bk-menu-item--destructive { color: var(--bk-error-text); }
 .bk-menu-item__kbd { margin-left: auto; color: var(--bk-ink-muted); font-size: var(--bk-text-11); }
 .bk-menu__separator { height: 1px; margin: var(--bk-space-4) 0; background: var(--bk-border); }
+
+/* ── Save status · Figma 697:461 · five truths, one pill ────────────────── */
+.bk-save {
+  display: inline-flex; align-items: center; gap: var(--bk-space-8);
+  height: var(--bk-space-24); padding: 0 var(--bk-space-8);
+  border-radius: var(--bk-radius-full);
+  font-family: var(--bk-font-ui); font-size: var(--bk-text-12);
+  white-space: nowrap;
+}
+.bk-save__dot { width: 6px; height: 6px; border-radius: var(--bk-radius-full); flex: none; }
+.bk-save--saved    { background: var(--bk-success-tint); color: var(--bk-success-text); }
+.bk-save--saved .bk-save__dot { background: var(--bk-success); }
+.bk-save--saving   { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
+.bk-save--saving .bk-save__dot { background: var(--bk-ink-muted); }
+.bk-save--unsaved  { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
+.bk-save--unsaved .bk-save__dot { background: var(--bk-warning); }
+.bk-save--conflict { background: var(--bk-error-tint); color: var(--bk-error-text); }
+.bk-save--conflict .bk-save__dot { background: var(--bk-error); }
+.bk-save--offline  { background: var(--bk-bg-subtle); color: var(--bk-ink-soft); }
+.bk-save--offline .bk-save__dot { background: var(--bk-ink-muted); }
+.bk-save--error    { background: var(--bk-error-tint); color: var(--bk-error-text); }
+.bk-save--error .bk-save__dot { background: var(--bk-error); }
+
+/* ── Presence · Figma 692:472 ───────────────────────────────────────────── */
+.bk-presence { display: inline-flex; align-items: center; gap: var(--bk-space-8); }
+.bk-presence__stack { display: inline-flex; align-items: center; }
+.bk-presence__stack > * + * { margin-left: calc(-1 * var(--bk-space-8)); }
+.bk-presence__overflow {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--bk-space-20); height: var(--bk-space-20);
+  border-radius: var(--bk-radius-full);
+  background: var(--bk-gray-200); color: var(--bk-gray-700);
+  box-shadow: 0 0 0 2px var(--bk-bg-card);
+  font-family: var(--bk-font-ui); font-size: var(--bk-text-11); font-weight: var(--bk-weight-medium);
+  flex: none;
+}
+.bk-presence__conn {
+  display: inline-flex; align-items: center; gap: var(--bk-space-4);
+  height: var(--bk-space-20); padding: 0 var(--bk-space-8);
+  border-radius: var(--bk-radius-full);
+  font-family: var(--bk-font-ui); font-size: var(--bk-text-11); font-weight: var(--bk-weight-medium);
+  white-space: nowrap;
+}
+.bk-presence__conn-dot { width: var(--bk-space-8); height: var(--bk-space-8); border-radius: var(--bk-radius-full); flex: none; }
+.bk-presence__conn--live { background: var(--bk-success-tint); color: var(--bk-success-text); }
+.bk-presence__conn--live .bk-presence__conn-dot { background: var(--bk-success); }
+.bk-presence__conn--reconnecting { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
+.bk-presence__conn--reconnecting .bk-presence__conn-dot { background: var(--bk-warning); }
+.bk-presence__conn--offline { background: var(--bk-error-tint); color: var(--bk-error-text); }
+.bk-presence__conn--offline .bk-presence__conn-dot { background: var(--bk-error); }
+
+/* Avatar tones — Figma 691:450. Tone is derived from the user id. */
+/* The stacking ring belongs to the stack, not to every avatar in the product —
+   an avatar in a comment row has nothing to separate itself from. */
+.bk-presence__stack .bk-avatar { box-shadow: 0 0 0 2px var(--bk-bg-card); }
+.bk-avatar--self {
+  outline: var(--bk-focus-ring-width) solid var(--bk-accent);
+  outline-offset: var(--bk-focus-ring-offset);
+}
+.bk-avatar--neutral { background: var(--bk-gray-200); color: var(--bk-gray-700); }
+.bk-avatar--blue    { background: var(--bk-blue-100); color: var(--bk-blue-800); }
+.bk-avatar--green   { background: var(--bk-green-100); color: var(--bk-green-800); }
+.bk-avatar--purple  { background: var(--bk-purple-100); color: var(--bk-purple-800); }
+.bk-avatar--amber   { background: var(--bk-yellow-100); color: var(--bk-yellow-800); }
+
+/* ── Topbar · Figma 681:122 ─────────────────────────────────────────────── */
+.bk-topbar {
+  display: flex; align-items: center; gap: var(--bk-space-12);
+  height: var(--bk-size-topbar); flex: none;
+  padding: 0 var(--bk-space-16);
+  background: var(--bk-bg-card);
+  border-bottom: 1px solid var(--bk-border);
+  font-family: var(--bk-font-ui); font-size: var(--bk-text-13);
+  color: var(--bk-ink);
+}
+.bk-topbar__name {
+  font-size: var(--bk-text-13); font-weight: var(--bk-weight-medium); color: var(--bk-ink);
+  max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.bk-topbar__spacer { flex: 1; }
+.bk-topbar__bell { position: relative; display: inline-flex; flex: none; }
+.bk-topbar__unread {
+  position: absolute; top: var(--bk-space-4); right: var(--bk-space-2);
+  width: var(--bk-space-8); height: var(--bk-space-8); border-radius: var(--bk-radius-full);
+  background: var(--bk-accent); box-shadow: 0 0 0 2px var(--bk-bg-card);
+}
+
+/* Menu — group / label / checkable item (compound API) */
+.bk-menu__group + .bk-menu__group {
+  margin-top: var(--bk-space-4);
+  padding-top: var(--bk-space-4);
+  border-top: 1px solid var(--bk-border);
+}
+.bk-menu__label {
+  padding: var(--bk-space-4) var(--bk-space-8) var(--bk-space-2);
+  color: var(--bk-ink-muted);
+  font-size: var(--bk-text-11);
+  font-weight: var(--bk-weight-medium);
+  letter-spacing: var(--bk-tracking-wide);
+  text-transform: uppercase;
+}
+.bk-menu-item__label { flex: 1; text-align: left; }
+.bk-menu-item:disabled { color: var(--bk-ink-disabled); cursor: default; }
+/* The check sits in the icon column so checkable and plain items stay aligned. */
+.bk-menu-item[aria-checked]::before {
+  content: "";
+  width: var(--bk-space-12);
+  flex: none;
+}
+.bk-menu-item[aria-checked="true"]::before {
+  content: "✓";
+  color: var(--bk-accent);
+}
+
+/* Topbar review pill — one shape, three tones (Figma 681:122 Review variants) */
+.bk-topbar__review {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bk-space-4);
+  height: var(--bk-space-24);
+  padding: 0 var(--bk-space-8);
+  border: none;
+  border-radius: var(--bk-radius-full);
+  font-size: var(--bk-text-12);
+  font-weight: var(--bk-weight-medium);
+  white-space: nowrap;
+}
+button.bk-topbar__review { cursor: pointer; }
+button.bk-topbar__review:focus-visible { outline: none; box-shadow: var(--bk-shadow-focus); }
+.bk-topbar__review--info { background: var(--bk-accent-subtle); color: var(--bk-accent-text); }
+.bk-topbar__review--warning { background: var(--bk-warning-tint); color: var(--bk-warning-text); }
+.bk-topbar__review--success { background: var(--bk-success-tint); color: var(--bk-success-text); }

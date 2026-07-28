@@ -9,7 +9,8 @@
  *
  *   - .bdc-panel  (used by AquibraStudio sidebar grid wrapper)
  *   - .bdc-canvas (used by AquibraStudio canvas wrapper)
- *   - .bdc-btn*   (used by Topbar primary/secondary/publish buttons)
+ *   - .bdc-btn*   (used by two Layers-panel buttons; the topbar that
+ *                  needed the primary/publish skins is gone)
  *
  * .bdc-lr* layer-row family moved to
  * editor/panels/layers/styles/layers-v2.css (canonical home).
@@ -43,5 +44,3 @@
 .bdc-btn.bdc-secondary:hover { background: var(--bk-bg-subtle); }
 .bdc-btn.bdc-primary { background: var(--bk-accent); color: var(--bk-accent-on); }
 .bdc-btn.bdc-primary:hover { background: var(--bk-accent-hover); }
-.bdc-btn.bdc-publish { background: var(--bk-accent); color: var(--bk-accent-on); font-weight: 500; }
-.bdc-btn.bdc-publish:hover { background: var(--bk-accent-hover); }

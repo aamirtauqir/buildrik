@@ -190,7 +190,7 @@ describe("run / stop", () => {
   });
 });
 
-describe("delete shortcut guard (shouldHandleShortcut)", () => {
+describe("shortcut guard (shouldHandleShortcut)", () => {
   it("suppresses the delete command when typing in an input", () => {
     const { composer } = makeCenter();
     const input = document.createElement("input");
@@ -220,14 +220,56 @@ describe("delete shortcut guard (shouldHandleShortcut)", () => {
     expect(composer.selection.getSelected).toHaveBeenCalled();
   });
 
-  it("does NOT suppress non-delete shortcuts inside inputs (guard is delete-only)", () => {
+  it("lets a modified shortcut through inside an input — ⌘S must save mid-sentence", () => {
     const { composer } = makeCenter();
     const input = document.createElement("input");
     document.body.appendChild(input);
 
-    input.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }),
-    );
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }));
+
+    expect(composer.history.undo).toHaveBeenCalled();
+  });
+
+  // The listener is global, capture-phase, and calls preventDefault(). With the
+  // arrow keys registered as bare shortcuts, that used to reach inside every
+  // menu, listbox and dialog and kill their own arrow-key handling — the widget
+  // saw defaultPrevented and stood down. Caught in the topbar site menu, where
+  // ArrowDown did nothing while the unregistered Home and End worked fine.
+  it.each([
+    ["menu", "menu"],
+    ["listbox", "listbox"],
+    ["combobox", "combobox"],
+    ["tree", "tree"],
+    ["dialog", "dialog"],
+    ["slider", "slider"],
+  ])("leaves the arrow keys to a %s that owns them", (_name, role) => {
+    const { composer } = makeCenter();
+    const widget = document.createElement("div");
+    widget.setAttribute("role", role);
+    const item = document.createElement("button");
+    widget.appendChild(item);
+    document.body.appendChild(widget);
+
+    item.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+
+    expect(composer.selection.getSelected).not.toHaveBeenCalled();
+  });
+
+  it("still runs arrow shortcuts on the canvas, where nothing else claims them", () => {
+    const { composer } = makeCenter();
+
+    document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+
+    expect(composer.selection.getSelected).toHaveBeenCalled();
+  });
+
+  it("a modified shortcut still fires from inside a widget — ⌘Z is not a menu key", () => {
+    const { composer } = makeCenter();
+    const widget = document.createElement("div");
+    widget.setAttribute("role", "dialog");
+    document.body.appendChild(widget);
+
+    widget.dispatchEvent(new KeyboardEvent("keydown", { key: "z", ctrlKey: true, bubbles: true }));
 
     expect(composer.history.undo).toHaveBeenCalled();
   });

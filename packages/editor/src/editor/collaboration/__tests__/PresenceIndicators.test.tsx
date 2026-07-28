@@ -1,165 +1,115 @@
+/**
+ * PresenceIndicators — the adapter's contract, not the organism's.
+ *
+ * What belongs here is the mapping: which users reach `Presence`, which
+ * connection state they arrive with, and who is marked as you. The stacking,
+ * overflow and pill copy are the organism's own tests (`ui/__tests__`).
+ *
+ * @license BSD-3-Clause
+ */
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { PresenceIndicators } from "../PresenceIndicators";
-import type { CollaborationUser } from "../../../shared/types/collaboration";
+import type { CollaborationUser } from "@/shared/types/collaboration";
 
-function makeUser(
-  id: string,
-  name: string,
-  extra: Partial<CollaborationUser> = {},
-): CollaborationUser {
+function makeUser(id: string, name: string, extra: Partial<CollaborationUser> = {}): CollaborationUser {
   return { id, name, color: "", lastActive: 0, ...extra };
 }
 
 describe("PresenceIndicators — MOCK_USERS fallback (pinned behavior)", () => {
   // PIN (2026-07-25, audit F2): the MOCK_USERS demo pair ("You" + "Ana") is
   // DEV-BUILD-ONLY (IS_DEV_BUILD). In any non-dev context — including this
-  // test env — a disconnected session with zero users renders NOTHING.
+  // test env — a disconnected session with zero users shows no collaborators.
   // Fake collaborators must never appear in production.
-  it("renders nothing when disconnected with no users (no fake collaborators)", () => {
-    const { container } = render(
-      <PresenceIndicators users={[]} currentUser={null} state="disconnected" />,
-    );
-
-    expect(screen.queryByText("You")).not.toBeInTheDocument();
-    expect(screen.queryByText("Ana")).not.toBeInTheDocument();
-    expect(container).toBeEmptyDOMElement();
+  it("invents no collaborators when disconnected with no users", () => {
+    render(<PresenceIndicators users={[]} currentUser={null} state="disconnected" />);
+    expect(screen.queryByRole("img")).toBeNull();
+    // Offline is still announced — an empty room is not the same as a lost connection.
+    expect(screen.getByText("Offline")).toBeInTheDocument();
   });
 
   it("does NOT fall back to mock users when disconnected but real users exist", () => {
     render(
-      <PresenceIndicators
-        users={[makeUser("u1", "Real Person")]}
-        currentUser={null}
-        state="disconnected"
-      />,
+      <PresenceIndicators users={[makeUser("u1", "Real Person")]} currentUser={null} state="disconnected" />,
     );
-
-    expect(screen.getByText("Real Person")).toBeInTheDocument();
-    expect(screen.queryByText("Ana")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Real Person" })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: "Ana" })).toBeNull();
   });
 
-  it("renders nothing when connected with zero users (no mock fallback)", () => {
-    const { container } = render(
-      <PresenceIndicators users={[]} currentUser={null} state="connected" />,
-    );
+  it("renders nothing at all when connected with zero users", () => {
+    const { container } = render(<PresenceIndicators users={[]} currentUser={null} state="connected" />);
     expect(container.firstChild).toBeNull();
   });
 });
 
-describe("PresenceIndicators — connecting/reconnecting spinner states", () => {
-  it("shows Connecting... and no avatars while connecting", () => {
-    render(
-      <PresenceIndicators
-        users={[makeUser("u1", "User One")]}
-        currentUser={null}
-        state="connecting"
-      />,
+describe("PresenceIndicators — connection states", () => {
+  it("connecting and reconnecting both read as Reconnecting", () => {
+    const { rerender } = render(
+      <PresenceIndicators users={[makeUser("u1", "User One")]} currentUser={null} state="connecting" />,
     );
-    expect(screen.getByText("Connecting...")).toBeInTheDocument();
-    expect(screen.queryByText("User One")).not.toBeInTheDocument();
+    expect(screen.getByText("Reconnecting…")).toBeInTheDocument();
+    rerender(<PresenceIndicators users={[]} currentUser={null} state="reconnecting" />);
+    expect(screen.getByText("Reconnecting…")).toBeInTheDocument();
   });
 
-  it("shows Reconnecting... while reconnecting", () => {
-    render(<PresenceIndicators users={[]} currentUser={null} state="reconnecting" />);
-    expect(screen.getByText("Reconnecting...")).toBeInTheDocument();
+  it("keeps the collaborators visible while reconnecting", () => {
+    // Hiding them mid-drop implies they left, which is a worse lie than a stale avatar.
+    render(<PresenceIndicators users={[makeUser("u1", "User One")]} currentUser={null} state="connecting" />);
+    expect(screen.getByRole("img", { name: "User One" })).toBeInTheDocument();
+  });
+
+  it("connected reports the head count", () => {
+    render(
+      <PresenceIndicators
+        users={[makeUser("u1", "A B"), makeUser("u2", "C D")]}
+        currentUser={null}
+        state="connected"
+      />,
+    );
+    expect(screen.getByText("2 editing")).toBeInTheDocument();
   });
 });
 
-describe("PresenceIndicators — avatar stacking + overflow", () => {
-  const five = [
-    makeUser("u1", "User One"),
-    makeUser("u2", "User Two"),
-    makeUser("u3", "User Three"),
-    makeUser("u4", "User Four"),
-    makeUser("u5", "User Five"),
-  ];
+describe("PresenceIndicators — who is shown", () => {
+  const five = ["One", "Two", "Three", "Four", "Five"].map((n, i) => makeUser(`u${i + 1}`, `User ${n}`));
 
-  it("shows at most maxVisible (default 3) avatars plus a +N overflow badge", () => {
+  it("passes maxVisible through to the overflow badge", () => {
     render(<PresenceIndicators users={five} currentUser={null} state="connected" />);
-
-    expect(screen.getByText("User One")).toBeInTheDocument();
-    expect(screen.getByText("User Two")).toBeInTheDocument();
-    expect(screen.getByText("User Three")).toBeInTheDocument();
-    expect(screen.queryByText("User Four")).not.toBeInTheDocument();
-    expect(screen.queryByText("User Five")).not.toBeInTheDocument();
-
-    expect(screen.getByText("+2")).toBeInTheDocument();
-    expect(screen.getByText("2 more collaborators")).toBeInTheDocument();
-  });
-
-  it("uses singular tooltip copy for a single overflow user", () => {
-    render(
-      <PresenceIndicators users={five.slice(0, 4)} currentUser={null} state="connected" />,
-    );
-    expect(screen.getByText("+1")).toBeInTheDocument();
-    expect(screen.getByText("1 more collaborator")).toBeInTheDocument();
-  });
-
-  it("renders no overflow badge when users fit within maxVisible", () => {
-    render(
-      <PresenceIndicators users={five.slice(0, 3)} currentUser={null} state="connected" />,
-    );
-    expect(screen.queryByText(/^\+\d+$/)).not.toBeInTheDocument();
+    expect(screen.getAllByRole("img")).toHaveLength(3);
+    expect(screen.getByLabelText("2 more")).toBeInTheDocument();
   });
 
   it("respects a custom maxVisible", () => {
     render(
-      <PresenceIndicators
-        users={five.slice(0, 3)}
-        currentUser={null}
-        state="connected"
-        maxVisible={1}
-      />,
+      <PresenceIndicators users={five.slice(0, 3)} currentUser={null} state="connected" maxVisible={1} />,
     );
-    expect(screen.getByText("User One")).toBeInTheDocument();
-    expect(screen.queryByText("User Two")).not.toBeInTheDocument();
-    expect(screen.getByText("+2")).toBeInTheDocument();
-  });
-});
-
-describe("PresenceIndicators — real users rendering", () => {
-  it("shows up to two initials per avatar", () => {
-    render(
-      <PresenceIndicators
-        users={[makeUser("u1", "Jane Doe"), makeUser("u2", "Ana Belle Carter")]}
-        currentUser={null}
-        state="connected"
-      />,
-    );
-    expect(screen.getByText("JD")).toBeInTheDocument();
-    // Three name parts still clamp to 2 initials.
-    expect(screen.getByText("AB")).toBeInTheDocument();
+    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(screen.getByLabelText("2 more")).toBeInTheDocument();
   });
 
-  it("renders an <img> when the user has an avatar url", () => {
-    render(
-      <PresenceIndicators
-        users={[makeUser("u1", "Pic User", { avatar: "https://example.com/a.png" })]}
-        currentUser={null}
-        state="connected"
-      />,
-    );
-    const img = screen.getByAltText("Pic User") as HTMLImageElement;
-    expect(img.tagName).toBe("IMG");
-    expect(img.src).toBe("https://example.com/a.png");
-  });
-
-  it("rings the avatar matching currentUser.id", () => {
+  it("marks the avatar matching currentUser.id as you", () => {
     const me = makeUser("me", "Me Self");
-    render(
+    render(<PresenceIndicators users={[me, makeUser("u2", "Other Person")]} currentUser={me} state="connected" />);
+    expect(screen.getByRole("img", { name: "Me Self" }).className).toContain("bk-avatar--self");
+    expect(screen.getByRole("img", { name: "Other Person" }).className).not.toContain("bk-avatar--self");
+  });
+
+  it("uses the profile image when there is one, initials when there is not", () => {
+    const { container } = render(
       <PresenceIndicators
-        users={[me, makeUser("u2", "Other Person")]}
-        currentUser={me}
+        users={[makeUser("u1", "Pic User", { avatar: "https://example.com/a.png" }), makeUser("u2", "Jane Doe")]}
+        currentUser={null}
         state="connected"
       />,
     );
-    expect(screen.getByText("MS").style.outlineOffset).toBe("2px");
-    expect(screen.getByText("OP").style.outlineOffset).not.toBe("2px");
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("https://example.com/a.png");
+    expect(screen.getByRole("img", { name: "Jane Doe" }).textContent).toBe("JD");
   });
 
-  it("prefers the user's provided color over the hashed palette color", () => {
+  it("colours avatars from the token ramp, never from a per-user hex", () => {
+    // The old component carried its own Tailwind palette and honoured
+    // `user.color`. One tone scale, derived from the id, is the whole point.
     render(
       <PresenceIndicators
         users={[makeUser("u1", "Colored User", { color: "rgb(1, 2, 3)" })]}
@@ -167,6 +117,8 @@ describe("PresenceIndicators — real users rendering", () => {
         state="connected"
       />,
     );
-    expect(screen.getByText("CU").style.backgroundColor).toBe("rgb(1, 2, 3)");
+    const avatar = screen.getByRole("img", { name: "Colored User" });
+    expect(avatar.style.backgroundColor).toBe("");
+    expect(avatar.className).toMatch(/bk-avatar--(neutral|blue|green|purple|amber)/);
   });
 });

@@ -40,12 +40,15 @@ export interface UseEditorShortcutsOptions {
   composer: Composer | null;
   modals: ShortcutModals;
   saveProject: () => void;
+  /** Opens a left-panel destination; the site menu prints these shortcuts. */
+  openLeftPanelToTab?: (primaryTab: string, subTab?: string) => void;
 }
 
 export function useEditorShortcuts({
   composer,
   modals,
   saveProject,
+  openLeftPanelToTab,
 }: UseEditorShortcutsOptions): void {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -71,6 +74,25 @@ export function useEditorShortcuts({
       if ((e.key === "c" || e.key === "C") && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
         e.preventDefault();
         composer?.emit("ui:comment-mode", {});
+        return;
+      }
+
+      // Site-menu destinations (Figma 642:3664 prints these on the rows, so
+      // they have to actually work — a shortcut shown and not honoured is worse
+      // than one not shown).
+      if ((e.ctrlKey || e.metaKey) && e.key === ",") {
+        e.preventDefault();
+        openLeftPanelToTab?.("settings");
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === "h" || e.key === "H")) {
+        e.preventDefault();
+        openLeftPanelToTab?.("history");
+        return;
+      }
+      if (e.shiftKey && (e.key === "A" || e.key === "a") && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        openLeftPanelToTab?.("components");
         return;
       }
 
@@ -112,5 +134,5 @@ export function useEditorShortcuts({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [saveProject, composer, modals]);
+  }, [saveProject, composer, modals, openLeftPanelToTab]);
 }

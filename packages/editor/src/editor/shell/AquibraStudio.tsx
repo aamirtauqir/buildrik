@@ -293,7 +293,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }, []);
 
   // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
-  useEditorShortcuts({ composer, modals, saveProject });
+  useEditorShortcuts({ composer, modals, saveProject, openLeftPanelToTab: state.openLeftPanelToTab });
 
   // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
   // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook
@@ -353,11 +353,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           lastSaved={state.saveState.lastSavedAt ? new Date(state.saveState.lastSavedAt) : null}
           lastSavedAt={state.saveState.lastSavedAt}
           previewLoading={modals.previewLoading}
-          exportLoading={modals.exportLoading}
           selectedElement={selectedElement}
-          showXRay={state.overlays.showXRay}
-          devMode={state.overlays.devMode}
-          showSuggestions={state.overlays.showSuggestions}
           studioSyncStatus={state.syncStatus}
           issues={state.issues}
           onInlinePreview={setPreviewHtml}
@@ -368,33 +364,19 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           // canvas selection itself, so no element context needs threading.
           onShowAI={() => composer.emit("ui:switch-tab", { tab: "ai" })}
           onShowExporter={modals.openExporter}
-          onToggleXRay={() => state.setShowXRay((v) => !v)}
-          onToggleDevMode={state.toggleDevMode}
-          onToggleSuggestions={() => state.setShowSuggestions((v) => !v)}
-          onAddPage={() => {
-            if (
-              composer &&
-              "elements" in composer &&
-              typeof composer.elements?.createPage === "function"
-            ) {
-              composer.elements.createPage("Home");
-            }
-          }}
           onOpenProjectSettings={modals.openProjectSettings}
           onOpenDesignSystem={() => state.openLeftPanelToTab("design")}
           onOpenPublish={() => state.openLeftPanelToTab("publish")}
           onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
+          onOpenPublishHistory={() => state.openLeftPanelToTab("settings", "publish-history")}
+          onOpenTemplates={() => state.openLeftPanelToTab("templates")}
+          onOpenComponents={() => state.openLeftPanelToTab("components")}
           onOpenIssues={() => setIssuesOpen(true)}
           onOpenShortcuts={modals.toggleShortcuts}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
           onVercelPublish={handleVercelPublish}
-          // Live-state is durable (a deployment is serving) = publishedUrl
-          // exists. uiState is transient job-state; a FAILED/CANCELLED
-          // *republish* of an already-live site must not flip the UI back to
-          // "draft" while the previous deployment is still up.
-          publishState={(publishJob.uiState === "published" || publishJob.publishedUrl) ? "published" : "draft"}
           publishLoading={publishJob.uiState === "publishing"}
           publishedUrl={publishJob.publishedUrl}
           addToast={addToast}

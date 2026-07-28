@@ -78,8 +78,7 @@
   .buildrick-spinner,
   .buildrick-skeleton-pulse,
   .buildrick-skeleton-wave,
-  .tmpl-progress__spinner,
-  .bd-topbar__status--saving > .bd-topbar__status-dot {
+  .tmpl-progress__spinner {
     animation: none !important;
   }
 }

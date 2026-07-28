@@ -1,22 +1,44 @@
 /**
- * Aquibra Studio - Header Wrapper Component
- * Wraps Topbar with business logic for preview, export, and download
+ * StudioHeader — the editor topbar's container.
+ *
+ * There used to be two files here: this wrapper and a 755-line `Topbar` that
+ * drew its own bar, its own buttons and its own pills, with a block of props
+ * commented "Legacy / StudioHeader wiring". The bar itself is now the `Topbar`
+ * component (Figma 681:122) and the rare surfaces are their own components
+ * (`SiteMenu`, `SendForReview`, `NotificationPanel`), so what is left here is
+ * the only thing a container should hold: translating editor state into what
+ * the design says about it.
+ *
+ * Every mapping below is a product decision, which is why they are here and not
+ * in the component:
+ *   · offline beats every other save state — a dropped connection must never
+ *     read as lost work;
+ *   · a blocked publish stays visible with its reason attached, never hidden;
+ *   · an invited editor sends for review instead of publishing.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Button, ToastInput } from "@/editor/ui";
+import { Topbar, type PublishState, type ReviewPill, type SaveState, type ToastInput } from "@/editor/ui";
 import type { Composer } from "../../engine";
 import { sanitizeHTMLForPreview } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
-import { PresenceIndicators } from "../collaboration";
-import { Users } from "lucide-react";
+import { toPresenceUsers } from "../collaboration/PresenceIndicators";
 import { getSiteIdFromUrl } from "../../services/BuildrikSyncProvider";
+import { fetchReviewStatus, type ReviewStatus } from "../../services/ReviewService";
 import { EVENTS } from "../../shared/constants";
 import { isFeatureEnabled } from "../../shared/utils/featureFlags";
+import { getEditorViewMode } from "../../shared/utils/editorViewMode";
+import { DASHBOARD_URL } from "@/shared/utils/runtimeEnv";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
-import { Topbar } from "./Topbar";
+import { useEditorRole } from "./hooks/useEditorRole";
+import { ColorModeIconCycle } from "@/editor/design-system/ui/ColorModeIconCycle";
+import { CommandPalette } from "./modals/CommandPalette";
+import { NotificationPanel, useUnreadCount } from "./NotificationPanel";
+import { SendForReview } from "./SendForReview";
+import { SiteMenu } from "./SiteMenu";
+import "./header.css";
 
 /** Selected element minimal info */
 export interface SelectedElementInfo {
@@ -40,16 +62,8 @@ export interface StudioHeaderProps {
   lastSavedAt?: number;
   /** Preview loading state */
   previewLoading: boolean;
-  /** Export loading state */
-  exportLoading: boolean;
   /** Currently selected element */
   selectedElement: SelectedElementInfo | null;
-  /** X-Ray mode enabled */
-  showXRay?: boolean;
-  /** Dev Mode enabled */
-  devMode?: boolean;
-  /** Show suggestions enabled */
-  showSuggestions?: boolean;
   /** Sync status */
   studioSyncStatus?: SyncStatus;
   /** Issues list */
@@ -59,14 +73,9 @@ export interface StudioHeaderProps {
   onSetPreviewLoading: (loading: boolean) => void;
   onSetExportLoading: (loading: boolean) => void;
 
-  // UI toggles
   /** ✨ Ask AI — opens the AITab rail panel (single consolidated AI surface). */
   onShowAI: () => void;
   onShowExporter: () => void;
-  onToggleXRay: () => void;
-  onToggleDevMode?: () => void;
-  onToggleSuggestions?: () => void;
-  onAddPage?: () => void;
 
   // Global settings menu handlers
   onOpenProjectSettings?: () => void;
@@ -75,8 +84,12 @@ export interface StudioHeaderProps {
   onOpenPlugins?: () => void;
   onOpenHistory?: () => void;
   onOpenIssues?: () => void;
-  /** Open Keyboard Shortcuts panel (wired to topbar Help button) */
+  /** Open Keyboard Shortcuts panel (site menu · `?`) */
   onOpenShortcuts?: () => void;
+  /** Site menu destinations from Figma 642:3664. */
+  onOpenPublishHistory?: () => void;
+  onOpenTemplates?: () => void;
+  onOpenComponents?: () => void;
 
   // Core actions
   onSave: () => void;
@@ -88,8 +101,6 @@ export interface StudioHeaderProps {
   onInlinePreview: (html: string) => void;
   /** Vercel publish flow — when present, replaces fallback handleExport on Publish click */
   onVercelPublish?: () => void;
-  /** Publish workflow state — drives PublishDropdown visuals */
-  publishState?: "draft" | "published";
   /** True while a publish job is in flight */
   publishLoading?: boolean;
   /** Live URL after successful publish */
@@ -99,11 +110,26 @@ export interface StudioHeaderProps {
   addToast: (input: ToastInput) => string;
 }
 
+/** Persistent review status → the topbar's one review pill. */
+const REVIEW_PILL: Record<ReviewStatus["state"], Omit<ReviewPill, "onClick"> | null> = {
+  none: null,
+  pending: { label: "In review", tone: "info" },
+  "opened-not-acted": { label: "Opened · no reply", tone: "info" },
+  "changes-requested": { label: "Changes requested", tone: "warning" },
+  approved: { label: "Approved", tone: "success" },
+  "approved-edited-since": { label: "Approved · edited since", tone: "warning" },
+};
 
-/**
- * StudioHeader Component
- * Wrapper around Topbar with preview, export, and download logic
- */
+/** "· 2d ago" suffix on the approved pill (S5.6 board 131:2). */
+function pillAgo(at?: string | Date | null): string {
+  if (!at) return "";
+  const diff = Math.floor((Date.now() - new Date(at).getTime()) / 1000);
+  if (!Number.isFinite(diff) || diff < 0) return "";
+  if (diff < 3600) return " · just now";
+  if (diff < 86400) return ` · ${Math.floor(diff / 3600)}h ago`;
+  return ` · ${Math.floor(diff / 86400)}d ago`;
+}
+
 export const StudioHeader: React.FC<StudioHeaderProps> = ({
   composer,
   saveStatus,
@@ -112,21 +138,13 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   lastSaved,
   lastSavedAt,
   previewLoading,
-  exportLoading,
   selectedElement,
-  showXRay = false,
-  devMode = false,
-  showSuggestions = true,
   studioSyncStatus = "connected",
   issues = [],
   onSetPreviewLoading,
   onSetExportLoading,
   onShowAI,
   onShowExporter,
-  onToggleXRay,
-  onToggleDevMode,
-  onToggleSuggestions,
-  onAddPage,
   onOpenProjectSettings,
   onOpenDesignSystem,
   onOpenPublish,
@@ -134,84 +152,83 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenHistory,
   onOpenIssues,
   onOpenShortcuts,
+  onOpenPublishHistory,
+  onOpenTemplates,
+  onOpenComponents,
   onSave,
   onExportHTML,
   onInlinePreview,
   onVercelPublish,
-  publishState,
   publishLoading,
   publishedUrl,
   addToast,
 }) => {
-  // Collaboration state
-  const {
-    users,
-    currentUser,
-    state: collaborationState,
-    isConnected,
-  } = useCollaboration(composer);
+  const { users, currentUser, state: collaborationState, isConnected } = useCollaboration(composer);
+  const isViewer = useEditorRole() === "VIEWER";
+  const viewMode = getEditorViewMode();
+  const publishEnabled = isFeatureEnabled("publish");
+  // Recovery Phase 0: collaboration is DEMO-ONLY (last-write-wins, 6 known P1s)
+  // and was the #1 reason the product read as "broken" in user testing. The flag
+  // gates the ENTIRE surface — when it is off, nothing collab shows, even if a
+  // session somehow connected.
+  const collabOn = isFeatureEnabled("collab");
 
-  // Gate: presence shows once a session is connected. When not connected we
-  // show a visible "Collaborate" button so the session is discoverable (it was
-  // only reachable via a hidden command-palette action before).
-  const hasTransport = isConnected;
+  const [cmdOpen, setCmdOpen] = React.useState(false);
+  const [notifOpen, setNotifOpen] = React.useState(false);
+  const headerRef = React.useRef<HTMLDivElement | null>(null);
+  const { count: unread, refresh: refreshUnread } = useUnreadCount();
 
-  const handleStartCollab = React.useCallback(() => {
-    const siteId = getSiteIdFromUrl();
-    if (!siteId || !composer) {
-      addToast?.({ title: "Save your site first", description: "Open a saved site to collaborate.", tone: "info" });
-      return;
-    }
-    void composer.collab.manager
-      .startSession(siteId, currentUser?.name ?? "Editor")
-      .catch(() =>
-        addToast?.({
-          title: "Couldn't start collaboration",
-          description: "Try again in a moment.",
-          tone: "error",
-        }),
-      );
-  }, [composer, currentUser, addToast]);
+  // Clicking away dismisses the notification panel. Scoped to the header so the
+  // bell's own toggle still works — otherwise it would close here and reopen there.
+  React.useEffect(() => {
+    if (!notifOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) setNotifOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    return () => document.removeEventListener("pointerdown", onDown, true);
+  }, [notifOpen]);
 
-  /**
-   * Handle preview - opens sanitized HTML in new window with sandboxed iframe
-   */
-  // In-shell preview (shell state 7, P5/F20): render the sanitized page below
-  // the topbar instead of a pop-up window (which could be blocked and lost the
-  // shell context).
-  const handlePreview = React.useCallback(() => {
-    if (previewLoading) return;
-    onSetPreviewLoading(true);
-    const rawHtml =
-      composer?.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
-    onInlinePreview(sanitizeHTMLForPreview(rawHtml));
-    setTimeout(() => onSetPreviewLoading(false), 300);
-  }, [composer, previewLoading, onSetPreviewLoading, onInlinePreview]);
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setCmdOpen((v) => !v);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
-  /**
-   * Handle export - show export modal
-   */
-  const handleExport = React.useCallback(() => {
-    onSetExportLoading(true);
-    onShowExporter();
-    setTimeout(() => onSetExportLoading(false), 500);
-  }, [onSetExportLoading, onShowExporter]);
+  // S5.2: the persistent review pill. Fails closed to "none" (flag off, no
+  // review), which renders nothing — safe for non-agency workspaces too.
+  const [reviewStatus, setReviewStatus] = React.useState<ReviewStatus>({
+    state: "none",
+    reviewerName: null,
+    at: null,
+  });
+  const refreshReview = React.useCallback(() => {
+    fetchReviewStatus().then(setReviewStatus);
+  }, []);
+  React.useEffect(() => {
+    refreshReview();
+  }, [refreshReview]);
 
-  // Compute lastSavedAt from lastSaved Date if not provided
-  const computedLastSavedAt = lastSavedAt ?? (lastSaved ? lastSaved.getTime() : undefined);
+  // Keeps "Saved · 2m ago" honest without a render on every tick.
+  const [, setTick] = React.useState(0);
+  React.useEffect(() => {
+    if (!lastSavedAt && !lastSaved) return;
+    const id = window.setInterval(() => setTick((t) => t + 1), 30_000);
+    return () => window.clearInterval(id);
+  }, [lastSavedAt, lastSaved]);
 
-  // Redesign P5: real topbar breadcrumb. Read the live site name + active page
-  // name from the composer (populated by loadProject → importProject) instead of
-  // the "My project › Home" placeholders. Reactive to project load + page switch.
-  // selectedElement is a dep so a page rename committed via the inspector re-reads.
-  const [crumb, setCrumb] = React.useState<{ projectName?: string; pageName?: string }>({});
+  // Redesign P5: the live site name, read from the composer rather than a
+  // "My project" placeholder. Reactive to project load and page switch;
+  // selectedElement is a dep so an inspector rename re-reads.
+  const [siteName, setSiteName] = React.useState("Untitled site");
   React.useEffect(() => {
     if (!composer) return;
-    const read = () =>
-      setCrumb({
-        projectName: composer.getProjectMetadata?.()?.name || undefined,
-        pageName: composer.elements?.getActivePage?.()?.name || undefined,
-      });
+    const read = () => setSiteName(composer.getProjectMetadata?.()?.name || "Untitled site");
     read();
     composer.on(EVENTS.PROJECT_LOADED, read);
     composer.on(EVENTS.PAGE_CHANGED, read);
@@ -221,66 +238,163 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     };
   }, [composer, selectedElement]);
 
-  return (
-    <Topbar
-      composer={composer}
-      projectName={crumb.projectName}
-      pageName={crumb.pageName}
-      saveStatus={saveStatus}
-      isOffline={isOffline}
-      isDirty={isDirty}
-      lastSavedAt={computedLastSavedAt}
-      previewLoading={previewLoading}
-      exportLoading={exportLoading}
-      selectedElement={selectedElement}
-      showXRay={showXRay}
-      devMode={devMode}
-      showSuggestions={showSuggestions}
-      syncStatus={studioSyncStatus}
-      issues={issues}
-      onAddPage={onAddPage}
-      onPreview={handlePreview}
-      onPublish={onVercelPublish ?? onOpenPublish ?? handleExport}
-      publishState={publishState}
-      publishLoading={publishLoading}
-      publishedUrl={publishedUrl}
-      onExportHTML={onExportHTML}
-      onSave={onSave}
-      onToggleXRay={onToggleXRay}
-      onToggleDevMode={onToggleDevMode}
-      onToggleSuggestions={onToggleSuggestions}
-      onOpenProjectSettings={onOpenProjectSettings}
-      onOpenDesignSystem={onOpenDesignSystem}
-      onOpenPublish={onOpenPublish}
-      onOpenPlugins={onOpenPlugins}
-      onOpenHistory={onOpenHistory}
-      onOpenAI={onShowAI}
-      onOpenIssues={onOpenIssues}
-      onHelp={onOpenShortcuts}
-      collaborationSlot={
-        // Recovery Phase 0: collaboration is DEMO-ONLY (last-write-wins, 6 known
-        // P1s) and is the #1 reason the product read as "broken" in user testing.
-        // Gate the ENTIRE collab slot behind VITE_FEATURE_COLLAB — when the flag is
-        // off, NOTHING collab shows, even if a session somehow connected (the old
-        // code leaked presence on hasTransport regardless of the flag).
-        isFeatureEnabled("collab") ? (
-          hasTransport ? (
-            <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
-          ) : (
-            <Button
-              kind="ghost"
-              size="sm"
-              onClick={handleStartCollab}
-              aria-label="Start collaboration session"
-              title="Start a real-time collaboration session (beta)"
-            >
-              <Users size={14} />
-              <span style={{ marginLeft: 4 }}>Collaborate</span>
-            </Button>
-          )
-        ) : null
+  const handlePreview = React.useCallback(() => {
+    if (previewLoading) return;
+    onSetPreviewLoading(true);
+    const rawHtml = composer?.exportHTML().combined || "<!DOCTYPE html><html><body>No content</body></html>";
+    onInlinePreview(sanitizeHTMLForPreview(rawHtml));
+    setTimeout(() => onSetPreviewLoading(false), 300);
+  }, [composer, previewLoading, onSetPreviewLoading, onInlinePreview]);
+
+  const handleExport = React.useCallback(() => {
+    onSetExportLoading(true);
+    onShowExporter();
+    setTimeout(() => onSetExportLoading(false), 500);
+  }, [onSetExportLoading, onShowExporter]);
+
+  const exitToDashboard = React.useCallback(() => {
+    window.location.assign(`${DASHBOARD_URL}/dashboard/projects`);
+  }, []);
+
+  const copyLiveUrl = React.useCallback(() => {
+    if (!publishedUrl) return;
+    // navigator.clipboard is absent on insecure origins, and writeText can be
+    // refused. Either way the user hears about it rather than pressing again.
+    const done = navigator.clipboard?.writeText(publishedUrl);
+    if (!done) {
+      addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" });
+      return;
+    }
+    void done.then(
+      () => addToast({ title: "Live URL copied", description: publishedUrl, tone: "success" }),
+      () => addToast({ title: "Couldn't copy", description: publishedUrl, tone: "error" }),
+    );
+  }, [publishedUrl, addToast]);
+
+  const startCollab = React.useCallback(() => {
+    const siteId = getSiteIdFromUrl();
+    if (!siteId || !composer) {
+      addToast?.({ title: "Save your site first", description: "Open a saved site to collaborate.", tone: "info" });
+      return;
+    }
+    void composer.collab.manager
+      .startSession(siteId, currentUser?.name ?? "Editor")
+      .catch(() =>
+        addToast?.({ title: "Couldn't start collaboration", description: "Try again in a moment.", tone: "error" }),
+      );
+  }, [composer, currentUser, addToast]);
+
+  // 60-save-states: "offline" is the browser being offline OR the dashboard sync
+  // being disconnected. Either way edits are queued locally, so it outranks
+  // every other state — a queued edit is not a failed one.
+  const offline = Boolean(isOffline) || studioSyncStatus === "offline";
+  const save: SaveState = offline
+    ? "offline"
+    : saveStatus === "saving"
+      ? "saving"
+      : saveStatus === "error"
+        ? "error"
+        : isDirty
+          ? "unsaved"
+          : "saved";
+
+  const errorCount = issues.filter((i) => i.type === "error").length;
+  const warnCount = issues.filter((i) => i.type === "warning").length;
+  const issueCount = errorCount + warnCount;
+  // Errors decide the word and the colour: one error among nine warnings is
+  // still the thing that blocks a publish.
+  const issueNoun = errorCount > 0 ? "error" : "warning";
+  const issueLabel = `${issueNoun}${issueCount === 1 ? "" : "s"}`;
+
+  // A blocked publish is shown disabled with its reason, never hidden — the
+  // user must be able to find out why (P6 permissions boards).
+  const publishBlockedReason = !publishEnabled
+    ? "Publishing isn't switched on for this workspace yet"
+    : isViewer
+      ? "Viewers can't publish — ask an editor"
+      : offline
+        ? "Can't publish while offline"
+        : undefined;
+  const publish: PublishState = publishBlockedReason ? "disabled" : errorCount > 0 ? "anyway" : "ready";
+
+  const pill = REVIEW_PILL[reviewStatus.state];
+  const review: ReviewPill | null = pill
+    ? {
+        ...pill,
+        label:
+          reviewStatus.state === "approved" && reviewStatus.reviewerName
+            ? `Approved by ${reviewStatus.reviewerName}${pillAgo(reviewStatus.at)}`
+            : pill.label,
+        title: reviewStatus.reviewerName ? `${pill.label} — ${reviewStatus.reviewerName}` : undefined,
       }
-    />
+    : null;
+
+  return (
+    <div className="bk-header" ref={headerRef}>
+      <Topbar
+        siteName={siteName}
+        onExit={exitToDashboard}
+        save={save}
+        savedAt={lastSavedAt ?? lastSaved?.getTime()}
+        onSave={onSave}
+        review={review}
+        presence={
+          // A reconnecting session still has collaborators in it — hiding them
+          // mid-drop reads as "everyone left", which is the wrong alarm.
+          collabOn && collaborationState !== "disconnected"
+            ? {
+                users: toPresenceUsers(users, currentUser, collaborationState),
+                connection: collaborationState === "connected" ? "live" : "reconnecting",
+              }
+            : null
+        }
+        unreadCount={unread}
+        onOpenNotifications={() => setNotifOpen((v) => !v)}
+        publish={publish}
+        publishBusy={publishLoading}
+        publishBlockedReason={publishBlockedReason}
+        onPublish={onVercelPublish ?? onOpenPublish ?? handleExport}
+        action={
+          viewMode.clientView ? (
+            <SendForReview
+              composer={composer}
+              disabledReason={isViewer ? "Viewers can't send for review — ask an editor" : undefined}
+              onSent={refreshReview}
+            />
+          ) : undefined
+        }
+        menu={
+          <SiteMenu
+            onOpenSiteSettings={onOpenProjectSettings}
+            onOpenHistory={onOpenHistory}
+            onOpenPublishHistory={onOpenPublishHistory}
+            onExportCode={onExportHTML}
+            onOpenTemplates={onOpenTemplates}
+            onOpenComponents={onOpenComponents}
+            onOpenShortcuts={onOpenShortcuts}
+            onExit={exitToDashboard}
+            onPreview={handlePreview}
+            issueCount={issueCount}
+            onOpenIssues={onOpenIssues}
+            onAskAI={viewMode.fourToolRail ? onShowAI : undefined}
+            onStartCollaboration={collabOn && !isConnected ? startCollab : undefined}
+            onOpenDesignSystem={onOpenDesignSystem}
+            onOpenPlugins={onOpenPlugins}
+            publishedUrl={publishedUrl}
+            onCopyLiveUrl={copyLiveUrl}
+            clientView={viewMode.clientView}
+          />
+        }
+      />
+
+      {notifOpen ? (
+        <div className="bk-header__dropdown">
+          <NotificationPanel onClose={() => setNotifOpen(false)} onRead={refreshUnread} />
+        </div>
+      ) : null}
+
+      {cmdOpen ? <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} /> : null}
+    </div>
   );
 };
 

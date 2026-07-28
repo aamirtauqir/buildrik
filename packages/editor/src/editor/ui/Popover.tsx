@@ -61,49 +61,86 @@ export function Popover({ open, onClose, trigger, placement = "bottom", children
   );
 }
 
-export interface MenuItemDef {
-  id: string;
-  label: string;
-  kbd?: string;
-  disabled?: boolean;
-  destructive?: boolean;
-  icon?: React.ReactNode;
-}
-
-export interface MenuProps {
-  items: MenuItemDef[];
-  onSelect: (item: MenuItemDef) => void;
+/**
+ * Menu — compound, because a real menu is not a flat array.
+ *
+ * The array form could not express groups, labels, or a checkable item, so
+ * every caller that needed one of those hand-rolled its own list. Children
+ * compose instead: Menu > MenuGroup > MenuLabel + MenuItem.
+ *
+ * Roving focus is computed from the DOM rather than from child indices. The
+ * items may be nested inside groups, wrapped by callers, or conditionally
+ * rendered — an index over `children` is wrong the moment any of that happens.
+ *
+ * Opening the menu moves focus to the first item, per the WAI-ARIA menu-button
+ * pattern. Without it the arrow keys land on the trigger, which is not in the
+ * menu, so a keyboard user opens the menu and then cannot get into it.
+ */
+export interface MenuProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "role"> {
   label?: string;
+  /** Set false when the menu is always on screen rather than opened. */
+  autoFocus?: boolean;
 }
 
-/** Roving focus: one tab stop, arrows move within, Home/End jump. */
-export function Menu({ items, onSelect, label = "Actions" }: MenuProps) {
-  const enabled = items.filter((i) => !i.disabled);
-  const [active, setActive] = React.useState(0);
-  const refs = React.useRef<Array<HTMLButtonElement | null>>([]);
+const ITEM_SELECTOR = '[role="menuitem"],[role="menuitemcheckbox"]';
+
+export function Menu({ label = "Actions", autoFocus = true, className, children, onKeyDown, ...rest }: MenuProps) {
+  const root = React.useRef<HTMLDivElement | null>(null);
+
+  const items = () => {
+    const all = Array.from(root.current?.querySelectorAll<HTMLElement>(ITEM_SELECTOR) ?? []);
+    return all.filter((el) => el.getAttribute("aria-disabled") !== "true" && !(el as HTMLButtonElement).disabled);
+  };
+
+  /** One tab stop: the focused item, or the first enabled one. */
+  const syncTabStops = React.useCallback((focus?: HTMLElement) => {
+    const all = Array.from(root.current?.querySelectorAll<HTMLElement>(ITEM_SELECTOR) ?? []);
+    const enabled = all.filter((el) => el.getAttribute("aria-disabled") !== "true" && !(el as HTMLButtonElement).disabled);
+    const stop = focus ?? enabled[0];
+    for (const el of all) el.tabIndex = el === stop ? 0 : -1;
+  }, []);
 
   React.useEffect(() => {
-    refs.current[active]?.focus();
-  }, [active]);
+    if (!autoFocus) return;
+    items()[0]?.focus();
+    // Mount only: re-focusing on every render would fight the user's arrow keys.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    // A parent re-render must not move the tab stop off whatever the user is
+    // standing on, so the focused item wins when it is one of ours.
+    const active = document.activeElement;
+    const inside = active instanceof HTMLElement && root.current?.contains(active) ? active : undefined;
+    syncTabStops(inside);
+  });
 
   const move = (dir: 1 | -1) => {
-    if (enabled.length === 0) return;
-    setActive((i) => {
-      let next = i;
-      for (let n = 0; n < items.length; n++) {
-        next = (next + dir + items.length) % items.length;
-        if (!items[next].disabled) break;
-      }
-      return next;
-    });
+    const list = items();
+    if (list.length === 0) return;
+    const at = list.indexOf(document.activeElement as HTMLElement);
+    const next = list[(at + dir + list.length) % list.length];
+    next.focus();
+    syncTabStops(next);
+  };
+
+  const jump = (to: "first" | "last") => {
+    const list = items();
+    const el = to === "first" ? list[0] : list[list.length - 1];
+    if (!el) return;
+    el.focus();
+    syncTabStops(el);
   };
 
   return (
     <div
-      className="bk-menu"
+      ref={root}
+      className={["bk-menu", className].filter(Boolean).join(" ")}
       role="menu"
       aria-label={label}
       onKeyDown={(e) => {
+        onKeyDown?.(e);
+        if (e.defaultPrevented) return;
         if (e.key === "ArrowDown") {
           e.preventDefault();
           move(1);
@@ -112,31 +149,59 @@ export function Menu({ items, onSelect, label = "Actions" }: MenuProps) {
           move(-1);
         } else if (e.key === "Home") {
           e.preventDefault();
-          setActive(0);
+          jump("first");
         } else if (e.key === "End") {
           e.preventDefault();
-          setActive(items.length - 1);
+          jump("last");
         }
       }}
+      {...rest}
     >
-      {items.map((item, i) => (
-        <button
-          key={item.id}
-          ref={(el) => {
-            refs.current[i] = el;
-          }}
-          type="button"
-          role="menuitem"
-          className={["bk-menu-item", item.destructive && "bk-menu-item--destructive"].filter(Boolean).join(" ")}
-          aria-disabled={item.disabled || undefined}
-          tabIndex={i === active ? 0 : -1}
-          onClick={() => !item.disabled && onSelect(item)}
-        >
-          {item.icon ? <span className="bk-row__icon">{item.icon}</span> : null}
-          <span>{item.label}</span>
-          {item.kbd ? <span className="bk-menu-item__kbd">{item.kbd}</span> : null}
-        </button>
-      ))}
+      {children}
+    </div>
+  );
+}
+
+export interface MenuItemProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "role"> {
+  icon?: React.ReactNode;
+  kbd?: string;
+  /** Present = checkable item. `true` renders it checked. */
+  selected?: boolean;
+  /** Destructive action — red, and never the resting tab stop by accident. */
+  danger?: boolean;
+}
+
+export function MenuItem({ icon, kbd, selected, danger, disabled, className, children, ...rest }: MenuItemProps) {
+  return (
+    <button
+      type="button"
+      role={selected === undefined ? "menuitem" : "menuitemcheckbox"}
+      aria-checked={selected === undefined ? undefined : selected}
+      className={["bk-menu-item", danger && "bk-menu-item--destructive", className].filter(Boolean).join(" ")}
+      disabled={disabled}
+      aria-disabled={disabled || undefined}
+      tabIndex={-1}
+      {...rest}
+    >
+      {icon ? <span className="bk-row__icon">{icon}</span> : null}
+      <span className="bk-menu-item__label">{children}</span>
+      {kbd ? <span className="bk-menu-item__kbd">{kbd}</span> : null}
+    </button>
+  );
+}
+
+export function MenuGroup({ className, children, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div role="group" className={["bk-menu__group", className].filter(Boolean).join(" ")} {...rest}>
+      {children}
+    </div>
+  );
+}
+
+export function MenuLabel({ className, children, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={["bk-menu__label", className].filter(Boolean).join(" ")} {...rest}>
+      {children}
     </div>
   );
 }

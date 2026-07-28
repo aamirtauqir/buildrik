@@ -6,6 +6,10 @@
  * under the 4.5:1 body-text floor, on an 11px pill. The full-strength hue is a
  * border/icon weight; the `-text` step is the one that survives on a tint.
  *
+ * Repointed to `tokens.generated.css` when the hand-written `design-system/`
+ * files were replaced by the Figma-generated token file. The rule outlives the
+ * palette — it caught the original pairing and it re-checks every new one.
+ *
  * This is the small version of the contrast rule the conformance plan puts in
  * CI: resolve the real token values, flatten alpha over the page background,
  * compute the ratio. A string-match test would not have caught the original
@@ -17,15 +21,14 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const DS = resolve(__dirname, "../design-system");
-const COLOR = readFileSync(resolve(DS, "color.css"), "utf8");
+const COLOR = readFileSync(resolve(__dirname, "../tokens.generated.css"), "utf8");
 const BADGE = readFileSync(resolve(__dirname, "../components/atoms/badge.css"), "utf8");
 
 /** Page background every chrome tint composites over. */
 const PAGE = { r: 1, g: 1, b: 1 };
 
 function token(name: string): string | null {
-  const m = COLOR.match(new RegExp(`--buildrick-${name}:\\s*([^;]+);`));
+  const m = COLOR.match(new RegExp(`--bk-${name}:\\s*([^;]+);`));
   return m ? m[1].trim() : null;
 }
 function parse(value: string): { r: number; g: number; b: number; a: number } | null {
@@ -58,11 +61,10 @@ function contrast(bg: string, fg: string): number {
 
 // bg token → text token, as badge.css pairs them
 const PAIRS: Array<[string, string, string]> = [
-  ["published", "success-light", "success-text"],
-  ["issues", "error-light", "error-text"],
-  ["unsaved", "warning-light", "warning-text"],
-  ["draft", "layer-muted-alpha", "text-secondary"],
-  ["syncing", "accent-alpha-08", "accent-text"],
+  ["published", "success-tint", "success-text"],
+  ["issues", "error-tint", "error-text"],
+  ["unsaved", "warning-tint", "warning-text"],
+  ["draft", "bg-subtle", "ink-soft"],
   ["new", "accent-tint", "accent-text"],
   ["count", "accent-tint", "accent-text"],
 ];
@@ -75,17 +77,16 @@ describe("badge contrast", () => {
   it("never pairs badge TEXT with a full-strength semantic hue", () => {
     // the border keeps full strength; only `color:` must use the -text step.
     // Anchored, because `border-color:` also ends in `color:`.
-    const colours = [...BADGE.matchAll(/(?:^|[;{])\s*color:\s*var\(--buildrick-([a-z0-9-]+)\)/gm)]
+    const colours = [...BADGE.matchAll(/(?:^|[;{])\s*color:\s*var\(--bk-([a-z0-9-]+)\)/gm)]
       .map((m) => m[1])
-      .filter((t) => !t.startsWith("text-") && t !== "text-on-accent");
+      .filter((t) => !t.startsWith("ink") && t !== "accent-on");
     const banned = colours.filter((t) => ["success", "error", "warning", "accent"].includes(t));
     expect(banned).toEqual([]);
   });
 
   it("every token badge.css references is defined", () => {
-    const used = new Set([...BADGE.matchAll(/var\(--buildrick-([a-z0-9-]+)\)/g)].map((m) => m[1]));
-    const undef = [...used].filter((t) => !new RegExp(`--buildrick-${t}:`).test(COLOR)
-      && !/space|font|radius|text-(xs|2xs)/.test(t));
+    const used = new Set([...BADGE.matchAll(/var\(--bk-([a-z0-9-]+)\)/g)].map((m) => m[1]));
+    const undef = [...used].filter((t) => !new RegExp(`--bk-${t}:`).test(COLOR));
     expect(undef).toEqual([]);
   });
 });

@@ -7,9 +7,14 @@
 import React from "react";
 
 export type AvatarSize = "sm" | "md";
+/** Tones come from the Flowbite ramps in the token file — never a raw hex. */
+export type AvatarTone = "neutral" | "blue" | "green" | "purple" | "amber";
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> {
   size?: AvatarSize;
+  tone?: AvatarTone;
+  /** Draws the accent ring that marks "this one is you". */
+  self?: boolean;
   name: string;
   src?: string;
 }
@@ -19,10 +24,14 @@ function initials(name: string): string {
   return parts.map((p) => p[0] ?? "").join("").toUpperCase();
 }
 
-export function Avatar({ size = "sm", name, src, className, ...rest }: AvatarProps) {
+export function Avatar({ size = "sm", tone = "neutral", self, name, src, className, ...rest }: AvatarProps) {
   return (
     <span
-      className={["bk-avatar", `bk-avatar--${size}`, className].filter(Boolean).join(" ")}
+      className={["bk-avatar", `bk-avatar--${size}`, `bk-avatar--${tone}`, self && "bk-avatar--self", className]
+        .filter(Boolean)
+        .join(" ")}
+      role="img"
+      aria-label={name}
       title={name}
       {...rest}
     >

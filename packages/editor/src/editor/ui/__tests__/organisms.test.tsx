@@ -173,7 +173,7 @@ describe("Shell frames", () => {
   it("Topbar and Footer are banner and contentinfo landmarks", () => {
     render(
       <>
-        <Topbar>top</Topbar>
+        <Topbar siteName="Bella Cucina" save="saved" />
         <Footer>bottom</Footer>
       </>,
     );

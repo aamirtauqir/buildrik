@@ -103,6 +103,5 @@
 @import "./components/organisms/pages-drawer.css" layer(components);
 @import "./components/organisms/rail.css" layer(components);
 @import "./components/organisms/templates-drawer.css" layer(components);
-@import "./components/organisms/topbar.css" layer(components);
 
 @import "./legacy-components.css";

@@ -29,7 +29,3 @@
  * Do not fold this into the generated file. */
 @import "./design.css";
 
-/* Forward-looking override layer for vibcoder canonical bd-topbar.
- * See docs/superpowers/specs/2026-04-29-vibcoder-bd-topbar-evolution.md.
- * Sunset on next vibcoder:vendor after upstream PR lands. */
-@import "./bd-topbar-overrides.css";

@@ -30,7 +30,7 @@ describe("vibcoder Checkbox wrapper", () => {
   });
 
   it("renders bd-checkbox__label span when label prop is provided", () => {
-    const { container } = render(<label className="bk-stack bk-stack--row bk-stack--sm"><Checkbox /><span>Agree</span></label>);
+    const { container } = render(<Checkbox label="Agree" />);
     const span = container.querySelector(".bd-checkbox__label")!;
     expect(span).toBeTruthy();
     expect(span.textContent).toBe("Agree");

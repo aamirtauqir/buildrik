@@ -17,7 +17,7 @@ export { Radio, type RadioProps } from "./Radio";
 export { Toggle, type ToggleProps } from "./Toggle";
 export { Badge, type BadgeProps, type BadgeKind } from "./Badge";
 export { StatusDot, type StatusDotProps, type StatusDotState } from "./StatusDot";
-export { Avatar, type AvatarProps, type AvatarSize } from "./Avatar";
+export { Avatar, type AvatarProps, type AvatarSize, type AvatarTone } from "./Avatar";
 export { Textarea, type TextareaProps } from "./Textarea";
 
 /* ── Molecules ──────────────────────────────────────────────────────────── */
@@ -47,7 +47,6 @@ export { Modal, type ModalProps, type ModalKind } from "./Modal";
 export { Drawer, type DrawerProps, type DrawerLayout } from "./Drawer";
 export { RightPanel, type RightPanelProps } from "./RightPanel";
 export { Rail, RailItem, RailSpacer, type RailProps, type RailItemProps } from "./Rail";
-export { Topbar, TopbarSpacer, type TopbarProps } from "./Topbar";
 export { Footer, FooterSpacer, type FooterProps } from "./Footer";
 export { CommandPalette, type CommandPaletteProps, type Command } from "./CommandPalette";
 
@@ -72,4 +71,9 @@ export {
 } from "./ModalParts";
 export { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent, TooltipPortal } from "./TooltipParts";
 export { Cluster, Label, HelperText, FormField, Tag, type ClusterProps, type LabelProps, type HelperTextProps, type FormFieldProps, type TagProps } from "./Field";
-export { Popover, Menu, MenuSeparator, type PopoverProps, type PopoverPlacement, type MenuProps, type MenuItemDef } from "./Popover";
+export { Popover, Menu, MenuItem, MenuGroup, MenuLabel, MenuSeparator } from "./Popover";
+export type { PopoverProps, PopoverPlacement, MenuProps, MenuItemProps } from "./Popover";
+export { SaveStatus, type SaveStatusProps, type SaveState } from "./SaveStatus";
+export { Presence, toneFor, type PresenceProps, type PresenceUser, type ConnectionState } from "./Presence";
+export { Topbar, SiteMenuIcon } from "./Topbar";
+export type { TopbarProps, PublishState, ReviewPill, ReviewTone } from "./Topbar";

@@ -315,20 +315,6 @@ export type {
   ColorPickerSwatchProps,
   ColorPickerInputProps,
 } from "./ColorPicker";
-export {
-  Topbar,
-  TopbarGroup,
-  TopbarBrand,
-  TopbarStatus,
-  TopbarStatusDot,
-} from "./Topbar";
-export type {
-  TopbarProps,
-  TopbarGroupProps,
-  TopbarBrandProps,
-  TopbarStatusProps,
-  TopbarStatusDotProps,
-} from "./Topbar";
 export { Footer, FooterGroup, FooterChip, FooterDot } from "./Footer";
 export type {
   FooterProps,

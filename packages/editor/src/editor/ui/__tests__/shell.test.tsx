@@ -9,7 +9,7 @@ import { EditorShell, Topbar, Footer, Rail, RailItem, Drawer, RightPanel } from 
 function shell(extra: Partial<React.ComponentProps<typeof EditorShell>> = {}) {
   return render(
     <EditorShell
-      topbar={<Topbar>Bella Cucina</Topbar>}
+      topbar={<Topbar siteName="Bella Cucina" save="saved" />}
       rail={
         <Rail>
           <RailItem icon="+" label="Insert" active />
