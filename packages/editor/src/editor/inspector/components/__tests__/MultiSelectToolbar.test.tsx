@@ -1,4 +1,3 @@
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * MultiSelectToolbar — alignment / distribution gating (align needs 2+,
  * distribute needs 3+), handler wiring, and the batch panel's Mixed labelling.
@@ -17,9 +16,7 @@ function renderToolbar(
   composer: unknown = makeMockComposer(),
 ) {
   return render(
-    <TooltipProvider>
-      <MultiSelectToolbar selectedIds={selectedIds} composer={composer as never} />
-    </TooltipProvider>
+    <MultiSelectToolbar selectedIds={selectedIds} composer={composer as never} />
   );
 }
 

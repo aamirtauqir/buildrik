@@ -19,7 +19,6 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -54,14 +53,12 @@ function pill(): HTMLElement {
 
 function render() {
   rtlRender(
-    <TooltipProvider>
-      <CanvasFooterToolbar
-        overlays={ALL_OFF}
-        zoom={100}
-        onOverlayChange={vi.fn()}
-        onZoomChange={vi.fn()}
-      />
-    </TooltipProvider>,
+    <CanvasFooterToolbar
+      overlays={ALL_OFF}
+      zoom={100}
+      onOverlayChange={vi.fn()}
+      onZoomChange={vi.fn()}
+    />,
   );
 }
 

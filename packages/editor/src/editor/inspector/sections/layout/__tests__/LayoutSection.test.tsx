@@ -1,4 +1,3 @@
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * LayoutSection (index) — collapsed preview string + advanced disclosure of the
  * Overflow / Visibility groups behind the MoreSettingsToggle.
@@ -15,9 +14,7 @@ type Props = React.ComponentProps<typeof LayoutSection>;
 function renderLayout(props: Partial<Props> = {}) {
   const onChange = vi.fn();
   const utils = render(
-    <TooltipProvider>
-      <LayoutSection styles={{}} onChange={onChange} isOpen={true} {...props} />
-    </TooltipProvider>
+    <LayoutSection styles={{}} onChange={onChange} isOpen={true} {...props} />
   );
   return { onChange, ...utils };
 }

@@ -1,7 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Button } from "@/editor/shared/vibcoder/Button";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 import { Stack } from "@/editor/shared/vibcoder/Stack";
 import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 import { Label } from "@/editor/shared/vibcoder/Label";
@@ -16,12 +14,7 @@ import { HelperText } from "@/editor/shared/vibcoder/HelperText";
  */
 
 import * as React from "react";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
+import { Button, Tooltip } from "@/editor/ui";
 import { generateContent } from "@/shared/utils/openai";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
@@ -95,7 +88,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             <strong style={{ color: "var(--bk-ink)" }}>noIndex is ON</strong> — search engines won&apos;t index this page regardless of your
             SEO settings.
             <Button
-              variant="ghost"
+              kind="ghost"
               size="sm"
               type="button"
               style={{ marginLeft: 6, padding: "2px 6px", color: "var(--bk-accent)", font: "500 11.5px var(--bk-font-ui)" }}
@@ -155,13 +148,12 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         </Cluster>
         {s.seoTitle.length < 10 && (
           <Button
-            variant="ghost"
+            kind="ghost"
             size="sm"
             type="button"
             style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "var(--bk-space-4)", padding: "3px var(--bk-space-8)", border: "1px solid var(--bk-accent)", borderRadius: "var(--bk-radius-full)", background: "var(--bk-accent-subtle)", color: "var(--bk-accent)", font: "500 10.5px var(--bk-font-ui)", transition: "background 100ms" }}
             aria-label="Suggest SEO title"
-            busy={aiBusy}
-            disabled={aiBusy}
+            loading={aiBusy}
             onClick={suggestTitle}
           >
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -185,30 +177,20 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
           <Cluster align="center" gap="xs">
             <Label htmlFor="seo-desc">Meta Description</Label>
-            <Tooltip delayDuration={200}>
-              <TooltipTrigger asChild>
-                <IconButton
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  aria-label="About Meta Description"
-                  style={{ padding: 2, color: "var(--bk-ink-muted)", display: "inline-flex", lineHeight: 0 }}
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                    <line x1="12" y1="17" x2="12.01" y2="17" />
-                  </svg>
-                </IconButton>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent side="right">
-                  <span style={{ display: "block", whiteSpace: "normal", maxWidth: 244 }}>
-                    A short summary of your page shown in Google search results (keep under 160
-                    characters)
-                  </span>
-                </TooltipContent>
-              </TooltipPortal>
+            <Tooltip label="A short summary of your page shown in Google search results (keep under 160 characters)">
+              <Button
+                kind="ghost"
+                size="sm"
+                type="button"
+                aria-label="About Meta Description"
+                style={{ padding: 2, color: "var(--bk-ink-muted)", display: "inline-flex", lineHeight: 0 }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </Button>
             </Tooltip>
           </Cluster>
           <span style={{ font: "500 10.5px var(--bk-font-mono)", color: s.seoDesc.length > 160 ? "var(--bk-error)" : s.seoDesc.length > 50 ? "var(--bk-success)" : "var(--bk-ink-muted)" }}>

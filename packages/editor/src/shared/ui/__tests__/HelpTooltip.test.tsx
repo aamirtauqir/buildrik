@@ -1,7 +1,6 @@
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * HelpTooltip tests — trigger accessibility, focus-opened tooltip content,
- * and the optional docs link. Radix Tooltip requires TooltipProvider.
+ * and the optional docs link.
  *
  * @license BSD-3-Clause
  */
@@ -11,18 +10,14 @@ import { HelpTooltip } from "../HelpTooltip";
 
 afterEach(cleanup);
 
-function renderHelp(ui: React.ReactElement) {
-  return render(<TooltipProvider>{ui}</TooltipProvider>);
-}
-
 describe("HelpTooltip", () => {
   it("renders the '?' trigger with an accessible label", () => {
-    renderHelp(<HelpTooltip content="Controls layout flow." />);
+    render(<HelpTooltip content="Controls layout flow." />);
     expect(screen.getByRole("button", { name: "What's this?" })).toBeInTheDocument();
   });
 
   it("shows the help content when the trigger receives focus", async () => {
-    renderHelp(<HelpTooltip content="Controls how this element flows in the layout." />);
+    render(<HelpTooltip content="Controls how this element flows in the layout." />);
 
     fireEvent.focus(screen.getByRole("button", { name: "What's this?" }));
 
@@ -33,7 +28,7 @@ describe("HelpTooltip", () => {
   });
 
   it("renders a docs link inside the tooltip when docsLink is set", async () => {
-    renderHelp(
+    render(
       <HelpTooltip content="Spacing scale." docsLink="https://docs.buildrick.io/spacing" />
     );
 
@@ -49,14 +44,14 @@ describe("HelpTooltip", () => {
   });
 
   it("omits the docs link without docsLink", async () => {
-    renderHelp(<HelpTooltip content="No docs here." />);
+    render(<HelpTooltip content="No docs here." />);
     fireEvent.focus(screen.getByRole("button", { name: "What's this?" }));
     await screen.findAllByText("No docs here.");
     expect(screen.queryByText("Learn more →")).not.toBeInTheDocument();
   });
 
   it("scales the icon by size", () => {
-    const { container } = renderHelp(<HelpTooltip content="c" size="md" />);
+    const { container } = render(<HelpTooltip content="c" size="md" />);
     expect(container.querySelector("svg")).toHaveAttribute("width", "16");
   });
 });

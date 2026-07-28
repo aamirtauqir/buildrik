@@ -1,4 +1,3 @@
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * PositionControls — position-mode buttons, offset inputs gated on a non-static
  * position, z-index row, disabled/reason plumbing, and Mixed badges.
@@ -15,9 +14,7 @@ type Props = React.ComponentProps<typeof PositionControls>;
 function renderPos(props: Partial<Props> = {}) {
   const onChange = vi.fn();
   const utils = render(
-    <TooltipProvider>
-      <PositionControls styles={{}} onChange={onChange} {...props} />
-    </TooltipProvider>
+    <PositionControls styles={{}} onChange={onChange} {...props} />
   );
   return { onChange, ...utils };
 }

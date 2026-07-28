@@ -1,4 +1,3 @@
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 /**
  * DisplayControls — display-mode buttons + the Flex/Grid hint box + Mixed badge.
  *
@@ -12,9 +11,7 @@ import { DisplayControls } from "../DisplayControls";
 function renderDisplay(display = "", mixedKeys?: ReadonlySet<string>) {
   const onChange = vi.fn();
   const utils = render(
-    <TooltipProvider>
-      <DisplayControls display={display} onChange={onChange} mixedKeys={mixedKeys} />
-    </TooltipProvider>
+    <DisplayControls display={display} onChange={onChange} mixedKeys={mixedKeys} />
   );
   return { onChange, ...utils };
 }

@@ -11,14 +11,9 @@
  */
 
 import * as React from "react";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { describe, it, expect, vi, beforeAll } from "vitest";
-import { render as rtlRender, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { CanvasFooterToolbar } from "../CanvasFooterToolbar";
-
-// The footer buttons use Radix Tooltip, which needs a Provider in isolation.
-const render = (ui: React.ReactElement) =>
-  rtlRender(<TooltipProvider>{ui}</TooltipProvider>);
 
 const overlays = {
   guides: true,

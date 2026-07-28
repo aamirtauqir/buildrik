@@ -1,7 +1,6 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Input Controls — InputRow, InputWithUnit, SelectRow.
  * Ported to .bdi-num / .bdi-text / .bdi-row-ctrl per comp-inspector.v1 design.
@@ -12,12 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { X } from "lucide-react";
 import * as React from "react";
 import { IconInfo } from "../../../../shared/ui/Icons";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
+import { Button, Tooltip } from "@/editor/ui";
 
 // ============================================================================
 // HELPERS
@@ -28,22 +22,17 @@ const OverrideDot: React.FC = () => (
 );
 
 const HelperIcon: React.FC<{ text: string }> = ({ text }) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <span
-        style={{
-          marginLeft: 4,
-          display: "inline-flex",
-          opacity: 0.5,
-          cursor: "help",
-        }}
-      >
-        <IconInfo size="xs" />
-      </span>
-    </TooltipTrigger>
-    <TooltipPortal>
-      <TooltipContent>{text}</TooltipContent>
-    </TooltipPortal>
+  <Tooltip label={text}>
+    <span
+      style={{
+        marginLeft: 4,
+        display: "inline-flex",
+        opacity: 0.5,
+        cursor: "help",
+      }}
+    >
+      <IconInfo size="xs" />
+    </span>
   </Tooltip>
 );
 
@@ -251,6 +240,8 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           />
           {showReset && (
             <Button
+              kind="ghost"
+              size="sm"
               type="button"
               onClick={(e) => {
                 e.stopPropagation();

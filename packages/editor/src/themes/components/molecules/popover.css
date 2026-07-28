@@ -27,59 +27,6 @@
   transform: translateX(-50%) rotate(45deg);
 }
 
-/* Tooltip (dark) */
-.bd-tooltip {
-  background: var(--bk-gray-900);
-  color: var(--bk-accent-on);
-  padding: var(--bk-space-4) var(--bk-space-8);
-  border-radius: var(--bk-radius-sm);
-  font-family: var(--bk-font-ui);
-  font-size: var(--bk-text-12);
-  font-weight: var(--bk-weight-regular);
-  line-height: var(--bk-space-16);
-  box-shadow: var(--bk-shadow-drag);
-  position: relative;
-  white-space: nowrap;
-  max-width: 220px;
-  z-index: var(--bk-z-tooltip, 40);
-}
-.bd-tooltip::before {
-  content: "";
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 6px;
-  height: 6px;
-  background: var(--bk-gray-900);
-}
-.bd-tooltip--multiline {
-  white-space: normal;
-  max-width: 220px;
-  padding: 8px 10px;
-}
-.bd-tooltip__title {
-  font-weight: var(--bk-weight-medium);
-  margin-bottom: 2px;
-  font-size: var(--bk-text-12);
-}
-.bd-tooltip__desc {
-  font-weight: var(--bk-weight-regular);
-  color: var(--bk-border-medium);
-  font-size: var(--bk-text-11);
-  line-height: var(--bk-space-16);
-}
-.bd-tooltip__kbd {
-  font-family: var(--bk-font-mono);
-  font-size: var(--bk-text-11);
-  font-weight: var(--bk-weight-medium);
-  background: var(--bk-alpha-on-dark-12);
-  padding: 0 var(--bk-space-4);
-  border-radius: var(--bk-radius-lg);
-  margin-left: 5px;
-  letter-spacing: var(--bk-tracking-wide);
-}
-
 /* Menu (action list inside popover) */
 .bd-menu {
   min-width: 200px;

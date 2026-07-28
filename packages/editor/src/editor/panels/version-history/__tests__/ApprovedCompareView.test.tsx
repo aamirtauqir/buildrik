@@ -6,7 +6,6 @@
  * always-present legend (icon+label, never color-only).
  */
 import * as React from "react";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApprovedCompareView } from "../ApprovedCompareView";
@@ -18,9 +17,7 @@ const CURRENT_CHANGED = wrap(`<div class="root"><section class="hero"><h2>Two</h
 
 function renderView(props: Partial<React.ComponentProps<typeof ApprovedCompareView>> = {}) {
   return render(
-    <TooltipProvider>
-      <ApprovedCompareView approvedPages={APPROVED} currentPages={CURRENT_CHANGED} {...props} />
-    </TooltipProvider>,
+    <ApprovedCompareView approvedPages={APPROVED} currentPages={CURRENT_CHANGED} {...props} />,
   );
 }
 

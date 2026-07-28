@@ -1,4 +1,3 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * CanvasFooterToolbar - Canvas Overlays & Zoom Controls
  * Bottom toolbar for canvas overlay toggles and zoom controls (IA Redesign 2026)
@@ -17,13 +16,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { useClickOutside } from "@/shared/hooks";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-  TooltipKbd,
-} from "@/editor/shared/vibcoder";
+import { Button, Tooltip } from "@/editor/ui";
 import { BreakpointSwitcher, type Breakpoint } from "@/editor/shared/vibcoder/BreakpointSwitcher";
 import { ZOOM_PRESETS } from "./shared";
 import { ROW_SM } from "@/shared/constants/layout";
@@ -174,41 +167,34 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
   active,
   onClick,
 }) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <Button
-        type="button"
-        className={`canvas-footer-btn ${active ? "canvas-footer-btn--active" : ""}`}
-        onClick={onClick}
-        aria-pressed={active}
-        aria-label={label}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "4px",
-          padding: "4px 8px",
-          height: "28px",
-          fontSize: "11px",
-          fontWeight: 500,
-          color: active ? "var(--bk-ink)" : "var(--bk-ink-soft)",
-          background: active ? "var(--bk-bg-subtle)" : "transparent",
-          border: active ? "1px solid var(--bk-accent)" : "1px solid transparent",
-          borderRadius: "var(--bk-radius-sm)",
-          cursor: "pointer",
-          transition: "all 0.15s ease",
-        }}
-      >
-        <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
-        <span>{label}</span>
-        {active && <span style={{ marginLeft: "2px", color: "var(--bk-accent-text)" }}>✓</span>}
-      </Button>
-    </TooltipTrigger>
-    <TooltipPortal>
-      <TooltipContent>
-        {label}
-        {shortcut && <> <TooltipKbd>{shortcut}</TooltipKbd></>}
-      </TooltipContent>
-    </TooltipPortal>
+  <Tooltip label={shortcut ? `${label} · ${shortcut}` : label}>
+    <Button
+      type="button"
+      kind="ghost"
+      className={`canvas-footer-btn ${active ? "canvas-footer-btn--active" : ""}`}
+      onClick={onClick}
+      aria-pressed={active}
+      aria-label={label}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "4px",
+        padding: "4px 8px",
+        height: "28px",
+        fontSize: "11px",
+        fontWeight: 500,
+        color: active ? "var(--bk-ink)" : "var(--bk-ink-soft)",
+        background: active ? "var(--bk-bg-subtle)" : "transparent",
+        border: active ? "1px solid var(--bk-accent)" : "1px solid transparent",
+        borderRadius: "var(--bk-radius-sm)",
+        cursor: "pointer",
+        transition: "all 0.15s ease",
+      }}
+    >
+      <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
+      <span>{label}</span>
+      {active && <span style={{ marginLeft: "2px", color: "var(--bk-accent-text)" }}>✓</span>}
+    </Button>
   </Tooltip>
 );
 
@@ -255,41 +241,33 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         <>
           <div style={overlaysGroupStyles}>
             {onUndo && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    className="canvas-footer-btn"
-                    onClick={onUndo}
-                    disabled={canUndo === false}
-                    aria-label="Undo"
-                    style={editBtnStyles}
-                  >
-                    <UndoIcon />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                  <TooltipContent>Undo <TooltipKbd>⌘Z</TooltipKbd></TooltipContent>
-                </TooltipPortal>
+              <Tooltip label="Undo · ⌘Z">
+                <Button
+                  type="button"
+                  kind="ghost"
+                  className="canvas-footer-btn"
+                  onClick={onUndo}
+                  disabled={canUndo === false}
+                  aria-label="Undo"
+                  style={editBtnStyles}
+                >
+                  <UndoIcon />
+                </Button>
               </Tooltip>
             )}
             {onRedo && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    className="canvas-footer-btn"
-                    onClick={onRedo}
-                    disabled={canRedo === false}
-                    aria-label="Redo"
-                    style={editBtnStyles}
-                  >
-                    <RedoIcon />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                  <TooltipContent>Redo <TooltipKbd>⌘⇧Z</TooltipKbd></TooltipContent>
-                </TooltipPortal>
+              <Tooltip label="Redo · ⌘⇧Z">
+                <Button
+                  type="button"
+                  kind="ghost"
+                  className="canvas-footer-btn"
+                  onClick={onRedo}
+                  disabled={canRedo === false}
+                  aria-label="Redo"
+                  style={editBtnStyles}
+                >
+                  <RedoIcon />
+                </Button>
               </Tooltip>
             )}
             {device && onDeviceChange && (
@@ -349,6 +327,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       <div style={{ ...zoomGroupStyles, position: "relative" }} ref={presetsRef}>
         <Button
           type="button"
+          kind="ghost"
           style={zoomBtnStyles}
           onClick={handleZoomOut}
           aria-label="Zoom out"
@@ -360,6 +339,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
         {/* % display — click to open preset dropdown */}
         <Button
           type="button"
+          kind="ghost"
           style={zoomPctStyles}
           onClick={() => setShowPresets((v) => !v)}
           aria-label="Zoom presets"
@@ -370,6 +350,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
 
         <Button
           type="button"
+          kind="ghost"
           style={zoomBtnStyles}
           onClick={handleZoomIn}
           aria-label="Zoom in"
@@ -385,6 +366,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               <Button
                 key={preset}
                 type="button"
+                kind="ghost"
                 onClick={() => {
                   onZoomChange(preset);
                   setShowPresets(false);
@@ -406,6 +388,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 <div style={presetDividerStyles} />
                 <Button
                   type="button"
+                  kind="ghost"
                   onClick={() => {
                     onFitToScreen();
                     setShowPresets(false);
@@ -423,20 +406,16 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       {onHelpClick && (
         <>
           <div style={dividerStyles} />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="button"
-                style={{ ...zoomBtnStyles, width: ROW_SM, height: ROW_SM }}
-                onClick={onHelpClick}
-                aria-label="Show keyboard shortcuts (press ? key)"
-              >
-                <HelpIcon />
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Keyboard shortcuts <TooltipKbd>?</TooltipKbd></TooltipContent>
-            </TooltipPortal>
+          <Tooltip label="Keyboard shortcuts · ?">
+            <Button
+              type="button"
+              kind="ghost"
+              style={{ ...zoomBtnStyles, width: ROW_SM, height: ROW_SM }}
+              onClick={onHelpClick}
+              aria-label="Show keyboard shortcuts (press ? key)"
+            >
+              <HelpIcon />
+            </Button>
           </Tooltip>
         </>
       )}

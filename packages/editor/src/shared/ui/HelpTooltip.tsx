@@ -1,39 +1,25 @@
 /**
- * Phase 4 T7 triage: keep-as-extension.
- *
- * Rationale: Cascades from Tooltip decision — composes the kept
- * Tooltip extension with a "?" icon trigger. No vibcoder primitive
- * covers this docs-link shape.
- *
- * Phase 5 disposition: when Tooltip ports (Radix.Tooltip-backed
- * vibcoder Tooltip), port HelpTooltip in the same commit. Two
- * consumers; trivial codemod.
- *
- * @license BSD-3-Clause
- */
-/**
  * HelpTooltip Component
  * "What's this?" helper for complex properties
  * UX Audit 2026 - Task 9: Help tooltips for inspector
+ *
+ * Slice 3 rebuild: rides the ui Tooltip pattern (bk-tooltip surface, hover +
+ * focus open, Escape closes) instead of the retired Radix compound. The open
+ * state is managed here rather than through <Tooltip label> because the docs
+ * link must render inside the tooltip, and label is a plain string.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import {
-  IconButton,
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
+import { Button } from "@/editor/ui";
 
 export interface HelpTooltipProps {
   /** Help text explaining the property */
   content: string;
   /** Optional link to documentation */
   docsLink?: string;
-  /** Position of the tooltip */
+  /** Accepted and ignored: the ui Tooltip has a single placement by design. */
   position?: "top" | "bottom" | "left" | "right";
   /** Size of the help icon */
   size?: "sm" | "md";
@@ -53,65 +39,73 @@ export interface HelpTooltipProps {
 export const HelpTooltip: React.FC<HelpTooltipProps> = ({
   content,
   docsLink,
-  position = "top",
   size = "sm",
 }) => {
   const iconSize = size === "sm" ? 14 : 16;
-
-  const tooltipContent = (
-    <div style={{ maxWidth: 220, whiteSpace: "normal", lineHeight: 1.4 }}>
-      <span>{content}</span>
-      {docsLink && (
-        <a
-          href={docsLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "block",
-            marginTop: 4,
-            color: "var(--bk-accent)",
-            fontSize: 12,
-            textDecoration: "none",
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          Learn more →
-        </a>
-      )}
-    </div>
-  );
+  const [open, setOpen] = React.useState(false);
+  const tipId = React.useId();
 
   return (
-    <Tooltip delayDuration={200}>
-      <TooltipTrigger asChild>
-        <IconButton
-          variant="ghost"
-          size="xs"
-          type="button"
-          aria-label="What's this?"
-          style={buttonStyles}
+    <span style={{ position: "relative", display: "inline-flex" }}>
+      <Button
+        kind="ghost"
+        size="sm"
+        type="button"
+        aria-label="What's this?"
+        aria-describedby={open ? tipId : undefined}
+        style={buttonStyles}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") setOpen(false);
+        }}
+      >
+        <svg
+          width={iconSize}
+          height={iconSize}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
         >
-          <svg
-            width={iconSize}
-            height={iconSize}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
-        </IconButton>
-      </TooltipTrigger>
-      <TooltipPortal>
-        <TooltipContent side={position}>{tooltipContent}</TooltipContent>
-      </TooltipPortal>
-    </Tooltip>
+          <circle cx="12" cy="12" r="10" />
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      </Button>
+      {open ? (
+        <span
+          role="tooltip"
+          id={tipId}
+          className="bk-tooltip"
+          style={{ maxWidth: 220, whiteSpace: "normal", lineHeight: 1.4 }}
+        >
+          <span>{content}</span>
+          {docsLink && (
+            <a
+              href={docsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "block",
+                marginTop: 4,
+                color: "var(--bk-accent)",
+                fontSize: 12,
+                textDecoration: "none",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              Learn more →
+            </a>
+          )}
+        </span>
+      ) : null}
+    </span>
   );
 };
 

@@ -9,16 +9,12 @@ import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { Button, Tooltip } from "@/editor/ui";
 import {
   Popover,
   PopoverTrigger,
   PopoverPortal,
   PopoverContent,
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
 } from "@/editor/shared/vibcoder";
 
 export interface RichTextEditorProps {
@@ -183,23 +179,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             const isActive = "active" in item ? item.active : false;
             const itemStyle = "style" in item ? item.style : {};
             return (
-              <Tooltip key={item.command}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => onCommand(item.command)}
-                    style={{
-                      ...toolbarButtonStyle,
-                      background: isActive ? "var(--bk-accent)" : "transparent",
-                      color: isActive ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
-                      ...itemStyle,
-                    }}
-                  >
-                    {item.icon}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                  <TooltipContent>{item.label}</TooltipContent>
-                </TooltipPortal>
+              <Tooltip key={item.command} label={item.label}>
+                <Button
+                  kind="ghost"
+                  onClick={() => onCommand(item.command)}
+                  style={{
+                    ...toolbarButtonStyle,
+                    background: isActive ? "var(--bk-accent)" : "transparent",
+                    color: isActive ? "var(--bk-bg-card)" : "var(--bk-ink-soft)",
+                    ...itemStyle,
+                  }}
+                >
+                  {item.icon}
+                </Button>
               </Tooltip>
             );
           })}
@@ -209,7 +201,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       {/* Colors */}
       <Popover open={textColorOpen} onOpenChange={setTextColorOpen}>
         <PopoverTrigger asChild>
-          <Button style={toolbarButtonStyle} title="Text Color" aria-label="Change text color">
+          <Button kind="ghost" style={toolbarButtonStyle} title="Text Color" aria-label="Change text color">
             <span style={{ borderBottom: "2px solid var(--bk-accent)" }}>A</span>
           </Button>
         </PopoverTrigger>
@@ -222,6 +214,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       <Popover open={bgColorOpen} onOpenChange={setBgColorOpen}>
         <PopoverTrigger asChild>
           <Button
+            kind="ghost"
             style={toolbarButtonStyle}
             title="Background Color"
             aria-label="Change background highlight color"
@@ -243,6 +236,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       <Popover open={linkOpen} onOpenChange={setLinkOpen}>
         <PopoverTrigger asChild>
           <Button
+            kind="ghost"
             style={{
               ...toolbarButtonStyle,
               background: activeStyles.link ? "var(--bk-accent)" : "transparent",
@@ -273,10 +267,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
                 }}
               />
               <div style={{ display: "flex", gap: 8 }}>
-                <Button size="sm" variant="ghost" onClick={() => onCommand("unlink")}>
+                <Button size="sm" kind="ghost" onClick={() => onCommand("unlink")}>
                   Remove
                 </Button>
-                <Button size="sm" onClick={handleLink}>
+                <Button size="sm" kind="primary" onClick={handleLink}>
                   Apply
                 </Button>
               </div>
@@ -285,15 +279,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         </PopoverPortal>
       </Popover>
       {/* Clear Formatting */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>
-            ✕
-          </Button>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>Clear Formatting</TooltipContent>
-        </TooltipPortal>
+      <Tooltip label="Clear Formatting">
+        <Button kind="ghost" onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>
+          ✕
+        </Button>
       </Tooltip>
     </Cluster>
   );

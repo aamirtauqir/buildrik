@@ -16,7 +16,6 @@ import { getBlockDefinitions } from "../../blocks/blockRegistry";
 import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { ToastProvider, useToast } from "@/editor/ui";
 import { StudioSkeleton } from "@/shared/extensions/SkeletonCompounds";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
@@ -594,20 +593,18 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
  * Main Aquibra Studio Editor (with providers).
  *
  * Provider stack (outer → inner):
- *   TooltipProvider          — Radix.Tooltip ambient (B1 T2, delayDuration=500
- *                              matches deleted shim default).
- *   ToastProvider            — Radix.Toast queue + Viewport (B3). Hosts the
- *                              vibcoder useToast hook for all chrome consumers.
+ *   ToastProvider            — toast queue + viewport. Hosts the useToast
+ *                              hook for all chrome consumers.
  *   StudioErrorBoundary      — last-resort UI fallback.
+ *
+ * (No tooltip provider: the ui Tooltip is self-contained.)
  */
 export const AquibraStudio: React.FC<AquibraStudioProps> = (props) => (
-  <TooltipProvider delayDuration={500}>
-    <ToastProvider>
-      <StudioErrorBoundary>
-        <AquibraStudioShell {...props} />
-      </StudioErrorBoundary>
-    </ToastProvider>
-  </TooltipProvider>
+  <ToastProvider>
+    <StudioErrorBoundary>
+      <AquibraStudioShell {...props} />
+    </StudioErrorBoundary>
+  </ToastProvider>
 );
 
 export default AquibraStudio;

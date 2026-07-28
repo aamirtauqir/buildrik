@@ -1,18 +1,11 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ZoomControls - Canvas zoom slider and controls
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPortal,
-  TooltipContent,
-} from "@/editor/shared/vibcoder";
+import { Button, Tooltip } from "@/editor/ui";
 import { ZOOM_PRESETS } from "./shared";
 
 export interface ZoomControlsProps {
@@ -53,18 +46,14 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
 
   return (
     <div style={containerStyles}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <IconButton
-            size="sm"
-            aria-label="Zoom Out"
-            onClick={handleZoomOut}
-            disabled={zoom <= minZoom}
-          ><ZoomOutIcon /></IconButton>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>Zoom Out</TooltipContent>
-        </TooltipPortal>
+      <Tooltip label="Zoom Out">
+        <Button
+          kind="ghost"
+          size="sm"
+          aria-label="Zoom Out"
+          onClick={handleZoomOut}
+          disabled={zoom <= minZoom}
+        ><ZoomOutIcon /></Button>
       </Tooltip>
       <div style={sliderContainerStyles}>
         <Input
@@ -76,21 +65,18 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           style={sliderStyles}
         />
       </div>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <IconButton
-            size="sm"
-            aria-label="Zoom In"
-            onClick={handleZoomIn}
-            disabled={zoom >= maxZoom}
-          ><ZoomInIcon /></IconButton>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>Zoom In</TooltipContent>
-        </TooltipPortal>
+      <Tooltip label="Zoom In">
+        <Button
+          kind="ghost"
+          size="sm"
+          aria-label="Zoom In"
+          onClick={handleZoomIn}
+          disabled={zoom >= maxZoom}
+        ><ZoomInIcon /></Button>
       </Tooltip>
       <div style={dividerStyles} />
       <Button
+        kind="ghost"
         onClick={() => setShowPresets(!showPresets)}
         style={percentButtonStyles}
         title="Zoom presets"
@@ -100,17 +86,13 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
       {onFitToScreen && (
         <>
           <div style={dividerStyles} />
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                size="sm"
-                aria-label="Fit to Screen"
-                onClick={onFitToScreen}
-              ><FitIcon /></IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Fit to Screen</TooltipContent>
-            </TooltipPortal>
+          <Tooltip label="Fit to Screen">
+            <Button
+              kind="ghost"
+              size="sm"
+              aria-label="Fit to Screen"
+              onClick={onFitToScreen}
+            ><FitIcon /></Button>
           </Tooltip>
         </>
       )}
@@ -119,6 +101,7 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           {ZOOM_PRESETS.map((preset) => (
             <Button
               key={preset}
+              kind="ghost"
               onClick={() => handlePresetSelect(preset)}
               style={{
                 ...presetItemStyles,

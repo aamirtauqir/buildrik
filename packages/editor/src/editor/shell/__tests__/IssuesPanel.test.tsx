@@ -4,7 +4,6 @@
  * Verifies the filter, the counts, the clean/empty states, and jump-to.
  */
 import * as React from "react";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IssuesPanel } from "../IssuesPanel";
@@ -16,7 +15,7 @@ const ISSUES = [
 ];
 
 function renderPanel(props = {}) {
-  return render(<TooltipProvider><IssuesPanel issues={ISSUES} onClose={vi.fn()} {...props} /></TooltipProvider>);
+  return render(<IssuesPanel issues={ISSUES} onClose={vi.fn()} {...props} />);
 }
 
 afterEach(cleanup);

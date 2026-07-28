@@ -15,16 +15,12 @@
  *   - Color popovers: foreColor / hiliteColor
  *   - Clear formatting (removeFormat)
  *
- * Radix note: Tooltip.Root throws without a TooltipProvider ancestor
- * (mounted at the app shell in prod) — tests wrap the component in one.
- *
  * @license BSD-3-Clause
  */
 
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
 import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
 import * as React from "react";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { RichTextEditor } from "../RichTextEditor";
 
 beforeAll(() => {
@@ -41,9 +37,7 @@ afterEach(() => {
 function renderEditor(props: Partial<React.ComponentProps<typeof RichTextEditor>> = {}) {
   const onCommand = vi.fn();
   render(
-    <TooltipProvider>
-      <RichTextEditor onCommand={onCommand} {...props} />
-    </TooltipProvider>
+    <RichTextEditor onCommand={onCommand} {...props} />
   );
   return onCommand;
 }
