@@ -8,29 +8,36 @@
 
 ## Surface Scope (which brand applies where)
 
-Buildrick runs on **one brand accent: `#406ED6`** across dashboard, auth and onboarding — no scoped exceptions, one blue on screen anywhere. Red is reserved for error/danger/destructive everywhere. (Adopted 2026-07-18 from the founder-supplied UI kit, `docs/design/dashboard-ui-kit.md`; supersedes the cobalt `#2D6DFF` unification of 2026-07-12, which itself had replaced the dashboard's red `#E42313`. See Decisions Log.)
+Buildrick runs on the **Flowbite palette with one brand accent: `#1A56DB`**
+(Flowbite blue-700) — founder-confirmed 2026-07-29. Red is reserved for
+error/danger/destructive everywhere. This supersedes the `#406ED6` UI-kit
+adoption of 2026-07-18 (which superseded cobalt `#2D6DFF`, which superseded the
+dashboard's red `#E42313`). See Decisions Log.
 
-**Editor chrome is now on `#406ED6` in code too** (migrated 2026-07-21, M4) — it carries its own `--buildrick-*` design system in `packages/editor/` with its own token contract and CI gates, so it was a separate migration. The flip is the single `--buildrick-accent` token in `themes/design-system/color.css` (+ `border-focus`/`info` and the `accent-hover`/`pressed`/`subtle`/`tint` shades); every chrome consumer follows via the `--bd-accent` / `--bd-cobalt` aliases, so no per-component edits were needed. The Figma file (`g4GzQFqzNYz5sosz1QtZXC`) had already moved to `#406ED6` on 2026-07-20; code now matches. `#406ED6` also cleared the last contrast failure — white on cobalt was 4.43:1, under the 4.5 bar; white on `#406ED6` is 4.75:1. (The user-facing site-builder default tokens in `editor/design-system/` stay their own palette — that is user output, not chrome.)
+**The editor shipped on Flowbite first** (`ds/fresh-token-system`, 2026-07-28):
+its entire chrome runs on `--bk-*` tokens GENERATED from the Figma file
+(`g4GzQFqzNYz5sosz1QtZXC` → `scripts/tokens/figma-tokens.json` →
+`packages/editor/src/themes/tokens.generated.css`). Palette changes are made in
+Figma and regenerated — never hand-edited. Dashboard, auth and onboarding are
+still on `#406ED6` in code and are **pending the Flowbite migration** (they are
+Next+Tailwind, so Flowbite's native Tailwind form is the expected route).
+(The user-facing site-builder default tokens in `editor/design-system/` stay
+their own palette — that is user output, not chrome.)
 
 | Surface | Lives in | Accent | Display font | Body font | Audience |
 |---|---|---|---|---|---|
-| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **`#406ED6`** (own `--buildrick-*` DS; code migrated 2026-07-21) | General Sans | Inter Tight | Power user mid-flow. Quiet. |
-| **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | **`#406ED6`** (`--color-primary`, hover `#2E56B8`, subtle `#EBF1FF`) | Inter | Inter | Signed-in workspace tasks. |
-| **Auth chrome** (signed-out craftwork) | `app/auth/` | **`#406ED6`** (`--color-auth-cta`, hover `#2E56B8`) + art rail | Inter Tight | Inter Tight | New visitor / signed-out. |
-| **Onboarding wizard** | `app/onboarding/` | **`#406ED6`** (`--color-onb-primary`) — no longer a scoped exception | Inter | Inter | Post-verification setup. |
+| **Editor chrome** (canvas + sidebars + topbar + inspector) | `packages/editor/` | **`#1A56DB`** (generated `--bk-*` DS; SHIPPED 2026-07-28) | Inter | Inter | Power user mid-flow. Quiet. |
+| **Dashboard chrome** (settings, billing, team, sites list, media, home) | `app/dashboard/`, `app/maintenance/`, 404, share | `#406ED6` — **pending Flowbite migration** | Inter | Inter | Signed-in workspace tasks. |
+| **Auth chrome** (signed-out craftwork) | `app/auth/` | `#406ED6` + art rail — **pending Flowbite migration** | Inter Tight | Inter Tight | New visitor / signed-out. |
+| **Onboarding wizard** | `app/onboarding/` | `#406ED6` — **pending Flowbite migration** | Inter | Inter | Post-verification setup. |
 | **Marketing site** (separate repo) | n/a in this repo | Own brand; not governed here | General Sans | Inter Tight | Cold traffic. |
 
-**Why one accent:** editor, auth, and dashboard are one continuous signed-in-adjacent product; a single cobalt accent reads as one brand. Onboarding keeps its blue per the M2 spec.
+**Why one accent:** editor, auth, and dashboard are one continuous signed-in-adjacent product; a single blue accent reads as one brand. Until the pending surfaces migrate, `#406ED6` vs `#1A56DB` is a KNOWN temporary split — new work uses `#1A56DB`.
 
 Rules:
-- **`#406ED6` is the single accent** for CTAs, links, active states and focus rings — everywhere, including the editor. (Editor chrome code migrated to `#406ED6` on 2026-07-21; design and code now match.)
+- **`#1A56DB` is the single accent** for CTAs, links, active states and focus rings. (Hover `#1E429F` blue-800, pressed `#233876` blue-900, subtle `#E1EFFE` blue-100, tint `#EBF5FF` blue-50.)
 - **Red means error/danger/destructive only** (delete confirm, FAILED status, validation, over-limit, dunning) — on every surface. Never a red CTA or accent.
-- Purple/violet/indigo remain **banned** as accents (AI-slop guard). **One narrow
-  exception (user-approved 2026-07-18):** third-party *brand* colours on the
-  Marketplace app tiles may be purple (e.g. Commerce `#7C5CF6`) — these are
-  per-app branding data in `lib/marketplace-catalog.ts`, never an accent, never a
-  gradient, and never applied to CTAs, links, focus, or active states. The
-  "no purple gradients, ever" rule below is unaffected.
+- Purple/violet/indigo remain **banned as accents** (AI-slop guard) — never on CTAs, links, focus, or active states, and never as gradients. Two data-colour allowances: (1) third-party *brand* colours on Marketplace app tiles (`lib/marketplace-catalog.ts`, user-approved 2026-07-18); (2) the Flowbite **purple ramp as identity/semantic data** — avatar identity tones (tone derived from user id) and the PRO badge (`--bk-purple-*`, founder-confirmed with the palette 2026-07-29).
 - The **NO BLACK RULE** below applies to **editor chrome only**. Dashboard may use `#0D0D0D` for primary text.
 
 ### Auth Surface — Craftwork (2026-07-10)
@@ -119,71 +126,80 @@ If you are tempted to reach for black for emphasis, use `--accent` (cobalt) inst
 
 **Type ramp (Figma "Type — 11 styles"):** ui/11 caption (11/16, 500) · ui/12 small (12/16) · ui/13 row label (13/20, 400/500) · ui/14 panel title (14/20, 600) · ui/16 heading (16/24, 600, −0.06em) · ui/20 heading lg (20/28, 600) · ui/24 title (24/32, 600) · data/11–13 in Geist Mono. **Weights cap at 600 — no 700 anywhere in chrome.** Editor chrome lives mostly at 12–14. Panel/drawer headers = 11/500 UPPERCASE ink-soft.
 
-## Color
+## Color — the Flowbite palette (founder-confirmed 2026-07-29)
 
-**Approach:** Restrained. **One accent (cobalt). All other color is warm slate neutral.** Color is rare and meaningful.
+**Approach:** Restrained. **One accent (Flowbite blue-700). All other color is
+Flowbite gray neutral.** Color is rare and meaningful. Every value below IS the
+live generated token (`packages/editor/src/themes/tokens.generated.css`) —
+change it in Figma, re-export, regenerate; never edit values in code or in this
+doc alone.
 
-### Surfaces (5-layer light depth, derived from topbar)
-
-```
---aqb-bg-app:      #F1F5F9   /* slate-100, outermost — rail background edge */
---aqb-bg-panel:    #F8FAFC   /* slate-50, topbar + sidebar panel */
---aqb-bg-subtle:   #F1F5F9   /* search fields, hover fills */
---aqb-bg-card:     #FFFFFF   /* cards, list rows, inputs, popovers */
---aqb-bg-elevated: #FFFFFF   /* modals, dropdowns, command palette */
---aqb-bg-canvas:   #FFFFFF   /* user's canvas — unchanged */
-```
-
-Depth is communicated by nesting + hairline borders, not shadows. The elevation scale is exactly three steps (Figma foundation, 2026-07-26): `raised 0 1px 3px rgba(15,23,42,.12)` (knobs, chips) · `drag 0 2px 6px rgba(15,23,42,.24)` (picked-up state, menus, popovers) · `overlay 0 12px 32px rgba(15,23,42,.16)` (modals, command palette, floating drawers).
-
-### Borders (slate, matches topbar)
+### Surfaces (light depth, Flowbite grays)
 
 ```
---aqb-border:         #E2E8F0   /* slate-200, default hairline */
---aqb-border-medium:  #CBD5E1   /* slate-300, inputs + buttons — matches topbar */
---aqb-border-input:   #8D949C   /* dedicated input-border step (Figma) */
---aqb-border-strong:  #94A3B8   /* slate-400, hover — matches topbar hover */
---aqb-border-focus:   #406ED6   /* accent focus — 2px, no halo */
+--bk-bg-app:      #F3F4F6   /* gray-100 — shell/canvas backdrop, rail */
+--bk-bg-panel:    #FFFFFF   /* panels, drawers, inspector */
+--bk-bg-subtle:   #F3F4F6   /* gray-100 — search fields, hover fills */
+--bk-bg-card:     #FFFFFF   /* cards, list rows, inputs, popovers */
+--bk-bg-elevated: #FFFFFF   /* modals, dropdowns, command palette */
 ```
+
+Depth is communicated by nesting + hairline borders, not heavy shadows. The
+elevation scale is exactly three steps: `raised 0 1px 2px rgba(0,0,0,.08)`
+(knobs, chips) · `drag 0 4px 6px rgba(0,0,0,.10)` (picked-up state, menus,
+popovers) · `overlay 0 10px 15px rgba(0,0,0,.10)` (modals, command palette,
+floating drawers).
+
+### Borders (Flowbite grays)
+
+```
+--bk-border:         #E5E7EB   /* gray-200, default hairline */
+--bk-border-medium:  #D1D5DB   /* gray-300, inputs + buttons */
+--bk-border-input:   #9CA3AF   /* gray-400 */
+--bk-border-strong:  #9CA3AF   /* gray-400, hover */
+```
+
+Focus = accent border + `--bk-shadow-focus: 0 0 0 2px rgba(26,86,219,.30)` —
+a soft 2px accent ring, the Flowbite focus language at editor density.
 
 ### Text — the ink scale (no pure black, ever)
 
 ```
---ink:          #0F172A   /* slate-900 — primary text, 4.5:1+ everywhere */
---ink-soft:     #485465   /* secondary labels, panel headers */
---ink-muted:    #656F7E   /* captions, counts, footer */
---ink-disabled: #CBD5E1   /* slate-300 — visibly inert */
---accent-on:    #FFFFFF   /* white on accent surfaces */
+--bk-ink:          #111827   /* gray-900 — primary text */
+--bk-ink-soft:     #4B5563   /* gray-600 — secondary labels, panel headers */
+--bk-ink-muted:    #6B7280   /* gray-500 — captions, counts, footer */
+--bk-ink-disabled: #D1D5DB   /* gray-300 — visibly inert */
+--bk-accent-on:    #FFFFFF   /* white on accent surfaces */
 ```
 
-(Foundation replaced 2026-07-26: the old slate-700/500/400 text ramp is retired; every level of the ink scale passes 4.5:1 on the light surfaces.)
-
-### Accent (single blue, Figma Package variable — the guard against a second blue)
+### Accent (single blue — the guard against a second blue)
 
 ```
---accent:         #406ED6
---accent-hover:   #2E56B8
---accent-pressed: #264899
---accent-text:    #3C68C9   /* AA accent-colored text on light */
---accent-subtle:  #EBF1FF   /* selected-row fill — PRE-MIXED, never alpha */
---accent-tint:    #ECF0FB   /* badge/pill fill — PRE-MIXED, never alpha */
---accent-on:      #FFFFFF   /* text on accent buttons */
+--bk-accent:         #1A56DB   /* blue-700 */
+--bk-accent-hover:   #1E429F   /* blue-800 */
+--bk-accent-pressed: #233876   /* blue-900 */
+--bk-accent-text:    #1A56DB   /* accent-colored text on light */
+--bk-accent-subtle:  #E1EFFE   /* blue-100 — selected-row fill, PRE-MIXED */
+--bk-accent-tint:    #EBF5FF   /* blue-50 — badge/pill fill, PRE-MIXED */
+--bk-accent-on:      #FFFFFF   /* text on accent buttons */
 ```
 
-**Tint rule (Figma):** semantic and accent tints are pre-mixed opaque values — never frame/alpha opacity. Alpha survives only where transparency is the point (scrims, canvas overlays, shimmer).
+**Tint rule:** semantic and accent tints are pre-mixed opaque values — never
+frame/alpha opacity. Alpha survives only where transparency is the point
+(scrims, canvas overlays, shimmer, the focus ring).
 
-**Usage rules:** accent appears on (a) the one primary CTA per screen, (b) selection outlines and selected-row tint, (c) active rail/tab indicator, (d) focus rings, (e) the account avatar (replaces the legacy `#1F2937` pill). Nowhere else.
+**Usage rules:** accent appears on (a) the one primary CTA per screen, (b) selection outlines and selected-row tint, (c) active rail/tab indicator, (d) focus rings, (e) the account avatar. Nowhere else. Avatar identity tones and the PRO badge may additionally use the Flowbite purple ramp (`--bk-purple-*`) — identity/semantic data, not an accent.
 
-### Semantic (fill / text / tint triads — WCAG AA, tints pre-mixed)
+### Semantic (fill / text / tint triads — Flowbite, WCAG AA, tints pre-mixed)
 
 ```
---success: #16A34A   --success-text: #117D39   --success-tint: #E3F4E9
---warning: #B45309   --warning-text: #A05804   --warning-tint: #FAECDC
---error:   #DC2626   --error-text:   #CB2323   --error-tint:   #FBE5E5
---info:    = accent (#406ED6 family — one blue)
+--bk-success: #0E9F6E   --bk-success-text: #057A55   --bk-success-tint: #DEF7EC
+--bk-warning: #C27803   --bk-warning-text: #723B13   --bk-warning-tint: #FDFDEA
+--bk-error:   #E02424   --bk-error-text:   #C81E1E   --bk-error-tint:   #FDE8E8
+--info:       = accent (blue family — one blue)
 ```
 
-Fill = dots/icons/borders. Text = labels on the matching tint (each measures 4.5:1+). Tint = the chip/badge background. Use for status indicators only (save state, validation, toasts). Never for decoration.
+Fill = dots/icons/borders. Text = labels on the matching tint. Tint = the chip/badge background. Use for status indicators only (save state, validation, toasts). Never for decoration.
 
 ## Spacing
 - **Base unit:** 4px.
@@ -192,7 +208,7 @@ Fill = dots/icons/borders. Text = labels on the matching tint (each measures 4.5
 
 ## Layout
 - **Editor:** Grid-disciplined. Topbar (56px) / Left rail (60px) / **Drawer 320px — all six panels** / canvas (flex) / **right inspector 300px**. *(Corrected 2026-07-19: read "240 nav / 320 authoring" and "inspector 320px". Both were the previous IA and both were outside the supersede banner below, so they read as live. The canonical source for every chrome dimension is `docs/designs/2026-07-18-editor-shell-wireframes.md` — this line exists only so it does not contradict it.)*
-- **Border radius scale:** `sm: 4px` (inputs, row corners), `md: 8px` (buttons, panels, cards — matches topbar), `lg: 12px` (modals), `full: 9999px` (pills, avatars, compact-state buttons).
+- **Border radius scale (Flowbite):** `sm: 4px` (row corners, small chips), `md: 6px` (icon tiles, compact controls), `lg: 8px` (buttons, inputs, panels, cards, modals — Flowbite rounded-lg), `full: 9999px` (pills, avatars).
 - **Topbar height:** 56px — canonical. All other chrome heights flow from this rhythm.
 - **Panel header height:** 44px — matches sidebar contract.
 
@@ -348,6 +364,7 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-07-29 | **Flowbite palette CONFIRMED as the product design language; accent → `#1A56DB`** | Founder confirmed the Flowbite re-base of the Figma foundation (2026-07-28) as final. Single accent moves `#406ED6` → **`#1A56DB`** (blue-700; hover blue-800 `#1E429F`, pressed blue-900 `#233876`, subtle blue-100 `#E1EFFE`, tint blue-50 `#EBF5FF`). Neutrals move slate → Flowbite gray (ink `#111827`/`#4B5563`/`#6B7280`); semantic triads → Flowbite green/yellow/red; radius lg 8px (rounded-lg) on buttons/inputs/cards/modals; focus = accent border + soft 2px ring `rgba(26,86,219,.30)`. Purple ramp allowed as identity/semantic data only (avatar tones, PRO badge) — still banned as accent/gradient. **Editor SHIPPED on this** via `ds/fresh-token-system` (generated `--bk-*` tokens + `src/editor/ui/` library, migration 402→0). Dashboard/auth/onboarding stay on `#406ED6` pending their Flowbite migration (Tailwind-native route expected). Values in this doc's §Color are transcriptions of `tokens.generated.css` — Figma is the source of truth. |
 | 2026-07-26 | **Editor chrome DS replaced with the Figma "Buildrick — Product" foundation** | Founder-directed replacement (Figma file `g4GzQFqzNYz5sosz1QtZXC`): the editor's token layer was rewritten from the file's Foundations page and all 173 shipped components. Concrete flips: editor UI font Inter Tight → **Inter**; accent shades corrected (hover `#2E56B8` — was lighter `#5E86E0`; pressed `#264899`); accent/semantic tints became **pre-mixed opaque** values (`accent-subtle #EBF1FF`, `accent-tint #ECF0FB`, success/warning/error tints `#E3F4E9/#FAECDC/#FBE5E5`) per the Figma "never frame opacity" rule; text ramp darkened onto the ink scale (`#0F172A/#485465/#656F7E`); elevation collapsed to the 3-step raised/drag/overlay scale; focus = 2px accent with **no halo**; motion re-based to 100/160/240ms ease-out with hover lifts/scales retired; weights cap at 600. Legacy token names survive only as references onto the new set — no legacy value survives. Conformance locked by `figma-32-2-conformance.test.ts` (rewritten against the new file). |
 | 2026-07-21 | **Dashboard IA follow-up — Templates → top nav, Help → Resources, Projects → Sites** | Post-IA-v2 cleanup (Codex dashboard audit): Templates moved out of the sidebar into the ecosystem top nav (it's a browse-the-catalog surface, not a workspace destination); the labeled Support group was dropped — Getting started folds into the main sidebar group and Help centre moves into Resources; the `Projects` sidebar item was relabelled **Sites** (route unchanged, `/dashboard/projects`). Sidebar settles at a single 6-item group `Home · Getting started · Sites · Agency (agency-only) · Media · Settings`. SSOT `components/dashboard/shell/nav.ts` reflects this; the shell bullets above were updated to match. No accent/token change. |
 | 2026-07-18 | **Single accent → `#406ED6` (UI kit); onboarding's scoped blue retired** | Founder adopted the supplied UI kit (`docs/design/dashboard-ui-kit.md`) over the cobalt reskin values, and chose to flip auth + onboarding with the dashboard so the kit's "one blue" rule (§7.2) actually holds. `--color-primary`, `--color-auth-cta` and `--color-onb-primary` all → `#406ED6` (hover `#2E56B8`); `--color-nav-label-active` → `#2E56B8`. The `.onb-scope` focus override and the short-lived `.dash-scope` override were both deleted — with one accent there is nothing to scope, and the global ring now resolves to `--color-primary`. Supersedes the 2026-07-12 RED→COBALT unification for these three surfaces. **Editor chrome remains cobalt `#2D6DFF`** in its own `--buildrick-*` DS (separate token contract + CI gates) and is a pending migration — until it lands, editor and app chrome differ. |
