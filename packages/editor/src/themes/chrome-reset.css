@@ -6,10 +6,29 @@
    mounted shell root is `.bd-studio`, set on AquibraStudio's outer <Stack>
    (src/editor/shell/AquibraStudio.tsx). `.bk-shell` (editor/ui/EditorShell.tsx)
    is exported from the ui library but has zero consumers outside its own
-   barrel — it is not what actually mounts. */
-.bd-studio, .bd-studio *, .bd-studio *::before, .bd-studio *::after {
+   barrel — it is not what actually mounts.
+
+   Canvas exclusion added 2026-07-30 (fix round 1, reviewer finding #1 —
+   CRITICAL): `.bd-studio` is an ANCESTOR of the canvas mount point,
+   `.buildrick-canvas` (src/editor/canvas/Canvas.tsx:503 — the div that
+   receives customer HTML via dangerouslySetInnerHTML). A bare `.bd-studio *`
+   reset restyles that customer-mounted subtree, which is exactly the §4.1
+   violation this task exists to prevent — and this file is imported
+   unlayered in default.css, which maximizes its cascade priority, so a leak
+   here would very likely win over the customer's own CSS. Every selector
+   below therefore carries `:not(.buildrick-canvas, .buildrick-canvas *)` —
+   verified by src/themes/__tests__/chrome-reset.test.ts, which parses this
+   file's selectors and fails if any `.bd-studio`-rooted selector is missing
+   the guard. */
+.bd-studio:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio *:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio *:not(.buildrick-canvas, .buildrick-canvas *)::before,
+.bd-studio *:not(.buildrick-canvas, .buildrick-canvas *)::after {
   box-sizing: border-box;
 }
-.bd-studio button, .bd-studio input, .bd-studio select, .bd-studio textarea {
+.bd-studio button:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio input:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio select:not(.buildrick-canvas, .buildrick-canvas *),
+.bd-studio textarea:not(.buildrick-canvas, .buildrick-canvas *) {
   font: inherit; color: inherit;
 }
