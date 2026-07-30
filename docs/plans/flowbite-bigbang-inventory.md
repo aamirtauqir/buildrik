@@ -1991,3 +1991,90 @@ Verified: `npx tsc --noEmit` clean. Targeted run across every touched
 top-level directory (`ui/__tests__`, `atoms.test.tsx`, `molecules.test.tsx`,
 `chrome-ui/__tests__`, `shared/forms`, `sidebar/tabs/pages`, `inspector`,
 `panels`, `shell`) — **157 test files / 1347 tests green**.
+
+### Slider → `flowbite-react` `RangeSlider` (composition, KEEP the wrapper)
+
+Confirmed via a fresh JSX-tag sweep (not text search) before touching
+anything: exactly 2 real consumers of `<Slider` from `@/editor/ui` —
+`shared/forms/SliderField.tsx` and
+`editor/panels/version-history/ApprovedCompareView.tsx`. Several other
+files matched a bare `Slider` text grep (`SliderControls.tsx`,
+`SliderControl.tsx`, `ZoomControls.tsx`'s `handleSliderChange`,
+`GapSlider`, lucide's `SlidersHorizontal` icon) — all false positives,
+none import the component.
+
+**Genuine structural swap, not a prop-rename**, confirmed by reading
+`RangeSlider.js`/`theme.js` in full before designing anything: flowbite's
+`RangeSlider` renders only `<div><div><input type="range" class="w-full
+cursor-pointer appearance-none rounded-lg bg-gray-200 h-2" /></div></div>`
+— a bare unfilled track. Nothing in the library provides: (1) the
+`--bk-slider-fill`-percentage accent fill bar, (2) the drag-grow
+14px→16px thumb, (3) a numeric field, (4) a unit suffix. `className` on
+`RangeSlider` lands on the OUTER wrapper div only (same structural gap as
+`TextInput`/`Select` — confirmed in source, not assumed); the real
+`<input>`'s class must come through `theme.field.input.base`.
+
+**Decision: kept `editor/ui/Slider.tsx` as a composition wrapper** around
+flowbite's `RangeSlider` (for the range-input semantics: focus, keyboard,
+native drag, ARIA) + a plain raw `<input type="number">` for the value
+readout — not extracted to `chrome-ui/`. Two reasons: (1) `SliderField.tsx`
+lives in `shared/forms/`, which per `CLAUDE.md` may only take the one
+sanctioned `shared/→editor` edge, `@/editor/ui` — same constraint
+`FormField` hit one round earlier; (2) `editor/ui/` is itself the
+sanctioned Gate-24 owner of native elements (confirmed directly in
+`scripts/ds-grep-gates.sh`'s `GATE24_HITS`/`GATE24_FILE_COUNT` find
+commands — both exclude `*/editor/ui/*` and `*/editor/chrome-ui/*`), so
+the raw number `<input>` needs no `chrome-ui/TextField` indirection; a
+pass-through around `TextField` would have been exactly the kind of
+wrapper CLAUDE.md rule 1 bars. `SliderProps`'s public API is byte-identical
+to the pre-swap version (`value`, `onChange`, `min`, `max`, `step`,
+`disabled`, `label`, `unit`, `withField`, `id`, `className`) — zero changes
+needed at either of the 2 call sites.
+
+**Fill-bar / thumb / numeric-field look reproduced via a new unlayered
+stylesheet, `src/editor/ui/slider.css`**, imported directly by
+`Slider.tsx` (`import "./slider.css"`) rather than routed through
+`themes/default.css`'s `@layer` chain — same precedent as
+`layers-v2.css`/`inspector.css`/`settings.css`: a plain-CSS file outside
+the layer system beats any `tw-utilities`-layer class regardless of
+specificity. This meant the old `.bk-slider*` block could move to the new
+file **verbatim** (same selectors, same declarations — a relocation, not
+a redesign) without needing to fight tailwind-merge or express the
+percentage-driven gradient as an arbitrary Tailwind value: passed
+`theme={{ field: { input: { base: "bk-slider__range" } } }}` to
+`RangeSlider` (the only way to land a class on the real `<input>`), and
+`--bk-slider-fill` continues to be set via a plain `style` prop (spread
+onto the real input by `RangeSlider`'s own `...restProps`). Verified the
+merge behavior empirically rather than assumed: since `bk-slider__range`
+isn't a recognized Tailwind utility, tailwind-merge doesn't evict any of
+flowbite's defaults (`bg-gray-200`, `h-2`, `rounded-lg`, `w-full` all
+remain in the class list) — irrelevant, because the unlayered rule wins
+on every property it declares regardless of what layered classes are
+still present.
+
+**Compiled-CSS proof** (established evidence bar for this task, not just
+class-list presence): ran `npx vite build`, grepped the emitted CSS —
+`.bk-slider__range{...background:linear-gradient(...)...}`,
+`.bk-slider__range::-webkit-slider-thumb{...}`,
+`.bk-slider--disabled .bk-slider__range{...}` all present, unlayered
+(no `@layer` wrapper in the compiled output); flowbite's own prefixed
+defaults (`.tw\:bg-gray-200`, `.tw\:h-2`, `.tw\:appearance-none`) also
+present and correctly compiled (harmless — beaten per-property by the
+unlayered rule, not absent). `dist/` is gitignored, removed after the
+check.
+
+**Class-list regen:** `pnpm flowbite:classlist` — one new entry
+(`tw:h-1`, picked up incidentally from another already-imported flowbite
+component's size variant scan, not from anything Slider added — Slider's
+own overrides are first-party arbitrary values already covered by
+`tw.css`'s `@source "../editor"` glob). `.flowbite-react/init.tsx`
+byproduct deleted again (same standing reason every prior round gives).
+
+**Orphan check:** `grep -rn "bk-slider" src` after the move found exactly
+one remaining reference outside `Slider.tsx`/`slider.css` —
+`AnimationEditor.test.tsx`'s `.bk-slider__num` selector query, still valid
+since the class name itself didn't change, only its file location.
+
+Verified: `npx tsc --noEmit` clean. Targeted run: `ui/__tests__` +
+`shared/forms` + `editor/animation` + `editor/panels/version-history` —
+14 test files / 175 tests green.

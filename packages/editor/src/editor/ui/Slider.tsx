@@ -1,10 +1,29 @@
 /**
  * Slider — Figma component set 92:30 (track 4px, knob 14→16 dragging,
- * mono value field 46×26). A native range input under the hood; the numeric
- * readout is a real number input so keyboard entry works.
+ * mono value field 46×26). Composes flowbite-react's `RangeSlider` for the
+ * range-input semantics (focus, keyboard, native drag) with a plain raw
+ * number input for the value readout (keyboard entry) — `editor/ui/` is
+ * the sanctioned Gate-24 owner of native elements, so the number input
+ * stays here directly rather than routing through `chrome-ui/TextField`.
+ *
+ * flowbite's `RangeSlider` renders only a bare unfilled track (`bg-gray-200`,
+ * no accent-fill styling, no numeric field, no unit suffix) — none of that
+ * exists in the library, so the Figma look (accent fill bar driven by a
+ * `--bk-slider-fill` percentage custom property, drag-grow thumb, mono
+ * number field) is reproduced via `./slider.css`, a plain **unlayered**
+ * stylesheet imported directly here (not routed through `themes/default.css`'s
+ * `@layer` chain) — same precedent as `layers-v2.css`/`inspector.css`:
+ * unlayered rules win over flowbite's `tw-utilities`-layer defaults
+ * regardless of specificity, so `bg-gray-200`/`h-2`/`rounded-lg` etc. are
+ * safely overridden without fighting tailwind-merge. `className` reaches
+ * flowbite's OUTER wrapper div only; the actual `<input type="range">`
+ * needs its class supplied via the `theme.field.input.base` prop instead
+ * (same structural gap as `TextInput`/`Select`).
  * @license BSD-3-Clause
  */
 import React from "react";
+import { RangeSlider } from "flowbite-react";
+import "./slider.css";
 
 export interface SliderProps {
   value: number;
@@ -32,19 +51,18 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(function S
 
   return (
     <div className={["bk-slider", disabled ? "bk-slider--disabled" : "", className].filter(Boolean).join(" ")}>
-      <input
+      <RangeSlider
         ref={ref}
         id={id}
-        type="range"
-        className="bk-slider__range"
-        style={{ ["--bk-slider-fill" as string]: `${pct}%` }}
         value={value}
         min={min}
         max={max}
         step={step}
         disabled={disabled}
         aria-label={label}
+        style={{ ["--bk-slider-fill" as string]: `${pct}%` }}
         onChange={(e) => onChange(clamp(Number(e.target.value)))}
+        theme={{ field: { input: { base: "bk-slider__range" } } }}
       />
       {withField && (
         <span className="bk-slider__field">
